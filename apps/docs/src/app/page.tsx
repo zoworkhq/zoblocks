@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, Check, Minus } from "lucide-react";
+import { Activity, ArrowRight, Braces, Check, ShieldCheck } from "lucide-react";
 import { CATALOG } from "@/lib/catalog";
 import { ComponentCard } from "@/components/site/component-card";
 import { ScrollRail, SiteFooter, SiteHeader } from "@/components/site/chrome";
@@ -42,69 +42,53 @@ function Hero() {
   ];
 
   return (
-    <section className="section-hero relative overflow-hidden">
+    <section className="section-hero hero-section relative overflow-hidden">
+      <div className="hero-aura" aria-hidden="true" />
       <div className="relative mx-auto max-w-6xl px-5 sm:px-8">
-        <div className="grid gap-12 lg:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)] lg:items-end lg:gap-16">
-          <div>
+        <div
+          className="hero-topline enter"
+          style={{ "--enter-delay": "0ms" } as React.CSSProperties}
+        >
+          <span className="numeric">OX / 01</span>
+          <span className="hidden sm:inline">Healthcare data systems · FHIR-native</span>
+          <span className="text-oxygen-deep">
+            Build on meaning <ArrowRight aria-hidden="true" className="inline size-3" />
+          </span>
+        </div>
+
+        <div className="grid gap-12 pt-10 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] lg:items-center lg:gap-14 lg:pt-16">
+          <div className="min-w-0">
             <p
               className="eyebrow eyebrow-rule enter text-oxygen-deep"
-              style={{ "--enter-delay": "0ms" } as React.CSSProperties}
+              style={{ "--enter-delay": "90ms" } as React.CSSProperties}
             >
-              FHIR R4 · shadcn registry · MIT core
+              FHIR R4 · source-first · MIT core
             </p>
 
             {/* Entrance is orchestrated on load rather than observed on scroll:
                 above-the-fold content should never wait for an observer. */}
             <h1
               className="display-2xl enter-blur mt-6 text-balance"
-              style={{ "--enter-delay": "90ms" } as React.CSSProperties}
+              style={{ "--enter-delay": "180ms" } as React.CSSProperties}
             >
-              Healthcare components that already know what the data means.
+              Healthcare UI that already knows what the data means.
             </h1>
 
             <p
               className="body-lg enter mt-7 max-w-xl text-pretty text-graphite"
-              style={{ "--enter-delay": "220ms" } as React.CSSProperties}
+              style={{ "--enter-delay": "300ms" } as React.CSSProperties}
             >
               Pass a FHIR <code className="numeric text-[0.9em] text-ink">Observation[]</code> and
               get reference ranges, interpretation flags, and the uninterpreted case handled
               correctly. The source is copied into your repo — yours to read, audit, and change.
             </p>
-
-          </div>
-
-          {/* The right column used to be empty. It now carries the actual
-              claim: which resources are typed. On-thesis, not decoration. */}
-          <aside
-            className="enter lg:pb-1"
-            style={{ "--enter-delay": "430ms" } as React.CSSProperties}
-            aria-label="FHIR resources covered"
-          >
-            <div className="ticks mb-5 opacity-70" aria-hidden="true" />
-            <p className="axis-label">Resources typed</p>
-            <ul className="mt-4 grid grid-cols-2 gap-x-6 gap-y-2 lg:grid-cols-1 lg:gap-y-2.5">
-              {resources.map((resource, index) => (
-                <li
-                  key={resource}
-                  className="group flex items-baseline gap-2.5 border-b border-rule/70 pb-2"
-                >
-                  <span className="numeric w-5 shrink-0 text-[0.625rem] text-graphite-soft">
-                    {String(index + 1).padStart(2, "0")}
-                  </span>
-                  <span className="numeric text-[0.8125rem] text-ink">{resource}</span>
-                </li>
-              ))}
-            </ul>
-          </aside>
-        </div>
-
             <div
-              className="enter mt-10 flex max-w-2xl flex-col gap-3 sm:flex-row sm:items-center"
-              style={{ "--enter-delay": "330ms" } as React.CSSProperties}
+              className="enter mt-8 flex max-w-2xl flex-col gap-3 sm:flex-row sm:items-center"
+              style={{ "--enter-delay": "390ms" } as React.CSSProperties}
             >
               <InstallCommand
                 command="pnpm dlx shadcn@latest add @oxygenui/vitals-panel"
-                className="flex-1"
+                className="min-w-0 flex-1"
               />
               <Link
                 href="/components"
@@ -118,14 +102,114 @@ function Hero() {
               </Link>
             </div>
 
+            <div
+              className="hero-proofline enter mt-6"
+              style={{ "--enter-delay": "470ms" } as React.CSSProperties}
+            >
+              {[
+                { label: "Source copied", icon: Braces },
+                { label: "WCAG-minded", icon: ShieldCheck },
+                { label: "Runtime: 0", icon: Activity },
+              ].map(({ label, icon: Icon }) => (
+                <span key={label} className="inline-flex items-center gap-1.5">
+                  <Icon aria-hidden="true" className="size-3.5 text-oxygen-deep" />
+                  {label}
+                </span>
+              ))}
+            </div>
+          </div>
+
+          <div
+            className="enter min-w-0 lg:pl-2"
+            style={{ "--enter-delay": "330ms" } as React.CSSProperties}
+          >
+            <SignalField />
+          </div>
+        </div>
+
         <div
-          className="enter mt-14"
-          style={{ "--enter-delay": "540ms" } as React.CSSProperties}
+          className="hero-resource-strip enter mt-10"
+          style={{ "--enter-delay": "530ms" } as React.CSSProperties}
         >
+          <span className="axis-label shrink-0">Typed to</span>
+          <div className="flex min-w-0 flex-wrap gap-2">
+            {resources.map((resource) => (
+              <span key={resource} className="hero-resource-chip numeric">
+                {resource}
+              </span>
+            ))}
+          </div>
+        </div>
+
+        <div className="enter mt-14" style={{ "--enter-delay": "620ms" } as React.CSSProperties}>
           <LiveInstrument />
         </div>
       </div>
     </section>
+  );
+}
+
+function SignalField() {
+  return (
+    <div
+      className="signal-field"
+      role="img"
+      aria-label="Live FHIR observation translated into a clinical UI: a critical potassium result is interpreted, while an observation without a reference range remains not interpreted."
+    >
+      <div className="signal-field__chrome">
+        <span className="inline-flex items-center gap-2">
+          <span className="signal-live-dot" aria-hidden="true" /> Live parser
+        </span>
+        <span className="numeric">trace://observation/001</span>
+      </div>
+
+      <div className="signal-field__stage" aria-hidden="true">
+        <div className="signal-core">
+          <span className="signal-core__mark">O₂</span>
+          <span className="signal-core__label">FHIR → UI</span>
+        </div>
+
+        <div className="signal-card signal-card--source">
+          <span className="eyebrow text-electric">INPUT</span>
+          <code className="mt-2 block text-[0.7rem] text-panel-fg/80">Observation[]</code>
+          <span className="mt-2 block text-[0.65rem] text-panel-muted">typed at the boundary</span>
+        </div>
+
+        <div className="signal-card signal-card--main">
+          <div className="flex items-center justify-between gap-3">
+            <span className="eyebrow text-panel-muted">Observation · potassium</span>
+            <span className="signal-status">Critical high</span>
+          </div>
+          <div className="signal-reading mt-4">
+            <span className="numeric">6.8</span>
+            <span>mmol/L</span>
+          </div>
+          <div className="signal-reading-bar mt-4">
+            <span />
+          </div>
+          <div className="mt-3 flex items-center justify-between gap-3 text-[0.65rem] text-panel-muted">
+            <span>3.5 — 5.1 mmol/L</span>
+            <span className="numeric">interpreted</span>
+          </div>
+          <TelemetryTrace mode="critical" height={38} />
+        </div>
+
+        <div className="signal-card signal-card--quiet">
+          <span className="eyebrow text-panel-muted">No range</span>
+          <strong className="mt-2 block font-display text-sm text-panel-fg">Not interpreted</strong>
+          <span className="mt-1 block text-[0.65rem] text-panel-muted">
+            never defaults to Normal
+          </span>
+        </div>
+      </div>
+
+      <div className="signal-field__footer">
+        <span>
+          <span className="signal-footer-dot" aria-hidden="true" /> Rendered state
+        </span>
+        <span className="numeric">0.8ms · source owned</span>
+      </div>
+    </div>
   );
 }
 
@@ -135,18 +219,24 @@ const STATE_FACTS = [
   {
     value: 7,
     suffix: "",
+    scope: "RESULT PROTOCOL",
+    unit: "STATES",
     label: "Result states per component",
     detail: "Final, preliminary, corrected, amended, critical, absent, uninterpreted.",
   },
   {
     value: 3,
     suffix: "",
+    scope: "LAYOUT SYSTEM",
+    unit: "MODES",
     label: "Density modes",
     detail: "Patient-facing, standard admin, and clinical-dense — switchable at any container.",
   },
   {
     value: 0,
     suffix: "",
+    scope: "SOURCE RUNTIME",
+    unit: "ADDED",
     label: "Runtime dependencies added",
     detail: "The components are source. Nothing sits between you and the render.",
   },
@@ -170,22 +260,43 @@ function StatesArgument() {
           </p>
         </div>
 
-        <div className="mt-14 grid gap-4 sm:grid-cols-3">
+        <div className="state-facts mt-14">
           {STATE_FACTS.map((fact, index) => (
-            <div
+            <article
               key={fact.label}
-              className="surface-1 rounded-2xl p-6 sm:p-7"
+              className="state-fact"
               data-reveal
               style={{ "--reveal-delay": `${index * 80}ms` } as React.CSSProperties}
             >
-              <div className="display-lg text-oxygen-deep">
-                <Counter to={fact.value} suffix={fact.suffix} />
+              <div className="state-fact__topline">
+                <span className="state-fact__scope numeric">
+                  0{index + 1} / {fact.scope}
+                </span>
+                <span className="state-fact__signal" aria-hidden="true">
+                  <span />
+                  <span />
+                  <span />
+                </span>
               </div>
-              <h3 className="mt-3 font-display text-[0.9375rem] font-semibold tracking-tight">
+
+              <div className="state-fact__reading">
+                <div className="state-fact__number display-lg text-oxygen-deep">
+                  <Counter to={fact.value} suffix={fact.suffix} />
+                </div>
+                <span className="state-fact__unit numeric">{fact.unit}</span>
+              </div>
+
+              <h3 className="state-fact__label font-display text-[0.9375rem] font-semibold tracking-tight">
                 {fact.label}
               </h3>
-              <p className="mt-1.5 text-sm leading-relaxed text-graphite">{fact.detail}</p>
-            </div>
+              <p className="state-fact__detail text-sm leading-relaxed text-graphite">
+                {fact.detail}
+              </p>
+
+              <div className="state-fact__baseline" aria-hidden="true">
+                <span />
+              </div>
+            </article>
           ))}
         </div>
       </div>
@@ -194,8 +305,6 @@ function StatesArgument() {
 }
 
 /* ========================================================================== */
-
-
 
 function CodeComparison() {
   return (
@@ -224,9 +333,6 @@ function CodeComparison() {
 }
 
 /* ========================================================================== */
-
-
-
 
 function Catalog() {
   return (
@@ -332,7 +438,10 @@ function ClosingCta() {
     <section className="border-t border-rule">
       <div className="mx-auto max-w-6xl section-major px-5 sm:px-8">
         <div className="instrument relative px-6 py-14 sm:px-12 sm:py-16" data-reveal>
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 opacity-30" aria-hidden="true">
+          <div
+            className="pointer-events-none absolute inset-x-0 bottom-0 opacity-30"
+            aria-hidden="true"
+          >
             <TelemetryTrace mode="normal" height={90} />
           </div>
 

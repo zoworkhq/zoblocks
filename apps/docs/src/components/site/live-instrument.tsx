@@ -14,19 +14,8 @@
  */
 
 import * as React from "react";
-import {
-  Activity,
-  CircleAlert,
-  EyeOff,
-  FileQuestion,
-  Loader,
-  ShieldAlert,
-} from "lucide-react";
-import {
-  observationPanel,
-  observations,
-  patients,
-} from "@oxygenui/fixtures";
+import { Activity, CircleAlert, EyeOff, FileQuestion, Loader, ShieldAlert } from "lucide-react";
+import { observationPanel, observations, patients } from "@oxygenui/fixtures";
 import type { Observation, Patient } from "@oxygenui/fhir";
 import { PatientBanner } from "@/registry/oxygen/patient-banner/patient-banner";
 import { ObservationPanel } from "@/registry/oxygen/vitals-panel/vitals-panel";
@@ -124,7 +113,7 @@ export function LiveInstrument() {
   const scenario = SCENARIOS.find((s) => s.id === scenarioId) ?? SCENARIOS[0]!;
 
   return (
-    <div className="instrument">
+    <div className="instrument instrument-demo">
       <InstrumentGlow />
 
       {/* Bezel header — reads as an instrument label strip. */}
@@ -141,13 +130,11 @@ export function LiveInstrument() {
         <TelemetryTrace mode={scenario.trace} height={52} />
       </div>
 
-      {/* The components themselves, in the dark theme with live density. */}
-      <div
-        data-theme="dark"
-        data-ox-density={density}
-        className="relative space-y-3 p-4 sm:p-5"
-      >
-        <PatientBanner headingLevel={3} patient={scenario.patient}
+      {/* The components inherit the page theme and use the selected density. */}
+      <div data-ox-density={density} className="relative space-y-3 p-4 sm:p-5">
+        <PatientBanner
+          headingLevel={3}
+          patient={scenario.patient}
           loading={scenario.loading}
           maskIdentifiers={scenario.mask}
           asOf={AS_OF}
@@ -161,12 +148,8 @@ export function LiveInstrument() {
       </div>
 
       {/* State rail */}
-      <div className="relative border-t border-panel-rule bg-[#060d0c]/60 px-3 py-3 sm:px-4">
-        <div
-          role="tablist"
-          aria-label="Component state"
-          className="flex flex-wrap gap-1.5"
-        >
+      <div className="relative border-t border-panel-rule bg-panel/60 px-3 py-3 sm:px-4">
+        <div role="tablist" aria-label="Component state" className="flex flex-wrap gap-1.5">
           {SCENARIOS.map((item) => {
             const Icon = item.icon;
             const active = item.id === scenario.id;

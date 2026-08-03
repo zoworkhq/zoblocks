@@ -37,6 +37,7 @@
 
   --color-oxygen: var(--site-oxygen);
   --color-oxygen-deep: var(--site-accent-text);
+  --color-electric: var(--site-electric);
   --color-critical: var(--site-critical);
 
   --color-cta: var(--site-cta);
@@ -79,6 +80,7 @@
   --site-oxygen: #10b995;
   /* Accent used on text. Deep here for contrast on paper; bright in dark. */
   --site-accent-text: #067662;
+  --site-electric: #0b7285;
   --site-critical: #dc2626;
 
   /* Primary button: dark on light. Pairs with text-paper, which inverts too. */
@@ -119,6 +121,7 @@
 
   --site-oxygen: #2dd4b0;
   --site-accent-text: #34d8b4;
+  --site-electric: #73d8ff;
   --site-critical: #fb7185;
 
   /* Bright button on a dark page; text-paper resolves dark, so it still reads. */
@@ -150,9 +153,16 @@ body {
   background: var(--color-paper);
   color: var(--color-ink);
   font-family: var(--font-sans);
-  font-feature-settings: "cv05" 1, "cv08" 1;
+  font-feature-settings:
+    "cv05" 1,
+    "cv08" 1;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+  overflow-x: clip;
+}
+
+#app-root {
+  overflow-x: clip;
 }
 
 /* ---------------------------------------------------------------------------
@@ -554,7 +564,10 @@ body {
   font-weight: 600;
   /* Optical: large display type needs less apparent weight than body copy at
      the same nominal weight, and the descenders need room at 0.9 leading. */
-  font-feature-settings: "cv05" 1, "cv08" 1, "ss01" 1;
+  font-feature-settings:
+    "cv05" 1,
+    "cv08" 1,
+    "ss01" 1;
 }
 
 .eyebrow {
@@ -617,6 +630,348 @@ body {
   padding-block: clamp(2.75rem, 5vw, 4.5rem);
 }
 
+.state-facts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border-top: 1px solid var(--color-rule-strong);
+  border-bottom: 1px solid var(--color-rule-strong);
+  background: var(--color-paper);
+}
+
+.state-fact {
+  position: relative;
+  min-width: 0;
+  padding: clamp(1.25rem, 3vw, 2rem) clamp(1rem, 3vw, 2.25rem) clamp(1.25rem, 3vw, 1.75rem);
+}
+
+.state-fact + .state-fact {
+  border-left: 1px solid var(--color-rule);
+}
+
+.state-fact__topline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  min-height: 1rem;
+}
+
+.state-fact__scope {
+  color: var(--color-graphite-soft);
+  font-size: 0.625rem;
+  letter-spacing: 0.14em;
+}
+
+.state-fact__signal {
+  display: flex;
+  align-items: end;
+  gap: 0.2rem;
+  height: 0.75rem;
+}
+
+.state-fact__signal span {
+  display: block;
+  width: 0.2rem;
+  border-radius: 999px;
+  background: var(--color-oxygen);
+}
+
+.state-fact__signal span:nth-child(1) {
+  height: 0.35rem;
+  opacity: 0.42;
+}
+
+.state-fact__signal span:nth-child(2) {
+  height: 0.6rem;
+  opacity: 0.68;
+}
+
+.state-fact__signal span:nth-child(3) {
+  height: 0.75rem;
+}
+
+.state-fact__reading {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  margin-top: clamp(2.5rem, 5vw, 4rem);
+}
+
+.state-fact__number {
+  font-size: clamp(3.25rem, 6vw, 5.25rem);
+  line-height: 0.82;
+  letter-spacing: -0.07em;
+}
+
+.state-fact__unit {
+  padding: 0.3rem 0.45rem;
+  border: 1px solid color-mix(in oklab, var(--color-oxygen) 28%, var(--color-rule));
+  border-radius: 0.4rem;
+  color: var(--color-oxygen-deep);
+  font-size: 0.5625rem;
+  letter-spacing: 0.12em;
+}
+
+.state-fact__label {
+  margin-top: 1.5rem;
+}
+
+.state-fact__detail {
+  max-width: 22rem;
+  margin-top: 0.5rem;
+}
+
+.state-fact__baseline {
+  position: relative;
+  height: 1px;
+  margin-top: clamp(1.5rem, 3vw, 2.25rem);
+  overflow: hidden;
+  background: var(--color-rule);
+}
+
+.state-fact__baseline span {
+  display: block;
+  width: 30%;
+  height: 1px;
+  background: var(--color-oxygen);
+}
+
+.state-fact:nth-child(2) .state-fact__baseline span {
+  width: 54%;
+}
+
+.state-fact:nth-child(3) .state-fact__baseline span {
+  width: 78%;
+}
+
+@media (max-width: 767px) {
+  .state-facts {
+    display: block;
+  }
+
+  .state-fact + .state-fact {
+    border-top: 1px solid var(--color-rule);
+    border-left: 0;
+  }
+
+  .state-fact__reading {
+    margin-top: 2rem;
+  }
+}
+
+.guidance-readout {
+  letter-spacing: 0.14em;
+}
+
+.guidance-board {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(2rem, 6vw, 5rem);
+  align-items: start;
+}
+
+.guidance-column {
+  align-self: start;
+  min-width: 0;
+  padding: 0 0.25rem 0.5rem;
+  border-top: 2px solid var(--color-rule-strong);
+}
+
+.guidance-column--use {
+  border-top-color: var(--color-oxygen);
+}
+
+.guidance-column--avoid {
+  border-top-color: var(--color-critical);
+}
+
+.guidance-column__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.1rem 0 0.9rem;
+  border-bottom: 1px solid var(--color-rule);
+}
+
+.guidance-column__marker {
+  width: 0.625rem;
+  height: 0.625rem;
+  flex: 0 0 auto;
+  border-radius: 999px;
+  background: var(--color-oxygen);
+  box-shadow: 0 0 0 4px color-mix(in oklab, var(--color-oxygen) 12%, transparent);
+}
+
+.guidance-column--avoid .guidance-column__marker {
+  background: var(--color-critical);
+  box-shadow: 0 0 0 4px color-mix(in oklab, var(--color-critical) 10%, transparent);
+}
+
+.guidance-kicker {
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.guidance-count {
+  display: grid;
+  width: 2.25rem;
+  height: 2.25rem;
+  flex: 0 0 auto;
+  place-items: center;
+  border: 1px solid var(--color-rule);
+  border-radius: 0.625rem;
+  color: var(--color-graphite-soft);
+  font-size: 0.6875rem;
+}
+
+.guidance-column--use .guidance-count {
+  border-color: color-mix(in oklab, var(--color-oxygen) 28%, var(--color-rule));
+  color: var(--color-oxygen-deep);
+}
+
+.guidance-column--avoid .guidance-count {
+  border-color: color-mix(in oklab, var(--color-critical) 25%, var(--color-rule));
+  color: var(--color-critical);
+}
+
+.guidance-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.guidance-item {
+  display: grid;
+  grid-template-columns: 2rem 1.125rem minmax(0, 1fr);
+  gap: 0.75rem;
+  align-items: start;
+  padding: 0.9rem 0;
+  border-bottom: 1px solid var(--color-rule);
+}
+
+.guidance-item:last-child {
+  border-bottom: 0;
+}
+
+.guidance-index {
+  padding-top: 0.1rem;
+  color: var(--color-graphite-soft);
+  font-size: 0.625rem;
+  letter-spacing: 0.08em;
+}
+
+.guidance-icon {
+  display: grid;
+  width: 1.125rem;
+  height: 1.125rem;
+  place-items: center;
+  border-radius: 0.375rem;
+  color: var(--color-oxygen-deep);
+  background: color-mix(in oklab, var(--color-oxygen) 12%, transparent);
+}
+
+.guidance-icon svg {
+  width: 0.75rem;
+  height: 0.75rem;
+  stroke-width: 2.5;
+}
+
+.guidance-column--avoid .guidance-icon {
+  color: var(--color-critical);
+  background: color-mix(in oklab, var(--color-critical) 10%, transparent);
+}
+
+.limitation-panel {
+  border-top: 2px solid var(--color-rule-strong);
+  border-bottom: 1px solid var(--color-rule-strong);
+}
+
+.limitation-panel__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--color-rule);
+}
+
+.limitation-panel__signal {
+  display: grid;
+  width: 2rem;
+  height: 2rem;
+  flex: 0 0 auto;
+  place-items: center;
+  border: 1px solid color-mix(in oklab, var(--color-electric) 32%, var(--color-rule));
+  border-radius: 0.55rem;
+  color: var(--color-electric);
+  background: color-mix(in oklab, var(--color-electric) 9%, transparent);
+}
+
+.limitation-panel__kicker {
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.limitation-panel__count {
+  display: grid;
+  width: 2.25rem;
+  height: 2.25rem;
+  flex: 0 0 auto;
+  place-items: center;
+  border: 1px solid var(--color-rule);
+  border-radius: 0.625rem;
+  color: var(--color-graphite-soft);
+  font-size: 0.6875rem;
+}
+
+.limitation-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.limitation-item {
+  display: grid;
+  grid-template-columns: 2rem 1.125rem minmax(0, 1fr);
+  gap: 0.75rem;
+  align-items: start;
+  padding: 0.9rem 0;
+  border-bottom: 1px solid var(--color-rule);
+}
+
+.limitation-item:last-child {
+  border-bottom: 0;
+}
+
+.limitation-index {
+  padding-top: 0.1rem;
+  color: var(--color-graphite-soft);
+  font-size: 0.625rem;
+  letter-spacing: 0.08em;
+}
+
+.limitation-marker {
+  padding-top: 0.02rem;
+  color: var(--color-electric);
+  font-size: 1rem;
+  line-height: 1;
+}
+
+@media (max-width: 767px) {
+  .guidance-board {
+    display: block;
+  }
+
+  .guidance-column {
+    padding-inline: 0.25rem;
+  }
+
+  .guidance-column--avoid {
+    margin-top: 2rem;
+  }
+}
+
 .lede {
   font-size: clamp(1.0625rem, 1.5vw, 1.25rem);
   line-height: 1.55;
@@ -625,7 +980,328 @@ body {
 }
 
 /* ---------------------------------------------------------------------------
- * Instrument bezel — the dark panel that houses every live demo.
+ * Hero signal field — a small visual system for the product thesis.
+ *
+ * The hero needs a visual explanation before the visitor reaches the live
+ * component demo: structured FHIR input enters, an interpreted state comes
+ * out. This is intentionally built from CSS and real typography so it stays
+ * sharp, fast, and consistent with the instrument panels below.
+ * ------------------------------------------------------------------------ */
+
+.hero-section {
+  isolation: isolate;
+  background: var(--color-paper);
+}
+
+.hero-section::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.24;
+  background-image:
+    linear-gradient(
+      to right,
+      color-mix(in oklab, var(--color-rule) 52%, transparent) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      to bottom,
+      color-mix(in oklab, var(--color-rule) 52%, transparent) 1px,
+      transparent 1px
+    );
+  background-size: 80px 80px;
+  mask-image: linear-gradient(to bottom, transparent, #000 14%, #000 74%, transparent);
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 14%, #000 74%, transparent);
+}
+
+.hero-aura {
+  display: none;
+}
+
+.hero-topline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  border-bottom: 1px solid var(--color-rule);
+  padding-bottom: 0.75rem;
+  color: var(--color-graphite-soft);
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.hero-proofline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.1rem;
+  color: var(--color-graphite-soft);
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.hero-resource-strip {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  border-top: 1px solid var(--color-rule);
+  padding-top: 0.75rem;
+}
+
+.hero-resource-chip {
+  border: 1px solid var(--color-rule);
+  border-radius: 0.375rem;
+  padding: 0.35rem 0.5rem;
+  color: var(--color-graphite);
+  font-size: 0.625rem;
+  transition:
+    border-color 200ms ease-out,
+    color 200ms ease-out,
+    background-color 200ms ease-out;
+}
+
+.hero-resource-chip:hover {
+  border-color: color-mix(in oklab, var(--color-oxygen) 45%, var(--color-rule));
+  background: color-mix(in oklab, var(--color-oxygen) 6%, transparent);
+  color: var(--color-ink);
+}
+
+.signal-field {
+  position: relative;
+  min-height: 31rem;
+  overflow: hidden;
+  border: 1px solid var(--color-panel-rule);
+  border-radius: 1.5rem;
+  background: #08110f;
+  box-shadow:
+    0 0 0 1px rgb(255 255 255 / 0.03) inset,
+    0 36px 80px -30px rgb(2 20 17 / 0.58);
+}
+
+html:not(.dark) .signal-field {
+  --color-panel: var(--site-paper-sunk);
+  --color-panel-raised: var(--site-paper);
+  --color-panel-rule: var(--site-rule);
+  --color-panel-fg: var(--site-ink);
+  --color-panel-muted: var(--site-graphite);
+  --color-trace: var(--site-accent-text);
+  --color-critical-lum: var(--site-critical);
+  background: var(--color-panel);
+  border-color: var(--color-panel-rule);
+  box-shadow:
+    0 0 0 1px rgb(255 255 255 / 0.8) inset,
+    0 28px 60px -30px rgb(2 20 17 / 0.2),
+    0 8px 22px -14px rgb(2 20 17 / 0.12);
+}
+
+.signal-field::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.7;
+  background-image:
+    linear-gradient(
+      to right,
+      color-mix(in oklab, var(--color-electric) 7%, transparent) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      to bottom,
+      color-mix(in oklab, var(--color-electric) 7%, transparent) 1px,
+      transparent 1px
+    );
+  background-size: 24px 24px;
+  mask-image: linear-gradient(to bottom, #000, transparent 90%);
+  -webkit-mask-image: linear-gradient(to bottom, #000, transparent 90%);
+}
+
+html:not(.dark) .signal-field::before {
+  opacity: 0.45;
+}
+
+.signal-field__chrome,
+.signal-field__footer {
+  position: relative;
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  color: var(--color-panel-muted);
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.signal-field__chrome {
+  border-bottom: 1px solid var(--color-panel-rule);
+  padding: 0.9rem 1rem;
+}
+
+.signal-field__footer {
+  position: absolute;
+  right: 1rem;
+  bottom: 1rem;
+  left: 1rem;
+  border-top: 1px solid var(--color-panel-rule);
+  padding-top: 0.75rem;
+}
+
+.signal-live-dot,
+.signal-footer-dot {
+  display: inline-block;
+  width: 0.375rem;
+  height: 0.375rem;
+  border-radius: 50%;
+  background: var(--color-trace);
+  box-shadow: 0 0 0.75rem var(--color-trace);
+}
+
+.signal-field__stage {
+  position: absolute;
+  inset: 3.5rem 1.25rem 3.75rem;
+}
+
+.signal-core {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: grid;
+  width: 9rem;
+  height: 9rem;
+  place-content: center;
+  gap: 0.25rem;
+  border: 1px solid rgb(45 212 176 / 0.35);
+  border-radius: 50%;
+  background: #0b1714;
+  box-shadow:
+    0 0 0 0.5rem rgb(45 212 176 / 0.04),
+    0 0 3rem rgb(45 212 176 / 0.16),
+    0 20px 40px -18px rgb(0 0 0 / 0.9);
+  text-align: center;
+  transform: translate(-50%, -50%);
+}
+
+html:not(.dark) .signal-core {
+  border-color: color-mix(in oklab, var(--color-oxygen) 32%, var(--color-panel-rule));
+  background: var(--color-panel-raised);
+  box-shadow:
+    0 0 0 0.5rem color-mix(in oklab, var(--color-oxygen) 5%, transparent),
+    0 0 3rem color-mix(in oklab, var(--color-oxygen) 12%, transparent),
+    0 20px 40px -18px rgb(2 20 17 / 0.18);
+}
+
+.signal-core__mark {
+  color: var(--color-panel-fg);
+  font-family: var(--font-display);
+  font-size: 2.5rem;
+  font-weight: 600;
+  letter-spacing: -0.08em;
+}
+
+.signal-core__label {
+  color: var(--color-trace);
+  font-family: var(--font-mono);
+  font-size: 0.5625rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.signal-card {
+  position: absolute;
+  z-index: 2;
+  border: 1px solid var(--color-panel-rule);
+  border-radius: 0.875rem;
+  background: color-mix(in srgb, var(--color-panel-raised) 92%, transparent);
+  box-shadow: 0 18px 36px -20px rgb(0 0 0 / 0.9);
+  backdrop-filter: blur(12px);
+}
+
+html:not(.dark) .signal-card {
+  box-shadow: 0 18px 36px -20px rgb(2 20 17 / 0.2);
+}
+
+.signal-card--source {
+  top: 5%;
+  left: 0;
+  width: 10.25rem;
+  padding: 0.8rem;
+}
+
+.signal-card--main {
+  top: 31%;
+  left: 12%;
+  width: 76%;
+  padding: 0.95rem;
+}
+
+.signal-card--quiet {
+  right: 0;
+  bottom: 5%;
+  width: 11rem;
+  padding: 0.8rem;
+}
+
+.signal-status {
+  border: 1px solid rgb(251 113 133 / 0.34);
+  border-radius: 999px;
+  background: rgb(251 113 133 / 0.12);
+  padding: 0.25rem 0.45rem;
+  color: var(--color-critical-lum);
+  font-family: var(--font-mono);
+  font-size: 0.5625rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+html:not(.dark) .signal-status {
+  border-color: color-mix(in oklab, var(--color-critical-lum) 42%, var(--color-panel-rule));
+  background: color-mix(in oklab, var(--color-critical-lum) 10%, transparent);
+}
+
+.signal-reading {
+  display: flex;
+  align-items: baseline;
+  gap: 0.45rem;
+  color: var(--color-panel-fg);
+  font-family: var(--font-mono);
+}
+
+.signal-reading > .numeric {
+  font-size: clamp(2rem, 4vw, 2.65rem);
+  letter-spacing: -0.07em;
+}
+
+.signal-reading > span:last-child {
+  color: var(--color-panel-muted);
+  font-size: 0.75rem;
+}
+
+.signal-reading-bar {
+  height: 0.25rem;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--color-panel-rule);
+}
+
+.signal-reading-bar span {
+  display: block;
+  width: 88%;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(to right, var(--color-trace), var(--color-critical-lum));
+  box-shadow: 0 0 0.75rem rgb(251 113 133 / 0.42);
+}
+
+/* ---------------------------------------------------------------------------
+ * Instrument bezel — the themed frame that houses every live demo.
  *
  * Deliberately reads as hardware: inset rule, faint grid, its own light.
  * ------------------------------------------------------------------------ */
@@ -642,14 +1318,82 @@ body {
   overflow: hidden;
 }
 
+/* Component demos follow the page theme. The dark instrument treatment is
+   still reserved for the closing CTA and other deliberate contrast moments;
+   live component previews should never look dark on a light page. */
+html:not(.dark) .instrument-demo {
+  --color-panel: var(--site-paper-sunk);
+  --color-panel-raised: var(--site-paper);
+  --color-panel-rule: var(--site-rule);
+  --color-panel-fg: var(--site-ink);
+  --color-panel-muted: var(--site-graphite);
+  --color-trace: var(--site-accent-text);
+  --color-critical-lum: var(--site-critical);
+  --site-panel: var(--site-paper-sunk);
+  --site-panel-raised: var(--site-paper);
+  --site-panel-rule: var(--site-rule);
+  --site-panel-fg: var(--site-ink);
+  --site-panel-muted: var(--site-graphite);
+  --site-trace: var(--site-accent-text);
+  --site-critical-lum: var(--site-critical);
+  border-color: var(--color-panel-rule);
+  box-shadow:
+    0 0 0 1px rgb(255 255 255 / 0.75) inset,
+    0 24px 55px -30px rgb(2 20 17 / 0.18),
+    0 8px 22px -14px rgb(2 20 17 / 0.12);
+}
+
+html:not(.dark) .component-preview-frame {
+  --color-panel: var(--site-paper);
+  --color-panel-rule: var(--site-rule);
+  --site-panel: var(--site-paper);
+  --site-panel-rule: var(--site-rule);
+  border: 1px solid var(--color-panel-rule);
+  background: var(--color-panel);
+}
+
+html:not(.dark) .instrument-demo .text-panel-fg,
+html:not(.dark) .instrument-demo [class*="text-panel-fg/"],
+html:not(.dark) .signal-field .text-panel-fg,
+html:not(.dark) .signal-field [class*="text-panel-fg/"] {
+  color: var(--site-ink);
+}
+
+html:not(.dark) .instrument-demo .text-panel-muted,
+html:not(.dark) .instrument-demo [class*="text-panel-muted/"],
+html:not(.dark) .signal-field .text-panel-muted,
+html:not(.dark) .signal-field [class*="text-panel-muted/"] {
+  color: var(--site-graphite);
+}
+
+html:not(.dark) .signal-field .text-electric {
+  color: var(--site-electric);
+}
+
+html:not(.dark) .instrument-demo [class*="border-panel-rule"] {
+  border-color: var(--site-rule);
+}
+
+html:not(.dark) .instrument-demo [class*="bg-panel"] {
+  background-color: var(--site-paper);
+}
+
 /* Graph-paper grid, barely there. Reads as an instrument face, not a texture. */
 .instrument::before {
   content: "";
   position: absolute;
   inset: 0;
   background-image:
-    linear-gradient(to right, rgb(45 212 176 / 0.045) 1px, transparent 1px),
-    linear-gradient(to bottom, rgb(45 212 176 / 0.045) 1px, transparent 1px);
+    linear-gradient(
+      to right,
+      color-mix(in oklab, var(--color-oxygen) 5%, transparent) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      to bottom,
+      color-mix(in oklab, var(--color-oxygen) 5%, transparent) 1px,
+      transparent 1px
+    );
   background-size: 28px 28px;
   pointer-events: none;
 }
@@ -785,5 +1529,53 @@ body {
 
   .instrument-glow {
     display: none;
+  }
+}
+
+@media (max-width: 639px) {
+  .hero-topline {
+    align-items: flex-start;
+    font-size: 0.5625rem;
+  }
+
+  .hero-resource-strip {
+    flex-direction: column;
+    gap: 0.625rem;
+  }
+
+  .signal-field {
+    min-height: 28rem;
+    border-radius: 1.25rem;
+  }
+
+  .signal-field__chrome,
+  .signal-field__footer {
+    padding-right: 0.75rem;
+    padding-left: 0.75rem;
+    font-size: 0.5625rem;
+  }
+
+  .signal-field__stage {
+    right: 0.75rem;
+    left: 0.75rem;
+  }
+
+  .signal-card--source {
+    width: 8.5rem;
+    transform: scale(0.86);
+    transform-origin: top left;
+  }
+
+  .signal-card--main {
+    top: 29%;
+    left: 3%;
+    width: 94%;
+  }
+
+  .signal-card--quiet {
+    right: -0.35rem;
+    width: 9.5rem;
+    transform: scale(0.88);
+    transform-origin: bottom right;
   }
 }

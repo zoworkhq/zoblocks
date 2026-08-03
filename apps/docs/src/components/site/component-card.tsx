@@ -123,9 +123,8 @@ export function ComponentCard({
 
       {preview ? (
         <div
-          data-theme="dark"
           data-ox-density="standard"
-          className="relative mt-5 flex-1 overflow-hidden rounded-xl border border-panel-rule bg-panel p-3"
+          className="component-preview-frame relative mt-5 flex-1 overflow-hidden rounded-xl p-3"
         >
           {/* Decorative inside the card. aria-hidden alone is a violation here:
               the panel contains a focusable scroll region, and hiding a

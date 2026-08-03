@@ -84,7 +84,7 @@ export function ShowcasePreview({
   const render = COMPOSITIONS[slug];
 
   return (
-    <div className="instrument">
+    <div className="instrument instrument-demo">
       <InstrumentGlow />
 
       <div className="relative flex items-center justify-between gap-4 border-b border-panel-rule px-4 py-2.5">
@@ -95,8 +95,10 @@ export function ShowcasePreview({
         <span className="eyebrow hidden text-panel-muted/70 sm:block">{density} density</span>
       </div>
 
-      <div data-theme="dark" data-ox-density={density} className="relative p-4 sm:p-5">
-        {render ? render() : (
+      <div data-ox-density={density} className="relative p-4 sm:p-5">
+        {render ? (
+          render()
+        ) : (
           <p className="py-8 text-center text-sm text-panel-muted">Composition coming soon.</p>
         )}
       </div>
