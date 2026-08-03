@@ -78,20 +78,20 @@ const FAILURES = [
 export function FailureDemo() {
   return (
     <div className="grid gap-5 lg:grid-cols-2">
-      <div data-reveal="left">
+      <div className="min-w-0" data-reveal="left">
         <div className="mb-3 flex items-center justify-between gap-3">
           <span className="eyebrow text-critical">Hand-rolled</span>
           <span className="axis-label">same data, both panels</span>
         </div>
 
-        <div className="instrument relative">
+        <div className="instrument instrument-demo relative">
           <InstrumentGlow />
           <div className="relative border-b border-panel-rule px-4 py-2.5">
             <span className="eyebrow text-critical">5 results · 5 defects</span>
           </div>
           {/* Deliberately broken output. Hidden from assistive tech — the
               failures are enumerated in text below instead. */}
-          <div data-theme="dark" className="relative overflow-x-auto p-4" aria-hidden="true">
+          <div className="relative overflow-x-auto p-4" aria-hidden="true">
             <NaivePanel />
           </div>
         </div>
@@ -106,28 +106,31 @@ export function FailureDemo() {
         </ul>
       </div>
 
-      <div data-reveal="right" style={{ "--reveal-delay": "120ms" } as React.CSSProperties}>
+      <div
+        className="min-w-0"
+        data-reveal="right"
+        style={{ "--reveal-delay": "120ms" } as React.CSSProperties}
+      >
         <div className="mb-3 flex items-center justify-between gap-3">
           <span className="eyebrow text-oxygen-deep">Oxygen</span>
           <span className="axis-label">one component</span>
         </div>
 
-        <div className="instrument relative">
+        <div className="instrument instrument-demo relative">
           <InstrumentGlow />
           <div className="relative border-b border-panel-rule px-4 py-2.5">
             <span className="eyebrow text-trace">5 results · 0 defects</span>
           </div>
-          <div data-theme="dark" data-ox-density="standard" className="relative p-4">
+          <div data-ox-density="standard" className="relative p-4">
             <ObservationPanel observations={DATA} label="Oxygen rendering of the same data" />
           </div>
         </div>
 
         <p className="mt-4 text-sm leading-relaxed text-graphite">
           Blood pressure resolves to its components and escalates to the worst of them. The absent
-          result states why. Ferritin reads{" "}
-          <span className="text-ink">Not interpreted</span>, never Normal. The critical potassium
-          carries a badge, a rule, and a live-region announcement — and preliminary stays labelled
-          preliminary.
+          result states why. Ferritin reads <span className="text-ink">Not interpreted</span>, never
+          Normal. The critical potassium carries a badge, a rule, and a live-region announcement —
+          and preliminary stays labelled preliminary.
         </p>
       </div>
     </div>

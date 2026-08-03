@@ -43,51 +43,229 @@ interface Scenario {
 
 const SCENARIOS: Record<string, Scenario[]> = {
   "patient-banner": [
-    { id: "routine", label: "Routine", note: "Complete demographics. The easy case.", render: () => <PatientBanner headingLevel={3} patient={patients.routine} asOf={AS_OF} /> },
-    { id: "restricted", label: "Restricted", note: "Confidentiality label on meta.security, identifiers masked for a shared screen.", render: () => <PatientBanner headingLevel={3} patient={patients.restricted} maskIdentifiers asOf={AS_OF} /> },
-    { id: "deceased", label: "Deceased", note: "Stated unambiguously, in text and icon — never by styling alone.", render: () => <PatientBanner headingLevel={3} patient={patients.deceased} asOf={AS_OF} /> },
-    { id: "sparse", label: "Missing data", note: "No name, no birth date. Absence reads as absence.", render: () => <PatientBanner headingLevel={3} patient={patients.sparse} asOf={AS_OF} /> },
-    { id: "loading", label: "Loading", note: "Skeleton carries aria-busy and an accessible label.", render: () => <PatientBanner headingLevel={3} patient={undefined} loading /> },
+    {
+      id: "routine",
+      label: "Routine",
+      note: "Complete demographics. The easy case.",
+      render: () => <PatientBanner headingLevel={3} patient={patients.routine} asOf={AS_OF} />,
+    },
+    {
+      id: "restricted",
+      label: "Restricted",
+      note: "Confidentiality label on meta.security, identifiers masked for a shared screen.",
+      render: () => (
+        <PatientBanner
+          headingLevel={3}
+          patient={patients.restricted}
+          maskIdentifiers
+          asOf={AS_OF}
+        />
+      ),
+    },
+    {
+      id: "deceased",
+      label: "Deceased",
+      note: "Stated unambiguously, in text and icon — never by styling alone.",
+      render: () => <PatientBanner headingLevel={3} patient={patients.deceased} asOf={AS_OF} />,
+    },
+    {
+      id: "sparse",
+      label: "Missing data",
+      note: "No name, no birth date. Absence reads as absence.",
+      render: () => <PatientBanner headingLevel={3} patient={patients.sparse} asOf={AS_OF} />,
+    },
+    {
+      id: "loading",
+      label: "Loading",
+      note: "Skeleton carries aria-busy and an accessible label.",
+      render: () => <PatientBanner headingLevel={3} patient={undefined} loading />,
+    },
   ],
   "vitals-panel": [
-    { id: "critical", label: "Critical", note: "Severity reaches the reader three ways: badge, left rule, and a live-region announcement.", render: () => <ObservationPanel observations={observations.panel} label="Chemistry panel" /> },
-    { id: "routine", label: "Routine", note: "Interpreted results with reference ranges.", render: () => <ObservationPanel observations={[observations.heartRate, observations.hemoglobinLow]} /> },
-    { id: "uninterpreted", label: "Uninterpreted", note: "No range, no stated interpretation. Reads “Not interpreted” — never “Normal”.", render: () => <ObservationPanel observations={[observations.uninterpreted, observations.absent, observations.preliminary]} /> },
-    { id: "empty", label: "Empty", note: "An empty result set states so rather than rendering a bare table.", render: () => <ObservationPanel observations={[]} /> },
-    { id: "loading", label: "Loading", note: "Skeleton rows preserve the table's shape.", render: () => <ObservationPanel observations={undefined} loading /> },
+    {
+      id: "critical",
+      label: "Critical",
+      note: "Severity reaches the reader three ways: badge, left rule, and a live-region announcement.",
+      render: () => <ObservationPanel observations={observations.panel} label="Chemistry panel" />,
+    },
+    {
+      id: "routine",
+      label: "Routine",
+      note: "Interpreted results with reference ranges.",
+      render: () => (
+        <ObservationPanel observations={[observations.heartRate, observations.hemoglobinLow]} />
+      ),
+    },
+    {
+      id: "uninterpreted",
+      label: "Uninterpreted",
+      note: "No range, no stated interpretation. Reads “Not interpreted” — never “Normal”.",
+      render: () => (
+        <ObservationPanel
+          observations={[observations.uninterpreted, observations.absent, observations.preliminary]}
+        />
+      ),
+    },
+    {
+      id: "empty",
+      label: "Empty",
+      note: "An empty result set states so rather than rendering a bare table.",
+      render: () => <ObservationPanel observations={[]} />,
+    },
+    {
+      id: "loading",
+      label: "Loading",
+      note: "Skeleton rows preserve the table's shape.",
+      render: () => <ObservationPanel observations={undefined} loading />,
+    },
   ],
   "medication-card": [
-    { id: "list", label: "Full list", note: "Active, on hold, expired, and stopped — each with its own label and tone.", render: () => <MedicationList requests={medications.list} asOf={AS_OF} /> },
-    { id: "hold", label: "On hold", note: "Paused deliberately, with the reason recorded. Must not read as stopped.", render: () => <MedicationCard request={medications.onHold} asOf={AS_OF} /> },
-    { id: "expired", label: "Expired", note: "Still `active` in the payload, but past its dispense validity period.", render: () => <MedicationCard request={medications.expired} asOf={AS_OF} /> },
-    { id: "sparse", label: "No dosage", note: "Missing dosage instruction is stated, not left blank.", render: () => <MedicationCard request={medications.noDosage} asOf={AS_OF} /> },
-    { id: "loading", label: "Loading", note: "Skeleton state.", render: () => <MedicationCard request={undefined} loading /> },
+    {
+      id: "list",
+      label: "Full list",
+      note: "Active, on hold, expired, and stopped — each with its own label and tone.",
+      render: () => <MedicationList requests={medications.list} asOf={AS_OF} />,
+    },
+    {
+      id: "hold",
+      label: "On hold",
+      note: "Paused deliberately, with the reason recorded. Must not read as stopped.",
+      render: () => <MedicationCard request={medications.onHold} asOf={AS_OF} />,
+    },
+    {
+      id: "expired",
+      label: "Expired",
+      note: "Still `active` in the payload, but past its dispense validity period.",
+      render: () => <MedicationCard request={medications.expired} asOf={AS_OF} />,
+    },
+    {
+      id: "sparse",
+      label: "No dosage",
+      note: "Missing dosage instruction is stated, not left blank.",
+      render: () => <MedicationCard request={medications.noDosage} asOf={AS_OF} />,
+    },
+    {
+      id: "loading",
+      label: "Loading",
+      note: "Skeleton state.",
+      render: () => <MedicationCard request={undefined} loading />,
+    },
   ],
   "allergy-list": [
-    { id: "list", label: "Recorded", note: "High-risk first, with unconfirmed and refuted entries clearly marked.", render: () => <AllergyList allergies={allergies.list} /> },
-    { id: "nka", label: "No known allergies", note: "An assertion someone actually recorded. Positive, confirmed state.", render: () => <AllergyList allergies={[]} noKnownAllergies /> },
-    { id: "unrecorded", label: "Not recorded", note: "Nobody has asked. Visually distinct from no-known-allergies — this is the distinction the component exists for.", render: () => <AllergyList allergies={[]} /> },
-    { id: "loading", label: "Loading", note: "Skeleton state.", render: () => <AllergyList allergies={undefined} loading /> },
+    {
+      id: "list",
+      label: "Recorded",
+      note: "High-risk first, with unconfirmed and refuted entries clearly marked.",
+      render: () => <AllergyList allergies={allergies.list} />,
+    },
+    {
+      id: "nka",
+      label: "No known allergies",
+      note: "An assertion someone actually recorded. Positive, confirmed state.",
+      render: () => <AllergyList allergies={[]} noKnownAllergies />,
+    },
+    {
+      id: "unrecorded",
+      label: "Not recorded",
+      note: "Nobody has asked. Visually distinct from no-known-allergies — this is the distinction the component exists for.",
+      render: () => <AllergyList allergies={[]} />,
+    },
+    {
+      id: "loading",
+      label: "Loading",
+      note: "Skeleton state.",
+      render: () => <AllergyList allergies={undefined} loading />,
+    },
   ],
   "appointment-card": [
-    { id: "booked", label: "Booked", note: "Time zone rendered explicitly beside the time.", render: () => <AppointmentCard appointment={appointments.booked} timeZone={TZ} /> },
-    { id: "virtual", label: "Virtual", note: "Modality is a text label, not an icon alone.", render: () => <AppointmentCard appointment={appointments.virtual} timeZone={TZ} /> },
-    { id: "noshow", label: "No-show", note: "Operationally distinct from a cancellation — follow-up usually depends on it.", render: () => <AppointmentCard appointment={appointments.noShow} timeZone={TZ} /> },
-    { id: "cancelled", label: "Cancelled", note: "Cancellation reason surfaced rather than dropped.", render: () => <AppointmentCard appointment={appointments.cancelled} timeZone={TZ} /> },
-    { id: "loading", label: "Loading", note: "Skeleton state.", render: () => <AppointmentCard appointment={undefined} timeZone={TZ} loading /> },
+    {
+      id: "booked",
+      label: "Booked",
+      note: "Time zone rendered explicitly beside the time.",
+      render: () => <AppointmentCard appointment={appointments.booked} timeZone={TZ} />,
+    },
+    {
+      id: "virtual",
+      label: "Virtual",
+      note: "Modality is a text label, not an icon alone.",
+      render: () => <AppointmentCard appointment={appointments.virtual} timeZone={TZ} />,
+    },
+    {
+      id: "noshow",
+      label: "No-show",
+      note: "Operationally distinct from a cancellation — follow-up usually depends on it.",
+      render: () => <AppointmentCard appointment={appointments.noShow} timeZone={TZ} />,
+    },
+    {
+      id: "cancelled",
+      label: "Cancelled",
+      note: "Cancellation reason surfaced rather than dropped.",
+      render: () => <AppointmentCard appointment={appointments.cancelled} timeZone={TZ} />,
+    },
+    {
+      id: "loading",
+      label: "Loading",
+      note: "Skeleton state.",
+      render: () => <AppointmentCard appointment={undefined} timeZone={TZ} loading />,
+    },
   ],
   "coverage-card": [
-    { id: "active", label: "Active", note: "Status active and inside its period.", render: () => <CoverageCard coverage={coverages.active} asOf={AS_OF} /> },
-    { id: "lapsed", label: "Lapsed", note: "Status says active; the period ended in 2025. This is the trap the component exists to catch.", render: () => <CoverageCard coverage={coverages.lapsed} asOf={AS_OF} /> },
-    { id: "future", label: "Not yet effective", note: "Starts next year — not usable today.", render: () => <CoverageCard coverage={coverages.future} asOf={AS_OF} /> },
-    { id: "masked", label: "Masked", note: "Member and group identifiers masked for a front-desk screen.", render: () => <CoverageCard coverage={coverages.active} asOf={AS_OF} maskIdentifiers /> },
-    { id: "loading", label: "Loading", note: "Skeleton state.", render: () => <CoverageCard coverage={undefined} loading /> },
+    {
+      id: "active",
+      label: "Active",
+      note: "Status active and inside its period.",
+      render: () => <CoverageCard coverage={coverages.active} asOf={AS_OF} />,
+    },
+    {
+      id: "lapsed",
+      label: "Lapsed",
+      note: "Status says active; the period ended in 2025. This is the trap the component exists to catch.",
+      render: () => <CoverageCard coverage={coverages.lapsed} asOf={AS_OF} />,
+    },
+    {
+      id: "future",
+      label: "Not yet effective",
+      note: "Starts next year — not usable today.",
+      render: () => <CoverageCard coverage={coverages.future} asOf={AS_OF} />,
+    },
+    {
+      id: "masked",
+      label: "Masked",
+      note: "Member and group identifiers masked for a front-desk screen.",
+      render: () => <CoverageCard coverage={coverages.active} asOf={AS_OF} maskIdentifiers />,
+    },
+    {
+      id: "loading",
+      label: "Loading",
+      note: "Skeleton state.",
+      render: () => <CoverageCard coverage={undefined} loading />,
+    },
   ],
   "condition-list": [
-    { id: "list", label: "Problem list", note: "Active problems first; resolved collapsed into their own group.", render: () => <ConditionList conditions={conditions.list} /> },
-    { id: "flat", label: "Not separated", note: "separateInactive off — everything in one sequence.", render: () => <ConditionList conditions={conditions.list} separateInactive={false} /> },
-    { id: "empty", label: "Empty", note: "No problems recorded.", render: () => <ConditionList conditions={[]} /> },
-    { id: "loading", label: "Loading", note: "Skeleton state.", render: () => <ConditionList conditions={undefined} loading /> },
+    {
+      id: "list",
+      label: "Problem list",
+      note: "Active problems first; resolved collapsed into their own group.",
+      render: () => <ConditionList conditions={conditions.list} />,
+    },
+    {
+      id: "flat",
+      label: "Not separated",
+      note: "separateInactive off — everything in one sequence.",
+      render: () => <ConditionList conditions={conditions.list} separateInactive={false} />,
+    },
+    {
+      id: "empty",
+      label: "Empty",
+      note: "No problems recorded.",
+      render: () => <ConditionList conditions={[]} />,
+    },
+    {
+      id: "loading",
+      label: "Loading",
+      note: "Skeleton state.",
+      render: () => <ConditionList conditions={undefined} loading />,
+    },
   ],
   "status-badge": [
     {
@@ -111,8 +289,12 @@ const SCENARIOS: Record<string, Scenario[]> = {
       note: "Two sizes. Both keep the label — there is no icon-only variant.",
       render: () => (
         <div className="flex flex-wrap items-center gap-2">
-          <StatusBadge tone="critical" size="sm">Small</StatusBadge>
-          <StatusBadge tone="critical" size="md">Medium</StatusBadge>
+          <StatusBadge tone="critical" size="sm">
+            Small
+          </StatusBadge>
+          <StatusBadge tone="critical" size="md">
+            Medium
+          </StatusBadge>
         </div>
       ),
     },
@@ -128,7 +310,7 @@ export function ComponentPreview({ name }: { name: string }) {
 
   if (!scenarios?.length) {
     return (
-      <div className="instrument flex items-center justify-center px-6 py-16">
+      <div className="instrument instrument-demo flex items-center justify-center px-6 py-16">
         <p className="text-sm text-panel-muted">Live preview coming with the next release.</p>
       </div>
     );
@@ -137,7 +319,7 @@ export function ComponentPreview({ name }: { name: string }) {
   const scenario = scenarios.find((s) => s.id === scenarioId) ?? scenarios[0]!;
 
   return (
-    <div className="instrument">
+    <div className="instrument instrument-demo">
       <InstrumentGlow />
 
       <div className="relative flex items-center justify-between gap-4 border-b border-panel-rule px-4 py-2.5">
@@ -154,7 +336,9 @@ export function ComponentPreview({ name }: { name: string }) {
               aria-pressed={density === item}
               className={cn(
                 "rounded-md px-2 py-1 font-mono text-[0.625rem] uppercase tracking-wider transition-colors duration-200",
-                density === item ? "bg-panel-fg/10 text-panel-fg" : "text-panel-muted hover:text-panel-fg/80",
+                density === item
+                  ? "bg-panel-fg/10 text-panel-fg"
+                  : "text-panel-muted hover:text-panel-fg/80",
               )}
             >
               {item}
@@ -163,11 +347,11 @@ export function ComponentPreview({ name }: { name: string }) {
         </div>
       </div>
 
-      <div data-theme="dark" data-ox-density={density} className="relative p-4 sm:p-6">
+      <div data-ox-density={density} className="relative p-4 sm:p-6">
         {scenario.render()}
       </div>
 
-      <div className="relative border-t border-panel-rule bg-[#060d0c]/60 px-3 py-3 sm:px-4">
+      <div className="relative border-t border-panel-rule bg-panel/60 px-3 py-3 sm:px-4">
         <div role="tablist" aria-label="Component state" className="flex flex-wrap gap-1.5">
           {scenarios.map((item) => (
             <button
@@ -188,7 +372,10 @@ export function ComponentPreview({ name }: { name: string }) {
             </button>
           ))}
         </div>
-        <p key={scenario.id} className="animate-rail-settle mt-3 max-w-2xl text-[0.8125rem] leading-relaxed text-panel-muted">
+        <p
+          key={scenario.id}
+          className="animate-rail-settle mt-3 max-w-2xl text-[0.8125rem] leading-relaxed text-panel-muted"
+        >
           {scenario.note}
         </p>
       </div>

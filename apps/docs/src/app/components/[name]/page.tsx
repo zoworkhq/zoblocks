@@ -101,7 +101,6 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
             <div className="mt-8 max-w-2xl">
               <InstallCommand command={`pnpm dlx shadcn@latest add @oxygenui/${component.name}`} />
             </div>
-
           </div>
         </section>
 
@@ -136,7 +135,10 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
 
               <div className="mt-8 grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)]">
                 <div data-reveal>
-                  <pre tabIndex={0} className="scroll-thin-dark overflow-x-auto rounded-2xl border border-panel-rule bg-panel p-5 font-mono text-[0.75rem] leading-relaxed text-panel-fg/90">
+                  <pre
+                    tabIndex={0}
+                    className="scroll-thin-dark overflow-x-auto rounded-2xl border border-panel-rule bg-panel p-5 font-mono text-[0.75rem] leading-relaxed text-panel-fg/90"
+                  >
                     <code>{component.usage}</code>
                   </pre>
 
@@ -170,7 +172,9 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
                         {component.props.map((prop) => (
                           <tr key={prop.name} className="border-b border-rule last:border-b-0">
                             <td className="px-4 py-3 align-top">
-                              <span className="numeric text-xs font-medium text-ink">{prop.name}</span>
+                              <span className="numeric text-xs font-medium text-ink">
+                                {prop.name}
+                              </span>
                               <p className="mt-1 text-xs leading-relaxed text-graphite">
                                 {prop.description}
                               </p>
@@ -196,20 +200,28 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
         {(component.guidance.use.length > 0 || component.guidance.avoid.length > 0) && (
           <section id="guidance" className="scroll-mt-24 border-b border-rule bg-paper-sunk/40">
             <div className="mx-auto max-w-6xl section-minor px-5 sm:px-8">
-              <SectionHeading eyebrow="Guidance" title="When to use it, and when not to." />
+              <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
+                <SectionHeading eyebrow="Guidance" title="When to use it, and when not to." />
+                <p className="guidance-readout numeric shrink-0 text-xs text-graphite-soft">
+                  DECISION SURFACE /{" "}
+                  {component.guidance.use.length + component.guidance.avoid.length} RULES
+                </p>
+              </div>
 
-              <div className="mt-8 grid gap-6 lg:grid-cols-2">
+              <div className="guidance-board mt-10">
                 <GuidanceList
                   title="Use it"
+                  label="Recommended context"
                   items={component.guidance.use}
                   icon={Check}
-                  tone="text-oxygen-deep"
+                  tone="use"
                 />
                 <GuidanceList
                   title="Don't"
+                  label="Guardrails"
                   items={component.guidance.avoid}
                   icon={X}
-                  tone="text-critical"
+                  tone="avoid"
                   delay
                 />
               </div>
@@ -242,18 +254,44 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
                   <div
                     data-reveal
                     style={{ "--reveal-delay": "80ms" } as React.CSSProperties}
-                    className="surface-1 self-start rounded-2xl p-6"
+                    className="limitation-panel self-start"
                   >
-                    <h3 className="flex items-center gap-2 font-display text-[0.9375rem] font-semibold tracking-tight">
-                      <CircleAlert aria-hidden="true" className="size-4 text-graphite" />
-                      Known limitations
-                    </h3>
+                    <div className="limitation-panel__header">
+                      <div className="flex min-w-0 items-center gap-3">
+                        <span className="limitation-panel__signal" aria-hidden="true">
+                          <CircleAlert className="size-4" />
+                        </span>
+                        <div>
+                          <p className="limitation-panel__kicker numeric text-[0.625rem] text-graphite-soft">
+                            Open gaps
+                          </p>
+                          <h3 className="mt-1 font-display text-base font-semibold tracking-tight">
+                            Known limitations
+                          </h3>
+                        </div>
+                      </div>
+                      <span
+                        className="limitation-panel__count numeric"
+                        aria-label={`${component.limitations.length} known limitations`}
+                      >
+                        {String(component.limitations.length).padStart(2, "0")}
+                      </span>
+                    </div>
                     {/* Stated plainly. An undocumented limitation becomes a
                         bug report, and in this domain, sometimes worse. */}
-                    <ul className="mt-3 space-y-2">
-                      {component.limitations.map((limitation) => (
-                        <li key={limitation} className="text-sm leading-relaxed text-graphite">
-                          — {limitation}
+                    <ul className="limitation-list" aria-label="Known limitations">
+                      {component.limitations.map((limitation, index) => (
+                        <li
+                          key={limitation}
+                          className="limitation-item text-sm leading-relaxed text-graphite"
+                        >
+                          <span className="limitation-index numeric" aria-hidden="true">
+                            {String(index + 1).padStart(2, "0")}
+                          </span>
+                          <span className="limitation-marker" aria-hidden="true">
+                            ↳
+                          </span>
+                          <span>{limitation}</span>
                         </li>
                       ))}
                     </ul>
@@ -268,13 +306,10 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
         {source && (
           <section id="source" className="scroll-mt-24 border-b border-rule bg-paper-sunk/40">
             <div className="mx-auto max-w-6xl section-minor px-5 sm:px-8">
-              <SectionHeading
-                eyebrow="Source"
-                title="Exactly what lands in your repository."
-              />
+              <SectionHeading eyebrow="Source" title="Exactly what lands in your repository." />
               <p className="mt-3 max-w-2xl text-sm text-graphite" data-reveal>
-                Read directly from the published registry, so this can never drift from what the
-                CLI installs.
+                Read directly from the published registry, so this can never drift from what the CLI
+                installs.
               </p>
               <details className="mt-6 group" data-reveal>
                 <summary className="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-rule bg-paper px-4 py-2 text-sm text-graphite transition-colors hover:border-rule-strong hover:text-ink">
@@ -284,7 +319,10 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
                     {source.split("\n").length} lines
                   </span>
                 </summary>
-                <pre tabIndex={0} className="scroll-thin-dark mt-4 max-h-[32rem] overflow-auto rounded-2xl border border-panel-rule bg-panel p-5 font-mono text-[0.7rem] leading-relaxed text-panel-fg/90">
+                <pre
+                  tabIndex={0}
+                  className="scroll-thin-dark mt-4 max-h-[32rem] overflow-auto rounded-2xl border border-panel-rule bg-panel p-5 font-mono text-[0.7rem] leading-relaxed text-panel-fg/90"
+                >
                   <code>{source}</code>
                 </pre>
               </details>
@@ -352,29 +390,47 @@ function Th({ children }: { children: React.ReactNode }) {
 
 function GuidanceList({
   title,
+  label,
   items,
   icon: Icon,
   tone,
   delay = false,
 }: {
   title: string;
+  label: string;
   items: string[];
   icon: React.ComponentType<{ className?: string }>;
-  tone: string;
+  tone: "use" | "avoid";
   delay?: boolean;
 }) {
   return (
     <div
       data-reveal
       style={delay ? ({ "--reveal-delay": "80ms" } as React.CSSProperties) : undefined}
-      className="surface-1 self-start rounded-2xl p-6"
+      className={`guidance-column guidance-column--${tone}`}
     >
-      <h3 className="font-display text-[0.9375rem] font-semibold tracking-tight">{title}</h3>
-      <ul className="mt-4 space-y-3">
-        {items.map((item) => (
-          <li key={item} className="flex items-start gap-2.5 text-sm leading-relaxed text-graphite">
-            <Icon aria-hidden="true" className={`mt-0.5 size-4 shrink-0 ${tone}`} />
-            {item}
+      <div className="guidance-column__header">
+        <div className="flex min-w-0 items-center gap-3">
+          <span className="guidance-column__marker" aria-hidden="true" />
+          <div>
+            <p className="guidance-kicker numeric text-[0.625rem] text-graphite-soft">{label}</p>
+            <h3 className="mt-1 font-display text-base font-semibold tracking-tight">{title}</h3>
+          </div>
+        </div>
+        <span className="guidance-count numeric" aria-label={`${items.length} guidance items`}>
+          {String(items.length).padStart(2, "0")}
+        </span>
+      </div>
+      <ul className="guidance-list" aria-label={`${title} guidance`}>
+        {items.map((item, index) => (
+          <li key={item} className="guidance-item text-sm leading-relaxed text-graphite">
+            <span className="guidance-index numeric" aria-hidden="true">
+              {String(index + 1).padStart(2, "0")}
+            </span>
+            <span className="guidance-icon" aria-hidden="true">
+              <Icon />
+            </span>
+            <span>{item}</span>
           </li>
         ))}
       </ul>

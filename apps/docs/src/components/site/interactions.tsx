@@ -59,6 +59,8 @@ export function InstallCommand({
       </span>
 
       <code
+        tabIndex={0}
+        aria-label={`Install command: ${command}`}
         className={cn(
           "scroll-hidden min-w-0 flex-1 overflow-x-auto whitespace-nowrap font-mono text-panel-fg/95",
           size === "lg" ? "text-[0.8125rem] sm:text-sm" : "text-xs",
