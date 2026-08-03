@@ -45,6 +45,7 @@ import {
   type Observation,
   type ObservationComponent,
 } from "@oxygenui/fhir";
+import { AbsentValue } from "@/components/oxygen/absent-value";
 import { cn } from "@/lib/utils";
 
 // ---------------------------------------------------------------------------
@@ -266,7 +267,6 @@ export function ObservationRow({
   const name = codeableText(observation.code) ?? "Unnamed observation";
   const parts = observation.component ?? [];
   const value = formatObservationValue(observation);
-  const absentReason = codeableText(observation.dataAbsentReason);
   const range = formatReferenceRange(observation.referenceRange?.[0]);
 
   const interactive = Boolean(onSelect);
@@ -332,9 +332,10 @@ export function ObservationRow({
             {parts.length} parts
           </span>
         ) : (
-          <span className="text-[length:var(--ox-text-sm)] italic text-[var(--ox-text-subtle)]">
-            {absentReason ?? "No value"}
-          </span>
+          // Absence is a state, and which absence it is changes what the reader
+          // should do. "Hidden — restricted" and "Not asked" are not the same
+          // fact and must not share a rendering.
+          <AbsentValue field={name} reason={observation.dataAbsentReason} />
         )}
       </td>
 
@@ -386,7 +387,6 @@ export function ObservationComponentRow({
 
   const name = codeableText(component.code) ?? "Component";
   const value = formatComponentValue(component);
-  const absentReason = codeableText(component.dataAbsentReason);
   const range = formatReferenceRange(component.referenceRange?.[0]);
 
   return (
@@ -414,9 +414,7 @@ export function ObservationComponentRow({
             {value}
           </span>
         ) : (
-          <span className="text-[length:var(--ox-text-sm)] italic text-[var(--ox-text-subtle)]">
-            {absentReason ?? "No value"}
-          </span>
+          <AbsentValue field={name} reason={component.dataAbsentReason} />
         )}
       </td>
 

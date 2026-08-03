@@ -26,6 +26,15 @@ export interface Coding {
   userSelected?: boolean;
 }
 
+/** https://hl7.org/fhir/R4/datatypes.html#Attachment */
+export interface Attachment {
+  contentType?: string;
+  url?: string;
+  data?: string;
+  title?: string;
+  creation?: string;
+}
+
 /** https://hl7.org/fhir/R4/datatypes.html#CodeableConcept */
 export interface CodeableConcept {
   coding?: Coding[];
@@ -122,6 +131,11 @@ export interface Patient extends Resource {
   birthDate?: string;
   deceasedBoolean?: boolean;
   deceasedDateTime?: string;
+  /**
+   * Presence of a photo is not consent to display it. Components require the
+   * consuming application to assert that separately.
+   */
+  photo?: Attachment[];
   address?: Array<{
     use?: string;
     line?: string[];
@@ -364,4 +378,144 @@ export interface Bundle<T extends Resource = Resource> {
   type?: string;
   total?: number;
   entry?: Array<{ fullUrl?: string; resource?: T }>;
+}
+
+/** https://hl7.org/fhir/R4/provenance.html */
+export interface Provenance extends Resource {
+  resourceType?: "Provenance";
+  target?: Reference[];
+  occurredDateTime?: string;
+  /** When the record was written, which is not when the event happened. */
+  recorded?: string;
+  reason?: CodeableConcept[];
+  activity?: CodeableConcept;
+  agent?: Array<{
+    type?: CodeableConcept;
+    who?: Reference;
+    onBehalfOf?: Reference;
+  }>;
+  entity?: Array<{
+    role?: "derivation" | "revision" | "quotation" | "source" | "removal";
+    what?: Reference;
+  }>;
+}
+
+/** https://hl7.org/fhir/R4/flag.html */
+export interface Flag extends Resource {
+  resourceType?: "Flag";
+  status?: "active" | "inactive" | "entered-in-error";
+  category?: CodeableConcept[];
+  code?: CodeableConcept;
+  subject?: Reference;
+  period?: Period;
+  author?: Reference;
+}
+
+/** https://hl7.org/fhir/R4/practitioner.html */
+export interface Practitioner extends Resource {
+  resourceType?: "Practitioner";
+  active?: boolean;
+  identifier?: Identifier[];
+  name?: HumanName[];
+  telecom?: ContactPoint[];
+  photo?: Attachment[];
+  qualification?: Array<{ code?: CodeableConcept; period?: Period }>;
+}
+
+/** https://hl7.org/fhir/R4/practitionerrole.html */
+export interface PractitionerRole extends Resource {
+  resourceType?: "PractitionerRole";
+  active?: boolean;
+  period?: Period;
+  practitioner?: Reference;
+  organization?: Reference;
+  code?: CodeableConcept[];
+  specialty?: CodeableConcept[];
+  telecom?: ContactPoint[];
+  availabilityExceptions?: string;
+}
+
+/** https://hl7.org/fhir/R4/relatedperson.html */
+export interface RelatedPerson extends Resource {
+  resourceType?: "RelatedPerson";
+  active?: boolean;
+  patient?: Reference;
+  relationship?: CodeableConcept[];
+  name?: HumanName[];
+  telecom?: ContactPoint[];
+  period?: Period;
+}
+
+/** https://hl7.org/fhir/R4/careteam.html */
+export interface CareTeam extends Resource {
+  resourceType?: "CareTeam";
+  status?: "proposed" | "active" | "suspended" | "inactive" | "entered-in-error";
+  name?: string;
+  subject?: Reference;
+  period?: Period;
+  participant?: Array<{
+    role?: CodeableConcept[];
+    member?: Reference;
+    onBehalfOf?: Reference;
+    period?: Period;
+  }>;
+  telecom?: ContactPoint[];
+}
+
+/** https://hl7.org/fhir/R4/detectedissue.html */
+export interface DetectedIssue extends Resource {
+  resourceType?: "DetectedIssue";
+  status?: "registered" | "preliminary" | "final" | "amended" | "entered-in-error";
+  code?: CodeableConcept;
+  severity?: "high" | "moderate" | "low";
+  patient?: Reference;
+  identifiedDateTime?: string;
+  detail?: string;
+  reference?: string;
+  mitigation?: Array<{ action?: CodeableConcept; date?: string; author?: Reference }>;
+}
+
+/** https://hl7.org/fhir/R4/consent.html */
+export interface Consent extends Resource {
+  resourceType?: "Consent";
+  status?: "draft" | "proposed" | "active" | "rejected" | "inactive" | "entered-in-error";
+  scope?: CodeableConcept;
+  category?: CodeableConcept[];
+  patient?: Reference;
+  dateTime?: string;
+  performer?: Reference[];
+  sourceAttachment?: Attachment;
+  sourceReference?: Reference;
+  policyRule?: CodeableConcept;
+  provision?: {
+    type?: "deny" | "permit";
+    period?: Period;
+    actor?: Array<{ role?: CodeableConcept; reference?: Reference }>;
+    purpose?: Coding[];
+  };
+}
+
+/** https://hl7.org/fhir/R4/documentreference.html */
+export interface DocumentReference extends Resource {
+  resourceType?: "DocumentReference";
+  status?: "current" | "superseded" | "entered-in-error";
+  docStatus?: "preliminary" | "final" | "amended" | "entered-in-error";
+  type?: CodeableConcept;
+  category?: CodeableConcept[];
+  subject?: Reference;
+  date?: string;
+  author?: Reference[];
+  description?: string;
+  content?: Array<{ attachment?: Attachment }>;
+}
+
+/** https://hl7.org/fhir/R4/operationoutcome.html */
+export interface OperationOutcome extends Resource {
+  resourceType?: "OperationOutcome";
+  issue?: Array<{
+    severity?: "fatal" | "error" | "warning" | "information";
+    code?: string;
+    diagnostics?: string;
+    details?: CodeableConcept;
+  }>;
 }

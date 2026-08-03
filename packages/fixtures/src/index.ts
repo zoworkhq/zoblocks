@@ -173,6 +173,84 @@ export const observationAbsent: Observation = {
   dataAbsentReason: { text: "Specimen hemolyzed — recollect" },
 };
 
+/**
+ * The absent-reason taxonomy, one observation per group that a reader must
+ * treat differently. These exist so the difference between "nobody asked",
+ * "she declined", "it is hidden from you", and "the analyser errored" is
+ * demonstrable rather than asserted.
+ *
+ * http://terminology.hl7.org/CodeSystem/data-absent-reason
+ */
+const ABSENT_SYSTEM = "http://terminology.hl7.org/CodeSystem/data-absent-reason";
+
+/** Nobody asked. The workflow never captured it. */
+export const observationNotAsked: Observation = {
+  resourceType: "Observation",
+  id: "syn-obs-not-asked",
+  status: "final",
+  code: { coding: [{ system: "http://loinc.org", code: "2601-3", display: "Magnesium [Moles/volume] in Serum or Plasma" }], text: "Magnesium" },
+  subject,
+  effectiveDateTime: "2026-08-03T07:40:00Z",
+  dataAbsentReason: { coding: [{ system: ABSENT_SYSTEM, code: "not-asked", display: "Not Asked" }] },
+};
+
+/** Asked, and the patient declined to answer. A clinically meaningful answer. */
+export const observationDeclined: Observation = {
+  resourceType: "Observation",
+  id: "syn-obs-declined",
+  status: "final",
+  code: { coding: [{ system: "http://loinc.org", code: "72166-2", display: "Tobacco smoking status" }], text: "Smoking status" },
+  subject,
+  effectiveDateTime: "2026-08-03T09:02:00Z",
+  dataAbsentReason: { coding: [{ system: ABSENT_SYSTEM, code: "asked-declined", display: "Asked But Declined" }] },
+};
+
+/**
+ * Present, but withheld from this reader. The dangerous one: read as "not
+ * recorded", a clinician concludes the chart is empty when it is not.
+ */
+export const observationMasked: Observation = {
+  resourceType: "Observation",
+  id: "syn-obs-masked",
+  status: "final",
+  code: { coding: [{ system: "http://loinc.org", code: "3426-4", display: "Toxicology screen" }], text: "Toxicology screen" },
+  subject,
+  effectiveDateTime: "2026-08-02T18:20:00Z",
+  dataAbsentReason: { coding: [{ system: ABSENT_SYSTEM, code: "masked", display: "Masked" }] },
+};
+
+/** Ordered, not yet resulted. May still arrive — do not stop asking. */
+export const observationPending: Observation = {
+  resourceType: "Observation",
+  id: "syn-obs-pending",
+  status: "registered",
+  code: { coding: [{ system: "http://loinc.org", code: "2028-9", display: "Carbon dioxide, total" }], text: "Bicarbonate" },
+  subject,
+  effectiveDateTime: "2026-08-03T07:40:00Z",
+  dataAbsentReason: { coding: [{ system: ABSENT_SYSTEM, code: "temp-unknown", display: "Temporarily Unknown" }] },
+};
+
+/** The analyser failed. Something is broken; this value SHOULD be here. */
+export const observationErrored: Observation = {
+  resourceType: "Observation",
+  id: "syn-obs-errored",
+  status: "final",
+  code: { coding: [{ system: "http://loinc.org", code: "1751-7", display: "Albumin [Mass/volume] in Serum or Plasma" }], text: "Albumin" },
+  subject,
+  effectiveDateTime: "2026-08-03T07:40:00Z",
+  dataAbsentReason: { coding: [{ system: ABSENT_SYSTEM, code: "error", display: "Error" }] },
+};
+
+/** Every absent path in one list, for the primitive's own documentation. */
+export const observationAbsentSet: Observation[] = [
+  observationNotAsked,
+  observationDeclined,
+  observationPending,
+  observationMasked,
+  observationErrored,
+  observationAbsent,
+];
+
 /** Corrected after release. Provenance has to be visible. */
 export const observationCorrected: Observation = {
   resourceType: "Observation",
@@ -612,6 +690,12 @@ export const observations = {
   uninterpreted: observationUninterpreted,
   preliminary: observationPreliminary,
   absent: observationAbsent,
+  notAsked: observationNotAsked,
+  declined: observationDeclined,
+  masked: observationMasked,
+  pending: observationPending,
+  errored: observationErrored,
+  absentSet: observationAbsentSet,
   corrected: observationCorrected,
   panel: observationPanel,
 };
