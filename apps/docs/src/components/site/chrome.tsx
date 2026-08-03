@@ -33,10 +33,16 @@ export function SiteHeader() {
             Components
           </Link>
           <Link
-            href="/#quality"
+            href="/showcase"
             className="hidden rounded-lg px-3 py-1.5 text-graphite transition-colors duration-200 hover:bg-paper-sunk hover:text-ink sm:block"
           >
-            Quality
+            Showcase
+          </Link>
+          <Link
+            href="/pro"
+            className="rounded-lg px-3 py-1.5 text-graphite transition-colors duration-200 hover:bg-paper-sunk hover:text-ink"
+          >
+            Pro
           </Link>
           <a
             href="https://github.com/zoworkhq/oxygenui"
@@ -67,6 +73,12 @@ export function SiteFooter() {
         <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-graphite">
           <Link href="/components" className="transition-colors duration-200 hover:text-ink">
             Components
+          </Link>
+          <Link href="/showcase" className="transition-colors duration-200 hover:text-ink">
+            Showcase
+          </Link>
+          <Link href="/pro" className="transition-colors duration-200 hover:text-ink">
+            Pro
           </Link>
           <a
             href="https://github.com/zoworkhq/oxygenui"
