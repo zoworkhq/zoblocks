@@ -40,10 +40,22 @@ export default function ComponentsPage() {
               would skip.
             </p>
 
-            <dl className="mt-8 flex flex-wrap gap-x-8 gap-y-3" data-reveal>
-              <Stat value={shipping.length} label="Shipping" />
-              <Stat value={CATALOG.length} label="In the catalog" />
-              <Stat value={new Set(CATALOG.map((c) => c.resource)).size} label="FHIR resources" />
+            {/*
+              These three read 8 / 8 / 8 when they were components / catalog /
+              resources — every component ships and every one takes a distinct
+              resource, so the numbers were identical and looked broken.
+              "States handled" is the one that actually carries the argument.
+            */}
+            <dl className="mt-8 flex flex-wrap gap-x-10 gap-y-3" data-reveal>
+              <Stat value={shipping.length} label="Components" />
+              <Stat
+                value={new Set(CATALOG.filter((c) => c.resource !== "Primitive").map((c) => c.resource)).size}
+                label="FHIR resources"
+              />
+              <Stat
+                value={CATALOG.reduce((total, c) => total + c.states.length, 0)}
+                label="States handled"
+              />
             </dl>
           </div>
         </section>
