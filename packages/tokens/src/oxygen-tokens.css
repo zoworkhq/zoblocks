@@ -1,0 +1,283 @@
+/**
+ * Oxygen UI — design tokens
+ *
+ * Plain CSS custom properties so the same file works in a Tailwind v4 project,
+ * a CSS-modules project, or plain CSS. Distributed via the registry as
+ * `@oxygenui/tokens` and copied into the consumer's stylesheet.
+ *
+ * Two rules govern this file:
+ *   1. Clinical meaning lives in SEMANTIC tokens, never in raw palette values.
+ *      Components reference --ox-status-critical, never --ox-red-600.
+ *   2. Status is never communicated by color alone. Every status token has a
+ *      matching icon and text label in the component layer. These colors are
+ *      reinforcement, not the signal.
+ */
+
+:root {
+  /* ---------------------------------------------------------------------
+   * Palette — raw values. Do not reference these directly in components.
+   * ------------------------------------------------------------------ */
+  --ox-brand-50: #ecfdf8;
+  --ox-brand-100: #d0faee;
+  --ox-brand-200: #a4f3df;
+  --ox-brand-300: #6ce7cb;
+  --ox-brand-400: #2dd4b0;
+  --ox-brand-500: #10b995;
+  --ox-brand-600: #059478;
+  --ox-brand-700: #067662;
+  --ox-brand-800: #0a5d4f;
+  --ox-brand-900: #0b4d42;
+  --ox-brand-950: #012e28;
+
+  --ox-slate-50: #f8fafc;
+  --ox-slate-100: #f1f5f9;
+  --ox-slate-200: #e2e8f0;
+  --ox-slate-300: #cbd5e1;
+  --ox-slate-400: #94a3b8;
+  --ox-slate-500: #64748b;
+  --ox-slate-600: #475569;
+  --ox-slate-700: #334155;
+  --ox-slate-800: #1e293b;
+  --ox-slate-900: #0f172a;
+  --ox-slate-950: #020617;
+
+  --ox-red-500: #ef4444;
+  --ox-red-600: #dc2626;
+  --ox-red-700: #b91c1c;
+  --ox-amber-500: #f59e0b;
+  --ox-amber-600: #d97706;
+  --ox-amber-700: #b45309;
+  --ox-blue-500: #3b82f6;
+  --ox-blue-600: #2563eb;
+  --ox-blue-700: #1d4ed8;
+  --ox-green-500: #10b981;
+  --ox-green-600: #059669;
+  --ox-green-700: #047857;
+
+  /* ---------------------------------------------------------------------
+   * Surface & text — semantic
+   * ------------------------------------------------------------------ */
+  --ox-bg: #ffffff;
+  --ox-bg-subtle: var(--ox-slate-50);
+  --ox-bg-muted: var(--ox-slate-100);
+  --ox-surface: #ffffff;
+  --ox-surface-raised: #ffffff;
+  --ox-surface-overlay: #ffffff;
+
+  --ox-border: var(--ox-slate-200);
+  --ox-border-strong: var(--ox-slate-300);
+
+  --ox-text: var(--ox-slate-900);
+  --ox-text-muted: var(--ox-slate-600);
+  --ox-text-subtle: var(--ox-slate-500);
+  --ox-text-on-accent: #ffffff;
+
+  --ox-accent: var(--ox-brand-600);
+  --ox-accent-hover: var(--ox-brand-700);
+  --ox-accent-subtle: var(--ox-brand-50);
+  --ox-accent-border: var(--ox-brand-200);
+
+  --ox-focus-ring: var(--ox-brand-500);
+  --ox-focus-ring-offset: var(--ox-bg);
+
+  /* ---------------------------------------------------------------------
+   * Clinical status — semantic. Paired with icon + label in components.
+   *
+   * `high` and `low` are separated by HUE, not just intensity, so the
+   * direction of an abnormal result survives monochrome printing and the
+   * most common forms of color vision deficiency.
+   * ------------------------------------------------------------------ */
+  --ox-status-critical: var(--ox-red-600);
+  --ox-status-critical-bg: #fef2f2;
+  --ox-status-critical-border: #fecaca;
+
+  --ox-status-high: var(--ox-amber-600);
+  --ox-status-high-bg: #fffbeb;
+  --ox-status-high-border: #fde68a;
+
+  --ox-status-low: var(--ox-blue-600);
+  --ox-status-low-bg: #eff6ff;
+  --ox-status-low-border: #bfdbfe;
+
+  --ox-status-normal: var(--ox-green-600);
+  --ox-status-normal-bg: #ecfdf5;
+  --ox-status-normal-border: #a7f3d0;
+
+  /* Absence of interpretation is a distinct state from "normal". */
+  --ox-status-unknown: var(--ox-slate-500);
+  --ox-status-unknown-bg: var(--ox-slate-50);
+  --ox-status-unknown-border: var(--ox-slate-200);
+
+  /* Record-level flags */
+  --ox-flag-restricted: #7c3aed;
+  --ox-flag-restricted-bg: #f5f3ff;
+  --ox-flag-provisional: var(--ox-amber-700);
+  --ox-flag-deceased: var(--ox-slate-700);
+
+  /* ---------------------------------------------------------------------
+   * Typography
+   * ------------------------------------------------------------------ */
+  --ox-font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --ox-font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+  /* Tabular figures are mandatory for values, doses, and identifiers. */
+  --ox-font-numeric: var(--ox-font-mono);
+
+  --ox-text-2xs: 0.6875rem;
+  --ox-text-xs: 0.75rem;
+  --ox-text-sm: 0.8125rem;
+  --ox-text-base: 0.875rem;
+  --ox-text-md: 1rem;
+  --ox-text-lg: 1.125rem;
+  --ox-text-xl: 1.375rem;
+  --ox-text-2xl: 1.75rem;
+
+  /* ---------------------------------------------------------------------
+   * Shape & elevation
+   * ------------------------------------------------------------------ */
+  --ox-radius-sm: 0.25rem;
+  --ox-radius: 0.5rem;
+  --ox-radius-lg: 0.75rem;
+  --ox-radius-xl: 1rem;
+  --ox-radius-full: 9999px;
+
+  --ox-shadow-sm: 0 1px 2px 0 rgb(2 6 23 / 0.05);
+  --ox-shadow: 0 1px 3px 0 rgb(2 6 23 / 0.08), 0 1px 2px -1px rgb(2 6 23 / 0.06);
+  --ox-shadow-md: 0 4px 12px -2px rgb(2 6 23 / 0.08), 0 2px 6px -2px rgb(2 6 23 / 0.05);
+  --ox-shadow-lg: 0 12px 32px -8px rgb(2 6 23 / 0.12);
+
+  /* ---------------------------------------------------------------------
+   * Density — the single most important healthcare-specific token group.
+   *
+   *   patient   roomy, larger targets, patient-facing surfaces
+   *   standard  general SaaS / admin
+   *   clinical  dense worklists, flowsheets, results tables
+   *
+   * Set with `data-ox-density` on any container; components read these
+   * rather than hard-coding spacing.
+   * ------------------------------------------------------------------ */
+  --ox-density-row-height: 2.5rem;
+  --ox-density-gap: 0.75rem;
+  --ox-density-pad-x: 0.875rem;
+  --ox-density-pad-y: 0.625rem;
+  --ox-density-font: var(--ox-text-base);
+  --ox-density-target: 2.75rem; /* minimum interactive target */
+
+  /* Motion. Decorative motion is prohibited on clinical surfaces. */
+  --ox-duration-fast: 120ms;
+  --ox-duration: 180ms;
+  --ox-duration-slow: 280ms;
+  --ox-ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+[data-ox-density="patient"] {
+  --ox-density-row-height: 3.25rem;
+  --ox-density-gap: 1.125rem;
+  --ox-density-pad-x: 1.125rem;
+  --ox-density-pad-y: 0.875rem;
+  --ox-density-font: var(--ox-text-md);
+  --ox-density-target: 3rem;
+}
+
+[data-ox-density="standard"] {
+  --ox-density-row-height: 2.5rem;
+  --ox-density-gap: 0.75rem;
+  --ox-density-pad-x: 0.875rem;
+  --ox-density-pad-y: 0.625rem;
+  --ox-density-font: var(--ox-text-base);
+  --ox-density-target: 2.75rem;
+}
+
+[data-ox-density="clinical"] {
+  --ox-density-row-height: 1.875rem;
+  --ox-density-gap: 0.375rem;
+  --ox-density-pad-x: 0.5rem;
+  --ox-density-pad-y: 0.25rem;
+  --ox-density-font: var(--ox-text-sm);
+  /* Target stays at 24px even in dense mode — below this, mis-taps become
+     clinically consequential. Dense means tighter rows, not smaller buttons. */
+  --ox-density-target: 1.5rem;
+}
+
+/* -----------------------------------------------------------------------
+ * Dark theme
+ *
+ * Status colors are re-tuned rather than reused: the light-mode values do not
+ * hold contrast on a dark surface, and critical must stay unmistakable.
+ * -------------------------------------------------------------------- */
+.dark,
+[data-theme="dark"] {
+  --ox-bg: #08110f;
+  --ox-bg-subtle: #0b1917;
+  --ox-bg-muted: #10201d;
+  --ox-surface: #0d1a18;
+  --ox-surface-raised: #12211f;
+  --ox-surface-overlay: #16272400;
+
+  --ox-border: #1d302d;
+  --ox-border-strong: #2a423e;
+
+  --ox-text: #e8f4f1;
+  --ox-text-muted: #9db3ae;
+  --ox-text-subtle: #7a908b;
+  --ox-text-on-accent: #012e28;
+
+  --ox-accent: var(--ox-brand-400);
+  --ox-accent-hover: var(--ox-brand-300);
+  --ox-accent-subtle: #0a2b26;
+  --ox-accent-border: #10453c;
+
+  --ox-focus-ring: var(--ox-brand-400);
+  --ox-focus-ring-offset: var(--ox-bg);
+
+  --ox-status-critical: #fb7185;
+  --ox-status-critical-bg: #2a1216;
+  --ox-status-critical-border: #5c1f28;
+
+  --ox-status-high: #fbbf24;
+  --ox-status-high-bg: #2a1f0c;
+  --ox-status-high-border: #5c421a;
+
+  --ox-status-low: #60a5fa;
+  --ox-status-low-bg: #0f1c33;
+  --ox-status-low-border: #1e3a68;
+
+  --ox-status-normal: #34d399;
+  --ox-status-normal-bg: #0a2620;
+  --ox-status-normal-border: #14503f;
+
+  --ox-status-unknown: #94a3b8;
+  --ox-status-unknown-bg: #141f22;
+  --ox-status-unknown-border: #253338;
+
+  --ox-flag-restricted: #c4b5fd;
+  --ox-flag-restricted-bg: #1c1533;
+  --ox-flag-provisional: #fbbf24;
+  --ox-flag-deceased: #cbd5e1;
+
+  --ox-shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.4);
+  --ox-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.5);
+  --ox-shadow-md: 0 4px 14px -2px rgb(0 0 0 / 0.55);
+  --ox-shadow-lg: 0 16px 40px -10px rgb(0 0 0 / 0.65);
+}
+
+/* -----------------------------------------------------------------------
+ * Reduced motion. Clinical surfaces must remain fully usable without it.
+ * -------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --ox-duration-fast: 0ms;
+    --ox-duration: 0ms;
+    --ox-duration-slow: 0ms;
+  }
+}
+
+/* -----------------------------------------------------------------------
+ * Forced colors (Windows High Contrast). Status must survive the loss of
+ * every custom color, which is exactly why labels and icons are mandatory.
+ * -------------------------------------------------------------------- */
+@media (forced-colors: active) {
+  :root {
+    --ox-border: CanvasText;
+    --ox-focus-ring: Highlight;
+  }
+}

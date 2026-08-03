@@ -1,0 +1,27 @@
+{
+  "name": "@oxygenui/tokens",
+  "version": "0.1.0",
+  "description": "Oxygen UI design tokens: semantic clinical status, density modes, light/dark themes.",
+  "license": "MIT",
+  "homepage": "https://oxygenui.design",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zoworkhq/oxygenui.git",
+    "directory": "packages/tokens"
+  },
+  "keywords": ["design-tokens", "healthcare", "css-variables", "tailwind"],
+  "sideEffects": ["*.css"],
+  "exports": {
+    "./oxygen-tokens.css": "./src/oxygen-tokens.css",
+    "./package.json": "./package.json"
+  },
+  "files": ["src"],
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "echo \"[tokens] css is published as source\"",
+    "typecheck": "echo \"[tokens] no typescript\"",
+    "lint": "echo \"[tokens] lint: configured in Phase 1\""
+  }
+}

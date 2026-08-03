@@ -1,0 +1,65 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    name: Typecheck, test, build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      # Runs before anything else: a registry that does not validate is a
+      # broken install for every customer, and it is the cheapest check we have.
+      - name: Validate registry
+        run: pnpm registry:check
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Test
+        run: pnpm test
+
+      - name: Build
+        run: pnpm build
+
+  no-phi:
+    name: Synthetic data check
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # Fixtures must stay synthetic. This catches the obvious mistakes — a real
+      # identifier system, a production hostname — not every possible one. It is
+      # a backstop for review, not a substitute for it.
+      - name: Scan for non-synthetic identifiers
+        run: |
+          set -euo pipefail
+          patterns='hl7\.org/fhir/sid/us-ssn|epic\.com|cerner\.com|athenahealth|\bPHI\b'
+          if grep -rInE "$patterns" packages/fixtures registry apps/docs/src 2>/dev/null; then
+            echo "::error::Possible non-synthetic data or real system reference found above."
+            exit 1
+          fi
+          echo "No non-synthetic identifiers found."

@@ -1,0 +1,18 @@
+{
+  "extends": "./packages/tsconfig/base.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "baseUrl": ".",
+    "paths": {
+      "@oxygenui/fhir": ["./packages/fhir/src/index.ts"],
+      "@oxygenui/fixtures": ["./packages/fixtures/src/index.ts"],
+      "@/registry/*": ["./registry/*"],
+      // Registry components import "@/lib/utils" because that is where the
+      // shadcn CLI writes it in the consumer's project. Mapped here so the
+      // same source typechecks in this repo without being edited.
+      "@/lib/utils": ["./registry/oxygen/lib/utils.ts"]
+    }
+  },
+  "include": ["scripts/**/*.ts", "registry/**/*.ts", "registry/**/*.tsx"],
+  "exclude": ["node_modules", "**/dist", "**/.next"]
+}

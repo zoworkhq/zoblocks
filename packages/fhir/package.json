@@ -1,0 +1,43 @@
+{
+  "name": "@oxygenui/fhir",
+  "version": "0.1.0",
+  "description": "Narrow FHIR R4 type contracts and pure read helpers for healthcare UI. Zero runtime dependencies.",
+  "license": "MIT",
+  "homepage": "https://oxygenui.design",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zoworkhq/oxygenui.git",
+    "directory": "packages/fhir"
+  },
+  "keywords": ["fhir", "fhir-r4", "healthcare", "hl7", "typescript", "react"],
+  "type": "module",
+  "sideEffects": false,
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "files": ["dist"],
+  "publishConfig": {
+    "access": "public",
+    "main": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "exports": {
+      ".": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      }
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "lint": "echo \"[fhir] lint: configured in Phase 1\""
+  },
+  "devDependencies": {
+    "@oxygenui/tsconfig": "workspace:*",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  }
+}
