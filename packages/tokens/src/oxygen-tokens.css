@@ -215,28 +215,28 @@
  * -------------------------------------------------------------------- */
 .dark,
 [data-theme="dark"] {
-  --ox-bg: #08110f;
-  --ox-bg-subtle: #0b1917;
-  --ox-bg-muted: #10201d;
-  --ox-surface: #0d1a18;
-  --ox-surface-raised: #12211f;
-  --ox-surface-overlay: #16272400;
+  --ox-bg: #0a0d12;
+  --ox-bg-subtle: #11161d;
+  --ox-bg-muted: #181f28;
+  --ox-surface: #141a22;
+  --ox-surface-raised: #1a222c;
+  --ox-surface-overlay: #1d263000;
 
-  --ox-border: #1d302d;
-  --ox-border-strong: #2a423e;
+  --ox-border: #29333f;
+  --ox-border-strong: #3a4654;
 
-  --ox-text: #e8f4f1;
-  --ox-text-muted: #9db3ae;
-  --ox-text-subtle: #7a908b;
-  --ox-text-on-accent: #012e28;
+  --ox-text: #edf2f7;
+  --ox-text-muted: #a5b1be;
+  --ox-text-subtle: #82909f;
+  --ox-text-on-accent: #071014;
 
-  --ox-accent: var(--ox-brand-400);
-  --ox-accent-hover: var(--ox-brand-300);
-  --ox-accent-subtle: #0a2b26;
-  --ox-accent-border: #10453c;
+  --ox-accent: #67e8f9;
+  --ox-accent-hover: #a5f3fc;
+  --ox-accent-subtle: #102a32;
+  --ox-accent-border: #1b4655;
 
-  --ox-focus-ring: var(--ox-brand-400);
-  --ox-focus-ring-offset: var(--ox-bg);
+  --ox-focus-ring: #67e8f9;
+  --ox-focus-ring-offset: #0a0d12;
 
   --ox-status-critical: #fb7185;
   --ox-status-critical-bg: #2a1216;
@@ -250,9 +250,9 @@
   --ox-status-low-bg: #0f1c33;
   --ox-status-low-border: #1e3a68;
 
-  --ox-status-normal: #34d399;
-  --ox-status-normal-bg: #0a2620;
-  --ox-status-normal-border: #14503f;
+  --ox-status-normal: #4ade80;
+  --ox-status-normal-bg: #10271e;
+  --ox-status-normal-border: #1e5138;
 
   --ox-status-unknown: #94a3b8;
   --ox-status-unknown-bg: #141f22;

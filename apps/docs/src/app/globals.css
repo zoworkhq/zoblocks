@@ -108,33 +108,33 @@
  * behaves in an unlit room.
  * -------------------------------------------------------------------- */
 .dark {
-  --site-paper: #050d0c;
-  --site-paper-sunk: #081412;
-  --site-rule: #172724;
-  --site-rule-strong: #243834;
+  --site-paper: #080b10;
+  --site-paper-sunk: #0d1219;
+  --site-rule: #1d2733;
+  --site-rule-strong: #2c3744;
 
-  --site-ink: #e8f4f1;
-  --site-graphite: #93a8a4;
+  --site-ink: #edf2f7;
+  --site-graphite: #a2aebb;
   /* Was #6d827e at 3.85:1 on the dark page — below AA. Muted text on a very
      dark ground needs to be lighter than intuition suggests. */
-  --site-graphite-soft: #8b9c98;
+  --site-graphite-soft: #8592a1;
 
-  --site-oxygen: #2dd4b0;
-  --site-accent-text: #34d8b4;
+  --site-oxygen: #67e8f9;
+  --site-accent-text: #86e1f2;
   --site-electric: #73d8ff;
   --site-critical: #fb7185;
 
   /* Bright button on a dark page; text-paper resolves dark, so it still reads. */
-  --site-cta: #2dd4b0;
+  --site-cta: #8be8f4;
 
   /* Lighter than --site-paper AND than every .surface-* level on purpose —
      the instrument has to remain the brightest object on the page. */
-  --site-panel: #101f1c;
-  --site-panel-raised: #142622;
-  --site-panel-rule: #24403b;
-  --site-panel-fg: #e8f4f1;
-  --site-panel-muted: #8b9c98;
-  --site-trace: #2dd4b0;
+  --site-panel: #151a21;
+  --site-panel-raised: #1c232c;
+  --site-panel-rule: #303b47;
+  --site-panel-fg: #edf2f7;
+  --site-panel-muted: #96a3b3;
+  --site-trace: #65e6e0;
   --site-critical-lum: #fb7185;
 
   color-scheme: dark;
@@ -218,7 +218,7 @@ body {
 }
 
 .scroll-thin-dark::-webkit-scrollbar-thumb {
-  background: #24403b;
+  background: #2b3745;
   border-radius: 999px;
 }
 
@@ -297,26 +297,26 @@ body {
  * instrument sits above all of them: it must remain the brightest object on
  * screen or the whole "lit instrument" premise collapses.
  *
- *   page  #050d0c  <  s1 #08120f  <  s2 #0a1614  <  s3 #0c1a17  <  panel #101f1c
+ *   page  #080b10  <  s1 #0e131a  <  s2 #121820  <  s3 #161e27  <  panel #151a21
  *
  * surface-2 and surface-3 previously both resolved to --color-paper-sunk, so
  * levels 2 and 3 were indistinguishable in dark mode.
  */
 .dark .surface-1 {
-  background: #08120f;
-  border-color: #16241f;
+  background: #0e131a;
+  border-color: #1f2833;
   box-shadow: none;
 }
 
 .dark .surface-2 {
-  background: #0a1614;
-  border-color: #1a2b26;
+  background: #121820;
+  border-color: #27323e;
   box-shadow: 0 12px 32px -16px rgb(0 0 0 / 0.55);
 }
 
 .dark .surface-3 {
-  background: #0c1a17;
-  border-color: #21352f;
+  background: #161e27;
+  border-color: #33404d;
   box-shadow: 0 20px 50px -22px rgb(0 0 0 / 0.7);
 }
 
@@ -1076,7 +1076,7 @@ body {
   overflow: hidden;
   border: 1px solid var(--color-panel-rule);
   border-radius: 1.5rem;
-  background: #08110f;
+  background: var(--color-panel);
   box-shadow:
     0 0 0 1px rgb(255 255 255 / 0.03) inset,
     0 36px 80px -30px rgb(2 20 17 / 0.58);
@@ -1177,12 +1177,12 @@ html:not(.dark) .signal-field::before {
   height: 9rem;
   place-content: center;
   gap: 0.25rem;
-  border: 1px solid rgb(45 212 176 / 0.35);
+  border: 1px solid color-mix(in srgb, var(--color-trace) 35%, transparent);
   border-radius: 50%;
-  background: #0b1714;
+  background: #1a212a;
   box-shadow:
-    0 0 0 0.5rem rgb(45 212 176 / 0.04),
-    0 0 3rem rgb(45 212 176 / 0.16),
+    0 0 0 0.5rem color-mix(in srgb, var(--color-trace) 4%, transparent),
+    0 0 3rem color-mix(in srgb, var(--color-trace) 16%, transparent),
     0 20px 40px -18px rgb(0 0 0 / 0.9);
   text-align: center;
   transform: translate(-50%, -50%);
@@ -1313,8 +1313,8 @@ html:not(.dark) .signal-status {
   border-radius: 1.125rem;
   box-shadow:
     0 0 0 1px rgb(255 255 255 / 0.02) inset,
-    0 30px 70px -24px rgb(2 20 17 / 0.45),
-    0 8px 24px -12px rgb(2 20 17 / 0.3);
+    0 30px 70px -24px rgb(0 0 0 / 0.5),
+    0 8px 24px -12px rgb(0 0 0 / 0.34);
   overflow: hidden;
 }
 
@@ -1408,7 +1408,7 @@ html:not(.dark) .instrument-demo [class*="bg-panel"] {
   transition: opacity 400ms var(--ease-out-expo);
   background: radial-gradient(
     420px circle at var(--glow-x, 50%) var(--glow-y, 0%),
-    rgb(45 212 176 / 0.1),
+    color-mix(in srgb, var(--color-trace) 10%, transparent),
     transparent 65%
   );
 }
