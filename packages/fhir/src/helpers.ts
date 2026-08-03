@@ -18,6 +18,7 @@ import type {
   Identifier,
   MedicationRequest,
   Observation,
+  ObservationComponent,
   ObservationReferenceRange,
   Patient,
   Quantity,
@@ -274,6 +275,95 @@ export function formatReferenceRange(
   if (typeof high === "number") return `< ${high}${suffix}`;
   if (typeof low === "number") return `> ${low}${suffix}`;
   return undefined;
+}
+
+// ---------------------------------------------------------------------------
+// Observation.component
+//
+// FHIR models blood pressure as ONE Observation with two components — systolic
+// and diastolic — and no value on the parent. A renderer that only reads
+// `valueQuantity` shows the most common vital sign in medicine as having no
+// value at all, which is worse than not supporting it.
+// ---------------------------------------------------------------------------
+
+/** True when the reading lives in components rather than on the parent. */
+export function hasComponents(observation: Observation | undefined): boolean {
+  return Boolean(observation?.component?.length);
+}
+
+/** Best available display value for a single component. */
+export function formatComponentValue(
+  component: ObservationComponent | undefined,
+): string | undefined {
+  if (!component) return undefined;
+  return (
+    formatQuantity(component.valueQuantity) ??
+    component.valueString ??
+    codeableText(component.valueCodeableConcept) ??
+    (typeof component.valueBoolean === "boolean"
+      ? component.valueBoolean
+        ? "Yes"
+        : "No"
+      : undefined)
+  );
+}
+
+/**
+ * Interpretation for a component, using the same rules as the parent: a stated
+ * interpretation wins, otherwise compare to the component's own reference
+ * range, otherwise unknown.
+ */
+export function getComponentInterpretation(
+  component: ObservationComponent | undefined,
+): Interpretation {
+  const codes = component?.interpretation?.flatMap((i) => i.coding ?? []) ?? [];
+  for (const coding of codes) {
+    const mapped = coding.code ? INTERPRETATION_BY_CODE[coding.code] : undefined;
+    if (mapped) return mapped;
+  }
+
+  const value = component?.valueQuantity?.value;
+  const range = component?.referenceRange?.[0];
+  if (typeof value === "number" && range) {
+    if (typeof range.high?.value === "number" && value > range.high.value) return "high";
+    if (typeof range.low?.value === "number" && value < range.low.value) return "low";
+    if (range.low?.value !== undefined || range.high?.value !== undefined) return "normal";
+  }
+
+  return "unknown";
+}
+
+/** Severity order, worst first. Used to escalate a panel to its worst part. */
+const INTERPRETATION_SEVERITY: Interpretation[] = [
+  "critical-high",
+  "critical-low",
+  "abnormal",
+  "high",
+  "low",
+  "normal",
+  "unknown",
+];
+
+export function worstInterpretation(interpretations: Interpretation[]): Interpretation {
+  for (const candidate of INTERPRETATION_SEVERITY) {
+    if (interpretations.includes(candidate)) return candidate;
+  }
+  return "unknown";
+}
+
+/**
+ * Interpretation for the whole observation, including its components.
+ *
+ * A panel is only as reassuring as its worst part — a critical systolic must
+ * escalate the blood-pressure row even though the parent carries no value and
+ * no interpretation of its own.
+ */
+export function getPanelInterpretation(observation: Observation | undefined): Interpretation {
+  const own = getInterpretation(observation);
+  if (!hasComponents(observation)) return own;
+
+  const parts = (observation?.component ?? []).map(getComponentInterpretation);
+  return worstInterpretation(own === "unknown" ? parts : [own, ...parts]);
 }
 
 /** Observation statuses that must be surfaced to the reader, not hidden. */

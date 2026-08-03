@@ -34,7 +34,7 @@ const TZ = "Asia/Kolkata";
 const COMPOSITIONS: Record<string, () => React.ReactNode> = {
   "patient-results": () => (
     <div className="space-y-3">
-      <PatientBanner patient={patients.routine} asOf={AS_OF} />
+      <PatientBanner headingLevel={3} patient={patients.routine} asOf={AS_OF} />
       {/* Same component as the clinical view — ranges hidden, patient density. */}
       <ObservationPanel
         observations={[observations.heartRate, observations.hemoglobinLow]}
@@ -46,7 +46,7 @@ const COMPOSITIONS: Record<string, () => React.ReactNode> = {
 
   "chart-summary": () => (
     <div className="space-y-3">
-      <PatientBanner patient={patients.routine} asOf={AS_OF} />
+      <PatientBanner headingLevel={3} patient={patients.routine} asOf={AS_OF} />
       <ObservationPanel observations={observations.panel.slice(0, 3)} label="Recent results" />
       <div className="grid gap-3 lg:grid-cols-2">
         <ConditionList conditions={conditions.list} />
@@ -58,7 +58,7 @@ const COMPOSITIONS: Record<string, () => React.ReactNode> = {
   "front-desk": () => (
     <div className="space-y-3">
       {/* Masked: this screen faces a waiting room. */}
-      <PatientBanner patient={patients.routine} maskIdentifiers asOf={AS_OF} />
+      <PatientBanner headingLevel={3} patient={patients.routine} maskIdentifiers asOf={AS_OF} />
       <div className="grid gap-3 lg:grid-cols-2">
         <AppointmentCard appointment={appointments.booked} timeZone={TZ} />
         <CoverageCard coverage={coverages.lapsed} asOf={AS_OF} maskIdentifiers />

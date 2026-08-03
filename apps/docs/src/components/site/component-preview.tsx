@@ -43,11 +43,11 @@ interface Scenario {
 
 const SCENARIOS: Record<string, Scenario[]> = {
   "patient-banner": [
-    { id: "routine", label: "Routine", note: "Complete demographics. The easy case.", render: () => <PatientBanner patient={patients.routine} asOf={AS_OF} /> },
-    { id: "restricted", label: "Restricted", note: "Confidentiality label on meta.security, identifiers masked for a shared screen.", render: () => <PatientBanner patient={patients.restricted} maskIdentifiers asOf={AS_OF} /> },
-    { id: "deceased", label: "Deceased", note: "Stated unambiguously, in text and icon — never by styling alone.", render: () => <PatientBanner patient={patients.deceased} asOf={AS_OF} /> },
-    { id: "sparse", label: "Missing data", note: "No name, no birth date. Absence reads as absence.", render: () => <PatientBanner patient={patients.sparse} asOf={AS_OF} /> },
-    { id: "loading", label: "Loading", note: "Skeleton carries aria-busy and an accessible label.", render: () => <PatientBanner patient={undefined} loading /> },
+    { id: "routine", label: "Routine", note: "Complete demographics. The easy case.", render: () => <PatientBanner headingLevel={3} patient={patients.routine} asOf={AS_OF} /> },
+    { id: "restricted", label: "Restricted", note: "Confidentiality label on meta.security, identifiers masked for a shared screen.", render: () => <PatientBanner headingLevel={3} patient={patients.restricted} maskIdentifiers asOf={AS_OF} /> },
+    { id: "deceased", label: "Deceased", note: "Stated unambiguously, in text and icon — never by styling alone.", render: () => <PatientBanner headingLevel={3} patient={patients.deceased} asOf={AS_OF} /> },
+    { id: "sparse", label: "Missing data", note: "No name, no birth date. Absence reads as absence.", render: () => <PatientBanner headingLevel={3} patient={patients.sparse} asOf={AS_OF} /> },
+    { id: "loading", label: "Loading", note: "Skeleton carries aria-busy and an accessible label.", render: () => <PatientBanner headingLevel={3} patient={undefined} loading /> },
   ],
   "vitals-panel": [
     { id: "critical", label: "Critical", note: "Severity reaches the reader three ways: badge, left rule, and a live-region announcement.", render: () => <ObservationPanel observations={observations.panel} label="Chemistry panel" /> },

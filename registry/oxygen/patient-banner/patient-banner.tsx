@@ -51,6 +51,16 @@ export interface PatientBannerProps extends React.HTMLAttributes<HTMLDivElement>
   asOf?: Date;
   /** Trailing slot for actions — encounter switcher, chart menu, alerts. */
   actions?: React.ReactNode;
+  /**
+   * Heading level for the patient name. Defaults to 2, which suits a banner at
+   * the top of a page.
+   *
+   * Set it when the banner is nested — several banners on one page at h2 each
+   * inject a sibling into the document outline, and screen-reader users
+   * navigate by that outline. Match the level to where the banner actually
+   * sits, not to how large you want the text.
+   */
+  headingLevel?: 1 | 2 | 3 | 4 | 5 | 6;
 }
 
 export function PatientBanner({
@@ -62,9 +72,11 @@ export function PatientBanner({
   loading = false,
   asOf,
   actions,
+  headingLevel = 2,
   className,
   ...props
 }: PatientBannerProps) {
+  const Heading = `h${headingLevel}` as const;
   if (loading) {
     return <PatientBannerSkeleton className={className} {...props} />;
   }
@@ -102,13 +114,13 @@ export function PatientBanner({
     >
       <div className="min-w-0 flex-1">
         <div className="flex flex-wrap items-center gap-2">
-          <h2 className="truncate text-[length:var(--ox-text-lg)] font-semibold tracking-tight">
+          <Heading className="truncate text-[length:var(--ox-text-lg)] font-semibold tracking-tight">
             {name ?? (
               <span className="font-normal italic text-[var(--ox-text-muted)]">
                 Name not recorded
               </span>
             )}
-          </h2>
+          </Heading>
 
           {deceased && (
             <Flag

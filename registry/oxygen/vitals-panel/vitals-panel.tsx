@@ -32,15 +32,18 @@ import {
 } from "lucide-react";
 import {
   codeableText,
+  formatComponentValue,
   formatObservationValue,
   formatReferenceRange,
-  getInterpretation,
+  getComponentInterpretation,
+  getPanelInterpretation,
   INTERPRETATION_LABEL,
   isCorrected,
   isCritical,
   isProvisional,
   type Interpretation,
   type Observation,
+  type ObservationComponent,
 } from "@oxygenui/fhir";
 import { cn } from "@/lib/utils";
 
@@ -155,7 +158,7 @@ export function ObservationPanel({
     );
   }
 
-  const criticalCount = observations.filter((o) => isCritical(getInterpretation(o))).length;
+  const criticalCount = observations.filter((o) => isCritical(getPanelInterpretation(o))).length;
 
   return (
     <div
@@ -186,12 +189,24 @@ export function ObservationPanel({
         </thead>
         <tbody>
           {observations.map((observation, index) => (
-            <ObservationRow
-              key={observation.id ?? index}
-              observation={observation}
-              hideReferenceRange={hideReferenceRange}
-              onSelect={onSelect}
-            />
+            <React.Fragment key={observation.id ?? index}>
+              <ObservationRow
+                observation={observation}
+                hideReferenceRange={hideReferenceRange}
+                onSelect={onSelect}
+              />
+              {/* Multi-part results (blood pressure, differentials) carry their
+                  reading in components, not on the parent. Each renders as its
+                  own indented row so systolic and diastolic are separately
+                  readable and separately flaggable. */}
+              {(observation.component ?? []).map((part, partIndex) => (
+                <ObservationComponentRow
+                  key={partIndex}
+                  component={part}
+                  hideReferenceRange={hideReferenceRange}
+                />
+              ))}
+            </React.Fragment>
           ))}
         </tbody>
       </table>
@@ -224,12 +239,15 @@ export function ObservationRow({
   hideReferenceRange?: boolean;
   onSelect?: (observation: Observation) => void;
 }) {
-  const interpretation = getInterpretation(observation);
+  // Panel interpretation, not just the parent's: a critical systolic must
+  // escalate the blood-pressure row even though the parent has no value.
+  const interpretation = getPanelInterpretation(observation);
   const style = INTERPRETATION_CLASS[interpretation];
   const Icon = INTERPRETATION_ICON[interpretation];
   const critical = isCritical(interpretation);
 
   const name = codeableText(observation.code) ?? "Unnamed observation";
+  const parts = observation.component ?? [];
   const value = formatObservationValue(observation);
   const absentReason = codeableText(observation.dataAbsentReason);
   const range = formatReferenceRange(observation.referenceRange?.[0]);
@@ -277,6 +295,94 @@ export function ObservationRow({
             </StatusChip>
           )}
         </div>
+      </td>
+
+      <td className="whitespace-nowrap px-[var(--ox-density-pad-x)] py-[var(--ox-density-pad-y)] text-right">
+        {value ? (
+          <span
+            className={cn(
+              "font-[family-name:var(--ox-font-numeric)] tabular-nums",
+              critical ? "font-bold" : "font-medium",
+              style.value,
+            )}
+          >
+            {value}
+          </span>
+        ) : parts.length ? (
+          // The reading is in the rows below. Saying "No value" here would be
+          // wrong, and blank would look like a failure.
+          <span className="text-[length:var(--ox-text-sm)] text-[var(--ox-text-subtle)]">
+            {parts.length} parts
+          </span>
+        ) : (
+          <span className="text-[length:var(--ox-text-sm)] italic text-[var(--ox-text-subtle)]">
+            {absentReason ?? "No value"}
+          </span>
+        )}
+      </td>
+
+      {!hideReferenceRange && (
+        <td className="whitespace-nowrap px-[var(--ox-density-pad-x)] py-[var(--ox-density-pad-y)] text-right">
+          {range ? (
+            <span className="font-[family-name:var(--ox-font-numeric)] tabular-nums text-[length:var(--ox-text-sm)] text-[var(--ox-text-muted)]">
+              {range}
+            </span>
+          ) : (
+            <Minus aria-hidden="true" className="ml-auto size-3.5 text-[var(--ox-text-subtle)]" />
+          )}
+        </td>
+      )}
+
+      <td className="px-[var(--ox-density-pad-x)] py-[var(--ox-density-pad-y)]">
+        <span
+          className={cn(
+            "inline-flex items-center gap-1.5 rounded-[var(--ox-radius-full)] border px-2 py-0.5",
+            "text-[length:var(--ox-text-xs)] font-semibold whitespace-nowrap",
+            style.badge,
+          )}
+        >
+          <Icon aria-hidden="true" className="size-3.5" />
+          {INTERPRETATION_LABEL[interpretation]}
+        </span>
+      </td>
+    </tr>
+  );
+}
+
+/**
+ * One part of a multi-component observation — a systolic reading, a
+ * differential fraction. Indented under its parent and independently flagged,
+ * because "blood pressure is abnormal" is not actionable but "systolic is
+ * critical high" is.
+ */
+export function ObservationComponentRow({
+  component,
+  hideReferenceRange = false,
+}: {
+  component: ObservationComponent;
+  hideReferenceRange?: boolean;
+}) {
+  const interpretation = getComponentInterpretation(component);
+  const style = INTERPRETATION_CLASS[interpretation];
+  const Icon = INTERPRETATION_ICON[interpretation];
+  const critical = isCritical(interpretation);
+
+  const name = codeableText(component.code) ?? "Component";
+  const value = formatComponentValue(component);
+  const absentReason = codeableText(component.dataAbsentReason);
+  const range = formatReferenceRange(component.referenceRange?.[0]);
+
+  return (
+    <tr
+      data-interpretation={interpretation}
+      className={cn(
+        "border-b border-[var(--ox-border)] last:border-b-0",
+        critical &&
+          "bg-[var(--ox-status-critical-bg)] shadow-[inset_3px_0_0_0_var(--ox-status-critical)]",
+      )}
+    >
+      <td className="py-[var(--ox-density-pad-y)] pl-[calc(var(--ox-density-pad-x)*2)] pr-[var(--ox-density-pad-x)]">
+        <span className="text-[var(--ox-text-muted)]">{name}</span>
       </td>
 
       <td className="whitespace-nowrap px-[var(--ox-density-pad-x)] py-[var(--ox-density-pad-y)] text-right">

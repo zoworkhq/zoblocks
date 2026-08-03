@@ -185,9 +185,44 @@ export const observationCorrected: Observation = {
   referenceRange: [{ low: { value: 70, unit: "mg/dL" }, high: { value: 100, unit: "mg/dL" } }],
 };
 
+
+/**
+ * Blood pressure — the case a component-blind renderer gets wrong.
+ *
+ * FHIR models BP as ONE Observation with two components and NO value on the
+ * parent. A renderer that only reads valueQuantity shows the most common vital
+ * sign in medicine as having no value at all.
+ */
+export const observationBloodPressure: Observation = {
+  resourceType: "Observation",
+  id: "syn-obs-bp",
+  status: "final",
+  category: vitalSigns,
+  code: {
+    coding: [{ system: "http://loinc.org", code: "85354-9", display: "Blood pressure panel" }],
+    text: "Blood pressure",
+  },
+  subject,
+  effectiveDateTime: "2026-08-03T09:14:00Z",
+  component: [
+    {
+      code: { coding: [{ system: "http://loinc.org", code: "8480-6" }], text: "Systolic" },
+      valueQuantity: { value: 168, unit: "mmHg" },
+      interpretation: [{ coding: [{ system: INTERPRETATION_SYSTEM, code: "H", display: "High" }] }],
+      referenceRange: [{ low: { value: 90 }, high: { value: 130, unit: "mmHg" } }],
+    },
+    {
+      code: { coding: [{ system: "http://loinc.org", code: "8462-4" }], text: "Diastolic" },
+      valueQuantity: { value: 82, unit: "mmHg" },
+      referenceRange: [{ low: { value: 60 }, high: { value: 85, unit: "mmHg" } }],
+    },
+  ],
+};
+
 /** A representative panel spanning every interpretation and status path. */
 export const observationPanel: Observation[] = [
   observationPotassiumCritical,
+  observationBloodPressure,
   observationHemoglobinLow,
   observationCorrected,
   observationHeartRate,
@@ -571,6 +606,7 @@ export const conditions = {
 
 export const observations = {
   heartRate: observationHeartRate,
+  bloodPressure: observationBloodPressure,
   potassiumCritical: observationPotassiumCritical,
   hemoglobinLow: observationHemoglobinLow,
   uninterpreted: observationUninterpreted,

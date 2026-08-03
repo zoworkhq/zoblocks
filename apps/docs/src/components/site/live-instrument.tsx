@@ -147,8 +147,7 @@ export function LiveInstrument() {
         data-ox-density={density}
         className="relative space-y-3 p-4 sm:p-5"
       >
-        <PatientBanner
-          patient={scenario.patient}
+        <PatientBanner headingLevel={3} patient={scenario.patient}
           loading={scenario.loading}
           maskIdentifiers={scenario.mask}
           asOf={AS_OF}

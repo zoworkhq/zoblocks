@@ -1,12 +1,17 @@
 import { describe, expect, it } from "vitest";
 import {
   calculateAge,
+  formatComponentValue,
   formatObservationValue,
   formatReferenceRange,
+  getComponentInterpretation,
   getInterpretation,
+  getPanelInterpretation,
+  hasComponents,
   isRestricted,
   maskIdentifier,
   resolvePatientName,
+  worstInterpretation,
 } from "./helpers";
 import type { Observation, Patient } from "./types";
 
@@ -107,6 +112,74 @@ describe("formatReferenceRange", () => {
     expect(formatReferenceRange({ low: { value: 70 }, high: { value: 100, unit: "mg/dL" } })).toBe("70 – 100 mg/dL");
     expect(formatReferenceRange({ high: { value: 5.7, unit: "%" } })).toBe("< 5.7 %");
     expect(formatReferenceRange({ low: { value: 12, unit: "g/dL" } })).toBe("> 12 g/dL");
+  });
+});
+
+describe("Observation.component", () => {
+  // FHIR models blood pressure as one Observation with two components and no
+  // value on the parent — the shape a component-blind renderer gets wrong.
+  const bloodPressure: Observation = {
+    code: { text: "Blood pressure" },
+    component: [
+      {
+        code: { text: "Systolic" },
+        valueQuantity: { value: 168, unit: "mmHg" },
+        referenceRange: [{ low: { value: 90 }, high: { value: 130 } }],
+      },
+      {
+        code: { text: "Diastolic" },
+        valueQuantity: { value: 82, unit: "mmHg" },
+        referenceRange: [{ low: { value: 60 }, high: { value: 85 } }],
+      },
+    ],
+  };
+
+  it("detects component-carried readings", () => {
+    expect(hasComponents(bloodPressure)).toBe(true);
+    expect(hasComponents({ valueQuantity: { value: 72 } })).toBe(false);
+  });
+
+  it("formats each component's own value", () => {
+    expect(formatComponentValue(bloodPressure.component?.[0])).toBe("168 mmHg");
+    expect(formatComponentValue(bloodPressure.component?.[1])).toBe("82 mmHg");
+  });
+
+  it("interprets each component against its own range", () => {
+    expect(getComponentInterpretation(bloodPressure.component?.[0])).toBe("high");
+    expect(getComponentInterpretation(bloodPressure.component?.[1])).toBe("normal");
+  });
+
+  it("escalates the panel to its worst component", () => {
+    // The parent has no value and no interpretation; without this, a raised
+    // systolic would render as "Not interpreted".
+    expect(getPanelInterpretation(bloodPressure)).toBe("high");
+  });
+
+  it("escalates to critical when any component is critical", () => {
+    const critical: Observation = {
+      component: [
+        {
+          valueQuantity: { value: 210 },
+          interpretation: [{ coding: [{ code: "HH" }] }],
+        },
+        { valueQuantity: { value: 80 }, referenceRange: [{ low: { value: 60 }, high: { value: 85 } }] },
+      ],
+    };
+    expect(getPanelInterpretation(critical)).toBe("critical-high");
+  });
+
+  it("leaves single-value observations unchanged", () => {
+    const single: Observation = {
+      valueQuantity: { value: 72 },
+      referenceRange: [{ low: { value: 60 }, high: { value: 100 } }],
+    };
+    expect(getPanelInterpretation(single)).toBe("normal");
+  });
+
+  it("orders severity worst-first", () => {
+    expect(worstInterpretation(["normal", "low", "critical-low"])).toBe("critical-low");
+    expect(worstInterpretation(["unknown", "normal"])).toBe("normal");
+    expect(worstInterpretation([])).toBe("unknown");
   });
 });
 

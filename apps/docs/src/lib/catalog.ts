@@ -100,6 +100,13 @@ export const CATALOG: ComponentDoc[] = [
         type: "ReactNode",
         description: "Trailing slot for actions — encounter switcher, chart menu, alerts.",
       },
+      {
+        name: "headingLevel",
+        type: "1 | 2 | 3 | 4 | 5 | 6",
+        default: "2",
+        description:
+          "Heading level for the patient name. Set it when the banner is nested — several banners at h2 each inject a sibling into the document outline, and screen-reader users navigate by that outline.",
+      },
     ],
     usage: `import { PatientBanner } from "@/components/oxygen/patient-banner";
 
@@ -129,6 +136,7 @@ export function ChartHeader({ patient }: { patient: Patient }) {
       { label: "Status flags", detail: "Deceased and restricted are text and icon, not color. Both are inside the region's accessible name." },
       { label: "Masked identifiers", detail: "Screen readers receive the last four characters and an explicit statement that the value is masked." },
       { label: "Loading", detail: "Skeleton carries aria-busy and an accessible label so the wait is announced." },
+      { label: "Heading level", detail: "The patient name renders at a configurable heading level so a nested banner does not corrupt the page outline." },
     ],
     limitations: [
       "Does not render address, telecom, or managing organization — compose those alongside it.",
@@ -150,6 +158,7 @@ export function ChartHeader({ patient }: { patient: Patient }) {
     categories: ["Clinical data", "Clinical"],
     dependencies: ["@oxygenui/fhir", "lucide-react", "clsx", "tailwind-merge"],
     states: [
+      "Multi-component (blood pressure)",
       "Critical high and low",
       "High and low",
       "Normal",
@@ -218,10 +227,11 @@ export function Results({ bundle }: { bundle: Bundle<Observation> }) {
       { label: "Critical announcement", detail: "A live region states the critical count before the table is read, so severity is known up front rather than discovered on row seven." },
       { label: "Never color alone", detail: "Every interpretation carries an icon and a text label. Critical rows add an inset rule — a second structural cue that survives grayscale and forced colors." },
       { label: "Row activation", detail: "When onSelect is provided, rows are focusable and respond to Enter and Space with a visible focus ring." },
+      { label: "Multi-part results", detail: "Blood pressure and other component-carried readings render each part as its own row, separately valued and separately flagged. The parent escalates to its worst component so a raised systolic is never hidden behind a silent panel." },
     ],
     limitations: [
       "Renders referenceRange[0] only. Age- and sex-specific ranges are not yet selected by context.",
-      "Observation.component (multi-part results such as blood pressure) renders the parent only.",
+      "Component reference ranges are read from referenceRange[0], same as the parent.",
       "No built-in unit conversion. Values render in the units supplied.",
     ],
     related: ["patient-banner"],
