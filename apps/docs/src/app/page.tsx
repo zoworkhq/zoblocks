@@ -228,7 +228,7 @@ function CodeComparison() {
             <div className="mb-3 flex items-center gap-2">
               <span className="eyebrow text-graphite">Hand-rolled</span>
             </div>
-            <pre className="scroll-thin overflow-x-auto rounded-2xl border border-rule bg-paper-sunk p-5 font-mono text-[0.75rem] leading-relaxed text-graphite">
+            <pre tabIndex={0} className="scroll-thin overflow-x-auto rounded-2xl border border-rule bg-paper-sunk p-5 font-mono text-[0.75rem] leading-relaxed text-graphite">
               <code>{`{observations.map((o) => (
   <Row
     name={o.code?.text}
@@ -253,7 +253,7 @@ function CodeComparison() {
             <div className="mb-3 flex items-center gap-2">
               <span className="eyebrow text-oxygen-deep">With Oxygen</span>
             </div>
-            <pre className="scroll-thin-dark overflow-x-auto rounded-2xl border border-panel-rule bg-panel p-5 font-mono text-[0.75rem] leading-relaxed text-panel-fg/90">
+            <pre tabIndex={0} className="scroll-thin-dark overflow-x-auto rounded-2xl border border-panel-rule bg-panel p-5 font-mono text-[0.75rem] leading-relaxed text-panel-fg/90">
               <code>
                 <span className="text-graphite-soft">{`// props are the FHIR resource\n`}</span>
                 {`<ObservationPanel\n  observations={observations}\n/>`}
@@ -329,7 +329,7 @@ function Catalog() {
 const QUALITY = [
   {
     title: "Accessibility, stated as a target",
-    body: "WCAG 2.2 AA is the bar, with keyboard paths, focus order, accessible names, reduced motion, and forced-colors verified per component. Each ships a conformance note recording what was tested and what is left to you.",
+    body: "WCAG 2.2 AA is the bar, and it is enforced in CI — every page is audited with axe-core in both light and dark on each commit. That check found and fixed four real violations, three of them in the clinical status tokens themselves. Automated testing catches roughly a third of WCAG issues, so keyboard and screen-reader passes remain manual.",
   },
   {
     title: "Status is never color alone",

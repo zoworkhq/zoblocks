@@ -43,6 +43,20 @@ jobs:
       - name: Build
         run: pnpm build
 
+      # The site claims WCAG 2.2 AA and publishes per-component accessibility
+      # notes. This is what makes that claim checkable rather than aspirational.
+      # Its first run found four real violations, including a contrast failure
+      # on the footer's own legal limitation statement and three in the
+      # clinical status tokens.
+      - name: Install Playwright browser
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Accessibility (WCAG 2.2 AA, both themes)
+        run: |
+          pnpm --filter @oxygenui/docs start &
+          npx wait-on http://localhost:6001 -t 60000
+          pnpm a11y http://localhost:6001
+
   no-phi:
     name: Synthetic data check
     runs-on: ubuntu-latest

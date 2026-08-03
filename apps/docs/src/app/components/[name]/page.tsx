@@ -137,7 +137,7 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
 
               <div className="mt-8 grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)]">
                 <div data-reveal>
-                  <pre className="scroll-thin-dark overflow-x-auto rounded-2xl border border-panel-rule bg-panel p-5 font-mono text-[0.75rem] leading-relaxed text-panel-fg/90">
+                  <pre tabIndex={0} className="scroll-thin-dark overflow-x-auto rounded-2xl border border-panel-rule bg-panel p-5 font-mono text-[0.75rem] leading-relaxed text-panel-fg/90">
                     <code>{component.usage}</code>
                   </pre>
 
@@ -285,7 +285,7 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
                     {source.split("\n").length} lines
                   </span>
                 </summary>
-                <pre className="scroll-thin-dark mt-4 max-h-[32rem] overflow-auto rounded-2xl border border-panel-rule bg-panel p-5 font-mono text-[0.7rem] leading-relaxed text-panel-fg/90">
+                <pre tabIndex={0} className="scroll-thin-dark mt-4 max-h-[32rem] overflow-auto rounded-2xl border border-panel-rule bg-panel p-5 font-mono text-[0.7rem] leading-relaxed text-panel-fg/90">
                   <code>{source}</code>
                 </pre>
               </details>

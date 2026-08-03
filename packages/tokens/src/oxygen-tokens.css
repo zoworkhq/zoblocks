@@ -87,11 +87,17 @@
    * direction of an abnormal result survives monochrome printing and the
    * most common forms of color vision deficiency.
    * ------------------------------------------------------------------ */
-  --ox-status-critical: var(--ox-red-600);
+  /* red-700, not red-600: at 600 this was 4.41:1 on its own background —
+     under the 4.5:1 floor by a hair. This is the single most consequential
+     token in the library; it does not get to be borderline. */
+  --ox-status-critical: var(--ox-red-700);
   --ox-status-critical-bg: #fef2f2;
   --ox-status-critical-border: #fecaca;
 
-  --ox-status-high: var(--ox-amber-600);
+  /* amber-700, not amber-600: at 600 this was 3.07:1 on its own background.
+     Amber is the hardest hue to keep accessible on a light surface — it must
+     be darkened further than the other statuses to clear 4.5:1. */
+  --ox-status-high: var(--ox-amber-700);
   --ox-status-high-bg: #fffbeb;
   --ox-status-high-border: #fde68a;
 
@@ -99,7 +105,10 @@
   --ox-status-low-bg: #eff6ff;
   --ox-status-low-border: #bfdbfe;
 
-  --ox-status-normal: var(--ox-green-600);
+  /* green-700, not green-600: at 600 this was 3.57:1 on its own background,
+     below the 4.5:1 AA floor. A status badge that fails contrast is a status
+     badge some readers cannot read. */
+  --ox-status-normal: var(--ox-green-700);
   --ox-status-normal-bg: #ecfdf5;
   --ox-status-normal-border: #a7f3d0;
 

@@ -296,7 +296,7 @@ export default function ProPage() {
               </h2>
             </div>
 
-            <dl className="mt-10 max-w-3xl divide-y divide-rule border-y border-rule">
+            <div className="mt-10 max-w-3xl divide-y divide-rule border-y border-rule">
               {FAQ.map((item) => (
                 <div key={item.q} data-reveal>
                   <details className="group py-5">
@@ -313,7 +313,7 @@ export default function ProPage() {
                   </details>
                 </div>
               ))}
-            </dl>
+            </div>
           </div>
         </section>
       </main>

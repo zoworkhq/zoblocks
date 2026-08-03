@@ -72,7 +72,9 @@
 
   --site-ink: #08110f;
   --site-graphite: #5a6b67;
-  --site-graphite-soft: #8b9c98;
+  /* Was #8b9c98 at 2.65:1 on paper — below the 4.5:1 AA floor, and it was
+     used for the footer's legal limitation statement. */
+  --site-graphite-soft: #5c6d68;
 
   --site-oxygen: #10b995;
   /* Accent used on text. Deep here for contrast on paper; bright in dark. */
@@ -111,7 +113,9 @@
 
   --site-ink: #e8f4f1;
   --site-graphite: #93a8a4;
-  --site-graphite-soft: #6d827e;
+  /* Was #6d827e at 3.85:1 on the dark page — below AA. Muted text on a very
+     dark ground needs to be lighter than intuition suggests. */
+  --site-graphite-soft: #8b9c98;
 
   --site-oxygen: #2dd4b0;
   --site-accent-text: #34d8b4;
@@ -120,9 +124,10 @@
   /* Bright button on a dark page; text-paper resolves dark, so it still reads. */
   --site-cta: #2dd4b0;
 
-  /* Lighter than --site-paper on purpose. See the note above. */
-  --site-panel: #0d1a18;
-  --site-panel-raised: #12211f;
+  /* Lighter than --site-paper AND than every .surface-* level on purpose —
+     the instrument has to remain the brightest object on the page. */
+  --site-panel: #101f1c;
+  --site-panel-raised: #142622;
   --site-panel-rule: #24403b;
   --site-panel-fg: #e8f4f1;
   --site-panel-muted: #8b9c98;
@@ -276,19 +281,33 @@ body {
     0 16px 44px -20px rgb(2 20 17 / 0.14);
 }
 
+/*
+ * Dark elevation is carried by LUMINANCE, not shadow — a shadow on a near-black
+ * page is invisible. Each level is a measured step above the page, and the
+ * instrument sits above all of them: it must remain the brightest object on
+ * screen or the whole "lit instrument" premise collapses.
+ *
+ *   page  #050d0c  <  s1 #08120f  <  s2 #0a1614  <  s3 #0c1a17  <  panel #101f1c
+ *
+ * surface-2 and surface-3 previously both resolved to --color-paper-sunk, so
+ * levels 2 and 3 were indistinguishable in dark mode.
+ */
 .dark .surface-1 {
-  background: color-mix(in oklab, var(--color-paper-sunk) 70%, transparent);
+  background: #08120f;
+  border-color: #16241f;
   box-shadow: none;
 }
 
 .dark .surface-2 {
-  background: var(--color-paper-sunk);
-  box-shadow: 0 12px 32px -16px rgb(0 0 0 / 0.6);
+  background: #0a1614;
+  border-color: #1a2b26;
+  box-shadow: 0 12px 32px -16px rgb(0 0 0 / 0.55);
 }
 
 .dark .surface-3 {
-  background: var(--color-paper-sunk);
-  box-shadow: 0 20px 50px -22px rgb(0 0 0 / 0.75);
+  background: #0c1a17;
+  border-color: #21352f;
+  box-shadow: 0 20px 50px -22px rgb(0 0 0 / 0.7);
 }
 
 /* ===========================================================================

@@ -127,10 +127,11 @@ export function ComponentCard({
           data-ox-density="standard"
           className="relative mt-5 flex-1 overflow-hidden rounded-xl border border-panel-rule bg-panel p-3"
         >
-          {/* Decorative inside the card — the real thing is one click away, and
-              duplicating its semantics here would double every heading and
-              live region in the page. */}
-          <div aria-hidden="true" className="pointer-events-none">
+          {/* Decorative inside the card. aria-hidden alone is a violation here:
+              the panel contains a focusable scroll region, and hiding a
+              focusable element from AT strands keyboard users on it. `inert`
+              removes it from both the a11y tree and the tab order. */}
+          <div inert aria-hidden="true" className="pointer-events-none">
             {preview()}
           </div>
         </div>
