@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-import { CATALOG, STATUS_LABEL, type ComponentStatus } from "@/lib/catalog";
+import { CATALOG } from "@/lib/catalog";
+import { ComponentCard } from "@/components/site/component-card";
 import { ScrollRail, SiteFooter, SiteHeader } from "@/components/site/chrome";
 import { RevealRoot } from "@/components/site/interactions";
 
@@ -11,15 +12,16 @@ export const metadata: Metadata = {
     "Every Oxygen UI component, named for the FHIR resource it takes. Patient, Observation, MedicationRequest, AllergyIntolerance, Appointment, Condition, and Coverage.",
 };
 
-const STATUS_STYLE: Record<ComponentStatus, string> = {
-  shipping: "border-oxygen/30 bg-oxygen/8 text-oxygen-deep",
-  review: "border-rule-strong bg-paper-sunk text-graphite",
-  design: "border-rule bg-transparent text-graphite-soft",
-};
-
 export default function ComponentsPage() {
+  // These two carry the product's argument — interpretation and identity — so
+  // they lead, each paired with a standard cell to keep the rhythm even.
+  const FEATURED = ["vitals-panel", "patient-banner"];
   const shipping = CATALOG.filter((c) => c.status === "shipping");
   const planned = CATALOG.filter((c) => c.status !== "shipping");
+
+  const featured = FEATURED.map((n) => shipping.find((c) => c.name === n)!).filter(Boolean);
+  const rest = shipping.filter((c) => !FEATURED.includes(c.name));
+  const ordered = [featured[0], rest[0], featured[1], rest[1], ...rest.slice(2)].filter(Boolean);
 
   return (
     <RevealRoot>
@@ -27,44 +29,60 @@ export default function ComponentsPage() {
 
       <main id="main">
         <section className="border-b border-rule">
-          <div className="mx-auto max-w-6xl section-major px-5 sm:px-8">
-            <p className="eyebrow text-oxygen-deep" data-reveal>
-              Catalog
-            </p>
-            <h1 className="display-lg mt-4 max-w-3xl text-balance" data-reveal>
-              Every component is named for the resource it takes.
-            </h1>
-            <p className="lede mt-5 max-w-2xl text-pretty" data-reveal>
-              No adapter layer and no bespoke prop shape to learn. If your server speaks FHIR, the
-              component is already typed for it — and every one of them ships the states a demo
-              would skip.
-            </p>
+          <div className="mx-auto grid max-w-6xl section-major gap-10 px-5 sm:px-8 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)] lg:items-end lg:gap-16">
+            <div>
+              <p className="eyebrow eyebrow-rule text-oxygen-deep" data-reveal>
+                Catalog
+              </p>
+              <h1 className="display-lg mt-5 text-balance" data-reveal>
+                Every component is named for the resource it takes.
+              </h1>
+              <p className="body-lg mt-6 max-w-xl text-pretty text-graphite" data-reveal>
+                No adapter layer and no bespoke prop shape to learn. If your server speaks FHIR, the
+                component is already typed for it — and every one of them ships the states a demo
+                would skip.
+              </p>
+            </div>
 
-            {/*
-              These three read 8 / 8 / 8 when they were components / catalog /
-              resources — every component ships and every one takes a distinct
-              resource, so the numbers were identical and looked broken.
-              "States handled" is the one that actually carries the argument.
-            */}
-            <dl className="mt-8 flex flex-wrap gap-x-10 gap-y-3" data-reveal>
-              <Stat value={shipping.length} label="Components" />
-              <Stat
-                value={new Set(CATALOG.filter((c) => c.resource !== "Primitive").map((c) => c.resource)).size}
-                label="FHIR resources"
-              />
-              <Stat
-                value={CATALOG.reduce((total, c) => total + c.states.length, 0)}
-                label="States handled"
-              />
+            {/* The right column was empty. Stats belong here, set as an
+                instrument readout rather than a row under the paragraph. */}
+            <dl className="lg:pb-1" data-reveal="right">
+              <div className="ticks mb-5 opacity-70" aria-hidden="true" />
+              {[
+                { label: "Components", value: shipping.length },
+                {
+                  label: "FHIR resources",
+                  value: new Set(
+                    CATALOG.filter((c) => c.resource !== "Primitive").map((c) => c.resource),
+                  ).size,
+                },
+                {
+                  label: "States handled",
+                  value: CATALOG.reduce((total, c) => total + c.states.length, 0),
+                },
+              ].map((stat) => (
+                <div
+                  key={stat.label}
+                  className="flex items-baseline justify-between border-b border-rule/70 py-2.5"
+                >
+                  <dt className="axis-label">{stat.label}</dt>
+                  <dd className="numeric text-2xl font-semibold text-oxygen-deep">{stat.value}</dd>
+                </div>
+              ))}
             </dl>
           </div>
         </section>
 
         <section className="bg-paper-sunk/40">
           <div className="mx-auto max-w-6xl section-minor px-5 sm:px-8">
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {shipping.map((component, index) => (
-                <ComponentCard key={component.name} component={component} index={index} />
+            <div className="grid auto-rows-fr gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {ordered.map((component, index) => (
+                <ComponentCard
+                  key={component!.name}
+                  component={component!}
+                  index={index}
+                  featured={FEATURED.includes(component!.name)}
+                />
               ))}
             </div>
 
@@ -90,55 +108,3 @@ export default function ComponentsPage() {
   );
 }
 
-function Stat({ value, label }: { value: number; label: string }) {
-  return (
-    <div>
-      <dt className="sr-only">{label}</dt>
-      <dd className="numeric display-sm text-oxygen-deep">{value}</dd>
-      <p className="mt-0.5 text-xs uppercase tracking-wide text-graphite">{label}</p>
-    </div>
-  );
-}
-
-function ComponentCard({
-  component,
-  index,
-}: {
-  component: (typeof CATALOG)[number];
-  index: number;
-}) {
-  return (
-    <Link
-      href={`/components/${component.name}`}
-      data-reveal
-      style={{ "--reveal-delay": `${(index % 3) * 70}ms` } as React.CSSProperties}
-      className="group flex flex-col surface-2 lift rounded-2xl p-5 hover:border-oxygen/45"
-    >
-      <div className="flex items-start justify-between gap-3">
-        <h3 className="font-display text-base font-semibold tracking-tight">{component.title}</h3>
-        <span
-          className={`shrink-0 rounded-full border px-2 py-0.5 font-mono text-[0.625rem] uppercase tracking-wider ${STATUS_STYLE[component.status]}`}
-        >
-          {STATUS_LABEL[component.status]}
-        </span>
-      </div>
-
-      <p className="numeric mt-2 text-xs text-oxygen-deep">{component.resource}</p>
-
-      <p className="mt-3 flex-1 text-sm leading-relaxed text-graphite">{component.summary}</p>
-
-      <div className="mt-4 flex items-center justify-between border-t border-rule pt-3">
-        <span className="numeric text-[0.6875rem] text-graphite-soft">
-          {component.states.length} states
-        </span>
-        <span className="inline-flex items-center gap-1 text-xs font-medium text-oxygen-deep">
-          View
-          <ArrowRight
-            aria-hidden="true"
-            className="size-3.5 transition-transform duration-300 ease-[var(--ease-out-expo)] group-hover:translate-x-0.5"
-          />
-        </span>
-      </div>
-    </Link>
-  );
-}

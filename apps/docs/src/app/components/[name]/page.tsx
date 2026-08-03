@@ -8,6 +8,7 @@ import { CATALOG, STATUS_LABEL, getComponent } from "@/lib/catalog";
 import { ScrollRail, SiteFooter, SiteHeader } from "@/components/site/chrome";
 import { ComponentPreview } from "@/components/site/component-preview";
 import { InstallCommand, RevealRoot } from "@/components/site/interactions";
+import { SectionRail, type RailSection } from "@/components/site/section-rail";
 
 export function generateStaticParams() {
   return CATALOG.map((component) => ({ name: component.name }));
@@ -51,6 +52,14 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
   if (!component) notFound();
 
   const source = await readRegistrySource(name);
+  const railSections: RailSection[] = [
+    { id: "preview", label: "Preview" },
+    ...(component.usage ? [{ id: "usage", label: "Usage & props" }] : []),
+    ...(component.guidance.use.length ? [{ id: "guidance", label: "Guidance" }] : []),
+    ...(component.accessibility.length ? [{ id: "quality", label: "Quality" }] : []),
+    ...(source ? [{ id: "source", label: "Source" }] : []),
+    { id: "related", label: "Related" },
+  ];
   const related = component.related.map(getComponent).filter(Boolean);
 
   return (
@@ -92,11 +101,15 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
             <div className="mt-8 max-w-2xl">
               <InstallCommand command={`pnpm dlx shadcn@latest add @oxygenui/${component.name}`} />
             </div>
+
+            <div className="mt-10 hidden lg:block">
+              <SectionRail sections={railSections} />
+            </div>
           </div>
         </section>
 
         {/* Preview ------------------------------------------------------ */}
-        <section className="border-b border-rule bg-paper-sunk/40">
+        <section id="preview" className="scroll-mt-24 border-b border-rule bg-paper-sunk/40">
           <div className="mx-auto max-w-6xl section-minor px-5 sm:px-8">
             <SectionHeading eyebrow="Preview" title="Every state, switchable." />
             <div className="mt-8" data-reveal>
@@ -118,7 +131,7 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
 
         {/* Usage & props ------------------------------------------------ */}
         {component.usage && (
-          <section className="border-b border-rule">
+          <section id="usage" className="scroll-mt-24 border-b border-rule">
             <div className="mx-auto max-w-6xl section-minor px-5 sm:px-8">
               <SectionHeading eyebrow="Usage" title="Props are the FHIR resource." />
 
@@ -182,7 +195,7 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
 
         {/* Guidance ----------------------------------------------------- */}
         {(component.guidance.use.length > 0 || component.guidance.avoid.length > 0) && (
-          <section className="border-b border-rule bg-paper-sunk/40">
+          <section id="guidance" className="scroll-mt-24 border-b border-rule bg-paper-sunk/40">
             <div className="mx-auto max-w-6xl section-minor px-5 sm:px-8">
               <SectionHeading eyebrow="Guidance" title="When to use it, and when not to." />
 
@@ -207,7 +220,7 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
 
         {/* Accessibility & limitations ---------------------------------- */}
         {(component.accessibility.length > 0 || component.limitations.length > 0) && (
-          <section className="border-b border-rule">
+          <section id="quality" className="scroll-mt-24 border-b border-rule">
             <div className="mx-auto max-w-6xl section-minor px-5 sm:px-8">
               <SectionHeading
                 eyebrow="Quality"
@@ -254,7 +267,7 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
 
         {/* Source ------------------------------------------------------- */}
         {source && (
-          <section className="border-b border-rule bg-paper-sunk/40">
+          <section id="source" className="scroll-mt-24 border-b border-rule bg-paper-sunk/40">
             <div className="mx-auto max-w-6xl section-minor px-5 sm:px-8">
               <SectionHeading
                 eyebrow="Source"
@@ -282,7 +295,7 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
 
         {/* Related ------------------------------------------------------ */}
         {related.length > 0 && (
-          <section>
+          <section id="related" className="scroll-mt-24">
             <div className="mx-auto max-w-6xl section-minor px-5 sm:px-8">
               <SectionHeading eyebrow="Related" title="Pairs well with." />
               <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">

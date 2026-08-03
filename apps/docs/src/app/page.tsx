@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ArrowRight, Check, Minus } from "lucide-react";
-import { CATALOG, STATUS_LABEL, type ComponentStatus } from "@/lib/catalog";
+import { CATALOG } from "@/lib/catalog";
+import { ComponentCard } from "@/components/site/component-card";
 import { ScrollRail, SiteFooter, SiteHeader } from "@/components/site/chrome";
 import { Counter, InstallCommand, RevealRoot } from "@/components/site/interactions";
 import { LiveInstrument } from "@/components/site/live-instrument";
@@ -277,11 +278,6 @@ function CodeComparison() {
 
 
 
-const STATUS_STYLE: Record<ComponentStatus, string> = {
-  shipping: "border-oxygen/30 bg-oxygen/8 text-oxygen-deep",
-  review: "border-rule-strong bg-paper-sunk text-graphite",
-  design: "border-rule bg-transparent text-graphite-soft",
-};
 
 function Catalog() {
   return (
@@ -300,45 +296,14 @@ function Catalog() {
           </p>
         </div>
 
-        <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-12 grid auto-rows-fr gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {CATALOG.map((component, index) => (
-            <Link
+            <ComponentCard
               key={component.name}
-              href={`/components/${component.name}`}
-              data-reveal
-              style={{ "--reveal-delay": `${(index % 3) * 70}ms` } as React.CSSProperties}
-              className="group flex flex-col surface-2 lift rounded-2xl p-5 hover:border-oxygen/45"
-            >
-              <div className="flex items-start justify-between gap-3">
-                <h3 className="font-display text-base font-semibold tracking-tight">
-                  {component.title}
-                </h3>
-                <span
-                  className={`shrink-0 rounded-full border px-2 py-0.5 font-mono text-[0.625rem] uppercase tracking-wider ${STATUS_STYLE[component.status]}`}
-                >
-                  {STATUS_LABEL[component.status]}
-                </span>
-              </div>
-
-              <p className="numeric mt-2 text-xs text-oxygen-deep">{component.resource}</p>
-
-              <p className="mt-3 flex-1 text-sm leading-relaxed text-graphite">
-                {component.summary}
-              </p>
-
-              <div className="mt-4 flex items-center justify-between border-t border-rule pt-3">
-                <span className="numeric text-[0.6875rem] text-graphite-soft">
-                  {component.states.length} states
-                </span>
-                <span className="inline-flex items-center gap-1 text-xs font-medium text-oxygen-deep">
-                  View
-                  <ArrowRight
-                    aria-hidden="true"
-                    className="size-3.5 transition-transform duration-300 ease-[var(--ease-out-expo)] group-hover:translate-x-0.5"
-                  />
-                </span>
-              </div>
-            </Link>
+              component={component}
+              index={index}
+              featured={index === 0}
+            />
           ))}
         </div>
 
