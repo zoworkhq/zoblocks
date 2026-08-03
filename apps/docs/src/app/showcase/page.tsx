@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, FlaskConical } from "lucide-react";
 import { SHOWCASE } from "@/lib/offerings";
-import { SiteFooter, SiteHeader } from "@/components/site/chrome";
+import { ScrollRail, SiteFooter, SiteHeader } from "@/components/site/chrome";
 import { RevealRoot } from "@/components/site/interactions";
 import { ShowcasePreview } from "@/components/site/showcase-preview";
 
@@ -20,7 +20,7 @@ export default function ShowcasePage() {
 
       <main id="main">
         <section className="border-b border-rule">
-          <div className="mx-auto max-w-6xl px-5 py-16 sm:px-8 sm:py-20">
+          <div className="mx-auto max-w-6xl section-major px-5 sm:px-8">
             <p className="eyebrow text-oxygen-deep" data-reveal>
               Showcase
             </p>
@@ -60,7 +60,7 @@ export default function ShowcasePage() {
               index % 2 === 0 ? "border-b border-rule bg-paper-sunk/40" : "border-b border-rule"
             }
           >
-            <div className="mx-auto max-w-6xl px-5 py-14 sm:px-8 sm:py-16">
+            <div className="mx-auto max-w-6xl section-minor px-5 sm:px-8">
               <div className="flex flex-wrap items-end justify-between gap-4">
                 <div className="max-w-2xl">
                   <p className="eyebrow text-graphite" data-reveal>
@@ -103,7 +103,7 @@ export default function ShowcasePage() {
         ))}
 
         <section>
-          <div className="mx-auto max-w-6xl px-5 py-16 sm:px-8 sm:py-20">
+          <div className="mx-auto max-w-6xl section-major px-5 sm:px-8">
             <div className="max-w-2xl">
               <h2 className="display-lg text-balance" data-reveal>
                 Built something with Oxygen?
@@ -137,6 +137,7 @@ export default function ShowcasePage() {
       </main>
 
       <SiteFooter />
+      <ScrollRail />
     </RevealRoot>
   );
 }

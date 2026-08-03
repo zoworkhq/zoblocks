@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { ArrowRight, Check, Minus } from "lucide-react";
 import { CATALOG, STATUS_LABEL, type ComponentStatus } from "@/lib/catalog";
-import { SiteFooter, SiteHeader } from "@/components/site/chrome";
+import { ScrollRail, SiteFooter, SiteHeader } from "@/components/site/chrome";
 import { Counter, InstallCommand, RevealRoot } from "@/components/site/interactions";
 import { LiveInstrument } from "@/components/site/live-instrument";
 import { TelemetryTrace } from "@/components/site/telemetry-trace";
@@ -19,6 +19,7 @@ export default function HomePage() {
         <ClosingCta />
       </main>
       <SiteFooter />
+      <ScrollRail />
     </RevealRoot>
   );
 }
@@ -28,55 +29,96 @@ export default function HomePage() {
 /* ========================================================================== */
 
 function Hero() {
+  const resources = [
+    "Patient",
+    "Observation",
+    "MedicationRequest",
+    "AllergyIntolerance",
+    "Appointment",
+    "Condition",
+    "Coverage",
+  ];
+
   return (
-    // No ambient trace behind the headline. It read as an artifact at low
-    // contrast and competed with the type at high contrast — and the
-    // instrument already carries the trace, wired to real state. One
-    // signature, used once.
-    <section className="relative overflow-hidden">
-      <div className="relative mx-auto max-w-6xl px-5 pb-16 pt-10 sm:px-8 sm:pb-20 sm:pt-16">
-        <div className="max-w-4xl">
-          <p className="eyebrow text-oxygen-deep" data-reveal>
-            FHIR R4 · shadcn registry · MIT core
-          </p>
-
-          <h1 className="display-xl mt-5 text-balance" data-reveal style={{ "--reveal-delay": "60ms" } as React.CSSProperties}>
-            Healthcare components that already know what the data means.
-          </h1>
-
-          <p
-            className="lede mt-6 max-w-2xl text-pretty"
-            data-reveal
-            style={{ "--reveal-delay": "120ms" } as React.CSSProperties}
-          >
-            Pass a FHIR <code className="numeric text-[0.9em] text-ink">Observation[]</code> and get
-            reference ranges, interpretation flags, and the uninterpreted case handled correctly.
-            The source is copied into your repo — yours to read, audit, and change.
-          </p>
-
-          <div
-            className="mt-8 flex max-w-2xl flex-col gap-3 sm:flex-row sm:items-center"
-            data-reveal
-            style={{ "--reveal-delay": "180ms" } as React.CSSProperties}
-          >
-            <InstallCommand command="pnpm dlx shadcn@latest add @oxygenui/vitals-panel" className="flex-1" />
-            <a
-              href="/components"
-              className="group inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-cta px-5 py-3.5 text-sm font-medium text-paper transition-all duration-300 ease-[var(--ease-out-expo)] hover:-translate-y-0.5 hover:opacity-90"
+    <section className="section-hero relative overflow-hidden">
+      <div className="relative mx-auto max-w-6xl px-5 sm:px-8">
+        <div className="grid gap-12 lg:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)] lg:items-end lg:gap-16">
+          <div>
+            <p
+              className="eyebrow eyebrow-rule enter text-oxygen-deep"
+              style={{ "--enter-delay": "0ms" } as React.CSSProperties}
             >
-              Browse components
-              <ArrowRight
-                aria-hidden="true"
-                className="size-4 transition-transform duration-300 ease-[var(--ease-out-expo)] group-hover:translate-x-0.5"
-              />
-            </a>
+              FHIR R4 · shadcn registry · MIT core
+            </p>
+
+            {/* Entrance is orchestrated on load rather than observed on scroll:
+                above-the-fold content should never wait for an observer. */}
+            <h1
+              className="display-2xl enter-blur mt-6 text-balance"
+              style={{ "--enter-delay": "90ms" } as React.CSSProperties}
+            >
+              Healthcare components that already know what the data means.
+            </h1>
+
+            <p
+              className="body-lg enter mt-7 max-w-xl text-pretty text-graphite"
+              style={{ "--enter-delay": "220ms" } as React.CSSProperties}
+            >
+              Pass a FHIR <code className="numeric text-[0.9em] text-ink">Observation[]</code> and
+              get reference ranges, interpretation flags, and the uninterpreted case handled
+              correctly. The source is copied into your repo — yours to read, audit, and change.
+            </p>
+
           </div>
+
+          {/* The right column used to be empty. It now carries the actual
+              claim: which resources are typed. On-thesis, not decoration. */}
+          <aside
+            className="enter lg:pb-1"
+            style={{ "--enter-delay": "430ms" } as React.CSSProperties}
+            aria-label="FHIR resources covered"
+          >
+            <div className="ticks mb-5 opacity-70" aria-hidden="true" />
+            <p className="axis-label">Resources typed</p>
+            <ul className="mt-4 grid grid-cols-2 gap-x-6 gap-y-2 lg:grid-cols-1 lg:gap-y-2.5">
+              {resources.map((resource, index) => (
+                <li
+                  key={resource}
+                  className="group flex items-baseline gap-2.5 border-b border-rule/70 pb-2"
+                >
+                  <span className="numeric w-5 shrink-0 text-[0.625rem] text-graphite-soft">
+                    {String(index + 1).padStart(2, "0")}
+                  </span>
+                  <span className="numeric text-[0.8125rem] text-ink">{resource}</span>
+                </li>
+              ))}
+            </ul>
+          </aside>
         </div>
 
+            <div
+              className="enter mt-10 flex max-w-2xl flex-col gap-3 sm:flex-row sm:items-center"
+              style={{ "--enter-delay": "330ms" } as React.CSSProperties}
+            >
+              <InstallCommand
+                command="pnpm dlx shadcn@latest add @oxygenui/vitals-panel"
+                className="flex-1"
+              />
+              <Link
+                href="/components"
+                className="group inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-cta px-5 py-3.5 text-sm font-medium text-paper transition-all duration-300 ease-[var(--ease-out-expo)] hover:-translate-y-0.5 hover:opacity-90"
+              >
+                Browse components
+                <ArrowRight
+                  aria-hidden="true"
+                  className="size-4 transition-transform duration-300 ease-[var(--ease-out-expo)] group-hover:translate-x-0.5"
+                />
+              </Link>
+            </div>
+
         <div
-          className="mt-10"
-          data-reveal
-          style={{ "--reveal-delay": "240ms" } as React.CSSProperties}
+          className="enter mt-14"
+          style={{ "--enter-delay": "540ms" } as React.CSSProperties}
         >
           <LiveInstrument />
         </div>
@@ -111,7 +153,7 @@ const STATE_FACTS = [
 function StatesArgument() {
   return (
     <section className="border-t border-rule bg-paper-sunk/50">
-      <div className="mx-auto max-w-6xl px-5 py-20 sm:px-8 sm:py-24">
+      <div className="mx-auto max-w-6xl section-major px-5 sm:px-8">
         <div className="max-w-3xl">
           <p className="eyebrow text-graphite" data-reveal>
             Why this exists
@@ -170,7 +212,7 @@ const WITH_OXYGEN = [
 function CodeComparison() {
   return (
     <section className="border-t border-rule">
-      <div className="mx-auto max-w-6xl px-5 py-20 sm:px-8 sm:py-24">
+      <div className="mx-auto max-w-6xl section-major px-5 sm:px-8">
         <div className="max-w-3xl">
           <p className="eyebrow text-graphite" data-reveal>
             The difference
@@ -244,7 +286,7 @@ const STATUS_STYLE: Record<ComponentStatus, string> = {
 function Catalog() {
   return (
     <section id="components" className="scroll-mt-16 border-t border-rule bg-paper-sunk/50">
-      <div className="mx-auto max-w-6xl px-5 py-20 sm:px-8 sm:py-24">
+      <div className="mx-auto max-w-6xl section-major px-5 sm:px-8">
         <div className="max-w-3xl">
           <p className="eyebrow text-graphite" data-reveal>
             Catalog
@@ -265,7 +307,7 @@ function Catalog() {
               href={`/components/${component.name}`}
               data-reveal
               style={{ "--reveal-delay": `${(index % 3) * 70}ms` } as React.CSSProperties}
-              className="group flex flex-col rounded-2xl border border-rule bg-paper p-5 transition-all duration-300 ease-[var(--ease-out-expo)] hover:-translate-y-0.5 hover:border-oxygen/40 hover:shadow-[0_16px_36px_-20px_rgb(6_118_98/0.35)]"
+              className="group flex flex-col surface-2 lift rounded-2xl p-5 hover:border-oxygen/45"
             >
               <div className="flex items-start justify-between gap-3">
                 <h3 className="font-display text-base font-semibold tracking-tight">
@@ -341,7 +383,7 @@ const QUALITY = [
 function Trust() {
   return (
     <section id="quality" className="scroll-mt-16 border-t border-rule">
-      <div className="mx-auto max-w-6xl px-5 py-20 sm:px-8 sm:py-24">
+      <div className="mx-auto max-w-6xl section-major px-5 sm:px-8">
         <div className="max-w-3xl">
           <p className="eyebrow text-graphite" data-reveal>
             Quality
@@ -374,7 +416,7 @@ function Trust() {
 function ClosingCta() {
   return (
     <section className="border-t border-rule">
-      <div className="mx-auto max-w-6xl px-5 py-20 sm:px-8 sm:py-24">
+      <div className="mx-auto max-w-6xl section-major px-5 sm:px-8">
         <div className="instrument relative px-6 py-14 sm:px-12 sm:py-16" data-reveal>
           <div className="pointer-events-none absolute inset-x-0 bottom-0 opacity-30" aria-hidden="true">
             <TelemetryTrace mode="normal" height={90} />

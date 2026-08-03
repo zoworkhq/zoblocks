@@ -220,10 +220,219 @@ body {
   color: #fff;
 }
 
+/* Two-tone focus ring: a dark core against the page and a light halo against
+   dark panels, so one rule stays visible on every surface in both themes. */
 :focus-visible {
   outline: 2px solid var(--color-oxygen);
   outline-offset: 3px;
-  border-radius: 2px;
+  border-radius: 3px;
+  box-shadow: 0 0 0 5px color-mix(in oklab, var(--color-oxygen) 18%, transparent);
+}
+
+/* ===========================================================================
+ * MATERIAL
+ *
+ * The page had exactly two surfaces and one border weight, which is why it
+ * read flat. Three levels now, each with a distinct border, shadow, and
+ * relationship to the page — plus a grain layer, because a perfectly smooth
+ * gradient is the tell of a template.
+ * ======================================================================== */
+
+/* Grain. Extremely low opacity — you should never see it, only miss it when
+   it's gone. SVG feTurbulence keeps it resolution-independent and inlined. */
+.grain::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+.dark .grain::after {
+  opacity: 0.055;
+}
+
+.surface-1 {
+  background: var(--color-paper);
+  border: 1px solid var(--color-rule);
+  box-shadow: 0 1px 2px -1px rgb(2 20 17 / 0.04);
+}
+
+.surface-2 {
+  background: var(--color-paper);
+  border: 1px solid var(--color-rule);
+  box-shadow:
+    0 1px 2px -1px rgb(2 20 17 / 0.05),
+    0 8px 24px -12px rgb(2 20 17 / 0.08);
+}
+
+.surface-3 {
+  background: var(--color-paper);
+  border: 1px solid var(--color-rule-strong);
+  box-shadow:
+    0 1px 2px -1px rgb(2 20 17 / 0.06),
+    0 16px 44px -20px rgb(2 20 17 / 0.14);
+}
+
+.dark .surface-1 {
+  background: color-mix(in oklab, var(--color-paper-sunk) 70%, transparent);
+  box-shadow: none;
+}
+
+.dark .surface-2 {
+  background: var(--color-paper-sunk);
+  box-shadow: 0 12px 32px -16px rgb(0 0 0 / 0.6);
+}
+
+.dark .surface-3 {
+  background: var(--color-paper-sunk);
+  box-shadow: 0 20px 50px -22px rgb(0 0 0 / 0.75);
+}
+
+/* ===========================================================================
+ * STRUCTURE — calibration marks
+ *
+ * The instrument metaphor was doing all its work inside one bezel. These push
+ * it into the page itself: engineering-drawing rules and calibration ticks
+ * that mark structure rather than decorate it.
+ * ======================================================================== */
+
+/* Vertical rules at the content edges, like a drawing sheet. Hairline, and
+   only where there is room for them to read as intentional. */
+.sheet {
+  position: relative;
+}
+
+@media (min-width: 1180px) {
+  .sheet::before,
+  .sheet::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background: linear-gradient(
+      to bottom,
+      transparent,
+      var(--color-rule) 8%,
+      var(--color-rule) 92%,
+      transparent
+    );
+    pointer-events: none;
+  }
+  .sheet::before {
+    left: max(1.25rem, calc(50% - 36rem));
+  }
+  .sheet::after {
+    right: max(1.25rem, calc(50% - 36rem));
+  }
+}
+
+/* Calibration ticks — a measured rule, used to open major sections. */
+.ticks {
+  height: 10px;
+  background-image: repeating-linear-gradient(
+    to right,
+    var(--color-rule-strong) 0 1px,
+    transparent 1px 8px
+  );
+  mask-image: linear-gradient(to right, #000 0%, #000 22%, transparent 78%);
+  -webkit-mask-image: linear-gradient(to right, #000 0%, #000 22%, transparent 78%);
+}
+
+/* Section index, set like an axis readout. */
+.axis-label {
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--color-graphite-soft);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ===========================================================================
+ * MOTION
+ *
+ * Distinct curves for distinct jobs. One easing everywhere is the reason
+ * interactions felt uniform.
+ * ======================================================================== */
+
+.lift {
+  transition:
+    transform 420ms var(--ease-out-expo),
+    box-shadow 420ms var(--ease-out-expo),
+    border-color 260ms ease-out;
+  will-change: transform;
+}
+
+.lift:hover {
+  transform: translateY(-3px);
+}
+
+/* Orchestrated entrance for above-the-fold content. Unlike [data-reveal],
+   this does not wait for an observer — it plays on load, in sequence. */
+@keyframes enter-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes enter-blur {
+  from {
+    opacity: 0;
+    filter: blur(6px);
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0);
+    transform: none;
+  }
+}
+
+.enter {
+  animation: enter-up 780ms var(--ease-out-expo) both;
+  animation-delay: var(--enter-delay, 0ms);
+}
+
+.enter-blur {
+  animation: enter-blur 900ms var(--ease-out-expo) both;
+  animation-delay: var(--enter-delay, 0ms);
+}
+
+/* Scroll progress, rendered as a calibrated column rather than a bar. */
+.scroll-rail {
+  position: fixed;
+  top: 50%;
+  right: 1.25rem;
+  translate: 0 -50%;
+  z-index: 30;
+  width: 2px;
+  height: 8rem;
+  border-radius: 999px;
+  background: var(--color-rule);
+  overflow: hidden;
+}
+
+.scroll-rail i {
+  display: block;
+  width: 100%;
+  background: var(--color-oxygen);
+  height: var(--scroll-progress, 0%);
+  transition: height 120ms linear;
+}
+
+@media (max-width: 1279px) {
+  .scroll-rail {
+    display: none;
+  }
 }
 
 /* ---------------------------------------------------------------------------
@@ -258,12 +467,77 @@ body {
   font-weight: 600;
 }
 
+/* The largest step. Reserved for one moment per page — the hero — and set
+   tight enough that it reads as a designed object rather than big text. */
+.display-2xl {
+  font-family: var(--font-display);
+  font-size: clamp(2.375rem, 4.5vw, 3.75rem);
+  line-height: 0.96;
+  letter-spacing: -0.05em;
+  font-weight: 600;
+  /* Optical: large display type needs less apparent weight than body copy at
+     the same nominal weight, and the descenders need room at 0.9 leading. */
+  font-feature-settings: "cv05" 1, "cv08" 1, "ss01" 1;
+}
+
 .eyebrow {
   font-family: var(--font-mono);
   font-size: 0.6875rem;
   letter-spacing: 0.16em;
   text-transform: uppercase;
   font-weight: 500;
+}
+
+/* Eyebrow with a leading rule — marks a section start without a heading. */
+.eyebrow-rule {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.625rem;
+}
+
+.eyebrow-rule::before {
+  content: "";
+  width: 1.75rem;
+  height: 1px;
+  background: currentColor;
+  opacity: 0.45;
+}
+
+/* Body scale. Three steps, each with leading tuned to its measure. */
+.body-lg {
+  font-size: 1.0625rem;
+  line-height: 1.6;
+  letter-spacing: -0.008em;
+}
+
+.body {
+  font-size: 0.9375rem;
+  line-height: 1.65;
+  letter-spacing: -0.005em;
+}
+
+.body-sm {
+  font-size: 0.8125rem;
+  line-height: 1.6;
+}
+
+/* ---------------------------------------------------------------------------
+ * Section rhythm
+ *
+ * Every section was py-16 sm:py-20, which flattens hierarchy — the reader gets
+ * no signal about what matters. Three tiers now.
+ * ------------------------------------------------------------------------ */
+
+.section-hero {
+  padding-block: clamp(3rem, 7vw, 6rem) clamp(3.5rem, 8vw, 7rem);
+}
+
+.section-major {
+  padding-block: clamp(4rem, 9vw, 8rem);
+}
+
+.section-minor {
+  padding-block: clamp(2.75rem, 5vw, 4.5rem);
 }
 
 .lede {

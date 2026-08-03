@@ -177,7 +177,23 @@ export function ObservationPanel({
         </p>
       )}
 
-      <table className="w-full border-collapse text-[length:var(--ox-density-font)]">
+      {/*
+        A results table has an irreducible minimum width — test, value, range,
+        and interpretation cannot usefully collapse. Without this scroller the
+        table is clipped by the nearest overflow-hidden ancestor and the
+        Interpretation column disappears on a phone, silently removing the
+        severity signal. Scroll, never truncate, when the data is clinical.
+
+        tabIndex + role make the scroller reachable by keyboard, which is
+        required once a region scrolls.
+      */}
+      <div
+        role="region"
+        aria-label={`${label}, scrollable`}
+        tabIndex={0}
+        className="w-full overflow-x-auto focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[var(--ox-focus-ring)]"
+      >
+      <table className="w-full min-w-[34rem] border-collapse text-[length:var(--ox-density-font)]">
         <caption className="sr-only">{label}</caption>
         <thead>
           <tr className="border-b border-[var(--ox-border)] bg-[var(--ox-bg-subtle)]">
@@ -210,6 +226,7 @@ export function ObservationPanel({
           ))}
         </tbody>
       </table>
+      </div>
     </div>
   );
 }

@@ -5,7 +5,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, ArrowUpRight, Check, CircleAlert, X } from "lucide-react";
 import { CATALOG, STATUS_LABEL, getComponent } from "@/lib/catalog";
-import { SiteFooter, SiteHeader } from "@/components/site/chrome";
+import { ScrollRail, SiteFooter, SiteHeader } from "@/components/site/chrome";
 import { ComponentPreview } from "@/components/site/component-preview";
 import { InstallCommand, RevealRoot } from "@/components/site/interactions";
 
@@ -60,7 +60,7 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
       <main id="main">
         {/* Header ------------------------------------------------------- */}
         <section className="border-b border-rule">
-          <div className="mx-auto max-w-6xl px-5 py-10 sm:px-8 sm:py-14">
+          <div className="mx-auto max-w-6xl section-minor px-5 sm:px-8">
             <Link
               href="/components"
               className="inline-flex items-center gap-1.5 text-sm text-graphite transition-colors hover:text-ink"
@@ -97,7 +97,7 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
 
         {/* Preview ------------------------------------------------------ */}
         <section className="border-b border-rule bg-paper-sunk/40">
-          <div className="mx-auto max-w-6xl px-5 py-12 sm:px-8 sm:py-16">
+          <div className="mx-auto max-w-6xl section-minor px-5 sm:px-8">
             <SectionHeading eyebrow="Preview" title="Every state, switchable." />
             <div className="mt-8" data-reveal>
               <ComponentPreview name={component.name} />
@@ -119,7 +119,7 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
         {/* Usage & props ------------------------------------------------ */}
         {component.usage && (
           <section className="border-b border-rule">
-            <div className="mx-auto max-w-6xl px-5 py-12 sm:px-8 sm:py-16">
+            <div className="mx-auto max-w-6xl section-minor px-5 sm:px-8">
               <SectionHeading eyebrow="Usage" title="Props are the FHIR resource." />
 
               <div className="mt-8 grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)]">
@@ -183,7 +183,7 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
         {/* Guidance ----------------------------------------------------- */}
         {(component.guidance.use.length > 0 || component.guidance.avoid.length > 0) && (
           <section className="border-b border-rule bg-paper-sunk/40">
-            <div className="mx-auto max-w-6xl px-5 py-12 sm:px-8 sm:py-16">
+            <div className="mx-auto max-w-6xl section-minor px-5 sm:px-8">
               <SectionHeading eyebrow="Guidance" title="When to use it, and when not to." />
 
               <div className="mt-8 grid gap-6 lg:grid-cols-2">
@@ -208,7 +208,7 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
         {/* Accessibility & limitations ---------------------------------- */}
         {(component.accessibility.length > 0 || component.limitations.length > 0) && (
           <section className="border-b border-rule">
-            <div className="mx-auto max-w-6xl px-5 py-12 sm:px-8 sm:py-16">
+            <div className="mx-auto max-w-6xl section-minor px-5 sm:px-8">
               <SectionHeading
                 eyebrow="Quality"
                 title="What was tested, and what is still missing."
@@ -230,7 +230,7 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
                   <div
                     data-reveal
                     style={{ "--reveal-delay": "80ms" } as React.CSSProperties}
-                    className="rounded-2xl border border-rule bg-paper-sunk p-6"
+                    className="surface-1 rounded-2xl p-6"
                   >
                     <h3 className="flex items-center gap-2 font-display text-[0.9375rem] font-semibold tracking-tight">
                       <CircleAlert aria-hidden="true" className="size-4 text-graphite" />
@@ -255,7 +255,7 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
         {/* Source ------------------------------------------------------- */}
         {source && (
           <section className="border-b border-rule bg-paper-sunk/40">
-            <div className="mx-auto max-w-6xl px-5 py-12 sm:px-8 sm:py-16">
+            <div className="mx-auto max-w-6xl section-minor px-5 sm:px-8">
               <SectionHeading
                 eyebrow="Source"
                 title="Exactly what lands in your repository."
@@ -283,7 +283,7 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
         {/* Related ------------------------------------------------------ */}
         {related.length > 0 && (
           <section>
-            <div className="mx-auto max-w-6xl px-5 py-12 sm:px-8 sm:py-16">
+            <div className="mx-auto max-w-6xl section-minor px-5 sm:px-8">
               <SectionHeading eyebrow="Related" title="Pairs well with." />
               <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {related.map((item) => (
@@ -291,7 +291,7 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
                     key={item!.name}
                     href={`/components/${item!.name}`}
                     data-reveal
-                    className="group rounded-2xl border border-rule bg-paper p-5 transition-all duration-300 ease-[var(--ease-out-expo)] hover:-translate-y-0.5 hover:border-oxygen/40"
+                    className="group surface-2 lift rounded-2xl p-5 hover:border-oxygen/45"
                   >
                     <h3 className="font-display text-base font-semibold tracking-tight">
                       {item!.title}
@@ -307,6 +307,7 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
       </main>
 
       <SiteFooter />
+      <ScrollRail />
     </RevealRoot>
   );
 }
@@ -354,7 +355,7 @@ function GuidanceList({
     <div
       data-reveal
       style={delay ? ({ "--reveal-delay": "80ms" } as React.CSSProperties) : undefined}
-      className="rounded-2xl border border-rule bg-paper p-6"
+      className="surface-1 rounded-2xl p-6"
     >
       <h3 className="font-display text-[0.9375rem] font-semibold tracking-tight">{title}</h3>
       <ul className="mt-4 space-y-3">

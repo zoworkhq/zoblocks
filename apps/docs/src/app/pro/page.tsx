@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, Check, Layers } from "lucide-react";
 import { FAQ, STATUS_COPY, TEMPLATES, TIERS } from "@/lib/offerings";
-import { SiteFooter, SiteHeader } from "@/components/site/chrome";
+import { ScrollRail, SiteFooter, SiteHeader } from "@/components/site/chrome";
 import { RevealRoot } from "@/components/site/interactions";
 import { TelemetryTrace } from "@/components/site/telemetry-trace";
 
@@ -27,7 +27,7 @@ export default function ProPage() {
       <main id="main">
         {/* Hero --------------------------------------------------------- */}
         <section className="border-b border-rule">
-          <div className="mx-auto max-w-6xl px-5 py-16 sm:px-8 sm:py-20">
+          <div className="mx-auto max-w-6xl section-major px-5 sm:px-8">
             <p className="eyebrow text-oxygen-deep" data-reveal>
               Oxygen Pro
             </p>
@@ -74,7 +74,7 @@ export default function ProPage() {
 
         {/* Kits --------------------------------------------------------- */}
         <section className="border-b border-rule bg-paper-sunk/40">
-          <div className="mx-auto max-w-6xl px-5 py-16 sm:px-8 sm:py-20">
+          <div className="mx-auto max-w-6xl section-major px-5 sm:px-8">
             <div className="max-w-3xl">
               <p className="eyebrow text-graphite" data-reveal>
                 Launch kits
@@ -95,7 +95,7 @@ export default function ProPage() {
                   key={template.slug}
                   data-reveal
                   style={{ "--reveal-delay": `${(index % 3) * 70}ms` } as React.CSSProperties}
-                  className="group flex flex-col rounded-2xl border border-rule bg-paper p-5 transition-all duration-300 ease-[var(--ease-out-expo)] hover:-translate-y-0.5 hover:border-oxygen/40 hover:shadow-[0_16px_36px_-20px_rgb(6_118_98/0.35)]"
+                  className="group flex flex-col surface-2 lift rounded-2xl p-5 hover:border-oxygen/45"
                 >
                   <div className="flex items-start justify-between gap-3">
                     <h3 className="font-display text-base font-semibold tracking-tight">
@@ -141,7 +141,7 @@ export default function ProPage() {
 
         {/* Pricing ------------------------------------------------------ */}
         <section id="pricing" className="scroll-mt-16 border-b border-rule">
-          <div className="mx-auto max-w-6xl px-5 py-16 sm:px-8 sm:py-20">
+          <div className="mx-auto max-w-6xl section-major px-5 sm:px-8">
             <div className="max-w-3xl">
               <p className="eyebrow text-graphite" data-reveal>
                 Pricing
@@ -160,7 +160,7 @@ export default function ProPage() {
                   className={
                     tier.featured
                       ? "flex flex-col rounded-2xl border-2 border-oxygen/40 bg-paper p-6 shadow-[0_16px_40px_-24px_rgb(6_118_98/0.4)]"
-                      : "flex flex-col rounded-2xl border border-rule bg-paper p-6"
+                      : "flex flex-col surface-1 rounded-2xl p-6"
                   }
                 >
                   <div className="flex items-center justify-between gap-2">
@@ -235,7 +235,7 @@ export default function ProPage() {
 
         {/* Waitlist ----------------------------------------------------- */}
         <section id="waitlist" className="scroll-mt-16 border-b border-rule bg-paper-sunk/40">
-          <div className="mx-auto max-w-6xl px-5 py-16 sm:px-8 sm:py-20">
+          <div className="mx-auto max-w-6xl section-major px-5 sm:px-8">
             <div className="instrument relative px-6 py-12 sm:px-12" data-reveal>
               <div
                 className="pointer-events-none absolute inset-x-0 bottom-0 opacity-30"
@@ -265,7 +265,7 @@ export default function ProPage() {
 
         {/* FAQ ---------------------------------------------------------- */}
         <section>
-          <div className="mx-auto max-w-6xl px-5 py-16 sm:px-8 sm:py-20">
+          <div className="mx-auto max-w-6xl section-major px-5 sm:px-8">
             <div className="max-w-3xl">
               <p className="eyebrow text-graphite" data-reveal>
                 Questions
@@ -298,6 +298,7 @@ export default function ProPage() {
       </main>
 
       <SiteFooter />
+      <ScrollRail />
     </RevealRoot>
   );
 }

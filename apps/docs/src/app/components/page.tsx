@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { CATALOG, STATUS_LABEL, type ComponentStatus } from "@/lib/catalog";
-import { SiteFooter, SiteHeader } from "@/components/site/chrome";
+import { ScrollRail, SiteFooter, SiteHeader } from "@/components/site/chrome";
 import { RevealRoot } from "@/components/site/interactions";
 
 export const metadata: Metadata = {
@@ -27,7 +27,7 @@ export default function ComponentsPage() {
 
       <main id="main">
         <section className="border-b border-rule">
-          <div className="mx-auto max-w-6xl px-5 py-14 sm:px-8 sm:py-20">
+          <div className="mx-auto max-w-6xl section-major px-5 sm:px-8">
             <p className="eyebrow text-oxygen-deep" data-reveal>
               Catalog
             </p>
@@ -61,7 +61,7 @@ export default function ComponentsPage() {
         </section>
 
         <section className="bg-paper-sunk/40">
-          <div className="mx-auto max-w-6xl px-5 py-14 sm:px-8 sm:py-16">
+          <div className="mx-auto max-w-6xl section-minor px-5 sm:px-8">
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {shipping.map((component, index) => (
                 <ComponentCard key={component.name} component={component} index={index} />
@@ -85,6 +85,7 @@ export default function ComponentsPage() {
       </main>
 
       <SiteFooter />
+      <ScrollRail />
     </RevealRoot>
   );
 }
@@ -111,7 +112,7 @@ function ComponentCard({
       href={`/components/${component.name}`}
       data-reveal
       style={{ "--reveal-delay": `${(index % 3) * 70}ms` } as React.CSSProperties}
-      className="group flex flex-col rounded-2xl border border-rule bg-paper p-5 transition-all duration-300 ease-[var(--ease-out-expo)] hover:-translate-y-0.5 hover:border-oxygen/40 hover:shadow-[0_16px_36px_-20px_rgb(6_118_98/0.35)]"
+      className="group flex flex-col surface-2 lift rounded-2xl p-5 hover:border-oxygen/45"
     >
       <div className="flex items-start justify-between gap-3">
         <h3 className="font-display text-base font-semibold tracking-tight">{component.title}</h3>
