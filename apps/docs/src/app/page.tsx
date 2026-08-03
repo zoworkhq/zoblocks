@@ -156,7 +156,7 @@ function StatesArgument() {
     <section className="border-t border-rule bg-paper-sunk/50">
       <div className="mx-auto max-w-6xl section-major px-5 sm:px-8">
         <div className="max-w-3xl">
-          <p className="eyebrow text-graphite" data-reveal>
+          <p className="eyebrow eyebrow-rule text-graphite" data-reveal>
             Why this exists
           </p>
           <h2 className="display-lg mt-4 text-balance" data-reveal>
@@ -169,11 +169,11 @@ function StatesArgument() {
           </p>
         </div>
 
-        <div className="mt-14 grid gap-px overflow-hidden rounded-2xl border border-rule bg-rule sm:grid-cols-3">
+        <div className="mt-14 grid gap-4 sm:grid-cols-3">
           {STATE_FACTS.map((fact, index) => (
             <div
               key={fact.label}
-              className="bg-paper p-6 sm:p-7"
+              className="surface-1 rounded-2xl p-6 sm:p-7"
               data-reveal
               style={{ "--reveal-delay": `${index * 80}ms` } as React.CSSProperties}
             >
@@ -215,7 +215,7 @@ function CodeComparison() {
     <section className="border-t border-rule">
       <div className="mx-auto max-w-6xl section-major px-5 sm:px-8">
         <div className="max-w-3xl">
-          <p className="eyebrow text-graphite" data-reveal>
+          <p className="eyebrow eyebrow-rule text-graphite" data-reveal>
             The difference
           </p>
           <h2 className="display-lg mt-4 text-balance" data-reveal>
@@ -224,7 +224,7 @@ function CodeComparison() {
         </div>
 
         <div className="mt-12 grid gap-6 lg:grid-cols-2">
-          <div data-reveal>
+          <div data-reveal="left">
             <div className="mb-3 flex items-center gap-2">
               <span className="eyebrow text-graphite">Hand-rolled</span>
             </div>
@@ -249,7 +249,7 @@ function CodeComparison() {
             </ul>
           </div>
 
-          <div data-reveal style={{ "--reveal-delay": "100ms" } as React.CSSProperties}>
+          <div data-reveal="right" style={{ "--reveal-delay": "100ms" } as React.CSSProperties}>
             <div className="mb-3 flex items-center gap-2">
               <span className="eyebrow text-oxygen-deep">With Oxygen</span>
             </div>
@@ -284,7 +284,7 @@ function Catalog() {
     <section id="components" className="scroll-mt-16 border-t border-rule bg-paper-sunk/50">
       <div className="mx-auto max-w-6xl section-major px-5 sm:px-8">
         <div className="max-w-3xl">
-          <p className="eyebrow text-graphite" data-reveal>
+          <p className="eyebrow eyebrow-rule text-graphite" data-reveal>
             Catalog
           </p>
           <h2 className="display-lg mt-4 text-balance" data-reveal>
@@ -350,7 +350,7 @@ function Trust() {
     <section id="quality" className="scroll-mt-16 border-t border-rule">
       <div className="mx-auto max-w-6xl section-major px-5 sm:px-8">
         <div className="max-w-3xl">
-          <p className="eyebrow text-graphite" data-reveal>
+          <p className="eyebrow eyebrow-rule text-graphite" data-reveal>
             Quality
           </p>
           <h2 className="display-lg mt-4 text-balance" data-reveal>
@@ -358,11 +358,11 @@ function Trust() {
           </h2>
         </div>
 
-        <dl className="mt-12 grid gap-px overflow-hidden rounded-2xl border border-rule bg-rule sm:grid-cols-2">
+        <dl className="mt-12 grid gap-4 sm:grid-cols-2">
           {QUALITY.map((item, index) => (
             <div
               key={item.title}
-              className="bg-paper p-6 sm:p-8"
+              className="surface-1 rounded-2xl p-6 sm:p-8"
               data-reveal
               style={{ "--reveal-delay": `${(index % 2) * 80}ms` } as React.CSSProperties}
             >

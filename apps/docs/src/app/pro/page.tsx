@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ArrowRight, Check, Layers } from "lucide-react";
 import { FAQ, STATUS_COPY, TEMPLATES, TIERS } from "@/lib/offerings";
 import { ScrollRail, SiteFooter, SiteHeader } from "@/components/site/chrome";
+import { cn } from "@/lib/utils";
 import { RevealRoot } from "@/components/site/interactions";
 import { TelemetryTrace } from "@/components/site/telemetry-trace";
 
@@ -151,64 +152,84 @@ export default function ProPage() {
               </h2>
             </div>
 
-            <div className="mt-12 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-              {TIERS.map((tier, index) => (
-                <article
-                  key={tier.name}
-                  data-reveal
-                  style={{ "--reveal-delay": `${index * 70}ms` } as React.CSSProperties}
-                  className={
-                    tier.featured
-                      ? "flex flex-col rounded-2xl border-2 border-oxygen/40 bg-paper p-6 shadow-[0_16px_40px_-24px_rgb(6_118_98/0.4)]"
-                      : "flex flex-col surface-1 rounded-2xl p-6"
-                  }
-                >
-                  <div className="flex items-center justify-between gap-2">
-                    <h3 className="font-display text-lg font-semibold tracking-tight">{tier.name}</h3>
-                    {tier.featured && (
-                      <span className="rounded-full bg-oxygen/12 px-2 py-0.5 font-mono text-[0.625rem] uppercase tracking-wider text-oxygen-deep">
-                        Popular
-                      </span>
-                    )}
-                  </div>
-
-                  <p className="mt-4 flex items-baseline gap-1.5">
-                    <span className="numeric display-sm text-ink">{tier.price}</span>
-                    {tier.cadence && (
-                      <span className="text-xs text-graphite">{tier.cadence}</span>
-                    )}
-                  </p>
-
-                  <p className="mt-3 text-sm leading-relaxed text-graphite">{tier.summary}</p>
-
-                  <ul className="mt-5 flex-1 space-y-2.5">
-                    {tier.features.map((feature) => (
-                      <li key={feature} className="flex items-start gap-2 text-sm text-graphite">
-                        <Check
-                          aria-hidden="true"
-                          className="mt-0.5 size-3.5 shrink-0 text-oxygen-deep"
-                        />
-                        {feature}
-                      </li>
-                    ))}
-                  </ul>
-
-                  {tier.note && (
-                    <p className="mt-4 text-xs leading-relaxed text-graphite-soft">{tier.note}</p>
-                  )}
-
-                  <a
-                    href={tier.href}
-                    className={
+            {/*
+              Four equal columns is the default answer and it flattens the
+              decision. Free and Enterprise are the two real ends of this
+              ladder — one is where everyone starts, one is where the revenue
+              is — so they anchor, and the paid middle sits between them at
+              standard weight with Pro carried on border, not scale.
+            */}
+            <div className="mt-12 grid gap-4 md:grid-cols-2 lg:grid-cols-12">
+              {TIERS.map((tier, index) => {
+                const anchor = tier.name === "Core" || tier.name === "Enterprise";
+                return (
+                  <article
+                    key={tier.name}
+                    data-reveal
+                    style={{ "--reveal-delay": `${index * 70}ms` } as React.CSSProperties}
+                    className={cn(
+                      "flex flex-col rounded-2xl p-6 lg:col-span-3",
                       tier.featured
-                        ? "mt-5 inline-flex items-center justify-center rounded-xl bg-cta px-4 py-2.5 text-sm font-medium text-paper transition-opacity duration-200 hover:opacity-90"
-                        : "mt-5 inline-flex items-center justify-center rounded-xl border border-rule px-4 py-2.5 text-sm font-medium text-ink transition-colors duration-200 hover:border-oxygen/40"
-                    }
+                        ? "surface-3 border-oxygen/45 ring-1 ring-oxygen/15"
+                        : anchor
+                          ? "surface-2"
+                          : "surface-1",
+                    )}
                   >
-                    {tier.cta}
-                  </a>
-                </article>
-              ))}
+                    <div className="flex items-center justify-between gap-2">
+                      <h3 className="font-display text-lg font-semibold tracking-tight">
+                        {tier.name}
+                      </h3>
+                      {tier.featured && (
+                        <span className="rounded-full bg-oxygen/12 px-2 py-0.5 font-mono text-[0.625rem] uppercase tracking-wider text-oxygen-deep">
+                          Popular
+                        </span>
+                      )}
+                    </div>
+
+                    <p className="mt-5 flex items-baseline gap-1.5">
+                      <span className="numeric text-3xl font-semibold tracking-tight text-ink">
+                        {tier.price}
+                      </span>
+                      {tier.cadence && (
+                        <span className="text-xs text-graphite-soft">{tier.cadence}</span>
+                      )}
+                    </p>
+
+                    <p className="body-sm mt-3 text-graphite">{tier.summary}</p>
+
+                    <div className="ticks my-5 opacity-60" aria-hidden="true" />
+
+                    <ul className="flex-1 space-y-2.5">
+                      {tier.features.map((feature) => (
+                        <li key={feature} className="flex items-start gap-2 text-sm text-graphite">
+                          <Check
+                            aria-hidden="true"
+                            className="mt-[3px] size-3.5 shrink-0 text-oxygen-deep"
+                          />
+                          {feature}
+                        </li>
+                      ))}
+                    </ul>
+
+                    {tier.note && (
+                      <p className="mt-4 text-xs leading-relaxed text-graphite-soft">{tier.note}</p>
+                    )}
+
+                    <a
+                      href={tier.href}
+                      className={cn(
+                        "mt-6 inline-flex items-center justify-center rounded-xl px-4 py-2.5 text-sm font-medium transition-all duration-300 ease-[var(--ease-out-expo)] hover:-translate-y-0.5",
+                        tier.featured
+                          ? "bg-cta text-paper hover:opacity-90"
+                          : "border border-rule text-ink hover:border-oxygen/45",
+                      )}
+                    >
+                      {tier.cta}
+                    </a>
+                  </article>
+                );
+              })}
             </div>
 
             <div

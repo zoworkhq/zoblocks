@@ -79,7 +79,9 @@ export function ComponentCard({
       style={{ "--reveal-delay": `${(index % 3) * 70}ms` } as React.CSSProperties}
       className={cn(
         "surface-2 lift group relative flex flex-col overflow-hidden rounded-2xl hover:border-oxygen/45",
-        featured ? "p-6 sm:col-span-2" : "p-5",
+        // Span only at 3 columns. At 2 columns a span-2 cell after an odd number
+        // of standard cards leaves an empty grid slot.
+        featured ? "p-6 lg:col-span-2" : "p-5",
       )}
     >
       {featured && (
