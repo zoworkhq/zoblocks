@@ -7,10 +7,13 @@
       "@oxygenui/fhir": ["./packages/fhir/src/index.ts"],
       "@oxygenui/fixtures": ["./packages/fixtures/src/index.ts"],
       "@/registry/*": ["./registry/*"],
-      // Registry components import "@/lib/utils" because that is where the
-      // shadcn CLI writes it in the consumer's project. Mapped here so the
-      // same source typechecks in this repo without being edited.
-      "@/lib/utils": ["./registry/oxygen/lib/utils.ts"]
+      // Registry components import "@/lib/utils" and "@/components/oxygen/*"
+      // because that is where the shadcn CLI writes them in the consumer's
+      // project. Mapped here so the same source typechecks in this repo
+      // without being edited. Add a mapping for every shared registry
+      // component the catalog grows.
+      "@/lib/utils": ["./registry/oxygen/lib/utils.ts"],
+      "@/components/oxygen/status-badge": ["./registry/oxygen/status-badge/status-badge.tsx"]
     }
   },
   "include": ["scripts/**/*.ts", "registry/**/*.ts", "registry/**/*.tsx"],

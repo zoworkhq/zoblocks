@@ -73,6 +73,63 @@ body {
   text-rendering: optimizeLegibility;
 }
 
+/* ---------------------------------------------------------------------------
+ * Scrollbars
+ *
+ * macOS renders a light native scrollbar inside overflow containers when
+ * "Show scroll bars: Always" is set. Inside the dark install pill that reads
+ * as a rendering bug, so the bar is hidden there — the command stays
+ * scrollable by trackpad, touch, and keyboard, and the Copy button is the
+ * real affordance anyway.
+ * ------------------------------------------------------------------------ */
+
+.scroll-hidden {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.scroll-hidden::-webkit-scrollbar {
+  display: none;
+}
+
+/* Code blocks keep a visible bar — there the overflow is content the reader
+   actually needs to reach — but a thin, themed one rather than the default. */
+.scroll-thin {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-rule-strong) transparent;
+}
+
+.scroll-thin::-webkit-scrollbar {
+  height: 8px;
+}
+
+.scroll-thin::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scroll-thin::-webkit-scrollbar-thumb {
+  background: var(--color-rule-strong);
+  border-radius: 999px;
+}
+
+.scroll-thin-dark {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-ink-rule) transparent;
+}
+
+.scroll-thin-dark::-webkit-scrollbar {
+  height: 8px;
+}
+
+.scroll-thin-dark::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scroll-thin-dark::-webkit-scrollbar-thumb {
+  background: #24403b;
+  border-radius: 999px;
+}
+
 /* Every number on this page is monospaced and tabular. Data is the product;
    the typography says so before the copy does. */
 .numeric {

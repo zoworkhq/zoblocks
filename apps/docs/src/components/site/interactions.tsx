@@ -60,7 +60,7 @@ export function InstallCommand({
 
       <code
         className={cn(
-          "min-w-0 flex-1 overflow-x-auto whitespace-nowrap font-mono text-paper/95",
+          "scroll-hidden min-w-0 flex-1 overflow-x-auto whitespace-nowrap font-mono text-paper/95",
           size === "lg" ? "text-[0.8125rem] sm:text-sm" : "text-xs",
         )}
       >

@@ -14,7 +14,11 @@
     "paths": {
       "@/*": ["./src/*"],
       "@/lib/utils": ["./src/lib/utils.ts"],
-      "@/registry/*": ["../../registry/*"]
+      "@/registry/*": ["../../registry/*"],
+      // Registry components import each other by the path the shadcn CLI
+      // writes in a consumer's project. Mapped back to the registry source so
+      // the previews render the real files, unedited.
+      "@/components/oxygen/status-badge": ["../../registry/oxygen/status-badge/status-badge.tsx"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],

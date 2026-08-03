@@ -1,5 +1,7 @@
 import Link from "next/link";
-import { ArrowRight, Check, Github, Minus } from "lucide-react";
+import { ArrowRight, Check, Minus } from "lucide-react";
+import { CATALOG, STATUS_LABEL, type ComponentStatus } from "@/lib/catalog";
+import { SiteFooter, SiteHeader } from "@/components/site/chrome";
 import { Counter, InstallCommand, RevealRoot } from "@/components/site/interactions";
 import { LiveInstrument } from "@/components/site/live-instrument";
 import { TelemetryTrace } from "@/components/site/telemetry-trace";
@@ -22,57 +24,6 @@ export default function HomePage() {
 }
 
 /* ========================================================================== */
-
-function SiteHeader() {
-  return (
-    <header className="sticky top-0 z-40 border-b border-rule/70 bg-paper/85 backdrop-blur-md">
-      <div className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-6 px-5 sm:px-8">
-        <Link href="/" className="flex items-center gap-2.5" aria-label="Oxygen UI home">
-          <OxygenMark />
-          <span className="font-display text-[0.9375rem] font-semibold tracking-tight">
-            Oxygen UI
-          </span>
-          <span className="numeric hidden rounded border border-rule px-1.5 py-0.5 text-[0.625rem] text-graphite sm:inline">
-            v0.1.0
-          </span>
-        </Link>
-
-        <nav className="flex items-center gap-1 text-sm">
-          {[
-            { href: "#components", label: "Components" },
-            { href: "#quality", label: "Quality" },
-          ].map((item) => (
-            <a
-              key={item.href}
-              href={item.href}
-              className="hidden rounded-lg px-3 py-1.5 text-graphite transition-colors duration-200 hover:bg-paper-sunk hover:text-ink sm:block"
-            >
-              {item.label}
-            </a>
-          ))}
-          <a
-            href="https://github.com/zoworkhq/oxygenui"
-            className="ml-1 inline-flex items-center gap-1.5 rounded-lg border border-rule px-3 py-1.5 text-sm text-graphite transition-all duration-200 hover:border-rule-strong hover:text-ink"
-          >
-            <Github aria-hidden="true" className="size-3.5" />
-            <span className="hidden sm:inline">GitHub</span>
-          </a>
-        </nav>
-      </div>
-    </header>
-  );
-}
-
-function OxygenMark() {
-  // Two bonded circles — O₂. The bond is the brand color; the atoms are not.
-  return (
-    <svg viewBox="0 0 28 16" className="h-4 w-7" aria-hidden="true">
-      <line x1="8" y1="8" x2="20" y2="8" stroke="var(--color-oxygen)" strokeWidth="2.5" />
-      <circle cx="8" cy="8" r="5.5" fill="none" stroke="var(--color-ink)" strokeWidth="2" />
-      <circle cx="20" cy="8" r="5.5" fill="none" stroke="var(--color-ink)" strokeWidth="2" />
-    </svg>
-  );
-}
 
 /* ========================================================================== */
 
@@ -110,7 +61,7 @@ function Hero() {
           >
             <InstallCommand command="pnpm dlx shadcn@latest add @oxygenui/vitals-panel" className="flex-1" />
             <a
-              href="#components"
+              href="/components"
               className="group inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-ink px-5 py-3.5 text-sm font-medium text-paper transition-all duration-300 ease-[var(--ease-out-expo)] hover:-translate-y-0.5 hover:bg-oxygen-deep"
             >
               Browse components
@@ -234,7 +185,7 @@ function CodeComparison() {
             <div className="mb-3 flex items-center gap-2">
               <span className="eyebrow text-graphite">Hand-rolled</span>
             </div>
-            <pre className="overflow-x-auto rounded-2xl border border-rule bg-paper-sunk p-5 font-mono text-[0.75rem] leading-relaxed text-graphite">
+            <pre className="scroll-thin overflow-x-auto rounded-2xl border border-rule bg-paper-sunk p-5 font-mono text-[0.75rem] leading-relaxed text-graphite">
               <code>{`{observations.map((o) => (
   <Row
     name={o.code?.text}
@@ -259,7 +210,7 @@ function CodeComparison() {
             <div className="mb-3 flex items-center gap-2">
               <span className="eyebrow text-oxygen-deep">With Oxygen</span>
             </div>
-            <pre className="overflow-x-auto rounded-2xl border border-ink-rule bg-ink p-5 font-mono text-[0.75rem] leading-relaxed text-paper/90">
+            <pre className="scroll-thin-dark overflow-x-auto rounded-2xl border border-ink-rule bg-ink p-5 font-mono text-[0.75rem] leading-relaxed text-paper/90">
               <code>
                 <span className="text-graphite-soft">{`// props are the FHIR resource\n`}</span>
                 {`<ObservationPanel\n  observations={observations}\n/>`}
@@ -282,59 +233,12 @@ function CodeComparison() {
 
 /* ========================================================================== */
 
-const COMPONENTS = [
-  {
-    name: "patient-banner",
-    title: "Patient Banner",
-    resource: "Patient",
-    status: "Shipping",
-    description:
-      "Persistent identity header. Restricted records, deceased status, masked identifiers, and missing demographics.",
-  },
-  {
-    name: "vitals-panel",
-    title: "Observation Panel",
-    resource: "Observation[]",
-    status: "Shipping",
-    description:
-      "Results table with reference ranges and interpretation. Uninterpreted results stay uninterpreted.",
-  },
-  {
-    name: "medication-card",
-    title: "Medication Card",
-    resource: "MedicationRequest",
-    status: "In review",
-    description:
-      "Dose, route, schedule, and status. Held, stopped, and expired are distinct — not one greyed-out style.",
-  },
-  {
-    name: "appointment-card",
-    title: "Appointment Card",
-    resource: "Appointment",
-    status: "In review",
-    description:
-      "Booked, pending, cancelled, no-show. Time zone and virtual/in-person carried explicitly.",
-  },
-  {
-    name: "allergy-list",
-    title: "Allergy List",
-    resource: "AllergyIntolerance",
-    status: "Design",
-    description: "Criticality and verification status, with no-known-allergies as its own state.",
-  },
-  {
-    name: "coverage-card",
-    title: "Coverage Card",
-    resource: "Coverage",
-    status: "Design",
-    description: "Plan, payer, member identifiers, and the period a coverage is actually active.",
-  },
-];
 
-const STATUS_STYLE: Record<string, string> = {
-  Shipping: "border-oxygen/30 bg-oxygen/8 text-oxygen-deep",
-  "In review": "border-rule-strong bg-paper-sunk text-graphite",
-  Design: "border-rule bg-transparent text-graphite-soft",
+
+const STATUS_STYLE: Record<ComponentStatus, string> = {
+  shipping: "border-oxygen/30 bg-oxygen/8 text-oxygen-deep",
+  review: "border-rule-strong bg-paper-sunk text-graphite",
+  design: "border-rule bg-transparent text-graphite-soft",
 };
 
 function Catalog() {
@@ -355,9 +259,10 @@ function Catalog() {
         </div>
 
         <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {COMPONENTS.map((component, index) => (
-            <article
+          {CATALOG.map((component, index) => (
+            <Link
               key={component.name}
+              href={`/components/${component.name}`}
               data-reveal
               style={{ "--reveal-delay": `${(index % 3) * 70}ms` } as React.CSSProperties}
               className="group flex flex-col rounded-2xl border border-rule bg-paper p-5 transition-all duration-300 ease-[var(--ease-out-expo)] hover:-translate-y-0.5 hover:border-oxygen/40 hover:shadow-[0_16px_36px_-20px_rgb(6_118_98/0.35)]"
@@ -369,23 +274,43 @@ function Catalog() {
                 <span
                   className={`shrink-0 rounded-full border px-2 py-0.5 font-mono text-[0.625rem] uppercase tracking-wider ${STATUS_STYLE[component.status]}`}
                 >
-                  {component.status}
+                  {STATUS_LABEL[component.status]}
                 </span>
               </div>
 
               <p className="numeric mt-2 text-xs text-oxygen-deep">{component.resource}</p>
 
               <p className="mt-3 flex-1 text-sm leading-relaxed text-graphite">
-                {component.description}
+                {component.summary}
               </p>
 
-              {component.status === "Shipping" && (
-                <div className="mt-4 border-t border-rule pt-3">
-                  <InstallCommand size="sm" command={`shadcn add @oxygenui/${component.name}`} />
-                </div>
-              )}
-            </article>
+              <div className="mt-4 flex items-center justify-between border-t border-rule pt-3">
+                <span className="numeric text-[0.6875rem] text-graphite-soft">
+                  {component.states.length} states
+                </span>
+                <span className="inline-flex items-center gap-1 text-xs font-medium text-oxygen-deep">
+                  View
+                  <ArrowRight
+                    aria-hidden="true"
+                    className="size-3.5 transition-transform duration-300 ease-[var(--ease-out-expo)] group-hover:translate-x-0.5"
+                  />
+                </span>
+              </div>
+            </Link>
           ))}
+        </div>
+
+        <div className="mt-10" data-reveal>
+          <Link
+            href="/components"
+            className="group inline-flex items-center gap-2 rounded-xl border border-rule bg-paper px-5 py-3 text-sm font-medium text-ink transition-all duration-300 ease-[var(--ease-out-expo)] hover:-translate-y-0.5 hover:border-oxygen/40"
+          >
+            Browse the full catalog
+            <ArrowRight
+              aria-hidden="true"
+              className="size-4 transition-transform duration-300 ease-[var(--ease-out-expo)] group-hover:translate-x-0.5"
+            />
+          </Link>
         </div>
       </div>
     </section>
@@ -474,30 +399,3 @@ function ClosingCta() {
 }
 
 /* ========================================================================== */
-
-function SiteFooter() {
-  return (
-    <footer className="border-t border-rule bg-paper-sunk/50">
-      <div className="mx-auto flex max-w-6xl flex-col gap-6 px-5 py-10 sm:flex-row sm:items-center sm:justify-between sm:px-8">
-        <div className="flex items-center gap-2.5">
-          <OxygenMark />
-          <span className="font-display text-sm font-semibold tracking-tight">Oxygen UI</span>
-          <span className="text-sm text-graphite">by Zowork</span>
-        </div>
-
-        <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-graphite">
-          <a
-            href="https://github.com/zoworkhq/oxygenui"
-            className="transition-colors duration-200 hover:text-ink"
-          >
-            GitHub
-          </a>
-          <a href="/r/index.json" className="transition-colors duration-200 hover:text-ink">
-            Registry
-          </a>
-          <span className="numeric text-xs text-graphite-soft">MIT · v0.1.0</span>
-        </div>
-      </div>
-    </footer>
-  );
-}

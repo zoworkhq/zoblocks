@@ -8,7 +8,10 @@
       "type": "registry:lib",
       "title": "Utils",
       "description": "Class-name merge helper shared by every Oxygen component.",
-      "dependencies": ["clsx", "tailwind-merge"],
+      "dependencies": [
+        "clsx",
+        "tailwind-merge"
+      ],
       "files": [
         {
           "path": "registry/oxygen/lib/utils.ts",
@@ -35,9 +38,20 @@
       "type": "registry:component",
       "title": "Patient Banner",
       "description": "Persistent patient identity header driven by a FHIR R4 Patient resource. Handles restricted records, deceased status, masked identifiers, and missing demographics.",
-      "categories": ["patient-identity", "clinical"],
-      "dependencies": ["@oxygenui/fhir", "lucide-react", "clsx", "tailwind-merge"],
-      "registryDependencies": ["https://oxygenui.design/r/utils.json", "https://oxygenui.design/r/tokens.json"],
+      "categories": [
+        "patient-identity",
+        "clinical"
+      ],
+      "dependencies": [
+        "@oxygenui/fhir",
+        "lucide-react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "https://oxygenui.design/r/utils.json",
+        "https://oxygenui.design/r/tokens.json"
+      ],
       "files": [
         {
           "path": "registry/oxygen/patient-banner/patient-banner.tsx",
@@ -50,15 +64,192 @@
       "name": "vitals-panel",
       "type": "registry:component",
       "title": "Observation Panel",
-      "description": "Results table for FHIR R4 Observation resources. Renders values, units, reference ranges, and interpretation — with uninterpreted results shown as uninterpreted, never as normal.",
-      "categories": ["clinical-data", "clinical"],
-      "dependencies": ["@oxygenui/fhir", "lucide-react", "clsx", "tailwind-merge"],
-      "registryDependencies": ["https://oxygenui.design/r/utils.json", "https://oxygenui.design/r/tokens.json"],
+      "description": "Results table for FHIR R4 Observation resources. Renders values, units, reference ranges, and interpretation \u2014 with uninterpreted results shown as uninterpreted, never as normal.",
+      "categories": [
+        "clinical-data",
+        "clinical"
+      ],
+      "dependencies": [
+        "@oxygenui/fhir",
+        "lucide-react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "https://oxygenui.design/r/utils.json",
+        "https://oxygenui.design/r/tokens.json"
+      ],
       "files": [
         {
           "path": "registry/oxygen/vitals-panel/vitals-panel.tsx",
           "type": "registry:component",
           "target": "components/oxygen/vitals-panel.tsx"
+        }
+      ]
+    },
+    {
+      "name": "status-badge",
+      "type": "registry:component",
+      "title": "Status Badge",
+      "description": "Shared severity and status chip used by every Oxygen component, so critical reads identically on a lab result, a medication, and an allergy. Label is required \u2014 there is no icon-only variant.",
+      "categories": [
+        "primitive",
+        "clinical"
+      ],
+      "dependencies": [
+        "lucide-react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "https://oxygenui.design/r/utils.json",
+        "https://oxygenui.design/r/tokens.json"
+      ],
+      "files": [
+        {
+          "path": "registry/oxygen/status-badge/status-badge.tsx",
+          "type": "registry:component",
+          "target": "components/oxygen/status-badge.tsx"
+        }
+      ]
+    },
+    {
+      "name": "medication-card",
+      "type": "registry:component",
+      "title": "Medication Card",
+      "description": "Medication order from a FHIR MedicationRequest. On-hold, stopped, completed, and expired each get their own label and tone rather than one greyed-out style, because they lead to opposite next actions.",
+      "categories": [
+        "medication",
+        "clinical"
+      ],
+      "dependencies": [
+        "@oxygenui/fhir",
+        "lucide-react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "https://oxygenui.design/r/utils.json",
+        "https://oxygenui.design/r/tokens.json",
+        "https://oxygenui.design/r/status-badge.json"
+      ],
+      "files": [
+        {
+          "path": "registry/oxygen/medication-card/medication-card.tsx",
+          "type": "registry:component",
+          "target": "components/oxygen/medication-card.tsx"
+        }
+      ]
+    },
+    {
+      "name": "allergy-list",
+      "type": "registry:component",
+      "title": "Allergy List",
+      "description": "Allergies and intolerances from FHIR AllergyIntolerance. Distinguishes a recorded no-known-allergies assertion from an empty list, because one means asked-and-answered and the other means nobody asked.",
+      "categories": [
+        "clinical-data",
+        "clinical"
+      ],
+      "dependencies": [
+        "@oxygenui/fhir",
+        "lucide-react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "https://oxygenui.design/r/utils.json",
+        "https://oxygenui.design/r/tokens.json",
+        "https://oxygenui.design/r/status-badge.json"
+      ],
+      "files": [
+        {
+          "path": "registry/oxygen/allergy-list/allergy-list.tsx",
+          "type": "registry:component",
+          "target": "components/oxygen/allergy-list.tsx"
+        }
+      ]
+    },
+    {
+      "name": "appointment-card",
+      "type": "registry:component",
+      "title": "Appointment Card",
+      "description": "Scheduled appointment from a FHIR Appointment resource. Time zone is a required prop rather than inferred from the browser, and no-show is treated as distinct from cancelled.",
+      "categories": [
+        "scheduling",
+        "clinical"
+      ],
+      "dependencies": [
+        "@oxygenui/fhir",
+        "lucide-react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "https://oxygenui.design/r/utils.json",
+        "https://oxygenui.design/r/tokens.json",
+        "https://oxygenui.design/r/status-badge.json"
+      ],
+      "files": [
+        {
+          "path": "registry/oxygen/appointment-card/appointment-card.tsx",
+          "type": "registry:component",
+          "target": "components/oxygen/appointment-card.tsx"
+        }
+      ]
+    },
+    {
+      "name": "coverage-card",
+      "type": "registry:component",
+      "title": "Coverage Card",
+      "description": "Insurance coverage from a FHIR Coverage resource. Effective state is derived from status and period together, so a coverage marked active but past its end date reads as lapsed.",
+      "categories": [
+        "billing",
+        "clinical"
+      ],
+      "dependencies": [
+        "@oxygenui/fhir",
+        "lucide-react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "https://oxygenui.design/r/utils.json",
+        "https://oxygenui.design/r/tokens.json",
+        "https://oxygenui.design/r/status-badge.json"
+      ],
+      "files": [
+        {
+          "path": "registry/oxygen/coverage-card/coverage-card.tsx",
+          "type": "registry:component",
+          "target": "components/oxygen/coverage-card.tsx"
+        }
+      ]
+    },
+    {
+      "name": "condition-list",
+      "type": "registry:component",
+      "title": "Condition List",
+      "description": "Problem list from FHIR Condition resources. Separates active from resolved, preserves vague onset as recorded, and never presents a provisional diagnosis as confirmed.",
+      "categories": [
+        "clinical-data",
+        "clinical"
+      ],
+      "dependencies": [
+        "@oxygenui/fhir",
+        "lucide-react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "https://oxygenui.design/r/utils.json",
+        "https://oxygenui.design/r/tokens.json",
+        "https://oxygenui.design/r/status-badge.json"
+      ],
+      "files": [
+        {
+          "path": "registry/oxygen/condition-list/condition-list.tsx",
+          "type": "registry:component",
+          "target": "components/oxygen/condition-list.tsx"
         }
       ]
     }

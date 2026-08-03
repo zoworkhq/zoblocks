@@ -68,7 +68,7 @@ and readable on their own.
 ```bash
 pnpm install
 pnpm registry:build   # generate apps/docs/public/r/*.json
-pnpm dev              # docs site on http://localhost:3000
+pnpm dev              # docs site on http://localhost:6001
 ```
 
 | Command | Purpose |

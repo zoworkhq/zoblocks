@@ -11,7 +11,15 @@
  * the states real products get wrong and demos usually skip.
  */
 
-import type { Observation, Patient } from "@oxygenui/fhir";
+import type {
+  AllergyIntolerance,
+  Appointment,
+  Condition,
+  Coverage,
+  MedicationRequest,
+  Observation,
+  Patient,
+} from "@oxygenui/fhir";
 
 export const MRN_SYSTEM = "http://example.org/fhir/sid/mrn";
 
@@ -187,6 +195,379 @@ export const observationPanel: Observation[] = [
   observationUninterpreted,
   observationAbsent,
 ];
+
+// ---------------------------------------------------------------------------
+// MedicationRequest
+// ---------------------------------------------------------------------------
+
+export const medicationActive: MedicationRequest = {
+  resourceType: "MedicationRequest",
+  id: "syn-med-lisinopril",
+  status: "active",
+  intent: "order",
+  medicationCodeableConcept: {
+    coding: [{ system: "http://www.nlm.nih.gov/research/umls/rxnorm", code: "314076", display: "Lisinopril 10 MG Oral Tablet" }],
+    text: "Lisinopril 10 mg",
+  },
+  subject,
+  authoredOn: "2026-05-12",
+  requester: { display: "Dr. N. Adeyemi" },
+  reasonCode: [{ text: "Hypertension" }],
+  dosageInstruction: [
+    {
+      text: "Take 1 tablet by mouth once daily",
+      route: { text: "Oral" },
+      timing: { repeat: { frequency: 1, period: 1, periodUnit: "d" } },
+      doseAndRate: [{ doseQuantity: { value: 10, unit: "mg" } }],
+    },
+  ],
+  dispenseRequest: { numberOfRepeatsAllowed: 3, validityPeriod: { start: "2026-05-12", end: "2027-05-12" } },
+};
+
+/** On hold — paused deliberately. Must not look like "stopped". */
+export const medicationOnHold: MedicationRequest = {
+  resourceType: "MedicationRequest",
+  id: "syn-med-metformin",
+  status: "on-hold",
+  intent: "order",
+  medicationCodeableConcept: { text: "Metformin 500 mg" },
+  subject,
+  authoredOn: "2026-03-02",
+  requester: { display: "Dr. N. Adeyemi" },
+  statusReason: { text: "Held pending renal function review" },
+  reasonCode: [{ text: "Type 2 diabetes mellitus" }],
+  dosageInstruction: [
+    {
+      route: { text: "Oral" },
+      timing: { repeat: { frequency: 2, period: 1, periodUnit: "d" } },
+      doseAndRate: [{ doseQuantity: { value: 500, unit: "mg" } }],
+    },
+  ],
+};
+
+/** Stopped, with the reason recorded — the field most implementations drop. */
+export const medicationStopped: MedicationRequest = {
+  resourceType: "MedicationRequest",
+  id: "syn-med-ibuprofen",
+  status: "stopped",
+  intent: "order",
+  medicationCodeableConcept: { text: "Ibuprofen 400 mg" },
+  subject,
+  authoredOn: "2026-01-18",
+  statusReason: { text: "Discontinued — GI intolerance" },
+  dosageInstruction: [{ text: "400 mg every 8 hours as needed for pain", asNeededBoolean: true }],
+};
+
+/** Still `active` in the payload, but past its validity period → expired. */
+export const medicationExpired: MedicationRequest = {
+  resourceType: "MedicationRequest",
+  id: "syn-med-amoxicillin",
+  status: "active",
+  intent: "order",
+  medicationCodeableConcept: { text: "Amoxicillin 500 mg" },
+  subject,
+  authoredOn: "2025-11-04",
+  dosageInstruction: [{ text: "500 mg three times daily for 7 days" }],
+  dispenseRequest: { numberOfRepeatsAllowed: 0, validityPeriod: { start: "2025-11-04", end: "2025-12-04" } },
+};
+
+/** No dosage instruction at all — the component must say so, not render blank. */
+export const medicationNoDosage: MedicationRequest = {
+  resourceType: "MedicationRequest",
+  id: "syn-med-sparse",
+  status: "active",
+  intent: "order",
+  medicationCodeableConcept: { text: "Atorvastatin 20 mg" },
+  subject,
+};
+
+export const medicationList: MedicationRequest[] = [
+  medicationActive,
+  medicationOnHold,
+  medicationNoDosage,
+  medicationExpired,
+  medicationStopped,
+];
+
+// ---------------------------------------------------------------------------
+// AllergyIntolerance
+// ---------------------------------------------------------------------------
+
+const CLINICAL_STATUS = "http://terminology.hl7.org/CodeSystem/allergyintolerance-clinical";
+const VERIFICATION_STATUS = "http://terminology.hl7.org/CodeSystem/allergyintolerance-verification";
+
+export const allergyHighRisk: AllergyIntolerance = {
+  resourceType: "AllergyIntolerance",
+  id: "syn-allergy-penicillin",
+  clinicalStatus: { coding: [{ system: CLINICAL_STATUS, code: "active" }] },
+  verificationStatus: { coding: [{ system: VERIFICATION_STATUS, code: "confirmed" }] },
+  type: "allergy",
+  category: ["medication"],
+  criticality: "high",
+  code: { text: "Penicillin" },
+  patient: subject,
+  recordedDate: "2019-06-11",
+  reaction: [{ manifestation: [{ text: "Anaphylaxis" }, { text: "Urticaria" }], severity: "severe" }],
+};
+
+export const allergyModerate: AllergyIntolerance = {
+  resourceType: "AllergyIntolerance",
+  id: "syn-allergy-shellfish",
+  clinicalStatus: { coding: [{ system: CLINICAL_STATUS, code: "active" }] },
+  verificationStatus: { coding: [{ system: VERIFICATION_STATUS, code: "confirmed" }] },
+  type: "allergy",
+  category: ["food"],
+  code: { text: "Shellfish" },
+  patient: subject,
+  reaction: [{ manifestation: [{ text: "Swelling of lips" }], severity: "moderate" }],
+};
+
+/** Unconfirmed — must not read as an established allergy. */
+export const allergyUnconfirmed: AllergyIntolerance = {
+  resourceType: "AllergyIntolerance",
+  id: "syn-allergy-latex",
+  clinicalStatus: { coding: [{ system: CLINICAL_STATUS, code: "active" }] },
+  verificationStatus: { coding: [{ system: VERIFICATION_STATUS, code: "unconfirmed" }] },
+  type: "allergy",
+  category: ["environment"],
+  code: { text: "Latex" },
+  patient: subject,
+};
+
+/** Refuted — actively ruled out. De-prescribing depends on this distinction. */
+export const allergyRefuted: AllergyIntolerance = {
+  resourceType: "AllergyIntolerance",
+  id: "syn-allergy-sulfa",
+  clinicalStatus: { coding: [{ system: CLINICAL_STATUS, code: "inactive" }] },
+  verificationStatus: { coding: [{ system: VERIFICATION_STATUS, code: "refuted" }] },
+  type: "allergy",
+  category: ["medication"],
+  code: { text: "Sulfonamides" },
+  patient: subject,
+  note: [{ text: "Ruled out after allergy testing, March 2026." }],
+};
+
+export const allergyList: AllergyIntolerance[] = [
+  allergyHighRisk,
+  allergyModerate,
+  allergyUnconfirmed,
+  allergyRefuted,
+];
+
+// ---------------------------------------------------------------------------
+// Appointment
+// ---------------------------------------------------------------------------
+
+export const appointmentBooked: Appointment = {
+  resourceType: "Appointment",
+  id: "syn-appt-booked",
+  status: "booked",
+  serviceType: [{ text: "Cardiology follow-up" }],
+  description: "Cardiology follow-up",
+  start: "2026-08-14T09:30:00Z",
+  end: "2026-08-14T10:00:00Z",
+  minutesDuration: 30,
+  participant: [
+    { actor: { reference: "Patient/syn-patient-routine", display: "Amara Okonkwo" }, status: "accepted" },
+    { actor: { reference: "Practitioner/syn-prac-1", display: "Dr. N. Adeyemi" }, status: "accepted" },
+  ],
+  patientInstruction: "Bring your home blood-pressure log.",
+};
+
+export const appointmentVirtual: Appointment = {
+  resourceType: "Appointment",
+  id: "syn-appt-virtual",
+  status: "pending",
+  serviceType: [{ text: "Virtual consultation" }],
+  appointmentType: { coding: [{ code: "VIRTUAL", display: "Telehealth video visit" }] },
+  description: "Medication review",
+  start: "2026-08-09T14:00:00Z",
+  minutesDuration: 15,
+  participant: [{ actor: { reference: "Practitioner/syn-prac-2", display: "Dr. L. Fernandes" }, status: "tentative" }],
+};
+
+/** No-show — operationally distinct from a cancellation. */
+export const appointmentNoShow: Appointment = {
+  resourceType: "Appointment",
+  id: "syn-appt-noshow",
+  status: "noshow",
+  serviceType: [{ text: "Diabetes education" }],
+  description: "Diabetes education",
+  start: "2026-07-22T11:00:00Z",
+  minutesDuration: 45,
+  participant: [{ actor: { reference: "Practitioner/syn-prac-3", display: "S. Raman, RD" } }],
+};
+
+export const appointmentCancelled: Appointment = {
+  resourceType: "Appointment",
+  id: "syn-appt-cancelled",
+  status: "cancelled",
+  serviceType: [{ text: "Dermatology consult" }],
+  description: "Dermatology consult",
+  start: "2026-07-30T15:15:00Z",
+  minutesDuration: 20,
+  cancelationReason: { text: "Cancelled by patient — schedule conflict" },
+};
+
+export const appointmentList: Appointment[] = [
+  appointmentBooked,
+  appointmentVirtual,
+  appointmentNoShow,
+  appointmentCancelled,
+];
+
+// ---------------------------------------------------------------------------
+// Coverage
+// ---------------------------------------------------------------------------
+
+const COVERAGE_CLASS = "http://terminology.hl7.org/CodeSystem/coverage-class";
+
+export const coverageActive: Coverage = {
+  resourceType: "Coverage",
+  id: "syn-coverage-active",
+  status: "active",
+  type: { text: "PPO" },
+  subscriberId: "882-401-556",
+  beneficiary: subject,
+  relationship: { text: "self" },
+  period: { start: "2026-01-01", end: "2026-12-31" },
+  payor: [{ display: "Meridian Health Plan" }],
+  class: [
+    { type: { coding: [{ system: COVERAGE_CLASS, code: "plan" }] }, value: "Meridian Choice PPO" },
+    { type: { coding: [{ system: COVERAGE_CLASS, code: "group" }] }, value: "GRP-40218" },
+  ],
+  order: 1,
+};
+
+/** Status says active; the period has already ended. This is the trap. */
+export const coverageLapsed: Coverage = {
+  resourceType: "Coverage",
+  id: "syn-coverage-lapsed",
+  status: "active",
+  type: { text: "HMO" },
+  subscriberId: "119-702-338",
+  beneficiary: subject,
+  relationship: { text: "spouse" },
+  period: { start: "2025-01-01", end: "2025-12-31" },
+  payor: [{ display: "Northgate Mutual" }],
+  class: [{ type: { coding: [{ system: COVERAGE_CLASS, code: "plan" }] }, value: "Northgate Essential HMO" }],
+  order: 2,
+};
+
+export const coverageFuture: Coverage = {
+  resourceType: "Coverage",
+  id: "syn-coverage-future",
+  status: "active",
+  type: { text: "PPO" },
+  subscriberId: "553-880-127",
+  beneficiary: subject,
+  relationship: { text: "self" },
+  period: { start: "2027-01-01" },
+  payor: [{ display: "Meridian Health Plan" }],
+};
+
+export const coverageList: Coverage[] = [coverageActive, coverageLapsed, coverageFuture];
+
+// ---------------------------------------------------------------------------
+// Condition
+// ---------------------------------------------------------------------------
+
+const CONDITION_CLINICAL = "http://terminology.hl7.org/CodeSystem/condition-clinical";
+const CONDITION_VERIFICATION = "http://terminology.hl7.org/CodeSystem/condition-ver-status";
+
+export const conditionActive: Condition = {
+  resourceType: "Condition",
+  id: "syn-cond-htn",
+  clinicalStatus: { coding: [{ system: CONDITION_CLINICAL, code: "active" }] },
+  verificationStatus: { coding: [{ system: CONDITION_VERIFICATION, code: "confirmed" }] },
+  code: { coding: [{ system: "http://snomed.info/sct", code: "38341003" }], text: "Essential hypertension" },
+  severity: { text: "Moderate" },
+  subject,
+  onsetDateTime: "2021-04-09",
+  recordedDate: "2021-04-09",
+};
+
+/** Vague onset recorded as a string — must not be coerced to a false date. */
+export const conditionVagueOnset: Condition = {
+  resourceType: "Condition",
+  id: "syn-cond-asthma",
+  clinicalStatus: { coding: [{ system: CONDITION_CLINICAL, code: "active" }] },
+  verificationStatus: { coding: [{ system: CONDITION_VERIFICATION, code: "confirmed" }] },
+  code: { text: "Asthma" },
+  severity: { text: "Mild" },
+  subject,
+  onsetString: "in childhood",
+};
+
+/** Provisional — carrying this forward as settled fact is a real-world harm. */
+export const conditionProvisional: Condition = {
+  resourceType: "Condition",
+  id: "syn-cond-provisional",
+  clinicalStatus: { coding: [{ system: CONDITION_CLINICAL, code: "active" }] },
+  verificationStatus: { coding: [{ system: CONDITION_VERIFICATION, code: "provisional" }] },
+  code: { text: "Iron deficiency anaemia" },
+  subject,
+  onsetDateTime: "2026-07-28",
+};
+
+export const conditionResolved: Condition = {
+  resourceType: "Condition",
+  id: "syn-cond-resolved",
+  clinicalStatus: { coding: [{ system: CONDITION_CLINICAL, code: "resolved" }] },
+  verificationStatus: { coding: [{ system: CONDITION_VERIFICATION, code: "confirmed" }] },
+  code: { text: "Community-acquired pneumonia" },
+  severity: { text: "Severe" },
+  subject,
+  onsetDateTime: "2025-11-02",
+  abatementDateTime: "2025-11-26",
+};
+
+export const conditionList: Condition[] = [
+  conditionActive,
+  conditionVagueOnset,
+  conditionProvisional,
+  conditionResolved,
+];
+
+export const medications = {
+  active: medicationActive,
+  onHold: medicationOnHold,
+  stopped: medicationStopped,
+  expired: medicationExpired,
+  noDosage: medicationNoDosage,
+  list: medicationList,
+};
+
+export const allergies = {
+  highRisk: allergyHighRisk,
+  moderate: allergyModerate,
+  unconfirmed: allergyUnconfirmed,
+  refuted: allergyRefuted,
+  list: allergyList,
+};
+
+export const appointments = {
+  booked: appointmentBooked,
+  virtual: appointmentVirtual,
+  noShow: appointmentNoShow,
+  cancelled: appointmentCancelled,
+  list: appointmentList,
+};
+
+export const coverages = {
+  active: coverageActive,
+  lapsed: coverageLapsed,
+  future: coverageFuture,
+  list: coverageList,
+};
+
+export const conditions = {
+  active: conditionActive,
+  vagueOnset: conditionVagueOnset,
+  provisional: conditionProvisional,
+  resolved: conditionResolved,
+  list: conditionList,
+};
 
 export const observations = {
   heartRate: observationHeartRate,

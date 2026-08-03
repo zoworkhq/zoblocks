@@ -188,6 +188,176 @@ export interface Observation extends Resource {
   component?: ObservationComponent[];
 }
 
+/** https://hl7.org/fhir/R4/datatypes.html#Annotation */
+export interface Annotation {
+  authorString?: string;
+  authorReference?: Reference;
+  time?: string;
+  text?: string;
+}
+
+/** https://hl7.org/fhir/R4/datatypes.html#Timing */
+export interface Timing {
+  event?: string[];
+  repeat?: {
+    frequency?: number;
+    period?: number;
+    periodUnit?: "s" | "min" | "h" | "d" | "wk" | "mo" | "a";
+    duration?: number;
+    durationUnit?: "s" | "min" | "h" | "d" | "wk" | "mo" | "a";
+    boundsPeriod?: Period;
+    when?: string[];
+    timeOfDay?: string[];
+  };
+  code?: CodeableConcept;
+}
+
+/** https://hl7.org/fhir/R4/dosage.html */
+export interface Dosage {
+  sequence?: number;
+  text?: string;
+  patientInstruction?: string;
+  timing?: Timing;
+  asNeededBoolean?: boolean;
+  asNeededCodeableConcept?: CodeableConcept;
+  site?: CodeableConcept;
+  route?: CodeableConcept;
+  method?: CodeableConcept;
+  doseAndRate?: Array<{
+    type?: CodeableConcept;
+    doseQuantity?: Quantity;
+    doseRange?: Range;
+    rateQuantity?: Quantity;
+  }>;
+  maxDosePerPeriod?: { numerator?: Quantity; denominator?: Quantity };
+}
+
+export type MedicationRequestStatus =
+  | "active"
+  | "on-hold"
+  | "cancelled"
+  | "completed"
+  | "entered-in-error"
+  | "stopped"
+  | "draft"
+  | "unknown";
+
+/** https://hl7.org/fhir/R4/medicationrequest.html */
+export interface MedicationRequest extends Resource {
+  resourceType?: "MedicationRequest";
+  status?: MedicationRequestStatus;
+  statusReason?: CodeableConcept;
+  intent?: "proposal" | "plan" | "order" | "original-order" | "reflex-order" | "filler-order" | "instance-order" | "option";
+  priority?: "routine" | "urgent" | "asap" | "stat";
+  medicationCodeableConcept?: CodeableConcept;
+  medicationReference?: Reference;
+  subject?: Reference;
+  authoredOn?: string;
+  requester?: Reference;
+  reasonCode?: CodeableConcept[];
+  note?: Annotation[];
+  dosageInstruction?: Dosage[];
+  dispenseRequest?: {
+    validityPeriod?: Period;
+    numberOfRepeatsAllowed?: number;
+    quantity?: Quantity;
+    expectedSupplyDuration?: Quantity;
+  };
+}
+
+/** https://hl7.org/fhir/R4/allergyintolerance.html */
+export interface AllergyIntolerance extends Resource {
+  resourceType?: "AllergyIntolerance";
+  clinicalStatus?: CodeableConcept;
+  verificationStatus?: CodeableConcept;
+  type?: "allergy" | "intolerance";
+  category?: Array<"food" | "medication" | "environment" | "biologic">;
+  criticality?: "low" | "high" | "unable-to-assess";
+  code?: CodeableConcept;
+  patient?: Reference;
+  onsetDateTime?: string;
+  recordedDate?: string;
+  note?: Annotation[];
+  reaction?: Array<{
+    substance?: CodeableConcept;
+    manifestation?: CodeableConcept[];
+    description?: string;
+    severity?: "mild" | "moderate" | "severe";
+    onset?: string;
+  }>;
+}
+
+export type AppointmentStatus =
+  | "proposed"
+  | "pending"
+  | "booked"
+  | "arrived"
+  | "fulfilled"
+  | "cancelled"
+  | "noshow"
+  | "entered-in-error"
+  | "checked-in"
+  | "waitlist";
+
+/** https://hl7.org/fhir/R4/appointment.html */
+export interface Appointment extends Resource {
+  resourceType?: "Appointment";
+  status?: AppointmentStatus;
+  cancelationReason?: CodeableConcept;
+  serviceCategory?: CodeableConcept[];
+  serviceType?: CodeableConcept[];
+  appointmentType?: CodeableConcept;
+  reasonCode?: CodeableConcept[];
+  priority?: number;
+  description?: string;
+  start?: string;
+  end?: string;
+  minutesDuration?: number;
+  created?: string;
+  comment?: string;
+  patientInstruction?: string;
+  participant?: Array<{
+    type?: CodeableConcept[];
+    actor?: Reference;
+    required?: "required" | "optional" | "information-only";
+    status?: "accepted" | "declined" | "tentative" | "needs-action";
+  }>;
+}
+
+/** https://hl7.org/fhir/R4/coverage.html */
+export interface Coverage extends Resource {
+  resourceType?: "Coverage";
+  status?: "active" | "cancelled" | "draft" | "entered-in-error";
+  type?: CodeableConcept;
+  subscriber?: Reference;
+  subscriberId?: string;
+  beneficiary?: Reference;
+  dependent?: string;
+  relationship?: CodeableConcept;
+  period?: Period;
+  payor?: Reference[];
+  class?: Array<{ type?: CodeableConcept; value?: string; name?: string }>;
+  order?: number;
+  network?: string;
+}
+
+/** https://hl7.org/fhir/R4/condition.html */
+export interface Condition extends Resource {
+  resourceType?: "Condition";
+  clinicalStatus?: CodeableConcept;
+  verificationStatus?: CodeableConcept;
+  category?: CodeableConcept[];
+  severity?: CodeableConcept;
+  code?: CodeableConcept;
+  bodySite?: CodeableConcept[];
+  subject?: Reference;
+  onsetDateTime?: string;
+  onsetString?: string;
+  abatementDateTime?: string;
+  recordedDate?: string;
+  note?: Annotation[];
+}
+
 /** https://hl7.org/fhir/R4/bundle.html — minimal search/collection shape. */
 export interface Bundle<T extends Resource = Resource> {
   resourceType?: "Bundle";
