@@ -16,6 +16,7 @@
  */
 
 import * as React from "react";
+import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
 import { ArrowRight, CornerDownLeft, Search } from "lucide-react";
 import { CATALOG } from "@/lib/catalog";
@@ -51,6 +52,8 @@ const ALL = [...PAGES, ...COMPONENT_ITEMS];
 export function CommandMenu() {
   const router = useRouter();
   const [open, setOpen] = React.useState(false);
+  const [mounted, setMounted] = React.useState(false);
+  React.useEffect(() => setMounted(true), []);
   const [query, setQuery] = React.useState("");
   const [active, setActive] = React.useState(0);
 
@@ -102,9 +105,10 @@ export function CommandMenu() {
 
     document.body.style.overflow = "hidden";
     app?.setAttribute("aria-hidden", "true");
-    requestAnimationFrame(() => inputRef.current?.focus());
+    const focusTimer = setTimeout(() => inputRef.current?.focus(), 0);
 
     return () => {
+      clearTimeout(focusTimer);
       document.body.style.overflow = overflow;
       app?.removeAttribute("aria-hidden");
       (previouslyFocused ?? triggerRef.current)?.focus?.();
@@ -163,7 +167,7 @@ export function CommandMenu() {
         </kbd>
       </button>
 
-      {open && (
+      {open && mounted && createPortal(
         <div
           className="fixed inset-0 z-50 flex items-start justify-center px-4 pt-[12vh]"
           onMouseDown={(event) => {
@@ -172,14 +176,14 @@ export function CommandMenu() {
         >
           <div
             aria-hidden="true"
-            className="absolute inset-0 bg-ink/25 backdrop-blur-[3px] motion-safe:animate-[enter-up_180ms_ease-out]"
+            className="absolute inset-0 bg-ink/40 backdrop-blur-[2px] motion-safe:animate-[overlay-in_200ms_ease-out]"
           />
 
           <div
             role="dialog"
             aria-modal="true"
             aria-label="Search components and pages"
-            className="surface-3 relative w-full max-w-xl overflow-hidden rounded-2xl motion-safe:animate-[enter-up_240ms_var(--ease-out-expo)]"
+            className="surface-3 relative w-full max-w-xl overflow-hidden rounded-2xl motion-safe:animate-[dialog-in_260ms_var(--ease-out-expo)]"
           >
             <div className="flex items-center gap-3 border-b border-rule px-4">
               <Search aria-hidden="true" className="size-4 shrink-0 text-graphite-soft" />
@@ -196,7 +200,7 @@ export function CommandMenu() {
                 aria-activedescendant={results[active] ? `cmd-${results[active].id}` : undefined}
                 autoComplete="off"
                 spellCheck={false}
-                className="w-full bg-transparent py-4 text-[0.9375rem] text-ink outline-none placeholder:text-graphite-soft"
+                className="w-full bg-transparent py-4 text-[0.9375rem] text-ink outline-none focus-visible:outline-none focus-visible:shadow-none placeholder:text-graphite-soft"
               />
               <kbd className="numeric shrink-0 rounded border border-rule px-1.5 py-0.5 text-[0.625rem] text-graphite-soft">
                 ESC
@@ -273,7 +277,8 @@ export function CommandMenu() {
               </span>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body,
       )}
     </>
   );

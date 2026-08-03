@@ -102,11 +102,10 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
               <InstallCommand command={`pnpm dlx shadcn@latest add @oxygenui/${component.name}`} />
             </div>
 
-            <div className="mt-10 hidden lg:block">
-              <SectionRail sections={railSections} />
-            </div>
           </div>
         </section>
+
+        <SectionRail sections={railSections} />
 
         {/* Preview ------------------------------------------------------ */}
         <section id="preview" className="scroll-mt-24 border-b border-rule bg-paper-sunk/40">
@@ -243,7 +242,7 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
                   <div
                     data-reveal
                     style={{ "--reveal-delay": "80ms" } as React.CSSProperties}
-                    className="surface-1 rounded-2xl p-6"
+                    className="surface-1 self-start rounded-2xl p-6"
                   >
                     <h3 className="flex items-center gap-2 font-display text-[0.9375rem] font-semibold tracking-tight">
                       <CircleAlert aria-hidden="true" className="size-4 text-graphite" />
@@ -368,7 +367,7 @@ function GuidanceList({
     <div
       data-reveal
       style={delay ? ({ "--reveal-delay": "80ms" } as React.CSSProperties) : undefined}
-      className="surface-1 rounded-2xl p-6"
+      className="surface-1 self-start rounded-2xl p-6"
     >
       <h3 className="font-display text-[0.9375rem] font-semibold tracking-tight">{title}</h3>
       <ul className="mt-4 space-y-3">

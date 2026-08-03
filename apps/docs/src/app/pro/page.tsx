@@ -28,8 +28,9 @@ export default function ProPage() {
       <main id="main">
         {/* Hero --------------------------------------------------------- */}
         <section className="border-b border-rule">
-          <div className="mx-auto max-w-6xl section-major px-5 sm:px-8">
-            <p className="eyebrow text-oxygen-deep" data-reveal>
+          <div className="mx-auto grid max-w-6xl section-major gap-10 px-5 sm:px-8 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)] lg:items-end lg:gap-16">
+            <div>
+            <p className="eyebrow eyebrow-rule text-oxygen-deep" data-reveal>
               Oxygen Pro
             </p>
             <h1 className="display-xl mt-5 max-w-4xl text-balance" data-reveal>
@@ -70,6 +71,22 @@ export default function ProPage() {
               the first starter kit is still in build. The waitlist is free and nothing is charged
               until a kit actually ships.
             </p>
+            </div>
+
+            {/* Right column carried the same emptiness as every other hero. */}
+            <dl className="lg:pb-1" data-reveal="right">
+              <div className="ticks mb-5 opacity-70" aria-hidden="true" />
+              {[
+                { label: "Launch kits", value: TEMPLATES.length },
+                { label: "Screens across kits", value: TEMPLATES.reduce((n, t) => n + t.screens.length, 0) },
+                { label: "Built on components", value: new Set(TEMPLATES.flatMap((t) => t.uses)).size },
+              ].map((stat) => (
+                <div key={stat.label} className="flex items-baseline justify-between border-b border-rule/70 py-2.5">
+                  <dt className="axis-label">{stat.label}</dt>
+                  <dd className="numeric text-2xl font-semibold text-oxygen-deep">{stat.value}</dd>
+                </div>
+              ))}
+            </dl>
           </div>
         </section>
 

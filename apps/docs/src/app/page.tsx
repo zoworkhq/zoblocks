@@ -4,6 +4,7 @@ import { CATALOG } from "@/lib/catalog";
 import { ComponentCard } from "@/components/site/component-card";
 import { ScrollRail, SiteFooter, SiteHeader } from "@/components/site/chrome";
 import { Counter, InstallCommand, RevealRoot } from "@/components/site/interactions";
+import { FailureDemo } from "@/components/site/failure-demo";
 import { LiveInstrument } from "@/components/site/live-instrument";
 import { TelemetryTrace } from "@/components/site/telemetry-trace";
 
@@ -194,21 +195,7 @@ function StatesArgument() {
 
 /* ========================================================================== */
 
-const HAND_ROLLED = [
-  "Crashes when valueQuantity is absent",
-  "Calls an uninterpreted result normal",
-  "Ignores a stated critical interpretation",
-  "Shows a preliminary result as final",
-  "Severity carried by color alone",
-];
 
-const WITH_OXYGEN = [
-  "Renders the dataAbsentReason instead",
-  "Reads “Not interpreted”, never “Normal”",
-  "Explicit interpretation always wins",
-  "Preliminary and corrected are labelled",
-  "Badge, rule, icon, and live region",
-];
 
 function CodeComparison() {
   return (
@@ -219,55 +206,17 @@ function CodeComparison() {
             The difference
           </p>
           <h2 className="display-lg mt-4 text-balance" data-reveal>
-            One line replaces the five bugs everyone writes.
+            Same five results. Two renderers.
           </h2>
+          <p className="body-lg mt-5 max-w-2xl text-pretty text-graphite" data-reveal>
+            Not a feature list — the actual output. The left panel is written the way the
+            hand-rolled example in our docs is written, and every defect it produces follows
+            directly from that code.
+          </p>
         </div>
 
-        <div className="mt-12 grid gap-6 lg:grid-cols-2">
-          <div data-reveal="left">
-            <div className="mb-3 flex items-center gap-2">
-              <span className="eyebrow text-graphite">Hand-rolled</span>
-            </div>
-            <pre tabIndex={0} className="scroll-thin overflow-x-auto rounded-2xl border border-rule bg-paper-sunk p-5 font-mono text-[0.75rem] leading-relaxed text-graphite">
-              <code>{`{observations.map((o) => (
-  <Row
-    name={o.code?.text}
-    value={o.valueQuantity.value + " " +
-           o.valueQuantity.unit}
-    status={o.valueQuantity.value >
-            range.high ? "high" : "normal"}
-  />
-))}`}</code>
-            </pre>
-            <ul className="mt-4 space-y-2">
-              {HAND_ROLLED.map((item) => (
-                <li key={item} className="flex items-start gap-2.5 text-sm text-graphite">
-                  <Minus aria-hidden="true" className="mt-0.5 size-4 shrink-0 text-critical" />
-                  {item}
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div data-reveal="right" style={{ "--reveal-delay": "100ms" } as React.CSSProperties}>
-            <div className="mb-3 flex items-center gap-2">
-              <span className="eyebrow text-oxygen-deep">With Oxygen</span>
-            </div>
-            <pre tabIndex={0} className="scroll-thin-dark overflow-x-auto rounded-2xl border border-panel-rule bg-panel p-5 font-mono text-[0.75rem] leading-relaxed text-panel-fg/90">
-              <code>
-                <span className="text-graphite-soft">{`// props are the FHIR resource\n`}</span>
-                {`<ObservationPanel\n  observations={observations}\n/>`}
-              </code>
-            </pre>
-            <ul className="mt-4 space-y-2">
-              {WITH_OXYGEN.map((item) => (
-                <li key={item} className="flex items-start gap-2.5 text-sm text-ink">
-                  <Check aria-hidden="true" className="mt-0.5 size-4 shrink-0 text-oxygen-deep" />
-                  {item}
-                </li>
-              ))}
-            </ul>
-          </div>
+        <div className="mt-12">
+          <FailureDemo />
         </div>
       </div>
     </section>

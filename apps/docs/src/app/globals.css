@@ -691,6 +691,26 @@ body {
   }
 }
 
+/* Modal entrances.
+ *
+ * Deliberately animate ONLY opacity-from-0 with no fill mode, so the element's
+ * resting state is always its natural, visible one. An entrance animation that
+ * can leave a dialog invisible when it fails to run is a worse bug than having
+ * no entrance animation at all.
+ */
+@keyframes overlay-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes dialog-in {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.985);
+  }
+}
+
 @keyframes cursor-blink {
   0%,
   49% {

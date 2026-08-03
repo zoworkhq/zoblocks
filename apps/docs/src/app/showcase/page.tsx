@@ -5,6 +5,7 @@ import { SHOWCASE } from "@/lib/offerings";
 import { ScrollRail, SiteFooter, SiteHeader } from "@/components/site/chrome";
 import { RevealRoot } from "@/components/site/interactions";
 import { ShowcasePreview } from "@/components/site/showcase-preview";
+import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = {
   title: "Showcase — Oxygen UI in composition",
@@ -20,45 +21,72 @@ export default function ShowcasePage() {
 
       <main id="main">
         <section className="border-b border-rule">
-          <div className="mx-auto max-w-6xl section-major px-5 sm:px-8">
-            <p className="eyebrow text-oxygen-deep" data-reveal>
-              Showcase
-            </p>
-            <h1 className="display-xl mt-5 max-w-4xl text-balance" data-reveal>
-              What the components look like doing real work.
-            </h1>
-            <p className="lede mt-6 max-w-2xl text-pretty" data-reveal>
-              A single component is easy to make look good. These are compositions — several
-              components on one screen, at the density that screen actually runs at, with the hard
-              states left in.
-            </p>
-
-            {/*
-              Stated at the top, not in the footer. Healthcare buyers check
-              logos, and a showcase padded with invented customers is the
-              fastest way to lose one. Better to be plainly pre-customer.
-            */}
-            <div
-              className="mt-8 flex max-w-2xl items-start gap-3 rounded-xl border border-rule bg-paper-sunk px-4 py-3"
-              data-reveal
-            >
-              <FlaskConical aria-hidden="true" className="mt-0.5 size-4 shrink-0 text-graphite" />
-              <p className="text-sm leading-relaxed text-graphite">
-                <strong className="text-ink">These are reference implementations, not customers.</strong>{" "}
-                Oxygen is new and has none yet. Every screen below is built by us on synthetic FHIR
-                data — no real person, encounter, or organisation appears anywhere on this site.
-                When customers ship, their work will appear here with their names on it.
+          <div className="mx-auto grid max-w-6xl section-major gap-10 px-5 sm:px-8 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)] lg:items-end lg:gap-16">
+            <div>
+              <p className="eyebrow eyebrow-rule text-oxygen-deep" data-reveal>
+                Showcase
               </p>
+              <h1 className="display-lg mt-5 text-balance" data-reveal>
+                What the components look like doing real work.
+              </h1>
+              <p className="body-lg mt-6 max-w-xl text-pretty text-graphite" data-reveal>
+                A single component is easy to make look good. These are compositions — several
+                components on one screen, at the density that screen actually runs at, with the
+                hard states left in.
+              </p>
+
+              {/*
+                Stated at the top, not in the footer. Healthcare buyers check
+                logos, and a showcase padded with invented customers is the
+                fastest way to lose one.
+              */}
+              <div
+                className="mt-7 flex max-w-xl items-start gap-3 rounded-xl border border-rule bg-paper-sunk px-4 py-3"
+                data-reveal
+              >
+                <FlaskConical aria-hidden="true" className="mt-0.5 size-4 shrink-0 text-graphite" />
+                <p className="body-sm text-graphite">
+                  <strong className="text-ink">Reference implementations, not customers.</strong>{" "}
+                  Oxygen is new and has none yet. Every screen below is built by us on synthetic
+                  FHIR data. When customers ship, their work appears here with their names on it.
+                </p>
+              </div>
             </div>
+
+            {/* The right column was empty. It now indexes the page. */}
+            <nav className="lg:pb-1" aria-label="Compositions" data-reveal="right">
+              <div className="ticks mb-5 opacity-70" aria-hidden="true" />
+              <p className="axis-label">On this page</p>
+              <ul className="mt-4">
+                {SHOWCASE.map((entry, index) => (
+                  <li key={entry.slug}>
+                    <a
+                      href={`#${entry.slug}`}
+                      className="group flex items-baseline justify-between gap-3 border-b border-rule/70 py-2.5 transition-colors hover:text-ink"
+                    >
+                      <span className="flex items-baseline gap-2.5">
+                        <span className="numeric text-[0.625rem] text-graphite-soft">
+                          {String(index + 1).padStart(2, "0")}
+                        </span>
+                        <span className="text-sm text-ink">{entry.title}</span>
+                      </span>
+                      <span className="axis-label">{entry.density}</span>
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </nav>
           </div>
         </section>
 
         {SHOWCASE.map((entry, index) => (
           <section
             key={entry.slug}
-            className={
-              index % 2 === 0 ? "border-b border-rule bg-paper-sunk/40" : "border-b border-rule"
-            }
+            id={entry.slug}
+            className={cn(
+              "scroll-mt-20 border-b border-rule",
+              index % 2 === 0 && "bg-paper-sunk/40",
+            )}
           >
             <div className="mx-auto max-w-6xl section-minor px-5 sm:px-8">
               <div className="flex flex-wrap items-end justify-between gap-4">
