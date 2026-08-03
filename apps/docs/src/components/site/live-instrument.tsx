@@ -128,16 +128,16 @@ export function LiveInstrument() {
       <InstrumentGlow />
 
       {/* Bezel header — reads as an instrument label strip. */}
-      <div className="relative flex items-center justify-between gap-4 border-b border-ink-rule px-4 py-2.5 sm:px-5">
+      <div className="relative flex items-center justify-between gap-4 border-b border-panel-rule px-4 py-2.5 sm:px-5">
         <div className="flex items-center gap-2.5">
           <span className="size-1.5 rounded-full bg-trace shadow-[0_0_8px_var(--color-trace)]" />
-          <span className="eyebrow text-graphite-soft">Live components · synthetic data</span>
+          <span className="eyebrow text-panel-muted">Live components · synthetic data</span>
         </div>
-        <span className="eyebrow hidden text-graphite-soft/70 sm:block">FHIR R4</span>
+        <span className="eyebrow hidden text-panel-muted/70 sm:block">FHIR R4</span>
       </div>
 
       {/* The trace responds to whichever state is selected. */}
-      <div className="relative border-b border-ink-rule/60">
+      <div className="relative border-b border-panel-rule/60">
         <TelemetryTrace mode={scenario.trace} height={52} />
       </div>
 
@@ -162,7 +162,7 @@ export function LiveInstrument() {
       </div>
 
       {/* State rail */}
-      <div className="relative border-t border-ink-rule bg-[#060d0c]/60 px-3 py-3 sm:px-4">
+      <div className="relative border-t border-panel-rule bg-[#060d0c]/60 px-3 py-3 sm:px-4">
         <div
           role="tablist"
           aria-label="Component state"
@@ -186,7 +186,7 @@ export function LiveInstrument() {
                     ? item.trace === "critical"
                       ? "bg-critical-lum/12 text-critical-lum ring-1 ring-critical-lum/35"
                       : "bg-trace/12 text-trace ring-1 ring-trace/35"
-                    : "text-graphite-soft hover:bg-paper/6 hover:text-paper/85",
+                    : "text-panel-muted hover:bg-panel-fg/6 hover:text-panel-fg/85",
                 )}
               >
                 <Icon aria-hidden="true" className="size-3.5" />
@@ -200,13 +200,13 @@ export function LiveInstrument() {
             the selection registered, without moving anything else. */}
         <p
           key={scenario.id}
-          className="animate-rail-settle mt-3 max-w-2xl text-[0.8125rem] leading-relaxed text-graphite-soft"
+          className="animate-rail-settle mt-3 max-w-2xl text-[0.8125rem] leading-relaxed text-panel-muted"
         >
           {scenario.note}
         </p>
 
-        <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-ink-rule/70 pt-3">
-          <span className="eyebrow mr-1 text-graphite-soft/70">Density</span>
+        <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-panel-rule/70 pt-3">
+          <span className="eyebrow mr-1 text-panel-muted/70">Density</span>
           {DENSITIES.map((item) => (
             <button
               key={item.id}
@@ -217,8 +217,8 @@ export function LiveInstrument() {
               className={cn(
                 "rounded-md px-2 py-1 font-mono text-[0.6875rem] uppercase tracking-wider transition-colors duration-200",
                 density === item.id
-                  ? "bg-paper/10 text-paper"
-                  : "text-graphite-soft hover:text-paper/80",
+                  ? "bg-panel-fg/10 text-panel-fg"
+                  : "text-panel-muted hover:text-panel-fg/80",
               )}
             >
               {item.label}

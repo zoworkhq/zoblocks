@@ -129,7 +129,7 @@ export function ComponentPreview({ name }: { name: string }) {
   if (!scenarios?.length) {
     return (
       <div className="instrument flex items-center justify-center px-6 py-16">
-        <p className="text-sm text-graphite-soft">Live preview coming with the next release.</p>
+        <p className="text-sm text-panel-muted">Live preview coming with the next release.</p>
       </div>
     );
   }
@@ -140,10 +140,10 @@ export function ComponentPreview({ name }: { name: string }) {
     <div className="instrument">
       <InstrumentGlow />
 
-      <div className="relative flex items-center justify-between gap-4 border-b border-ink-rule px-4 py-2.5">
+      <div className="relative flex items-center justify-between gap-4 border-b border-panel-rule px-4 py-2.5">
         <div className="flex items-center gap-2.5">
           <span className="size-1.5 rounded-full bg-trace shadow-[0_0_8px_var(--color-trace)]" />
-          <span className="eyebrow text-graphite-soft">Live · synthetic data</span>
+          <span className="eyebrow text-panel-muted">Live · synthetic data</span>
         </div>
         <div className="flex items-center gap-1">
           {DENSITIES.map((item) => (
@@ -154,7 +154,7 @@ export function ComponentPreview({ name }: { name: string }) {
               aria-pressed={density === item}
               className={cn(
                 "rounded-md px-2 py-1 font-mono text-[0.625rem] uppercase tracking-wider transition-colors duration-200",
-                density === item ? "bg-paper/10 text-paper" : "text-graphite-soft hover:text-paper/80",
+                density === item ? "bg-panel-fg/10 text-panel-fg" : "text-panel-muted hover:text-panel-fg/80",
               )}
             >
               {item}
@@ -167,7 +167,7 @@ export function ComponentPreview({ name }: { name: string }) {
         {scenario.render()}
       </div>
 
-      <div className="relative border-t border-ink-rule bg-[#060d0c]/60 px-3 py-3 sm:px-4">
+      <div className="relative border-t border-panel-rule bg-[#060d0c]/60 px-3 py-3 sm:px-4">
         <div role="tablist" aria-label="Component state" className="flex flex-wrap gap-1.5">
           {scenarios.map((item) => (
             <button
@@ -181,14 +181,14 @@ export function ComponentPreview({ name }: { name: string }) {
                 "transition-all duration-200 ease-[var(--ease-out-expo)]",
                 item.id === scenario.id
                   ? "bg-trace/12 text-trace ring-1 ring-trace/35"
-                  : "text-graphite-soft hover:bg-paper/6 hover:text-paper/85",
+                  : "text-panel-muted hover:bg-panel-fg/6 hover:text-panel-fg/85",
               )}
             >
               {item.label}
             </button>
           ))}
         </div>
-        <p key={scenario.id} className="animate-rail-settle mt-3 max-w-2xl text-[0.8125rem] leading-relaxed text-graphite-soft">
+        <p key={scenario.id} className="animate-rail-settle mt-3 max-w-2xl text-[0.8125rem] leading-relaxed text-panel-muted">
           {scenario.note}
         </p>
       </div>

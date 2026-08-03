@@ -22,30 +22,35 @@
  * understand the domain.
  * ======================================================================== */
 
-@theme {
-  /* Cool, faintly green off-white — a clean clinical surface, not warm cream. */
-  --color-paper: #f7f9f8;
-  --color-paper-sunk: #eef3f1;
-  --color-rule: #dde5e2;
-  --color-rule-strong: #c3d0cc;
+/* `inline` keeps these as var() references at the use site rather than
+   resolving them here, so flipping the underlying values under .dark actually
+   re-themes the page. Without it, every utility would bake in the light value. */
+@theme inline {
+  --color-paper: var(--site-paper);
+  --color-paper-sunk: var(--site-paper-sunk);
+  --color-rule: var(--site-rule);
+  --color-rule-strong: var(--site-rule-strong);
 
-  /* Near-black with a green undertone. Matches the component dark theme. */
-  --color-ink: #08110f;
-  --color-ink-raised: #0d1a18;
-  --color-ink-rule: #1d302d;
+  --color-ink: var(--site-ink);
+  --color-graphite: var(--site-graphite);
+  --color-graphite-soft: var(--site-graphite-soft);
 
-  --color-oxygen: #10b995;
-  --color-oxygen-deep: #067662;
-  /* The luminous variant. Dark instrument surfaces only — it has no contrast
-     on paper and using it there is the fastest way to make this look generic. */
-  --color-trace: #2dd4b0;
+  --color-oxygen: var(--site-oxygen);
+  --color-oxygen-deep: var(--site-accent-text);
+  --color-critical: var(--site-critical);
 
-  --color-graphite: #5a6b67;
-  --color-graphite-soft: #8b9c98;
+  --color-cta: var(--site-cta);
 
-  /* Reserved. See the rule above. */
-  --color-critical: #dc2626;
-  --color-critical-lum: #fb7185;
+  /* Panel family — the always-dark surfaces: instrument bezels, code blocks,
+     the install pill. These are hardware, not document, so they stay dark in
+     both themes. Only their relationship to the page inverts. */
+  --color-panel: var(--site-panel);
+  --color-panel-raised: var(--site-panel-raised);
+  --color-panel-rule: var(--site-panel-rule);
+  --color-panel-fg: var(--site-panel-fg);
+  --color-panel-muted: var(--site-panel-muted);
+  --color-trace: var(--site-trace);
+  --color-critical-lum: var(--site-critical-lum);
 
   --font-display: var(--font-instrument-sans), ui-sans-serif, system-ui, sans-serif;
   --font-sans: var(--font-instrument-sans), ui-sans-serif, system-ui, sans-serif;
@@ -53,6 +58,78 @@
 
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* -----------------------------------------------------------------------
+ * Light — a calm clinical document with a dark instrument set into it.
+ * -------------------------------------------------------------------- */
+:root {
+  /* Cool, faintly green off-white — a clean clinical surface, not warm cream. */
+  --site-paper: #f7f9f8;
+  --site-paper-sunk: #eef3f1;
+  --site-rule: #dde5e2;
+  --site-rule-strong: #c3d0cc;
+
+  --site-ink: #08110f;
+  --site-graphite: #5a6b67;
+  --site-graphite-soft: #8b9c98;
+
+  --site-oxygen: #10b995;
+  /* Accent used on text. Deep here for contrast on paper; bright in dark. */
+  --site-accent-text: #067662;
+  --site-critical: #dc2626;
+
+  /* Primary button: dark on light. Pairs with text-paper, which inverts too. */
+  --site-cta: #08110f;
+
+  --site-panel: #08110f;
+  --site-panel-raised: #0d1a18;
+  --site-panel-rule: #1d302d;
+  --site-panel-fg: #e8f4f1;
+  --site-panel-muted: #8b9c98;
+  /* The luminous variant. Dark panels only — it has no contrast on paper, and
+     using it there is the fastest way to make this look generic. */
+  --site-trace: #2dd4b0;
+  --site-critical-lum: #fb7185;
+
+  color-scheme: light;
+}
+
+/* -----------------------------------------------------------------------
+ * Dark — the page drops BELOW the instrument rather than matching it.
+ *
+ * The signature is that the instrument reads as the lit object. Making the
+ * page a deeper black than the panel preserves that relationship instead of
+ * flattening everything into one dark field, and it is how a real monitor
+ * behaves in an unlit room.
+ * -------------------------------------------------------------------- */
+.dark {
+  --site-paper: #050d0c;
+  --site-paper-sunk: #081412;
+  --site-rule: #172724;
+  --site-rule-strong: #243834;
+
+  --site-ink: #e8f4f1;
+  --site-graphite: #93a8a4;
+  --site-graphite-soft: #6d827e;
+
+  --site-oxygen: #2dd4b0;
+  --site-accent-text: #34d8b4;
+  --site-critical: #fb7185;
+
+  /* Bright button on a dark page; text-paper resolves dark, so it still reads. */
+  --site-cta: #2dd4b0;
+
+  /* Lighter than --site-paper on purpose. See the note above. */
+  --site-panel: #0d1a18;
+  --site-panel-raised: #12211f;
+  --site-panel-rule: #24403b;
+  --site-panel-fg: #e8f4f1;
+  --site-panel-muted: #8b9c98;
+  --site-trace: #2dd4b0;
+  --site-critical-lum: #fb7185;
+
+  color-scheme: dark;
 }
 
 /* ---------------------------------------------------------------------------
@@ -114,7 +191,7 @@ body {
 
 .scroll-thin-dark {
   scrollbar-width: thin;
-  scrollbar-color: var(--color-ink-rule) transparent;
+  scrollbar-color: var(--color-panel-rule) transparent;
 }
 
 .scroll-thin-dark::-webkit-scrollbar {
@@ -204,8 +281,8 @@ body {
 
 .instrument {
   position: relative;
-  background: var(--color-ink);
-  border: 1px solid var(--color-ink-rule);
+  background: var(--color-panel);
+  border: 1px solid var(--color-panel-rule);
   border-radius: 1.125rem;
   box-shadow:
     0 0 0 1px rgb(255 255 255 / 0.02) inset,

@@ -47,7 +47,7 @@ export function InstallCommand({
   return (
     <div
       className={cn(
-        "group inline-flex w-full max-w-full items-center gap-3 rounded-xl border border-ink-rule bg-ink text-left",
+        "group inline-flex w-full max-w-full items-center gap-3 rounded-xl border border-panel-rule bg-panel text-left",
         "transition-[transform,box-shadow] duration-300 ease-[var(--ease-out-expo)]",
         "hover:-translate-y-0.5 hover:shadow-[0_18px_40px_-16px_rgb(2_20_17/0.5)]",
         size === "lg" ? "px-4 py-3.5 sm:px-5" : "px-3 py-2.5",
@@ -60,7 +60,7 @@ export function InstallCommand({
 
       <code
         className={cn(
-          "scroll-hidden min-w-0 flex-1 overflow-x-auto whitespace-nowrap font-mono text-paper/95",
+          "scroll-hidden min-w-0 flex-1 overflow-x-auto whitespace-nowrap font-mono text-panel-fg/95",
           size === "lg" ? "text-[0.8125rem] sm:text-sm" : "text-xs",
         )}
       >
@@ -77,7 +77,7 @@ export function InstallCommand({
           "transition-colors duration-200",
           copied
             ? "bg-trace/15 text-trace"
-            : "text-graphite-soft hover:bg-paper/8 hover:text-paper",
+            : "text-panel-muted hover:bg-panel-fg/8 hover:text-panel-fg",
         )}
       >
         {copied ? (

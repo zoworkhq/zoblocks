@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Github } from "lucide-react";
+import { ThemeToggle } from "@/components/site/theme-toggle";
 
 export function OxygenMark({ className = "h-4 w-7" }: { className?: string }) {
   // Two bonded circles — O₂. The bond is the brand color; the atoms are not.
@@ -44,6 +45,9 @@ export function SiteHeader() {
             <Github aria-hidden="true" className="size-3.5" />
             <span className="hidden sm:inline">GitHub</span>
           </a>
+          <div className="ml-1">
+            <ThemeToggle />
+          </div>
         </nav>
       </div>
     </header>

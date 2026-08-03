@@ -62,7 +62,7 @@ function Hero() {
             <InstallCommand command="pnpm dlx shadcn@latest add @oxygenui/vitals-panel" className="flex-1" />
             <a
               href="/components"
-              className="group inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-ink px-5 py-3.5 text-sm font-medium text-paper transition-all duration-300 ease-[var(--ease-out-expo)] hover:-translate-y-0.5 hover:bg-oxygen-deep"
+              className="group inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-cta px-5 py-3.5 text-sm font-medium text-paper transition-all duration-300 ease-[var(--ease-out-expo)] hover:-translate-y-0.5 hover:opacity-90"
             >
               Browse components
               <ArrowRight
@@ -210,7 +210,7 @@ function CodeComparison() {
             <div className="mb-3 flex items-center gap-2">
               <span className="eyebrow text-oxygen-deep">With Oxygen</span>
             </div>
-            <pre className="scroll-thin-dark overflow-x-auto rounded-2xl border border-ink-rule bg-ink p-5 font-mono text-[0.75rem] leading-relaxed text-paper/90">
+            <pre className="scroll-thin-dark overflow-x-auto rounded-2xl border border-panel-rule bg-panel p-5 font-mono text-[0.75rem] leading-relaxed text-panel-fg/90">
               <code>
                 <span className="text-graphite-soft">{`// props are the FHIR resource\n`}</span>
                 {`<ObservationPanel\n  observations={observations}\n/>`}
@@ -381,7 +381,7 @@ function ClosingCta() {
           </div>
 
           <div className="relative mx-auto max-w-2xl text-center">
-            <h2 className="display-lg text-balance text-paper">
+            <h2 className="display-lg text-balance text-panel-fg">
               Install one component. See if it holds up.
             </h2>
             <p className="mt-5 text-pretty text-[1.0625rem] leading-relaxed text-graphite-soft">
