@@ -75,7 +75,7 @@ export default function ComponentsPage() {
 
         <section className="bg-paper-sunk/40">
           <div className="mx-auto max-w-6xl section-minor px-5 sm:px-8">
-            <div className="grid auto-rows-fr gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {ordered.map((component, index) => (
                 <ComponentCard
                   key={component!.name}

@@ -51,7 +51,7 @@ const STATE_TONES: Record<string, StatusTone[]> = {
 const FEATURED_PREVIEW: Record<string, () => React.ReactNode> = {
   "vitals-panel": () => (
     <ObservationPanel
-      observations={[observations.potassiumCritical, observations.bloodPressure]}
+      observations={[observations.potassiumCritical]}
       label="Featured preview"
     />
   ),
@@ -124,7 +124,8 @@ export function ComponentCard({
       {preview ? (
         <div
           data-ox-density="standard"
-          className="component-preview-frame relative mt-5 flex-1 overflow-hidden rounded-xl p-3"
+          className="component-preview-frame relative mt-5 max-h-52 flex-1 overflow-hidden rounded-xl p-3
+            [mask-image:linear-gradient(to_bottom,#000_72%,transparent)]"
         >
           {/* Decorative inside the card. aria-hidden alone is a violation here:
               the panel contains a focusable scroll region, and hiding a
