@@ -68,12 +68,39 @@ jobs:
       # Fixtures must stay synthetic. This catches the obvious mistakes — a real
       # identifier system, a production hostname — not every possible one. It is
       # a backstop for review, not a substitute for it.
+      #
+      # The bare acronym "PHI" used to be in this pattern. It matched our own
+      # prose explaining the PHI policy — in the fixtures header, on the
+      # homepage, in component documentation — so the job was red on every
+      # commit and told us nothing. A check that always fails is a check nobody
+      # reads. Patterns here must match DATA, never discussion of data.
       - name: Scan for non-synthetic identifiers
         run: |
           set -euo pipefail
-          patterns='hl7\.org/fhir/sid/us-ssn|epic\.com|cerner\.com|athenahealth|\bPHI\b'
-          if grep -rInE "$patterns" packages/fixtures registry apps/docs/src 2>/dev/null; then
-            echo "::error::Possible non-synthetic data or real system reference found above."
-            exit 1
+          fail=0
+
+          # Real terminology systems, vendor hostnames, and SSN-shaped literals.
+          # Plain -E only: portable, and testable on a developer's machine.
+          patterns='hl7\.org/fhir/sid/us-ssn|hl7\.org/fhir/sid/us-mbi'
+          patterns="$patterns"'|epic\.com|cerner\.com|athenahealth|allscripts\.com'
+          patterns="$patterns"'|[0-9]{3}-[0-9]{2}-[0-9]{4}'
+          if grep -rInE "$patterns" packages/fixtures registry apps/docs/src; then
+            echo "::error::Real identifier system, vendor hostname, or SSN-shaped literal found above."
+            fail=1
           fi
+
+          # Email addresses outside the reserved example domains. Two passes
+          # rather than a PCRE lookahead, so the same command runs locally.
+          #
+          # zowork.com is allowed: our own contact address on the marketing
+          # pages is not patient data. The point of this pass is a real
+          # person's address reaching a fixture or a component default.
+          if grep -rInE '[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}' \
+               packages/fixtures registry apps/docs/src \
+             | grep -vE '@(example\.(org|com)|zowork\.com)'; then
+            echo "::error::Email address outside example.org / example.com / zowork.com found above."
+            fail=1
+          fi
+
+          if [ "$fail" -ne 0 ]; then exit 1; fi
           echo "No non-synthetic identifiers found."
