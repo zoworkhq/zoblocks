@@ -237,11 +237,22 @@ body {
 
 /* Two-tone focus ring: a dark core against the page and a light halo against
    dark panels, so one rule stays visible on every surface in both themes. */
-:focus-visible {
-  outline: 2px solid var(--color-oxygen);
-  outline-offset: 3px;
-  border-radius: 3px;
-  box-shadow: 0 0 0 5px color-mix(in oklab, var(--color-oxygen) 18%, transparent);
+/*
+ * Must live in @layer base.
+ *
+ * Unlayered CSS beats anything inside a cascade layer regardless of
+ * specificity, and Tailwind v4 emits every utility into @layer utilities. As
+ * an unlayered rule this silently overrode EVERY focus-visible: utility on the
+ * site — a component could not opt out of the ring even with
+ * focus-visible:outline-none. In @layer base, utilities win normally.
+ */
+@layer base {
+  :focus-visible {
+    outline: 2px solid var(--color-oxygen);
+    outline-offset: 3px;
+    border-radius: 3px;
+    box-shadow: 0 0 0 5px color-mix(in oklab, var(--color-oxygen) 18%, transparent);
+  }
 }
 
 /* ===========================================================================

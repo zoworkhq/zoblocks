@@ -185,7 +185,7 @@ export function CommandMenu() {
             aria-label="Search components and pages"
             className="surface-3 relative w-full max-w-xl overflow-hidden rounded-2xl motion-safe:animate-[dialog-in_260ms_var(--ease-out-expo)]"
           >
-            <div className="flex items-center gap-3 border-b border-rule px-4">
+            <div className="flex items-center gap-3 border-b border-rule px-4 py-1">
               <Search aria-hidden="true" className="size-4 shrink-0 text-graphite-soft" />
               <input
                 ref={inputRef}
