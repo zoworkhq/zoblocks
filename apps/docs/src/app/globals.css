@@ -618,8 +618,14 @@ body {
  * no signal about what matters. Three tiers now.
  * ------------------------------------------------------------------------ */
 
+/*
+ * The hero opens with a thin meta strip, not a headline, so it should sit
+ * close under the header rather than floating below 96px of nothing. The
+ * inner grid carries its own top padding — the two were stacking and pushing
+ * the headline ~223px down the page.
+ */
 .section-hero {
-  padding-block: clamp(3rem, 7vw, 6rem) clamp(3.5rem, 8vw, 7rem);
+  padding-block: clamp(1.25rem, 2.5vw, 2rem) clamp(3rem, 6vw, 5rem);
 }
 
 .section-major {

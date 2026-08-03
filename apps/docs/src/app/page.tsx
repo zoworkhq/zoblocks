@@ -14,6 +14,7 @@ export default function HomePage() {
       <SiteHeader />
       <main id="main">
         <Hero />
+        <LiveDemo />
         <StatesArgument />
         <CodeComparison />
         <Catalog />
@@ -56,7 +57,7 @@ function Hero() {
           </span>
         </div>
 
-        <div className="grid gap-12 pt-10 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] lg:items-center lg:gap-14 lg:pt-16">
+        <div className="grid gap-10 pt-8 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] lg:items-center lg:gap-14 lg:pt-12">
           <div className="min-w-0">
             <p
               className="eyebrow eyebrow-rule enter text-oxygen-deep"
@@ -141,7 +142,37 @@ function Hero() {
           </div>
         </div>
 
-        <div className="enter mt-14" style={{ "--enter-delay": "620ms" } as React.CSSProperties}>
+      </div>
+    </section>
+  );
+}
+
+/**
+ * The interactive demo, promoted out of the hero.
+ *
+ * It sat below the hero's SignalField with no heading — two large panels
+ * making the same argument, which pushed the hero to 1.5 viewports and left
+ * the instrument itself unexplained. It earns a section.
+ */
+function LiveDemo() {
+  return (
+    <section className="border-t border-rule bg-paper-sunk/40">
+      <div className="mx-auto max-w-6xl section-minor px-5 sm:px-8">
+        <div className="flex flex-wrap items-end justify-between gap-4">
+          <div className="max-w-2xl">
+            <p className="eyebrow eyebrow-rule text-graphite" data-reveal>
+              Try it
+            </p>
+            <h2 className="display-sm mt-3 text-balance" data-reveal>
+              Switch the state. The components respond.
+            </h2>
+          </div>
+          <p className="axis-label" data-reveal>
+            real components · synthetic FHIR
+          </p>
+        </div>
+
+        <div className="mt-8" data-reveal>
           <LiveInstrument />
         </div>
       </div>
