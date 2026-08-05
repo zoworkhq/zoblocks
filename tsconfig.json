@@ -4,8 +4,8 @@
     "noEmit": true,
     "baseUrl": ".",
     "paths": {
-      "@oxygenui/fhir": ["./packages/fhir/src/index.ts"],
-      "@oxygenui/fixtures": ["./packages/fixtures/src/index.ts"],
+      "@oxygenui-design/fhir": ["./packages/fhir/src/index.ts"],
+      "@oxygenui-design/fixtures": ["./packages/fixtures/src/index.ts"],
       "@/registry/*": ["./registry/*"],
       // Registry components import "@/lib/utils" and "@/components/oxygen/*"
       // because that is where the shadcn CLI writes them in the consumer's

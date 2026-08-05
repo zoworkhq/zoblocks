@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Instrument_Sans, JetBrains_Mono } from "next/font/google";
 
 // Component tokens first, so the site layer can override deliberately.
-import "@oxygenui/tokens/oxygen-tokens.css";
+import "@oxygenui-design/tokens/oxygen-tokens.css";
 import "./globals.css";
 
 const instrumentSans = Instrument_Sans({

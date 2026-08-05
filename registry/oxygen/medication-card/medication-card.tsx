@@ -22,7 +22,7 @@ import {
   isMedicationExpired,
   medicationName,
   type MedicationRequest,
-} from "@oxygenui/fhir";
+} from "@oxygenui-design/fhir";
 import { StatusBadge, type StatusTone } from "@/components/oxygen/status-badge";
 import { cn } from "@/lib/utils";
 
@@ -39,7 +39,12 @@ type DisplayStatus =
 
 const STATUS_PRESENTATION: Record<
   DisplayStatus,
-  { label: string; tone: StatusTone; icon?: React.ComponentType<{ className?: string }>; dimmed: boolean }
+  {
+    label: string;
+    tone: StatusTone;
+    icon?: React.ComponentType<{ className?: string }>;
+    dimmed: boolean;
+  }
 > = {
   active: { label: "Active", tone: "normal", dimmed: false },
   "on-hold": { label: "On hold", tone: "high", icon: CirclePause, dimmed: false },
@@ -66,8 +71,10 @@ function resolveStatus(request: MedicationRequest | undefined, asOf: Date): Disp
   return "unknown";
 }
 
-export interface MedicationCardProps
-  extends Omit<React.HTMLAttributes<HTMLDivElement>, "onSelect"> {
+export interface MedicationCardProps extends Omit<
+  React.HTMLAttributes<HTMLDivElement>,
+  "onSelect"
+> {
   /** FHIR R4 MedicationRequest. */
   request: MedicationRequest | undefined;
   /** Date used to evaluate expiry. Pass a fixed date to keep tests deterministic. */
@@ -196,7 +203,9 @@ export function MedicationCard({
           {statusReason && <Field label="Reason">{statusReason}</Field>}
           {typeof refills === "number" && (
             <Field label="Refills">
-              <span className="font-[family-name:var(--ox-font-numeric)] tabular-nums">{refills}</span>
+              <span className="font-[family-name:var(--ox-font-numeric)] tabular-nums">
+                {refills}
+              </span>
             </Field>
           )}
           {showProvenance && request?.authoredOn && (
@@ -246,7 +255,9 @@ export function MedicationList({
         )}
         {...props}
       >
-        <p className="text-[length:var(--ox-text-base)] text-[var(--ox-text-muted)]">{emptyMessage}</p>
+        <p className="text-[length:var(--ox-text-base)] text-[var(--ox-text-muted)]">
+          {emptyMessage}
+        </p>
       </div>
     );
   }

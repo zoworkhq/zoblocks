@@ -24,7 +24,12 @@
 
 import * as React from "react";
 import { Phone, Send, UserRound } from "lucide-react";
-import { careTeamMembers, nameInitials, type CareTeam, type CareTeamMember } from "@oxygenui/fhir";
+import {
+  careTeamMembers,
+  nameInitials,
+  type CareTeam,
+  type CareTeamMember,
+} from "@oxygenui-design/fhir";
 import { cn } from "@/lib/utils";
 
 export interface CoverageInfo {

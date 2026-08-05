@@ -44,7 +44,7 @@ import {
   type Interpretation,
   type Observation,
   type ObservationComponent,
-} from "@oxygenui/fhir";
+} from "@oxygenui-design/fhir";
 import { AbsentValue } from "@/components/oxygen/absent-value";
 import { cn } from "@/lib/utils";
 
@@ -109,8 +109,10 @@ const INTERPRETATION_CLASS: Record<Interpretation, { badge: string; value: strin
 // `onSelect` is omitted from the DOM attributes deliberately: React's native
 // onSelect fires on text selection, which is not what a row activation means.
 // Ours takes the Observation that was chosen.
-export interface ObservationPanelProps
-  extends Omit<React.HTMLAttributes<HTMLDivElement>, "onSelect"> {
+export interface ObservationPanelProps extends Omit<
+  React.HTMLAttributes<HTMLDivElement>,
+  "onSelect"
+> {
   /** FHIR R4 Observation resources, in the order they should be read. */
   observations: Observation[] | undefined;
   /** Accessible name for the results table. */
@@ -194,39 +196,39 @@ export function ObservationPanel({
         tabIndex={0}
         className="w-full overflow-x-auto focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[var(--ox-focus-ring)]"
       >
-      <table className="w-full min-w-[34rem] border-collapse text-[length:var(--ox-density-font)]">
-        <caption className="sr-only">{label}</caption>
-        <thead>
-          <tr className="border-b border-[var(--ox-border)] bg-[var(--ox-bg-subtle)]">
-            <Th className="text-left">Test</Th>
-            <Th className="text-right">Result</Th>
-            {!hideReferenceRange && <Th className="text-right">Reference</Th>}
-            <Th className="text-left">Interpretation</Th>
-          </tr>
-        </thead>
-        <tbody>
-          {observations.map((observation, index) => (
-            <React.Fragment key={observation.id ?? index}>
-              <ObservationRow
-                observation={observation}
-                hideReferenceRange={hideReferenceRange}
-                onSelect={onSelect}
-              />
-              {/* Multi-part results (blood pressure, differentials) carry their
+        <table className="w-full min-w-[34rem] border-collapse text-[length:var(--ox-density-font)]">
+          <caption className="sr-only">{label}</caption>
+          <thead>
+            <tr className="border-b border-[var(--ox-border)] bg-[var(--ox-bg-subtle)]">
+              <Th className="text-left">Test</Th>
+              <Th className="text-right">Result</Th>
+              {!hideReferenceRange && <Th className="text-right">Reference</Th>}
+              <Th className="text-left">Interpretation</Th>
+            </tr>
+          </thead>
+          <tbody>
+            {observations.map((observation, index) => (
+              <React.Fragment key={observation.id ?? index}>
+                <ObservationRow
+                  observation={observation}
+                  hideReferenceRange={hideReferenceRange}
+                  onSelect={onSelect}
+                />
+                {/* Multi-part results (blood pressure, differentials) carry their
                   reading in components, not on the parent. Each renders as its
                   own indented row so systolic and diastolic are separately
                   readable and separately flaggable. */}
-              {(observation.component ?? []).map((part, partIndex) => (
-                <ObservationComponentRow
-                  key={partIndex}
-                  component={part}
-                  hideReferenceRange={hideReferenceRange}
-                />
-              ))}
-            </React.Fragment>
-          ))}
-        </tbody>
-      </table>
+                {(observation.component ?? []).map((part, partIndex) => (
+                  <ObservationComponentRow
+                    key={partIndex}
+                    component={part}
+                    hideReferenceRange={hideReferenceRange}
+                  />
+                ))}
+              </React.Fragment>
+            ))}
+          </tbody>
+        </table>
       </div>
     </div>
   );

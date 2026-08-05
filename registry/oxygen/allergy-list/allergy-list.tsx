@@ -21,7 +21,7 @@ import {
   verificationStatusCode,
   worstReactionSeverity,
   type AllergyIntolerance,
-} from "@oxygenui/fhir";
+} from "@oxygenui-design/fhir";
 import { StatusBadge, type StatusTone } from "@/components/oxygen/status-badge";
 import { cn } from "@/lib/utils";
 
@@ -218,7 +218,11 @@ function AllergyRow({ allergy }: { allergy: AllergyIntolerance }) {
               confirmed one — clinicians de-prescribe on this distinction. */}
           {isRefuted && <StatusBadge tone="neutral">Refuted</StatusBadge>}
           {isUnconfirmed && <StatusBadge tone="unknown">Unconfirmed</StatusBadge>}
-          {isInactive && <StatusBadge tone="neutral">{clinical === "resolved" ? "Resolved" : "Inactive"}</StatusBadge>}
+          {isInactive && (
+            <StatusBadge tone="neutral">
+              {clinical === "resolved" ? "Resolved" : "Inactive"}
+            </StatusBadge>
+          )}
         </div>
       </div>
 

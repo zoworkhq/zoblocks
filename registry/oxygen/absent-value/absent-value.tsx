@@ -38,7 +38,7 @@ import {
   resolveAbsentReason,
   type AbsentReason,
   type CodeableConcept,
-} from "@oxygenui/fhir";
+} from "@oxygenui-design/fhir";
 import { cn } from "@/lib/utils";
 
 /**

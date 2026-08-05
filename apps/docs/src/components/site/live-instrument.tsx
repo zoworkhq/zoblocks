@@ -15,8 +15,8 @@
 
 import * as React from "react";
 import { Activity, CircleAlert, EyeOff, FileQuestion, Loader, ShieldAlert } from "lucide-react";
-import { observationPanel, observations, patients } from "@oxygenui/fixtures";
-import type { Observation, Patient } from "@oxygenui/fhir";
+import { observationPanel, observations, patients } from "@oxygenui-design/fixtures";
+import type { Observation, Patient } from "@oxygenui-design/fhir";
 import { PatientBanner } from "@/registry/oxygen/patient-banner/patient-banner";
 import { ObservationPanel } from "@/registry/oxygen/vitals-panel/vitals-panel";
 import { InstrumentGlow } from "@/components/site/interactions";

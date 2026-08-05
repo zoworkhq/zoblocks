@@ -32,7 +32,7 @@ import {
   safeDoseText,
   weightBasedDose,
   type DoseFormatIssue,
-} from "@oxygenui/fhir";
+} from "@oxygenui-design/fhir";
 import { cn } from "@/lib/utils";
 
 export interface DoseInputProps {

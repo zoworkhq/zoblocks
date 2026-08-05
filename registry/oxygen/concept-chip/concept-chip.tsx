@@ -20,7 +20,7 @@
 
 import * as React from "react";
 import { CircleAlert, Tag } from "lucide-react";
-import { codeableText, terminologyName, type CodeableConcept } from "@oxygenui/fhir";
+import { codeableText, terminologyName, type CodeableConcept } from "@oxygenui-design/fhir";
 import { cn } from "@/lib/utils";
 
 export interface ConceptChipProps extends Omit<React.HTMLAttributes<HTMLElement>, "children"> {

@@ -1,5 +1,5 @@
 {
-  "extends": "@oxygenui/tsconfig/base.json",
+  "extends": "@oxygenui-design/tsconfig/base.json",
   "compilerOptions": {
     "noEmit": true,
     "declaration": false,
@@ -20,11 +20,15 @@
       // the previews render the real files, unedited.
       "@/components/oxygen/status-badge": ["../../registry/oxygen/status-badge/status-badge.tsx"],
       "@/components/oxygen/absent-value": ["../../registry/oxygen/absent-value/absent-value.tsx"],
-      "@/components/oxygen/clinical-value": ["../../registry/oxygen/clinical-value/clinical-value.tsx"],
+      "@/components/oxygen/clinical-value": [
+        "../../registry/oxygen/clinical-value/clinical-value.tsx"
+      ],
       "@/components/oxygen/reference-range": [
         "../../registry/oxygen/reference-range/reference-range.tsx"
       ],
-      "@/components/oxygen/clinical-time": ["../../registry/oxygen/clinical-time/clinical-time.tsx"],
+      "@/components/oxygen/clinical-time": [
+        "../../registry/oxygen/clinical-time/clinical-time.tsx"
+      ],
       "@/components/oxygen/identity-token": [
         "../../registry/oxygen/identity-token/identity-token.tsx"
       ],
@@ -40,33 +44,21 @@
       "@/components/oxygen/clinical-skeleton": [
         "../../registry/oxygen/clinical-skeleton/clinical-skeleton.tsx"
       ],
-      "@/components/oxygen/dose-input": [
-        "../../registry/oxygen/dose-input/dose-input.tsx"
-      ],
-      "@/components/oxygen/provenance": [
-        "../../registry/oxygen/provenance/provenance.tsx"
-      ],
+      "@/components/oxygen/dose-input": ["../../registry/oxygen/dose-input/dose-input.tsx"],
+      "@/components/oxygen/provenance": ["../../registry/oxygen/provenance/provenance.tsx"],
       "@/components/oxygen/unsaved-guard": [
         "../../registry/oxygen/unsaved-guard/unsaved-guard.tsx"
       ],
       "@/components/oxygen/error-boundary": [
         "../../registry/oxygen/error-boundary/error-boundary.tsx"
       ],
-      "@/components/oxygen/app-shell": [
-        "../../registry/oxygen/app-shell/app-shell.tsx"
-      ],
-      "@/components/oxygen/code-status": [
-        "../../registry/oxygen/code-status/code-status.tsx"
-      ],
+      "@/components/oxygen/app-shell": ["../../registry/oxygen/app-shell/app-shell.tsx"],
+      "@/components/oxygen/code-status": ["../../registry/oxygen/code-status/code-status.tsx"],
       "@/components/oxygen/precautions-bar": [
         "../../registry/oxygen/precautions-bar/precautions-bar.tsx"
       ],
-      "@/components/oxygen/care-team": [
-        "../../registry/oxygen/care-team/care-team.tsx"
-      ],
-      "@/components/oxygen/alert-banner": [
-        "../../registry/oxygen/alert-banner/alert-banner.tsx"
-      ],
+      "@/components/oxygen/care-team": ["../../registry/oxygen/care-team/care-team.tsx"],
+      "@/components/oxygen/alert-banner": ["../../registry/oxygen/alert-banner/alert-banner.tsx"],
       "@/components/oxygen/patient-snapshot": [
         "../../registry/oxygen/patient-snapshot/patient-snapshot.tsx"
       ]

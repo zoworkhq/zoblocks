@@ -19,7 +19,7 @@ import type {
   MedicationRequest,
   Observation,
   Patient,
-} from "@oxygenui/fhir";
+} from "@oxygenui-design/fhir";
 
 export const MRN_SYSTEM = "http://example.org/fhir/sid/mrn";
 
@@ -91,12 +91,15 @@ export const patients = {
 // Observations
 // ---------------------------------------------------------------------------
 
-const INTERPRETATION_SYSTEM =
-  "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation";
+const INTERPRETATION_SYSTEM = "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation";
 
 const subject = { reference: "Patient/syn-patient-routine" };
 const vitalSigns = [
-  { coding: [{ system: "http://terminology.hl7.org/CodeSystem/observation-category", code: "vital-signs" }] },
+  {
+    coding: [
+      { system: "http://terminology.hl7.org/CodeSystem/observation-category", code: "vital-signs" },
+    ],
+  },
 ];
 
 export const observationHeartRate: Observation = {
@@ -104,11 +107,21 @@ export const observationHeartRate: Observation = {
   id: "syn-obs-hr",
   status: "final",
   category: vitalSigns,
-  code: { coding: [{ system: "http://loinc.org", code: "8867-4", display: "Heart rate" }], text: "Heart rate" },
+  code: {
+    coding: [{ system: "http://loinc.org", code: "8867-4", display: "Heart rate" }],
+    text: "Heart rate",
+  },
   subject,
   effectiveDateTime: "2026-08-03T09:14:00Z",
-  valueQuantity: { value: 72, unit: "beats/min", system: "http://unitsofmeasure.org", code: "/min" },
-  referenceRange: [{ low: { value: 60, unit: "beats/min" }, high: { value: 100, unit: "beats/min" } }],
+  valueQuantity: {
+    value: 72,
+    unit: "beats/min",
+    system: "http://unitsofmeasure.org",
+    code: "/min",
+  },
+  referenceRange: [
+    { low: { value: 60, unit: "beats/min" }, high: { value: 100, unit: "beats/min" } },
+  ],
 };
 
 /** Explicitly flagged critical — the interpretation is stated, not inferred. */
@@ -116,10 +129,20 @@ export const observationPotassiumCritical: Observation = {
   resourceType: "Observation",
   id: "syn-obs-k",
   status: "final",
-  code: { coding: [{ system: "http://loinc.org", code: "2823-3", display: "Potassium [Moles/volume] in Serum" }], text: "Potassium" },
+  code: {
+    coding: [
+      { system: "http://loinc.org", code: "2823-3", display: "Potassium [Moles/volume] in Serum" },
+    ],
+    text: "Potassium",
+  },
   subject,
   effectiveDateTime: "2026-08-03T07:40:00Z",
-  valueQuantity: { value: 6.8, unit: "mmol/L", system: "http://unitsofmeasure.org", code: "mmol/L" },
+  valueQuantity: {
+    value: 6.8,
+    unit: "mmol/L",
+    system: "http://unitsofmeasure.org",
+    code: "mmol/L",
+  },
   interpretation: [
     { coding: [{ system: INTERPRETATION_SYSTEM, code: "HH", display: "Critical high" }] },
   ],
@@ -132,7 +155,12 @@ export const observationHemoglobinLow: Observation = {
   resourceType: "Observation",
   id: "syn-obs-hgb",
   status: "final",
-  code: { coding: [{ system: "http://loinc.org", code: "718-7", display: "Hemoglobin [Mass/volume] in Blood" }], text: "Hemoglobin" },
+  code: {
+    coding: [
+      { system: "http://loinc.org", code: "718-7", display: "Hemoglobin [Mass/volume] in Blood" },
+    ],
+    text: "Hemoglobin",
+  },
   subject,
   effectiveDateTime: "2026-08-03T07:40:00Z",
   valueQuantity: { value: 10.2, unit: "g/dL" },
@@ -144,7 +172,12 @@ export const observationUninterpreted: Observation = {
   resourceType: "Observation",
   id: "syn-obs-ferritin",
   status: "final",
-  code: { coding: [{ system: "http://loinc.org", code: "2276-4", display: "Ferritin [Mass/volume] in Serum" }], text: "Ferritin" },
+  code: {
+    coding: [
+      { system: "http://loinc.org", code: "2276-4", display: "Ferritin [Mass/volume] in Serum" },
+    ],
+    text: "Ferritin",
+  },
   subject,
   effectiveDateTime: "2026-08-02T15:02:00Z",
   valueQuantity: { value: 43, unit: "ng/mL" },
@@ -155,7 +188,16 @@ export const observationPreliminary: Observation = {
   resourceType: "Observation",
   id: "syn-obs-tsh",
   status: "preliminary",
-  code: { coding: [{ system: "http://loinc.org", code: "3016-3", display: "Thyrotropin [Units/volume] in Serum" }], text: "TSH" },
+  code: {
+    coding: [
+      {
+        system: "http://loinc.org",
+        code: "3016-3",
+        display: "Thyrotropin [Units/volume] in Serum",
+      },
+    ],
+    text: "TSH",
+  },
   subject,
   effectiveDateTime: "2026-08-03T10:05:00Z",
   valueQuantity: { value: 5.9, unit: "mIU/L" },
@@ -167,7 +209,12 @@ export const observationAbsent: Observation = {
   resourceType: "Observation",
   id: "syn-obs-absent",
   status: "final",
-  code: { coding: [{ system: "http://loinc.org", code: "6690-2", display: "Leukocytes [#/volume] in Blood" }], text: "White blood cell count" },
+  code: {
+    coding: [
+      { system: "http://loinc.org", code: "6690-2", display: "Leukocytes [#/volume] in Blood" },
+    ],
+    text: "White blood cell count",
+  },
   subject,
   effectiveDateTime: "2026-08-03T07:40:00Z",
   dataAbsentReason: { text: "Specimen hemolyzed — recollect" },
@@ -188,10 +235,21 @@ export const observationNotAsked: Observation = {
   resourceType: "Observation",
   id: "syn-obs-not-asked",
   status: "final",
-  code: { coding: [{ system: "http://loinc.org", code: "2601-3", display: "Magnesium [Moles/volume] in Serum or Plasma" }], text: "Magnesium" },
+  code: {
+    coding: [
+      {
+        system: "http://loinc.org",
+        code: "2601-3",
+        display: "Magnesium [Moles/volume] in Serum or Plasma",
+      },
+    ],
+    text: "Magnesium",
+  },
   subject,
   effectiveDateTime: "2026-08-03T07:40:00Z",
-  dataAbsentReason: { coding: [{ system: ABSENT_SYSTEM, code: "not-asked", display: "Not Asked" }] },
+  dataAbsentReason: {
+    coding: [{ system: ABSENT_SYSTEM, code: "not-asked", display: "Not Asked" }],
+  },
 };
 
 /** Asked, and the patient declined to answer. A clinically meaningful answer. */
@@ -199,10 +257,15 @@ export const observationDeclined: Observation = {
   resourceType: "Observation",
   id: "syn-obs-declined",
   status: "final",
-  code: { coding: [{ system: "http://loinc.org", code: "72166-2", display: "Tobacco smoking status" }], text: "Smoking status" },
+  code: {
+    coding: [{ system: "http://loinc.org", code: "72166-2", display: "Tobacco smoking status" }],
+    text: "Smoking status",
+  },
   subject,
   effectiveDateTime: "2026-08-03T09:02:00Z",
-  dataAbsentReason: { coding: [{ system: ABSENT_SYSTEM, code: "asked-declined", display: "Asked But Declined" }] },
+  dataAbsentReason: {
+    coding: [{ system: ABSENT_SYSTEM, code: "asked-declined", display: "Asked But Declined" }],
+  },
 };
 
 /**
@@ -213,7 +276,10 @@ export const observationMasked: Observation = {
   resourceType: "Observation",
   id: "syn-obs-masked",
   status: "final",
-  code: { coding: [{ system: "http://loinc.org", code: "3426-4", display: "Toxicology screen" }], text: "Toxicology screen" },
+  code: {
+    coding: [{ system: "http://loinc.org", code: "3426-4", display: "Toxicology screen" }],
+    text: "Toxicology screen",
+  },
   subject,
   effectiveDateTime: "2026-08-02T18:20:00Z",
   dataAbsentReason: { coding: [{ system: ABSENT_SYSTEM, code: "masked", display: "Masked" }] },
@@ -224,10 +290,15 @@ export const observationPending: Observation = {
   resourceType: "Observation",
   id: "syn-obs-pending",
   status: "registered",
-  code: { coding: [{ system: "http://loinc.org", code: "2028-9", display: "Carbon dioxide, total" }], text: "Bicarbonate" },
+  code: {
+    coding: [{ system: "http://loinc.org", code: "2028-9", display: "Carbon dioxide, total" }],
+    text: "Bicarbonate",
+  },
   subject,
   effectiveDateTime: "2026-08-03T07:40:00Z",
-  dataAbsentReason: { coding: [{ system: ABSENT_SYSTEM, code: "temp-unknown", display: "Temporarily Unknown" }] },
+  dataAbsentReason: {
+    coding: [{ system: ABSENT_SYSTEM, code: "temp-unknown", display: "Temporarily Unknown" }],
+  },
 };
 
 /** The analyser failed. Something is broken; this value SHOULD be here. */
@@ -235,7 +306,16 @@ export const observationErrored: Observation = {
   resourceType: "Observation",
   id: "syn-obs-errored",
   status: "final",
-  code: { coding: [{ system: "http://loinc.org", code: "1751-7", display: "Albumin [Mass/volume] in Serum or Plasma" }], text: "Albumin" },
+  code: {
+    coding: [
+      {
+        system: "http://loinc.org",
+        code: "1751-7",
+        display: "Albumin [Mass/volume] in Serum or Plasma",
+      },
+    ],
+    text: "Albumin",
+  },
   subject,
   effectiveDateTime: "2026-08-03T07:40:00Z",
   dataAbsentReason: { coding: [{ system: ABSENT_SYSTEM, code: "error", display: "Error" }] },
@@ -256,13 +336,17 @@ export const observationCorrected: Observation = {
   resourceType: "Observation",
   id: "syn-obs-glucose",
   status: "corrected",
-  code: { coding: [{ system: "http://loinc.org", code: "2339-0", display: "Glucose [Mass/volume] in Blood" }], text: "Glucose" },
+  code: {
+    coding: [
+      { system: "http://loinc.org", code: "2339-0", display: "Glucose [Mass/volume] in Blood" },
+    ],
+    text: "Glucose",
+  },
   subject,
   effectiveDateTime: "2026-08-03T07:40:00Z",
   valueQuantity: { value: 156, unit: "mg/dL" },
   referenceRange: [{ low: { value: 70, unit: "mg/dL" }, high: { value: 100, unit: "mg/dL" } }],
 };
-
 
 /**
  * Blood pressure — the case a component-blind renderer gets wrong.
@@ -319,7 +403,13 @@ export const medicationActive: MedicationRequest = {
   status: "active",
   intent: "order",
   medicationCodeableConcept: {
-    coding: [{ system: "http://www.nlm.nih.gov/research/umls/rxnorm", code: "314076", display: "Lisinopril 10 MG Oral Tablet" }],
+    coding: [
+      {
+        system: "http://www.nlm.nih.gov/research/umls/rxnorm",
+        code: "314076",
+        display: "Lisinopril 10 MG Oral Tablet",
+      },
+    ],
     text: "Lisinopril 10 mg",
   },
   subject,
@@ -334,7 +424,10 @@ export const medicationActive: MedicationRequest = {
       doseAndRate: [{ doseQuantity: { value: 10, unit: "mg" } }],
     },
   ],
-  dispenseRequest: { numberOfRepeatsAllowed: 3, validityPeriod: { start: "2026-05-12", end: "2027-05-12" } },
+  dispenseRequest: {
+    numberOfRepeatsAllowed: 3,
+    validityPeriod: { start: "2026-05-12", end: "2027-05-12" },
+  },
 };
 
 /** On hold — paused deliberately. Must not look like "stopped". */
@@ -381,7 +474,10 @@ export const medicationExpired: MedicationRequest = {
   subject,
   authoredOn: "2025-11-04",
   dosageInstruction: [{ text: "500 mg three times daily for 7 days" }],
-  dispenseRequest: { numberOfRepeatsAllowed: 0, validityPeriod: { start: "2025-11-04", end: "2025-12-04" } },
+  dispenseRequest: {
+    numberOfRepeatsAllowed: 0,
+    validityPeriod: { start: "2025-11-04", end: "2025-12-04" },
+  },
 };
 
 /** No dosage instruction at all — the component must say so, not render blank. */
@@ -420,7 +516,9 @@ export const allergyHighRisk: AllergyIntolerance = {
   code: { text: "Penicillin" },
   patient: subject,
   recordedDate: "2019-06-11",
-  reaction: [{ manifestation: [{ text: "Anaphylaxis" }, { text: "Urticaria" }], severity: "severe" }],
+  reaction: [
+    { manifestation: [{ text: "Anaphylaxis" }, { text: "Urticaria" }], severity: "severe" },
+  ],
 };
 
 export const allergyModerate: AllergyIntolerance = {
@@ -481,8 +579,14 @@ export const appointmentBooked: Appointment = {
   end: "2026-08-14T10:00:00Z",
   minutesDuration: 30,
   participant: [
-    { actor: { reference: "Patient/syn-patient-routine", display: "Amara Okonkwo" }, status: "accepted" },
-    { actor: { reference: "Practitioner/syn-prac-1", display: "Dr. N. Adeyemi" }, status: "accepted" },
+    {
+      actor: { reference: "Patient/syn-patient-routine", display: "Amara Okonkwo" },
+      status: "accepted",
+    },
+    {
+      actor: { reference: "Practitioner/syn-prac-1", display: "Dr. N. Adeyemi" },
+      status: "accepted",
+    },
   ],
   patientInstruction: "Bring your home blood-pressure log.",
 };
@@ -496,7 +600,12 @@ export const appointmentVirtual: Appointment = {
   description: "Medication review",
   start: "2026-08-09T14:00:00Z",
   minutesDuration: 15,
-  participant: [{ actor: { reference: "Practitioner/syn-prac-2", display: "Dr. L. Fernandes" }, status: "tentative" }],
+  participant: [
+    {
+      actor: { reference: "Practitioner/syn-prac-2", display: "Dr. L. Fernandes" },
+      status: "tentative",
+    },
+  ],
 };
 
 /** No-show — operationally distinct from a cancellation. */
@@ -563,7 +672,12 @@ export const coverageLapsed: Coverage = {
   relationship: { text: "spouse" },
   period: { start: "2025-01-01", end: "2025-12-31" },
   payor: [{ display: "Northgate Mutual" }],
-  class: [{ type: { coding: [{ system: COVERAGE_CLASS, code: "plan" }] }, value: "Northgate Essential HMO" }],
+  class: [
+    {
+      type: { coding: [{ system: COVERAGE_CLASS, code: "plan" }] },
+      value: "Northgate Essential HMO",
+    },
+  ],
   order: 2,
 };
 
@@ -593,7 +707,10 @@ export const conditionActive: Condition = {
   id: "syn-cond-htn",
   clinicalStatus: { coding: [{ system: CONDITION_CLINICAL, code: "active" }] },
   verificationStatus: { coding: [{ system: CONDITION_VERIFICATION, code: "confirmed" }] },
-  code: { coding: [{ system: "http://snomed.info/sct", code: "38341003" }], text: "Essential hypertension" },
+  code: {
+    coding: [{ system: "http://snomed.info/sct", code: "38341003" }],
+    text: "Essential hypertension",
+  },
   severity: { text: "Moderate" },
   subject,
   onsetDateTime: "2021-04-09",

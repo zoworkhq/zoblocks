@@ -24,7 +24,7 @@ Supporting decisions:
 
 1. **Types are a narrow structural subset, not `@types/fhir`.** Components are
    copied into customer codebases; every type they touch becomes a dependency
-   the customer inherits. `@oxygenui/fhir` declares only what components read,
+   the customer inherits. `@oxygenui-design/fhir` declares only what components read,
    is structurally compatible with real FHIR, and has zero runtime dependencies.
 
 2. **Every field is optional.** Real payloads are sparse. Components render

@@ -7,5 +7,5 @@
   "access": "public",
   "baseBranch": "main",
   "updateInternalDependencies": "patch",
-  "ignore": ["@oxygenui/docs", "@oxygenui/fixtures"]
+  "ignore": ["@oxygenui-design/docs", "@oxygenui-design/fixtures"]
 }

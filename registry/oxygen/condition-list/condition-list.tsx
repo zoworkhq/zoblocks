@@ -20,7 +20,7 @@ import {
   codeableText,
   verificationStatusCode,
   type Condition,
-} from "@oxygenui/fhir";
+} from "@oxygenui-design/fhir";
 import { StatusBadge, type StatusTone } from "@/components/oxygen/status-badge";
 import { cn } from "@/lib/utils";
 
@@ -91,7 +91,9 @@ export function ConditionList({
         )}
         {...props}
       >
-        <p className="text-[length:var(--ox-text-base)] text-[var(--ox-text-muted)]">{emptyMessage}</p>
+        <p className="text-[length:var(--ox-text-base)] text-[var(--ox-text-muted)]">
+          {emptyMessage}
+        </p>
       </div>
     );
   }
@@ -118,8 +120,7 @@ export function ConditionList({
       {inactive.length > 0 && (
         <details className="border-t border-[var(--ox-border)] bg-[var(--ox-bg-subtle)]">
           <summary className="cursor-pointer px-[var(--ox-density-pad-x)] py-2 text-[length:var(--ox-text-sm)] text-[var(--ox-text-muted)] focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[var(--ox-focus-ring)]">
-            {inactive.length} resolved or inactive{" "}
-            {inactive.length === 1 ? "problem" : "problems"}
+            {inactive.length} resolved or inactive {inactive.length === 1 ? "problem" : "problems"}
           </summary>
           <div className="divide-y divide-[var(--ox-border)] border-t border-[var(--ox-border)]">
             {inactive.map((condition, index) => (
@@ -156,7 +157,10 @@ function ConditionRow({ condition }: { condition: Condition }) {
           {active ? (
             <CircleDot aria-hidden="true" className="size-3.5 shrink-0 text-[var(--ox-accent)]" />
           ) : (
-            <Activity aria-hidden="true" className="size-3.5 shrink-0 text-[var(--ox-text-subtle)]" />
+            <Activity
+              aria-hidden="true"
+              className="size-3.5 shrink-0 text-[var(--ox-text-subtle)]"
+            />
           )}
           <span
             className={cn(
@@ -176,7 +180,9 @@ function ConditionRow({ condition }: { condition: Condition }) {
           {onset ? (
             <span>
               Onset{" "}
-              <span className="font-[family-name:var(--ox-font-numeric)] tabular-nums">{onset}</span>
+              <span className="font-[family-name:var(--ox-font-numeric)] tabular-nums">
+                {onset}
+              </span>
             </span>
           ) : (
             <span className="italic">Onset not recorded</span>
@@ -203,7 +209,11 @@ function ConditionRow({ condition }: { condition: Condition }) {
         {severity && <StatusBadge tone={tone}>{severity}</StatusBadge>}
         {!active && (
           <StatusBadge tone="neutral">
-            {clinical === "resolved" ? "Resolved" : clinical === "remission" ? "Remission" : "Inactive"}
+            {clinical === "resolved"
+              ? "Resolved"
+              : clinical === "remission"
+                ? "Remission"
+                : "Inactive"}
           </StatusBadge>
         )}
       </div>

@@ -1,5 +1,5 @@
 {
-  "extends": "@oxygenui/tsconfig/base.json",
+  "extends": "@oxygenui-design/tsconfig/base.json",
   "compilerOptions": {
     "noEmit": true
   },

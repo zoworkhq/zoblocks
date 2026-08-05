@@ -30,7 +30,7 @@ import {
   summariseProvenance,
   type Provenance,
   type Resource,
-} from "@oxygenui/fhir";
+} from "@oxygenui-design/fhir";
 import { cn } from "@/lib/utils";
 
 export interface ProvenanceTagProps {

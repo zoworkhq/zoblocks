@@ -35,13 +35,37 @@ result reads **"Not interpreted"**, never "Normal".
 
 ## Install
 
+Register the namespace once, in your project's `components.json`:
+
+```json
+{
+  "registries": {
+    "@oxygenui": "https://oxygenui.design/r/{name}.json"
+  }
+}
+```
+
+Then add components by name:
+
 ```bash
 pnpm dlx shadcn@latest add @oxygenui/vitals-panel
 ```
 
+Without that `registries` entry the CLI has no way to resolve `@oxygenui`, so
+the add command fails before it reaches the network. If you would rather not
+edit `components.json`, pass the URL directly instead:
+
+```bash
+pnpm dlx shadcn@latest add https://oxygenui.design/r/vitals-panel.json
+```
+
 Components are distributed as source. The CLI writes the files into your
-project and adds `@oxygenui/fhir` (types and pure helpers, zero runtime
+project and adds `@oxygenui-design/fhir` (types and pure helpers, zero runtime
 dependencies) to your `package.json`.
+
+The `@oxygenui` in the install command is a shadcn registry namespace, not an
+npm scope — it is a local alias for the URL above, and you can name it whatever
+you like. The npm packages it pulls in are published under `@oxygenui-design`.
 
 ## Repository layout
 
@@ -49,8 +73,8 @@ dependencies) to your `package.json`.
 oxygenui/
 ├─ apps/docs/          # oxygenui.design — marketing site, catalog, registry host
 ├─ packages/
-│  ├─ fhir/            # @oxygenui/fhir — FHIR R4 types + pure read helpers
-│  ├─ tokens/          # @oxygenui/tokens — semantic clinical CSS variables
+│  ├─ fhir/            # @oxygenui-design/fhir — FHIR R4 types + pure read helpers
+│  ├─ tokens/          # @oxygenui-design/tokens — semantic clinical CSS variables
 │  ├─ fixtures/        # synthetic, non-PHI FHIR fixtures for docs and tests
 │  └─ tsconfig/        # shared TypeScript configs
 ├─ registry/oxygen/    # component source — this is what customers receive
@@ -71,15 +95,15 @@ pnpm registry:build   # generate apps/docs/public/r/*.json
 pnpm dev              # docs site on http://localhost:6001
 ```
 
-| Command | Purpose |
-| --- | --- |
-| `pnpm dev` | Run the docs site |
-| `pnpm build` | Build every package and app |
-| `pnpm test` | Unit tests |
-| `pnpm typecheck` | Typecheck the workspace |
-| `pnpm registry:build` | Regenerate registry JSON |
+| Command               | Purpose                               |
+| --------------------- | ------------------------------------- |
+| `pnpm dev`            | Run the docs site                     |
+| `pnpm build`          | Build every package and app           |
+| `pnpm test`           | Unit tests                            |
+| `pnpm typecheck`      | Typecheck the workspace               |
+| `pnpm registry:build` | Regenerate registry JSON              |
 | `pnpm registry:check` | Validate the registry without writing |
-| `pnpm changeset` | Record a release intent |
+| `pnpm changeset`      | Record a release intent               |
 
 ### Adding a component
 

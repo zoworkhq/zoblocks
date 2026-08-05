@@ -31,8 +31,8 @@
   "devDependencies": {
     "@axe-core/cli": "^4.12.1",
     "@changesets/cli": "^2.27.10",
-    "@oxygenui/fhir": "workspace:*",
-    "@oxygenui/fixtures": "workspace:*",
+    "@oxygenui-design/fhir": "workspace:*",
+    "@oxygenui-design/fixtures": "workspace:*",
     "@playwright/test": "^1.62.1",
     "@types/node": "^22.10.2",
     "@types/react": "^19.0.2",
