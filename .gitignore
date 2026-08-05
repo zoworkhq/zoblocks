@@ -12,7 +12,10 @@ build/
 # turbo
 .turbo/
 
-# generated registry output — rebuilt by `pnpm registry:build`
+# Registry payloads inline the full source of every component, so committing
+# them would put each component's source in the diff twice. Rebuilt by
+# `pnpm gen`. The manifest (registry.json) and the other generated artifacts
+# ARE committed, and CI fails if they are stale.
 apps/docs/public/r/*.json
 
 # env & secrets — never commit

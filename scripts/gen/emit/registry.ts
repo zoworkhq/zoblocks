@@ -1,0 +1,254 @@
+/**
+ * Emits the shadcn registry: registry.json and one document per item under
+ * apps/docs/public/r/.
+ *
+ * Two guarantees this build makes that a hand-written registry cannot:
+ *
+ *   1. Every published item's source is read from disk at build time, so the
+ *      documented source and the shipped source cannot diverge.
+ *   2. `tier: "pro"` never reaches public output. Commercial source leaking onto
+ *      the CDN is a one-line mistake in a hand-maintained file and an
+ *      impossibility here.
+ *
+ * See content/decisions/0002-dual-channel-distribution.md.
+ */
+
+import { readFile } from "node:fs/promises";
+import { existsSync } from "node:fs";
+import path from "node:path";
+import { HOMEPAGE, REGISTRY_NAME, ROOT, paths } from "../config";
+import type { LoadedComponent } from "../load";
+import type { Emitter } from "../write";
+
+/**
+ * Registry items that are not components: the shared utility module and the
+ * token stylesheet. They have no props, no states, and no docs page, so they do
+ * not carry component metadata.
+ */
+const SUPPORT_ITEMS: BuildableItem[] = [
+  {
+    name: "utils",
+    type: "registry:lib",
+    title: "Utils",
+    description: "Class-name merge helper shared by every Oxygen component.",
+    dependencies: ["clsx", "tailwind-merge"],
+    registryDependencies: [] as string[],
+    files: [
+      { path: "registry/oxygen/lib/utils.ts", type: "registry:lib", target: "lib/utils.ts" },
+    ],
+  },
+  {
+    name: "tokens",
+    type: "registry:style",
+    title: "Oxygen tokens",
+    description:
+      "Semantic clinical status tokens, three density modes, and light/dark themes. Required by every Oxygen component.",
+    dependencies: [] as string[],
+    registryDependencies: [] as string[],
+    files: [
+      {
+        path: "packages/tokens/src/oxygen-tokens.css",
+        type: "registry:file",
+        target: "styles/oxygen-tokens.css",
+      },
+    ],
+  },
+];
+
+interface BuildableItem {
+  name: string;
+  type: string;
+  title: string;
+  description: string;
+  categories?: string[];
+  dependencies: string[];
+  registryDependencies: string[];
+  files: Array<{ path: string; type: string; target?: string }>;
+}
+
+/**
+ * Registry categories are identifiers used for filtering, not display text.
+ * The catalog carries them in sentence case for the docs; the registry gets
+ * slugs, which is what the shadcn ecosystem expects and what survives being
+ * put in a URL.
+ */
+function slugifyCategory(category: string): string {
+  return category
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
+}
+
+function toBuildable(component: LoadedComponent): BuildableItem {
+  const { meta } = component;
+  return {
+    name: meta.name,
+    // Deliberately not derived from `layer`. In shadcn's vocabulary
+    // `registry:block` means a multi-file composition installed as a unit;
+    // `layer` is our dependency-direction concept. They are different axes that
+    // happen to share a word, and conflating them would change install
+    // behaviour as a side effect of an architectural label.
+    type: "registry:component",
+    title: meta.title,
+    // The install-time blurb. The long form lives in `rationale`, on the docs
+    // page, which is the only surface with room for it.
+    description: meta.description,
+    categories: meta.categories.map(slugifyCategory),
+    dependencies: meta.dependencies,
+    registryDependencies: meta.registryDependencies,
+    files: meta.files ?? [
+      { path: component.sourcePath, type: "registry:component", target: component.consumerTarget },
+    ],
+  };
+}
+
+/**
+ * Constraints on anything copied into a customer's repository.
+ *
+ * These are the subset of content/decisions/0009 that can be checked on file
+ * text; the rest are lint rules. Both exist because a component that reaches the
+ * environment, the network, or the console behaves differently in the customer's
+ * build than in ours, and the failure surfaces in their CI rather than ours.
+ */
+const FORBIDDEN: Array<{ pattern: RegExp; why: string }> = [
+  { pattern: /process\.env\./, why: "reads process.env — registry files must be self-contained" },
+  { pattern: /\bfetch\s*\(/, why: "makes a network call — components must not fetch" },
+  { pattern: /dangerouslySetInnerHTML/, why: "uses dangerouslySetInnerHTML" },
+  { pattern: /\bnew\s+WebSocket\b/, why: "opens a WebSocket" },
+  { pattern: /\beval\s*\(/, why: "calls eval" },
+];
+
+export async function emitRegistry(
+  components: LoadedComponent[],
+  emitter: Emitter,
+): Promise<string[]> {
+  const problems: string[] = [];
+
+  // Pro items are excluded from public output entirely — not marked, not
+  // stubbed. The registry served from the CDN is the free catalog.
+  const publicComponents = components.filter((c) => c.meta.tier === "free");
+  const items: BuildableItem[] = [...SUPPORT_ITEMS.map((i) => ({ ...i })), ...publicComponents.map(toBuildable)];
+
+  const published = new Set(items.map((i) => i.name));
+  const built: Array<Record<string, unknown>> = [];
+
+  for (const item of items) {
+    const files: Array<Record<string, string>> = [];
+
+    for (const file of item.files) {
+      const absolute = path.join(ROOT, file.path);
+
+      if (!existsSync(absolute)) {
+        problems.push(`${item.name}: file not found — ${file.path}`);
+        continue;
+      }
+
+      const content = await readFile(absolute, "utf8");
+      if (!content.trim()) {
+        problems.push(`${item.name}: file is empty — ${file.path}`);
+        continue;
+      }
+
+      for (const { pattern, why } of FORBIDDEN) {
+        if (pattern.test(content)) problems.push(`${item.name}: ${file.path} ${why}`);
+      }
+
+      files.push({ path: file.path, type: file.type, target: file.target ?? "", content });
+    }
+
+    for (const dep of item.registryDependencies) {
+      if (!dep.includes("/") && !published.has(dep)) {
+        problems.push(
+          `${item.name}: registryDependency "${dep}" is not published — it may be a Pro item referenced from a free one`,
+        );
+      }
+    }
+
+    built.push({
+      $schema: "https://ui.shadcn.com/schema/registry-item.json",
+      name: item.name,
+      type: item.type,
+      title: item.title,
+      description: item.description,
+      ...(item.categories?.length ? { categories: item.categories } : {}),
+      ...(item.dependencies.length ? { dependencies: item.dependencies } : {}),
+      ...(item.registryDependencies.length
+        ? {
+            // Bare names are expanded to absolute URLs here so authors never
+            // write the homepage into metadata, and a domain change is one edit.
+            registryDependencies: item.registryDependencies.map((d) =>
+              d.includes("/") ? d : `${HOMEPAGE}/r/${d}.json`,
+            ),
+          }
+        : {}),
+      files,
+    });
+  }
+
+  if (problems.length) return problems;
+
+  // registry.json — the manifest, now an output rather than a hand-edited input.
+  await emitter.emit(
+    paths.registryJson,
+    JSON.stringify(
+      {
+        $schema: "https://ui.shadcn.com/schema/registry.json",
+        name: REGISTRY_NAME,
+        homepage: HOMEPAGE,
+        items: items.map((item) => ({
+          name: item.name,
+          type: item.type,
+          title: item.title,
+          description: item.description,
+          ...(item.categories?.length ? { categories: item.categories } : {}),
+          ...(item.dependencies.length ? { dependencies: item.dependencies } : {}),
+          ...(item.registryDependencies.length
+            ? {
+                registryDependencies: item.registryDependencies.map((d) =>
+                  d.includes("/") ? d : `${HOMEPAGE}/r/${d}.json`,
+                ),
+              }
+            : {}),
+          files: item.files.map((f) => ({ path: f.path, type: f.type, target: f.target ?? "" })),
+        })),
+      },
+      null,
+      2,
+    ),
+  );
+
+  for (const item of built) {
+    await emitter.emit(path.join(paths.registryOut, `${item.name as string}.json`), JSON.stringify(item, null, 2));
+  }
+
+  // A component removed from the repository must stop being served. Its JSON
+  // would otherwise sit on the CDN and the shadcn CLI would keep installing
+  // source nobody maintains.
+  await emitter.prune(
+    paths.registryOut,
+    new Set([...built.map((i) => `${i.name as string}.json`), "index.json", "coverage.json"]),
+    ".json",
+  );
+
+  await emitter.emit(
+    path.join(paths.registryOut, "index.json"),
+    JSON.stringify(
+      {
+        name: REGISTRY_NAME,
+        homepage: HOMEPAGE,
+        items: items.map((item) => ({
+          name: item.name,
+          type: item.type,
+          title: item.title,
+          description: item.description,
+          categories: item.categories ?? [],
+          url: `${HOMEPAGE}/r/${item.name}.json`,
+        })),
+      },
+      null,
+      2,
+    ),
+  );
+
+  return [];
+}

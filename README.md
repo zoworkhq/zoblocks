@@ -47,27 +47,33 @@ dependencies) to your `package.json`.
 
 ```
 oxygenui/
-├─ apps/docs/          # oxygenui.design — marketing site, catalog, registry host
+├─ apps/docs/           # oxygenui.design — marketing site, catalog, registry host
 ├─ packages/
-│  ├─ fhir/            # @oxygenui/fhir — FHIR R4 types + pure read helpers
-│  ├─ tokens/          # @oxygenui/tokens — semantic clinical CSS variables
-│  ├─ fixtures/        # synthetic, non-PHI FHIR fixtures for docs and tests
-│  └─ tsconfig/        # shared TypeScript configs
-├─ registry/oxygen/    # component source — this is what customers receive
-├─ content/decisions/  # architecture decision records
-├─ scripts/            # registry build and validation
-└─ registry.json       # catalog manifest
+│  ├─ fhir/             # @oxygenui/fhir — FHIR R4 types + pure read helpers
+│  ├─ tokens/           # @oxygenui/tokens — semantic clinical CSS variables
+│  ├─ fixtures/         # synthetic, non-PHI FHIR fixtures for docs and tests
+│  ├─ component-meta/   # the metadata schema every generated artifact derives from
+│  ├─ eslint-plugin/    # lint rules enforcing the architectural invariants
+│  └─ tsconfig/         # shared TypeScript configs
+├─ registry/oxygen/     # component source — this is what customers receive
+├─ content/decisions/   # architecture decision records
+├─ scripts/gen/         # the generator
+└─ ARCHITECTURE.md      # how it all fits together, and why
 ```
 
 `registry/` is the source of truth for anything a customer installs. Those
 files are copied verbatim into their project, so they must be self-contained
 and readable on their own.
 
+`registry.json`, `tsconfig.generated.json`, `apps/docs/src/lib/generated/`,
+`apps/docs/public/r/`, and `apps/docs/public/llms.txt` are **generated**. Edit a
+component's `*.meta.ts` and run `pnpm gen`; CI fails if they are stale.
+
 ## Development
 
 ```bash
 pnpm install
-pnpm registry:build   # generate apps/docs/public/r/*.json
+pnpm gen              # generate the registry, catalog, and path mappings
 pnpm dev              # docs site on http://localhost:6001
 ```
 
@@ -76,26 +82,51 @@ pnpm dev              # docs site on http://localhost:6001
 | `pnpm dev` | Run the docs site |
 | `pnpm build` | Build every package and app |
 | `pnpm test` | Unit tests |
-| `pnpm typecheck` | Typecheck the workspace |
-| `pnpm registry:build` | Regenerate registry JSON |
-| `pnpm registry:check` | Validate the registry without writing |
+| `pnpm lint` | Lint the workspace |
+| `pnpm typecheck` | Typecheck the workspace, including registry source |
+| `pnpm gen` | Regenerate everything derived from component metadata |
+| `pnpm gen:check` | Verify nothing generated is stale (CI) |
+| `pnpm gen:component <name>` | Scaffold a new component |
 | `pnpm changeset` | Record a release intent |
 
 ### Adding a component
 
-1. Write the source under `registry/oxygen/<name>/`.
-2. Add an entry to `registry.json` with its files, dependencies, and target path.
-3. Run `pnpm registry:build`.
-4. Add it to the catalog in `apps/docs/src/app/page.tsx`.
+```bash
+pnpm gen:component vitals-trend
+```
 
-Two things that will silently break a component:
+Then fill in `registry/oxygen/vitals-trend/vitals-trend.tsx` and its
+`vitals-trend.meta.ts`, and run `pnpm gen`.
+
+**That is the whole process.** No shared file is edited. The registry manifest,
+the docs catalog and its prop tables, TypeScript path mappings, the Tailwind
+source list, and the agent manifest are all derived from the metadata and the
+component's own types. `pnpm gen` refuses to run while the scaffolded
+placeholders are still in place, and names each field it is waiting on.
+
+Prop documentation is **extracted from the TypeScript types** and must never be
+written by hand — a prop table is read as a contract, and one that has silently
+drifted is worse than none.
+
+Two things that used to break a component silently are now enforced:
 
 - **Never build a class name from a variable.** Tailwind resolves classes by
   scanning source text, so `` `text-[var(--ox-status-${token})]` `` produces no
   CSS and severity styling vanishes. Use a literal lookup map.
-- **New registry directories must be added to `@source` in
-  `apps/docs/src/app/globals.css`.** Tailwind does not scan outside the app tree
-  on its own, and components render completely unstyled without it.
+  → `@oxygenui/no-dynamic-class-name`
+- **Components reference semantic tokens, never raw palette values.** A
+  component that reaches past `--ox-status-critical` to `--ox-red-600` ignores
+  every brand override. → `@oxygenui/no-primitive-token`
+
+The Tailwind `@source` list, previously a manual step with the same failure
+mode, is generated.
+
+### Architecture
+
+[`ARCHITECTURE.md`](ARCHITECTURE.md) describes the target platform — layer
+model, package topology, distribution channels, theming, testing, versioning,
+and the phased path from here. Individual decisions and their rejected
+alternatives live in [`content/decisions/`](content/decisions/).
 
 ## Principles
 
