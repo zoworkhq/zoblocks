@@ -20,7 +20,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-import { observations, patients } from "@oxygenui/fixtures";
+import { observations, patients } from "@oxygenui-design/fixtures";
 import { PatientBanner } from "@/registry/oxygen/patient-banner/patient-banner";
 import { ObservationPanel } from "@/registry/oxygen/vitals-panel/vitals-panel";
 import { StatusBadge, type StatusTone } from "@/registry/oxygen/status-badge/status-badge";

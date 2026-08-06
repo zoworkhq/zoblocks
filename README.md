@@ -35,13 +35,37 @@ result reads **"Not interpreted"**, never "Normal".
 
 ## Install
 
+Register the namespace once, in your project's `components.json`:
+
+```json
+{
+  "registries": {
+    "@oxygenui": "https://oxygenui.design/r/{name}.json"
+  }
+}
+```
+
+Then add components by name:
+
 ```bash
 pnpm dlx shadcn@latest add @oxygenui/vitals-panel
 ```
 
+Without that `registries` entry the CLI has no way to resolve `@oxygenui`, so
+the add command fails before it reaches the network. If you would rather not
+edit `components.json`, pass the URL directly instead:
+
+```bash
+pnpm dlx shadcn@latest add https://oxygenui.design/r/vitals-panel.json
+```
+
 Components are distributed as source. The CLI writes the files into your
-project and adds `@oxygenui/fhir` (types and pure helpers, zero runtime
+project and adds `@oxygenui-design/fhir` (types and pure helpers, zero runtime
 dependencies) to your `package.json`.
+
+The `@oxygenui` in the install command is a shadcn registry namespace, not an
+npm scope — it is a local alias for the URL above, and you can name it whatever
+you like. The npm packages it pulls in are published under `@oxygenui-design`.
 
 ## Repository layout
 
@@ -49,8 +73,8 @@ dependencies) to your `package.json`.
 oxygenui/
 ├─ apps/docs/           # oxygenui.design — marketing site, catalog, registry host
 ├─ packages/
-│  ├─ fhir/             # @oxygenui/fhir — FHIR R4 types + pure read helpers
-│  ├─ tokens/           # @oxygenui/tokens — semantic clinical CSS variables
+│  ├─ fhir/             # @oxygenui-design/fhir — FHIR R4 types + pure read helpers
+│  ├─ tokens/           # @oxygenui-design/tokens — semantic clinical CSS variables
 │  ├─ fixtures/         # synthetic, non-PHI FHIR fixtures for docs and tests
 │  ├─ component-meta/   # the metadata schema every generated artifact derives from
 │  ├─ eslint-plugin/    # lint rules enforcing the architectural invariants

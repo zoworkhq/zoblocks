@@ -23,9 +23,9 @@ import type { LoadedComponent } from "../load";
 import type { Emitter } from "../write";
 
 const WORKSPACE_ALIASES: Record<string, string[]> = {
-  "@oxygenui/fhir": ["./packages/fhir/src/index.ts"],
-  "@oxygenui/fixtures": ["./packages/fixtures/src/index.ts"],
-  "@oxygenui/component-meta": ["./packages/component-meta/src/index.ts"],
+  "@oxygenui-design/fhir": ["./packages/fhir/src/index.ts"],
+  "@oxygenui-design/fixtures": ["./packages/fixtures/src/index.ts"],
+  "@oxygenui-design/component-meta": ["./packages/component-meta/src/index.ts"],
   "@/lib/utils": ["./registry/oxygen/lib/utils.ts"],
 };
 

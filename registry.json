@@ -43,7 +43,7 @@
         "clinical"
       ],
       "dependencies": [
-        "@oxygenui/fhir",
+        "@oxygenui-design/fhir@^0.1.0",
         "lucide-react",
         "clsx",
         "tailwind-merge"
@@ -96,7 +96,7 @@
         "clinical"
       ],
       "dependencies": [
-        "@oxygenui/fhir",
+        "@oxygenui-design/fhir@^0.1.0",
         "lucide-react",
         "clsx",
         "tailwind-merge"
@@ -123,7 +123,7 @@
         "clinical"
       ],
       "dependencies": [
-        "@oxygenui/fhir",
+        "@oxygenui-design/fhir@^0.1.0",
         "lucide-react",
         "clsx",
         "tailwind-merge"
@@ -176,7 +176,7 @@
         "scheduling"
       ],
       "dependencies": [
-        "@oxygenui/fhir",
+        "@oxygenui-design/fhir@^0.1.0",
         "lucide-react",
         "clsx",
         "tailwind-merge"
@@ -204,7 +204,7 @@
         "clinical"
       ],
       "dependencies": [
-        "@oxygenui/fhir",
+        "@oxygenui-design/fhir@^0.1.0",
         "lucide-react",
         "clsx",
         "tailwind-merge"
@@ -257,7 +257,7 @@
         "clinical"
       ],
       "dependencies": [
-        "@oxygenui/fhir",
+        "@oxygenui-design/fhir@^0.1.0",
         "lucide-react",
         "clsx",
         "tailwind-merge"
@@ -284,7 +284,7 @@
         "clinical"
       ],
       "dependencies": [
-        "@oxygenui/fhir",
+        "@oxygenui-design/fhir@^0.1.0",
         "lucide-react",
         "clsx",
         "tailwind-merge"
@@ -312,7 +312,7 @@
         "clinical"
       ],
       "dependencies": [
-        "@oxygenui/fhir",
+        "@oxygenui-design/fhir@^0.1.0",
         "lucide-react",
         "clsx",
         "tailwind-merge"
@@ -339,7 +339,7 @@
         "clinical"
       ],
       "dependencies": [
-        "@oxygenui/fhir",
+        "@oxygenui-design/fhir@^0.1.0",
         "lucide-react",
         "clsx",
         "tailwind-merge"
@@ -366,7 +366,7 @@
         "clinical"
       ],
       "dependencies": [
-        "@oxygenui/fhir",
+        "@oxygenui-design/fhir@^0.1.0",
         "lucide-react",
         "clsx",
         "tailwind-merge"
@@ -393,7 +393,7 @@
         "billing-and-coverage"
       ],
       "dependencies": [
-        "@oxygenui/fhir",
+        "@oxygenui-design/fhir@^0.1.0",
         "lucide-react",
         "clsx",
         "tailwind-merge"
@@ -447,7 +447,7 @@
         "clinical"
       ],
       "dependencies": [
-        "@oxygenui/fhir",
+        "@oxygenui-design/fhir@^0.1.0",
         "lucide-react",
         "clsx",
         "tailwind-merge"
@@ -526,7 +526,7 @@
         "patient-identity"
       ],
       "dependencies": [
-        "@oxygenui/fhir",
+        "@oxygenui-design/fhir@^0.1.0",
         "lucide-react",
         "clsx",
         "tailwind-merge"
@@ -553,7 +553,7 @@
         "clinical"
       ],
       "dependencies": [
-        "@oxygenui/fhir",
+        "@oxygenui-design/fhir@^0.1.0",
         "lucide-react",
         "clsx",
         "tailwind-merge"
@@ -581,7 +581,7 @@
         "clinical"
       ],
       "dependencies": [
-        "@oxygenui/fhir",
+        "@oxygenui-design/fhir@^0.1.0",
         "lucide-react",
         "clsx",
         "tailwind-merge"
@@ -608,7 +608,7 @@
         "clinical"
       ],
       "dependencies": [
-        "@oxygenui/fhir",
+        "@oxygenui-design/fhir@^0.1.0",
         "lucide-react",
         "clsx",
         "tailwind-merge"
@@ -637,7 +637,7 @@
         "clinical"
       ],
       "dependencies": [
-        "@oxygenui/fhir",
+        "@oxygenui-design/fhir@^0.1.0",
         "lucide-react",
         "clsx",
         "tailwind-merge"
@@ -664,7 +664,7 @@
         "system"
       ],
       "dependencies": [
-        "@oxygenui/fhir",
+        "@oxygenui-design/fhir@^0.1.0",
         "lucide-react",
         "clsx",
         "tailwind-merge"
@@ -691,7 +691,7 @@
         "clinical"
       ],
       "dependencies": [
-        "@oxygenui/fhir",
+        "@oxygenui-design/fhir@^0.1.0",
         "lucide-react",
         "clsx",
         "tailwind-merge"
@@ -796,7 +796,7 @@
         "clinical"
       ],
       "dependencies": [
-        "@oxygenui/fhir",
+        "@oxygenui-design/fhir@^0.1.0",
         "lucide-react",
         "clsx",
         "tailwind-merge"

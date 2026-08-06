@@ -71,7 +71,7 @@ export function ${pascal}({ placeholder, className, ...props }: ${pascal}Props) 
 }
 `;
 
-const meta = `import { defineComponentMeta } from "@oxygenui/component-meta";
+const meta = `import { defineComponentMeta } from "@oxygenui-design/component-meta";
 
 export default defineComponentMeta({
   name: "${name}",

@@ -454,7 +454,21 @@ function ClosingCta() {
               repository where you can read every line before you trust it.
             </p>
             <div className="mx-auto mt-8 max-w-xl">
-              <InstallCommand command="pnpm dlx shadcn@latest add @oxygenui/vitals-panel" />
+              <InstallCommand
+                command="pnpm dlx shadcn@latest add @oxygenui/vitals-panel"
+                note={
+                  <>
+                    <code className="font-mono text-[0.6875rem] text-ink">@oxygenui</code> is a
+                    shadcn registry namespace — add{" "}
+                    <code className="font-mono text-[0.6875rem] text-ink">
+                      {'"@oxygenui": "https://oxygenui.design/r/{name}.json"'}
+                    </code>{" "}
+                    to your{" "}
+                    <code className="font-mono text-[0.6875rem] text-ink">components.json</code>{" "}
+                    once, or pass the full URL instead.
+                  </>
+                }
+              />
             </div>
           </div>
         </div>

@@ -1,0 +1,14 @@
+{
+  // Build-only: emits dist, and is the sole config that excludes tests.
+  //
+  // The exclude has to be declared *here* rather than inherited. TypeScript
+  // resolves relative paths in an extended config against the directory of the
+  // file they came from, so the `**/*.test.ts` exclude in @oxygenui-design/tsconfig
+  // globs that package's own directory, matches nothing, and silently shipped
+  // the test suite to npm — a third of the published tarball.
+  //
+  // tsconfig.json deliberately keeps tests in scope so `pnpm typecheck` still
+  // covers them. Only the published artifact drops them.
+  "extends": "./tsconfig.json",
+  "exclude": ["**/*.test.ts"]
+}

@@ -25,7 +25,7 @@
 
 import * as React from "react";
 import { FileText, Phone, ShieldQuestion, TriangleAlert } from "lucide-react";
-import { formatClinicalDate, type RelatedPerson } from "@oxygenui/fhir";
+import { formatClinicalDate, type RelatedPerson } from "@oxygenui-design/fhir";
 import { cn } from "@/lib/utils";
 
 export type ResuscitationStatus =

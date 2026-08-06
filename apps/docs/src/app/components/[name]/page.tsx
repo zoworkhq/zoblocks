@@ -99,7 +99,25 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
             <p className="lede mt-6 max-w-3xl text-pretty">{component.rationale}</p>
 
             <div className="mt-8 max-w-2xl">
-              <InstallCommand command={`pnpm dlx shadcn@latest add @oxygenui/${component.name}`} />
+              <InstallCommand
+                command={`pnpm dlx shadcn@latest add @oxygenui/${component.name}`}
+                note={
+                  <>
+                    First install? Add{" "}
+                    <code className="font-mono text-[0.6875rem] text-ink">
+                      {'"@oxygenui": "https://oxygenui.design/r/{name}.json"'}
+                    </code>{" "}
+                    to the <code className="font-mono text-[0.6875rem] text-ink">registries</code>{" "}
+                    block of your{" "}
+                    <code className="font-mono text-[0.6875rem] text-ink">components.json</code>{" "}
+                    first — or skip the config and pass{" "}
+                    <code className="font-mono text-[0.6875rem] text-ink">
+                      {`https://oxygenui.design/r/${component.name}.json`}
+                    </code>{" "}
+                    directly.
+                  </>
+                }
+              />
             </div>
           </div>
         </section>

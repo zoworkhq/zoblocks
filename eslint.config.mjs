@@ -11,7 +11,7 @@
 
 import next from "@next/eslint-plugin-next";
 import js from "@eslint/js";
-import oxygen from "@oxygenui/eslint-plugin";
+import oxygen from "@oxygenui-design/eslint-plugin";
 import reactHooks from "eslint-plugin-react-hooks";
 import globals from "globals";
 import tseslint from "typescript-eslint";
@@ -28,6 +28,7 @@ export default tseslint.config(
       "apps/docs/public/**",
       // Written by Next on every build.
       "apps/docs/next-env.d.ts",
+      "apps/hq/next-env.d.ts",
       "oxygen-ui-component-library-proposal.html",
     ],
   },
@@ -108,7 +109,16 @@ export default tseslint.config(
   // Build tooling. Runs in Node, may read the environment and write output.
   // -------------------------------------------------------------------------
   {
-    files: ["scripts/**/*.ts", "*.config.{mjs,ts}", "packages/eslint-plugin/**/*.js"],
+    files: [
+      "scripts/**/*.ts",
+      "*.config.{mjs,ts}",
+      "packages/eslint-plugin/**/*.js",
+      // Per-package tooling: the fhir publish guard and dist rewriter, the hq
+      // dev seed and its drizzle config. Same job, same environment.
+      "packages/*/scripts/**/*.mjs",
+      "apps/*/scripts/**/*.mjs",
+      "apps/*/*.config.{mjs,ts}",
+    ],
     languageOptions: {
       globals: { ...globals.node },
     },
@@ -129,6 +139,25 @@ export default tseslint.config(
     files: ["apps/docs/**/*.{ts,tsx}"],
     languageOptions: {
       globals: { ...globals.browser },
+      parserOptions: { ecmaFeatures: { jsx: true } },
+    },
+    plugins: { "react-hooks": reactHooks, "@next/next": next },
+    rules: {
+      ...next.configs.recommended.rules,
+      "react-hooks/rules-of-hooks": "error",
+      "@typescript-eslint/no-explicit-any": "error",
+    },
+  },
+
+  // -------------------------------------------------------------------------
+  // hq. Internal tool, not shipped to anyone — but it is the dogfood consumer
+  // of the registry, so it is held to the same rules as the docs site rather
+  // than exempted for being internal.
+  // -------------------------------------------------------------------------
+  {
+    files: ["apps/hq/**/*.{ts,tsx}"],
+    languageOptions: {
+      globals: { ...globals.browser, ...globals.node },
       parserOptions: { ecmaFeatures: { jsx: true } },
     },
     plugins: { "react-hooks": reactHooks, "@next/next": next },

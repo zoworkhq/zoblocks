@@ -26,7 +26,7 @@
 
 import * as React from "react";
 import { CircleAlert, Info, TriangleAlert, X } from "lucide-react";
-import type { AlertSeverity } from "@oxygenui/fhir";
+import type { AlertSeverity } from "@oxygenui-design/fhir";
 import { cn } from "@/lib/utils";
 
 export interface AlertDismissal {

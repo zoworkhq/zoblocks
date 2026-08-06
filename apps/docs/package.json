@@ -1,5 +1,5 @@
 {
-  "name": "@oxygenui/docs",
+  "name": "@oxygenui-design/docs",
   "version": "0.1.0",
   "private": true,
   "description": "oxygenui.design — marketing site, component catalog, and registry host.",
@@ -11,9 +11,9 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@oxygenui/fhir": "workspace:*",
-    "@oxygenui/fixtures": "workspace:*",
-    "@oxygenui/tokens": "workspace:*",
+    "@oxygenui-design/fhir": "workspace:*",
+    "@oxygenui-design/fixtures": "workspace:*",
+    "@oxygenui-design/tokens": "workspace:*",
     "clsx": "^2.1.1",
     "lucide-react": "^0.468.0",
     "motion": "^11.15.0",
@@ -23,7 +23,7 @@
     "tailwind-merge": "^2.5.5"
   },
   "devDependencies": {
-    "@oxygenui/tsconfig": "workspace:*",
+    "@oxygenui-design/tsconfig": "workspace:*",
     "@tailwindcss/postcss": "^4.0.0",
     "@types/node": "^22.10.2",
     "@types/react": "^19.0.2",

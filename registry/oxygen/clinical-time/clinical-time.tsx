@@ -21,7 +21,12 @@
 
 import * as React from "react";
 import { TriangleAlert } from "lucide-react";
-import { datePrecision, formatClinicalDate, isFutureDate, timeZoneLabel } from "@oxygenui/fhir";
+import {
+  datePrecision,
+  formatClinicalDate,
+  isFutureDate,
+  timeZoneLabel,
+} from "@oxygenui-design/fhir";
 import { cn } from "@/lib/utils";
 
 const MINUTE = 60_000;

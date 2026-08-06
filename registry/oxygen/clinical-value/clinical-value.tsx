@@ -22,7 +22,7 @@
  */
 
 import * as React from "react";
-import { quantityParts, type CodeableConcept, type Quantity } from "@oxygenui/fhir";
+import { quantityParts, type CodeableConcept, type Quantity } from "@oxygenui-design/fhir";
 import { AbsentValue } from "@/components/oxygen/absent-value";
 import { cn } from "@/lib/utils";
 

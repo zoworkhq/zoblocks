@@ -89,7 +89,20 @@ jobs:
 
       - name: Accessibility (WCAG 2.2 AA, both themes)
         run: |
-          pnpm --filter @oxygenui/docs start &
+          # The filter is checked before starting, because `pnpm --filter` on a
+          # name that matches nothing prints a notice and exits quietly.
+          # Backgrounded, that surfaces 60s later as "timed out waiting for
+          # localhost:6001", which points at the server rather than at the
+          # renamed package that actually broke it.
+          # `pnpm --filter <unmatched> exec` still exits 0, so the exit code
+          # cannot be used. `ls --json` prints nothing at all when no package
+          # matches, which can.
+          if [ -z "$(pnpm --filter @oxygenui-design/docs ls --depth -1 --json 2>/dev/null)" ]; then
+            echo "::error::No package matched @oxygenui-design/docs — check the name in apps/docs/package.json."
+            exit 1
+          fi
+
+          pnpm --filter @oxygenui-design/docs start &
           npx wait-on http://localhost:6001 -t 60000
           pnpm a11y http://localhost:6001
 

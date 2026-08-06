@@ -1,4 +1,4 @@
-import { defineComponentMeta } from "@oxygenui/component-meta";
+import { defineComponentMeta } from "@oxygenui-design/component-meta";
 
 export default defineComponentMeta({
   name: "vitals-panel",
@@ -82,7 +82,7 @@ export default defineComponentMeta({
   ],
 
   dependencies: [
-    "@oxygenui/fhir",
+    "@oxygenui-design/fhir@^0.1.0",
     "lucide-react",
     "clsx",
     "tailwind-merge",

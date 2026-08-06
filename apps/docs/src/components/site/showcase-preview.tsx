@@ -18,7 +18,7 @@ import {
   medications,
   observations,
   patients,
-} from "@oxygenui/fixtures";
+} from "@oxygenui-design/fixtures";
 import { PatientBanner } from "@/registry/oxygen/patient-banner/patient-banner";
 import { ObservationPanel } from "@/registry/oxygen/vitals-panel/vitals-panel";
 import { MedicationList } from "@/registry/oxygen/medication-card/medication-card";

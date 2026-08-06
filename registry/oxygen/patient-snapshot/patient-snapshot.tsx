@@ -25,7 +25,7 @@
 
 import * as React from "react";
 import { Clock } from "lucide-react";
-import { formatClinicalDate } from "@oxygenui/fhir";
+import { formatClinicalDate } from "@oxygenui-design/fhir";
 import { EmptyState } from "@/components/oxygen/empty-state";
 import { ProgressiveSection, type SectionState } from "@/components/oxygen/clinical-skeleton";
 import { cn } from "@/lib/utils";

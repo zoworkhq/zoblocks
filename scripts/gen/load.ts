@@ -11,7 +11,7 @@ import { existsSync } from "node:fs";
 import { readdir } from "node:fs/promises";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
-import { componentMetaSchema, type ComponentMeta } from "@oxygenui/component-meta";
+import { componentMetaSchema, type ComponentMeta } from "@oxygenui-design/component-meta";
 import { COMPONENTS_DIR, CONSUMER_COMPONENT_DIR, NON_COMPONENT_DIRS, ROOT, rel } from "./config";
 
 export interface LoadedComponent {

@@ -1,4 +1,4 @@
-import { defineComponentMeta } from "@oxygenui/component-meta";
+import { defineComponentMeta } from "@oxygenui-design/component-meta";
 
 export default defineComponentMeta({
   name: "density-provider",
@@ -57,7 +57,7 @@ export default defineComponentMeta({
   limitations: [
     "Does not read OS accessibility preferences \\u2014 wire those into the density you pass.",
     "The floor applies to controls wrapped in DensityTarget, not automatically to every descendant.",
-    "Token values come from @oxygenui/tokens; this sets the attribute and context, not the spacing scale.",
+    "Token values come from @oxygenui-design/tokens; this sets the attribute and context, not the spacing scale.",
   ],
   related: [
     "vitals-panel",

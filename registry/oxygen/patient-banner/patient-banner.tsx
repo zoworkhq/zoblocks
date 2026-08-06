@@ -28,7 +28,7 @@ import {
   maskIdentifier,
   resolvePatientName,
   type Patient,
-} from "@oxygenui/fhir";
+} from "@oxygenui-design/fhir";
 import { cn } from "@/lib/utils";
 
 export interface PatientBannerProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -85,9 +85,7 @@ export function PatientBanner({
   const name = resolvePatientName(patient, "official");
   const identifier = getIdentifier(patient, identifierSystem);
   const rawIdentifierValue = identifier?.value;
-  const identifierValue = maskIdentifiers
-    ? maskIdentifier(rawIdentifierValue)
-    : rawIdentifierValue;
+  const identifierValue = maskIdentifiers ? maskIdentifier(rawIdentifierValue) : rawIdentifierValue;
   const age = calculateAge(patient?.birthDate, asOf);
   const deceased = isDeceased(patient);
 
@@ -105,9 +103,7 @@ export function PatientBanner({
         "rounded-[var(--ox-radius-lg)] border bg-[var(--ox-surface)]",
         "px-[var(--ox-density-pad-x)] py-[var(--ox-density-pad-y)]",
         "text-[length:var(--ox-density-font)] text-[var(--ox-text)]",
-        deceased
-          ? "border-[var(--ox-border-strong)]"
-          : "border-[var(--ox-border)]",
+        deceased ? "border-[var(--ox-border-strong)]" : "border-[var(--ox-border)]",
         className,
       )}
       {...props}
@@ -123,19 +119,13 @@ export function PatientBanner({
           </Heading>
 
           {deceased && (
-            <Flag
-              icon={<TriangleAlert aria-hidden="true" className="size-3.5" />}
-              tone="deceased"
-            >
+            <Flag icon={<TriangleAlert aria-hidden="true" className="size-3.5" />} tone="deceased">
               Deceased
             </Flag>
           )}
 
           {isRestrictedRecord && (
-            <Flag
-              icon={<ShieldAlert aria-hidden="true" className="size-3.5" />}
-              tone="restricted"
-            >
+            <Flag icon={<ShieldAlert aria-hidden="true" className="size-3.5" />} tone="restricted">
               Restricted record
             </Flag>
           )}
@@ -205,11 +195,7 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
  * from a rendering failure, and in a chart that ambiguity is dangerous.
  */
 function NotRecorded() {
-  return (
-    <span className="italic text-[var(--ox-text-subtle)]">
-      Not recorded
-    </span>
-  );
+  return <span className="italic text-[var(--ox-text-subtle)]">Not recorded</span>;
 }
 
 function Flag({

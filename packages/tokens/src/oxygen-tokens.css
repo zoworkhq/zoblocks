@@ -3,7 +3,7 @@
  *
  * Plain CSS custom properties so the same file works in a Tailwind v4 project,
  * a CSS-modules project, or plain CSS. Distributed via the registry as
- * `@oxygenui/tokens` and copied into the consumer's stylesheet.
+ * `@oxygenui-design/tokens` and copied into the consumer's stylesheet.
  *
  * Two rules govern this file:
  *   1. Clinical meaning lives in SEMANTIC tokens, never in raw palette values.

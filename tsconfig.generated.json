@@ -102,13 +102,13 @@
       "@/lib/utils": [
         "./registry/oxygen/lib/utils.ts"
       ],
-      "@oxygenui/component-meta": [
+      "@oxygenui-design/component-meta": [
         "./packages/component-meta/src/index.ts"
       ],
-      "@oxygenui/fhir": [
+      "@oxygenui-design/fhir": [
         "./packages/fhir/src/index.ts"
       ],
-      "@oxygenui/fixtures": [
+      "@oxygenui-design/fixtures": [
         "./packages/fixtures/src/index.ts"
       ]
     }

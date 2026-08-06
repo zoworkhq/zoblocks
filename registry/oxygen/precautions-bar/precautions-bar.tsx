@@ -22,7 +22,7 @@
 
 import * as React from "react";
 import { Biohazard, HandHelping, PersonStanding, ShieldAlert, Wind } from "lucide-react";
-import { codeableText, flagCategory, isFlagActive, type Flag } from "@oxygenui/fhir";
+import { codeableText, flagCategory, isFlagActive, type Flag } from "@oxygenui-design/fhir";
 import { cn } from "@/lib/utils";
 
 export type PrecautionKind =

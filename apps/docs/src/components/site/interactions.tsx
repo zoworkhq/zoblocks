@@ -20,10 +20,18 @@ export function InstallCommand({
   command,
   className,
   size = "lg",
+  note,
 }: {
   command: string;
   className?: string;
   size?: "sm" | "lg";
+  /**
+   * Rendered under the command. Used to state the `components.json` registry
+   * entry the CLI needs — without it `@oxygenui/…` resolves to nothing and the
+   * add fails before it reaches the network, which reads as a broken library
+   * rather than a missing line of config.
+   */
+  note?: React.ReactNode;
 }) {
   const [copied, setCopied] = React.useState(false);
   const timeout = React.useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
@@ -44,7 +52,7 @@ export function InstallCommand({
     timeout.current = setTimeout(() => setCopied(false), 2000);
   }
 
-  return (
+  const box = (
     <div
       className={cn(
         "group inline-flex w-full max-w-full items-center gap-3 rounded-xl border border-panel-rule bg-panel text-left",
@@ -94,6 +102,15 @@ export function InstallCommand({
       <span role="status" aria-live="polite" className="sr-only">
         {copied ? "Command copied to clipboard" : ""}
       </span>
+    </div>
+  );
+
+  if (!note) return box;
+
+  return (
+    <div className="w-full">
+      {box}
+      <p className="mt-2.5 text-xs leading-relaxed text-graphite-soft">{note}</p>
     </div>
   );
 }

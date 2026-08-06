@@ -21,7 +21,7 @@ import {
   maskIdentifier,
   type Coverage,
   type CoverageState,
-} from "@oxygenui/fhir";
+} from "@oxygenui-design/fhir";
 import { StatusBadge, type StatusTone } from "@/components/oxygen/status-badge";
 import { cn } from "@/lib/utils";
 
@@ -105,7 +105,9 @@ export function CoverageCard({
             )}
           </h3>
           {plan && (
-            <p className="mt-0.5 text-[length:var(--ox-text-sm)] text-[var(--ox-text-muted)]">{plan}</p>
+            <p className="mt-0.5 text-[length:var(--ox-text-sm)] text-[var(--ox-text-muted)]">
+              {plan}
+            </p>
           )}
         </div>
 
@@ -120,10 +122,7 @@ export function CoverageCard({
             <span className="font-[family-name:var(--ox-font-numeric)] tabular-nums">
               {memberId}
               {shouldMask && coverage?.subscriberId && (
-                <span className="sr-only">
-                  {" "}
-                  (masked, ending {coverage.subscriberId.slice(-4)})
-                </span>
+                <span className="sr-only"> (masked, ending {coverage.subscriberId.slice(-4)})</span>
               )}
             </span>
           ) : (

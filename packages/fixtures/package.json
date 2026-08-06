@@ -1,5 +1,5 @@
 {
-  "name": "@oxygenui/fixtures",
+  "name": "@oxygenui-design/fixtures",
   "version": "0.1.0",
   "private": true,
   "description": "Synthetic, non-PHI FHIR fixtures for Oxygen docs, demos, and tests.",
@@ -16,10 +16,10 @@
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
-    "@oxygenui/fhir": "workspace:*"
+    "@oxygenui-design/fhir": "workspace:*"
   },
   "devDependencies": {
-    "@oxygenui/tsconfig": "workspace:*",
+    "@oxygenui-design/tsconfig": "workspace:*",
     "typescript": "^5.7.2"
   }
 }

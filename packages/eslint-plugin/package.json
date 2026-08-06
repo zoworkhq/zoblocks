@@ -1,5 +1,5 @@
 {
-  "name": "@oxygenui/eslint-plugin",
+  "name": "@oxygenui-design/eslint-plugin",
   "version": "0.1.0",
   "private": true,
   "description": "Lint rules that enforce Oxygen's architectural invariants — the ones previously kept by comment.",

@@ -22,8 +22,8 @@
 
 import * as React from "react";
 import { CircleAlert } from "lucide-react";
-import { observations } from "@oxygenui/fixtures";
-import type { Observation } from "@oxygenui/fhir";
+import { observations } from "@oxygenui-design/fixtures";
+import type { Observation } from "@oxygenui-design/fhir";
 import { ObservationPanel } from "@/registry/oxygen/vitals-panel/vitals-panel";
 import { InstrumentGlow } from "@/components/site/interactions";
 

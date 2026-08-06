@@ -8,7 +8,7 @@
  * types rather than from a second description of them.
  */
 
-import type { ComponentDoc, PropDoc } from "@oxygenui/component-meta";
+import type { ComponentDoc, PropDoc } from "@oxygenui-design/component-meta";
 import { HOMEPAGE, banner, paths } from "../config";
 import type { LoadedComponent } from "../load";
 import type { ExtractedExport } from "../props";
@@ -82,7 +82,7 @@ export function buildCatalog(
 export async function emitCatalog(catalog: ComponentDoc[], emitter: Emitter): Promise<void> {
   const source = `${banner()}
 
-import type { ComponentDoc } from "@oxygenui/component-meta";
+import type { ComponentDoc } from "@oxygenui-design/component-meta";
 
 export const CATALOG: ComponentDoc[] = ${JSON.stringify(catalog, null, 2)};
 

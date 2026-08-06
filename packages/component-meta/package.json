@@ -1,5 +1,5 @@
 {
-  "name": "@oxygenui/component-meta",
+  "name": "@oxygenui-design/component-meta",
   "version": "0.1.0",
   "private": true,
   "description": "Schema and types for per-component metadata. The single source of truth every generated artifact is derived from.",
@@ -20,7 +20,7 @@
     "zod": "^3.24.1"
   },
   "devDependencies": {
-    "@oxygenui/tsconfig": "workspace:*",
+    "@oxygenui-design/tsconfig": "workspace:*",
     "typescript": "^5.7.2",
     "vitest": "^2.1.8"
   }

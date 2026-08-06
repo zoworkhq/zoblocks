@@ -29,7 +29,7 @@ import {
   resolvePatientName,
   getIdentifier,
   type Patient,
-} from "@oxygenui/fhir";
+} from "@oxygenui-design/fhir";
 import { cn } from "@/lib/utils";
 
 const SIZE = {

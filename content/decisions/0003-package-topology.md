@@ -17,7 +17,7 @@ Three shapes were considered.
 exports.**
 
 ```
-L0  @oxygenui/tokens  @oxygenui/fhir  @oxygenui/intl  @oxygenui/utils
+L0  @oxygenui-design/tokens  @oxygenui-design/fhir  @oxygenui/intl  @oxygenui/utils
 L1  @oxygenui/primitives  @oxygenui/system
 L2  @oxygenui/react  @oxygenui/icons  @oxygenui/pro-charts
     @oxygenui/pro-forms  @oxygenui/pro-scheduling

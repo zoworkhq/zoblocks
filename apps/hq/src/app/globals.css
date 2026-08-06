@@ -1,0 +1,337 @@
+@import "tailwindcss";
+
+/* Oxygen components live at the repo root, outside this app's tree, so
+   Tailwind's automatic content detection never sees them. */
+@source "../../../../registry";
+
+/* ===========================================================================
+ * hq.oxygenui.design
+ *
+ * Reference: ClickUp's List view. Compact rows, Inter, inline controls that
+ * appear on hover, colour-coded status dots, avatar chips, flag priorities.
+ *
+ * Density is the whole point. A row is 36px, body text is 13px, and controls
+ * live inside the row rather than below it, so twenty tasks fit on a laptop
+ * screen without scrolling. Everything here serves that.
+ *
+ * One rule kept from the component library, because it is a safety rule and
+ * not a style one: RED ONLY EVER MEANS OVERDUE OR URGENT, and never carries a
+ * meaning on its own — every coloured thing also has a word or an icon.
+ * ======================================================================== */
+
+@theme {
+  --color-ink: oklch(24% 0.014 265);
+  --color-ink-soft: oklch(34% 0.012 265);
+  --color-muted: oklch(52% 0.012 265);
+  --color-faint: oklch(64% 0.011 265);
+
+  --color-paper: oklch(100% 0 0);
+  --color-vellum: oklch(97.6% 0.002 265);
+  --color-rule: oklch(92.5% 0.004 265);
+  --color-rule-soft: oklch(95.5% 0.003 265);
+
+  /* ClickUp's chrome is a deep indigo-slate, not black. */
+  --color-shell: oklch(25% 0.028 275);
+  --color-shell-soft: oklch(31% 0.03 275);
+  --color-shell-fg: oklch(95% 0.006 275);
+  --color-shell-muted: oklch(74% 0.018 275);
+
+  --color-brand: oklch(52% 0.19 285);
+  --color-brand-soft: oklch(95% 0.03 285);
+
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+}
+
+.hq-shell {
+  --ox-bg: var(--color-vellum);
+  --ox-surface: var(--color-shell);
+  --ox-bg-subtle: var(--color-shell);
+  --ox-bg-muted: var(--color-shell-soft);
+  --ox-border: oklch(33% 0.028 275);
+  --ox-text: var(--color-shell-fg);
+  --ox-text-muted: var(--color-shell-muted);
+  --ox-accent: oklch(82% 0.11 285);
+  --ox-accent-subtle: oklch(33% 0.06 285);
+}
+
+.hq-page {
+  --ox-bg: var(--color-paper);
+  --ox-surface: var(--color-paper);
+  --ox-bg-subtle: var(--color-vellum);
+  --ox-bg-muted: var(--color-vellum);
+  --ox-border: var(--color-rule);
+  --ox-text: var(--color-ink);
+  --ox-text-muted: var(--color-muted);
+  --ox-accent: var(--color-brand);
+  --ox-accent-subtle: var(--color-brand-soft);
+}
+
+@layer base {
+  html {
+    background: var(--color-vellum);
+    color: var(--color-ink);
+    -webkit-font-smoothing: antialiased;
+    font-size: 15px;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    font-size: 0.8125rem;
+    line-height: 1.45;
+  }
+
+  :where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+    outline: 2px solid var(--color-brand);
+    outline-offset: 1px;
+    border-radius: 4px;
+  }
+
+  /* Dates and counts sit in columns that must align down the list. */
+  time,
+  .num {
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+@layer components {
+  /* -- List rows ---------------------------------------------------------
+     36px tall, hairline separated, controls revealed on hover. */
+  .list-row {
+    display: grid;
+    grid-template-columns: 1.25rem minmax(0, 1fr) auto;
+    grid-template-areas: "check title meta";
+    align-items: center;
+    gap: 0.625rem;
+    min-height: 2.375rem;
+    padding: 0.25rem 0.75rem 0.25rem 0.5rem;
+    border-bottom: 1px solid var(--color-rule-soft);
+    transition: background-color 100ms ease;
+    /* Anchor for row-level popovers. Anything revealed inside a row has to
+       overlay it — laid out inline, a panel wide enough to hold a URL wraps
+       the meta cluster and squeezes the name column to an ellipsis. */
+    position: relative;
+  }
+
+  .row-popover {
+    position: absolute;
+    right: 0.5rem;
+    top: calc(100% - 0.25rem);
+    z-index: 20;
+    width: min(22rem, calc(100vw - 2rem));
+    border: 1px solid var(--color-rule);
+    border-radius: 8px;
+    background: var(--color-paper);
+    padding: 0.5rem;
+    box-shadow:
+      0 1px 2px rgb(15 23 42 / 0.06),
+      0 8px 24px -8px rgb(15 23 42 / 0.18);
+  }
+
+  .list-row:hover {
+    background: var(--color-vellum);
+  }
+
+  .list-row:last-child {
+    border-bottom: 0;
+  }
+
+  .lr-check {
+    grid-area: check;
+  }
+  .lr-title {
+    grid-area: title;
+  }
+  .lr-meta {
+    grid-area: meta;
+  }
+
+  /* Below sm the date, avatar and flags win the fight for width and squeeze
+     the title to nothing — a row rendering as a bare "HQ-4" with no name.
+     Give the title its own line and let the meta sit under it. */
+  @media (max-width: 40rem) {
+    .list-row {
+      grid-template-columns: 1.25rem minmax(0, 1fr);
+      grid-template-areas:
+        "check title"
+        ".     meta";
+      row-gap: 0.25rem;
+      align-items: start;
+      padding-block: 0.5rem;
+    }
+
+    .lr-check {
+      margin-top: 0.125rem;
+    }
+
+    .lr-meta {
+      justify-content: flex-start;
+    }
+  }
+
+  /* Revealed on hover or focus — ClickUp hides secondary controls until the
+     row is engaged, which is what keeps a dense list from looking busy.
+     Focus-within is essential: hover-only would make them keyboard-dead. */
+  .on-hover {
+    opacity: 0;
+    transition: opacity 100ms ease;
+  }
+
+  .list-row:hover .on-hover,
+  .list-row:focus-within .on-hover {
+    opacity: 1;
+  }
+
+  /* -- Status + priority -------------------------------------------------- */
+  .status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    border-radius: 4px;
+    padding: 0.1875rem 0.5rem;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .dot {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 999px;
+    flex-shrink: 0;
+  }
+
+  /* -- Controls ----------------------------------------------------------- */
+  .field {
+    width: 100%;
+    border: 1px solid var(--color-rule);
+    background: var(--color-paper);
+    border-radius: 6px;
+    padding: 0.4375rem 0.625rem;
+    font-size: 0.8125rem;
+    color: var(--color-ink);
+    transition:
+      border-color 100ms ease,
+      box-shadow 100ms ease;
+  }
+
+  .field:focus {
+    border-color: var(--color-brand);
+    box-shadow: 0 0 0 3px oklch(52% 0.19 285 / 0.12);
+    outline: none;
+  }
+
+  .field::placeholder {
+    color: var(--color-faint);
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.375rem;
+    border-radius: 6px;
+    padding: 0.4375rem 0.75rem;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    background: var(--color-brand);
+    color: white;
+    transition:
+      filter 100ms ease,
+      opacity 100ms ease;
+  }
+
+  .btn:hover {
+    filter: brightness(1.08);
+  }
+
+  .btn:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+
+  .btn-ghost {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.375rem;
+    border-radius: 6px;
+    padding: 0.375rem 0.5rem;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: var(--color-muted);
+    transition:
+      background-color 100ms ease,
+      color 100ms ease;
+  }
+
+  .btn-ghost:hover {
+    background: var(--color-vellum);
+    color: var(--color-ink);
+  }
+
+  .btn-outline {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.375rem;
+    border-radius: 6px;
+    border: 1px solid var(--color-rule);
+    background: var(--color-paper);
+    padding: 0.375rem 0.625rem;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: var(--color-ink);
+    transition: background-color 100ms ease;
+  }
+
+  .btn-outline:hover {
+    background: var(--color-vellum);
+  }
+
+  /* -- Avatar ------------------------------------------------------------- */
+  .avatar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.375rem;
+    height: 1.375rem;
+    border-radius: 999px;
+    font-size: 0.625rem;
+    font-weight: 600;
+    color: white;
+    flex-shrink: 0;
+    letter-spacing: 0.01em;
+  }
+
+  .avatar-empty {
+    border: 1px dashed var(--color-rule);
+    color: var(--color-faint);
+    background: transparent;
+  }
+
+  /* -- Group header ------------------------------------------------------- */
+  .group-bar {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.375rem 0.5rem;
+    width: 100%;
+    border-radius: 6px;
+    transition: background-color 100ms ease;
+  }
+
+  .group-bar:hover {
+    background: var(--color-vellum);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 1ms !important;
+    animation-duration: 1ms !important;
+  }
+}

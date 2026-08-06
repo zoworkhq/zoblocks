@@ -1,5 +1,5 @@
 {
-  "name": "@oxygenui/tokens",
+  "name": "@oxygenui-design/tokens",
   "version": "0.1.0",
   "description": "Oxygen UI design tokens: semantic clinical status, density modes, light/dark themes.",
   "license": "MIT",
@@ -9,13 +9,22 @@
     "url": "git+https://github.com/zoworkhq/oxygenui.git",
     "directory": "packages/tokens"
   },
-  "keywords": ["design-tokens", "healthcare", "css-variables", "tailwind"],
-  "sideEffects": ["*.css"],
+  "keywords": [
+    "design-tokens",
+    "healthcare",
+    "css-variables",
+    "tailwind"
+  ],
+  "sideEffects": [
+    "*.css"
+  ],
   "exports": {
     "./oxygen-tokens.css": "./src/oxygen-tokens.css",
     "./package.json": "./package.json"
   },
-  "files": ["src"],
+  "files": [
+    "src"
+  ],
   "publishConfig": {
     "access": "public"
   },

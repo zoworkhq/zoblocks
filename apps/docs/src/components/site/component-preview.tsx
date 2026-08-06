@@ -17,7 +17,7 @@ import {
   medications,
   observations,
   patients,
-} from "@oxygenui/fixtures";
+} from "@oxygenui-design/fixtures";
 import { PatientBanner } from "@/registry/oxygen/patient-banner/patient-banner";
 import { ObservationPanel } from "@/registry/oxygen/vitals-panel/vitals-panel";
 import { MedicationCard, MedicationList } from "@/registry/oxygen/medication-card/medication-card";
@@ -406,7 +406,11 @@ const SCENARIOS: Record<string, Scenario[]> = {
           {[
             ["Potassium", { value: 6.8, unit: "mmol/L" }, "critical" as const],
             ["Sodium", { value: 138, unit: "mmol/L" }, "normal" as const],
-            ["Troponin", { value: 0.01, comparator: "<" as const, unit: "ng/mL" }, "default" as const],
+            [
+              "Troponin",
+              { value: 0.01, comparator: "<" as const, unit: "ng/mL" },
+              "default" as const,
+            ],
             ["HbA1c", { value: 5.7, unit: "%" }, "normal" as const],
           ].map(([label, quantity, tone]) => (
             <div key={label as string} className="flex items-baseline justify-between gap-3">
@@ -463,7 +467,10 @@ const SCENARIOS: Record<string, Scenario[]> = {
             ["Potassium 6.8", 6.8, "critical-high"],
             ["Potassium 12.0", 12, "critical-high"],
           ].map(([label, value, interp]) => (
-            <div key={label as string} className="grid grid-cols-[9rem_minmax(0,1fr)] items-center gap-3">
+            <div
+              key={label as string}
+              className="grid grid-cols-[9rem_minmax(0,1fr)] items-center gap-3"
+            >
               <span className="text-[var(--ox-text-muted)]">{label as string}</span>
               <ReferenceRange
                 value={value as number}
@@ -483,7 +490,11 @@ const SCENARIOS: Record<string, Scenario[]> = {
         <div className="flex flex-col gap-3 text-[length:var(--ox-text-sm)]">
           <div className="grid grid-cols-[9rem_minmax(0,1fr)] items-center gap-3">
             <span className="text-[var(--ox-text-muted)]">One-sided</span>
-            <ReferenceRange value={4.9} range={{ high: { value: 5.7, unit: "%" } }} interpretation="normal" />
+            <ReferenceRange
+              value={4.9}
+              range={{ high: { value: 5.7, unit: "%" } }}
+              interpretation="normal"
+            />
           </div>
           <div className="grid grid-cols-[9rem_minmax(0,1fr)] items-center gap-3">
             <span className="text-[var(--ox-text-muted)]">Text-only range</span>
@@ -608,7 +619,13 @@ const SCENARIOS: Record<string, Scenario[]> = {
       render: () => (
         <div className="flex flex-wrap gap-2">
           <ConceptChip concept={{ text: "Chest pain, atypical" }} />
-          <ConceptChip concept={{ coding: [{ system: "http://example.org/local", code: "LOC-42", display: "Local code" }] }} />
+          <ConceptChip
+            concept={{
+              coding: [
+                { system: "http://example.org/local", code: "LOC-42", display: "Local code" },
+              ],
+            }}
+          />
           <ConceptChip
             concept={observations.heartRate.code}
             expectedCodes={["http://loinc.org|2823-3"]}
@@ -644,7 +661,10 @@ const SCENARIOS: Record<string, Scenario[]> = {
       label: "Nesting",
       note: "A patient-facing card inside a clinical worklist keeps its own density. Innermost wins.",
       render: () => (
-        <DensityProvider density="clinical" className="rounded-[var(--ox-radius)] border border-[var(--ox-border)] p-3">
+        <DensityProvider
+          density="clinical"
+          className="rounded-[var(--ox-radius)] border border-[var(--ox-border)] p-3"
+        >
           <p className="mb-2 font-mono text-[length:var(--ox-text-2xs)] uppercase tracking-wider text-[var(--ox-text-subtle)]">
             clinical
           </p>
@@ -666,11 +686,7 @@ const SCENARIOS: Record<string, Scenario[]> = {
       label: "Break the glass",
       note: "Redacted by default. Disclosure needs a stated reason and re-hides on its own — try it.",
       render: () => (
-        <RestrictedShield
-          restricted
-          category="Substance use — 42 CFR Part 2"
-          durationSeconds={20}
-        >
+        <RestrictedShield restricted category="Substance use — 42 CFR Part 2" durationSeconds={20}>
           <ObservationPanel observations={[observations.masked, observations.potassiumCritical]} />
         </RestrictedShield>
       ),
@@ -680,7 +696,11 @@ const SCENARIOS: Record<string, Scenario[]> = {
       label: "Disclosure not permitted",
       note: "Different from being able to ask and choosing not to. The content is acknowledged; the path is not offered.",
       render: () => (
-        <RestrictedShield restricted disclosurePermitted={false} category="Adolescent confidential record">
+        <RestrictedShield
+          restricted
+          disclosurePermitted={false}
+          category="Adolescent confidential record"
+        >
           <ObservationPanel observations={[observations.masked]} />
         </RestrictedShield>
       ),
@@ -741,8 +761,16 @@ const SCENARIOS: Record<string, Scenario[]> = {
             description="The source system did not respond. Do not read this section as complete."
             lastCheckedLabel="Last read 08:41"
           />
-          <EmptyState reason="filtered" title="No results match these filters" description="12 results are hidden by the active filters." />
-          <EmptyState reason="pending" title="Ordered, not yet resulted" description="Expected within 4 hours." />
+          <EmptyState
+            reason="filtered"
+            title="No results match these filters"
+            description="12 results are hidden by the active filters."
+          />
+          <EmptyState
+            reason="pending"
+            title="Ordered, not yet resulted"
+            description="Expected within 4 hours."
+          />
         </div>
       ),
     },
@@ -816,7 +844,13 @@ const SCENARIOS: Record<string, Scenario[]> = {
       note: "The arithmetic stays on screen. A bare number invites use with a stale weight.",
       render: () => (
         <div className="flex flex-col gap-4">
-          <DoseInputDemo initial="" dosePerKg={15} weightKg={3.2} units={["mg"]} absoluteMax={1000} />
+          <DoseInputDemo
+            initial=""
+            dosePerKg={15}
+            weightKg={3.2}
+            units={["mg"]}
+            absoluteMax={1000}
+          />
           <DoseInputDemo initial="" dosePerKg={15} units={["mg"]} />
         </div>
       ),
@@ -831,19 +865,36 @@ const SCENARIOS: Record<string, Scenario[]> = {
       render: () => (
         <dl className="grid gap-3 text-[length:var(--ox-text-sm)]">
           {[
-            ["Potassium 6.8 mmol/L", { agent: [{ type: { coding: [{ code: "author" }] }, who: { display: "A. Bensouda, MD" } }], recorded: "2026-08-03T06:44:00Z", occurredDateTime: "2026-08-03T06:42:00Z" }],
-            ["Home blood pressure", { agent: [{ who: { reference: "Device/bp-monitor-4", display: "Omron BP7450" } }], recorded: "2026-08-02T21:10:00Z" }],
-            ["Smoking status", { agent: [{ type: { coding: [{ code: "informant" }] }, who: { display: "Patient" } }], recorded: "2026-08-01T14:00:00Z" }],
+            [
+              "Potassium 6.8 mmol/L",
+              {
+                agent: [
+                  { type: { coding: [{ code: "author" }] }, who: { display: "A. Bensouda, MD" } },
+                ],
+                recorded: "2026-08-03T06:44:00Z",
+                occurredDateTime: "2026-08-03T06:42:00Z",
+              },
+            ],
+            [
+              "Home blood pressure",
+              {
+                agent: [{ who: { reference: "Device/bp-monitor-4", display: "Omron BP7450" } }],
+                recorded: "2026-08-02T21:10:00Z",
+              },
+            ],
+            [
+              "Smoking status",
+              {
+                agent: [{ type: { coding: [{ code: "informant" }] }, who: { display: "Patient" } }],
+                recorded: "2026-08-01T14:00:00Z",
+              },
+            ],
             ["Referral letter", {}],
           ].map(([label, prov]) => (
             <div key={label as string} className="flex items-center justify-between gap-3">
               <dt className="text-[var(--ox-text-muted)]">{label as string}</dt>
               <dd>
-                <ProvenanceTag
-                  provenance={prov as never}
-                  timeZone={TZ}
-                  subject={label as string}
-                />
+                <ProvenanceTag provenance={prov as never} timeZone={TZ} subject={label as string} />
               </dd>
             </div>
           ))}
@@ -857,13 +908,23 @@ const SCENARIOS: Record<string, Scenario[]> = {
       render: () => (
         <div className="flex flex-wrap items-center gap-4">
           <ProvenanceTag
-            provenance={{ agent: [{ type: { coding: [{ code: "author" }] }, who: { display: "Lab interface" } }], recorded: "2026-08-03T08:10:00Z" }}
+            provenance={{
+              agent: [
+                { type: { coding: [{ code: "author" }] }, who: { display: "Lab interface" } },
+              ],
+              recorded: "2026-08-03T08:10:00Z",
+            }}
             resource={{ meta: { versionId: "3" } }}
             timeZone={TZ}
             subject="Glucose 156 mg/dL"
           />
           <ProvenanceTag
-            provenance={{ agent: [{ type: { coding: [{ code: "author" }] }, who: { display: "A. Bensouda, MD" } }], recorded: "2026-08-03T06:44:00Z" }}
+            provenance={{
+              agent: [
+                { type: { coding: [{ code: "author" }] }, who: { display: "A. Bensouda, MD" } },
+              ],
+              recorded: "2026-08-03T06:44:00Z",
+            }}
             timeZone={TZ}
             inline
           />
@@ -953,7 +1014,12 @@ const SCENARIOS: Record<string, Scenario[]> = {
             proxy={{ name: [{ text: "R. Okonkwo" }], relationship: [{ text: "spouse" }] }}
           />
           <CodeStatus status="unknown" timeZone={TZ} asOf={AS_OF} />
-          <CodeStatus status="full-code" verifiedAt="2026-05-02T09:00:00Z" timeZone={TZ} asOf={AS_OF} />
+          <CodeStatus
+            status="full-code"
+            verifiedAt="2026-05-02T09:00:00Z"
+            timeZone={TZ}
+            asOf={AS_OF}
+          />
         </div>
       ),
     },
@@ -986,7 +1052,11 @@ const SCENARIOS: Record<string, Scenario[]> = {
         <PrecautionsBar
           precautions={[
             { kind: "fall", label: "Fall risk", action: "Bed low, call bell in reach" },
-            { kind: "airborne", label: "Airborne precautions", action: "N95 before entry, door closed" },
+            {
+              kind: "airborne",
+              label: "Airborne precautions",
+              action: "N95 before entry, door closed",
+            },
             { kind: "behavioral", label: "Approach", action: "Two staff for personal care" },
             { kind: "isolation", label: "Contact precautions", action: "Gown and gloves" },
           ]}
@@ -1001,10 +1071,21 @@ const SCENARIOS: Record<string, Scenario[]> = {
         <PrecautionsBar
           asOf={AS_OF}
           flags={[
-            { status: "active", category: [{ coding: [{ code: "infection" }] }], code: { text: "Contact precautions" } },
-            { status: "active", category: [{ coding: [{ code: "infection" }] }], code: { text: "Droplet precautions (ended 12 Jul)" }, period: { end: "2026-07-12" } },
+            {
+              status: "active",
+              category: [{ coding: [{ code: "infection" }] }],
+              code: { text: "Contact precautions" },
+            },
+            {
+              status: "active",
+              category: [{ coding: [{ code: "infection" }] }],
+              code: { text: "Droplet precautions (ended 12 Jul)" },
+              period: { end: "2026-07-12" },
+            },
           ]}
-          actionFor={(flag) => (flag.code?.text?.startsWith("Contact") ? "Gown and gloves" : undefined)}
+          actionFor={(flag) =>
+            flag.code?.text?.startsWith("Contact") ? "Gown and gloves" : undefined
+          }
         />
       ),
     },
@@ -1027,14 +1108,23 @@ const SCENARIOS: Record<string, Scenario[]> = {
           responsibleRef="Practitioner/bensouda"
           team={{
             participant: [
-              { member: { display: "A. Bensouda, MD", reference: "Practitioner/bensouda" }, role: [{ text: "Psychiatrist" }] },
+              {
+                member: { display: "A. Bensouda, MD", reference: "Practitioner/bensouda" },
+                role: [{ text: "Psychiatrist" }],
+              },
               { member: { display: "J. Whitfield, LCSW" }, role: [{ text: "Therapist" }] },
               { member: { display: "M. Okonkwo" }, role: [{ text: "Spouse and caregiver" }] },
               { member: { display: "T. Alvarez" }, role: [{ text: "Peer support specialist" }] },
-              { member: { display: "S. Vukovic, MD" }, role: [{ text: "Prior psychiatrist" }], period: { end: "2026-03-01" } },
+              {
+                member: { display: "S. Vukovic, MD" },
+                role: [{ text: "Prior psychiatrist" }],
+                period: { end: "2026-03-01" },
+              },
             ],
           }}
-          coverage={{ "Practitioner/bensouda": { coveringName: "P. Ramanathan, PMHNP", until: "07:00" } }}
+          coverage={{
+            "Practitioner/bensouda": { coveringName: "P. Ramanathan, PMHNP", until: "07:00" },
+          }}
           contacts={{
             "Practitioner/bensouda": { phone: "+15550111" },
             "J. Whitfield, LCSW": { onMessage: () => {} },
@@ -1062,7 +1152,11 @@ const SCENARIOS: Record<string, Scenario[]> = {
             finding="Potassium 6.8 mmol/L — critical high"
             detail="Repeat sample and review cardiac monitoring."
             source="Chemistry · resulted 06:42"
-            dismissReasons={["Already actioned", "Known for this patient", "Not clinically relevant"]}
+            dismissReasons={[
+              "Already actioned",
+              "Known for this patient",
+              "Not clinically relevant",
+            ]}
             onDismiss={() => {}}
           />
           <AlertBanner
@@ -1123,7 +1217,8 @@ const SCENARIOS: Record<string, Scenario[]> = {
               isEmpty: true,
               lastReadAt: "2026-08-03T09:10:00Z",
               emptyTitle: "No allergy information recorded",
-              emptyDescription: "This is not the same as no known allergies. Ask and record before prescribing.",
+              emptyDescription:
+                "This is not the same as no known allergies. Ask and record before prescribing.",
               content: null,
             },
           ]}
@@ -1210,7 +1305,8 @@ function ShellDemo({
         brand={<span className="text-[length:var(--ox-text-sm)] font-bold">Oxygen Clinic</span>}
       >
         <p className="text-[length:var(--ox-text-sm)] text-[var(--ox-text-muted)]">
-          {scopes.length} scope{scopes.length === 1 ? "" : "s"} held — navigation composed from them.
+          {scopes.length} scope{scopes.length === 1 ? "" : "s"} held — navigation composed from
+          them.
         </p>
       </AppShell>
     </div>

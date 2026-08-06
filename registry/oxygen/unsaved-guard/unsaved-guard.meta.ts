@@ -1,4 +1,4 @@
-import { defineComponentMeta } from "@oxygenui/component-meta";
+import { defineComponentMeta } from "@oxygenui-design/component-meta";
 
 export default defineComponentMeta({
   name: "unsaved-guard",

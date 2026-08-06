@@ -1,6 +1,6 @@
 {
-  "name": "@oxygenui/fhir",
-  "version": "0.1.0",
+  "name": "@oxygenui-design/fhir",
+  "version": "0.1.1",
   "description": "Narrow FHIR R4 type contracts and pure read helpers for healthcare UI. Zero runtime dependencies.",
   "license": "MIT",
   "homepage": "https://oxygenui.design",
@@ -9,7 +9,14 @@
     "url": "git+https://github.com/zoworkhq/oxygenui.git",
     "directory": "packages/fhir"
   },
-  "keywords": ["fhir", "fhir-r4", "healthcare", "hl7", "typescript", "react"],
+  "keywords": [
+    "fhir",
+    "fhir-r4",
+    "healthcare",
+    "hl7",
+    "typescript",
+    "react"
+  ],
   "type": "module",
   "sideEffects": false,
   "main": "./src/index.ts",
@@ -17,7 +24,14 @@
   "exports": {
     ".": "./src/index.ts"
   },
-  "files": ["dist"],
+  "files": [
+    "dist",
+    "src",
+    "!src/**/*.test.ts"
+  ],
+  "engines": {
+    "node": ">=20.11.0"
+  },
   "publishConfig": {
     "access": "public",
     "main": "./dist/index.js",
@@ -30,12 +44,13 @@
     }
   },
   "scripts": {
-    "build": "tsc -p tsconfig.json",
+    "prepublishOnly": "node scripts/require-pnpm.mjs",
+    "build": "tsc -p tsconfig.build.json && node scripts/fix-esm-extensions.mjs",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run"
   },
   "devDependencies": {
-    "@oxygenui/tsconfig": "workspace:*",
+    "@oxygenui-design/tsconfig": "workspace:*",
     "typescript": "^5.7.2",
     "vitest": "^2.1.8"
   }

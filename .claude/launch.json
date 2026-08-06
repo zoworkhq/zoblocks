@@ -4,8 +4,14 @@
     {
       "name": "docs",
       "runtimeExecutable": "pnpm",
-      "runtimeArgs": ["--filter", "@oxygenui/docs", "dev"],
+      "runtimeArgs": ["--filter", "@oxygenui-design/docs", "dev"],
       "port": 6001
+    },
+    {
+      "name": "hq",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["--filter", "@oxygenui-design/hq", "dev"],
+      "port": 6002
     }
   ]
 }

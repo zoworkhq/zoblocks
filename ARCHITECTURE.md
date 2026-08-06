@@ -75,7 +75,7 @@ choosing ownership means they have forked. See
 ### 1.4 What is absent entirely
 
 No ESLint configuration exists (`packages/*` scripts read
-`echo "lint: configured in Phase 1"`). One test file covers `@oxygenui/fhir`
+`echo "lint: configured in Phase 1"`). One test file covers `@oxygenui-design/fhir`
 helpers; no component has a test. There is no Storybook, no visual regression,
 no per-component accessibility check (the axe run is page-level on the docs
 site), no internationalisation, no bundle budget, and no public API surface
@@ -121,8 +121,8 @@ Two consequences worth naming:
   opinion about markup. When a customer needs their own visual language, they
   rebuild L2 and keep L1 — which is where the accessibility correctness lives,
   and the part they should not be rewriting.
-- **L0 holds no React.** `@oxygenui/fhir`, `@oxygenui/tokens`, and
-  `@oxygenui/intl` are consumable by a Vue app, a server, or a test harness.
+- **L0 holds no React.** `@oxygenui-design/fhir`, `@oxygenui-design/tokens`, and
+  `@oxygenui-design/intl` are consumable by a Vue app, a server, or a test harness.
   This is what keeps a future non-React target from being a rewrite.
 
 ---
@@ -135,12 +135,12 @@ Radix-style per-component packages give precise versioning and minimal installs.
 They also mean 500 `package.json` files, 500 changelogs, and — the disqualifier
 — a shared-internals problem. `StatusBadge` is imported by most of the catalog.
 Under per-component packaging, either every package inlines its own copy or 400
-packages take a dependency on `@oxygenui/status-badge`, and every consumer
+packages take a dependency on `@oxygenui-design/status-badge`, and every consumer
 resolves version skew across them. Radix itself consolidated for this reason.
 
 ### 3.2 Why not one package
 
-A single `@oxygenui/react` gives one version for everything: a patch to a
+A single `@oxygenui-design/react` gives one version for everything: a patch to a
 scheduling component bumps the version of the patient banner, every release note
 is noise for most consumers, and there is no seam to put the free/Pro boundary
 on.
@@ -148,25 +148,25 @@ on.
 ### 3.3 Domain-scoped packages with subpath exports
 
 ```
-@oxygenui/tokens        L0   design tokens — generated, multi-brand
-@oxygenui/fhir          L0   FHIR R4 types + pure helpers        (exists)
-@oxygenui/intl          L0   locale, units, dates, message catalog
-@oxygenui/utils         L0   cn, id generation, invariant
+@oxygenui-design/tokens        L0   design tokens — generated, multi-brand
+@oxygenui-design/fhir          L0   FHIR R4 types + pure helpers        (exists)
+@oxygenui-design/intl          L0   locale, units, dates, message catalog
+@oxygenui-design/utils         L0   cn, id generation, invariant
 
-@oxygenui/primitives    L1   headless behaviour hooks, unstyled
-@oxygenui/system        L1   variant engine, polymorphism, slots, density ctx
+@oxygenui-design/primitives    L1   headless behaviour hooks, unstyled
+@oxygenui-design/system        L1   variant engine, polymorphism, slots, density ctx
 
-@oxygenui/react         L2   free core components
-@oxygenui/icons         L2   icon set — generated from SVG source
+@oxygenui-design/react         L2   free core components
+@oxygenui-design/icons         L2   icon set — generated from SVG source
 
-@oxygenui/pro-charts    L2   commercial: clinical charting, trends, flowsheets
-@oxygenui/pro-forms     L2   commercial: FHIR Questionnaire renderer
-@oxygenui/pro-scheduling L2  commercial: availability, booking, calendars
-@oxygenui/blocks        L3   composed screens and templates
-@oxygenui/pro-blocks    L3   commercial: full EHR-shaped screens
+@oxygenui-design/pro-charts    L2   commercial: clinical charting, trends, flowsheets
+@oxygenui-design/pro-forms     L2   commercial: FHIR Questionnaire renderer
+@oxygenui-design/pro-scheduling L2  commercial: availability, booking, calendars
+@oxygenui-design/blocks        L3   composed screens and templates
+@oxygenui-design/pro-blocks    L3   commercial: full EHR-shaped screens
 
-@oxygenui/codemod       —    migration codemods
-@oxygenui/cli           —    scaffolding, registry install, license auth
+@oxygenui-design/codemod       —    migration codemods
+@oxygenui-design/cli           —    scaffolding, registry install, license auth
 ```
 
 Roughly 15 packages at maturity, not 500 and not 1. Each is a coherent unit that
@@ -185,8 +185,8 @@ per-component subpaths:
 }
 ```
 
-Both `import { VitalsPanel } from "@oxygenui/react"` and
-`from "@oxygenui/react/vitals-panel"` shake correctly under any modern bundler.
+Both `import { VitalsPanel } from "@oxygenui-design/react"` and
+`from "@oxygenui-design/react/vitals-panel"` shake correctly under any modern bundler.
 The barrel is generated, so it stays complete and correctly ordered.
 
 Bundle size is defended by budget, not by hope: `size-limit` asserts a per-subpath
@@ -267,7 +267,7 @@ root `tsconfig.json` paths so it typechecks in this repo. That is the reason the
 path map needs a manual entry per shared component.
 
 Under the target architecture the direction reverses. Source is written with
-real package specifiers — `import { cn } from "@oxygenui/utils"` — which
+real package specifiers — `import { cn } from "@oxygenui-design/utils"` — which
 typecheck natively with no path mapping. The **registry generator rewrites them**
 to `@/` form when it emits copy-source output. The rewrite is one function with
 a test, rather than a growing hand-maintained map.
@@ -298,9 +298,16 @@ notices.
 
 `tier` in `*.meta.ts` drives the boundary mechanically:
 
-- **Free** → public npm under `@oxygenui/*`, public registry JSON on the CDN.
+- **Free** → public npm under `@oxygenui-design/*`, public registry JSON on the CDN.
 - **Pro** → private npm dist-tag with per-customer access tokens; registry items
   served from an authenticated endpoint keyed to the same license.
+
+The npm scope is `@oxygenui-design`, not `@oxygenui`. The shorter one is not
+available: `oxygen-ui` is already published by an unrelated project, and npm
+rejects names that differ from an existing package only by punctuation, so every
+variant of it is blocked. This is unrelated to the `@oxygenui` that appears in
+install commands — that is a shadcn registry namespace declared in the
+consumer's `components.json`, and it is free to keep the shorter name.
 
 Pro source never reaches the public CDN, and CI asserts that: a check walks the
 generated public registry output and fails if any item's meta says `tier: "pro"`.
@@ -405,7 +412,7 @@ is how the standard holds without a human reviewing 500 components.
 
 | Status | Export path | Breaking-change policy |
 | --- | --- | --- |
-| `experimental` | `@oxygenui/react/experimental` | may break in any minor |
+| `experimental` | `@oxygenui-design/react/experimental` | may break in any minor |
 | `beta` | main barrel, flagged in docs | may break in a minor, with a changeset note |
 | `stable` | main barrel | breaks only in a major |
 | `deprecated` | main barrel, dev-time warning | removed in the next major |
@@ -421,7 +428,7 @@ A deprecation is not an announcement, it is a sequence:
 1. `status: "deprecated"` with `deprecatedIn`, `removeIn`, and a `replacement`.
 2. A development-only `console.warn` naming the replacement, stripped from
    production builds by the `NODE_ENV` guard.
-3. A codemod in `@oxygenui/codemod`, shipped in the same release.
+3. A codemod in `@oxygenui-design/codemod`, shipped in the same release.
 4. Minimum two minor versions of overlap.
 5. Removal in the next major, listed in the migration guide.
 
@@ -489,7 +496,7 @@ documented screen-reader support matrix (NVDA, JAWS, VoiceOver) per component.
 **Internationalisation is the one item that must land early or become
 prohibitive.** Components currently hardcode user-visible English —
 `"Not interpreted"`, `"milligrams per decilitre"`. Retrofitting 500 components
-is an enormous project; retrofitting 24 is a week. `@oxygenui/intl` provides a
+is an enormous project; retrofitting 24 is a week. `@oxygenui-design/intl` provides a
 provider and a message catalog with English defaults, so the change is
 mechanical and non-breaking.
 
@@ -576,8 +583,8 @@ against arrives in Phase 2.
 
 ### Phase 1 — foundations
 Token pipeline with the three-tier model and brand/theme/density axes. Package
-topology: `@oxygenui/utils`, `@oxygenui/system`, `@oxygenui/primitives`, and
-`@oxygenui/react` carved out; import direction reversed so the registry
+topology: `@oxygenui-design/utils`, `@oxygenui-design/system`, `@oxygenui-design/primitives`, and
+`@oxygenui-design/react` carved out; import direction reversed so the registry
 generator rewrites specifiers rather than tsconfig mapping them back.
 
 ### Phase 2 — quality infrastructure
@@ -589,7 +596,7 @@ npm channel live with semver and codemods; Pro boundary and licensed
 distribution; provenance and SBOM; support-window policy published.
 
 ### Phase 4 — internationalisation
-`@oxygenui/intl` and the message-catalog retrofit across the catalog. Kept as a
+`@oxygenui-design/intl` and the message-catalog retrofit across the catalog. Kept as a
 distinct phase because it is mechanical and wide, but it must not slip past
 roughly 50 components.
 

@@ -1,5 +1,5 @@
 {
-  "extends": "@oxygenui/tsconfig/react-library.json",
+  "extends": "@oxygenui-design/tsconfig/react-library.json",
   "compilerOptions": {
     // Restated locally: paths in an extended config resolve relative to the
     // file that declares them, so inheriting these from the shared config

@@ -5,7 +5,7 @@
 //
 // See content/decisions/0004-generated-component-metadata.md
 
-import type { ComponentDoc } from "@oxygenui/component-meta";
+import type { ComponentDoc } from "@oxygenui-design/component-meta";
 
 export const CATALOG: ComponentDoc[] = [
   {
@@ -177,7 +177,7 @@ export const CATALOG: ComponentDoc[] = [
       "status-badge"
     ],
     "dependencies": [
-      "@oxygenui/fhir",
+      "@oxygenui-design/fhir@^0.1.0",
       "lucide-react",
       "clsx",
       "tailwind-merge"
@@ -577,7 +577,7 @@ export const CATALOG: ComponentDoc[] = [
       "empty-state"
     ],
     "dependencies": [
-      "@oxygenui/fhir",
+      "@oxygenui-design/fhir@^0.1.0",
       "lucide-react",
       "clsx",
       "tailwind-merge"
@@ -730,7 +730,7 @@ export const CATALOG: ComponentDoc[] = [
       "condition-list"
     ],
     "dependencies": [
-      "@oxygenui/fhir",
+      "@oxygenui-design/fhir@^0.1.0",
       "lucide-react",
       "clsx",
       "tailwind-merge"
@@ -1046,7 +1046,7 @@ export const CATALOG: ComponentDoc[] = [
         "required": false
       }
     ],
-    "extendsType": "Omit<React.HTMLAttributes<HTMLDivElement>, \"onSelect\">",
+    "extendsType": "Omit< React.HTMLAttributes<HTMLDivElement>, \"onSelect\" >",
     "exports": [
       {
         "name": "AppointmentCard",
@@ -1083,7 +1083,7 @@ export const CATALOG: ComponentDoc[] = [
             "required": false
           }
         ],
-        "extendsType": "Omit<React.HTMLAttributes<HTMLDivElement>, \"onSelect\">"
+        "extendsType": "Omit< React.HTMLAttributes<HTMLDivElement>, \"onSelect\" >"
       }
     ],
     "usage": "import { AppointmentCard } from \"@/components/oxygen/appointment-card\";\n\n<AppointmentCard\n  appointment={appointment}\n  timeZone={clinic.timeZone}   // required — never inferred\n  locale=\"en-IN\"\n/>",
@@ -1123,7 +1123,7 @@ export const CATALOG: ComponentDoc[] = [
       "coverage-card"
     ],
     "dependencies": [
-      "@oxygenui/fhir",
+      "@oxygenui-design/fhir@^0.1.0",
       "lucide-react",
       "clsx",
       "tailwind-merge"
@@ -1327,7 +1327,7 @@ export const CATALOG: ComponentDoc[] = [
       "app-shell"
     ],
     "dependencies": [
-      "@oxygenui/fhir",
+      "@oxygenui-design/fhir@^0.1.0",
       "lucide-react",
       "clsx",
       "tailwind-merge"
@@ -1682,7 +1682,7 @@ export const CATALOG: ComponentDoc[] = [
       "patient-banner"
     ],
     "dependencies": [
-      "@oxygenui/fhir",
+      "@oxygenui-design/fhir@^0.1.0",
       "lucide-react",
       "clsx",
       "tailwind-merge"
@@ -1872,7 +1872,7 @@ export const CATALOG: ComponentDoc[] = [
       "vitals-panel"
     ],
     "dependencies": [
-      "@oxygenui/fhir",
+      "@oxygenui-design/fhir@^0.1.0",
       "lucide-react",
       "clsx",
       "tailwind-merge"
@@ -2109,7 +2109,7 @@ export const CATALOG: ComponentDoc[] = [
       "patient-snapshot"
     ],
     "dependencies": [
-      "@oxygenui/fhir",
+      "@oxygenui-design/fhir@^0.1.0",
       "lucide-react",
       "clsx",
       "tailwind-merge"
@@ -2273,7 +2273,7 @@ export const CATALOG: ComponentDoc[] = [
       "status-badge"
     ],
     "dependencies": [
-      "@oxygenui/fhir",
+      "@oxygenui-design/fhir@^0.1.0",
       "lucide-react",
       "clsx",
       "tailwind-merge"
@@ -2429,7 +2429,7 @@ export const CATALOG: ComponentDoc[] = [
       "medication-card"
     ],
     "dependencies": [
-      "@oxygenui/fhir",
+      "@oxygenui-design/fhir@^0.1.0",
       "lucide-react",
       "clsx",
       "tailwind-merge"
@@ -2540,7 +2540,7 @@ export const CATALOG: ComponentDoc[] = [
       "avoid": [
         "As an eligibility check. A rendered card is not a real-time eligibility response from the payer.",
         "Showing only the primary coverage. Dropping secondary coverage causes downstream billing errors.",
-        "Trusting status alone in your own code — use coverageState from @oxygenui/fhir."
+        "Trusting status alone in your own code — use coverageState from @oxygenui-design/fhir."
       ]
     },
     "accessibility": [
@@ -2567,7 +2567,7 @@ export const CATALOG: ComponentDoc[] = [
       "appointment-card"
     ],
     "dependencies": [
-      "@oxygenui/fhir",
+      "@oxygenui-design/fhir@^0.1.0",
       "lucide-react",
       "clsx",
       "tailwind-merge"
@@ -2702,7 +2702,7 @@ export const CATALOG: ComponentDoc[] = [
     "limitations": [
       "Does not read OS accessibility preferences \\u2014 wire those into the density you pass.",
       "The floor applies to controls wrapped in DensityTarget, not automatically to every descendant.",
-      "Token values come from @oxygenui/tokens; this sets the attribute and context, not the spacing scale."
+      "Token values come from @oxygenui-design/tokens; this sets the attribute and context, not the spacing scale."
     ],
     "related": [
       "vitals-panel",
@@ -2967,7 +2967,7 @@ export const CATALOG: ComponentDoc[] = [
       "medication-card"
     ],
     "dependencies": [
-      "@oxygenui/fhir",
+      "@oxygenui-design/fhir@^0.1.0",
       "lucide-react",
       "clsx",
       "tailwind-merge"
@@ -3496,7 +3496,7 @@ export const CATALOG: ComponentDoc[] = [
       "restricted-shield"
     ],
     "dependencies": [
-      "@oxygenui/fhir",
+      "@oxygenui-design/fhir@^0.1.0",
       "lucide-react",
       "clsx",
       "tailwind-merge"
@@ -3571,7 +3571,7 @@ export const CATALOG: ComponentDoc[] = [
         "default": "true"
       }
     ],
-    "extendsType": "Omit<React.HTMLAttributes<HTMLDivElement>, \"onSelect\">",
+    "extendsType": "Omit< React.HTMLAttributes<HTMLDivElement>, \"onSelect\" >",
     "exports": [
       {
         "name": "MedicationCard",
@@ -3610,7 +3610,7 @@ export const CATALOG: ComponentDoc[] = [
             "default": "true"
           }
         ],
-        "extendsType": "Omit<React.HTMLAttributes<HTMLDivElement>, \"onSelect\">"
+        "extendsType": "Omit< React.HTMLAttributes<HTMLDivElement>, \"onSelect\" >"
       },
       {
         "name": "MedicationList",
@@ -3674,7 +3674,7 @@ export const CATALOG: ComponentDoc[] = [
       "condition-list"
     ],
     "dependencies": [
-      "@oxygenui/fhir",
+      "@oxygenui-design/fhir@^0.1.0",
       "lucide-react",
       "clsx",
       "tailwind-merge"
@@ -3886,7 +3886,7 @@ export const CATALOG: ComponentDoc[] = [
       "vitals-panel"
     ],
     "dependencies": [
-      "@oxygenui/fhir",
+      "@oxygenui-design/fhir@^0.1.0",
       "lucide-react",
       "clsx",
       "tailwind-merge"
@@ -4059,7 +4059,7 @@ export const CATALOG: ComponentDoc[] = [
       "clinical-skeleton"
     ],
     "dependencies": [
-      "@oxygenui/fhir",
+      "@oxygenui-design/fhir@^0.1.0",
       "lucide-react",
       "clsx",
       "tailwind-merge"
@@ -4206,7 +4206,7 @@ export const CATALOG: ComponentDoc[] = [
       "alert-banner"
     ],
     "dependencies": [
-      "@oxygenui/fhir",
+      "@oxygenui-design/fhir@^0.1.0",
       "lucide-react",
       "clsx",
       "tailwind-merge"
@@ -4377,7 +4377,7 @@ export const CATALOG: ComponentDoc[] = [
       "absent-value"
     ],
     "dependencies": [
-      "@oxygenui/fhir",
+      "@oxygenui-design/fhir@^0.1.0",
       "lucide-react",
       "clsx",
       "tailwind-merge"
@@ -4528,7 +4528,7 @@ export const CATALOG: ComponentDoc[] = [
       "status-badge"
     ],
     "dependencies": [
-      "@oxygenui/fhir",
+      "@oxygenui-design/fhir@^0.1.0",
       "lucide-react",
       "clsx",
       "tailwind-merge"
@@ -5067,7 +5067,7 @@ export const CATALOG: ComponentDoc[] = [
         "required": false
       }
     ],
-    "extendsType": "Omit<React.HTMLAttributes<HTMLDivElement>, \"onSelect\">",
+    "extendsType": "Omit< React.HTMLAttributes<HTMLDivElement>, \"onSelect\" >",
     "exports": [
       {
         "name": "ObservationPanel",
@@ -5120,7 +5120,7 @@ export const CATALOG: ComponentDoc[] = [
             "required": false
           }
         ],
-        "extendsType": "Omit<React.HTMLAttributes<HTMLDivElement>, \"onSelect\">"
+        "extendsType": "Omit< React.HTMLAttributes<HTMLDivElement>, \"onSelect\" >"
       },
       {
         "name": "ObservationRow",
@@ -5221,7 +5221,7 @@ export const CATALOG: ComponentDoc[] = [
       "patient-banner"
     ],
     "dependencies": [
-      "@oxygenui/fhir",
+      "@oxygenui-design/fhir@^0.1.0",
       "lucide-react",
       "clsx",
       "tailwind-merge"

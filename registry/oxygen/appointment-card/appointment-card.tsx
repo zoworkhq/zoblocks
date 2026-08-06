@@ -21,7 +21,7 @@ import {
   timeZoneLabel,
   type Appointment,
   type AppointmentStatus,
-} from "@oxygenui/fhir";
+} from "@oxygenui-design/fhir";
 import { StatusBadge, type StatusTone } from "@/components/oxygen/status-badge";
 import { cn } from "@/lib/utils";
 
@@ -43,8 +43,10 @@ const STATUS_PRESENTATION: Record<
   waitlist: { label: "Waitlisted", tone: "unknown" },
 };
 
-export interface AppointmentCardProps
-  extends Omit<React.HTMLAttributes<HTMLDivElement>, "onSelect"> {
+export interface AppointmentCardProps extends Omit<
+  React.HTMLAttributes<HTMLDivElement>,
+  "onSelect"
+> {
   appointment: Appointment | undefined;
   /**
    * IANA time zone the appointment time should be read in, e.g.
@@ -85,16 +87,20 @@ export function AppointmentCard({
   }
 
   const status = appointment?.status;
-  const presentation = status ? STATUS_PRESENTATION[status] : { label: "Status unknown", tone: "unknown" as StatusTone };
+  const presentation = status
+    ? STATUS_PRESENTATION[status]
+    : { label: "Status unknown", tone: "unknown" as StatusTone };
   const when = formatAppointmentTime(appointment, timeZone, locale);
   const zone = timeZoneLabel(timeZone);
   const virtual = isVirtualAppointment(appointment);
-  const service = codeableText(appointment?.serviceType?.[0]) ?? codeableText(appointment?.appointmentType);
+  const service =
+    codeableText(appointment?.serviceType?.[0]) ?? codeableText(appointment?.appointmentType);
   const practitioner = appointment?.participant?.find((p) =>
     p.actor?.reference?.startsWith("Practitioner"),
   )?.actor?.display;
   const cancellation = codeableText(appointment?.cancelationReason);
-  const inactive = status === "cancelled" || status === "fulfilled" || status === "entered-in-error";
+  const inactive =
+    status === "cancelled" || status === "fulfilled" || status === "entered-in-error";
   const interactive = Boolean(onSelect);
 
   return (
@@ -128,7 +134,12 @@ export function AppointmentCard({
     >
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <h3 className={cn("font-semibold text-[var(--ox-text)]", inactive && "text-[var(--ox-text-muted)]")}>
+          <h3
+            className={cn(
+              "font-semibold text-[var(--ox-text)]",
+              inactive && "text-[var(--ox-text-muted)]",
+            )}
+          >
             {appointment?.description ?? service ?? "Appointment"}
           </h3>
 

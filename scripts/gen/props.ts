@@ -18,7 +18,7 @@
 
 import path from "node:path";
 import ts from "typescript";
-import type { PropDoc } from "@oxygenui/component-meta";
+import type { PropDoc } from "@oxygenui-design/component-meta";
 import { ROOT } from "./config";
 import type { LoadedComponent } from "./load";
 
@@ -42,9 +42,9 @@ export interface ExtractedExport {
  */
 function compilerOptions(components: LoadedComponent[]): ts.CompilerOptions {
   const paths: ts.MapLike<string[]> = {
-    "@oxygenui/fhir": ["./packages/fhir/src/index.ts"],
-    "@oxygenui/fixtures": ["./packages/fixtures/src/index.ts"],
-    "@oxygenui/component-meta": ["./packages/component-meta/src/index.ts"],
+    "@oxygenui-design/fhir": ["./packages/fhir/src/index.ts"],
+    "@oxygenui-design/fixtures": ["./packages/fixtures/src/index.ts"],
+    "@oxygenui-design/component-meta": ["./packages/component-meta/src/index.ts"],
     "@/lib/utils": ["./registry/oxygen/lib/utils.ts"],
   };
 
