@@ -1,5 +1,5 @@
 import { approveUser, setUserRole, setUserStatus } from "@/lib/actions";
-import type { UserRole } from "@/db/schema";
+import type { UserRole } from "@/db/collections";
 import { Avatar } from "./bits";
 import { DisableAccount } from "./disable-account";
 import { ResetLinkButton } from "./reset-link-button";

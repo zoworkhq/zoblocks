@@ -6,10 +6,12 @@
  * - Passwords are bcrypt-hashed at cost 12. Never stored, never logged, never
  *   returned from a query that reaches a component.
  * - The session cookie holds a 256-bit random token. The database stores only
- *   its SHA-256 hash, so a dump of the sessions table yields nothing usable.
- * - Sessions are server-side rows, so `status = 'disabled'` ends every session
- *   that account holds on its next request. A stateless JWT cannot do that, and
- *   offboarding is the security event that actually happens on a small team.
+ *   its SHA-256 hash, so a dump of the sessions collection yields nothing
+ *   usable.
+ * - Sessions are server-side documents, so `status = 'disabled'` ends every
+ *   session that account holds on its next request. A stateless JWT cannot do
+ *   that, and offboarding is the security event that actually happens on a
+ *   small team.
  * - Login failures are deliberately indistinguishable: wrong password, unknown
  *   address, and not-yet-approved all return the same message, so the form
  *   cannot be used to enumerate who works here.
@@ -17,10 +19,10 @@
 
 import { createHash, randomBytes, timingSafeEqual } from "node:crypto";
 import { cookies, headers } from "next/headers";
-import { and, count, eq, gt, isNull, lt, sql } from "drizzle-orm";
+import { ObjectId } from "mongodb";
 import bcrypt from "bcryptjs";
 import { db } from "@/db/client";
-import { loginAttempts, passwordResets, sessions, users, type User } from "@/db/schema";
+import type { UserDoc, UserRole, UserStatus } from "@/db/collections";
 
 const COOKIE = "hq_session";
 const SESSION_DAYS = 14;
@@ -55,19 +57,18 @@ export function safeEqual(a: string, b: string): boolean {
   return timingSafeEqual(ab, bb);
 }
 
-export async function createSession(userId: string): Promise<void> {
+export async function createSession(userId: ObjectId): Promise<void> {
   const token = randomBytes(32).toString("base64url");
   const expiresAt = new Date(Date.now() + SESSION_DAYS * 24 * 60 * 60 * 1000);
   const agent = (await headers()).get("user-agent")?.slice(0, 400) ?? null;
 
-  await db()
-    .insert(sessions)
-    .values({
-      id: hashToken(token),
-      userId,
-      expiresAt,
-      userAgent: agent,
-    });
+  await db().sessions.insertOne({
+    _id: hashToken(token),
+    userId,
+    expiresAt,
+    createdAt: new Date(),
+    userAgent: agent,
+  });
 
   (await cookies()).set(COOKIE, token, {
     httpOnly: true,
@@ -82,40 +83,53 @@ export async function destroySession(): Promise<void> {
   const jar = await cookies();
   const token = jar.get(COOKIE)?.value;
   if (token) {
-    await db()
-      .delete(sessions)
-      .where(eq(sessions.id, hashToken(token)));
+    await db().sessions.deleteOne({ _id: hashToken(token) });
   }
   jar.delete(COOKIE);
 }
 
-export type SessionUser = Pick<User, "id" | "email" | "name" | "role" | "status">;
+export interface SessionUser {
+  id: string;
+  email: string;
+  name: string;
+  role: UserRole;
+  status: UserStatus;
+}
+
+function toSessionUser(doc: UserDoc): SessionUser {
+  return {
+    id: doc._id.toHexString(),
+    email: doc.email,
+    name: doc.name,
+    role: doc.role,
+    status: doc.status,
+  };
+}
 
 /**
  * Resolves the current user, or null. Re-reads `status` on every call rather
  * than trusting anything in the cookie, so an admin disabling someone takes
  * effect immediately rather than at token expiry.
+ *
+ * The expiry is still compared here even though a TTL index also removes the
+ * document: TTL runs on a background sweep, roughly once a minute, so a lapsed
+ * session can briefly still exist. Correctness comes from the comparison; the
+ * index is only housekeeping.
  */
 export async function currentUser(): Promise<SessionUser | null> {
   const token = (await cookies()).get(COOKIE)?.value;
   if (!token) return null;
 
-  const rows = await db()
-    .select({
-      id: users.id,
-      email: users.email,
-      name: users.name,
-      role: users.role,
-      status: users.status,
-    })
-    .from(sessions)
-    .innerJoin(users, eq(users.id, sessions.userId))
-    .where(and(eq(sessions.id, hashToken(token)), gt(sessions.expiresAt, new Date())))
-    .limit(1);
+  const { sessions, users } = db();
+  const session = await sessions.findOne({
+    _id: hashToken(token),
+    expiresAt: { $gt: new Date() },
+  });
+  if (!session) return null;
 
-  const user = rows[0];
+  const user = await users.findOne({ _id: session.userId });
   if (!user || user.status !== "active") return null;
-  return user;
+  return toSessionUser(user);
 }
 
 // ---------------------------------------------------------------------------
@@ -138,11 +152,7 @@ function windowStart(): Date {
 }
 
 async function failuresFor(key: string): Promise<number> {
-  const rows = await db()
-    .select({ value: count() })
-    .from(loginAttempts)
-    .where(and(eq(loginAttempts.key, key), gt(loginAttempts.createdAt, windowStart())));
-  return rows[0]?.value ?? 0;
+  return db().loginAttempts.countDocuments({ key, createdAt: { $gt: windowStart() } });
 }
 
 /**
@@ -160,22 +170,18 @@ export async function isThrottled(email: string): Promise<boolean> {
 
 export async function recordFailure(email: string): Promise<void> {
   const ip = await clientKey();
-  await db()
-    .insert(loginAttempts)
-    .values([{ key: `email:${email}` }, { key: ip }]);
-
-  // Opportunistic sweep so the table cannot grow without bound. Cheap, and it
-  // avoids needing a scheduled job for a table only written to on failure.
-  await db()
-    .delete(loginAttempts)
-    .where(lt(loginAttempts.createdAt, new Date(Date.now() - 3_600_000)));
+  const createdAt = new Date();
+  // The sweep the SQL version needed is gone: a TTL index on createdAt drops
+  // these an hour later without anyone asking.
+  await db().loginAttempts.insertMany([
+    { _id: new ObjectId(), key: `email:${email}`, createdAt },
+    { _id: new ObjectId(), key: ip, createdAt },
+  ]);
 }
 
 /** A correct password clears that account's failures, so one typo is not sticky. */
 export async function clearFailures(email: string): Promise<void> {
-  await db()
-    .delete(loginAttempts)
-    .where(eq(loginAttempts.key, `email:${email}`));
+  await db().loginAttempts.deleteMany({ key: `email:${email}` });
 }
 
 // ---------------------------------------------------------------------------
@@ -189,52 +195,47 @@ export async function clearFailures(email: string): Promise<void> {
  * older one live.
  */
 export async function createPasswordReset(
-  userId: string,
-  adminId: string,
+  userId: ObjectId,
+  adminId: ObjectId,
 ): Promise<{ token: string; expiresAt: Date }> {
-  await db()
-    .update(passwordResets)
-    .set({ usedAt: new Date() })
-    .where(and(eq(passwordResets.userId, userId), isNull(passwordResets.usedAt)));
+  const { passwordResets } = db();
+
+  await passwordResets.updateMany({ userId, usedAt: null }, { $set: { usedAt: new Date() } });
 
   const token = randomBytes(32).toString("base64url");
   const expiresAt = new Date(Date.now() + RESET_MINUTES * 60 * 1000);
 
-  await db()
-    .insert(passwordResets)
-    .values({
-      id: hashToken(token),
-      userId,
-      expiresAt,
-      createdBy: adminId,
-    });
+  await passwordResets.insertOne({
+    _id: hashToken(token),
+    userId,
+    expiresAt,
+    usedAt: null,
+    createdBy: adminId,
+    createdAt: new Date(),
+  });
 
   return { token, expiresAt };
 }
 
 export async function resolvePasswordReset(
   token: string,
-): Promise<{ userId: string; name: string } | null> {
+): Promise<{ userId: ObjectId; name: string } | null> {
   if (!token) return null;
 
-  const rows = await db()
-    .select({ userId: passwordResets.userId, name: users.name, status: users.status })
-    .from(passwordResets)
-    .innerJoin(users, eq(users.id, passwordResets.userId))
-    .where(
-      and(
-        eq(passwordResets.id, hashToken(token)),
-        isNull(passwordResets.usedAt),
-        gt(passwordResets.expiresAt, new Date()),
-      ),
-    )
-    .limit(1);
+  const { passwordResets, users } = db();
+  const grant = await passwordResets.findOne({
+    _id: hashToken(token),
+    usedAt: null,
+    expiresAt: { $gt: new Date() },
+  });
+  if (!grant) return null;
 
-  const row = rows[0];
+  const user = await users.findOne({ _id: grant.userId });
   // A disabled account must not be recoverable through a link minted before it
   // was disabled — otherwise offboarding has a back door.
-  if (!row || row.status === "disabled") return null;
-  return { userId: row.userId, name: row.name };
+  if (!user || user.status === "disabled") return null;
+
+  return { userId: grant.userId, name: user.name };
 }
 
 /**
@@ -246,21 +247,15 @@ export async function consumePasswordReset(token: string, newPassword: string): 
   const grant = await resolvePasswordReset(token);
   if (!grant) return false;
 
+  const { users, passwordResets, sessions } = db();
   const hash = await hashPassword(newPassword);
 
-  await db().update(users).set({ passwordHash: hash }).where(eq(users.id, grant.userId));
-  await db()
-    .update(passwordResets)
-    .set({ usedAt: new Date() })
-    .where(eq(passwordResets.id, hashToken(token)));
-  await db().delete(sessions).where(eq(sessions.userId, grant.userId));
+  await users.updateOne({ _id: grant.userId }, { $set: { passwordHash: hash } });
+  await passwordResets.updateOne({ _id: hashToken(token) }, { $set: { usedAt: new Date() } });
+  await sessions.deleteMany({ userId: grant.userId });
 
-  const email = await db()
-    .select({ email: users.email })
-    .from(users)
-    .where(eq(users.id, grant.userId))
-    .limit(1);
-  if (email[0]) await clearFailures(email[0].email.toLowerCase());
+  const user = await users.findOne({ _id: grant.userId });
+  if (user) await clearFailures(user.emailLower);
 
   return true;
 }
@@ -271,32 +266,23 @@ export async function consumePasswordReset(token: string, newPassword: string): 
  * signs out the other devices without signing you out of the one in your hand.
  */
 export async function changePassword(
-  userId: string,
+  userId: ObjectId,
   currentPassword: string,
   newPassword: string,
   keepSessionToken: string | undefined,
 ): Promise<boolean> {
-  const rows = await db()
-    .select({ hash: users.passwordHash })
-    .from(users)
-    .where(eq(users.id, userId))
-    .limit(1);
-  const existing = rows[0];
-  if (!existing || !(await verifyPassword(currentPassword, existing.hash))) return false;
+  const { users, sessions } = db();
 
-  await db()
-    .update(users)
-    .set({ passwordHash: await hashPassword(newPassword) })
-    .where(eq(users.id, userId));
+  const user = await users.findOne({ _id: userId });
+  if (!user || !(await verifyPassword(currentPassword, user.passwordHash))) return false;
+
+  await users.updateOne(
+    { _id: userId },
+    { $set: { passwordHash: await hashPassword(newPassword) } },
+  );
 
   const keep = keepSessionToken ? hashToken(keepSessionToken) : null;
-  await db()
-    .delete(sessions)
-    .where(
-      keep
-        ? and(eq(sessions.userId, userId), sql`${sessions.id} <> ${keep}`)
-        : eq(sessions.userId, userId),
-    );
+  await sessions.deleteMany(keep ? { userId, _id: { $ne: keep } } : { userId });
 
   return true;
 }

@@ -1,9 +1,7 @@
-import { asc } from "drizzle-orm";
 import { notFound, redirect } from "next/navigation";
 import { PersonRow } from "@/components/person-row";
 import { PageHeader } from "@/components/page-header";
 import { db } from "@/db/client";
-import { users } from "@/db/schema";
 import { currentUser } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
@@ -36,17 +34,15 @@ export default async function PeoplePage() {
   // redirect to /login would confirm the route is real.
   if (user.role !== "admin") notFound();
 
-  const everyone = await db()
-    .select({
-      id: users.id,
-      name: users.name,
-      email: users.email,
-      role: users.role,
-      status: users.status,
-      createdAt: users.createdAt,
-    })
-    .from(users)
-    .orderBy(asc(users.createdAt));
+  const docs = await db().users.find({}).sort({ createdAt: 1 }).toArray();
+  const everyone = docs.map((d) => ({
+    id: d._id.toHexString(),
+    name: d.name,
+    email: d.email,
+    role: d.role,
+    status: d.status,
+    createdAt: d.createdAt,
+  }));
 
   const pending = everyone.filter((p) => p.status === "pending");
   const active = everyone.filter((p) => p.status === "active");

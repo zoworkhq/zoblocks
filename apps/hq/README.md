@@ -21,8 +21,8 @@ so this validates the foundations layer only.
 ## Running it
 
 ```bash
-cp .env.example .env.local          # point DATABASE_URL at Postgres
-pnpm --filter @oxygenui-design/hq db:migrate
+cp .env.example .env.local          # point DATABASE_URL at MongoDB
+pnpm --filter @oxygenui-design/hq db:indexes
 pnpm --filter @oxygenui-design/hq dev      # http://localhost:6002
 ```
 
@@ -34,11 +34,9 @@ node scripts/seed-dev.mjs
 
 The seed refuses to run against anything that is not localhost.
 
-| Command            | Purpose                                  |
-| ------------------ | ---------------------------------------- |
-| `pnpm db:generate` | Generate a migration from schema changes |
-| `pnpm db:migrate`  | Apply pending migrations                 |
-| `pnpm db:studio`   | Browse the data                          |
+| Command           | Purpose                    |
+| ----------------- | -------------------------- |
+| `pnpm db:indexes` | Apply indexes (idempotent) |
 
 ## Access model
 
@@ -70,12 +68,15 @@ server-side in `src/lib/actions.ts`.** Hiding a control is never the control.
 ## Deploying
 
 A second Vercel project on this repository, **Root Directory `apps/hq`**, with
-`DATABASE_URL` set to a pooled Postgres connection string. Add
+`DATABASE_URL` set to the MongoDB connection string the marketing site already
+uses. hq always opens the database named `hq` inside that cluster, never the
+site's — so the connection string can be shared without the data being shared. Add
 `hq.oxygenui.design` as its domain. DNS already sits on Vercel, so no records
 need editing.
 
-Migrations are not run at build time on purpose — run `db:migrate` deliberately
-against production rather than letting a deploy alter the schema.
+Indexes are not applied at build time on purpose — run `db:indexes` deliberately
+against production. A unique index fails to build if existing data violates it,
+which is a thing to watch rather than discover in a deploy log.
 
 ## Not built yet
 

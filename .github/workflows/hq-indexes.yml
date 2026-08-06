@@ -1,0 +1,64 @@
+name: Apply hq indexes
+
+# Mongo creates collections on first write, so there is no schema to migrate.
+# What must be applied deliberately is the indexes — and two of them are
+# correctness rather than speed:
+#
+#   users.emailLower (unique)  stops "Ada@" and "ada@" becoming two accounts
+#   tasks.ref        (unique)  stops two tasks both being called HQ-42
+#
+# The script is idempotent, so this is safe to re-run. It stays manual because
+# an index build on a large collection is a real operation, and because a
+# unique index fails outright if the data already violates it — a thing to do
+# while watching, not as a side effect of merging.
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: 'Type "apply" to confirm you intend to change indexes on production'
+        required: true
+        type: string
+
+concurrency:
+  group: hq-indexes
+  cancel-in-progress: false
+
+jobs:
+  indexes:
+    name: Apply indexes
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment:
+      name: production-hq
+
+    steps:
+      - name: Check confirmation
+        run: |
+          if [ "${{ inputs.confirm }}" != "apply" ]; then
+            echo "::error::Not confirmed. Re-run and type apply in the confirmation field."
+            exit 1
+          fi
+
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Apply
+        working-directory: apps/hq
+        env:
+          DATABASE_URL: ${{ secrets.HQ_DATABASE_URL }}
+        run: |
+          if [ -z "${DATABASE_URL:-}" ]; then
+            echo "::error::HQ_DATABASE_URL is not set. Add it under Settings → Secrets → Actions."
+            exit 1
+          fi
+          node scripts/ensure-indexes.mjs

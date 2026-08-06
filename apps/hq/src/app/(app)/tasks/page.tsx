@@ -1,10 +1,9 @@
-import { and, asc, count, eq } from "drizzle-orm";
+import { ObjectId } from "mongodb";
 import { redirect } from "next/navigation";
 import { TaskBoard } from "@/components/task-board";
 import { PageHeader } from "@/components/page-header";
-import { db } from "@/db/client";
-import { comments, tasks, users } from "@/db/schema";
 import { currentUser } from "@/lib/auth";
+import { activeMembers, taskRows } from "@/lib/queries";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "My work" };
@@ -13,34 +12,18 @@ export default async function MyTasksPage() {
   const user = await currentUser();
   if (!user) redirect("/login");
 
-  const rows = await db()
-    .select({
-      id: tasks.id,
-      ref: tasks.ref,
-      title: tasks.title,
-      status: tasks.status,
-      priority: tasks.priority,
-      dueDate: tasks.dueDate,
-      assigneeId: tasks.assigneeId,
-      assigneeName: users.name,
-      commentCount: count(comments.id),
-    })
-    .from(tasks)
-    .leftJoin(users, eq(users.id, tasks.assigneeId))
-    .leftJoin(comments, eq(comments.taskId, tasks.id))
-    .where(eq(tasks.assigneeId, user.id))
-    .groupBy(tasks.id, users.name)
-    .orderBy(asc(tasks.dueDate), asc(tasks.ref));
-
-  const members = await db()
-    .select({ id: users.id, name: users.name })
-    .from(users)
-    .where(and(eq(users.status, "active")))
-    .orderBy(asc(users.name));
+  const [rows, members] = await Promise.all([
+    taskRows({ assigneeId: new ObjectId(user.id) }),
+    activeMembers(),
+  ]);
 
   const now = new Date();
   const open = rows.filter((t) => t.status !== "done");
-  const overdue = open.filter((t) => t.dueDate && t.dueDate < now).length;
+  const overdue = open.filter((t) => t.dueDate && new Date(t.dueDate) < now).length;
+
+  // The date, not a greeting. Every row below says "due tomorrow" or "overdue"
+  // relative to today, and stating today makes those readable without doing
+  // arithmetic. A greeting would also be wrong half the time.
   const today = now.toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long" });
 
   return (
@@ -51,7 +34,7 @@ export default async function MyTasksPage() {
       />
 
       <TaskBoard
-        tasks={rows.map((t) => ({ ...t, dueDate: t.dueDate ? t.dueDate.toISOString() : null }))}
+        tasks={rows}
         members={members}
         isAdmin={user.role === "admin"}
         currentUserId={user.id}
