@@ -42,26 +42,35 @@ const SIZE = {
 } as const;
 
 /**
- * Six neutral swatches. Written out in full because Tailwind cannot see a
+ * Six decorative swatches. Written out in full because Tailwind cannot see a
  * class assembled from a variable, and a colourless avatar is a broken one.
  *
- * These are decorative only — never the sole carrier of identity, and never
- * mapped to anything about the person.
+ * They come from the dedicated `--ox-swatch-*` group rather than from status
+ * tokens. Borrowing a clinical colour for decoration puts the amber that means
+ * "high" on an avatar because of a hash of someone's name, three rows above a
+ * result where that same amber is a finding.
+ *
+ * Decorative only — never the sole carrier of identity, and never mapped to
+ * anything about the person.
  */
 const SWATCH = [
-  "bg-[var(--ox-brand-50)] text-[var(--ox-brand-800)] border-[var(--ox-brand-200)]",
-  "bg-[var(--ox-slate-100)] text-[var(--ox-slate-700)] border-[var(--ox-slate-300)]",
-  "bg-[var(--ox-status-low-bg)] text-[var(--ox-status-low)] border-[var(--ox-status-low-border)]",
-  "bg-[var(--ox-status-normal-bg)] text-[var(--ox-status-normal)] border-[var(--ox-status-normal-border)]",
-  "bg-[var(--ox-status-high-bg)] text-[var(--ox-status-high)] border-[var(--ox-status-high-border)]",
-  "bg-[var(--ox-flag-restricted-bg)] text-[var(--ox-flag-restricted)] border-[#ddd6fe]",
+  "bg-[var(--ox-swatch-1-bg)] text-[var(--ox-swatch-1)] border-[var(--ox-swatch-1-border)]",
+  "bg-[var(--ox-swatch-2-bg)] text-[var(--ox-swatch-2)] border-[var(--ox-swatch-2-border)]",
+  "bg-[var(--ox-swatch-3-bg)] text-[var(--ox-swatch-3)] border-[var(--ox-swatch-3-border)]",
+  "bg-[var(--ox-swatch-4-bg)] text-[var(--ox-swatch-4)] border-[var(--ox-swatch-4-border)]",
+  "bg-[var(--ox-swatch-5-bg)] text-[var(--ox-swatch-5)] border-[var(--ox-swatch-5-border)]",
+  "bg-[var(--ox-swatch-6-bg)] text-[var(--ox-swatch-6)] border-[var(--ox-swatch-6-border)]",
 ];
+
+/** Used when the seed is empty. A swatch is decoration; there is always one. */
+const SWATCH_FALLBACK =
+  "bg-[var(--ox-swatch-6-bg)] text-[var(--ox-swatch-6)] border-[var(--ox-swatch-6-border)]";
 
 /** Stable index from the name's characters. Same name, same swatch, always. */
 function swatchFor(seed: string): string {
   let hash = 0;
   for (let i = 0; i < seed.length; i += 1) hash = (hash * 31 + seed.charCodeAt(i)) % 997;
-  return SWATCH[hash % SWATCH.length]!;
+  return SWATCH[hash % SWATCH.length] ?? SWATCH_FALLBACK;
 }
 
 export interface IdentityTokenProps extends React.HTMLAttributes<HTMLDivElement> {

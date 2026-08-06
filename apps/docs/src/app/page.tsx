@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Activity, ArrowRight, Braces, Check, ShieldCheck } from "lucide-react";
+import { Activity, ArrowRight, Braces, ShieldCheck } from "lucide-react";
 import { CATALOG } from "@/lib/catalog";
 import { ComponentCard } from "@/components/site/component-card";
 import { ScrollRail, SiteFooter, SiteHeader } from "@/components/site/chrome";

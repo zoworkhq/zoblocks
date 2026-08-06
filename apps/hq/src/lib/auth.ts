@@ -17,7 +17,7 @@
 
 import { createHash, randomBytes, timingSafeEqual } from "node:crypto";
 import { cookies, headers } from "next/headers";
-import { and, count, eq, gt, inArray, isNull, lt, sql } from "drizzle-orm";
+import { and, count, eq, gt, isNull, lt, sql } from "drizzle-orm";
 import bcrypt from "bcryptjs";
 import { db } from "@/db/client";
 import { loginAttempts, passwordResets, sessions, users, type User } from "@/db/schema";

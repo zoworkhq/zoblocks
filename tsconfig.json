@@ -1,20 +1,16 @@
 {
-  "extends": "./packages/tsconfig/base.json",
+  // Path mappings live in tsconfig.generated.json, produced by `pnpm gen`.
+  //
+  // Registry components import "@/lib/utils" and "@/components/oxygen/*"
+  // because that is where the shadcn CLI writes them in the consumer's project,
+  // so those specifiers have to resolve here too. That map used to be
+  // maintained by hand, with a comment asking authors to add an entry per
+  // component; four were missing and nothing reported it, because no workspace
+  // task typechecked this config. It is generated now, and `pnpm typecheck`
+  // runs it.
+  "extends": ["./packages/tsconfig/base.json", "./tsconfig.generated.json"],
   "compilerOptions": {
-    "noEmit": true,
-    "baseUrl": ".",
-    "paths": {
-      "@oxygenui-design/fhir": ["./packages/fhir/src/index.ts"],
-      "@oxygenui-design/fixtures": ["./packages/fixtures/src/index.ts"],
-      "@/registry/*": ["./registry/*"],
-      // Registry components import "@/lib/utils" and "@/components/oxygen/*"
-      // because that is where the shadcn CLI writes them in the consumer's
-      // project. Mapped here so the same source typechecks in this repo
-      // without being edited. Add a mapping for every shared registry
-      // component the catalog grows.
-      "@/lib/utils": ["./registry/oxygen/lib/utils.ts"],
-      "@/components/oxygen/status-badge": ["./registry/oxygen/status-badge/status-badge.tsx"]
-    }
+    "noEmit": true
   },
   "include": ["scripts/**/*.ts", "registry/**/*.ts", "registry/**/*.tsx"],
   "exclude": ["node_modules", "**/dist", "**/.next"]

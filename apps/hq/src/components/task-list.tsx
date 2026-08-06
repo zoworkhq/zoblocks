@@ -207,8 +207,10 @@ function QuickAdd({ status, members }: { status: TaskStatus; members: Member[] }
       <label className="sr-only" htmlFor={`qa-${status}`}>
         New task in {STATUS_LABEL[status]}
       </label>
-      {/* eslint-disable-next-line jsx-a11y/no-autofocus -- the button that
-          opened this row is gone; focus has to land somewhere deliberate. */}
+      {/* autoFocus is deliberate: the button that opened this row is gone, so
+          focus has to land somewhere. jsx-a11y is not installed here, so the
+          reasoning lives in a comment rather than a disable for a rule that
+          does not exist. */}
       <input
         id={`qa-${status}`}
         name="title"

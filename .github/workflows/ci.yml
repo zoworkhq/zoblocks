@@ -29,11 +29,47 @@ jobs:
       - name: Install
         run: pnpm install --frozen-lockfile
 
-      # Runs before anything else: a registry that does not validate is a
-      # broken install for every customer, and it is the cheapest check we have.
-      - name: Validate registry
-        run: pnpm registry:check
+      # Runs before anything else. It validates every component's metadata,
+      # typechecks the source customers receive, and produces every derived
+      # artifact. A registry that does not validate is a broken install for
+      # every customer, and this is the cheapest check we have.
+      #
+      # `--strict` additionally fails when a component does not meet the bar for
+      # its declared stability tier. Switched on in Phase 2, once story and test
+      # infrastructure exists for it to check against.
+      - name: Generate
+        run: pnpm gen
 
+      # Some generated artifacts are committed (registry.json, path mappings,
+      # the docs catalog) and some are build output (apps/docs/public/r/*.json,
+      # which .gitignore excludes). `git diff` is the check that covers exactly
+      # the committed ones, without the generator needing to know which is
+      # which. `pnpm gen:check` is the equivalent locally.
+      - name: No stale generated files
+        run: |
+          if ! git diff --exit-code --stat; then
+            echo "::error::Generated files are stale. Run \`pnpm gen\` and commit the result."
+            exit 1
+          fi
+
+      # `pnpm lint` carries a --max-warnings ratchet set to the exact count on
+      # the day lint was introduced, so the gate is identical here and on a
+      # developer's machine. Two rules are staged as warnings rather than errors
+      # — logical properties, and reading the clock inside a component —
+      # because the existing catalog violates them, and promoting them straight
+      # to errors would have meant either a large refactor in the same change or
+      # a blanket suppression.
+      #
+      # The number may go down. It may not go up: a new warning fails the build,
+      # so adding one means fixing it, or fixing another to make room. When it
+      # reaches zero, both rules become errors and the flag goes away.
+      - name: Lint
+        run: pnpm lint
+
+      # Covers the registry component source — the exact files copied into a
+      # customer's project. Nothing used to typecheck them: the root config that
+      # includes them was not part of any workspace task, and four components
+      # had unresolvable imports that no job reported.
       - name: Typecheck
         run: pnpm typecheck
 

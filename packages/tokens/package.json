@@ -30,7 +30,6 @@
   },
   "scripts": {
     "build": "echo \"[tokens] css is published as source\"",
-    "typecheck": "echo \"[tokens] no typescript\"",
-    "lint": "echo \"[tokens] lint: configured in Phase 1\""
+    "typecheck": "echo \"[tokens] no typescript\""
   }
 }

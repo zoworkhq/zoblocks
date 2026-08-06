@@ -96,7 +96,7 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
               <span className="text-graphite-soft">{component.categories.join(" · ")}</span>
             </p>
 
-            <p className="lede mt-6 max-w-3xl text-pretty">{component.description}</p>
+            <p className="lede mt-6 max-w-3xl text-pretty">{component.rationale}</p>
 
             <div className="mt-8 max-w-2xl">
               <InstallCommand
