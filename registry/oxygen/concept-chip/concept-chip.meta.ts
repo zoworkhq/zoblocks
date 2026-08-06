@@ -8,14 +8,14 @@ export default defineComponentMeta({
   since: "0.1.0",
   layer: "primitive",
 
-  summary: "A coded concept with its coding one interaction away, and honest about what is missing.",
-  description: "A coded clinical concept with its coding one interaction away. Marks text-only concepts, unrecognised systems, and codes outside an expected value set.",
-  rationale: "Clinicians read display text; integrations and audits need the code. Hiding the coding makes data problems undiagnosable, showing it inline makes every list unreadable, so it lives behind a disclosure. The useful behaviour is the honesty: text with no coding is marked as such, an unrecognised system shows its raw URI rather than being dressed up as standard, and a concept outside an expected value set is flagged so bad mappings become visible instead of accumulating.",
+  summary:
+    "A coded concept with its coding one interaction away, and honest about what is missing.",
+  description:
+    "A coded clinical concept with its coding one interaction away. Marks text-only concepts, unrecognised systems, and codes outside an expected value set.",
+  rationale:
+    "Clinicians read display text; integrations and audits need the code. Hiding the coding makes data problems undiagnosable, showing it inline makes every list unreadable, so it lives behind a disclosure. The useful behaviour is the honesty: text with no coding is marked as such, an unrecognised system shows its raw URI rather than being dressed up as standard, and a concept outside an expected value set is flagged so bad mappings become visible instead of accumulating.",
 
-  categories: [
-    "Primitive",
-    "Clinical",
-  ],
+  categories: ["Primitive", "Clinical"],
   fhir: [
     {
       name: "CodeableConcept",
@@ -35,11 +35,13 @@ export default defineComponentMeta({
   a11y: [
     {
       label: "Button, not hover",
-      detail: "The disclosure is a real button with an expanded state, dismissible with Escape. Nothing is hover-only.",
+      detail:
+        "The disclosure is a real button with an expanded state, dismissible with Escape. Nothing is hover-only.",
     },
     {
       label: "Code out of the name",
-      detail: "The accessible name carries the concept text and any warning; system and code live inside the disclosure rather than crowding it.",
+      detail:
+        "The accessible name carries the concept text and any warning; system and code live inside the disclosure rather than crowding it.",
     },
     {
       label: "Warnings in text",
@@ -65,22 +67,10 @@ export default defineComponentMeta({
     "Post-coordinated SNOMED expressions render as their raw code.",
     "The recognised-system list is finite; extend it as your integrations grow.",
   ],
-  related: [
-    "condition-list",
-    "vitals-panel",
-    "status-badge",
-  ],
+  related: ["condition-list", "vitals-panel", "status-badge"],
 
-  dependencies: [
-    "@oxygenui-design/fhir@^0.1.0",
-    "lucide-react",
-    "clsx",
-    "tailwind-merge",
-  ],
-  registryDependencies: [
-    "utils",
-    "tokens",
-  ],
+  dependencies: ["@oxygenui-design/fhir@^0.1.0", "lucide-react", "clsx", "tailwind-merge"],
+  registryDependencies: ["utils", "tokens"],
 
   usage: `import { ConceptChip } from "@/components/oxygen/concept-chip";
 

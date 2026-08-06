@@ -9,13 +9,12 @@ export default defineComponentMeta({
   layer: "pattern",
 
   summary: "Severity tiers as an interruption budget. Only critical may take focus.",
-  description: "Severity tiers as an interruption budget. Only critical may take focus, the specific finding is stated rather than a category, and dismissal captures a reason so rules can be measured.",
-  rationale: "Interruption is a scarce resource and every alert spends it. The failure mode of clinical alerting is not missing alerts, it is too many — fire enough and clinicians dismiss everything, including the one that mattered. So the tiers here are a budget rather than a palette. The specific finding is stated rather than the category, because “Potassium 6.8 — critical high” earns its interruption and “Abnormal result” does not. Dismissing a critical alert captures a reason, because an alert everyone silently clears should be retired and you cannot know that without the reasons.",
+  description:
+    "Severity tiers as an interruption budget. Only critical may take focus, the specific finding is stated rather than a category, and dismissal captures a reason so rules can be measured.",
+  rationale:
+    "Interruption is a scarce resource and every alert spends it. The failure mode of clinical alerting is not missing alerts, it is too many — fire enough and clinicians dismiss everything, including the one that mattered. So the tiers here are a budget rather than a palette. The specific finding is stated rather than the category, because “Potassium 6.8 — critical high” earns its interruption and “Abnormal result” does not. Dismissing a critical alert captures a reason, because an alert everyone silently clears should be retired and you cannot know that without the reasons.",
 
-  categories: [
-    "Primitive",
-    "Clinical",
-  ],
+  categories: ["Primitive", "Clinical"],
   fhir: [
     {
       name: "DetectedIssue",
@@ -23,19 +22,13 @@ export default defineComponentMeta({
     },
   ],
 
-  states: [
-    "Critical",
-    "High",
-    "Moderate",
-    "Low",
-    "Info",
-    "Dismissal with reason",
-  ],
+  states: ["Critical", "High", "Moderate", "Low", "Info", "Dismissal with reason"],
 
   a11y: [
     {
       label: "Tiered live regions",
-      detail: "Only critical is assertive. Everything else is polite and waits its turn in the reading order.",
+      detail:
+        "Only critical is assertive. Everything else is polite and waits its turn in the reading order.",
     },
     {
       label: "Severity as a word",
@@ -65,22 +58,10 @@ export default defineComponentMeta({
     "Suppression across encounters is application state, not component state.",
     "Emits dismissal reasons; storing and analysing them is yours.",
   ],
-  related: [
-    "status-badge",
-    "action-gate",
-    "empty-state",
-  ],
+  related: ["status-badge", "action-gate", "empty-state"],
 
-  dependencies: [
-    "@oxygenui-design/fhir@^0.1.0",
-    "lucide-react",
-    "clsx",
-    "tailwind-merge",
-  ],
-  registryDependencies: [
-    "utils",
-    "tokens",
-  ],
+  dependencies: ["@oxygenui-design/fhir@^0.1.0", "lucide-react", "clsx", "tailwind-merge"],
+  registryDependencies: ["utils", "tokens"],
 
   usage: `import { AlertBanner } from "@/components/oxygen/alert-banner";
 

@@ -114,7 +114,11 @@ function defaultsFromParameter(parameter: ts.ParameterDeclaration): Map<string, 
 /** Collapses the whitespace tsc emits inside object and union types onto one line. */
 function renderType(checker: ts.TypeChecker, type: ts.Type, at: ts.Node): string {
   return checker
-    .typeToString(type, at, ts.TypeFormatFlags.NoTruncation | ts.TypeFormatFlags.UseSingleQuotesForStringLiteralType)
+    .typeToString(
+      type,
+      at,
+      ts.TypeFormatFlags.NoTruncation | ts.TypeFormatFlags.UseSingleQuotesForStringLiteralType,
+    )
     .replace(/\s+/g, " ")
     .trim();
 }
@@ -144,9 +148,12 @@ function propsFromType(
     props.push({
       name: symbol.getName(),
       type: renderType(checker, propType, at),
-      description: ts.displayPartsToString(symbol.getDocumentationComment(checker)).replace(/\s+/g, " ").trim(),
+      description: ts
+        .displayPartsToString(symbol.getDocumentationComment(checker))
+        .replace(/\s+/g, " ")
+        .trim(),
       required: !optional,
-      ...(defaults.get(symbol.getName()) ?? defaultFromJsDoc(symbol)
+      ...((defaults.get(symbol.getName()) ?? defaultFromJsDoc(symbol))
         ? { default: defaults.get(symbol.getName()) ?? defaultFromJsDoc(symbol) }
         : {}),
     });
@@ -167,18 +174,20 @@ function propsFromType(
  * line than the 280 properties it resolves to say in a table.
  */
 function extendsTypeOf(type: ts.Type, ownFile: string): string | undefined {
-  const declaration = type.getSymbol()?.declarations?.find(
-    (d) =>
-      ts.isInterfaceDeclaration(d) &&
-      path.resolve(d.getSourceFile().fileName) === path.resolve(ownFile),
-  ) as ts.InterfaceDeclaration | undefined;
+  const declaration = type
+    .getSymbol()
+    ?.declarations?.find(
+      (d) =>
+        ts.isInterfaceDeclaration(d) &&
+        path.resolve(d.getSourceFile().fileName) === path.resolve(ownFile),
+    ) as ts.InterfaceDeclaration | undefined;
 
-  const heritage = declaration?.heritageClauses?.find((c) => c.token === ts.SyntaxKind.ExtendsKeyword);
+  const heritage = declaration?.heritageClauses?.find(
+    (c) => c.token === ts.SyntaxKind.ExtendsKeyword,
+  );
   if (!heritage) return undefined;
 
-  return heritage.types
-    .map((t) => t.getText().replace(/\s+/g, " ").trim())
-    .join(", ");
+  return heritage.types.map((t) => t.getText().replace(/\s+/g, " ").trim()).join(", ");
 }
 
 /** The props type of a class component, read from `extends React.Component<Props>`. */

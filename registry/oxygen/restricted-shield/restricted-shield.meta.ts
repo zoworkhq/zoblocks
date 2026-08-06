@@ -8,15 +8,14 @@ export default defineComponentMeta({
   since: "0.1.0",
   layer: "pattern",
 
-  summary: "Redacted by default. Discloses only with a stated reason, on a timer, and can conceal that content exists.",
-  description: "Wraps content restricted by sensitivity policy. Redacted by default, discloses only with a stated reason, re-hides on a timer, and can conceal that content exists at all.",
-  rationale: "Behavioral health, substance use under 42 CFR Part 2, reproductive care, HIV status, and minor confidentiality can each be restricted independently of the rest of the chart. The redacted state is the default render, not the fallback, and every path fails closed. The subtle requirement is the middle ground — stating that restricted content exists without revealing what it is — with a concealExistence variant for the narrower case where even that acknowledgement is not permitted.",
+  summary:
+    "Redacted by default. Discloses only with a stated reason, on a timer, and can conceal that content exists.",
+  description:
+    "Wraps content restricted by sensitivity policy. Redacted by default, discloses only with a stated reason, re-hides on a timer, and can conceal that content exists at all.",
+  rationale:
+    "Behavioral health, substance use under 42 CFR Part 2, reproductive care, HIV status, and minor confidentiality can each be restricted independently of the rest of the chart. The redacted state is the default render, not the fallback, and every path fails closed. The subtle requirement is the middle ground — stating that restricted content exists without revealing what it is — with a concealExistence variant for the narrower case where even that acknowledgement is not permitted.",
 
-  categories: [
-    "Primitive",
-    "System",
-    "Clinical",
-  ],
+  categories: ["Primitive", "System", "Clinical"],
   fhir: [
     {
       name: "Consent · meta.security",
@@ -36,15 +35,18 @@ export default defineComponentMeta({
   a11y: [
     {
       label: "Announced as withheld",
-      detail: "The redacted state reads as restricted content with an available action, never as an empty section.",
+      detail:
+        "The redacted state reads as restricted content with an available action, never as an empty section.",
     },
     {
       label: "Polite countdown",
-      detail: "The re-hide timer uses a polite live region. A countdown that interrupts every second is worse than the risk it mitigates.",
+      detail:
+        "The re-hide timer uses a polite live region. A countdown that interrupts every second is worse than the risk it mitigates.",
     },
     {
       label: "Real form controls",
-      detail: "The reason is a labelled select, not a free-text box, so the disclosure record is auditable.",
+      detail:
+        "The reason is a labelled select, not a free-text box, so the disclosure record is auditable.",
     },
   ],
 
@@ -66,21 +68,10 @@ export default defineComponentMeta({
     "The audit event is emitted only. Persistence, retention, and review are yours.",
     "Timer state is per-instance and resets on remount.",
   ],
-  related: [
-    "absent-value",
-    "empty-state",
-    "action-gate",
-  ],
+  related: ["absent-value", "empty-state", "action-gate"],
 
-  dependencies: [
-    "lucide-react",
-    "clsx",
-    "tailwind-merge",
-  ],
-  registryDependencies: [
-    "utils",
-    "tokens",
-  ],
+  dependencies: ["lucide-react", "clsx", "tailwind-merge"],
+  registryDependencies: ["utils", "tokens"],
 
   usage: `import { RestrictedShield } from "@/components/oxygen/restricted-shield";
 

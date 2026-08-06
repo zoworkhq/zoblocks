@@ -8,14 +8,14 @@ export default defineComponentMeta({
   since: "0.1.0",
   layer: "block",
 
-  summary: "One-screen pre-encounter summary where every section carries its own recency and failure.",
-  description: "One-screen pre-encounter summary. Each section carries its own recency and failure, truncation is counted rather than silent, and changes since last review lead.",
-  rationale: "The single most requested and most misdesigned surface in clinical software. The design problem is not what to show but what to leave out, and the answer differs by specialty, setting, and patient. Six source systems back this screen and partial failure is normal, so a section that did not load says so rather than rendering empty. Truncation is counted rather than silent — showing three of eleven problems and stopping is a summary that reads as a complete list. Changes since the reader last looked lead, because covering clinicians need the delta rather than the chart.",
+  summary:
+    "One-screen pre-encounter summary where every section carries its own recency and failure.",
+  description:
+    "One-screen pre-encounter summary. Each section carries its own recency and failure, truncation is counted rather than silent, and changes since last review lead.",
+  rationale:
+    "The single most requested and most misdesigned surface in clinical software. The design problem is not what to show but what to leave out, and the answer differs by specialty, setting, and patient. Six source systems back this screen and partial failure is normal, so a section that did not load says so rather than rendering empty. Truncation is counted rather than silent — showing three of eleven problems and stopping is a summary that reads as a complete list. Changes since the reader last looked lead, because covering clinicians need the delta rather than the chart.",
 
-  categories: [
-    "Patient identity",
-    "Clinical",
-  ],
+  categories: ["Patient identity", "Clinical"],
   fhir: [
     {
       name: "Composition",
@@ -35,11 +35,13 @@ export default defineComponentMeta({
   a11y: [
     {
       label: "Sections as regions",
-      detail: "Each section is a labelled article, so a screen-reader user navigates section by section.",
+      detail:
+        "Each section is a labelled article, so a screen-reader user navigates section by section.",
     },
     {
       label: "Failure summarised first",
-      detail: "Failed sections are announced at the top, before the reader forms a picture from the sections above them.",
+      detail:
+        "Failed sections are announced at the top, before the reader forms a picture from the sections above them.",
     },
     {
       label: "Change counts in the name",
@@ -65,25 +67,10 @@ export default defineComponentMeta({
     "Specialty configuration is caller-supplied.",
     "Change detection compares counts you supply; it does not diff resources.",
   ],
-  related: [
-    "patient-banner",
-    "code-status",
-    "care-team",
-    "clinical-skeleton",
-  ],
+  related: ["patient-banner", "code-status", "care-team", "clinical-skeleton"],
 
-  dependencies: [
-    "@oxygenui-design/fhir@^0.1.0",
-    "lucide-react",
-    "clsx",
-    "tailwind-merge",
-  ],
-  registryDependencies: [
-    "utils",
-    "tokens",
-    "empty-state",
-    "clinical-skeleton",
-  ],
+  dependencies: ["@oxygenui-design/fhir@^0.1.0", "lucide-react", "clsx", "tailwind-merge"],
+  registryDependencies: ["utils", "tokens", "empty-state", "clinical-skeleton"],
 
   usage: `import { PatientSnapshot } from "@/components/oxygen/patient-snapshot";
 

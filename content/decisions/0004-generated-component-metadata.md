@@ -6,19 +6,19 @@
 
 Adding a component today edits five shared files:
 
-| File | Work per component |
-| --- | --- |
-| `registry.json` | hand-written entry |
-| `apps/docs/src/lib/catalog.ts` | ~70 hand-written lines |
-| `tsconfig.json` `paths` | one mapping per shared component |
-| `apps/docs/src/app/globals.css` `@source` | one entry per new directory |
-| `apps/docs/src/app/page.tsx` | catalog listing |
+| File                                      | Work per component               |
+| ----------------------------------------- | -------------------------------- |
+| `registry.json`                           | hand-written entry               |
+| `apps/docs/src/lib/catalog.ts`            | ~70 hand-written lines           |
+| `tsconfig.json` `paths`                   | one mapping per shared component |
+| `apps/docs/src/app/globals.css` `@source` | one entry per new directory      |
+| `apps/docs/src/app/page.tsx`              | catalog listing                  |
 
 Each carries a comment reminding the next author. At 24 components that is
 sound. At 500 it is a merge-conflict generator worked on by every contributor,
 and `catalog.ts` alone projects to roughly 35,000 lines.
 
-Two of the five fail *silently*. A missing `@source` entry produces a component
+Two of the five fail _silently_. A missing `@source` entry produces a component
 that typechecks and renders completely unstyled — the README documents this as a
 known way to break a component. A rule that is enforced by a comment is not
 enforced.

@@ -261,7 +261,15 @@ export interface MedicationRequest extends Resource {
   resourceType?: "MedicationRequest";
   status?: MedicationRequestStatus;
   statusReason?: CodeableConcept;
-  intent?: "proposal" | "plan" | "order" | "original-order" | "reflex-order" | "filler-order" | "instance-order" | "option";
+  intent?:
+    | "proposal"
+    | "plan"
+    | "order"
+    | "original-order"
+    | "reflex-order"
+    | "filler-order"
+    | "instance-order"
+    | "option";
   priority?: "routine" | "urgent" | "asap" | "stat";
   medicationCodeableConcept?: CodeableConcept;
   medicationReference?: Reference;

@@ -4,3 +4,12 @@ dist
 .turbo
 pnpm-lock.yaml
 apps/docs/public/r
+
+# Machine-written. Formatting these would fight the tool that produces them:
+# Prettier reformats, the next `pnpm gen` or `drizzle-kit generate` writes it
+# back, and CI's stale-generated-files check fails on a diff nobody made.
+# The generators own their own output shape.
+registry.json
+tsconfig.generated.json
+apps/docs/src/lib/generated
+apps/hq/drizzle/meta

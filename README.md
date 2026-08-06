@@ -101,17 +101,17 @@ pnpm gen              # generate the registry, catalog, and path mappings
 pnpm dev              # docs site on http://localhost:6001
 ```
 
-| Command | Purpose |
-| --- | --- |
-| `pnpm dev` | Run the docs site |
-| `pnpm build` | Build every package and app |
-| `pnpm test` | Unit tests |
-| `pnpm lint` | Lint the workspace |
-| `pnpm typecheck` | Typecheck the workspace, including registry source |
-| `pnpm gen` | Regenerate everything derived from component metadata |
-| `pnpm gen:check` | Verify nothing generated is stale (CI) |
-| `pnpm gen:component <name>` | Scaffold a new component |
-| `pnpm changeset` | Record a release intent |
+| Command                     | Purpose                                               |
+| --------------------------- | ----------------------------------------------------- |
+| `pnpm dev`                  | Run the docs site                                     |
+| `pnpm build`                | Build every package and app                           |
+| `pnpm test`                 | Unit tests                                            |
+| `pnpm lint`                 | Lint the workspace                                    |
+| `pnpm typecheck`            | Typecheck the workspace, including registry source    |
+| `pnpm gen`                  | Regenerate everything derived from component metadata |
+| `pnpm gen:check`            | Verify nothing generated is stale (CI)                |
+| `pnpm gen:component <name>` | Scaffold a new component                              |
+| `pnpm changeset`            | Record a release intent                               |
 
 ### Adding a component
 

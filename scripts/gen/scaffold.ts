@@ -26,7 +26,9 @@ function bail(message: string): never {
 
 if (!name) bail("Usage: pnpm gen:component <kebab-case-name>");
 if (!/^[a-z0-9]+(-[a-z0-9]+)*$/.test(name)) {
-  bail(`"${name}" must be kebab-case — it becomes the directory, the URL slug, and the registry item.`);
+  bail(
+    `"${name}" must be kebab-case — it becomes the directory, the URL slug, and the registry item.`,
+  );
 }
 
 /** vitals-trend → VitalsTrend */

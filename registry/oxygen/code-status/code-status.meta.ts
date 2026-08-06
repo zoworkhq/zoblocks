@@ -8,14 +8,14 @@ export default defineComponentMeta({
   since: "0.1.0",
   layer: "clinical",
 
-  summary: "Resuscitation status and directives. Unknown is loud, never a silent default to full code.",
-  description: "Resuscitation status, advance directives, and healthcare proxy. Unknown is a loud state, never a silent default to full code, and conflicting directives are surfaced rather than resolved.",
-  rationale: "The highest-consequence display in the library. A DNR order that is not visible during a code is a catastrophic failure of information design, and the failure mode is never a crash — it is a directive on file, one click away, that nobody found in eleven seconds. So unknown is a loud state rather than a default to full code, verification age is part of the status, and conflicting directives are surfaced as a question rather than resolved by silently picking the newer one.",
+  summary:
+    "Resuscitation status and directives. Unknown is loud, never a silent default to full code.",
+  description:
+    "Resuscitation status, advance directives, and healthcare proxy. Unknown is a loud state, never a silent default to full code, and conflicting directives are surfaced rather than resolved.",
+  rationale:
+    "The highest-consequence display in the library. A DNR order that is not visible during a code is a catastrophic failure of information design, and the failure mode is never a crash — it is a directive on file, one click away, that nobody found in eleven seconds. So unknown is a loud state rather than a default to full code, verification age is part of the status, and conflicting directives are surfaced as a question rather than resolved by silently picking the newer one.",
 
-  categories: [
-    "Patient identity",
-    "Clinical",
-  ],
+  categories: ["Patient identity", "Clinical"],
   fhir: [
     {
       name: "Consent",
@@ -40,7 +40,8 @@ export default defineComponentMeta({
     },
     {
       label: "Never colour alone",
-      detail: "Status is a full phrase; the DNR states are spelled out rather than abbreviated to a badge.",
+      detail:
+        "Status is a full phrase; the DNR states are spelled out rather than abbreviated to a badge.",
     },
     {
       label: "Reachable proxy",
@@ -66,22 +67,10 @@ export default defineComponentMeta({
     "Does not verify document validity across organisations.",
     "Status vocabulary is a fixed set; jurisdictional variants need mapping upstream.",
   ],
-  related: [
-    "patient-banner",
-    "precautions-bar",
-    "patient-snapshot",
-  ],
+  related: ["patient-banner", "precautions-bar", "patient-snapshot"],
 
-  dependencies: [
-    "@oxygenui-design/fhir@^0.1.0",
-    "lucide-react",
-    "clsx",
-    "tailwind-merge",
-  ],
-  registryDependencies: [
-    "utils",
-    "tokens",
-  ],
+  dependencies: ["@oxygenui-design/fhir@^0.1.0", "lucide-react", "clsx", "tailwind-merge"],
+  registryDependencies: ["utils", "tokens"],
 
   usage: `import { CodeStatus } from "@/components/oxygen/code-status";
 

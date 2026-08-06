@@ -33,9 +33,7 @@ const SUPPORT_ITEMS: BuildableItem[] = [
     description: "Class-name merge helper shared by every Oxygen component.",
     dependencies: ["clsx", "tailwind-merge"],
     registryDependencies: [] as string[],
-    files: [
-      { path: "registry/oxygen/lib/utils.ts", type: "registry:lib", target: "lib/utils.ts" },
-    ],
+    files: [{ path: "registry/oxygen/lib/utils.ts", type: "registry:lib", target: "lib/utils.ts" }],
   },
   {
     name: "tokens",
@@ -127,7 +125,10 @@ export async function emitRegistry(
   // Pro items are excluded from public output entirely — not marked, not
   // stubbed. The registry served from the CDN is the free catalog.
   const publicComponents = components.filter((c) => c.meta.tier === "free");
-  const items: BuildableItem[] = [...SUPPORT_ITEMS.map((i) => ({ ...i })), ...publicComponents.map(toBuildable)];
+  const items: BuildableItem[] = [
+    ...SUPPORT_ITEMS.map((i) => ({ ...i })),
+    ...publicComponents.map(toBuildable),
+  ];
 
   const published = new Set(items.map((i) => i.name));
   const built: Array<Record<string, unknown>> = [];
@@ -218,7 +219,10 @@ export async function emitRegistry(
   );
 
   for (const item of built) {
-    await emitter.emit(path.join(paths.registryOut, `${item.name as string}.json`), JSON.stringify(item, null, 2));
+    await emitter.emit(
+      path.join(paths.registryOut, `${item.name as string}.json`),
+      JSON.stringify(item, null, 2),
+    );
   }
 
   // A component removed from the repository must stop being served. Its JSON

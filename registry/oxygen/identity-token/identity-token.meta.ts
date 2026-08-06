@@ -8,14 +8,14 @@ export default defineComponentMeta({
   since: "0.1.0",
   layer: "primitive",
 
-  summary: "Compact, privacy-aware representation of a person, built around confirming rather than labelling.",
-  description: "Compact, privacy-aware representation of a person. Photos require asserted consent, deceased and restricted are text, and initials infer nothing demographic.",
-  rationale: "Wrong-patient error begins with an identity affordance that looked close enough. A photo renders only when consent is explicitly asserted — the component will not infer consent from a photo being present in the resource. A secondary identifier shows by default, because a name alone does not distinguish two people called J. Patel. Initials and colour derive from the characters of the name only; an avatar is not a classifier.",
+  summary:
+    "Compact, privacy-aware representation of a person, built around confirming rather than labelling.",
+  description:
+    "Compact, privacy-aware representation of a person. Photos require asserted consent, deceased and restricted are text, and initials infer nothing demographic.",
+  rationale:
+    "Wrong-patient error begins with an identity affordance that looked close enough. A photo renders only when consent is explicitly asserted — the component will not infer consent from a photo being present in the resource. A secondary identifier shows by default, because a name alone does not distinguish two people called J. Patel. Initials and colour derive from the characters of the name only; an avatar is not a classifier.",
 
-  categories: [
-    "Primitive",
-    "Patient identity",
-  ],
+  categories: ["Primitive", "Patient identity"],
   fhir: [
     {
       name: "Patient",
@@ -36,11 +36,13 @@ export default defineComponentMeta({
   a11y: [
     {
       label: "Full name never truncated",
-      detail: "The visible name may truncate; the accessible name carries the whole identity, age, identifier, and flags as one phrase.",
+      detail:
+        "The visible name may truncate; the accessible name carries the whole identity, age, identifier, and flags as one phrase.",
     },
     {
       label: "Flags as text",
-      detail: "Restricted and deceased are words, not icons a reader has to know. Photos carry empty alt because the adjacent name is the label.",
+      detail:
+        "Restricted and deceased are words, not icons a reader has to know. Photos carry empty alt because the adjacent name is the label.",
     },
     {
       label: "Name-alike announced",
@@ -66,22 +68,10 @@ export default defineComponentMeta({
     "Age precision uses birthDate only \\u2014 sub-day precision for neonates needs a birth time the resource rarely carries.",
     "Initial derivation is Latin-script-biased for multi-word names, though single tokens work in any script.",
   ],
-  related: [
-    "patient-banner",
-    "absent-value",
-    "restricted-shield",
-  ],
+  related: ["patient-banner", "absent-value", "restricted-shield"],
 
-  dependencies: [
-    "@oxygenui-design/fhir@^0.1.0",
-    "lucide-react",
-    "clsx",
-    "tailwind-merge",
-  ],
-  registryDependencies: [
-    "utils",
-    "tokens",
-  ],
+  dependencies: ["@oxygenui-design/fhir@^0.1.0", "lucide-react", "clsx", "tailwind-merge"],
+  registryDependencies: ["utils", "tokens"],
 
   usage: `import { IdentityToken } from "@/components/oxygen/identity-token";
 

@@ -22,11 +22,11 @@ architectural changes." That is only true if a brand is data.
 
 Three tiers, with a strict reference rule:
 
-| Tier | Example | May be referenced by |
-| --- | --- | --- |
-| Primitive | `--ox-ref-red-600` | semantic tokens only |
-| Semantic | `--ox-status-critical` | components |
-| Component | `--ox-badge-critical-bg` | its own component |
+| Tier      | Example                  | May be referenced by |
+| --------- | ------------------------ | -------------------- |
+| Primitive | `--ox-ref-red-600`       | semantic tokens only |
+| Semantic  | `--ox-status-critical`   | components           |
+| Component | `--ox-badge-critical-bg` | its own component    |
 
 Three axes: **brand** × **theme** (light, dark, high-contrast) × **density**
 (patient, standard, clinical). Density already exists as `data-ox-density` and

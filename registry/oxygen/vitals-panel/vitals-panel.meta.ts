@@ -8,14 +8,14 @@ export default defineComponentMeta({
   since: "0.1.0",
   layer: "clinical",
 
-  summary: "Results table with reference ranges and interpretation. Uninterpreted results stay uninterpreted.",
-  description: "Results table for FHIR R4 Observation resources. Renders values, units, reference ranges, and interpretation — with uninterpreted results shown as uninterpreted, never as normal.",
-  rationale: "Renders a set of Observation resources as a results list: value, units, reference range, and interpretation. The interpretation logic is the entire point. An interpretation stated in the payload always wins; absent one, it is derived only by comparing the value to its own reference range; with neither, the result reads “Not interpreted” rather than “Normal”. Silently defaulting an uninterpreted result to normal is how a UI manufactures false reassurance.",
+  summary:
+    "Results table with reference ranges and interpretation. Uninterpreted results stay uninterpreted.",
+  description:
+    "Results table for FHIR R4 Observation resources. Renders values, units, reference ranges, and interpretation — with uninterpreted results shown as uninterpreted, never as normal.",
+  rationale:
+    "Renders a set of Observation resources as a results list: value, units, reference range, and interpretation. The interpretation logic is the entire point. An interpretation stated in the payload always wins; absent one, it is derived only by comparing the value to its own reference range; with neither, the result reads “Not interpreted” rather than “Normal”. Silently defaulting an uninterpreted result to normal is how a UI manufactures false reassurance.",
 
-  categories: [
-    "Clinical data",
-    "Clinical",
-  ],
+  categories: ["Clinical data", "Clinical"],
   fhir: [
     {
       name: "Observation[]",
@@ -43,19 +43,23 @@ export default defineComponentMeta({
     },
     {
       label: "Critical announcement",
-      detail: "A live region states the critical count before the table is read, so severity is known up front rather than discovered on row seven.",
+      detail:
+        "A live region states the critical count before the table is read, so severity is known up front rather than discovered on row seven.",
     },
     {
       label: "Never color alone",
-      detail: "Every interpretation carries an icon and a text label. Critical rows add an inset rule — a second structural cue that survives grayscale and forced colors.",
+      detail:
+        "Every interpretation carries an icon and a text label. Critical rows add an inset rule — a second structural cue that survives grayscale and forced colors.",
     },
     {
       label: "Row activation",
-      detail: "When onSelect is provided, rows are focusable and respond to Enter and Space with a visible focus ring.",
+      detail:
+        "When onSelect is provided, rows are focusable and respond to Enter and Space with a visible focus ring.",
     },
     {
       label: "Multi-part results",
-      detail: "Blood pressure and other component-carried readings render each part as its own row, separately valued and separately flagged. The parent escalates to its worst component so a raised systolic is never hidden behind a silent panel.",
+      detail:
+        "Blood pressure and other component-carried readings render each part as its own row, separately valued and separately flagged. The parent escalates to its worst component so a raised systolic is never hidden behind a silent panel.",
     },
   ],
 
@@ -77,21 +81,10 @@ export default defineComponentMeta({
     "Component reference ranges are read from referenceRange[0], same as the parent.",
     "No built-in unit conversion. Values render in the units supplied.",
   ],
-  related: [
-    "patient-banner",
-  ],
+  related: ["patient-banner"],
 
-  dependencies: [
-    "@oxygenui-design/fhir@^0.1.0",
-    "lucide-react",
-    "clsx",
-    "tailwind-merge",
-  ],
-  registryDependencies: [
-    "utils",
-    "tokens",
-    "absent-value",
-  ],
+  dependencies: ["@oxygenui-design/fhir@^0.1.0", "lucide-react", "clsx", "tailwind-merge"],
+  registryDependencies: ["utils", "tokens", "absent-value"],
 
   usage: `import { ObservationPanel } from "@/components/oxygen/vitals-panel";
 

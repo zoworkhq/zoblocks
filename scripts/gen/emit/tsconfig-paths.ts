@@ -39,7 +39,9 @@ export async function emitTsconfigPaths(
     mappings[component.consumerSpecifier] = [`./${component.sourcePath.split("\\").join("/")}`];
   }
 
-  const ordered = Object.fromEntries(Object.entries(mappings).sort(([a], [b]) => a.localeCompare(b)));
+  const ordered = Object.fromEntries(
+    Object.entries(mappings).sort(([a], [b]) => a.localeCompare(b)),
+  );
 
   await emitter.emit(
     paths.tsconfigPaths,
@@ -47,7 +49,9 @@ export async function emitTsconfigPaths(
       {
         $schema: "https://json.schemastore.org/tsconfig",
         display: "Oxygen generated path mappings",
-        _generated: banner("//").split("\n").map((l) => l.replace(/^\/\/ ?/, "")),
+        _generated: banner("//")
+          .split("\n")
+          .map((l) => l.replace(/^\/\/ ?/, "")),
         compilerOptions: {
           baseUrl: ".",
           paths: ordered,

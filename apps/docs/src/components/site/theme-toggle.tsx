@@ -18,7 +18,11 @@ import { cn } from "@/lib/utils";
 
 type Theme = "light" | "dark" | "system";
 
-const OPTIONS: Array<{ value: Theme; label: string; icon: React.ComponentType<{ className?: string }> }> = [
+const OPTIONS: Array<{
+  value: Theme;
+  label: string;
+  icon: React.ComponentType<{ className?: string }>;
+}> = [
   { value: "light", label: "Light", icon: Sun },
   { value: "dark", label: "Dark", icon: Moon },
   { value: "system", label: "System", icon: Monitor },
@@ -78,9 +82,7 @@ export function ThemeToggle() {
             onClick={() => choose(option.value)}
             className={cn(
               "rounded-md p-1.5 transition-colors duration-200",
-              selected
-                ? "bg-paper-sunk text-ink"
-                : "text-graphite hover:text-ink",
+              selected ? "bg-paper-sunk text-ink" : "text-graphite hover:text-ink",
             )}
           >
             <Icon aria-hidden="true" className="size-3.5" />

@@ -9,13 +9,12 @@ export default defineComponentMeta({
   layer: "clinical",
 
   summary: "Everyone involved, and who is actually reachable now.",
-  description: "Everyone involved and who is actually reachable now. Coverage sits beside the assignment rather than replacing it, and non-clinical members are first-class.",
-  rationale: "The gap this closes is that the person on the record is frequently not the person to contact. A panel listing the assigned consultant at 2am with no indication they are off call is worse than no panel — it produces a confident call to a phone nobody is holding. So coverage sits beside the assignment rather than replacing it. Past members are kept as history, and caregivers, peer supports, and community health workers render with the same weight as clinicians, because in behavioral health and complex care they frequently are the team.",
+  description:
+    "Everyone involved and who is actually reachable now. Coverage sits beside the assignment rather than replacing it, and non-clinical members are first-class.",
+  rationale:
+    "The gap this closes is that the person on the record is frequently not the person to contact. A panel listing the assigned consultant at 2am with no indication they are off call is worse than no panel — it produces a confident call to a phone nobody is holding. So coverage sits beside the assignment rather than replacing it. Past members are kept as history, and caregivers, peer supports, and community health workers render with the same weight as clinicians, because in behavioral health and complex care they frequently are the team.",
 
-  categories: [
-    "Patient identity",
-    "Clinical",
-  ],
+  categories: ["Patient identity", "Clinical"],
   fhir: [
     {
       name: "CareTeam",
@@ -65,22 +64,10 @@ export default defineComponentMeta({
     "Participants without a display name are skipped rather than shown as unknown.",
     "Does not model team hierarchy; order is source order with the responsible clinician pinned.",
   ],
-  related: [
-    "identity-token",
-    "patient-snapshot",
-    "app-shell",
-  ],
+  related: ["identity-token", "patient-snapshot", "app-shell"],
 
-  dependencies: [
-    "@oxygenui-design/fhir@^0.1.0",
-    "lucide-react",
-    "clsx",
-    "tailwind-merge",
-  ],
-  registryDependencies: [
-    "utils",
-    "tokens",
-  ],
+  dependencies: ["@oxygenui-design/fhir@^0.1.0", "lucide-react", "clsx", "tailwind-merge"],
+  registryDependencies: ["utils", "tokens"],
 
   usage: `import { CareTeamPanel } from "@/components/oxygen/care-team";
 

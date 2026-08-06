@@ -9,13 +9,12 @@ export default defineComponentMeta({
   layer: "primitive",
 
   summary: "Who recorded this, when, from where, and whether it has been amended.",
-  description: "Who recorded a datum, when, from what source, and whether it has been amended. Separates event time from charting time and states an absent source rather than guessing.",
-  rationale: "Clinicians discount data they cannot source, and an amended result that looks identical to the original is a known harm pathway — both are solved by the same disclosure. It refuses to flatten three distinctions: when something happened versus when it was written, who observed it versus what typed it, and present versus absent provenance. Amendment is surfaced on the trigger itself, because a correction nobody opens is a correction nobody saw.",
+  description:
+    "Who recorded a datum, when, from what source, and whether it has been amended. Separates event time from charting time and states an absent source rather than guessing.",
+  rationale:
+    "Clinicians discount data they cannot source, and an amended result that looks identical to the original is a known harm pathway — both are solved by the same disclosure. It refuses to flatten three distinctions: when something happened versus when it was written, who observed it versus what typed it, and present versus absent provenance. Amendment is surfaced on the trigger itself, because a correction nobody opens is a correction nobody saw.",
 
-  categories: [
-    "Primitive",
-    "System",
-  ],
+  categories: ["Primitive", "System"],
   fhir: [
     {
       name: "Provenance",
@@ -66,22 +65,10 @@ export default defineComponentMeta({
     "Does not fetch version history \\u2014 it reports what the payload and meta carry.",
     "Amendment detection uses versionId and revision entities; systems that populate neither will read as unamended.",
   ],
-  related: [
-    "clinical-time",
-    "vitals-panel",
-    "absent-value",
-  ],
+  related: ["clinical-time", "vitals-panel", "absent-value"],
 
-  dependencies: [
-    "@oxygenui-design/fhir@^0.1.0",
-    "lucide-react",
-    "clsx",
-    "tailwind-merge",
-  ],
-  registryDependencies: [
-    "utils",
-    "tokens",
-  ],
+  dependencies: ["@oxygenui-design/fhir@^0.1.0", "lucide-react", "clsx", "tailwind-merge"],
+  registryDependencies: ["utils", "tokens"],
 
   usage: `import { ProvenanceTag } from "@/components/oxygen/provenance";
 
