@@ -10,8 +10,19 @@
   // runs it.
   "extends": ["./packages/tsconfig/base.json", "./tsconfig.generated.json"],
   "compilerOptions": {
-    "noEmit": true
+    "noEmit": true,
+    // jest-dom's matchers are added at runtime by test/setup.ts. TypeScript
+    // needs the augmentation listed explicitly, or every `toBeInTheDocument`
+    // is an error here while the tests themselves pass.
+    "types": ["vitest/globals", "@testing-library/jest-dom"]
   },
-  "include": ["scripts/**/*.ts", "registry/**/*.ts", "registry/**/*.tsx"],
+  "include": [
+    "scripts/**/*.ts",
+    "registry/**/*.ts",
+    "registry/**/*.tsx",
+    "test/**/*.ts",
+    "test/**/*.tsx",
+    "vitest.config.ts"
+  ],
   "exclude": ["node_modules", "**/dist", "**/.next"]
 }

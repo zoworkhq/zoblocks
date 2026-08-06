@@ -41,8 +41,10 @@ jobs:
       # every customer, and this is the cheapest check we have.
       #
       # `--strict` additionally fails when a component does not meet the bar for
-      # its declared stability tier. Switched on in Phase 2, once story and test
-      # infrastructure exists for it to check against.
+      # its declared stability tier. Half of that bar is now met: all 29
+      # components have test files (coverage.json reports withTest: 29). Stories
+      # are still at zero, so turning `--strict` on today would fail every
+      # component. It goes on when stories land.
       - name: Generate
         run: pnpm gen
 
@@ -87,6 +89,20 @@ jobs:
       - name: Typecheck
         run: pnpm typecheck
 
+      # Two layers, both required to pass:
+      #
+      #   `turbo run test`   — the workspace packages (FHIR helpers, and any
+      #                        package that adds tests later).
+      #   `pnpm test:registry` — the 29 registry components, rendered in jsdom
+      #                        against the source a customer actually receives.
+      #
+      # Every component asserts the safety claim it exists to make: an
+      # uninterpreted result never reads as normal, a comparator survives, an
+      # unknown code status never defaults to full code, a restricted record
+      # fails closed. Those are the failures that look fine in review.
+      #
+      # The registry half needs no build — the workspace packages resolve to
+      # their TypeScript sources — so it is safe to run here, ahead of Build.
       - name: Test
         run: pnpm test
 
