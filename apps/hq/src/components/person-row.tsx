@@ -2,6 +2,7 @@ import { approveUser, setUserRole, setUserStatus } from "@/lib/actions";
 import type { UserRole } from "@/db/schema";
 import { Avatar } from "./bits";
 import { DisableAccount } from "./disable-account";
+import { ResetLinkButton } from "./reset-link-button";
 
 export interface Person {
   id: string;
@@ -79,6 +80,8 @@ export function PersonRow({ person, selfId }: { person: Person; selfId: string }
                 Make {person.role === "admin" ? "member" : "admin"}
               </button>
             </form>
+
+            <ResetLinkButton userId={person.id} name={person.name} />
 
             {!isSelf && <DisableAccount userId={person.id} name={person.name} />}
           </>

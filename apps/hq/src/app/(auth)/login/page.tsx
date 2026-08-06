@@ -10,10 +10,10 @@ export const metadata = { title: "Sign in" };
 export default async function LoginPage({
   searchParams,
 }: {
-  searchParams: Promise<{ bootstrapped?: string }>;
+  searchParams: Promise<{ bootstrapped?: string; reset?: string }>;
 }) {
   if (await currentUser()) redirect("/tasks");
-  const { bootstrapped } = await searchParams;
+  const { bootstrapped, reset } = await searchParams;
 
   return (
     <>
@@ -28,6 +28,17 @@ export default async function LoginPage({
           className="mb-5 rounded-lg border border-[var(--ox-accent-border)] bg-[var(--ox-accent-subtle)] px-3 py-2.5 text-[0.8125rem] leading-snug text-ink"
         >
           Admin account created. Sign in — every later signup waits for your approval.
+        </p>
+      )}
+
+      {/* Without this the reset flow ends on a bare sign-in form with no
+          confirmation that anything happened. */}
+      {reset && (
+        <p
+          role="status"
+          className="mb-5 rounded-lg border border-rule bg-vellum px-3 py-2.5 text-[0.8125rem] leading-snug text-ink"
+        >
+          Password updated. Sign in with your new password.
         </p>
       )}
 

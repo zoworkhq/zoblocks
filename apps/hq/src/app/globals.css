@@ -106,6 +106,25 @@
     padding: 0.25rem 0.75rem 0.25rem 0.5rem;
     border-bottom: 1px solid var(--color-rule-soft);
     transition: background-color 100ms ease;
+    /* Anchor for row-level popovers. Anything revealed inside a row has to
+       overlay it — laid out inline, a panel wide enough to hold a URL wraps
+       the meta cluster and squeezes the name column to an ellipsis. */
+    position: relative;
+  }
+
+  .row-popover {
+    position: absolute;
+    right: 0.5rem;
+    top: calc(100% - 0.25rem);
+    z-index: 20;
+    width: min(22rem, calc(100vw - 2rem));
+    border: 1px solid var(--color-rule);
+    border-radius: 8px;
+    background: var(--color-paper);
+    padding: 0.5rem;
+    box-shadow:
+      0 1px 2px rgb(15 23 42 / 0.06),
+      0 8px 24px -8px rgb(15 23 42 / 0.18);
   }
 
   .list-row:hover {

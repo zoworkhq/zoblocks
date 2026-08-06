@@ -81,6 +81,53 @@ export const sessions = pgTable(
   (t) => [index("sessions_user_idx").on(t.userId)],
 );
 
+/**
+ * Single-use password reset grants, issued by an admin.
+ *
+ * There is no mail service here, so the usual "email me a link" flow does not
+ * exist. An admin mints a link and hands it over in person or over whatever
+ * channel they already trust — which for a team this size is a stronger
+ * identity check than an email inbox anyway.
+ *
+ * `id` is a SHA-256 of the token, never the token itself. `usedAt` makes the
+ * grant single-use rather than replayable for its whole lifetime.
+ */
+export const passwordResets = pgTable(
+  "password_resets",
+  {
+    id: text("id").primaryKey(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+    usedAt: timestamp("used_at", { withTimezone: true }),
+    createdBy: uuid("created_by").references(() => users.id, { onDelete: "set null" }),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index("password_resets_user_idx").on(t.userId)],
+);
+
+/**
+ * Failed sign-in attempts, for throttling.
+ *
+ * Keyed by a string rather than a user id so the same table can hold both
+ * "email:someone@example.com" and "ip:1.2.3.4". Throttling only by account
+ * lets anyone lock a colleague out by guessing at their address; throttling
+ * only by address lets a single attacker walk the whole user list from one
+ * connection. Both keys are counted, and either one can trip.
+ *
+ * Rows are recorded for failures only, and cleared on success.
+ */
+export const loginAttempts = pgTable(
+  "login_attempts",
+  {
+    id: serial("id").primaryKey(),
+    key: text("key").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index("login_attempts_key_idx").on(t.key, t.createdAt)],
+);
+
 export const projects = pgTable(
   "projects",
   {

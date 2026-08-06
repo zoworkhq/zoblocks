@@ -50,9 +50,12 @@ export function Shell({
       }
       actions={
         <form action={signOut} className="flex items-center gap-4">
-          <span className="hidden text-[0.75rem] text-[var(--ox-text-muted)] sm:inline">
+          <a
+            href="/account"
+            className="hidden rounded-md px-2 py-1.5 text-[0.75rem] text-[var(--ox-text-muted)] no-underline transition-colors hover:text-[var(--ox-text)] sm:inline"
+          >
             {userName}
-          </span>
+          </a>
           <button
             type="submit"
             className="inline-flex items-center gap-1.5 rounded-md px-2 py-1.5 text-[0.75rem] text-[var(--ox-text-muted)] transition-colors hover:text-[var(--ox-text)]"

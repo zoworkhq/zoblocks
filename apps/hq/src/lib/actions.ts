@@ -6,7 +6,20 @@ import { and, count, eq, sql } from "drizzle-orm";
 import { z } from "zod";
 import { db } from "@/db/client";
 import { activity, comments, tasks, users } from "@/db/schema";
-import { createSession, currentUser, destroySession, hashPassword, verifyPassword } from "./auth";
+import {
+  changePassword,
+  clearFailures,
+  consumePasswordReset,
+  createPasswordReset,
+  createSession,
+  currentSessionToken,
+  currentUser,
+  destroySession,
+  hashPassword,
+  isThrottled,
+  recordFailure,
+  verifyPassword,
+} from "./auth";
 
 /** One message for every failure mode, so the form cannot enumerate accounts. */
 const SIGNIN_FAILED = "That email and password combination is not recognised.";
@@ -29,7 +42,7 @@ const signupInput = z.object({
   name: z.string().trim().min(2, "Enter your full name."),
 });
 
-export type FormState = { error?: string; notice?: string };
+export type FormState = { error?: string; notice?: string; link?: string };
 
 export async function signUp(_prev: FormState, form: FormData): Promise<FormState> {
   const parsed = signupInput.safeParse({
@@ -82,6 +95,13 @@ export async function signIn(_prev: FormState, form: FormData): Promise<FormStat
   if (!parsed.success) return { error: SIGNIN_FAILED };
   const { email, password } = parsed.data;
 
+  // Checked before the password, so a guessing run costs nothing to refuse.
+  if (await isThrottled(email)) {
+    return {
+      error: "Too many failed attempts. Wait a few minutes and try again.",
+    };
+  }
+
   const rows = await db()
     .select()
     .from(users)
@@ -95,12 +115,19 @@ export async function signIn(_prev: FormState, form: FormData): Promise<FormStat
     user?.passwordHash ?? "$2a$12$invalidinvalidinvalidinvalidinvalidinvalidinvalidinvalidin";
   const ok = await verifyPassword(password, hash);
 
-  if (!user || !ok) return { error: SIGNIN_FAILED };
+  if (!user || !ok) {
+    await recordFailure(email);
+    return { error: SIGNIN_FAILED };
+  }
   if (user.status === "pending") {
     return { error: "This account is waiting for an admin to approve it." };
   }
-  if (user.status === "disabled") return { error: SIGNIN_FAILED };
+  if (user.status === "disabled") {
+    await recordFailure(email);
+    return { error: SIGNIN_FAILED };
+  }
 
+  await clearFailures(email);
   await createSession(user.id);
   redirect("/tasks");
 }
@@ -360,6 +387,81 @@ export async function approveUser(form: FormData): Promise<void> {
     .where(eq(users.id, userId));
 
   revalidatePath("/admin/people");
+}
+
+/**
+ * Mint a reset link for someone who is locked out.
+ *
+ * The link is returned to the admin's screen and never sent anywhere — there
+ * is no mail service, and for a team this size handing it over on a channel you
+ * already trust is a stronger identity check than an inbox. It is shown once;
+ * only its hash is stored, so it cannot be looked up later.
+ */
+export async function issuePasswordReset(_prev: FormState, form: FormData): Promise<FormState> {
+  const admin = await requireAdmin();
+  const userId = z.string().uuid().parse(form.get("userId"));
+
+  const rows = await db()
+    .select({ name: users.name, status: users.status })
+    .from(users)
+    .where(eq(users.id, userId))
+    .limit(1);
+  const target = rows[0];
+  if (!target) return { error: "That account no longer exists." };
+  if (target.status !== "active") {
+    return { error: "Approve or re-enable the account first — a reset cannot revive it." };
+  }
+
+  const { token } = await createPasswordReset(userId, admin.id);
+  // Relative on purpose: the admin's own origin is the right one, and building
+  // an absolute URL would need a base that differs per environment.
+  return {
+    link: `/reset/${token}`,
+    notice: `One-time link for ${target.name}, valid for 1 hour. It is shown once.`,
+  };
+}
+
+/** Public: spends a reset grant. Rejects a spent, expired, or unknown token. */
+export async function resetPassword(_prev: FormState, form: FormData): Promise<FormState> {
+  const token = z.string().min(1).safeParse(form.get("token"));
+  const password = z
+    .string()
+    .min(12, "Use at least 12 characters.")
+    .safeParse(form.get("password"));
+  const confirm = form.get("confirm");
+
+  if (!token.success) return { error: "This link is not valid." };
+  if (!password.success) {
+    return { error: password.error.issues[0]?.message ?? "Check the form and try again." };
+  }
+  if (password.data !== confirm) return { error: "The two passwords do not match." };
+
+  const ok = await consumePasswordReset(token.data, password.data);
+  if (!ok) {
+    return { error: "This link has expired or has already been used. Ask an admin for a new one." };
+  }
+
+  redirect("/login?reset=1");
+}
+
+/** Signed-in change. Requires the current password, so a borrowed screen is not enough. */
+export async function changeOwnPassword(_prev: FormState, form: FormData): Promise<FormState> {
+  const user = await requireUser();
+
+  const current = z.string().min(1).safeParse(form.get("current"));
+  const next = z.string().min(12, "Use at least 12 characters.").safeParse(form.get("password"));
+  if (!current.success) return { error: "Enter your current password." };
+  if (!next.success) {
+    return { error: next.error.issues[0]?.message ?? "Check the form and try again." };
+  }
+  if (next.data !== form.get("confirm")) return { error: "The two passwords do not match." };
+
+  const keep = await currentSessionToken();
+  const ok = await changePassword(user.id, current.data, next.data, keep);
+  if (!ok) return { error: "That current password is not right." };
+
+  await clearFailures(user.email.toLowerCase());
+  return { notice: "Password changed. Any other devices have been signed out." };
 }
 
 export async function setUserRole(form: FormData): Promise<void> {
