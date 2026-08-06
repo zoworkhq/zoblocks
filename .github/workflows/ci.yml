@@ -211,9 +211,9 @@ jobs:
             echo "::error::VERCEL_TOKEN is not set. Add it under Settings → Secrets → Actions."
             exit 1
           fi
-          pnpm dlx vercel@48 pull --yes --environment=production
-          pnpm dlx vercel@48 build --prod
-          url=$(pnpm dlx vercel@48 deploy --prebuilt --prod)
+          pnpm dlx vercel@48 pull --yes --environment=production --token "$VERCEL_TOKEN"
+          pnpm dlx vercel@48 build --prod --token "$VERCEL_TOKEN"
+          url=$(pnpm dlx vercel@48 deploy --prebuilt --prod --token "$VERCEL_TOKEN")
           echo "Deployed: $url"
           echo "### Docs deployed" >> "$GITHUB_STEP_SUMMARY"
           echo "$url" >> "$GITHUB_STEP_SUMMARY"
@@ -289,16 +289,18 @@ jobs:
           VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID_HQ }}
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
         run: |
-          # Same guard the docs job carries. Without it, a missing token
-          # surfaces as a Vercel CLI error about a project it cannot read,
-          # which sends you looking at the project instead of the secret.
+          # The token is passed with --token on every call. The CLI does not
+          # read VERCEL_TOKEN from the environment for these commands, and
+          # relying on that produced "No existing credentials found" with the
+          # secret correctly set — a failure that reads like a missing secret
+          # and is not one.
           if [ -z "${VERCEL_TOKEN:-}" ]; then
             echo "::error::VERCEL_TOKEN is not set. Add it under Settings → Secrets → Actions."
             exit 1
           fi
-          pnpm dlx vercel@48 pull --yes --environment=production
-          pnpm dlx vercel@48 build --prod
-          url=$(pnpm dlx vercel@48 deploy --prebuilt --prod)
+          pnpm dlx vercel@48 pull --yes --environment=production --token "$VERCEL_TOKEN"
+          pnpm dlx vercel@48 build --prod --token "$VERCEL_TOKEN"
+          url=$(pnpm dlx vercel@48 deploy --prebuilt --prod --token "$VERCEL_TOKEN")
           echo "Deployed: $url"
 
       # Signed out, hq must redirect to its own sign-in rather than render
@@ -343,8 +345,8 @@ jobs:
             echo "VERCEL_TOKEN not set — skipping preview." >> "$GITHUB_STEP_SUMMARY"
             exit 0
           fi
-          pnpm dlx vercel@48 pull --yes --environment=preview
-          pnpm dlx vercel@48 build
-          url=$(pnpm dlx vercel@48 deploy --prebuilt)
+          pnpm dlx vercel@48 pull --yes --environment=preview --token "$VERCEL_TOKEN"
+          pnpm dlx vercel@48 build --token "$VERCEL_TOKEN"
+          url=$(pnpm dlx vercel@48 deploy --prebuilt --token "$VERCEL_TOKEN")
           echo "### Preview" >> "$GITHUB_STEP_SUMMARY"
           echo "$url" >> "$GITHUB_STEP_SUMMARY"
