@@ -13,7 +13,13 @@
 import type { ComponentDoc } from "@oxygenui-design/component-meta";
 import { BY_NAME, CATALOG } from "./generated/catalog";
 
-export type { ComponentDoc, ComponentExportDoc, PropDoc, Stability, Tier } from "@oxygenui-design/component-meta";
+export type {
+  ComponentDoc,
+  ComponentExportDoc,
+  PropDoc,
+  Stability,
+  Tier,
+} from "@oxygenui-design/component-meta";
 export { STATUS_LABEL, STATUS_CONTRACT } from "@oxygenui-design/component-meta";
 export { CATALOG, ALL_CATEGORIES } from "./generated/catalog";
 

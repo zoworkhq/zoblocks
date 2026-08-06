@@ -21,19 +21,19 @@ well at that size. Three properties of it do not survive multiplication.
 
 ### 1.1 Adding one component edits five shared files
 
-| File | Per-component work today | Line count at 500 |
-| --- | --- | --- |
-| `registry.json` | hand-written entry | ~25,000 |
-| `apps/docs/src/lib/catalog.ts` | hand-written metadata, ~70 lines each | ~35,000 |
-| `tsconfig.json` `paths` | one mapping per shared component | — |
-| `apps/docs/src/app/globals.css` `@source` | one entry per new directory | — |
-| `apps/docs/src/app/page.tsx` | catalog listing | — |
+| File                                      | Per-component work today              | Line count at 500 |
+| ----------------------------------------- | ------------------------------------- | ----------------- |
+| `registry.json`                           | hand-written entry                    | ~25,000           |
+| `apps/docs/src/lib/catalog.ts`            | hand-written metadata, ~70 lines each | ~35,000           |
+| `tsconfig.json` `paths`                   | one mapping per shared component      | —                 |
+| `apps/docs/src/app/globals.css` `@source` | one entry per new directory           | —                 |
+| `apps/docs/src/app/page.tsx`              | catalog listing                       | —                 |
 
 Each of those files carries a comment telling the next author to remember to
 update it. That is the correct response at 24 components and the wrong one at
 500: five shared files edited by every contributor is a merge-conflict
 generator, and "remember to" is not a mechanism. Two of them — `tsconfig.json`
-and `globals.css` — fail *silently*, producing components that typecheck but
+and `globals.css` — fail _silently_, producing components that typecheck but
 render unstyled.
 
 **The architecture's central move is to invert this.** Metadata is authored once
@@ -64,7 +64,7 @@ display components it is a liability, and enterprise procurement will ask about
 it directly.
 
 Copy-source is a genuinely good product property and the README is right to sell
-it. It just cannot be the *only* channel.
+it. It just cannot be the _only_ channel.
 
 **Decision: npm becomes the source of truth; the registry becomes a generated
 projection of it.** Both ship from the same files. Customers choose whether they
@@ -88,7 +88,7 @@ These are all cheaper to establish at 24 components than at 100.
 ## 2. Layer model
 
 Clean architecture applied to a component library means dependencies point in
-one direction, and the direction is *away from the domain*. Clinical knowledge
+one direction, and the direction is _away from the domain_. Clinical knowledge
 sits at the bottom as data and types; rendering sits above it; composition above
 that.
 
@@ -262,7 +262,7 @@ scaffolds it; nothing shared is edited by hand.
 ### 4.3 Import direction is fixed
 
 Today, registry source is written with consumer-shaped specifiers
-(`@/lib/utils`, `@/components/oxygen/status-badge`) and mapped *backwards* via
+(`@/lib/utils`, `@/components/oxygen/status-badge`) and mapped _backwards_ via
 root `tsconfig.json` paths so it typechecks in this repo. That is the reason the
 path map needs a manual entry per shared component.
 
@@ -278,13 +278,13 @@ a test, rather than a growing hand-maintained map.
 
 ### 5.1 Two channels, one source
 
-| | npm | Registry (shadcn CLI) |
-| --- | --- | --- |
-| Upgrade path | semver, patches, codemods | none — the customer has forked |
-| Security fixes reach customers | yes | no |
-| Customer can read and edit | yes (node_modules) | yes (their repo, permanently) |
-| Deprecation warnings | yes, dev-only | no |
-| Recommended for | production applications | teams that want to own the code |
+|                                | npm                       | Registry (shadcn CLI)           |
+| ------------------------------ | ------------------------- | ------------------------------- |
+| Upgrade path                   | semver, patches, codemods | none — the customer has forked  |
+| Security fixes reach customers | yes                       | no                              |
+| Customer can read and edit     | yes (node_modules)        | yes (their repo, permanently)   |
+| Deprecation warnings           | yes, dev-only             | no                              |
+| Recommended for                | production applications   | teams that want to own the code |
 
 Both are generated from the same source. The registry output is a build
 artifact, not a hand-maintained parallel copy.
@@ -335,10 +335,10 @@ themes each want a different output from the same data.
 
 Tokens are authored as W3C DTCG-format JSON and built to every output.
 
-| Tier | Example | Who references it |
-| --- | --- | --- |
-| **Primitive** | `--ox-ref-red-600` | nothing outside the token build |
-| **Semantic** | `--ox-status-critical` | components |
+| Tier          | Example                  | Who references it                |
+| ------------- | ------------------------ | -------------------------------- |
+| **Primitive** | `--ox-ref-red-600`       | nothing outside the token build  |
+| **Semantic**  | `--ox-status-critical`   | components                       |
 | **Component** | `--ox-badge-critical-bg` | one component, an override point |
 
 Components reference semantic tokens only. This is already the repo's stated
@@ -378,16 +378,16 @@ The current state is one test file and a page-level axe run. The target is a
 pyramid where **test count scales with component count automatically**, because
 most of it derives from stories rather than from separately authored tests.
 
-| Level | Tool | Scope |
-| --- | --- | --- |
-| Unit | Vitest + Testing Library | every component; logic and rendering |
-| Interaction | Storybook play functions | keyboard paths, focus, state transitions |
-| Accessibility | axe on every story | × 2 themes × 3 densities, plus forced-colors |
-| Visual regression | Playwright screenshots | every story × theme × density |
-| Type | `expect-type` | public prop contracts — catches silent API breakage |
-| API surface | `api-extractor` | committed report; a diff is a required review |
-| Bundle | `size-limit` | per subpath and per barrel, fails on regression |
-| E2E | Playwright | docs site + a reference application |
+| Level             | Tool                     | Scope                                               |
+| ----------------- | ------------------------ | --------------------------------------------------- |
+| Unit              | Vitest + Testing Library | every component; logic and rendering                |
+| Interaction       | Storybook play functions | keyboard paths, focus, state transitions            |
+| Accessibility     | axe on every story       | × 2 themes × 3 densities, plus forced-colors        |
+| Visual regression | Playwright screenshots   | every story × theme × density                       |
+| Type              | `expect-type`            | public prop contracts — catches silent API breakage |
+| API surface       | `api-extractor`          | committed report; a diff is a required review       |
+| Bundle            | `size-limit`             | per subpath and per barrel, fails on regression     |
+| E2E               | Playwright               | docs site + a reference application                 |
 
 Two details that matter more than the list:
 
@@ -410,12 +410,12 @@ is how the standard holds without a human reviewing 500 components.
 
 `status` in `*.meta.ts` is a contract with consumers, not a label:
 
-| Status | Export path | Breaking-change policy |
-| --- | --- | --- |
-| `experimental` | `@oxygenui-design/react/experimental` | may break in any minor |
-| `beta` | main barrel, flagged in docs | may break in a minor, with a changeset note |
-| `stable` | main barrel | breaks only in a major |
-| `deprecated` | main barrel, dev-time warning | removed in the next major |
+| Status         | Export path                           | Breaking-change policy                      |
+| -------------- | ------------------------------------- | ------------------------------------------- |
+| `experimental` | `@oxygenui-design/react/experimental` | may break in any minor                      |
+| `beta`         | main barrel, flagged in docs          | may break in a minor, with a changeset note |
+| `stable`       | main barrel                           | breaks only in a major                      |
+| `deprecated`   | main barrel, dev-time warning         | removed in the next major                   |
 
 Routing experimental components through a separate export path is what lets the
 library ship new ideas without either freezing them prematurely or making the
@@ -556,6 +556,7 @@ Ordered by what unblocks the most and by what gets more expensive the longer it
 waits.
 
 ### Phase 0 — stop the bleeding — **implemented**
+
 Component metadata colocated as `*.meta.ts` for all 29 components; props
 extracted from TypeScript types; generators for `registry.json`, the docs
 catalog, tsconfig path mappings, the Tailwind source list, `llms.txt`, and the
@@ -582,20 +583,24 @@ enforcing (`--strict`), because the story and test infrastructure it checks
 against arrives in Phase 2.
 
 ### Phase 1 — foundations
+
 Token pipeline with the three-tier model and brand/theme/density axes. Package
 topology: `@oxygenui-design/utils`, `@oxygenui-design/system`, `@oxygenui-design/primitives`, and
 `@oxygenui-design/react` carved out; import direction reversed so the registry
 generator rewrites specifiers rather than tsconfig mapping them back.
 
 ### Phase 2 — quality infrastructure
+
 Storybook, Vitest workspace, per-story a11y, visual regression, API surface
 reports, bundle budgets, coverage manifest gate.
 
 ### Phase 3 — commercial readiness
+
 npm channel live with semver and codemods; Pro boundary and licensed
 distribution; provenance and SBOM; support-window policy published.
 
 ### Phase 4 — internationalisation
+
 `@oxygenui-design/intl` and the message-catalog retrofit across the catalog. Kept as a
 distinct phase because it is mechanical and wide, but it must not slip past
 roughly 50 components.

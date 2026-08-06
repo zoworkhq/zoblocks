@@ -30,47 +30,47 @@ export default function ProPage() {
         <section className="border-b border-rule">
           <div className="mx-auto grid max-w-6xl section-major gap-10 px-5 sm:px-8 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)] lg:items-end lg:gap-16">
             <div>
-            <p className="eyebrow eyebrow-rule text-oxygen-deep" data-reveal>
-              Oxygen Pro
-            </p>
-            <h1 className="display-xl mt-5 max-w-4xl text-balance" data-reveal>
-              Whole products, not just components.
-            </h1>
-            <p className="lede mt-6 max-w-2xl text-pretty" data-reveal>
-              Core gets you a component. Pro gets you the information architecture, the routes, the
-              empty states, and the fixtures — a healthcare product you can hand to a clinician on
-              day one instead of week six.
-            </p>
+              <p className="eyebrow eyebrow-rule text-oxygen-deep" data-reveal>
+                Oxygen Pro
+              </p>
+              <h1 className="display-xl mt-5 max-w-4xl text-balance" data-reveal>
+                Whole products, not just components.
+              </h1>
+              <p className="lede mt-6 max-w-2xl text-pretty" data-reveal>
+                Core gets you a component. Pro gets you the information architecture, the routes,
+                the empty states, and the fixtures — a healthcare product you can hand to a
+                clinician on day one instead of week six.
+              </p>
 
-            <div className="mt-8 flex flex-wrap gap-3" data-reveal>
-              <a
-                href="#pricing"
-                className="group inline-flex items-center gap-2 rounded-xl bg-cta px-5 py-3.5 text-sm font-medium text-paper transition-all duration-300 ease-[var(--ease-out-expo)] hover:-translate-y-0.5 hover:opacity-90"
-              >
-                See pricing
-                <ArrowRight
-                  aria-hidden="true"
-                  className="size-4 transition-transform duration-300 ease-[var(--ease-out-expo)] group-hover:translate-x-0.5"
-                />
-              </a>
-              <Link
-                href="/components"
-                className="inline-flex items-center gap-2 rounded-xl border border-rule px-5 py-3.5 text-sm font-medium text-ink transition-all duration-300 ease-[var(--ease-out-expo)] hover:-translate-y-0.5 hover:border-oxygen/40"
-              >
-                Start free with Core
-              </Link>
-            </div>
+              <div className="mt-8 flex flex-wrap gap-3" data-reveal>
+                <a
+                  href="#pricing"
+                  className="group inline-flex items-center gap-2 rounded-xl bg-cta px-5 py-3.5 text-sm font-medium text-paper transition-all duration-300 ease-[var(--ease-out-expo)] hover:-translate-y-0.5 hover:opacity-90"
+                >
+                  See pricing
+                  <ArrowRight
+                    aria-hidden="true"
+                    className="size-4 transition-transform duration-300 ease-[var(--ease-out-expo)] group-hover:translate-x-0.5"
+                  />
+                </a>
+                <Link
+                  href="/components"
+                  className="inline-flex items-center gap-2 rounded-xl border border-rule px-5 py-3.5 text-sm font-medium text-ink transition-all duration-300 ease-[var(--ease-out-expo)] hover:-translate-y-0.5 hover:border-oxygen/40"
+                >
+                  Start free with Core
+                </Link>
+              </div>
 
-            {/* Said up front, not buried in the FAQ. A team that discovers
+              {/* Said up front, not buried in the FAQ. A team that discovers
                 this at checkout will not come back. */}
-            <p
-              className="mt-8 max-w-2xl rounded-xl border border-rule bg-paper-sunk px-4 py-3 text-sm leading-relaxed text-graphite"
-              data-reveal
-            >
-              <strong className="text-ink">Pre-launch.</strong> The catalog is eight components and
-              the first starter kit is still in build. The waitlist is free and nothing is charged
-              until a kit actually ships.
-            </p>
+              <p
+                className="mt-8 max-w-2xl rounded-xl border border-rule bg-paper-sunk px-4 py-3 text-sm leading-relaxed text-graphite"
+                data-reveal
+              >
+                <strong className="text-ink">Pre-launch.</strong> The catalog is eight components
+                and the first starter kit is still in build. The waitlist is free and nothing is
+                charged until a kit actually ships.
+              </p>
             </div>
 
             {/* Right column carried the same emptiness as every other hero. */}
@@ -78,10 +78,19 @@ export default function ProPage() {
               <div className="ticks mb-5 opacity-70" aria-hidden="true" />
               {[
                 { label: "Launch kits", value: TEMPLATES.length },
-                { label: "Screens across kits", value: TEMPLATES.reduce((n, t) => n + t.screens.length, 0) },
-                { label: "Built on components", value: new Set(TEMPLATES.flatMap((t) => t.uses)).size },
+                {
+                  label: "Screens across kits",
+                  value: TEMPLATES.reduce((n, t) => n + t.screens.length, 0),
+                },
+                {
+                  label: "Built on components",
+                  value: new Set(TEMPLATES.flatMap((t) => t.uses)).size,
+                },
               ].map((stat) => (
-                <div key={stat.label} className="flex items-baseline justify-between border-b border-rule/70 py-2.5">
+                <div
+                  key={stat.label}
+                  className="flex items-baseline justify-between border-b border-rule/70 py-2.5"
+                >
                   <dt className="axis-label">{stat.label}</dt>
                   <dd className="numeric text-2xl font-semibold text-oxygen-deep">{stat.value}</dd>
                 </div>

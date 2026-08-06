@@ -8,14 +8,14 @@ export default defineComponentMeta({
   since: "0.1.0",
   layer: "pattern",
 
-  summary: "Two-step confirmation that names the consequence and the patient, then emits an audit event.",
-  description: "Two-step confirmation for consequential clinical actions. States the specific consequence and names the patient, escalates friction for irreversible actions, and emits a structured audit event.",
-  rationale: "The copy rule is the whole component: it states what will happen, to whom, and what cannot be undone. “Are you sure?” is not a confirmation — it asks the reader to re-derive the consequence they were already unsure about, which is why consequence and patientName exist as props. Friction is calibrated rather than maximised: too little and wrong-patient actions happen, too much and clinicians route around the system, which is worse because it moves the work somewhere you cannot see.",
+  summary:
+    "Two-step confirmation that names the consequence and the patient, then emits an audit event.",
+  description:
+    "Two-step confirmation for consequential clinical actions. States the specific consequence and names the patient, escalates friction for irreversible actions, and emits a structured audit event.",
+  rationale:
+    "The copy rule is the whole component: it states what will happen, to whom, and what cannot be undone. “Are you sure?” is not a confirmation — it asks the reader to re-derive the consequence they were already unsure about, which is why consequence and patientName exist as props. Friction is calibrated rather than maximised: too little and wrong-patient actions happen, too much and clinicians route around the system, which is worse because it moves the work somewhere you cannot see.",
 
-  categories: [
-    "Primitive",
-    "System",
-  ],
+  categories: ["Primitive", "System"],
   fhir: [
     {
       name: "AuditEvent",
@@ -35,11 +35,13 @@ export default defineComponentMeta({
   a11y: [
     {
       label: "Focus managed",
-      detail: "Focus moves into the dialog on open and returns to the trigger on dismiss. Escape always exits.",
+      detail:
+        "Focus moves into the dialog on open and returns to the trigger on dismiss. Escape always exits.",
     },
     {
       label: "Consequence in the description",
-      detail: "The dialog is an alertdialog whose accessible description carries the consequence and the patient name, not just visible text.",
+      detail:
+        "The dialog is an alertdialog whose accessible description carries the consequence and the patient name, not just visible text.",
     },
     {
       label: "Hold has a keyboard path",
@@ -65,20 +67,10 @@ export default defineComponentMeta({
     "No re-authentication step \\u2014 compose one around it where policy requires.",
     "Focus is managed but not fully trapped; a portal-based dialog is the next step.",
   ],
-  related: [
-    "restricted-shield",
-    "status-badge",
-  ],
+  related: ["restricted-shield", "status-badge"],
 
-  dependencies: [
-    "lucide-react",
-    "clsx",
-    "tailwind-merge",
-  ],
-  registryDependencies: [
-    "utils",
-    "tokens",
-  ],
+  dependencies: ["lucide-react", "clsx", "tailwind-merge"],
+  registryDependencies: ["utils", "tokens"],
 
   usage: `import { ActionGate } from "@/components/oxygen/action-gate";
 

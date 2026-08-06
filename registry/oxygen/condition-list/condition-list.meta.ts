@@ -8,14 +8,14 @@ export default defineComponentMeta({
   since: "0.1.0",
   layer: "clinical",
 
-  summary: "Problem list that separates active from resolved and never promotes a provisional diagnosis.",
-  description: "Problem list from FHIR Condition resources. Separates active from resolved, preserves vague onset as recorded, and never presents a provisional diagnosis as confirmed.",
-  rationale: "Renders a problem list from Condition resources. A problem list is not a log — its value comes from the reader telling at a glance which problems are current, so resolved and inactive entries are grouped separately rather than merely sorted below. Onset renders exactly as recorded: FHIR permits onsetString (“in childhood”) alongside onsetDateTime, and coercing a vague onset into a false precise date is a common and quietly damaging bug.",
+  summary:
+    "Problem list that separates active from resolved and never promotes a provisional diagnosis.",
+  description:
+    "Problem list from FHIR Condition resources. Separates active from resolved, preserves vague onset as recorded, and never presents a provisional diagnosis as confirmed.",
+  rationale:
+    "Renders a problem list from Condition resources. A problem list is not a log — its value comes from the reader telling at a glance which problems are current, so resolved and inactive entries are grouped separately rather than merely sorted below. Onset renders exactly as recorded: FHIR permits onsetString (“in childhood”) alongside onsetDateTime, and coercing a vague onset into a false precise date is a common and quietly damaging bug.",
 
-  categories: [
-    "Clinical data",
-    "Clinical",
-  ],
+  categories: ["Clinical data", "Clinical"],
   fhir: [
     {
       name: "Condition",
@@ -38,15 +38,18 @@ export default defineComponentMeta({
   a11y: [
     {
       label: "Native disclosure",
-      detail: "The inactive group uses details/summary, so it is keyboard operable and announced without custom ARIA.",
+      detail:
+        "The inactive group uses details/summary, so it is keyboard operable and announced without custom ARIA.",
     },
     {
       label: "Provisional is labelled",
-      detail: "Provisional and differential diagnoses carry an explicit badge rather than a subtle style difference.",
+      detail:
+        "Provisional and differential diagnoses carry an explicit badge rather than a subtle style difference.",
     },
     {
       label: "Onset honesty",
-      detail: "A vague onset renders as its recorded text; a missing one renders as explicitly not recorded.",
+      detail:
+        "A vague onset renders as its recorded text; a missing one renders as explicitly not recorded.",
     },
   ],
 
@@ -68,22 +71,10 @@ export default defineComponentMeta({
     "No grouping by category (problem list item vs encounter diagnosis).",
     "Severity is matched on display text; coded severity value sets are not yet mapped.",
   ],
-  related: [
-    "allergy-list",
-    "medication-card",
-  ],
+  related: ["allergy-list", "medication-card"],
 
-  dependencies: [
-    "@oxygenui-design/fhir@^0.1.0",
-    "lucide-react",
-    "clsx",
-    "tailwind-merge",
-  ],
-  registryDependencies: [
-    "utils",
-    "tokens",
-    "status-badge",
-  ],
+  dependencies: ["@oxygenui-design/fhir@^0.1.0", "lucide-react", "clsx", "tailwind-merge"],
+  registryDependencies: ["utils", "tokens", "status-badge"],
 
   usage: `import { ConditionList } from "@/components/oxygen/condition-list";
 

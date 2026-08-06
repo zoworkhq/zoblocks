@@ -9,13 +9,12 @@ export default defineComponentMeta({
   layer: "primitive",
 
   summary: "A clinical instant with a required time zone, honouring FHIR partial-date precision.",
-  description: "A clinical instant with a required time zone. Preserves FHIR partial-date precision, keeps absolute time always available, and flags future timestamps as the data errors they usually are.",
-  rationale: "timeZone is a required prop with no default, because the browser's zone is the wrong answer often enough to be dangerous. Relative time is an addition, never a replacement — “two hours ago” is useless in a handover and wrong in a medication record. Partial precision is preserved: rendering a year-only value as 1 January invents a day nobody recorded.",
+  description:
+    "A clinical instant with a required time zone. Preserves FHIR partial-date precision, keeps absolute time always available, and flags future timestamps as the data errors they usually are.",
+  rationale:
+    "timeZone is a required prop with no default, because the browser's zone is the wrong answer often enough to be dangerous. Relative time is an addition, never a replacement — “two hours ago” is useless in a handover and wrong in a medication record. Partial precision is preserved: rendering a year-only value as 1 January invents a day nobody recorded.",
 
-  categories: [
-    "Primitive",
-    "Clinical",
-  ],
+  categories: ["Primitive", "Clinical"],
   fhir: [
     {
       name: "dateTime · instant",
@@ -36,7 +35,8 @@ export default defineComponentMeta({
   a11y: [
     {
       label: "Absolute always announced",
-      detail: "The accessible name carries the absolute date, time, and zone even when the visible text is relative.",
+      detail:
+        "The accessible name carries the absolute date, time, and zone even when the visible text is relative.",
     },
     {
       label: "Real time element",
@@ -66,22 +66,10 @@ export default defineComponentMeta({
     "Daylight-saving ambiguity is not resolved \\u2014 the zone is applied as given.",
     "Relative display is ignored for year and month precision, which have no instant.",
   ],
-  related: [
-    "appointment-card",
-    "vitals-panel",
-    "patient-banner",
-  ],
+  related: ["appointment-card", "vitals-panel", "patient-banner"],
 
-  dependencies: [
-    "@oxygenui-design/fhir@^0.1.0",
-    "lucide-react",
-    "clsx",
-    "tailwind-merge",
-  ],
-  registryDependencies: [
-    "utils",
-    "tokens",
-  ],
+  dependencies: ["@oxygenui-design/fhir@^0.1.0", "lucide-react", "clsx", "tailwind-merge"],
+  registryDependencies: ["utils", "tokens"],
 
   usage: `import { ClinicalTime } from "@/components/oxygen/clinical-time";
 

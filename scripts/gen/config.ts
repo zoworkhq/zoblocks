@@ -50,7 +50,8 @@ export function banner(comment: "//" | "/*" | "#" = "//"): string {
   ];
 
   if (comment === "#") return lines.map((l) => (l ? `# ${l}` : "#")).join("\n");
-  if (comment === "/*") return ["/*", ...lines.map((l) => (l ? ` * ${l}` : " *")), " */"].join("\n");
+  if (comment === "/*")
+    return ["/*", ...lines.map((l) => (l ? ` * ${l}` : " *")), " */"].join("\n");
   return lines.map((l) => (l ? `// ${l}` : "//")).join("\n");
 }
 

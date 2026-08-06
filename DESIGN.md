@@ -59,7 +59,7 @@ Each of these must have a defined design, not a default:
 
 ## Boundaries
 
-State plainly what this product does *not* do, and what remains the
+State plainly what this product does _not_ do, and what remains the
 implementing team's responsibility:
 
 - **Access control and audit:**

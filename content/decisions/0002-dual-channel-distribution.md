@@ -26,8 +26,8 @@ of free and Pro **npm packages**.
 A second, quieter cost: because registry source is written with consumer-shaped
 specifiers (`@/lib/utils`, `@/components/oxygen/status-badge`), the root
 `tsconfig.json` must map each one backwards so the repo typechecks. That file
-carries the comment *"Add a mapping for every shared registry component the
-catalog grows."* It is an O(n) manual step that exists solely because the import
+carries the comment _"Add a mapping for every shared registry component the
+catalog grows."_ It is an O(n) manual step that exists solely because the import
 direction is inverted.
 
 ## Decision

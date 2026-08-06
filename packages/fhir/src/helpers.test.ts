@@ -95,7 +95,14 @@ describe("getInterpretation", () => {
   it("trusts an explicit critical code", () => {
     const observation: Observation = {
       interpretation: [
-        { coding: [{ system: "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation", code: "HH" }] },
+        {
+          coding: [
+            {
+              system: "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
+              code: "HH",
+            },
+          ],
+        },
       ],
     };
     expect(getInterpretation(observation)).toBe("critical-high");
@@ -123,13 +130,17 @@ describe("formatObservationValue", () => {
   });
 
   it("returns undefined when the observation carries no value", () => {
-    expect(formatObservationValue({ dataAbsentReason: { text: "Specimen unsatisfactory" } })).toBeUndefined();
+    expect(
+      formatObservationValue({ dataAbsentReason: { text: "Specimen unsatisfactory" } }),
+    ).toBeUndefined();
   });
 });
 
 describe("formatReferenceRange", () => {
   it("renders bounded, upper-only, and lower-only ranges", () => {
-    expect(formatReferenceRange({ low: { value: 70 }, high: { value: 100, unit: "mg/dL" } })).toBe("70 – 100 mg/dL");
+    expect(formatReferenceRange({ low: { value: 70 }, high: { value: 100, unit: "mg/dL" } })).toBe(
+      "70 – 100 mg/dL",
+    );
     expect(formatReferenceRange({ high: { value: 5.7, unit: "%" } })).toBe("< 5.7 %");
     expect(formatReferenceRange({ low: { value: 12, unit: "g/dL" } })).toBe("> 12 g/dL");
   });
@@ -182,7 +193,10 @@ describe("Observation.component", () => {
           valueQuantity: { value: 210 },
           interpretation: [{ coding: [{ code: "HH" }] }],
         },
-        { valueQuantity: { value: 80 }, referenceRange: [{ low: { value: 60 }, high: { value: 85 } }] },
+        {
+          valueQuantity: { value: 80 },
+          referenceRange: [{ low: { value: 60 }, high: { value: 85 } }],
+        },
       ],
     };
     expect(getPanelInterpretation(critical)).toBe("critical-high");
@@ -266,7 +280,9 @@ describe("resolveAbsentReason", () => {
   });
 
   it("classifies pending and error absences", () => {
-    expect(isPendingAbsence(resolveAbsentReason({ coding: [{ code: "temp-unknown" }] }))).toBe(true);
+    expect(isPendingAbsence(resolveAbsentReason({ coding: [{ code: "temp-unknown" }] }))).toBe(
+      true,
+    );
     expect(isPendingAbsence(resolveAbsentReason({ coding: [{ code: "not-asked" }] }))).toBe(false);
     expect(isErrorAbsence(resolveAbsentReason({ coding: [{ code: "unsupported" }] }))).toBe(true);
     expect(isErrorAbsence(resolveAbsentReason({ coding: [{ code: "unknown" }] }))).toBe(false);
@@ -558,15 +574,11 @@ describe("isFlagActive", () => {
 
   it("drops a lapsed precaution rather than showing it greyed", () => {
     // A stale precaution on screen teaches staff to ignore all of them.
-    expect(
-      isFlagActive({ status: "active", period: { end: "2026-07-01" } }, asOf),
-    ).toBe(false);
+    expect(isFlagActive({ status: "active", period: { end: "2026-07-01" } }, asOf)).toBe(false);
   });
 
   it("ignores a precaution that has not started", () => {
-    expect(
-      isFlagActive({ status: "active", period: { start: "2026-09-01" } }, asOf),
-    ).toBe(false);
+    expect(isFlagActive({ status: "active", period: { start: "2026-09-01" } }, asOf)).toBe(false);
   });
 });
 

@@ -8,23 +8,17 @@ export default defineComponentMeta({
   since: "0.1.0",
   layer: "primitive",
 
-  summary: "Loading shaped like layout, never like a value — plus progressive sections that keep partial failure visible.",
-  description: "Loading placeholders shaped like layout, never like a value, plus a progressive section that keeps partial failure and stale cache visible instead of silently omitting content.",
-  rationale: "A skeleton shaped like a lab result invites the reader to fill in the blank, so these are shaped like layout: neutral bars of varying width, never like a number. The more important export is ProgressiveSection. Six source systems behind one screen is normal in healthcare and partial failure is the normal case, so the dangerous outcome is a screen that renders five sections and silently omits the sixth. A section is always in exactly one of four honest states, and failed and stale are visible facts rather than the absence of a fact.",
+  summary:
+    "Loading shaped like layout, never like a value — plus progressive sections that keep partial failure visible.",
+  description:
+    "Loading placeholders shaped like layout, never like a value, plus a progressive section that keeps partial failure and stale cache visible instead of silently omitting content.",
+  rationale:
+    "A skeleton shaped like a lab result invites the reader to fill in the blank, so these are shaped like layout: neutral bars of varying width, never like a number. The more important export is ProgressiveSection. Six source systems behind one screen is normal in healthcare and partial failure is the normal case, so the dangerous outcome is a screen that renders five sections and silently omits the sixth. A section is always in exactly one of four honest states, and failed and stale are visible facts rather than the absence of a fact.",
 
-  categories: [
-    "Primitive",
-    "System",
-  ],
+  categories: ["Primitive", "System"],
   fhir: [],
 
-  states: [
-    "Loading",
-    "Loaded",
-    "Failed with retry",
-    "Stale while revalidating",
-    "Reduced motion",
-  ],
+  states: ["Loading", "Loaded", "Failed with retry", "Stale while revalidating", "Reduced motion"],
 
   a11y: [
     {
@@ -33,7 +27,8 @@ export default defineComponentMeta({
     },
     {
       label: "Failure is assertive",
-      detail: "A failed section uses role=alert, because it changes what the reader can conclude from the screen.",
+      detail:
+        "A failed section uses role=alert, because it changes what the reader can conclude from the screen.",
     },
     {
       label: "Reduced motion respected",
@@ -59,21 +54,10 @@ export default defineComponentMeta({
     "No automatic timeout detection; decide when slow becomes failed.",
     "Skeleton shapes approximate layout and will not perfectly prevent shift in every composition.",
   ],
-  related: [
-    "empty-state",
-    "density-provider",
-    "vitals-panel",
-  ],
+  related: ["empty-state", "density-provider", "vitals-panel"],
 
-  dependencies: [
-    "lucide-react",
-    "clsx",
-    "tailwind-merge",
-  ],
-  registryDependencies: [
-    "utils",
-    "tokens",
-  ],
+  dependencies: ["lucide-react", "clsx", "tailwind-merge"],
+  registryDependencies: ["utils", "tokens"],
 
   usage: `import { ClinicalSkeleton, ProgressiveSection } from "@/components/oxygen/clinical-skeleton";
 

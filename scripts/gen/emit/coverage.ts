@@ -46,7 +46,9 @@ function gapsFor(component: LoadedComponent, propCount: number): string[] {
   }
   if (meta.status === "stable") {
     if (!meta.limitations.length) {
-      gaps.push("no limitations listed — every component has at least one, and an unstated one is a bug report");
+      gaps.push(
+        "no limitations listed — every component has at least one, and an unstated one is a bug report",
+      );
     }
     if (propCount === 0) {
       gaps.push("no props extracted — check the component's exported signature");
@@ -98,7 +100,9 @@ export async function emitCoverage(report: CoverageReport, emitter: Emitter): Pr
     paths.coverage,
     JSON.stringify(
       {
-        _generated: banner("//").split("\n").map((l) => l.replace(/^\/\/ ?/, "")),
+        _generated: banner("//")
+          .split("\n")
+          .map((l) => l.replace(/^\/\/ ?/, "")),
         total: report.rows.length,
         byStatus,
         withStory: report.rows.filter((r) => r.hasStory).length,

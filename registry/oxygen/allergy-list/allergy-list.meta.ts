@@ -9,13 +9,12 @@ export default defineComponentMeta({
   layer: "clinical",
 
   summary: "Criticality and verification status, with no-known-allergies as its own state.",
-  description: "Allergies and intolerances from FHIR AllergyIntolerance. Distinguishes a recorded no-known-allergies assertion from an empty list, because one means asked-and-answered and the other means nobody asked.",
-  rationale: "Renders known allergies and intolerances with criticality, reaction manifestations, and verification status. The decision that matters most is what an empty list means: “no allergies recorded” and “no known allergies” are different clinical facts. The first means nobody has asked; the second means someone asked and documented the answer. Rendering them identically tells a clinician the patient is safe when the truth is the question was never put — so noKnownAllergies must be passed explicitly and is never inferred.",
+  description:
+    "Allergies and intolerances from FHIR AllergyIntolerance. Distinguishes a recorded no-known-allergies assertion from an empty list, because one means asked-and-answered and the other means nobody asked.",
+  rationale:
+    "Renders known allergies and intolerances with criticality, reaction manifestations, and verification status. The decision that matters most is what an empty list means: “no allergies recorded” and “no known allergies” are different clinical facts. The first means nobody has asked; the second means someone asked and documented the answer. Rendering them identically tells a clinician the patient is safe when the truth is the question was never put — so noKnownAllergies must be passed explicitly and is never inferred.",
 
-  categories: [
-    "Clinical data",
-    "Clinical",
-  ],
+  categories: ["Clinical data", "Clinical"],
   fhir: [
     {
       name: "AllergyIntolerance",
@@ -41,11 +40,13 @@ export default defineComponentMeta({
     },
     {
       label: "Distinct empty states",
-      detail: "No-known-allergies and not-recorded differ in icon, wording, and tone — not color alone.",
+      detail:
+        "No-known-allergies and not-recorded differ in icon, wording, and tone — not color alone.",
     },
     {
       label: "Verification never dropped",
-      detail: "Unconfirmed and refuted entries carry an explicit badge so they cannot be mistaken for confirmed allergies.",
+      detail:
+        "Unconfirmed and refuted entries carry an explicit badge so they cannot be mistaken for confirmed allergies.",
     },
   ],
 
@@ -67,22 +68,10 @@ export default defineComponentMeta({
     "Criticality falls back to worst observed reaction severity when absent — documented, but an approximation.",
     "No grouping by category (food, medication, environment).",
   ],
-  related: [
-    "medication-card",
-    "condition-list",
-  ],
+  related: ["medication-card", "condition-list"],
 
-  dependencies: [
-    "@oxygenui-design/fhir@^0.1.0",
-    "lucide-react",
-    "clsx",
-    "tailwind-merge",
-  ],
-  registryDependencies: [
-    "utils",
-    "tokens",
-    "status-badge",
-  ],
+  dependencies: ["@oxygenui-design/fhir@^0.1.0", "lucide-react", "clsx", "tailwind-merge"],
+  registryDependencies: ["utils", "tokens", "status-badge"],
 
   usage: `import { AllergyList } from "@/components/oxygen/allergy-list";
 

@@ -72,6 +72,14 @@ jobs:
       - name: Lint
         run: pnpm lint
 
+      # Formatting was checkable but never checked, so it drifted to 65 files.
+      # Generated artifacts are excluded in .prettierignore rather than
+      # formatted: Prettier would reformat them, the next `pnpm gen` would
+      # write them back, and the stale-generated-files check above would fail
+      # on a diff nobody made. The generators own their own output shape.
+      - name: Format
+        run: pnpm format:check
+
       # Covers the registry component source — the exact files copied into a
       # customer's project. Nothing used to typecheck them: the root config that
       # includes them was not part of any workspace task, and four components

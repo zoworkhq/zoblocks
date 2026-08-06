@@ -8,14 +8,14 @@ export default defineComponentMeta({
   since: "0.1.0",
   layer: "pattern",
 
-  summary: "Stops clinical documentation being lost to a navigation, a patient switch, or a closed tab.",
-  description: "Central registry that stops clinical documentation being lost to a navigation, a patient switch, or a closed tab. Distinguishes recoverable drafts from work that exists only in this tab.",
-  rationale: "Lost notes are among the most reliably enraging failures in clinical software, and they are almost always a coordination failure rather than a bug in any one form. Dirtiness is registered centrally so every editor participates, and the guard blocks navigation, patient-context changes, and tab close. Two distinctions decide whether the prompt is honest: recoverable drafts versus work that exists only in this tab, and trivially recreatable state versus twenty minutes of documentation — so the registry takes a description and the prompt names what is at stake.",
+  summary:
+    "Stops clinical documentation being lost to a navigation, a patient switch, or a closed tab.",
+  description:
+    "Central registry that stops clinical documentation being lost to a navigation, a patient switch, or a closed tab. Distinguishes recoverable drafts from work that exists only in this tab.",
+  rationale:
+    "Lost notes are among the most reliably enraging failures in clinical software, and they are almost always a coordination failure rather than a bug in any one form. Dirtiness is registered centrally so every editor participates, and the guard blocks navigation, patient-context changes, and tab close. Two distinctions decide whether the prompt is honest: recoverable drafts versus work that exists only in this tab, and trivially recreatable state versus twenty minutes of documentation — so the registry takes a description and the prompt names what is at stake.",
 
-  categories: [
-    "Primitive",
-    "System",
-  ],
+  categories: ["Primitive", "System"],
   fhir: [],
 
   states: [
@@ -31,15 +31,18 @@ export default defineComponentMeta({
   a11y: [
     {
       label: "Managed focus",
-      detail: "The prompt is an alertdialog; focus moves in on open and Escape cancels the departure.",
+      detail:
+        "The prompt is an alertdialog; focus moves in on open and Escape cancels the departure.",
     },
     {
       label: "Failure is assertive",
-      detail: "Autosave failure announces assertively. A silent failure lets someone write for twenty minutes believing their note is filed.",
+      detail:
+        "Autosave failure announces assertively. A silent failure lets someone write for twenty minutes believing their note is filed.",
     },
     {
       label: "Named stakes",
-      detail: "The dialog lists each dirty surface by description, so the consequence is legible rather than generic.",
+      detail:
+        "The dialog lists each dirty surface by description, so the consequence is legible rather than generic.",
     },
   ],
 
@@ -61,20 +64,10 @@ export default defineComponentMeta({
     "Does not persist drafts; it reports save state and blocks. Persistence is yours.",
     "Route interception depends on your router calling confirmLeave.",
   ],
-  related: [
-    "action-gate",
-    "app-shell",
-  ],
+  related: ["action-gate", "app-shell"],
 
-  dependencies: [
-    "lucide-react",
-    "clsx",
-    "tailwind-merge",
-  ],
-  registryDependencies: [
-    "utils",
-    "tokens",
-  ],
+  dependencies: ["lucide-react", "clsx", "tailwind-merge"],
+  registryDependencies: ["utils", "tokens"],
 
   usage: `import {
   UnsavedGuardProvider,

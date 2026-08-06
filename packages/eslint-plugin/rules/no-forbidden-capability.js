@@ -36,7 +36,13 @@ export default {
   },
 
   create(context) {
-    const NETWORK_CALLS = new Set(["fetch", "XMLHttpRequest", "WebSocket", "EventSource", "sendBeacon"]);
+    const NETWORK_CALLS = new Set([
+      "fetch",
+      "XMLHttpRequest",
+      "WebSocket",
+      "EventSource",
+      "sendBeacon",
+    ]);
 
     return {
       MemberExpression(node) {

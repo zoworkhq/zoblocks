@@ -126,7 +126,10 @@ export function maskIdentifier(value: string | undefined, visible = 4): string |
  * Age in whole years at `asOf`. Returns undefined rather than guessing when
  * birthDate is absent or unparseable — an unknown age must render as unknown.
  */
-export function calculateAge(birthDate: string | undefined, asOf: Date = new Date()): number | undefined {
+export function calculateAge(
+  birthDate: string | undefined,
+  asOf: Date = new Date(),
+): number | undefined {
   if (!birthDate) return undefined;
   const born = new Date(birthDate);
   if (Number.isNaN(born.getTime())) return undefined;
@@ -167,13 +170,7 @@ export function isRestricted(resource: Resource | undefined): boolean {
  * https://terminology.hl7.org/ValueSet-v3-ObservationInterpretation.html
  */
 export type Interpretation =
-  | "critical-high"
-  | "critical-low"
-  | "high"
-  | "low"
-  | "abnormal"
-  | "normal"
-  | "unknown";
+  "critical-high" | "critical-low" | "high" | "low" | "abnormal" | "normal" | "unknown";
 
 const INTERPRETATION_BY_CODE: Record<string, Interpretation> = {
   HH: "critical-high",
@@ -196,9 +193,7 @@ const INTERPRETATION_BY_CODE: Record<string, Interpretation> = {
  * Deliberately does NOT infer clinical severity from anything else. A missing
  * interpretation renders as "unknown", not as "normal".
  */
-export function getInterpretation(
-  observation: Observation | undefined,
-): Interpretation {
+export function getInterpretation(observation: Observation | undefined): Interpretation {
   const codes = observation?.interpretation?.flatMap((i) => i.coding ?? []) ?? [];
   for (const coding of codes) {
     const mapped = coding.code ? INTERPRETATION_BY_CODE[coding.code] : undefined;
@@ -336,8 +331,7 @@ const ABSENT_REASON_BY_CODE: Record<string, AbsentReason> = {
   PINF: "error",
 };
 
-export const DATA_ABSENT_REASON_SYSTEM =
-  "http://terminology.hl7.org/CodeSystem/data-absent-reason";
+export const DATA_ABSENT_REASON_SYSTEM = "http://terminology.hl7.org/CodeSystem/data-absent-reason";
 
 /**
  * Normalize a `dataAbsentReason` into the group that drives display.
@@ -508,10 +502,7 @@ export function isCorrected(observation: Observation | undefined): boolean {
 
 /** Drug name from either the inline concept or the referenced Medication. */
 export function medicationName(request: MedicationRequest | undefined): string | undefined {
-  return (
-    codeableText(request?.medicationCodeableConcept) ??
-    request?.medicationReference?.display
-  );
+  return codeableText(request?.medicationCodeableConcept) ?? request?.medicationReference?.display;
 }
 
 const TIMING_UNIT_LABEL: Record<string, string> = {
@@ -653,14 +644,19 @@ export function formatAppointmentTime(
     }).format(start);
   } catch {
     // An invalid IANA zone must not take the screen down with it.
-    return new Intl.DateTimeFormat(locale, { dateStyle: "medium", timeStyle: "short" }).format(start);
+    return new Intl.DateTimeFormat(locale, { dateStyle: "medium", timeStyle: "short" }).format(
+      start,
+    );
   }
 }
 
 /** Short time-zone label, e.g. "GMT+5:30". */
 export function timeZoneLabel(timeZone: string, at: Date = new Date()): string | undefined {
   try {
-    const parts = new Intl.DateTimeFormat("en", { timeZone, timeZoneName: "shortOffset" }).formatToParts(at);
+    const parts = new Intl.DateTimeFormat("en", {
+      timeZone,
+      timeZoneName: "shortOffset",
+    }).formatToParts(at);
     return parts.find((p) => p.type === "timeZoneName")?.value;
   } catch {
     return undefined;
@@ -673,11 +669,12 @@ export function isVirtualAppointment(appointment: Appointment | undefined): bool
     ...(appointment?.serviceType ?? []),
     ...(appointment?.appointmentType ? [appointment.appointmentType] : []),
   ];
-  return codes.some((c) =>
-    c.coding?.some((coding) => {
-      const value = `${coding.code ?? ""} ${coding.display ?? ""}`.toLowerCase();
-      return value.includes("virtual") || value.includes("telehealth") || value.includes("video");
-    }) || (c.text ?? "").toLowerCase().includes("virtual"),
+  return codes.some(
+    (c) =>
+      c.coding?.some((coding) => {
+        const value = `${coding.code ?? ""} ${coding.display ?? ""}`.toLowerCase();
+        return value.includes("virtual") || value.includes("telehealth") || value.includes("video");
+      }) || (c.text ?? "").toLowerCase().includes("virtual"),
   );
 }
 
@@ -713,7 +710,8 @@ export function coverageState(
 
 /** Named class value from a Coverage, e.g. "group", "plan", "subgroup". */
 export function coverageClass(coverage: Coverage | undefined, type: string): string | undefined {
-  return coverage?.class?.find((c) => c.type?.coding?.some((coding) => coding.code === type))?.value;
+  return coverage?.class?.find((c) => c.type?.coding?.some((coding) => coding.code === type))
+    ?.value;
 }
 
 // ---------------------------------------------------------------------------
@@ -860,8 +858,18 @@ export function datePrecision(value: string | undefined): DatePrecision | undefi
 }
 
 const MONTHS = [
-  "January", "February", "March", "April", "May", "June",
-  "July", "August", "September", "October", "November", "December",
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
 ];
 
 /**
@@ -918,7 +926,10 @@ export function isFutureDate(value: string | undefined, asOf: Date = new Date())
  * A heart rate of 150 is an emergency in an adult and unremarkable in a
  * newborn, so "0 y" is not an acceptable rendering for a six-day-old.
  */
-export function formatAge(birthDate: string | undefined, asOf: Date = new Date()): string | undefined {
+export function formatAge(
+  birthDate: string | undefined,
+  asOf: Date = new Date(),
+): string | undefined {
   if (!birthDate) return undefined;
   const born = new Date(birthDate);
   if (Number.isNaN(born.getTime()) || born > asOf) return undefined;
@@ -929,7 +940,8 @@ export function formatAge(birthDate: string | undefined, asOf: Date = new Date()
   const years = calculateAge(birthDate, asOf);
   if (years === undefined) return undefined;
   if (years < 2) {
-    let months = (asOf.getFullYear() - born.getFullYear()) * 12 + (asOf.getMonth() - born.getMonth());
+    let months =
+      (asOf.getFullYear() - born.getFullYear()) * 12 + (asOf.getMonth() - born.getMonth());
     if (asOf.getDate() < born.getDate()) months -= 1;
     return `${Math.max(0, months)} mo`;
   }
@@ -1031,8 +1043,10 @@ export function safeDoseText(raw: string | undefined): string | undefined {
 }
 
 export const DOSE_ISSUE_LABEL: Record<DoseFormatIssue, string> = {
-  "trailing-zero": "Trailing zero — write 1 mg, not 1.0 mg. A missed decimal point reads as a tenfold overdose.",
-  "naked-decimal": "Missing leading zero — write 0.5 mg, not .5 mg. A missed decimal point reads as a tenfold overdose.",
+  "trailing-zero":
+    "Trailing zero — write 1 mg, not 1.0 mg. A missed decimal point reads as a tenfold overdose.",
+  "naked-decimal":
+    "Missing leading zero — write 0.5 mg, not .5 mg. A missed decimal point reads as a tenfold overdose.",
   "not-a-number": "Not a number.",
 };
 
@@ -1138,7 +1152,8 @@ export function summariseProvenance(
     author: agent?.who?.display,
     recordedAt: provenance?.recorded ?? resource?.meta?.lastUpdated,
     occurredAt: provenance?.occurredDateTime,
-    source: provenance?.entity?.find((e) => e.role === "source")?.what?.display ?? resource?.meta?.source,
+    source:
+      provenance?.entity?.find((e) => e.role === "source")?.what?.display ?? resource?.meta?.source,
     method,
     // versionId "1" is the original. Anything higher means it was revised, and
     // a corrected result that looks identical to the original is a known harm.
