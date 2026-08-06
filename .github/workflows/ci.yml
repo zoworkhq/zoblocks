@@ -10,6 +10,12 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+# Identifiers, not credentials — they appear in .vercel/project.json on every
+# machine that has ever run `vercel link`. The only secret is VERCEL_TOKEN.
+env:
+  VERCEL_ORG_ID: team_ykOxK7PvNXML8d1afzA5dfNP
+  VERCEL_PROJECT_ID_DOCS: prj_mdPnSKVCxN5nwG1XZrHDBrBHYOQq
+
 jobs:
   verify:
     name: Typecheck, test, build
@@ -153,3 +159,177 @@ jobs:
 
           if [ "$fail" -ne 0 ]; then exit 1; fi
           echo "No non-synthetic identifiers found."
+
+  # ---------------------------------------------------------------------------
+  # Deployment
+  #
+  # Deliberately GitHub Actions rather than Vercel's own Git integration. That
+  # integration deploys on every push whether or not the checks passed — which
+  # for a site publishing WCAG conformance and healthcare component guidance is
+  # the wrong default. `needs:` makes a green build a precondition, not a
+  # parallel opinion.
+  #
+  # It also removes the failure mode this replaced: deploys ran from a laptop
+  # via `vercel --prod`, against whatever branch happened to be checked out.
+  # Production sat three merges stale because the working copy was on a feature
+  # branch. CI has no checkout to get wrong.
+  # ---------------------------------------------------------------------------
+  deploy-docs:
+    name: Deploy docs (production)
+    needs: [verify, no-phi]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment:
+      name: production
+      url: https://oxygenui.design
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Deploy
+        env:
+          VERCEL_PROJECT_ID: ${{ env.VERCEL_PROJECT_ID_DOCS }}
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: |
+          if [ -z "${VERCEL_TOKEN:-}" ]; then
+            echo "::error::VERCEL_TOKEN is not set. Add it under Settings → Secrets → Actions."
+            exit 1
+          fi
+          pnpm dlx vercel@48 pull --yes --environment=production
+          pnpm dlx vercel@48 build --prod
+          url=$(pnpm dlx vercel@48 deploy --prebuilt --prod)
+          echo "Deployed: $url"
+          echo "### Docs deployed" >> "$GITHUB_STEP_SUMMARY"
+          echo "$url" >> "$GITHUB_STEP_SUMMARY"
+
+      # The registry is the contract customers install against. A deploy that
+      # returns 200 but serves a stale or malformed registry is a broken
+      # install for everyone, and it is exactly what went unnoticed for three
+      # merges. Assert the deployed artifact, not just the response code.
+      - name: Verify the deployed registry
+        run: |
+          set -euo pipefail
+          url="https://oxygenui.design/r/vitals-panel.json?ci=${GITHUB_SHA}"
+          for i in $(seq 1 10); do
+            body=$(curl -fsS --max-time 20 "$url" || true)
+            if [ -n "$body" ]; then break; fi
+            sleep 6
+          done
+          echo "$body" | node -e '
+            const d = JSON.parse(require("fs").readFileSync(0, "utf8"));
+            const deps = d.dependencies ?? [];
+            const fhir = deps.find((x) => x.startsWith("@oxygenui-design/fhir"));
+            if (!fhir) {
+              console.error("::error::Deployed registry does not reference @oxygenui-design/fhir. Got: " + JSON.stringify(deps));
+              process.exit(1);
+            }
+            if (!fhir.includes("@^")) {
+              console.error("::error::Deployed registry dependency is unpinned: " + fhir);
+              process.exit(1);
+            }
+            console.log("Registry verified: " + fhir);
+          '
+
+  # hq is a separate Vercel project. The job self-skips until VERCEL_PROJECT_ID_HQ
+  # exists as a repository variable, so this workflow is committable before the
+  # project is created rather than red until someone gets to it.
+  deploy-hq:
+    name: Deploy hq (production)
+    needs: [verify, no-phi]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment:
+      name: production-hq
+      url: https://hq.oxygenui.design
+
+    steps:
+      - name: Check the project exists
+        id: gate
+        run: |
+          if [ -z "${{ vars.VERCEL_PROJECT_ID_HQ }}" ]; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            echo "VERCEL_PROJECT_ID_HQ is not set — skipping. Create the Vercel project, then add the variable." \
+              >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: actions/checkout@v4
+        if: steps.gate.outputs.skip == 'false'
+
+      - uses: pnpm/action-setup@v4
+        if: steps.gate.outputs.skip == 'false'
+
+      - uses: actions/setup-node@v4
+        if: steps.gate.outputs.skip == 'false'
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Deploy
+        if: steps.gate.outputs.skip == 'false'
+        env:
+          VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID_HQ }}
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: |
+          pnpm dlx vercel@48 pull --yes --environment=production
+          pnpm dlx vercel@48 build --prod
+          url=$(pnpm dlx vercel@48 deploy --prebuilt --prod)
+          echo "Deployed: $url"
+
+      # Signed out, hq must redirect to its own sign-in rather than render
+      # anything. A misconfigured Root Directory would serve the marketing site
+      # from this domain, and the redirect is what distinguishes them.
+      - name: Verify hq is serving hq
+        if: steps.gate.outputs.skip == 'false'
+        run: |
+          set -euo pipefail
+          code=$(curl -s -o /dev/null -w "%{http_code}" --max-time 20 https://hq.oxygenui.design/tasks)
+          if [ "$code" != "307" ] && [ "$code" != "302" ]; then
+            echo "::error::hq.oxygenui.design/tasks returned $code, expected a redirect to sign-in. Check the project's Root Directory is apps/hq."
+            exit 1
+          fi
+          echo "hq responded $code — signed-out redirect intact."
+
+  # Preview per pull request. Same build path as production, so a PR that
+  # deploys is a PR that can be looked at rather than imagined.
+  deploy-preview:
+    name: Deploy docs (preview)
+    needs: [verify, no-phi]
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Deploy preview
+        env:
+          VERCEL_PROJECT_ID: ${{ env.VERCEL_PROJECT_ID_DOCS }}
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: |
+          if [ -z "${VERCEL_TOKEN:-}" ]; then
+            echo "VERCEL_TOKEN not set — skipping preview." >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          pnpm dlx vercel@48 pull --yes --environment=preview
+          pnpm dlx vercel@48 build
+          url=$(pnpm dlx vercel@48 deploy --prebuilt)
+          echo "### Preview" >> "$GITHUB_STEP_SUMMARY"
+          echo "$url" >> "$GITHUB_STEP_SUMMARY"
