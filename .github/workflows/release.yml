@@ -1,0 +1,83 @@
+name: Release
+
+# Publishing is separate from deploying on purpose. The site can ship many
+# times a day; an npm release changes what every existing consumer resolves to
+# and should happen when someone decided it would, not as a side effect of
+# merging.
+#
+# Changesets makes that decision explicit: a PR carrying a changeset opens a
+# "Version packages" PR, and merging *that* publishes. A PR with no changeset
+# publishes nothing.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  pull-requests: write
+  # Required for npm provenance. It is what lets npm attest that the tarball
+  # was built from this repository at this commit — worth having anywhere, and
+  # worth more on a package whose pitch is that you can audit every line.
+  id-token: write
+
+jobs:
+  release:
+    name: Version or publish
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          registry-url: https://registry.npmjs.org
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      # The published artifact is built here, not taken on trust. A local
+      # rehearsal once found the test suite inside the tarball and dist
+      # emitting extensionless imports that threw in plain Node — neither of
+      # which typecheck or `npm publish --dry-run` noticed.
+      - name: Build
+        run: pnpm build
+
+      - name: Test
+        run: pnpm test
+
+      # Guards against the failure that shipped 0.1.0: a package whose
+      # publishConfig points at ./dist while dist does not contain what it
+      # claims, or contains things it should not.
+      - name: Inspect the tarball before publishing
+        working-directory: packages/fhir
+        run: node scripts/check-tarball.mjs
+
+      - name: Version PR or publish
+        uses: changesets/action@v1
+        with:
+          version: pnpm changeset version
+          publish: pnpm changeset publish
+          commit: "Version packages"
+          title: "Version packages"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Optional. Preferred setup is npm trusted publishing (OIDC), which
+          # needs no stored credential at all — configure it per package in the
+          # npm UI and this can stay empty. Kept as a fallback because trusted
+          # publishing has to be enabled on a package that already exists.
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_CONFIG_PROVENANCE: "true"
