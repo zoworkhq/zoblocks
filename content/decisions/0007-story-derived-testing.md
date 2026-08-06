@@ -1,6 +1,17 @@
 # 0007 — Tests derive from stories; quality is gated at the catalog level
 
-**Status:** proposed · 6 August 2026
+**Status:** proposed · 6 August 2026 · unit layer implemented
+
+> **Update, 6 August 2026.** The first row of the pyramid has landed: all 29
+> components have colocated `*.test.tsx` files run by Vitest and Testing
+> Library, wired into `pnpm test` and the CI verify job, and the generated
+> coverage manifest now reports `withTest: 29`. The Context below ("No component
+> has a test") described the state before that.
+>
+> The catalog-level gate in decision 4 is therefore half-armed: `pnpm gen`
+> reports which components fall short, but `--strict` stays off because
+> `withStory` is still 0 and every component would fail on the story check.
+> Turning it on is the story work, not the test work.
 
 ## Context
 

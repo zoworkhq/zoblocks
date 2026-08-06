@@ -61,14 +61,20 @@ const GuardContext = React.createContext<GuardContextValue | undefined>(undefine
  */
 export function useUnsavedWork(surface: DirtySurface | undefined) {
   const context = React.useContext(GuardContext);
-  const { id } = surface ?? {};
+  // Depend on the registration functions, never on the context object. The
+  // context value changes whenever ANY surface registers; depending on it
+  // would make this effect tear down and re-register on every such change,
+  // which itself changes the context — a loop that ends in an OOM rather than
+  // an error. `register`/`unregister` are stable for the provider's lifetime.
+  const register = context?.register;
+  const unregister = context?.unregister;
+  const { id, description, saveState, lastSavedLabel } = surface ?? {};
 
   React.useEffect(() => {
-    if (!context || !surface) return;
-    context.register(surface);
-    return () => context.unregister(surface.id);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [context, id, surface?.saveState, surface?.description, surface?.lastSavedLabel]);
+    if (!register || !unregister || !id || !description || !saveState) return;
+    register({ id, description, saveState, lastSavedLabel });
+    return () => unregister(id);
+  }, [register, unregister, id, description, saveState, lastSavedLabel]);
 }
 
 /** Ask the guard whether it is safe to leave. Returns false if the user cancels. */
@@ -85,17 +91,40 @@ export function UnsavedGuardProvider({ children }: { children: React.ReactNode }
   } | null>(null);
 
   const register = React.useCallback((surface: DirtySurface) => {
-    setSurfaces((current) => [...current.filter((s) => s.id !== surface.id), surface]);
+    setSurfaces((current) => {
+      const existing = current.find((s) => s.id === surface.id);
+      // Re-registering an unchanged surface must return the SAME array, or
+      // React re-renders, the context value changes, the registering effect
+      // runs again, and the three of them spin until the tab runs out of
+      // memory. Callers re-register on every render by design.
+      if (
+        existing &&
+        existing.saveState === surface.saveState &&
+        existing.description === surface.description &&
+        existing.lastSavedLabel === surface.lastSavedLabel
+      ) {
+        return current;
+      }
+      return [...current.filter((s) => s.id !== surface.id), surface];
+    });
   }, []);
 
   const unregister = React.useCallback((id: string) => {
-    setSurfaces((current) => current.filter((s) => s.id !== id));
+    setSurfaces((current) =>
+      current.some((s) => s.id === id) ? current.filter((s) => s.id !== id) : current,
+    );
   }, []);
 
   // Work that exists nowhere but this tab. A failed autosave is the case that
   // must never be navigated past with a soft notice.
-  const blocking = surfaces.filter((s) => s.saveState === "failed" || s.saveState === "saving");
-  const dirty = surfaces.filter((s) => s.saveState !== "clean");
+  //
+  // Memoized because these feed the context value: a fresh array here makes
+  // every consumer's effect re-run on every render.
+  const blocking = React.useMemo(
+    () => surfaces.filter((s) => s.saveState === "failed" || s.saveState === "saving"),
+    [surfaces],
+  );
+  const dirty = React.useMemo(() => surfaces.filter((s) => s.saveState !== "clean"), [surfaces]);
 
   const confirmLeave = React.useCallback(
     (intent: string) =>

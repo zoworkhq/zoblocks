@@ -105,7 +105,10 @@ pnpm dev              # docs site on http://localhost:6001
 | --------------------------- | ----------------------------------------------------- |
 | `pnpm dev`                  | Run the docs site                                     |
 | `pnpm build`                | Build every package and app                           |
-| `pnpm test`                 | Unit tests                                            |
+| `pnpm test`                 | Package tests, then every registry component          |
+| `pnpm test:registry`        | Just the components (no build needed)                 |
+| `pnpm test:watch`           | Components, in watch mode                             |
+| `pnpm test:coverage`        | Component coverage report                             |
 | `pnpm lint`                 | Lint the workspace                                    |
 | `pnpm typecheck`            | Typecheck the workspace, including registry source    |
 | `pnpm gen`                  | Regenerate everything derived from component metadata |
@@ -144,6 +147,39 @@ Two things that used to break a component silently are now enforced:
 
 The Tailwind `@source` list, previously a manual step with the same failure
 mode, is generated.
+
+### Testing a component
+
+Every component has a colocated `<name>.test.tsx`, run against the same source
+a customer receives. `pnpm gen` reports any component without one, and the
+generated `coverage.json` records the count.
+
+A test here asserts **the safety claim the component exists to make**, not that
+it renders. The distinction matters, because the failures worth catching all
+look fine on screen:
+
+```tsx
+it("shows an uninterpreted result as uninterpreted, never as normal", () => {
+  render(<ObservationPanel observations={[observations.uninterpreted]} />);
+  expect(screen.getByText(/not interpreted/i)).toBeInTheDocument();
+  expect(screen.queryByText(/^normal$/i)).not.toBeInTheDocument();
+});
+```
+
+Three conventions:
+
+- **Start from the component's own doc comment.** Each one states its rules in
+  prose — comparators survive, unknown is loud, absence routes to `AbsentValue`.
+  Those sentences are the test list, and quoting the relevant one above a test
+  keeps the two from drifting apart.
+- **Use `@oxygenui-design/fixtures`.** It deliberately over-represents the hard
+  states — critical, uninterpreted, masked, refuted, expired — which are the
+  ones products get wrong and demos skip. Never write PHI-shaped data.
+- **Assert the meaning is in words.** `expectStatedInWords` from
+  [`test/contract.tsx`](test/contract.tsx) checks that a state is readable
+  without colour. `itMeetsTheContract` adds the floor every component owes: no
+  `undefined` or `Invalid Date` reaching the screen, every interactive control
+  accessibly named, and never rendering nothing at all.
 
 ### Architecture
 
