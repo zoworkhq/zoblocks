@@ -303,16 +303,30 @@ jobs:
           url=$(pnpm dlx vercel@48 deploy --prebuilt --prod --token "$VERCEL_TOKEN")
           echo "Deployed: $url"
 
-      # Signed out, hq must redirect to its own sign-in rather than render
-      # anything. A misconfigured Root Directory would serve the marketing site
-      # from this domain, and the redirect is what distinguishes them.
+      # Asserted against the custom domain only when it is actually attached.
+      # It was hard-coded, so a successful deploy failed here with curl exit 6 —
+      # host not found — reported as though hq were broken when hq was fine and
+      # the domain simply had not been moved onto the project yet. A check that
+      # fails for a reason outside what it is checking teaches people to ignore
+      # it.
       - name: Verify hq is serving hq
         if: steps.gate.outputs.skip == 'false'
         run: |
-          set -euo pipefail
-          code=$(curl -s -o /dev/null -w "%{http_code}" --max-time 20 https://hq.oxygenui.design/tasks)
+          set -uo pipefail
+          host=hq.oxygenui.design
+
+          if ! getent hosts "$host" >/dev/null 2>&1 && ! host "$host" >/dev/null 2>&1; then
+            echo "$host does not resolve yet — domain not attached to this project. Skipping the check." \
+              >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+
+          # Signed out, hq must redirect to its own sign-in rather than render.
+          # A wrong Root Directory would serve the marketing site from this
+          # hostname, and the redirect is what distinguishes them.
+          code=$(curl -s -o /dev/null -w "%{http_code}" --max-time 20 "https://$host/tasks")
           if [ "$code" != "307" ] && [ "$code" != "302" ]; then
-            echo "::error::hq.oxygenui.design/tasks returned $code, expected a redirect to sign-in. Check the project's Root Directory is apps/hq."
+            echo "::error::https://$host/tasks returned $code, expected a redirect to sign-in. Check the project Root Directory is apps/hq."
             exit 1
           fi
           echo "hq responded $code — signed-out redirect intact."
