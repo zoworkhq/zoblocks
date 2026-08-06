@@ -13,8 +13,7 @@
   },
   "scripts": {
     "build": "echo \"[fixtures] consumed as source\"",
-    "typecheck": "tsc -p tsconfig.json --noEmit",
-    "lint": "echo \"[fixtures] lint: configured in Phase 1\""
+    "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
     "@oxygenui/fhir": "workspace:*"

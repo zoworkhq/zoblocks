@@ -1,0 +1,116 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "display": "Oxygen generated path mappings",
+  "_generated": [
+    "GENERATED FILE — DO NOT EDIT.",
+    "",
+    "Produced by `pnpm gen` from each component's *.meta.ts.",
+    "Edit the metadata, then re-run. CI fails if this file is stale.",
+    "",
+    "See content/decisions/0004-generated-component-metadata.md"
+  ],
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/components/oxygen/absent-value": [
+        "./registry/oxygen/absent-value/absent-value.tsx"
+      ],
+      "@/components/oxygen/action-gate": [
+        "./registry/oxygen/action-gate/action-gate.tsx"
+      ],
+      "@/components/oxygen/alert-banner": [
+        "./registry/oxygen/alert-banner/alert-banner.tsx"
+      ],
+      "@/components/oxygen/allergy-list": [
+        "./registry/oxygen/allergy-list/allergy-list.tsx"
+      ],
+      "@/components/oxygen/app-shell": [
+        "./registry/oxygen/app-shell/app-shell.tsx"
+      ],
+      "@/components/oxygen/appointment-card": [
+        "./registry/oxygen/appointment-card/appointment-card.tsx"
+      ],
+      "@/components/oxygen/care-team": [
+        "./registry/oxygen/care-team/care-team.tsx"
+      ],
+      "@/components/oxygen/clinical-skeleton": [
+        "./registry/oxygen/clinical-skeleton/clinical-skeleton.tsx"
+      ],
+      "@/components/oxygen/clinical-time": [
+        "./registry/oxygen/clinical-time/clinical-time.tsx"
+      ],
+      "@/components/oxygen/clinical-value": [
+        "./registry/oxygen/clinical-value/clinical-value.tsx"
+      ],
+      "@/components/oxygen/code-status": [
+        "./registry/oxygen/code-status/code-status.tsx"
+      ],
+      "@/components/oxygen/concept-chip": [
+        "./registry/oxygen/concept-chip/concept-chip.tsx"
+      ],
+      "@/components/oxygen/condition-list": [
+        "./registry/oxygen/condition-list/condition-list.tsx"
+      ],
+      "@/components/oxygen/coverage-card": [
+        "./registry/oxygen/coverage-card/coverage-card.tsx"
+      ],
+      "@/components/oxygen/density-provider": [
+        "./registry/oxygen/density-provider/density-provider.tsx"
+      ],
+      "@/components/oxygen/dose-input": [
+        "./registry/oxygen/dose-input/dose-input.tsx"
+      ],
+      "@/components/oxygen/empty-state": [
+        "./registry/oxygen/empty-state/empty-state.tsx"
+      ],
+      "@/components/oxygen/error-boundary": [
+        "./registry/oxygen/error-boundary/error-boundary.tsx"
+      ],
+      "@/components/oxygen/identity-token": [
+        "./registry/oxygen/identity-token/identity-token.tsx"
+      ],
+      "@/components/oxygen/medication-card": [
+        "./registry/oxygen/medication-card/medication-card.tsx"
+      ],
+      "@/components/oxygen/patient-banner": [
+        "./registry/oxygen/patient-banner/patient-banner.tsx"
+      ],
+      "@/components/oxygen/patient-snapshot": [
+        "./registry/oxygen/patient-snapshot/patient-snapshot.tsx"
+      ],
+      "@/components/oxygen/precautions-bar": [
+        "./registry/oxygen/precautions-bar/precautions-bar.tsx"
+      ],
+      "@/components/oxygen/provenance": [
+        "./registry/oxygen/provenance/provenance.tsx"
+      ],
+      "@/components/oxygen/reference-range": [
+        "./registry/oxygen/reference-range/reference-range.tsx"
+      ],
+      "@/components/oxygen/restricted-shield": [
+        "./registry/oxygen/restricted-shield/restricted-shield.tsx"
+      ],
+      "@/components/oxygen/status-badge": [
+        "./registry/oxygen/status-badge/status-badge.tsx"
+      ],
+      "@/components/oxygen/unsaved-guard": [
+        "./registry/oxygen/unsaved-guard/unsaved-guard.tsx"
+      ],
+      "@/components/oxygen/vitals-panel": [
+        "./registry/oxygen/vitals-panel/vitals-panel.tsx"
+      ],
+      "@/lib/utils": [
+        "./registry/oxygen/lib/utils.ts"
+      ],
+      "@oxygenui/component-meta": [
+        "./packages/component-meta/src/index.ts"
+      ],
+      "@oxygenui/fhir": [
+        "./packages/fhir/src/index.ts"
+      ],
+      "@oxygenui/fixtures": [
+        "./packages/fixtures/src/index.ts"
+      ]
+    }
+  }
+}

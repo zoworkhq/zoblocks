@@ -1,0 +1,20 @@
+{
+  "name": "@oxygenui/eslint-plugin",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Lint rules that enforce Oxygen's architectural invariants — the ones previously kept by comment.",
+  "license": "MIT",
+  "type": "module",
+  "main": "./index.js",
+  "exports": {
+    ".": "./index.js"
+  },
+  "scripts": {
+    "build": "echo \"[eslint-plugin] plain ESM, no build\"",
+    "typecheck": "echo \"[eslint-plugin] plain ESM, no typecheck\"",
+    "test": "vitest run --passWithNoTests"
+  },
+  "devDependencies": {
+    "vitest": "^2.1.8"
+  }
+}

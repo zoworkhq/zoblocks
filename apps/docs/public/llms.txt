@@ -1,0 +1,179 @@
+# Oxygen UI
+
+> React components for healthcare interfaces, typed to FHIR R4 and delivered as
+> source through a shadcn registry. Components take FHIR resources as props
+> directly and render absence, preliminary status, restricted records, and
+> critical results as explicit states rather than as blanks.
+
+Oxygen UI is not a compliance boundary, not a medical device, and not clinical
+decision support. Access control, audit, data residency, and clinical validation
+remain the implementing team's responsibility.
+
+Rules that matter when generating code with these components:
+
+- A missing value renders as explicitly missing. Never substitute an empty
+  string or a dash.
+- An uninterpreted result reads "Not interpreted", never "Normal".
+- Status is never conveyed by colour alone; every severity carries an icon and a
+  text label.
+- Never build a Tailwind class name from a variable. Tailwind resolves classes
+  by scanning source text, so a template literal produces no CSS and the
+  severity styling silently disappears.
+
+## Primitive
+
+- [Absent Value](https://oxygenui.design/components/absent-value): Renders absence as a statement. Withheld, not asked, declined, and errored are different facts and never share a dash.
+  install: pnpm dlx shadcn@latest add https://oxygenui.design/r/absent-value.json
+  fhir: dataAbsentReason
+  states: Not recorded (no reason given), Not asked, Declined to answer, Result pending, Hidden — restricted, Unavailable — system error, Not applicable
+  status: stable
+- [Clinical Skeleton](https://oxygenui.design/components/clinical-skeleton): Loading shaped like layout, never like a value — plus progressive sections that keep partial failure visible.
+  install: pnpm dlx shadcn@latest add https://oxygenui.design/r/clinical-skeleton.json
+  states: Loading, Loaded, Failed with retry, Stale while revalidating, Reduced motion
+  status: stable
+- [Clinical Time](https://oxygenui.design/components/clinical-time): A clinical instant with a required time zone, honouring FHIR partial-date precision.
+  install: pnpm dlx shadcn@latest add https://oxygenui.design/r/clinical-time.json
+  fhir: dateTime · instant
+  states: Full instant, Day precision, Month precision, Year precision, Future timestamp, Event vs recorded time, No date
+  status: stable
+- [Clinical Value](https://oxygenui.design/components/clinical-value): One measured quantity, unit, and comparator as a single atomic element that cannot drift apart.
+  install: pnpm dlx shadcn@latest add https://oxygenui.design/r/clinical-value.json
+  fhir: Quantity
+  states: Numeric with unit, Comparator (<0.01), Non-numeric result, Absent with a reason, Absent with no reason, Unit missing
+  status: stable
+- [Concept Chip](https://oxygenui.design/components/concept-chip): A coded concept with its coding one interaction away, and honest about what is missing.
+  install: pnpm dlx shadcn@latest add https://oxygenui.design/r/concept-chip.json
+  fhir: CodeableConcept
+  states: Coded concept, Text only, no coding, Multiple codings, Unrecognised system, Outside expected value set, No concept recorded
+  status: stable
+- [Empty State](https://oxygenui.design/components/empty-state): Five reasons a section shows nothing. An unavailable section is never rendered as an empty one.
+  install: pnpm dlx shadcn@latest add https://oxygenui.design/r/empty-state.json
+  states: Never recorded, Filtered to empty, Source unavailable, Restricted, Pending, Compact
+  status: stable
+- [Identity Token](https://oxygenui.design/components/identity-token): Compact, privacy-aware representation of a person, built around confirming rather than labelling.
+  install: pnpm dlx shadcn@latest add https://oxygenui.design/r/identity-token.json
+  fhir: Patient
+  states: Complete identity, Name not recorded, Restricted record, Deceased, Photo without consent, Name-alike collision, Masked identifiers
+  status: stable
+- [Provenance Tag](https://oxygenui.design/components/provenance): Who recorded this, when, from where, and whether it has been amended.
+  install: pnpm dlx shadcn@latest add https://oxygenui.design/r/provenance.json
+  fhir: Provenance
+  states: Clinician-entered, Patient-reported, Device-recorded, Interface feed, Amended, Source not recorded, Charted after the event
+  status: stable
+- [Reference Range](https://oxygenui.design/components/reference-range): Positions a result against its own range, and refuses to draw when no bound was stated.
+  install: pnpm dlx shadcn@latest add https://oxygenui.design/r/reference-range.json
+  fhir: Observation.referenceRange
+  states: Bounded range, One-sided range, No range available, Value off scale, Text-only range, No value
+  status: stable
+- [Status Badge](https://oxygenui.design/components/status-badge): The shared severity chip. Critical reads identically on a lab result, a medication, and an allergy.
+  install: pnpm dlx shadcn@latest add https://oxygenui.design/r/status-badge.json
+  states: Critical, High, Low, Normal, Unknown, Neutral
+  status: stable
+
+## Clinical
+
+- [Allergy List](https://oxygenui.design/components/allergy-list): Criticality and verification status, with no-known-allergies as its own state.
+  install: pnpm dlx shadcn@latest add https://oxygenui.design/r/allergy-list.json
+  fhir: AllergyIntolerance
+  states: High risk, Severe / moderate / mild reaction, Risk not assessed, Unconfirmed, Refuted, Inactive, No known allergies, Not recorded
+  status: stable
+- [Appointment Card](https://oxygenui.design/components/appointment-card): Booked, pending, cancelled, no-show. Time zone is a required prop, not a guess.
+  install: pnpm dlx shadcn@latest add https://oxygenui.design/r/appointment-card.json
+  fhir: Appointment
+  states: Booked, Pending, Arrived, Checked in, Completed, Cancelled, No-show, Waitlisted, Virtual, In person
+  status: stable
+- [Care Team Panel](https://oxygenui.design/components/care-team): Everyone involved, and who is actually reachable now.
+  install: pnpm dlx shadcn@latest add https://oxygenui.design/r/care-team.json
+  fhir: CareTeam
+  states: Current team, Covered member, Past members, Non-clinical members, No team recorded, Role not recorded
+  status: stable
+- [Code Status](https://oxygenui.design/components/code-status): Resuscitation status and directives. Unknown is loud, never a silent default to full code.
+  install: pnpm dlx shadcn@latest add https://oxygenui.design/r/code-status.json
+  fhir: Consent
+  states: Full code, DNR, DNR / DNI, Comfort measures, Not on file, Verification stale, Conflicting directives
+  status: stable
+- [Condition List](https://oxygenui.design/components/condition-list): Problem list that separates active from resolved and never promotes a provisional diagnosis.
+  install: pnpm dlx shadcn@latest add https://oxygenui.design/r/condition-list.json
+  fhir: Condition
+  states: Active, Recurrence, Remission, Resolved, Inactive, Provisional, Differential, Vague onset, Onset not recorded
+  status: stable
+- [Coverage Card](https://oxygenui.design/components/coverage-card): Effective state derived from status and period together — an active record past its end date reads as lapsed.
+  install: pnpm dlx shadcn@latest add https://oxygenui.design/r/coverage-card.json
+  fhir: Coverage
+  states: Active, Lapsed, Not yet effective, Cancelled, Status unknown, Masked identifiers
+  status: stable
+- [Dose Input](https://oxygenui.design/components/dose-input): Dose entry with ISMP formatting rules, plausibility separated from hard limits, and visible arithmetic.
+  install: pnpm dlx shadcn@latest add https://oxygenui.design/r/dose-input.json
+  fhir: Dosage
+  states: Well-formed dose, Trailing zero, Missing leading zero, Above plausible range, Above absolute maximum, Weight-based calculation, No weight on file
+  status: stable
+- [Medication Card](https://oxygenui.design/components/medication-card): Dose, route, schedule, and status. Held, stopped, and expired are distinct — not one greyed-out style.
+  install: pnpm dlx shadcn@latest add https://oxygenui.design/r/medication-card.json
+  fhir: MedicationRequest
+  states: Active, On hold, Stopped, Cancelled, Completed, Expired, Draft, Entered in error, No dosage recorded
+  status: stable
+- [Patient Banner](https://oxygenui.design/components/patient-banner): Persistent identity header for a clinical screen, driven by a FHIR Patient resource.
+  install: pnpm dlx shadcn@latest add https://oxygenui.design/r/patient-banner.json
+  fhir: Patient
+  states: Complete demographics, Name not recorded, Restricted record, Deceased, Masked identifiers, Loading
+  status: stable
+- [Precautions Bar](https://oxygenui.design/components/precautions-bar): What staff must do before entering the room, ordered by required action.
+  install: pnpm dlx shadcn@latest add https://oxygenui.design/r/precautions-bar.json
+  fhir: Flag
+  states: Airborne, Contact isolation, Behavioral approach, Fall risk, Mobility, No active precautions, Lapsed and dropped
+  status: stable
+- [Observation Panel](https://oxygenui.design/components/vitals-panel): Results table with reference ranges and interpretation. Uninterpreted results stay uninterpreted.
+  install: pnpm dlx shadcn@latest add https://oxygenui.design/r/vitals-panel.json
+  fhir: Observation[]
+  states: Multi-component (blood pressure), Critical high and low, High and low, Normal, Not interpreted, No value (dataAbsentReason), Preliminary, Amended and corrected, Empty, Loading
+  status: stable
+
+## Pattern
+
+- [Action Gate](https://oxygenui.design/components/action-gate): Two-step confirmation that names the consequence and the patient, then emits an audit event.
+  install: pnpm dlx shadcn@latest add https://oxygenui.design/r/action-gate.json
+  fhir: AuditEvent
+  states: Reversible confirm, Irreversible type-to-confirm, Hold-to-confirm, Reason required, In flight, Cancelled
+  status: stable
+- [Alert Banner](https://oxygenui.design/components/alert-banner): Severity tiers as an interruption budget. Only critical may take focus.
+  install: pnpm dlx shadcn@latest add https://oxygenui.design/r/alert-banner.json
+  fhir: DetectedIssue
+  states: Critical, High, Moderate, Low, Info, Dismissal with reason
+  status: stable
+- [App Shell](https://oxygenui.design/components/app-shell): Navigation composed from permissions, patient context as a landmark, and guarded context changes.
+  install: pnpm dlx shadcn@latest add https://oxygenui.design/r/app-shell.json
+  fhir: PractitionerRole
+  states: Role with full access, Role with limited access, No features enabled, Session expiring, Break-glass active, Mobile navigation
+  status: stable
+- [Density Provider](https://oxygenui.design/components/density-provider): Sets the spacing and target-size contract for a subtree. Density changes spacing, never which facts appear.
+  install: pnpm dlx shadcn@latest add https://oxygenui.design/r/density-provider.json
+  states: Patient density, Standard density, Clinical density, Nested providers, Target-size floor enforced
+  status: stable
+- [Error Boundary](https://oxygenui.design/components/error-boundary): Contains a failure to one section and never renders a partial record as a complete one.
+  install: pnpm dlx shadcn@latest add https://oxygenui.design/r/error-boundary.json
+  fhir: OperationOutcome
+  states: Healthy, Section failed, Critical boundary failed, Retried
+  status: stable
+- [Restricted Shield](https://oxygenui.design/components/restricted-shield): Redacted by default. Discloses only with a stated reason, on a timer, and can conceal that content exists.
+  install: pnpm dlx shadcn@latest add https://oxygenui.design/r/restricted-shield.json
+  fhir: Consent · meta.security
+  states: Restricted, disclosure permitted, Restricted, disclosure not permitted, Existence concealed, Disclosed with countdown, Auto re-redacted, Not restricted
+  status: stable
+- [Unsaved Guard](https://oxygenui.design/components/unsaved-guard): Stops clinical documentation being lost to a navigation, a patient switch, or a closed tab.
+  install: pnpm dlx shadcn@latest add https://oxygenui.design/r/unsaved-guard.json
+  states: Clean, Saving, Saved, Autosave failed, Prompt on navigation, Prompt on patient switch, Browser close guard
+  status: stable
+
+## Block
+
+- [Patient Snapshot](https://oxygenui.design/components/patient-snapshot): One-screen pre-encounter summary where every section carries its own recency and failure.
+  install: pnpm dlx shadcn@latest add https://oxygenui.design/r/patient-snapshot.json
+  fhir: Composition
+  states: All sections loaded, Section failed, Section stale, Section empty, Truncated with a count, Changes since last review
+  status: stable
+
+## Machine-readable catalog
+
+- Index: https://oxygenui.design/r/index.json
+- Item: https://oxygenui.design/r/{name}.json
+- Coverage: https://oxygenui.design/r/coverage.json

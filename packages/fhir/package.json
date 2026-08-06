@@ -32,8 +32,7 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test": "vitest run",
-    "lint": "echo \"[fhir] lint: configured in Phase 1\""
+    "test": "vitest run"
   },
   "devDependencies": {
     "@oxygenui/tsconfig": "workspace:*",

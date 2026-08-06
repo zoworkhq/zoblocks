@@ -1,6 +1,4 @@
 import type { Metadata } from "next";
-import Link from "next/link";
-import { ArrowRight } from "lucide-react";
 import { CATALOG } from "@/lib/catalog";
 import { ComponentCard } from "@/components/site/component-card";
 import { ScrollRail, SiteFooter, SiteHeader } from "@/components/site/chrome";
@@ -16,8 +14,11 @@ export default function ComponentsPage() {
   // These two carry the product's argument — interpretation and identity — so
   // they lead, each paired with a standard cell to keep the rhythm even.
   const FEATURED = ["vitals-panel", "patient-banner"];
-  const shipping = CATALOG.filter((c) => c.status === "shipping");
-  const planned = CATALOG.filter((c) => c.status !== "shipping");
+  // "Stable" is the only tier that promises a consumer their build will not
+  // break in a minor release. Beta and experimental are real and installable,
+  // but they belong below the fold rather than in the lead grid.
+  const shipping = CATALOG.filter((c) => c.status === "stable");
+  const planned = CATALOG.filter((c) => c.status !== "stable");
 
   const featured = FEATURED.map((n) => shipping.find((c) => c.name === n)!).filter(Boolean);
   const rest = shipping.filter((c) => !FEATURED.includes(c.name));
