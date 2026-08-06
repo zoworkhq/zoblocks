@@ -1,4 +1,4 @@
-import type { TaskPriority, TaskStatus } from "@/db/schema";
+import type { TaskPriority, TaskStatus } from "@/db/collections";
 
 export const STATUS_LABEL: Record<TaskStatus, string> = {
   todo: "To do",

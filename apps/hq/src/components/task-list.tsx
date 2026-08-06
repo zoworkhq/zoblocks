@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { CalendarDays, ChevronRight, Plus, Search, MessageSquare } from "lucide-react";
-import type { TaskPriority, TaskStatus } from "@/db/schema";
+import type { TaskPriority, TaskStatus } from "@/db/collections";
 import {
   PRIORITY_LABEL,
   PRIORITY_ORDER,

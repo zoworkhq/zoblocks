@@ -14,28 +14,39 @@
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import bcrypt from "bcryptjs";
-import postgres from "postgres";
+import { MongoClient, ObjectId } from "mongodb";
 
-const url =
-  process.env.DATABASE_URL ??
-  readFileSync(path.join(process.cwd(), ".env.local"), "utf8")
-    .split("\n")
-    .find((l) => l.trim().startsWith("DATABASE_URL="))
-    ?.split("=")
-    .slice(1)
-    .join("=")
-    .trim()
-    .replace(/^["']|["']$/g, "");
+function connectionString() {
+  if (process.env.DATABASE_URL) return process.env.DATABASE_URL;
+  const file = readFileSync(path.join(process.cwd(), ".env.local"), "utf8");
+  const line = file.split("\n").find((l) => l.trim().startsWith("DATABASE_URL="));
+  return line
+    ? line
+        .slice(line.indexOf("=") + 1)
+        .trim()
+        .replace(/^["']|["']$/g, "")
+    : "";
+}
 
-if (!url) throw new Error("DATABASE_URL not found in env or .env.local");
-if (!/localhost|127\.0\.0\.1/.test(url)) {
+const uri = connectionString();
+if (!uri) throw new Error("DATABASE_URL not found in env or .env.local");
+if (!/localhost|127\.0\.0\.1|mongodb:\/\/127/.test(uri)) {
   throw new Error("Refusing to seed a non-local database.");
 }
 
-const sql = postgres(url, { max: 1 });
+const client = new MongoClient(uri);
+await client.connect();
+const db = client.db(process.env.HQ_DB_NAME || "hq");
+
 const hash = await bcrypt.hash("dev-placeholder-passphrase", 12);
 const day = 86_400_000;
 const now = Date.now();
+
+if ((await db.collection("users").countDocuments()) > 0) {
+  console.log("Users already seeded — nothing to do.");
+  await client.close();
+  process.exit(0);
+}
 
 const team = [
   ["Ada Okafor", "ada@example.com", "admin", "active"],
@@ -47,22 +58,23 @@ const team = [
 
 const ids = {};
 for (const [name, email, role, status] of team) {
-  const [row] = await sql`
-    insert into users (name, email, password_hash, role, status, approved_at)
-    values (${name}, ${email}, ${hash}, ${role}, ${status},
-            ${status === "active" ? new Date() : null})
-    on conflict do nothing
-    returning id
-  `;
-  if (row) ids[email] = row.id;
+  const _id = new ObjectId();
+  ids[email] = _id;
+  await db.collection("users").insertOne({
+    _id,
+    name,
+    email,
+    emailLower: email.toLowerCase(),
+    passwordHash: hash,
+    role,
+    status,
+    createdAt: new Date(),
+    approvedAt: status === "active" ? new Date() : null,
+    approvedBy: null,
+  });
 }
 
 const admin = ids["ada@example.com"];
-if (!admin) {
-  console.log("Users already seeded — skipping tasks.");
-  await sql.end();
-  process.exit(0);
-}
 
 const tasks = [
   ["Publish @oxygenui-design/fhir 0.1.1", "in_progress", "urgent", ids["ada@example.com"], -1],
@@ -77,14 +89,28 @@ const tasks = [
   ["Ship the OG image", "done", "normal", ids["sam@example.com"], -6],
 ];
 
-for (const [title, status, priority, assignee, dueInDays] of tasks) {
-  await sql`
-    insert into tasks (title, status, priority, assignee_id, creator_id, due_date, completed_at)
-    values (${title}, ${status}, ${priority}, ${assignee ?? null}, ${admin},
-            ${dueInDays === null ? null : new Date(now + dueInDays * day)},
-            ${status === "done" ? new Date() : null})
-  `;
+let seq = 0;
+for (const [title, status, priority, assigneeId, dueInDays] of tasks) {
+  seq += 1;
+  await db.collection("tasks").insertOne({
+    _id: new ObjectId(),
+    ref: seq,
+    title,
+    description: null,
+    status,
+    priority,
+    assigneeId: assigneeId ?? null,
+    creatorId: admin,
+    dueDate: dueInDays === null ? null : new Date(now + dueInDays * day),
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    completedAt: status === "done" ? new Date() : null,
+  });
 }
 
+// Keep the counter ahead of what was seeded, or the next task created through
+// the UI collides with an existing ref and the unique index rejects it.
+await db.collection("counters").updateOne({ _id: "tasks" }, { $set: { seq } }, { upsert: true });
+
 console.log(`Seeded ${team.length} people and ${tasks.length} tasks.`);
-await sql.end();
+await client.close();

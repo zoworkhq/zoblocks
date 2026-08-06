@@ -1,5 +1,5 @@
 import { Flag, User } from "lucide-react";
-import type { TaskPriority, TaskStatus } from "@/db/schema";
+import type { TaskPriority, TaskStatus } from "@/db/collections";
 import {
   PRIORITY_COLOR,
   PRIORITY_LABEL,
