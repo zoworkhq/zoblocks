@@ -22,7 +22,9 @@ export async function emitTailwindSources(
 ): Promise<void> {
   // Distinct parent directories of every component. One today; one per
   // component package once Phase 1 splits them out.
-  const roots = [...new Set(components.map((c) => path.dirname(path.dirname(c.sourceFile))))].sort();
+  const roots = [
+    ...new Set(components.map((c) => path.dirname(path.dirname(c.sourceFile)))),
+  ].sort();
 
   const from = path.dirname(paths.tailwindSources);
   const directives = roots.map((root) => {

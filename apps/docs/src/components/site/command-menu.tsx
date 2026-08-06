@@ -33,9 +33,27 @@ interface Item {
 
 const PAGES: Item[] = [
   { id: "p-home", label: "Home", group: "Pages", href: "/", keywords: "home start overview" },
-  { id: "p-components", label: "Components", group: "Pages", href: "/components", keywords: "catalog browse all" },
-  { id: "p-showcase", label: "Showcase", group: "Pages", href: "/showcase", keywords: "examples compositions demos" },
-  { id: "p-pro", label: "Pro", group: "Pages", href: "/pro", keywords: "pricing templates kits paid enterprise" },
+  {
+    id: "p-components",
+    label: "Components",
+    group: "Pages",
+    href: "/components",
+    keywords: "catalog browse all",
+  },
+  {
+    id: "p-showcase",
+    label: "Showcase",
+    group: "Pages",
+    href: "/showcase",
+    keywords: "examples compositions demos",
+  },
+  {
+    id: "p-pro",
+    label: "Pro",
+    group: "Pages",
+    href: "/pro",
+    keywords: "pricing templates kits paid enterprise",
+  },
 ];
 
 const COMPONENT_ITEMS: Item[] = CATALOG.map((c) => ({
@@ -64,9 +82,7 @@ export function CommandMenu() {
   const results = React.useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!q) return ALL;
-    return ALL.filter(
-      (item) => item.label.toLowerCase().includes(q) || item.keywords.includes(q),
-    );
+    return ALL.filter((item) => item.label.toLowerCase().includes(q) || item.keywords.includes(q));
   }, [query]);
 
   // Grouped, but the flat index is what the keyboard walks — the two must not
@@ -167,119 +183,123 @@ export function CommandMenu() {
         </kbd>
       </button>
 
-      {open && mounted && createPortal(
-        <div
-          className="fixed inset-0 z-50 flex items-start justify-center px-4 pt-[12vh]"
-          onMouseDown={(event) => {
-            if (event.target === event.currentTarget) setOpen(false);
-          }}
-        >
+      {open &&
+        mounted &&
+        createPortal(
           <div
-            aria-hidden="true"
-            className="absolute inset-0 bg-ink/40 backdrop-blur-[2px] motion-safe:animate-[overlay-in_200ms_ease-out]"
-          />
-
-          <div
-            role="dialog"
-            aria-modal="true"
-            aria-label="Search components and pages"
-            className="surface-3 relative w-full max-w-xl overflow-hidden rounded-2xl motion-safe:animate-[dialog-in_260ms_var(--ease-out-expo)]"
+            className="fixed inset-0 z-50 flex items-start justify-center px-4 pt-[12vh]"
+            onMouseDown={(event) => {
+              if (event.target === event.currentTarget) setOpen(false);
+            }}
           >
-            <div className="flex items-center gap-3 border-b border-rule px-4">
-              <Search aria-hidden="true" className="size-4 shrink-0 text-graphite-soft" />
-              <input
-                ref={inputRef}
-                value={query}
-                onChange={(event) => setQuery(event.target.value)}
-                onKeyDown={onKeyDown}
-                placeholder="Search components, resources, pages…"
-                aria-label="Search"
-                role="combobox"
-                aria-expanded="true"
-                aria-controls="command-list"
-                aria-activedescendant={results[active] ? `cmd-${results[active].id}` : undefined}
-                autoComplete="off"
-                spellCheck={false}
-                className="w-full bg-transparent py-4 text-[0.9375rem] text-ink outline-none focus-visible:outline-none focus-visible:shadow-none placeholder:text-graphite-soft"
-              />
-              <kbd className="numeric shrink-0 rounded border border-rule px-1.5 py-0.5 text-[0.625rem] text-graphite-soft">
-                ESC
-              </kbd>
-            </div>
+            <div
+              aria-hidden="true"
+              className="absolute inset-0 bg-ink/40 backdrop-blur-[2px] motion-safe:animate-[overlay-in_200ms_ease-out]"
+            />
 
-            <ul
-              ref={listRef}
-              id="command-list"
-              role="listbox"
-              aria-label="Results"
-              className="scroll-thin max-h-[46vh] overflow-y-auto p-2"
+            <div
+              role="dialog"
+              aria-modal="true"
+              aria-label="Search components and pages"
+              className="surface-3 relative w-full max-w-xl overflow-hidden rounded-2xl motion-safe:animate-[dialog-in_260ms_var(--ease-out-expo)]"
             >
-              {results.length === 0 && (
-                <li className="px-3 py-8 text-center text-sm text-graphite">
-                  No match for “{query}”.
-                </li>
-              )}
-
-              {groups.map((group) => (
-                <li key={group.name}>
-                  <p className="axis-label px-3 pb-1 pt-3">{group.name}</p>
-                  <ul role="group" aria-label={group.name}>
-                    {group.items.map((item) => (
-                      <li
-                        key={item.id}
-                        id={`cmd-${item.id}`}
-                        role="option"
-                        aria-selected={item.index === active}
-                        data-index={item.index}
-                        onMouseEnter={() => setActive(item.index)}
-                        onClick={() => commit(item)}
-                        className={cn(
-                          "flex cursor-pointer items-center justify-between gap-3 rounded-lg px-3 py-2.5 text-sm",
-                          item.index === active
-                            ? "bg-oxygen/10 text-ink"
-                            : "text-graphite hover:bg-paper-sunk",
-                        )}
-                      >
-                        <span className="flex min-w-0 items-center gap-2.5">
-                          <ArrowRight
-                            aria-hidden="true"
-                            className={cn(
-                              "size-3.5 shrink-0 transition-opacity",
-                              item.index === active ? "text-oxygen-deep opacity-100" : "opacity-0",
-                            )}
-                          />
-                          <span className="truncate font-medium">{item.label}</span>
-                        </span>
-                        {item.hint && (
-                          <span className="numeric shrink-0 text-xs text-oxygen-deep">
-                            {item.hint}
-                          </span>
-                        )}
-                      </li>
-                    ))}
-                  </ul>
-                </li>
-              ))}
-            </ul>
-
-            <div className="flex items-center gap-4 border-t border-rule px-4 py-2.5 text-[0.6875rem] text-graphite-soft">
-              <span className="inline-flex items-center gap-1.5">
-                <kbd className="numeric rounded border border-rule px-1 py-0.5">↑↓</kbd> navigate
-              </span>
-              <span className="inline-flex items-center gap-1.5">
-                <kbd className="numeric rounded border border-rule px-1 py-0.5">
-                  <CornerDownLeft className="size-2.5" aria-hidden="true" />
+              <div className="flex items-center gap-3 border-b border-rule px-4">
+                <Search aria-hidden="true" className="size-4 shrink-0 text-graphite-soft" />
+                <input
+                  ref={inputRef}
+                  value={query}
+                  onChange={(event) => setQuery(event.target.value)}
+                  onKeyDown={onKeyDown}
+                  placeholder="Search components, resources, pages…"
+                  aria-label="Search"
+                  role="combobox"
+                  aria-expanded="true"
+                  aria-controls="command-list"
+                  aria-activedescendant={results[active] ? `cmd-${results[active].id}` : undefined}
+                  autoComplete="off"
+                  spellCheck={false}
+                  className="w-full bg-transparent py-4 text-[0.9375rem] text-ink outline-none focus-visible:outline-none focus-visible:shadow-none placeholder:text-graphite-soft"
+                />
+                <kbd className="numeric shrink-0 rounded border border-rule px-1.5 py-0.5 text-[0.625rem] text-graphite-soft">
+                  ESC
                 </kbd>
-                open
-              </span>
-              <span className="numeric ml-auto">
-                {results.length} result{results.length === 1 ? "" : "s"}
-              </span>
+              </div>
+
+              <ul
+                ref={listRef}
+                id="command-list"
+                role="listbox"
+                aria-label="Results"
+                className="scroll-thin max-h-[46vh] overflow-y-auto p-2"
+              >
+                {results.length === 0 && (
+                  <li className="px-3 py-8 text-center text-sm text-graphite">
+                    No match for “{query}”.
+                  </li>
+                )}
+
+                {groups.map((group) => (
+                  <li key={group.name}>
+                    <p className="axis-label px-3 pb-1 pt-3">{group.name}</p>
+                    <ul role="group" aria-label={group.name}>
+                      {group.items.map((item) => (
+                        <li
+                          key={item.id}
+                          id={`cmd-${item.id}`}
+                          role="option"
+                          aria-selected={item.index === active}
+                          data-index={item.index}
+                          onMouseEnter={() => setActive(item.index)}
+                          onClick={() => commit(item)}
+                          className={cn(
+                            "flex cursor-pointer items-center justify-between gap-3 rounded-lg px-3 py-2.5 text-sm",
+                            item.index === active
+                              ? "bg-oxygen/10 text-ink"
+                              : "text-graphite hover:bg-paper-sunk",
+                          )}
+                        >
+                          <span className="flex min-w-0 items-center gap-2.5">
+                            <ArrowRight
+                              aria-hidden="true"
+                              className={cn(
+                                "size-3.5 shrink-0 transition-opacity",
+                                item.index === active
+                                  ? "text-oxygen-deep opacity-100"
+                                  : "opacity-0",
+                              )}
+                            />
+                            <span className="truncate font-medium">{item.label}</span>
+                          </span>
+                          {item.hint && (
+                            <span className="numeric shrink-0 text-xs text-oxygen-deep">
+                              {item.hint}
+                            </span>
+                          )}
+                        </li>
+                      ))}
+                    </ul>
+                  </li>
+                ))}
+              </ul>
+
+              <div className="flex items-center gap-4 border-t border-rule px-4 py-2.5 text-[0.6875rem] text-graphite-soft">
+                <span className="inline-flex items-center gap-1.5">
+                  <kbd className="numeric rounded border border-rule px-1 py-0.5">↑↓</kbd> navigate
+                </span>
+                <span className="inline-flex items-center gap-1.5">
+                  <kbd className="numeric rounded border border-rule px-1 py-0.5">
+                    <CornerDownLeft className="size-2.5" aria-hidden="true" />
+                  </kbd>
+                  open
+                </span>
+                <span className="numeric ml-auto">
+                  {results.length} result{results.length === 1 ? "" : "s"}
+                </span>
+              </div>
             </div>
-          </div>
-        </div>,
-        document.body,
-      )}
+          </div>,
+          document.body,
+        )}
     </>
   );
 }

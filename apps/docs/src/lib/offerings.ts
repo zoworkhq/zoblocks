@@ -28,8 +28,22 @@ export const TEMPLATES: Template[] = [
     role: "Patient",
     summary:
       "Appointments, results, medications, messages, documents, and billing — in plain language, at patient density, with save-and-resume on every form.",
-    screens: ["Dashboard", "Appointments", "Results", "Medications", "Documents", "Billing", "Profile"],
-    uses: ["patient-banner", "appointment-card", "vitals-panel", "medication-card", "coverage-card"],
+    screens: [
+      "Dashboard",
+      "Appointments",
+      "Results",
+      "Medications",
+      "Documents",
+      "Billing",
+      "Profile",
+    ],
+    uses: [
+      "patient-banner",
+      "appointment-card",
+      "vitals-panel",
+      "medication-card",
+      "coverage-card",
+    ],
     status: "building",
     tier: "pro",
   },
@@ -269,8 +283,7 @@ export const SHOWCASE: ShowcaseEntry[] = [
     slug: "medication-review",
     title: "Medication review",
     role: "Pharmacist",
-    blurb:
-      "Active, held, expired, and stopped in one list, with the allergy list beside it.",
+    blurb: "Active, held, expired, and stopped in one list, with the allergy list beside it.",
     demonstrates:
       "Four medication statuses that most implementations flatten into one grey style, and a refuted allergy that must not read as active.",
     density: "standard",

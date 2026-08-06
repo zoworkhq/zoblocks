@@ -9,13 +9,12 @@ export default defineComponentMeta({
   layer: "clinical",
 
   summary: "Persistent identity header for a clinical screen, driven by a FHIR Patient resource.",
-  description: "Persistent patient identity header driven by a FHIR R4 Patient resource. Handles restricted records, deceased status, masked identifiers, and missing demographics.",
-  rationale: "Renders who the chart belongs to and keeps it reachable at any point on the screen. Wrong-patient error is one of the highest-consequence failures in clinical software, so this component never invents a name, never renders absence as blankness, and announces deceased and restricted status to assistive technology rather than conveying it through styling alone.",
+  description:
+    "Persistent patient identity header driven by a FHIR R4 Patient resource. Handles restricted records, deceased status, masked identifiers, and missing demographics.",
+  rationale:
+    "Renders who the chart belongs to and keeps it reachable at any point on the screen. Wrong-patient error is one of the highest-consequence failures in clinical software, so this component never invents a name, never renders absence as blankness, and announces deceased and restricted status to assistive technology rather than conveying it through styling alone.",
 
-  categories: [
-    "Patient identity",
-    "Clinical",
-  ],
+  categories: ["Patient identity", "Clinical"],
   fhir: [
     {
       name: "Patient",
@@ -35,15 +34,18 @@ export default defineComponentMeta({
   a11y: [
     {
       label: "Landmark",
-      detail: "Renders as a labelled region so the patient context is reachable from anywhere on the page.",
+      detail:
+        "Renders as a labelled region so the patient context is reachable from anywhere on the page.",
     },
     {
       label: "Status flags",
-      detail: "Deceased and restricted are text and icon, not color. Both are inside the region's accessible name.",
+      detail:
+        "Deceased and restricted are text and icon, not color. Both are inside the region's accessible name.",
     },
     {
       label: "Masked identifiers",
-      detail: "Screen readers receive the last four characters and an explicit statement that the value is masked.",
+      detail:
+        "Screen readers receive the last four characters and an explicit statement that the value is masked.",
     },
     {
       label: "Loading",
@@ -51,7 +53,8 @@ export default defineComponentMeta({
     },
     {
       label: "Heading level",
-      detail: "The patient name renders at a configurable heading level so a nested banner does not corrupt the page outline.",
+      detail:
+        "The patient name renders at a configurable heading level so a nested banner does not corrupt the page outline.",
     },
   ],
 
@@ -73,20 +76,10 @@ export default defineComponentMeta({
     "Age is computed in whole years only. Neonatal and paediatric age display (days, weeks, months) is not yet handled.",
     "No built-in patient-photo slot.",
   ],
-  related: [
-    "vitals-panel",
-  ],
+  related: ["vitals-panel"],
 
-  dependencies: [
-    "@oxygenui-design/fhir@^0.1.0",
-    "lucide-react",
-    "clsx",
-    "tailwind-merge",
-  ],
-  registryDependencies: [
-    "utils",
-    "tokens",
-  ],
+  dependencies: ["@oxygenui-design/fhir@^0.1.0", "lucide-react", "clsx", "tailwind-merge"],
+  registryDependencies: ["utils", "tokens"],
 
   usage: `import { PatientBanner } from "@/components/oxygen/patient-banner";
 

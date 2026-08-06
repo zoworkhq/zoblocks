@@ -31,16 +31,16 @@ the generated catalog rather than per pull request.**
 
 2. **The full pyramid:**
 
-   | Level | Tool | Scope |
-   | --- | --- | --- |
-   | Unit | Vitest + Testing Library | logic and rendering |
-   | Interaction | Storybook play functions | keyboard paths, focus, transitions |
-   | Accessibility | axe per story | × 2 themes × 3 densities, plus forced-colors |
-   | Visual regression | Playwright | every story × theme × density |
-   | Type | `expect-type` | public prop contracts |
-   | API surface | `api-extractor` | committed report, diffed in review |
-   | Bundle | `size-limit` | per subpath and per barrel |
-   | E2E | Playwright | docs site and a reference application |
+   | Level             | Tool                     | Scope                                        |
+   | ----------------- | ------------------------ | -------------------------------------------- |
+   | Unit              | Vitest + Testing Library | logic and rendering                          |
+   | Interaction       | Storybook play functions | keyboard paths, focus, transitions           |
+   | Accessibility     | axe per story            | × 2 themes × 3 densities, plus forced-colors |
+   | Visual regression | Playwright               | every story × theme × density                |
+   | Type              | `expect-type`            | public prop contracts                        |
+   | API surface       | `api-extractor`          | committed report, diffed in review           |
+   | Bundle            | `size-limit`             | per subpath and per barrel                   |
+   | E2E               | Playwright               | docs site and a reference application        |
 
 3. **Visual regression must be deterministic.** Frozen time, animation and
    transitions disabled, fonts pinned as local files, browser version pinned,

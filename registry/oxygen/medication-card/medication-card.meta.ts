@@ -8,14 +8,14 @@ export default defineComponentMeta({
   since: "0.1.0",
   layer: "clinical",
 
-  summary: "Dose, route, schedule, and status. Held, stopped, and expired are distinct — not one greyed-out style.",
-  description: "Medication order from a FHIR MedicationRequest. On-hold, stopped, completed, and expired each get their own label and tone rather than one greyed-out style, because they lead to opposite next actions.",
-  rationale: "Renders a medication order with its dosage instruction and status. The design problem is status: most implementations collapse on-hold, stopped, completed, and expired into a single muted treatment, which loses the difference between a drug a clinician deliberately paused and one that simply ran out of refills. Those lead to opposite next actions, so each gets its own label and tone. Expired is derived rather than stored — FHIR has no expired status, so an order still marked active past its dispense validity period is surfaced as expired instead of presented as current.",
+  summary:
+    "Dose, route, schedule, and status. Held, stopped, and expired are distinct — not one greyed-out style.",
+  description:
+    "Medication order from a FHIR MedicationRequest. On-hold, stopped, completed, and expired each get their own label and tone rather than one greyed-out style, because they lead to opposite next actions.",
+  rationale:
+    "Renders a medication order with its dosage instruction and status. The design problem is status: most implementations collapse on-hold, stopped, completed, and expired into a single muted treatment, which loses the difference between a drug a clinician deliberately paused and one that simply ran out of refills. Those lead to opposite next actions, so each gets its own label and tone. Expired is derived rather than stored — FHIR has no expired status, so an order still marked active past its dispense validity period is surfaced as expired instead of presented as current.",
 
-  categories: [
-    "Medication",
-    "Clinical",
-  ],
+  categories: ["Medication", "Clinical"],
   fhir: [
     {
       name: "MedicationRequest",
@@ -38,11 +38,13 @@ export default defineComponentMeta({
   a11y: [
     {
       label: "No strike-through",
-      detail: "Discontinued medications are never struck through — struck text is unreadable at small sizes and is not exposed as meaning by screen readers. The status badge carries the state.",
+      detail:
+        "Discontinued medications are never struck through — struck text is unreadable at small sizes and is not exposed as meaning by screen readers. The status badge carries the state.",
     },
     {
       label: "Status labels",
-      detail: "Every status has a text label, not just a tone. On hold, stopped, and expired are distinguishable in grayscale.",
+      detail:
+        "Every status has a text label, not just a tone. On hold, stopped, and expired are distinguishable in grayscale.",
     },
     {
       label: "Activation",
@@ -68,22 +70,10 @@ export default defineComponentMeta({
     "No interaction or contraindication checking. That is a clinical decision support concern, not a UI one.",
     "medicationReference renders the reference display text; it does not resolve the Medication resource.",
   ],
-  related: [
-    "allergy-list",
-    "condition-list",
-  ],
+  related: ["allergy-list", "condition-list"],
 
-  dependencies: [
-    "@oxygenui-design/fhir@^0.1.0",
-    "lucide-react",
-    "clsx",
-    "tailwind-merge",
-  ],
-  registryDependencies: [
-    "utils",
-    "tokens",
-    "status-badge",
-  ],
+  dependencies: ["@oxygenui-design/fhir@^0.1.0", "lucide-react", "clsx", "tailwind-merge"],
+  registryDependencies: ["utils", "tokens", "status-badge"],
 
   usage: `import { MedicationCard, MedicationList } from "@/components/oxygen/medication-card";
 

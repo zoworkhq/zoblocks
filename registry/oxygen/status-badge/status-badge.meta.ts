@@ -8,32 +8,28 @@ export default defineComponentMeta({
   since: "0.1.0",
   layer: "primitive",
 
-  summary: "The shared severity chip. Critical reads identically on a lab result, a medication, and an allergy.",
-  description: "Shared severity and status chip used by every Oxygen component, so critical reads identically on a lab result, a medication, and an allergy. Label is required — there is no icon-only variant.",
-  rationale: "The status chip every other Oxygen component uses, so that severity is consistent across the whole system. Two rules are enforced by the API itself: children is required, because an icon alone is not a label but a rebus; and tone maps to a semantic token rather than a raw color, so a caller passes “critical”, never “red”, and the token decides what that means in light, dark, and forced-colors modes.",
+  summary:
+    "The shared severity chip. Critical reads identically on a lab result, a medication, and an allergy.",
+  description:
+    "Shared severity and status chip used by every Oxygen component, so critical reads identically on a lab result, a medication, and an allergy. Label is required — there is no icon-only variant.",
+  rationale:
+    "The status chip every other Oxygen component uses, so that severity is consistent across the whole system. Two rules are enforced by the API itself: children is required, because an icon alone is not a label but a rebus; and tone maps to a semantic token rather than a raw color, so a caller passes “critical”, never “red”, and the token decides what that means in light, dark, and forced-colors modes.",
 
-  categories: [
-    "Primitive",
-  ],
+  categories: ["Primitive"],
   fhir: [],
 
-  states: [
-    "Critical",
-    "High",
-    "Low",
-    "Normal",
-    "Unknown",
-    "Neutral",
-  ],
+  states: ["Critical", "High", "Low", "Normal", "Unknown", "Neutral"],
 
   a11y: [
     {
       label: "Label required",
-      detail: "The API has no icon-only variant, so a badge can never ship without an accessible label.",
+      detail:
+        "The API has no icon-only variant, so a badge can never ship without an accessible label.",
     },
     {
       label: "Token-driven",
-      detail: "Tones resolve through status tokens, keeping contrast correct in light, dark, and forced-colors modes.",
+      detail:
+        "Tones resolve through status tokens, keeping contrast correct in light, dark, and forced-colors modes.",
     },
   ],
 
@@ -53,20 +49,10 @@ export default defineComponentMeta({
     "Not interactive — no button, link, or dismiss behavior.",
     "Six tones only. Additional semantics belong in a token, not a one-off color.",
   ],
-  related: [
-    "vitals-panel",
-    "medication-card",
-  ],
+  related: ["vitals-panel", "medication-card"],
 
-  dependencies: [
-    "lucide-react",
-    "clsx",
-    "tailwind-merge",
-  ],
-  registryDependencies: [
-    "utils",
-    "tokens",
-  ],
+  dependencies: ["lucide-react", "clsx", "tailwind-merge"],
+  registryDependencies: ["utils", "tokens"],
 
   usage: `import { StatusBadge } from "@/components/oxygen/status-badge";
 

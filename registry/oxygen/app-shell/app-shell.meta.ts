@@ -8,14 +8,14 @@ export default defineComponentMeta({
   since: "0.1.0",
   layer: "pattern",
 
-  summary: "Navigation composed from permissions, patient context as a landmark, and guarded context changes.",
-  description: "Outermost frame composed from the user's permissions rather than rendered-then-disabled. Patient context is a landmark, context changes are guarded, and session expiry warns before it acts.",
-  rationale: "A prescriber, a scheduler, and a billing analyst need genuinely different products out of one codebase, so navigation is derived from permissions rather than rendered-then-disabled — a greyed-out “Prescribe” teaches a nurse the system is broken and teaches an auditor nothing. Patient context is a landmark rather than a breadcrumb, because which chart is open is a safety fact. Session expiry warns before it acts, because expiring a session under a half-written note is how documentation is lost to a policy timer.",
+  summary:
+    "Navigation composed from permissions, patient context as a landmark, and guarded context changes.",
+  description:
+    "Outermost frame composed from the user's permissions rather than rendered-then-disabled. Patient context is a landmark, context changes are guarded, and session expiry warns before it acts.",
+  rationale:
+    "A prescriber, a scheduler, and a billing analyst need genuinely different products out of one codebase, so navigation is derived from permissions rather than rendered-then-disabled — a greyed-out “Prescribe” teaches a nurse the system is broken and teaches an auditor nothing. Patient context is a landmark rather than a breadcrumb, because which chart is open is a safety fact. Session expiry warns before it acts, because expiring a session under a half-written note is how documentation is lost to a policy timer.",
 
-  categories: [
-    "Navigation",
-    "System",
-  ],
+  categories: ["Navigation", "System"],
   fhir: [
     {
       name: "PractitionerRole",
@@ -35,11 +35,13 @@ export default defineComponentMeta({
   a11y: [
     {
       label: "Correct landmarks",
-      detail: "Primary navigation, patient context, and main content are separate labelled landmarks.",
+      detail:
+        "Primary navigation, patient context, and main content are separate labelled landmarks.",
     },
     {
       label: "Counts in the name",
-      detail: "Badge counts are part of each link's accessible name, with urgent distinguished from unread.",
+      detail:
+        "Badge counts are part of each link's accessible name, with urgent distinguished from unread.",
     },
     {
       label: "Provisioning failure is visible",
@@ -65,21 +67,10 @@ export default defineComponentMeta({
     "Session countdown is driven by the prop; the timer itself is yours.",
     "Multi-patient tab management is a separate component.",
   ],
-  related: [
-    "unsaved-guard",
-    "patient-banner",
-    "restricted-shield",
-  ],
+  related: ["unsaved-guard", "patient-banner", "restricted-shield"],
 
-  dependencies: [
-    "lucide-react",
-    "clsx",
-    "tailwind-merge",
-  ],
-  registryDependencies: [
-    "utils",
-    "tokens",
-  ],
+  dependencies: ["lucide-react", "clsx", "tailwind-merge"],
+  registryDependencies: ["utils", "tokens"],
 
   usage: `import { AppShell } from "@/components/oxygen/app-shell";
 

@@ -31,8 +31,8 @@ export default function ShowcasePage() {
               </h1>
               <p className="body-lg mt-6 max-w-xl text-pretty text-graphite" data-reveal>
                 A single component is easy to make look good. These are compositions — several
-                components on one screen, at the density that screen actually runs at, with the
-                hard states left in.
+                components on one screen, at the density that screen actually runs at, with the hard
+                states left in.
               </p>
 
               {/*

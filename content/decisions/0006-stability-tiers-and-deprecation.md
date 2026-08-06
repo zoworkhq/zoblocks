@@ -23,12 +23,12 @@ Neither is solved by a policy document. It has to be structural.
 **`status` in a component's metadata determines its export path, and therefore
 what semver promises about it.**
 
-| Status | Export path | Breaking-change policy |
-| --- | --- | --- |
-| `experimental` | `@oxygenui/react/experimental` | may break in any minor |
-| `beta` | main barrel, flagged in docs | may break in a minor, noted in the changeset |
-| `stable` | main barrel | breaks only in a major |
-| `deprecated` | main barrel, dev-time warning | removed in the next major |
+| Status         | Export path                    | Breaking-change policy                       |
+| -------------- | ------------------------------ | -------------------------------------------- |
+| `experimental` | `@oxygenui/react/experimental` | may break in any minor                       |
+| `beta`         | main barrel, flagged in docs   | may break in a minor, noted in the changeset |
+| `stable`       | main barrel                    | breaks only in a major                       |
+| `deprecated`   | main barrel, dev-time warning  | removed in the next major                    |
 
 Routing experimental work through a separate export path is the mechanism. A
 consumer importing from `/experimental` has opted in explicitly, so breaking it

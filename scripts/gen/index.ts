@@ -93,9 +93,13 @@ async function main() {
     console.warn(`\n⚠ ${heading}`);
     for (const failure of coverage.failures.slice(0, 8)) console.warn(`  ${failure}`);
     if (coverage.failures.length > 8) {
-      console.warn(`  … and ${coverage.failures.length - 8} more — see apps/docs/public/r/coverage.json`);
+      console.warn(
+        `  … and ${coverage.failures.length - 8} more — see apps/docs/public/r/coverage.json`,
+      );
     }
-    console.warn("  Not fatal yet. Becomes fatal under --strict once story and test infrastructure lands.\n");
+    console.warn(
+      "  Not fatal yet. Becomes fatal under --strict once story and test infrastructure lands.\n",
+    );
   }
 
   const totalProps = [...props.values()].reduce(

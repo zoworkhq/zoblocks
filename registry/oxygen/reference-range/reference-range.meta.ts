@@ -8,14 +8,14 @@ export default defineComponentMeta({
   since: "0.1.0",
   layer: "primitive",
 
-  summary: "Positions a result against its own range, and refuses to draw when no bound was stated.",
-  description: "Positions a result against its own reference range. Refuses to draw when no numeric bound was stated, and marks off-scale and one-sided ranges rather than implying bounds nobody gave.",
-  rationale: "A badge tells you a potassium is high. It does not tell you whether it is 5.2 or 6.8, and those are different afternoons. The discipline is in refusing to draw: no numeric bound means no bar, because a drawn scale implies bounds nobody stated. An off-scale value is clamped with an explicit marker rather than silently pinned to the edge as though it were merely borderline.",
+  summary:
+    "Positions a result against its own range, and refuses to draw when no bound was stated.",
+  description:
+    "Positions a result against its own reference range. Refuses to draw when no numeric bound was stated, and marks off-scale and one-sided ranges rather than implying bounds nobody gave.",
+  rationale:
+    "A badge tells you a potassium is high. It does not tell you whether it is 5.2 or 6.8, and those are different afternoons. The discipline is in refusing to draw: no numeric bound means no bar, because a drawn scale implies bounds nobody stated. An off-scale value is clamped with an explicit marker rather than silently pinned to the edge as though it were merely borderline.",
 
-  categories: [
-    "Primitive",
-    "Clinical",
-  ],
+  categories: ["Primitive", "Clinical"],
   fhir: [
     {
       name: "Observation.referenceRange",
@@ -35,11 +35,13 @@ export default defineComponentMeta({
   a11y: [
     {
       label: "Decorative by design",
-      detail: "The bar is hidden from assistive technology. The value, bounds, and interpretation are announced by the surrounding row; a nameless graphic would add noise, not access.",
+      detail:
+        "The bar is hidden from assistive technology. The value, bounds, and interpretation are announced by the surrounding row; a nameless graphic would add noise, not access.",
     },
     {
       label: "Off-scale survives greyscale",
-      detail: "An off-scale marker changes shape as well as position, and is labelled in text, so the fact survives monochrome printing.",
+      detail:
+        "An off-scale marker changes shape as well as position, and is labelled in text, so the fact survives monochrome printing.",
     },
     {
       label: "Bounds as text",
@@ -64,22 +66,10 @@ export default defineComponentMeta({
     "One-sided ranges infer the far end of the scale; it is marked, not hidden.",
     "Age- and sex-conditional range selection is the caller's job.",
   ],
-  related: [
-    "clinical-value",
-    "vitals-panel",
-    "status-badge",
-  ],
+  related: ["clinical-value", "vitals-panel", "status-badge"],
 
-  dependencies: [
-    "@oxygenui-design/fhir@^0.1.0",
-    "lucide-react",
-    "clsx",
-    "tailwind-merge",
-  ],
-  registryDependencies: [
-    "utils",
-    "tokens",
-  ],
+  dependencies: ["@oxygenui-design/fhir@^0.1.0", "lucide-react", "clsx", "tailwind-merge"],
+  registryDependencies: ["utils", "tokens"],
 
   usage: `import { ReferenceRange } from "@/components/oxygen/reference-range";
 

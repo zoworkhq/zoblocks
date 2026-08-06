@@ -14,7 +14,10 @@ import type { LoadedComponent } from "../load";
 import type { ExtractedExport } from "../props";
 import type { Emitter } from "../write";
 
-function applyPropOverrides(props: PropDoc[], overrides: LoadedComponent["meta"]["props"]): PropDoc[] {
+function applyPropOverrides(
+  props: PropDoc[],
+  overrides: LoadedComponent["meta"]["props"],
+): PropDoc[] {
   if (!overrides.length) return props;
 
   const byName = new Map(overrides.map((o) => [o.name, o]));

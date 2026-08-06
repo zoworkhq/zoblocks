@@ -8,13 +8,14 @@ export default defineComponentMeta({
   since: "0.1.0",
   layer: "clinical",
 
-  summary: "Effective state derived from status and period together — an active record past its end date reads as lapsed.",
-  description: "Insurance coverage from a FHIR Coverage resource. Effective state is derived from status and period together, so a coverage marked active but past its end date reads as lapsed.",
-  rationale: "Renders insurance coverage with payer, plan, member and group identifiers, and the active period. A status of active is not sufficient to say a coverage is usable: a record can carry an active status while its period has already ended, and acting on lapsed coverage produces a denied claim and a surprise bill for the patient. The effective state is therefore derived from status and period together.",
+  summary:
+    "Effective state derived from status and period together — an active record past its end date reads as lapsed.",
+  description:
+    "Insurance coverage from a FHIR Coverage resource. Effective state is derived from status and period together, so a coverage marked active but past its end date reads as lapsed.",
+  rationale:
+    "Renders insurance coverage with payer, plan, member and group identifiers, and the active period. A status of active is not sufficient to say a coverage is usable: a record can carry an active status while its period has already ended, and acting on lapsed coverage produces a denied claim and a surprise bill for the patient. The effective state is therefore derived from status and period together.",
 
-  categories: [
-    "Billing and coverage",
-  ],
+  categories: ["Billing and coverage"],
   fhir: [
     {
       name: "Coverage",
@@ -34,15 +35,18 @@ export default defineComponentMeta({
   a11y: [
     {
       label: "Lapsed is explicit",
-      detail: "A lapsed coverage adds a written instruction to verify eligibility, not just a red border.",
+      detail:
+        "A lapsed coverage adds a written instruction to verify eligibility, not just a red border.",
     },
     {
       label: "Masked identifiers",
-      detail: "Screen readers receive the last four characters and a statement that the value is masked.",
+      detail:
+        "Screen readers receive the last four characters and a statement that the value is masked.",
     },
     {
       label: "Absent fields",
-      detail: "Every unpopulated field renders as explicitly not recorded rather than as an empty cell.",
+      detail:
+        "Every unpopulated field renders as explicitly not recorded rather than as an empty cell.",
     },
   ],
 
@@ -64,22 +68,10 @@ export default defineComponentMeta({
     "Cost-to-beneficiary (copay, deductible) is not rendered.",
     "No eligibility or benefits verification — display only.",
   ],
-  related: [
-    "patient-banner",
-    "appointment-card",
-  ],
+  related: ["patient-banner", "appointment-card"],
 
-  dependencies: [
-    "@oxygenui-design/fhir@^0.1.0",
-    "lucide-react",
-    "clsx",
-    "tailwind-merge",
-  ],
-  registryDependencies: [
-    "utils",
-    "tokens",
-    "status-badge",
-  ],
+  dependencies: ["@oxygenui-design/fhir@^0.1.0", "lucide-react", "clsx", "tailwind-merge"],
+  registryDependencies: ["utils", "tokens", "status-badge"],
 
   usage: `import { CoverageCard } from "@/components/oxygen/coverage-card";
 

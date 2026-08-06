@@ -8,14 +8,14 @@ export default defineComponentMeta({
   since: "0.1.0",
   layer: "clinical",
 
-  summary: "Dose entry with ISMP formatting rules, plausibility separated from hard limits, and visible arithmetic.",
-  description: "Numeric entry for doses with ISMP formatting rules, plausibility warnings separated from hard maximums, and weight-based calculation that shows its arithmetic.",
-  rationale: "One of the highest-consequence inputs in healthcare software, and a free-text number field is not an acceptable control for it. Three defences in order of harm prevented: ISMP formatting rules, because “1.0 mg” read past the decimal point is 10 mg; plausibility warnings kept separate from hard maximums, because a dose can be unusual and correct and conflating the two teaches prescribers to click through both; and weight-based calculation that keeps its inputs on screen, because a calculator returning a bare number invites use with a stale weight.",
+  summary:
+    "Dose entry with ISMP formatting rules, plausibility separated from hard limits, and visible arithmetic.",
+  description:
+    "Numeric entry for doses with ISMP formatting rules, plausibility warnings separated from hard maximums, and weight-based calculation that shows its arithmetic.",
+  rationale:
+    "One of the highest-consequence inputs in healthcare software, and a free-text number field is not an acceptable control for it. Three defences in order of harm prevented: ISMP formatting rules, because “1.0 mg” read past the decimal point is 10 mg; plausibility warnings kept separate from hard maximums, because a dose can be unusual and correct and conflating the two teaches prescribers to click through both; and weight-based calculation that keeps its inputs on screen, because a calculator returning a bare number invites use with a stale weight.",
 
-  categories: [
-    "Primitive",
-    "Clinical",
-  ],
+  categories: ["Primitive", "Clinical"],
   fhir: [
     {
       name: "Dosage",
@@ -36,7 +36,8 @@ export default defineComponentMeta({
   a11y: [
     {
       label: "Messages bound to the field",
-      detail: "Every warning is associated through aria-describedby and announced on the input, not discovered at submit.",
+      detail:
+        "Every warning is associated through aria-describedby and announced on the input, not discovered at submit.",
     },
     {
       label: "Blocking states are alerts",
@@ -44,7 +45,8 @@ export default defineComponentMeta({
     },
     {
       label: "No spinner",
-      detail: "A numeric keypad without increment controls, so a stray scroll cannot change a prescription.",
+      detail:
+        "A numeric keypad without increment controls, so a stray scroll cannot change a prescription.",
     },
   ],
 
@@ -66,22 +68,10 @@ export default defineComponentMeta({
     "Unit lists are caller-supplied; the component does not know which units suit a formulation.",
     "Override workflow for exceeding the maximum is yours to build; this blocks and explains.",
   ],
-  related: [
-    "clinical-value",
-    "action-gate",
-    "medication-card",
-  ],
+  related: ["clinical-value", "action-gate", "medication-card"],
 
-  dependencies: [
-    "@oxygenui-design/fhir@^0.1.0",
-    "lucide-react",
-    "clsx",
-    "tailwind-merge",
-  ],
-  registryDependencies: [
-    "utils",
-    "tokens",
-  ],
+  dependencies: ["@oxygenui-design/fhir@^0.1.0", "lucide-react", "clsx", "tailwind-merge"],
+  registryDependencies: ["utils", "tokens"],
 
   usage: `import { DoseInput } from "@/components/oxygen/dose-input";
 

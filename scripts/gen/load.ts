@@ -70,7 +70,9 @@ export async function loadComponents(): Promise<LoadedComponent[]> {
     const module = (await import(pathToFileURL(metaFile).href)) as { default?: unknown };
 
     if (module.default === undefined) {
-      problems.push(`${rel(metaFile)}: no default export — use \`export default defineComponentMeta({...})\``);
+      problems.push(
+        `${rel(metaFile)}: no default export — use \`export default defineComponentMeta({...})\``,
+      );
       continue;
     }
 
@@ -115,7 +117,9 @@ export async function loadComponents(): Promise<LoadedComponent[]> {
     for (const dep of component.meta.registryDependencies) {
       // Bare names refer to items in this registry; anything else is external.
       if (!dep.includes("/") && !names.has(dep) && !["utils", "tokens"].includes(dep)) {
-        problems.push(`${component.meta.name}: registryDependency "${dep}" does not exist in this registry`);
+        problems.push(
+          `${component.meta.name}: registryDependency "${dep}" does not exist in this registry`,
+        );
       }
     }
     if (component.meta.related.includes(component.meta.name)) {

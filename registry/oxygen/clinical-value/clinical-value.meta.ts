@@ -8,14 +8,14 @@ export default defineComponentMeta({
   since: "0.1.0",
   layer: "primitive",
 
-  summary: "One measured quantity, unit, and comparator as a single atomic element that cannot drift apart.",
-  description: "One measured quantity, unit, comparator, and interpretation as a single atomic element. Preserves reported precision and never lets a value drift apart from its unit.",
-  rationale: "The bug this prevents is mundane and everywhere: a value and its unit as separate nodes, which drift apart under truncation, wrapping, or translation. Here they are one element. Precision is never changed — a lab that reported 5.10 meant three significant figures. Comparators survive, because a result of <0.01 is not 0.01. Absence routes to AbsentValue; there is no path that renders an empty string.",
+  summary:
+    "One measured quantity, unit, and comparator as a single atomic element that cannot drift apart.",
+  description:
+    "One measured quantity, unit, comparator, and interpretation as a single atomic element. Preserves reported precision and never lets a value drift apart from its unit.",
+  rationale:
+    "The bug this prevents is mundane and everywhere: a value and its unit as separate nodes, which drift apart under truncation, wrapping, or translation. Here they are one element. Precision is never changed — a lab that reported 5.10 meant three significant figures. Comparators survive, because a result of <0.01 is not 0.01. Absence routes to AbsentValue; there is no path that renders an empty string.",
 
-  categories: [
-    "Primitive",
-    "Clinical",
-  ],
+  categories: ["Primitive", "Clinical"],
   fhir: [
     {
       name: "Quantity",
@@ -35,15 +35,18 @@ export default defineComponentMeta({
   a11y: [
     {
       label: "One accessible name",
-      detail: "The comparator, number, and expanded unit are announced as a single phrase, so a screen reader never reads a bare number.",
+      detail:
+        "The comparator, number, and expanded unit are announced as a single phrase, so a screen reader never reads a bare number.",
     },
     {
       label: "Unit expansion",
-      detail: "Common units are spoken in full — mg/dL and mmol/L differ by a factor that matters. Unknown units are announced as written rather than guessed at.",
+      detail:
+        "Common units are spoken in full — mg/dL and mmol/L differ by a factor that matters. Unknown units are announced as written rather than guessed at.",
     },
     {
       label: "Tabular figures",
-      detail: "Decimal points align down a column, which is what makes a dense results table scannable.",
+      detail:
+        "Decimal points align down a column, which is what makes a dense results table scannable.",
     },
   ],
 
@@ -65,23 +68,10 @@ export default defineComponentMeta({
     "The spoken-unit table covers common units only; an unlisted unit is read as written.",
     "Tone is presentational \\u2014 it does not derive severity from the value.",
   ],
-  related: [
-    "absent-value",
-    "reference-range",
-    "vitals-panel",
-  ],
+  related: ["absent-value", "reference-range", "vitals-panel"],
 
-  dependencies: [
-    "@oxygenui-design/fhir@^0.1.0",
-    "lucide-react",
-    "clsx",
-    "tailwind-merge",
-  ],
-  registryDependencies: [
-    "utils",
-    "tokens",
-    "absent-value",
-  ],
+  dependencies: ["@oxygenui-design/fhir@^0.1.0", "lucide-react", "clsx", "tailwind-merge"],
+  registryDependencies: ["utils", "tokens", "absent-value"],
 
   usage: `import { ClinicalValue } from "@/components/oxygen/clinical-value";
 
