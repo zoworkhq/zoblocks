@@ -16,6 +16,13 @@ env:
   VERCEL_ORG_ID: team_ykOxK7PvNXML8d1afzA5dfNP
   VERCEL_PROJECT_ID_DOCS: prj_mdPnSKVCxN5nwG1XZrHDBrBHYOQq
 
+  # Where mongodb-memory-server keeps its mongod, for hq's tests. Set here
+  # rather than left to default because the library resolves the directory from
+  # the working directory: `pnpm install` runs at the root and `turbo run test`
+  # runs in apps/hq, so the default has them disagree and fetch it twice. One
+  # fixed path is also the only thing actions/cache can be pointed at.
+  MONGOMS_DOWNLOAD_DIR: ${{ github.workspace }}/.cache/mongodb-binaries
+
 jobs:
   verify:
     name: Typecheck, test, build
@@ -32,14 +39,13 @@ jobs:
           node-version: 22
           cache: pnpm
 
-      # hq's tests run against a real mongod, which `mongodb-memory-server`
-      # fetches in its postinstall. Restored before install so the postinstall
-      # finds it and skips a 66MB download on every run — and so a network
-      # hiccup at the download host cannot fail an otherwise-green build.
+      # hq's tests run against a real mongod, fetched by mongodb-memory-server's
+      # postinstall. Restored before install so the postinstall finds it, and so
+      # a bad day at the download host cannot fail an otherwise-green build.
       - name: Cache mongod binary
         uses: actions/cache@v4
         with:
-          path: node_modules/.cache/mongodb-memory-server
+          path: ${{ github.workspace }}/.cache/mongodb-binaries
           key: mongod-${{ runner.os }}-7.0.24
 
       - name: Install
