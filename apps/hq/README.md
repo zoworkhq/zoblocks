@@ -78,6 +78,33 @@ Indexes are not applied at build time on purpose — run `db:indexes` deliberate
 against production. A unique index fails to build if existing data violates it,
 which is a thing to watch rather than discover in a deploy log.
 
+### Why `vercel.json` pins the region to `bom1`
+
+**The functions must run in the same region as the database.** Do not remove
+that line without moving the cluster.
+
+hq was first deployed on the default region, `iad1` (Washington DC), while the
+Atlas cluster is in `ap-south-1` (Mumbai) — so every query crossed the Atlantic
+twice. From Mumbai the cluster answers in about 45ms; from Virginia it is closer
+to 200ms, and none of hq's pages issue only one query:
+
+| Page     | Sequential round trips                                      |
+| -------- | ----------------------------------------------------------- |
+| any page | session lookup, then the user it points at — 2, unavoidably |
+| `/board` | plus tasks, plus members and comment counts                 |
+
+That is roughly three to four serial round trips before anything renders, and a
+cold function pays the connection handshake — TCP, TLS, then SCRAM auth — on top,
+which is several more. At Virginia latency the network alone accounted for well
+over a second; the queries themselves are trivial and the data is tiny.
+
+`x-vercel-id` on any response names the region that served it, in the form
+`edge::function::id` — the second field is the one that matters here.
+
+Nothing about this is specific to hq: any Vercel app talking to a database in
+another continent has the same problem, and it is invisible in local
+development, where the database is a few milliseconds away.
+
 ## Not built yet
 
 Comments and the activity feed have tables and are written to, but nothing
