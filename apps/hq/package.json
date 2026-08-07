@@ -2,14 +2,15 @@
   "name": "@oxygenui-design/hq",
   "version": "0.1.0",
   "private": true,
-  "description": "hq.oxygenui.design \u2014 internal task management for the Zowork team. Not part of the public registry.",
+  "description": "hq.oxygenui.design — internal task management for the Zowork team. Not part of the public registry.",
   "scripts": {
     "dev": "next dev --turbopack --port 6002",
     "build": "next build",
     "start": "next start --port 6002",
     "typecheck": "tsc --noEmit",
     "lint": "next lint",
-    "db:indexes": "node scripts/ensure-indexes.mjs"
+    "db:indexes": "node scripts/ensure-indexes.mjs",
+    "test": "vitest run"
   },
   "dependencies": {
     "@oxygenui-design/tokens": "workspace:*",
@@ -30,7 +31,9 @@
     "@types/node": "^22.10.2",
     "@types/react": "^19.0.2",
     "@types/react-dom": "^19.0.2",
+    "mongodb-memory-server": "^10",
     "tailwindcss": "^4.0.0",
-    "typescript": "^5.7.2"
+    "typescript": "^5.7.2",
+    "vitest": "^2"
   }
 }

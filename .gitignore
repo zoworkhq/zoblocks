@@ -37,3 +37,6 @@ test-results/
 !.vscode/extensions.json
 *.swp
 .vercel
+
+# mongod binary for hq's tests (see MONGOMS_DOWNLOAD_DIR in ci.yml)
+.cache/

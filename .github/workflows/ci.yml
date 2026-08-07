@@ -16,6 +16,13 @@ env:
   VERCEL_ORG_ID: team_ykOxK7PvNXML8d1afzA5dfNP
   VERCEL_PROJECT_ID_DOCS: prj_mdPnSKVCxN5nwG1XZrHDBrBHYOQq
 
+  # Where mongodb-memory-server keeps its mongod, for hq's tests. Set here
+  # rather than left to default because the library resolves the directory from
+  # the working directory: `pnpm install` runs at the root and `turbo run test`
+  # runs in apps/hq, so the default has them disagree and fetch it twice. One
+  # fixed path is also the only thing actions/cache can be pointed at.
+  MONGOMS_DOWNLOAD_DIR: ${{ github.workspace }}/.cache/mongodb-binaries
+
 jobs:
   verify:
     name: Typecheck, test, build
@@ -31,6 +38,15 @@ jobs:
         with:
           node-version: 22
           cache: pnpm
+
+      # hq's tests run against a real mongod, fetched by mongodb-memory-server's
+      # postinstall. Restored before install so the postinstall finds it, and so
+      # a bad day at the download host cannot fail an otherwise-green build.
+      - name: Cache mongod binary
+        uses: actions/cache@v4
+        with:
+          path: ${{ github.workspace }}/.cache/mongodb-binaries
+          key: mongod-${{ runner.os }}-7.0.24
 
       - name: Install
         run: pnpm install --frozen-lockfile
@@ -91,8 +107,13 @@ jobs:
 
       # Two layers, both required to pass:
       #
-      #   `turbo run test`   — the workspace packages (FHIR helpers, and any
-      #                        package that adds tests later).
+      #   `turbo run test`   — the workspace packages (FHIR helpers) and hq's
+      #                        auth, permissions, and server actions, the last
+      #                        against a real mongod rather than a mocked driver:
+      #                        the guarantees there (a unique index deciding a
+      #                        duplicate signup, an atomic claim deciding who is
+      #                        the first admin) live in the database, so a mock
+      #                        would assert the code calls what it calls.
       #   `pnpm test:registry` — the 29 registry components, rendered in jsdom
       #                        against the source a customer actually receives.
       #

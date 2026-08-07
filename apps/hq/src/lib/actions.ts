@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { ObjectId } from "mongodb";
 import { z } from "zod";
 import { database, db } from "@/db/client";
-import { nextRef, type TaskPriority, type TaskStatus } from "@/db/collections";
+import { claimFirstAdmin, nextRef, type TaskPriority, type TaskStatus } from "@/db/collections";
 import { objectId } from "./ids";
 import {
   changePassword,
@@ -61,22 +61,31 @@ export async function signUp(_prev: FormState, form: FormData): Promise<FormStat
   const emailLower = email.toLowerCase();
 
   const { users } = db();
+  const _id = new ObjectId();
 
-  // Bootstrap: the first account has to be an approved admin, or there is
-  // nobody with the authority to approve anyone. Every later signup is pending.
-  const first = (await users.estimatedDocumentCount()) === 0;
+  // Is this plausibly the first account? Read before the insert, deliberately:
+  // afterwards, two simultaneous signups each see the other and both conclude a
+  // team already exists, which leaves an instance with no administrator at all.
+  //
+  // Exact rather than estimated. `estimatedDocumentCount` reads collection
+  // metadata, which is allowed to be stale, and wrong in the low direction it
+  // would hand an established team a brand-new administrator.
+  const couldBeFirst = (await users.countDocuments({}, { limit: 1 })) === 0;
 
+  // Everyone is inserted pending. Admin is granted afterwards, and only to the
+  // account that wins the claim below — so a failure here can never consume the
+  // one-time bootstrap, and a signup is never admin merely because it was fast.
   try {
     await users.insertOne({
-      _id: new ObjectId(),
+      _id,
       name,
       email,
       emailLower,
       passwordHash: await hashPassword(password),
-      role: first ? "admin" : "member",
-      status: first ? "active" : "pending",
+      role: "member",
+      status: "pending",
       createdAt: new Date(),
-      approvedAt: first ? new Date() : null,
+      approvedAt: null,
       approvedBy: null,
     });
   } catch (error) {
@@ -90,7 +99,22 @@ export async function signUp(_prev: FormState, form: FormData): Promise<FormStat
     throw error;
   }
 
-  if (first) redirect("/login?bootstrapped=1");
+  // Bootstrap: the first account has to be an approved admin, or there is
+  // nobody with the authority to approve anyone.
+  //
+  // Eligibility above is not sufficient on its own — it is a read, and two
+  // people signing up in the same moment both pass it. That is not a hypothetical
+  // ordering: it is what happens when a team is told the tool is ready. The
+  // claim is atomic and has exactly one winner, so it, not the read, is what
+  // decides who holds administrative power over the instance.
+  if (couldBeFirst && (await claimFirstAdmin(database()))) {
+    await users.updateOne(
+      { _id },
+      { $set: { role: "admin", status: "active", approvedAt: new Date() } },
+    );
+    redirect("/login?bootstrapped=1");
+  }
+
   return { notice: "If that address is new, an admin has been asked to approve it." };
 }
 

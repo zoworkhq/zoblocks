@@ -209,3 +209,27 @@ export async function nextRef(db: Db, name = "tasks"): Promise<number> {
   if (!doc) throw new Error("Could not allocate a task reference.");
   return doc.seq;
 }
+
+/**
+ * Claims the one-time right to become the first administrator.
+ *
+ * Returns true to exactly one caller, ever. The bootstrap decides who holds
+ * administrative power over the whole instance, so it cannot be decided by
+ * reading a count and then acting on it: two people signing up in the same
+ * moment — which is precisely what happens when a team is told the tool is
+ * ready — would both read zero and both be made admin.
+ *
+ * Built on the same atomic `$inc` as `nextRef`, so the database decides the
+ * winner rather than the application, in the same way the unique index on
+ * `emailLower` decides a duplicate signup.
+ *
+ * Spent once and never re-armed. Emptying the users collection therefore does
+ * not re-open the bootstrap — the safe direction, but it leaves a wiped
+ * instance with no route back to an administrator through the interface. To
+ * deliberately re-bootstrap, an operator deletes the counter:
+ *
+ *     db.counters.deleteOne({ _id: "bootstrap" })
+ */
+export async function claimFirstAdmin(db: Db): Promise<boolean> {
+  return (await nextRef(db, "bootstrap")) === 1;
+}
