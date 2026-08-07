@@ -32,6 +32,16 @@ jobs:
           node-version: 22
           cache: pnpm
 
+      # hq's tests run against a real mongod, which `mongodb-memory-server`
+      # fetches in its postinstall. Restored before install so the postinstall
+      # finds it and skips a 66MB download on every run — and so a network
+      # hiccup at the download host cannot fail an otherwise-green build.
+      - name: Cache mongod binary
+        uses: actions/cache@v4
+        with:
+          path: node_modules/.cache/mongodb-memory-server
+          key: mongod-${{ runner.os }}-7.0.24
+
       - name: Install
         run: pnpm install --frozen-lockfile
 
@@ -91,8 +101,13 @@ jobs:
 
       # Two layers, both required to pass:
       #
-      #   `turbo run test`   — the workspace packages (FHIR helpers, and any
-      #                        package that adds tests later).
+      #   `turbo run test`   — the workspace packages (FHIR helpers) and hq's
+      #                        auth, permissions, and server actions, the last
+      #                        against a real mongod rather than a mocked driver:
+      #                        the guarantees there (a unique index deciding a
+      #                        duplicate signup, an atomic claim deciding who is
+      #                        the first admin) live in the database, so a mock
+      #                        would assert the code calls what it calls.
       #   `pnpm test:registry` — the 29 registry components, rendered in jsdom
       #                        against the source a customer actually receives.
       #

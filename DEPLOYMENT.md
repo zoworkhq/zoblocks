@@ -31,7 +31,7 @@ Set under **Settings → Secrets and variables → Actions**.
 | ---------------------- | -------- | ----------- | -------------------------------------------------------------------------------------- |
 | `VERCEL_TOKEN`         | secret   | all deploys | Vercel → Account Settings → Tokens. Scope it to the team.                              |
 | `VERCEL_PROJECT_ID_HQ` | variable | hq deploys  | From `apps/hq/.vercel/project.json` after linking. The hq job skips until this exists. |
-| `HQ_DATABASE_URL`      | secret   | indexes     | The MongoDB connection string. Same cluster as the marketing site.                     |
+| `HQ_DATABASE_URL`      | secret   | indexes     | Connection string for the `hq`-scoped database user — see below.                       |
 | `NPM_TOKEN`            | secret   | npm publish | Optional — see below.                                                                  |
 
 The Vercel org and docs project IDs are in `ci.yml` in plain text on purpose.
@@ -53,9 +53,10 @@ supported as a fallback for the first publish of a new package.
 hq is a **separate Vercel project** on the same repository:
 
 1. Create the project, Root Directory **`apps/hq`**.
-2. Set `DATABASE_URL` in its environment to the MongoDB connection string — the
-   same one the marketing site uses. hq always opens the database named `hq`
-   inside that cluster, never the site's, so the two cannot collide.
+2. Set `DATABASE_URL` in its environment to a connection string for a database
+   user **scoped to the `hq` database** — see below. hq always opens the
+   database named `hq` inside that cluster, never the site's, so the two cannot
+   collide.
 3. Move the `hq.oxygenui.design` domain onto it. It is currently attached to the
    docs project, which would serve the marketing site from that hostname.
 4. Add `VERCEL_PROJECT_ID_HQ` and `HQ_DATABASE_URL` to the repository.
@@ -63,6 +64,48 @@ hq is a **separate Vercel project** on the same repository:
 
 Both projects must have their Root Directory set explicitly. With two apps in
 one repository, a project that defaults to the root builds the wrong app.
+
+### The database user hq should hold
+
+hq currently shares the marketing site's Atlas credential. That credential can
+read and write the site's Payload database, so the blast radius of a bug or a
+leak in hq is the production website's content — a scope hq has no reason to
+have, and one that is invisible until it matters.
+
+Fixing it is one Atlas user. **Create it yourself** — it involves choosing a
+password, which is not something to hand to a tool or paste into a chat.
+
+In Atlas → **Database Access → Add New Database User**:
+
+- Authentication: password. Generate one; do not reuse the site's.
+- Built-in role: **Read and write to any database** → change to **Specific
+  Privileges**, granting `readWrite` on database `hq` only.
+- Restrict to the same network access list the site user uses.
+
+`readWrite` on `hq` is exactly the privilege hq needs and no more. That is not
+a guess — the surface is small and checkable:
+
+| Fact                                            | Where                                                                            |
+| ----------------------------------------------- | -------------------------------------------------------------------------------- |
+| One database, named in code, never from the URI | a single `client.db(DB_NAME)` in `apps/hq/src/db/client.ts`                      |
+| Six collections                                 | `users`, `sessions`, `tasks`, `comments`, `activity`, `counters`                 |
+| Reads and writes documents                      | `findOne`, `countDocuments`, `insert*`, `update*`, `delete*`, `findOneAndUpdate` |
+| Creates its own indexes                         | `ensureIndexes`, run by the `hq-indexes` workflow                                |
+
+No aggregation, no `dropDatabase`, no administrative commands, and no second
+database — so nothing here needs a role broader than `readWrite`, and index
+creation is already inside it.
+
+Then, in order:
+
+1. Update `DATABASE_URL` in the hq Vercel project (all environments) to the new
+   string. Keep the `hq` database name in the path or leave it off — the code
+   ignores it either way.
+2. Update the `HQ_DATABASE_URL` repository secret, which the indexes workflow
+   uses.
+3. Redeploy hq and sign in once to confirm.
+4. Only then, rotate the site credential hq was borrowing. Until that rotation
+   the old credential is still valid and still known to two systems.
 
 ## What the deploy jobs assert
 

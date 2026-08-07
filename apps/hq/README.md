@@ -50,6 +50,14 @@ The first account ever created becomes an approved admin, because otherwise
 there is nobody with the authority to approve anyone. Every later signup is
 `pending`.
 
+That decision is made **once**, by an atomic claim in the database, not by
+reading a count and acting on it. A count is a read: when a team is told the
+tool is ready and several people sign up in the same moment, every one of them
+sees an empty user list and every one of them would be made an administrator.
+It is the same reasoning as the unique index on `emailLower` — the database
+decides, not the application. See `claimFirstAdmin` in `src/db/collections.ts`,
+which also notes how to deliberately re-open the bootstrap.
+
 Navigation is composed from scopes, so a member has no admin route rather than a
 disabled one — but that is a usability decision. **Every permission is enforced
 server-side in `src/lib/actions.ts`.** Hiding a control is never the control.
@@ -64,6 +72,17 @@ server-side in `src/lib/actions.ts`.** Hiding a control is never the control.
   security event that actually happens on a small team
 - Sign-in failures are deliberately indistinguishable, and signup never reveals
   whether an address is already registered — neither form is an enumeration oracle
+
+Auth and permissions are covered by `src/lib/auth.test.ts` and
+`src/lib/actions.test.ts`, run against a real mongod via `mongodb-memory-server`
+rather than a mocked driver — the guarantees here live in the database (a unique
+index deciding a duplicate signup, an atomic claim deciding the first admin, a
+`$ne` filter sparing the session in your hand), and a mock would only assert
+that the code calls what it calls.
+
+```bash
+pnpm --filter @oxygenui-design/hq test
+```
 
 ## Deploying
 
