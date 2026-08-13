@@ -1,0 +1,176 @@
+/*
+ * GENERATED FILE — DO NOT EDIT.
+ *
+ * Produced by `pnpm gen` from each component's *.meta.ts.
+ * Edit the metadata, then re-run. CI fails if this file is stale.
+ *
+ * See content/decisions/0004-generated-component-metadata.md
+ */
+
+/**
+ * Tailwind v4 theme block.
+ *
+ * Import after oxygen-tokens.css to get `bg-ox-status-critical-bg`,
+ * `text-ox-status-critical` and friends as real utilities rather than
+ * arbitrary values. Every entry points at the custom property rather than a
+ * literal, so theme and density switching still happens in CSS at runtime.
+ */
+
+@theme {
+  --font-ox-font-sans: var(--ox-font-sans);
+  --font-ox-font-mono: var(--ox-font-mono);
+  --font-ox-font-numeric: var(--ox-font-numeric);
+  --spacing-ox-text-2xs: var(--ox-text-2xs);
+  --spacing-ox-text-xs: var(--ox-text-xs);
+  --spacing-ox-text-sm: var(--ox-text-sm);
+  --spacing-ox-text-base: var(--ox-text-base);
+  --spacing-ox-text-md: var(--ox-text-md);
+  --spacing-ox-text-lg: var(--ox-text-lg);
+  --spacing-ox-text-xl: var(--ox-text-xl);
+  --spacing-ox-text-2xl: var(--ox-text-2xl);
+  --spacing-ox-radius-sm: var(--ox-radius-sm);
+  --spacing-ox-radius: var(--ox-radius);
+  --spacing-ox-radius-lg: var(--ox-radius-lg);
+  --spacing-ox-radius-xl: var(--ox-radius-xl);
+  --spacing-ox-radius-full: var(--ox-radius-full);
+  --color-ox-bg: var(--ox-bg);
+  --color-ox-bg-subtle: var(--ox-bg-subtle);
+  --color-ox-bg-muted: var(--ox-bg-muted);
+  --color-ox-surface: var(--ox-surface);
+  --color-ox-surface-raised: var(--ox-surface-raised);
+  --color-ox-surface-overlay: var(--ox-surface-overlay);
+  --color-ox-border: var(--ox-border);
+  --color-ox-border-strong: var(--ox-border-strong);
+  --color-ox-text: var(--ox-text);
+  --color-ox-text-muted: var(--ox-text-muted);
+  --color-ox-text-subtle: var(--ox-text-subtle);
+  --color-ox-text-on-accent: var(--ox-text-on-accent);
+  --color-ox-accent: var(--ox-accent);
+  --color-ox-accent-hover: var(--ox-accent-hover);
+  --color-ox-accent-subtle: var(--ox-accent-subtle);
+  --color-ox-accent-border: var(--ox-accent-border);
+  --color-ox-focus-ring: var(--ox-focus-ring);
+  --color-ox-focus-ring-offset: var(--ox-focus-ring-offset);
+  --color-ox-status-critical: var(--ox-status-critical);
+  --color-ox-status-critical-bg: var(--ox-status-critical-bg);
+  --color-ox-status-critical-border: var(--ox-status-critical-border);
+  --color-ox-status-high: var(--ox-status-high);
+  --color-ox-status-high-bg: var(--ox-status-high-bg);
+  --color-ox-status-high-border: var(--ox-status-high-border);
+  --color-ox-status-low: var(--ox-status-low);
+  --color-ox-status-low-bg: var(--ox-status-low-bg);
+  --color-ox-status-low-border: var(--ox-status-low-border);
+  --color-ox-status-normal: var(--ox-status-normal);
+  --color-ox-status-normal-bg: var(--ox-status-normal-bg);
+  --color-ox-status-normal-border: var(--ox-status-normal-border);
+  --color-ox-status-unknown: var(--ox-status-unknown);
+  --color-ox-status-unknown-bg: var(--ox-status-unknown-bg);
+  --color-ox-status-unknown-border: var(--ox-status-unknown-border);
+  --color-ox-flag-restricted: var(--ox-flag-restricted);
+  --color-ox-flag-restricted-bg: var(--ox-flag-restricted-bg);
+  --color-ox-flag-provisional: var(--ox-flag-provisional);
+  --color-ox-flag-deceased: var(--ox-flag-deceased);
+  --color-ox-swatch-1: var(--ox-swatch-1);
+  --color-ox-swatch-2: var(--ox-swatch-2);
+  --color-ox-swatch-3: var(--ox-swatch-3);
+  --color-ox-swatch-4: var(--ox-swatch-4);
+  --color-ox-swatch-5: var(--ox-swatch-5);
+  --color-ox-swatch-6: var(--ox-swatch-6);
+  --color-ox-swatch-1-bg: var(--ox-swatch-1-bg);
+  --color-ox-swatch-1-border: var(--ox-swatch-1-border);
+  --color-ox-swatch-2-bg: var(--ox-swatch-2-bg);
+  --color-ox-swatch-2-border: var(--ox-swatch-2-border);
+  --color-ox-swatch-3-bg: var(--ox-swatch-3-bg);
+  --color-ox-swatch-3-border: var(--ox-swatch-3-border);
+  --color-ox-swatch-4-bg: var(--ox-swatch-4-bg);
+  --color-ox-swatch-4-border: var(--ox-swatch-4-border);
+  --color-ox-swatch-5-bg: var(--ox-swatch-5-bg);
+  --color-ox-swatch-5-border: var(--ox-swatch-5-border);
+  --color-ox-swatch-6-bg: var(--ox-swatch-6-bg);
+  --color-ox-swatch-6-border: var(--ox-swatch-6-border);
+  --color-ox-badge-critical-fg: var(--ox-badge-critical-fg);
+  --color-ox-badge-critical-bg: var(--ox-badge-critical-bg);
+  --color-ox-badge-critical-border: var(--ox-badge-critical-border);
+  --color-ox-badge-high-fg: var(--ox-badge-high-fg);
+  --color-ox-badge-high-bg: var(--ox-badge-high-bg);
+  --color-ox-badge-high-border: var(--ox-badge-high-border);
+  --color-ox-badge-low-fg: var(--ox-badge-low-fg);
+  --color-ox-badge-low-bg: var(--ox-badge-low-bg);
+  --color-ox-badge-low-border: var(--ox-badge-low-border);
+  --color-ox-badge-normal-fg: var(--ox-badge-normal-fg);
+  --color-ox-badge-normal-bg: var(--ox-badge-normal-bg);
+  --color-ox-badge-normal-border: var(--ox-badge-normal-border);
+  --color-ox-badge-unknown-fg: var(--ox-badge-unknown-fg);
+  --color-ox-badge-unknown-bg: var(--ox-badge-unknown-bg);
+  --color-ox-badge-unknown-border: var(--ox-badge-unknown-border);
+  --spacing-ox-badge-radius: var(--ox-badge-radius);
+  --color-ox-alert-critical-fg: var(--ox-alert-critical-fg);
+  --color-ox-alert-critical-bg: var(--ox-alert-critical-bg);
+  --color-ox-alert-critical-border: var(--ox-alert-critical-border);
+  --color-ox-alert-warning-fg: var(--ox-alert-warning-fg);
+  --color-ox-alert-warning-bg: var(--ox-alert-warning-bg);
+  --color-ox-alert-warning-border: var(--ox-alert-warning-border);
+  --color-ox-alert-info-fg: var(--ox-alert-info-fg);
+  --color-ox-alert-info-bg: var(--ox-alert-info-bg);
+  --color-ox-alert-info-border: var(--ox-alert-info-border);
+  --spacing-ox-alert-radius: var(--ox-alert-radius);
+  --spacing-ox-alert-pad-x: var(--ox-alert-pad-x);
+  --spacing-ox-alert-pad-y: var(--ox-alert-pad-y);
+  --color-ox-value-fg: var(--ox-value-fg);
+  --color-ox-value-unit-fg: var(--ox-value-unit-fg);
+  --font-ox-value-font: var(--ox-value-font);
+  --color-ox-absent-fg: var(--ox-absent-fg);
+  --color-ox-absent-restricted-fg: var(--ox-absent-restricted-fg);
+  --color-ox-absent-error-fg: var(--ox-absent-error-fg);
+  --color-ox-range-track: var(--ox-range-track);
+  --color-ox-range-band: var(--ox-range-band);
+  --color-ox-range-band-border: var(--ox-range-band-border);
+  --color-ox-range-marker: var(--ox-range-marker);
+  --color-ox-range-marker-abnormal: var(--ox-range-marker-abnormal);
+  --spacing-ox-range-height: var(--ox-range-height);
+  --color-ox-banner-bg: var(--ox-banner-bg);
+  --color-ox-banner-border: var(--ox-banner-border);
+  --color-ox-banner-fg: var(--ox-banner-fg);
+  --color-ox-banner-meta-fg: var(--ox-banner-meta-fg);
+  --color-ox-banner-restricted-bg: var(--ox-banner-restricted-bg);
+  --color-ox-banner-restricted-border: var(--ox-banner-restricted-border);
+  --color-ox-banner-deceased-fg: var(--ox-banner-deceased-fg);
+  --color-ox-surface-card-bg: var(--ox-surface-card-bg);
+  --color-ox-surface-card-border: var(--ox-surface-card-border);
+  --spacing-ox-surface-card-radius: var(--ox-surface-card-radius);
+  --spacing-ox-surface-card-pad-x: var(--ox-surface-card-pad-x);
+  --spacing-ox-surface-card-pad-y: var(--ox-surface-card-pad-y);
+  --color-ox-field-bg: var(--ox-field-bg);
+  --color-ox-field-border: var(--ox-field-border);
+  --color-ox-field-border-focus: var(--ox-field-border-focus);
+  --color-ox-field-border-invalid: var(--ox-field-border-invalid);
+  --color-ox-field-fg: var(--ox-field-fg);
+  --color-ox-field-placeholder-fg: var(--ox-field-placeholder-fg);
+  --color-ox-field-label-fg: var(--ox-field-label-fg);
+  --color-ox-field-hint-fg: var(--ox-field-hint-fg);
+  --color-ox-field-error-fg: var(--ox-field-error-fg);
+  --color-ox-field-prefilled-bg: var(--ox-field-prefilled-bg);
+  --color-ox-field-prefilled-border: var(--ox-field-prefilled-border);
+  --spacing-ox-field-radius: var(--ox-field-radius);
+  --spacing-ox-field-pad-x: var(--ox-field-pad-x);
+  --spacing-ox-field-pad-y: var(--ox-field-pad-y);
+  --color-ox-chart-axis: var(--ox-chart-axis);
+  --color-ox-chart-grid: var(--ox-chart-grid);
+  --color-ox-chart-label-fg: var(--ox-chart-label-fg);
+  --color-ox-chart-line: var(--ox-chart-line);
+  --color-ox-chart-band-bg: var(--ox-chart-band-bg);
+  --color-ox-chart-band-border: var(--ox-chart-band-border);
+  --color-ox-chart-point: var(--ox-chart-point);
+  --color-ox-chart-surface: var(--ox-chart-surface);
+  --spacing-ox-chart-line-width: var(--ox-chart-line-width);
+  --spacing-ox-chart-point-radius: var(--ox-chart-point-radius);
+  --spacing-ox-chart-point-radius-flagged: var(--ox-chart-point-radius-flagged);
+  --color-ox-nav-bg: var(--ox-nav-bg);
+  --color-ox-nav-border: var(--ox-nav-border);
+  --color-ox-nav-fg: var(--ox-nav-fg);
+  --color-ox-nav-fg-current: var(--ox-nav-fg-current);
+  --color-ox-nav-bg-current: var(--ox-nav-bg-current);
+  --color-ox-nav-border-current: var(--ox-nav-border-current);
+  --color-ox-nav-bg-hover: var(--ox-nav-bg-hover);
+  --spacing-ox-nav-radius: var(--ox-nav-radius);
+}

@@ -1,0 +1,247 @@
+{
+  "$description": "Primitive tier — the reference palette and raw scales. W3C DTCG format.\n\nNothing outside the token build references these. They are emitted as --ox-ref-* custom properties so a brand can replace the whole palette in one place, and @oxygenui/no-primitive-token makes a component reaching for one a lint error. A primitive is a colour; it does not mean anything. Meaning lives in the semantic tier.\n\nSee content/decisions/0005-three-tier-token-pipeline.md.",
+
+  "ref": {
+    "$description": "Reference palette. Replaceable wholesale by a brand.",
+
+    "brand": {
+      "$type": "color",
+      "50": { "$value": "#ecfdf8" },
+      "100": { "$value": "#d0faee" },
+      "200": { "$value": "#a4f3df" },
+      "300": { "$value": "#6ce7cb" },
+      "400": { "$value": "#2dd4b0" },
+      "500": { "$value": "#10b995" },
+      "600": { "$value": "#059478" },
+      "700": { "$value": "#067662" },
+      "800": { "$value": "#0a5d4f" },
+      "900": { "$value": "#0b4d42" },
+      "950": { "$value": "#012e28" }
+    },
+
+    "slate": {
+      "$type": "color",
+      "50": { "$value": "#f8fafc" },
+      "100": { "$value": "#f1f5f9" },
+      "200": { "$value": "#e2e8f0" },
+      "300": { "$value": "#cbd5e1" },
+      "400": { "$value": "#94a3b8" },
+      "500": { "$value": "#64748b" },
+      "600": { "$value": "#475569" },
+      "700": { "$value": "#334155" },
+      "800": { "$value": "#1e293b" },
+      "900": { "$value": "#0f172a" },
+      "950": { "$value": "#020617" }
+    },
+
+    "red": {
+      "$type": "color",
+      "50": { "$value": "#fef2f2" },
+      "200": { "$value": "#fecaca" },
+      "400": { "$value": "#fb7185" },
+      "500": { "$value": "#ef4444" },
+      "600": { "$value": "#dc2626" },
+      "700": { "$value": "#b91c1c" }
+    },
+
+    "amber": {
+      "$type": "color",
+      "50": { "$value": "#fffbeb" },
+      "200": { "$value": "#fde68a" },
+      "400": { "$value": "#fbbf24" },
+      "500": { "$value": "#f59e0b" },
+      "600": { "$value": "#d97706" },
+      "700": { "$value": "#b45309" }
+    },
+
+    "blue": {
+      "$type": "color",
+      "50": { "$value": "#eff6ff" },
+      "200": { "$value": "#bfdbfe" },
+      "400": { "$value": "#60a5fa" },
+      "500": { "$value": "#3b82f6" },
+      "600": { "$value": "#2563eb" },
+      "700": { "$value": "#1d4ed8" }
+    },
+
+    "green": {
+      "$type": "color",
+      "50": { "$value": "#ecfdf5" },
+      "200": { "$value": "#a7f3d0" },
+      "400": { "$value": "#4ade80" },
+      "500": { "$value": "#10b981" },
+      "600": { "$value": "#059669" },
+      "700": { "$value": "#047857" }
+    },
+
+    "violet": {
+      "$type": "color",
+      "50": { "$value": "#f5f3ff" },
+      "300": { "$value": "#c4b5fd" },
+      "600": { "$value": "#7c3aed" },
+      "950": { "$value": "#1c1533" }
+    },
+
+    "ink": {
+      "$description": "Dark-surface chrome scale. Not a grey ramp — tuned so a raised surface reads as raised without a shadow, which matters because shadows are nearly invisible on a dark ground.",
+      "$type": "color",
+      "950": { "$value": "#0a0d12" },
+      "900": { "$value": "#11161d" },
+      "860": { "$value": "#141a22" },
+      "820": { "$value": "#181f28" },
+      "780": { "$value": "#1a222c" },
+      "740": { "$value": "#1d2630" },
+      "700": { "$value": "#29333f" },
+      "600": { "$value": "#3a4654" },
+      "300": { "$value": "#82909f" },
+      "200": { "$value": "#a5b1be" },
+      "100": { "$value": "#edf2f7" },
+      "on-accent": { "$value": "#071014" }
+    },
+
+    "tint": {
+      "$description": "Each status hue composited onto the dark ground, at two strengths. These belong to the palette rather than the semantic tier — a tint of a hue on ink is still a colour, not a meaning. They exist because the light-mode surface tints (#fef2f2 and friends) are near-white and unusable on a dark surface.",
+      "$type": "color",
+      "critical": {
+        "bg": { "$value": "#2a1216" },
+        "border": { "$value": "#5c1f28" }
+      },
+      "high": {
+        "bg": { "$value": "#2a1f0c" },
+        "border": { "$value": "#5c421a" }
+      },
+      "low": {
+        "bg": { "$value": "#0f1c33" },
+        "border": { "$value": "#1e3a68" }
+      },
+      "normal": {
+        "bg": { "$value": "#10271e" },
+        "border": { "$value": "#1e5138" }
+      },
+      "unknown": {
+        "bg": { "$value": "#141f22" },
+        "border": { "$value": "#253338" }
+      },
+      "accent": {
+        "bg": { "$value": "#102a32" },
+        "border": { "$value": "#1b4655" }
+      }
+    },
+
+    "hc": {
+      "$description": "High-contrast values. Chosen to clear 7:1 against white rather than the 4.5:1 the default theme targets, and deliberately not derived from the other scales — a darkened version of a hue that was tuned for 4.5:1 lands in an unpredictable place.",
+      "$type": "color",
+      "critical": { "$value": "#8a0000" },
+      "high": { "$value": "#6b3000" },
+      "low": { "$value": "#003a8c" },
+      "normal": { "$value": "#00513a" },
+      "unknown": { "$value": "#333333" },
+      "restricted": { "$value": "#4c1d95" },
+      "accent": { "$value": "#005141" },
+      "accent-hover": { "$value": "#00332a" },
+      "text-muted": { "$value": "#1f1f1f" }
+    },
+
+    "cyan": {
+      "$description": "Lower numbers are lighter, as in every other scale here. The dark theme's accent hover is LIGHTER than its rest state, which is why hover reaches for 200 rather than 400.",
+      "$type": "color",
+      "200": { "$value": "#a5f3fc" },
+      "300": { "$value": "#67e8f9" }
+    },
+
+    "swatch": {
+      "$description": "Decorative hues for avatars and identity chips.\n\nConstrained rather than chosen freely. Red, amber, emerald, blue and violet are spoken for — critical, high, normal, low, restricted — so these are teal, cyan, indigo, fuchsia, olive and stone. A colour that carries meaning somewhere carries it everywhere, and an avatar tinted from a hash of someone's name must never land on the amber that means 'high' three rows below it. Any addition must clear the same bar: a hue that means nothing.",
+      "$type": "color",
+      "teal": {
+        "fg": { "$value": "#115e59" },
+        "bg": { "$value": "#f0fdfa" },
+        "border": { "$value": "#99f6e4" },
+        "fg-dark": { "$value": "#5eead4" },
+        "bg-dark": { "$value": "#10241f" },
+        "border-dark": { "$value": "#1d4c44" }
+      },
+      "cyan": {
+        "fg": { "$value": "#155e75" },
+        "bg": { "$value": "#ecfeff" },
+        "border": { "$value": "#a5f3fc" },
+        "fg-dark": { "$value": "#67e8f9" },
+        "bg-dark": { "$value": "#0e2429" },
+        "border-dark": { "$value": "#1a4a55" }
+      },
+      "indigo": {
+        "fg": { "$value": "#3730a3" },
+        "bg": { "$value": "#eef2ff" },
+        "border": { "$value": "#c7d2fe" },
+        "fg-dark": { "$value": "#a5b4fc" },
+        "bg-dark": { "$value": "#171a33" },
+        "border-dark": { "$value": "#2e3468" }
+      },
+      "fuchsia": {
+        "fg": { "$value": "#86198f" },
+        "bg": { "$value": "#fdf4ff" },
+        "border": { "$value": "#f5d0fe" },
+        "fg-dark": { "$value": "#f0abfc" },
+        "bg-dark": { "$value": "#26102b" },
+        "border-dark": { "$value": "#50245a" }
+      },
+      "olive": {
+        "fg": { "$value": "#3f6212" },
+        "bg": { "$value": "#f7fee7" },
+        "border": { "$value": "#d9f99d" },
+        "fg-dark": { "$value": "#bef264" },
+        "bg-dark": { "$value": "#1a2110" },
+        "border-dark": { "$value": "#35441f" }
+      },
+      "stone": {
+        "fg": { "$value": "#44403c" },
+        "bg": { "$value": "#fafaf9" },
+        "border": { "$value": "#e7e5e4" },
+        "fg-dark": { "$value": "#d6d3d1" },
+        "bg-dark": { "$value": "#1c1b1a" },
+        "border-dark": { "$value": "#3a3735" }
+      }
+    },
+
+    "white": { "$type": "color", "$value": "#ffffff" },
+    "black": { "$type": "color", "$value": "#000000" },
+
+    "font": {
+      "$type": "fontFamily",
+      "sans": {
+        "$value": "ui-sans-serif, system-ui, -apple-system, \"Segoe UI\", Roboto, sans-serif"
+      },
+      "mono": {
+        "$value": "ui-monospace, SFMono-Regular, \"SF Mono\", Menlo, monospace"
+      }
+    },
+
+    "size": {
+      "$description": "Type scale. Smaller than a marketing scale by design — these are working surfaces, and 14px is the size a results table is actually read at.",
+      "$type": "dimension",
+      "2xs": { "$value": "0.6875rem" },
+      "xs": { "$value": "0.75rem" },
+      "sm": { "$value": "0.8125rem" },
+      "base": { "$value": "0.875rem" },
+      "md": { "$value": "1rem" },
+      "lg": { "$value": "1.125rem" },
+      "xl": { "$value": "1.375rem" },
+      "2xl": { "$value": "1.75rem" }
+    },
+
+    "radius": {
+      "$type": "dimension",
+      "sm": { "$value": "0.25rem" },
+      "md": { "$value": "0.5rem" },
+      "lg": { "$value": "0.75rem" },
+      "xl": { "$value": "1rem" },
+      "full": { "$value": "9999px" }
+    },
+
+    "duration": {
+      "$type": "duration",
+      "fast": { "$value": "120ms" },
+      "base": { "$value": "180ms" },
+      "slow": { "$value": "280ms" }
+    }
+  }
+}

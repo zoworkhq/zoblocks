@@ -1,226 +1,380 @@
+/*
+ * GENERATED FILE — DO NOT EDIT.
+ *
+ * Produced by `pnpm gen` from each component's *.meta.ts.
+ * Edit the metadata, then re-run. CI fails if this file is stale.
+ *
+ * See content/decisions/0004-generated-component-metadata.md
+ */
+
 /**
  * Oxygen UI — design tokens
  *
- * Plain CSS custom properties so the same file works in a Tailwind v4 project,
- * a CSS-modules project, or plain CSS. Distributed via the registry as
- * `@oxygenui-design/tokens` and copied into the consumer's stylesheet.
+ * Plain CSS custom properties, so the same file works in a Tailwind v4
+ * project, a CSS-modules project, or plain CSS.
  *
- * Two rules govern this file:
- *   1. Clinical meaning lives in SEMANTIC tokens, never in raw palette values.
- *      Components reference --ox-status-critical, never --ox-red-600.
- *   2. Status is never communicated by color alone. Every status token has a
- *      matching icon and text label in the component layer. These colors are
- *      reinforcement, not the signal.
+ * Three tiers, with a strict reference rule:
+ *
+ *   --ox-ref-*        primitive   referenced by semantic tokens only
+ *   --ox-status-*     semantic    referenced by components
+ *   --ox-badge-*      component   referenced by one component; your override point
+ *
+ * Three axes: brand × theme (light, dark, high-contrast) × density
+ * (patient, standard, clinical).
+ *
+ * Status is never communicated by colour alone. Every status token has a
+ * matching icon and text label in the component layer. These colours are
+ * reinforcement, not the signal.
  */
 
 :root {
-  /* ---------------------------------------------------------------------
-   * Palette — raw values. Do not reference these directly in components.
-   * ------------------------------------------------------------------ */
-  --ox-brand-50: #ecfdf8;
-  --ox-brand-100: #d0faee;
-  --ox-brand-200: #a4f3df;
-  --ox-brand-300: #6ce7cb;
-  --ox-brand-400: #2dd4b0;
-  --ox-brand-500: #10b995;
-  --ox-brand-600: #059478;
-  --ox-brand-700: #067662;
-  --ox-brand-800: #0a5d4f;
-  --ox-brand-900: #0b4d42;
-  --ox-brand-950: #012e28;
+  /* Primitive — the reference palette -----------------------------------
+   * Do not reference these from a component. A brand replaces this block
+   * wholesale; a component that reaches past the semantic tier to a colour
+   * here silently ignores the brand. Enforced by @oxygenui/no-primitive-token.
+   */
+  --ox-ref-brand-50: #ecfdf8;
+  --ox-ref-brand-100: #d0faee;
+  --ox-ref-brand-200: #a4f3df;
+  --ox-ref-brand-300: #6ce7cb;
+  --ox-ref-brand-400: #2dd4b0;
+  --ox-ref-brand-500: #10b995;
+  --ox-ref-brand-600: #059478;
+  --ox-ref-brand-700: #067662;
+  --ox-ref-brand-800: #0a5d4f;
+  --ox-ref-brand-900: #0b4d42;
+  --ox-ref-brand-950: #012e28;
+  --ox-ref-slate-50: #f8fafc;
+  --ox-ref-slate-100: #f1f5f9;
+  --ox-ref-slate-200: #e2e8f0;
+  --ox-ref-slate-300: #cbd5e1;
+  --ox-ref-slate-400: #94a3b8;
+  --ox-ref-slate-500: #64748b;
+  --ox-ref-slate-600: #475569;
+  --ox-ref-slate-700: #334155;
+  --ox-ref-slate-800: #1e293b;
+  --ox-ref-slate-900: #0f172a;
+  --ox-ref-slate-950: #020617;
+  --ox-ref-red-50: #fef2f2;
+  --ox-ref-red-200: #fecaca;
+  --ox-ref-red-400: #fb7185;
+  --ox-ref-red-500: #ef4444;
+  --ox-ref-red-600: #dc2626;
+  --ox-ref-red-700: #b91c1c;
+  --ox-ref-amber-50: #fffbeb;
+  --ox-ref-amber-200: #fde68a;
+  --ox-ref-amber-400: #fbbf24;
+  --ox-ref-amber-500: #f59e0b;
+  --ox-ref-amber-600: #d97706;
+  --ox-ref-amber-700: #b45309;
+  --ox-ref-blue-50: #eff6ff;
+  --ox-ref-blue-200: #bfdbfe;
+  --ox-ref-blue-400: #60a5fa;
+  --ox-ref-blue-500: #3b82f6;
+  --ox-ref-blue-600: #2563eb;
+  --ox-ref-blue-700: #1d4ed8;
+  --ox-ref-green-50: #ecfdf5;
+  --ox-ref-green-200: #a7f3d0;
+  --ox-ref-green-400: #4ade80;
+  --ox-ref-green-500: #10b981;
+  --ox-ref-green-600: #059669;
+  --ox-ref-green-700: #047857;
+  --ox-ref-violet-50: #f5f3ff;
+  --ox-ref-violet-300: #c4b5fd;
+  --ox-ref-violet-600: #7c3aed;
+  --ox-ref-violet-950: #1c1533;
+  --ox-ref-ink-100: #edf2f7;
+  --ox-ref-ink-200: #a5b1be;
+  --ox-ref-ink-300: #82909f;
+  --ox-ref-ink-600: #3a4654;
+  --ox-ref-ink-700: #29333f;
+  --ox-ref-ink-740: #1d2630;
+  --ox-ref-ink-780: #1a222c;
+  --ox-ref-ink-820: #181f28;
+  --ox-ref-ink-860: #141a22;
+  --ox-ref-ink-900: #11161d;
+  --ox-ref-ink-950: #0a0d12;
+  --ox-ref-ink-on-accent: #071014;
+  --ox-ref-tint-critical-bg: #2a1216;
+  --ox-ref-tint-critical-border: #5c1f28;
+  --ox-ref-tint-high-bg: #2a1f0c;
+  --ox-ref-tint-high-border: #5c421a;
+  --ox-ref-tint-low-bg: #0f1c33;
+  --ox-ref-tint-low-border: #1e3a68;
+  --ox-ref-tint-normal-bg: #10271e;
+  --ox-ref-tint-normal-border: #1e5138;
+  --ox-ref-tint-unknown-bg: #141f22;
+  --ox-ref-tint-unknown-border: #253338;
+  --ox-ref-tint-accent-bg: #102a32;
+  --ox-ref-tint-accent-border: #1b4655;
+  --ox-ref-hc-critical: #8a0000;
+  --ox-ref-hc-high: #6b3000;
+  --ox-ref-hc-low: #003a8c;
+  --ox-ref-hc-normal: #00513a;
+  --ox-ref-hc-unknown: #333333;
+  --ox-ref-hc-restricted: #4c1d95;
+  --ox-ref-hc-accent: #005141;
+  --ox-ref-hc-accent-hover: #00332a;
+  --ox-ref-hc-text-muted: #1f1f1f;
+  --ox-ref-cyan-200: #a5f3fc;
+  --ox-ref-cyan-300: #67e8f9;
+  --ox-ref-swatch-teal-fg: #115e59;
+  --ox-ref-swatch-teal-bg: #f0fdfa;
+  --ox-ref-swatch-teal-border: #99f6e4;
+  --ox-ref-swatch-teal-fg-dark: #5eead4;
+  --ox-ref-swatch-teal-bg-dark: #10241f;
+  --ox-ref-swatch-teal-border-dark: #1d4c44;
+  --ox-ref-swatch-cyan-fg: #155e75;
+  --ox-ref-swatch-cyan-bg: #ecfeff;
+  --ox-ref-swatch-cyan-border: #a5f3fc;
+  --ox-ref-swatch-cyan-fg-dark: #67e8f9;
+  --ox-ref-swatch-cyan-bg-dark: #0e2429;
+  --ox-ref-swatch-cyan-border-dark: #1a4a55;
+  --ox-ref-swatch-indigo-fg: #3730a3;
+  --ox-ref-swatch-indigo-bg: #eef2ff;
+  --ox-ref-swatch-indigo-border: #c7d2fe;
+  --ox-ref-swatch-indigo-fg-dark: #a5b4fc;
+  --ox-ref-swatch-indigo-bg-dark: #171a33;
+  --ox-ref-swatch-indigo-border-dark: #2e3468;
+  --ox-ref-swatch-fuchsia-fg: #86198f;
+  --ox-ref-swatch-fuchsia-bg: #fdf4ff;
+  --ox-ref-swatch-fuchsia-border: #f5d0fe;
+  --ox-ref-swatch-fuchsia-fg-dark: #f0abfc;
+  --ox-ref-swatch-fuchsia-bg-dark: #26102b;
+  --ox-ref-swatch-fuchsia-border-dark: #50245a;
+  --ox-ref-swatch-olive-fg: #3f6212;
+  --ox-ref-swatch-olive-bg: #f7fee7;
+  --ox-ref-swatch-olive-border: #d9f99d;
+  --ox-ref-swatch-olive-fg-dark: #bef264;
+  --ox-ref-swatch-olive-bg-dark: #1a2110;
+  --ox-ref-swatch-olive-border-dark: #35441f;
+  --ox-ref-swatch-stone-fg: #44403c;
+  --ox-ref-swatch-stone-bg: #fafaf9;
+  --ox-ref-swatch-stone-border: #e7e5e4;
+  --ox-ref-swatch-stone-fg-dark: #d6d3d1;
+  --ox-ref-swatch-stone-bg-dark: #1c1b1a;
+  --ox-ref-swatch-stone-border-dark: #3a3735;
+  --ox-ref-white: #ffffff;
+  --ox-ref-black: #000000;
+  --ox-ref-font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --ox-ref-font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+  --ox-ref-size-2xs: 0.6875rem;
+  --ox-ref-size-xs: 0.75rem;
+  --ox-ref-size-sm: 0.8125rem;
+  --ox-ref-size-base: 0.875rem;
+  --ox-ref-size-md: 1rem;
+  --ox-ref-size-lg: 1.125rem;
+  --ox-ref-size-xl: 1.375rem;
+  --ox-ref-size-2xl: 1.75rem;
+  --ox-ref-radius-sm: 0.25rem;
+  --ox-ref-radius-md: 0.5rem;
+  --ox-ref-radius-lg: 0.75rem;
+  --ox-ref-radius-xl: 1rem;
+  --ox-ref-radius-full: 9999px;
+  --ox-ref-duration-fast: 120ms;
+  --ox-ref-duration-base: 180ms;
+  --ox-ref-duration-slow: 280ms;
 
-  --ox-slate-50: #f8fafc;
-  --ox-slate-100: #f1f5f9;
-  --ox-slate-200: #e2e8f0;
-  --ox-slate-300: #cbd5e1;
-  --ox-slate-400: #94a3b8;
-  --ox-slate-500: #64748b;
-  --ox-slate-600: #475569;
-  --ox-slate-700: #334155;
-  --ox-slate-800: #1e293b;
-  --ox-slate-900: #0f172a;
-  --ox-slate-950: #020617;
+  /* Semantic — typography, shape, motion --------------------------------
+   * Identical in every theme.
+   */
+  --ox-font-sans: var(--ox-ref-font-sans);
+  --ox-font-mono: var(--ox-ref-font-mono);
+  --ox-font-numeric: var(--ox-ref-font-mono);
+  --ox-text-2xs: var(--ox-ref-size-2xs);
+  --ox-text-xs: var(--ox-ref-size-xs);
+  --ox-text-sm: var(--ox-ref-size-sm);
+  --ox-text-base: var(--ox-ref-size-base);
+  --ox-text-md: var(--ox-ref-size-md);
+  --ox-text-lg: var(--ox-ref-size-lg);
+  --ox-text-xl: var(--ox-ref-size-xl);
+  --ox-text-2xl: var(--ox-ref-size-2xl);
+  --ox-radius-sm: var(--ox-ref-radius-sm);
+  --ox-radius: var(--ox-ref-radius-md);
+  --ox-radius-lg: var(--ox-ref-radius-lg);
+  --ox-radius-xl: var(--ox-ref-radius-xl);
+  --ox-radius-full: var(--ox-ref-radius-full);
+  --ox-duration-fast: var(--ox-ref-duration-fast);
+  --ox-duration: var(--ox-ref-duration-base);
+  --ox-duration-slow: var(--ox-ref-duration-slow);
+  --ox-ease: cubic-bezier(0.22, 1, 0.36, 1);
 
-  --ox-red-500: #ef4444;
-  --ox-red-600: #dc2626;
-  --ox-red-700: #b91c1c;
-  --ox-amber-500: #f59e0b;
-  --ox-amber-600: #d97706;
-  --ox-amber-700: #b45309;
-  --ox-blue-500: #3b82f6;
-  --ox-blue-600: #2563eb;
-  --ox-blue-700: #1d4ed8;
-  --ox-green-500: #10b981;
-  --ox-green-600: #059669;
-  --ox-green-700: #047857;
-
-  /* ---------------------------------------------------------------------
-   * Surface & text — semantic
-   * ------------------------------------------------------------------ */
-  --ox-bg: #ffffff;
-  --ox-bg-subtle: var(--ox-slate-50);
-  --ox-bg-muted: var(--ox-slate-100);
-  --ox-surface: #ffffff;
-  --ox-surface-raised: #ffffff;
-  --ox-surface-overlay: #ffffff;
-
-  --ox-border: var(--ox-slate-200);
-  --ox-border-strong: var(--ox-slate-300);
-
-  --ox-text: var(--ox-slate-900);
-  --ox-text-muted: var(--ox-slate-600);
-  --ox-text-subtle: var(--ox-slate-500);
-  --ox-text-on-accent: #ffffff;
-
-  --ox-accent: var(--ox-brand-600);
-  --ox-accent-hover: var(--ox-brand-700);
-  --ox-accent-subtle: var(--ox-brand-50);
-  --ox-accent-border: var(--ox-brand-200);
-
-  --ox-focus-ring: var(--ox-brand-500);
-  --ox-focus-ring-offset: var(--ox-bg);
-
-  /* ---------------------------------------------------------------------
-   * Clinical status — semantic. Paired with icon + label in components.
-   *
-   * `high` and `low` are separated by HUE, not just intensity, so the
-   * direction of an abnormal result survives monochrome printing and the
-   * most common forms of color vision deficiency.
-   * ------------------------------------------------------------------ */
-  /* red-700, not red-600: at 600 this was 4.41:1 on its own background —
-     under the 4.5:1 floor by a hair. This is the single most consequential
-     token in the library; it does not get to be borderline. */
-  --ox-status-critical: var(--ox-red-700);
-  --ox-status-critical-bg: #fef2f2;
-  --ox-status-critical-border: #fecaca;
-
-  /* amber-700, not amber-600: at 600 this was 3.07:1 on its own background.
-     Amber is the hardest hue to keep accessible on a light surface — it must
-     be darkened further than the other statuses to clear 4.5:1. */
-  --ox-status-high: var(--ox-amber-700);
-  --ox-status-high-bg: #fffbeb;
-  --ox-status-high-border: #fde68a;
-
-  --ox-status-low: var(--ox-blue-600);
-  --ox-status-low-bg: #eff6ff;
-  --ox-status-low-border: #bfdbfe;
-
-  /* green-700, not green-600: at 600 this was 3.57:1 on its own background,
-     below the 4.5:1 AA floor. A status badge that fails contrast is a status
-     badge some readers cannot read. */
-  --ox-status-normal: var(--ox-green-700);
-  --ox-status-normal-bg: #ecfdf5;
-  --ox-status-normal-border: #a7f3d0;
-
-  /* Absence of interpretation is a distinct state from "normal". */
-  --ox-status-unknown: var(--ox-slate-500);
-  --ox-status-unknown-bg: var(--ox-slate-50);
-  --ox-status-unknown-border: var(--ox-slate-200);
-
-  /* Record-level flags */
-  --ox-flag-restricted: #7c3aed;
-  --ox-flag-restricted-bg: #f5f3ff;
-  --ox-flag-provisional: var(--ox-amber-700);
-  --ox-flag-deceased: var(--ox-slate-700);
-
-  /* ---------------------------------------------------------------------
-   * Decorative swatches — avatars and identity chips.
-   *
-   * These exist so that decoration never borrows a clinical colour. An
-   * avatar tinted from a hash of someone's name must not land on the amber
-   * that means "high" three rows below it on the same screen; a colour that
-   * carries meaning somewhere carries it everywhere, and a false severity cue
-   * beside a result is exactly the kind of ambient wrongness that erodes trust
-   * in the whole display.
-   *
-   * The hue set is constrained rather than chosen freely. Red, amber, emerald,
-   * blue, and violet are spoken for — critical, high, normal, low, restricted —
-   * so the swatches use teal, cyan, indigo, fuchsia, olive, and stone. Any
-   * future addition must clear the same bar: a hue that means nothing.
-   *
-   * Never the sole carrier of identity, and never mapped to any attribute of
-   * the person.
-   * ------------------------------------------------------------------ */
-  --ox-swatch-1: #115e59; /* teal */
-  --ox-swatch-1-bg: #f0fdfa;
-  --ox-swatch-1-border: #99f6e4;
-  --ox-swatch-2: #155e75; /* cyan */
-  --ox-swatch-2-bg: #ecfeff;
-  --ox-swatch-2-border: #a5f3fc;
-  --ox-swatch-3: #3730a3; /* indigo */
-  --ox-swatch-3-bg: #eef2ff;
-  --ox-swatch-3-border: #c7d2fe;
-  --ox-swatch-4: #86198f; /* fuchsia */
-  --ox-swatch-4-bg: #fdf4ff;
-  --ox-swatch-4-border: #f5d0fe;
-  --ox-swatch-5: #3f6212; /* olive */
-  --ox-swatch-5-bg: #f7fee7;
-  --ox-swatch-5-border: #d9f99d;
-  --ox-swatch-6: #44403c; /* stone */
-  --ox-swatch-6-bg: #fafaf9;
-  --ox-swatch-6-border: #e7e5e4;
-
-  /* ---------------------------------------------------------------------
-   * Typography
-   * ------------------------------------------------------------------ */
-  --ox-font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  --ox-font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
-  /* Tabular figures are mandatory for values, doses, and identifiers. */
-  --ox-font-numeric: var(--ox-font-mono);
-
-  --ox-text-2xs: 0.6875rem;
-  --ox-text-xs: 0.75rem;
-  --ox-text-sm: 0.8125rem;
-  --ox-text-base: 0.875rem;
-  --ox-text-md: 1rem;
-  --ox-text-lg: 1.125rem;
-  --ox-text-xl: 1.375rem;
-  --ox-text-2xl: 1.75rem;
-
-  /* ---------------------------------------------------------------------
-   * Shape & elevation
-   * ------------------------------------------------------------------ */
-  --ox-radius-sm: 0.25rem;
-  --ox-radius: 0.5rem;
-  --ox-radius-lg: 0.75rem;
-  --ox-radius-xl: 1rem;
-  --ox-radius-full: 9999px;
-
+  /* Semantic — light theme ----------------------------------------------
+   * The key space every other theme must match. A theme missing a key here
+   * is a build error, not a fallback.
+   */
+  --ox-bg: var(--ox-ref-white);
+  --ox-bg-subtle: var(--ox-ref-slate-50);
+  --ox-bg-muted: var(--ox-ref-slate-100);
+  --ox-surface: var(--ox-ref-white);
+  --ox-surface-raised: var(--ox-ref-white);
+  --ox-surface-overlay: var(--ox-ref-white);
+  --ox-border: var(--ox-ref-slate-200);
+  --ox-border-strong: var(--ox-ref-slate-300);
+  --ox-text: var(--ox-ref-slate-900);
+  --ox-text-muted: var(--ox-ref-slate-600);
+  --ox-text-subtle: var(--ox-ref-slate-500);
+  --ox-text-on-accent: var(--ox-ref-white);
+  --ox-accent: var(--ox-ref-brand-600);
+  --ox-accent-hover: var(--ox-ref-brand-700);
+  --ox-accent-subtle: var(--ox-ref-brand-50);
+  --ox-accent-border: var(--ox-ref-brand-200);
+  --ox-focus-ring: var(--ox-ref-brand-500);
+  --ox-focus-ring-offset: var(--ox-ref-white);
+  --ox-status-critical: var(--ox-ref-red-700);
+  --ox-status-critical-bg: var(--ox-ref-red-50);
+  --ox-status-critical-border: var(--ox-ref-red-200);
+  --ox-status-high: var(--ox-ref-amber-700);
+  --ox-status-high-bg: var(--ox-ref-amber-50);
+  --ox-status-high-border: var(--ox-ref-amber-200);
+  --ox-status-low: var(--ox-ref-blue-600);
+  --ox-status-low-bg: var(--ox-ref-blue-50);
+  --ox-status-low-border: var(--ox-ref-blue-200);
+  --ox-status-normal: var(--ox-ref-green-700);
+  --ox-status-normal-bg: var(--ox-ref-green-50);
+  --ox-status-normal-border: var(--ox-ref-green-200);
+  --ox-status-unknown: var(--ox-ref-slate-500);
+  --ox-status-unknown-bg: var(--ox-ref-slate-50);
+  --ox-status-unknown-border: var(--ox-ref-slate-200);
+  --ox-flag-restricted: var(--ox-ref-violet-600);
+  --ox-flag-restricted-bg: var(--ox-ref-violet-50);
+  --ox-flag-provisional: var(--ox-ref-amber-700);
+  --ox-flag-deceased: var(--ox-ref-slate-700);
+  --ox-swatch-1: var(--ox-ref-swatch-teal-fg);
+  --ox-swatch-2: var(--ox-ref-swatch-cyan-fg);
+  --ox-swatch-3: var(--ox-ref-swatch-indigo-fg);
+  --ox-swatch-4: var(--ox-ref-swatch-fuchsia-fg);
+  --ox-swatch-5: var(--ox-ref-swatch-olive-fg);
+  --ox-swatch-6: var(--ox-ref-swatch-stone-fg);
+  --ox-swatch-1-bg: var(--ox-ref-swatch-teal-bg);
+  --ox-swatch-1-border: var(--ox-ref-swatch-teal-border);
+  --ox-swatch-2-bg: var(--ox-ref-swatch-cyan-bg);
+  --ox-swatch-2-border: var(--ox-ref-swatch-cyan-border);
+  --ox-swatch-3-bg: var(--ox-ref-swatch-indigo-bg);
+  --ox-swatch-3-border: var(--ox-ref-swatch-indigo-border);
+  --ox-swatch-4-bg: var(--ox-ref-swatch-fuchsia-bg);
+  --ox-swatch-4-border: var(--ox-ref-swatch-fuchsia-border);
+  --ox-swatch-5-bg: var(--ox-ref-swatch-olive-bg);
+  --ox-swatch-5-border: var(--ox-ref-swatch-olive-border);
+  --ox-swatch-6-bg: var(--ox-ref-swatch-stone-bg);
+  --ox-swatch-6-border: var(--ox-ref-swatch-stone-border);
   --ox-shadow-sm: 0 1px 2px 0 rgb(2 6 23 / 0.05);
   --ox-shadow: 0 1px 3px 0 rgb(2 6 23 / 0.08), 0 1px 2px -1px rgb(2 6 23 / 0.06);
   --ox-shadow-md: 0 4px 12px -2px rgb(2 6 23 / 0.08), 0 2px 6px -2px rgb(2 6 23 / 0.05);
   --ox-shadow-lg: 0 12px 32px -8px rgb(2 6 23 / 0.12);
 
-  /* ---------------------------------------------------------------------
-   * Density — the single most important healthcare-specific token group.
-   *
-   *   patient   roomy, larger targets, patient-facing surfaces
-   *   standard  general SaaS / admin
-   *   clinical  dense worklists, flowsheets, results tables
-   *
-   * Set with `data-ox-density` on any container; components read these
-   * rather than hard-coding spacing.
-   * ------------------------------------------------------------------ */
+  /* Density — default profile (standard) --------------------------------
+   * So a page that never sets data-ox-density is still usable rather than
+   * unstyled.
+   */
   --ox-density-row-height: 2.5rem;
   --ox-density-gap: 0.75rem;
   --ox-density-pad-x: 0.875rem;
   --ox-density-pad-y: 0.625rem;
-  --ox-density-font: var(--ox-text-base);
-  --ox-density-target: 2.75rem; /* minimum interactive target */
+  --ox-density-font: var(--ox-ref-size-base);
+  --ox-density-target: 2.75rem;
+  --ox-density-target-floor: 1.5rem;
 
-  /* Motion. Decorative motion is prohibited on clinical surfaces. */
-  --ox-duration-fast: 120ms;
-  --ox-duration: 180ms;
-  --ox-duration-slow: 280ms;
-  --ox-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  /* Component — the override surface ------------------------------------
+   * Every one of these resolves to a semantic token, so they follow light,
+   * dark and high-contrast without being redeclared. Override any of them to
+   * restyle a component without editing the source you were shipped.
+   */
+  --ox-badge-critical-fg: var(--ox-status-critical);
+  --ox-badge-critical-bg: var(--ox-status-critical-bg);
+  --ox-badge-critical-border: var(--ox-status-critical-border);
+  --ox-badge-high-fg: var(--ox-status-high);
+  --ox-badge-high-bg: var(--ox-status-high-bg);
+  --ox-badge-high-border: var(--ox-status-high-border);
+  --ox-badge-low-fg: var(--ox-status-low);
+  --ox-badge-low-bg: var(--ox-status-low-bg);
+  --ox-badge-low-border: var(--ox-status-low-border);
+  --ox-badge-normal-fg: var(--ox-status-normal);
+  --ox-badge-normal-bg: var(--ox-status-normal-bg);
+  --ox-badge-normal-border: var(--ox-status-normal-border);
+  --ox-badge-unknown-fg: var(--ox-status-unknown);
+  --ox-badge-unknown-bg: var(--ox-status-unknown-bg);
+  --ox-badge-unknown-border: var(--ox-status-unknown-border);
+  --ox-badge-radius: var(--ox-radius-full);
+  --ox-alert-critical-fg: var(--ox-status-critical);
+  --ox-alert-critical-bg: var(--ox-status-critical-bg);
+  --ox-alert-critical-border: var(--ox-status-critical-border);
+  --ox-alert-warning-fg: var(--ox-status-high);
+  --ox-alert-warning-bg: var(--ox-status-high-bg);
+  --ox-alert-warning-border: var(--ox-status-high-border);
+  --ox-alert-info-fg: var(--ox-status-low);
+  --ox-alert-info-bg: var(--ox-status-low-bg);
+  --ox-alert-info-border: var(--ox-status-low-border);
+  --ox-alert-radius: var(--ox-radius);
+  --ox-alert-pad-x: var(--ox-density-pad-x);
+  --ox-alert-pad-y: var(--ox-density-pad-y);
+  --ox-value-fg: var(--ox-text);
+  --ox-value-unit-fg: var(--ox-text-muted);
+  --ox-value-font: var(--ox-font-numeric);
+  --ox-absent-fg: var(--ox-text-subtle);
+  --ox-absent-restricted-fg: var(--ox-flag-restricted);
+  --ox-absent-error-fg: var(--ox-status-critical);
+  --ox-range-track: var(--ox-bg-muted);
+  --ox-range-band: var(--ox-status-normal-bg);
+  --ox-range-band-border: var(--ox-status-normal-border);
+  --ox-range-marker: var(--ox-text);
+  --ox-range-marker-abnormal: var(--ox-status-critical);
+  --ox-range-height: 0.5rem;
+  --ox-banner-bg: var(--ox-surface);
+  --ox-banner-border: var(--ox-border);
+  --ox-banner-fg: var(--ox-text);
+  --ox-banner-meta-fg: var(--ox-text-muted);
+  --ox-banner-restricted-bg: var(--ox-flag-restricted-bg);
+  --ox-banner-restricted-border: var(--ox-flag-restricted);
+  --ox-banner-deceased-fg: var(--ox-flag-deceased);
+  --ox-surface-card-bg: var(--ox-surface);
+  --ox-surface-card-border: var(--ox-border);
+  --ox-surface-card-radius: var(--ox-radius-lg);
+  --ox-surface-card-shadow: var(--ox-shadow-sm);
+  --ox-surface-card-pad-x: var(--ox-density-pad-x);
+  --ox-surface-card-pad-y: var(--ox-density-pad-y);
+  --ox-field-bg: var(--ox-surface);
+  --ox-field-border: var(--ox-border-strong);
+  --ox-field-border-focus: var(--ox-focus-ring);
+  --ox-field-border-invalid: var(--ox-status-critical);
+  --ox-field-fg: var(--ox-text);
+  --ox-field-placeholder-fg: var(--ox-text-subtle);
+  --ox-field-label-fg: var(--ox-text);
+  --ox-field-hint-fg: var(--ox-text-muted);
+  --ox-field-error-fg: var(--ox-status-critical);
+  --ox-field-prefilled-bg: var(--ox-accent-subtle);
+  --ox-field-prefilled-border: var(--ox-accent-border);
+  --ox-field-radius: var(--ox-radius);
+  --ox-field-pad-x: var(--ox-density-pad-x);
+  --ox-field-pad-y: var(--ox-density-pad-y);
+  --ox-chart-axis: var(--ox-border-strong);
+  --ox-chart-grid: var(--ox-border);
+  --ox-chart-label-fg: var(--ox-text-muted);
+  --ox-chart-line: var(--ox-text);
+  --ox-chart-band-bg: var(--ox-status-normal-bg);
+  --ox-chart-band-border: var(--ox-status-normal-border);
+  --ox-chart-point: var(--ox-text);
+  --ox-chart-surface: var(--ox-surface);
+  --ox-chart-line-width: 1.5px;
+  --ox-chart-point-radius: 3px;
+  --ox-chart-point-radius-flagged: 4.5px;
+  --ox-nav-bg: var(--ox-surface);
+  --ox-nav-border: var(--ox-border);
+  --ox-nav-fg: var(--ox-text-muted);
+  --ox-nav-fg-current: var(--ox-text);
+  --ox-nav-bg-current: var(--ox-accent-subtle);
+  --ox-nav-border-current: var(--ox-accent);
+  --ox-nav-bg-hover: var(--ox-bg-muted);
+  --ox-nav-radius: var(--ox-radius);
 }
 
+/* Density profiles. Nestable — innermost wins. */
 [data-ox-density="patient"] {
   --ox-density-row-height: 3.25rem;
   --ox-density-gap: 1.125rem;
   --ox-density-pad-x: 1.125rem;
   --ox-density-pad-y: 0.875rem;
-  --ox-density-font: var(--ox-text-md);
+  --ox-density-font: var(--ox-ref-size-md);
   --ox-density-target: 3rem;
 }
 
@@ -229,7 +383,7 @@
   --ox-density-gap: 0.75rem;
   --ox-density-pad-x: 0.875rem;
   --ox-density-pad-y: 0.625rem;
-  --ox-density-font: var(--ox-text-base);
+  --ox-density-font: var(--ox-ref-size-base);
   --ox-density-target: 2.75rem;
 }
 
@@ -238,97 +392,144 @@
   --ox-density-gap: 0.375rem;
   --ox-density-pad-x: 0.5rem;
   --ox-density-pad-y: 0.25rem;
-  --ox-density-font: var(--ox-text-sm);
-  /* Target stays at 24px even in dense mode — below this, mis-taps become
-     clinically consequential. Dense means tighter rows, not smaller buttons. */
+  --ox-density-font: var(--ox-ref-size-sm);
   --ox-density-target: 1.5rem;
 }
 
-/* -----------------------------------------------------------------------
- * Dark theme
- *
- * Status colors are re-tuned rather than reused: the light-mode values do not
- * hold contrast on a dark surface, and critical must stay unmistakable.
- * -------------------------------------------------------------------- */
+/* dark
+   Status colours are re-tuned rather than reused: the light values do not
+   hold contrast on a dark surface, and critical must stay unmistakable. */
 .dark,
-[data-theme="dark"] {
-  --ox-bg: #0a0d12;
-  --ox-bg-subtle: #11161d;
-  --ox-bg-muted: #181f28;
-  --ox-surface: #141a22;
-  --ox-surface-raised: #1a222c;
-  --ox-surface-overlay: #1d263000;
-
-  --ox-border: #29333f;
-  --ox-border-strong: #3a4654;
-
-  --ox-text: #edf2f7;
-  --ox-text-muted: #a5b1be;
-  --ox-text-subtle: #82909f;
-  --ox-text-on-accent: #071014;
-
-  --ox-accent: #67e8f9;
-  --ox-accent-hover: #a5f3fc;
-  --ox-accent-subtle: #102a32;
-  --ox-accent-border: #1b4655;
-
-  --ox-focus-ring: #67e8f9;
-  --ox-focus-ring-offset: #0a0d12;
-
-  --ox-status-critical: #fb7185;
-  --ox-status-critical-bg: #2a1216;
-  --ox-status-critical-border: #5c1f28;
-
-  --ox-status-high: #fbbf24;
-  --ox-status-high-bg: #2a1f0c;
-  --ox-status-high-border: #5c421a;
-
-  --ox-status-low: #60a5fa;
-  --ox-status-low-bg: #0f1c33;
-  --ox-status-low-border: #1e3a68;
-
-  --ox-status-normal: #4ade80;
-  --ox-status-normal-bg: #10271e;
-  --ox-status-normal-border: #1e5138;
-
-  --ox-status-unknown: #94a3b8;
-  --ox-status-unknown-bg: #141f22;
-  --ox-status-unknown-border: #253338;
-
-  --ox-flag-restricted: #c4b5fd;
-  --ox-flag-restricted-bg: #1c1533;
-  --ox-flag-provisional: #fbbf24;
-  --ox-flag-deceased: #cbd5e1;
-
-  /* Decorative swatches — same six hues, inverted for dark surfaces. */
-  --ox-swatch-1: #5eead4;
-  --ox-swatch-1-bg: #10241f;
-  --ox-swatch-1-border: #1d4c44;
-  --ox-swatch-2: #67e8f9;
-  --ox-swatch-2-bg: #0e2429;
-  --ox-swatch-2-border: #1a4a55;
-  --ox-swatch-3: #a5b4fc;
-  --ox-swatch-3-bg: #171a33;
-  --ox-swatch-3-border: #2e3468;
-  --ox-swatch-4: #f0abfc;
-  --ox-swatch-4-bg: #26102b;
-  --ox-swatch-4-border: #50245a;
-  --ox-swatch-5: #bef264;
-  --ox-swatch-5-bg: #1a2110;
-  --ox-swatch-5-border: #35441f;
-  --ox-swatch-6: #d6d3d1;
-  --ox-swatch-6-bg: #1c1b1a;
-  --ox-swatch-6-border: #3a3735;
-
+[data-theme="dark"],
+[data-ox-theme="dark"] {
+  --ox-bg: var(--ox-ref-ink-950);
+  --ox-bg-subtle: var(--ox-ref-ink-900);
+  --ox-bg-muted: var(--ox-ref-ink-820);
+  --ox-surface: var(--ox-ref-ink-860);
+  --ox-surface-raised: var(--ox-ref-ink-780);
+  --ox-surface-overlay: var(--ox-ref-ink-740);
+  --ox-border: var(--ox-ref-ink-700);
+  --ox-border-strong: var(--ox-ref-ink-600);
+  --ox-text: var(--ox-ref-ink-100);
+  --ox-text-muted: var(--ox-ref-ink-200);
+  --ox-text-subtle: var(--ox-ref-ink-300);
+  --ox-text-on-accent: var(--ox-ref-ink-on-accent);
+  --ox-accent: var(--ox-ref-cyan-300);
+  --ox-accent-hover: var(--ox-ref-cyan-200);
+  --ox-accent-subtle: var(--ox-ref-tint-accent-bg);
+  --ox-accent-border: var(--ox-ref-tint-accent-border);
+  --ox-focus-ring: var(--ox-ref-cyan-300);
+  --ox-focus-ring-offset: var(--ox-ref-ink-950);
+  --ox-status-critical: var(--ox-ref-red-400);
+  --ox-status-critical-bg: var(--ox-ref-tint-critical-bg);
+  --ox-status-critical-border: var(--ox-ref-tint-critical-border);
+  --ox-status-high: var(--ox-ref-amber-400);
+  --ox-status-high-bg: var(--ox-ref-tint-high-bg);
+  --ox-status-high-border: var(--ox-ref-tint-high-border);
+  --ox-status-low: var(--ox-ref-blue-400);
+  --ox-status-low-bg: var(--ox-ref-tint-low-bg);
+  --ox-status-low-border: var(--ox-ref-tint-low-border);
+  --ox-status-normal: var(--ox-ref-green-400);
+  --ox-status-normal-bg: var(--ox-ref-tint-normal-bg);
+  --ox-status-normal-border: var(--ox-ref-tint-normal-border);
+  --ox-status-unknown: var(--ox-ref-slate-400);
+  --ox-status-unknown-bg: var(--ox-ref-tint-unknown-bg);
+  --ox-status-unknown-border: var(--ox-ref-tint-unknown-border);
+  --ox-flag-restricted: var(--ox-ref-violet-300);
+  --ox-flag-restricted-bg: var(--ox-ref-violet-950);
+  --ox-flag-provisional: var(--ox-ref-amber-400);
+  --ox-flag-deceased: var(--ox-ref-slate-300);
+  --ox-swatch-1: var(--ox-ref-swatch-teal-fg-dark);
+  --ox-swatch-2: var(--ox-ref-swatch-cyan-fg-dark);
+  --ox-swatch-3: var(--ox-ref-swatch-indigo-fg-dark);
+  --ox-swatch-4: var(--ox-ref-swatch-fuchsia-fg-dark);
+  --ox-swatch-5: var(--ox-ref-swatch-olive-fg-dark);
+  --ox-swatch-6: var(--ox-ref-swatch-stone-fg-dark);
+  --ox-swatch-1-bg: var(--ox-ref-swatch-teal-bg-dark);
+  --ox-swatch-1-border: var(--ox-ref-swatch-teal-border-dark);
+  --ox-swatch-2-bg: var(--ox-ref-swatch-cyan-bg-dark);
+  --ox-swatch-2-border: var(--ox-ref-swatch-cyan-border-dark);
+  --ox-swatch-3-bg: var(--ox-ref-swatch-indigo-bg-dark);
+  --ox-swatch-3-border: var(--ox-ref-swatch-indigo-border-dark);
+  --ox-swatch-4-bg: var(--ox-ref-swatch-fuchsia-bg-dark);
+  --ox-swatch-4-border: var(--ox-ref-swatch-fuchsia-border-dark);
+  --ox-swatch-5-bg: var(--ox-ref-swatch-olive-bg-dark);
+  --ox-swatch-5-border: var(--ox-ref-swatch-olive-border-dark);
+  --ox-swatch-6-bg: var(--ox-ref-swatch-stone-bg-dark);
+  --ox-swatch-6-border: var(--ox-ref-swatch-stone-border-dark);
   --ox-shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.4);
   --ox-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.5);
   --ox-shadow-md: 0 4px 14px -2px rgb(0 0 0 / 0.55);
   --ox-shadow-lg: 0 16px 40px -10px rgb(0 0 0 / 0.65);
 }
 
-/* -----------------------------------------------------------------------
- * Reduced motion. Clinical surfaces must remain fully usable without it.
- * -------------------------------------------------------------------- */
+/* high-contrast
+   Targets 7:1 rather than 4.5:1, and spends the contrast budget on text and
+   borders rather than on tinted surfaces — a pale wash behind dark text is
+   the first thing to disappear for the reader who selected this theme. */
+[data-ox-theme="high-contrast"] {
+  --ox-bg: var(--ox-ref-white);
+  --ox-bg-subtle: var(--ox-ref-white);
+  --ox-bg-muted: var(--ox-ref-slate-100);
+  --ox-surface: var(--ox-ref-white);
+  --ox-surface-raised: var(--ox-ref-white);
+  --ox-surface-overlay: var(--ox-ref-white);
+  --ox-border: var(--ox-ref-black);
+  --ox-border-strong: var(--ox-ref-black);
+  --ox-text: var(--ox-ref-black);
+  --ox-text-muted: var(--ox-ref-hc-text-muted);
+  --ox-text-subtle: var(--ox-ref-hc-text-muted);
+  --ox-text-on-accent: var(--ox-ref-white);
+  --ox-accent: var(--ox-ref-hc-accent);
+  --ox-accent-hover: var(--ox-ref-hc-accent-hover);
+  --ox-accent-subtle: var(--ox-ref-white);
+  --ox-accent-border: var(--ox-ref-hc-accent);
+  --ox-focus-ring: var(--ox-ref-black);
+  --ox-focus-ring-offset: var(--ox-ref-white);
+  --ox-status-critical: var(--ox-ref-hc-critical);
+  --ox-status-critical-bg: var(--ox-ref-white);
+  --ox-status-critical-border: var(--ox-ref-hc-critical);
+  --ox-status-high: var(--ox-ref-hc-high);
+  --ox-status-high-bg: var(--ox-ref-white);
+  --ox-status-high-border: var(--ox-ref-hc-high);
+  --ox-status-low: var(--ox-ref-hc-low);
+  --ox-status-low-bg: var(--ox-ref-white);
+  --ox-status-low-border: var(--ox-ref-hc-low);
+  --ox-status-normal: var(--ox-ref-hc-normal);
+  --ox-status-normal-bg: var(--ox-ref-white);
+  --ox-status-normal-border: var(--ox-ref-hc-normal);
+  --ox-status-unknown: var(--ox-ref-hc-unknown);
+  --ox-status-unknown-bg: var(--ox-ref-white);
+  --ox-status-unknown-border: var(--ox-ref-hc-unknown);
+  --ox-flag-restricted: var(--ox-ref-hc-restricted);
+  --ox-flag-restricted-bg: var(--ox-ref-white);
+  --ox-flag-provisional: var(--ox-ref-hc-high);
+  --ox-flag-deceased: var(--ox-ref-black);
+  --ox-swatch-1: var(--ox-ref-hc-text-muted);
+  --ox-swatch-2: var(--ox-ref-hc-text-muted);
+  --ox-swatch-3: var(--ox-ref-hc-text-muted);
+  --ox-swatch-4: var(--ox-ref-hc-text-muted);
+  --ox-swatch-5: var(--ox-ref-hc-text-muted);
+  --ox-swatch-6: var(--ox-ref-hc-text-muted);
+  --ox-swatch-1-bg: var(--ox-ref-white);
+  --ox-swatch-1-border: var(--ox-ref-black);
+  --ox-swatch-2-bg: var(--ox-ref-white);
+  --ox-swatch-2-border: var(--ox-ref-black);
+  --ox-swatch-3-bg: var(--ox-ref-white);
+  --ox-swatch-3-border: var(--ox-ref-black);
+  --ox-swatch-4-bg: var(--ox-ref-white);
+  --ox-swatch-4-border: var(--ox-ref-black);
+  --ox-swatch-5-bg: var(--ox-ref-white);
+  --ox-swatch-5-border: var(--ox-ref-black);
+  --ox-swatch-6-bg: var(--ox-ref-white);
+  --ox-swatch-6-border: var(--ox-ref-black);
+  --ox-shadow-sm: none;
+  --ox-shadow: none;
+  --ox-shadow-md: none;
+  --ox-shadow-lg: none;
+}
+
+/* Reduced motion. Clinical surfaces must remain fully usable without it. */
 @media (prefers-reduced-motion: reduce) {
   :root {
     --ox-duration-fast: 0ms;
@@ -337,13 +538,13 @@
   }
 }
 
-/* -----------------------------------------------------------------------
- * Forced colors (Windows High Contrast). Status must survive the loss of
- * every custom color, which is exactly why labels and icons are mandatory.
- * -------------------------------------------------------------------- */
+/* Forced colours (Windows High Contrast).
+   Every custom colour is discarded here, which is exactly why a status
+   label and icon are mandatory rather than decorative. */
 @media (forced-colors: active) {
   :root {
     --ox-border: CanvasText;
+    --ox-border-strong: CanvasText;
     --ox-focus-ring: Highlight;
   }
 }

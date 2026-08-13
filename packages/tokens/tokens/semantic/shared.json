@@ -1,0 +1,35 @@
+{
+  "$description": "Semantic tokens that do not vary by theme — typography, shape and motion. Split out so the theme files contain only what actually differs, and a reviewer comparing light against dark is looking at a diff of colour rather than a diff of everything.",
+
+  "font-sans": { "$type": "fontFamily", "$value": "{ref.font.sans}" },
+  "font-mono": { "$type": "fontFamily", "$value": "{ref.font.mono}" },
+  "font-numeric": {
+    "$type": "fontFamily",
+    "$value": "{ref.font.mono}",
+    "$description": "Tabular figures are mandatory for values, doses and identifiers. A proportional 1 in a column of results breaks the alignment that makes the column scannable."
+  },
+
+  "text-2xs": { "$type": "dimension", "$value": "{ref.size.2xs}" },
+  "text-xs": { "$type": "dimension", "$value": "{ref.size.xs}" },
+  "text-sm": { "$type": "dimension", "$value": "{ref.size.sm}" },
+  "text-base": { "$type": "dimension", "$value": "{ref.size.base}" },
+  "text-md": { "$type": "dimension", "$value": "{ref.size.md}" },
+  "text-lg": { "$type": "dimension", "$value": "{ref.size.lg}" },
+  "text-xl": { "$type": "dimension", "$value": "{ref.size.xl}" },
+  "text-2xl": { "$type": "dimension", "$value": "{ref.size.2xl}" },
+
+  "radius-sm": { "$type": "dimension", "$value": "{ref.radius.sm}" },
+  "radius": { "$type": "dimension", "$value": "{ref.radius.md}" },
+  "radius-lg": { "$type": "dimension", "$value": "{ref.radius.lg}" },
+  "radius-xl": { "$type": "dimension", "$value": "{ref.radius.xl}" },
+  "radius-full": { "$type": "dimension", "$value": "{ref.radius.full}" },
+
+  "duration-fast": {
+    "$type": "duration",
+    "$value": "{ref.duration.fast}",
+    "$description": "Decorative motion is prohibited on clinical surfaces. These durations exist for state changes a user initiated, not for drawing attention."
+  },
+  "duration": { "$type": "duration", "$value": "{ref.duration.base}" },
+  "duration-slow": { "$type": "duration", "$value": "{ref.duration.slow}" },
+  "ease": { "$type": "cubicBezier", "$value": "cubic-bezier(0.22, 1, 0.36, 1)" }
+}

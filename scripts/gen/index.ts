@@ -27,6 +27,9 @@ import { emitTailwindSources } from "./emit/tailwind-sources";
 import { emitTsconfigPaths } from "./emit/tsconfig-paths";
 import { MetaError, loadComponents } from "./load";
 import { diagnoseComponents, extractProps } from "./props";
+import { emitTokens } from "./tokens/emit";
+import { loadTokenSource } from "./tokens/load";
+import { validateTokens } from "./tokens/validate";
 import { Emitter } from "./write";
 
 const CHECK = process.argv.includes("--check");
@@ -41,6 +44,22 @@ function report(title: string, lines: string[]) {
 async function main() {
   const components = await loadComponents();
   const emitter = new Emitter(CHECK);
+
+  // Tokens first. Every component's styling resolves through them, and a token
+  // problem is the kind that renders rather than throwing — a status colour
+  // below the contrast floor, a theme missing a key, a component token reaching
+  // past the semantic tier to a primitive. None of those fail a typecheck, so
+  // this is the only place they get caught.
+  const tokenSource = await loadTokenSource();
+  const tokenProblems = validateTokens(tokenSource);
+  if (tokenProblems.length) {
+    report(
+      `${tokenProblems.length} token problem(s)`,
+      tokenProblems.map((p) => p.message),
+    );
+    process.exit(1);
+  }
+  await emitTokens(tokenSource, emitter);
 
   // Path mappings are emitted before anything reads types, so a newly added
   // component's imports resolve on the same run that introduces it.
