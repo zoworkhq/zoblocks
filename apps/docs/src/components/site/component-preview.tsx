@@ -9,6 +9,7 @@
  */
 
 import * as React from "react";
+import type { Observation } from "@oxygenui-design/fhir";
 import {
   allergies,
   appointments,
@@ -20,6 +21,7 @@ import {
 } from "@oxygenui-design/fixtures";
 import { PatientBanner } from "@/registry/oxygen/patient-banner/patient-banner";
 import { ObservationPanel } from "@/registry/oxygen/vitals-panel/vitals-panel";
+import { ObservationTrend } from "@/registry/oxygen/observation-trend/observation-trend";
 import { MedicationCard, MedicationList } from "@/registry/oxygen/medication-card/medication-card";
 import { AllergyList } from "@/registry/oxygen/allergy-list/allergy-list";
 import { AppointmentCard } from "@/registry/oxygen/appointment-card/appointment-card";
@@ -65,7 +67,102 @@ interface Scenario {
   render: () => React.ReactNode;
 }
 
+/**
+ * A rising potassium. The point of the trend component in one dataset: every
+ * one of these values read alone is a different conversation from the four of
+ * them read together.
+ */
+function potassiumSeries(): Observation[] {
+  const days = [
+    ["2026-07-30T08:10:00Z", 4.1, undefined],
+    ["2026-07-31T08:05:00Z", 4.6, undefined],
+    ["2026-08-01T08:20:00Z", 5.0, undefined],
+    ["2026-08-02T07:55:00Z", 5.6, "H"],
+    ["2026-08-03T08:00:00Z", 6.8, "HH"],
+  ] as const;
+
+  return days.map(([when, value, interpretation]) => ({
+    resourceType: "Observation" as const,
+    status: "final" as const,
+    code: { text: "Potassium", coding: [{ system: "http://loinc.org", code: "2823-3" }] },
+    effectiveDateTime: when,
+    valueQuantity: { value, unit: "mmol/L" },
+    interpretation: interpretation ? [{ coding: [{ code: interpretation }] }] : undefined,
+    referenceRange: [{ low: { value: 3.5 }, high: { value: 5.3, unit: "mmol/L" } }],
+  }));
+}
+
 const SCENARIOS: Record<string, Scenario[]> = {
+  "observation-trend": [
+    {
+      id: "rising",
+      label: "A rising potassium",
+      note: "Each value read alone is a different conversation from the five read together. Shape carries direction, so the escalation survives monochrome and colour vision deficiency.",
+      render: () => (
+        <ObservationTrend observations={potassiumSeries()} timeZone={TZ} label="Potassium" />
+      ),
+    },
+    {
+      id: "no-range",
+      label: "No reference range",
+      note: "No stated bound means no band. An invented normal band reads as the definition of normal for the whole series.",
+      render: () => (
+        <ObservationTrend
+          observations={potassiumSeries().map((o) => ({ ...o, referenceRange: undefined }))}
+          timeZone={TZ}
+          label="Potassium"
+        />
+      ),
+    },
+    {
+      id: "gaps",
+      label: "Results that cannot be plotted",
+      note: "Counted, never dropped. A trend built from five of seven results that presents itself as the whole series is worse than no chart.",
+      render: () => (
+        <ObservationTrend
+          observations={[
+            ...potassiumSeries(),
+            {
+              resourceType: "Observation",
+              status: "final",
+              code: { text: "Potassium", coding: [{ system: "http://loinc.org", code: "2823-3" }] },
+              effectiveDateTime: "2026-08-04T08:00:00Z",
+              dataAbsentReason: { coding: [{ code: "error" }] },
+            },
+            {
+              resourceType: "Observation",
+              status: "final",
+              code: { text: "Potassium", coding: [{ system: "http://loinc.org", code: "2823-3" }] },
+              valueQuantity: { value: 5.2, unit: "mmol/L" },
+            },
+          ]}
+          timeZone={TZ}
+          label="Potassium"
+        />
+      ),
+    },
+    {
+      id: "refusal",
+      label: "When it refuses to draw",
+      note: "Two units on one axis would render a unit change as a cliff in the patient. The drawing is withheld; the table stays correct because it carries a unit per row.",
+      render: () => (
+        <ObservationTrend
+          observations={[
+            ...potassiumSeries().slice(0, 3),
+            {
+              resourceType: "Observation",
+              status: "final",
+              code: { text: "Potassium", coding: [{ system: "http://loinc.org", code: "2823-3" }] },
+              effectiveDateTime: "2026-08-03T08:00:00Z",
+              valueQuantity: { value: 21.9, unit: "mg/dL" },
+            },
+          ]}
+          timeZone={TZ}
+          label="Potassium"
+        />
+      ),
+    },
+  ],
   "patient-banner": [
     {
       id: "routine",
