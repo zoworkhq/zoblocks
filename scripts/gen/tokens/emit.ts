@@ -270,7 +270,7 @@ function buildTs(source: TokenSource): string {
   out.push("");
   out.push("export type TokenName = (typeof TOKEN_NAMES)[number];");
   out.push("");
-  out.push("/** `cssVar(\"status.critical\")` → `\"var(--ox-status-critical)\"`. */");
+  out.push('/** `cssVar("status.critical")` → `"var(--ox-status-critical)"`. */');
   out.push("export function cssVar(name: TokenName): string {");
   out.push('  return `var(--ox-${name.split(".").join("-")})`;');
   out.push("}");

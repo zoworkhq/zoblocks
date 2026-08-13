@@ -33,13 +33,13 @@ Absence is a value with a reason, not a gap in the layout.
 Five kinds of absence are clinically distinct and must never collapse into one
 another:
 
-| Kind | Means | Example wording |
-| --- | --- | --- |
-| Not asked | Nobody collected it | "Not asked" |
-| Declined | The person refused | "Declined by patient" |
-| Masked | Policy withheld it from you | "Restricted — not shown" |
-| Pending | Collected, result not back | "Result pending" |
-| Error | The system could not fetch it | "Could not load allergies" |
+| Kind      | Means                         | Example wording            |
+| --------- | ----------------------------- | -------------------------- |
+| Not asked | Nobody collected it           | "Not asked"                |
+| Declined  | The person refused            | "Declined by patient"      |
+| Masked    | Policy withheld it from you   | "Restricted — not shown"   |
+| Pending   | Collected, result not back    | "Result pending"           |
+| Error     | The system could not fetch it | "Could not load allergies" |
 
 ✅ **Do**
 
@@ -115,7 +115,7 @@ discards the hue, and roughly one in twelve men cannot separate red from green.
 ✅ **Do**
 
 - State what will happen, to whom, and what cannot be undone.
-  *"Discharges Ada Lovelace and closes the encounter. This cannot be undone."*
+  _"Discharges Ada Lovelace and closes the encounter. This cannot be undone."_
 - Name the patient in any action that applies to one. Wrong-patient actions are
   what this friction exists to prevent.
 - Match friction to consequence. Too little and mistakes happen; too much and
@@ -139,7 +139,7 @@ on screen is complete.
 
 ✅ **Do**
 
-- *"Could not load allergies. This list may be incomplete."*
+- _"Could not load allergies. This list may be incomplete."_
 - Say what remains usable. Partial failure is the normal case in a record
   assembled from several sources.
 - Keep failure contained to its section. `ErrorBoundary` exists so one dead
@@ -178,8 +178,8 @@ on screen is complete.
 
 Patient-facing and clinician-facing strings are **different catalogs, not
 different tones of the same string**. "Potassium" and "K+" are not a formality
-setting, and *"your result is higher than the usual range"* is not a politer way
-of writing *"H 6.8 mmol/L"*.
+setting, and _"your result is higher than the usual range"_ is not a politer way
+of writing _"H 6.8 mmol/L"_.
 
 Bind wording to the surface profile rather than assuming an audience:
 
@@ -187,12 +187,12 @@ Bind wording to the surface profile rather than assuming an audience:
 const label = useTerm({ clinician: "K+", patient: "Potassium" });
 ```
 
-| | Clinician | Patient |
-| --- | --- | --- |
-| Vocabulary | Abbreviations, codes, units as written | Whole words, expanded units |
-| Reference ranges | The numbers | What the numbers mean, then the numbers |
-| Uncertainty | Stated plainly | Stated plainly, and what happens next |
-| Reading level | Domain-fluent | Target grade 8 unless stated otherwise |
+|                  | Clinician                              | Patient                                 |
+| ---------------- | -------------------------------------- | --------------------------------------- |
+| Vocabulary       | Abbreviations, codes, units as written | Whole words, expanded units             |
+| Reference ranges | The numbers                            | What the numbers mean, then the numbers |
+| Uncertainty      | Stated plainly                         | Stated plainly, and what happens next   |
+| Reading level    | Domain-fluent                          | Target grade 8 unless stated otherwise  |
 
 ✅ **Do**
 
@@ -213,7 +213,7 @@ const label = useTerm({ clinician: "K+", patient: "Potassium" });
 
 ✅ **Do**
 
-- Describe behaviour, not people. *"Requires two staff for personal care"*, not
+- Describe behaviour, not people. _"Requires two staff for personal care"_, not
   a label attached to the person.
 - Treat deceased and restricted as text, not as a colour or an icon alone.
 - Use the name the record holds, including the used name where one is recorded.
@@ -250,10 +250,10 @@ const label = useTerm({ clinician: "K+", patient: "Potassium" });
 
 ## Enforcement
 
-| Rule | Severity | Catches |
-| --- | --- | --- |
-| `@oxygenui/no-absence-placeholder` | error | A placeholder string substituted for a missing value |
-| `@oxygenui/no-ambiguous-clinical-copy` | warning | Bare "Normal", "Are you sure?", generic error copy, bare "Unknown" |
+| Rule                                   | Severity | Catches                                                            |
+| -------------------------------------- | -------- | ------------------------------------------------------------------ |
+| `@oxygenui/no-absence-placeholder`     | error    | A placeholder string substituted for a missing value               |
+| `@oxygenui/no-ambiguous-clinical-copy` | warning  | Bare "Normal", "Are you sure?", generic error copy, bare "Unknown" |
 
 Both are scoped to prose positions in JSX. A comparison operand, a React key, a
 `className` and an enum-ish prop value are not copy, and firing on those would

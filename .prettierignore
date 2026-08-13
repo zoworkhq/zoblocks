@@ -13,3 +13,11 @@ registry.json
 tsconfig.generated.json
 apps/docs/src/lib/generated
 apps/hq/drizzle/meta
+
+# Token build outputs. The DTCG source in packages/tokens/tokens/ is
+# hand-written and IS formatted; everything below is emitted from it.
+packages/tokens/src/oxygen-tokens.css
+packages/tokens/src/tailwind.css
+packages/tokens/src/tokens.ts
+packages/tokens/src/tokens.json
+packages/tokens/src/contrast.json

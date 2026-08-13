@@ -39,7 +39,7 @@ const PATTERNS = [
   {
     id: "emptyConfirmation",
     test: /^\s*are you sure\??\s*$/i,
-    hint: 'Not a confirmation — it asks the reader to re-derive the consequence they were already unsure about. State what will happen, to whom, and what cannot be undone. See ActionGate\'s consequence and patientName props.',
+    hint: "Not a confirmation — it asks the reader to re-derive the consequence they were already unsure about. State what will happen, to whom, and what cannot be undone. See ActionGate's consequence and patientName props.",
   },
   {
     id: "genericError",
@@ -53,8 +53,7 @@ export default {
   meta: {
     type: "suggestion",
     docs: {
-      description:
-        "Flag user-visible clinical copy that omits a fact the interface already has.",
+      description: "Flag user-visible clinical copy that omits a fact the interface already has.",
     },
     schema: [],
     messages: {

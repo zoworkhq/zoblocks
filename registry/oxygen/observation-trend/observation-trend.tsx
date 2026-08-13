@@ -357,10 +357,7 @@ export function ObservationTrend({
   const series = React.useMemo(() => buildSeries(observations, range), [observations, range]);
   const { points, excluded, band, scale, conflict } = series;
 
-  const title =
-    label ??
-    observations.find((o) => o.code?.text)?.code?.text ??
-    "Observation";
+  const title = label ?? observations.find((o) => o.code?.text)?.code?.text ?? "Observation";
 
   // Destructured rather than length-checked: the ends of the series are used
   // for the scale and the summary, and narrowing them here means neither can
@@ -437,7 +434,9 @@ export function ObservationTrend({
           {title}
         </span>
         {unit && (
-          <span className="text-[length:var(--ox-text-xs)] text-[var(--ox-text-muted)]">{unit}</span>
+          <span className="text-[length:var(--ox-text-xs)] text-[var(--ox-text-muted)]">
+            {unit}
+          </span>
         )}
         <span className="text-[length:var(--ox-text-xs)] text-[var(--ox-text-muted)]">
           {summary}
@@ -463,98 +462,97 @@ export function ObservationTrend({
       {/* The drawing is decoration over the table. Assistive technology gets
           the table, which carries every value rather than a summary of them. */}
       {!conflict && (
-      <div
-        className="relative w-full rounded-[var(--ox-radius-sm)] bg-[var(--ox-chart-surface)]"
-        style={{ height }}
-      >
-      {/* Stretchable layer: the band and the line. Both are meant to fill the
+        <div
+          className="relative w-full rounded-[var(--ox-radius-sm)] bg-[var(--ox-chart-surface)]"
+          style={{ height }}
+        >
+          {/* Stretchable layer: the band and the line. Both are meant to fill the
           width — the x axis is time, and a wider container should show the same
           trend over more pixels. */}
-      <svg
-        aria-hidden="true"
-        focusable="false"
-        viewBox={`0 0 ${VIEW_W} ${height}`}
-        preserveAspectRatio="none"
-        className="absolute inset-0 block size-full"
-      >
-        {band && (
-          <rect
-            x={0}
-            y={Number.isFinite(band[1]) ? y(band[1]) : 0}
-            width={VIEW_W}
-            height={Math.max(
-              1,
-              (Number.isFinite(band[0]) ? y(band[0]) : height) -
-                (Number.isFinite(band[1]) ? y(band[1]) : 0),
+          <svg
+            aria-hidden="true"
+            focusable="false"
+            viewBox={`0 0 ${VIEW_W} ${height}`}
+            preserveAspectRatio="none"
+            className="absolute inset-0 block size-full"
+          >
+            {band && (
+              <rect
+                x={0}
+                y={Number.isFinite(band[1]) ? y(band[1]) : 0}
+                width={VIEW_W}
+                height={Math.max(
+                  1,
+                  (Number.isFinite(band[0]) ? y(band[0]) : height) -
+                    (Number.isFinite(band[1]) ? y(band[1]) : 0),
+                )}
+                fill="var(--ox-chart-band-bg)"
+                stroke="var(--ox-chart-band-border)"
+                strokeWidth="1"
+                /* The band's border must not thin out as the plot stretches. */
+                vectorEffect="non-scaling-stroke"
+              />
             )}
-            fill="var(--ox-chart-band-bg)"
-            stroke="var(--ox-chart-band-border)"
-            strokeWidth="1"
-            /* The band's border must not thin out as the plot stretches. */
-            vectorEffect="non-scaling-stroke"
-          />
-        )}
 
-        <polyline
-          points={points.map((p) => `${x(p.at)},${y(p.value)}`).join(" ")}
-          fill="none"
-          stroke="var(--ox-chart-line)"
-          strokeWidth="var(--ox-chart-line-width)"
-          strokeLinejoin="round"
-          strokeLinecap="round"
-          vectorEffect="non-scaling-stroke"
-        />
+            <polyline
+              points={points.map((p) => `${x(p.at)},${y(p.value)}`).join(" ")}
+              fill="none"
+              stroke="var(--ox-chart-line)"
+              strokeWidth="var(--ox-chart-line-width)"
+              strokeLinejoin="round"
+              strokeLinecap="round"
+              vectorEffect="non-scaling-stroke"
+            />
+          </svg>
 
-      </svg>
-
-      {/* Unstretchable layer: marks and labels. Positioned as a percentage of
+          {/* Unstretchable layer: marks and labels. Positioned as a percentage of
           the width and a pixel offset down, so they land exactly where the
           stretched plot puts them while keeping their authored pixel size. */}
-      {points.map((p, i) => (
-        <span
-          key={`mark-${p.at}-${i}`}
-          aria-hidden="true"
-          className="pointer-events-none absolute"
-          style={{
-            left: `${(x(p.at) / VIEW_W) * 100}%`,
-            top: y(p.value),
-            transform: "translate(-50%, -50%)",
-          }}
-        >
-          <Mark
-            shape={SHAPE[p.interpretation]}
-            /* Out of range is larger as well as differently shaped and
+          {points.map((p, i) => (
+            <span
+              key={`mark-${p.at}-${i}`}
+              aria-hidden="true"
+              className="pointer-events-none absolute"
+              style={{
+                left: `${(x(p.at) / VIEW_W) * 100}%`,
+                top: y(p.value),
+                transform: "translate(-50%, -50%)",
+              }}
+            >
+              <Mark
+                shape={SHAPE[p.interpretation]}
+                /* Out of range is larger as well as differently shaped and
                differently coloured. Three redundant encodings on the mark a
                reader is scanning for. */
-            size={p.interpretation === "normal" ? 6 : 9}
-            fill={TONE_VAR[p.interpretation]}
-          />
-        </span>
-      ))}
+                size={p.interpretation === "normal" ? 6 : 9}
+                fill={TONE_VAR[p.interpretation]}
+              />
+            </span>
+          ))}
 
-      {annotated.map((p, i) => {
-        const py = y(p.value);
-        // Flip the label below the point when it would clip the top edge.
-        const above = py > PAD_Y + 14;
-        const leftPct = (x(p.at) / VIEW_W) * 100;
-        return (
-          <span
-            key={`label-${i}`}
-            aria-hidden="true"
-            className="pointer-events-none absolute whitespace-nowrap font-[family-name:var(--ox-font-numeric)] text-[length:var(--ox-text-2xs)] font-semibold tabular-nums"
-            style={{
-              left: `${leftPct}%`,
-              top: above ? py - 16 : py + 8,
-              // Nudge the end labels inward so neither clips the plot edge.
-              transform: `translateX(${leftPct > 92 ? "-100%" : leftPct < 8 ? "0%" : "-50%"})`,
-              color: TONE_VAR[p.interpretation],
-            }}
-          >
-            {p.display}
-          </span>
-        );
-      })}
-      </div>
+          {annotated.map((p, i) => {
+            const py = y(p.value);
+            // Flip the label below the point when it would clip the top edge.
+            const above = py > PAD_Y + 14;
+            const leftPct = (x(p.at) / VIEW_W) * 100;
+            return (
+              <span
+                key={`label-${i}`}
+                aria-hidden="true"
+                className="pointer-events-none absolute whitespace-nowrap font-[family-name:var(--ox-font-numeric)] text-[length:var(--ox-text-2xs)] font-semibold tabular-nums"
+                style={{
+                  left: `${leftPct}%`,
+                  top: above ? py - 16 : py + 8,
+                  // Nudge the end labels inward so neither clips the plot edge.
+                  transform: `translateX(${leftPct > 92 ? "-100%" : leftPct < 8 ? "0%" : "-50%"})`,
+                  color: TONE_VAR[p.interpretation],
+                }}
+              >
+                {p.display}
+              </span>
+            );
+          })}
+        </div>
       )}
 
       {/* When the drawing was withheld there is nothing left to toggle — the

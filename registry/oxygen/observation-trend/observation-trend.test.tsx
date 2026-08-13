@@ -18,9 +18,7 @@ function potassium(
     code: { text: "Potassium", coding: [{ system: "http://loinc.org", code: "2823-3" }] },
     effectiveDateTime: at,
     valueQuantity: value === undefined ? undefined : { value, unit },
-    interpretation: interpretation
-      ? [{ coding: [{ code: interpretation }] }]
-      : undefined,
+    interpretation: interpretation ? [{ coding: [{ code: interpretation }] }] : undefined,
     referenceRange: range
       ? [
           {
@@ -110,10 +108,7 @@ describe("buildSeries", () => {
    */
   it("extends the scale so the band stays visible when every value is outside it", () => {
     const series = buildSeries(
-      [
-        potassium(1.1, "2026-08-01T09:00:00Z", "LL"),
-        potassium(1.2, "2026-08-02T09:00:00Z", "LL"),
-      ],
+      [potassium(1.1, "2026-08-01T09:00:00Z", "LL"), potassium(1.2, "2026-08-02T09:00:00Z", "LL")],
       "from-observations",
     );
     expect(series.scale[1]).toBeGreaterThanOrEqual(5.3);
@@ -311,7 +306,10 @@ describe("ObservationTrend", () => {
   it("withholds the drawing when two different analytes are passed", () => {
     const { container } = render(
       <ObservationTrend
-        observations={[potassium(4.1, "2026-08-01T09:00:00Z"), glucose(5.4, "2026-08-02T09:00:00Z")]}
+        observations={[
+          potassium(4.1, "2026-08-01T09:00:00Z"),
+          glucose(5.4, "2026-08-02T09:00:00Z"),
+        ]}
         timeZone="UTC"
       />,
     );
@@ -360,10 +358,7 @@ describe("ObservationTrend", () => {
   /** A lone reading has no time extent; left-aligning it implies one. */
   it("centres a single point rather than pinning it to the axis start", () => {
     const { container } = render(
-      <ObservationTrend
-        observations={[potassium(4.1, "2026-08-01T09:00:00Z")]}
-        timeZone="UTC"
-      />,
+      <ObservationTrend observations={[potassium(4.1, "2026-08-01T09:00:00Z")]} timeZone="UTC" />,
     );
     // Position is carried by the wrapper's percentage offset, not by the mark's
     // own coordinates — the mark SVG is always drawn at its own origin.

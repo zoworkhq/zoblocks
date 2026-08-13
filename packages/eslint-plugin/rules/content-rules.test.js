@@ -30,7 +30,7 @@ ruleTester.run("no-absence-placeholder", noAbsencePlaceholder, {
   valid: [
     // A separator between two rendered things. This is typography, not a
     // missing value — absent-value.tsx and care-team.tsx both do it correctly.
-    { code: 'const a = <span>— {explanation}</span>;' },
+    { code: "const a = <span>— {explanation}</span>;" },
     { code: 'const a = <li>{member.name} — {member.role ?? "Role not recorded"}</li>;' },
 
     // A React key never reaches a reader.
@@ -102,8 +102,8 @@ ruleTester.run("no-ambiguous-clinical-copy", noAmbiguousClinicalCopy, {
     { code: 'const a = <span className={state === "failed" ? "text-red" : "text-grey"} />;' },
 
     // The corrected wording.
-    { code: 'const a = <span>Not interpreted</span>;' },
-    { code: 'const a = <span>Within range</span>;' },
+    { code: "const a = <span>Not interpreted</span>;" },
+    { code: "const a = <span>Within range</span>;" },
     {
       code: 'const a = <ActionGate consequence="Discharges Ada Lovelace and closes the encounter." />;',
     },
@@ -114,7 +114,7 @@ ruleTester.run("no-ambiguous-clinical-copy", noAmbiguousClinicalCopy, {
 
   invalid: [
     {
-      code: 'const a = <span>Normal</span>;',
+      code: "const a = <span>Normal</span>;",
       errors: [{ messageId: "ambiguous" }],
     },
     {
@@ -122,7 +122,7 @@ ruleTester.run("no-ambiguous-clinical-copy", noAmbiguousClinicalCopy, {
       errors: [{ messageId: "ambiguous" }],
     },
     {
-      code: 'const a = <p>Something went wrong</p>;',
+      code: "const a = <p>Something went wrong</p>;",
       errors: [{ messageId: "ambiguous" }],
     },
     {

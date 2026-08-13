@@ -52,7 +52,13 @@ interface DtcgNode {
  * `$type` inherits down the group tree, which is what lets a group declare
  * `"$type": "color"` once instead of on all sixty of its children.
  */
-function flatten(node: DtcgNode, prefix: string[], inheritedType: string | undefined, file: string, out: TokenMap): void {
+function flatten(
+  node: DtcgNode,
+  prefix: string[],
+  inheritedType: string | undefined,
+  file: string,
+  out: TokenMap,
+): void {
   const type = typeof node.$type === "string" ? node.$type : inheritedType;
 
   if (node.$value !== undefined) {
