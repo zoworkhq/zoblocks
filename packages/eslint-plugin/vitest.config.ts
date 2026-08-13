@@ -10,6 +10,10 @@ import { defineConfig } from "vitest/config";
 export default defineConfig({
   test: {
     environment: "node",
-    include: ["src/**/*.test.ts"],
+    // Rules live in rules/, not src/. The previous glob matched nothing, and
+    // because the test script passes with no tests, the first rule test added
+    // would have been skipped silently — the exact failure this file's comment
+    // was written to prevent.
+    include: ["rules/**/*.test.js"],
   },
 });

@@ -160,7 +160,12 @@ export function ConceptChip({
               className="flex flex-col gap-0.5 border-b border-[var(--ox-border)] py-1.5 last:border-b-0"
             >
               <span className="flex items-center gap-2 font-[family-name:var(--ox-font-mono)] text-[length:var(--ox-text-xs)]">
-                <span className="font-semibold text-[var(--ox-text)]">{coding.code ?? "—"}</span>
+                {/* A coding can carry a system and a display with no code. A dash
+                    here would read as "the code is a dash"; the absence is stated
+                    instead, matching the display line below. */}
+                <span className="font-semibold text-[var(--ox-text)]">
+                  {coding.code ?? "No code"}
+                </span>
                 {coding.userSelected && (
                   <span className="text-[length:var(--ox-text-2xs)] text-[var(--ox-accent)]">
                     user selected
