@@ -2581,18 +2581,20 @@ export const CATALOG: ComponentDoc[] = [
     "status": "stable",
     "since": "0.1.0",
     "layer": "pattern",
-    "summary": "Sets the spacing and target-size contract for a subtree. Density changes spacing, never which facts appear.",
-    "description": "Sets the spacing and target-size contract for a subtree. Three modes, nestable, and clamped to the WCAG 2.2 target-size floor so clinical density can never shrink a control below the accessible minimum.",
-    "rationale": "Density is a contract, not a preference. The same component serves a patient reading on a phone and a nurse scanning ninety rows, and the difference is spacing and target size — never which clinical facts appear. Hiding a fact to save a row is a defect, not a density mode. The provider also clamps to the WCAG 2.2 target-size floor rather than trusting every component to remember, and nests so a patient-facing card inside a clinical worklist keeps its own density.",
+    "summary": "Sets the surface contract for a subtree — spacing, target size, vocabulary and disclosure. Never which facts appear.",
+    "description": "Sets the surface profile for a subtree: spacing, WCAG 2.2 target-size floor, which vocabulary the surface speaks, and how much is disclosed before asking. Three profiles, nestable, and clamped so clinical density can never shrink a control below the accessible minimum.",
+    "rationale": "Density began as a spacing axis and is not one. The same component serves a patient reading on a phone and a nurse scanning ninety rows, and the difference between those surfaces is spacing, target size, disclosure, and which words are used. A surface that gives the patient a nurse's row height and the nurse's vocabulary has solved a quarter of the problem. Patient-facing and clinician-facing strings are different catalogs, not different tones of the same string — \\u201cpotassium\\u201d and \\u201cK+\\u201d are not a formality setting. Binding the catalog to the profile now means the translation layer has somewhere to plug in; binding it afterwards is a migration across every component. The provider also clamps to the WCAG 2.2 target-size floor rather than trusting every component to remember, and nests so a patient-facing card inside a clinical worklist keeps its own profile.",
     "categories": [
       "Primitive",
       "System"
     ],
     "fhir": [],
     "states": [
-      "Patient density",
-      "Standard density",
-      "Clinical density",
+      "Patient profile (roomy, patient vocabulary, progressive disclosure)",
+      "Standard profile (clinician vocabulary)",
+      "Clinical profile (dense, clinician vocabulary, full disclosure)",
+      "Register overridden independently of density",
+      "Disclosure overridden independently of density",
       "Nested providers",
       "Target-size floor enforced"
     ],
@@ -2620,6 +2622,18 @@ export const CATALOG: ComponentDoc[] = [
         "name": "className",
         "type": "string | undefined",
         "description": "",
+        "required": false
+      },
+      {
+        "name": "disclosure",
+        "type": "Disclosure | undefined",
+        "description": "Override the disclosure level the density implies.",
+        "required": false
+      },
+      {
+        "name": "register",
+        "type": "Register | undefined",
+        "description": "Override the vocabulary the density implies. The case this exists for is real but rare: a patient-facing summary rendered inside a clinician's workflow, where the clinician needs to see exactly what the patient will.",
         "required": false
       }
     ],
@@ -2651,6 +2665,18 @@ export const CATALOG: ComponentDoc[] = [
             "type": "string | undefined",
             "description": "",
             "required": false
+          },
+          {
+            "name": "disclosure",
+            "type": "Disclosure | undefined",
+            "description": "Override the disclosure level the density implies.",
+            "required": false
+          },
+          {
+            "name": "register",
+            "type": "Register | undefined",
+            "description": "Override the vocabulary the density implies. The case this exists for is real but rare: a patient-facing summary rendered inside a clinician's workflow, where the clinician needs to see exactly what the patient will.",
+            "required": false
           }
         ]
       },
@@ -2672,23 +2698,26 @@ export const CATALOG: ComponentDoc[] = [
         ]
       }
     ],
-    "usage": "import { DensityProvider, useDensity } from \"@/components/oxygen/density-provider\";\n\n<DensityProvider density=\"clinical\">\n  <ObservationPanel observations={observations} />\n</DensityProvider>\n\n// Components can adapt behaviour, not just spacing.\nconst density = useDensity();",
+    "usage": "import {\n  DensityProvider,\n  useDensity,\n  useTerm,\n} from \"@/components/oxygen/density-provider\";\n\n<DensityProvider density=\"clinical\">\n  <ObservationPanel observations={observations} />\n</DensityProvider>\n\n// A clinician previewing the patient's own view: dense layout, patient words.\n<DensityProvider density=\"clinical\" register=\"patient\">\n  <PatientSnapshot patient={patient} />\n</DensityProvider>\n\n// Components select wording rather than assuming an audience.\nconst label = useTerm({ clinician: \"K+\", patient: \"Potassium\" });",
     "guidance": {
       "use": [
         "At the root of a worklist, flowsheet, or patient-facing surface.",
         "Nested, when a patient-facing card sits inside a clinical screen.",
+        "With useTerm to select wording, so a component reads correctly on both kinds of surface.",
+        "With register overridden when a clinician needs to preview exactly what the patient will see.",
         "With asChild inside table rows and other layout-sensitive containers."
       ],
       "avoid": [
         "Deriving density from the viewport. Density and breakpoint are independent axes.",
         "Using clinical density to fit more facts by hiding some. That is a defect.",
+        "Treating register as a tone setting. The two catalogs are different words, not different politeness.",
         "Assuming the floor makes any spacing safe \\u2014 it clamps targets, not text size."
       ]
     },
     "accessibility": [
       {
         "label": "Target-size floor",
-        "detail": "Clinical density cannot shrink an interactive target below the WCAG 2.2 minimum of 24 CSS pixels. DensityTarget enforces it around any control."
+        "detail": "Clinical density cannot shrink an interactive target below the WCAG 2.2 minimum of 24 CSS pixels. DensityTarget clamps against --ox-density-target-floor around any control."
       },
       {
         "label": "Independent of zoom",
@@ -2696,13 +2725,18 @@ export const CATALOG: ComponentDoc[] = [
       },
       {
         "label": "No content hidden",
-        "detail": "Spacing changes only. Nothing that is visible at patient density disappears at clinical density."
+        "detail": "Spacing and wording change. Nothing that is visible at patient density disappears at clinical density — full disclosure means fewer interactions in front of the same facts, not more facts."
+      },
+      {
+        "label": "Register is on the DOM",
+        "detail": "data-ox-register mirrors the vocabulary in force, so a test can assert that a patient-facing subtree is actually speaking the patient catalog."
       }
     ],
     "limitations": [
       "Does not read OS accessibility preferences \\u2014 wire those into the density you pass.",
       "The floor applies to controls wrapped in DensityTarget, not automatically to every descendant.",
-      "Token values come from @oxygenui-design/tokens; this sets the attribute and context, not the spacing scale."
+      "useTerm takes both wordings inline. It is the binding point for a message catalog, not the catalog itself \\u2014 see ADR 0008.",
+      "Token values come from @oxygenui-design/tokens; this sets the attributes and context, not the spacing scale."
     ],
     "related": [
       "vitals-panel",
@@ -3680,6 +3714,195 @@ export const CATALOG: ComponentDoc[] = [
       "tailwind-merge"
     ],
     "install": "pnpm dlx shadcn@latest add https://oxygenui.design/r/medication-card.json"
+  },
+  {
+    "name": "observation-trend",
+    "title": "Observation Trend",
+    "tier": "free",
+    "status": "experimental",
+    "since": "0.2.0",
+    "layer": "clinical",
+    "summary": "One measurement over time. Abnormality is encoded as shape and colour, and the data table is an accessible peer rather than a fallback.",
+    "description": "A time series for FHIR Observations sharing one code. Draws the reference band only when a numeric range was actually stated, encodes each point's interpretation as a distinct shape as well as a colour, annotates only what crosses, and ships a real data table that assistive technology reads instead of the drawing.",
+    "rationale": "A clinician reads a trend, not a number. A potassium of 5.4 means something different if the last three were 4.1, 4.6, 5.0 — and a library that renders every value in isolation uses the one framing that hides deterioration. A chart is also the surface where this library's founding rule is hardest: status is never colour alone, but nothing can put a text label on every point. Four decisions resolve it. Abnormality is a shape as well as a hue, so direction survives monochrome printing and colour vision deficiency. Only critical points and the latest point are annotated, which is the interruption budget applied to a drawing. The data table is always in the accessibility tree and the SVG is hidden from it, so the text equivalent is the primary artifact rather than a degraded one. And no stated range means no band, because an invented normal band is a fabricated clinical claim that reads as the definition of normal for the entire series.",
+    "categories": [
+      "Clinical",
+      "Visualisation"
+    ],
+    "fhir": [
+      {
+        "name": "Observation",
+        "url": "https://hl7.org/fhir/R4/observation.html"
+      }
+    ],
+    "resource": "Observation",
+    "resourceUrl": "https://hl7.org/fhir/R4/observation.html",
+    "states": [
+      "Series with a stated reference band",
+      "Series with no reference range (no band drawn, stated in the summary)",
+      "One-sided reference range",
+      "Critical points present",
+      "Uninterpreted points (hollow diamond, never a filled normal mark)",
+      "Observations excluded for having no value, counted not dropped",
+      "Observations excluded for having no usable time, counted not dropped",
+      "Imprecise dates marked in the table",
+      "Empty series",
+      "Table hidden, table revealed"
+    ],
+    "props": [
+      {
+        "name": "observations",
+        "type": "Observation[]",
+        "description": "Observations sharing one code. Order does not matter; they are sorted.",
+        "required": true
+      },
+      {
+        "name": "timeZone",
+        "type": "string",
+        "description": "Required, never inferred from the browser. The reader's clock is not the event's clock, and a trend read across a time-zone boundary silently reorders itself.",
+        "required": true
+      },
+      {
+        "name": "className",
+        "type": "string | undefined",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "height",
+        "type": "number | undefined",
+        "description": "",
+        "required": false,
+        "default": "132"
+      },
+      {
+        "name": "label",
+        "type": "string | undefined",
+        "description": "What the measurement is called. Falls back to the observation's own text.",
+        "required": false
+      },
+      {
+        "name": "range",
+        "type": "ObservationReferenceRange | 'from-observations' | 'none' | undefined",
+        "description": "Where the normal band comes from. `\"none\"` draws no band; an explicit range overrides what the observations carry. There is no option that invents one.",
+        "required": false,
+        "default": "\"from-observations\""
+      },
+      {
+        "name": "table",
+        "type": "'toggle' | 'always' | undefined",
+        "description": "How the data table is surfaced. It is always in the DOM for assistive tech.",
+        "required": false,
+        "default": "\"toggle\""
+      }
+    ],
+    "exports": [
+      {
+        "name": "ObservationTrend",
+        "props": [
+          {
+            "name": "observations",
+            "type": "Observation[]",
+            "description": "Observations sharing one code. Order does not matter; they are sorted.",
+            "required": true
+          },
+          {
+            "name": "timeZone",
+            "type": "string",
+            "description": "Required, never inferred from the browser. The reader's clock is not the event's clock, and a trend read across a time-zone boundary silently reorders itself.",
+            "required": true
+          },
+          {
+            "name": "className",
+            "type": "string | undefined",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "height",
+            "type": "number | undefined",
+            "description": "",
+            "required": false,
+            "default": "132"
+          },
+          {
+            "name": "label",
+            "type": "string | undefined",
+            "description": "What the measurement is called. Falls back to the observation's own text.",
+            "required": false
+          },
+          {
+            "name": "range",
+            "type": "ObservationReferenceRange | 'from-observations' | 'none' | undefined",
+            "description": "Where the normal band comes from. `\"none\"` draws no band; an explicit range overrides what the observations carry. There is no option that invents one.",
+            "required": false,
+            "default": "\"from-observations\""
+          },
+          {
+            "name": "table",
+            "type": "'toggle' | 'always' | undefined",
+            "description": "How the data table is surfaced. It is always in the DOM for assistive tech.",
+            "required": false,
+            "default": "\"toggle\""
+          }
+        ]
+      }
+    ],
+    "usage": "import { ObservationTrend } from \"@/components/oxygen/observation-trend\";\n\n<ObservationTrend\n  observations={potassiumSeries}\n  timeZone=\"Europe/London\"\n  label=\"Potassium\"\n/>\n\n// No band unless the source stated one:\n<ObservationTrend observations={series} timeZone=\"UTC\" range=\"none\" />",
+    "guidance": {
+      "use": [
+        "For a series of Observations sharing one code, with the time zone stated explicitly.",
+        "Beside ObservationPanel, where the panel answers \\u201cwhat is it\\u201d and this answers \\u201cwhere is it going\\u201d.",
+        "With range=\\u201cnone\\u201d when the measurement has no meaningful normal band."
+      ],
+      "avoid": [
+        "Mixing codes in one series. Two analytes on one axis is a different component.",
+        "Passing a range the source did not state in order to get a band drawn.",
+        "Using it as the only representation of a long series \\u2014 past roughly thirty points, the table is the readable artifact and the chart is orientation."
+      ]
+    },
+    "accessibility": [
+      {
+        "label": "The table is the accessible artifact",
+        "detail": "The SVG is aria-hidden. A real table with a caption, column headers and a row header per timestamp is always present in the accessibility tree, so a screen-reader user gets every value rather than a summary."
+      },
+      {
+        "label": "Shape as well as colour",
+        "detail": "Circle in range, triangle up for high, triangle down for low, square for critical, hollow diamond for uninterpreted. The direction of an abnormal result survives monochrome output and colour vision deficiency."
+      },
+      {
+        "label": "Uninterpreted is visually distinct",
+        "detail": "An uninterpreted point is drawn hollow so it cannot read as an assessed, in-range one, and the table spells it out as \\u201cNot interpreted\\u201d."
+      },
+      {
+        "label": "Summary states what is missing",
+        "detail": "Excluded observations and the absence of a reference range are stated in the caption, which is read before the table."
+      },
+      {
+        "label": "Toggle is a real button",
+        "detail": "The show/hide control is a button with aria-expanded, and hiding uses sr-only rather than display:none so the table never leaves the accessibility tree."
+      }
+    ],
+    "limitations": [
+      "Annotates critical points and the latest point only. A dense series with many non-critical abnormal values relies on the table.",
+      "The x axis is linear in time and unlabelled; it shows shape, not exact spacing. Read timestamps from the table.",
+      "Does not aggregate, resample, or interpolate. Gaps in time are drawn as straight segments between the points that exist.",
+      "Interpretation is never computed here \\u2014 it comes from Observation.interpretation, or from the observation's own reference range via getInterpretation.",
+      "Components of a multi-component Observation (a blood pressure) are not plotted; pass a single-value code."
+    ],
+    "related": [
+      "vitals-panel",
+      "clinical-value",
+      "reference-range",
+      "absent-value"
+    ],
+    "dependencies": [
+      "@oxygenui-design/fhir@^0.1.0",
+      "lucide-react",
+      "clsx",
+      "tailwind-merge"
+    ],
+    "install": "pnpm dlx shadcn@latest add https://oxygenui.design/r/observation-trend.json"
   },
   {
     "name": "patient-banner",

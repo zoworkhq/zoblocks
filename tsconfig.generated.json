@@ -72,6 +72,9 @@
       "@/components/oxygen/medication-card": [
         "./registry/oxygen/medication-card/medication-card.tsx"
       ],
+      "@/components/oxygen/observation-trend": [
+        "./registry/oxygen/observation-trend/observation-trend.tsx"
+      ],
       "@/components/oxygen/patient-banner": [
         "./registry/oxygen/patient-banner/patient-banner.tsx"
       ],

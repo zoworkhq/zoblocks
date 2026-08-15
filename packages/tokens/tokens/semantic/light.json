@@ -1,0 +1,107 @@
+{
+  "$description": "Semantic tier, light theme. This file defines the key space every other theme must match — a theme missing a key here is a build error, because a brand that forgets to define `status.critical` must fail the build rather than render the default green.\n\nComponents reference these and only these.",
+
+  "bg": { "$type": "color", "$value": "{ref.white}" },
+  "bg-subtle": { "$type": "color", "$value": "{ref.slate.50}" },
+  "bg-muted": { "$type": "color", "$value": "{ref.slate.100}" },
+
+  "surface": { "$type": "color", "$value": "{ref.white}" },
+  "surface-raised": { "$type": "color", "$value": "{ref.white}" },
+  "surface-overlay": { "$type": "color", "$value": "{ref.white}" },
+
+  "border": { "$type": "color", "$value": "{ref.slate.200}" },
+  "border-strong": { "$type": "color", "$value": "{ref.slate.300}" },
+
+  "text": { "$type": "color", "$value": "{ref.slate.900}" },
+  "text-muted": { "$type": "color", "$value": "{ref.slate.600}" },
+  "text-subtle": { "$type": "color", "$value": "{ref.slate.500}" },
+  "text-on-accent": { "$type": "color", "$value": "{ref.white}" },
+
+  "accent": { "$type": "color", "$value": "{ref.brand.600}" },
+  "accent-hover": { "$type": "color", "$value": "{ref.brand.700}" },
+  "accent-subtle": { "$type": "color", "$value": "{ref.brand.50}" },
+  "accent-border": { "$type": "color", "$value": "{ref.brand.200}" },
+
+  "focus-ring": { "$type": "color", "$value": "{ref.brand.500}" },
+  "focus-ring-offset": { "$type": "color", "$value": "{ref.white}" },
+
+  "status": {
+    "$description": "Clinical status. Paired with an icon and a text label in every component — these colours are reinforcement, not the signal.\n\n`high` and `low` are separated by HUE rather than intensity, so the direction of an abnormal result survives monochrome printing and the common forms of colour vision deficiency.",
+    "$type": "color",
+
+    "critical": {
+      "$value": "{ref.red.700}",
+      "$description": "red-700, not red-600: at 600 this was 4.41:1 on its own background — under the 4.5:1 floor by a hair. This is the single most consequential token in the library; it does not get to be borderline."
+    },
+    "critical-bg": { "$value": "{ref.red.50}" },
+    "critical-border": { "$value": "{ref.red.200}" },
+
+    "high": {
+      "$value": "{ref.amber.700}",
+      "$description": "amber-700, not amber-600: at 600 this was 3.07:1 on its own background. Amber is the hardest hue to keep accessible on a light surface and must be darkened further than the others to clear 4.5:1."
+    },
+    "high-bg": { "$value": "{ref.amber.50}" },
+    "high-border": { "$value": "{ref.amber.200}" },
+
+    "low": { "$value": "{ref.blue.600}" },
+    "low-bg": { "$value": "{ref.blue.50}" },
+    "low-border": { "$value": "{ref.blue.200}" },
+
+    "normal": {
+      "$value": "{ref.green.700}",
+      "$description": "green-700, not green-600: at 600 this was 3.57:1 on its own background, below the AA floor. A status badge that fails contrast is a status badge some readers cannot read."
+    },
+    "normal-bg": { "$value": "{ref.green.50}" },
+    "normal-border": { "$value": "{ref.green.200}" },
+
+    "unknown": {
+      "$value": "{ref.slate.500}",
+      "$description": "Absence of interpretation is a distinct state from normal, and it gets its own colour so it cannot be mistaken for one."
+    },
+    "unknown-bg": { "$value": "{ref.slate.50}" },
+    "unknown-border": { "$value": "{ref.slate.200}" }
+  },
+
+  "flag": {
+    "$description": "Record-level flags. These describe the record, not the measurement, which is why they sit outside the status scale.",
+    "$type": "color",
+    "restricted": { "$value": "{ref.violet.600}" },
+    "restricted-bg": { "$value": "{ref.violet.50}" },
+    "provisional": { "$value": "{ref.amber.700}" },
+    "deceased": { "$value": "{ref.slate.700}" }
+  },
+
+  "swatch": {
+    "$description": "Decorative only. Never the sole carrier of identity, and never mapped to any attribute of the person.",
+    "$type": "color",
+    "1": { "$value": "{ref.swatch.teal.fg}" },
+    "1-bg": { "$value": "{ref.swatch.teal.bg}" },
+    "1-border": { "$value": "{ref.swatch.teal.border}" },
+    "2": { "$value": "{ref.swatch.cyan.fg}" },
+    "2-bg": { "$value": "{ref.swatch.cyan.bg}" },
+    "2-border": { "$value": "{ref.swatch.cyan.border}" },
+    "3": { "$value": "{ref.swatch.indigo.fg}" },
+    "3-bg": { "$value": "{ref.swatch.indigo.bg}" },
+    "3-border": { "$value": "{ref.swatch.indigo.border}" },
+    "4": { "$value": "{ref.swatch.fuchsia.fg}" },
+    "4-bg": { "$value": "{ref.swatch.fuchsia.bg}" },
+    "4-border": { "$value": "{ref.swatch.fuchsia.border}" },
+    "5": { "$value": "{ref.swatch.olive.fg}" },
+    "5-bg": { "$value": "{ref.swatch.olive.bg}" },
+    "5-border": { "$value": "{ref.swatch.olive.border}" },
+    "6": { "$value": "{ref.swatch.stone.fg}" },
+    "6-bg": { "$value": "{ref.swatch.stone.bg}" },
+    "6-border": { "$value": "{ref.swatch.stone.border}" }
+  },
+
+  "shadow-sm": { "$type": "shadow", "$value": "0 1px 2px 0 rgb(2 6 23 / 0.05)" },
+  "shadow": {
+    "$type": "shadow",
+    "$value": "0 1px 3px 0 rgb(2 6 23 / 0.08), 0 1px 2px -1px rgb(2 6 23 / 0.06)"
+  },
+  "shadow-md": {
+    "$type": "shadow",
+    "$value": "0 4px 12px -2px rgb(2 6 23 / 0.08), 0 2px 6px -2px rgb(2 6 23 / 0.05)"
+  },
+  "shadow-lg": { "$type": "shadow", "$value": "0 12px 32px -8px rgb(2 6 23 / 0.12)" }
+}

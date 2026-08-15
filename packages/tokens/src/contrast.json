@@ -1,0 +1,212 @@
+[
+  {
+    "theme": "light",
+    "token": "status.critical",
+    "against": "status.critical-bg",
+    "ratio": 5.91,
+    "floor": 4.5
+  },
+  {
+    "theme": "light",
+    "token": "status.high",
+    "against": "status.high-bg",
+    "ratio": 4.84,
+    "floor": 4.5
+  },
+  {
+    "theme": "light",
+    "token": "status.low",
+    "against": "status.low-bg",
+    "ratio": 4.75,
+    "floor": 4.5
+  },
+  {
+    "theme": "light",
+    "token": "status.normal",
+    "against": "status.normal-bg",
+    "ratio": 5.21,
+    "floor": 4.5
+  },
+  {
+    "theme": "light",
+    "token": "status.unknown",
+    "against": "status.unknown-bg",
+    "ratio": 4.55,
+    "floor": 4.5
+  },
+  {
+    "theme": "light",
+    "token": "text",
+    "against": "bg",
+    "ratio": 17.85,
+    "floor": 4.5
+  },
+  {
+    "theme": "light",
+    "token": "text-muted",
+    "against": "bg",
+    "ratio": 7.58,
+    "floor": 4.5
+  },
+  {
+    "theme": "light",
+    "token": "text",
+    "against": "surface",
+    "ratio": 17.85,
+    "floor": 4.5
+  },
+  {
+    "theme": "light",
+    "token": "text-muted",
+    "against": "surface",
+    "ratio": 7.58,
+    "floor": 4.5
+  },
+  {
+    "theme": "light",
+    "token": "flag.restricted",
+    "against": "flag.restricted-bg",
+    "ratio": 5.2,
+    "floor": 4.5
+  },
+  {
+    "theme": "dark",
+    "token": "status.critical",
+    "against": "status.critical-bg",
+    "ratio": 6.52,
+    "floor": 4.5
+  },
+  {
+    "theme": "dark",
+    "token": "status.high",
+    "against": "status.high-bg",
+    "ratio": 9.68,
+    "floor": 4.5
+  },
+  {
+    "theme": "dark",
+    "token": "status.low",
+    "against": "status.low-bg",
+    "ratio": 6.69,
+    "floor": 4.5
+  },
+  {
+    "theme": "dark",
+    "token": "status.normal",
+    "against": "status.normal-bg",
+    "ratio": 9.05,
+    "floor": 4.5
+  },
+  {
+    "theme": "dark",
+    "token": "status.unknown",
+    "against": "status.unknown-bg",
+    "ratio": 6.56,
+    "floor": 4.5
+  },
+  {
+    "theme": "dark",
+    "token": "text",
+    "against": "bg",
+    "ratio": 17.28,
+    "floor": 4.5
+  },
+  {
+    "theme": "dark",
+    "token": "text-muted",
+    "against": "bg",
+    "ratio": 8.93,
+    "floor": 4.5
+  },
+  {
+    "theme": "dark",
+    "token": "text",
+    "against": "surface",
+    "ratio": 15.53,
+    "floor": 4.5
+  },
+  {
+    "theme": "dark",
+    "token": "text-muted",
+    "against": "surface",
+    "ratio": 8.02,
+    "floor": 4.5
+  },
+  {
+    "theme": "dark",
+    "token": "flag.restricted",
+    "against": "flag.restricted-bg",
+    "ratio": 9.44,
+    "floor": 4.5
+  },
+  {
+    "theme": "high-contrast",
+    "token": "status.critical",
+    "against": "status.critical-bg",
+    "ratio": 10.09,
+    "floor": 7
+  },
+  {
+    "theme": "high-contrast",
+    "token": "status.high",
+    "against": "status.high-bg",
+    "ratio": 10.25,
+    "floor": 7
+  },
+  {
+    "theme": "high-contrast",
+    "token": "status.low",
+    "against": "status.low-bg",
+    "ratio": 10.59,
+    "floor": 7
+  },
+  {
+    "theme": "high-contrast",
+    "token": "status.normal",
+    "against": "status.normal-bg",
+    "ratio": 9.38,
+    "floor": 7
+  },
+  {
+    "theme": "high-contrast",
+    "token": "status.unknown",
+    "against": "status.unknown-bg",
+    "ratio": 12.63,
+    "floor": 7
+  },
+  {
+    "theme": "high-contrast",
+    "token": "text",
+    "against": "bg",
+    "ratio": 21,
+    "floor": 7
+  },
+  {
+    "theme": "high-contrast",
+    "token": "text-muted",
+    "against": "bg",
+    "ratio": 16.48,
+    "floor": 7
+  },
+  {
+    "theme": "high-contrast",
+    "token": "text",
+    "against": "surface",
+    "ratio": 21,
+    "floor": 7
+  },
+  {
+    "theme": "high-contrast",
+    "token": "text-muted",
+    "against": "surface",
+    "ratio": 16.48,
+    "floor": 7
+  },
+  {
+    "theme": "high-contrast",
+    "token": "flag.restricted",
+    "against": "flag.restricted-bg",
+    "ratio": 10.95,
+    "floor": 7
+  }
+]

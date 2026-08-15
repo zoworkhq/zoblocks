@@ -20,10 +20,15 @@
   ],
   "exports": {
     "./oxygen-tokens.css": "./src/oxygen-tokens.css",
+    "./tailwind.css": "./src/tailwind.css",
+    "./tokens.json": "./src/tokens.json",
+    "./contrast.json": "./src/contrast.json",
+    ".": "./src/tokens.ts",
     "./package.json": "./package.json"
   },
   "files": [
-    "src"
+    "src",
+    "tokens"
   ],
   "publishConfig": {
     "access": "public"

@@ -1,0 +1,1095 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Better Design System — competitive research for Oxygen UI</title>
+<meta name="description" content="What better.care's Better Design System is, how it is built, and the ten ideas worth importing into Oxygen UI — with the concrete translation for each.">
+<style>
+/* ============================================================
+   BETTER DESIGN SYSTEM — RESEARCH REPORT
+   Chrome, palette and status colours are taken from
+   packages/tokens/src/oxygen-tokens.css so this report is
+   rendered in the system it is advising.
+   ============================================================ */
+:root{
+  --paper:#F4F7F6; --paper-2:#EAF0EE; --paper-3:#E1E9E7; --white:#fff;
+  --ink:#0A1614; --ink-2:#33453F; --ink-3:#61736D; --ink-4:#8A9A94;
+  --line:#D9E3E0; --line-2:#C4D2CE;
+
+  /* Oxygen brand — oxygen-tokens.css */
+  --accent:#067662; --accent-2:#059478; --accent-3:#10b995;
+  --accent-soft:#ECFDF8; --accent-line:#A4F3DF; --accent-deep:#012E28;
+
+  /* Better's own brand blue, used only where Better is the subject */
+  --bds:#0B62D6; --bds-2:#1D4ED8; --bds-soft:#EFF6FF; --bds-line:#BFDBFE;
+
+  /* clinical status — quoted verbatim from the token file */
+  --st-crit:#b91c1c; --st-crit-bg:#fef2f2; --st-crit-line:#fecaca;
+  --st-high:#b45309; --st-high-bg:#fffbeb; --st-high-line:#fde68a;
+  --st-low:#2563eb;  --st-low-bg:#eff6ff;  --st-low-line:#bfdbfe;
+  --st-norm:#047857; --st-norm-bg:#ecfdf5; --st-norm-line:#a7f3d0;
+  --st-unk:#64748b;  --st-unk-bg:#f8fafc;  --st-unk-line:#e2e8f0;
+  --flag-restricted:#7c3aed; --flag-restricted-bg:#f5f3ff;
+
+  --sans:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
+  --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
+
+  --r-sm:4px; --r:8px; --r-lg:12px; --r-xl:18px;
+  --sh-sm:0 1px 2px rgb(2 6 23/.05);
+  --sh:0 1px 3px rgb(2 6 23/.07),0 1px 2px -1px rgb(2 6 23/.05);
+  --sh-md:0 4px 14px -3px rgb(2 6 23/.09),0 2px 6px -3px rgb(2 6 23/.06);
+  --sh-lg:0 18px 44px -14px rgb(2 6 23/.16);
+
+  --rail:250px; --maxw:1120px;
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --paper:#0A0D12; --paper-2:#11161D; --paper-3:#181F28; --white:#141A22;
+    --ink:#EDF2F7; --ink-2:#C3CDD7; --ink-3:#A5B1BE; --ink-4:#82909F;
+    --line:#29333F; --line-2:#3A4654;
+    --accent:#5EEAD4; --accent-2:#2DD4B0; --accent-3:#10b995;
+    --accent-soft:#102A32; --accent-line:#1B4655; --accent-deep:#D0FAEE;
+    --bds:#7DB3FF; --bds-2:#A5C8FF; --bds-soft:#0F1C33; --bds-line:#1E3A68;
+    --st-crit:#fb7185; --st-crit-bg:#2A1216; --st-crit-line:#5C1F28;
+    --st-high:#fbbf24; --st-high-bg:#2A1F0C; --st-high-line:#5C421A;
+    --st-low:#60a5fa;  --st-low-bg:#0F1C33;  --st-low-line:#1E3A68;
+    --st-norm:#4ade80; --st-norm-bg:#10271E; --st-norm-line:#1E5138;
+    --st-unk:#94a3b8;  --st-unk-bg:#141F22;  --st-unk-line:#253338;
+    --flag-restricted:#c4b5fd; --flag-restricted-bg:#1C1533;
+    --sh-sm:0 1px 2px rgb(0 0 0/.4); --sh:0 1px 3px rgb(0 0 0/.5);
+    --sh-md:0 4px 14px -2px rgb(0 0 0/.55); --sh-lg:0 16px 40px -10px rgb(0 0 0/.65);
+  }
+}
+
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth;scroll-padding-top:84px}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}
+}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);
+  font-size:16px;line-height:1.62;-webkit-font-smoothing:antialiased;font-feature-settings:"kern" 1}
+h1,h2,h3,h4{margin:0;line-height:1.14;letter-spacing:-.022em;font-weight:700}
+p{margin:0 0 1em}
+a{color:var(--accent);text-decoration-color:color-mix(in srgb,var(--accent) 35%,transparent);
+  text-underline-offset:2px}
+a:hover{text-decoration-color:currentColor}
+:where(a,button,summary,[tabindex]):focus-visible{outline:2.5px solid var(--accent-2);outline-offset:2px;border-radius:3px}
+::selection{background:var(--accent-line);color:var(--accent-deep)}
+code{font-family:var(--mono);font-size:.86em;background:var(--paper-3);
+  padding:.12em .38em;border-radius:var(--r-sm);border:1px solid var(--line)}
+
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.eyebrow{font-family:var(--mono);font-size:.6875rem;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--ink-3);font-weight:600;margin:0 0 .6rem}
+.lede{font-size:clamp(1.02rem,1.5vw,1.2rem);line-height:1.6;color:var(--ink-2);max-width:68ch}
+.small{font-size:.8125rem;color:var(--ink-3);line-height:1.55}
+
+/* ---------- chrome ---------- */
+.topbar{position:sticky;top:0;z-index:60;background:color-mix(in srgb,var(--paper) 88%,transparent);
+  backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+.topbar-in{max-width:var(--maxw);margin:0 auto;padding:.7rem 1.5rem;display:flex;
+  align-items:center;justify-content:space-between;gap:1rem}
+.wordmark{display:flex;align-items:center;gap:.55rem;font-weight:700;letter-spacing:-.02em;font-size:.95rem}
+.dot{width:11px;height:11px;border-radius:50%;background:var(--accent-2);
+  box-shadow:0 0 0 3.5px color-mix(in srgb,var(--accent-2) 18%,transparent)}
+.topbar nav{display:flex;gap:1.1rem;font-size:.78rem;color:var(--ink-3);flex-wrap:wrap}
+.topbar nav a{color:inherit;text-decoration:none}
+.topbar nav a:hover{color:var(--accent)}
+@media (max-width:800px){.topbar nav{display:none}}
+
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 1.5rem}
+section{scroll-margin-top:84px}
+
+/* ---------- hero ---------- */
+.hero{padding:4.5rem 0 3rem;border-bottom:1px solid var(--line)}
+.hero h1{font-size:clamp(2.1rem,5.2vw,3.5rem);max-width:20ch;margin-bottom:1.1rem}
+.hero h1 em{font-style:normal;color:var(--accent)}
+.meta{display:flex;gap:1.6rem;flex-wrap:wrap;margin-top:2.2rem;padding-top:1.4rem;
+  border-top:1px solid var(--line);font-size:.78rem;color:var(--ink-3)}
+.meta b{display:block;color:var(--ink);font-weight:600;font-size:.95rem;margin-top:.15rem}
+
+/* ---------- generic blocks ---------- */
+.sec{padding:3.4rem 0;border-bottom:1px solid var(--line)}
+.sec > h2{font-size:clamp(1.5rem,3vw,2rem);margin-bottom:.8rem;max-width:24ch}
+.sec > .lede{margin-bottom:2rem}
+h3{font-size:1.12rem;margin:2rem 0 .6rem}
+h4{font-size:.95rem;margin:1.3rem 0 .4rem}
+
+.grid{display:grid;gap:1rem}
+.g2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.g3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.g4{grid-template-columns:repeat(4,minmax(0,1fr))}
+@media (max-width:900px){.g3,.g4{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:640px){.g2,.g3,.g4{grid-template-columns:1fr}}
+
+.card{background:var(--white);border:1px solid var(--line);border-radius:var(--r-lg);
+  padding:1.15rem 1.25rem;box-shadow:var(--sh-sm)}
+.card h4{margin-top:0;font-size:.9rem;letter-spacing:-.01em}
+.card p{margin:.35rem 0 0;font-size:.85rem;color:var(--ink-2);line-height:1.55}
+.card .tag{font-family:var(--mono);font-size:.625rem;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--ink-4);display:block;margin-bottom:.5rem}
+
+.stat{background:var(--white);border:1px solid var(--line);border-radius:var(--r-lg);padding:1.1rem 1.15rem}
+.stat .n{font-family:var(--mono);font-size:1.75rem;font-weight:700;letter-spacing:-.03em;
+  color:var(--accent);display:block;line-height:1.1}
+.stat .l{font-size:.775rem;color:var(--ink-3);margin-top:.35rem;display:block;line-height:1.45}
+
+/* ---------- callouts ---------- */
+.note{border-left:3px solid var(--accent-2);background:var(--accent-soft);
+  padding:.95rem 1.15rem;border-radius:0 var(--r) var(--r) 0;margin:1.4rem 0}
+.note p{margin:0;font-size:.88rem;color:var(--ink-2)}
+.note strong{color:var(--ink)}
+.warn{border-left:3px solid var(--st-high);background:var(--st-high-bg)}
+.crit{border-left:3px solid var(--st-crit);background:var(--st-crit-bg)}
+
+/* ---------- tables ---------- */
+.tw{overflow-x:auto;border:1px solid var(--line);border-radius:var(--r-lg);background:var(--white);margin:1.2rem 0}
+table{border-collapse:collapse;width:100%;min-width:640px;font-size:.83rem}
+th,td{text-align:left;padding:.7rem .85rem;border-bottom:1px solid var(--line);vertical-align:top}
+thead th{background:var(--paper-2);font-size:.68rem;letter-spacing:.09em;text-transform:uppercase;
+  font-family:var(--mono);color:var(--ink-3);font-weight:600;position:sticky;top:0}
+tbody tr:last-child td{border-bottom:0}
+td.mono,th.mono{font-family:var(--mono);font-size:.78rem}
+.yes{color:var(--st-norm);font-weight:600}
+.no{color:var(--st-crit);font-weight:600}
+.part{color:var(--st-high);font-weight:600}
+
+/* ---------- chips ---------- */
+.chips{display:flex;flex-wrap:wrap;gap:.4rem;margin:.7rem 0 0}
+.chip{font-size:.735rem;padding:.22rem .55rem;border-radius:999px;border:1px solid var(--line-2);
+  background:var(--paper-2);color:var(--ink-2);font-family:var(--mono)}
+.chip.ox{background:var(--accent-soft);border-color:var(--accent-line);color:var(--accent)}
+.chip.bd{background:var(--bds-soft);border-color:var(--bds-line);color:var(--bds)}
+.chip.new{background:var(--st-high-bg);border-color:var(--st-high-line);color:var(--st-high)}
+
+/* ---------- timeline ---------- */
+.tl{position:relative;margin:1.6rem 0 0;padding-left:1.6rem}
+.tl::before{content:"";position:absolute;left:5px;top:.5rem;bottom:.5rem;width:2px;background:var(--line-2)}
+.tl li{list-style:none;position:relative;margin-bottom:1.4rem}
+.tl li::before{content:"";position:absolute;left:-1.6rem;top:.42rem;width:12px;height:12px;
+  border-radius:50%;background:var(--white);border:2.5px solid var(--bds)}
+.tl .when{font-family:var(--mono);font-size:.7rem;color:var(--ink-3);letter-spacing:.06em;text-transform:uppercase}
+.tl h4{margin:.2rem 0 .25rem;font-size:.95rem}
+.tl p{margin:0;font-size:.845rem;color:var(--ink-2)}
+
+/* ---------- idea blocks ---------- */
+.idea{background:var(--white);border:1px solid var(--line);border-radius:var(--r-lg);
+  margin:1.1rem 0;overflow:hidden;box-shadow:var(--sh-sm)}
+.idea > header{display:flex;gap:.9rem;align-items:flex-start;padding:1.1rem 1.3rem;
+  border-bottom:1px solid var(--line);background:var(--paper-2)}
+.idea .rank{font-family:var(--mono);font-size:1.05rem;font-weight:700;color:var(--accent);
+  min-width:2.1rem;line-height:1.3}
+.idea h3{margin:0;font-size:1.06rem;letter-spacing:-.015em}
+.idea .sub{font-size:.79rem;color:var(--ink-3);margin-top:.2rem}
+.idea .body{padding:1.15rem 1.3rem}
+.idea .body > *:last-child{margin-bottom:0}
+.idea dl{margin:0;display:grid;grid-template-columns:8.5rem 1fr;gap:.5rem 1rem;font-size:.86rem}
+.idea dt{font-family:var(--mono);font-size:.68rem;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--ink-3);padding-top:.2rem}
+.idea dd{margin:0;color:var(--ink-2)}
+@media (max-width:640px){.idea dl{grid-template-columns:1fr;gap:.15rem}.idea dt{margin-top:.6rem}}
+.badges{display:flex;gap:.4rem;flex-wrap:wrap;margin-left:auto}
+.badge{font-family:var(--mono);font-size:.63rem;letter-spacing:.07em;text-transform:uppercase;
+  padding:.25rem .5rem;border-radius:999px;border:1px solid var(--line-2);color:var(--ink-3);
+  background:var(--white);white-space:nowrap;height:fit-content}
+.badge.hi{color:var(--st-crit);border-color:var(--st-crit-line);background:var(--st-crit-bg)}
+.badge.md{color:var(--st-high);border-color:var(--st-high-line);background:var(--st-high-bg)}
+.badge.lo{color:var(--st-norm);border-color:var(--st-norm-line);background:var(--st-norm-bg)}
+
+pre{background:var(--paper-3);border:1px solid var(--line);border-radius:var(--r);
+  padding:.85rem 1rem;overflow-x:auto;font-family:var(--mono);font-size:.775rem;
+  line-height:1.6;margin:.9rem 0;color:var(--ink-2)}
+pre .k{color:var(--accent);font-weight:600}
+pre .c{color:var(--ink-4)}
+pre .s{color:var(--st-crit)}
+
+ul.tight{margin:.5rem 0 1rem;padding-left:1.15rem}
+ul.tight li{margin-bottom:.42rem;font-size:.875rem;color:var(--ink-2)}
+ul.tight li strong{color:var(--ink)}
+
+/* ---------- verdict split ---------- */
+.split{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+@media (max-width:760px){.split{grid-template-columns:1fr}}
+.pane{border:1px solid var(--line);border-radius:var(--r-lg);padding:1.15rem 1.25rem;background:var(--white)}
+.pane.ox{border-top:3px solid var(--accent-2)}
+.pane.bd{border-top:3px solid var(--bds)}
+.pane h4{margin-top:0;display:flex;align-items:center;gap:.5rem;font-size:.9rem}
+
+/* ---------- swatch demo ---------- */
+.sw{display:flex;gap:.5rem;flex-wrap:wrap;margin:.8rem 0}
+.sw div{flex:1;min-width:88px;border-radius:var(--r);padding:.6rem .7rem;font-size:.7rem;
+  font-family:var(--mono);border:1px solid}
+.sw .c1{background:var(--st-crit-bg);border-color:var(--st-crit-line);color:var(--st-crit)}
+.sw .c2{background:var(--st-high-bg);border-color:var(--st-high-line);color:var(--st-high)}
+.sw .c3{background:var(--st-norm-bg);border-color:var(--st-norm-line);color:var(--st-norm)}
+.sw .c4{background:var(--st-low-bg);border-color:var(--st-low-line);color:var(--st-low)}
+.sw .c5{background:var(--st-unk-bg);border-color:var(--st-unk-line);color:var(--st-unk)}
+
+/* ---------- sources ---------- */
+ol.src{font-size:.83rem;color:var(--ink-2);padding-left:1.3rem;margin:1rem 0 0}
+ol.src li{margin-bottom:.55rem}
+ol.src a{word-break:break-word}
+
+footer{padding:2.6rem 0 4rem;color:var(--ink-3);font-size:.8rem}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-in">
+    <div class="wordmark"><span class="dot"></span> Oxygen&nbsp;UI <span class="small" style="font-weight:400">· research</span></div>
+    <nav>
+      <a href="#summary">Summary</a>
+      <a href="#who">Who Better is</a>
+      <a href="#anatomy">BDS anatomy</a>
+      <a href="#inventory">Inventory</a>
+      <a href="#compare">Head to head</a>
+      <a href="#ideas">Ideas to take</a>
+      <a href="#avoid">What to skip</a>
+      <a href="#roadmap">Roadmap</a>
+      <a href="#sources">Sources</a>
+    </nav>
+  </div>
+</div>
+
+<header class="hero wrap">
+  <p class="eyebrow">Competitive research · better.care</p>
+  <h1>The closest thing to a peer Oxygen has — and it is <em>not shipping to your buyer</em>.</h1>
+  <p class="lede">
+    Better's design system is the most mature healthcare-specific design system in public view: four
+    releases in fifteen months, a full clinical data-visualisation pillar, clinical forms, a content
+    style guide, and component-level design tokens across every component. It is also welded to a
+    platform, distributed behind a login, and built for people configuring Better's EHR — not for
+    developers building their own product. That gap is the whole opportunity.
+  </p>
+  <div class="meta">
+    <div>Prepared<b>13 August 2026</b></div>
+    <div>Subject<b>Better Design System 2.2.0</b></div>
+    <div>Compared against<b>Oxygen UI · 29 components</b></div>
+    <div>Primary sources<b>11</b></div>
+  </div>
+</header>
+
+<main class="wrap">
+
+<!-- ============================================================ -->
+<section class="sec" id="summary">
+  <p class="eyebrow">01 · Executive summary</p>
+  <h2>What this is and what to do about it</h2>
+  <p class="lede">
+    Better (better.care) is a Slovenian digital-health platform vendor built on openEHR and FHIR.
+    Their design system, BDS, exists to make <em>their</em> platform's applications consistent. It is
+    excellent at the things a platform vendor is forced to be excellent at — forms, visualisation,
+    navigation, theming — and absent on the things a component vendor has to be excellent at:
+    open distribution, typed data contracts, and being auditable in someone else's repository.
+  </p>
+
+  <div class="grid g4" style="margin:1.8rem 0">
+    <div class="stat"><span class="n">6</span><span class="l">pillars BDS markets, of which Oxygen ships two and a half</span></div>
+    <div class="stat"><span class="n">0</span><span class="l">clinical charts, sparklines or trend components in Oxygen today</span></div>
+    <div class="stat"><span class="n">0</span><span class="l">form-fill surfaces in Oxygen; BDS has a whole pillar plus a builder</span></div>
+    <div class="stat"><span class="n">3&nbsp;×&nbsp;3</span><span class="l">both systems independently landed on three named surface profiles</span></div>
+  </div>
+
+  <h3>The five-line read</h3>
+  <ul class="tight">
+    <li><strong>BDS is a platform design system, not a product.</strong> No public npm package, no public component docs — everything lives behind <code>studio.better.care</code>. Their design system is a reason to buy Better Platform, not a thing you buy.</li>
+    <li><strong>Their declared differentiator is clinical data visualisation.</strong> "Turn plain patient data into a graphical representation." Oxygen has no charting at all. This is the single largest capability gap.</li>
+    <li><strong>Their second pillar is clinical forms</strong> — prefill, multi-page flows, dependency logic, openEHR template import. Oxygen has one input component (<code>dose-input</code>) and no <code>Questionnaire</code> type in <code>@oxygenui-design/fhir</code>.</li>
+    <li><strong>They validated your density model independently.</strong> BDS ships clinical / tooling / patient-facing themes. Oxygen ships clinical / standard / patient densities. Two teams solved the same problem the same way — that is the strongest signal in this report that the axis is real.</li>
+    <li><strong>They shipped component-layer tokens in June 2026.</strong> <code>ARCHITECTURE.md §6.2</code> already specifies exactly this three-tier model. A competitor shipping it first is the argument for pulling it forward.</li>
+  </ul>
+
+  <div class="note">
+    <p><strong>The strategic framing.</strong> Do not read BDS as a competitor for the same sale. Better's design system is bundled with a €-figure platform contract sold to NHS trusts and university hospitals; Oxygen is sold to digital-health startups and health-tech vendors who are building their own front end. The two never meet in a procurement. What BDS is, is <em>the best available specification of what a healthcare design system has to cover</em> — written by a team with UX researchers, UX writers and 1,000+ institutional deployments behind them. Treat it as a free requirements document.</p>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<section class="sec" id="who">
+  <p class="eyebrow">02 · Context</p>
+  <h2>Who Better is, and why they built a design system</h2>
+
+  <div class="grid g2" style="margin-bottom:1.4rem">
+    <div class="card">
+      <span class="tag">The company</span>
+      <h4>Better — a "postmodern EHR" platform vendor</h4>
+      <p>An openEHR-first digital health platform. Two repositories underneath: a clinical data repository on openEHR, an operational data repository on FHIR. Their site claims 1,000+ connected institutions across 30+ markets and 40M+ patient records. Customers named publicly include NHS trusts (The Christie, Universal Care Plan / OneLondon), university medical centres, and EHA Clinics.</p>
+    </div>
+    <div class="card">
+      <span class="tag">The product BDS serves</span>
+      <h4>Better Studio — low-code clinical app building</h4>
+      <p>Form Builder (drag-and-drop EHR forms with dependency logic and localisation), AQL Builder (query authoring with an AI assistant), Archetype Designer (openEHR archetypes and templates), and a Form Renderer that embeds forms into web applications. Since Studio 3.15 the Form Renderer renders <em>through BDS components</em> — the design system is the runtime of the low-code product.</p>
+    </div>
+  </div>
+
+  <h3>Their own account of why</h3>
+  <p>
+    Better's engineering blog is unusually candid about the origin: designers were starting every
+    screen from scratch, which produced inconsistency and waste. They deliberately rejected adopting
+    a generic system from a large tech company on the grounds that "the demands of developing digital
+    products for healthcare are very specific," and adapted NHS design principles rather than Material
+    or Fluent. The team composition is stated explicitly — UI/UX designers, developers, UX researchers
+    <em>and UX writers</em> — which is why the content style guide exists as a first-class pillar
+    rather than an afterthought.
+  </p>
+
+  <div class="note warn">
+    <p><strong>The detail worth internalising.</strong> Better identified notification and alert inconsistency as their most damaging UX problem and responded by writing precise rules per notification type with Do / Don't examples. They frame this in clinical-safety terms: cognitive load and alert fatigue, not aesthetics. Oxygen's <code>alert-banner</code> already implements the strongest version of this idea in code — severity tiers as an <em>interruption budget</em> — but the reasoning is buried in a component description rather than published as guidance a customer's team can follow when they write their own alerts.</p>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<section class="sec" id="anatomy">
+  <p class="eyebrow">03 · Anatomy</p>
+  <h2>How BDS is built</h2>
+
+  <h3>The architecture rewrite</h3>
+  <p>
+    BDS was originally built on Angular Material and deeply coupled to Angular. The "next generation"
+    release rebuilt it as <strong>web components on Lit</strong> — browser-native custom elements with
+    encapsulated HTML, CSS and JS. The stated payoff is framework independence: the same components
+    run in React, Angular, Vue, or no framework at all, with style isolation via shadow DOM. An
+    Angular <em>directives layer</em> is in development on top, to make the web components "feel like
+    first-class Angular citizens" — which tells you where their actual consumers still are.
+  </p>
+
+  <h3>Three named themes</h3>
+  <p>Rather than one theme with a density switch, BDS ships three purpose-built themes:</p>
+  <div class="grid g3">
+    <div class="card">
+      <span class="tag">Default</span>
+      <h4>Clinical application theme</h4>
+      <p>The baseline. Tuned for clinicians working inside patient records during care delivery.</p>
+    </div>
+    <div class="card">
+      <span class="tag">Denser</span>
+      <h4>Tooling theme</h4>
+      <p>A tighter layout for specialised users — the people configuring and administering systems rather than delivering care.</p>
+    </div>
+    <div class="card">
+      <span class="tag">Roomier</span>
+      <h4>Patient-facing theme</h4>
+      <p>Increased white space, explicitly justified by accessibility needs of patients rather than by preference.</p>
+    </div>
+  </div>
+
+  <div class="note">
+    <p><strong>Convergent evolution.</strong> Oxygen's <code>data-ox-density</code> has <span class="mono">clinical</span> / <span class="mono">standard</span> / <span class="mono">patient</span>. BDS has clinical / tooling / patient-facing. Same three audiences, same ordering, arrived at independently. The difference is scope: BDS changes a whole theme, Oxygen changes spacing and target size. Section 06 argues Oxygen should widen its axis to match — including the <em>content register</em>, which neither system currently binds to the profile.</p>
+  </div>
+
+  <h3>Accessibility posture</h3>
+  <p>
+    BDS states compliance with <strong>WCAG 2.2</strong> and explicit preparation for the
+    <strong>European Accessibility Act (EAA 2025)</strong>, delivered through colour contrast, focus
+    states, keyboard and screen-reader support. Each release notes systematic keyboard work — Enter-key
+    support added component by component, <code>aria-labelledby</code> fixes on checkbox and radio
+    groups, comprehensive <code>aria-label</code> examples for icons. This is incremental, visible,
+    per-release accessibility work, published as marketing.
+  </p>
+
+  <h3>Release history</h3>
+  <ul class="tl">
+    <li>
+      <span class="when">April 2025 · next generation</span>
+      <h4>Angular Material → Lit web components</h4>
+      <p>Framework-agnostic rebuild. First component set: Button, Input, Select, Checkbox, Radio, Slide Toggle, Table, List, Tabs, Progress Bar, Progress Spinner, Tooltip, Tag, Badge, Icon. WCAG 2.2 and EAA 2025 stated as targets. Three themes introduced.</p>
+    </li>
+    <li>
+      <span class="when">October 2025 · 1.2.0</span>
+      <h4>"More ways to navigate, guide and interact"</h4>
+      <p>Eleven components: Date picker, Checkbox group, Menu, Stepper, Tree view, Breadcrumbs, Link, Search, Banner, Avatar, Data list.</p>
+    </li>
+    <li>
+      <span class="when">January 2026 · 1.3.0</span>
+      <h4>Advanced form input and product-level navigation</h4>
+      <p>Five clinical form inputs — Form Button Group, <strong>Proportion Field</strong> (dose per kilogram, drug-to-carrier ratios), Rich Text Editor, <strong>Split Field</strong> (segmented identifiers, weight/height), Upload — plus Navigation Link and Top Navigation.</p>
+    </li>
+    <li>
+      <span class="when">March 2026 · 2.0.0</span>
+      <h4>Strengthening the foundation</h4>
+      <p>Production stability and DX. Combobox and Select refactored with suffix icons, split-field integration, and small/medium/large sizing. <strong>"Other" slots</strong> added to checkbox groups, radio groups and form button groups — free text alongside structured choice. Table gains selective column sorting and better infinite scroll. Icon library expanded.</p>
+    </li>
+    <li>
+      <span class="when">June 2026 · 2.2.0</span>
+      <h4>Full token coverage and navigation components</h4>
+      <p><strong>Every component now ships a component-layer token set</strong> — spacing, colour, typography and interaction states fully exposed, documented and overridable without touching source. Two structural components: <strong>Top bar</strong> and <strong>Side navigation</strong>. Paginator gains first/last buttons; Expansion panel gains a title-area slot; Date picker gains a no-manual-input mode for restricted contexts like appointment booking; Split button gains toggle states.</p>
+    </li>
+  </ul>
+
+  <h3>Their navigation research</h3>
+  <p>
+    A separate article documents the design history behind the navigation components, and it is the
+    most transferable thinking on the site. Their findings:
+  </p>
+  <ul class="tight">
+    <li><strong>The root cause is information architecture, not navigation.</strong> Stated bluntly: "if the content structure is a mess, no navigation can rescue it."</li>
+    <li><strong>Contextual navigation failed at scale.</strong> At University Children's Hospital Ljubljana they removed menu bars entirely in favour of navigating through contextual elements. An award-winning panel-based follow-up was abandoned as "too fragile and unstable to be practical" against real EHR data volumes.</li>
+    <li><strong>What survived: hierarchy plus progressive disclosure inside a rigid container.</strong> Navigate general → specific; reveal detail in context; hold it all in a "strong and robust container" (their cardboard-box metaphor) with customisable modules inside a fixed portal structure.</li>
+    <li><strong>Navigation is permission- and role-dependent</strong> — record access is "dynamic and dependent on the level of access granted."</li>
+  </ul>
+  <div class="note">
+    <p><strong>Oxygen already agrees with the last point, in code.</strong> <code>app-shell</code> derives navigation from the user's permissions rather than rendering-then-disabling. Better arrived at the same conclusion through failed prototypes; Oxygen shipped it as a first principle. That is a story worth telling on the marketing site.</p>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<section class="sec" id="inventory">
+  <p class="eyebrow">04 · Inventory</p>
+  <h2>Everything BDS has named publicly</h2>
+  <p class="lede">
+    Compiled from four release posts and the design-system page. Roughly 40 components. Note how few
+    are clinically specific — BDS is mostly a very good general-purpose enterprise UI kit, with
+    clinical specificity concentrated in forms and visualisation.
+  </p>
+
+  <div class="grid g2">
+    <div class="card">
+      <span class="tag">Form and input</span>
+      <h4>13 components</h4>
+      <div class="chips">
+        <span class="chip">Input</span><span class="chip">Select</span><span class="chip">Combobox</span>
+        <span class="chip">Checkbox</span><span class="chip">Checkbox group</span><span class="chip">Radio</span>
+        <span class="chip">Slide toggle</span><span class="chip">Date picker</span>
+        <span class="chip bd">Form button group</span><span class="chip bd">Proportion field</span>
+        <span class="chip bd">Split field</span><span class="chip">Rich text editor</span><span class="chip">Upload</span>
+      </div>
+      <p style="margin-top:.8rem"><span class="chip bd" style="margin-right:.3rem">blue</span> = clinically motivated. Proportion field exists because dose-per-kilogram is a real data type. Split field exists because clinical identifiers are segmented.</p>
+    </div>
+
+    <div class="card">
+      <span class="tag">Navigation and structure</span>
+      <h4>11 components</h4>
+      <div class="chips">
+        <span class="chip new">Top bar</span><span class="chip new">Side navigation</span>
+        <span class="chip">Top navigation</span><span class="chip">Navigation link</span>
+        <span class="chip">Breadcrumbs</span><span class="chip">Menu</span><span class="chip">Tabs</span>
+        <span class="chip">Stepper</span><span class="chip">Tree view</span>
+        <span class="chip">Expansion panel</span><span class="chip">Paginator</span>
+      </div>
+      <p style="margin-top:.8rem"><span class="chip new" style="margin-right:.3rem">amber</span> = shipped in 2.2.0, June 2026. Navigation was the last major gap they closed.</p>
+    </div>
+
+    <div class="card">
+      <span class="tag">Data display</span>
+      <h4>7 components</h4>
+      <div class="chips">
+        <span class="chip">Table</span><span class="chip">List</span><span class="chip">Data list</span>
+        <span class="chip">Tag</span><span class="chip">Badge</span><span class="chip">Avatar</span><span class="chip">Icon</span>
+      </div>
+      <p style="margin-top:.8rem">Table carries the clinical weight: selective column sorting, infinite scroll, refined background tokens.</p>
+    </div>
+
+    <div class="card">
+      <span class="tag">Feedback and action</span>
+      <h4>6 components</h4>
+      <div class="chips">
+        <span class="chip">Button</span><span class="chip">Split button</span><span class="chip">Banner</span>
+        <span class="chip">Tooltip</span><span class="chip">Progress bar</span><span class="chip">Progress spinner</span>
+      </div>
+      <p style="margin-top:.8rem">Banner is the notification workhorse and the component their content style guide governs most tightly.</p>
+    </div>
+  </div>
+
+  <h3>The two pillars with no component list</h3>
+  <p>
+    Clinical data visualisation and clinical forms are marketed as pillars but never enumerated as
+    components. Both are delivered through Better Studio's builders rather than as a library you
+    assemble — you compose a visualisation in the low-code tool and bind it to data. Publicly stated
+    capabilities: graphs, charts, sparklines, unified colour coding for clinical scales, trend and
+    pattern recognition across vital signs, lab analyses, medications, orders and documents; forms
+    with prefilling, multi-page flows, dependency logic, and openEHR template import.
+  </p>
+</section>
+
+<!-- ============================================================ -->
+<section class="sec" id="compare">
+  <p class="eyebrow">05 · Head to head</p>
+  <h2>Oxygen UI vs Better Design System</h2>
+
+  <div class="tw">
+    <table>
+      <thead>
+        <tr><th style="width:20%">Dimension</th><th style="width:32%">Better Design System</th><th style="width:32%">Oxygen UI</th><th style="width:16%">Advantage</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><b>Distribution</b></td>
+          <td>Platform-attached. No package found on public npm; docs behind <code>studio.better.care</code>.</td>
+          <td>Public shadcn registry. <code>shadcn add @oxygenui/&lt;name&gt;</code> writes readable source into the customer's repo. MIT core.</td>
+          <td class="yes">Oxygen</td>
+        </tr>
+        <tr>
+          <td><b>Data contract</b></td>
+          <td>Generic props. Data binding happens in Studio, against openEHR archetypes.</td>
+          <td>Components take FHIR R4 resources as props directly. 18 resource types typed in <code>@oxygenui-design/fhir</code>, zero runtime deps.</td>
+          <td class="yes">Oxygen</td>
+        </tr>
+        <tr>
+          <td><b>Framework</b></td>
+          <td>Lit web components — React, Angular, Vue, or none. Angular directive layer in progress.</td>
+          <td>React only, by explicit decision (<code>ARCHITECTURE.md §14</code>). L0/L1 kept framework-independent so a second target is additive.</td>
+          <td class="part">Better</td>
+        </tr>
+        <tr>
+          <td><b>UI primitives</b></td>
+          <td>~40 components. Complete enterprise kit: table, combobox, stepper, tree view, paginator, rich text.</td>
+          <td>None by design. Rides on shadcn/ui; Oxygen ships only what encodes clinical meaning.</td>
+          <td class="part">Different bet</td>
+        </tr>
+        <tr>
+          <td><b>Clinical semantics</b></td>
+          <td>Implicit. Colour coding for clinical scales; validated forms.</td>
+          <td>The entire product. Absence, uncertainty, provenance, restriction, interpretation status, code status, precautions — each its own component.</td>
+          <td class="yes">Oxygen</td>
+        </tr>
+        <tr>
+          <td><b>Data visualisation</b></td>
+          <td>A marketed pillar. Graphs, charts, sparklines, unified scale colour coding.</td>
+          <td class="no">Nothing. <code>reference-range</code> draws a positional bar; there is no time series anywhere in the library.</td>
+          <td class="no">Better</td>
+        </tr>
+        <tr>
+          <td><b>Forms / data capture</b></td>
+          <td>A marketed pillar plus a builder. Prefill, multi-page, dependencies, openEHR template import, BDS-rendered.</td>
+          <td class="no"><code>dose-input</code> only. No <code>Questionnaire</code> or <code>QuestionnaireResponse</code> in the FHIR package.</td>
+          <td class="no">Better</td>
+        </tr>
+        <tr>
+          <td><b>Navigation</b></td>
+          <td>Top bar, side navigation, breadcrumbs, menu, tree view, stepper, tabs — plus published research.</td>
+          <td><code>app-shell</code> only — but permission-derived, with guarded context changes and patient context as a landmark.</td>
+          <td class="part">Better on breadth, Oxygen on correctness</td>
+        </tr>
+        <tr>
+          <td><b>Tokens</b></td>
+          <td>Three-tier with full component-layer coverage shipped June 2026. Overridable without touching source.</td>
+          <td>One hand-written CSS file mixing palette and semantics. Three-tier DTCG pipeline is designed in <code>§6.2</code>, not built.</td>
+          <td class="no">Better</td>
+        </tr>
+        <tr>
+          <td><b>Theming axes</b></td>
+          <td>Three named themes (clinical / tooling / patient-facing) + dark mode + high contrast.</td>
+          <td>Light / dark × three densities. Brand axis designed but not implemented.</td>
+          <td class="part">Even</td>
+        </tr>
+        <tr>
+          <td><b>Content / microcopy</b></td>
+          <td>A published content style guide: tone, terminology, phrasing, per-notification-type rules with Do/Don't examples. UX writers on staff.</td>
+          <td class="no">Excellent microcopy embedded in components ("Not interpreted"), but no published guide and no lint enforcement.</td>
+          <td class="no">Better</td>
+        </tr>
+        <tr>
+          <td><b>Accessibility</b></td>
+          <td>WCAG 2.2 stated, EAA 2025 explicitly targeted, per-release keyboard and ARIA work published.</td>
+          <td>WCAG 2.2 target-size enforced in tokens; CI axe gate; forced-colors and reduced-motion handled in the token file.</td>
+          <td class="part">Even — Oxygen deeper, Better louder</td>
+        </tr>
+        <tr>
+          <td><b>Internationalisation</b></td>
+          <td>Localisation in Form Builder; site published in English and German.</td>
+          <td class="no">User-visible English hardcoded in components. <code>§10</code> flags this as the one item that must land early or become prohibitive.</td>
+          <td class="no">Better</td>
+        </tr>
+        <tr>
+          <td><b>Ecosystem</b></td>
+          <td>Marketplace, partner programme, and a learning hub (Hive) with courses.</td>
+          <td>Docs site, generated <code>llms.txt</code>, MCP manifest — agent-oriented distribution.</td>
+          <td class="part">Different bet</td>
+        </tr>
+        <tr>
+          <td><b>Auditability</b></td>
+          <td>Closed. Component internals are not customer-visible.</td>
+          <td>Source is copied into the customer's repository — readable, auditable, forkable. eslint plugin enforces architectural invariants.</td>
+          <td class="yes">Oxygen</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="split" style="margin-top:1.8rem">
+    <div class="pane ox">
+      <h4><span class="dot" style="width:9px;height:9px;box-shadow:none"></span> What Oxygen does that BDS does not, at all</h4>
+      <ul class="tight" style="margin-bottom:0">
+        <li><strong>Absence as a first-class value.</strong> <code>absent-value</code> distinguishes not-asked, declined, masked, pending and error. BDS renders a blank.</li>
+        <li><strong>"Not interpreted" ≠ "Normal".</strong> The single best line in the Oxygen README, and there is no equivalent claim anywhere on better.care.</li>
+        <li><strong>Decorative-colour quarantine.</strong> Oxygen's avatar swatches are constrained to hues that mean nothing clinically, so a name-hashed tint can never land on the amber that means "high" three rows below. This is a level of rigour BDS's "unified colour coding" does not claim.</li>
+        <li><strong>Provenance and restriction as components.</strong> <code>provenance</code>, <code>restricted-shield</code>, <code>code-status</code>, <code>precautions-bar</code> — safety semantics with no BDS analogue.</li>
+        <li><strong>Loss prevention.</strong> <code>unsaved-guard</code> treats a patient switch as the same class of error as navigating away from unsaved documentation.</li>
+        <li><strong>Failure containment.</strong> <code>error-boundary</code> never renders a partial record as a complete one, and reports without PHI.</li>
+      </ul>
+    </div>
+    <div class="pane bd">
+      <h4><span class="dot" style="width:9px;height:9px;background:var(--bds);box-shadow:none"></span> What BDS has that Oxygen has nothing of</h4>
+      <ul class="tight" style="margin-bottom:0">
+        <li><strong>Any chart at all.</strong> No sparkline, no trend, no flowsheet, no banded score.</li>
+        <li><strong>Any form-fill surface.</strong> No questionnaire, no clinical input set beyond dose.</li>
+        <li><strong>Component-layer tokens.</strong> Designed but unbuilt — customers cannot restyle a badge without editing the copied source.</li>
+        <li><strong>A published content style guide</strong> customers can apply to their own screens.</li>
+        <li><strong>A localisation story.</strong> Strings are hardcoded English today.</li>
+        <li><strong>Standard structural navigation</strong> beyond the single app shell.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<section class="sec" id="ideas">
+  <p class="eyebrow">06 · Recommendations</p>
+  <h2>Ten ideas worth importing, ranked</h2>
+  <p class="lede">
+    Each is stated as: what Better does, why it matters clinically, and the concrete Oxygen
+    translation — component names, prop shapes and token names where they can be pinned down. Ranked
+    by product impact against implementation cost.
+  </p>
+
+  <!-- 1 -->
+  <div class="idea">
+    <header>
+      <span class="rank">01</span>
+      <div>
+        <h3>A clinical data-visualisation set</h3>
+        <div class="sub">Better's declared differentiator. Oxygen's largest gap.</div>
+      </div>
+      <div class="badges"><span class="badge hi">Highest impact</span><span class="badge md">Large</span></div>
+    </header>
+    <div class="body">
+      <dl>
+        <dt>What they do</dt>
+        <dd>Graphs, charts and sparklines with "unified colour coding" for clinical scales, explicitly designed "to minimise cognitive overload and highlight critical information." They call this the thing generic design systems do not have.</dd>
+        <dt>Why it matters</dt>
+        <dd>A clinician reads a trend, not a number. A potassium of 5.4 means something different if the last three were 4.1, 4.6, 5.0. Oxygen renders every value as a point in isolation, which is the one framing that hides deterioration.</dd>
+      </dl>
+
+      <h4>The Oxygen translation</h4>
+      <p>Four components, each carrying the same refusal-to-guess discipline the rest of the library already has:</p>
+      <ul class="tight">
+        <li><code>observation-trend</code> — a sparkline / time series for a series of FHIR <code>Observation</code> resources sharing a code. Renders the reference range as a band behind the line, reusing <code>--ox-status-normal-bg</code>. Points inheriting interpretation from <code>Observation.interpretation</code>, not from a computed threshold.</li>
+        <li><code>flowsheet</code> — the observation × time grid every inpatient product rebuilds by hand. Rows are codes, columns are timestamps, cells are <code>clinical-value</code>. Gaps are <code>absent-value</code>, not empty cells.</li>
+        <li><code>clinical-scale</code> — a banded composite score (NEWS2, qSOFA, Braden, GCS) showing the score, its band, and the contribution of each parameter. Escalation guidance is a slot the implementer fills, never a built-in recommendation.</li>
+        <li><code>growth-chart</code> — percentile curves for paediatrics. High effort, high defensibility, and a genuine wedge into paediatric health-tech.</li>
+      </ul>
+
+      <div class="note crit">
+        <p><strong>The hard problem, and it must be solved before the first line of chart code.</strong> Oxygen's founding rule is that status is never communicated by colour alone — every status pairs colour with an icon and a text label. A line chart is the one surface where that rule is genuinely difficult: you cannot put a text label on every point. The answer has to be designed, not deferred:</p>
+      </div>
+      <ul class="tight">
+        <li><strong>Encode abnormality in marker shape, not only hue</strong> — circle for in-range, upward triangle for high, downward triangle for low, filled square for critical. This survives monochrome print and every form of colour vision deficiency, which is exactly the argument the token file already makes for separating high and low by hue.</li>
+        <li><strong>Annotate only what crosses.</strong> Label the points that leave the reference band with value and interpretation; leave in-range points unlabelled. This is the visual form of the interruption budget in <code>alert-banner</code>.</li>
+        <li><strong>Ship a table as the accessible peer, not as a fallback.</strong> Every chart renders an associated <code>&lt;table&gt;</code> — visually hidden by default, revealed by a control, and the thing the screen reader gets. A chart with no text equivalent is unusable to a portion of clinicians and fails the EAA claim in idea 07.</li>
+        <li><strong>Refuse to draw the band when there is no stated range.</strong> <code>reference-range</code> already "refuses to draw when no numeric bound was stated." The chart must inherit that behaviour rather than inventing a plausible band — an invented normal band is a fabricated clinical claim.</li>
+      </ul>
+      <pre><span class="c">// The shape this should take — interpretation comes from the resource,</span>
+<span class="c">// never from a threshold the component invented.</span>
+&lt;<span class="k">ObservationTrend</span>
+  observations={potassiumSeries}       <span class="c">// Observation[] sharing a code</span>
+  timeZone=<span class="s">"Europe/London"</span>             <span class="c">// required, as in clinical-time</span>
+  range={<span class="s">"from-observation"</span>}          <span class="c">// | ReferenceRange | "none"</span>
+  markers=<span class="s">"shape-and-colour"</span>          <span class="c">// never colour alone</span>
+  annotate=<span class="s">"out-of-range"</span>              <span class="c">// interruption budget</span>
+  tableEquivalent                      <span class="c">// a11y peer, on by default</span>
+/&gt;</pre>
+    </div>
+  </div>
+
+  <!-- 2 -->
+  <div class="idea">
+    <header>
+      <span class="rank">02</span>
+      <div>
+        <h3>A FHIR <code>Questionnaire</code> renderer</h3>
+        <div class="sub">Better's second pillar. Oxygen has no data-capture surface at all.</div>
+      </div>
+      <div class="badges"><span class="badge hi">Highest impact</span><span class="badge md">Large</span></div>
+    </header>
+    <div class="body">
+      <dl>
+        <dt>What they do</dt>
+        <dd>Clinical forms with "built-in logic," prefilling, multi-page flows and dependencies, authored in Form Builder or imported from openEHR templates, then rendered through BDS components by the Form Renderer.</dd>
+        <dt>Why it matters</dt>
+        <dd>Oxygen is currently a read-only library. Every product built with it needs data capture, and every team builds it themselves — which is exactly the surface where clinical safety errors originate. A library that renders a potassium correctly but leaves the team to hand-roll the form that records it has ceded the riskier half.</dd>
+      </dl>
+
+      <h4>The Oxygen translation</h4>
+      <p>
+        FHIR already has the standard Better had to build proprietary tooling for:
+        <code>Questionnaire</code> and <code>QuestionnaireResponse</code>. Neither type exists in
+        <code>@oxygenui-design/fhir</code> today. A renderer that takes a <code>Questionnaire</code>
+        and emits a valid <code>QuestionnaireResponse</code> is the most defensible flagship in the
+        library — it is the thing that cannot be reproduced by styling shadcn components.
+      </p>
+      <ul class="tight">
+        <li><code>questionnaire-form</code> — renders a <code>Questionnaire</code>, honours <code>enableWhen</code> / <code>enableBehavior</code> for dependency logic, and emits <code>QuestionnaireResponse</code>.</li>
+        <li><strong>Composes with what already exists.</strong> Multi-page flow registers with <code>unsaved-guard</code>; prefilled answers carry <code>provenance</code>; unanswered items render as <code>absent-value</code> with the correct FHIR data-absent reason rather than an empty string; item validation errors use the <code>alert-banner</code> severity tiers.</li>
+        <li><strong>Prefill must be visible.</strong> Better lists prefilling as a safety feature; it is also a safety hazard — a clinician signing a form does not always notice which values were carried forward. Every prefilled answer should be visually marked and its source stated. This is a genuine improvement on what Better describes, and it falls straight out of Oxygen's existing provenance model.</li>
+      </ul>
+      <div class="note">
+        <p><strong>This closes an open strategic question.</strong> Whether <code>zowork/formbuilder</code> could seed a <code>Questionnaire</code> renderer has been an open item. Better treating clinical forms as one of six equal pillars — and rebuilding their entire form renderer on their design system — is the strongest available external evidence that it should be the flagship rather than a later phase.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3 -->
+  <div class="idea">
+    <header>
+      <span class="rank">03</span>
+      <div>
+        <h3>Component-layer tokens, shipped not designed</h3>
+        <div class="sub">BDS 2.2.0's headline. Oxygen has the spec and not the build.</div>
+      </div>
+      <div class="badges"><span class="badge hi">High impact</span><span class="badge lo">Medium</span></div>
+    </header>
+    <div class="body">
+      <dl>
+        <dt>What they do</dt>
+        <dd>Every component ships a component-layer token set. Spacing, colour, typography and interaction states are "fully exposed, documented, and overridable" — custom theming with no source modification.</dd>
+        <dt>Why it matters</dt>
+        <dd>For Oxygen it matters more than it does for Better. Oxygen's whole distribution model is copying source into the customer's repo; without an override layer, "customise it" means "fork it," and every fork is a component that can never receive an upstream fix.</dd>
+      </dl>
+      <h4>The Oxygen translation</h4>
+      <p>
+        <code>ARCHITECTURE.md §6.2</code> already specifies the exact model — primitive
+        (<code>--ox-ref-red-600</code>) → semantic (<code>--ox-status-critical</code>) → component
+        (<code>--ox-badge-critical-bg</code>), authored as W3C DTCG JSON and built to CSS, a Tailwind
+        v4 <code>@theme</code> block, typed TS constants, flat JSON and Figma tokens. The work is
+        real but bounded at 29 components. It becomes unbounded at 200.
+      </p>
+      <div class="sw">
+        <div class="c1">--ox-status-critical</div>
+        <div class="c2">--ox-status-high</div>
+        <div class="c3">--ox-status-normal</div>
+        <div class="c4">--ox-status-low</div>
+        <div class="c5">--ox-status-unknown</div>
+      </div>
+      <p class="small">The semantic tier already exists and is well reasoned — including the contrast-driven decision to use red-700 and amber-700 rather than the 600 steps. What is missing is the tier below it that a customer can override, and the tier above it that a build can generate from.</p>
+      <div class="note warn">
+        <p><strong>One rule to keep while adding the tier.</strong> Better exposes component tokens for theming. Oxygen must expose them for theming <em>without</em> letting a customer override a clinical status colour into meaninglessness. Consider making <code>--ox-status-*</code> a locked tier — brand overrides may replace the palette, but a build error should fire if a brand redefines critical to something that fails 4.5:1 or collides with the normal hue. A design system for clinical software is allowed to have opinions its customers cannot override.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4 -->
+  <div class="idea">
+    <header>
+      <span class="rank">04</span>
+      <div>
+        <h3>Publish the content style guide</h3>
+        <div class="sub">The cheapest high-leverage idea on this list.</div>
+      </div>
+      <div class="badges"><span class="badge hi">High impact</span><span class="badge lo">Small</span></div>
+    </header>
+    <div class="body">
+      <dl>
+        <dt>What they do</dt>
+        <dd>A full content style guide: rules for tone, terminology and phrasing; per-notification-type rules with Do and Don't examples; explicitly justified as reducing confusion and building trust. UX writers are named as part of the design system team.</dd>
+        <dt>Why it matters</dt>
+        <dd>Oxygen's microcopy is already the best argument for the product — "Not interpreted," never "Normal"; a recorded no-known-allergies assertion distinguished from an empty list; unknown code status as a loud state. But the discipline stops at the component boundary. The customer writes the other 90% of the strings in their application, and nothing helps them do it consistently.</dd>
+      </dl>
+      <h4>The Oxygen translation</h4>
+      <ul class="tight">
+        <li><strong><code>CONTENT.md</code>, alongside <code>DESIGN.md</code>.</strong> The design contract already asks teams to define escalation language, clinician vs patient terminology, and reading level — it just does not tell them how. This is the missing half of a document that already exists.</li>
+        <li><strong>Rules with Do / Don't pairs</strong>, drawn from decisions already made inside components: never state a normal range as fact when none was supplied; never label an uninterpreted result; name the specific finding rather than its category; state the consequence before asking for confirmation; describe behaviour rather than labelling a person.</li>
+        <li><strong>Enforce what can be enforced.</strong> <code>@oxygenui-design/eslint-plugin</code> already exists to hold architectural invariants. A rule that flags banned strings in JSX — "Normal" as a bare interpretation, "N/A" for a clinical absence, "Error" with no stated cause — turns guidance into a gate.</li>
+        <li><strong>Ship it as marketing.</strong> A published clinical content style guide is a page every healthcare design lead will read, and there is no equivalent public artefact from Better — theirs is described, not published.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- 5 -->
+  <div class="idea">
+    <header>
+      <span class="rank">05</span>
+      <div>
+        <h3>Split <code>app-shell</code> into a navigation family</h3>
+        <div class="sub">BDS shipped Top bar and Side navigation as separate structural components in June.</div>
+      </div>
+      <div class="badges"><span class="badge md">Medium impact</span><span class="badge lo">Medium</span></div>
+    </header>
+    <div class="body">
+      <dl>
+        <dt>What they do</dt>
+        <dd>Top bar — "a consistent, accessible home for the information and actions that belong to the current screen," carrying title, actions, search and filters. Side navigation — hierarchical navigation across application sections, multi-level, for deep clinical workflows "without losing context." Plus breadcrumbs, menu, stepper and tree view.</dd>
+        <dt>Why it matters</dt>
+        <dd>Oxygen's <code>app-shell</code> has the better idea inside it — navigation derived from permissions, patient context as a landmark, guarded context changes — but it is one monolithic component. A team that wants Oxygen's permission model and its own layout has to fork it.</dd>
+      </dl>
+      <h4>The Oxygen translation</h4>
+      <ul class="tight">
+        <li><strong>Keep <code>app-shell</code> as the composed default</strong>, and extract <code>context-bar</code> (patient identity + screen actions, the landmark that must never be lost), <code>section-nav</code> (permission-derived hierarchical navigation), and <code>clinical-breadcrumb</code> (general → specific, with the patient always at the root).</li>
+        <li><strong>Take their hierarchy-plus-progressive-disclosure finding directly.</strong> Better burned two failed prototypes to learn that contextual and panel-based navigation collapse under real EHR data volume. That is free negative evidence — do not rebuild either.</li>
+        <li><strong>Bind navigation to <code>unsaved-guard</code> by default.</strong> Oxygen already treats a patient switch as a loss event; making that automatic inside <code>section-nav</code> rather than a wiring exercise is a correctness feature Better does not describe.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- 6 -->
+  <div class="idea">
+    <header>
+      <span class="rank">06</span>
+      <div>
+        <h3>Promote density to a named surface profile</h3>
+        <div class="sub">Both systems found the same three audiences. Better binds more to them.</div>
+      </div>
+      <div class="badges"><span class="badge md">Medium impact</span><span class="badge lo">Small</span></div>
+    </header>
+    <div class="body">
+      <dl>
+        <dt>What they do</dt>
+        <dd>Three themes rather than three densities — clinical, tooling, patient-facing — each a complete visual treatment, with the patient theme's extra white space justified on accessibility grounds.</dd>
+        <dt>Why it matters</dt>
+        <dd>Oxygen's <code>data-ox-density</code> changes row height, gap, padding, font size and target size. But the difference between a clinician surface and a patient surface is not only spacing — it is vocabulary, motion tolerance, disclosure depth and reading level. <code>ARCHITECTURE.md §10</code> already states that patient-facing and clinician-facing strings are <em>different catalogs, not different tones of the same string</em>. Nothing currently connects that to the density attribute.</dd>
+      </dl>
+      <h4>The Oxygen translation</h4>
+      <p>Make <code>data-ox-density</code> select the content register too, so one attribute switches the whole surface:</p>
+      <pre>[data-ox-density=<span class="s">"patient"</span>] <span class="c">→</span> roomier spacing
+                          <span class="c">+</span> patient string catalog (<span class="s">"potassium"</span>)
+                          <span class="c">+</span> plain-language reference explanations
+                          <span class="c">+</span> conservative disclosure defaults
+
+[data-ox-density=<span class="s">"clinical"</span>] <span class="c">→</span> dense rows, target floor held at 24px
+                          <span class="c">+</span> clinician catalog (<span class="s">"K+"</span>, <span class="s">"mmol/L"</span>)
+                          <span class="c">+</span> abbreviations and codes surfaced</pre>
+      <p class="small">
+        This is a rename and a binding, not new architecture — and it converts a spacing token into
+        the product's most explainable feature. It also arrives at the right time: doing it during
+        the i18n work in <code>§10</code> costs almost nothing; doing it after costs a migration.
+      </p>
+    </div>
+  </div>
+
+  <!-- 7 -->
+  <div class="idea">
+    <header>
+      <span class="rank">07</span>
+      <div>
+        <h3>Claim EAA 2025 and EN 301 549 explicitly</h3>
+        <div class="sub">Better does. Oxygen quietly does more of the work and says less.</div>
+      </div>
+      <div class="badges"><span class="badge md">Medium impact</span><span class="badge lo">Small</span></div>
+    </header>
+    <div class="body">
+      <dl>
+        <dt>What they do</dt>
+        <dd>State WCAG 2.2 compliance and explicit preparation for the European Accessibility Act, and publish per-release accessibility work as part of the changelog.</dd>
+        <dt>Why it matters</dt>
+        <dd>Oxygen's accessibility posture is arguably stronger already — WCAG 2.2 target size enforced in the token layer and clamped even in clinical density, a CI axe gate, forced-colors handling, reduced-motion handling, and a founding rule that status never relies on colour. None of it is stated as a compliance claim, and EU and NHS procurement asks the question directly.</dd>
+      </dl>
+      <h4>The Oxygen translation</h4>
+      <ul class="tight">
+        <li>An <strong>accessibility conformance page</strong> stating WCAG 2.2 AA, EN 301 549, and EAA readiness, with per-component status generated from the existing metadata rather than hand-maintained.</li>
+        <li><strong>Extend the CI gate to match the claim</strong> — <code>§10</code> already targets per-story axe runs, forced-colors mode, reduced-motion, 200% zoom, 320px reflow, and a documented NVDA / JAWS / VoiceOver support matrix. Ship the matrix; it is the artefact procurement actually asks for.</li>
+        <li><strong>Make the target-size decision a marketing line.</strong> "Dense means tighter rows, not smaller buttons" — the clinical density floor holding at 24px is a defensible safety decision stated in a code comment and nowhere a buyer can see it.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- 8 -->
+  <div class="idea">
+    <header>
+      <span class="rank">08</span>
+      <div>
+        <h3>The "Other" slot — structured choice plus free text</h3>
+        <div class="sub">A small BDS 2.0.0 feature with an unusually good data model behind it.</div>
+      </div>
+      <div class="badges"><span class="badge md">Medium impact</span><span class="badge lo">Small</span></div>
+    </header>
+    <div class="body">
+      <dl>
+        <dt>What they do</dt>
+        <dd>Checkbox groups, radio groups and form button groups gained "Other" slots — free-text input sitting alongside the structured choices.</dd>
+        <dt>Why it matters</dt>
+        <dd>This is the interface answer to the oldest problem in clinical data quality. When the value set does not contain what the clinician needs to record, they either pick the nearest wrong code or abandon the field. An explicit Other captures the truth <em>and</em> preserves the fact that it was uncoded.</dd>
+      </dl>
+      <h4>The Oxygen translation</h4>
+      <p>
+        FHIR models this precisely: <code>CodeableConcept.coding</code> for the structured choice,
+        <code>CodeableConcept.text</code> for the free text. Oxygen's <code>concept-chip</code>
+        already marks text-only concepts, unrecognised systems, and codes outside an expected value
+        set — the read side is built. Building the write side as part of idea 02 means
+        <code>questionnaire-form</code> can emit an answer that is honestly uncoded rather than
+        falsely coded, and <code>concept-chip</code> renders it back with that status intact.
+      </p>
+      <div class="note">
+        <p><strong>Round-tripping the uncoded value is the differentiator.</strong> Better captures Other. Oxygen can capture it, mark it as uncoded through <code>concept-chip</code>, and attribute it through <code>provenance</code> — so a value someone typed because the value set failed them never later reads as though it came from a terminology server.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 9 -->
+  <div class="idea">
+    <header>
+      <span class="rank">09</span>
+      <div>
+        <h3>Clinical input types beyond dose</h3>
+        <div class="sub">Proportion field and split field are small, specific, and obviously right.</div>
+      </div>
+      <div class="badges"><span class="badge lo">Lower impact</span><span class="badge lo">Small</span></div>
+    </header>
+    <div class="body">
+      <dl>
+        <dt>What they do</dt>
+        <dd><strong>Proportion field</strong> — ratio-based values such as dose per kilogram and drug-to-carrier ratios, with built-in validation. <strong>Split field</strong> — one logical value broken into grouped inputs, for segmented identifiers and paired measurements like weight and height. Plus a rich text editor for clinical notes and patient narratives.</dd>
+        <dt>Why it matters</dt>
+        <dd>These exist because someone watched clinicians mis-enter ratios and identifiers. <code>dose-input</code> already does the hardest version of this — ISMP formatting rules, plausibility warnings separated from hard maximums, weight-based calculation that shows its arithmetic. The pattern generalises.</dd>
+      </dl>
+      <h4>The Oxygen translation</h4>
+      <ul class="tight">
+        <li><code>ratio-input</code> — a FHIR <code>Ratio</code> with both units explicit and the computed result always shown, following <code>dose-input</code>'s show-your-work precedent.</li>
+        <li><code>quantity-input</code> — a FHIR <code>Quantity</code> with a required unit, unit-system awareness, and refusal to silently convert between mg/dL and mmol/L (the conversion problem <code>§10</code> already calls out).</li>
+        <li><code>identifier-input</code> — a segmented identifier with per-segment validation and check-digit support for NHS number, MRN and equivalents. Currently every customer writes this.</li>
+        <li>Skip the rich text editor. It is a large dependency, a large attack surface, and not where Oxygen's argument lives.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- 10 -->
+  <div class="idea">
+    <header>
+      <span class="rank">10</span>
+      <div>
+        <h3>Ship releases as published arguments</h3>
+        <div class="sub">Four release posts in fifteen months is Better's whole content strategy.</div>
+      </div>
+      <div class="badges"><span class="badge lo">Lower impact</span><span class="badge lo">Small</span></div>
+    </header>
+    <div class="body">
+      <dl>
+        <dt>What they do</dt>
+        <dd>Every minor release gets a written post naming each component, explaining the clinical reasoning, and stating what is coming next. The navigation article publishes two failed prototypes and why they failed.</dd>
+        <dt>Why it matters</dt>
+        <dd>It is why this report exists — nearly everything documented here came from their release notes, not their product. Oxygen already runs changesets; the changelog is generated and invisible. Given the buyer is digital-health startups and their agencies, the release note is the marketing.</dd>
+      </dl>
+      <h4>The Oxygen translation</h4>
+      <ul class="tight">
+        <li><strong>One post per minor release</strong>, structured as Better's are: what shipped, the clinical reasoning, what is next.</li>
+        <li><strong>Publish the reasoning that is already written.</strong> <code>content/decisions/</code> holds nine architecture decision records and the token file contains genuinely interesting arguments — why red-700 rather than red-600, why decorative swatches are quarantined from clinical hues. That is publishable material sitting in a repo nobody outside can read.</li>
+        <li><strong>Publish a failure.</strong> Better's navigation article is more credible than any of their feature pages because it admits what did not work. It is also the only reason their design conclusions are worth trusting.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<section class="sec" id="avoid">
+  <p class="eyebrow">07 · Boundaries</p>
+  <h2>Four things not to copy</h2>
+
+  <div class="grid g2">
+    <div class="card">
+      <span class="tag">Skip</span>
+      <h4>The low-code builder</h4>
+      <p>Form Builder, AQL Builder, Archetype Designer and the drag-and-drop visualisation tool are a platform product with a platform's cost structure. <code>ARCHITECTURE.md §14</code> already rules out data fetching and state management for the same reason: it would make Oxygen a dependency of the customer's data architecture. A <code>Questionnaire</code> renderer is the right slice — it consumes an artefact the customer authors elsewhere.</p>
+    </div>
+    <div class="card">
+      <span class="tag">Skip</span>
+      <h4>The web-components rewrite</h4>
+      <p>Better needed Lit because they were escaping Angular Material with an install base across three frameworks. Oxygen's constraint is the opposite — React-only, copy-source, readable in the customer's repo. Shadow DOM actively fights that: it makes components harder to inspect and restyle, which is the one thing the distribution model sells. <code>§14</code>'s position — L0 and L1 stay framework-independent so a second target is additive — is the right one; do not pre-build the abstraction.</p>
+    </div>
+    <div class="card">
+      <span class="tag">Skip</span>
+      <h4>openEHR as a second data model</h4>
+      <p>Better is openEHR-first with FHIR for operational data, which is a strong position in the NHS and DACH markets and a weak one everywhere else. Oxygen's whole thesis is FHIR-typed props. Supporting two clinical information models would double the type surface and halve the clarity. If openEHR ever matters, it matters as an import path into <code>Questionnaire</code> — the same slice Better's own template import occupies.</p>
+    </div>
+    <div class="card">
+      <span class="tag">Skip</span>
+      <h4>Platform-attached distribution</h4>
+      <p>BDS has no public package and no public component documentation. That is coherent for a platform vendor and fatal for a component vendor. Oxygen's open registry, MIT core and copied-in source are the advantage — the thing a health-tech CTO can audit before adopting. Every idea in section 06 should be implementable without weakening it.</p>
+    </div>
+  </div>
+
+  <div class="note">
+    <p><strong>The positioning line that falls out of this research.</strong> Better sells a design system you get by buying their platform. Oxygen sells a design system you keep. Everything above — the charts, the questionnaire renderer, the content guide — should be built so a customer can read the source, understand the clinical reasoning, and take it with them. That is the one thing the better-resourced competitor structurally cannot offer.</p>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<section class="sec" id="roadmap">
+  <p class="eyebrow">08 · Sequencing</p>
+  <h2>What this changes about the plan</h2>
+  <p class="lede">
+    Mapped onto the existing phases in <code>ARCHITECTURE.md §13</code>. Nothing here replaces that
+    plan; three items argue for reordering inside it, and two are new scope.
+  </p>
+
+  <div class="tw">
+    <table>
+      <thead>
+        <tr><th style="width:8%">#</th><th style="width:28%">Item</th><th style="width:14%">Type</th><th style="width:22%">Lands in</th><th style="width:28%">Why now</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="mono">03</td><td>Three-tier token build with component layer</td><td>Reorder — pull forward</td><td>Phase 1 · foundations</td><td>Already specified. Cost scales with component count; a competitor shipped it in June.</td></tr>
+        <tr><td class="mono">04</td><td><code>CONTENT.md</code> + content lint rules</td><td>New scope, small</td><td>Phase 1, alongside <code>DESIGN.md</code></td><td>Days of work. Highest ratio of differentiation to effort on the list.</td></tr>
+        <tr><td class="mono">06</td><td>Density → surface profile incl. content register</td><td>Reorder — merge into i18n</td><td>Phase 4 · internationalisation</td><td><code>§10</code> already separates patient and clinician catalogs. Binding them to the existing attribute is nearly free if done during that work, and a migration if done after.</td></tr>
+        <tr><td class="mono">07</td><td>Conformance page + extended a11y gates</td><td>Existing scope, surfaced</td><td>Phase 2 · quality infrastructure</td><td>The work is largely planned; the published claim is what procurement asks for.</td></tr>
+        <tr><td class="mono">02</td><td><code>questionnaire-form</code> + <code>Questionnaire</code> types</td><td>New scope, large</td><td>Phase 3 · commercial readiness</td><td>The strongest candidate for a paid-tier flagship. Answers the open question about seeding it from <code>zowork/formbuilder</code>.</td></tr>
+        <tr><td class="mono">01</td><td>Visualisation set — trend, flowsheet, scale</td><td>New scope, large</td><td>Phase 3 · commercial readiness</td><td>Largest capability gap and the competitor's declared differentiator. Design the colour-plus-shape and table-equivalent rules before writing chart code.</td></tr>
+        <tr><td class="mono">05</td><td>Navigation family extracted from <code>app-shell</code></td><td>New scope, medium</td><td>Phase 3</td><td>Unblocks teams who want the permission model without the layout.</td></tr>
+        <tr><td class="mono">08 · 09</td><td>Other slots, <code>ratio-input</code>, <code>quantity-input</code>, <code>identifier-input</code></td><td>New scope, small</td><td>With idea 02</td><td>Cheap once a form surface exists; incoherent before one does.</td></tr>
+        <tr><td class="mono">10</td><td>Release posts + publish the decision records</td><td>New scope, small</td><td>Continuous</td><td>The material is written. It is sitting in a private repo.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>If only three things happen</h3>
+  <div class="grid g3" style="margin-top:1rem">
+    <div class="card">
+      <span class="tag">Cheapest win</span>
+      <h4>Publish the content style guide</h4>
+      <p>Days of work. Turns Oxygen's best-in-class microcopy from a per-component detail into a documented, enforceable, marketable position — and Better's equivalent is described but not published.</p>
+    </div>
+    <div class="card">
+      <span class="tag">Highest leverage</span>
+      <h4>Component-layer tokens</h4>
+      <p>Already designed. Gets radically more expensive with every component added, and without it "customise" means "fork," which breaks the upgrade channel the whole distribution model depends on.</p>
+    </div>
+    <div class="card">
+      <span class="tag">Biggest bet</span>
+      <h4><code>questionnaire-form</code></h4>
+      <p>Turns a read-only library into one that covers capture — the higher-risk half of clinical UI — using a FHIR standard Better had to build proprietary tooling to match.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<section class="sec" id="sources" style="border-bottom:0">
+  <p class="eyebrow">09 · Sources</p>
+  <h2>Where this came from</h2>
+  <p class="small" style="max-width:68ch">
+    All primary sources are Better's own published material, retrieved 13 August 2026. Figures such as
+    institution and record counts are Better's marketing claims and are reported as such, not verified
+    independently. The absence of a public BDS package is an inference from a public npm registry
+    search returning no package under a Better namespace, combined with documentation living behind
+    <span class="mono">studio.better.care</span> — not a statement from Better.
+  </p>
+  <ol class="src">
+    <li><a href="https://www.better.care/design-system/">Design system — Better</a> — the six marketed pillars, benefits framing, and Atomic Design lineage.</li>
+    <li><a href="https://www.better.care/blog-en/better-design-system-2-2-0/">Better Design System 2.2.0</a>, 23 June 2026 — component-layer token coverage, Top bar, Side navigation, Paginator / Expansion panel / Date picker / Split button changes, Angular directives layer.</li>
+    <li><a href="https://www.better.care/blog-en/better-design-system-2-0-0-strengthening-the-foundation/">Better Design System 2.0.0 — strengthening the foundation</a>, March 2026 — Combobox and Select refactor, "Other" slots, Table sorting, ARIA fixes.</li>
+    <li><a href="https://www.better.care/blog-en/better-design-system-1-3-0-advanced-form-input-and-product-level-navigation/">Better Design System 1.3.0 — advanced form input and product-level navigation</a>, January 2026 — Proportion field, Split field, Rich text editor, Form button group, Upload, Top navigation.</li>
+    <li><a href="https://www.better.care/blog-en/better-design-system-1-2-0-more-ways-to-navigate-guide-and-interact/">Better Design System 1.2.0 — more ways to navigate, guide and interact</a>, October 2025 — Date picker, Checkbox group, Menu, Stepper, Tree view, Breadcrumbs, Link, Search, Banner, Avatar, Data list.</li>
+    <li><a href="https://www.better.care/blog-en/introducing-the-next-generation-of-better-design-system/">Introducing the next generation of Better Design System</a>, April 2025 — the Angular Material → Lit migration, initial component set, WCAG 2.2 / EAA 2025, and the three themes.</li>
+    <li><a href="https://www.better.care/blog-en/building-a-design-system-for-digital-solutions-in-healthcare/">Building a design system for digital solutions in healthcare</a> — the four parts, the rejection of generic systems, NHS principles, alert-fatigue reasoning, and team composition.</li>
+    <li><a href="https://www.better.care/blog-en/rethinking-navigation-in-healthcare-applications-improving-user-experience-and-patient-care/">Rethinking navigation in healthcare applications</a> — the Ljubljana contextual-navigation and panel-based prototypes, and the hierarchy-plus-progressive-disclosure conclusion.</li>
+    <li><a href="https://www.better.care/blog-en/better-studio-3-15-etl-2fa/">Better Studio 3.15 — ETL, BDS renderer, 2FA</a> — the Form Renderer rebuilt on BDS components.</li>
+    <li><a href="https://www.better.care/better-studio">Better Studio</a> — Form Builder, AQL Builder, Archetype Designer, Form Renderer, and the citizen-developer positioning.</li>
+    <li><a href="https://www.better.care/">Better — company and platform</a> — openEHR clinical repository, FHIR operational repository, deployment claims, "postmodern EHR" positioning.</li>
+  </ol>
+  <p class="small" style="margin-top:1.4rem">
+    Oxygen-side facts are taken from this repository as of 13 August 2026:
+    <span class="mono">registry.json</span> (29 components),
+    <span class="mono">packages/tokens/src/oxygen-tokens.css</span>,
+    <span class="mono">packages/fhir/src/types.ts</span> (18 FHIR R4 resource types),
+    <span class="mono">ARCHITECTURE.md</span> §6, §10, §13, §14,
+    <span class="mono">DESIGN.md</span>, and <span class="mono">content/decisions/</span>.
+  </p>
+</section>
+
+</main>
+
+<footer class="wrap">
+  <p>Competitive research prepared for Oxygen UI · 13 August 2026 · Subject: Better Design System 2.2.0 (better.care)</p>
+</footer>
+
+</body>
+</html>

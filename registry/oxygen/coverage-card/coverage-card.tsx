@@ -144,8 +144,19 @@ export function CoverageCard({
 
         <Field label="Effective">
           {start || end ? (
+            /* One bound can be absent while the other is present. A dash on the
+               missing side would read as an unparsed date rather than as a
+               missing one — and a coverage whose start is unknown is a different
+               fact from one that started on an unreadable day. Each side states
+               its own absence: "open" forward, "not recorded" backward. */
             <span className="font-[family-name:var(--ox-font-numeric)] tabular-nums">
-              {start?.slice(0, 10) ?? "—"}
+              {start ? (
+                start.slice(0, 10)
+              ) : (
+                <span className="font-[family-name:var(--ox-font-sans)] text-[var(--ox-text-subtle)]">
+                  Start not recorded
+                </span>
+              )}
               {" → "}
               {end?.slice(0, 10) ?? "open"}
             </span>

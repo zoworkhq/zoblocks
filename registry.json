@@ -415,7 +415,7 @@
       "name": "density-provider",
       "type": "registry:component",
       "title": "Density Provider",
-      "description": "Sets the spacing and target-size contract for a subtree. Three modes, nestable, and clamped to the WCAG 2.2 target-size floor so clinical density can never shrink a control below the accessible minimum.",
+      "description": "Sets the surface profile for a subtree: spacing, WCAG 2.2 target-size floor, which vocabulary the surface speaks, and how much is disclosed before asking. Three profiles, nestable, and clamped so clinical density can never shrink a control below the accessible minimum.",
       "categories": [
         "primitive",
         "system"
@@ -568,6 +568,34 @@
           "path": "registry/oxygen/medication-card/medication-card.tsx",
           "type": "registry:component",
           "target": "components/oxygen/medication-card.tsx"
+        }
+      ]
+    },
+    {
+      "name": "observation-trend",
+      "type": "registry:component",
+      "title": "Observation Trend",
+      "description": "A time series for FHIR Observations sharing one code. Draws the reference band only when a numeric range was actually stated, encodes each point's interpretation as a distinct shape as well as a colour, annotates only what crosses, and ships a real data table that assistive technology reads instead of the drawing.",
+      "categories": [
+        "clinical",
+        "visualisation"
+      ],
+      "dependencies": [
+        "@oxygenui-design/fhir@^0.1.0",
+        "lucide-react",
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "https://oxygenui.design/r/utils.json",
+        "https://oxygenui.design/r/tokens.json",
+        "https://oxygenui.design/r/absent-value.json"
+      ],
+      "files": [
+        {
+          "path": "registry/oxygen/observation-trend/observation-trend.tsx",
+          "type": "registry:component",
+          "target": "components/oxygen/observation-trend.tsx"
         }
       ]
     },

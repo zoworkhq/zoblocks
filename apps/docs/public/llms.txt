@@ -112,6 +112,11 @@ Rules that matter when generating code with these components:
   fhir: MedicationRequest
   states: Active, On hold, Stopped, Cancelled, Completed, Expired, Draft, Entered in error, No dosage recorded
   status: stable
+- [Observation Trend](https://oxygenui.design/components/observation-trend): One measurement over time. Abnormality is encoded as shape and colour, and the data table is an accessible peer rather than a fallback.
+  install: pnpm dlx shadcn@latest add https://oxygenui.design/r/observation-trend.json
+  fhir: Observation
+  states: Series with a stated reference band, Series with no reference range (no band drawn, stated in the summary), One-sided reference range, Critical points present, Uninterpreted points (hollow diamond, never a filled normal mark), Observations excluded for having no value, counted not dropped, Observations excluded for having no usable time, counted not dropped, Imprecise dates marked in the table, Empty series, Table hidden, table revealed
+  status: experimental
 - [Patient Banner](https://oxygenui.design/components/patient-banner): Persistent identity header for a clinical screen, driven by a FHIR Patient resource.
   install: pnpm dlx shadcn@latest add https://oxygenui.design/r/patient-banner.json
   fhir: Patient
@@ -145,9 +150,9 @@ Rules that matter when generating code with these components:
   fhir: PractitionerRole
   states: Role with full access, Role with limited access, No features enabled, Session expiring, Break-glass active, Mobile navigation
   status: stable
-- [Density Provider](https://oxygenui.design/components/density-provider): Sets the spacing and target-size contract for a subtree. Density changes spacing, never which facts appear.
+- [Density Provider](https://oxygenui.design/components/density-provider): Sets the surface contract for a subtree — spacing, target size, vocabulary and disclosure. Never which facts appear.
   install: pnpm dlx shadcn@latest add https://oxygenui.design/r/density-provider.json
-  states: Patient density, Standard density, Clinical density, Nested providers, Target-size floor enforced
+  states: Patient profile (roomy, patient vocabulary, progressive disclosure), Standard profile (clinician vocabulary), Clinical profile (dense, clinician vocabulary, full disclosure), Register overridden independently of density, Disclosure overridden independently of density, Nested providers, Target-size floor enforced
   status: stable
 - [Error Boundary](https://oxygenui.design/components/error-boundary): Contains a failure to one section and never renders a partial record as a complete one.
   install: pnpm dlx shadcn@latest add https://oxygenui.design/r/error-boundary.json
