@@ -168,7 +168,13 @@ export async function emitRegistry(
 
   // Pro items are excluded from public output entirely — not marked, not
   // stubbed. The registry served from the CDN is the free catalog.
-  const publicComponents = components.filter((c) => c.meta.tier === "free");
+  // Two exclusions, for different reasons. Pro items are commercial and must
+  // never reach the public CDN. Package components have no source to copy —
+  // they ship on npm — so an item for one would tell the shadcn CLI to fetch
+  // files that do not exist.
+  const publicComponents = components.filter(
+    (c) => c.meta.tier === "free" && c.meta.distribution !== "package",
+  );
   const items: BuildableItem[] = [
     ...SUPPORT_ITEMS.map((i) => ({ ...i })),
     ...publicComponents.map(toBuildable),
