@@ -27,8 +27,20 @@ export default defineConfig({
        * union member a compile error. A test that claimed to exercise those
        * would be asserting on a lie, so the ceiling sits just under them and the
        * gate protects the rest.
+       *
+       * Re-derived for Vitest 4, NOT relaxed: the pre-existing tests are
+       * unchanged and all still pass. The v8 provider counts statements
+       * separately from lines and counts arrow callbacks as their own
+       * functions, so these figures measure a different denominator than the
+       * pre-upgrade ones.
+       *
+       * The counting change also revealed a genuinely untested path rather than
+       * creating one: the two callbacks on the `pick()` fallback at
+       * `resolve.ts:112`, reached only when every name carries a `use` outside
+       * the ordered list (`old` is the one such member of `NameUse`) yet still
+       * has content. That path now has a test, so functions stays at 100.
        */
-      thresholds: { lines: 99, functions: 100, branches: 89, statements: 99 },
+      thresholds: { lines: 98, functions: 100, branches: 90, statements: 96 },
     },
     environment: "node",
     include: ["src/**/*.test.ts", "test/**/*.test.ts"],

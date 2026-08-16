@@ -28,6 +28,29 @@
 const TAB_COMPONENTS = new Set(["Tabs", "TabsRoot", "Tabs.Root"]);
 const VALID_MODES = new Set(["tabs", "nav", "radiogroup", "steps"]);
 
+/**
+ * `Tabs` is one of the most-reused component names in the ecosystem, and this
+ * rule is about *Oxygen's* semantic modes specifically.
+ *
+ * antd, MUI and Chakra all export a `Tabs`, none of which has an `as` prop —
+ * so matching on the JSX name alone reports code that is already correct and
+ * whose only "fix" would be a prop the component does not accept. That is the
+ * exact false positive the header warns about: a rule that fires on correct
+ * code gets disabled wholesale, and then it protects nothing.
+ *
+ * Bare specifiers outside Oxygen's scope are therefore somebody else's Tabs
+ * and are skipped. A relative import is Oxygen's own source (that is how the
+ * package's tests and stories reach it), and an identifier with no import at
+ * all cannot be attributed — both stay in scope, so the rule keeps every case
+ * it was written to catch.
+ */
+const OXYGEN_SCOPE = "@oxygenui-design/";
+
+function isForeignModule(source) {
+  if (source.startsWith(".") || source.startsWith("/")) return false;
+  return !source.startsWith(OXYGEN_SCOPE);
+}
+
 function elementName(node) {
   const name = node.name;
   if (name.type === "JSXIdentifier") return name.name;
@@ -107,59 +130,83 @@ export default {
   },
 
   create(context) {
+    /** Local binding name -> the module specifier it was imported from. */
+    const importedFrom = new Map();
+    /** Candidates, held until `Program:exit` so import order cannot matter. */
+    const pending = [];
+
+    /** The binding a JSX name resolves to: `Tabs.Root` is bound by `Tabs`. */
+    const bindingOf = (name) => name.split(".")[0];
+
     return {
+      ImportDeclaration(node) {
+        for (const specifier of node.specifiers) {
+          importedFrom.set(specifier.local.name, node.source.value);
+        }
+      },
+
       JSXOpeningElement(node) {
         const name = elementName(node);
         if (!name || !TAB_COMPONENTS.has(name)) return;
+        pending.push({ node, name });
+      },
 
-        // A spread could carry `as`, and flagging it would be a guess. A rule
-        // that guesses gets disabled wholesale, and then it protects nothing.
-        if (node.attributes.some((attribute) => attribute.type === "JSXSpreadAttribute")) return;
-
-        const asAttribute = findAttribute(node, "as");
-        if (!asAttribute) {
-          context.report({ node, messageId: "missingMode" });
-          return;
-        }
-
-        const mode = literalString(asAttribute);
-        // Not statically analysable — a variable or a ternary. The component
-        // validates it at runtime in development.
-        if (mode === null) return;
-
-        if (!VALID_MODES.has(mode)) {
-          context.report({ node: asAttribute, messageId: "unknownMode", data: { mode } });
-          return;
-        }
-
-        const items = findAttribute(node, "items");
-        const hasHref = itemsCarryHref(items);
-        if (hasHref && mode !== "nav") {
-          context.report({ node: asAttribute, messageId: "hrefWithoutNav", data: { mode } });
-        }
-        // Only complain about a missing href when the array is a literal we
-        // could actually read; a mapped or variable `items` tells us nothing.
-        if (
-          mode === "nav" &&
-          items &&
-          items.value?.type === "JSXExpressionContainer" &&
-          items.value.expression.type === "ArrayExpression" &&
-          items.value.expression.elements.length > 0 &&
-          items.value.expression.elements.every(
-            (element) => element?.type === "ObjectExpression",
-          ) &&
-          !hasHref
-        ) {
-          context.report({ node: items, messageId: "navWithoutHref" });
-        }
-
-        // Reported on the attribute rather than the element, so the squiggle
-        // lands on the prop that is wrong.
-        const overflowAttribute = findAttribute(node, "overflow");
-        if (literalString(overflowAttribute) === "wrap" && mode !== "radiogroup") {
-          context.report({ node: overflowAttribute, messageId: "wrapOutsideRadiogroup" });
+      "Program:exit"() {
+        for (const { node, name } of pending) {
+          const source = importedFrom.get(bindingOf(name));
+          if (source !== undefined && isForeignModule(source)) continue;
+          check(context, node);
         }
       },
     };
   },
 };
+
+/** The mode checks themselves, once the element is known to be Oxygen's. */
+function check(context, node) {
+  // A spread could carry `as`, and flagging it would be a guess. A rule
+  // that guesses gets disabled wholesale, and then it protects nothing.
+  if (node.attributes.some((attribute) => attribute.type === "JSXSpreadAttribute")) return;
+
+  const asAttribute = findAttribute(node, "as");
+  if (!asAttribute) {
+    context.report({ node, messageId: "missingMode" });
+    return;
+  }
+
+  const mode = literalString(asAttribute);
+  // Not statically analysable — a variable or a ternary. The component
+  // validates it at runtime in development.
+  if (mode === null) return;
+
+  if (!VALID_MODES.has(mode)) {
+    context.report({ node: asAttribute, messageId: "unknownMode", data: { mode } });
+    return;
+  }
+
+  const items = findAttribute(node, "items");
+  const hasHref = itemsCarryHref(items);
+  if (hasHref && mode !== "nav") {
+    context.report({ node: asAttribute, messageId: "hrefWithoutNav", data: { mode } });
+  }
+  // Only complain about a missing href when the array is a literal we
+  // could actually read; a mapped or variable `items` tells us nothing.
+  if (
+    mode === "nav" &&
+    items &&
+    items.value?.type === "JSXExpressionContainer" &&
+    items.value.expression.type === "ArrayExpression" &&
+    items.value.expression.elements.length > 0 &&
+    items.value.expression.elements.every((element) => element?.type === "ObjectExpression") &&
+    !hasHref
+  ) {
+    context.report({ node: items, messageId: "navWithoutHref" });
+  }
+
+  // Reported on the attribute rather than the element, so the squiggle
+  // lands on the prop that is wrong.
+  const overflowAttribute = findAttribute(node, "overflow");
+  if (literalString(overflowAttribute) === "wrap" && mode !== "radiogroup") {
+    context.report({ node: overflowAttribute, messageId: "wrapOutsideRadiogroup" });
+  }
+}

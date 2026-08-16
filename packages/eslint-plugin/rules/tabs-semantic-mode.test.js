@@ -60,6 +60,16 @@ ruleTester.run("tabs-semantic-mode", tabsSemanticMode, {
     { code: 'const a = <Tabs as="tabs" overflow={strategy} items={items} />;' },
     // An empty literal array tells us nothing about hrefs either way.
     { code: 'const a = <Tabs as="nav" items={[]} />;' },
+
+    // Somebody else's Tabs. antd, MUI and Chakra all export one, none of them
+    // has an `as` prop, and the modal in `packages/signature` uses antd's —
+    // so the only "fix" this rule could offer there is a prop the component
+    // does not accept. Matching on the JSX name alone reported all of them.
+    { code: 'import { Tabs } from "antd";\nconst a = <Tabs items={items} />;' },
+    { code: 'import Tabs from "@mui/material/Tabs";\nconst a = <Tabs value={v} />;' },
+    { code: 'import { Tabs } from "@chakra-ui/react";\nconst a = <Tabs.Root value={v} />;' },
+    // A foreign import still wins when the JSX sits above it.
+    { code: 'const a = <Tabs items={items} />;\nimport { Tabs } from "antd";' },
   ],
 
   invalid: [
@@ -110,6 +120,22 @@ ruleTester.run("tabs-semantic-mode", tabsSemanticMode, {
       // Two independent problems, both reported.
       code: 'const a = <Tabs as="tabs" overflow="wrap" items={[{ href: "/a" }]} />;',
       errors: [{ messageId: "hrefWithoutNav" }, { messageId: "wrapOutsideRadiogroup" }],
+    },
+    {
+      // Oxygen's own Tabs, by package specifier — the case the rule exists for.
+      code: 'import { Tabs } from "@oxygenui-design/tabs";\nconst a = <Tabs items={items} />;',
+      errors: [{ messageId: "missingMode" }],
+    },
+    {
+      // ...and by relative path, which is how this package's own tests and
+      // stories reach it. Skipping these would gut the rule.
+      code: 'import { Tabs } from "../src/index.js";\nconst a = <Tabs items={items} />;',
+      errors: [{ messageId: "missingMode" }],
+    },
+    {
+      // The compound root resolves through its own binding, not `Tabs`.
+      code: 'import { TabsRoot } from "@oxygenui-design/tabs";\nconst a = <TabsRoot defaultValue="x" />;',
+      errors: [{ messageId: "missingMode" }],
     },
   ],
 });

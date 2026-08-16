@@ -78,6 +78,32 @@ describe("resolveName", () => {
     );
     expect(n.text).toBe("Okonkwo");
   });
+
+  it("falls back to any name with content when no `use` is in the order", () => {
+    // `old` is a member of NameUse but appears in neither DISPLAY_ORDER nor
+    // LEGAL_ORDER, so a record carrying only that reaches `pick`'s final
+    // fallback. Reporting "Name not recorded" for a patient whose name is
+    // right there in the record would be the interface lying about what it
+    // holds — the exact failure `states the absence` guards the other way.
+    const onlyOld = F.patient({ name: [{ use: "old", family: "Okonkwo", given: ["Amara"] }] });
+    expect(resolveName(onlyOld, P).text).toBe("Amara Okonkwo");
+    expect(resolveName(onlyOld, policy({ nameContext: "legal", now: F.NOW })).text).toBe(
+      "Amara Okonkwo",
+    );
+
+    // The empty-entry guard still applies inside the fallback: an `old` entry
+    // with no content must not win over a later one that has some.
+    const emptyThenReal = F.patient({
+      name: [{ use: "old" }, { use: "old", text: "Amara C Okonkwo" }],
+    });
+    expect(resolveName(emptyThenReal, P).text).toBe("Amara C Okonkwo");
+
+    // Given-only, so the fallback's content check has to reach `given` rather
+    // than short-circuiting on `text` or `family` — the mononym shape, which
+    // is the one most likely to be dropped by a "has a family name" test.
+    const givenOnly = F.patient({ name: [{ use: "old", given: ["Suryanto"] }] });
+    expect(resolveName(givenOnly, P).text).toBe("Suryanto");
+  });
 });
 
 describe("resolvePronouns", () => {
