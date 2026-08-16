@@ -40,8 +40,36 @@ pnpm format
 Before pushing, run what CI runs:
 
 ```bash
-pnpm gen:check && pnpm lint && pnpm format:check && pnpm typecheck && pnpm test && pnpm build
+pnpm verify
 ```
+
+That runs the same gates as `.github/workflows/ci.yml`, in the same order, and
+prints output only for the ones that fail. `pnpm verify --fast` skips the tests
+and the build when you want the quick pass.
+
+**`pre-push` runs `pnpm verify --fast` for you.** That is deliberate, and it is
+worth knowing why there are two hooks rather than one:
+
+| Hook         | Runs          | Sees                      |
+| ------------ | ------------- | ------------------------- |
+| `pre-commit` | `lint-staged` | only the files you staged |
+| `pre-push`   | `pnpm verify` | the whole repository      |
+
+`lint-staged` is the right tool for a commit — it is fast, and it keeps what you
+wrote tidy. But it is structurally blind to the failures that actually break a
+build: a new lint rule firing on a package you never opened, a shared lockfile
+change breaking someone else's tests, a type error that only exists across a
+package boundary, or `format:check`, which has no staged-files equivalent at
+all. Every one of those passes `pre-commit` and fails CI.
+
+If you need to push past it:
+
+```bash
+SKIP_VERIFY=1 git push     # or: git push --no-verify
+```
+
+Use it for a WIP branch where CI is the faster loop. Do not use it for a branch
+you are about to open a pull request from.
 
 ## Adding a component
 

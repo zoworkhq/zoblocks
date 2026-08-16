@@ -17,6 +17,7 @@
     "build": "turbo run build",
     "dev": "turbo run dev",
     "lint": "eslint . --max-warnings 8",
+    "verify": "bash scripts/verify.sh",
     "lint:fix": "eslint . --fix",
     "typecheck": "tsc -p tsconfig.json --noEmit && turbo run typecheck",
     "test": "turbo run test && pnpm test:registry",
