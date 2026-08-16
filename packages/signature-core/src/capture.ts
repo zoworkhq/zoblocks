@@ -56,6 +56,8 @@ export const DEFAULT_CAPTURE: CaptureOptions = {
 
 export interface CaptureSnapshot {
   strokes: Stroke[];
+  /** Finished strokes only — see `committedCount`. */
+  committedCount: number;
   canUndo: boolean;
   canRedo: boolean;
   /** True when there is not enough ink to count as a signature. */
@@ -208,6 +210,18 @@ export class SignatureCapture {
     return this.#active ? [...this.#strokes, this.#active] : [...this.#strokes];
   }
 
+  /**
+   * Finished strokes, excluding one still being drawn.
+   *
+   * `strokes` deliberately includes the in-progress stroke so the ink renders
+   * as the pen moves. Anything that reacts to a *completed* mark — a live
+   * region announcement, an autosave — has to count this instead, or it fires
+   * the instant the pen touches down and again on every sample.
+   */
+  get committedCount(): number {
+    return this.#strokes.length;
+  }
+
   get canUndo(): boolean {
     return this.#strokes.length > 0;
   }
@@ -243,6 +257,7 @@ export class SignatureCapture {
     const verdict = assessInk(strokes, this.options.threshold);
     return {
       strokes,
+      committedCount: this.committedCount,
       canUndo: this.canUndo,
       canRedo: this.canRedo,
       isEmpty: !verdict.ok,

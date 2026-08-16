@@ -127,12 +127,48 @@ export interface Stroke {
   pointerType: "pen" | "touch" | "mouse" | "unknown";
 }
 
+/**
+ * One drawable segment. `d` is SVG path data; `width` is the stroke width.
+ *
+ * Structured rather than pre-rendered markup, and that is a security decision
+ * rather than a stylistic one: a UI that renders a stored `svg` string has to
+ * reach for `innerHTML`, and `Ink` is a value that round-trips through a
+ * database. An attacker who can write to that record could otherwise store
+ * `<image href=x onerror=…>` and have it execute in the next reviewer's
+ * browser. Path data cannot carry script.
+ */
+export interface InkPath {
+  d: string;
+  width: number;
+}
+
+/** A typed signature's text, positioned. Also renderable without innerHTML. */
+export interface InkText {
+  value: string;
+  x: number;
+  y: number;
+  fontSize: number;
+  fontFamily: string;
+  italic?: boolean;
+}
+
 /** The rendered artifacts, and the strokes they came from. */
 export interface Ink {
   /** The source of truth. Everything else is a render of this. */
   strokes: Stroke[];
-  /** Trimmed SVG path markup. Vector, so print and archive are resolution-free. */
+  /**
+   * Trimmed SVG markup, for storage, print and export.
+   *
+   * Never render this with `innerHTML` — use `render` below. It exists so a
+   * signature can be written to a file or a PDF pipeline as one string.
+   */
   svg: string;
+  /** Structured render data. What a UI should actually draw. */
+  render: {
+    viewBox: string;
+    paths: InkPath[];
+    text?: InkText;
+  };
   /** Trimmed PNG as a data URL, at the requested DPI. */
   png?: string;
   /** Ink bounding box in capture coordinates. */

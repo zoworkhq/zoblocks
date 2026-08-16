@@ -1,0 +1,347 @@
+/*
+ * Signature styles.
+ *
+ * Everything resolves through Ant Design's CSS variables where they exist, so
+ * the component picks up a `ConfigProvider` theme — including `darkAlgorithm`
+ * — without any JavaScript. The fallbacks are antd's own default token values,
+ * so it still looks right in an app that has not enabled `cssVar`.
+ *
+ * Two blocks are load-bearing rather than cosmetic and are commented as such:
+ * `touch-action` on the surface, and the forced-colors section.
+ */
+
+.ox-signature {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-family: var(
+    --ant-font-family,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    sans-serif
+  );
+  font-size: var(--ant-font-size, 14px);
+  color: var(--ant-color-text, rgb(0 0 0 / 0.88));
+}
+
+.ox-signature__label {
+  color: var(--ant-color-text, rgb(0 0 0 / 0.88));
+}
+
+/*
+ * Visually hidden, still announced.
+ *
+ * `display: none` and `visibility: hidden` remove content from the
+ * accessibility tree entirely — which for the live region would mean nothing
+ * is ever announced, and for the button labels would mean icon-only controls
+ * with no accessible name.
+ */
+.ox-signature__sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+.ox-signature__frame {
+  border: 1px solid var(--ant-color-border, #d9d9d9);
+  border-radius: var(--ant-border-radius-lg, 8px);
+  background: var(--ant-color-bg-container, #fff);
+  overflow: hidden;
+}
+
+.ox-signature__frame[data-ox-error="true"] {
+  border-color: var(--ant-color-error, #ff4d4f);
+}
+
+.ox-signature__toolbar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 10px;
+  border-bottom: 1px solid var(--ant-color-border-secondary, #f0f0f0);
+  background: var(--ant-color-fill-quaternary, rgb(0 0 0 / 0.02));
+}
+
+.ox-signature__divider {
+  width: 1px;
+  height: 16px;
+  margin-inline: 4px;
+  background: var(--ant-color-border, #d9d9d9);
+}
+
+/*
+ * WCAG 2.2 SC 2.5.8 Target Size (Minimum) is 24x24 CSS pixels.
+ *
+ * The canvas itself is exempt — Note 1 makes spatially-selected areas a single
+ * target — so 2.5.8 is entirely a toolbar problem, which is exactly what this
+ * rule addresses.
+ */
+.ox-signature__tool {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  min-height: 24px;
+  padding: 0 6px;
+  border: 1px solid transparent;
+  border-radius: var(--ant-border-radius, 6px);
+  background: transparent;
+  color: var(--ant-color-text-secondary, rgb(0 0 0 / 0.65));
+  font: inherit;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.ox-signature__tool:hover:not(:disabled) {
+  background: var(--ant-color-fill-tertiary, rgb(0 0 0 / 0.04));
+  color: var(--ant-color-text, rgb(0 0 0 / 0.88));
+}
+
+.ox-signature__tool:disabled {
+  color: var(--ant-color-text-quaternary, rgb(0 0 0 / 0.25));
+  cursor: not-allowed;
+}
+
+.ox-signature__tool:focus-visible,
+.ox-signature__surface:focus-visible {
+  outline: 2px solid var(--ant-color-primary, #1677ff);
+  outline-offset: 1px;
+}
+
+.ox-signature__surface {
+  position: relative;
+  display: block;
+  width: 100%;
+  color: var(--ant-color-text, rgb(0 0 0 / 0.88));
+
+  /*
+   * Without this the browser claims the gesture for scrolling and the
+   * signature arrives as a handful of disconnected dots. It has to be CSS
+   * rather than a JavaScript preventDefault, because the decision is made
+   * before the first pointerdown reaches us.
+   */
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+  cursor: crosshair;
+}
+
+.ox-signature--disabled .ox-signature__surface {
+  cursor: not-allowed;
+  background: var(--ant-color-fill-quaternary, rgb(0 0 0 / 0.02));
+}
+
+.ox-signature__ink {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.ox-signature__baseline {
+  position: absolute;
+  inset-inline: 12%;
+  bottom: 34%;
+  border-bottom: 1px solid var(--ant-color-border, #d9d9d9);
+  pointer-events: none;
+}
+
+.ox-signature__cue {
+  position: absolute;
+  inset-inline-start: calc(12% - 18px);
+  bottom: calc(34% - 7px);
+  color: var(--ant-color-text-tertiary, rgb(0 0 0 / 0.45));
+  pointer-events: none;
+}
+
+.ox-signature__placeholder {
+  position: absolute;
+  inset-inline-start: 12%;
+  bottom: calc(34% + 6px);
+  color: var(--ant-color-text-quaternary, rgb(0 0 0 / 0.25));
+  font-size: 12px;
+  pointer-events: none;
+}
+
+.ox-signature__hint {
+  color: var(--ant-color-text-description, rgb(0 0 0 / 0.45));
+}
+
+.ox-signature__error {
+  color: var(--ant-color-error, #ff4d4f);
+}
+
+/* ------------------------------------------------------------------ */
+/* The typed signature                                                 */
+/* ------------------------------------------------------------------ */
+
+.ox-signature__typed {
+  display: grid;
+  place-items: center;
+  min-height: 120px;
+  padding: 16px;
+  font-size: clamp(28px, 8vw, 44px);
+  line-height: 1.2;
+  color: var(--ant-color-text, rgb(0 0 0 / 0.88));
+  overflow-wrap: anywhere;
+}
+
+.ox-signature__typed[data-style="script"] {
+  font-family: "Snell Roundhand", "Apple Chancery", "Segoe Script", "Brush Script MT", cursive;
+}
+.ox-signature__typed[data-style="formal"] {
+  font-family: Georgia, "Times New Roman", serif;
+  font-style: italic;
+}
+.ox-signature__typed[data-style="plain"] {
+  font-family: inherit;
+  font-size: clamp(20px, 5vw, 28px);
+}
+
+/* ------------------------------------------------------------------ */
+/* The manifest                                                        */
+/* ------------------------------------------------------------------ */
+
+.ox-signature-manifest {
+  border: 1px solid var(--ant-color-border-secondary, #f0f0f0);
+  border-radius: var(--ant-border-radius-lg, 8px);
+  overflow: hidden;
+  font-size: var(--ant-font-size, 14px);
+  color: var(--ant-color-text, rgb(0 0 0 / 0.88));
+}
+
+.ox-signature-manifest__ink {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  padding: 16px;
+  border-bottom: 1px solid var(--ant-color-border-secondary, #f0f0f0);
+}
+
+.ox-signature-manifest__ink svg {
+  max-width: 260px;
+  height: auto;
+}
+
+.ox-signature-manifest__rows {
+  margin: 0;
+}
+
+.ox-signature-manifest__row {
+  display: grid;
+  grid-template-columns: minmax(120px, 190px) 1fr;
+  border-bottom: 1px solid var(--ant-color-border-secondary, #f0f0f0);
+}
+
+.ox-signature-manifest__row:last-child {
+  border-bottom: 0;
+}
+
+.ox-signature-manifest__row dt {
+  padding: 10px 16px;
+  background: var(--ant-color-fill-quaternary, rgb(0 0 0 / 0.02));
+  color: var(--ant-color-text-secondary, rgb(0 0 0 / 0.65));
+}
+
+.ox-signature-manifest__row dd {
+  padding: 10px 16px;
+  margin: 0;
+}
+
+/* Digits that line up in a column read as data rather than as prose. */
+.ox-signature-manifest__row dd time,
+.ox-signature-manifest time {
+  font-variant-numeric: tabular-nums;
+}
+
+.ox-signature-manifest--revoked .ox-signature-manifest__ink svg {
+  opacity: 0.45;
+}
+
+@media (max-width: 480px) {
+  .ox-signature-manifest__row {
+    grid-template-columns: 1fr;
+  }
+  .ox-signature-manifest__row dt {
+    padding-bottom: 0;
+    background: none;
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Forced colors                                                       */
+/* ------------------------------------------------------------------ */
+
+/*
+ * The failure this prevents is total, not cosmetic: the signature disappears.
+ *
+ * Forced-colors mode rewrites CSS <color> properties. Ink rendered from
+ * `currentColor` is a CSS colour and gets forced correctly — which is the
+ * payoff for rendering SVG rather than a canvas, whose script-painted bitmap
+ * would keep its original pixels while the container behind it turned black.
+ *
+ * What still needs stating: borders must be real borders (a box-shadow or a
+ * gradient computes to `none` and a faked boundary vanishes with it), and the
+ * baseline guide has to survive as a visible rule.
+ */
+@media (forced-colors: active) {
+  .ox-signature__frame,
+  .ox-signature-manifest {
+    border: 1px solid CanvasText;
+  }
+
+  .ox-signature__surface,
+  .ox-signature__ink {
+    forced-color-adjust: none;
+    color: CanvasText;
+    background: Canvas;
+  }
+
+  .ox-signature__baseline {
+    border-bottom-color: CanvasText;
+  }
+
+  .ox-signature__tool:disabled {
+    color: GrayText;
+  }
+
+  .ox-signature__tool:focus-visible,
+  .ox-signature__surface:focus-visible {
+    outline: 2px solid Highlight;
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Print                                                               */
+/* ------------------------------------------------------------------ */
+
+/*
+ * A signature record ends up on paper more often than anything else in a
+ * clinical chart. The toolbar is not part of the record; the manifest is.
+ */
+@media print {
+  .ox-signature__toolbar,
+  .ox-signature__placeholder {
+    display: none;
+  }
+
+  .ox-signature-manifest {
+    border-color: #000;
+    break-inside: avoid;
+  }
+
+  .ox-signature-manifest__row dt {
+    background: none;
+  }
+}

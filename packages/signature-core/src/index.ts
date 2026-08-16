@@ -44,7 +44,14 @@ export {
   type WidthOptions,
 } from "./strokes.js";
 
-export { DEFAULT_RENDER, toInk, toPathMarkup, toSVG, type RenderOptions } from "./export.js";
+export {
+  DEFAULT_RENDER,
+  toInk,
+  toInkPaths,
+  toPathMarkup,
+  toSVG,
+  type RenderOptions,
+} from "./export.js";
 
 export {
   OUTCOMES,
@@ -62,6 +69,8 @@ export {
   type CaptureMethod,
   type DeclinedValue,
   type Ink,
+  type InkPath,
+  type InkText,
   type OnPaperValue,
   type Outcome,
   type PendingValue,

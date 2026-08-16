@@ -16,7 +16,7 @@
  * Nothing here touches a canvas or the DOM, so it runs on a server.
  */
 
-import type { Ink, Stroke } from "./value.js";
+import type { Ink, InkPath, Stroke } from "./value.js";
 import {
   DEFAULT_WIDTH,
   decimate,
@@ -82,6 +82,54 @@ function attr(value: string): string {
  * consecutive widths are smoothed and the segments overlap at round caps, the
  * seams are not visible.
  */
+/**
+ * Strokes to structured segments.
+ *
+ * This is the primary output. The SVG string below is generated *from* it, so
+ * markup and render data can never disagree — and a React consumer draws the
+ * segments directly rather than injecting markup.
+ */
+export function toInkPaths(
+  strokes: readonly Stroke[],
+  overrides: Partial<RenderOptions> = {},
+): InkPath[] {
+  const options = { ...DEFAULT_RENDER, ...overrides };
+  const out: InkPath[] = [];
+
+  for (const stroke of strokes) {
+    const points = decimate(stroke.points);
+    if (points.length === 0) continue;
+
+    if (!options.variableWidth) {
+      out.push({ d: toPathData(points), width: round(options.width.base) });
+      continue;
+    }
+
+    const only = points[0];
+    if (points.length === 1 && only) {
+      out.push({
+        d: `M ${round(only.x)} ${round(only.y)} l 0 0`,
+        width: round(options.width.base),
+      });
+      continue;
+    }
+
+    const w = widths(points, options.width);
+    for (let i = 1; i < points.length; i++) {
+      const a = points[i - 1];
+      const b = points[i];
+      if (!a || !b) continue;
+      const segment = ((w[i - 1] ?? options.width.base) + (w[i] ?? options.width.base)) / 2;
+      out.push({
+        d: `M ${round(a.x)} ${round(a.y)} L ${round(b.x)} ${round(b.y)}`,
+        width: round(segment),
+      });
+    }
+  }
+
+  return out;
+}
+
 function paths(strokes: readonly Stroke[], options: RenderOptions): string[] {
   const out: string[] = [];
 
@@ -174,9 +222,13 @@ export function toPathMarkup(
  * value is complete and useful without it.
  */
 export function toInk(strokes: readonly Stroke[], overrides: Partial<RenderOptions> = {}): Ink {
+  const svg = toSVG(strokes, overrides);
+  const viewBox = /viewBox="([^"]+)"/.exec(svg)?.[1] ?? "0 0 1 1";
+
   return {
     strokes: strokes.map((s) => ({ ...s, points: [...s.points] })),
-    svg: toSVG(strokes, overrides),
+    svg,
+    render: { viewBox, paths: toInkPaths(strokes, overrides) },
     bounds: inkBounds(strokes),
   };
 }

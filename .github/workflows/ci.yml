@@ -146,6 +146,14 @@ jobs:
       - name: Test
         run: pnpm test
 
+      # Coverage is a gate, not a report. The readiness audit's tier bar puts
+      # `beta` at 90% lines / 85% branches, and the packages that declare
+      # thresholds fail their own run when they slip below — so this step goes
+      # red on a regression rather than quietly publishing a number nobody
+      # reads.
+      - name: Coverage thresholds
+        run: pnpm test:coverage
+
       - name: Build
         run: pnpm build
 

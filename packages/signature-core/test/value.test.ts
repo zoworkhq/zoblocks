@@ -14,9 +14,13 @@
 
 import { describe, expect, it } from "vitest";
 import {
+  OUTCOMES,
   isAffirmative,
   isAnswered,
+  isDeclined,
+  isRevoked,
   isSigned,
+  isUnable,
   validate,
   type DeclinedValue,
   type Ink,
@@ -496,5 +500,120 @@ describe("attribution", () => {
     for (const value of values) {
       expect(toFhirProvenance(value).agent.length, value.outcome).toBeGreaterThan(0);
     }
+  });
+});
+
+describe("guards and edge cases", () => {
+  const verbal: SignatureValue = {
+    outcome: "verbal",
+    channel: "video",
+    script: "Read the consent aloud and confirmed understanding.",
+    witness: { name: "M. Silva", credential: "MD" },
+    recordedAt: "2026-08-16T10:00:00.000Z",
+    recordedBy: { name: "A. Okafor", credential: "RN" },
+  };
+  const onPaper: SignatureValue = {
+    outcome: "on-paper",
+    scanRef: "DocumentReference/9911",
+    recordedAt: "2026-08-16T10:00:00.000Z",
+    recordedBy: { name: "A. Okafor", credential: "RN" },
+  };
+  const revoked: SignatureValue = {
+    outcome: "revoked",
+    original: signed,
+    revokedBy: { name: "A. Okafor", credential: "RN" },
+    revokedAt: "2026-08-18T09:00:00.000Z",
+    reason: "Patient withdrew before the procedure.",
+    recordedAt: "2026-08-18T09:00:00.000Z",
+  };
+
+  it("narrows each outcome to exactly one guard", () => {
+    const cases: Array<[SignatureValue, string]> = [
+      [signed, "signed"],
+      [declined, "declined"],
+      [unable, "unable"],
+      [revoked, "revoked"],
+    ];
+    for (const [value, expected] of cases) {
+      const hits = [
+        isSigned(value) && "signed",
+        isDeclined(value) && "declined",
+        isUnable(value) && "unable",
+        isRevoked(value) && "revoked",
+      ].filter(Boolean);
+      expect(hits, value.outcome).toEqual([expected]);
+    }
+  });
+
+  it("OUTCOMES lists every member of the union exactly once", () => {
+    // If a new outcome is added to the type without being added here, the
+    // interface that iterates OUTCOMES silently stops offering it.
+    expect(new Set(OUTCOMES).size).toBe(OUTCOMES.length);
+    expect(OUTCOMES).toContain("signed");
+    expect(OUTCOMES).toContain("revoked");
+  });
+
+  it("accepts a well-formed verbal, on-paper and revoked value", () => {
+    expect(validate(verbal)).toEqual([]);
+    expect(validate(onPaper)).toEqual([]);
+    expect(validate(revoked)).toEqual([]);
+  });
+
+  it("requires a witness for verbal consent", () => {
+    // No mark exists at all, so the witness is the only evidence the
+    // conversation happened.
+    const bad = { ...verbal, witness: undefined } as unknown as SignatureValue;
+    expect(validate(bad).join()).toMatch(/witness is required/);
+  });
+
+  it("requires a reason on a revocation", () => {
+    expect(validate({ ...revoked, reason: "  " } as SignatureValue).join()).toMatch(/reason/);
+  });
+
+  it("rejects an empty pending value", () => {
+    const bad: SignatureValue = {
+      outcome: "pending",
+      awaiting: "clinician",
+      since: "2026-08-16T11:20:00.000Z",
+      soFar: [],
+      recordedAt: "2026-08-16T11:20:00.000Z",
+      recordedBy: { name: "A. Okafor" },
+    };
+    expect(validate(bad).join()).toMatch(/nothing is actually pending/);
+  });
+
+  it("requires a recordedAt at all", () => {
+    const bad = { ...declined, recordedAt: "" } as SignatureValue;
+    expect(validate(bad).join()).toMatch(/recordedAt is required/);
+  });
+
+  it("requires a meaning — 21 CFR 11.50(a)(3)", () => {
+    const bad = { ...signed, meaning: undefined } as unknown as SignatureValue;
+    expect(validate(bad).join()).toMatch(/meaning is required/);
+  });
+
+  it("rejects a signature with no renderable ink", () => {
+    // An empty svg would render as a blank space in the manifest, which is
+    // indistinguishable from no signature at all.
+    const bad: SignedValue = { ...signed, ink: { ...ink, svg: "" } };
+    expect(validate(bad).join()).toMatch(/ink\.svg is empty/);
+  });
+
+  it("allows a typed signature to have no strokes", () => {
+    // A typed signature has no stroke model, and fabricating one would put
+    // invented geometry into a legal record.
+    const typed: SignedValue = { ...signed, method: "type", ink: { ...ink, strokes: [] } };
+    expect(validate(typed)).toEqual([]);
+  });
+
+  it("reports every problem at once rather than stopping at the first", () => {
+    // A caller fixing one field at a time through five round-trips is worse
+    // than one list.
+    const bad = {
+      outcome: "unable",
+      reason: "other",
+      recordedAt: "not-a-date",
+    } as unknown as SignatureValue;
+    expect(validate(bad).length).toBeGreaterThan(2);
   });
 });
