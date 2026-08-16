@@ -36,6 +36,17 @@ export default defineConfig({
   },
   test: {
     environment: "jsdom",
+    /*
+     * 20s, against Vitest's 5s default.
+     *
+     * Story play functions drive whole components through jsdom — the Consult
+     * walkthrough alone opens a mode tray, switches mode, picks a suggestion,
+     * runs the shortcut menu, toggles dictation, asks a question and opens the
+     * sources drawer. That is seconds of work without a layout engine, and a CI
+     * runner is slower again. The same paths take milliseconds in the Playwright
+     * suite, which is where browser behaviour is actually asserted.
+     */
+    testTimeout: 20_000,
     globals: true,
     setupFiles: ["./test/setup.ts"],
     include: ["registry/**/*.test.{ts,tsx}", "test/**/*.test.{ts,tsx}"],

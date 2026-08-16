@@ -31,6 +31,18 @@ export default defineConfig({
       thresholds: { lines: 90, functions: 90, branches: 85, statements: 90 },
     },
     environment: "jsdom",
+    /*
+     * 20s, against Vitest's 5s default.
+     *
+     * Every test here drives a real antd Modal through jsdom, which has no
+     * layout engine and no compositor — the suite takes ~26s for 45 tests on a
+     * developer machine, and the longest chains (open the modal, switch tab,
+     * fill two fields, submit) sit near 2.5s locally. A CI runner is several
+     * times slower, so 5s is a budget the environment cannot meet rather than a
+     * signal that anything is wrong. The Playwright suite covers the same paths
+     * in a browser, where they take milliseconds.
+     */
+    testTimeout: 20_000,
     globals: true,
     setupFiles: ["./test/setup.ts"],
     include: ["src/**/*.test.tsx", "test/**/*.test.tsx"],

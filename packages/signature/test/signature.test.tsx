@@ -137,7 +137,13 @@ describe("the typed path", () => {
     // `.keyboard()` only produce keyboard input, so if this passes the
     // component is operable without a pointer — which is what SC 2.1.1
     // (Level A) requires, and what a draw-only pad cannot do.
-    const user = userEvent.setup();
+    const user = userEvent.setup({
+      // jsdom runs no CSS transitions, so the `pointer-events: none` antd sets
+      // on a modal while it animates in never clears — a real browser clears it
+      // in about 200ms, and the Playwright suite exercises these same paths for
+      // real. Checking it here tests jsdom, not the component.
+      pointerEventsCheck: 0,
+    });
     const onChange = vi.fn();
 
     render(<Signature now={NOW} onChange={onChange} attestation="I agree." />);
@@ -167,7 +173,13 @@ describe("the typed path", () => {
     // nothing showed it was "typed purposefully rather than generated
     // automatically". An autofilled name is exactly that fact pattern, so the
     // identity field may be pre-filled and the signature field may not.
-    const user = userEvent.setup();
+    const user = userEvent.setup({
+      // jsdom runs no CSS transitions, so the `pointer-events: none` antd sets
+      // on a modal while it animates in never clears — a real browser clears it
+      // in about 200ms, and the Playwright suite exercises these same paths for
+      // real. Checking it here tests jsdom, not the component.
+      pointerEventsCheck: 0,
+    });
     render(<Signature now={NOW} signer={{ name: "Josh Randall" }} />);
 
     await user.click(screen.getByRole("button", { name: /add signature/i }));
@@ -180,7 +192,13 @@ describe("the typed path", () => {
 
   it("says the typed name has the same legal effect", async () => {
     // The sentence that stops people retreating to the inaccessible tab.
-    const user = userEvent.setup();
+    const user = userEvent.setup({
+      // jsdom runs no CSS transitions, so the `pointer-events: none` antd sets
+      // on a modal while it animates in never clears — a real browser clears it
+      // in about 200ms, and the Playwright suite exercises these same paths for
+      // real. Checking it here tests jsdom, not the component.
+      pointerEventsCheck: 0,
+    });
     render(<Signature now={NOW} />);
     await user.click(screen.getByRole("button", { name: /add signature/i }));
     const dialog = await screen.findByRole("dialog");
@@ -203,7 +221,13 @@ describe("antd gaps this component closes", () => {
   it("names the dialog even though the header is custom", async () => {
     // antd wires aria-labelledby only when `title` is passed; a custom header
     // otherwise leaves the dialog anonymous.
-    const user = userEvent.setup();
+    const user = userEvent.setup({
+      // jsdom runs no CSS transitions, so the `pointer-events: none` antd sets
+      // on a modal while it animates in never clears — a real browser clears it
+      // in about 200ms, and the Playwright suite exercises these same paths for
+      // real. Checking it here tests jsdom, not the component.
+      pointerEventsCheck: 0,
+    });
     render(<Signature now={NOW} title="Sign consent for treatment" />);
     await user.click(screen.getByRole("button", { name: /add signature/i }));
 
@@ -214,7 +238,13 @@ describe("antd gaps this component closes", () => {
   it("wires the tabs to their panels", async () => {
     // Without an `id` on antd's Tabs, aria-controls and aria-labelledby are
     // omitted entirely and the relationship is invisible to assistive tech.
-    const user = userEvent.setup();
+    const user = userEvent.setup({
+      // jsdom runs no CSS transitions, so the `pointer-events: none` antd sets
+      // on a modal while it animates in never clears — a real browser clears it
+      // in about 200ms, and the Playwright suite exercises these same paths for
+      // real. Checking it here tests jsdom, not the component.
+      pointerEventsCheck: 0,
+    });
     render(<Signature now={NOW} />);
     await user.click(screen.getByRole("button", { name: /add signature/i }));
 
@@ -227,7 +257,13 @@ describe("antd gaps this component closes", () => {
   it("keeps the ink when the user peeks at another tab", async () => {
     // antd destroys hidden panes by default. That would silently erase a
     // signature the moment somebody glanced at the Type tab.
-    const user = userEvent.setup();
+    const user = userEvent.setup({
+      // jsdom runs no CSS transitions, so the `pointer-events: none` antd sets
+      // on a modal while it animates in never clears — a real browser clears it
+      // in about 200ms, and the Playwright suite exercises these same paths for
+      // real. Checking it here tests jsdom, not the component.
+      pointerEventsCheck: 0,
+    });
     render(<Signature now={NOW} />);
     await user.click(screen.getByRole("button", { name: /add signature/i }));
     const dialog = await screen.findByRole("dialog");
@@ -242,7 +278,13 @@ describe("antd gaps this component closes", () => {
 
 describe("the outcomes", () => {
   it("offers a way out for someone who cannot sign", async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({
+      // jsdom runs no CSS transitions, so the `pointer-events: none` antd sets
+      // on a modal while it animates in never clears — a real browser clears it
+      // in about 200ms, and the Playwright suite exercises these same paths for
+      // real. Checking it here tests jsdom, not the component.
+      pointerEventsCheck: 0,
+    });
     render(<Signature now={NOW} outcomes={["declined", "unable"]} />);
     await user.click(screen.getByRole("button", { name: /add signature/i }));
 
@@ -251,7 +293,13 @@ describe("the outcomes", () => {
   });
 
   it("records a decline with its reason", async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({
+      // jsdom runs no CSS transitions, so the `pointer-events: none` antd sets
+      // on a modal while it animates in never clears — a real browser clears it
+      // in about 200ms, and the Playwright suite exercises these same paths for
+      // real. Checking it here tests jsdom, not the component.
+      pointerEventsCheck: 0,
+    });
     const onChange = vi.fn();
     render(
       <Signature
@@ -280,7 +328,13 @@ describe("the outcomes", () => {
   it("refuses to record an unwitnessed 'unable'", async () => {
     // The type makes `witness` mandatory. The interface must not let someone
     // reach submit and then be surprised by it.
-    const user = userEvent.setup();
+    const user = userEvent.setup({
+      // jsdom runs no CSS transitions, so the `pointer-events: none` antd sets
+      // on a modal while it animates in never clears — a real browser clears it
+      // in about 200ms, and the Playwright suite exercises these same paths for
+      // real. Checking it here tests jsdom, not the component.
+      pointerEventsCheck: 0,
+    });
     const onChange = vi.fn();
     render(<Signature now={NOW} onChange={onChange} outcomes={["declined", "unable"]} />);
 
@@ -296,7 +350,13 @@ describe("the outcomes", () => {
   });
 
   it("says a witness is required where the choice is made", async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({
+      // jsdom runs no CSS transitions, so the `pointer-events: none` antd sets
+      // on a modal while it animates in never clears — a real browser clears it
+      // in about 200ms, and the Playwright suite exercises these same paths for
+      // real. Checking it here tests jsdom, not the component.
+      pointerEventsCheck: 0,
+    });
     render(<Signature now={NOW} outcomes={["unable"]} />);
     await user.click(screen.getByRole("button", { name: /add signature/i }));
     await user.click(await screen.findByRole("button", { name: /can't sign/i }));
@@ -308,7 +368,13 @@ describe("the outcomes", () => {
   });
 
   it("frames a decline as a decision rather than a failure", async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({
+      // jsdom runs no CSS transitions, so the `pointer-events: none` antd sets
+      // on a modal while it animates in never clears — a real browser clears it
+      // in about 200ms, and the Playwright suite exercises these same paths for
+      // real. Checking it here tests jsdom, not the component.
+      pointerEventsCheck: 0,
+    });
     render(<Signature now={NOW} />);
     await user.click(screen.getByRole("button", { name: /add signature/i }));
     await user.click(await screen.findByRole("button", { name: /can't sign/i }));
@@ -323,7 +389,13 @@ describe("Form integration", () => {
     // The single most likely integration mistake, guarded here: a rule that
     // demands "signed" makes a refusal impossible to submit, which defeats the
     // whole point of the component.
-    const user = userEvent.setup();
+    const user = userEvent.setup({
+      // jsdom runs no CSS transitions, so the `pointer-events: none` antd sets
+      // on a modal while it animates in never clears — a real browser clears it
+      // in about 200ms, and the Playwright suite exercises these same paths for
+      // real. Checking it here tests jsdom, not the component.
+      pointerEventsCheck: 0,
+    });
     const onFinish = vi.fn();
 
     render(
@@ -340,7 +412,13 @@ describe("Form integration", () => {
   });
 
   it("blocks submission when the field is untouched", async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({
+      // jsdom runs no CSS transitions, so the `pointer-events: none` antd sets
+      // on a modal while it animates in never clears — a real browser clears it
+      // in about 200ms, and the Playwright suite exercises these same paths for
+      // real. Checking it here tests jsdom, not the component.
+      pointerEventsCheck: 0,
+    });
     const onFinish = vi.fn();
 
     render(
@@ -358,7 +436,13 @@ describe("Form integration", () => {
   });
 
   it("offers a stricter rule for the cases that need agreement", async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({
+      // jsdom runs no CSS transitions, so the `pointer-events: none` antd sets
+      // on a modal while it animates in never clears — a real browser clears it
+      // in about 200ms, and the Playwright suite exercises these same paths for
+      // real. Checking it here tests jsdom, not the component.
+      pointerEventsCheck: 0,
+    });
     const onFinish = vi.fn();
 
     render(
@@ -657,7 +741,13 @@ describe("the field", () => {
   });
 
   it("works uncontrolled", async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({
+      // jsdom runs no CSS transitions, so the `pointer-events: none` antd sets
+      // on a modal while it animates in never clears — a real browser clears it
+      // in about 200ms, and the Playwright suite exercises these same paths for
+      // real. Checking it here tests jsdom, not the component.
+      pointerEventsCheck: 0,
+    });
     const { container } = render(<Signature now={NOW} defaultValue={SIGNED} />);
     expect(container.querySelector(".ox-signature-manifest")).toHaveTextContent("Josh Randall");
     await user.click(screen.getByRole("button", { name: /change/i }));
@@ -667,7 +757,13 @@ describe("the field", () => {
   it("clears between openings, because bedside tablets are shared", async () => {
     // A previous patient's ink carried into the next signing is a disclosure,
     // not a convenience.
-    const user = userEvent.setup();
+    const user = userEvent.setup({
+      // jsdom runs no CSS transitions, so the `pointer-events: none` antd sets
+      // on a modal while it animates in never clears — a real browser clears it
+      // in about 200ms, and the Playwright suite exercises these same paths for
+      // real. Checking it here tests jsdom, not the component.
+      pointerEventsCheck: 0,
+    });
     render(<Signature now={NOW} />);
 
     await user.click(screen.getByRole("button", { name: /add signature/i }));
@@ -683,7 +779,13 @@ describe("the field", () => {
   });
 
   it("emits audit events without ever transmitting anything", async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({
+      // jsdom runs no CSS transitions, so the `pointer-events: none` antd sets
+      // on a modal while it animates in never clears — a real browser clears it
+      // in about 200ms, and the Playwright suite exercises these same paths for
+      // real. Checking it here tests jsdom, not the component.
+      pointerEventsCheck: 0,
+    });
     const onAuditEvent = vi.fn();
     const fetchSpy = vi.spyOn(globalThis, "fetch");
 
