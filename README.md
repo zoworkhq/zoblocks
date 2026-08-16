@@ -34,6 +34,13 @@ independently installable components paced to resting physiology rather than to
 a spinner. The clinical layer, which takes FHIR resources as props directly with
 no adapter and no bespoke prop shape, follows on the rebuilt foundation.
 
+Two clinical components ship on npm alongside it, both wrapping Ant Design:
+[`@oxygenui-design/signature`](packages/signature/README.md), which records the
+times nobody signed as carefully as the times somebody did, and
+[`@oxygenui-design/identity`](packages/identity/README.md) — a patient avatar,
+chip and banner, with a pass that keeps two patients who share a name apart on
+a worklist.
+
 **Not React?** The same loaders ship as dependency-free custom elements for Vue,
 Angular, Svelte, or plain HTML — see
 [`@oxygenui-design/loaders`](packages/loaders/README.md).
@@ -83,6 +90,13 @@ oxygenui/
 ├─ packages/
 │  ├─ fhir/             # @oxygenui-design/fhir — FHIR R4 types + pure read helpers
 │  ├─ tokens/           # @oxygenui-design/tokens — semantic clinical CSS variables
+│  ├─ intl/             # @oxygenui-design/intl — locale, units, message catalog
+│  ├─ loaders/          # @oxygenui-design/loaders — the five loaders, as custom elements
+│  ├─ react/            # @oxygenui-design/react — the React loader shells
+│  ├─ signature-core/   # @oxygenui-design/signature-core — capture engine, no React
+│  ├─ signature/        # @oxygenui-design/signature — the Ant Design surface
+│  ├─ identity-core/    # @oxygenui-design/identity-core — identity engine, no React
+│  ├─ identity/         # @oxygenui-design/identity — avatar, chip, patient banner
 │  ├─ fixtures/         # synthetic, non-PHI FHIR fixtures for docs and tests
 │  ├─ component-meta/   # the metadata schema every generated artifact derives from
 │  ├─ eslint-plugin/    # lint rules enforcing the architectural invariants
