@@ -558,6 +558,9 @@ importers:
         specifier: workspace:*
         version: link:../signature-core
     devDependencies:
+      '@oxygenui-design/component-meta':
+        specifier: workspace:*
+        version: link:../component-meta
       '@oxygenui-design/tsconfig':
         specifier: workspace:*
         version: link:../tsconfig

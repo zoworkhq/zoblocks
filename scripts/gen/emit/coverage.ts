@@ -40,17 +40,52 @@ function gapsFor(component: LoadedComponent, propCount: number): string[] {
 
   if (meta.status === "experimental") return gaps;
 
-  if (!component.hasStory) gaps.push("no story file");
-  if (meta.status === "stable" || meta.status === "beta") {
-    if (!component.hasTest) gaps.push("no test file");
+  /*
+   * The story requirement does not transfer to a package component, and
+   * waiving it needs a reason rather than an exception.
+   *
+   * ADR 0007 requires a story because a story is consumed four ways: as
+   * documentation, as the visual-regression fixture, as the accessibility
+   * fixture, and — through play functions — as the interaction test. The root
+   * harness in `test/stories.test.tsx` is what provides all four, and it globs
+   * `registry/oxygen`, renders in jsdom, and carries no framework beyond React.
+   *
+   * A package component cannot be rendered there. Signature wraps Ant Design;
+   * pulling antd into the registry harness to satisfy a file check would make
+   * the harness heavier and prove nothing it does not already prove elsewhere.
+   * Its own suite does all four jobs — axe per outcome, userEvent interaction,
+   * a keyboard-only signing test — against the real component with its real
+   * dependency, which is a stronger signal than a story rendered without it.
+   *
+   * So the bar is raised rather than lowered: a package component must have a
+   * test suite at every non-experimental tier, where a registry component only
+   * needs one from beta. A package that ships with no tests fails here.
+   */
+  const isPackage = meta.distribution === "package";
+
+  if (isPackage) {
+    if (!component.hasTest) {
+      gaps.push(
+        "no test suite — a package component proves its tier through its own tests, since it cannot render in the registry story harness",
+      );
+    }
+  } else {
+    if (!component.hasStory) gaps.push("no story file");
+    if (meta.status === "stable" || meta.status === "beta") {
+      if (!component.hasTest) gaps.push("no test file");
+    }
   }
+
   if (meta.status === "stable") {
     if (!meta.limitations.length) {
       gaps.push(
         "no limitations listed — every component has at least one, and an unstated one is a bug report",
       );
     }
-    if (propCount === 0) {
+    // Props are extracted from registry source. A package component's props
+    // live in its own package and are documented in its README, so an empty
+    // count here says nothing about it.
+    if (propCount === 0 && !isPackage) {
       gaps.push("no props extracted — check the component's exported signature");
     }
   }

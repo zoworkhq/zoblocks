@@ -108,25 +108,48 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
             <p className="lede mt-6 max-w-3xl text-pretty">{component.rationale}</p>
 
             <div className="mt-8 max-w-2xl">
-              <InstallCommand
-                command={`pnpm dlx shadcn@latest add @oxygenui/${component.name}`}
-                note={
-                  <>
-                    First install? Add{" "}
-                    <code className="font-mono text-[0.6875rem] text-ink">
-                      {'"@oxygenui": "https://oxygenui.design/r/{name}.json"'}
-                    </code>{" "}
-                    to the <code className="font-mono text-[0.6875rem] text-ink">registries</code>{" "}
-                    block of your{" "}
-                    <code className="font-mono text-[0.6875rem] text-ink">components.json</code>{" "}
-                    first — or skip the config and pass{" "}
-                    <code className="font-mono text-[0.6875rem] text-ink">
-                      {`https://oxygenui.design/r/${component.name}.json`}
-                    </code>{" "}
-                    directly.
-                  </>
-                }
-              />
+              {/*
+                Two channels, and the command has to match the one this
+                component actually uses. A package component shown a
+                `shadcn add` line sends the reader to a registry item that does
+                not exist — which is worse than no install instructions.
+              */}
+              {component.distribution === "package" ? (
+                <InstallCommand
+                  command={`pnpm add ${component.packageName}`}
+                  note={
+                    <>
+                      This one ships on npm rather than as copied source, because it wraps Ant
+                      Design — copying a framework into your repository would be a fork, not a
+                      component. Import its stylesheet too:{" "}
+                      <code className="font-mono text-[0.6875rem] text-ink">
+                        {`import "${component.packageName}/styles.css"`}
+                      </code>
+                      .
+                    </>
+                  }
+                />
+              ) : (
+                <InstallCommand
+                  command={`pnpm dlx shadcn@latest add @oxygenui/${component.name}`}
+                  note={
+                    <>
+                      First install? Add{" "}
+                      <code className="font-mono text-[0.6875rem] text-ink">
+                        {'"@oxygenui": "https://oxygenui.design/r/{name}.json"'}
+                      </code>{" "}
+                      to the <code className="font-mono text-[0.6875rem] text-ink">registries</code>{" "}
+                      block of your{" "}
+                      <code className="font-mono text-[0.6875rem] text-ink">components.json</code>{" "}
+                      first — or skip the config and pass{" "}
+                      <code className="font-mono text-[0.6875rem] text-ink">
+                        {`https://oxygenui.design/r/${component.name}.json`}
+                      </code>{" "}
+                      directly.
+                    </>
+                  }
+                />
+              )}
             </div>
           </div>
         </section>

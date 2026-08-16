@@ -50,6 +50,12 @@ export function buildCatalog(
       status: meta.status,
       since: meta.since,
       layer: meta.layer,
+      distribution: meta.distribution,
+      // Spread rather than set to undefined: the catalog is serialised with
+      // JSON.stringify, which drops undefined keys but keeps explicit ones,
+      // and a `"packageName": null` on every loader is noise in a generated
+      // file people read.
+      ...(meta.packageName ? { packageName: meta.packageName } : {}),
       ...(meta.deprecation ? { deprecation: meta.deprecation } : {}),
 
       summary: meta.summary,
