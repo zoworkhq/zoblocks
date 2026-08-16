@@ -1,6 +1,8 @@
 # 0008 — Internationalisation lands before the catalog reaches ~50 components
 
-**Status:** proposed · 6 August 2026
+**Status:** accepted · 6 August 2026
+
+> **Ratified 16 August 2026.** Implemented at five components rather than fifty, as this ADR argued. @oxygenui-design/intl ships with register-aware lookup and a missing-key path that never renders blank.
 
 ## Context
 

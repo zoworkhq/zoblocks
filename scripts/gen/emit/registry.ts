@@ -16,7 +16,7 @@
 import { readFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import path from "node:path";
-import { HOMEPAGE, REGISTRY_NAME, ROOT, paths } from "../config";
+import { HOMEPAGE, REGISTRY_NAME, ROOT, SUPPORT_ITEM_NAMES, paths } from "../config";
 import type { LoadedComponent } from "../load";
 import type { Emitter } from "../write";
 
@@ -77,16 +77,6 @@ const SUPPORT_ITEMS: BuildableItem[] = [
     ],
   },
 ];
-
-/**
- * The names a component may list in `registryDependencies` without being a
- * component itself. Derived from SUPPORT_ITEMS rather than restated, because a
- * second hand-written list is how "this dependency does not exist" becomes a
- * confusing error about a file that is right there.
- */
-export const SUPPORT_ITEM_NAMES: ReadonlySet<string> = new Set(
-  SUPPORT_ITEMS.map((item) => item.name),
-);
 
 interface BuildableItem {
   name: string;
@@ -156,6 +146,25 @@ export async function emitRegistry(
   emitter: Emitter,
 ): Promise<string[]> {
   const problems: string[] = [];
+
+  // The two lists must agree: config.ts names what a component may depend on,
+  // this file builds what is actually published. A name in one and not the
+  // other is either a dependency that resolves to nothing or an item nobody can
+  // depend on.
+  for (const item of SUPPORT_ITEMS) {
+    if (!SUPPORT_ITEM_NAMES.has(item.name)) {
+      problems.push(
+        `support item "${item.name}" is built but not listed in SUPPORT_ITEM_NAMES (scripts/gen/config.ts), so no component may depend on it`,
+      );
+    }
+  }
+  for (const name of SUPPORT_ITEM_NAMES) {
+    if (!SUPPORT_ITEMS.some((item) => item.name === name)) {
+      problems.push(
+        `SUPPORT_ITEM_NAMES lists "${name}" but no support item builds it — a component depending on it would resolve to nothing`,
+      );
+    }
+  }
 
   // Pro items are excluded from public output entirely — not marked, not
   // stubbed. The registry served from the CDN is the free catalog.

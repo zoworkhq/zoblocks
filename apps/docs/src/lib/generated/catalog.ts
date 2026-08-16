@@ -44,6 +44,12 @@ export const CATALOG: ComponentDoc[] = [
         "required": false
       },
       {
+        "name": "children",
+        "type": "React.ReactNode",
+        "description": "A brand mark rendered in place of the core. Decorative: it sits inside the aria-hidden art, so a logo never becomes a second announcement on a wait that already has a label.",
+        "required": false
+      },
+      {
         "name": "delay",
         "type": "number | undefined",
         "description": "Wait this long before appearing, so a fast response never flashes a loader.",
@@ -135,6 +141,7 @@ export const CATALOG: ComponentDoc[] = [
         "default": "1"
       }
     ],
+    "extendsType": "LoaderCommonProps",
     "exports": [
       {
         "name": "BreathLoader",
@@ -149,6 +156,12 @@ export const CATALOG: ComponentDoc[] = [
             "name": "announce",
             "type": "import(\"/Users/rahulrajeevan/zowork/OxygenUI/.claude/worktrees/better-care-design-research-e11521/registry/oxygen/lib/loader\").LoaderAnnounce | undefined",
             "description": "Live-region politeness while indeterminate.",
+            "required": false
+          },
+          {
+            "name": "children",
+            "type": "React.ReactNode",
+            "description": "A brand mark rendered in place of the core. Decorative: it sits inside the aria-hidden art, so a logo never becomes a second announcement on a wait that already has a label.",
             "required": false
           },
           {
@@ -242,7 +255,8 @@ export const CATALOG: ComponentDoc[] = [
             "required": false,
             "default": "1"
           }
-        ]
+        ],
+        "extendsType": "LoaderCommonProps"
       }
     ],
     "usage": "import { BreathLoader } from \"@/components/oxygen/breath-loader\";\n\n// Patient-facing page wait\n<BreathLoader mode=\"page\" label=\"Loading your information\" />\n\n// Slower still, for a long wait\n<BreathLoader speed={0.7} label=\"Preparing your summary\" hint=\"This can take a few seconds.\" />",

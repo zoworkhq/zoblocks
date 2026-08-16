@@ -1,6 +1,8 @@
 # 0005 — Tokens are built from a DTCG source across brand × theme × density
 
-**Status:** proposed · 6 August 2026
+**Status:** accepted · 6 August 2026
+
+> **Ratified 16 August 2026.** Three tiers, three themes, three densities, all validated. The contrast gate now covers every composed pair and has its own tests. The brand axis remains unimplemented — tracked as follow-up, not a blocker to accepting the tier model.
 
 ## Context
 

@@ -61,8 +61,8 @@ jobs:
       - name: Audit dependencies
         run: pnpm audit --audit-level=high
 
-      - name: Generate
-        run: pnpm gen
+      - name: Generate and enforce the catalog quality gate
+        run: pnpm gen --strict
 
       - name: No stale generated files
         run: |

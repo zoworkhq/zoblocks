@@ -12,8 +12,14 @@ import { readdir } from "node:fs/promises";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 import { componentMetaSchema, type ComponentMeta } from "@oxygenui-design/component-meta";
-import { COMPONENTS_DIR, CONSUMER_COMPONENT_DIR, NON_COMPONENT_DIRS, ROOT, rel } from "./config";
-import { SUPPORT_ITEM_NAMES } from "./emit/registry";
+import {
+  COMPONENTS_DIR,
+  CONSUMER_COMPONENT_DIR,
+  NON_COMPONENT_DIRS,
+  ROOT,
+  SUPPORT_ITEM_NAMES,
+  rel,
+} from "./config";
 
 export interface LoadedComponent {
   meta: ComponentMeta;
@@ -119,12 +125,7 @@ export async function loadComponents(): Promise<LoadedComponent[]> {
       // Bare names refer to items in this registry; anything else is external.
       // Support items (utils, tokens, loader-core) are registry items without
       // component metadata, so they are named rather than discovered.
-      if (
-        !dep.includes("/") &&
-        !names.has(dep) &&
-        dep !== "tokens" &&
-        !SUPPORT_ITEM_NAMES.has(dep)
-      ) {
+      if (!dep.includes("/") && !names.has(dep) && !SUPPORT_ITEM_NAMES.has(dep)) {
         problems.push(
           `${component.meta.name}: registryDependency "${dep}" does not exist in this registry`,
         );

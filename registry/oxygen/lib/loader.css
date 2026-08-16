@@ -72,6 +72,24 @@
 .ox-loader__art {
   display: block;
   line-height: 0;
+  position: relative;
+}
+
+/* The brand-mark slot, centred over the art. Decorative by construction: it
+   sits inside the aria-hidden art wrapper, so a logo never becomes a second
+   announcement on a wait that already has a label. */
+.ox-loader__mark {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  line-height: 1;
+  pointer-events: none;
+}
+
+.ox-loader__mark > * {
+  max-width: 42%;
+  max-height: 42%;
 }
 
 .ox-loader__art > svg {

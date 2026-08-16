@@ -58,7 +58,9 @@ export const LOADER_CSS = `
 :host([mode="overlay"]:not([scrim="false"])),
 :host([mode="page"]:not([scrim="false"])) { background: var(--_scrim); }
 
-.art { display: block; line-height: 0; }
+.art { display: block; line-height: 0; position: relative; }
+.mark { position: absolute; inset: 0; display: grid; place-items: center; line-height: 1; pointer-events: none; }
+.mark ::slotted(*) { max-width: 42%; max-height: 42%; }
 svg { display: block; width: var(--_size); height: auto; overflow: visible; }
 
 .label { color: var(--ox-text, currentColor); font-weight: 500; }

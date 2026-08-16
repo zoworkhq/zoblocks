@@ -20,6 +20,17 @@ export const COMPONENTS_DIR = path.join(ROOT, "registry", "oxygen");
 /** Directories under COMPONENTS_DIR that are not components. */
 export const NON_COMPONENT_DIRS = new Set(["lib"]);
 
+/**
+ * Registry items that exist without component metadata, and may therefore be
+ * named in a component's `registryDependencies`.
+ *
+ * Declared here rather than beside SUPPORT_ITEMS in emit/registry.ts: `load.ts`
+ * needs the names to validate dependencies, and importing them from the emitter
+ * made load → emit/registry → load a cycle. config.ts imports nothing from the
+ * generator, so it is the one place both sides can reach without one.
+ */
+export const SUPPORT_ITEM_NAMES: ReadonlySet<string> = new Set(["utils", "tokens", "loader-core"]);
+
 /** Prefix the shadcn CLI writes component files under, inside the consumer's project. */
 export const CONSUMER_COMPONENT_DIR = "components/oxygen";
 

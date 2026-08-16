@@ -1,7 +1,9 @@
 # 0002 — npm is the source of truth; the registry is generated from it
 
-**Status:** proposed · 6 August 2026
-**Supersedes part of:** the distribution assumption implicit in [0001](0001-fhir-typed-props.md)
+**Status:** accepted · 6 August 2026
+
+> **Ratified 16 August 2026.** Both channels ship and are generated from one source (scripts/gen/emit/react-package.ts). The upgrade channel this ADR called for exists as @oxygenui-design/react.
+> **Supersedes part of:** the distribution assumption implicit in [0001](0001-fhir-typed-props.md)
 
 ## Context
 

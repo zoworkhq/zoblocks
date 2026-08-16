@@ -1,6 +1,8 @@
 # 0006 — Stability tiers gate the export path; deprecation is a sequence
 
-**Status:** proposed · 6 August 2026
+**Status:** accepted · 6 August 2026
+
+> **Ratified 16 August 2026.** Stability tiers drive the catalog quality gate, which is armed: `pnpm gen --strict` runs in CI and in the release workflow.
 
 ## Context
 

@@ -132,6 +132,7 @@ export default tseslint.config(
     files: [
       "scripts/**/*.ts",
       "*.config.{mjs,ts}",
+      ".dependency-cruiser.cjs",
       "packages/eslint-plugin/**/*.js",
       // Per-package tooling: the fhir publish guard and dist rewriter, the hq
       // dev seed and its drizzle config. Same job, same environment.
@@ -141,6 +142,7 @@ export default tseslint.config(
     ],
     languageOptions: {
       globals: { ...globals.node },
+      sourceType: "commonjs",
     },
     rules: {
       "no-console": "off",

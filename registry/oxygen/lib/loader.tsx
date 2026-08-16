@@ -290,6 +290,8 @@ export interface LoaderFrameProps extends Omit<LoaderCommonProps, "size" | "spee
   vars?: LoaderVars;
   /** Identifies the loader in the DOM for tests and styling hooks. */
   variant: string;
+  /** Optional brand mark, centred over the art and decorative like it. */
+  mark?: React.ReactNode;
 }
 
 /**
@@ -310,6 +312,7 @@ export function LoaderFrame({
   art,
   vars,
   variant,
+  mark,
   mode = "inline",
   label = "Loading",
   showLabel,
@@ -358,6 +361,7 @@ export function LoaderFrame({
     >
       <div className="ox-loader__art" aria-hidden="true">
         {art}
+        {mark ? <span className="ox-loader__mark">{mark}</span> : null}
       </div>
 
       <span id={labelId} className={withLabel ? "ox-loader__label" : "ox-loader__sr"}>

@@ -1,6 +1,8 @@
 # 0003 — Domain-scoped packages, not one package per component
 
-**Status:** proposed · 6 August 2026
+**Status:** accepted · 6 August 2026
+
+> **Ratified 16 August 2026.** Package topology is in place: tokens, fhir, intl, react, loaders, plus the private build packages. The layer rule is enforced by .dependency-cruiser.cjs rather than documented.
 
 ## Context
 

@@ -26,9 +26,17 @@ import {
   type LoaderCommonProps,
 } from "@/lib/oxygen-loader";
 
-export type BreathLoaderProps = LoaderCommonProps;
+export interface BreathLoaderProps extends LoaderCommonProps {
+  /**
+   * A brand mark rendered in place of the core.
+   *
+   * Decorative: it sits inside the aria-hidden art, so a logo never becomes a
+   * second announcement on a wait that already has a label.
+   */
+  children?: React.ReactNode;
+}
 
-export function BreathLoader({ speed = 1, size, ...props }: BreathLoaderProps) {
+export function BreathLoader({ speed = 1, size, children, ...props }: BreathLoaderProps) {
   const px = resolveLoaderSize(size, "lg");
 
   return (
@@ -46,9 +54,14 @@ export function BreathLoader({ speed = 1, size, ...props }: BreathLoaderProps) {
           <circle className="ox-loader__stroke ox-loader__ring" cx="60" cy="60" r="54" />
           <circle className="ox-loader__stroke ox-loader__ring" cx="60" cy="60" r="54" />
           <circle className="ox-loader__stroke ox-loader__ring" cx="60" cy="60" r="54" />
-          <circle className="ox-loader__fill ox-loader__core" cx="60" cy="60" r="11" />
+          {/* The core is the slot: a supplied mark replaces it rather than
+              sitting behind it. */}
+          {children ? null : (
+            <circle className="ox-loader__fill ox-loader__core" cx="60" cy="60" r="11" />
+          )}
         </svg>
       }
+      mark={children}
     />
   );
 }

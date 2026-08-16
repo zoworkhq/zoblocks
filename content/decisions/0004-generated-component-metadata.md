@@ -1,6 +1,8 @@
 # 0004 — Component metadata is colocated and everything shared is generated
 
-**Status:** proposed · 6 August 2026
+**Status:** accepted · 6 August 2026
+
+> **Ratified 16 August 2026.** Implemented and load-bearing. Adding a component touches one directory; `pnpm gen --check` fails CI on drift; props are extracted from types rather than restated.
 
 ## Context
 
