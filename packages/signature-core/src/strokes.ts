@@ -279,12 +279,16 @@ export function summariseBiometrics(strokes: readonly Stroke[]): BiometricSummar
   let pressureSum = 0;
   let pressureCount = 0;
   const pauses: number[] = [];
+  const tilts: number[] = [];
 
   strokes.forEach((stroke, index) => {
     for (const s of speeds(stroke.points)) all.push(s);
     for (const p of stroke.points) {
       pressureSum += p.pressure;
       pressureCount += 1;
+      // Only points that carried a reading. Averaging in a zero for every
+      // mouse sample would drag a real pen's mean towards upright.
+      if (p.tiltX !== undefined) tilts.push(p.tiltX);
     }
     if (index > 0) {
       const prev = strokes[index - 1];
@@ -301,5 +305,11 @@ export function summariseBiometrics(strokes: readonly Stroke[]): BiometricSummar
     peakSpeed: round(all.length ? Math.max(...all) : 0),
     meanPressure: round(pressureCount ? pressureSum / pressureCount : 0),
     pauseMs: pauses.map((p) => Math.round(p)),
+    ...(tilts.length
+      ? {
+          meanTilt: round(mean(tilts)),
+          tiltRange: round(Math.max(...tilts) - Math.min(...tilts)),
+        }
+      : {}),
   };
 }

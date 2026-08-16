@@ -468,3 +468,66 @@ describe("export determinism", () => {
     expect(toSVG(pad.strokes)).toContain('aria-hidden="true"');
   });
 });
+
+describe("pen tilt", () => {
+  /*
+   * Brief item 4 names the point shape as
+   * `{x, y, t, pressure, tiltX, tiltY, pointerType}`. Tilt is the half most
+   * easily lost, because most hardware does not report it and the tempting
+   * fix — defaulting to zero — is wrong in a way that only shows up in a
+   * forensic comparison years later.
+   */
+  it("records the angle a stylus reports", () => {
+    const capture = new SignatureCapture();
+    capture.down({ x: 10, y: 10, t: 0, pointerType: "pen", tiltX: 12, tiltY: -34 });
+    capture.move({ x: 40, y: 30, t: 16, pointerType: "pen", tiltX: 14, tiltY: -30 });
+    capture.up({ x: 60, y: 40, t: 32, pointerType: "pen", tiltX: 15, tiltY: -28 });
+
+    const points = capture.snapshot().strokes[0]?.points ?? [];
+    expect(points[0]?.tiltX).toBe(12);
+    expect(points[0]?.tiltY).toBe(-34);
+    expect(points.at(-1)?.tiltX).toBe(15);
+  });
+
+  it("omits tilt rather than inventing an upright pen", () => {
+    // Zero is a real reading — a stylus held perpendicular — so a device that
+    // reports nothing must produce `undefined`, not 0. A record that cannot
+    // tell "vertical" from "unknown" is worse than one that omits the field.
+    const capture = new SignatureCapture();
+    capture.down({ x: 10, y: 10, t: 0, pointerType: "mouse" });
+    capture.up({ x: 60, y: 40, t: 32, pointerType: "mouse" });
+
+    const point = capture.snapshot().strokes[0]?.points[0];
+    expect(point).toBeDefined();
+    expect(point && "tiltX" in point).toBe(false);
+    expect(point?.tiltX).toBeUndefined();
+  });
+
+  it("keeps a reported zero, which is a vertical pen", () => {
+    const capture = new SignatureCapture();
+    capture.down({ x: 10, y: 10, t: 0, pointerType: "pen", tiltX: 0, tiltY: 0 });
+    capture.up({ x: 60, y: 40, t: 32, pointerType: "pen", tiltX: 0, tiltY: 0 });
+
+    expect(capture.snapshot().strokes[0]?.points[0]?.tiltX).toBe(0);
+  });
+
+  it("clamps to the range Pointer Events defines", () => {
+    // −90..90. A driver reporting outside it should not put an impossible
+    // angle into a record that may be read as evidence.
+    const capture = new SignatureCapture();
+    capture.down({ x: 10, y: 10, t: 0, pointerType: "pen", tiltX: 400, tiltY: -400 });
+    capture.up({ x: 60, y: 40, t: 32, pointerType: "pen" });
+
+    const point = capture.snapshot().strokes[0]?.points[0];
+    expect(point?.tiltX).toBe(90);
+    expect(point?.tiltY).toBe(-90);
+  });
+
+  it("ignores a NaN rather than storing it", () => {
+    const capture = new SignatureCapture();
+    capture.down({ x: 10, y: 10, t: 0, pointerType: "pen", tiltX: Number.NaN });
+    capture.up({ x: 60, y: 40, t: 32, pointerType: "pen" });
+
+    expect(capture.snapshot().strokes[0]?.points[0]?.tiltX).toBeUndefined();
+  });
+});

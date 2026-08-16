@@ -221,12 +221,15 @@ describe("undo, redo and clear", () => {
     const { container } = render(<SignaturePad onChange={onChange} />);
     draw(surfaceOf(container), SIGNATURE);
 
-    const clear = screen.getByRole("button", { name: /clear/i });
-    expect(clear).toBeEnabled();
-    await user.click(clear);
+    expect(screen.getByRole("button", { name: /clear/i })).toBeEnabled();
+    await user.click(screen.getByRole("button", { name: /clear/i }));
+    // Clearing a real signature is confirmed first — see the dedicated block
+    // below for why, and for the case where it is not asked.
+    await user.click(screen.getByRole("button", { name: /^erase$/i }));
 
     expect(onChange.mock.calls.at(-1)?.[0]).toHaveLength(0);
-    expect(clear).toBeDisabled();
+    // Re-queried: the button was unmounted while the question stood.
+    expect(screen.getByRole("button", { name: /clear/i })).toBeDisabled();
   });
 
   it("announces what happened, because nothing else does", async () => {
@@ -238,6 +241,7 @@ describe("undo, redo and clear", () => {
     await waitFor(() => expect(live).toHaveTextContent(/captured, 1 stroke/i));
 
     fireEvent.click(screen.getByRole("button", { name: /clear/i }));
+    fireEvent.click(screen.getByRole("button", { name: /^erase$/i }));
     await waitFor(() => expect(live).toHaveTextContent(/cleared/i));
   });
 
@@ -1230,5 +1234,163 @@ describe("uploading a photographed signature", () => {
     expect(xhr).not.toHaveBeenCalled();
     fetchSpy.mockRestore();
     xhr.mockRestore();
+  });
+});
+
+/* ------------------------------------------------------------------ */
+
+/**
+ * Clear, which is the one toolbar control whose mistake cannot be undone.
+ *
+ * Undo is per-stroke; Clear is not. It sits beside two controls that are
+ * reversible, which is exactly what makes hitting it by accident easy and
+ * expensive — a completed signature, gone, with the person who wrote it
+ * already putting the stylus down.
+ */
+describe("clearing asks first, but only when it matters", () => {
+  it("clears an accidental dot immediately", async () => {
+    // A confirmation that fires on nothing is one people learn to dismiss
+    // without reading — the habit that later loses the real signature.
+    const user = userEvent.setup();
+    const { container } = render(<SignaturePad />);
+    draw(surfaceOf(container), [
+      [40, 100],
+      [42, 101],
+    ]);
+
+    await user.click(screen.getByRole("button", { name: /clear/i }));
+
+    expect(screen.queryByText(/erase this signature/i)).not.toBeInTheDocument();
+    expect(container.querySelector(".ox-signature__ink")?.innerHTML).not.toContain("<path");
+  });
+
+  it("asks before erasing a real signature", async () => {
+    const user = userEvent.setup();
+    const { container } = render(<SignaturePad />);
+    draw(surfaceOf(container), SIGNATURE);
+
+    await user.click(screen.getByRole("button", { name: /clear/i }));
+
+    expect(screen.getByText(/erase this signature/i)).toBeInTheDocument();
+    // Still there — asking is not doing.
+    expect(container.querySelector(".ox-signature__ink")?.innerHTML).toContain("<path");
+  });
+
+  it("erases when the erase is confirmed", async () => {
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    const { container } = render(<SignaturePad onChange={onChange} />);
+    draw(surfaceOf(container), SIGNATURE);
+
+    await user.click(screen.getByRole("button", { name: /clear/i }));
+    await user.click(screen.getByRole("button", { name: /^erase$/i }));
+
+    expect(onChange.mock.calls.at(-1)?.[0]).toHaveLength(0);
+    expect(container.querySelector(".ox-signature__ink")?.innerHTML).not.toContain("<path");
+  });
+
+  it("keeps the signature when the question is declined", async () => {
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    const { container } = render(<SignaturePad onChange={onChange} />);
+    draw(surfaceOf(container), SIGNATURE);
+    const strokesBefore = onChange.mock.calls.at(-1)?.[0];
+
+    await user.click(screen.getByRole("button", { name: /clear/i }));
+    await user.click(screen.getByRole("button", { name: /cancel/i }));
+
+    expect(onChange.mock.calls.at(-1)?.[0]).toEqual(strokesBefore);
+    expect(screen.getByRole("button", { name: /clear/i })).toBeInTheDocument();
+    expect(container.querySelector(".ox-signature__ink")?.innerHTML).toContain("<path");
+  });
+
+  it("moves focus to the question, not away from it", async () => {
+    // The button that was under the pointer has just been replaced by two
+    // others. Leaving focus where it was strands a keyboard user on nothing.
+    const user = userEvent.setup();
+    const { container } = render(<SignaturePad />);
+    draw(surfaceOf(container), SIGNATURE);
+
+    await user.click(screen.getByRole("button", { name: /clear/i }));
+    expect(screen.getByRole("button", { name: /^erase$/i })).toHaveFocus();
+  });
+
+  it("names the question for assistive technology", async () => {
+    const user = userEvent.setup();
+    const { container } = render(<SignaturePad />);
+    draw(surfaceOf(container), SIGNATURE);
+    await user.click(screen.getByRole("button", { name: /clear/i }));
+
+    expect(screen.getByRole("group", { name: /erase this signature/i })).toBeInTheDocument();
+  });
+
+  it("withdraws the question if the pad empties another way", async () => {
+    // Undo can empty the pad while the confirmation is open, which would
+    // otherwise leave a question about a signature that is no longer there.
+    const user = userEvent.setup();
+    const { container } = render(<SignaturePad />);
+    draw(surfaceOf(container), SIGNATURE);
+
+    await user.click(screen.getByRole("button", { name: /clear/i }));
+    expect(screen.getByText(/erase this signature/i)).toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: /undo/i }));
+    expect(screen.queryByText(/erase this signature/i)).not.toBeInTheDocument();
+  });
+});
+
+/* ------------------------------------------------------------------ */
+
+describe("the kiosk case", () => {
+  it("empties the engine when the pad leaves the screen", () => {
+    /*
+     * A bedside or waiting-room terminal moves from one patient to the next.
+     * React drops this component's state on unmount, but the capture engine is
+     * a ref — a mutable object that outlives the render — so a host holding
+     * the headless hook across a route change could still be carrying the
+     * previous patient's strokes.
+     *
+     * Asserted through a re-mount rather than by reaching into internals: the
+     * second pad must come up empty.
+     */
+    const onChange = vi.fn();
+    const first = render(<SignaturePad onChange={onChange} />);
+    draw(surfaceOf(first.container), SIGNATURE);
+    expect(onChange.mock.calls.at(-1)?.[0]).toHaveLength(1);
+
+    first.unmount();
+
+    const second = render(<SignaturePad onChange={onChange} />);
+    expect(second.container.querySelector(".ox-signature__ink")?.innerHTML).not.toContain("<path");
+    expect(screen.getByRole("button", { name: /clear/i })).toBeDisabled();
+  });
+});
+
+/* ------------------------------------------------------------------ */
+
+describe("the initials variant", () => {
+  it("is a smaller box and nothing else", () => {
+    // Brief item 17. Initials are a signature with fewer letters — same model,
+    // same evidence — so only the frame changes.
+    const { container } = render(<SignaturePad variant="initials" />);
+    expect(container.querySelector(".ox-signature--initials")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /undo/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /clear/i })).toBeInTheDocument();
+  });
+
+  it("captures the same stroke model a full signature does", () => {
+    const onChange = vi.fn();
+    const { container } = render(<SignaturePad variant="initials" onChange={onChange} />);
+    draw(surfaceOf(container), SIGNATURE);
+
+    const strokes = onChange.mock.calls.at(-1)?.[0];
+    expect(strokes).toHaveLength(1);
+    expect(strokes[0].points.length).toBeGreaterThan(2);
+  });
+
+  it("takes an explicit height over the variant default", () => {
+    const { container } = render(<SignaturePad variant="initials" height={64} />);
+    const surface = container.querySelector<HTMLElement>(".ox-signature__surface");
+    expect(surface?.style.height).toBe("64px");
   });
 });

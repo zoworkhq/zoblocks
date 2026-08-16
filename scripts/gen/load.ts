@@ -35,6 +35,15 @@ export interface LoadedComponent {
   sourceFile: string;
   /** Repo-relative path to the implementation file. Empty for a package component. */
   sourcePath: string;
+  /**
+   * The file whose exported types document the public API.
+   *
+   * The same as `sourceFile` for a registry component. A package component has
+   * no registry source but still has props — and props are most of what the
+   * docs page is *for*, so reading them from the package is the difference
+   * between a props table and an empty one with three headings.
+   */
+  propsFile: string;
   /** Import specifier a consumer uses after installing, e.g. "@/components/oxygen/vitals-panel". */
   consumerSpecifier: string;
   /** Where the shadcn CLI writes it, e.g. "components/oxygen/vitals-panel.tsx". */
@@ -130,6 +139,8 @@ export async function loadComponents(): Promise<LoadedComponent[]> {
       dir,
       sourceFile,
       sourcePath: path.relative(ROOT, sourceFile),
+      // One and the same for a registry component: the file is the API.
+      propsFile: sourceFile,
       consumerSpecifier: `@/${CONSUMER_COMPONENT_DIR}/${name}`,
       consumerTarget: `${CONSUMER_COMPONENT_DIR}/${name}.tsx`,
       hasStory: existsSync(path.join(dir, `${name}.stories.tsx`)),
@@ -171,12 +182,34 @@ export async function loadComponents(): Promise<LoadedComponent[]> {
       continue;
     }
 
+    /*
+     * Where this package declares its public component.
+     *
+     * `<title>.tsx` is the convention across this workspace — `Signature` in
+     * `Signature.tsx`. The barrel is not usable for extraction: it re-exports,
+     * so its statements are export declarations rather than the interface the
+     * props live on, and reading it yields nothing at all.
+     */
+    const propsFile =
+      [
+        path.join(dir, "src", `${parsed.data.title}.tsx`),
+        path.join(dir, "src", `${parsed.data.name}.tsx`),
+      ].find(existsSync) ?? "";
+
+    if (!propsFile) {
+      problems.push(
+        `${rel(metaFile)}: no props source found — expected src/${parsed.data.title}.tsx, so the docs page would render an empty props table`,
+      );
+      continue;
+    }
+
     loaded.push({
       meta: parsed.data,
       dir,
       // No registry source: nothing here is copied into a consumer's project.
       sourceFile: "",
       sourcePath: "",
+      propsFile,
       consumerSpecifier: parsed.data.packageName ?? "",
       consumerTarget: "",
       hasStory: existsSync(path.join(dir, "src", `${parsed.data.name}.stories.tsx`)),
