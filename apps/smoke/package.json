@@ -22,7 +22,7 @@
     "@angular/platform-browser-dynamic": "^22.1.2",
     "@sveltejs/vite-plugin-svelte": "^5.0.3",
     "@vitejs/plugin-react": "^4.3.4",
-    "@vitejs/plugin-vue": "^5.2.1",
+    "@vitejs/plugin-vue": "^6.0.8",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "rxjs": "^7.8.1",
