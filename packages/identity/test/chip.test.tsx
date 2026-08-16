@@ -165,10 +165,23 @@ describe("PatientChip — inside an IdentitySet", () => {
     const onDisambiguate = vi.fn();
     rows([F.amaraA, F.amaraB, F.ada, F.devraj, F.twinA, F.twinB], onDisambiguate);
     await waitFor(() => expect(onDisambiguate.mock.calls.length).toBeGreaterThan(0));
-    const settled = onDisambiguate.mock.calls.length;
-    await new Promise((r) => setTimeout(r, 60));
+
+    // Poll until the count stops moving, rather than sampling after a fixed
+    // window: on a slow CI runner a fixed wait can land mid-flight and fail for
+    // reasons that have nothing to do with convergence.
+    const countAfterQuietPeriod = async (): Promise<number> => {
+      for (let i = 0; i < 100; i++) {
+        const before = onDisambiguate.mock.calls.length;
+        await new Promise((r) => setTimeout(r, 20));
+        if (onDisambiguate.mock.calls.length === before) return before;
+      }
+      throw new Error("IdentitySet never stopped re-rendering");
+    };
+
     // Identity objects are memoised by the resolution cache, so registration is
-    // reference-stable and the set converges.
+    // reference-stable and the set converges to a fixed point.
+    const settled = await countAfterQuietPeriod();
+    await new Promise((r) => setTimeout(r, 50));
     expect(onDisambiguate.mock.calls.length).toBe(settled);
   });
 

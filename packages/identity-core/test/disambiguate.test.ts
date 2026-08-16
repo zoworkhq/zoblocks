@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { MAX_COLLISION_PEERS, disambiguate, disambiguationNotice } from "../src/disambiguate.js";
 import { policy, resolveIdentity } from "../src/resolve.js";
 import type { Identity } from "../src/types.js";
@@ -137,6 +137,56 @@ describe("disambiguate", () => {
   });
 });
 
+/**
+ * Counts `fold()` calls without putting instrumentation in shipped code.
+ */
+const foldCalls = { n: 0 };
+vi.mock("../src/text.js", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("../src/text.js")>();
+  return {
+    ...actual,
+    fold: (input: string): string => {
+      foldCalls.n++;
+      return actual.fold(input);
+    },
+  };
+});
+
+const FAMILIES = [
+  "Okonkwo",
+  "Iyer",
+  "Yusuf",
+  "Mensah",
+  "Ramirez",
+  "Chen",
+  "Lindqvist",
+  "Haddad",
+  "Berg",
+  "Kulkarni",
+  "Adeyemi",
+  "Novak",
+  "Ferreira",
+  "Nguyen",
+  "Meer",
+  "Tashkandi",
+];
+
+function makeSet(n: number, prefix: string): Identity[] {
+  const set: Identity[] = [];
+  for (let i = 0; i < n; i++) {
+    set.push(
+      id(
+        `pat-${prefix}-${i}`,
+        [`Given${i % 37}`],
+        FAMILIES[i % FAMILIES.length],
+        `19${80 + (i % 10)}-03-${String((i % 28) + 1).padStart(2, "0")}`,
+        String(300000000 + i),
+      ),
+    );
+  }
+  return set;
+}
+
 describe("disambiguate — the property that matters", () => {
   /**
    * After the pass, every escalated identity must be separable from the ones it
@@ -224,71 +274,40 @@ describe("disambiguate — the property that matters", () => {
   });
 
   /**
-   * A scaling assertion rather than a wall clock.
+   * Counted work, not elapsed time.
    *
-   * A wall clock is hardware-dependent and roughly doubles under coverage
-   * instrumentation, which makes it exactly the kind of test a team learns to
-   * ignore — the failure mode ARCHITECTURE §7 warns about for visual
-   * regression, applied to performance. What actually matters is the shape of
-   * the curve: the pair loop is O(n^2), so tripling the input should cost
-   * about nine times as much. If someone reintroduces per-pair folding or an
-   * array-concat merge, the inner term stops being constant and this ratio
-   * blows out regardless of how fast the machine is.
+   * This started as a wall-clock ratio and failed on a shared CI runner, which
+   * is the whole problem with timing assertions: a noisy neighbour, a throttled
+   * core or coverage instrumentation each move the number more than a real
+   * regression would. A test that fails for reasons unrelated to the code is
+   * one the team learns to re-run rather than read.
+   *
+   * So count the thing that actually went wrong instead. `fold()` normalises,
+   * strips marks and runs four regex passes; the first version of this file
+   * called it inside the O(n^2) pair loop, which is what made a 300-row
+   * worklist take half a second. Called once per identity during `prepare`, its
+   * call count is linear. If it ever creeps back inside the loop the count goes
+   * quadratic, and that is deterministic on any machine.
    */
-  function timeDisambiguate(n: number): number {
-    const fam = [
-      "Okonkwo",
-      "Iyer",
-      "Yusuf",
-      "Mensah",
-      "Ramirez",
-      "Chen",
-      "Lindqvist",
-      "Haddad",
-      "Berg",
-      "Kulkarni",
-      "Adeyemi",
-      "Novak",
-      "Ferreira",
-      "Nguyen",
-      "Meer",
-      "Tashkandi",
-    ];
-    const set: Identity[] = [];
-    for (let i = 0; i < n; i++) {
-      set.push(
-        id(
-          `pat-t${n}-${i}`,
-          [`Given${i % 37}`],
-          fam[i % fam.length],
-          `19${80 + (i % 10)}-03-${String((i % 28) + 1).padStart(2, "0")}`,
-          String(300000000 + i),
-        ),
-      );
-    }
-    disambiguate(set); // warm up, so JIT state is not part of the measurement
-    // Median of three. A single sample at these sizes is dominated by whatever
-    // else the machine was doing, and a flaky performance test is worse than no
-    // performance test — the team stops reading it.
-    const runs: number[] = [];
-    for (let i = 0; i < 3; i++) {
-      const t0 = performance.now();
-      disambiguate(set);
-      runs.push(performance.now() - t0);
-    }
-    runs.sort((a, b) => a - b);
-    return runs[1] as number;
-  }
+  it("folds once per identity, not once per comparison", () => {
+    const measure = (n: number): { folds: number; pairs: number } => {
+      foldCalls.n = 0;
+      disambiguate(makeSet(n, `f${n}`));
+      return { folds: foldCalls.n, pairs: (n * (n - 1)) / 2 };
+    };
 
-  it("scales quadratically, not worse — the inner comparison stays constant", () => {
-    // 150 and 450 rather than 100 and 300: at a hundred rows the whole pass is
-    // under a millisecond, and a ratio computed from sub-millisecond samples
-    // measures the clock rather than the algorithm.
-    const small = Math.max(timeDisambiguate(150), 0.5);
-    const large = timeDisambiguate(450);
-    // 3x the rows is 9x the pairs. Allow 3x headroom for noise; a regression
-    // that puts real work back inside the loop lands far above it.
-    expect(large / small).toBeLessThan(27);
+    const small = measure(20);
+    const large = measure(100);
+
+    // `prepare` folds three times per identity: family, full name, given names.
+    expect(small.folds).toBeLessThanOrEqual(20 * 4);
+    expect(large.folds).toBeLessThanOrEqual(100 * 4);
+
+    // Five times the rows, about five times the folds — not twenty-five times.
+    expect(large.folds / small.folds).toBeLessThan(8);
+
+    // And emphatically fewer folds than there are pairs to compare.
+    expect(large.folds).toBeLessThan(large.pairs);
   });
 
   it("survives a degenerate set where everything collides", () => {
@@ -301,7 +320,10 @@ describe("disambiguate — the property that matters", () => {
     }
     const t0 = performance.now();
     const r = disambiguate(set);
-    expect(performance.now() - t0).toBeLessThan(400);
+    // A deliberately loose ceiling. This is a catastrophe guard — an accidental
+    // exponential, or a hang — not a performance assertion, because a tight
+    // wall clock on shared CI hardware measures the runner rather than the code.
+    expect(performance.now() - t0).toBeLessThan(5000);
     expect(r.escalated).toBe(300);
     for (const plan of r.plan.values()) {
       expect(plan.add).toContain("identifier");
