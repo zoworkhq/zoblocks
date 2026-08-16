@@ -11,7 +11,7 @@ template layer, which unit tests in jsdom never touch:
 | React 19   | React 19 sets a **property** when one exists on the element and an attribute otherwise. A getter-only property would silently no-op.  |
 | React 18   | React 18 sets everything as an **attribute**, stringified: `open={false}` becomes `open="false"`. Presence-style booleans break here. |
 | Vue        | Vue's compiler treats an unknown hyphenated tag as a component and warns, unless `isCustomElement` is configured.                     |
-| Angular    | Angular's template compiler **errors** (NG0304) on an unknown element without `CUSTOM_ELEMENTS_SCHEMA`.                               |
+| Angular 22 | Angular's template compiler **errors** (NG0304) on an unknown element without `CUSTOM_ELEMENTS_SCHEMA`.                               |
 | Svelte     | Svelte's compiler is permissive, but its attribute update path differs for `null`/`undefined`/`false`.                                |
 
 Each page is the same tiny application, so one Playwright spec

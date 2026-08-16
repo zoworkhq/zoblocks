@@ -67,7 +67,7 @@ Angular, for three different reasons.
 | Plain HTML | —              | none                                      |
 | React      | 18.3 and 19.2  | none                                      |
 | Vue        | 3.5            | one `isCustomElement` line                |
-| Angular    | 19.2           | `CUSTOM_ELEMENTS_SCHEMA` on the component |
+| Angular    | 22.1           | `CUSTOM_ELEMENTS_SCHEMA` on the component |
 | Svelte     | 5.19           | none                                      |
 
 ### Vue 3 / Nuxt
