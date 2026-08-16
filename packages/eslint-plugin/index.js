@@ -14,6 +14,7 @@ import noForbiddenCapability from "./rules/no-forbidden-capability.js";
 import noPrimitiveToken from "./rules/no-primitive-token.js";
 import preferLogicalProperties from "./rules/prefer-logical-properties.js";
 import signatureRequiresTypedPath from "./rules/signature-requires-typed-path.js";
+import tabsSemanticMode from "./rules/tabs-semantic-mode.js";
 
 const plugin = {
   meta: { name: "@oxygenui/eslint-plugin", version: "0.1.0" },
@@ -25,6 +26,7 @@ const plugin = {
     "no-primitive-token": noPrimitiveToken,
     "prefer-logical-properties": preferLogicalProperties,
     "signature-requires-typed-path": signatureRequiresTypedPath,
+    "tabs-semantic-mode": tabsSemanticMode,
   },
 };
 
@@ -43,6 +45,10 @@ plugin.configs = {
       // An error, not a warning: a draw-only signature control is a WCAG
       // Level A failure that renders perfectly and passes every other test.
       "@oxygenui/signature-requires-typed-path": "error",
+      // An error for the same reason: a tablist of links renders perfectly,
+      // passes every automated checker, and destroys a keyboard user's focus
+      // the first time they press an arrow key.
+      "@oxygenui/tabs-semantic-mode": "error",
       // Warn rather than error while the existing catalog is converted. Becomes
       // an error in Phase 1; see ADR 0008.
       "@oxygenui/prefer-logical-properties": "warn",
