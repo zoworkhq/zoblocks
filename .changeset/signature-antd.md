@@ -1,7 +1,6 @@
 ---
 "@oxygenui-design/signature": minor
 "@oxygenui-design/signature-core": minor
-"@oxygenui-design/eslint-plugin": minor
 ---
 
 New package: `@oxygenui-design/signature`, healthcare signature capture for Ant
