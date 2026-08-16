@@ -258,8 +258,9 @@ describe("re-entrant requests", () => {
     // instead" — is a real pattern, and the first request must not land after
     // the second has already committed.
     const commits: string[] = [];
-    let gate: ReturnType<typeof createChangeGate>;
-    gate = createChangeGate({
+    // `const`, even though the callback below references it: the arrow captures
+    // the binding, and it does not run until after initialisation completes.
+    const gate: ReturnType<typeof createChangeGate> = createChangeGate({
       onBeforeChange: (next) => {
         if (next === "b") void gate.request("c", "programmatic");
         return true;

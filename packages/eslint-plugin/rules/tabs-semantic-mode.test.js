@@ -26,6 +26,21 @@ const ruleTester = new RuleTester({
 
 ruleTester.run("tabs-semantic-mode", tabsSemanticMode, {
   valid: [
+    // antd's Tabs is a different component that happens to share the name and
+    // has no `as` prop. Demanding one would forward an unknown property to the
+    // DOM, and a rule that flags code which cannot comply gets disabled
+    // wholesale — after which it protects nothing.
+    {
+      code: `import { Tabs } from "antd";\nconst a = <Tabs items={items} />;`,
+    },
+    {
+      code: `import { Modal, Tabs } from "antd";\nconst a = <Tabs activeKey={k} onChange={f} />;`,
+    },
+    // A relative or @/ import is ours, and still has to declare itself — the
+    // registry copies components in under those specifiers.
+    {
+      code: `import { Tabs } from "./tabs";\nconst a = <Tabs as="tabs" items={items} />;`,
+    },
     // Every mode, spelled out.
     { code: 'const a = <Tabs as="tabs" items={items} />;' },
     { code: 'const a = <Tabs as="radiogroup" items={items} />;' },
