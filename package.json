@@ -59,7 +59,7 @@
     "@playwright/test": "^1.62.1",
     "@size-limit/preset-small-lib": "^13.0.3",
     "@testing-library/dom": "^10",
-    "@testing-library/jest-dom": "^6",
+    "@testing-library/jest-dom": "^7",
     "@testing-library/react": "^16",
     "@testing-library/user-event": "^14",
     "@types/node": "^22.10.2",

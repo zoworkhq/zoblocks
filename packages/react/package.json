@@ -76,7 +76,7 @@
   },
   "devDependencies": {
     "@oxygenui-design/tsconfig": "workspace:*",
-    "@testing-library/jest-dom": "^6",
+    "@testing-library/jest-dom": "^7",
     "@testing-library/react": "^16",
     "@types/react": "^19.0.2",
     "jsdom": "^25",

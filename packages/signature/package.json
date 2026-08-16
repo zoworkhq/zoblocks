@@ -71,7 +71,7 @@
     "@oxygenui-design/component-meta": "workspace:*",
     "@oxygenui-design/tsconfig": "workspace:*",
     "@testing-library/dom": "^10",
-    "@testing-library/jest-dom": "^6",
+    "@testing-library/jest-dom": "^7",
     "@testing-library/react": "^16",
     "@testing-library/user-event": "^14",
     "@types/react": "^19.0.2",
