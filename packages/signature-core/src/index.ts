@@ -26,7 +26,7 @@ export {
   type CaptureOptions,
   type CaptureSnapshot,
   type Sample,
-} from "./capture.js";
+} from "./capture";
 
 export {
   DEFAULT_INK_THRESHOLD,
@@ -42,7 +42,7 @@ export {
   type InkThreshold,
   type InkVerdict,
   type WidthOptions,
-} from "./strokes.js";
+} from "./strokes";
 
 export {
   DEFAULT_RENDER,
@@ -51,7 +51,7 @@ export {
   toPathMarkup,
   toSVG,
   type RenderOptions,
-} from "./export.js";
+} from "./export";
 
 export {
   OUTCOMES,
@@ -85,7 +85,7 @@ export {
   type UnableReason,
   type UnableValue,
   type VerbalValue,
-} from "./value.js";
+} from "./value";
 
 export {
   SIGNATURE_TYPE,
@@ -99,4 +99,4 @@ export {
   type FhirReference,
   type FhirSignature,
   type ToFhirOptions,
-} from "./fhir.js";
+} from "./fhir";

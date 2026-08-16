@@ -149,9 +149,15 @@ importers:
       '@oxygenui-design/fixtures':
         specifier: workspace:*
         version: link:../../packages/fixtures
+      '@oxygenui-design/signature':
+        specifier: workspace:*
+        version: link:../../packages/signature
       '@oxygenui-design/tokens':
         specifier: workspace:*
         version: link:../../packages/tokens
+      antd:
+        specifier: ^6.6.0
+        version: 6.6.0(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       clsx:
         specifier: ^2.1.1
         version: 2.1.1

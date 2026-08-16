@@ -19,7 +19,7 @@ import {
   readImageFile,
   renderTypedSignature,
   type SignatureValue,
-} from "../src/index.js";
+} from "../src/index";
 
 const NOW = "2026-08-16T14:36:02.000Z";
 
@@ -857,5 +857,126 @@ describe("SignatureInk", () => {
     const svg = container.querySelector("svg");
     expect(svg).toHaveAttribute("width", "120");
     expect(svg).toHaveAttribute("viewBox", "0 0 100 40");
+  });
+});
+
+describe("PNG export", () => {
+  /**
+   * The gap this closes: `Signature.data` in the FHIR mapping *is* the PNG, so
+   * before the rasteriser existed a drawn or typed signature produced a FHIR
+   * Signature element with no payload at all. Only an upload carried one,
+   * because an upload arrives as a bitmap already.
+   */
+  function stubRaster() {
+    const drawn: string[] = [];
+    vi.spyOn(HTMLCanvasElement.prototype, "getContext").mockReturnValue({
+      drawImage: () => drawn.push("drawn"),
+      fillRect: () => {},
+      set fillStyle(_v: string) {},
+    } as unknown as CanvasRenderingContext2D);
+    vi.spyOn(HTMLCanvasElement.prototype, "toDataURL").mockReturnValue(
+      "data:image/png;base64,UE5H",
+    );
+
+    const seen: string[] = [];
+    class StubImage {
+      onload: (() => void) | null = null;
+      onerror: (() => void) | null = null;
+      width = 200;
+      height = 80;
+      set src(value: string) {
+        seen.push(value);
+        queueMicrotask(() => this.onload?.());
+      }
+    }
+    vi.stubGlobal("Image", StubImage);
+    return { seen, drawn };
+  }
+
+  it("gives a drawn signature a PNG, so FHIR Signature.data is populated", async () => {
+    const { seen } = stubRaster();
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    render(<Signature now={NOW} onChange={onChange} signer={{ name: "Josh Randall" }} />);
+
+    await user.click(screen.getByRole("button", { name: /add signature/i }));
+    const dialog = await screen.findByRole("dialog");
+    draw(dialog.querySelector<HTMLElement>("[data-ox-signature-pad]")!, SIGNATURE);
+    await user.click(within(dialog).getByRole("button", { name: /sign and continue/i }));
+
+    await waitFor(() => expect(onChange).toHaveBeenCalled());
+    const value = onChange.mock.calls[0]?.[0] as SignatureValue;
+    expect(value.outcome === "signed" && value.ink.png).toBe("data:image/png;base64,UE5H");
+
+    // currentColor cannot resolve in a standalone raster; it must be
+    // substituted before serialising or the PNG comes out blank.
+    expect(seen[0]).toBeDefined();
+    expect(decodeURIComponent(seen[0]!)).not.toContain("currentColor");
+    expect(decodeURIComponent(seen[0]!)).toContain("#141414");
+  });
+
+  it("commits without a PNG rather than blocking when rasterising fails", async () => {
+    // A signature recorded without its raster is recoverable from the stroke
+    // model. A signature the person could not complete is not.
+    vi.spyOn(HTMLCanvasElement.prototype, "getContext").mockReturnValue(null);
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    render(<Signature now={NOW} onChange={onChange} signer={{ name: "Josh Randall" }} />);
+
+    await user.click(screen.getByRole("button", { name: /add signature/i }));
+    const dialog = await screen.findByRole("dialog");
+    draw(dialog.querySelector<HTMLElement>("[data-ox-signature-pad]")!, SIGNATURE);
+    await user.click(within(dialog).getByRole("button", { name: /sign and continue/i }));
+
+    await waitFor(() => expect(onChange).toHaveBeenCalled());
+    expect((onChange.mock.calls[0]?.[0] as SignatureValue).outcome).toBe("signed");
+  });
+
+  it("bakes the chosen ink colour into the raster", async () => {
+    const { seen } = stubRaster();
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    render(<Signature now={NOW} onChange={onChange} signer={{ name: "Josh Randall" }} />);
+
+    await user.click(screen.getByRole("button", { name: /add signature/i }));
+    const dialog = await screen.findByRole("dialog");
+    await user.click(within(dialog).getByRole("radio", { name: /blue/i }));
+    draw(dialog.querySelector<HTMLElement>("[data-ox-signature-pad]")!, SIGNATURE);
+    await user.click(within(dialog).getByRole("button", { name: /sign and continue/i }));
+
+    await waitFor(() => expect(onChange).toHaveBeenCalled());
+    expect(decodeURIComponent(seen[0]!)).toContain("#1d39c4");
+  });
+});
+
+describe("ink colour", () => {
+  it("names each colour rather than relying on the swatch", async () => {
+    // Two unlabelled dots are unusable by keyboard and invisible to a screen
+    // reader — and colour alone is never a control label here.
+    const user = userEvent.setup();
+    render(<Signature now={NOW} />);
+    await user.click(screen.getByRole("button", { name: /add signature/i }));
+    const dialog = await screen.findByRole("dialog");
+
+    const group = within(dialog).getByRole("radiogroup", { name: /ink/i });
+    expect(within(group).getByRole("radio", { name: /black/i })).toBeInTheDocument();
+    expect(within(group).getByRole("radio", { name: /blue/i })).toBeInTheDocument();
+  });
+
+  it("defaults to black and reports the selection", async () => {
+    const user = userEvent.setup();
+    render(<Signature now={NOW} />);
+    await user.click(screen.getByRole("button", { name: /add signature/i }));
+    const dialog = await screen.findByRole("dialog");
+
+    expect(within(dialog).getByRole("radio", { name: /black/i })).toHaveAttribute(
+      "aria-checked",
+      "true",
+    );
+    await user.click(within(dialog).getByRole("radio", { name: /blue/i }));
+    expect(within(dialog).getByRole("radio", { name: /blue/i })).toHaveAttribute(
+      "aria-checked",
+      "true",
+    );
   });
 });

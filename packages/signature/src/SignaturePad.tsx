@@ -31,8 +31,8 @@
 
 import * as React from "react";
 import { toInkPaths, type Stroke } from "@oxygenui-design/signature-core";
-import { useSignatureCapture, type UseSignatureCaptureOptions } from "./use-signature-capture.js";
-import { useLocale, type SignatureLocale } from "./locale.js";
+import { useSignatureCapture, type UseSignatureCaptureOptions } from "./use-signature-capture";
+import { useLocale, type SignatureLocale } from "./locale";
 
 export interface SignaturePadProps extends UseSignatureCaptureOptions {
   id?: string;

@@ -27,7 +27,7 @@ import {
   type SignatureValue,
   type SignedValue,
   type UnableValue,
-} from "../src/value.js";
+} from "../src/value";
 import {
   SIGNATURE_TYPE,
   SIGNATURE_TYPE_SYSTEM,
@@ -35,7 +35,7 @@ import {
   toFhirProvenance,
   toFhirSignature,
   withDetachedSignature,
-} from "../src/fhir.js";
+} from "../src/fhir";
 
 const ink: Ink = {
   strokes: [

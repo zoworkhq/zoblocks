@@ -23,7 +23,7 @@
 import * as React from "react";
 import { Alert, Button, Input, Modal, Radio, Select, Space } from "antd";
 import type { SignatureValue, Signer, UnableReason } from "@oxygenui-design/signature-core";
-import { useLocale, type SignatureLocale } from "./locale.js";
+import { useLocale, type SignatureLocale } from "./locale";
 
 type OutcomeKind = "declined" | "unable" | "verbal" | "on-paper";
 

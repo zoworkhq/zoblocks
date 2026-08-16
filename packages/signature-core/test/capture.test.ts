@@ -12,9 +12,9 @@
  */
 
 import { describe, expect, it } from "vitest";
-import { SignatureCapture, type Sample } from "../src/capture.js";
-import { assessInk, inkBounds, pathLength, speeds } from "../src/strokes.js";
-import { toSVG } from "../src/export.js";
+import { SignatureCapture, type Sample } from "../src/capture";
+import { assessInk, inkBounds, pathLength, speeds } from "../src/strokes";
+import { toSVG } from "../src/export";
 
 /* ------------------------------------------------------------------ */
 /* Fixtures                                                            */
