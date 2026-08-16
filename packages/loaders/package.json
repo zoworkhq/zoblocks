@@ -88,7 +88,7 @@
   },
   "devDependencies": {
     "@oxygenui-design/tsconfig": "workspace:*",
-    "jsdom": "^25",
+    "jsdom": "^30",
     "typescript": "^5.7.2",
     "vitest": "^3.2.7"
   }
