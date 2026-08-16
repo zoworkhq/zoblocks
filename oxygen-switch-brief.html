@@ -673,8 +673,9 @@
       <span class="pill">tier: free</span>
       <span class="pill">status target: experimental → beta</span>
       <span class="pill">antd-compatible API</span>
-      <span class="pill">no antd dependency (proposed)</span>
+      <span class="pill">no antd dependency</span>
       <span class="pill">5 appearances · 7 phases · 3 axes</span>
+      <span class="pill pill--accent">shipped · status experimental</span>
     </div>
   </div>
 </header>
@@ -739,6 +740,28 @@
         rendered — across most healthcare products built on a general-purpose
         design system — as one of the sixteen cells that already exist, which is
         how a switch comes to make a claim nobody checked.
+      </p>
+    </div>
+
+    <div class="callout callout--ok">
+      <strong>Built. This document is now the record, not the proposal.</strong>
+      <p>
+        Everything through §19's P8 is implemented and merged into the branch —
+        the three axes, the seven-phase commit machine, five appearances, four
+        sizes, <code>tone</code>, <code>until</code>, <code>queued</code>,
+        <code>stale</code>, all four confirmation modes,
+        <code>SwitchField</code>, <code>SwitchList</code>, four lint rules, and
+        <code>&lt;ox-switch&gt;</code> in a new
+        <code>@oxygenui-design/elements</code> package with a parity test
+        between the two channels. ADR 0010 is accepted.
+      </p>
+      <p>
+        702 registry tests, 41 element tests, 47 lint-rule tests; 99.4%
+        statements and 90.7% branches against a 90/85 floor. Status is
+        <code>experimental</code> — §19's P7 (VRT baselines,
+        <code>api.md</code>, the screen-reader matrix) is what stands between
+        that and <code>stable</code>. Three defects found while building are
+        recorded in §20.
       </p>
     </div>
 
@@ -2694,10 +2717,10 @@ provenance={entry.recordedBy}</code></pre>
           <li><strong>Visual language</strong> — the pill, the travel, the in-track labels, the sizes. Recognisably an antd switch, in Oxygen's tokens.</li>
           <li><strong>An optional bridge</strong> — <code>@oxygenui-design/react/antd-bridge</code> reads <code>theme.useToken()</code> and writes the <code>--ox-switch-*</code> tokens, so an antd application gets Oxygen's behaviour in its own brand. antd is imported only by that subpath, so it stays out of the main graph.</li>
         </ul>
-        <div class="callout callout--note" style="margin-top:1.25rem">
-          <strong>This wants an ADR, not a paragraph</strong>
+        <div class="callout callout--ok" style="margin-top:1.25rem">
+          <strong>Accepted: ADR 0010 — antd-compatible, antd-free primitives</strong>
           <p>
-            Proposed: <strong>ADR 0010 — antd-compatible, antd-free primitives.</strong>
+            <code>content/decisions/0010-antd-compatible-primitives.md</code>.
             It draws the line explicitly: primitives match antd's API and take no
             dependency; compound clinical organisms may wrap antd where a
             genuinely expensive behaviour is being inherited, and each one names
@@ -2989,45 +3012,102 @@ registry.json                         <span class="c"># by pnpm gen</span></code
       </table>
     </div>
 
-    <h3 style="margin-top:2rem">Open questions — for you</h3>
+    <h3 style="margin-top:2rem">Decided, and what is still open</h3>
+    <p class="prose">
+      The four questions this section opened were answered in the build. Three
+      are settled; the fourth is the one that still needs somebody outside this
+      repository.
+    </p>
     <div class="grid g2">
       <div class="card">
-        <h4>1 · Does ADR 0010 land as proposed?</h4>
+        <span class="tag">decided</span>
+        <h4>1 · ADR 0010 landed as proposed</h4>
         <p class="why">
           "Primitives are antd-compatible and antd-free; compound clinical
           organisms may wrap antd where they name the expensive behaviour they
-          are inheriting." That rule decides the Switch and also every form
-          primitive after it. If you would rather wrap antd here, the design
-          above still holds but §07's third state and §04's phase machine both
-          become substantially more expensive, and the registry channel closes
-          for the form family.
+          are inheriting." Accepted. Signature satisfies the second clause; the
+          Switch is the first component under the first. The reviewer test for
+          the next component is <em>does it own a clinical concept, or is it a
+          control?</em>
         </p>
       </div>
       <div class="card">
-        <h4>2 · Is <code>SwitchList</code> in scope for the first release?</h4>
+        <span class="tag">decided</span>
+        <h4>2 · <code>SwitchList</code> shipped in the first release</h4>
         <p class="why">
-          It is where switches actually live, and it is 2 days. Cutting it ships
-          the primitive sooner and leaves every consumer to rebuild the group
-          live region — which is the part they will get wrong.
+          It is where switches actually live, and the part a consumer would get
+          wrong is the group live region — five rows each announcing separately
+          is five interleaved announcements on one group commit. Its summary
+          counts <code>unknown</code> apart from off, which is §07's failure at
+          group scale and the reason the component exists.
         </p>
       </div>
       <div class="card">
-        <h4>3 · Which comes first, Switch or Checkbox?</h4>
+        <span class="tag">decided</span>
+        <h4>3 · Switch first; <code>segmented</code> covers the gap</h4>
         <p class="why">
-          §17 sends four situations to a checkbox and a radio group that do not
-          exist yet. Shipping the Switch alone means shipping a docs page that
-          points at nothing. A minimal <code>Checkbox</code> with
-          <code>indeterminate</code> may be the more honest first primitive.
+          The reason to ship Checkbox first was that §17 pointed at controls
+          that did not exist. <code>appearance="segmented"</code> resolves the
+          largest of those cases inside this component — the three-answer
+          question now has a real destination. What Checkbox still owns is the
+          group header meaning "some children are on", which remains an
+          honest cross-reference to something unbuilt, and the next primitive.
         </p>
       </div>
       <div class="card">
-        <h4>4 · Is there a real surface to validate against?</h4>
+        <span class="tag">still open</span>
+        <h4>4 · No real surface has validated the words</h4>
         <p class="why">
-          The precautions panel in §09 is invented from general clinical
-          knowledge, not from a customer's screen. If <code>zowork/formbuilder</code>
-          or an existing product has a real settings surface, the state-label
-          presets and the absence taxonomy should be checked against it before
-          P4 fixes them in an intl catalog.
+          Unchanged, and the one thing here that cannot be settled from inside
+          the repository. The precautions panel in §09 and the seven
+          <code>STATE_LABEL_PRESETS</code> come from general clinical knowledge,
+          not from a customer's screen. They are in code now but not in an intl
+          catalog, which is deliberate — that is the point at which changing a
+          word becomes a breaking change. Check them against a real surface
+          before that happens.
+        </p>
+      </div>
+    </div>
+
+    <h3 style="margin-top:2rem">Found while building</h3>
+    <p class="prose">
+      Three defects the design work did not predict. Each is fixed, and each is
+      the kind that renders perfectly.
+    </p>
+    <div class="grid g3">
+      <div class="card">
+        <span class="tag">defect · accessibility</span>
+        <h4>A switch with only an <code>aria-label</code> had no name at all</h4>
+        <p class="why">
+          The root is decorative and drops its <code>aria-label</code> so it
+          cannot compete with the control's — but the control was never given
+          it. Every icon-only switch in a dense table would have been anonymous
+          to a screen reader. Caught by the shared component contract suite,
+          which asserts that every interactive element has an accessible name.
+        </p>
+      </div>
+      <div class="card">
+        <span class="tag">defect · timing</span>
+        <h4>Hold-to-confirm was frame-driven</h4>
+        <p class="why">
+          The ring drove the decision, so a throttled or backgrounded tab
+          silently refused a hold the user genuinely completed. Now the elapsed
+          time decides and the ring only indicates — measured on
+          <code>performance.now()</code>, because <code>Date.now()</code> moves
+          under an NTP step and a 600ms hold should not be able to measure as
+          an hour.
+        </p>
+      </div>
+      <div class="card">
+        <span class="tag">defect · harness</span>
+        <h4>Two test checks assumed every component is a loader</h4>
+        <p class="why">
+          The story harness required every title to match
+          <code>/^Loaders\//</code> and every fixture to render
+          <code>[data-ox-loader]</code>. Both were invisible until a second
+          component family existed. Generalised against each component's
+          declared metadata rather than a literal, which is what they were
+          reaching for.
         </p>
       </div>
     </div>
