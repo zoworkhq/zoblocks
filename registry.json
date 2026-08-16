@@ -46,6 +46,27 @@
       ]
     },
     {
+      "name": "accordion-core",
+      "type": "registry:lib",
+      "title": "Accordion core",
+      "description": "Headless disclosure behaviour and stylesheet behind Accordion and Disclosure: the open-set policies, the ARIA wiring, the access model, and find-in-page support. Installed automatically with either.",
+      "registryDependencies": [
+        "https://oxygenui.design/r/utils.json"
+      ],
+      "files": [
+        {
+          "path": "registry/oxygen/lib/accordion-core.tsx",
+          "type": "registry:hook",
+          "target": "lib/oxygen-accordion.tsx"
+        },
+        {
+          "path": "registry/oxygen/lib/accordion.css",
+          "type": "registry:file",
+          "target": "styles/oxygen-accordion.css"
+        }
+      ]
+    },
+    {
       "name": "tokens",
       "type": "registry:style",
       "title": "Oxygen tokens",
@@ -55,6 +76,32 @@
           "path": "packages/tokens/src/oxygen-tokens.css",
           "type": "registry:file",
           "target": "styles/oxygen-tokens.css"
+        }
+      ]
+    },
+    {
+      "name": "accordion",
+      "type": "registry:component",
+      "title": "Accordion",
+      "description": "Collapsible sections with a summary slot in the header, clinical severity on the leading edge, sections that cannot be closed, and four kinds of gate between a reader and content that is governed rather than merely hidden. Ant Design's Collapse API, with the accordion mode's accessibility defects fixed.",
+      "categories": [
+        "disclosure",
+        "layout"
+      ],
+      "dependencies": [
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "https://oxygenui.design/r/utils.json",
+        "https://oxygenui.design/r/tokens.json",
+        "https://oxygenui.design/r/accordion-core.json"
+      ],
+      "files": [
+        {
+          "path": "registry/oxygen/accordion/accordion.tsx",
+          "type": "registry:component",
+          "target": "components/oxygen/accordion.tsx"
         }
       ]
     },
@@ -81,6 +128,33 @@
           "path": "registry/oxygen/breath-loader/breath-loader.tsx",
           "type": "registry:component",
           "target": "components/oxygen/breath-loader.tsx"
+        }
+      ]
+    },
+    {
+      "name": "chart-accordion",
+      "type": "registry:component",
+      "title": "Chart Accordion",
+      "description": "Accordion with a clinical summary vocabulary: a status paired with its severity, a count, and a timestamp at the precision the record holds. Adds an expand-all control that never opens a section the reader may not have.",
+      "categories": [
+        "disclosure",
+        "clinical"
+      ],
+      "dependencies": [
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "https://oxygenui.design/r/utils.json",
+        "https://oxygenui.design/r/tokens.json",
+        "https://oxygenui.design/r/accordion-core.json",
+        "https://oxygenui.design/r/accordion.json"
+      ],
+      "files": [
+        {
+          "path": "registry/oxygen/chart-accordion/chart-accordion.tsx",
+          "type": "registry:component",
+          "target": "components/oxygen/chart-accordion.tsx"
         }
       ]
     },
@@ -186,6 +260,33 @@
           "path": "registry/oxygen/rhythm-loader/rhythm-loader.tsx",
           "type": "registry:component",
           "target": "components/oxygen/rhythm-loader.tsx"
+        }
+      ]
+    },
+    {
+      "name": "safety-plan",
+      "type": "registry:component",
+      "title": "Safety Plan",
+      "description": "A patient-facing safety plan: warning signs, coping, distraction, people to ask, professionals and agencies, and means restriction. The crisis step cannot be collapsed, empty steps say they are unfinished rather than disappearing, and the wording is a patient catalog throughout.",
+      "categories": [
+        "disclosure",
+        "clinical"
+      ],
+      "dependencies": [
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "https://oxygenui.design/r/utils.json",
+        "https://oxygenui.design/r/tokens.json",
+        "https://oxygenui.design/r/accordion-core.json",
+        "https://oxygenui.design/r/accordion.json"
+      ],
+      "files": [
+        {
+          "path": "registry/oxygen/safety-plan/safety-plan.tsx",
+          "type": "registry:component",
+          "target": "components/oxygen/safety-plan.tsx"
         }
       ]
     }

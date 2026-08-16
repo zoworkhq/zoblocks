@@ -22,6 +22,10 @@ Rules that matter when generating code with these components:
 
 ## Primitive
 
+- [Accordion](https://oxygenui.design/components/accordion): A disclosure widget whose headers can be read while closed, with a per-section access model for content a reader may not simply be shown.
+  install: pnpm dlx shadcn@latest add https://oxygenui.design/r/accordion.json
+  states: Closed, Open, Summary in the header, Severity on the leading edge, Pinned — cannot be closed, Advisory gate, Reason gate, Consent gate, Consent refused, Withheld, Single open at a time, Nested, with heading levels
+  status: beta
 - [Breath Loader](https://oxygenui.design/components/breath-loader): Three rings expanding and fading from a soft core, paced at a resting breath rather than a spinner's tempo.
   install: pnpm dlx shadcn@latest add https://oxygenui.design/r/breath-loader.json
   states: Indeterminate, Delayed (not yet shown), Slow wait, Reduced motion, With a brand mark in the core
@@ -41,6 +45,20 @@ Rules that matter when generating code with these components:
 - [Rhythm Loader](https://oxygenui.design/components/rhythm-loader): One rhythm strip, swept like a monitor. The quietest way for an interface to say it is still there.
   install: pnpm dlx shadcn@latest add https://oxygenui.design/r/rhythm-loader.json
   states: Indeterminate, Delayed (not yet shown), Slow wait, Reduced motion, Inline
+  status: beta
+
+## Clinical
+
+- [Chart Accordion](https://oxygenui.design/components/chart-accordion): A record's sections with their headers composed to the house rules, so a severity can never reach the screen without the words that explain it.
+  install: pnpm dlx shadcn@latest add https://oxygenui.design/r/chart-accordion.json
+  states: Closed, with summaries, Expanded, Severity across the scale, Consent gate, Withheld section, Section that failed to load, No sections
+  status: beta
+
+## Block
+
+- [Safety Plan](https://oxygenui.design/components/safety-plan): The six steps of the Stanley-Brown Safety Planning Intervention, in order, with the crisis step rendered open and uncloseable.
+  install: pnpm dlx shadcn@latest add https://oxygenui.design/r/safety-plan.json
+  states: Complete plan, Crisis step pinned open, Unfinished step, Empty plan, Clinician editing view, nothing pinned
   status: beta
 
 ## Machine-readable catalog

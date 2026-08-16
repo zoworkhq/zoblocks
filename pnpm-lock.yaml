@@ -352,6 +352,21 @@ importers:
         specifier: ^6.0.7
         version: 6.4.3(@types/node@22.20.1)(jiti@2.7.0)(lightningcss@1.32.0)(tsx@4.23.5)(yaml@2.9.0)
 
+  packages/codemod:
+    devDependencies:
+      '@oxygenui-design/tsconfig':
+        specifier: workspace:*
+        version: link:../tsconfig
+      '@vitest/coverage-v8':
+        specifier: ^3.2.7
+        version: 3.2.7(vitest@3.2.7(@types/node@22.20.1)(jiti@2.7.0)(jsdom@25.0.1)(lightningcss@1.32.0)(tsx@4.23.5)(yaml@2.9.0))
+      typescript:
+        specifier: ^5.7.2
+        version: 5.9.3
+      vitest:
+        specifier: ^3.2.7
+        version: 3.2.7(@types/node@22.20.1)(jiti@2.7.0)(jsdom@25.0.1)(lightningcss@1.32.0)(tsx@4.23.5)(yaml@2.9.0)
+
   packages/component-meta:
     dependencies:
       zod:

@@ -66,7 +66,7 @@ const storyModules = import.meta.glob("../registry/oxygen/*/*.stories.tsx", {
 
 const metaModules = import.meta.glob("../registry/oxygen/*/*.meta.ts", {
   eager: true,
-}) as Record<string, { default: { name: string; states: string[] } }>;
+}) as Record<string, { default: { name: string; states: string[]; categories: string[] } }>;
 
 function nameFromPath(filePath: string): string {
   return path.basename(path.dirname(filePath));
@@ -90,8 +90,10 @@ for (const [filePath, mod] of Object.entries(storyModules)) {
 }
 
 const declaredStates = new Map<string, string[]>();
+const declaredCategories = new Map<string, string[]>();
 for (const [filePath, mod] of Object.entries(metaModules)) {
   declaredStates.set(nameFromPath(filePath), mod.default.states);
+  declaredCategories.set(nameFromPath(filePath), mod.default.categories);
 }
 
 /**
@@ -158,9 +160,23 @@ describe("story coverage", () => {
     expect(undeclared, `${name} has stories for states missing from its meta.ts`).toEqual([]);
   });
 
-  it("titles every story file under the Loaders category", () => {
-    for (const entry of entries) {
-      expect(entry.meta.title, entry.component).toMatch(/^Loaders\//);
+  /**
+   * A story title's first segment is its sidebar group, and the catalog already
+   * has a field for that. Asserting they agree keeps Storybook's navigation and
+   * the docs catalog from drifting into two different taxonomies — which is the
+   * same class of drift the generated catalog exists to prevent.
+   *
+   * This replaced a hardcoded `/^Loaders\//`, which was correct while loaders
+   * were the only components and became a barrier to the sixth.
+   */
+  it.each(componentNames)("%s titles its stories under a declared category", (name) => {
+    const categories = declaredCategories.get(name) ?? [];
+    for (const entry of entries.filter((e) => e.component === name)) {
+      const group = entry.meta.title?.split("/")[0];
+      expect(
+        categories,
+        `${name} › story title "${entry.meta.title}" is grouped under "${group}", which is not one of its declared categories`,
+      ).toContain(group);
     }
   });
 });
@@ -175,7 +191,10 @@ describe("every story renders", () => {
       // A story that renders nothing is either a broken fixture or a state that
       // deliberately shows nothing — and the second must say so.
       if (entry.story.parameters?.skipVrt) return;
-      expect(view.container.querySelector("[data-ox-loader]")).not.toBeNull();
+      expect(
+        view.container.firstElementChild,
+        `${entry.component} › ${entry.exportName} rendered nothing. If that is the state, set parameters.skipVrt.`,
+      ).not.toBeNull();
     },
   );
 });

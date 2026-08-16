@@ -29,7 +29,12 @@ export const NON_COMPONENT_DIRS = new Set(["lib"]);
  * made load → emit/registry → load a cycle. config.ts imports nothing from the
  * generator, so it is the one place both sides can reach without one.
  */
-export const SUPPORT_ITEM_NAMES: ReadonlySet<string> = new Set(["utils", "tokens", "loader-core"]);
+export const SUPPORT_ITEM_NAMES: ReadonlySet<string> = new Set([
+  "utils",
+  "tokens",
+  "loader-core",
+  "accordion-core",
+]);
 
 /** Prefix the shadcn CLI writes component files under, inside the consumer's project. */
 export const CONSUMER_COMPONENT_DIR = "components/oxygen";

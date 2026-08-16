@@ -274,6 +274,7 @@
   --ox-density-pad-y: 0.625rem;
   --ox-density-font: var(--ox-ref-size-base);
   --ox-density-target: 2.75rem;
+  --ox-density-duration: var(--ox-ref-duration-base);
   --ox-density-target-floor: 1.5rem;
 
   /* Component — the override surface ------------------------------------
@@ -297,6 +298,34 @@
   --ox-badge-unknown-bg: var(--ox-status-unknown-bg);
   --ox-badge-unknown-border: var(--ox-status-unknown-border);
   --ox-badge-radius: var(--ox-radius-full);
+  --ox-accordion-header-bg: var(--ox-bg-muted);
+  --ox-accordion-header-bg-hover: var(--ox-bg-subtle);
+  --ox-accordion-header-bg-open: var(--ox-surface);
+  --ox-accordion-header-fg: var(--ox-text);
+  --ox-accordion-summary-fg: var(--ox-text-muted);
+  --ox-accordion-icon-fg: var(--ox-text-muted);
+  --ox-accordion-border: var(--ox-border);
+  --ox-accordion-divider: var(--ox-border);
+  --ox-accordion-body-fg: var(--ox-text-muted);
+  --ox-accordion-rail-critical: var(--ox-status-critical);
+  --ox-accordion-rail-high: var(--ox-status-high);
+  --ox-accordion-rail-low: var(--ox-status-low);
+  --ox-accordion-rail-normal: var(--ox-status-normal);
+  --ox-accordion-rail-unknown: var(--ox-status-unknown);
+  --ox-accordion-rail-restricted: var(--ox-flag-restricted);
+  --ox-accordion-rail-width: 3px;
+  --ox-accordion-restricted-bg: var(--ox-flag-restricted-bg);
+  --ox-accordion-restricted-fg: var(--ox-flag-restricted);
+  --ox-accordion-withheld-fg: var(--ox-text-subtle);
+  --ox-accordion-gate-bg: var(--ox-bg-muted);
+  --ox-accordion-gate-border: var(--ox-border);
+  --ox-accordion-radius: var(--ox-radius-lg);
+  --ox-accordion-pad-x: var(--ox-density-pad-x);
+  --ox-accordion-pad-y: var(--ox-density-pad-y);
+  --ox-accordion-gap: var(--ox-density-gap);
+  --ox-accordion-target: var(--ox-density-target);
+  --ox-accordion-font: var(--ox-density-font);
+  --ox-accordion-duration: var(--ox-density-duration);
   --ox-alert-critical-fg: var(--ox-status-critical);
   --ox-alert-critical-bg: var(--ox-status-critical-bg);
   --ox-alert-critical-border: var(--ox-status-critical-border);
@@ -391,6 +420,7 @@
   --ox-density-pad-y: 0.875rem;
   --ox-density-font: var(--ox-ref-size-md);
   --ox-density-target: 3rem;
+  --ox-density-duration: var(--ox-ref-duration-slow);
 }
 
 [data-ox-density="standard"] {
@@ -400,6 +430,7 @@
   --ox-density-pad-y: 0.625rem;
   --ox-density-font: var(--ox-ref-size-base);
   --ox-density-target: 2.75rem;
+  --ox-density-duration: var(--ox-ref-duration-base);
 }
 
 [data-ox-density="clinical"] {
@@ -409,6 +440,7 @@
   --ox-density-pad-y: 0.25rem;
   --ox-density-font: var(--ox-ref-size-sm);
   --ox-density-target: 1.5rem;
+  --ox-density-duration: var(--ox-ref-duration-fast);
 }
 
 /* dark

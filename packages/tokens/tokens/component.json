@@ -22,6 +22,43 @@
     "radius": { "$type": "dimension", "$value": "{radius-full}" }
   },
 
+  "accordion": {
+    "$description": "Accordion / Disclosure. Two groups here are load-bearing rather than decorative. The severity rail is the only signal that survives a collapsed section, so it routes through the same status set as StatusBadge — critical must read identically on a lab result, a medication, and a chart section. And restricted is drawn from flag.*, not from the status scale, because it describes the record's legal standing rather than a measurement; rendering it as merely disabled would tell a reader the section is unavailable when it is actually withheld.",
+    "$type": "color",
+
+    "header-bg": { "$value": "{bg-muted}" },
+    "header-bg-hover": { "$value": "{bg-subtle}" },
+    "header-bg-open": { "$value": "{surface}" },
+    "header-fg": { "$value": "{text}" },
+    "summary-fg": { "$value": "{text-muted}" },
+    "icon-fg": { "$value": "{text-muted}" },
+    "border": { "$value": "{border}" },
+    "divider": { "$value": "{border}" },
+    "body-fg": { "$value": "{text-muted}" },
+
+    "rail-critical": { "$value": "{status.critical}" },
+    "rail-high": { "$value": "{status.high}" },
+    "rail-low": { "$value": "{status.low}" },
+    "rail-normal": { "$value": "{status.normal}" },
+    "rail-unknown": { "$value": "{status.unknown}" },
+    "rail-restricted": { "$value": "{flag.restricted}" },
+    "rail-width": { "$type": "dimension", "$value": "3px" },
+
+    "restricted-bg": { "$value": "{flag.restricted-bg}" },
+    "restricted-fg": { "$value": "{flag.restricted}" },
+    "withheld-fg": { "$value": "{text-subtle}" },
+    "gate-bg": { "$value": "{bg-muted}" },
+    "gate-border": { "$value": "{border}" },
+
+    "radius": { "$type": "dimension", "$value": "{radius-lg}" },
+    "pad-x": { "$type": "dimension", "$value": "{density.pad-x}" },
+    "pad-y": { "$type": "dimension", "$value": "{density.pad-y}" },
+    "gap": { "$type": "dimension", "$value": "{density.gap}" },
+    "target": { "$type": "dimension", "$value": "{density.target}" },
+    "font": { "$type": "dimension", "$value": "{density.font}" },
+    "duration": { "$type": "duration", "$value": "{density.duration}" }
+  },
+
   "alert": {
     "$description": "AlertBanner. Severity tiers are an interruption budget — only critical may take focus. The tokens are separate from badge so a product can make an inline badge quiet without also making a critical interruption quiet.",
     "$type": "color",
