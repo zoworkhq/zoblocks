@@ -1590,3 +1590,663 @@ describe("deferred commit", () => {
     });
   });
 });
+
+/* =================================================================== */
+/* Edge paths                                                          */
+/*                                                                     */
+/* The branches a happy-path suite never reaches. Each of these is a    */
+/* real situation, not a coverage errand: a hold that never started, a  */
+/* countersign that cannot be collected, a conflict resolved to the     */
+/* value you already had. They are grouped because they share one       */
+/* property — every one of them is a path a clinician can take, and     */
+/* none of them is a path anyone demonstrates.                          */
+/* =================================================================== */
+
+describe("edge paths", () => {
+  /* ---------------------------------------------------------------- */
+  /* Read-only, in every appearance                                   */
+  /* ---------------------------------------------------------------- */
+
+  describe("read-only stays reachable", () => {
+    it("keeps a segmented control in the tab order", () => {
+      // The whole argument against `disabled`: it removes the control from a
+      // screen-reader user's world, so they never learn it exists or why it
+      // cannot be changed. Read-only must not do that in any appearance.
+      render(
+        <Switch
+          label="Interpreter required"
+          appearance="segmented"
+          checked
+          readOnly
+          lockedReason="Encounter signed."
+        />,
+      );
+      const radios = screen.getAllByRole("radio");
+      for (const radio of radios) {
+        expect(radio).not.toBeDisabled();
+        expect(radio).toHaveAttribute("aria-readonly", "true");
+      }
+      expect(screen.getByRole("radiogroup")).toHaveAttribute("aria-readonly", "true");
+    });
+
+    it("refuses the change anyway", async () => {
+      const user = userEvent.setup();
+      const onCommit = vi.fn();
+      render(
+        <Switch
+          label="Interpreter required"
+          appearance="segmented"
+          checked
+          readOnly
+          onCommit={onCommit}
+        />,
+      );
+      // Focusable, named, and inert. All three at once is the point.
+      await user.click(screen.getAllByRole("radio")[0] as HTMLElement);
+      expect(onCommit).not.toHaveBeenCalled();
+    });
+
+    it("marks a genuinely disabled segmented control as disabled", () => {
+      render(<Switch label="Interpreter required" appearance="segmented" checked disabled />);
+      for (const radio of screen.getAllByRole("radio")) expect(radio).toBeDisabled();
+    });
+  });
+
+  /* ---------------------------------------------------------------- */
+  /* Countersign — the paths where no signature arrives                */
+  /* ---------------------------------------------------------------- */
+
+  describe("countersign", () => {
+    const open = async (props: Partial<React.ComponentProps<typeof Switch>>) => {
+      const user = userEvent.setup();
+      render(
+        <Switch
+          label="Release restraint order"
+          tone="critical"
+          confirm="countersign"
+          defaultChecked={false}
+          {...props}
+        />,
+      );
+      await user.click(control());
+      return user;
+    };
+
+    it("says so when no verifier was supplied", async () => {
+      const user = await open({ countersign: { role: "registered-nurse", notSameAs: "u1" } });
+      await user.click(screen.getByRole("button", { name: /collect countersignature/i }));
+      expect(
+        await screen.findByText(/no countersignature could be collected/i),
+      ).toBeInTheDocument();
+    });
+
+    it("refuses a signature from the requester — that is what makes it independent", async () => {
+      const onCommit = vi.fn();
+      const user = await open({
+        onCommit,
+        countersign: {
+          role: "registered-nurse",
+          notSameAs: "u1",
+          verify: () => Promise.resolve("u1"),
+        },
+      });
+      await user.click(screen.getByRole("button", { name: /collect countersignature/i }));
+      expect(await screen.findByText(/must be from a different person/i)).toBeInTheDocument();
+      expect(onCommit).not.toHaveBeenCalled();
+    });
+
+    it("commits when a different qualified person signs", async () => {
+      const onCommit = vi.fn().mockResolvedValue(undefined);
+      const user = await open({
+        onCommit,
+        countersign: {
+          role: "registered-nurse",
+          notSameAs: "u1",
+          verify: () => Promise.resolve("u2"),
+        },
+      });
+      await user.click(screen.getByRole("button", { name: /collect countersignature/i }));
+      await waitFor(() => expect(onCommit).toHaveBeenCalledWith(true, expect.anything()));
+      expect(onCommit.mock.calls[0]?.[1]).toMatchObject({ reason: "countersigned by u2" });
+    });
+
+    it("reports a rejection that carries no message", async () => {
+      const user = await open({
+        countersign: {
+          role: "registered-nurse",
+          notSameAs: "u1",
+          // A bare rejection — a cancelled badge scan, typically.
+          verify: () => Promise.reject(new Error("")),
+        },
+      });
+      await user.click(screen.getByRole("button", { name: /collect countersignature/i }));
+      expect(await screen.findByText(/countersignature was not collected/i)).toBeInTheDocument();
+    });
+  });
+
+  /* ---------------------------------------------------------------- */
+  /* Hold — the paths that are not a completed hold                    */
+  /* ---------------------------------------------------------------- */
+
+  describe("hold", () => {
+    it("ignores a pointer-up that was never preceded by a pointer-down", () => {
+      const onCommit = vi.fn();
+      render(
+        <Switch label="Suspend alarm" confirm="hold" defaultChecked={false} onCommit={onCommit} />,
+      );
+      fireEvent.pointerUp(control());
+      expect(onCommit).not.toHaveBeenCalled();
+    });
+
+    it("treats a second pointer-down as part of the same hold", () => {
+      render(<Switch label="Suspend alarm" confirm="hold" defaultChecked={false} />);
+      fireEvent.pointerDown(control());
+      fireEvent.pointerDown(control());
+      // Still one hold in progress; releasing it once ends it.
+      fireEvent.pointerUp(control());
+      expect(control()).toHaveAttribute("aria-checked", "false");
+    });
+
+    it("routes a plain click to the dialog, never to a silent commit", async () => {
+      const user = userEvent.setup();
+      const onCommit = vi.fn();
+      render(
+        <Switch label="Suspend alarm" confirm="hold" defaultChecked={false} onCommit={onCommit} />,
+      );
+      await user.click(control());
+      expect(onCommit).not.toHaveBeenCalled();
+      expect(screen.getByRole("alertdialog")).toBeInTheDocument();
+    });
+  });
+
+  /* ---------------------------------------------------------------- */
+  /* Conflict resolution                                               */
+  /* ---------------------------------------------------------------- */
+
+  describe("stale", () => {
+    it("re-sends your value when you keep yours", async () => {
+      const user = userEvent.setup();
+      const onCommit = vi.fn().mockResolvedValue(undefined);
+      const onResolveConflict = vi.fn();
+      render(
+        <Switch
+          label="Contact precautions"
+          stateLabels="in-effect"
+          checked
+          serverValue={false}
+          onCommit={onCommit}
+          onResolveConflict={onResolveConflict}
+        />,
+      );
+      await user.click(screen.getByRole("button", { name: /change it back/i }));
+      expect(onResolveConflict).toHaveBeenCalledWith("mine");
+      await waitFor(() => expect(onCommit).toHaveBeenCalledWith(true, expect.anything()));
+    });
+
+    it("leaves the conflict alone while a write of your own is in flight", async () => {
+      // Two competing explanations on screen is worse than one that arrives a
+      // moment later, so an external change never interrupts a pending request.
+      const user = userEvent.setup();
+      let settle: (() => void) | undefined;
+      const onCommit = vi.fn(() => new Promise<void>((resolve) => (settle = resolve)));
+      const view = render(
+        <Switch label="Contact precautions" defaultChecked={false} onCommit={onCommit} />,
+      );
+      await user.click(control());
+      await waitFor(() => expect(root(view.container)).toHaveAttribute("data-ox-phase", "pending"));
+
+      view.rerender(
+        <Switch
+          label="Contact precautions"
+          defaultChecked={false}
+          serverValue
+          onCommit={onCommit}
+        />,
+      );
+      expect(root(view.container)).toHaveAttribute("data-ox-phase", "pending");
+      await act(async () => {
+        settle?.();
+      });
+    });
+  });
+
+  /* ---------------------------------------------------------------- */
+  /* Slots                                                             */
+  /* ---------------------------------------------------------------- */
+
+  describe("slots", () => {
+    it("hands the thumb slot the resolved value and phase", () => {
+      render(
+        <Switch
+          label="Custom"
+          checked
+          slots={{
+            thumb: ({ value, phase }) => <i data-testid="thumb">{`${String(value)}:${phase}`}</i>,
+          }}
+        />,
+      );
+      expect(screen.getByTestId("thumb")).toHaveTextContent("true:idle");
+    });
+
+    it("hands the state slot the word a reader sees, so the two cannot disagree", () => {
+      render(
+        <Switch
+          label="Custom"
+          checked
+          stateLabels="in-effect"
+          slots={{ state: ({ word }) => <b data-testid="state">{word}</b> }}
+        />,
+      );
+      expect(screen.getByTestId("state")).toHaveTextContent("In effect");
+    });
+  });
+
+  /* ---------------------------------------------------------------- */
+  /* Rendering with almost nothing supplied                            */
+  /* ---------------------------------------------------------------- */
+
+  describe("minimal props", () => {
+    it("renders a bare chip with no label, using the state word", () => {
+      render(<Switch aria-label="Isolation" appearance="chip" checked stateLabels="in-effect" />);
+      expect(screen.getByRole("switch")).toHaveAccessibleName("Isolation");
+    });
+
+    it("renders a segmented control named only by aria-label", () => {
+      render(<Switch aria-label="Latex allergy" appearance="segmented" checked={false} />);
+      expect(screen.getByRole("radiogroup")).toHaveAccessibleName("Latex allergy");
+    });
+
+    it("puts the text before the control when asked", () => {
+      const view = render(
+        <Switch label="Interpreter" appearance="segmented" checked labelPlacement="start" />,
+      );
+      const rootEl = root(view.container) as HTMLElement;
+      const text = rootEl.querySelector(".ox-switch__text") as HTMLElement;
+      const group = rootEl.querySelector(".ox-switch__segments") as HTMLElement;
+      // Reading order, not visual order — a screen reader follows the DOM.
+      expect(text.compareDocumentPosition(group) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    });
+
+    it("renders a switch with no text column at all", () => {
+      const view = render(<Switch aria-label="Bare" checked showState={false} />);
+      expect(view.container.querySelector(".ox-switch__text")).toBeNull();
+      expect(screen.getByRole("switch")).toHaveAccessibleName("Bare");
+    });
+
+    it("renders a list with no title and no counts", () => {
+      const view = render(
+        <SwitchList>
+          <SwitchField label="Contact" checked />
+        </SwitchList>,
+      );
+      expect(view.container.querySelector(".ox-switch-list__head")).toBeNull();
+      expect(screen.getByRole("switch")).toBeInTheDocument();
+    });
+
+    it("forwards an explicit aria-describedby alongside its own", () => {
+      render(
+        <>
+          <span id="external">Set by the admitting clerk.</span>
+          <Switch label="Interpreter" checked aria-describedby="external" />
+        </>,
+      );
+      expect(control().getAttribute("aria-describedby")).toContain("external");
+    });
+  });
+
+  /* ---------------------------------------------------------------- */
+  /* Provenance                                                        */
+  /* ---------------------------------------------------------------- */
+
+  it("names how a change was made when the caller knows", () => {
+    const view = render(
+      <Switch
+        label="Contact precautions"
+        checked
+        provenance={{ by: "S. Mehta", at: NOW, via: "on the ward round" }}
+      />,
+    );
+    expect(view.container.textContent).toMatch(/S\. Mehta, on the ward round/);
+  });
+});
+
+/* =================================================================== */
+/* The commit machine, driven directly                                 */
+/*                                                                     */
+/* useCommitPhase is exported for controls that are not this one, so it */
+/* is tested as its own unit rather than only through the component.    */
+/* =================================================================== */
+
+describe("useCommitPhase, directly", () => {
+  function Harness(props: Parameters<typeof useCommitPhase>[0] & { probe?: (s: unknown) => void }) {
+    const { probe, ...options } = props;
+    const state = useCommitPhase(options);
+    probe?.(state);
+    return (
+      <div>
+        <span data-testid="phase">{state.phase}</span>
+        <span data-testid="shown">{String(state.shown)}</span>
+        <span data-testid="error">{state.error ?? ""}</span>
+        <button onClick={() => state.request(true)}>request</button>
+        <button onClick={() => state.cancelQueued()}>cancel</button>
+        <button onClick={() => state.acknowledge()}>ack</button>
+        <button onClick={() => state.resolveConflict("theirs")}>resolve</button>
+      </div>
+    );
+  }
+
+  const phase = () => screen.getByTestId("phase").textContent;
+
+  it("cancelling when nothing is queued does nothing", async () => {
+    const user = userEvent.setup();
+    const onAuditEvent = vi.fn();
+    render(<Harness value={false} now={NOW} onAuditEvent={onAuditEvent} />);
+    await user.click(screen.getByText("cancel"));
+    expect(phase()).toBe("idle");
+    expect(onAuditEvent).not.toHaveBeenCalled();
+  });
+
+  it("acknowledging when there is nothing to acknowledge does nothing", async () => {
+    const user = userEvent.setup();
+    render(<Harness value={false} now={NOW} />);
+    await user.click(screen.getByText("ack"));
+    expect(phase()).toBe("idle");
+  });
+
+  it("resolving when there is no conflict does nothing", async () => {
+    const user = userEvent.setup();
+    const onAuditEvent = vi.fn();
+    render(<Harness value={false} now={NOW} onAuditEvent={onAuditEvent} />);
+    await user.click(screen.getByText("resolve"));
+    expect(onAuditEvent).not.toHaveBeenCalled();
+  });
+
+  it("accepts a synchronous onCommit and still passes through pending", async () => {
+    const user = userEvent.setup();
+    const onCommit = vi.fn(() => undefined);
+    render(<Harness value={false} now={NOW} onCommit={onCommit} minPendingMs={0} />);
+    await user.click(screen.getByText("request"));
+    await waitFor(() => expect(phase()).toBe("committed"));
+    expect(onCommit).toHaveBeenCalledWith(true, expect.objectContaining({ from: false }));
+  });
+
+  it("falls back to a stated message when a rejection carries none", async () => {
+    const user = userEvent.setup();
+    render(
+      <Harness
+        value={false}
+        now={NOW}
+        minPendingMs={0}
+        // A rejection that is not an Error at all — a thrown string from a
+        // hand-rolled fetch wrapper is the usual source.
+        onCommit={() => Promise.reject("network")}
+      />,
+    );
+    await user.click(screen.getByText("request"));
+    await waitFor(() => expect(phase()).toBe("reverted"));
+    expect(screen.getByTestId("error").textContent).toBe("The change was not saved.");
+  });
+
+  it("records an audit event even when the caller supplied no clock", async () => {
+    // `now` is required alongside onAuditEvent at the type level. If it goes
+    // missing anyway, an empty timestamp is visible in the log — a crash
+    // inside the toggle handler is not.
+    const user = userEvent.setup();
+    const onAuditEvent = vi.fn();
+    render(<Harness value={false} onAuditEvent={onAuditEvent} minPendingMs={0} />);
+    await user.click(screen.getByText("request"));
+    expect(onAuditEvent).toHaveBeenCalledWith(expect.objectContaining({ at: "" }));
+  });
+
+  it("drops a slow-timer callback belonging to a superseded request", async () => {
+    vi.useFakeTimers();
+    const onSlow = vi.fn();
+    try {
+      const view = render(
+        <Harness
+          value={false}
+          now={NOW}
+          slowAfter={50}
+          minPendingMs={0}
+          onCommit={() => new Promise<void>(() => {})}
+          onSlow={onSlow}
+        />,
+      );
+      const request = view.getByText("request");
+      act(() => {
+        request.click();
+      });
+      act(() => {
+        request.click();
+      });
+      act(() => {
+        vi.advanceTimersByTime(200);
+      });
+      // Two requests, two timers, one surviving sequence: the first timer must
+      // not fire a stall warning for a request nobody is waiting on.
+      expect(onSlow).toHaveBeenCalledTimes(1);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+});
+
+/* =================================================================== */
+/* The monotonic clock                                                 */
+/* =================================================================== */
+
+describe("elapsed time", () => {
+  it("degrades to no minimum rather than throwing where performance is absent", async () => {
+    const original = globalThis.performance;
+    // Some embedded webviews and older React Native runtimes have no
+    // performance object at all. A missing clock must cost a minimum pending
+    // window, never a crash inside a click handler.
+    Reflect.deleteProperty(globalThis, "performance");
+    try {
+      const { elapsedClock } = await import("@/lib/oxygen-switch");
+      expect(elapsedClock()).toBe(0);
+    } finally {
+      Object.defineProperty(globalThis, "performance", {
+        value: original,
+        configurable: true,
+        writable: true,
+      });
+    }
+  });
+});
+
+/* =================================================================== */
+/* The remaining corners                                               */
+/* =================================================================== */
+
+describe("remaining corners", () => {
+  it("records the negative from unknown with a shift-activation", async () => {
+    const user = userEvent.setup();
+    const onCommit = vi.fn().mockResolvedValue(undefined);
+    render(
+      <Switch
+        label="Latex allergy"
+        checked="unknown"
+        absentReason="not-collected"
+        stateLabels="yes-no"
+        onCommit={onCommit}
+      />,
+    );
+    // Plain activation records yes — the answer somebody is writing down.
+    // Shift records no. Neither can return to "unknown".
+    await user.keyboard("{Shift>}");
+    await user.click(control());
+    await user.keyboard("{/Shift}");
+    await waitFor(() => expect(onCommit).toHaveBeenCalledWith(false, expect.anything()));
+  });
+
+  it("names itself generically when the caller supplied no label at all", async () => {
+    // Not a supported configuration — the contract suite requires an
+    // accessible name — but the announcement must still read as a sentence
+    // rather than interpolating undefined into a live region.
+    const user = userEvent.setup();
+    const view = render(
+      <Switch defaultChecked={false} onCommit={() => Promise.reject(new Error("Nope."))} />,
+    );
+    await user.click(view.container.querySelector("button") as HTMLElement);
+    await waitFor(() => {
+      expect(view.container.textContent).toMatch(/This setting was not changed/i);
+    });
+    expectNoLeakedValues(view);
+  });
+
+  it("omits the via clause when provenance does not carry one", () => {
+    const view = render(
+      <Switch label="Contact precautions" checked provenance={{ by: "S. Mehta", at: NOW }} />,
+    );
+    expect(view.container.textContent).toMatch(/by S\. Mehta/);
+    expect(view.container.textContent).not.toMatch(/S\. Mehta,/);
+  });
+
+  it("renders an off chip without a glyph", () => {
+    const view = render(<Switch aria-label="Isolation" appearance="chip" checked={false} />);
+    expect(view.container.querySelector(".ox-switch__chip .ox-switch__glyph")).toBeNull();
+  });
+
+  it("renders a row with no description", () => {
+    const view = render(<Switch label="Text me my results" appearance="row" checked />);
+    expect(view.container.querySelector(".ox-switch__desc")).toBeNull();
+    expect(screen.getByRole("switch")).toHaveAccessibleName("Text me my results");
+  });
+
+  it("renders a list with a title and no counts", () => {
+    render(
+      <SwitchList title="Isolation precautions">
+        <SwitchField label="Contact" checked />
+      </SwitchList>,
+    );
+    expect(screen.getByRole("group")).toHaveAccessibleName("Isolation precautions");
+  });
+
+  it("queues a change made while offline and still reports the conflict when one lands", () => {
+    // A conflict arriving while a change is queued must not replace the queued
+    // state: the user still has an un-sent decision, and losing it silently is
+    // the failure the queued phase exists to prevent.
+    const view = render(<Switch label="Falls risk" defaultChecked={false} online={false} />);
+    fireEvent.click(control());
+    expect(root(view.container)).toHaveAttribute("data-ox-phase", "queued");
+
+    view.rerender(<Switch label="Falls risk" checked={false} serverValue online={false} />);
+    expect(root(view.container)).toHaveAttribute("data-ox-phase", "queued");
+  });
+
+  it("cancels a queued change and reports it as cancelled", async () => {
+    const user = userEvent.setup();
+    const onAuditEvent = vi.fn();
+    const view = render(
+      <Switch
+        label="Falls risk"
+        defaultChecked={false}
+        online={false}
+        now={NOW}
+        onAuditEvent={onAuditEvent}
+      />,
+    );
+    await user.click(control());
+    await user.click(screen.getByRole("button", { name: /cancel/i }));
+    expect(root(view.container)).toHaveAttribute("data-ox-phase", "idle");
+    expect(onAuditEvent).toHaveBeenCalledWith(
+      expect.objectContaining({ type: "cancelled", to: true }),
+    );
+  });
+
+  it("never warns about a stall when slowAfter is switched off", async () => {
+    vi.useFakeTimers();
+    const onSlow = vi.fn();
+    try {
+      render(
+        <Switch
+          label="Contact precautions"
+          defaultChecked={false}
+          slowAfter={0}
+          onSlow={onSlow}
+          onCommit={() => new Promise<void>(() => {})}
+        />,
+      );
+      act(() => {
+        control().click();
+      });
+      act(() => {
+        vi.advanceTimersByTime(60_000);
+      });
+      expect(onSlow).not.toHaveBeenCalled();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it("drops the committed-to-idle timer belonging to a superseded request", async () => {
+    vi.useFakeTimers();
+    try {
+      const resolvers: Array<() => void> = [];
+      const view = render(
+        <Switch
+          label="Contact precautions"
+          defaultChecked={false}
+          minPendingMs={0}
+          onCommit={() => new Promise<void>((resolve) => resolvers.push(resolve))}
+        />,
+      );
+      act(() => {
+        control().click();
+      });
+      act(() => {
+        control().click();
+      });
+      // Resolve the FIRST request after the second has superseded it. Its
+      // committed-then-idle timer must not touch the state the second owns.
+      await act(async () => {
+        resolvers[0]?.();
+      });
+      act(() => {
+        vi.advanceTimersByTime(5000);
+      });
+      await act(async () => {
+        resolvers[1]?.();
+      });
+      act(() => {
+        vi.advanceTimersByTime(5000);
+      });
+      expect(root(view.container)).toHaveAttribute("data-ox-phase", "idle");
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+});
+
+describe("partial composition", () => {
+  it("renders a row described but not labelled", () => {
+    // A row inside a list whose heading already names it: the description
+    // carries the detail and the accessible name comes from aria-label.
+    const view = render(
+      <Switch
+        aria-label="Text me my results"
+        appearance="row"
+        description="To the mobile ending 4471."
+        checked
+      />,
+    );
+    expect(view.container.querySelector(".ox-switch__label")).toBeNull();
+    expect(view.container.textContent).toMatch(/ending 4471/);
+    expect(screen.getByRole("switch")).toHaveAccessibleName("Text me my results");
+  });
+
+  it("renders a list summary without a title", () => {
+    const view = render(
+      <SwitchList counts={{ on: 2, total: 5, unknown: 1 }}>
+        <SwitchField label="Contact" checked />
+      </SwitchList>,
+    );
+    expect(view.container.querySelector(".ox-switch-list__title")).toBeNull();
+    // Unknown is reported separately and excluded from the ratio — a count
+    // that folds "not asked" into "off" is the group-scale version of the
+    // failure this component exists to prevent.
+    expect(view.container.textContent).toMatch(/2 of 5 in effect/);
+    expect(view.container.textContent).toMatch(/1 not asked/);
+  });
+});

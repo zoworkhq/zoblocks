@@ -981,6 +981,7 @@ export const Switch = React.forwardRef<HTMLSpanElement, SwitchProps>(function Sw
           role="radiogroup"
           aria-labelledby={label ? labelId : undefined}
           aria-label={label ? undefined : ariaLabel}
+          aria-readonly={readOnly || undefined}
         >
           {/*
             Two labelled cells that both look pressable ARE a radio group.
@@ -994,7 +995,13 @@ export const Switch = React.forwardRef<HTMLSpanElement, SwitchProps>(function Sw
               className="ox-switch__segment"
               role="radio"
               aria-checked={shown === option}
-              disabled={!editable}
+              // `disabled` only when genuinely disabled: a read-only cell stays
+              // in the tab order and keeps its name, and `attempt` refuses the
+              // change anyway. Removing it from the tab order would hide the
+              // control from a screen-reader user entirely.
+              disabled={disabled}
+              aria-disabled={disabled || undefined}
+              aria-readonly={readOnly || undefined}
               onClick={(event) => requestValue(option, event)}
             >
               {shown === option ? <Glyph kind="on" /> : null}
