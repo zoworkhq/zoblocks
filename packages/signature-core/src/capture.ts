@@ -15,8 +15,8 @@
  * a signature it would also put an unverifiable timestamp into a legal record.
  */
 
-import type { Point, Stroke } from "./value.js";
-import { DEFAULT_INK_THRESHOLD, assessInk, type InkThreshold, type InkVerdict } from "./strokes.js";
+import type { Point, Stroke } from "./value";
+import { DEFAULT_INK_THRESHOLD, assessInk, type InkThreshold, type InkVerdict } from "./strokes";
 
 /** One sample from a pointing device. */
 export interface Sample {

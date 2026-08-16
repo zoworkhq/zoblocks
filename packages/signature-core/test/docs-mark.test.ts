@@ -22,8 +22,8 @@ import { describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { toInkPaths } from "../src/export.js";
-import type { Stroke } from "../src/value.js";
+import { toInkPaths } from "../src/export";
+import type { Stroke } from "../src/value";
 
 const MARK = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
