@@ -32,6 +32,7 @@ import { InfusionLoader } from "@/registry/oxygen/infusion-loader/infusion-loade
 import { RhythmLoader } from "@/registry/oxygen/rhythm-loader/rhythm-loader";
 import { BreathLoader } from "@/registry/oxygen/breath-loader/breath-loader";
 import { HelixLoader } from "@/registry/oxygen/helix-loader/helix-loader";
+import { SignatureMark } from "@/components/site/signature-mark";
 import { STATUS_LABEL, type ComponentDoc } from "@/lib/catalog";
 import { cn } from "@/lib/utils";
 
@@ -79,6 +80,10 @@ const PREVIEW: Record<string, (featured: boolean) => React.ReactNode> = {
     <BreathLoader size={featured ? 92 : 64} label="Loading your information" />
   ),
   "helix-loader": (featured) => <HelixLoader size={featured ? 92 : 64} label="Running the panel" />,
+  // Not the component itself: Signature wraps Ant Design, which the docs site
+  // does not carry. This draws the same geometry from the same engine — see
+  // signature-mark.tsx.
+  signature: (featured) => <SignatureMark size={featured ? 92 : 72} />,
 };
 
 export function ComponentCard({

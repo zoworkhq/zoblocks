@@ -6,18 +6,6 @@
       "runtimeExecutable": "pnpm",
       "runtimeArgs": ["--filter", "@oxygenui-design/docs", "dev"],
       "port": 6001
-    },
-    {
-      "name": "smoke",
-      "runtimeExecutable": "pnpm",
-      "runtimeArgs": ["--filter", "@oxygenui-design/smoke", "preview"],
-      "port": 6010
-    },
-    {
-      "name": "briefs",
-      "runtimeExecutable": "python3",
-      "runtimeArgs": ["-m", "http.server", "6020"],
-      "port": 6020
     }
   ]
 }
