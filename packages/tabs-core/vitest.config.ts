@@ -7,9 +7,12 @@ export default defineConfig({
       reporter: ["text-summary", "json-summary", "lcov"],
       include: ["src/**/*.ts"],
       exclude: ["src/index.ts", "**/*.d.ts"],
-      // The tier bar from the readiness audit: nothing merges below `beta`,
-      // and `beta` is 90% lines / 85% branches.
-      thresholds: { lines: 90, functions: 90, branches: 85, statements: 90 },
+      // Well above the `beta` bar from the readiness audit (90% lines / 85%
+      // branches), and set at what the suite actually clears. Ratchet these
+      // up; never down. The remaining branch gap is a handful of defensive
+      // guards whose only reachable form would be a faked global — a test of
+      // the mock rather than of the code.
+      thresholds: { lines: 100, functions: 100, branches: 99, statements: 100 },
     },
     // No DOM: that is the point of this package, and running it in jsdom would
     // let a DOM dependency creep in without failing anything.

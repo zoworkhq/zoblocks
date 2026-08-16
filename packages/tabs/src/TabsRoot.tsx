@@ -37,7 +37,12 @@ import {
   type TabsLocale,
   type TransitionKind,
 } from "@oxygenui-design/tabs-core";
-import { TabsContext, type RegisteredTrigger, type TabsContextValue } from "./context.js";
+import {
+  TabsContext,
+  ValidatedByParent,
+  type RegisteredTrigger,
+  type TabsContextValue,
+} from "./context.js";
 import { useTabsLocale } from "./locale.js";
 import {
   REGISTRY_UNRELIABLE,
@@ -47,6 +52,9 @@ import {
 } from "./internal.js";
 
 const VALID_MODES = new Set<SemanticMode>(["tabs", "nav", "radiogroup", "steps"]);
+
+/** Stable empty list, so the skip path does not churn the effect deps. */
+const EMPTY_ITEMS: readonly TabItem[] = [];
 
 export interface TabsEditable {
   onClose?: (value: string) => void;
@@ -159,14 +167,17 @@ export const TabsRoot = React.forwardRef<HTMLDivElement, TabsRootProps>(function
     return triggers.current.map((entry) => entry.item);
   }, [registryVersion]);
 
+  // When the declarative `Tabs` is driving, it has already checked these at
+  // render time — earlier, more completely, and on the server too.
+  const alreadyValidated = React.useContext(ValidatedByParent);
   useValidateConfig(
     {
       mode,
-      items,
-      overflow,
+      items: alreadyValidated ? EMPTY_ITEMS : items,
+      overflow: alreadyValidated ? undefined : overflow,
       orientation,
-      value: controlledValue,
-      defaultValue,
+      value: alreadyValidated ? undefined : controlledValue,
+      defaultValue: alreadyValidated ? undefined : defaultValue,
       hasCloseHandler: Boolean(editable?.onClose),
     },
     { ignore: REGISTRY_UNRELIABLE },

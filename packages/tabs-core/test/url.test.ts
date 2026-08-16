@@ -168,3 +168,12 @@ describe("resolveAdapter", () => {
     expect(resolveAdapter(custom, "tab", win)).toBe(custom);
   });
 });
+
+describe("searchParamAdapter history mode", () => {
+  it("pushes when the host asks for a history entry", () => {
+    const win = fakeWindow("https://example.test/chart?tab=labs");
+    searchParamAdapter("tab", win).write("vitals", { replace: false });
+    expect(win.history.pushState).toHaveBeenCalled();
+    expect(win.history.replaceState).not.toHaveBeenCalled();
+  });
+});

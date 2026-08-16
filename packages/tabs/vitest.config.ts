@@ -6,11 +6,17 @@ export default defineConfig({
       provider: "v8",
       reporter: ["text-summary", "json-summary", "lcov"],
       include: ["src/**/*.{ts,tsx}"],
-      // `antd.ts` is the optional bridge: exercising it means booting antd's
-      // whole theme engine in jsdom to assert a token map, which tests antd
-      // rather than this package. It is covered by the smoke app instead.
-      exclude: ["src/index.ts", "src/antd.ts", "**/*.d.ts"],
-      thresholds: { lines: 90, functions: 90, branches: 85, statements: 90 },
+      // Only the barrel is excluded — it is re-exports, and covering it would
+      // measure nothing. The antd bridge is included and tested: it is a
+      // mapping with real arithmetic in it (concentric radii), and a mapping
+      // that quietly drifts is exactly the kind of thing nobody notices.
+      exclude: ["src/index.ts", "**/*.d.ts"],
+      // Set at what the suite clears. The residual branch gap is the SSR and
+      // absent-global guards (`typeof window === "undefined"`,
+      // `typeof ResizeObserver === "undefined"`): the real ones are exercised
+      // by `ssr.test.tsx` through `renderToString`, and forcing the rest by
+      // deleting globals would assert the mock, not the component.
+      thresholds: { lines: 100, functions: 98, branches: 93, statements: 100 },
     },
     environment: "jsdom",
     globals: true,

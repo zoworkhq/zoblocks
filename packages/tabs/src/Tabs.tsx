@@ -21,8 +21,8 @@
 
 import * as React from "react";
 import type { Availability, StepState, TabItem, Tone } from "@oxygenui-design/tabs-core";
-import { TabsContext } from "./context.js";
-import { DECLARATIVE_ONLY, useValidateConfig } from "./internal.js";
+import { TabsContext, ValidatedByParent } from "./context.js";
+import { useValidateProps } from "./internal.js";
 import { TabsRoot, type TabsRootProps } from "./TabsRoot.js";
 import { TabsList } from "./TabsList.js";
 import { TabsTrigger } from "./TabsTrigger.js";
@@ -66,64 +66,67 @@ export const Tabs = React.forwardRef<HTMLDivElement, TabsProps>(function Tabs(
   const ownsPanels = rootProps.as === "tabs" || rootProps.as === "steps";
 
   /*
-   * The declarative form knows its items as a prop, so it answers the two
-   * questions the registry cannot — and only those, so no problem is reported
-   * twice (see DECLARATIVE_ONLY).
+   * Validated here, at render, over the whole set.
+   *
+   * `items` is a prop, so nothing has to wait for the trigger registry — which
+   * means this also runs on a server, where the registry never exists. That is
+   * the difference between a tablist of links failing in CI and failing in
+   * somebody's browser. `Tabs.Root` stands down (see `ValidatedByParent`) so
+   * each problem has exactly one reporter.
    */
-  useValidateConfig(
-    {
-      mode: rootProps.as,
-      items: items as readonly TabItem[],
-      overflow: rootProps.overflow,
-      orientation: rootProps.orientation,
-      value: rootProps.value,
-      defaultValue: rootProps.defaultValue,
-      hasPanels: items.some((item) => item.children !== undefined),
-      hasCloseHandler: Boolean(rootProps.editable?.onClose),
-    },
-    { only: DECLARATIVE_ONLY },
-  );
+  useValidateProps({
+    mode: rootProps.as,
+    items: items as readonly TabItem[],
+    overflow: rootProps.overflow,
+    orientation: rootProps.orientation,
+    value: rootProps.value,
+    defaultValue: rootProps.defaultValue,
+    hasPanels: items.some((item) => item.children !== undefined),
+    hasCloseHandler: Boolean(rootProps.editable?.onClose),
+  });
 
   return (
-    <TabsRoot {...rootProps} ref={ref}>
-      <TabsList
-        aria-label={label}
-        className={listClassName}
-        extra={rootProps.editable?.onAdd ? <TabsAddButton /> : undefined}
-      >
-        {items.map((item) => (
-          <TabsTrigger
-            key={item.value}
-            value={item.value}
-            textLabel={item.textLabel}
-            icon={item.icon}
-            count={item.count}
-            tone={item.tone}
-            dot={item.dot}
-            availability={item.availability}
-            disabled={item.disabled}
-            disabledReason={item.disabledReason}
-            closable={item.closable}
-            href={item.href}
-            state={item.state}
-          >
-            {item.label}
-          </TabsTrigger>
-        ))}
-      </TabsList>
-
-      {toolbar}
-
-      {ownsPanels && items.some((item) => item.children !== undefined) ? (
-        <TabsPanels className={panelsClassName}>
+    <ValidatedByParent.Provider value={true}>
+      <TabsRoot {...rootProps} ref={ref}>
+        <TabsList
+          aria-label={label}
+          className={listClassName}
+          extra={rootProps.editable?.onAdd ? <TabsAddButton /> : undefined}
+        >
           {items.map((item) => (
-            <TabsPanel key={item.value} value={item.value} mount={item.mount}>
-              {item.children}
-            </TabsPanel>
+            <TabsTrigger
+              key={item.value}
+              value={item.value}
+              textLabel={item.textLabel}
+              icon={item.icon}
+              count={item.count}
+              tone={item.tone}
+              dot={item.dot}
+              availability={item.availability}
+              disabled={item.disabled}
+              disabledReason={item.disabledReason}
+              closable={item.closable}
+              href={item.href}
+              state={item.state}
+            >
+              {item.label}
+            </TabsTrigger>
           ))}
-        </TabsPanels>
-      ) : null}
-    </TabsRoot>
+        </TabsList>
+
+        {toolbar}
+
+        {ownsPanels && items.some((item) => item.children !== undefined) ? (
+          <TabsPanels className={panelsClassName}>
+            {items.map((item) => (
+              <TabsPanel key={item.value} value={item.value} mount={item.mount}>
+                {item.children}
+              </TabsPanel>
+            ))}
+          </TabsPanels>
+        ) : null}
+      </TabsRoot>
+    </ValidatedByParent.Provider>
   );
 });
 

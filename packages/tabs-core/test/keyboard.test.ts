@@ -332,3 +332,21 @@ describe("reorderIntent", () => {
     expect(reorderIntent("ArrowRight", mods, 9, 4, horizontal)).toBeNull();
   });
 });
+
+describe("degenerate lists", () => {
+  it("returns none when a sparse array has no navigable item", () => {
+    // A host that builds items with `new Array(n)` and fills them
+    // conditionally leaves holes. Walking off the end of one must terminate,
+    // not spin.
+    const sparse = new Array<TabItem>(3);
+    expect(keyToIntent("ArrowRight", sparse, 0, horizontal)).toEqual({ kind: "none" });
+    expect(keyToIntent("Home", sparse, 0, horizontal)).toEqual({ kind: "none" });
+    expect(keyToIntent("End", sparse, 0, horizontal)).toEqual({ kind: "none" });
+  });
+
+  it("skips holes to reach a real item", () => {
+    const sparse = new Array<TabItem>(3);
+    sparse[2] = { value: "c", label: "Charlie" };
+    expect(keyToIntent("ArrowRight", sparse, 0, horizontal)).toEqual({ kind: "move", index: 2 });
+  });
+});

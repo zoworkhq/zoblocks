@@ -2800,7 +2800,7 @@
           <tr><td>3 — Overflow</td><td>scroll, menu, collapse, wrap + container queries</td><td>23 tabs at 360 px reachable by keyboard, pointer and screen reader in every strategy</td><td class="yes">Shipped</td></tr>
           <tr><td>4 — Stateful</td><td>enclosed/editable, stepper, <code>onBeforeChange</code>, audit events, availability</td><td>Close-focus order and guard veto covered by tests; audit payload reviewed</td><td class="yes">Shipped</td></tr>
           <tr><td>5 — Composed</td><td>card, stat, command; antd <code>ConfigProvider</code> bridge; <code>syncTo</code> adapters</td><td>Docs site rebuilt on Oxygen Tabs — dogfooded before release</td><td class="mid">Shipped, not yet dogfooded</td></tr>
-          <tr><td>6 — Tests</td><td>Core units, React integration, axe across variants and modes</td><td>340 tests; 99.5 % / 98.3 % statement coverage over the two packages</td><td class="yes">Shipped</td></tr>
+          <tr><td>6 — Tests</td><td>Core units, React integration, SSR, axe across variants and modes</td><td>483 tests; 100 % statement and line coverage on both packages</td><td class="yes">Shipped</td></tr>
         </tbody>
       </table>
     </div>
@@ -2831,6 +2831,20 @@
         without panels pointed at an element that did not exist.</li>
         <li><b>Typeahead did not implement APG's repeat-to-cycle rule</b>, so pressing L three
         times searched for “lll” and stranded the user on the first L tab.</li>
+      </ul>
+      <p>
+        Two more surfaced while pushing coverage to the top, and both were found only because
+        the last few uncovered lines were chased rather than written off:
+      </p>
+      <ul>
+        <li><b>Validation ran in an effect, so it was silent on the server.</b> A tablist of
+        links passed straight through <code>renderToString</code> and only failed once it reached
+        a browser — the wrong half of the pipeline to find out in, for the one defect this whole
+        component exists to prevent. The declarative <code>Tabs</code> now validates at render.</li>
+        <li><b><code>Array.prototype.map</code> preserves holes</b>, so the “everything fits”
+        path of <code>fitTabs</code> returned a sparse index list whenever the width cache was
+        briefly incomplete — and the tabs at those positions ended up in neither the visible set
+        nor the overflow set. They simply stopped existing.</li>
       </ul>
     </div>
 

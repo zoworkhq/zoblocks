@@ -39,3 +39,9 @@ audit events, a `--ox-tabs-*` token surface that falls through to `--ant-*`, and
 `tabs-core` ships the parts with no React dependency: the role table, the
 keyboard model, priority-plus `fitTabs`, indicator geometry, the change gate,
 validation, locale strings and the URL adapters.
+
+Configuration is validated at render time by the declarative `Tabs`, so an
+invalid strip fails identically in `renderToString` and in a browser — a
+tablist of links must not be something you only discover after deploying. The
+compound `Tabs.Root` keeps a post-mount check, because it learns its items from
+a registry that layout effects fill.

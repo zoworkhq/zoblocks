@@ -89,6 +89,16 @@ export interface TabsContextValue {
 
 export const TabsContext = React.createContext<TabsContextValue | null>(null);
 
+/**
+ * Set by the declarative `Tabs`, read by `Tabs.Root`.
+ *
+ * When `Tabs` is driving, it has already validated the same items at render
+ * time — more completely, and early enough to fail on a server. `Tabs.Root`
+ * then skips its own late check, because two components reporting one problem
+ * is how you get an `AggregateError` whose message is the empty string.
+ */
+export const ValidatedByParent = React.createContext(false);
+
 export function useTabsContext(part: string): TabsContextValue {
   const context = React.useContext(TabsContext);
   if (!context) {

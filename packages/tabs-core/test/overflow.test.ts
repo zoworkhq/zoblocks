@@ -140,3 +140,34 @@ describe("shouldCollapse", () => {
     expect(shouldCollapse(500, 6, 600)).toBe(true);
   });
 });
+
+describe("fitTabs with an incomplete width map", () => {
+  // The cache is invalidated when the tab set changes, so there is a window
+  // where it is shorter than the list. Treating a missing width as zero keeps
+  // the strip usable instead of throwing arithmetic at NaN.
+  it("treats a missing width as zero rather than producing NaN", () => {
+    const widths = new Array<number>(4);
+    widths[0] = 100;
+    const result = fitTabs({ widths, available: 260, gap: 0, reserve: 60 });
+    expect(result.visible.concat(result.overflow).sort((a, b) => a - b)).toEqual([0, 1, 2, 3]);
+  });
+
+  it("keeps an unmeasured tab in the partition when the strip overflows", () => {
+    const widths = new Array<number>(4);
+    widths[0] = 200;
+    widths[1] = 200;
+    widths[3] = 200;
+    const result = fitTabs({ widths, available: 220, gap: 0, reserve: 60 });
+    // Index 2 has no measured width. It must land in one set or the other —
+    // a tab that is in neither has silently stopped existing.
+    expect(result.visible.concat(result.overflow).sort((a, b) => a - b)).toEqual([0, 1, 2, 3]);
+  });
+
+  it("survives a pinned index with no measured width", () => {
+    const widths = new Array<number>(3);
+    widths[0] = 400;
+    widths[1] = 400;
+    const result = fitTabs({ widths, available: 200, reserve: 40, pinned: 2 });
+    expect(result.visible).toContain(2);
+  });
+});

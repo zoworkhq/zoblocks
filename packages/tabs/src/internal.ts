@@ -52,17 +52,44 @@ export interface ValidateScope {
   only?: readonly ProblemCode[];
 }
 
+function report(input: ValidateInput, scope: ValidateScope): void {
+  const { ignore, only } = scope;
+  const problems = validateTabsConfig(input).filter((problem) => {
+    if (only) return only.includes(problem.code);
+    return !ignore?.includes(problem.code);
+  });
+  if (problems.length === 0) return;
+  throw new Error(formatProblems(problems));
+}
+
+/**
+ * Validation during render, for a caller that already knows its items.
+ *
+ * The effect-based variant below cannot run on a server, so a tablist of links
+ * would pass straight through `renderToString` and only fail once it reached a
+ * browser — the wrong half of the pipeline to find out in, and precisely the
+ * defect this component exists to prevent. The declarative `Tabs` has its
+ * items as a prop, so it checks them at render time and fails identically in
+ * both places.
+ */
+export function useValidateProps(input: ValidateInput, scope: ValidateScope = {}): void {
+  report(input, scope);
+}
+
+/**
+ * Validation after mount, for the compound API.
+ *
+ * `Tabs.Root` learns its items from the trigger registry, which layout effects
+ * fill — so there is nothing to validate until after the first commit, and
+ * nothing at all on a server. This is the unavoidably late check; the
+ * render-time one above covers everything that can be known earlier.
+ */
 export function useValidateConfig(input: ValidateInput, scope: ValidateScope = {}): void {
   const { ignore, only } = scope;
-  // The dependency list is intentionally coarse — validation is dev-only and
-  // cheap, and a fine-grained list would miss a mutated item object.
+  // The dependency list is intentionally coarse — validation is cheap, and a
+  // fine-grained list would miss a mutated item object.
   React.useEffect(() => {
-    const problems = validateTabsConfig(input).filter((problem) => {
-      if (only) return only.includes(problem.code);
-      return !ignore?.includes(problem.code);
-    });
-    if (problems.length === 0) return;
-    throw new Error(formatProblems(problems));
+    report(input, { ignore, only });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [input.mode, input.items, input.overflow, input.value, input.defaultValue]);
 }

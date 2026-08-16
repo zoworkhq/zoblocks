@@ -49,7 +49,12 @@ export function fitTabs({
   // Everything fits: no reserve is needed, because there is no More button.
   const total = widths.reduce((sum, w) => sum + w, 0) + gap * Math.max(0, n - 1);
   if (total <= available) {
-    return { visible: widths.map((_, i) => i), overflow: [] };
+    // `Array.from`, not `widths.map` — map preserves holes, so a width cache
+    // that is briefly sparse (it is invalidated whenever the tab set changes)
+    // would return a sparse index list, and the tabs at those positions would
+    // be in neither the visible set nor the overflow set. They would simply
+    // stop existing.
+    return { visible: Array.from({ length: n }, (_, i) => i), overflow: [] };
   }
 
   const budget = available - reserve;

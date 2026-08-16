@@ -251,3 +251,25 @@ describe("canEnterStep", () => {
     expect(canEnterStep(steps, 0, 9)).toBe(false);
   });
 });
+
+describe("re-entrant requests", () => {
+  it("supersedes when the guard itself requests another change", async () => {
+    // A guard that navigates — "you cannot open Labs, here is Summary
+    // instead" — is a real pattern, and the first request must not land after
+    // the second has already committed.
+    const commits: string[] = [];
+    let gate: ReturnType<typeof createChangeGate>;
+    gate = createChangeGate({
+      onBeforeChange: (next) => {
+        if (next === "b") void gate.request("c", "programmatic");
+        return true;
+      },
+      onCommit: (value) => commits.push(value),
+    });
+
+    const first = await gate.request("b", "pointer");
+    expect(first).toMatchObject({ status: "superseded", value: "b" });
+    // Only the redirect committed; the request it replaced did not.
+    expect(commits).toEqual(["c"]);
+  });
+});
