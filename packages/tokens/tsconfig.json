@@ -1,0 +1,10 @@
+{
+  "extends": "@oxygenui-design/tsconfig/react-library.json",
+  "compilerOptions": {
+    "outDir": "dist",
+    "rootDir": "src",
+    "resolveJsonModule": true,
+    "allowJs": false
+  },
+  "include": ["src/**/*.ts"]
+}

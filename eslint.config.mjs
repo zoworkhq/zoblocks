@@ -40,7 +40,27 @@ export default tseslint.config(
   // Component source — everything copied into a customer's repository.
   // -------------------------------------------------------------------------
   {
-    files: ["registry/**/*.{ts,tsx}", "packages/react/**/*.{ts,tsx}", "packages/pro-*/**/*.{ts,tsx}"],
+    // Everything that reaches a customer, through either channel.
+    //
+    // This used to name `packages/react/**` and `packages/pro-*/**`, neither of
+    // which exists — so `packages/loaders`, the one package actually published,
+    // received none of these rules. `eslint --print-config` reported
+    // "@oxygenui rules applied: NONE" for the source shipped to every non-React
+    // framework. Globs that match nothing fail silently, which is why the
+    // negation below names what is excluded rather than listing what is included.
+    files: [
+      "registry/**/*.{ts,tsx}",
+      "packages/*/src/**/*.{ts,tsx}",
+      "packages/pro-*/**/*.{ts,tsx}",
+    ],
+    ignores: [
+      // Build tooling and fixtures, not shipped component source.
+      "packages/eslint-plugin/**",
+      "packages/component-meta/**",
+      "packages/fixtures/**",
+      "packages/tsconfig/**",
+      "**/*.test.{ts,tsx}",
+    ],
     languageOptions: {
       globals: { ...globals.browser },
       parserOptions: { ecmaFeatures: { jsx: true } },
@@ -112,6 +132,7 @@ export default tseslint.config(
     files: [
       "scripts/**/*.ts",
       "*.config.{mjs,ts}",
+      ".dependency-cruiser.cjs",
       "packages/eslint-plugin/**/*.js",
       // Per-package tooling: the fhir publish guard and dist rewriter, the hq
       // dev seed and its drizzle config. Same job, same environment.
@@ -121,6 +142,7 @@ export default tseslint.config(
     ],
     languageOptions: {
       globals: { ...globals.node },
+      sourceType: "commonjs",
     },
     rules: {
       "no-console": "off",

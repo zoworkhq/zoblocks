@@ -26,7 +26,7 @@ import {
   type TokenMap,
   type TokenSource,
 } from "./load";
-import { measureContrast, resolveTheme } from "./validate";
+import { measureContrast, resolveFlat, resolveTheme } from "./validate";
 
 export const tokenPaths = {
   css: path.join(ROOT, "packages", "tokens", "src", "oxygen-tokens.css"),
@@ -137,6 +137,30 @@ function buildCss(source: TokenSource): string {
 
   out.push("}");
   out.push("");
+
+  // ---- Brands -----------------------------------------------------------
+  //
+  // A brand replaces primitives only, so a single block per brand re-declares
+  // the palette and every semantic token downstream follows automatically —
+  // which is the whole point of the tier discipline. No component knows a brand
+  // exists.
+  //
+  // Emitted after the base palette so a brand wins on source order at equal
+  // specificity, and scoped to an attribute so it can be applied to <html> or
+  // to any subtree — a portal previewing a customer's theme inside our own
+  // admin, for instance.
+  for (const brand of source.brands) {
+    out.push(
+      section(
+        `Brand — ${brand.name}`,
+        brand.description ?? "Customer palette. Overrides primitives only.",
+      ),
+    );
+    out.push(`[data-ox-brand="${brand.name}"] {`);
+    out.push(...declarations(brand.primitive));
+    out.push("}");
+    out.push("");
+  }
 
   // -- density profiles ----------------------------------------------------
   out.push("/* Density profiles. Nestable — innermost wins. */");
@@ -306,18 +330,44 @@ function buildJson(source: TokenSource): string {
     );
   }
 
+  // Resolved, like the theme and component blocks above. This used to publish
+  // `token.value` raw, so three density entries shipped the literal string
+  // "{ref.size.md}" to anything consuming the file the header describes as a
+  // flat map for external tooling. Reference resolution was checked; output
+  // shape was not, which is why it survived.
   const density: Record<string, Record<string, string>> = {};
   for (const profile of DENSITIES) {
     density[profile] = Object.fromEntries(
-      [...source.density[profile]].map(([key, token]) => [`--ox-density-${key}`, token.value]),
+      [...resolveFlat(source, source.density[profile])].map(([key, value]) => [
+        `--ox-density-${key}`,
+        value,
+      ]),
     );
   }
 
   const component = Object.fromEntries(
-    [...source.component].map(([name, token]) => [cssVar(name), toCssValue(token.value)]),
+    [...resolveFlat(source, source.component)].map(([name, value]) => [cssVar(name), value]),
   );
 
-  return JSON.stringify({ themes, density, component }, null, 2);
+  // Brands are published as fully resolved theme maps rather than as their
+  // overrides, because a consumer asking "what colour is --ox-accent for
+  // Northwind in dark?" should not have to re-implement the resolver.
+  const brands: Record<string, Record<string, Record<string, string>>> = {};
+  for (const brand of source.brands) {
+    const themed: Record<string, Record<string, string>> = {};
+    for (const theme of THEMES) {
+      themed[theme] = Object.fromEntries(
+        [...resolveTheme(source, theme, brand)].map(([name, value]) => [cssVar(name), value]),
+      );
+    }
+    brands[brand.name] = themed;
+  }
+
+  return JSON.stringify(
+    { themes, density, component, ...(source.brands.length ? { brands } : {}) },
+    null,
+    2,
+  );
 }
 
 // ---------------------------------------------------------------------------

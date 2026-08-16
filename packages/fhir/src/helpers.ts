@@ -962,7 +962,12 @@ export function nameInitials(name: string | undefined, max = 2): string | undefi
     .filter((w) => w && !/^(mr|mrs|ms|mx|dr|prof|sir|rev)$/i.test(w));
   if (!words.length) return undefined;
 
-  const picked = words.length === 1 ? [words[0]!] : [words[0]!, words[words.length - 1]!];
+  // Guarded by the length check above, but written without assertions: this is
+  // published source in a healthcare library, and "provably safe today" is how
+  // an assertion survives the refactor that makes it unsafe.
+  const first = words[0] ?? "";
+  const last = words[words.length - 1] ?? "";
+  const picked = words.length === 1 ? [first] : [first, last];
   const initials = picked
     .slice(0, max)
     .map((w) => Array.from(w)[0] ?? "")

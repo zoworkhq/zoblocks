@@ -43,11 +43,25 @@ export default defineConfig({
     // the registry, which is not a package and would otherwise be tested by
     // nothing.
     exclude: ["**/node_modules/**", "packages/**", "apps/**"],
+    // Deliberately NOT passWithNoTests. It was set while the registry was empty
+    // during the rebuild, and it means deleting every component test leaves CI
+    // green — the gate's real floor becomes zero. Components exist again, so the
+    // suite must find them.
+    passWithNoTests: false,
     coverage: {
       provider: "v8",
       include: ["registry/oxygen/**/*.tsx"],
       exclude: ["**/*.test.tsx", "**/*.meta.ts"],
       reporter: ["text-summary", "json-summary"],
+      // A coverage report nothing enforces is a number in a log. These are set
+      // at the level the current suite already clears, so they ratchet rather
+      // than aspire; raise them, never lower them.
+      thresholds: {
+        lines: 90,
+        statements: 90,
+        branches: 85,
+        functions: 90,
+      },
     },
   },
 });

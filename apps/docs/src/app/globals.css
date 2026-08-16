@@ -9,6 +9,11 @@
    forgotten. Do not add entries here. */
 @import "./generated-sources.css";
 
+/* Loader keyframes and structure. Shipped to customers as
+   styles/oxygen-loader.css by the `loader-core` registry item; imported here
+   so the docs render the same file a customer installs, not a copy of it. */
+@import "../../../../registry/oxygen/lib/loader.css";
+
 /* ===========================================================================
  * oxygenui.design — site design layer
  *

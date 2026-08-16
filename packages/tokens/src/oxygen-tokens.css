@@ -86,6 +86,7 @@
   --ox-ref-ink-100: #edf2f7;
   --ox-ref-ink-200: #a5b1be;
   --ox-ref-ink-300: #82909f;
+  --ox-ref-ink-500: #5d6c7e;
   --ox-ref-ink-600: #3a4654;
   --ox-ref-ink-700: #29333f;
   --ox-ref-ink-740: #1d2630;
@@ -210,16 +211,16 @@
   --ox-surface-raised: var(--ox-ref-white);
   --ox-surface-overlay: var(--ox-ref-white);
   --ox-border: var(--ox-ref-slate-200);
-  --ox-border-strong: var(--ox-ref-slate-300);
+  --ox-border-strong: var(--ox-ref-slate-500);
   --ox-text: var(--ox-ref-slate-900);
   --ox-text-muted: var(--ox-ref-slate-600);
   --ox-text-subtle: var(--ox-ref-slate-500);
   --ox-text-on-accent: var(--ox-ref-white);
-  --ox-accent: var(--ox-ref-brand-600);
-  --ox-accent-hover: var(--ox-ref-brand-700);
+  --ox-accent: var(--ox-ref-brand-700);
+  --ox-accent-hover: var(--ox-ref-brand-800);
   --ox-accent-subtle: var(--ox-ref-brand-50);
   --ox-accent-border: var(--ox-ref-brand-200);
-  --ox-focus-ring: var(--ox-ref-brand-500);
+  --ox-focus-ring: var(--ox-ref-brand-600);
   --ox-focus-ring-offset: var(--ox-ref-white);
   --ox-status-critical: var(--ox-ref-red-700);
   --ox-status-critical-bg: var(--ox-ref-red-50);
@@ -368,6 +369,20 @@
   --ox-nav-radius: var(--ox-radius);
 }
 
+  /* Brand — northwind ---------------------------------------------------
+   * Northwind Health — a worked example, and the fixture the brand tests run against. Overrides the brand ramp and the accent-adjacent neutrals only; every status colour is inherited, because what critical looks like is not a brand decision.
+   */
+[data-ox-brand="northwind"] {
+  --ox-ref-brand-50: #eff6ff;
+  --ox-ref-brand-200: #bfdbfe;
+  --ox-ref-brand-500: #3b82f6;
+  --ox-ref-brand-600: #1d63c9;
+  --ox-ref-brand-700: #1a53a8;
+  --ox-ref-brand-800: #17458a;
+  --ox-ref-cyan-200: #bae6fd;
+  --ox-ref-cyan-300: #7dd3fc;
+}
+
 /* Density profiles. Nestable — innermost wins. */
 [data-ox-density="patient"] {
   --ox-density-row-height: 3.25rem;
@@ -409,7 +424,7 @@
   --ox-surface-raised: var(--ox-ref-ink-780);
   --ox-surface-overlay: var(--ox-ref-ink-740);
   --ox-border: var(--ox-ref-ink-700);
-  --ox-border-strong: var(--ox-ref-ink-600);
+  --ox-border-strong: var(--ox-ref-ink-500);
   --ox-text: var(--ox-ref-ink-100);
   --ox-text-muted: var(--ox-ref-ink-200);
   --ox-text-subtle: var(--ox-ref-ink-300);

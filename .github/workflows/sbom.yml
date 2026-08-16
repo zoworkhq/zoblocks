@@ -1,0 +1,62 @@
+# Software Bill of Materials.
+#
+# Healthcare procurement asks for one, increasingly as a contract term. It is
+# cheap to produce and expensive to be without at the moment a customer asks.
+# Generated on every release and attached to the GitHub release.
+
+name: SBOM
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  sbom:
+    name: Generate and attach
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate CycloneDX SBOM
+        run: |
+          set -euo pipefail
+          pnpm dlx @cyclonedx/cyclonedx-npm@latest \
+            --output-format JSON \
+            --output-file sbom.cyclonedx.json \
+            --omit dev \
+            --spec-version 1.5
+
+      - name: Summarise
+        run: |
+          set -euo pipefail
+          count=$(node -e 'process.stdout.write(String((require("./sbom.cyclonedx.json").components||[]).length))')
+          echo "### SBOM generated" >> "$GITHUB_STEP_SUMMARY"
+          echo "\`$count\` runtime components, CycloneDX 1.5." >> "$GITHUB_STEP_SUMMARY"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: sbom
+          path: sbom.cyclonedx.json
+          retention-days: 90
+
+      - name: Attach to the release
+        if: github.event_name == 'release'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release upload "${{ github.event.release.tag_name }}" sbom.cyclonedx.json --clobber

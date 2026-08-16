@@ -23,8 +23,12 @@ export async function generateMetadata({
   const component = getComponent(name);
   if (!component) return {};
 
+  // Primitives take no FHIR resource, and "FHIR undefined React component" is
+  // the kind of title that ends up in a search result.
   return {
-    title: `${component.title} — FHIR ${component.resource} React component`,
+    title: component.resource
+      ? `${component.title} — FHIR ${component.resource} React component`
+      : `${component.title} — React component for healthcare interfaces`,
     description: component.summary,
     alternates: { canonical: `/components/${component.name}` },
   };
@@ -86,13 +90,18 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
             </div>
 
             <p className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-graphite">
-              <a
-                href={component.resourceUrl}
-                className="numeric inline-flex items-center gap-1 text-oxygen-deep transition-colors hover:text-ink"
-              >
-                {component.resource}
-                <ArrowUpRight aria-hidden="true" className="size-3" />
-              </a>
+              {/* Primitives take no FHIR resource. Rendering the link anyway
+                  leaves an anchor with no text and no destination, which is
+                  both an empty affordance and an axe violation. */}
+              {component.resource && component.resourceUrl ? (
+                <a
+                  href={component.resourceUrl}
+                  className="numeric inline-flex items-center gap-1 text-oxygen-deep transition-colors hover:text-ink"
+                >
+                  {component.resource}
+                  <ArrowUpRight aria-hidden="true" className="size-3" />
+                </a>
+              ) : null}
               <span className="text-graphite-soft">{component.categories.join(" · ")}</span>
             </p>
 
@@ -176,7 +185,19 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
                 </div>
 
                 <div data-reveal style={{ "--reveal-delay": "80ms" } as React.CSSProperties}>
-                  <div className="scroll-thin overflow-x-auto rounded-2xl border border-rule bg-paper">
+                  {/* A container that scrolls must be reachable by keyboard —
+                      WCAG 2.1.1. `tabIndex={0}` makes it focusable so arrow
+                      keys can pan it, and the group role plus label mean a
+                      screen-reader user is told what they have landed on rather
+                      than hearing an unnamed focus stop. This became a real
+                      violation the moment the props table started listing the
+                      full API instead of one prop. */}
+                  <div
+                    className="scroll-thin overflow-x-auto rounded-2xl border border-rule bg-paper"
+                    tabIndex={0}
+                    role="group"
+                    aria-label={`${component.title} props — scrollable table`}
+                  >
                     <table className="w-full border-collapse text-sm">
                       <caption className="sr-only">{component.title} props</caption>
                       <thead>

@@ -19,6 +19,8 @@ import {
   type TokenMap,
   type TokenSource,
   referenceTarget,
+  toCssValue,
+  type Brand,
 } from "./load";
 
 export interface TokenProblem {
@@ -129,14 +131,29 @@ function resolveLiteral(
   return resolveLiteral(next, lookup, [...seen, target]);
 }
 
-function themeLookup(source: TokenSource, theme: Theme) {
+/**
+ * A palette with a brand's overrides applied on top.
+ *
+ * Overlaying rather than replacing is what makes a brand a *partial* file: it
+ * supplies the steps it cares about and inherits the rest, so a brand cannot
+ * accidentally delete a colour by not mentioning it.
+ */
+function brandedPrimitive(source: TokenSource, brand: Brand | undefined): TokenMap {
+  if (!brand) return source.primitive;
+  const merged = new Map(source.primitive);
+  for (const [key, token] of brand.primitive) merged.set(key, token);
+  return merged;
+}
+
+function themeLookup(source: TokenSource, theme: Theme, brand?: Brand) {
+  const primitive = brandedPrimitive(source, brand);
   return (path: string): string | undefined => {
     const semantic = source.semantic[theme].get(path);
     if (semantic) return semantic.value;
     const shared = source.shared.get(path);
     if (shared) return shared.value;
-    const primitive = source.primitive.get(path);
-    if (primitive) return primitive.value;
+    const ref = primitive.get(path);
+    if (ref) return ref.value;
     return undefined;
   };
 }
@@ -247,9 +264,9 @@ function checkComponentTier(source: TokenSource, problems: TokenProblem[]): void
  * software is allowed to have opinions its customers cannot override, and this
  * is the one that matters most.
  */
-function checkStatusContrast(source: TokenSource, problems: TokenProblem[]): void {
+function checkStatusContrast(source: TokenSource, problems: TokenProblem[], brand?: Brand): void {
   for (const theme of THEMES) {
-    const lookup = themeLookup(source, theme);
+    const lookup = themeLookup(source, theme, brand);
     const floor = floorFor(theme);
     const hues: Partial<Record<(typeof STATUS_PAIRS)[number], number>> = {};
 
@@ -299,30 +316,96 @@ function checkStatusContrast(source: TokenSource, problems: TokenProblem[]): voi
   }
 }
 
-/** Text on its own background, in every theme. */
-function checkTextContrast(source: TokenSource, problems: TokenProblem[]): void {
-  const pairs: [string, string][] = [
-    ["text", "bg"],
-    ["text-muted", "bg"],
-    ["text", "surface"],
-    ["text-muted", "surface"],
-  ];
+/**
+ * Every foreground the system actually composes over a background.
+ *
+ * This list used to be four text pairs. Three real WCAG failures were shipping
+ * outside it, because a pair that is not named here is not checked at all:
+ *
+ *   focus-ring on bg      2.50:1  — the focus indicator for the whole library
+ *   text-on-accent/accent 3.81:1  — every primary button label
+ *   border-strong on bg   1.48:1  — backs --ox-field-border
+ *
+ * The lesson is not "those three values were wrong". It is that a gate which
+ * checks a hand-picked subset reports green while the system fails, and the
+ * subset is the defect. Anything that carries meaning against a surface belongs
+ * here.
+ *
+ * `kind` selects the floor. WCAG separates readable text (1.4.3, 4.5:1) from
+ * user-interface components and graphical objects (1.4.11, 3:1) — a focus ring
+ * and a field border are the second kind, and holding them to 4.5 would be
+ * wrong in the other direction.
+ */
+type ContrastPair = { fg: string; bg: string; kind: "text" | "ui" };
 
+const CONTRAST_PAIRS: ContrastPair[] = [
+  // Readable text — SC 1.4.3.
+  { fg: "text", bg: "bg", kind: "text" },
+  { fg: "text", bg: "surface", kind: "text" },
+  { fg: "text", bg: "bg-subtle", kind: "text" },
+  { fg: "text", bg: "bg-muted", kind: "text" },
+  { fg: "text-muted", bg: "bg", kind: "text" },
+  { fg: "text-muted", bg: "surface", kind: "text" },
+  { fg: "text-muted", bg: "bg-subtle", kind: "text" },
+  { fg: "text-subtle", bg: "bg", kind: "text" },
+  { fg: "text-subtle", bg: "surface", kind: "text" },
+  // Label on a filled action. This is the pair that makes a primary button
+  // readable, and it was the one nobody was checking.
+  { fg: "text-on-accent", bg: "accent", kind: "text" },
+  { fg: "text-on-accent", bg: "accent-hover", kind: "text" },
+  // Interface components and graphical objects — SC 1.4.11.
+  { fg: "focus-ring", bg: "bg", kind: "ui" },
+  { fg: "focus-ring", bg: "surface", kind: "ui" },
+  { fg: "focus-ring", bg: "bg-subtle", kind: "ui" },
+  { fg: "border-strong", bg: "bg", kind: "ui" },
+  { fg: "border-strong", bg: "surface", kind: "ui" },
+  { fg: "accent", bg: "bg", kind: "ui" },
+  { fg: "accent", bg: "surface", kind: "ui" },
+  // Deliberately absent: accent-border on accent-subtle. A border drawn on its
+  // own tint reinforces a fill that already identifies the component; SC 1.4.11
+  // governs information *required* to identify a control, and demanding 3:1
+  // there would force a heavy rule around every soft callout in the system.
+  // Borders are checked where they actually delimit something — against the page.
+  // Clinical flags carry meaning and were measured but never gated.
+  { fg: "flag.restricted", bg: "flag.restricted-bg", kind: "text" },
+  { fg: "flag.provisional", bg: "bg", kind: "ui" },
+  { fg: "flag.deceased", bg: "bg", kind: "ui" },
+];
+
+/** SC 1.4.3 for text, SC 1.4.11 for interface components; AAA in high contrast. */
+function floorForPair(theme: Theme, kind: ContrastPair["kind"]): number {
+  if (theme === "high-contrast") return kind === "text" ? 7 : 4.5;
+  return kind === "text" ? 4.5 : 3;
+}
+
+function checkTextContrast(source: TokenSource, problems: TokenProblem[], brand?: Brand): void {
   for (const theme of THEMES) {
-    const lookup = themeLookup(source, theme);
-    const floor = floorFor(theme);
+    const lookup = themeLookup(source, theme, brand);
 
-    for (const [fgKey, bgKey] of pairs) {
-      const fgLiteral = resolveLiteral(lookup(fgKey) ?? "", lookup);
-      const bgLiteral = resolveLiteral(lookup(bgKey) ?? "", lookup);
+    for (const { fg: fgKey, bg: bgKey, kind } of CONTRAST_PAIRS) {
+      const fgRaw = lookup(fgKey);
+      const bgRaw = lookup(bgKey);
+      // A pair naming a token this theme does not define is a parity problem,
+      // reported by checkThemeParity. Silence here would hide it twice.
+      if (fgRaw === undefined || bgRaw === undefined) continue;
+
+      const fgLiteral = resolveLiteral(fgRaw, lookup);
+      const bgLiteral = resolveLiteral(bgRaw, lookup);
       const fg = fgLiteral ? parseHex(fgLiteral) : undefined;
       const bg = bgLiteral ? parseHex(bgLiteral) : undefined;
+
+      // Unlike the status check this does not hard-fail on an unparseable
+      // value: several of these backgrounds are legitimately translucent in
+      // dark themes, where a ratio against an unknown backdrop is not a number
+      // we can honestly compute.
       if (!fg || !bg) continue;
 
+      const floor = floorForPair(theme, kind);
       const ratio = contrastRatio(fg, bg);
       if (ratio < floor) {
+        const rule = kind === "text" ? "SC 1.4.3 (text)" : "SC 1.4.11 (interface component)";
         problems.push({
-          message: `${fgKey} on ${bgKey} in theme "${theme}" is ${ratio.toFixed(2)}:1, below the ${floor}:1 floor.`,
+          message: `${fgKey} on ${bgKey} in theme "${theme}" is ${ratio.toFixed(2)}:1, below the ${floor}:1 floor for ${rule}.`,
         });
       }
     }
@@ -365,6 +448,40 @@ function checkReferencesResolve(source: TokenSource, problems: TokenProblem[]): 
   }
 }
 
+/**
+ * Every brand is held to the base palette's bar.
+ *
+ * A brand overriding the palette can quietly push the focus ring or a status
+ * colour under its contrast floor — and the customer would ship it, because the
+ * base build was green. Each brand therefore re-runs the full contrast and hue
+ * gate against its own resolved values, in every theme.
+ *
+ * Customers get their colours. They do not get an unreadable clinical display.
+ */
+function checkBrands(source: TokenSource, problems: TokenProblem[]): void {
+  const baseKeys = new Set(source.primitive.keys());
+
+  for (const brand of source.brands) {
+    // A typo in a brand file must be a build failure, not a line the build
+    // silently ignores while the customer wonders why nothing changed.
+    for (const key of brand.primitive.keys()) {
+      if (!baseKeys.has(key)) {
+        problems.push({
+          message: `brand "${brand.name}" overrides "${key}", which the base palette does not define. A brand may only replace steps that exist.`,
+        });
+      }
+    }
+
+    const brandProblems: TokenProblem[] = [];
+    checkStatusContrast(source, brandProblems, brand);
+    checkTextContrast(source, brandProblems, brand);
+
+    for (const problem of brandProblems) {
+      problems.push({ message: `brand "${brand.name}": ${problem.message}` });
+    }
+  }
+}
+
 export function validateTokens(source: TokenSource): TokenProblem[] {
   const problems: TokenProblem[] = [];
 
@@ -374,6 +491,7 @@ export function validateTokens(source: TokenSource): TokenProblem[] {
   checkComponentTier(source, problems);
   checkStatusContrast(source, problems);
   checkTextContrast(source, problems);
+  checkBrands(source, problems);
 
   return problems;
 }
@@ -387,8 +505,12 @@ export function validateTokens(source: TokenSource): TokenProblem[] {
  * the browser — chart geometry, canvas rendering, and the contrast table in the
  * accessibility docs.
  */
-export function resolveTheme(source: TokenSource, theme: Theme): Map<string, string> {
-  const lookup = themeLookup(source, theme);
+export function resolveTheme(
+  source: TokenSource,
+  theme: Theme,
+  brand?: Brand,
+): Map<string, string> {
+  const lookup = themeLookup(source, theme, brand);
   const out = new Map<string, string>();
 
   for (const map of [source.shared, source.semantic[theme]]) {
@@ -398,6 +520,33 @@ export function resolveTheme(source: TokenSource, theme: Theme): Map<string, str
     }
   }
 
+  return out;
+}
+
+/**
+ * Density and component tiers resolved to literals.
+ *
+ * `resolveTheme` covers the theme tiers; this covers the two that are
+ * theme-invariant, so that every block of `tokens.json` is literal. The file is
+ * documented as a flat map for Figma and other tooling, and neither an alias
+ * (`{ref.size.md}`) nor a CSS variable (`var(--ox-ref-size-md)`) is a value an
+ * external tool can read.
+ */
+export function resolveFlat(source: TokenSource, map: TokenMap): Map<string, string> {
+  const lookup = (path: string): string | undefined =>
+    source.semantic.light.get(path)?.value ??
+    source.shared.get(path)?.value ??
+    source.primitive.get(path)?.value;
+
+  const out = new Map<string, string>();
+  for (const [key, token] of map) {
+    const literal = resolveLiteral(token.value, lookup);
+    // A component token may reference density deliberately — those vary per
+    // container and cannot be reduced to a literal at build time. Publish them
+    // as the CSS variable they resolve to at runtime, never as a raw
+    // "{density.pad-x}" alias, which is meaningless to every consumer.
+    out.set(key, literal ?? toCssValue(token.value));
+  }
   return out;
 }
 
@@ -415,18 +564,26 @@ export function measureContrast(source: TokenSource): ContrastReading[] {
 
   for (const theme of THEMES) {
     const lookup = themeLookup(source, theme);
-    const floor = floorFor(theme);
 
-    const pairs: [string, string][] = [
-      ...STATUS_PAIRS.map((s) => [`status.${s}`, `status.${s}-bg`] as [string, string]),
-      ["text", "bg"],
-      ["text-muted", "bg"],
-      ["text", "surface"],
-      ["text-muted", "surface"],
-      ["flag.restricted", "flag.restricted-bg"],
+    // Published evidence must be the same list the gate enforces. Two lists is
+    // how `flag.restricted` ended up measured, printed, and checked by nothing.
+    // Each pair carries the floor its own rule imposes. Publishing one blanket
+    // floor made the evidence table disagree with the gate: a focus ring was
+    // reported failing 4.5:1 while the gate correctly held it to 3:1.
+    const pairs: { fg: string; bg: string; floor: number }[] = [
+      ...STATUS_PAIRS.map((s) => ({
+        fg: `status.${s}`,
+        bg: `status.${s}-bg`,
+        floor: floorFor(theme),
+      })),
+      ...CONTRAST_PAIRS.map((p) => ({
+        fg: p.fg,
+        bg: p.bg,
+        floor: floorForPair(theme, p.kind),
+      })),
     ];
 
-    for (const [fgKey, bgKey] of pairs) {
+    for (const { fg: fgKey, bg: bgKey, floor: pairFloor } of pairs) {
       const fgLiteral = resolveLiteral(lookup(fgKey) ?? "", lookup);
       const bgLiteral = resolveLiteral(lookup(bgKey) ?? "", lookup);
       const fg = fgLiteral ? parseHex(fgLiteral) : undefined;
@@ -438,7 +595,7 @@ export function measureContrast(source: TokenSource): ContrastReading[] {
         token: fgKey,
         against: bgKey,
         ratio: Math.round(contrastRatio(fg, bg) * 100) / 100,
-        floor,
+        floor: pairFloor,
       });
     }
   }

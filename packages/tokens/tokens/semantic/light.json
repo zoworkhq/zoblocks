@@ -10,19 +10,22 @@
   "surface-overlay": { "$type": "color", "$value": "{ref.white}" },
 
   "border": { "$type": "color", "$value": "{ref.slate.200}" },
-  "border-strong": { "$type": "color", "$value": "{ref.slate.300}" },
+  "$comment-border-strong": "Backs --ox-field-border and --ox-chart-axis, both UI components under WCAG 1.4.11. slate.300 measured 1.48:1 on white — half the 3:1 floor. slate.500 is 4.76:1.",
+  "border-strong": { "$type": "color", "$value": "{ref.slate.500}" },
 
   "text": { "$type": "color", "$value": "{ref.slate.900}" },
   "text-muted": { "$type": "color", "$value": "{ref.slate.600}" },
   "text-subtle": { "$type": "color", "$value": "{ref.slate.500}" },
   "text-on-accent": { "$type": "color", "$value": "{ref.white}" },
 
-  "accent": { "$type": "color", "$value": "{ref.brand.600}" },
-  "accent-hover": { "$type": "color", "$value": "{ref.brand.700}" },
+  "$comment-accent": "White text on brand.600 measured 3.81:1, below the 4.5:1 floor for --ox-text-on-accent — that is every primary button label. brand.700 is 5.56:1.",
+  "accent": { "$type": "color", "$value": "{ref.brand.700}" },
+  "accent-hover": { "$type": "color", "$value": "{ref.brand.800}" },
   "accent-subtle": { "$type": "color", "$value": "{ref.brand.50}" },
   "accent-border": { "$type": "color", "$value": "{ref.brand.200}" },
 
-  "focus-ring": { "$type": "color", "$value": "{ref.brand.500}" },
+  "$comment-focus-ring": "brand.500 measured 2.50:1 on white against the 3:1 floor in SC 1.4.11 and 2.4.11 — the focus indicator for every interactive component in the library. brand.600 is 3.81:1 and stays distinct from the accent.",
+  "focus-ring": { "$type": "color", "$value": "{ref.brand.600}" },
   "focus-ring-offset": { "$type": "color", "$value": "{ref.white}" },
 
   "status": {

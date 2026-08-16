@@ -3,9 +3,9 @@ import { Activity, ArrowRight, Braces, ShieldCheck } from "lucide-react";
 import { CATALOG } from "@/lib/catalog";
 import { ComponentCard } from "@/components/site/component-card";
 import { ScrollRail, SiteFooter, SiteHeader } from "@/components/site/chrome";
+import { DemoPlaceholder } from "@/components/site/demo-placeholder";
+import { LoaderShowcase } from "@/components/site/loader-showcase";
 import { Counter, InstallCommand, RevealRoot } from "@/components/site/interactions";
-import { FailureDemo } from "@/components/site/failure-demo";
-import { LiveInstrument } from "@/components/site/live-instrument";
 import { TelemetryTrace } from "@/components/site/telemetry-trace";
 
 export default function HomePage() {
@@ -31,14 +31,16 @@ export default function HomePage() {
 /* ========================================================================== */
 
 function Hero() {
-  const resources = [
-    "Patient",
-    "Observation",
-    "MedicationRequest",
-    "AllergyIntolerance",
-    "Appointment",
-    "Condition",
-    "Coverage",
+  // What the loaders are held to, stated as the claim rather than as a promise
+  // about components that do not exist yet.
+  const claims = [
+    "WCAG 2.2 AA",
+    "Reduced motion",
+    "Forced colours",
+    "Light + dark",
+    "Token-themed",
+    "SSR-safe",
+    "0 dependencies",
   ];
 
   return (
@@ -78,16 +80,16 @@ function Hero() {
               className="body-lg enter mt-7 max-w-xl text-pretty text-graphite"
               style={{ "--enter-delay": "300ms" } as React.CSSProperties}
             >
-              Pass a FHIR <code className="numeric text-[0.9em] text-ink">Observation[]</code> and
-              get reference ranges, interpretation flags, and the uninterpreted case handled
-              correctly. The source is copied into your repo — yours to read, audit, and change.
+              Components built for the moments a healthcare interface is judged: the wait, the
+              missing value, the result nobody interpreted. The source is copied into your repo —
+              yours to read, audit, and change.
             </p>
             <div
               className="enter mt-8 flex max-w-2xl flex-col gap-3 sm:flex-row sm:items-center"
               style={{ "--enter-delay": "390ms" } as React.CSSProperties}
             >
               <InstallCommand
-                command="pnpm dlx shadcn@latest add @oxygenui/vitals-panel"
+                command="pnpm dlx shadcn@latest add @oxygenui/pulse-loader"
                 className="min-w-0 flex-1"
               />
               <Link
@@ -131,18 +133,18 @@ function Hero() {
           className="hero-resource-strip enter mt-10"
           style={{ "--enter-delay": "530ms" } as React.CSSProperties}
         >
-          <span className="axis-label shrink-0">Typed to</span>
+          <span className="axis-label shrink-0">Held to</span>
           <div className="flex min-w-0 flex-wrap gap-2">
-            {resources.map((resource) => (
-              <span key={resource} className="hero-resource-chip numeric">
-                {resource}
+            {claims.map((claim) => (
+              <span key={claim} className="hero-resource-chip numeric">
+                {claim}
               </span>
             ))}
           </div>
         </div>
 
         <div className="enter mt-14" style={{ "--enter-delay": "620ms" } as React.CSSProperties}>
-          <LiveInstrument />
+          <LoaderShowcase />
         </div>
       </div>
     </section>
@@ -325,7 +327,12 @@ function CodeComparison() {
         </div>
 
         <div className="mt-12">
-          <FailureDemo />
+          {/* Was FailureDemo: the hand-rolled renderer beside the real one, on
+              the same five results. Returns with the rebuilt catalog. */}
+          <DemoPlaceholder label="Two renderers · same five results">
+            The side-by-side comparison renders the real component — it returns with the rebuilt
+            component catalog.
+          </DemoPlaceholder>
         </div>
       </div>
     </section>
@@ -343,24 +350,33 @@ function Catalog() {
             Catalog
           </p>
           <h2 className="display-lg mt-4 text-balance" data-reveal>
-            Every component is named for the resource it takes.
+            Installed one at a time, built to one standard.
           </h2>
           <p className="lede mt-5 max-w-2xl text-pretty" data-reveal>
-            No adapter layer, no bespoke prop shape to learn. If your server speaks FHIR, the
-            component is already typed for it.
+            Every component carries its own tests, its own accessibility notes, and a designed
+            reduced-motion state. Take the one you need.
           </p>
         </div>
 
-        <div className="mt-12 grid auto-rows-fr gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {CATALOG.map((component, index) => (
-            <ComponentCard
-              key={component.name}
-              component={component}
-              index={index}
-              featured={index === 0}
-            />
-          ))}
-        </div>
+        {CATALOG.length > 0 ? (
+          <div className="mt-12 grid auto-rows-fr gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {CATALOG.map((component, index) => (
+              <ComponentCard
+                key={component.name}
+                component={component}
+                index={index}
+                featured={index === 0}
+              />
+            ))}
+          </div>
+        ) : (
+          <p
+            className="mt-12 max-w-xl rounded-2xl border border-dashed border-rule px-6 py-8 text-sm leading-relaxed text-graphite"
+            data-reveal
+          >
+            The catalog is being rebuilt from scratch. Components appear here as each one ships.
+          </p>
+        )}
 
         <div className="mt-10" data-reveal>
           <Link
@@ -455,7 +471,7 @@ function ClosingCta() {
             </p>
             <div className="mx-auto mt-8 max-w-xl">
               <InstallCommand
-                command="pnpm dlx shadcn@latest add @oxygenui/vitals-panel"
+                command="pnpm dlx shadcn@latest add @oxygenui/pulse-loader"
                 note={
                   <>
                     <code className="font-mono text-[0.6875rem] text-ink">@oxygenui</code> is a

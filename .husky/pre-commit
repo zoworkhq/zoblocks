@@ -1,0 +1,4 @@
+# Fast checks only. A pre-commit hook that runs the test suite is a hook people
+# disable; this formats and lints what is actually staged, and leaves the real
+# gates to CI where they belong.
+pnpm exec lint-staged

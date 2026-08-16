@@ -14,7 +14,8 @@
   },
 
   "border": { "$type": "color", "$value": "{ref.ink.700}" },
-  "border-strong": { "$type": "color", "$value": "{ref.ink.600}" },
+  "$comment-border-strong": "ink.600 measured 2.02:1 on the dark ground, below the 3:1 floor for a field border. ink.500 is 3.21:1.",
+  "border-strong": { "$type": "color", "$value": "{ref.ink.500}" },
 
   "text": { "$type": "color", "$value": "{ref.ink.100}" },
   "text-muted": { "$type": "color", "$value": "{ref.ink.200}" },

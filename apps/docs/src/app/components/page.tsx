@@ -7,21 +7,24 @@ import { RevealRoot } from "@/components/site/interactions";
 export const metadata: Metadata = {
   title: "Components",
   description:
-    "Every Oxygen UI component, named for the FHIR resource it takes. Patient, Observation, MedicationRequest, AllergyIntolerance, Appointment, Condition, and Coverage.",
+    "Every Oxygen UI component. Healthcare loaders paced to resting physiology, installed one at a time, with a designed reduced-motion state and a wait that is announced in words.",
 };
 
 export default function ComponentsPage() {
-  // These two carry the product's argument — interpretation and identity — so
-  // they lead, each paired with a standard cell to keep the rhythm even.
-  const FEATURED = ["vitals-panel", "patient-banner"];
-  // "Stable" is the only tier that promises a consumer their build will not
-  // break in a minor release. Beta and experimental are real and installable,
-  // but they belong below the fold rather than in the lead grid.
-  const shipping = CATALOG.filter((c) => c.status === "stable");
-  const planned = CATALOG.filter((c) => c.status !== "stable");
+  // These two carry the product's argument — the signature wait, and the only
+  // loader that can tell the truth about how much is left — so they lead, each
+  // paired with a standard cell to keep the rhythm even.
+  const FEATURED = ["pulse-loader", "infusion-loader"];
 
-  const featured = FEATURED.map((n) => shipping.find((c) => c.name === n)!).filter(Boolean);
-  const rest = shipping.filter((c) => !FEATURED.includes(c.name));
+  // Deprecated components are still installable and still documented, but they
+  // do not belong in the lead grid. Every other tier does: a beta component is
+  // real, shipped, and the thing a visitor came to see. Filtering the grid down
+  // to "stable" only made sense when the catalog had any.
+  const current = CATALOG.filter((c) => c.status !== "deprecated");
+  const deprecated = CATALOG.filter((c) => c.status === "deprecated");
+
+  const featured = FEATURED.map((n) => current.find((c) => c.name === n)).filter(Boolean);
+  const rest = current.filter((c) => !FEATURED.includes(c.name));
   const ordered = [featured[0], rest[0], featured[1], rest[1], ...rest.slice(2)].filter(Boolean);
 
   return (
@@ -36,12 +39,12 @@ export default function ComponentsPage() {
                 Catalog
               </p>
               <h1 className="display-lg mt-5 text-balance" data-reveal>
-                Every component is named for the resource it takes.
+                Every component ships the states a demo would skip.
               </h1>
               <p className="body-lg mt-6 max-w-xl text-pretty text-graphite" data-reveal>
-                No adapter layer and no bespoke prop shape to learn. If your server speaks FHIR, the
-                component is already typed for it — and every one of them ships the states a demo
-                would skip.
+                Install them one at a time. Each one handles reduced motion with a designed still
+                state, announces itself in words, and resolves every colour through a token your
+                brand can override.
               </p>
             </div>
 
@@ -50,12 +53,10 @@ export default function ComponentsPage() {
             <dl className="lg:pb-1" data-reveal="right">
               <div className="ticks mb-5 opacity-70" aria-hidden="true" />
               {[
-                { label: "Components", value: shipping.length },
+                { label: "Components", value: current.length },
                 {
-                  label: "FHIR resources",
-                  value: new Set(
-                    CATALOG.filter((c) => c.resource !== "Primitive").map((c) => c.resource),
-                  ).size,
+                  label: "Categories",
+                  value: new Set(CATALOG.flatMap((c) => c.categories)).size,
                 },
                 {
                   label: "States handled",
@@ -76,6 +77,15 @@ export default function ComponentsPage() {
 
         <section className="bg-paper-sunk/40">
           <div className="mx-auto max-w-6xl section-minor px-5 sm:px-8">
+            {CATALOG.length === 0 && (
+              <p
+                className="max-w-xl rounded-2xl border border-dashed border-rule px-6 py-8 text-sm leading-relaxed text-graphite"
+                data-reveal
+              >
+                The catalog is being rebuilt from scratch. Components appear here as each one ships.
+              </p>
+            )}
+
             <div className="grid auto-rows-fr gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {ordered.map((component, index) => (
                 <ComponentCard
@@ -87,13 +97,17 @@ export default function ComponentsPage() {
               ))}
             </div>
 
-            {planned.length > 0 && (
+            {deprecated.length > 0 && (
               <>
                 <h2 className="display-sm mt-16" data-reveal>
-                  In progress
+                  Deprecated
                 </h2>
+                <p className="mt-2 max-w-xl text-sm text-graphite" data-reveal>
+                  Still installable and still documented, with a removal version and a migration
+                  note on each page.
+                </p>
                 <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                  {planned.map((component, index) => (
+                  {deprecated.map((component, index) => (
                     <ComponentCard key={component.name} component={component} index={index} />
                   ))}
                 </div>

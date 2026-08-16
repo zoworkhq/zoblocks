@@ -8,7 +8,15 @@ on:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  # Cancel superseded PR runs, never a run that is mid-deploy on main. Two
+  # merges in quick succession used to cancel the first one's `vercel deploy`.
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+# Least privilege. There was no permissions block, so every job inherited the
+# repository default while running `pnpm dlx` on network-fetched code. Jobs that
+# need more than read declare it themselves.
+permissions:
+  contents: read
 
 # Identifiers, not credentials — they appear in .vercel/project.json on every
 # machine that has ever run `vercel link`. The only secret is VERCEL_TOKEN.
@@ -57,12 +65,18 @@ jobs:
       # every customer, and this is the cheapest check we have.
       #
       # `--strict` additionally fails when a component does not meet the bar for
-      # its declared stability tier. Half of that bar is now met: all 29
-      # components have test files (coverage.json reports withTest: 29). Stories
-      # are still at zero, so turning `--strict` on today would fail every
-      # component. It goes on when stories land.
-      - name: Generate
-        run: pnpm gen
+      # The catalog quality gate, armed.
+      #
+      # `--strict` makes a component that does not meet the bar for its declared
+      # stability tier a build failure rather than a warning. It stayed off
+      # because `withStory` was 0 and every component would have failed; stories
+      # now exist for all five, and coverage.json reports withStory: 5.
+      #
+      # This is what makes the standard hold without a human reviewing every
+      # component: a beta component without a story, or a stable one without
+      # limitations or extracted props, cannot merge.
+      - name: Generate and enforce the catalog quality gate
+        run: pnpm gen --strict
 
       # Some generated artifacts are committed (registry.json, path mappings,
       # the docs catalog) and some are build output (apps/docs/public/r/*.json,
@@ -87,6 +101,11 @@ jobs:
       # The number may go down. It may not go up: a new warning fails the build,
       # so adding one means fixing it, or fixing another to make room. When it
       # reaches zero, both rules become errors and the flag goes away.
+      # C5: a critical advisory in the toolchain is a critical advisory. This
+      # fails the build rather than waiting for a procurement reviewer to run it.
+      - name: Audit dependencies
+        run: pnpm audit --audit-level=high
+
       - name: Lint
         run: pnpm lint
 
@@ -127,6 +146,14 @@ jobs:
       - name: Test
         run: pnpm test
 
+      # Coverage is a gate, not a report. The readiness audit's tier bar puts
+      # `beta` at 90% lines / 85% branches, and the packages that declare
+      # thresholds fail their own run when they slip below — so this step goes
+      # red on a regression rather than quietly publishing a number nobody
+      # reads.
+      - name: Coverage thresholds
+        run: pnpm test:coverage
+
       - name: Build
         run: pnpm build
 
@@ -135,8 +162,11 @@ jobs:
       # Its first run found four real violations, including a contrast failure
       # on the footer's own legal limitation statement and three in the
       # clinical status tokens.
-      - name: Install Playwright browser
-        run: pnpm exec playwright install --with-deps chromium
+      - name: Install Playwright browsers
+        # Firefox and WebKit as well as Chromium: the library publishes a WCAG
+        # 2.2 AA claim, and a focus ring or a forced-colours fallback that works
+        # in one engine and not another is exactly the defect that claim hides.
+        run: pnpm exec playwright install --with-deps chromium firefox webkit
 
       - name: Accessibility (WCAG 2.2 AA, both themes)
         run: |
@@ -156,6 +186,53 @@ jobs:
           pnpm --filter @oxygenui-design/docs start &
           npx wait-on http://localhost:6001 -t 60000
           pnpm a11y http://localhost:6001
+
+      # Visual regression, plus the accessibility checks that need a real layout
+      # engine: 320px reflow, 200% zoom, forced colours, the focus indicator,
+      # and the reduced-motion still state. jsdom can see none of those.
+      # `e2e:ci` deliberately excludes the @vrt tag.
+      #
+      # Screenshot baselines are platform-specific — the committed set is
+      # darwin, and font rasterisation alone makes them fail on linux. Running
+      # them here would make a new gate red on its first run, which is how a
+      # team learns to ignore a gate. The browser-level accessibility checks
+      # (reflow, zoom, forced colours, focus, reduced motion) are
+      # platform-independent and run here.
+      #
+      # To make VRT blocking in CI, generate linux baselines once inside the
+      # official Playwright container and commit them:
+      #   docker run --rm -v "$PWD:/w" -w /w mcr.microsoft.com/playwright:v1.56.0-jammy \
+      #     sh -c "corepack enable && pnpm i --frozen-lockfile && pnpm build && pnpm e2e:update"
+      # then swap this step for `pnpm e2e`.
+      #
+      # This step also runs the @framework suite: six applications in
+      # apps/smoke and apps/smoke-react18, one per supported framework, each
+      # built by that framework's own compiler and driven through an identical
+      # script in all three engines. Playwright's webServer config builds and
+      # serves them, so no extra step is needed here — and the build itself is
+      # half the test, since Angular and Vue reject bad markup at compile time.
+      # Its first run found the elements broken in React 19, Vue, and Angular.
+      - name: Browser accessibility and cross-framework smoke
+        env:
+          OXYGEN_BASE_URL: http://localhost:6001
+        run: pnpm e2e:ci
+
+      - name: Upload the Playwright report on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 14
+
+      # Budgets on the bytes a customer installs. ENGINEERING.md §11.
+      - name: Bundle budgets
+        run: pnpm size
+
+      # The layer rule from ARCHITECTURE.md §2, executable rather than written
+      # down. Also catches cycles and a devDependency reaching shipped source.
+      - name: Architecture rules
+        run: pnpm deps
 
   no-phi:
     name: Synthetic data check
@@ -259,28 +336,40 @@ jobs:
       # returns 200 but serves a stale or malformed registry is a broken
       # install for everyone, and it is exactly what went unnoticed for three
       # merges. Assert the deployed artifact, not just the response code.
+      # Verifies the deployed registry against what this commit actually built,
+      # rather than against a component named here. The previous version fetched
+      # `vitals-panel.json` by name; when that component was removed the gate
+      # kept asking for it, so the next merge to main would have failed on a
+      # component that was deliberately deleted. A gate must not carry its own
+      # expiry date.
       - name: Verify the deployed registry
         run: |
           set -euo pipefail
-          url="https://oxygenui.design/r/vitals-panel.json?ci=${GITHUB_SHA}"
+          expected=$(node -e 'process.stdout.write(require("./registry.json").items.map(i=>i.name).sort().join(","))')
+          echo "Expecting: $expected"
+
+          url="https://oxygenui.design/r/index.json?ci=${GITHUB_SHA}"
           for i in $(seq 1 10); do
             body=$(curl -fsS --max-time 20 "$url" || true)
             if [ -n "$body" ]; then break; fi
             sleep 6
           done
-          echo "$body" | node -e '
-            const d = JSON.parse(require("fs").readFileSync(0, "utf8"));
-            const deps = d.dependencies ?? [];
-            const fhir = deps.find((x) => x.startsWith("@oxygenui-design/fhir"));
-            if (!fhir) {
-              console.error("::error::Deployed registry does not reference @oxygenui-design/fhir. Got: " + JSON.stringify(deps));
+
+          if [ -z "$body" ]; then
+            echo "::error::Deployed registry index was unreachable after 10 attempts."
+            exit 1
+          fi
+
+          echo "$body" | EXPECTED="$expected" node -e '
+            const served = JSON.parse(require("fs").readFileSync(0, "utf8"));
+            const names = (served.items ?? []).map((i) => i.name).sort().join(",");
+            if (names !== process.env.EXPECTED) {
+              console.error("::error::Deployed registry does not match this build.");
+              console.error("  built:  " + process.env.EXPECTED);
+              console.error("  served: " + names);
               process.exit(1);
             }
-            if (!fhir.includes("@^")) {
-              console.error("::error::Deployed registry dependency is unpinned: " + fhir);
-              process.exit(1);
-            }
-            console.log("Registry verified: " + fhir);
+            console.log("Registry verified: " + (served.items ?? []).length + " items served");
           '
 
   # hq is a separate Vercel project. The job self-skips until VERCEL_PROJECT_ID_HQ
@@ -298,9 +387,13 @@ jobs:
 
     steps:
       - name: Check the project exists
-        id: gate
+        env:
+          # Through the environment, never interpolated into the script body.
+          # `${{ vars.X }}` is expanded before the shell parses the line, so a
+          # value containing shell syntax executes.
+          PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID_HQ }}
         run: |
-          if [ -z "${{ vars.VERCEL_PROJECT_ID_HQ }}" ]; then
+          if [ -z "${PROJECT_ID:-}" ]; then
             echo "skip=true" >> "$GITHUB_OUTPUT"
             echo "VERCEL_PROJECT_ID_HQ is not set — skipping. Create the Vercel project, then add the variable." \
               >> "$GITHUB_STEP_SUMMARY"
@@ -393,7 +486,12 @@ jobs:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
         run: |
           if [ -z "${VERCEL_TOKEN:-}" ]; then
-            echo "VERCEL_TOKEN not set — skipping preview." >> "$GITHUB_STEP_SUMMARY"
+            # Fork PRs never receive secrets, so this is the normal path for an
+            # outside contribution. Say so plainly instead of reporting a green
+            # "deployed" that deployed nothing.
+            echo "### Preview skipped" >> "$GITHUB_STEP_SUMMARY"
+            echo "No \`VERCEL_TOKEN\` in this context — expected on a fork PR. A maintainer preview runs after review." >> "$GITHUB_STEP_SUMMARY"
+            echo "::notice::Preview deployment skipped: no VERCEL_TOKEN (expected on fork PRs)."
             exit 0
           fi
           pnpm dlx vercel@48 pull --yes --environment=preview --token "$VERCEL_TOKEN"

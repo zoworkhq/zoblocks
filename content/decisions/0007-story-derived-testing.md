@@ -1,6 +1,8 @@
 # 0007 — Tests derive from stories; quality is gated at the catalog level
 
-**Status:** proposed · 6 August 2026 · unit layer implemented
+**Status:** accepted · 6 August 2026 · unit layer implemented
+
+> **Ratified 16 August 2026.** Fully implemented. Stories exist for every component, consumed four ways — docs, axe, interaction (play functions), and visual regression. The gate is armed.
 
 > **Update, 6 August 2026.** The first row of the pyramid has landed: all 29
 > components have colocated `*.test.tsx` files run by Vitest and Testing

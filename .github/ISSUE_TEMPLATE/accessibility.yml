@@ -1,0 +1,44 @@
+name: Accessibility issue
+description: A barrier for keyboard, screen-reader, low-vision, or reduced-motion users.
+labels: ["accessibility", "priority: high", "needs triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Accessibility issues are triaged ahead of other bugs. Thank you for
+        reporting one.
+  - type: input
+    id: component
+    attributes:
+      label: Component
+    validations: { required: true }
+  - type: dropdown
+    id: barrier
+    attributes:
+      label: Kind of barrier
+      options:
+        - Screen reader — wrong, missing, or duplicated announcement
+        - Keyboard — cannot reach, cannot operate, or focus is lost
+        - Focus indicator — missing or too low contrast
+        - Colour contrast
+        - Motion — no reduced-motion respect, or vestibular trigger
+        - Forced colours / high contrast mode
+        - Zoom or reflow (200% / 320px)
+        - Target size
+        - Other
+    validations: { required: true }
+  - type: input
+    id: sc
+    attributes:
+      label: WCAG success criterion, if known
+      placeholder: "1.4.11 Non-text Contrast"
+  - type: textarea
+    id: environment
+    attributes:
+      label: Assistive technology and browser
+      placeholder: "NVDA 2024.4 + Firefox 133 on Windows 11"
+  - type: textarea
+    id: detail
+    attributes:
+      label: What happens, and what should happen
+    validations: { required: true }

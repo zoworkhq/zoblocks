@@ -1,0 +1,32 @@
+# Review ownership.
+#
+# The design-system maintainers own everything that reaches a customer: the
+# published packages, the registry source, the tokens, and the pipeline that
+# generates the rest. A change to any of those is an API change whether or not
+# it looks like one.
+
+*                               @zoworkhq/oxygen-maintainers
+
+# Shipped source — always a maintainer review.
+/packages/core/                 @zoworkhq/oxygen-maintainers
+/packages/react/                @zoworkhq/oxygen-maintainers
+/packages/loaders/              @zoworkhq/oxygen-maintainers
+/packages/tokens/               @zoworkhq/oxygen-maintainers
+/packages/fhir/                 @zoworkhq/oxygen-maintainers
+/registry/                      @zoworkhq/oxygen-maintainers
+
+# The generator decides what the registry, the docs, and the type paths contain.
+/scripts/gen/                   @zoworkhq/oxygen-maintainers
+
+# Architecture invariants and the contribution standard.
+/ENGINEERING.md                 @zoworkhq/oxygen-maintainers
+/ARCHITECTURE.md                @zoworkhq/oxygen-maintainers
+/CONTENT.md                     @zoworkhq/oxygen-maintainers
+/content/decisions/             @zoworkhq/oxygen-maintainers
+
+# Supply chain and release. A change here changes what ships and who can ship it.
+/.github/workflows/             @zoworkhq/oxygen-maintainers
+/.changeset/config.json         @zoworkhq/oxygen-maintainers
+/package.json                   @zoworkhq/oxygen-maintainers
+/pnpm-lock.yaml                 @zoworkhq/oxygen-maintainers
+/SECURITY.md                    @zoworkhq/oxygen-maintainers

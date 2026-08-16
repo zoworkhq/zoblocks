@@ -15,53 +15,11 @@
       "@/*": ["./src/*"],
       "@/lib/utils": ["./src/lib/utils.ts"],
       "@/registry/*": ["../../registry/*"],
-      // Registry components import each other by the path the shadcn CLI
-      // writes in a consumer's project. Mapped back to the registry source so
-      // the previews render the real files, unedited.
-      "@/components/oxygen/status-badge": ["../../registry/oxygen/status-badge/status-badge.tsx"],
-      "@/components/oxygen/absent-value": ["../../registry/oxygen/absent-value/absent-value.tsx"],
-      "@/components/oxygen/clinical-value": [
-        "../../registry/oxygen/clinical-value/clinical-value.tsx"
-      ],
-      "@/components/oxygen/reference-range": [
-        "../../registry/oxygen/reference-range/reference-range.tsx"
-      ],
-      "@/components/oxygen/clinical-time": [
-        "../../registry/oxygen/clinical-time/clinical-time.tsx"
-      ],
-      "@/components/oxygen/identity-token": [
-        "../../registry/oxygen/identity-token/identity-token.tsx"
-      ],
-      "@/components/oxygen/concept-chip": ["../../registry/oxygen/concept-chip/concept-chip.tsx"],
-      "@/components/oxygen/density-provider": [
-        "../../registry/oxygen/density-provider/density-provider.tsx"
-      ],
-      "@/components/oxygen/restricted-shield": [
-        "../../registry/oxygen/restricted-shield/restricted-shield.tsx"
-      ],
-      "@/components/oxygen/action-gate": ["../../registry/oxygen/action-gate/action-gate.tsx"],
-      "@/components/oxygen/empty-state": ["../../registry/oxygen/empty-state/empty-state.tsx"],
-      "@/components/oxygen/clinical-skeleton": [
-        "../../registry/oxygen/clinical-skeleton/clinical-skeleton.tsx"
-      ],
-      "@/components/oxygen/dose-input": ["../../registry/oxygen/dose-input/dose-input.tsx"],
-      "@/components/oxygen/provenance": ["../../registry/oxygen/provenance/provenance.tsx"],
-      "@/components/oxygen/unsaved-guard": [
-        "../../registry/oxygen/unsaved-guard/unsaved-guard.tsx"
-      ],
-      "@/components/oxygen/error-boundary": [
-        "../../registry/oxygen/error-boundary/error-boundary.tsx"
-      ],
-      "@/components/oxygen/app-shell": ["../../registry/oxygen/app-shell/app-shell.tsx"],
-      "@/components/oxygen/code-status": ["../../registry/oxygen/code-status/code-status.tsx"],
-      "@/components/oxygen/precautions-bar": [
-        "../../registry/oxygen/precautions-bar/precautions-bar.tsx"
-      ],
-      "@/components/oxygen/care-team": ["../../registry/oxygen/care-team/care-team.tsx"],
-      "@/components/oxygen/alert-banner": ["../../registry/oxygen/alert-banner/alert-banner.tsx"],
-      "@/components/oxygen/patient-snapshot": [
-        "../../registry/oxygen/patient-snapshot/patient-snapshot.tsx"
-      ]
+      // Registry components import each other, and their shared library, by the
+      // paths the shadcn CLI writes in a consumer's project. Mapped back to the
+      // registry source so the previews render the real files, unedited.
+      "@/lib/oxygen-loader": ["../../registry/oxygen/lib/loader.tsx"],
+      "@/components/oxygen/rhythm-loader": ["../../registry/oxygen/rhythm-loader/rhythm-loader.tsx"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],

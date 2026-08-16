@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, Check, Layers } from "lucide-react";
+import { getComponent } from "@/lib/catalog";
 import { FAQ, STATUS_COPY, TEMPLATES, TIERS } from "@/lib/offerings";
 import { ScrollRail, SiteFooter, SiteHeader } from "@/components/site/chrome";
 import { cn } from "@/lib/utils";
@@ -150,15 +151,26 @@ export default function ProPage() {
                   </div>
 
                   <div className="mt-3 flex flex-wrap gap-1.5">
-                    {template.uses.map((item) => (
-                      <Link
-                        key={item}
-                        href={`/components/${item}`}
-                        className="numeric rounded-md border border-rule px-1.5 py-0.5 text-[0.625rem] text-graphite transition-colors hover:border-oxygen/40 hover:text-oxygen-deep"
-                      >
-                        {item}
-                      </Link>
-                    ))}
+                    {/* Linked only once the component exists in the catalog;
+                        until then the name is a plan, not a page. */}
+                    {template.uses.map((item) =>
+                      getComponent(item) ? (
+                        <Link
+                          key={item}
+                          href={`/components/${item}`}
+                          className="numeric rounded-md border border-rule px-1.5 py-0.5 text-[0.625rem] text-graphite transition-colors hover:border-oxygen/40 hover:text-oxygen-deep"
+                        >
+                          {item}
+                        </Link>
+                      ) : (
+                        <span
+                          key={item}
+                          className="numeric rounded-md border border-dashed border-rule px-1.5 py-0.5 text-[0.625rem] text-graphite-soft"
+                        >
+                          {item}
+                        </span>
+                      ),
+                    )}
                   </div>
                 </article>
               ))}

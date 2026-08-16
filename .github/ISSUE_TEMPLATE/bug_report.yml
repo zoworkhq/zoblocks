@@ -1,0 +1,59 @@
+name: Bug report
+description: Something in a shipped component or package behaves incorrectly.
+labels: ["bug", "needs triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **Never paste real patient data.** Use `@oxygenui-design/fixtures`, or
+        invent values on `example.org`. We delete and re-request anything
+        containing real data.
+  - type: input
+    id: package
+    attributes:
+      label: Package or component
+      placeholder: "@oxygenui-design/loaders · pulse-loader"
+    validations: { required: true }
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      placeholder: "0.1.0"
+    validations: { required: true }
+  - type: dropdown
+    id: framework
+    attributes:
+      label: Framework
+      options: [React, Vue, Angular, Svelte, Plain HTML, Other]
+    validations: { required: true }
+  - type: dropdown
+    id: rendering
+    attributes:
+      label: Rendering mode
+      options: [Client only, Server-rendered (SSR/SSG), Both]
+    validations: { required: true }
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected
+    validations: { required: true }
+  - type: textarea
+    id: actual
+    attributes:
+      label: What happened instead
+    validations: { required: true }
+  - type: textarea
+    id: repro
+    attributes:
+      label: Reproduction
+      description: A link to a minimal repo or sandbox, or the smallest code that shows it.
+    validations: { required: true }
+  - type: checkboxes
+    id: confirm
+    attributes:
+      label: Before submitting
+      options:
+        - label: This contains no real patient data
+          required: true
+        - label: I checked this is not a security issue (those go to SECURITY.md)
+          required: true

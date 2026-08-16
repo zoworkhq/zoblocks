@@ -1,0 +1,1373 @@
+<meta charset="utf-8" />
+<title>Oxygen Page Loader</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<style>
+  /* ------------------------------------------------------------------ */
+  /* Tokens — light is the base; dark redefines tokens only.             */
+  /* Palette is Oxygen's own: brand teal, slate neutrals with a teal     */
+  /* bias, ink for the instrument stage.                                 */
+  /* ------------------------------------------------------------------ */
+  :root {
+    --paper: #f6faf8;
+    --surface: #ffffff;
+    --surface-2: #eef4f2;
+    --ink: #0e1c19;
+    --ink-2: #33473f;
+    --muted: #5d716b;
+    --rule: #d8e4df;
+    --rule-2: #c3d3cd;
+    --accent: #059478;
+    --accent-2: #0bb08f;
+    --accent-soft: #e6f7f1;
+    --accent-ink: #045b4b;
+    --stage: #0b1716;
+    --stage-2: #10201e;
+    --stage-fg: #dff3ec;
+    --stage-muted: #7f9c94;
+    --stage-accent: #4fd6c0;
+    --stage-rule: #1c3230;
+    --warn: #b7791f;
+    --warn-soft: #fbf3e0;
+    --ok: #1f8f5f;
+    --code-bg: #0f1e1c;
+    --code-fg: #d9ece6;
+    --code-k: #7ee0cd;
+    --code-s: #f2c98a;
+    --code-c: #7f9c94;
+    --shadow: 0 1px 2px rgb(14 28 25 / 0.06), 0 8px 24px -12px rgb(14 28 25 / 0.18);
+    --font-display: "Avenir Next", "Segoe UI Variable Display", "Helvetica Neue", ui-sans-serif, system-ui, sans-serif;
+    --font-body: -apple-system, BlinkMacSystemFont, "Segoe UI Variable Text", "Segoe UI", ui-sans-serif, system-ui, sans-serif;
+    --font-mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper: #0b1514;
+      --surface: #101d1b;
+      --surface-2: #142522;
+      --ink: #e7f2ee;
+      --ink-2: #c3d6d0;
+      --muted: #93aca5;
+      --rule: #1f312e;
+      --rule-2: #2c423e;
+      --accent: #5fe0c9;
+      --accent-2: #8aeedd;
+      --accent-soft: #10302b;
+      --accent-ink: #b8f3e7;
+      --stage: #070f0e;
+      --stage-2: #0d1a19;
+      --stage-fg: #dff3ec;
+      --stage-muted: #7f9c94;
+      --stage-accent: #5fe0c9;
+      --stage-rule: #1a2d2b;
+      --warn: #e2b04a;
+      --warn-soft: #2a2410;
+      --ok: #5fd39a;
+      --code-bg: #0a1413;
+      --code-fg: #d9ece6;
+      --shadow: 0 1px 2px rgb(0 0 0 / 0.4), 0 10px 30px -14px rgb(0 0 0 / 0.6);
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper: #0b1514;
+    --surface: #101d1b;
+    --surface-2: #142522;
+    --ink: #e7f2ee;
+    --ink-2: #c3d6d0;
+    --muted: #93aca5;
+    --rule: #1f312e;
+    --rule-2: #2c423e;
+    --accent: #5fe0c9;
+    --accent-2: #8aeedd;
+    --accent-soft: #10302b;
+    --accent-ink: #b8f3e7;
+    --stage: #070f0e;
+    --stage-2: #0d1a19;
+    --stage-fg: #dff3ec;
+    --stage-muted: #7f9c94;
+    --stage-accent: #5fe0c9;
+    --stage-rule: #1a2d2b;
+    --warn: #e2b04a;
+    --warn-soft: #2a2410;
+    --ok: #5fd39a;
+    --code-bg: #0a1413;
+    --code-fg: #d9ece6;
+    --shadow: 0 1px 2px rgb(0 0 0 / 0.4), 0 10px 30px -14px rgb(0 0 0 / 0.6);
+    color-scheme: dark;
+  }
+
+  /* ------------------------------------------------------------------ */
+  /* Base                                                                 */
+  /* ------------------------------------------------------------------ */
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+  a { color: var(--accent-ink); text-decoration-color: color-mix(in oklab, var(--accent) 50%, transparent); text-underline-offset: 3px; }
+  a:hover { text-decoration-color: var(--accent); }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+  h1, h2, h3, h4 { font-family: var(--font-display); letter-spacing: -0.015em; text-wrap: balance; margin: 0; }
+  h1 { font-size: clamp(2.2rem, 4.5vw, 3.4rem); line-height: 1.05; font-weight: 600; }
+  h2 { font-size: 1.75rem; line-height: 1.2; font-weight: 600; margin-top: 0.25rem; }
+  h3 { font-size: 1.2rem; line-height: 1.3; font-weight: 600; }
+  h4 { font-size: 1rem; font-weight: 600; }
+  p { margin: 0; text-wrap: pretty; }
+  p + p { margin-top: 0.85em; }
+  ul, ol { margin: 0.5em 0 0; padding-inline-start: 1.25em; }
+  li + li { margin-top: 0.35em; }
+  code, kbd { font-family: var(--font-mono); font-size: 0.86em; }
+  :not(pre) > code { background: var(--surface-2); border: 1px solid var(--rule); padding: 0.05em 0.35em; border-radius: 5px; color: var(--ink); }
+  strong { font-weight: 600; color: var(--ink); }
+  hr { border: 0; border-top: 1px solid var(--rule); margin: 0; }
+  .eyebrow { font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+  .eyebrow.accent { color: var(--accent-ink); }
+  .measure { max-width: 68ch; }
+  .muted { color: var(--muted); }
+  .num { font-variant-numeric: tabular-nums; }
+  .small { font-size: 0.9rem; }
+
+  /* ------------------------------------------------------------------ */
+  /* Layout                                                               */
+  /* ------------------------------------------------------------------ */
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 0 clamp(1rem, 4vw, 2.5rem); }
+  header.masthead { border-bottom: 1px solid var(--rule); padding: 2.5rem 0 2rem; }
+  .masthead-grid { display: grid; gap: 2rem; align-items: end; grid-template-columns: minmax(0, 1.4fr) minmax(280px, 1fr); }
+  @media (max-width: 860px) { .masthead-grid { grid-template-columns: 1fr; } }
+  .masthead .lede { font-size: 1.15rem; color: var(--ink-2); max-width: 60ch; margin-top: 1.1rem; }
+  .meta-row { display: flex; flex-wrap: wrap; gap: 0.5rem 1.5rem; margin-top: 1.25rem; font-family: var(--font-mono); font-size: 0.78rem; color: var(--muted); }
+  .meta-row b { color: var(--ink); font-weight: 600; }
+  /* The loader's documented default ink is the accent token; these stages
+     supply it the way a host app's theme would. */
+  .hero-stage, .stage.ink, .gallery.ink .stage { --ox-accent: var(--stage-accent); }
+  .stage, .play-stage { --ox-accent: var(--accent); }
+  .hero-stage {
+    background: var(--stage); color: var(--stage-fg); border-radius: 18px; padding: 1.25rem;
+    display: grid; place-items: center; min-height: 260px; position: relative; overflow: hidden;
+    background-image: linear-gradient(var(--stage-rule) 1px, transparent 1px), linear-gradient(90deg, var(--stage-rule) 1px, transparent 1px);
+    background-size: 24px 24px; background-position: center;
+    box-shadow: var(--shadow);
+  }
+  .hero-stage::after { content: ""; position: absolute; inset: 0; background: radial-gradient(60% 70% at 50% 40%, color-mix(in oklab, var(--stage-accent) 14%, transparent), transparent 70%); pointer-events: none; }
+  .hero-stage > * { position: relative; z-index: 1; }
+  .hero-caption { position: absolute; left: 1rem; right: 1rem; bottom: 0.9rem; display: flex; justify-content: space-between; font-family: var(--font-mono); font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--stage-muted); z-index: 1; }
+
+  .shell { display: grid; grid-template-columns: 200px minmax(0, 1fr); gap: 3rem; padding: 2.5rem 0 5rem; }
+  @media (max-width: 960px) { .shell { grid-template-columns: 1fr; gap: 1.5rem; } .toc { display: none; } }
+  .toc { position: sticky; top: 1.25rem; align-self: start; font-size: 0.86rem; }
+  .toc ol { list-style: none; padding: 0; margin: 0.6rem 0 0; border-inline-start: 1px solid var(--rule); }
+  .toc li { margin: 0; }
+  .toc a { display: block; padding: 0.3rem 0 0.3rem 0.9rem; color: var(--muted); text-decoration: none; border-inline-start: 2px solid transparent; margin-inline-start: -1px; line-height: 1.35; }
+  .toc a:hover { color: var(--ink); }
+  .toc a.active { color: var(--accent-ink); border-color: var(--accent); }
+  main { min-width: 0; }
+  section.block { padding: 0 0 3.25rem; margin-bottom: 3.25rem; border-bottom: 1px solid var(--rule); }
+  section.block:last-child { border-bottom: 0; }
+  .block-head { display: grid; gap: 0.5rem; margin-bottom: 1.5rem; }
+  .block-head p { color: var(--ink-2); max-width: 68ch; }
+
+  /* ------------------------------------------------------------------ */
+  /* Components of the page                                               */
+  /* ------------------------------------------------------------------ */
+  .card { background: var(--surface); border: 1px solid var(--rule); border-radius: 14px; padding: 1.25rem 1.35rem; }
+  .callout { border-radius: 14px; padding: 1.1rem 1.25rem; border: 1px solid var(--rule); background: var(--surface); }
+  .callout.accent { background: var(--accent-soft); border-color: color-mix(in oklab, var(--accent) 35%, var(--rule)); }
+  .callout.warn { background: var(--warn-soft); border-color: color-mix(in oklab, var(--warn) 40%, var(--rule)); }
+  .callout .eyebrow { margin-bottom: 0.35rem; }
+  .grid-2 { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+  .grid-3 { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+  .kv { display: grid; grid-template-columns: max-content 1fr; gap: 0.35rem 1rem; font-size: 0.92rem; }
+  .kv dt { color: var(--muted); font-family: var(--font-mono); font-size: 0.75rem; letter-spacing: 0.06em; text-transform: uppercase; padding-top: 0.2em; }
+  .kv dd { margin: 0; }
+  .pill { display: inline-flex; align-items: center; gap: 0.35em; padding: 0.15em 0.6em; border-radius: 999px; font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.06em; text-transform: uppercase; border: 1px solid var(--rule-2); color: var(--ink-2); background: var(--surface); }
+  .pill.accent { background: var(--accent-soft); color: var(--accent-ink); border-color: color-mix(in oklab, var(--accent) 40%, transparent); }
+  .pill.ok { color: var(--ok); border-color: color-mix(in oklab, var(--ok) 40%, transparent); }
+  .pill.warn { color: var(--warn); border-color: color-mix(in oklab, var(--warn) 45%, transparent); }
+
+  .table-wrap { overflow-x: auto; border: 1px solid var(--rule); border-radius: 12px; background: var(--surface); }
+  table { border-collapse: collapse; width: 100%; font-size: 0.9rem; }
+  th, td { text-align: left; vertical-align: top; padding: 0.65rem 0.85rem; border-bottom: 1px solid var(--rule); }
+  th { font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); font-weight: 600; background: var(--surface-2); }
+  tbody tr:last-child td { border-bottom: 0; }
+  td code { white-space: nowrap; }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  .yes { color: var(--ok); font-weight: 600; }
+  .no { color: var(--warn); font-weight: 600; }
+
+  pre { margin: 0; background: var(--code-bg); color: var(--code-fg); padding: 1rem 1.1rem; border-radius: 12px; overflow-x: auto; font-size: 0.82rem; line-height: 1.55; font-family: var(--font-mono); tab-size: 2; }
+  pre .k { color: var(--code-k); } pre .s { color: var(--code-s); } pre .c { color: var(--code-c); font-style: italic; }
+  .tabs { display: flex; flex-wrap: wrap; gap: 0.25rem; margin-bottom: 0.5rem; }
+  .tabs button { font: inherit; font-size: 0.82rem; padding: 0.35rem 0.75rem; border-radius: 8px; border: 1px solid var(--rule); background: var(--surface); color: var(--ink-2); cursor: pointer; }
+  .tabs button[aria-selected="true"] { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+  .tabpanel[hidden] { display: none; }
+
+  /* Mockup gallery */
+  .gallery-head { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 1rem; margin-bottom: 1rem; }
+  .seg { display: inline-flex; border: 1px solid var(--rule-2); border-radius: 10px; overflow: hidden; }
+  .seg button { font: inherit; font-size: 0.8rem; padding: 0.35rem 0.75rem; border: 0; background: var(--surface); color: var(--ink-2); cursor: pointer; }
+  .seg button + button { border-inline-start: 1px solid var(--rule-2); }
+  .seg button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+  .gallery { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
+  .mock { background: var(--surface); border: 1px solid var(--rule); border-radius: 16px; overflow: hidden; display: grid; grid-template-rows: auto 1fr; box-shadow: var(--shadow); }
+  .mock.primary { grid-column: 1 / -1; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); grid-template-rows: none; }
+  @media (max-width: 760px) { .mock.primary { grid-template-columns: 1fr; } }
+  .stage {
+    position: relative; min-height: 220px; display: grid; place-items: center; padding: 1.5rem;
+    background: var(--surface-2); color: var(--ink);
+    background-image: linear-gradient(var(--rule) 1px, transparent 1px), linear-gradient(90deg, var(--rule) 1px, transparent 1px);
+    background-size: 24px 24px; background-position: center;
+  }
+  .gallery.ink .stage, .stage.ink { background-color: var(--stage); color: var(--stage-fg); background-image: linear-gradient(var(--stage-rule) 1px, transparent 1px), linear-gradient(90deg, var(--stage-rule) 1px, transparent 1px); }
+  .stage .tag { position: absolute; top: 0.7rem; left: 0.9rem; font-family: var(--font-mono); font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+  .gallery.ink .stage .tag, .stage.ink .tag { color: var(--stage-muted); }
+  .stage .tag.r { left: auto; right: 0.9rem; }
+  .mock-body { padding: 1.1rem 1.25rem 1.25rem; display: grid; gap: 0.7rem; align-content: start; }
+  .mock-body h3 { display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; }
+  .mock-body .spec { display: grid; grid-template-columns: max-content 1fr; gap: 0.25rem 0.9rem; font-size: 0.84rem; margin-top: 0.25rem; }
+  .mock-body .spec dt { color: var(--muted); font-family: var(--font-mono); font-size: 0.68rem; letter-spacing: 0.08em; text-transform: uppercase; padding-top: 0.25em; }
+  .mock-body .spec dd { margin: 0; }
+  .fit { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+
+  /* Playground */
+  .play { display: grid; grid-template-columns: minmax(260px, 320px) minmax(0, 1fr); gap: 1.25rem; align-items: start; }
+  @media (max-width: 900px) { .play { grid-template-columns: 1fr; } }
+  .controls { display: grid; gap: 0.9rem; }
+  .ctl { display: grid; gap: 0.3rem; }
+  .ctl label, .ctl .lbl { font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); display: flex; justify-content: space-between; }
+  .ctl label output { color: var(--ink); font-variant-numeric: tabular-nums; }
+  .ctl select, .ctl input[type="text"] { font: inherit; font-size: 0.9rem; padding: 0.45rem 0.6rem; border-radius: 8px; border: 1px solid var(--rule-2); background: var(--surface); color: var(--ink); width: 100%; }
+  .ctl input[type="range"] { width: 100%; accent-color: var(--accent); }
+  .ctl .row { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; }
+  .switch { display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.88rem; color: var(--ink-2); cursor: pointer; }
+  .switch input { accent-color: var(--accent); width: 1rem; height: 1rem; }
+  .btn { font: inherit; font-size: 0.85rem; padding: 0.45rem 0.85rem; border-radius: 9px; border: 1px solid var(--rule-2); background: var(--surface); color: var(--ink); cursor: pointer; }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .btn.primary:hover { background: var(--accent-2); border-color: var(--accent-2); }
+  :root[data-theme="dark"] .btn.primary, .btn.primary.dark { color: #052a24; }
+  .play-stage { position: relative; min-height: 340px; border-radius: 16px; overflow: hidden; border: 1px solid var(--rule); background: var(--surface); }
+  .fake-app { padding: 1.25rem 1.5rem; display: grid; gap: 0.75rem; }
+  .fake-app .bar { height: 12px; border-radius: 6px; background: var(--surface-2); }
+  .fake-app .bar.w60 { width: 60%; } .fake-app .bar.w40 { width: 40%; } .fake-app .bar.w80 { width: 80%; }
+  .fake-app .tile { height: 72px; border-radius: 10px; background: var(--surface-2); border: 1px solid var(--rule); }
+  .fake-app .tiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; }
+  .play-code { margin-top: 0.9rem; }
+
+  /* Architecture diagram */
+  .arch { display: grid; gap: 0.75rem; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
+  .arch .node { border: 1px solid var(--rule-2); border-radius: 12px; padding: 0.85rem 0.95rem; background: var(--surface); font-size: 0.88rem; }
+  .arch .node.core { background: var(--accent-soft); border-color: color-mix(in oklab, var(--accent) 45%, transparent); grid-column: 1 / -1; }
+  .arch .node .eyebrow { margin-bottom: 0.25rem; }
+  .arch .node ul { font-size: 0.84rem; margin-top: 0.4rem; }
+  .flow { display: flex; align-items: center; justify-content: center; color: var(--muted); font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; grid-column: 1 / -1; }
+  .tree { font-family: var(--font-mono); font-size: 0.8rem; line-height: 1.6; background: var(--surface); border: 1px solid var(--rule); border-radius: 12px; padding: 0.9rem 1.1rem; overflow-x: auto; white-space: pre; color: var(--ink-2); }
+  .tree b { color: var(--ink); font-weight: 600; }
+  .tree i { color: var(--muted); font-style: normal; }
+
+  /* Checklists */
+  .check { list-style: none; padding: 0; margin: 0.5rem 0 0; display: grid; gap: 0.5rem; }
+  .check li { display: grid; grid-template-columns: 1.4rem 1fr; gap: 0.5rem; align-items: start; font-size: 0.92rem; }
+  .check li::before { content: "✓"; color: var(--ok); font-weight: 700; line-height: 1.6; }
+  .check li.open::before { content: "?"; color: var(--warn); }
+  .decisions li { padding: 0.75rem 0; border-bottom: 1px dashed var(--rule); }
+  .decisions li:last-child { border-bottom: 0; }
+  .decisions .rec { color: var(--accent-ink); font-weight: 600; }
+  .phase { display: grid; grid-template-columns: 5.5rem 1fr; gap: 0.5rem 1rem; padding: 0.85rem 0; border-bottom: 1px solid var(--rule); }
+  .phase:last-child { border-bottom: 0; }
+  .phase .when { font-family: var(--font-mono); font-size: 0.74rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--accent-ink); padding-top: 0.25rem; }
+  .phase h4 { margin-bottom: 0.15rem; }
+  footer.colophon { border-top: 1px solid var(--rule); padding: 1.5rem 0 3rem; color: var(--muted); font-size: 0.85rem; }
+
+  /* Reduced-motion note for this document's own decoration */
+  @media (prefers-reduced-motion: reduce) { .hero-stage::after { display: none; } }
+</style>
+
+<header class="masthead">
+  <div class="wrap masthead-grid">
+    <div>
+      <p class="eyebrow accent">Oxygen UI · component brief 001 · draft for decision</p>
+      <h1>Oxygen Page Loader</h1>
+      <p class="lede">The first component of the rebuilt catalog: a soothing, healthcare-native page loader recreated from the reference Lottie as native SVG + CSS, packaged once and installable in React, Vue, Angular, or plain HTML. Six live variants, the configuration surface, the architecture, and the test plan — everything needed to say “build it”.</p>
+      <div class="meta-row">
+        <span>Date <b>16 Aug 2026</b></span>
+        <span>Registry name <b>loader</b></span>
+        <span>Element <b>&lt;ox-loader&gt;</b></span>
+        <span>Layer <b>primitive</b></span>
+        <span>Status <b>proposal</b></span>
+      </div>
+    </div>
+    <div class="hero-stage" aria-label="Live preview of the primary loader variant, Pulse">
+      <ox-loader variant="pulse" size="132" label="Loading your records" show-label bpm="60"></ox-loader>
+      <div class="hero-caption"><span>Pulse · live · 60 bpm</span><span>svg + css · 0 dependencies</span></div>
+    </div>
+  </div>
+</header>
+
+<div class="wrap shell">
+  <nav class="toc" aria-label="Contents">
+    <p class="eyebrow">Contents</p>
+    <ol>
+      <li><a href="#tldr">The short version</a></li>
+      <li><a href="#purpose">Purpose and fit</a></li>
+      <li><a href="#reference">Reference teardown</a></li>
+      <li><a href="#principles">Design principles</a></li>
+      <li><a href="#variants">Six loaders, live</a></li>
+      <li><a href="#playground">Configure it</a></li>
+      <li><a href="#api">Configuration API</a></li>
+      <li><a href="#architecture">Architecture &amp; install</a></li>
+      <li><a href="#a11y">Accessibility &amp; standards</a></li>
+      <li><a href="#perf">Performance budget</a></li>
+      <li><a href="#tests">Test plan</a></li>
+      <li><a href="#plan">Delivery plan</a></li>
+      <li><a href="#decisions">Decisions &amp; risks</a></li>
+      <li><a href="#appendix">Appendix: motion spec</a></li>
+    </ol>
+  </nav>
+
+  <main>
+    <!-- ============================================================ -->
+    <section class="block" id="tldr">
+      <div class="block-head">
+        <p class="eyebrow">01 · The short version</p>
+        <h2>Recreate it natively, package it once, ship it everywhere.</h2>
+      </div>
+      <div class="grid-2">
+        <div class="callout accent">
+          <p class="eyebrow accent">Recommendation</p>
+          <p><strong>Build the loader as native SVG + CSS keyframes — not as a Lottie playback.</strong> The reference is one teal stroke: an open heart that beats and an ECG line that redraws itself through the gap. That is ~2 KB of SVG and CSS, needs no runtime, themes through Oxygen tokens, respects reduced motion for free, and — decisively for a <em>page</em> loader — works before any JavaScript bundle has loaded.</p>
+          <p>Package one art source three ways: the <strong>shadcn registry item</strong> for React (Oxygen’s channel), a dependency-free <strong>Custom Element <code>&lt;ox-loader&gt;</code></strong> for Vue, Angular, Svelte and any other stack, and a <strong>copy-paste HTML/CSS snippet</strong> for the no-JS boot screen. One parity test keeps the three identical.</p>
+        </div>
+        <div class="card">
+          <p class="eyebrow">What this brief contains</p>
+          <ul class="small" style="margin-top:.5rem">
+            <li>A frame-by-frame teardown of the reference Lottie — its structure, timing, and the two flaws worth fixing.</li>
+            <li><strong>Pulse</strong> (the recreation) plus five alternatives — <strong>Trace</strong> (heartbeat only), <strong>Breath</strong>, <strong>Cross</strong>, <strong>Helix</strong>, <strong>Fill</strong> — all running live below, on light and dark stages.</li>
+            <li>An interactive configurator driven by a working <code>&lt;ox-loader&gt;</code> prototype, with generated React / Vue / Angular / HTML usage.</li>
+            <li>The full prop / attribute / token / part / event contract, the repo file layout and <code>meta.ts</code>, install commands per framework, and the SSR and boot-screen recipes.</li>
+            <li>Accessibility and standards checklist, performance budget, a story-derived test plan, delivery phases, and the decisions only you can make.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="grid-3" style="margin-top:1rem">
+        <div class="card"><p class="eyebrow">Default cadence</p><p style="font-family:var(--font-display);font-size:1.6rem;font-weight:600;margin-top:.2rem" class="num">60 bpm</p><p class="small muted">Sinus rhythm at rest. Configurable 40–100; the reference beats at exactly this rate.</p></div>
+        <div class="card"><p class="eyebrow">Payload</p><p style="font-family:var(--font-display);font-size:1.6rem;font-weight:600;margin-top:.2rem" class="num">≈ 2 KB CSS · ≈ 3 KB JS</p><p class="small muted">Gzipped. The Lottie route is 8 KB of JSON plus a 40–70 KB player.</p></div>
+        <div class="card"><p class="eyebrow">Frameworks</p><p style="font-family:var(--font-display);font-size:1.6rem;font-weight:600;margin-top:.2rem">React · Vue · Angular · any</p><p class="small muted">Custom Elements v1 + one native React item. Svelte, Solid, Rails, Django, static HTML all covered by the element or the snippet.</p></div>
+      </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <section class="block" id="purpose">
+      <div class="block-head">
+        <p class="eyebrow">02 · Purpose and fit</p>
+        <h2>What a page loader has to do in a healthcare app</h2>
+        <p>It is the first thing a clinician or a patient sees, it plays while the system is at its most fragile, and it is judged in the first 300 ms. The bar is “alive and calm”, not “busy”.</p>
+      </div>
+      <div class="grid-2">
+        <div class="card">
+          <h3>Where it appears</h3>
+          <dl class="kv" style="margin-top:.75rem">
+            <dt>App boot</dt><dd>Inline in <code>index.html</code>, before the framework bundle arrives. This is the case that rules out a JS-driven player.</dd>
+            <dt>Route change</dt><dd>Full-page or region overlay while a chart, worklist, or results page resolves.</dd>
+            <dt>Panel</dt><dd>Overlay on one card while it re-fetches — the rest of the record stays usable (per <code>CONTENT.md</code> §5, failure and waiting stay contained).</dd>
+            <dt>Inline</dt><dd>Small (20–32 px) beside a button label or a table row. Two of the six variants read at that size.</dd>
+          </dl>
+        </div>
+        <div class="card">
+          <h3>Where it sits in Oxygen</h3>
+          <dl class="kv" style="margin-top:.75rem">
+            <dt>Layer</dt><dd><code>primitive</code> — no FHIR input, no clinical logic. Registry name <code>loader</code>; React exports <code>Loader</code> and a <code>PageLoader</code> preset.</dd>
+            <dt>Depends on</dt><dd><code>tokens</code> (colour, density) and <code>utils</code>. Nothing else — zero npm dependencies, per README’s “Runtime: 0”.</dd>
+            <dt>Precedent it sets</dt><dd>First component with a framework-agnostic core. ARCHITECTURE §2 already reserves L0/L1 for exactly this (“L0 holds no React… keeps a future non-React target from being a rewrite”).</dd>
+            <dt>Replaces</dt><dd>Nothing yet. <code>ClinicalSkeleton</code> (content-shaped placeholders) will return later and complements this: skeleton for known layouts, loader for unknown waits.</dd>
+          </dl>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <section class="block" id="reference">
+      <div class="block-head">
+        <p class="eyebrow">03 · Reference teardown</p>
+        <h2>What the Lottie actually is, frame by frame</h2>
+        <p>Pulled from the animation JSON (<code>q3QbAe1Rrl.json</code>, 8.2 KB) rather than eyeballed. Everything below is measured.</p>
+      </div>
+      <div class="grid-2">
+        <div class="card">
+          <h3>Structure</h3>
+          <dl class="kv" style="margin-top:.75rem">
+            <dt>Format</dt><dd>Lottie 5.5.7 · 173 frames @ 24 fps = <span class="num">7.21 s</span> loop · 3840 × 2160 comp · 1 shape layer, 0 assets.</dd>
+            <dt>Ink</dt><dd>One stroke, <code>#43BEB7</code>, width 30 comp units (2.4 % of the heart’s width), round caps, miter joins, no fill.</dd>
+            <dt>Heart</dt><dd>Two open paths: the two lobes (one cubic path, 10 vertices) and the bottom “V”. The sides are deliberately <strong>left open</strong> at mid-height so the ECG line can pass through.</dd>
+            <dt>ECG line</dt><dd>One 18-vertex path, wider than the heart, running horizontally through the gap: bump ▲ spike ▼ deep dip ▲ spike, then flat.</dd>
+            <dt>Colour source</dt><dd>Same teal family as Oxygen’s accent (<code>--ox-accent</code> = <code>#059478</code> light / <code>#67e8f9</code> dark), so tokenising it costs nothing.</dd>
+          </dl>
+        </div>
+        <div class="card">
+          <h3>Motion</h3>
+          <dl class="kv" style="margin-top:.75rem">
+            <dt>Heart draws in</dt><dd>Trim path 100 → 0 over 17 frames (<span class="num">0.7 s</span>), ease-out — then stays.</dd>
+            <dt>Heart beats</dt><dd>Scale 100 → 110 → 100 every <span class="num">24 frames = 1.0 s</span> (<strong>60 bpm</strong>), ease-in-out (bezier ≈ 0.33/0 → 0.67/1). Symmetric, no “lub-dub”.</dd>
+            <dt>Line sweeps</dt><dd>Trim path draws the line left→right in 20–21 frames (<span class="num">0.85 s</span>), then either erases from the left over 6 frames or resets in 2. Seven sweeps per loop, one per beat.</dd>
+            <dt>Sync</dt><dd>Sweep and beat share the 1.0 s period — the line’s spike lands as the heart expands.</dd>
+          </dl>
+        </div>
+      </div>
+      <div class="grid-2" style="margin-top:1rem">
+        <div class="callout">
+          <p class="eyebrow">Keep</p>
+          <ul class="small">
+            <li>The concept: open heart + ECG through the gap. Reads at a glance as “care” without a red cross or a stethoscope.</li>
+            <li>The line-weight discipline: one thin stroke, one colour, no fill. That is what makes it calm.</li>
+            <li>60 bpm with symmetric ease-in-out. It is measurably a resting rhythm.</li>
+            <li>The draw-in entrance. It turns “appear” into “arrive”.</li>
+          </ul>
+        </div>
+        <div class="callout warn">
+          <p class="eyebrow">Fix</p>
+          <ul class="small">
+            <li><strong>Loop seam.</strong> The heart re-draws itself at frame 0 of every loop, so every 7.2 s the heart vanishes and redraws. Ours draws once on mount; only the beat and sweep loop, seamlessly.</li>
+            <li><strong>Inconsistent sweep.</strong> Some passes erase, some snap. Ours uses one monitor-style sweep — a bright head with a fading tail — over a faint static track, so the shape never disappears between beats.</li>
+            <li><strong>Baked colour and size.</strong> Ours is <code>currentColor</code>, sized by a CSS variable, stroke width constant in pixels at any size (<code>vector-effect: non-scaling-stroke</code>).</li>
+            <li><strong>No accessibility, no reduced motion, no SSR.</strong> All three are first-class below.</li>
+          </ul>
+        </div>
+      </div>
+
+      <h3 style="margin-top:1.75rem">Lottie playback vs native recreation</h3>
+      <div class="table-wrap" style="margin-top:.75rem">
+        <table>
+          <thead><tr><th>Concern</th><th>Play the Lottie</th><th>Native SVG + CSS (recommended)</th></tr></thead>
+          <tbody>
+            <tr><td>Available before app JS loads</td><td class="no">No — needs a player (lottie-web ~60 KB gz, dotLottie ~25 KB + WASM)</td><td class="yes">Yes — inline in the HTML shell, CSS animates it</td></tr>
+            <tr><td>Payload</td><td>8 KB JSON + player</td><td class="yes">≈ 2 KB CSS + 0.5 KB SVG per variant</td></tr>
+            <tr><td>Theming (light / dark / brand / forced colours)</td><td>Colour is baked; runtime overrides are player-specific</td><td class="yes"><code>currentColor</code> + <code>--ox-loader-*</code> tokens</td></tr>
+            <tr><td>Reduced motion</td><td>Manual: detect and swap assets</td><td class="yes">One media query with a designed fallback</td></tr>
+            <tr><td>Rendering cost</td><td>JS drives every frame; SVG renderer mutates DOM at 60 fps</td><td class="yes">Compositor-only transforms/opacity; dash offset is a tiny repaint</td></tr>
+            <tr><td>Accessibility semantics</td><td>None built in</td><td class="yes"><code>role=status</code> / <code>progressbar</code>, live region, label</td></tr>
+            <tr><td>SSR / RSC / Nuxt / Angular Universal</td><td>Client-only</td><td class="yes">Static markup; declarative shadow DOM for the element</td></tr>
+            <tr><td>Designer iteration</td><td class="yes">Edit in After Effects, re-export</td><td>Edit keyframes in CSS; the motion spec is small enough to own</td></tr>
+            <tr><td>Fidelity to the reference</td><td class="yes">Exact</td><td>Faithful — same paths, same timing — and improved where noted</td></tr>
+            <tr><td>Multi-framework</td><td>Player per framework or a web component wrapper anyway</td><td class="yes">One element, one React item, one snippet</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="small muted" style="margin-top:.6rem">Licence note: LottieFiles free animations ship under the Lottie Simple License (free for commercial use). Our recreation is original SVG built from measured geometry, so nothing is redistributed; crediting Laud Gilbert as the reference in the component docs is a courtesy worth paying.</p>
+    </section>
+
+    <!-- ============================================================ -->
+    <section class="block" id="principles">
+      <div class="block-head">
+        <p class="eyebrow">04 · Design principles</p>
+        <h2>“Soothing” is a set of numbers, not an adjective</h2>
+        <p>Every variant below is held to the same six rules. They are also the review checklist for any future loader.</p>
+      </div>
+      <div class="grid-3">
+        <div class="card"><h4>Cadence at rest</h4><p class="small" style="margin-top:.4rem">Cardiac variants beat at 60 bpm by default (range 40–100). Breath cycles at 15/min (4 s). Nothing cycles faster than 1.7 Hz; nothing flashes above WCAG’s 3 Hz threshold.</p></div>
+        <div class="card"><h4>Small amplitude</h4><p class="small" style="margin-top:.4rem">Beat scale ≤ 7 %. Rings fade before they reach full size. Dots travel ≤ 12 units. Motion should be noticed peripherally, never tracked.</p></div>
+        <div class="card"><h4>Sine-like easing</h4><p class="small" style="margin-top:.4rem"><code>cubic-bezier(.45,0,.55,1)</code> for cycles, ease-out for entrances. No linear spins, no springs, no overshoot.</p></div>
+        <div class="card"><h4>One ink, faint track</h4><p class="small" style="margin-top:.4rem">Accent stroke on a 22 % track. The track keeps the shape legible between beats and passes 3:1 non-text contrast on both grounds.</p></div>
+        <div class="card"><h4>Alive, not busy</h4><p class="small" style="margin-top:.4rem">Loops must be seamless (first frame ≡ last frame). No spinners: rotation implies “working hard”; a pulse implies “still here”.</p></div>
+        <div class="card"><h4>Honest about time</h4><p class="small" style="margin-top:.4rem">Delay before showing (avoid flashes), minimum visible time (avoid flicker), a slow-wait message after 8 s. A loader that hides that the system hung is a clinical risk.</p></div>
+      </div>
+      <div class="callout warn" style="margin-top:1rem">
+        <p class="eyebrow">Two healthcare-specific cautions</p>
+        <ul class="small">
+          <li><strong>Never a red cross.</strong> The red cross on white is a protected emblem (Geneva Conventions; national law in most markets). The Cross variant is always in the accent hue, and the docs say so.</li>
+          <li><strong>A beating heart is not neutral everywhere.</strong> In a resuscitation or oncology workflow it can read as glib. Trace and Breath exist so a product can pick a variant that fits its clinical context; the DESIGN.md contract gets a “Loading” line to record that choice.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <section class="block" id="variants">
+      <div class="block-head">
+        <p class="eyebrow">05 · Six loaders, live</p>
+        <h2>The recreation and five alternatives</h2>
+        <p>Every one of these is the real prototype element rendering real SVG — resize the window, switch your OS to dark, or turn on “reduce motion” and they respond. Toggle the stage to judge them on a light app ground and on a dark monitor ground.</p>
+      </div>
+      <div class="gallery-head">
+        <div>
+          <p class="eyebrow">Stage</p>
+          <div class="seg" role="group" aria-label="Stage background">
+            <button type="button" data-stage="paper" aria-pressed="true">Paper (app ground)</button>
+            <button type="button" data-stage="ink" aria-pressed="false">Ink (monitor ground)</button>
+          </div>
+        </div>
+        <div>
+          <p class="eyebrow">Motion</p>
+          <div class="seg" role="group" aria-label="Motion preference simulation">
+            <button type="button" data-motion="auto" aria-pressed="true">Follow OS</button>
+            <button type="button" data-motion="reduced" aria-pressed="false">Simulate reduced</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="gallery" id="gallery">
+        <!-- Primary -->
+        <article class="mock primary">
+          <div class="stage"><span class="tag">Primary · Pulse</span><span class="tag r">60 bpm · draw-in once</span>
+            <ox-loader variant="pulse" size="150" label="Loading your records" show-label></ox-loader>
+          </div>
+          <div class="mock-body">
+            <h3>Pulse <span class="pill accent">recommended default</span></h3>
+            <p class="small">The reference, recreated from its own geometry: open heart, ECG through the gap. Heart draws in once (0.7 s), then beats at 60 bpm while a bright head with a fading tail sweeps the line each beat over a faint track. Same paths, same 1.0 s period, no loop seam.</p>
+            <dl class="spec">
+              <dt>Cycle</dt><dd>1 beat = 60 000 / bpm ms · scale 1 → 1.07 → 1 · sweep 0 → 100 % path</dd>
+              <dt>Layers</dt><dd>heart (2 paths, one group) · track · sweep tail · sweep head — 5 elements</dd>
+              <dt>Reduced motion</dt><dd>Static heart + full line at 100 % opacity, gentle 2.4 s opacity breath (0.55 → 1). No scale, no travel.</dd>
+              <dt>Size floor</dt><dd>40 px — below that the ECG detail collapses; the element auto-swaps to Trace at <code>sm</code>.</dd>
+              <dt>Best for</dt><dd><span class="fit"><span class="pill">page boot</span><span class="pill">patient portal</span><span class="pill">brand moment</span></span></dd>
+            </dl>
+          </div>
+        </article>
+
+        <article class="mock">
+          <div class="stage"><span class="tag">Alt 1 · Trace</span>
+            <ox-loader variant="trace" size="150" label="Loading" bpm="60"></ox-loader>
+          </div>
+          <div class="mock-body">
+            <h3>Trace <span class="pill">heartbeat only</span></h3>
+            <p class="small">The “only heartbeat” option: one PQRST complex on a baseline, monitor-style sweep with fading tail, one beat per sweep. The calmest way to say “alive”; the right choice for clinical dashboards and for cardiac contexts where a cartoon heart would jar.</p>
+            <dl class="spec">
+              <dt>Cycle</dt><dd>1 beat · sweep only, nothing scales</dd>
+              <dt>Reduced motion</dt><dd>Static full trace, opacity breath</dd>
+              <dt>Size floor</dt><dd>20 px — reads inline in a button</dd>
+              <dt>Best for</dt><dd><span class="fit"><span class="pill">clinical</span><span class="pill">inline</span><span class="pill">tables</span></span></dd>
+            </dl>
+          </div>
+        </article>
+
+        <article class="mock">
+          <div class="stage"><span class="tag">Alt 2 · Breath</span>
+            <ox-loader variant="breath" size="120" label="Loading"></ox-loader>
+          </div>
+          <div class="mock-body">
+            <h3>Breath</h3>
+            <p class="small">Three rings expanding and fading from a soft core on a 4 s cycle — the cadence of calm breathing, not of a spinner. Symbol-free, so it suits any specialty, and the core is a slot for a customer’s logo mark.</p>
+            <dl class="spec">
+              <dt>Cycle</dt><dd>4 s / speed · rings staggered by ⅓ · core 1 → 1.18</dd>
+              <dt>Reduced motion</dt><dd>Core + one static ring, opacity breath</dd>
+              <dt>Size floor</dt><dd>20 px</dd>
+              <dt>Best for</dt><dd><span class="fit"><span class="pill">patient-facing</span><span class="pill">long waits</span><span class="pill">white-label</span></span></dd>
+            </dl>
+          </div>
+        </article>
+
+        <article class="mock">
+          <div class="stage"><span class="tag">Alt 3 · Cross</span>
+            <ox-loader variant="cross" size="110" label="Loading"></ox-loader>
+          </div>
+          <div class="mock-body">
+            <h3>Cross</h3>
+            <p class="small">Four rounded arms breathe outward in sequence — a ripple through the plus, not a rotation. Universally read as “medical”, and deliberately never red (see §04). The most “iconic” option for a hospital or clinic brand.</p>
+            <dl class="spec">
+              <dt>Cycle</dt><dd>2.4 s / speed · arm travel 5 units · stagger ¼</dd>
+              <dt>Reduced motion</dt><dd>Static cross, opacity breath</dd>
+              <dt>Size floor</dt><dd>24 px</dd>
+              <dt>Best for</dt><dd><span class="fit"><span class="pill">provider brand</span><span class="pill">page boot</span></span></dd>
+            </dl>
+          </div>
+        </article>
+
+        <article class="mock">
+          <div class="stage"><span class="tag">Alt 4 · Helix</span>
+            <ox-loader variant="helix" size="140" label="Loading"></ox-loader>
+          </div>
+          <div class="mock-body">
+            <h3>Helix</h3>
+            <p class="small">Two strands of dots on a slow sine, with depth faked by scale and opacity so the strands pass in front of and behind each other. Reads as “science / genomics / lab”. Elegant, but the least generic — a lab-results product would love it; a scheduling app would not.</p>
+            <dl class="spec">
+              <dt>Cycle</dt><dd>2.6 s / speed · 9 columns · strand B offset ½</dd>
+              <dt>Reduced motion</dt><dd>Static strands, opacity breath</dd>
+              <dt>Size floor</dt><dd>48 px wide</dd>
+              <dt>Best for</dt><dd><span class="fit"><span class="pill">lab / diagnostics</span><span class="pill">research</span></span></dd>
+            </dl>
+          </div>
+        </article>
+
+        <article class="mock">
+          <div class="stage"><span class="tag">Alt 5 · Fill</span>
+            <ox-loader variant="fill" size="150" label="Loading"></ox-loader>
+          </div>
+          <div class="mock-body">
+            <h3>Fill <span class="pill">determinate-capable</span></h3>
+            <p class="small">A capsule with a soft liquid slug. Indeterminate: the slug drifts end to end. Determinate: pass <code>progress</code> and it becomes a real 0–100 % fill with <code>role="progressbar"</code>. The only variant that can show honest progress for multi-step loads (fetch → decrypt → render).</p>
+            <dl class="spec">
+              <dt>Cycle</dt><dd>2.8 s / speed drift · or width = progress</dd>
+              <dt>Reduced motion</dt><dd>Static slug at 40 % (indeterminate) or exact fill (determinate)</dd>
+              <dt>Size floor</dt><dd>64 px wide</dd>
+              <dt>Best for</dt><dd><span class="fit"><span class="pill">known progress</span><span class="pill">imports</span><span class="pill">uploads</span></span></dd>
+            </dl>
+          </div>
+        </article>
+      </div>
+
+      <div class="table-wrap" style="margin-top:1.25rem">
+        <table>
+          <thead><tr><th>Variant</th><th>Signal</th><th>Cadence</th><th class="num">Elements</th><th>Inline (≤32 px)</th><th>Determinate</th><th>Symbol risk</th><th>Verdict</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Pulse</strong></td><td>heart + ECG</td><td>60 bpm</td><td class="num">5</td><td>no (swaps to Trace)</td><td>no</td><td>heart in acute-care contexts</td><td>Default. The brand moment.</td></tr>
+            <tr><td><strong>Trace</strong></td><td>ECG only</td><td>60 bpm</td><td class="num">3</td><td class="yes">yes</td><td>no</td><td>none</td><td>Ship in v1. Clinical default.</td></tr>
+            <tr><td><strong>Breath</strong></td><td>rings</td><td>15 / min</td><td class="num">4</td><td class="yes">yes</td><td>no</td><td>none</td><td>Ship in v1. Patient default; logo slot.</td></tr>
+            <tr><td><strong>Cross</strong></td><td>plus ripple</td><td>25 / min</td><td class="num">4</td><td>marginal</td><td>no</td><td>never red</td><td>v1.1 unless a customer asks.</td></tr>
+            <tr><td><strong>Helix</strong></td><td>DNA</td><td>23 / min</td><td class="num">18</td><td>no</td><td>no</td><td>niche</td><td>v1.1; lab products.</td></tr>
+            <tr><td><strong>Fill</strong></td><td>capsule</td><td>21 / min</td><td class="num">2</td><td>no</td><td class="yes">yes</td><td>none</td><td>Ship in v1 — it is the progress story.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <section class="block" id="playground">
+      <div class="block-head">
+        <p class="eyebrow">06 · Configure it</p>
+        <h2>The configuration surface, as a thing you can touch</h2>
+        <p>These controls drive the same prototype element and print the equivalent code. Everything here maps one-to-one onto the API in §07.</p>
+      </div>
+      <div class="play">
+        <div class="controls card">
+          <div class="ctl"><label for="p-variant">variant</label>
+            <select id="p-variant"><option value="pulse">pulse</option><option value="trace">trace</option><option value="breath">breath</option><option value="cross">cross</option><option value="helix">helix</option><option value="fill">fill</option></select></div>
+          <div class="ctl"><label for="p-size">size <output id="o-size">88</output></label>
+            <input id="p-size" type="range" min="20" max="160" step="4" value="88" /></div>
+          <div class="ctl"><label for="p-bpm">bpm (cardiac) <output id="o-bpm">60</output></label>
+            <input id="p-bpm" type="range" min="40" max="100" step="2" value="60" /></div>
+          <div class="ctl"><label for="p-speed">speed (all) <output id="o-speed">1.0</output></label>
+            <input id="p-speed" type="range" min="0.5" max="2" step="0.1" value="1" /></div>
+          <div class="ctl"><label for="p-progress">progress <output id="o-progress">indeterminate</output></label>
+            <input id="p-progress" type="range" min="-1" max="100" step="1" value="-1" /></div>
+          <div class="ctl"><label for="p-label">label</label>
+            <input id="p-label" type="text" value="Loading your records" /></div>
+          <div class="ctl"><label for="p-hint">hint</label>
+            <input id="p-hint" type="text" value="" placeholder="e.g. This can take a few seconds" /></div>
+          <div class="ctl"><span class="lbl">mode</span>
+            <div class="row">
+              <label class="switch"><input type="radio" name="p-mode" value="inline" checked /> inline</label>
+              <label class="switch"><input type="radio" name="p-mode" value="overlay" /> overlay (page)</label>
+            </div></div>
+          <div class="ctl"><span class="lbl">flags</span>
+            <div class="row">
+              <label class="switch"><input type="checkbox" id="p-showlabel" checked /> show label</label>
+              <label class="switch"><input type="checkbox" id="p-reduced" /> motion=“reduced”</label>
+              <label class="switch"><input type="checkbox" id="p-slow" /> simulate slow (8 s)</label>
+            </div></div>
+          <div class="ctl"><span class="lbl">colour</span>
+            <div class="row">
+              <label class="switch"><input type="radio" name="p-color" value="" checked /> accent token</label>
+              <label class="switch"><input type="radio" name="p-color" value="#7c5cff" /> brand override</label>
+            </div></div>
+          <div class="row"><button type="button" class="btn primary" id="p-replay">Replay entrance</button><button type="button" class="btn" id="p-toggle">Hide / show (exit fade)</button></div>
+        </div>
+        <div>
+          <div class="play-stage" id="play-stage">
+            <div class="fake-app" aria-hidden="true">
+              <div class="bar w40"></div><div class="bar w80"></div><div class="bar w60"></div>
+              <div class="tiles"><div class="tile"></div><div class="tile"></div><div class="tile"></div></div>
+              <div class="bar w80"></div><div class="bar w60"></div>
+            </div>
+            <ox-loader id="play" variant="pulse" size="88" label="Loading your records" show-label bpm="60" speed="1" style="position:absolute;inset:0;display:grid;place-content:center;place-items:center;"></ox-loader>
+          </div>
+          <div class="play-code">
+            <div class="tabs" role="tablist" aria-label="Framework">
+              <button role="tab" aria-selected="true" data-tab="ce">HTML / any framework</button>
+              <button role="tab" aria-selected="false" data-tab="react">React (registry)</button>
+              <button role="tab" aria-selected="false" data-tab="vue">Vue</button>
+              <button role="tab" aria-selected="false" data-tab="angular">Angular</button>
+            </div>
+            <div class="tabpanel" data-panel="ce"><pre id="code-ce"></pre></div>
+            <div class="tabpanel" data-panel="react" hidden><pre id="code-react"></pre></div>
+            <div class="tabpanel" data-panel="vue" hidden><pre id="code-vue"></pre></div>
+            <div class="tabpanel" data-panel="angular" hidden><pre id="code-angular"></pre></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <section class="block" id="api">
+      <div class="block-head">
+        <p class="eyebrow">07 · Configuration API</p>
+        <h2>One contract, three surfaces</h2>
+        <p>Attributes on the element, props on the React component, and CSS custom properties for anything visual. Names are identical across surfaces (kebab-case on the element, camelCase in React). Defaults are chosen so <code>&lt;ox-loader&gt;</code> with no attributes is already correct.</p>
+      </div>
+      <h3>Props / attributes</h3>
+      <div class="table-wrap" style="margin-top:.6rem">
+        <table>
+          <thead><tr><th>Name</th><th>Type</th><th>Default</th><th>What it does</th></tr></thead>
+          <tbody>
+            <tr><td><code>variant</code></td><td><code>pulse · trace · breath · cross · helix · fill</code></td><td><code>pulse</code></td><td>Which loader. Below 40 px, <code>pulse</code> renders as <code>trace</code> automatically (the ECG detail does not survive; the heartbeat does).</td></tr>
+            <tr><td><code>size</code></td><td><code>sm · md · lg · xl · number(px)</code></td><td><code>md</code> inline · <code>xl</code> page</td><td>sm 20 · md 32 · lg 56 · xl 88. Number is the art width in px. Sets <code>--ox-loader-size</code>.</td></tr>
+            <tr><td><code>mode</code></td><td><code>inline · overlay · page</code></td><td><code>inline</code></td><td><em>overlay</em> covers the nearest positioned ancestor (<code>position:absolute; inset:0</code>) with a scrim; <em>page</em> is <code>position:fixed</code> over the viewport, on <code>--ox-loader-z</code>, and locks scroll.</td></tr>
+            <tr><td><code>label</code></td><td>string</td><td><code>"Loading"</code></td><td>The accessible name and, when shown, the visible text. Apps should say <em>what</em> is loading (“Loading your results”). Register-aware via <code>useTerm</code> in the React item.</td></tr>
+            <tr><td><code>show-label</code> / <code>showLabel</code></td><td>boolean</td><td>true in page/overlay · false inline</td><td>Visible label under the art. Hidden labels are still announced.</td></tr>
+            <tr><td><code>hint</code></td><td>string</td><td>—</td><td>Secondary line (“This can take a few seconds”). Never a substitute for the label.</td></tr>
+            <tr><td><code>progress</code></td><td>0–100 · undefined</td><td>undefined</td><td>Determinate mode: <code>role="progressbar"</code> with <code>aria-valuenow/min/max</code>. <code>fill</code> shows the value; other variants keep looping and add a numeric readout.</td></tr>
+            <tr><td><code>bpm</code></td><td>40–100</td><td>60</td><td>Beat rate for <code>pulse</code> and <code>trace</code>. Sets <code>--ox-loader-beat = 60000/bpm ms</code>. Values outside the range are clamped (a loader is not a tachycardia demo).</td></tr>
+            <tr><td><code>speed</code></td><td>0.5–2</td><td>1</td><td>Cadence multiplier for every variant. Cardiac variants use <code>bpm</code> if given, else <code>60 × speed</code>.</td></tr>
+            <tr><td><code>delay</code></td><td>ms</td><td>0 page · 200 inline/overlay</td><td>Wait before becoming visible, so a 120 ms fetch never flashes a loader (Fluent and Atlassian spinners do the same).</td></tr>
+            <tr><td><code>min-duration</code> / <code>minDuration</code></td><td>ms</td><td>400</td><td>Once shown, stay at least this long, so a loader never blinks on and off.</td></tr>
+            <tr><td><code>slow-after</code> / <code>slowAfter</code></td><td>ms · 0 = off</td><td>8000</td><td>After this, show <code>slow-hint</code> and fire <code>ox-loader-slow</code>. Nielsen’s 10 s attention limit, minus a margin.</td></tr>
+            <tr><td><code>slow-hint</code> / <code>slowHint</code></td><td>string</td><td><code>"Still loading. You can keep waiting or go back."</code></td><td>Names the situation and what remains possible, per CONTENT.md §5. Slot <code>actions</code> can add Retry / Go back.</td></tr>
+            <tr><td><code>open</code></td><td>boolean</td><td>true</td><td>Controls visibility with an enter fade (160 ms) and an exit fade (220 ms). Setting <code>false</code> before <code>min-duration</code> elapses defers the exit.</td></tr>
+            <tr><td><code>motion</code></td><td><code>auto · reduced · full</code></td><td><code>auto</code></td><td><em>auto</em> follows <code>prefers-reduced-motion</code>; <em>reduced</em> forces the still fallback; <em>full</em> is only for apps with their own motion setting and is documented as such.</td></tr>
+            <tr><td><code>scrim</code></td><td>boolean</td><td>true (overlay/page)</td><td>Translucent backdrop from <code>--ox-loader-scrim</code>. Blur is opt-in (<code>blur</code>) because <code>backdrop-filter</code> is the one expensive thing here.</td></tr>
+            <tr><td><code>lock-scroll</code> / <code>lockScroll</code></td><td>boolean</td><td>true (page)</td><td>Body scroll lock while a page loader is open. Restored on hide.</td></tr>
+            <tr><td><code>announce</code></td><td><code>polite · assertive · off</code></td><td><code>polite</code></td><td><code>aria-live</code> politeness of the status text. <em>off</em> for loaders inside an already-live region.</td></tr>
+            <tr><td>slots: <code>default</code>, <code>actions</code></td><td>content</td><td>—</td><td>Default slot replaces the art (a logo mark inside Breath, for instance); <code>actions</code> renders under the slow hint.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="grid-2" style="margin-top:1rem">
+        <div class="card">
+          <h3>CSS custom properties</h3>
+          <div class="table-wrap" style="margin-top:.6rem;border:0">
+            <table>
+              <tbody>
+                <tr><td><code>--ox-loader-color</code></td><td>Stroke/ink. Default <code>var(--ox-accent, currentColor)</code>.</td></tr>
+                <tr><td><code>--ox-loader-track</code></td><td>Faint static shape. Default 22 % mix of the colour.</td></tr>
+                <tr><td><code>--ox-loader-scrim</code></td><td>Backdrop. Default 72 % of <code>--ox-bg</code>.</td></tr>
+                <tr><td><code>--ox-loader-size</code></td><td>Art width. Set by <code>size</code>; overridable.</td></tr>
+                <tr><td><code>--ox-loader-stroke</code></td><td>Stroke in px, constant at any size. Default 2.4px (2px sm).</td></tr>
+                <tr><td><code>--ox-loader-beat</code></td><td>Beat period. Set by <code>bpm</code>.</td></tr>
+                <tr><td><code>--ox-loader-cycle</code></td><td>Non-cardiac cycle. Set by <code>speed</code>.</td></tr>
+                <tr><td><code>--ox-loader-z</code></td><td>Stacking for page mode. Default 1000.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="card">
+          <h3>Parts, events, density</h3>
+          <dl class="kv" style="margin-top:.75rem">
+            <dt>Parts</dt><dd><code>::part(scrim)</code> · <code>::part(art)</code> · <code>::part(label)</code> · <code>::part(hint)</code> · <code>::part(progress)</code> — style hooks through the shadow boundary.</dd>
+            <dt>Events</dt><dd><code>ox-loader-show</code> · <code>ox-loader-hide</code> · <code>ox-loader-slow</code> (bubbling, composed). React: <code>onShow</code>, <code>onHide</code>, <code>onSlow</code>.</dd>
+            <dt>Density</dt><dd>Reads <code>data-ox-density</code>: <em>patient</em> enlarges label text and default size one step; <em>clinical</em> drops the hint and tightens spacing.</dd>
+            <dt>Themes</dt><dd>Inherits <code>--ox-*</code>; nothing hard-coded. In forced-colours mode the stroke becomes <code>CanvasText</code> and the scrim <code>Canvas</code>.</dd>
+            <dt>Copy defaults</dt><dd>Two register catalogs, per CONTENT.md §7: clinician “Loading” / patient “Loading your information”. Apps override per surface.</dd>
+          </dl>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <section class="block" id="architecture">
+      <div class="block-head">
+        <p class="eyebrow">08 · Architecture &amp; install</p>
+        <h2>One art source, two thin shells, one parity test</h2>
+        <p>The motion lives in CSS and the shapes in SVG. Neither knows about React or the DOM API. Everything framework-specific is a shell around that core, and the shells are tested to render identical markup.</p>
+      </div>
+      <div class="arch">
+        <div class="node core">
+          <p class="eyebrow accent">Core (L0/L1 · no framework)</p>
+          <strong>packages/loader-core</strong> — <code>loader.css</code> (keyframes, custom properties, reduced-motion and forced-colours rules) · <code>art.ts</code> (SVG path constants and per-variant markup templates) · <code>gate.ts</code> (delay / min-duration / slow-after state machine, ~60 lines, pure).
+        </div>
+        <div class="flow">↓ &nbsp; consumed as source by &nbsp; ↓</div>
+        <div class="node"><p class="eyebrow">Shell A · React</p><strong>registry/oxygen/loader/</strong><ul><li>Native React, JSX SVG, Tailwind + tokens</li><li>Copied into the customer’s repo (shadcn)</li><li><code>useLoadingGate()</code> hook = gate.ts</li></ul></div>
+        <div class="node"><p class="eyebrow">Shell B · Custom Element</p><strong>@oxygenui/loader</strong> (npm + CDN)<ul><li>Vanilla <code>HTMLElement</code>, shadow DOM, ~3 KB</li><li>ElementInternals for role/aria</li><li>Declarative shadow DOM for SSR</li></ul></div>
+        <div class="node"><p class="eyebrow">Shell C · Snippet</p><strong>docs “boot loader” recipe</strong><ul><li>Static HTML + inline CSS, no JS</li><li>For <code>index.html</code> before the bundle</li><li>Removed by the app on hydrate</li></ul></div>
+      </div>
+
+      <div class="grid-2" style="margin-top:1rem">
+        <div>
+          <h3>Repo layout (matches ARCHITECTURE §4)</h3>
+<div class="tree" style="margin-top:.6rem"><b>registry/oxygen/loader/</b>
+├── loader.tsx              <i>Loader + PageLoader, JSX art, gate hook</i>
+├── loader.css              <i>keyframes + vars — “only when tokens cannot express it”</i>
+├── loader.meta.ts          <i>metadata → registry, docs, llms.txt</i>
+├── loader.stories.tsx      <i>6 variants × modes × states → VRT, axe, play</i>
+└── loader.test.tsx         <i>unit + contract + parity</i>
+<b>packages/loader-core/</b>       <i>art.ts · loader.css · gate.ts (framework-free)</i>
+<b>packages/loader-element/</b>    <i>ox-loader.ts → @oxygenui/loader (CE, npm, CDN)</i>
+<b>apps/docs/</b> …/components/loader   <i>generated page + ComponentPreview scenarios</i></div>
+          <p class="small muted" style="margin-top:.6rem">The React file must stay self-contained (it is copied verbatim to customers), so it inlines the art constants. A parity test asserts the inlined constants equal <code>loader-core/art.ts</code>, and that <code>&lt;Loader/&gt;</code> and <code>&lt;ox-loader&gt;</code> serialise to the same SVG. Drift fails CI, not review.</p>
+        </div>
+        <div>
+          <h3><code>loader.meta.ts</code></h3>
+<pre style="margin-top:.6rem"><span class="k">export default</span> defineComponentMeta({
+  name: <span class="s">"loader"</span>,
+  title: <span class="s">"Loader"</span>,
+  tier: <span class="s">"free"</span>, status: <span class="s">"beta"</span>, since: <span class="s">"0.2.0"</span>,
+  layer: <span class="s">"primitive"</span>,
+  categories: [<span class="s">"Feedback"</span>, <span class="s">"Foundations"</span>],
+  fhir: [],                       <span class="c">// no resource input</span>
+  summary: <span class="s">"Soothing page and region loader with six healthcare-native variants."</span>,
+  states: [<span class="s">"Indeterminate"</span>, <span class="s">"Determinate"</span>, <span class="s">"Delayed (not yet shown)"</span>,
+           <span class="s">"Slow wait"</span>, <span class="s">"Reduced motion"</span>, <span class="s">"Exiting"</span>],
+  a11y: [{ label: <span class="s">"Announced once"</span>, detail: <span class="s">"role=status, aria-live=polite; determinate uses progressbar."</span> },
+         { label: <span class="s">"Motion"</span>, detail: <span class="s">"Honours prefers-reduced-motion with a designed still state."</span> }],
+  guidance: { use: [<span class="s">"Unknown waits over 300 ms; app boot; route changes."</span>],
+              avoid: [<span class="s">"Layouts you already know — use ClinicalSkeleton."</span>,
+                      <span class="s">"Any red rendering of the cross variant."</span>] },
+  limitations: [<span class="s">"Not a progress source; the app supplies progress."</span>],
+  related: [], dependencies: [], registryDependencies: [<span class="s">"utils"</span>, <span class="s">"tokens"</span>],
+  files: [{ path: <span class="s">"registry/oxygen/loader/loader.tsx"</span>, type: <span class="s">"registry:component"</span>, target: <span class="s">"components/oxygen/loader.tsx"</span> },
+          { path: <span class="s">"registry/oxygen/loader/loader.css"</span>, type: <span class="s">"registry:file"</span>, target: <span class="s">"styles/oxygen-loader.css"</span> }],
+});</pre>
+        </div>
+      </div>
+
+      <h3 style="margin-top:1.5rem">Install and use, per stack</h3>
+      <div class="grid-2" style="margin-top:.6rem">
+        <div>
+          <p class="eyebrow">React · shadcn registry (Oxygen’s channel)</p>
+<pre style="margin-top:.4rem"><span class="c"># once: registries → "@oxygenui": "https://oxygenui.design/r/{name}.json"</span>
+pnpm dlx shadcn@latest add @oxygenui/loader
+
+<span class="c">// app/(app)/loading.tsx  — Next.js route-level loader</span>
+<span class="k">import</span> { PageLoader } <span class="k">from</span> <span class="s">"@/components/oxygen/loader"</span>;
+<span class="k">export default function</span> Loading() {
+  <span class="k">return</span> &lt;PageLoader label=<span class="s">"Loading your records"</span> bpm={60} /&gt;;
+}
+
+<span class="c">// anywhere: region overlay with delay + slow-wait</span>
+&lt;Loader mode=<span class="s">"overlay"</span> variant=<span class="s">"trace"</span> label=<span class="s">"Loading results"</span>
+        delay={200} slowAfter={8000} onSlow={track} /&gt;</pre>
+        </div>
+        <div>
+          <p class="eyebrow">Vue 3 · Nuxt</p>
+<pre style="margin-top:.4rem">npm i @oxygenui/loader
+<span class="c">// main.ts</span>
+<span class="k">import</span> <span class="s">"@oxygenui/loader"</span>;            <span class="c">// defines &lt;ox-loader&gt;</span>
+<span class="c">// vite.config: vue({ template: { compilerOptions: { isCustomElement: t =&gt; t.startsWith("ox-") } } })</span>
+
+&lt;ox-loader variant=<span class="s">"breath"</span> mode=<span class="s">"page"</span> :open=<span class="s">"pending"</span>
+           label=<span class="s">"Loading your information"</span> @ox-loader-slow=<span class="s">"onSlow"</span> /&gt;</pre>
+        </div>
+        <div>
+          <p class="eyebrow">Angular 17+</p>
+<pre style="margin-top:.4rem">npm i @oxygenui/loader
+<span class="c">// main.ts</span>  <span class="k">import</span> <span class="s">"@oxygenui/loader"</span>;
+<span class="c">// component: schemas: [CUSTOM_ELEMENTS_SCHEMA]</span>
+
+&lt;ox-loader variant=<span class="s">"pulse"</span> mode=<span class="s">"overlay"</span> [attr.open]=<span class="s">"loading() ? '' : null"</span>
+           [attr.progress]=<span class="s">"progress()"</span> label=<span class="s">"Loading results"</span>&gt;&lt;/ox-loader&gt;</pre>
+        </div>
+        <div>
+          <p class="eyebrow">Anything else · boot screen with no JS</p>
+<pre style="margin-top:.4rem"><span class="c">&lt;!-- index.html, before the bundle. ~2 KB inline. --&gt;</span>
+&lt;style&gt;<span class="c">/* contents of oxygen-loader.css, minified */</span>&lt;/style&gt;
+&lt;div <span class="k">class</span>=<span class="s">"ox-loader"</span> <span class="k">data-mode</span>=<span class="s">"page"</span> role=<span class="s">"status"</span> aria-label=<span class="s">"Loading"</span>&gt;
+  &lt;svg viewBox=<span class="s">"0 0 160 128"</span>&gt;…pulse art…&lt;/svg&gt;
+&lt;/div&gt;
+<span class="c">&lt;!-- CDN for Svelte / Rails / Django / HTMX --&gt;</span>
+&lt;script type=<span class="s">"module"</span> src=<span class="s">"https://cdn.jsdelivr.net/npm/@oxygenui/loader@1"</span>&gt;&lt;/script&gt;
+&lt;ox-loader variant=<span class="s">"pulse"</span> mode=<span class="s">"page"</span>&gt;&lt;/ox-loader&gt;</pre>
+        </div>
+      </div>
+      <div class="callout" style="margin-top:1rem">
+        <p class="eyebrow">Server rendering</p>
+        <p class="small">React: the registry item is a client component with no effects on first paint — it renders the SVG on the server and hydrates cleanly. Element: ships a declarative-shadow-DOM template so Nuxt, Angular Universal, and Astro emit the loader in HTML; on hydrate the element adopts the existing shadow root instead of re-rendering. React 19 passes attributes and events to custom elements natively; for React 18 hosts the docs recommend the registry item over the element.</p>
+      </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <section class="block" id="a11y">
+      <div class="block-head">
+        <p class="eyebrow">09 · Accessibility &amp; standards</p>
+        <h2>The rules it is built against</h2>
+      </div>
+      <div class="grid-2">
+        <div class="card">
+          <h3>WAI-ARIA &amp; WCAG 2.2</h3>
+          <ul class="check">
+            <li><strong>Indeterminate:</strong> <code>role="status"</code> (implicit <code>aria-live="polite"</code>) with the label as accessible name; announced once on show, once on hide (“Loaded” is the app’s job).</li>
+            <li><strong>Determinate:</strong> <code>role="progressbar"</code>, <code>aria-valuemin/max/now</code>, <code>aria-valuetext</code> (“42 percent”); throttled to announce every 10 %.</li>
+            <li>The region being loaded gets <code>aria-busy="true"</code> (React item exposes <code>busyRef</code>; element exposes <code>for="id"</code>).</li>
+            <li><strong>2.2.2 Pause, Stop, Hide:</strong> a preload indicator is the documented exception (“part of a preload phase… not indicating progress could confuse users”); we still expose <code>motion="reduced"</code>.</li>
+            <li><strong>2.3.1 Three flashes:</strong> max cadence 100 bpm = 1.67 Hz, amplitude ≤ 7 %, no full-field luminance change.</li>
+            <li><strong>2.3.3 Animation from interactions (AAA):</strong> honoured via <code>prefers-reduced-motion</code>; the still state is designed, not just paused.</li>
+            <li><strong>1.4.11 Non-text contrast:</strong> stroke ≥ 3:1 on both grounds; track is decorative and exempt, but the still state raises it to 100 %.</li>
+            <li><strong>1.4.3 / 1.4.6:</strong> label and hint use <code>--ox-text</code> / <code>--ox-text-muted</code>, already contrast-checked in the token build.</li>
+            <li>No focus trap; page mode does not steal focus; scroll lock is released on hide and on unmount.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Platform &amp; ecosystem standards</h3>
+          <ul class="check">
+            <li><strong>Custom Elements v1 + Shadow DOM</strong>, <code>ElementInternals</code> for role/aria, <code>::part()</code> hooks, CSS custom properties across the boundary — scores 100 % on custom-elements-everywhere for Vue, Angular, Svelte; React 19 native.</li>
+            <li><strong>Declarative shadow DOM</strong> for SSR; <code>customElements.whenDefined</code> guard for late upgrades.</li>
+            <li><strong>Design tokens:</strong> only <code>--ox-*</code>; the loader adds a <code>component.loader</code> group to the DTCG source, so brand overrides go through the token build (ADR 0005), never CSS overrides.</li>
+            <li><strong>Forced colours:</strong> <code>@media (forced-colors: active)</code> → stroke <code>CanvasText</code>, scrim <code>Canvas</code>, no opacity-only cues.</li>
+            <li><strong>RTL:</strong> the ECG sweep runs start→end (logical); everything else is symmetric. Logical properties only (lint enforces).</li>
+            <li><strong>Content:</strong> label/hint/slow-hint follow CONTENT.md — name the wait, say what remains usable, no “Something went wrong”.</li>
+            <li><strong>Security constraints (ADR 0009):</strong> no fetch, no env, no console, no <code>innerHTML</code> from input — lint-enforced on the registry file; the element package is held to the same rules.</li>
+            <li><strong>Reduced-data / battery:</strong> page mode pauses animations when the tab is hidden (<code>visibilitychange</code>) — the one JS behaviour worth having.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <section class="block" id="perf">
+      <div class="block-head">
+        <p class="eyebrow">10 · Performance budget</p>
+        <h2>Numbers CI can hold it to</h2>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Budget</th><th class="num">Limit</th><th>How it is met</th><th>Enforced by</th></tr></thead>
+          <tbody>
+            <tr><td>CSS (all variants)</td><td class="num">≤ 2.5 KB gz</td><td>Shared keyframes; variant-specific rules only where shapes differ</td><td><code>size-limit</code></td></tr>
+            <tr><td>Element JS</td><td class="num">≤ 3.5 KB gz</td><td>Vanilla element, no framework, no template lib</td><td><code>size-limit</code></td></tr>
+            <tr><td>React item</td><td class="num">≤ 2 KB gz</td><td>Source is the deliverable; measured after the customer’s bundler</td><td><code>size-limit</code> on a sample build</td></tr>
+            <tr><td>Animated properties</td><td class="num">transform · opacity · stroke-dashoffset</td><td>First two are compositor-only; dash offset repaints a ≤ 150 px path — sub-millisecond</td><td>Playwright + CDP paint counters in the perf test</td></tr>
+            <tr><td>Frame rate under 4× CPU throttle</td><td class="num">≥ 55 fps</td><td>≤ 18 animated nodes (Helix worst case); no filters, no <code>backdrop-filter</code> unless opted in</td><td>Playwright trace, asserted in CI</td></tr>
+            <tr><td>Layout shift on show / hide</td><td class="num">CLS 0</td><td>Overlay/page are out of flow; inline reserves its box before the delay elapses</td><td>Playwright <code>PerformanceObserver</code></td></tr>
+            <tr><td>Long tasks on show</td><td class="num">0 &gt; 50 ms</td><td>No layout reads; class toggles only</td><td>Playwright trace</td></tr>
+            <tr><td>Hidden tab</td><td class="num">0 % CPU</td><td>Animations paused on <code>visibilitychange</code></td><td>Unit test on the element</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <section class="block" id="tests">
+      <div class="block-head">
+        <p class="eyebrow">11 · Test plan</p>
+        <h2>Story-derived, catalog-gated, deterministic</h2>
+        <p>Per ADR 0007: the stories are the fixture for docs, VRT, axe, and interaction; unit tests cover logic; a small set of tests exists only for this component’s cross-framework promise.</p>
+      </div>
+      <h3>Matrix</h3>
+      <div class="table-wrap" style="margin-top:.6rem">
+        <table>
+          <thead><tr><th>Level</th><th>Tool</th><th>What, concretely</th><th class="num">Count</th></tr></thead>
+          <tbody>
+            <tr><td>Stories</td><td>Storybook CSF</td><td>6 variants × {inline, overlay, page} × {indeterminate, determinate 42 %} + delayed / slow-wait / reduced / exiting / density × 3 / theme × 2</td><td class="num">≈ 48</td></tr>
+            <tr><td>Unit</td><td>Vitest + Testing Library (fake timers)</td><td>Gate: shows after <code>delay</code>, not before; hides no earlier than <code>minDuration</code>; <code>slowAfter</code> fires once and renders hint; <code>open=false</code> mid-delay never shows. Roles/aria for both modes; <code>aria-valuetext</code> throttling; clamp <code>bpm</code>; <code>pulse</code>→<code>trace</code> swap under 40 px; scroll lock set and restored; label register defaults</td><td class="num">≈ 30</td></tr>
+            <tr><td>Contract</td><td><code>test/contract.tsx</code></td><td>Renders something perceivable; no leaked <code>undefined</code>/<code>NaN</code>; interactives (Retry in <code>actions</code>) are named</td><td class="num">every story</td></tr>
+            <tr><td>Parity</td><td>Vitest + jsdom</td><td><code>&lt;Loader/&gt;</code> SSR HTML vs <code>&lt;ox-loader&gt;</code> shadow HTML: identical SVG after attribute normalisation; inlined art constants equal <code>loader-core/art.ts</code></td><td class="num">6</td></tr>
+            <tr><td>Motion</td><td>Playwright + WAAPI</td><td>Deterministic frames: <code>document.getAnimations().forEach(a =&gt; a.pause(); a.currentTime = t)</code> at 0 / 25 / 50 / 75 % of the cycle → screenshot each. Loop seam: frame at 0 % equals frame at 100 %. Beat period equals <code>60000/bpm</code>. Under <code>reducedMotion: 'reduce'</code>, zero animations with transforms</td><td class="num">6 × 4 × 2</td></tr>
+            <tr><td>Accessibility</td><td>axe per story</td><td>× 2 themes × 3 densities + forced-colours emulation; zero violations is the stable-tier gate</td><td class="num">≈ 300 runs</td></tr>
+            <tr><td>Visual regression</td><td>Playwright screenshots</td><td>Every story, animations paused at 30 %; pinned fonts and viewport; light + dark</td><td class="num">≈ 96</td></tr>
+            <tr><td>Type</td><td><code>expect-type</code> + api-extractor</td><td>Prop contract snapshot; a diff is a required review</td><td class="num">1 report</td></tr>
+            <tr><td>Bundle</td><td><code>size-limit</code></td><td>Budgets in §10</td><td class="num">3</td></tr>
+            <tr><td>Cross-framework</td><td>Playwright against 5 sample apps</td><td>Vite+React 19, Vite+Vue 3, Angular 18, SvelteKit, static HTML+CDN: element upgrades, attributes reflect, event fires, SSR HTML contains the SVG</td><td class="num">5 × 4</td></tr>
+            <tr><td>Manual</td><td>VoiceOver, NVDA, TalkBack</td><td>Announcement script: on show, on determinate progress, on slow, on hide; recorded in the docs’ support matrix</td><td class="num">1 pass / release</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="grid-2" style="margin-top:1rem">
+        <div class="card">
+          <h3>Definition of done (stable tier)</h3>
+          <ul class="check">
+            <li>All stories present; <code>pnpm gen --strict</code> passes for <code>loader</code>.</li>
+            <li>Zero axe violations across the matrix; forced-colours screenshots reviewed.</li>
+            <li>VRT baselines committed for light and dark; motion frames match spec ±1 frame.</li>
+            <li>Parity and cross-framework suites green in CI.</li>
+            <li>Bundle budgets met; perf trace within limits under 4× throttle.</li>
+            <li>Docs page shows all six scenarios via <code>ComponentPreview</code>; boot-screen recipe verified with JS disabled.</li>
+            <li>Screen-reader pass recorded; DESIGN.md gains a “Loading” decision line.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Motion QA checklist (human)</h3>
+          <ul class="check">
+            <li>Watch each variant for 60 s on both grounds — does attention drift away? (It should.)</li>
+            <li>Loop boundary invisible at 1× and 0.25× playback.</li>
+            <li>Beat and sweep stay in phase at 40, 60, and 100 bpm.</li>
+            <li>At 20 px, Trace and Breath still read as intentional; Pulse has swapped.</li>
+            <li>Reduced-motion state looks designed, not broken.</li>
+            <li>Nothing red anywhere near the Cross variant.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <section class="block" id="plan">
+      <div class="block-head">
+        <p class="eyebrow">12 · Delivery plan</p>
+        <h2>Four phases, about two working weeks</h2>
+        <p>Effort is for one engineer with this brief in hand. Phase 1 alone produces something demoable; the rest is what makes it a component rather than a demo.</p>
+      </div>
+      <div class="phase"><div class="when">Phase 0 · ½ day</div><div><h4>Decide</h4><p class="small">Sign off the decisions in §13. Scaffold with <code>pnpm gen:component loader</code>. Add the <code>component.loader</code> token group.</p></div></div>
+      <div class="phase"><div class="when">Phase 1 · 2–3 days</div><div><h4>Core + element</h4><p class="small">Port the six variants from this prototype into <code>loader-core</code>: final paths, keyframes, reduced-motion and forced-colours rules, gate state machine. Build <code>&lt;ox-loader&gt;</code> with ElementInternals and DSD. Publish <code>@oxygenui/loader@0.1.0-beta</code> to npm (private tag).</p></div></div>
+      <div class="phase"><div class="when">Phase 2 · 2–3 days</div><div><h4>React item + docs</h4><p class="small"><code>loader.tsx</code> (Loader, PageLoader, useLoadingGate), <code>meta.ts</code>, stories, unit + contract + parity tests. Wire <code>ComponentPreview</code> scenarios and the docs page. <code>pnpm gen</code> publishes the registry item.</p></div></div>
+      <div class="phase"><div class="when">Phase 3 · 2 days</div><div><h4>Quality gates</h4><p class="small">Motion frame tests, VRT baselines, axe matrix, size-limit, perf trace, five framework smoke apps in CI. Screen-reader pass.</p></div></div>
+      <div class="phase"><div class="when">Phase 4 · 1 day</div><div><h4>Release as beta</h4><p class="small">Changeset, docs polish, boot-screen recipe verified with JS off, hq adopts it for its own route loading (dogfood). Promote to <code>stable</code> after one release cycle without API change.</p></div></div>
+    </section>
+
+    <!-- ============================================================ -->
+    <section class="block" id="decisions">
+      <div class="block-head">
+        <p class="eyebrow">13 · Decisions &amp; risks</p>
+        <h2>What only you can decide, and what could bite</h2>
+      </div>
+      <div class="grid-2">
+        <div class="card">
+          <h3>Decisions</h3>
+          <ol class="decisions small" style="padding-inline-start:1.2em">
+            <li><strong>Name.</strong> <code>loader</code> (Loader + PageLoader) vs <code>page-loader</code>. <span class="rec">Recommend <code>loader</code></span> — one component, three modes; the page case is a preset.</li>
+            <li><strong>v1 variant set.</strong> Pulse, Trace, Breath, Fill now; Cross and Helix in v1.1. <span class="rec">Recommend that split</span> — it covers brand, clinical, patient, and progress.</li>
+            <li><strong>Default rhythm.</strong> 60 bpm and 7 % beat (reference is 60 / 10 %). <span class="rec">Recommend 60 / 7 %</span>; 10 % feels eager at 88 px.</li>
+            <li><strong>Element now or later.</strong> Ship <code>@oxygenui/loader</code> alongside the registry item, or React first. <span class="rec">Recommend alongside</span> — the prototype already exists and it is the multi-framework promise.</li>
+            <li><strong>Where the CSS lives.</strong> Own <code>loader.css</code> registry file vs folding keyframes into the tokens stylesheet. <span class="rec">Recommend own file</span>; tokens stay declarative.</li>
+            <li><strong>Slow-wait copy.</strong> Approve “Still loading. You can keep waiting or go back.” for both registers, or write two.</li>
+            <li><strong>Reduced-motion still state.</strong> Opacity breath (proposed) vs fully static. <span class="rec">Recommend opacity breath</span> — motion-safe and still signals “working”.</li>
+          </ol>
+        </div>
+        <div class="card">
+          <h3>Risks and mitigations</h3>
+          <ul class="check">
+            <li class="open"><strong>Two renderers drift.</strong> Mitigated by the parity test and by generating the JSX art from <code>art.ts</code> if drift ever occurs.</li>
+            <li class="open"><strong>React 18 hosts and custom elements.</strong> Attribute/event quirks pre-19; docs steer React users to the registry item.</li>
+            <li class="open"><strong>Emblem law.</strong> Cross never red; docs and lint (<code>no-primitive-token</code>) prevent a raw red on it.</li>
+            <li class="open"><strong>Symbol fit.</strong> Heart may be wrong for some workflows; variants exist and DESIGN.md records the choice.</li>
+            <li class="open"><strong>Vestibular safety.</strong> Amplitudes are small and reduced motion is honoured; the motion QA checklist is a release gate.</li>
+            <li class="open"><strong>Boot-screen removal.</strong> If the app forgets to hide the inline loader, users wait forever; the recipe includes the hide call and a 20 s watchdog that reveals a “Reload” action.</li>
+            <li class="open"><strong>Perf on old tablets.</strong> Helix is the heaviest (18 nodes); it is v1.1 and gated by the 4× throttle test.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <section class="block" id="appendix">
+      <div class="block-head">
+        <p class="eyebrow">14 · Appendix</p>
+        <h2>Motion spec and geometry</h2>
+        <p>Enough to implement without this page open. All easings are named once and reused.</p>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Variant</th><th>Element</th><th>Keyframes</th><th>Duration</th><th>Easing</th></tr></thead>
+          <tbody>
+            <tr><td rowspan="4">Pulse</td><td>heart (draw-in, once)</td><td><code>stroke-dashoffset 100 → 0</code> (pathLength 100)</td><td>700 ms</td><td>ease-out <code>(.2,.8,.2,1)</code></td></tr>
+            <tr><td>heart group (beat)</td><td><code>scale 1 → 1.07 → 1</code> about heart centre</td><td>beat</td><td>sine <code>(.45,0,.55,1)</code></td></tr>
+            <tr><td>sweep head</td><td>dasharray <code>22 200</code>, offset <code>22 → −100</code></td><td>beat</td><td><code>(.4,0,.6,1)</code></td></tr>
+            <tr><td>sweep tail</td><td>dasharray <code>44 200</code>, offset <code>44 → −78</code>, opacity .35</td><td>beat</td><td>same</td></tr>
+            <tr><td>Trace</td><td>head / tail on ECG path</td><td>as Pulse sweep; track at 22 %</td><td>beat</td><td><code>(.4,0,.6,1)</code></td></tr>
+            <tr><td rowspan="2">Breath</td><td>ring ×3</td><td><code>scale .3 → 1</code>, <code>opacity .55 → 0</code>, staggered −⅓ cycle</td><td>cycle (4 s)</td><td><code>(.2,.6,.4,1)</code></td></tr>
+            <tr><td>core</td><td><code>scale 1 → 1.18 → 1</code></td><td>cycle</td><td>sine</td></tr>
+            <tr><td>Cross</td><td>arm ×4</td><td><code>translate 0 → 5u</code> outward → 0, staggered −¼</td><td>0.6 × cycle</td><td>sine</td></tr>
+            <tr><td>Helix</td><td>dot ×18</td><td><code>y 0 → −12 → 0 → 12 → 0</code>, <code>scale 1 → .85 → .6 → .85 → 1</code>, opacity to .45 at back; column delay −i/9, strand B −½</td><td>0.65 × cycle</td><td>ease-in-out</td></tr>
+            <tr><td>Fill</td><td>slug</td><td>indeterminate <code>x 12 → 100 → 12</code>; determinate width <code>30 + p × 106</code></td><td>0.7 × cycle</td><td>sine</td></tr>
+            <tr><td>All</td><td>reduced motion</td><td>animations off; <code>.art opacity 1 → .55 → 1</code></td><td>2.4 s</td><td>sine</td></tr>
+            <tr><td>All</td><td>enter / exit</td><td>opacity 0 → 1 / 1 → 0 (+ scale .98 on exit)</td><td>160 / 220 ms</td><td><code>--ox-ease</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <h3 style="margin-top:1.25rem">Pulse geometry (viewBox 0 0 160 128, from the reference)</h3>
+<pre style="margin-top:.5rem"><span class="c">// heart, upper lobes (open at both sides)</span>
+M135.6 58.3 C137 55.3 138.2 52.3 139 49.3 C140.1 45.6 140.7 42 140.8 38.5 C140.8 38.2 140.8 37.9 140.8 37.6
+C140.8 20.4 129.2 6.4 109.5 6.4 C89.9 6.4 78.3 30 78.3 30 C78.3 30 66.7 6.4 47 6.4 C27.3 6.4 15.8 20.4 15.8 37.6
+C15.8 37.9 15.8 38.2 15.8 38.5 C15.9 43.2 16.9 48 18.7 52.8
+<span class="c">// heart, lower V</span>
+M128.5 71 C110.3 98.1 78.4 121.6 78.4 121.6 C78.4 121.6 46.3 97.9 28.1 70.5
+<span class="c">// ECG line through the gap</span>
+M5 63.6 L29.4 63.6 C32.7 63.6 35.6 61.5 36.6 58.3 L43 39.3 C43.7 37.2 46.7 37.6 46.9 39.7 L49.5 63.6 L58.8 63.6
+C60.6 63.6 62.2 64.8 62.8 66.5 L69.1 87.7 C70.1 91.1 74.9 91.3 76.1 88 L84.2 66.6 C84.9 64.8 86.6 63.6 88.6 63.6
+L101.3 63.6 L108.5 40.9 C109.3 38.5 112.8 38.7 113.3 41.1 L117.3 59.6 C117.8 61.9 119.9 63.6 122.3 63.6 L154.9 63.6</pre>
+      <p class="small muted" style="margin-top:.6rem">Stroke: <code>vector-effect: non-scaling-stroke</code>, width <code>--ox-loader-stroke</code> (2.4 px), round caps and joins. Reference stroke was 2.4 % of heart width — the same ratio at 100 px.</p>
+    </section>
+  </main>
+</div>
+
+<footer class="colophon">
+  <div class="wrap">Oxygen UI · component brief 001 · prepared 16 August 2026 for decision. Reference: “Healthcare loader” by Laud Gilbert on LottieFiles (id d789bad8, 173 f @ 24 fps). Every animation on this page is the proposal’s own SVG + CSS running in a prototype <code>&lt;ox-loader&gt;</code>; nothing here is a video or an image.</div>
+</footer>
+
+<script>
+(() => {
+  "use strict";
+
+  /* ================================================================
+   * <ox-loader> — prototype of the proposed element.
+   * One CSS string, one art template per variant, attributes → vars.
+   * The production element adds ElementInternals, DSD, gate timers,
+   * scroll lock and events; the rendering below is what ships.
+   * ================================================================ */
+  const CSS = `
+    :host{
+      --_size: var(--ox-loader-size, 56px);
+      --_color: var(--ox-loader-color, var(--ox-accent, currentColor));
+      --_track: var(--ox-loader-track, color-mix(in oklab, var(--_color) 22%, transparent));
+      --_stroke: var(--ox-loader-stroke, 2.4px);
+      --_beat: var(--ox-loader-beat, 1000ms);
+      --_cycle: var(--ox-loader-cycle, 4000ms);
+      --_ease: cubic-bezier(.45,0,.55,1);
+      display:inline-grid; place-items:center; gap:.65em; color:var(--_color);
+      font: 500 0.875rem/1.4 var(--ox-font-sans, inherit); text-align:center;
+      transition: opacity 220ms cubic-bezier(.22,1,.36,1), transform 220ms cubic-bezier(.22,1,.36,1);
+    }
+    :host([hidden]){display:none}
+    :host(.ox-exit){opacity:0; transform:scale(.98)}
+    :host([mode="overlay"]),:host([mode="page"]){position:absolute; inset:0; display:grid; place-content:center; place-items:center; background:var(--ox-loader-scrim, color-mix(in oklab, var(--ox-bg, Canvas) 72%, transparent)); z-index:var(--ox-loader-z,1000)}
+    :host([mode="page"]){position:fixed}
+    .art{display:block; line-height:0}
+    svg{width:var(--_size); height:auto; overflow:visible; display:block}
+    .s{fill:none; stroke:currentColor; stroke-width:var(--_stroke); stroke-linecap:round; stroke-linejoin:round; vector-effect:non-scaling-stroke}
+    .track{opacity:.22}
+    .f{fill:currentColor}
+    .label{color:inherit; opacity:.92; margin-top:.15em}
+    .hint{font-weight:400; font-size:.85em; opacity:.68; margin-top:-.35em; max-width:32ch}
+    .hint:empty{display:none}
+    .pct{font-variant-numeric:tabular-nums; font-size:.8em; opacity:.8}
+    /* pulse */
+    .draw{stroke-dasharray:100; stroke-dashoffset:100; animation:ox-draw 700ms cubic-bezier(.2,.8,.2,1) forwards}
+    .beat{transform-box:fill-box; transform-origin:center; animation:ox-beat var(--_beat) var(--_ease) infinite; animation-delay:400ms}
+    .head{stroke-dasharray:22 200; stroke-dashoffset:22; animation:ox-head var(--_beat) cubic-bezier(.4,0,.6,1) infinite; animation-delay:400ms}
+    .tail{stroke-dasharray:44 200; stroke-dashoffset:44; opacity:.35; animation:ox-tail var(--_beat) cubic-bezier(.4,0,.6,1) infinite; animation-delay:400ms}
+    @keyframes ox-draw{to{stroke-dashoffset:0}}
+    @keyframes ox-beat{0%,100%{transform:scale(1)}50%{transform:scale(1.07)}}
+    @keyframes ox-head{to{stroke-dashoffset:-100}}
+    @keyframes ox-tail{to{stroke-dashoffset:-78}}
+    /* breath */
+    .ring{transform-box:fill-box; transform-origin:center; opacity:0; animation:ox-ring var(--_cycle) cubic-bezier(.2,.6,.4,1) infinite}
+    .ring:nth-of-type(2){animation-delay:calc(var(--_cycle) / -3)}
+    .ring:nth-of-type(3){animation-delay:calc(var(--_cycle) * -2 / 3)}
+    .core{transform-box:fill-box; transform-origin:center; animation:ox-core var(--_cycle) var(--_ease) infinite}
+    @keyframes ox-ring{0%{transform:scale(.3); opacity:.55}70%{opacity:.08}100%{transform:scale(1); opacity:0}}
+    @keyframes ox-core{0%,100%{transform:scale(1)}50%{transform:scale(1.18)}}
+    /* cross */
+    .arm{transform-box:fill-box; transform-origin:center; animation:ox-arm calc(var(--_cycle) * .6) var(--_ease) infinite}
+    .arm:nth-of-type(2){animation-delay:calc(var(--_cycle) * -.15)}
+    .arm:nth-of-type(3){animation-delay:calc(var(--_cycle) * -.30)}
+    .arm:nth-of-type(4){animation-delay:calc(var(--_cycle) * -.45)}
+    @keyframes ox-arm{0%,100%{transform:translate(0,0)}40%{transform:translate(calc(var(--dx) * 5px), calc(var(--dy) * 5px))}}
+    /* helix */
+    .dot{transform-box:fill-box; transform-origin:center; animation:ox-helix calc(var(--_cycle) * .65) ease-in-out infinite; animation-delay:calc(var(--_cycle) * .65 * var(--ph))}
+    @keyframes ox-helix{0%{transform:translateY(0) scale(1); opacity:1}25%{transform:translateY(-12px) scale(.85); opacity:.85}50%{transform:translateY(0) scale(.6); opacity:.45}75%{transform:translateY(12px) scale(.85); opacity:.85}100%{transform:translateY(0) scale(1); opacity:1}}
+    /* fill */
+    .slug{animation:ox-slug calc(var(--_cycle) * .7) var(--_ease) infinite alternate}
+    @keyframes ox-slug{from{transform:translateX(0)}to{transform:translateX(88px)}}
+    :host([progress]) .slug{animation:none; transform:none}
+    /* reduced motion: designed still state */
+    @media (prefers-reduced-motion: reduce){
+      :host(:not([motion="full"])) .draw,:host(:not([motion="full"])) .beat,:host(:not([motion="full"])) .head,:host(:not([motion="full"])) .tail,
+      :host(:not([motion="full"])) .ring,:host(:not([motion="full"])) .core,:host(:not([motion="full"])) .arm,:host(:not([motion="full"])) .dot,:host(:not([motion="full"])) .slug{animation:none}
+      :host(:not([motion="full"])) .draw{stroke-dashoffset:0}
+      :host(:not([motion="full"])) .head,:host(:not([motion="full"])) .tail{opacity:0}
+      :host(:not([motion="full"])) .track{opacity:1}
+      :host(:not([motion="full"])) .ring{opacity:0} :host(:not([motion="full"])) .ring:nth-of-type(1){opacity:.35; transform:scale(.7)}
+      :host(:not([motion="full"])) .art{animation:ox-still 2400ms var(--_ease) infinite}
+    }
+    :host([motion="reduced"]) .draw,:host([motion="reduced"]) .beat,:host([motion="reduced"]) .head,:host([motion="reduced"]) .tail,
+    :host([motion="reduced"]) .ring,:host([motion="reduced"]) .core,:host([motion="reduced"]) .arm,:host([motion="reduced"]) .dot,:host([motion="reduced"]) .slug{animation:none}
+    :host([motion="reduced"]) .draw{stroke-dashoffset:0}
+    :host([motion="reduced"]) .head,:host([motion="reduced"]) .tail{opacity:0}
+    :host([motion="reduced"]) .track{opacity:1}
+    :host([motion="reduced"]) .ring{opacity:0} :host([motion="reduced"]) .ring:nth-of-type(1){opacity:.35; transform:scale(.7)}
+    :host([motion="reduced"]) .art{animation:ox-still 2400ms var(--_ease) infinite}
+    @keyframes ox-still{0%,100%{opacity:1}50%{opacity:.55}}
+    @media (forced-colors: active){ :host{color:CanvasText} :host([mode]){background:Canvas} .track{opacity:.5} }
+  `;
+
+  const HEART_TOP = "M135.6 58.3 C137 55.3 138.2 52.3 139 49.3 C140.1 45.6 140.7 42 140.8 38.5 C140.8 38.2 140.8 37.9 140.8 37.6 C140.8 20.4 129.2 6.4 109.5 6.4 C89.9 6.4 78.3 30 78.3 30 C78.3 30 66.7 6.4 47 6.4 C27.3 6.4 15.8 20.4 15.8 37.6 C15.8 37.9 15.8 38.2 15.8 38.5 C15.9 43.2 16.9 48 18.7 52.8";
+  const HEART_BOTTOM = "M128.5 71 C110.3 98.1 78.4 121.6 78.4 121.6 C78.4 121.6 46.3 97.9 28.1 70.5";
+  const ECG_IN_HEART = "M5 63.6 L29.4 63.6 C32.7 63.6 35.6 61.5 36.6 58.3 L43 39.3 C43.7 37.2 46.7 37.6 46.9 39.7 L49.5 63.6 L58.8 63.6 C60.6 63.6 62.2 64.8 62.8 66.5 L69.1 87.7 C70.1 91.1 74.9 91.3 76.1 88 L84.2 66.6 C84.9 64.8 86.6 63.6 88.6 63.6 L101.3 63.6 L108.5 40.9 C109.3 38.5 112.8 38.7 113.3 41.1 L117.3 59.6 C117.8 61.9 119.9 63.6 122.3 63.6 L154.9 63.6";
+  const ECG_TRACE = "M0 36 L40 36 C44 36 46 30 50 30 C54 30 56 36 60 36 L72 36 L76 40 L82 10 L88 48 L92 36 L110 36 C114 36 116 26 122 26 C128 26 130 36 134 36 L200 36";
+
+  const ART = {
+    pulse: `<svg viewBox="-4 -4 168 136" aria-hidden="true">
+      <g class="beat"><path class="s draw" pathLength="100" d="${HEART_TOP}"/><path class="s draw" pathLength="100" d="${HEART_BOTTOM}"/></g>
+      <path class="s track" d="${ECG_IN_HEART}"/>
+      <path class="s tail" pathLength="100" d="${ECG_IN_HEART}"/>
+      <path class="s head" pathLength="100" d="${ECG_IN_HEART}"/>
+    </svg>`,
+    trace: `<svg viewBox="-4 -2 208 68" aria-hidden="true">
+      <path class="s track" d="${ECG_TRACE}"/>
+      <path class="s tail" pathLength="100" d="${ECG_TRACE}"/>
+      <path class="s head" pathLength="100" d="${ECG_TRACE}"/>
+    </svg>`,
+    breath: `<svg viewBox="0 0 120 120" aria-hidden="true">
+      <circle class="s ring" cx="60" cy="60" r="54"/><circle class="s ring" cx="60" cy="60" r="54"/><circle class="s ring" cx="60" cy="60" r="54"/>
+      <circle class="f core" cx="60" cy="60" r="11"/>
+    </svg>`,
+    cross: `<svg viewBox="0 0 120 120" aria-hidden="true">
+      <rect class="f arm" style="--dx:0;--dy:-1" x="49" y="16" width="22" height="34" rx="11"/>
+      <rect class="f arm" style="--dx:1;--dy:0" x="70" y="49" width="34" height="22" rx="11"/>
+      <rect class="f arm" style="--dx:0;--dy:1" x="49" y="70" width="22" height="34" rx="11"/>
+      <rect class="f arm" style="--dx:-1;--dy:0" x="16" y="49" width="34" height="22" rx="11"/>
+      <circle class="f" cx="60" cy="60" r="8" opacity=".55"/>
+    </svg>`,
+    helix: (() => {
+      const cols = 9; let d = "";
+      for (let i = 0; i < cols; i++) {
+        const x = 12 + i * 17;
+        d += `<circle class="f dot" style="--ph:${(-i / cols).toFixed(3)}" cx="${x}" cy="30" r="4.2"/>`;
+        d += `<circle class="f dot" style="--ph:${(-i / cols - 0.5).toFixed(3)}" cx="${x}" cy="30" r="4.2"/>`;
+      }
+      return `<svg viewBox="0 0 160 60" aria-hidden="true"><line class="s track" x1="8" y1="30" x2="152" y2="30"/>${d}</svg>`;
+    })(),
+    fill: `<svg viewBox="0 0 160 48" aria-hidden="true">
+      <rect class="s track" x="4" y="4" width="152" height="40" rx="20" style="opacity:.45"/>
+      <rect class="f slug" x="12" y="9" width="48" height="30" rx="15" opacity=".9"/>
+    </svg>`,
+  };
+  const SIZES = { sm: 20, md: 32, lg: 56, xl: 88 };
+  const clamp = (n, lo, hi) => Math.min(hi, Math.max(lo, n));
+
+  class OxLoader extends HTMLElement {
+    static get observedAttributes() { return ["variant", "size", "bpm", "speed", "progress", "label", "hint", "mode", "show-label", "motion", "open", "color"]; }
+    constructor() { super(); this.attachShadow({ mode: "open" }); this._variant = null; }
+    connectedCallback() { this._render(); }
+    attributeChangedCallback() { if (this.isConnected) this._render(); }
+    get _resolvedVariant() {
+      const v = this.getAttribute("variant") || "pulse";
+      const size = this._px();
+      return (v === "pulse" && size < 40) ? "trace" : (ART[v] ? v : "pulse");
+    }
+    _px() { const s = this.getAttribute("size") || "md"; return SIZES[s] ?? clamp(parseFloat(s) || 32, 12, 400); }
+    _render() {
+      const variant = this._resolvedVariant;
+      const px = this._px();
+      const bpmAttr = this.getAttribute("bpm");
+      const speed = clamp(parseFloat(this.getAttribute("speed") || "1") || 1, 0.5, 2);
+      const bpm = bpmAttr ? clamp(parseFloat(bpmAttr) || 60, 40, 100) : 60 * speed;
+      const progressAttr = this.getAttribute("progress");
+      const progress = progressAttr === null ? null : clamp(parseFloat(progressAttr) || 0, 0, 100);
+      const label = this.getAttribute("label") || "Loading";
+      const hint = this.getAttribute("hint") || "";
+      const showLabel = this.hasAttribute("show-label");
+      const color = this.getAttribute("color");
+
+      this.style.setProperty("--ox-loader-size", px + "px");
+      this.style.setProperty("--ox-loader-beat", Math.round(60000 / bpm) + "ms");
+      this.style.setProperty("--ox-loader-cycle", Math.round(4000 / speed) + "ms");
+      this.style.setProperty("--ox-loader-stroke", (px < 28 ? 2 : 2.4) + "px");
+      if (color) this.style.setProperty("--ox-loader-color", color); else this.style.removeProperty("--ox-loader-color");
+
+      // ARIA: status when indeterminate, progressbar when determinate.
+      if (progress === null) {
+        this.setAttribute("role", "status"); this.setAttribute("aria-live", "polite");
+        ["aria-valuemin", "aria-valuemax", "aria-valuenow", "aria-valuetext"].forEach((a) => this.removeAttribute(a));
+      } else {
+        this.setAttribute("role", "progressbar"); this.removeAttribute("aria-live");
+        this.setAttribute("aria-valuemin", "0"); this.setAttribute("aria-valuemax", "100");
+        this.setAttribute("aria-valuenow", String(Math.round(progress)));
+        this.setAttribute("aria-valuetext", Math.round(progress) + " percent");
+      }
+      this.setAttribute("aria-label", label);
+
+      if (this._variant !== variant) {
+        this._variant = variant;
+        this.shadowRoot.innerHTML = `<style>${CSS}</style><div class="art" part="art">${ART[variant]}</div><div class="label" part="label"></div><div class="hint" part="hint"></div>`;
+      }
+      const $label = this.shadowRoot.querySelector(".label");
+      const $hint = this.shadowRoot.querySelector(".hint");
+      const pct = progress === null ? "" : ` <span class="pct">${Math.round(progress)}%</span>`;
+      $label.innerHTML = showLabel ? `${escapeHtml(label)}${pct}` : (progress === null ? "" : `<span class="pct">${Math.round(progress)}%</span>`);
+      $hint.textContent = showLabel ? hint : "";
+
+      // Determinate fill: width from progress (30 + p × 106 in a 160-wide box).
+      if (variant === "fill") {
+        const slug = this.shadowRoot.querySelector(".slug");
+        if (slug) slug.setAttribute("width", progress === null ? "48" : String(30 + (progress / 100) * 106));
+      }
+      // open=false → exit fade then hidden
+      const open = this.getAttribute("open");
+      if (open === "false") { this.classList.add("ox-exit"); setTimeout(() => { if (this.getAttribute("open") === "false") this.setAttribute("hidden", ""); }, 230); }
+      else { this.removeAttribute("hidden"); this.classList.remove("ox-exit"); }
+    }
+    replay() { this._variant = null; this._render(); }
+  }
+  function escapeHtml(s) { return String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])); }
+  if (!customElements.get("ox-loader")) customElements.define("ox-loader", OxLoader);
+
+  /* ================================================================
+   * Page behaviour: stage toggles, motion simulation, playground, tabs, TOC
+   * ================================================================ */
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+
+  // Stage + motion toggles for the gallery
+  const gallery = $("#gallery");
+  $$("[data-stage]").forEach((b) => b.addEventListener("click", () => {
+    $$("[data-stage]").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+    gallery.classList.toggle("ink", b.dataset.stage === "ink");
+  }));
+  $$("[data-motion]").forEach((b) => b.addEventListener("click", () => {
+    $$("[data-motion]").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+    $$("ox-loader", gallery).forEach((el) => { if (b.dataset.motion === "reduced") el.setAttribute("motion", "reduced"); else el.removeAttribute("motion"); });
+  }));
+
+  // Playground
+  const play = $("#play");
+  const stage = $("#play-stage");
+  const ctl = {
+    variant: $("#p-variant"), size: $("#p-size"), bpm: $("#p-bpm"), speed: $("#p-speed"), progress: $("#p-progress"),
+    label: $("#p-label"), hint: $("#p-hint"), showLabel: $("#p-showlabel"), reduced: $("#p-reduced"), slow: $("#p-slow"),
+  };
+  const out = { size: $("#o-size"), bpm: $("#o-bpm"), speed: $("#o-speed"), progress: $("#o-progress") };
+  let slowTimer = null;
+  function state() {
+    const mode = ($("input[name='p-mode']:checked") || {}).value || "inline";
+    const color = ($("input[name='p-color']:checked") || {}).value || "";
+    const progress = parseInt(ctl.progress.value, 10);
+    return {
+      variant: ctl.variant.value, size: parseInt(ctl.size.value, 10), bpm: parseInt(ctl.bpm.value, 10), speed: parseFloat(ctl.speed.value),
+      progress: progress < 0 ? null : progress, label: ctl.label.value.trim() || "Loading", hint: ctl.hint.value.trim(),
+      showLabel: ctl.showLabel.checked, reduced: ctl.reduced.checked, slow: ctl.slow.checked, mode, color,
+    };
+  }
+  function apply() {
+    const s = state();
+    out.size.textContent = s.size; out.bpm.textContent = s.bpm; out.speed.textContent = s.speed.toFixed(1);
+    out.progress.textContent = s.progress === null ? "indeterminate" : s.progress + "%";
+    play.setAttribute("variant", s.variant); play.setAttribute("size", String(s.size));
+    play.setAttribute("bpm", String(s.bpm)); play.setAttribute("speed", String(s.speed));
+    if (s.progress === null) play.removeAttribute("progress"); else play.setAttribute("progress", String(s.progress));
+    play.setAttribute("label", s.label);
+    if (s.showLabel) play.setAttribute("show-label", ""); else play.removeAttribute("show-label");
+    if (s.reduced) play.setAttribute("motion", "reduced"); else play.removeAttribute("motion");
+    if (s.color) play.setAttribute("color", s.color); else play.removeAttribute("color");
+    if (s.mode === "overlay") { play.setAttribute("mode", "overlay"); play.style.cssText = ""; }
+    else { play.removeAttribute("mode"); play.style.cssText = "position:absolute;inset:0;display:grid;place-content:center;place-items:center;"; }
+    // slow-wait simulation: show the hint after 8 s (2 s here so it is watchable)
+    clearTimeout(slowTimer);
+    if (s.slow) { play.setAttribute("hint", s.hint || "Connecting…"); slowTimer = setTimeout(() => { play.setAttribute("hint", "Still loading. You can keep waiting or go back."); }, 2000); }
+    else play.setAttribute("hint", s.hint);
+    renderCode(s);
+  }
+  function attr(name, v) { return v === true ? ` ${name}` : (v === false || v == null || v === "" ? "" : ` ${name}="${v}"`); }
+  function renderCode(s) {
+    const common = attr("variant", s.variant) + attr("size", s.size) + (s.variant === "pulse" || s.variant === "trace" ? attr("bpm", s.bpm) : "") + (s.speed !== 1 ? attr("speed", s.speed) : "") + (s.progress === null ? "" : attr("progress", s.progress)) + attr("label", s.label) + attr("show-label", s.showLabel) + attr("hint", s.hint) + (s.mode === "overlay" ? attr("mode", "page") : "") + (s.reduced ? attr("motion", "reduced") : "") + (s.slow ? attr("slow-after", 8000) : "");
+    const style = s.color ? ` style="--ox-loader-color: ${s.color}"` : "";
+    $("#code-ce").textContent = `<script type="module" src="https://cdn.jsdelivr.net/npm/@oxygenui/loader@1"><\/script>\n<ox-loader${common}${style}></ox-loader>`;
+    const rp = [];
+    rp.push(`variant="${s.variant}"`); rp.push(`size={${s.size}}`);
+    if (s.variant === "pulse" || s.variant === "trace") rp.push(`bpm={${s.bpm}}`);
+    if (s.speed !== 1) rp.push(`speed={${s.speed}}`);
+    if (s.progress !== null) rp.push(`progress={${s.progress}}`);
+    rp.push(`label="${s.label}"`); if (s.showLabel) rp.push(`showLabel`); if (s.hint) rp.push(`hint="${s.hint}"`);
+    if (s.mode === "overlay") rp.push(`mode="page"`); if (s.reduced) rp.push(`motion="reduced"`); if (s.slow) rp.push(`slowAfter={8000} onSlow={reportSlow}`);
+    if (s.color) rp.push(`style={{ "--ox-loader-color": "${s.color}" }}`);
+    $("#code-react").textContent = `import { Loader } from "@/components/oxygen/loader";\n\n<Loader\n  ${rp.join("\n  ")}\n/>`;
+    $("#code-vue").textContent = `<script setup>\nimport "@oxygenui/loader";\n<\/script>\n\n<template>\n  <ox-loader${common}${style} />\n</template>`;
+    $("#code-angular").textContent = `// main.ts: import "@oxygenui/loader";  // schemas: [CUSTOM_ELEMENTS_SCHEMA]\n<ox-loader${common}${style}></ox-loader>`;
+  }
+  Object.values(ctl).forEach((el) => el.addEventListener("input", apply));
+  $$("input[name='p-mode'], input[name='p-color']").forEach((el) => el.addEventListener("change", apply));
+  $("#p-replay").addEventListener("click", () => play.replay());
+  $("#p-toggle").addEventListener("click", () => {
+    if (play.getAttribute("open") === "false") play.setAttribute("open", "true"); else play.setAttribute("open", "false");
+  });
+  apply();
+
+  // Tabs
+  $$(".tabs [role='tab']").forEach((tab) => tab.addEventListener("click", () => {
+    const list = tab.closest(".tabs");
+    $$("[role='tab']", list).forEach((t) => t.setAttribute("aria-selected", String(t === tab)));
+    const wrap = list.parentElement;
+    $$(".tabpanel", wrap).forEach((p) => { p.hidden = p.dataset.panel !== tab.dataset.tab; });
+  }));
+
+  // TOC active state
+  const links = $$(".toc a");
+  const map = new Map(links.map((a) => [a.getAttribute("href").slice(1), a]));
+  if ("IntersectionObserver" in window) {
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((e) => { if (e.isIntersecting) { links.forEach((l) => l.classList.remove("active")); map.get(e.target.id)?.classList.add("active"); } });
+    }, { rootMargin: "-20% 0px -70% 0px", threshold: 0 });
+    $$("section.block").forEach((s) => io.observe(s));
+  }
+})();
+</script>

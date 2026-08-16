@@ -1,6 +1,8 @@
 # 0009 — Component capability is constrained by lint; the supply chain is attested
 
-**Status:** proposed · 6 August 2026
+**Status:** accepted · 6 August 2026
+
+> **Ratified 16 August 2026.** Enforced by @oxygenui/no-forbidden-capability, re-checked at registry build, and extended: the shipped npm packages are now covered by the same rules, and CI runs `pnpm audit --audit-level=high`, CodeQL, and SBOM generation.
 
 ## Context
 

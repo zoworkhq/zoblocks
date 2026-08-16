@@ -11,10 +11,17 @@ the core is ever open-sourced — nothing outside this directory refers to it.
 
 It is the dogfood consumer of the registry. Screens import Oxygen components by
 the exact specifier the shadcn CLI writes into a customer's project
-(`@/components/oxygen/app-shell`), mapped back to `registry/` source through
-tsconfig paths. A component that breaks breaks our own daily tool first.
+(`@/components/oxygen/app-shell`). A component that breaks breaks our own daily
+tool first.
 
-Currently exercising `AppShell`, `StatusBadge`, `EmptyState`, and `ActionGate`.
+**Interim state (August 2026):** the proof-of-concept registry was cleared so
+the component library can be planned and rebuilt from scratch. Until the new
+components land, the two this app needs — `AppShell` and `ActionGate` — are
+vendored under `src/components/oxygen/`, which is exactly the layout a customer
+ends up with after `shadcn add`. When the rebuilt registry ships, delete those
+copies and map the specifiers back to `registry/` source through tsconfig paths
+(see the comment in `tsconfig.json`).
+
 It does not exercise the FHIR components — a task tracker has no Observations —
 so this validates the foundations layer only.
 

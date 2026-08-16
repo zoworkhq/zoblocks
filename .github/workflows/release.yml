@@ -48,10 +48,38 @@ jobs:
       - name: Install
         run: pnpm install --frozen-lockfile
 
-      # The published artifact is built here, not taken on trust. A local
-      # rehearsal once found the test suite inside the tarball and dist
+      # Releases used to run strictly fewer gates than merges — no lint, no
+      # typecheck, no format, no generator drift check, and no dependency on CI
+      # having passed, so a commit with red CI could publish to npm. Publishing
+      # is the most irreversible thing this repository does; it now runs at
+      # least what a merge runs.
+      #
+      # The published artifact is also built here rather than taken on trust. A
+      # local rehearsal once found the test suite inside the tarball and dist
       # emitting extensionless imports that threw in plain Node — neither of
       # which typecheck or `npm publish --dry-run` noticed.
+      - name: Audit dependencies
+        run: pnpm audit --audit-level=high
+
+      - name: Generate and enforce the catalog quality gate
+        run: pnpm gen --strict
+
+      - name: No stale generated files
+        run: |
+          if ! git diff --exit-code --stat; then
+            echo "::error::Generated files are stale. Run \`pnpm gen\` and commit the result."
+            exit 1
+          fi
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Format
+        run: pnpm format:check
+
+      - name: Typecheck
+        run: pnpm typecheck
+
       - name: Build
         run: pnpm build
 
@@ -61,9 +89,21 @@ jobs:
       # Guards against the failure that shipped 0.1.0: a package whose
       # publishConfig points at ./dist while dist does not contain what it
       # claims, or contains things it should not.
-      - name: Inspect the tarball before publishing
-        working-directory: packages/fhir
-        run: node scripts/check-tarball.mjs
+      #
+      # Every publishable package is inspected, not just the first one that
+      # ever needed it. This used to name packages/fhir directly, so a second
+      # package could be published with none of these checks run against it.
+      - name: Inspect every tarball before publishing
+        run: |
+          set -euo pipefail
+          failed=0
+          for pkg in packages/*/; do
+            if [ -f "${pkg}scripts/check-tarball.mjs" ]; then
+              echo "── ${pkg}"
+              (cd "$pkg" && node scripts/check-tarball.mjs) || failed=1
+            fi
+          done
+          exit $failed
 
       - name: Version PR or publish
         uses: changesets/action@v1
