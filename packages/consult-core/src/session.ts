@@ -269,9 +269,14 @@ export function reduce(state: SessionState, action: SessionAction): SessionState
       };
 
     default: {
-      // Exhaustiveness. A new action member fails to compile until handled.
-      const never: never = action;
-      return never;
+      // Exhaustiveness at compile time, inertness at runtime. The assignment is
+      // what makes a new action member fail to compile until it is handled;
+      // returning `state` is what makes an action that somehow arrives anyway —
+      // from untyped JavaScript, or a version skew between packages — leave the
+      // session alone instead of replacing it with the action object.
+      const _exhaustive: never = action;
+      void _exhaustive;
+      return state;
     }
   }
 }
@@ -323,8 +328,12 @@ function applyEvent(state: SessionState, event: ConsultEvent): SessionState {
       return state;
 
     default: {
-      const never: never = event;
-      return never;
+      // Same shape as above, and the same reason: an unrecognised stream event
+      // must not become the state. A provider on a newer protocol version is
+      // the realistic way this happens.
+      const _exhaustive: never = event;
+      void _exhaustive;
+      return state;
     }
   }
 }

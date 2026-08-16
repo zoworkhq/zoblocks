@@ -19,7 +19,10 @@ export default defineConfig({
       provider: "v8",
       reporter: ["text-summary", "json-summary", "lcov"],
       include: ["src/**/*.{ts,tsx}"],
-      exclude: ["src/index.ts", "**/*.d.ts"],
+      // `fhir-types.ts` is type declarations only — it emits no runtime code, so
+      // v8 reports it as 0% of nothing and drags the total down for a file that
+      // cannot be covered. The barrel is excluded for the same reason.
+      exclude: ["src/index.ts", "src/fhir-types.ts", "**/*.d.ts"],
       // The tier bar from the readiness audit: nothing merges below `beta`,
       // and `beta` is 90% lines / 85% branches.
       thresholds: { lines: 90, functions: 90, branches: 85, statements: 90 },

@@ -191,6 +191,7 @@ export function useConsult(options: UseConsultOptions): ConsultApi {
   const abortRef = useRef<AbortController | null>(null);
   const answeredAtRef = useRef<number | null>(null);
   const proposalShownAtRef = useRef<number | null>(null);
+  const inFlightRef = useRef(false);
 
   const mode = useMemo(() => requireMode(modes, state.modeId), [modes, state.modeId]);
 
@@ -242,33 +243,49 @@ export function useConsult(options: UseConsultOptions): ConsultApi {
     async (override?: string) => {
       const question = (override ?? stateRef.current.draft).trim();
       if (!question || suppressed) return;
+
+      // A synchronous latch, not a status read.
+      //
+      // `stateRef` only catches up when React re-renders, so two calls in the
+      // same tick — a double-click ahead of the disabled state, or two
+      // programmatic calls — would both see "idle" and both start an exchange.
+      // Two concurrent exchanges on one session means interleaved dispatches,
+      // two audit events for one question, and a thread that no longer matches
+      // what anybody asked. The ref closes the window regardless of render
+      // timing; the status check stays as the guard for the ordinary case.
+      if (inFlightRef.current) return;
       if (stateRef.current.status === "streaming" || stateRef.current.status === "submitting") {
         return;
       }
+      inFlightRef.current = true;
 
       const controller = new AbortController();
       abortRef.current = controller;
 
-      await runExchange({
-        question,
-        state: stateRef.current,
-        mode,
-        deps: {
-          provider,
-          modes,
-          ...(context ? { contextResolver: context } : {}),
-          ...(subject ? { subject } : {}),
-          locale,
-          ...(classifiers ? { classifiers } : {}),
-          ...(onAudit ? { audit: onAudit } : {}),
-          ...(onTelemetry ? { telemetry: onTelemetry } : {}),
-          ...(actor ? { actor: { display: actor.display, ...(actor.reference ? { reference: actor.reference } : {}) } } : {}),
-          now,
-          newId,
-        },
-        dispatch,
-        signal: controller.signal,
-      });
+      try {
+        await runExchange({
+          question,
+          state: stateRef.current,
+          mode,
+          deps: {
+            provider,
+            modes,
+            ...(context ? { contextResolver: context } : {}),
+            ...(subject ? { subject } : {}),
+            locale,
+            ...(classifiers ? { classifiers } : {}),
+            ...(onAudit ? { audit: onAudit } : {}),
+            ...(onTelemetry ? { telemetry: onTelemetry } : {}),
+            ...(actor ? { actor: { display: actor.display, ...(actor.reference ? { reference: actor.reference } : {}) } } : {}),
+            now,
+            newId,
+          },
+          dispatch,
+          signal: controller.signal,
+        });
+      } finally {
+        inFlightRef.current = false;
+      }
     },
     [
       mode,

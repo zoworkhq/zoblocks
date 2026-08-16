@@ -602,3 +602,74 @@ describe("resilience", () => {
     expect(outcome.kind).toBe("answered");
   });
 });
+
+describe("the remaining pipeline branches", () => {
+  it("treats a throw after abort as a stop, not a network failure", async () => {
+    // The realistic shape: aborting the underlying fetch makes it reject, and
+    // the user who pressed Stop should not be shown a connection error.
+    const controller = new AbortController();
+    const h = harness({
+      provider: {
+        ...createStaticProvider({ events: [], disclosure }),
+        async *send(_request: unknown, signal: AbortSignal) {
+          yield { type: "delta", text: "partial" } as const;
+          controller.abort();
+          void signal;
+          throw new Error("The operation was aborted");
+        },
+      },
+    });
+
+    const outcome = await runExchange({
+      question: "AF first line?",
+      state: h.state(),
+      mode: lookUp,
+      deps: h.deps,
+      dispatch: h.dispatch,
+      signal: controller.signal,
+    });
+
+    expect(outcome.kind).toBe("stopped");
+    expect(h.state().status).toBe("stopped");
+    expect(h.state().error).toBeNull();
+  });
+
+  it("falls back to a generic refusal message for an unrecognised scope reason", async () => {
+    const h = harness({
+      classifiers: {
+        scope: () => ({
+          inScope: false,
+          reason: "some-future-reason" as never,
+          rules: ["custom"],
+        }),
+      },
+    });
+
+    const outcome = await runExchange({
+      question: "anything",
+      state: h.state(),
+      mode: lookUp,
+      deps: h.deps,
+      dispatch: h.dispatch,
+      signal: new AbortController().signal,
+    });
+
+    expect(outcome.kind).toBe("refused");
+    expect(h.state().error?.message).toMatch(/outside what this assistant is for/i);
+  });
+
+  it("carries a suggested mode through to the error so the redirect can render", async () => {
+    const h = harness({ modes: [lookUp, prepare] });
+
+    await runExchange({
+      question: "what are this patient's current medications",
+      state: h.state(),
+      mode: lookUp,
+      deps: h.deps,
+      dispatch: h.dispatch,
+      signal: new AbortController().signal,
+    });
+
+    expect(h.state().error?.suggestedModeId).toBe("prepare");
+  });
+});
