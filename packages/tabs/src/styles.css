@@ -1,0 +1,924 @@
+/*
+ * Oxygen Tabs.
+ *
+ * Three-tier tokens with a strict reference rule. Every value a component
+ * reads is an `--ox-tabs-*` token; every one of those resolves to a semantic
+ * `--ox-*` token, then to an Ant Design `--ant-*` variable, then to a literal.
+ * That chain is what makes the same stylesheet correct in three places:
+ *
+ *   - an Oxygen app, where `--ox-*` are defined and the brand flows through;
+ *   - a plain antd app, where `ConfigProvider` drives `--ant-*` and the strip
+ *     matches the host theme with no JavaScript at all;
+ *   - a bare page, where the literals keep it legible.
+ *
+ * `--ox-tabs-*` is the documented override surface. A brand sets those and
+ * nothing else. A component that reached past the semantic tier to a primitive
+ * would silently ignore the brand, which is what `@oxygenui/no-primitive-token`
+ * exists to prevent.
+ */
+
+.ox-tabs {
+  /* ---- geometry ---------------------------------------------------- */
+  --ox-tabs-font: var(--ox-density-font, var(--ant-font-size, 0.875rem));
+  --ox-tabs-weight: 450;
+  --ox-tabs-weight-selected: 550;
+  --ox-tabs-gap: 0.125rem;
+  --ox-tabs-pad-x: var(--ox-density-pad-x, 0.875rem);
+  --ox-tabs-pad-y: var(--ox-density-pad-y, 0.625rem);
+  --ox-tabs-min-h: var(--ox-density-target, 2.75rem);
+
+  /* ---- colour ------------------------------------------------------ */
+  --ox-tabs-fg: var(--ox-fg-muted, var(--ant-color-text-secondary, #475569));
+  --ox-tabs-fg-hover: var(--ox-fg, var(--ant-color-text, #0f172a));
+  --ox-tabs-fg-selected: var(--ox-fg, var(--ant-color-text, #0f172a));
+  --ox-tabs-fg-disabled: var(--ox-fg-subtle, var(--ant-color-text-disabled, #94a3b8));
+  --ox-tabs-bg-hover: color-mix(in oklab, currentcolor 6%, transparent);
+
+  --ox-tabs-track-bg: var(--ox-bg-muted, var(--ant-color-fill-tertiary, #f1f5f9));
+  --ox-tabs-track-border: color-mix(in oklab, currentcolor 7%, transparent);
+  --ox-tabs-track-pad: 4px;
+  --ox-tabs-track-radius: var(--ox-radius-xl, 1rem);
+
+  --ox-tabs-thumb-bg: var(--ox-surface-raised, var(--ant-color-bg-container, #ffffff));
+  --ox-tabs-thumb-border: color-mix(in oklab, currentcolor 8%, transparent);
+  --ox-tabs-thumb-radius: 0.8rem;
+  --ox-tabs-thumb-shadow: 0 1px 2px rgb(2 6 23 / 0.07), 0 3px 10px -4px rgb(2 6 23 / 0.16);
+
+  --ox-tabs-accent: var(--ox-accent, var(--ant-color-primary, #059478));
+  --ox-tabs-accent-fg: var(--ox-accent-hover, var(--ant-color-primary-hover, #067662));
+  --ox-tabs-accent-subtle: var(--ox-accent-subtle, var(--ant-color-primary-bg, #ecfdf8));
+  --ox-tabs-accent-border: var(--ox-accent-border, var(--ant-color-primary-border, #a4f3df));
+
+  --ox-tabs-indicator: var(--ox-tabs-accent);
+  --ox-tabs-indicator-size: 2px;
+  --ox-tabs-indicator-radius: 2px;
+  --ox-tabs-rail: var(--ox-border, var(--ant-color-border-secondary, #e2e8f0));
+  --ox-tabs-border: var(--ox-border, var(--ant-color-border, #e2e8f0));
+  --ox-tabs-surface: var(--ox-surface, var(--ant-color-bg-container, #ffffff));
+  --ox-tabs-surface-subtle: var(--ox-bg-subtle, var(--ant-color-fill-quaternary, #f8fafc));
+
+  --ox-tabs-badge-bg: var(--ox-bg-muted, var(--ant-color-fill-tertiary, #f1f5f9));
+  --ox-tabs-badge-fg: var(--ox-fg-muted, var(--ant-color-text-secondary, #475569));
+  --ox-tabs-badge-bg-selected: var(--ox-tabs-accent-subtle);
+  --ox-tabs-badge-fg-selected: var(--ox-tabs-accent-fg);
+
+  --ox-tabs-critical: var(--ox-status-critical, var(--ant-color-error, #b91c1c));
+  --ox-tabs-critical-bg: var(--ox-status-critical-bg, var(--ant-color-error-bg, #fef2f2));
+  --ox-tabs-critical-border: var(
+    --ox-status-critical-border,
+    var(--ant-color-error-border, #fecaca)
+  );
+  --ox-tabs-high: var(--ox-status-high, var(--ant-color-warning, #b45309));
+  --ox-tabs-high-bg: var(--ox-status-high-bg, var(--ant-color-warning-bg, #fffbeb));
+  --ox-tabs-high-border: var(--ox-status-high-border, var(--ant-color-warning-border, #fde68a));
+  --ox-tabs-normal: var(--ox-status-normal, var(--ant-color-success, #15803d));
+
+  --ox-tabs-focus: var(--ox-focus-ring, var(--ant-color-primary, #059478));
+
+  /* ---- motion ------------------------------------------------------ */
+  --ox-tabs-duration: var(--ox-duration, 180ms);
+  --ox-tabs-ease: var(--ox-ease, cubic-bezier(0.22, 1, 0.36, 1));
+
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  min-inline-size: 0;
+  font-family: var(--ox-font-sans, var(--ant-font-family, ui-sans-serif, system-ui, sans-serif));
+  color: var(--ox-tabs-fg-selected);
+}
+
+/* Column is the default. A horizontal strip stacks above its panels, and
+   omitting an orientation must never silently produce a side-by-side layout. */
+.ox-tabs[data-ox-orientation="vertical"] {
+  flex-direction: row;
+  gap: 1.25rem;
+  align-items: flex-start;
+}
+
+/* ---- sizes. Independent of density: density is a property of the surface
+   and set once on a container; size overrides it for one instance. ------- */
+.ox-tabs[data-ox-size="sm"] {
+  --ox-tabs-font: 0.8125rem;
+  --ox-tabs-pad-y: 0.25rem;
+  --ox-tabs-pad-x: 0.6rem;
+  --ox-tabs-min-h: 1.875rem;
+  --ox-tabs-track-pad: 3px;
+  --ox-tabs-thumb-radius: 0.5rem;
+  --ox-tabs-track-radius: 0.65rem;
+}
+.ox-tabs[data-ox-size="lg"] {
+  --ox-tabs-font: 1rem;
+  --ox-tabs-pad-y: 0.85rem;
+  --ox-tabs-pad-x: 1.15rem;
+  --ox-tabs-min-h: 3rem;
+  --ox-tabs-track-pad: 5px;
+  --ox-tabs-thumb-radius: 0.9rem;
+}
+
+/* =====================================================================
+ * The list
+ * ================================================================== */
+.ox-tabs__list {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--ox-tabs-gap);
+  min-inline-size: 0;
+  scrollbar-width: none;
+}
+.ox-tabs__list::-webkit-scrollbar {
+  display: none;
+}
+.ox-tabs[data-ox-orientation="vertical"] > .ox-tabs__list,
+.ox-tabs[data-ox-orientation="vertical"] > * > .ox-tabs__list {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+/* =====================================================================
+ * The trigger
+ * ================================================================== */
+.ox-tabs__tab {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  flex: 0 0 auto;
+  min-block-size: var(--ox-tabs-min-h);
+  padding: var(--ox-tabs-pad-y) var(--ox-tabs-pad-x);
+  font: inherit;
+  font-size: var(--ox-tabs-font);
+  font-weight: var(--ox-tabs-weight);
+  line-height: 1.4;
+  color: var(--ox-tabs-fg);
+  background: transparent;
+  border: 0;
+  border-radius: var(--ox-radius, 0.5rem);
+  cursor: pointer;
+  white-space: nowrap;
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    color var(--ox-tabs-duration) var(--ox-tabs-ease),
+    background-color var(--ox-tabs-duration) var(--ox-tabs-ease);
+}
+
+.ox-tabs__tab:hover:not([aria-disabled="true"]) {
+  color: var(--ox-tabs-fg-hover);
+}
+.ox-tabs__tab[data-ox-selected] {
+  color: var(--ox-tabs-fg-selected);
+  font-weight: var(--ox-tabs-weight-selected);
+}
+.ox-tabs__tab[aria-disabled="true"] {
+  color: var(--ox-tabs-fg-disabled);
+  cursor: not-allowed;
+}
+.ox-tabs__tab:focus-visible {
+  outline: 2px solid var(--ox-tabs-focus);
+  outline-offset: 2px;
+  z-index: 3;
+}
+
+/*
+ * Reserve the selected weight up front.
+ *
+ * Without this, selecting a tab makes its label bolder, which makes the
+ * trigger wider, which moves the thumb the indicator is animating towards —
+ * so it settles a few pixels short. The pseudo-element holds the bold width
+ * at all times; `visibility: hidden` keeps it out of the accessibility tree
+ * and out of the paint.
+ */
+.ox-tabs__label {
+  display: inline-grid;
+  min-inline-size: 0;
+}
+.ox-tabs__label::after {
+  content: attr(data-ox-text);
+  grid-area: 1 / 1;
+  font-weight: var(--ox-tabs-weight-selected);
+  visibility: hidden;
+  block-size: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.ox-tabs__label > * {
+  grid-area: 1 / 1;
+}
+
+.ox-tabs__icon {
+  flex: 0 0 auto;
+  display: inline-grid;
+  place-items: center;
+  inline-size: 1em;
+  block-size: 1em;
+  opacity: 0.9;
+}
+.ox-tabs__icon > svg {
+  inline-size: 100%;
+  block-size: 100%;
+}
+
+.ox-tabs__count {
+  font-family: var(--ox-font-numeric, var(--ox-tabs-font-numeric, ui-monospace, monospace));
+  font-size: 0.75em;
+  font-weight: 550;
+  min-inline-size: 1.35em;
+  padding-inline: 0.35em;
+  block-size: 1.45em;
+  line-height: 1.45em;
+  text-align: center;
+  border-radius: 9999px;
+  background: var(--ox-tabs-badge-bg);
+  color: var(--ox-tabs-badge-fg);
+  font-variant-numeric: tabular-nums;
+  flex: 0 0 auto;
+}
+[data-ox-selected] > .ox-tabs__count {
+  background: var(--ox-tabs-badge-bg-selected);
+  color: var(--ox-tabs-badge-fg-selected);
+}
+/* Tone is reinforcement, never the signal: every one of these is paired with
+   a word in the accessible name by `describeCount`. The inset ring means the
+   badge still reads as distinct when colour is unavailable. */
+.ox-tabs__count[data-ox-tone="critical"] {
+  background: var(--ox-tabs-critical-bg);
+  color: var(--ox-tabs-critical);
+  box-shadow: inset 0 0 0 1px var(--ox-tabs-critical-border);
+}
+.ox-tabs__count[data-ox-tone="high"] {
+  background: var(--ox-tabs-high-bg);
+  color: var(--ox-tabs-high);
+  box-shadow: inset 0 0 0 1px var(--ox-tabs-high-border);
+}
+
+.ox-tabs__dot {
+  inline-size: 6px;
+  block-size: 6px;
+  border-radius: 50%;
+  background: var(--ox-tabs-critical);
+  flex: 0 0 auto;
+}
+.ox-tabs__dot[data-ox-dot="dirty"] {
+  background: var(--ox-tabs-accent);
+}
+.ox-tabs__dot[data-ox-dot="error"] {
+  background: var(--ox-tabs-critical);
+}
+
+/* Stale content is marked, never hidden: a clinician looking at cached vitals
+   needs to know they are cached, not that the section does not exist. */
+.ox-tabs__tab[data-ox-availability="stale"] .ox-tabs__label {
+  opacity: 0.75;
+}
+.ox-tabs__tab[data-ox-availability="stale"]::after {
+  content: "";
+  position: absolute;
+  inset-block-start: 0.35rem;
+  inset-inline-end: 0.35rem;
+  inline-size: 5px;
+  block-size: 5px;
+  border-radius: 50%;
+  border: 1px solid var(--ox-tabs-fg-disabled);
+}
+
+/*
+ * Visually hidden, still announced.
+ *
+ * `display: none` would remove it from the accessibility tree entirely, which
+ * is the whole point of the node — it is what turns "Labs 2" into "Labs, 2
+ * critical results".
+ */
+.ox-tabs__sr {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+.ox-tabs__close {
+  display: inline-grid;
+  place-items: center;
+  inline-size: 1.15rem;
+  block-size: 1.15rem;
+  margin-inline-start: 0.15rem;
+  border-radius: var(--ox-radius-sm, 0.25rem);
+  color: var(--ox-tabs-fg-disabled);
+  flex: 0 0 auto;
+  cursor: pointer;
+  font-size: 0.95em;
+  line-height: 1;
+}
+.ox-tabs__close:hover {
+  background: var(--ox-tabs-bg-hover);
+  color: var(--ox-tabs-fg-hover);
+}
+
+.ox-tabs__add {
+  display: inline-grid;
+  place-items: center;
+  inline-size: 1.9rem;
+  block-size: 1.9rem;
+  flex: 0 0 auto;
+  border: 0;
+  background: transparent;
+  color: var(--ox-tabs-fg);
+  border-radius: var(--ox-radius, 0.5rem);
+  cursor: pointer;
+  margin-inline-start: 0.25rem;
+  font-size: 1rem;
+}
+.ox-tabs__add:hover {
+  background: var(--ox-tabs-bg-hover);
+  color: var(--ox-tabs-fg-hover);
+}
+.ox-tabs__add:focus-visible {
+  outline: 2px solid var(--ox-tabs-focus);
+  outline-offset: 2px;
+}
+
+/* =====================================================================
+ * Indicators
+ *
+ * Positioned physically (top/left) and driven by offsetTop/offsetLeft, which
+ * resolve against the same padding edge an absolutely-positioned child does.
+ * Physical on both sides means the arithmetic is identical in RTL — a logical
+ * `inset-inline-start` would flip the origin and invert every offset.
+ * ================================================================== */
+.ox-tabs__thumb,
+.ox-tabs__line {
+  position: absolute;
+  z-index: 0;
+  pointer-events: none;
+  inset-block-start: 0;
+  inset-inline-start: 0;
+  left: 0;
+  transform: translate3d(var(--ox-tabs-ind-x, 0), var(--ox-tabs-ind-y, 0), 0);
+  inline-size: var(--ox-tabs-ind-w, 0);
+  transition:
+    transform var(--ox-tabs-duration) var(--ox-tabs-ease),
+    inline-size var(--ox-tabs-duration) var(--ox-tabs-ease),
+    block-size var(--ox-tabs-duration) var(--ox-tabs-ease);
+  will-change: transform, inline-size;
+}
+.ox-tabs__thumb {
+  block-size: var(--ox-tabs-ind-h, 0);
+  background: var(--ox-tabs-thumb-bg);
+  border: 1px solid var(--ox-tabs-thumb-border);
+  border-radius: var(--ox-tabs-thumb-radius);
+  box-shadow: var(--ox-tabs-thumb-shadow);
+}
+.ox-tabs__line {
+  block-size: var(--ox-tabs-indicator-size);
+  background: var(--ox-tabs-indicator);
+  border-radius: var(--ox-tabs-indicator-radius);
+}
+
+/*
+ * First paint, before JavaScript measures.
+ *
+ * The server-rendered strip must not flash. Until `data-ox-measured` appears,
+ * the moving element is hidden and selection is painted directly on the
+ * selected trigger — so the markup is correct with JavaScript disabled, and
+ * hydration swaps to the animated indicator with no visible jump.
+ */
+.ox-tabs__list:not([data-ox-measured]) .ox-tabs__thumb,
+.ox-tabs__list:not([data-ox-measured]) .ox-tabs__line {
+  opacity: 0;
+}
+[data-ox-variant="segmented"]
+  .ox-tabs__list:not([data-ox-measured])
+  .ox-tabs__tab[data-ox-selected],
+[data-ox-variant="command"] .ox-tabs__list:not([data-ox-measured]) .ox-tabs__tab[data-ox-selected] {
+  background: var(--ox-tabs-thumb-bg);
+  box-shadow: inset 0 0 0 1px var(--ox-tabs-thumb-border);
+  border-radius: var(--ox-tabs-thumb-radius);
+}
+[data-ox-variant="underline"]
+  .ox-tabs__list:not([data-ox-measured])
+  .ox-tabs__tab[data-ox-selected] {
+  box-shadow: inset 0 calc(-1 * var(--ox-tabs-indicator-size)) 0 0 var(--ox-tabs-indicator);
+}
+
+/* Inert while an async guard is pending — the one case where an unresponsive
+   tab strip is correct rather than a bug. */
+.ox-tabs[data-ox-pending] .ox-tabs__list {
+  pointer-events: none;
+  opacity: 0.7;
+}
+
+/* =====================================================================
+ * Variant: segmented
+ * ================================================================== */
+[data-ox-variant="segmented"] > .ox-tabs__list,
+[data-ox-variant="segmented"] > * > .ox-tabs__list {
+  background: var(--ox-tabs-track-bg);
+  border: 1px solid var(--ox-tabs-track-border);
+  border-radius: var(--ox-tabs-track-radius);
+  padding: var(--ox-tabs-track-pad);
+  gap: 0;
+  align-self: flex-start;
+}
+[data-ox-variant="segmented"] .ox-tabs__tab {
+  border-radius: var(--ox-tabs-thumb-radius);
+}
+[data-ox-variant="segmented"]
+  .ox-tabs__tab:hover:not([data-ox-selected]):not([aria-disabled="true"]) {
+  background: var(--ox-tabs-bg-hover);
+}
+/*
+ * Hairline separators between adjacent *unselected* triggers, faded around
+ * the thumb and on hover. At two tabs you barely notice it; at five it is the
+ * difference between a control and a smear.
+ */
+[data-ox-variant="segmented"] .ox-tabs__tab + .ox-tabs__tab::before {
+  content: "";
+  position: absolute;
+  inset-inline-start: -0.5px;
+  inset-block: 22%;
+  inline-size: 1px;
+  background: color-mix(in oklab, currentcolor 18%, transparent);
+  transition: opacity var(--ox-tabs-duration) var(--ox-tabs-ease);
+}
+[data-ox-variant="segmented"] .ox-tabs__tab[data-ox-selected]::before,
+[data-ox-variant="segmented"] .ox-tabs__tab[data-ox-selected] + .ox-tabs__tab::before,
+[data-ox-variant="segmented"] .ox-tabs__tab:hover::before,
+[data-ox-variant="segmented"] .ox-tabs__tab:hover + .ox-tabs__tab::before {
+  opacity: 0;
+}
+
+/* =====================================================================
+ * Variant: underline
+ * ================================================================== */
+[data-ox-variant="underline"] > .ox-tabs__list,
+[data-ox-variant="underline"] > * > .ox-tabs__list {
+  /* An inset shadow rather than a border, so the 2px indicator can sit at
+     bottom:0 and overlap it exactly at any zoom. A 1px border plus a 2px
+     indicator leaves a half-pixel seam at 110%. */
+  box-shadow: inset 0 -1px 0 0 var(--ox-tabs-rail);
+  gap: clamp(0.5rem, 2vw, 1.5rem);
+}
+[data-ox-variant="underline"] .ox-tabs__tab {
+  padding-inline: 0.15rem;
+  border-radius: var(--ox-radius-sm, 0.25rem) var(--ox-radius-sm, 0.25rem) 0 0;
+}
+[data-ox-variant="underline"] .ox-tabs__line {
+  inset-block-start: auto;
+  top: auto;
+  bottom: 0;
+}
+[data-ox-variant="underline"] .ox-tabs__tab[data-ox-selected] {
+  color: var(--ox-tabs-accent-fg);
+}
+
+/* =====================================================================
+ * Variant: pill
+ * ================================================================== */
+[data-ox-variant="pill"] > .ox-tabs__list,
+[data-ox-variant="pill"] > * > .ox-tabs__list {
+  gap: 0.4rem;
+}
+/* Wrapping is opt-in through `overflow="wrap"`, and validation restricts that
+   to `as="radiogroup"`: once a tablist wraps, "the next tab" stops being a
+   direction and arrow navigation has no correct answer. */
+.ox-tabs[data-ox-overflow="wrap"] > .ox-tabs__list,
+.ox-tabs[data-ox-overflow="wrap"] > * > .ox-tabs__list {
+  flex-wrap: wrap;
+}
+[data-ox-variant="pill"] .ox-tabs__tab {
+  border-radius: 9999px;
+  box-shadow: inset 0 0 0 1px var(--ox-tabs-border);
+  background: var(--ox-tabs-surface);
+  min-block-size: calc(var(--ox-tabs-min-h) - 0.4rem);
+}
+[data-ox-variant="pill"] .ox-tabs__tab[data-ox-selected] {
+  background: var(--ox-tabs-accent-subtle);
+  color: var(--ox-tabs-accent-fg);
+  box-shadow: inset 0 0 0 1px var(--ox-tabs-accent-border);
+}
+
+/* =====================================================================
+ * Variant: enclosed — browser-style, editable
+ * ================================================================== */
+[data-ox-variant="enclosed"] > .ox-tabs__list,
+[data-ox-variant="enclosed"] > * > .ox-tabs__list {
+  gap: 2px;
+  box-shadow: inset 0 -1px 0 0 var(--ox-tabs-rail);
+  padding-inline-start: 2px;
+}
+[data-ox-variant="enclosed"] .ox-tabs__tab {
+  border-radius: var(--ox-radius, 0.5rem) var(--ox-radius, 0.5rem) 0 0;
+  background: var(--ox-tabs-surface-subtle);
+  box-shadow: inset 0 0 0 1px var(--ox-tabs-border);
+  margin-block-end: -1px;
+  padding-inline-end: 0.5rem;
+}
+[data-ox-variant="enclosed"] .ox-tabs__tab[data-ox-selected] {
+  background: var(--ox-tabs-surface);
+  box-shadow:
+    inset 0 0 0 1px var(--ox-tabs-border),
+    inset 0 2px 0 0 var(--ox-tabs-accent);
+  z-index: 2;
+}
+
+/* =====================================================================
+ * Variant: rail — vertical
+ * ================================================================== */
+[data-ox-variant="rail"] > .ox-tabs__list,
+[data-ox-variant="rail"] > * > .ox-tabs__list {
+  gap: 0.1rem;
+  min-inline-size: 190px;
+  padding-inline-end: 0.5rem;
+  border-inline-end: 1px solid var(--ox-tabs-rail);
+}
+[data-ox-variant="rail"] .ox-tabs__tab {
+  justify-content: flex-start;
+  text-align: start;
+  inline-size: 100%;
+}
+[data-ox-variant="rail"] .ox-tabs__label {
+  flex: 1 1 auto;
+  text-align: start;
+}
+[data-ox-variant="rail"] .ox-tabs__tab:hover:not([data-ox-selected]) {
+  background: var(--ox-tabs-bg-hover);
+}
+[data-ox-variant="rail"] .ox-tabs__tab[data-ox-selected] {
+  background: var(--ox-tabs-accent-subtle);
+  color: var(--ox-tabs-accent-fg);
+}
+/* The bar rides the divider at the inline-end. Anchored logically because it
+   never moves on that axis — only the block offset is computed. */
+[data-ox-variant="rail"] .ox-tabs__line {
+  left: auto;
+  inset-inline-start: auto;
+  inset-inline-end: calc(-1px - var(--ox-tabs-indicator-size) / 2);
+  inline-size: var(--ox-tabs-indicator-size);
+  block-size: var(--ox-tabs-ind-h, 0);
+  transform: translate3d(0, var(--ox-tabs-ind-y, 0), 0);
+}
+
+/* =====================================================================
+ * Variant: ghost — no track, no rail, no indicator element
+ * ================================================================== */
+[data-ox-variant="ghost"] > .ox-tabs__list,
+[data-ox-variant="ghost"] > * > .ox-tabs__list {
+  gap: 0.15rem;
+}
+[data-ox-variant="ghost"] .ox-tabs__tab:hover:not([data-ox-selected]) {
+  background: var(--ox-tabs-bg-hover);
+}
+[data-ox-variant="ghost"] .ox-tabs__tab[data-ox-selected] {
+  background: var(--ox-tabs-track-bg);
+}
+
+/* =====================================================================
+ * Variant: command — icon-first toolbar
+ * ================================================================== */
+[data-ox-variant="command"] > .ox-tabs__list,
+[data-ox-variant="command"] > * > .ox-tabs__list {
+  background: var(--ox-tabs-track-bg);
+  border: 1px solid var(--ox-tabs-track-border);
+  border-radius: var(--ox-radius, 0.5rem);
+  padding: 3px;
+  gap: 2px;
+  align-self: flex-start;
+}
+[data-ox-variant="command"] .ox-tabs__tab {
+  padding: 0.35rem 0.5rem;
+  min-block-size: 1.9rem;
+  border-radius: calc(var(--ox-radius, 0.5rem) - 2px);
+}
+[data-ox-variant="command"] .ox-tabs__thumb {
+  border-radius: calc(var(--ox-radius, 0.5rem) - 2px);
+}
+
+/* =====================================================================
+ * Variant: stepper
+ * ================================================================== */
+[data-ox-variant="stepper"] > .ox-tabs__list,
+[data-ox-variant="stepper"] > * > .ox-tabs__list {
+  gap: 0;
+  align-items: stretch;
+  box-shadow: inset 0 0 0 1px var(--ox-tabs-border);
+  border-radius: var(--ox-radius, 0.5rem);
+  overflow: hidden;
+}
+[data-ox-variant="stepper"] .ox-tabs__tab {
+  flex: 1 1 0;
+  min-inline-size: 0;
+  justify-content: flex-start;
+  border-radius: 0;
+}
+[data-ox-variant="stepper"] .ox-tabs__tab + .ox-tabs__tab {
+  border-inline-start: 1px solid var(--ox-tabs-border);
+}
+[data-ox-variant="stepper"] .ox-tabs__tab[data-ox-selected] {
+  background: var(--ox-tabs-accent-subtle);
+}
+[data-ox-variant="stepper"] .ox-tabs__tab[data-ox-state="done"] {
+  color: var(--ox-tabs-fg-selected);
+}
+[data-ox-variant="stepper"] .ox-tabs__tab[data-ox-state="locked"] {
+  color: var(--ox-tabs-fg-disabled);
+}
+
+/* =====================================================================
+ * Variants: card and stat — selection carries its own surface
+ * ================================================================== */
+[data-ox-variant="card"] > .ox-tabs__list,
+[data-ox-variant="card"] > * > .ox-tabs__list,
+[data-ox-variant="stat"] > .ox-tabs__list,
+[data-ox-variant="stat"] > * > .ox-tabs__list {
+  gap: 0.75rem;
+  align-items: stretch;
+  flex-wrap: wrap;
+}
+[data-ox-variant="card"] .ox-tabs__tab,
+[data-ox-variant="stat"] .ox-tabs__tab {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.25rem;
+  text-align: start;
+  white-space: normal;
+  padding: 1rem;
+  flex: 1 1 190px;
+  min-inline-size: 170px;
+  border-radius: var(--ox-radius-lg, 0.75rem);
+  background: var(--ox-tabs-surface);
+  box-shadow: inset 0 0 0 1px var(--ox-tabs-border);
+}
+[data-ox-variant="card"] .ox-tabs__tab[data-ox-selected],
+[data-ox-variant="stat"] .ox-tabs__tab[data-ox-selected] {
+  background: var(--ox-tabs-accent-subtle);
+  box-shadow: inset 0 0 0 1.5px var(--ox-tabs-accent);
+}
+
+/* =====================================================================
+ * Fill modes
+ * ================================================================== */
+.ox-tabs[data-ox-fill="equal"] > .ox-tabs__list,
+.ox-tabs[data-ox-fill="equal"] > * > .ox-tabs__list {
+  /* Grid rather than flex: `1fr` columns size to the widest label, so the
+     thumb never resizes as selection moves between them. */
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  inline-size: 100%;
+  align-self: stretch;
+}
+.ox-tabs[data-ox-fill="equal"] .ox-tabs__tab {
+  inline-size: 100%;
+}
+.ox-tabs[data-ox-fill="stretch"] > .ox-tabs__list,
+.ox-tabs[data-ox-fill="stretch"] > * > .ox-tabs__list {
+  inline-size: 100%;
+  align-self: stretch;
+}
+.ox-tabs[data-ox-fill="stretch"] .ox-tabs__tab {
+  flex: 1 1 auto;
+}
+
+/* =====================================================================
+ * Overflow apparatus
+ * ================================================================== */
+/*
+ * The bar holds everything that is not a tab.
+ *
+ * `role="tablist"` may only own `role="tab"`, so the add button, the overflow
+ * trigger and the scroll nudges are siblings of the tablist rather than
+ * children of it — otherwise the strip fails `aria-required-children` and the
+ * "n of m" a screen reader announces counts controls that are not tabs.
+ */
+.ox-tabs__bar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-inline-size: 0;
+  gap: 0.25rem;
+}
+.ox-tabs[data-ox-orientation="vertical"] .ox-tabs__bar {
+  flex-direction: column;
+  align-items: stretch;
+}
+.ox-tabs__bar[data-ox-scrollable] > .ox-tabs__list {
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  flex: 1 1 auto;
+}
+.ox-tabs__nudge {
+  flex: 0 0 auto;
+  inline-size: 1.75rem;
+  block-size: 1.75rem;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--ox-tabs-border);
+  background: var(--ox-tabs-surface);
+  color: var(--ox-tabs-fg);
+  border-radius: 9999px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  line-height: 1;
+  transition: opacity var(--ox-tabs-duration) var(--ox-tabs-ease);
+}
+.ox-tabs__nudge:disabled {
+  opacity: 0.25;
+  cursor: default;
+}
+/* Fades belong to the container, not the track, so they work on any
+   background — including a dark theme, where a white-to-transparent gradient
+   would be a grey smear. */
+.ox-tabs__bar[data-ox-scrollable]::before,
+.ox-tabs__bar[data-ox-scrollable]::after {
+  content: "";
+  position: absolute;
+  inset-block: 0;
+  inline-size: 2.25rem;
+  pointer-events: none;
+  z-index: 2;
+  opacity: 0;
+  transition: opacity var(--ox-tabs-duration) var(--ox-tabs-ease);
+  background: linear-gradient(to right, var(--ox-tabs-surface), transparent);
+}
+.ox-tabs__bar[data-ox-scrollable]::before {
+  inset-inline-start: 1.9rem;
+}
+.ox-tabs__bar[data-ox-scrollable]::after {
+  inset-inline-end: 1.9rem;
+  background: linear-gradient(to left, var(--ox-tabs-surface), transparent);
+}
+.ox-tabs__bar[data-ox-start="false"]::before {
+  opacity: 1;
+}
+.ox-tabs__bar[data-ox-end="false"]::after {
+  opacity: 1;
+}
+
+.ox-tabs__more {
+  position: relative;
+  flex: 0 0 auto;
+}
+.ox-tabs__more-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  min-block-size: var(--ox-tabs-min-h);
+  padding: var(--ox-tabs-pad-y) 0.6rem;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  font: inherit;
+  font-size: var(--ox-tabs-font);
+  color: var(--ox-tabs-fg);
+  border-radius: var(--ox-radius, 0.5rem);
+}
+.ox-tabs__more-button:hover {
+  background: var(--ox-tabs-bg-hover);
+  color: var(--ox-tabs-fg-hover);
+}
+.ox-tabs__more-button[data-ox-has-selected] {
+  color: var(--ox-tabs-accent-fg);
+  font-weight: var(--ox-tabs-weight-selected);
+}
+.ox-tabs__more-button:focus-visible {
+  outline: 2px solid var(--ox-tabs-focus);
+  outline-offset: 2px;
+}
+.ox-tabs__menu {
+  position: absolute;
+  z-index: 20;
+  inset-inline-end: 0;
+  inset-block-start: calc(100% + 6px);
+  min-inline-size: 190px;
+  padding: 0.3rem;
+  margin: 0;
+  list-style: none;
+  background: var(--ox-tabs-surface);
+  border: 1px solid var(--ox-tabs-border);
+  border-radius: var(--ox-radius-lg, 0.75rem);
+  box-shadow: var(--ox-shadow-md, 0 8px 22px -6px rgb(2 6 23 / 0.14));
+}
+.ox-tabs__menu[hidden] {
+  display: none;
+}
+.ox-tabs__menu-item {
+  display: flex;
+  inline-size: 100%;
+  align-items: center;
+  gap: 0.5rem;
+  text-align: start;
+  padding: 0.4rem 0.55rem;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  font: inherit;
+  font-size: var(--ox-tabs-font);
+  color: var(--ox-tabs-fg-selected);
+  border-radius: var(--ox-radius-sm, 0.25rem);
+}
+.ox-tabs__menu-item:hover,
+.ox-tabs__menu-item:focus-visible {
+  background: var(--ox-tabs-bg-hover);
+}
+.ox-tabs__menu-item > .ox-tabs__count {
+  margin-inline-start: auto;
+}
+
+.ox-tabs__select {
+  inline-size: 100%;
+  font: inherit;
+  font-size: var(--ox-tabs-font);
+  color: var(--ox-tabs-fg-selected);
+  min-block-size: var(--ox-tabs-min-h);
+  padding-inline: var(--ox-tabs-pad-x) 2rem;
+  background: var(--ox-tabs-surface);
+  border: 1px solid var(--ox-tabs-border);
+  border-radius: var(--ox-radius, 0.5rem);
+}
+
+/* =====================================================================
+ * Panels
+ * ================================================================== */
+.ox-tabs__panels {
+  margin-block-start: 1rem;
+  min-inline-size: 0;
+  flex: 1 1 auto;
+}
+.ox-tabs[data-ox-orientation="vertical"] > .ox-tabs__panels {
+  margin-block-start: 0;
+}
+.ox-tabs__panel[hidden] {
+  display: none;
+}
+.ox-tabs__panel:focus-visible {
+  outline: 2px solid var(--ox-tabs-focus);
+  outline-offset: 4px;
+  border-radius: var(--ox-radius, 0.5rem);
+}
+[data-ox-transition="fade"] .ox-tabs__panel:not([hidden]) {
+  animation: ox-tabs-fade var(--ox-tabs-duration) var(--ox-tabs-ease);
+}
+@keyframes ox-tabs-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+/* =====================================================================
+ * Reduced motion
+ *
+ * Collapsed to 1ms rather than removed. Removing the transition means
+ * `transitionend` never fires, and every library that has shipped that bug
+ * ends up with a permanently promoted `will-change` layer.
+ * ================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  .ox-tabs *,
+  .ox-tabs *::before,
+  .ox-tabs *::after {
+    transition-duration: 1ms !important;
+    animation-duration: 1ms !important;
+  }
+}
+
+/* =====================================================================
+ * Forced colors
+ *
+ * The OS erases backgrounds and shadows, so a segmented control whose only
+ * selection cue is a white thumb has, in High Contrast, no selection cue at
+ * all. This block is the difference between usable and not.
+ * ================================================================== */
+@media (forced-colors: active) {
+  .ox-tabs__thumb {
+    display: none;
+  }
+  .ox-tabs__line {
+    background: Highlight;
+    forced-color-adjust: none;
+  }
+  .ox-tabs__tab {
+    border: 1px solid transparent;
+  }
+  .ox-tabs__tab[data-ox-selected] {
+    forced-color-adjust: none;
+    background: Highlight;
+    color: HighlightText;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .ox-tabs__tab[aria-disabled="true"] {
+    color: GrayText;
+  }
+  .ox-tabs__tab:focus-visible {
+    outline: 2px solid CanvasText;
+  }
+  .ox-tabs__count {
+    border: 1px solid CanvasText;
+  }
+}

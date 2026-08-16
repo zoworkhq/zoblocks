@@ -335,6 +335,13 @@ export function SignatureModal({
         </label>
       </div>
 
+      {/* eslint-disable-next-line @oxygenui/tabs-semantic-mode -- This is antd's
+          Tabs, not Oxygen's: Signature wraps antd (see the file header), and
+          `as` is not a prop antd accepts — passing it would forward an unknown
+          attribute to the DOM. The rule matches on the element name and cannot
+          yet see which module a `Tabs` came from. Semantically this is a view
+          switch between draw, type and upload, so `as="tabs"` is what it would
+          declare once Signature moves onto the Oxygen component. */}
       <Tabs
         // Without an id, antd emits no aria-controls or aria-labelledby and the
         // tab/panel relationship is invisible to assistive technology.

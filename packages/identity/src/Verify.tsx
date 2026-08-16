@@ -1,0 +1,220 @@
+/**
+ * `PatientVerify` and `useWristbandMatch` — the 40% interventions.
+ *
+ * Adelman et al. (JAMIA 2013), 901,776 ordering sessions: a dismissible
+ * ID-verify alert reduced wrong-patient orders with an odds ratio of 0.84; an
+ * ID-*reentry* step reduced them with an odds ratio of 0.60. Everyone ships the
+ * first. This is the second.
+ */
+
+import { identityInitials, type Identity } from "@oxygenui-design/identity-core";
+import { useCallback, useMemo, useState, type ReactNode } from "react";
+import { useIdentityPolicy } from "./IdentityProvider.js";
+
+export type VerifyMode = "initials" | "birth-date";
+
+/** Literal class map. See the note in `states.tsx`. */
+const VERIFY_STATE_CLASS = {
+  idle: "ox-verify--idle",
+  wrong: "ox-verify--wrong",
+  confirmed: "ox-verify--confirmed",
+} as const;
+
+export interface PatientVerifyProps {
+  identity: Identity;
+  /**
+   * What the clinician is about to do. Named in the prompt, because
+   * CONTENT.md §4 says state the consequence rather than asking "are you sure".
+   */
+  action: string;
+  mode?: VerifyMode;
+  onConfirm: () => void;
+  onCancel?: () => void;
+  /** Fired on every failed attempt, so the application can count near misses. */
+  onFailure?: (attempt: string) => void;
+}
+
+export function PatientVerify(props: PatientVerifyProps): ReactNode {
+  const { identity, action, mode = "initials", onConfirm, onCancel, onFailure } = props;
+  const { policy } = useIdentityPolicy();
+  const [entry, setEntry] = useState("");
+  const [state, setState] = useState<"idle" | "wrong" | "confirmed">("idle");
+
+  const expected = useMemo(() => {
+    if (mode === "birth-date") return identity.birthDate?.value.replace(/-/g, "") ?? "";
+    return identityInitials(identity.name, policy.locale);
+  }, [identity, mode, policy.locale]);
+
+  const submit = useCallback(() => {
+    const given = entry
+      .trim()
+      .replace(/[\s/-]/g, "")
+      .toUpperCase();
+    if (!given) return;
+    if (given === expected.toUpperCase()) {
+      setState("confirmed");
+      onConfirm();
+      return;
+    }
+    setState("wrong");
+    onFailure?.(given);
+  }, [entry, expected, onConfirm, onFailure]);
+
+  const label =
+    mode === "birth-date"
+      ? "Type this patient's date of birth to continue"
+      : "Type this patient's initials to continue";
+
+  return (
+    <div
+      className={["ox-verify", VERIFY_STATE_CLASS[state]].join(" ")}
+      role="alertdialog"
+      aria-label={`Confirm the patient before ${action}`}
+      data-ox-patient-id={identity.key}
+    >
+      <span className="ox-verify__rail" aria-hidden="true" />
+      <div className="ox-verify__body">
+        <p className="ox-verify__title">Confirm the patient before {action}</p>
+        <p className="ox-verify__prompt">
+          You are about to <strong>{action}</strong>. {label}.
+        </p>
+        <div className="ox-verify__row">
+          <div className="ox-verify__who">
+            <span className="ox-verify__name">{identity.name.text}</span>
+            <span className="ox-verify__detail">
+              {[
+                identity.birthDate?.text,
+                identity.identifiers[0] &&
+                  `${identity.identifiers[0].label} ${identity.identifiers[0].text}`,
+              ]
+                .filter(Boolean)
+                .join(" · ")}
+            </span>
+          </div>
+          <label className="ox-verify__field">
+            <span className="ox-visually-hidden">{label}</span>
+            <input
+              className="ox-verify__input"
+              value={entry}
+              inputMode={mode === "birth-date" ? "numeric" : "text"}
+              autoComplete="off"
+              maxLength={mode === "birth-date" ? 10 : 4}
+              onChange={(e) => {
+                setEntry(e.target.value);
+                if (state === "wrong") setState("idle");
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") submit();
+              }}
+              placeholder={mode === "birth-date" ? "DDMMYYYY" : "Initials"}
+            />
+          </label>
+          <button type="button" className="ox-btn ox-btn--primary" onClick={submit}>
+            Confirm
+          </button>
+          {onCancel && (
+            <button type="button" className="ox-btn" onClick={onCancel}>
+              Cancel
+            </button>
+          )}
+        </div>
+        <p className="ox-verify__result" role="status">
+          {state === "wrong" &&
+            `That does not match the patient on screen. Nothing has been ordered. Check the chart before retrying.`}
+          {state === "confirmed" && `Confirmed for ${identity.name.text}.`}
+        </p>
+      </div>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Wristband
+// ---------------------------------------------------------------------------
+
+export type WristbandVerdict =
+  | { kind: "idle" }
+  | { kind: "match"; identifier: string; assigner?: string | undefined }
+  | { kind: "mismatch"; scanned: string }
+  | { kind: "wrong-system"; scanned: string; scannedSystem: string; expectedSystem: string };
+
+export interface ScannedIdentifier {
+  value: string;
+  /** The assigning system. A right number from the wrong authority is not a match. */
+  system?: string;
+}
+
+/**
+ * Compare a scanned wristband against the displayed patient.
+ *
+ * Pew found match rates fall to roughly 50% between organisations, which means
+ * "the number matched" is not the same claim as "this is the same person"
+ * unless the *system* matched too. A right-number-wrong-system scan is
+ * therefore a **mismatch**, not a match with a warning — a warning beside a
+ * green tick is read as a green tick.
+ */
+export function useWristbandMatch(identity: Identity | undefined): {
+  verdict: WristbandVerdict;
+  scan: (scanned: ScannedIdentifier) => WristbandVerdict;
+  reset: () => void;
+} {
+  const [verdict, setVerdict] = useState<WristbandVerdict>({ kind: "idle" });
+
+  const scan = useCallback(
+    (scanned: ScannedIdentifier): WristbandVerdict => {
+      const normalise = (v: string): string => v.replace(/[\s-]/g, "").toUpperCase();
+      const value = normalise(scanned.value);
+
+      if (!identity) {
+        const out: WristbandVerdict = { kind: "mismatch", scanned: scanned.value };
+        setVerdict(out);
+        return out;
+      }
+
+      const hit = identity.identifiers.find((id) => normalise(id.raw) === value);
+      if (!hit) {
+        const out: WristbandVerdict = { kind: "mismatch", scanned: scanned.value };
+        setVerdict(out);
+        return out;
+      }
+
+      if (scanned.system && hit.system && scanned.system !== hit.system) {
+        const out: WristbandVerdict = {
+          kind: "wrong-system",
+          scanned: scanned.value,
+          scannedSystem: scanned.system,
+          expectedSystem: hit.system,
+        };
+        setVerdict(out);
+        return out;
+      }
+
+      const out: WristbandVerdict = { kind: "match", identifier: hit.text, assigner: hit.assigner };
+      setVerdict(out);
+      return out;
+    },
+    [identity],
+  );
+
+  const reset = useCallback(() => setVerdict({ kind: "idle" }), []);
+
+  return { verdict, scan, reset };
+}
+
+/** Human-readable text for a verdict. Exported so applications can reuse it. */
+export function wristbandMessage(verdict: WristbandVerdict): string {
+  switch (verdict.kind) {
+    case "idle":
+      return "No wristband scanned.";
+    case "match":
+      return `Wristband ${verdict.identifier}${verdict.assigner ? ` (${verdict.assigner})` : ""} matches the displayed patient. Two identifiers verified.`;
+    case "mismatch":
+      return `Wristband ${verdict.scanned} belongs to a different patient. Stop. Do not proceed on this chart.`;
+    case "wrong-system":
+      return `Number ${verdict.scanned} matches — but it was issued by a different organisation. A right number from the wrong authority is not the same person.`;
+    default: {
+      const never: never = verdict;
+      return never;
+    }
+  }
+}
