@@ -191,6 +191,21 @@
   .chip.good { color: var(--good); background: var(--good-bg); border-color: color-mix(in oklab, var(--good) 35%, transparent); }
   .chip.neu  { color: var(--neutral); background: var(--neutral-bg); border-color: color-mix(in oklab, var(--neutral) 32%, transparent); }
   .chip .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; flex: none; }
+  .chip.fixed { color: var(--good); background: var(--good-bg); border-color: color-mix(in oklab, var(--good) 40%, transparent); }
+  .chip.fixed .dot { border-radius: 0; width: 7px; height: 7px; clip-path: polygon(14% 44%, 0 60%, 39% 100%, 100% 22%, 84% 8%, 39% 68%); }
+  /* A resolved finding stays on the page — struck through, not deleted. The
+     record of what was wrong is the reason the gate now exists. */
+  .finding.done { border-inline-start-color: var(--good); background: color-mix(in oklab, var(--good-bg) 42%, var(--surface)); }
+  .finding.done h3 { color: var(--muted); }
+  .finding.done .ev { opacity: .85; }
+  .fixnote { font-size: .88rem; border-top: 1px dashed color-mix(in oklab, var(--good) 40%, var(--rule)); padding-top: .6rem; margin-top: .1rem; }
+  .fixnote b { color: var(--good); }
+  .banner { border-radius: 14px; padding: 1.1rem 1.3rem; background: var(--good-bg); border: 1px solid color-mix(in oklab, var(--good) 35%, var(--rule)); display: grid; gap: .5rem; }
+  .banner .eyebrow { color: var(--good); }
+  .prog { display: grid; grid-template-columns: 1fr auto; gap: .5rem 1rem; align-items: center; margin-top: .3rem; }
+  .prog .bar { height: 10px; border-radius: 99px; background: color-mix(in oklab, var(--good) 18%, transparent); overflow: hidden; }
+  .prog .bar i { display: block; height: 100%; background: var(--good); border-radius: 99px; }
+  .prog .n { font-family: var(--font-mono); font-size: .8rem; font-weight: 700; color: var(--good); font-variant-numeric: tabular-nums; }
 
   .tablewrap { overflow-x: auto; border: 1px solid var(--rule); border-radius: 12px; background: var(--surface); }
   table { border-collapse: collapse; width: 100%; font-size: 0.89rem; min-width: 540px; }
@@ -219,6 +234,9 @@
   .track .fill { position: absolute; inset-block: 0; inset-inline-start: 0; border-radius: 99px; background: var(--accent); }
   .track .tgt { position: absolute; inset-block: -4px; width: 2px; background: var(--ink); opacity: 0.55; border-radius: 2px; }
   .track .gap { position: absolute; inset-block: 3px; border-radius: 99px; background: repeating-linear-gradient(135deg, var(--faint) 0 3px, transparent 3px 6px); }
+  /* What this remediation pass moved, drawn over the original bar. */
+  .track .gained { position: absolute; inset-block: 0; border-radius: 99px; background: var(--good); }
+  .srow .v em { font-style: normal; font-size: .62rem; color: var(--good); font-weight: 700; margin-inline-start: .18em; vertical-align: super; }
   @media (max-width: 720px) {
     .srow { grid-template-columns: 1fr 2.6rem; grid-template-areas: "name now" "track track" "chip chip"; gap: 0.4rem 0.6rem; }
     .srow .name { grid-area: name; } .srow .v:not(.t) { grid-area: now; }
@@ -275,14 +293,15 @@
 <header class="mast">
   <div class="wrap mast-grid">
     <div>
-      <p class="eyebrow on">Zowork · engineering audit · 16 August 2026</p>
+      <p class="eyebrow on">Zowork · engineering audit · 16 August 2026 · <span style="color:var(--good)">revision 2 — remediated</span></p>
       <h1>Oxygen&nbsp;UI<br />Readiness Audit</h1>
       <p class="lede">An evidence-based assessment of the component library against enterprise, production, and open-source standards — and a costed path from where it is to where Netsmart or CVS could be shown it without caveats.</p>
       <div class="meta">
         <span>Files inspected <b>278</b></span>
+        <span>Files changed <b>236</b></span>
         <span>Components <b>5</b></span>
-        <span>Tests <b>439</b></span>
-        <span>Critical findings <b>8</b></span>
+        <span>Tests <b>439 → 695</b></span>
+        <span>Critical findings <b>8 → 0</b></span>
         <span>Method <b>inspection + execution</b></span>
       </div>
     </div>
@@ -290,17 +309,17 @@
     <div class="verdict">
       <div class="row"><span>Overall readiness</span><span>18 categories</span></div>
       <div class="reading">
-        <span class="now">4.7</span>
+        <span class="now">7.2</span>
         <span class="arrow">→</span>
         <span class="goal">8.9</span>
         <span class="unit">/ 10</span>
       </div>
       <div class="vtrack">
-        <i style="width:47%"></i>
+        <i style="width:72%"></i>
         <u style="inset-inline-start:89%"></u>
       </div>
-      <div class="vscale"><span>0</span><span>current 4.7</span><span>target 8.9</span><span>10</span></div>
-      <p class="note">The architecture is stronger than the score suggests; the score is held down by delivery, governance, and security — the layers enterprise buyers actually audit. <strong style="color:#fff">Reachable in ~7 weeks with two engineers.</strong></p>
+      <div class="vscale"><span>0</span><span>was 4.7 · now 7.2</span><span>target 8.9</span><span>10</span></div>
+      <p class="note"><strong style="color:#8ff0d5">All eight critical findings are closed</strong> and merged in <a href="https://github.com/zoworkhq/oxygenui/pull/15" style="color:#8ff0d5">PR #15</a>, together with the governance and security layer. What remains is Phase 1–3 breadth: Storybook, visual regression, i18n, and the accessibility evidence pack.</p>
     </div>
   </div>
 </header>
@@ -311,8 +330,8 @@
   <section class="block">
     <div class="head">
       <p class="eyebrow">01 — The verdict</p>
-      <h2>A strong spine and a small body</h2>
-      <p>Oxygen has a metadata generator, a contrast-gating token validator, and six domain-specific lint rules that are better than what most Series-B companies ship. Against that, it currently contains five components in one category, all <code>beta</code>, and the distribution and institutional layers are largely absent. <strong>The gap is not quality — it is surface area and readiness.</strong></p>
+      <h2>A strong spine, a small body — and the defects closed</h2>
+      <p>Oxygen has a metadata generator, a contrast-gating token validator, and six domain-specific lint rules that are better than what most Series-B companies ship. The audit found eight critical defects around that core; <strong>all eight are now closed, along with the gates that let them through.</strong> What remains is not broken — it is absent: stories, visual regression, i18n, accessibility evidence, and breadth. Broken things block a pilot; absent things are schedulable.</p>
     </div>
 
     <div class="grid3">
@@ -327,23 +346,23 @@
         </ul>
       </div>
       <div class="card">
-        <p class="eyebrow">Partly built</p>
+        <p class="eyebrow">Fixed in this pass</p>
         <ul class="small" style="margin-top:.5rem">
-          <li>Testing: 439 tests, but one layer of eight</li>
-          <li>Quality gate exists and <em>cannot be switched on</em></li>
-          <li>Cross-framework: shipped and broken under SSR</li>
-          <li>Release automation without release gates</li>
-          <li>Docs site whose props tables are wrong</li>
+          <li>SSR crash — plus the Node test that would have caught it</li>
+          <li>Three WCAG failures, and the gate that missed them</li>
+          <li>Props tables: 1 prop → 105</li>
+          <li>Release now gated; zero advisories</li>
+          <li>A real React package, generated from one source</li>
         </ul>
       </div>
       <div class="card">
-        <p class="eyebrow">Absent</p>
+        <p class="eyebrow">Still absent</p>
         <ul class="small" style="margin-top:.5rem">
-          <li>Every governance file — contributing, security, owners</li>
-          <li>Storybook, visual regression, E2E, coverage gates</li>
-          <li>A React package installable from npm</li>
+          <li>Storybook, visual regression, E2E</li>
           <li>i18n, despite an ADR warning about the deadline</li>
-          <li>Dependency scanning, SAST, SBOM</li>
+          <li>Screen-reader evidence and a VPAT</li>
+          <li>Framework smoke apps proving Vue and Angular</li>
+          <li>Catalog breadth — still five components</li>
         </ul>
       </div>
     </div>
@@ -353,64 +372,78 @@
   <section class="block">
     <div class="head">
       <p class="eyebrow">02 — Triage</p>
-      <h2>Eight critical findings</h2>
-      <p>Each was verified by running something, not by reading. Three would be visible to a customer today.</p>
+      <h2>Eight critical findings — all closed</h2>
+      <p>Each was verified by running something, not by reading. Each fix was verified the same way. The findings stay on this page rather than being deleted: the record of what went wrong is the reason each gate now exists.</p>
+    </div>
+
+    <div class="banner" style="margin-bottom:1.1rem">
+      <p class="eyebrow">Remediation status</p>
+      <p style="font-size:1.02rem"><strong>8 of 8 closed</strong>, merged in <a href="https://github.com/zoworkhq/oxygenui/pull/15">PR #15</a>. In every case the underlying gate was widened too — a wrong value is an hour's work; a check that could not see it is the real defect.</p>
+      <div class="prog"><div class="bar"><i style="width:100%"></i></div><span class="n">8 / 8</span></div>
     </div>
 
     <div style="display:grid; gap:.85rem">
 
-      <article class="finding">
-        <div class="fhead"><span class="id">C1</span><span class="chip crit"><span class="dot"></span>Ship blocker</span><h3>The npm package crashes on import in Node</h3></div>
+      <article class="finding done">
+        <div class="fhead"><span class="id">C1</span><span class="chip fixed"><span class="dot"></span>Fixed</span><h3>The npm package crashes on import in Node</h3></div>
         <p class="small"><code>class OxLoaderElement extends HTMLElement</code> evaluates at module scope. Any server-rendering context — Nuxt, Angular Universal, Astro, SvelteKit, a Next.js server component — throws before the loader renders. The package README explicitly promises Nuxt and Angular Universal support.</p>
         <div class="ev">$ node -e "import('./dist/index.js')"<br /><b>ReferenceError: HTMLElement is not defined</b><br /><span class="muted">packages/loaders/src/base.ts:135 · jsdom tests passed because jsdom provides HTMLElement; there is no Node-environment test</span></div>
+              <p class="fixnote small"><b>Fixed.</b> The class now extends an inert stand-in when there is no DOM, so importing on a server is a no-op. A <code>node</code>-environment suite covers all six entry points — <em>its absence is why this shipped</em>, since jsdom supplies <code>HTMLElement</code>. Verified: <code>node -e "import('./dist/index.js')"</code> exits 0.</p>
       </article>
 
-      <article class="finding">
-        <div class="fhead"><span class="id">C2</span><span class="chip crit"><span class="dot"></span>Broken now</span><h3>CI on <code>main</code> fails on the next merge</h3></div>
+      <article class="finding done">
+        <div class="fhead"><span class="id">C2</span><span class="chip fixed"><span class="dot"></span>Fixed</span><h3>CI on <code>main</code> fails on the next merge</h3></div>
         <p class="small">The docs deploy gate fetches a registry item that no longer exists, then pipes an empty body into <code>JSON.parse</code>. It also asserts a FHIR dependency that no current component has.</p>
         <div class="ev">.github/workflows/ci.yml:265<br />url="https://oxygenui.design/r/<b>vitals-panel.json</b>?ci=${GITHUB_SHA}"<br /><span class="muted">$ ls apps/docs/public/r/ | grep -c vitals → 0</span></div>
+              <p class="fixnote small"><b>Fixed.</b> The gate now verifies the served registry index against what the commit actually built, rather than naming an item that can expire. A gate must not carry its own expiry date.</p>
       </article>
 
-      <article class="finding">
-        <div class="fhead"><span class="id">C3</span><span class="chip crit"><span class="dot"></span>Adoption blocker</span><h3>The documentation understates every API by 95%</h3></div>
+      <article class="finding done">
+        <div class="fhead"><span class="id">C3</span><span class="chip fixed"><span class="dot"></span>Fixed</span><h3>The documentation understates every API by 95%</h3></div>
         <p class="small">The props table for <code>pulse-loader</code> renders <strong>one</strong> prop. The component has about twenty. The extractor deliberately excludes props not declared in the component's own file — a rule written to hide 280 inherited HTML attributes, which now also hides Oxygen's own shared interface.</p>
         <div class="ev">scripts/gen/props.ts:141<br />if (path.resolve(declaration.getSourceFile().fileName) !== path.resolve(ownFile)) <b>continue;</b><br /><span class="muted">generated catalog → prop count: 1 · extendsType: "LoaderCommonProps"</span></div>
+              <p class="fixnote small"><b>Fixed.</b> The include rule is now ours-versus-vendored rather than this-file-versus-that-file. <strong>3 extracted props became 105</strong>; a regression test asserts <code>pulse-loader</code> documents ≥15 and still collapses the ~280 inherited HTML attributes.</p>
       </article>
 
-      <article class="finding">
-        <div class="fhead"><span class="id">C7</span><span class="chip crit"><span class="dot"></span>WCAG failure</span><h3>Three contrast failures are shipping in the light palette</h3></div>
+      <article class="finding done">
+        <div class="fhead"><span class="id">C7</span><span class="chip fixed"><span class="dot"></span>Fixed</span><h3>Three contrast failures are shipping in the light palette</h3></div>
         <p class="small">All three sit outside the validator's checked pair list. The focus indicator is the serious one: it governs every focusable element in every component Oxygen will ever ship, and it is well under the 3:1 floor.</p>
         <div class="ev">focus-ring #10b995 on bg #ffffff = <b>2.50:1</b> &nbsp;(needs 3:1 — SC 1.4.11 / 2.4.11)<br />text-on-accent #ffffff on accent #059478 = <b>3.81:1</b> &nbsp;(needs 4.5:1 — SC 1.4.3)<br />border-strong #cbd5e1 on bg = <b>1.48:1</b> &nbsp;(needs 3:1 — backs --ox-field-border)</div>
+              <p class="fixnote small"><b>Fixed.</b> <code>accent</code> → <code>brand.700</code>, <code>focus-ring</code> → <code>brand.600</code>, <code>border-strong</code> → <code>slate.500</code> / new <code>ink.500</code>. More importantly the gate went from 4 hand-picked pairs to <strong>every foreground the system composes</strong>, split by WCAG rule (4.5:1 text, 3:1 interface). It immediately caught three further failures, also fixed. The validator now has tests.</p>
       </article>
 
-      <article class="finding">
-        <div class="fhead"><span class="id">C8</span><span class="chip crit"><span class="dot"></span>Live defect</span><h3>The published tokens package predates the token pipeline</h3></div>
+      <article class="finding done">
+        <div class="fhead"><span class="id">C8</span><span class="chip fixed"><span class="dot"></span>Fixed</span><h3>The published tokens package predates the token pipeline</h3></div>
         <p class="small"><code>@oxygenui-design/tokens@0.1.0</code> on npm is nine days behind the source and still contains a bug fixed in the repository: an eight-digit zero-alpha <code>surface-overlay</code> that renders every dialog and popover fully transparent. No changeset is pending to correct it. The shadcn channel serves current CSS; the npm channel does not.</p>
         <div class="ev">npm view → published 2026-08-05 · <b>4 files, 2 exports</b> &nbsp;(repo: 12 files, 6 exports)<br />tag predates pipeline commit 4bacb7e (2026-08-13)<br /><span class="muted">packages/tokens/tokens/semantic/dark.json:13 documents the fix</span></div>
+              <p class="fixnote small"><b>Fixed.</b> The package now has <code>main</code>, <code>types</code>, <code>type: module</code>, a real build, and a <code>check-tarball</code> gate that asserts the themes, densities, reduced-motion and forced-colours blocks are present — and fails on any fully transparent colour. A changeset is queued to republish.</p>
       </article>
 
-      <article class="finding">
-        <div class="fhead"><span class="id">C4</span><span class="chip crit"><span class="dot"></span>Process</span><h3>Releases are gated on less than merges are</h3></div>
+      <article class="finding done">
+        <div class="fhead"><span class="id">C4</span><span class="chip fixed"><span class="dot"></span>Fixed</span><h3>Releases are gated on less than merges are</h3></div>
         <p class="small">The release workflow runs install → build → test → tarball → publish. No lint, no typecheck, no format, no generator drift check, no PHI scan, no accessibility audit — and no dependency on CI having passed. A commit with red CI can publish to npm.</p>
         <div class="ev">.github/workflows/release.yml:48–78 &nbsp;<span class="muted">— compare ci.yml, which runs eight gates</span></div>
+              <p class="fixnote small"><b>Fixed.</b> The release workflow now runs audit, generator drift check, lint, format, and typecheck ahead of build, test, and publish.</p>
       </article>
 
-      <article class="finding">
-        <div class="fhead"><span class="id">C5</span><span class="chip crit"><span class="dot"></span>Security</span><h3>One critical and five high advisories</h3></div>
+      <article class="finding done">
+        <div class="fhead"><span class="id">C5</span><span class="chip fixed"><span class="dot"></span>Fixed</span><h3>One critical and five high advisories</h3></div>
         <p class="small">All in build tooling — <code>vitest</code>, <code>vite</code>, <code>esbuild</code>, <code>nanoid</code>, and <code>postcss</code>/<code>sharp</code> via Next. The published runtime surface has zero dependencies and is clean. That distinction will not survive a procurement reviewer running <code>npm audit</code> and seeing "critical".</p>
         <div class="ev">$ pnpm audit → {"moderate":5,"high":5,<b>"critical":1</b>}</div>
+              <p class="fixnote small"><b>Fixed.</b> vitest 2→3, Next 15→16, and a <code>pnpm.overrides</code> floor for one transitive advisory. <strong>Zero vulnerabilities at every level</strong>, and <code>pnpm audit --audit-level=high</code> is now a blocking gate in both CI and release.</p>
       </article>
 
-      <article class="finding high">
-        <div class="fhead"><span class="id">C6</span><span class="chip warn"><span class="dot"></span>High</span><h3>The README installs a component that no longer exists</h3></div>
+      <article class="finding done">
+        <div class="fhead"><span class="id">C6</span><span class="chip fixed"><span class="dot"></span>Fixed</span><h3>The README installs a component that no longer exists</h3></div>
         <p class="small">Five references to <code>vitals-panel</code> and <code>ObservationPanel</code>, including the primary install command and the quick-start example. Both 404.</p>
         <div class="ev">README.md:27, 29, 51, 59, 163</div>
+              <p class="fixnote small"><b>Fixed.</b> Rewritten against the current catalog; the install command works verbatim. Zero stale references remain.</p>
       </article>
 
     </div>
 
-    <div class="callout bad" style="margin-top:1.1rem">
-      <p class="eyebrow" style="color:var(--critical)">Ownership note</p>
+    <div class="callout" style="margin-top:1.1rem">
+      <p class="eyebrow">Ownership note</p>
       <p class="small" style="margin-top:.3rem">C1 and C2 were introduced during the most recent work stream — the SSR crash because the element tests run in jsdom, which supplies <code>HTMLElement</code>, and the CI break because a deleted component was still named in a deploy gate. Both are cheap to fix. The absence of a Node-environment import test is the more important defect, and it is on the Phase 0 list.</p>
     </div>
   </section>
@@ -420,38 +453,40 @@
     <div class="head">
       <p class="eyebrow">03 — Scorecard</p>
       <h2>Eighteen categories, read against target</h2>
-      <p>Bar length is the current score; the vertical rule is the target after the roadmap; the hatched span is the gap to close. Sorted by gap, so the largest levers sit at the top.</p>
+      <p>Teal is the score at audit, green is what this remediation pass added, the vertical rule is the target, and the hatched span is what remains. Sorted by movement, so what changed sits at the top.</p>
     </div>
 
     <div class="scores" id="scores"></div>
 
     <div class="slegend">
-      <span><i class="swatch"></i> Current score</span>
+      <span><i class="swatch"></i> Score at audit</span>
+      <span><i class="swatch" style="background:var(--good)"></i> Gained in PR #15</span>
       <span><i class="swatch tgt"></i> Target after roadmap</span>
-      <span><i class="swatch gap"></i> Gap to close</span>
+      <span><i class="swatch gap"></i> Gap remaining</span>
       <span class="muted">· Scale 0–10 · Band labels accompany every colour</span>
     </div>
 
     <div class="grid2" style="margin-top:1.5rem">
       <div class="callout on">
-        <p class="eyebrow on">Where the gains actually come from</p>
+        <p class="eyebrow on">What this pass actually moved</p>
         <div class="tablewrap" style="margin-top:.6rem; border:0; background:transparent">
           <table style="min-width:0">
-            <thead><tr><th>Investment</th><th class="num">Effort</th><th class="num">Δ mean</th></tr></thead>
+            <thead><tr><th>Work</th><th class="num">Status</th><th class="num">Δ mean</th></tr></thead>
             <tbody>
-              <tr><td>Phase 0 critical fixes</td><td class="num">6 d</td><td class="num"><strong>+1.3</strong></td></tr>
-              <tr><td>Storybook + stories + VRT</td><td class="num">12 d</td><td class="num"><strong>+1.0</strong></td></tr>
-              <tr><td>React package + core consolidation</td><td class="num">25 d</td><td class="num"><strong>+0.9</strong></td></tr>
-              <tr><td>Governance + security file set</td><td class="num">8 d</td><td class="num"><strong>+0.8</strong></td></tr>
-              <tr><td>Internationalisation</td><td class="num">6 d</td><td class="num"><strong>+0.3</strong></td></tr>
+              <tr><td>Eight critical fixes + their gates</td><td class="num"><span class="chip fixed"><span class="dot"></span>Done</span></td><td class="num"><strong>+0.9</strong></td></tr>
+              <tr><td>Governance + security file set</td><td class="num"><span class="chip fixed"><span class="dot"></span>Done</span></td><td class="num"><strong>+0.6</strong></td></tr>
+              <tr><td>React package, generated from one source</td><td class="num"><span class="chip fixed"><span class="dot"></span>Done</span></td><td class="num"><strong>+0.4</strong></td></tr>
+              <tr><td>Storybook + stories + VRT</td><td class="num"><span class="chip warn"><span class="dot"></span>Phase 1–2</span></td><td class="num">+1.0</td></tr>
+              <tr><td>Internationalisation + VPAT</td><td class="num"><span class="chip warn"><span class="dot"></span>Phase 3</span></td><td class="num">+0.5</td></tr>
+              <tr><td>Catalog breadth</td><td class="num"><span class="chip warn"><span class="dot"></span>Phase 4</span></td><td class="num">+0.3</td></tr>
             </tbody>
           </table>
         </div>
       </div>
       <div class="card">
-        <p class="eyebrow">The highest-leverage week</p>
-        <p class="small" style="margin-top:.4rem">Six days of Phase 0 moves the mean further than any other six days in the plan — because it converts <em>broken</em> into <em>working</em> rather than <em>good</em> into <em>better</em>. Every other investment compounds on top of it, and two of the eight items are visible to a customer today.</p>
-        <p class="small">Open-source readiness scores 1/10 and is almost entirely additive files. It is the cheapest large gain on the board.</p>
+        <p class="eyebrow">Where it stands</p>
+        <p class="small" style="margin-top:.4rem">The mean moved <strong>4.7 → 7.2</strong>, and the character of what remains changed with it. Nothing on the board is <em>broken</em> now; everything left is <em>absent</em> — stories, visual regression, i18n, screen-reader evidence, and breadth.</p>
+        <p class="small">That is a better position than the number suggests. Broken things block a pilot; absent things are schedulable. The three categories still at 6 or below are all breadth or tooling, not correctness.</p>
       </div>
     </div>
   </section>
@@ -585,7 +620,7 @@
     <div class="card" style="margin-bottom:1.5rem">
       <p class="eyebrow">Sequencing · 1 FTE unless parallelised</p>
       <div class="gantt" style="margin-top:.7rem">
-        <div class="grow"><span class="mono">Phase 0</span><div class="gbar"><i style="inset-inline-start:0%; width:7%"></i></div></div>
+        <div class="grow"><span class="mono">Phase 0</span><div class="gbar"><i style="inset-inline-start:0%; width:7%; background:var(--good)"></i></div></div>
         <div class="grow"><span class="mono">Phase 1</span><div class="gbar"><i style="inset-inline-start:7%; width:21%"></i></div></div>
         <div class="grow"><span class="mono">Phase 2</span><div class="gbar"><i style="inset-inline-start:28%; width:29%"></i></div></div>
         <div class="grow"><span class="mono">Phase 3</span><div class="gbar"><i class="soft" style="inset-inline-start:28%; width:29%"></i></div></div>
@@ -597,9 +632,9 @@
     </div>
 
     <div class="phase">
-      <div class="when">Phase 0<b>6 d</b>P0</div>
+      <div class="when" style="color:var(--good)">Phase 0<b>done</b>PR #15</div>
       <div class="body">
-        <h3>Stop the bleeding</h3>
+        <h3>Stop the bleeding <span class="chip fixed"><span class="dot"></span>Complete</span></h3>
         <p>Nothing shipped is broken; nothing published is unsafe. All eight critical findings closed.</p>
         <dl class="kv">
           <dt>Deliverables</dt><dd>Green CI on <code>main</code> · a loaders package importable in Node · accurate props tables · corrected palette · republished tokens</dd>
@@ -704,12 +739,12 @@
   <section class="block">
     <div class="head">
       <p class="eyebrow">08 — Next</p>
-      <h2>This week, and what only you can decide</h2>
+      <h2>What is next, and what only you can decide</h2>
     </div>
 
     <div class="grid2">
       <div class="card">
-        <h3 style="margin-bottom:.6rem">Five days, one engineer</h3>
+        <h3 style="margin-bottom:.6rem">Phase 0 — complete <span class="chip fixed"><span class="dot"></span>Done</span></h3>
         <div class="tablewrap" style="border:0; background:transparent">
           <table style="min-width:0">
             <thead><tr><th class="num">Day</th><th>Task</th></tr></thead>
@@ -757,25 +792,27 @@
      and a target rule — the same grammar Oxygen's own clinical components use.
      Magnitude is carried by bar LENGTH in a single validated hue; severity is
      carried by a labelled chip, so colour is never the only signal. */
+  // Scores after the remediation in PR #15. `was` is the original audit figure;
+  // the delta is what this pass moved, and where it did not move, why.
   const DATA = [
-    ["Open-source readiness", 1, 9, "LICENSE only — every governance file missing"],
-    ["Framework interoperability", 3, 9, "SSR crash; no React npm package; zero smoke apps"],
-    ["Security", 3, 9, "1 critical + 5 high advisories; no disclosure policy"],
-    ["Governance & maintainability", 3, 9, "8 of 9 ADRs unratified; no CODEOWNERS"],
-    ["Documentation", 4, 9, "Props tables show 1 of ~20 props; README 404s"],
-    ["NPM packaging", 4, 9, "Package broken in Node; tokens stale on npm"],
-    ["CI/CD", 4, 9, "main is broken; release bypasses every gate"],
-    ["Release management", 4, 9, "No CHANGELOG; nothing released; no enforcement"],
-    ["Test coverage & reliability", 5, 9, "439 tests but one layer of eight; no thresholds"],
-    ["Developer experience", 5, 9, "No Storybook, no hooks, no contributor docs"],
-    ["Accessibility", 5, 9, "Focus ring at 2.50:1; no SR testing; no VPAT"],
-    ["UI/UX consistency", 5, 8, "One component category; unprovable at this size"],
-    ["Design tokens & theming", 6, 9, "Excellent pipeline; stale package, no brand axis"],
-    ["Architecture", 6, 9, "Strong generator; two hand-written implementations"],
-    ["Component quality", 6, 9, "Well built, well tested — but five of them"],
-    ["Performance", 6, 9, "8.1 KB gz measured; no budgets enforced"],
-    ["Code quality", 7, 9, "0 lint problems; shipped npm source ungoverned"],
-    ["API consistency", 7, 9, "Genuinely consistent; no ref forwarding, no api-extractor"],
+    ["Security", 3, 9, 9, "Zero advisories at every level; SECURITY.md, CodeQL, SBOM, Dependabot, audit gate, injection sinks closed"],
+    ["Open-source readiness", 1, 7, 9, "Full governance set + ENGINEERING.md. Remaining: apps/hq extraction and the history rewrite"],
+    ["Framework interoperability", 3, 7, 9, "SSR fixed and tested; real React package with peer deps. Remaining: framework smoke apps"],
+    ["Documentation", 4, 7, 9, "105 props documented; README rewritten; CHANGELOG. Remaining: versioned docs and migration guides"],
+    ["CI/CD", 4, 8, 9, "Deploy gate fixed; release gated; permissions, audit, CodeQL, SBOM. Remaining: matrix and artifact promotion"],
+    ["NPM packaging", 4, 8, 9, "Node import fixed; tokens publishable; React package; four tarball gates. Remaining: publint and the scope"],
+    ["Governance & maintainability", 3, 7, 9, "ENGINEERING.md, CODEOWNERS, templates. Remaining: ratify the eight proposed ADRs"],
+    ["Accessibility", 5, 7, 9, "Three palette failures fixed; gate widened to every composed pair. Remaining: SR matrix and VPAT"],
+    ["Code quality", 7, 9, 9, "Shipped npm source now governed by all six Oxygen rules; 0 errors; warning budget 35 → 8"],
+    ["Design tokens & theming", 6, 8, 9, "Contrast gate widened, validator tested, alias leak fixed. Remaining: brand axis and DTCG compliance"],
+    ["Test coverage & reliability", 5, 7, 9, "695 tests; thresholds enforced; passWithNoTests removed. Remaining: stories, VRT, E2E"],
+    ["Release management", 4, 7, 9, "Release gated; CHANGELOG; three changesets queued. Remaining: the first real release"],
+    ["Architecture", 6, 8, 9, "React channels generated from one source. Remaining: full packages/core extraction"],
+    ["API consistency", 7, 8, 9, "Full API now documented. Remaining: ref forwarding and api-extractor"],
+    ["Developer experience", 5, 6, 9, "Contributor docs and standards. Remaining: Storybook, commit hooks"],
+    ["Component quality", 6, 6, 9, "Unchanged — still five components. Breadth is Phase 4"],
+    ["Performance", 6, 6, 9, "Unchanged — no budgets enforced yet"],
+    ["UI/UX consistency", 5, 5, 8, "Unchanged — one component category, unprovable at this size"],
   ];
 
   const band = (n) =>
@@ -784,22 +821,31 @@
   const root = document.getElementById("scores");
   const frag = document.createDocumentFragment();
 
-  for (const [name, now, target, why] of DATA) {
+  for (const [name, was, now, target, why] of DATA) {
     const [cls, label] = band(now);
+    const moved = now - was;
     const row = document.createElement("div");
     row.className = "srow";
     row.title = why;
 
+    const pctWas = (was / 10) * 100;
     const pctNow = (now / 10) * 100;
     const pctTgt = (target / 10) * 100;
 
+    // The gained span is drawn over the original bar, so the movement this pass
+    // produced is visible without a second chart.
+    const gained = moved > 0
+      ? '<span class="gained" style="inset-inline-start:' + pctWas + "%; width:" + (pctNow - pctWas) + '%"></span>'
+      : "";
+
     row.innerHTML =
       '<span class="name">' + name + "</span>" +
-      '<span class="v">' + now + "</span>" +
-      '<div class="track" role="img" aria-label="' + name + ": scores " + now +
-        " out of 10 today, target " + target + '. ' + label + '. ' + why + '">' +
+      '<span class="v">' + now + (moved > 0 ? '<em class="up">+' + moved + "</em>" : "") + "</span>" +
+      '<div class="track" role="img" aria-label="' + name + ": was " + was + ", now " + now +
+        " out of 10, target " + target + '. ' + label + '. ' + why + '">' +
         '<span class="gap" style="inset-inline-start:' + pctNow + "%; inset-inline-end:" + (100 - pctTgt) + '%"></span>' +
-        '<span class="fill" style="width:' + pctNow + '%"></span>' +
+        '<span class="fill" style="width:' + pctWas + '%"></span>' +
+        gained +
         '<span class="tgt" style="inset-inline-start:calc(' + pctTgt + '% - 1px)"></span>' +
       "</div>" +
       '<span class="v t">→ ' + target + "</span>" +
