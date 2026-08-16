@@ -1,0 +1,2948 @@
+<meta charset="utf-8" />
+<title>Oxygen Signature</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<style>
+  /* ------------------------------------------------------------------ */
+  /* Document tokens — Oxygen's own identity.                            */
+  /* The mockups further down deliberately do NOT use these: they use    */
+  /* Ant Design's real token values, so what you are judging is antd,    */
+  /* not a teal impression of it.                                        */
+  /* ------------------------------------------------------------------ */
+  :root {
+    --paper: #f6faf8;
+    --surface: #ffffff;
+    --surface-2: #eef4f2;
+    --ink: #0e1c19;
+    --ink-2: #33473f;
+    --muted: #5d716b;
+    --rule: #d8e4df;
+    --rule-2: #c3d3cd;
+    --accent: #059478;
+    --accent-2: #0bb08f;
+    --accent-soft: #e6f7f1;
+    --accent-ink: #045b4b;
+    --stage: #0b1716;
+    --stage-2: #10201e;
+    --stage-fg: #dff3ec;
+    --stage-muted: #7f9c94;
+    --stage-rule: #1c3230;
+    --warn: #b7791f;
+    --warn-soft: #fbf3e0;
+    --warn-rule: #e4c98a;
+    --bad: #b4423a;
+    --bad-soft: #fbeceb;
+    --bad-rule: #e8b5b0;
+    --ok: #1f8f5f;
+    --ok-soft: #e6f6ee;
+    --ok-rule: #a9dcc3;
+    --code-bg: #0f1e1c;
+    --code-fg: #d9ece6;
+    --code-k: #7ee0cd;
+    --code-s: #f2c98a;
+    --code-c: #7f9c94;
+    --shadow: 0 1px 2px rgb(14 28 25 / 0.06), 0 8px 24px -12px rgb(14 28 25 / 0.18);
+    --font-display: "Avenir Next", "Segoe UI Variable Display", "Helvetica Neue", ui-sans-serif, system-ui, sans-serif;
+    --font-body: -apple-system, BlinkMacSystemFont, "Segoe UI Variable Text", "Segoe UI", ui-sans-serif, system-ui, sans-serif;
+    --font-mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper: #0b1514;
+      --surface: #101d1b;
+      --surface-2: #142522;
+      --ink: #e7f2ee;
+      --ink-2: #c3d6d0;
+      --muted: #93aca5;
+      --rule: #1f312e;
+      --rule-2: #2c423e;
+      --accent: #5fe0c9;
+      --accent-2: #8aeedd;
+      --accent-soft: #10302b;
+      --accent-ink: #b8f3e7;
+      --stage: #070f0e;
+      --stage-2: #0d1a19;
+      --stage-fg: #dff3ec;
+      --stage-muted: #7f9c94;
+      --stage-rule: #1a2d2b;
+      --warn: #e2b04a;
+      --warn-soft: #2a2410;
+      --warn-rule: #4d4020;
+      --bad: #f0928a;
+      --bad-soft: #2c1614;
+      --bad-rule: #552a26;
+      --ok: #5fd39a;
+      --ok-soft: #10281d;
+      --ok-rule: #23503a;
+      --code-bg: #0a1413;
+      --code-fg: #d9ece6;
+      --shadow: 0 1px 2px rgb(0 0 0 / 0.4), 0 10px 30px -14px rgb(0 0 0 / 0.6);
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper: #0b1514;
+    --surface: #101d1b;
+    --surface-2: #142522;
+    --ink: #e7f2ee;
+    --ink-2: #c3d6d0;
+    --muted: #93aca5;
+    --rule: #1f312e;
+    --rule-2: #2c423e;
+    --accent: #5fe0c9;
+    --accent-2: #8aeedd;
+    --accent-soft: #10302b;
+    --accent-ink: #b8f3e7;
+    --stage: #070f0e;
+    --stage-2: #0d1a19;
+    --stage-fg: #dff3ec;
+    --stage-muted: #7f9c94;
+    --stage-rule: #1a2d2b;
+    --warn: #e2b04a;
+    --warn-soft: #2a2410;
+    --warn-rule: #4d4020;
+    --bad: #f0928a;
+    --bad-soft: #2c1614;
+    --bad-rule: #552a26;
+    --ok: #5fd39a;
+    --ok-soft: #10281d;
+    --ok-rule: #23503a;
+    --code-bg: #0a1413;
+    --code-fg: #d9ece6;
+    --shadow: 0 1px 2px rgb(0 0 0 / 0.4), 0 10px 30px -14px rgb(0 0 0 / 0.6);
+    color-scheme: dark;
+  }
+
+  /* ------------------------------------------------------------------ */
+  /* Base                                                                */
+  /* ------------------------------------------------------------------ */
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+  a { color: var(--accent-ink); text-decoration-color: color-mix(in oklab, var(--accent) 50%, transparent); text-underline-offset: 3px; }
+  a:hover { text-decoration-color: var(--accent); }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+  h1, h2, h3, h4 { font-family: var(--font-display); letter-spacing: -0.015em; text-wrap: balance; margin: 0; }
+  h1 { font-size: clamp(2.2rem, 4.5vw, 3.4rem); line-height: 1.05; font-weight: 600; }
+  h2 { font-size: 1.75rem; line-height: 1.2; font-weight: 600; }
+  h3 { font-size: 1.2rem; line-height: 1.3; font-weight: 600; }
+  h4 { font-size: 1rem; line-height: 1.35; font-weight: 600; }
+  p { margin: 0 0 1rem; }
+  ul, ol { margin: 0 0 1rem; padding-inline-start: 1.35rem; }
+  li { margin-bottom: 0.4rem; }
+  li::marker { color: var(--accent); }
+  strong { font-weight: 600; color: var(--ink); }
+  code { font-family: var(--font-mono); font-size: 0.86em; background: var(--surface-2); padding: 0.1em 0.35em; border-radius: 4px; }
+
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 0 clamp(1rem, 4vw, 2.5rem); }
+  .prose { max-width: 68ch; }
+
+  /* ------------------------------------------------------------------ */
+  /* Header                                                              */
+  /* ------------------------------------------------------------------ */
+  header.hero {
+    padding: clamp(3rem, 9vw, 6.5rem) 0 clamp(2rem, 5vw, 3.5rem);
+    border-bottom: 1px solid var(--rule);
+    background:
+      radial-gradient(1100px 420px at 12% -12%, color-mix(in oklab, var(--accent) 11%, transparent), transparent 62%),
+      var(--paper);
+  }
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--accent-ink);
+    margin-bottom: 1.1rem;
+  }
+  .hero .lede { font-size: clamp(1.05rem, 2vw, 1.3rem); color: var(--ink-2); max-width: 62ch; margin-top: 1.25rem; }
+  .hero-meta { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: 2rem; }
+  .pill {
+    font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.05em;
+    padding: 0.35rem 0.7rem; border-radius: 999px;
+    border: 1px solid var(--rule-2); background: var(--surface); color: var(--muted);
+  }
+  .pill.on { border-color: color-mix(in oklab, var(--accent) 45%, transparent); background: var(--accent-soft); color: var(--accent-ink); }
+
+  /* ------------------------------------------------------------------ */
+  /* Table of contents                                                   */
+  /* ------------------------------------------------------------------ */
+  nav.toc { border-bottom: 1px solid var(--rule); background: var(--surface); position: sticky; top: 0; z-index: 40; }
+  nav.toc .wrap { display: flex; gap: 0.25rem; overflow-x: auto; padding-block: 0.5rem; scrollbar-width: thin; }
+  nav.toc a {
+    flex: 0 0 auto; font-size: 0.8rem; padding: 0.35rem 0.65rem; border-radius: 6px;
+    color: var(--muted); text-decoration: none; white-space: nowrap;
+  }
+  nav.toc a:hover { background: var(--surface-2); color: var(--ink); }
+
+  /* ------------------------------------------------------------------ */
+  /* Sections                                                            */
+  /* ------------------------------------------------------------------ */
+  section { padding: clamp(2.75rem, 6vw, 4.5rem) 0; border-bottom: 1px solid var(--rule); scroll-margin-top: 3.5rem; }
+  section > .wrap > .sec-head { margin-bottom: 2rem; }
+  .sec-num {
+    font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.14em;
+    color: var(--accent); text-transform: uppercase; display: block; margin-bottom: 0.5rem;
+  }
+  .sec-head p { color: var(--ink-2); max-width: 66ch; margin-top: 0.75rem; }
+
+  /* ------------------------------------------------------------------ */
+  /* Cards, callouts, grids                                              */
+  /* ------------------------------------------------------------------ */
+  .grid { display: grid; gap: 1rem; }
+  .g2 { grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
+  .g3 { grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); }
+  .g4 { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
+
+  .card {
+    background: var(--surface); border: 1px solid var(--rule);
+    border-radius: 12px; padding: 1.25rem 1.35rem; box-shadow: var(--shadow);
+  }
+  .card h4 { margin-bottom: 0.5rem; }
+  .card p:last-child, .card ul:last-child { margin-bottom: 0; }
+  .card .k { font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); display: block; margin-bottom: 0.4rem; }
+
+  .note {
+    border-inline-start: 3px solid var(--accent);
+    background: var(--accent-soft); color: var(--accent-ink);
+    padding: 1rem 1.15rem; border-radius: 0 10px 10px 0; margin: 1.5rem 0;
+  }
+  .note.warn { border-color: var(--warn); background: var(--warn-soft); color: var(--ink); }
+  .note.bad { border-color: var(--bad); background: var(--bad-soft); color: var(--ink); }
+  .note.ok { border-color: var(--ok); background: var(--ok-soft); color: var(--ink); }
+  .note p:last-child { margin-bottom: 0; }
+  .note .lbl { font-family: var(--font-mono); font-size: 0.68rem; letter-spacing: 0.12em; text-transform: uppercase; display: block; margin-bottom: 0.4rem; opacity: 0.85; }
+
+  /* ------------------------------------------------------------------ */
+  /* Tables                                                              */
+  /* ------------------------------------------------------------------ */
+  .tw { overflow-x: auto; border: 1px solid var(--rule); border-radius: 12px; background: var(--surface); margin: 1.5rem 0; }
+  table { border-collapse: collapse; width: 100%; font-size: 0.88rem; min-width: 560px; }
+  th, td { text-align: start; padding: 0.7rem 0.9rem; border-bottom: 1px solid var(--rule); vertical-align: top; }
+  th { font-family: var(--font-mono); font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); background: var(--surface-2); position: sticky; top: 0; }
+  tr:last-child td { border-bottom: 0; }
+  td code { white-space: nowrap; }
+  .num { font-variant-numeric: tabular-nums; }
+
+  /* ------------------------------------------------------------------ */
+  /* Code                                                                */
+  /* ------------------------------------------------------------------ */
+  pre {
+    background: var(--code-bg); color: var(--code-fg); border-radius: 12px;
+    padding: 1.1rem 1.25rem; overflow-x: auto; font-family: var(--font-mono);
+    font-size: 0.8rem; line-height: 1.65; margin: 1.25rem 0; border: 1px solid var(--stage-rule);
+  }
+  pre code { background: none; padding: 0; font-size: inherit; color: inherit; }
+  .c-k { color: var(--code-k); }
+  .c-s { color: var(--code-s); }
+  .c-c { color: var(--code-c); font-style: italic; }
+
+  /* ------------------------------------------------------------------ */
+  /* Figure frame for the mockups                                        */
+  /* ------------------------------------------------------------------ */
+  figure { margin: 1.75rem 0; }
+  figcaption {
+    font-size: 0.82rem; color: var(--muted); margin-top: 0.75rem;
+    padding-inline-start: 0.9rem; border-inline-start: 2px solid var(--rule-2);
+  }
+  figcaption b { color: var(--ink-2); font-weight: 600; }
+  .stage {
+    background:
+      linear-gradient(var(--surface-2) 0 0) padding-box,
+      var(--surface);
+    border: 1px solid var(--rule); border-radius: 14px;
+    padding: clamp(1rem, 3vw, 2rem); overflow-x: auto;
+  }
+  .stage.dark { background: #1f1f1f; border-color: #303030; }
+
+  /* ------------------------------------------------------------------ */
+  /* ANT DESIGN mockup primitives — real antd v5 token values.           */
+  /* Kept in their own namespace so the document's teal never leaks in.  */
+  /* ------------------------------------------------------------------ */
+  .antd {
+    --a-primary: #1677ff;
+    --a-primary-hover: #4096ff;
+    --a-primary-bg: #e6f4ff;
+    --a-primary-border: #91caff;
+    --a-success: #52c41a;
+    --a-success-bg: #f6ffed;
+    --a-success-border: #b7eb8f;
+    --a-warning: #faad14;
+    --a-warning-bg: #fffbe6;
+    --a-warning-border: #ffe58f;
+    --a-error: #ff4d4f;
+    --a-error-bg: #fff2f0;
+    --a-error-border: #ffccc7;
+    --a-text: rgba(0, 0, 0, 0.88);
+    --a-text-2: rgba(0, 0, 0, 0.65);
+    --a-text-3: rgba(0, 0, 0, 0.45);
+    --a-text-4: rgba(0, 0, 0, 0.25);
+    --a-border: #d9d9d9;
+    --a-border-2: #f0f0f0;
+    --a-bg: #ffffff;
+    --a-bg-layout: #f5f5f5;
+    --a-fill-3: rgba(0, 0, 0, 0.04);
+    --a-fill-2: rgba(0, 0, 0, 0.06);
+    --a-radius: 6px;
+    --a-radius-lg: 8px;
+    --a-radius-sm: 4px;
+    --a-h: 32px;
+    --a-h-lg: 40px;
+    --a-h-sm: 24px;
+    --a-shadow: 0 6px 16px 0 rgb(0 0 0 / 0.08), 0 3px 6px -4px rgb(0 0 0 / 0.12), 0 9px 28px 8px rgb(0 0 0 / 0.05);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+    font-size: 14px;
+    line-height: 1.5714;
+    color: var(--a-text);
+  }
+  .antd.dark {
+    --a-primary: #1668dc;
+    --a-primary-hover: #3c89e8;
+    --a-primary-bg: #111a2c;
+    --a-primary-border: #15325b;
+    --a-success: #49aa19;
+    --a-success-bg: #162312;
+    --a-success-border: #274916;
+    --a-warning: #d89614;
+    --a-warning-bg: #2b2111;
+    --a-warning-border: #594214;
+    --a-error: #dc4446;
+    --a-error-bg: #2c1618;
+    --a-error-border: #5b2526;
+    --a-text: rgba(255, 255, 255, 0.85);
+    --a-text-2: rgba(255, 255, 255, 0.65);
+    --a-text-3: rgba(255, 255, 255, 0.45);
+    --a-text-4: rgba(255, 255, 255, 0.25);
+    --a-border: #424242;
+    --a-border-2: #303030;
+    --a-bg: #141414;
+    --a-bg-layout: #000000;
+    --a-fill-3: rgba(255, 255, 255, 0.08);
+    --a-fill-2: rgba(255, 255, 255, 0.12);
+  }
+
+  /* Modal */
+  .a-modal {
+    background: var(--a-bg); border-radius: var(--a-radius-lg);
+    box-shadow: var(--a-shadow); width: 100%; max-width: 640px; margin: 0 auto;
+    overflow: hidden;
+  }
+  .a-modal.wide { max-width: 780px; }
+  .a-modal-head {
+    display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem;
+    padding: 16px 24px; border-bottom: 1px solid var(--a-border-2);
+  }
+  .a-modal-title { font-size: 16px; font-weight: 600; line-height: 1.5; color: var(--a-text); }
+  .a-modal-sub { font-size: 12px; color: var(--a-text-3); margin-top: 2px; }
+  .a-modal-x { color: var(--a-text-3); font-size: 16px; line-height: 1; cursor: default; padding: 4px; border-radius: var(--a-radius-sm); }
+  .a-modal-body { padding: 20px 24px; }
+  .a-modal-foot {
+    display: flex; align-items: center; justify-content: flex-end; gap: 8px;
+    padding: 12px 24px 16px; border-top: 1px solid var(--a-border-2);
+  }
+  .a-modal-foot.split { justify-content: space-between; }
+
+  /* Buttons */
+  .a-btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+    height: var(--a-h); padding: 0 15px; border-radius: var(--a-radius);
+    border: 1px solid var(--a-border); background: var(--a-bg); color: var(--a-text);
+    font-size: 14px; font-weight: 400; white-space: nowrap;
+  }
+  .a-btn.primary { background: var(--a-primary); border-color: var(--a-primary); color: #fff; }
+  .a-btn.primary.dis { background: var(--a-primary); border-color: var(--a-primary); opacity: 0.45; }
+  .a-btn.text { border-color: transparent; background: transparent; color: var(--a-text-2); }
+  .a-btn.link { border-color: transparent; background: transparent; color: var(--a-primary); }
+  .a-btn.danger { border-color: var(--a-error); color: var(--a-error); }
+  .a-btn.dis { color: var(--a-text-4); border-color: var(--a-border); background: var(--a-fill-3); }
+  .a-btn.sm { height: var(--a-h-sm); padding: 0 7px; font-size: 12px; }
+  .a-btn.lg { height: var(--a-h-lg); padding: 0 15px; font-size: 16px; }
+
+  /* Tabs */
+  .a-tabs { border-bottom: 1px solid var(--a-border-2); display: flex; gap: 32px; }
+  .a-tab { padding: 12px 0; font-size: 14px; color: var(--a-text); display: flex; align-items: center; gap: 8px; position: relative; }
+  .a-tab.on { color: var(--a-primary); font-weight: 500; }
+  .a-tab.on::after { content: ""; position: absolute; inset-inline: 0; bottom: -1px; height: 2px; background: var(--a-primary); border-radius: 2px; }
+  .a-tab.off { color: var(--a-text-4); }
+
+  /* Signature surface */
+  .a-pad {
+    border: 1px solid var(--a-border); border-radius: var(--a-radius-lg);
+    background: var(--a-bg); overflow: hidden;
+  }
+  .a-pad-bar {
+    display: flex; align-items: center; gap: 4px;
+    padding: 8px 12px; border-bottom: 1px solid var(--a-border-2);
+    background: var(--a-fill-3);
+  }
+  .a-pad-bar .sp { flex: 1; }
+  .a-pad-bar .div { width: 1px; height: 16px; background: var(--a-border); margin: 0 6px; }
+  .a-pad-canvas { position: relative; height: 190px; display: grid; place-items: center; }
+  .a-pad-canvas .baseline {
+    position: absolute; inset-inline: 12%; bottom: 34%;
+    border-bottom: 1px solid var(--a-border);
+  }
+  .a-pad-canvas .cue {
+    position: absolute; inset-inline-start: 12%; bottom: calc(34% + 6px);
+    font-size: 12px; color: var(--a-text-4);
+  }
+  .a-pad-canvas .xmark {
+    position: absolute; inset-inline-start: calc(12% - 18px); bottom: calc(34% - 6px);
+    font-size: 15px; color: var(--a-text-3);
+  }
+
+  /* Form bits */
+  .a-label { display: block; font-size: 14px; color: var(--a-text); margin-bottom: 8px; }
+  .a-label .req { color: var(--a-error); font-family: SimSun, sans-serif; margin-inline-end: 4px; }
+  .a-input {
+    height: var(--a-h); border: 1px solid var(--a-border); border-radius: var(--a-radius);
+    padding: 4px 11px; display: flex; align-items: center; color: var(--a-text); background: var(--a-bg);
+  }
+  .a-input.ph { color: var(--a-text-4); }
+  .a-input.err { border-color: var(--a-error); }
+  .a-input.lg { height: var(--a-h-lg); font-size: 16px; }
+  .a-help { font-size: 14px; color: var(--a-error); margin-top: 4px; }
+  .a-extra { font-size: 14px; color: var(--a-text-3); margin-top: 4px; }
+  .a-select { justify-content: space-between; }
+  .a-radio { display: flex; align-items: flex-start; gap: 8px; padding: 6px 0; }
+  .a-radio .dot { width: 16px; height: 16px; border-radius: 50%; border: 1px solid var(--a-border); flex: 0 0 auto; margin-top: 3px; }
+  .a-radio.on .dot { border-color: var(--a-primary); border-width: 5px; }
+  .a-check { display: flex; align-items: flex-start; gap: 8px; padding: 4px 0; }
+  .a-check .box { width: 16px; height: 16px; border-radius: var(--a-radius-sm); border: 1px solid var(--a-border); flex: 0 0 auto; margin-top: 3px; }
+  .a-check.on .box { background: var(--a-primary); border-color: var(--a-primary); position: relative; }
+  .a-check.on .box::after { content: ""; position: absolute; inset-inline-start: 5px; top: 1.5px; width: 4px; height: 8px; border: 2px solid #fff; border-block-start: 0; border-inline-start: 0; transform: rotate(45deg); }
+
+  /* Alert */
+  .a-alert {
+    display: flex; gap: 8px; align-items: flex-start;
+    padding: 8px 12px; border-radius: var(--a-radius); font-size: 14px;
+    border: 1px solid var(--a-primary-border); background: var(--a-primary-bg); color: var(--a-text);
+  }
+  .a-alert.warning { border-color: var(--a-warning-border); background: var(--a-warning-bg); }
+  .a-alert.error { border-color: var(--a-error-border); background: var(--a-error-bg); }
+  .a-alert.success { border-color: var(--a-success-border); background: var(--a-success-bg); }
+  .a-alert .ic { flex: 0 0 auto; line-height: 1.5714; }
+
+  /* Tag */
+  .a-tag {
+    display: inline-flex; align-items: center; gap: 4px; height: 22px; padding: 0 7px;
+    font-size: 12px; line-height: 20px; border-radius: var(--a-radius-sm);
+    border: 1px solid var(--a-border); background: var(--a-fill-3); color: var(--a-text-2);
+  }
+  .a-tag.blue { border-color: var(--a-primary-border); background: var(--a-primary-bg); color: var(--a-primary); }
+  .a-tag.green { border-color: var(--a-success-border); background: var(--a-success-bg); color: var(--a-success); }
+  .a-tag.gold { border-color: var(--a-warning-border); background: var(--a-warning-bg); color: #d48806; }
+  .a-tag.red { border-color: var(--a-error-border); background: var(--a-error-bg); color: var(--a-error); }
+
+  /* Descriptions (the manifest block) */
+  .a-desc { border: 1px solid var(--a-border-2); border-radius: var(--a-radius-lg); overflow: hidden; }
+  .a-desc-head { padding: 12px 16px; border-bottom: 1px solid var(--a-border-2); display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .a-desc-row { display: grid; grid-template-columns: minmax(120px, 180px) 1fr; border-bottom: 1px solid var(--a-border-2); }
+  .a-desc-row:last-child { border-bottom: 0; }
+  .a-desc-row dt { padding: 10px 16px; background: var(--a-fill-3); color: var(--a-text-2); font-size: 14px; }
+  .a-desc-row dd { padding: 10px 16px; margin: 0; color: var(--a-text); font-size: 14px; }
+
+  /* Upload dragger */
+  .a-dragger {
+    border: 1px dashed var(--a-border); border-radius: var(--a-radius-lg);
+    background: var(--a-fill-3); padding: 32px 16px; text-align: center;
+  }
+  .a-dragger .big { font-size: 40px; color: var(--a-primary); line-height: 1; }
+  .a-dragger .t { font-size: 16px; color: var(--a-text); margin-top: 12px; }
+  .a-dragger .s { font-size: 14px; color: var(--a-text-3); margin-top: 4px; }
+
+  /* Annotation callouts over a mockup */
+  .anno { position: relative; }
+  .anno .mark {
+    position: absolute; z-index: 3;
+    width: 22px; height: 22px; border-radius: 50%;
+    background: var(--accent); color: #fff;
+    font-family: var(--font-mono); font-size: 11px; font-weight: 700;
+    display: grid; place-items: center;
+    box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent) 25%, transparent);
+  }
+  .anno .mark.bad { background: var(--bad); box-shadow: 0 0 0 3px color-mix(in oklab, var(--bad) 25%, transparent); }
+  .anno-key { margin-top: 1rem; display: grid; gap: 0.5rem; }
+  .anno-key li { display: flex; gap: 0.6rem; align-items: flex-start; font-size: 0.88rem; color: var(--ink-2); list-style: none; }
+  .anno-key .n {
+    flex: 0 0 auto; width: 20px; height: 20px; border-radius: 50%;
+    background: var(--accent); color: #fff; font-family: var(--font-mono);
+    font-size: 10px; font-weight: 700; display: grid; place-items: center; margin-top: 2px;
+  }
+  .anno-key .n.bad { background: var(--bad); }
+  .anno-key ul { padding: 0; margin: 0; }
+
+  /* The ink itself */
+  .ink-svg { display: block; }
+  .ink-svg path { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; }
+
+  /* Feature list */
+  .feat { display: grid; gap: 0; border: 1px solid var(--rule); border-radius: 12px; overflow: hidden; background: var(--surface); margin: 1.5rem 0; }
+  .feat > div { display: grid; grid-template-columns: 2.5rem 1fr; gap: 0.9rem; padding: 0.9rem 1.1rem; border-bottom: 1px solid var(--rule); }
+  .feat > div:last-child { border-bottom: 0; }
+  .feat .n { font-family: var(--font-mono); font-size: 0.75rem; color: var(--muted); padding-top: 0.15rem; }
+  .feat .t { font-weight: 600; margin-bottom: 0.15rem; }
+  .feat .d { font-size: 0.9rem; color: var(--ink-2); }
+  .feat .badge { font-family: var(--font-mono); font-size: 0.62rem; letter-spacing: 0.08em; text-transform: uppercase; padding: 0.1rem 0.4rem; border-radius: 4px; margin-inline-start: 0.5rem; vertical-align: 0.1em; }
+  .badge.new { background: var(--accent-soft); color: var(--accent-ink); border: 1px solid color-mix(in oklab, var(--accent) 35%, transparent); }
+  .badge.ref { background: var(--surface-2); color: var(--muted); border: 1px solid var(--rule-2); }
+  .badge.law { background: var(--warn-soft); color: var(--warn); border: 1px solid var(--warn-rule); }
+  .badge.a11y { background: var(--ok-soft); color: var(--ok); border: 1px solid var(--ok-rule); }
+
+  /* Phase timeline */
+  .phases { display: grid; gap: 1rem; }
+  .phase { display: grid; grid-template-columns: auto 1fr; gap: 1.1rem; }
+  .phase .rail { display: grid; grid-template-rows: auto 1fr; justify-items: center; }
+  .phase .dot { width: 30px; height: 30px; border-radius: 50%; background: var(--accent-soft); border: 2px solid var(--accent); color: var(--accent-ink); font-family: var(--font-mono); font-size: 0.72rem; font-weight: 700; display: grid; place-items: center; }
+  .phase .line { width: 2px; background: var(--rule); margin-top: 4px; min-height: 1rem; }
+  .phase:last-child .line { display: none; }
+  .phase .body { padding-bottom: 1.25rem; }
+  .phase .body h4 { margin-bottom: 0.3rem; }
+  .phase .meta { font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.5rem; }
+
+  footer { padding: 3rem 0 4rem; color: var(--muted); font-size: 0.85rem; }
+  footer .wrap > div + div { margin-top: 0.5rem; }
+
+  @media print {
+    nav.toc { display: none; }
+    section { break-inside: avoid; }
+  }
+</style>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="eyebrow">Oxygen UI · Component brief · 16 August 2026</div>
+    <h1>Signature</h1>
+    <p class="lede">
+      The reference is a good signature pad. What healthcare needs is not a
+      signature pad — it is a record of <em>who committed to what, when, in what
+      capacity, and by what means</em>, including all the times nobody signed at
+      all. This brief takes the supplied design as the starting point and works
+      out the rest.
+    </p>
+    <div class="hero-meta">
+      <span class="pill on">Ant Design v6</span>
+      <span class="pill">React 18 &amp; 19</span>
+      <span class="pill">WCAG 2.2 AA</span>
+      <span class="pill">FHIR Signature</span>
+      <span class="pill">21 CFR 11-ready</span>
+      <span class="pill">Draw · Type · Upload</span>
+    </div>
+  </div>
+</header>
+
+<nav class="toc" aria-label="Contents">
+  <div class="wrap">
+    <a href="#thesis">The argument</a>
+    <a href="#reference">The reference</a>
+    <a href="#outcomes">Outcomes</a>
+    <a href="#features">Features</a>
+    <a href="#mockups">Mockups</a>
+    <a href="#a11y">Accessibility</a>
+    <a href="#api">API</a>
+    <a href="#data">Data contract</a>
+    <a href="#law">Compliance</a>
+    <a href="#arch">Architecture</a>
+    <a href="#antd">The antd question</a>
+    <a href="#tests">Test plan</a>
+    <a href="#plan">Plan</a>
+    <a href="#decide">Open decisions</a>
+  </div>
+</nav>
+
+<!-- ================================================================== -->
+<section id="thesis">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="sec-num">01 — The argument</span>
+      <h2>A signature is not an image. It is a claim about a person.</h2>
+      <p>
+        Almost every signature component on npm solves one problem: get ink from
+        a pointer onto a canvas and hand back a PNG. That problem is solved, it
+        is solved well, and it is about fifteen percent of what a healthcare
+        product needs.
+      </p>
+    </div>
+
+    <div class="prose">
+      <p>
+        The other eighty-five percent is everything the PNG does not say. Who
+        signed — and were they the patient, the patient's daughter holding power
+        of attorney, or the nurse who witnessed a patient too weak to hold a
+        stylus? What were they agreeing to? Did they read it? What were they
+        claiming — authorship, review, consent, or merely that they watched
+        someone else sign? When, by whose clock? Against which version of the
+        document? And, most often of all in real clinical work:
+        <strong>what do you record when there is no signature?</strong>
+      </p>
+
+      <p>
+        A dash in a cell and a value that was never measured are different
+        clinical facts — that argument is already the foundation of this
+        library, and there is a lint rule enforcing it. The signature component
+        is the same argument at a higher stake. An empty signature field and a
+        patient who <em>refused to sign</em> are not the same fact. One is
+        missing data. The other is a documented act with legal consequences, and
+        a component whose only two states are <code>empty</code> and
+        <code>signed</code> makes it unrecordable.
+      </p>
+
+      <div class="note">
+        <span class="lbl">The thesis, in one line</span>
+        <p>
+          The value of this component is a <strong>discriminated union of
+          outcomes</strong>, not a base64 string. <code>signed</code> is one
+          member. <code>declined</code>, <code>unable</code>,
+          <code>verbal</code>, <code>on-paper</code>, <code>pending</code> and
+          <code>revoked</code> are the others, and every one of them happens
+          daily in a real clinic.
+        </p>
+      </div>
+
+      <p>
+        That reframing is what makes this an Oxygen component rather than a
+        wrapper around <code>signature_pad</code>. It also happens to be the
+        thing that sells: the buyers named in the readiness audit — Netsmart,
+        CVS Health, Heidi Health — do not have a problem drawing ink. They have
+        a problem passing an audit.
+      </p>
+
+      <h3 style="margin-top:2rem">Three claims this brief will defend</h3>
+      <div class="grid g3" style="margin-top:1rem">
+        <div class="card">
+          <span class="k">Claim 1</span>
+          <h4>Type is not a fallback</h4>
+          <p style="font-size:0.92rem;color:var(--ink-2)">
+            WCAG 2.1.1 — <em>Level A</em> — uses handwriting as its worked
+            example of an input technique whose underlying function does not
+            need a path. The Type tab is therefore a <em>conformance
+            mechanism</em>, not a convenience. The reference already has it; it
+            should stop looking like the second-best option.
+          </p>
+        </div>
+        <div class="card">
+          <span class="k">Claim 2</span>
+          <h4>Store strokes, render pixels</h4>
+          <p style="font-size:0.92rem;color:var(--ink-2)">
+            Capture an ordered stroke model, not a canvas. Undo becomes exact,
+            export becomes lossless vector at any DPI, print stops being a
+            96&nbsp;dpi smear, and forensic comparison becomes possible at all.
+          </p>
+        </div>
+        <div class="card">
+          <span class="k">Claim 3</span>
+          <h4>The manifest is the product</h4>
+          <p style="font-size:0.92rem;color:var(--ink-2)">
+            The read-only block that prints name, credential, capacity, meaning
+            and timestamp beside the ink is what regulators actually look at.
+            Nobody ships it. It is a day of work and it is the differentiator.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================== -->
+<section id="reference">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="sec-num">02 — The reference</span>
+      <h2>What the supplied design gets right, and the eleven gaps</h2>
+      <p>
+        Taking the two screenshots at face value and reading them as a
+        specification. The structure is sound and worth keeping: a modal, three
+        capture methods as tabs, a bounded toolbar, one primary commit action
+        that stays disabled until there is something to commit.
+      </p>
+    </div>
+
+    <figure>
+      <div class="stage">
+        <div class="antd anno" style="max-width:640px;margin:0 auto">
+          <div class="a-modal">
+            <div class="a-modal-head">
+              <div>
+                <div class="a-modal-title">Add Signature</div>
+              </div>
+              <div class="a-modal-x">&#10005;</div>
+            </div>
+            <div class="a-modal-body">
+              <div class="a-tabs" style="margin:-4px 0 20px">
+                <div class="a-tab on"><span>&#9998;</span> Draw</div>
+                <div class="a-tab"><span>&#9000;</span> Type</div>
+                <div class="a-tab"><span>&#8679;</span> Upload</div>
+              </div>
+              <div class="a-pad">
+                <div class="a-pad-bar">
+                  <span class="a-btn text sm">&#8630; Back</span>
+                  <span class="div"></span>
+                  <span class="a-btn text sm">&#9003; Clear</span>
+                  <span class="sp"></span>
+                  <span class="a-btn text sm">&#128190; Save Sign</span>
+                </div>
+                <div class="a-pad-canvas">
+                  <svg class="ink-svg" viewBox="0 0 420 120" width="330" height="94"
+                       role="img" aria-label="A handwritten signature reading Josh Randall"
+                       style="color:#141414;position:absolute;inset-block-start:14px">
+                    <path d="M52 84 C 54 52 64 26 78 28 C 90 30 84 60 72 80 C 64 94 50 94 50 82 C 52 66 68 60 78 68 C 86 74 82 86 74 84 C 66 82 68 66 80 60 C 92 54 102 66 96 78 C 92 86 82 84 84 74 C 88 58 104 46 116 46 C 126 46 124 62 116 76"
+                          stroke-width="4.5"/>
+                    <path d="M186 92 C 188 60 194 26 206 24 C 218 22 216 44 202 58 C 190 70 176 74 176 74 C 190 72 204 76 210 86 C 216 96 222 92 226 82 C 232 66 244 56 252 60 C 258 63 254 76 248 84 C 244 90 250 92 256 84 C 264 72 276 62 284 66 C 290 69 286 82 282 88 C 279 93 286 94 292 86 C 300 74 312 40 316 26 C 318 18 322 20 320 34 C 316 62 310 82 314 88 C 318 94 328 88 336 76 C 342 66 348 46 350 32 C 352 22 356 24 354 38 C 350 66 346 84 352 88 C 358 92 372 84 384 66"
+                          stroke-width="4.5"/>
+                  </svg>
+                  <div class="baseline"></div>
+                </div>
+              </div>
+            </div>
+            <div class="a-modal-foot">
+              <span class="a-btn primary">Done</span>
+            </div>
+          </div>
+
+          <span class="mark" style="inset-inline-end:-11px;inset-block-start:14px">1</span>
+          <span class="mark bad" style="inset-inline-start:-11px;inset-block-start:96px">2</span>
+          <span class="mark bad" style="inset-inline-start:224px;inset-block-start:150px">3</span>
+          <span class="mark bad" style="inset-inline-end:-11px;inset-block-start:150px">4</span>
+          <span class="mark bad" style="inset-inline-start:-11px;inset-block-end:74px">5</span>
+          <span class="mark bad" style="inset-inline-end:-11px;inset-block-end:14px">6</span>
+        </div>
+      </div>
+      <figcaption>
+        <b>The reference, re-rendered in true Ant Design v5 tokens</b> and
+        annotated. Teal markers are things to keep; red markers are gaps. The ink
+        is drawn from a stroke model, which is how the real component will store
+        it.
+      </figcaption>
+    </figure>
+
+    <ul class="anno-key">
+      <li><span class="n">1</span><span><b>Keep: the modal shape.</b> Title, close affordance, one primary commit. This is exactly antd's <code>Modal</code> with a custom <code>footer</code>, and it is the right container — signing is a deliberate, interruptible, confirmable act.</span></li>
+      <li><span class="n bad">2</span><span><b>Gap: no attestation.</b> Nothing above the pad says what signing <em>means</em>. A signature with no statement attached is, in the FDA's framing, a signature with no meaning — and in plain terms, the person does not know what they just agreed to.</span></li>
+      <li><span class="n bad">3</span><span><b>Gap: no redo.</b> "Back" is undo. Undo without redo is a trap: one over-tap destroys a good signature and the only path back is Clear and start again.</span></li>
+      <li><span class="n bad">4</span><span><b>Gap: "Save Sign" has no destination.</b> The label implies a saved-signature store, which raises the question the screenshot cannot answer: saved <em>where</em>, for how long, on a shared bedside tablet? This is a privacy decision wearing the costume of a toolbar button.</span></li>
+      <li><span class="n bad">5</span><span><b>Gap: no signer identity.</b> The ink is anonymous. Nothing captures printed name, credential, role, or capacity — and "capacity" is where healthcare diverges hardest from generic e-signature.</span></li>
+      <li><span class="n bad">6</span><span><b>Gap: the only exit is X.</b> A patient who declines, or who physically cannot sign, has no path. They are recorded identically to a form nobody opened.</span></li>
+    </ul>
+
+    <h3 style="margin-top:2.5rem">The full gap list</h3>
+    <div class="tw">
+      <table>
+        <thead>
+          <tr><th style="width:2.5rem">#</th><th>Gap</th><th>Why it matters here specifically</th><th style="width:8rem">Severity</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="num">1</td><td>No attestation statement</td><td>21 CFR 11.50 requires the <em>meaning</em> of the signature in the manifestation. More basically: informed consent that is not shown is not informed.</td><td><span class="a-tag red" style="font-family:var(--font-mono)">Critical</span></td></tr>
+          <tr><td class="num">2</td><td>No signer identity or capacity</td><td>Parent for a minor, proxy for an incapacitated adult, interpreter, witness. Healthcare signatures are frequently not the patient's own.</td><td><span class="a-tag red" style="font-family:var(--font-mono)">Critical</span></td></tr>
+          <tr><td class="num">3</td><td>No non-signature outcomes</td><td>Declined, unable, verbal, on paper. Each is a recordable event; none are expressible.</td><td><span class="a-tag red" style="font-family:var(--font-mono)">Critical</span></td></tr>
+          <tr><td class="num">4</td><td>No read-only manifestation</td><td>The signed state has no design. Every product then invents its own, inconsistently, and the printed record varies by screen.</td><td><span class="a-tag red" style="font-family:var(--font-mono)">Critical</span></td></tr>
+          <tr><td class="num">5</td><td>No document binding</td><td>Nothing ties the ink to <em>what</em> was signed. Without a hash of the target, tampering after signing is undetectable.</td><td><span class="a-tag gold" style="font-family:var(--font-mono)">High</span></td></tr>
+          <tr><td class="num">6</td><td>No redo</td><td>Undo-only is a one-way destruction of work.</td><td><span class="a-tag gold" style="font-family:var(--font-mono)">High</span></td></tr>
+          <tr><td class="num">7</td><td>No minimum-ink gate</td><td>A stray tap produces a one-pixel dot that commits as a legal signature.</td><td><span class="a-tag gold" style="font-family:var(--font-mono)">High</span></td></tr>
+          <tr><td class="num">8</td><td>Type tab is visually subordinate</td><td>It is the accessible path. Presenting it as the runner-up is a conformance problem wearing a visual-hierarchy costume.</td><td><span class="a-tag gold" style="font-family:var(--font-mono)">High</span></td></tr>
+          <tr><td class="num">9</td><td>"Save Sign" storage undefined</td><td>A reusable signature on a shared device is a disclosure risk with a friendly label.</td><td><span class="a-tag gold" style="font-family:var(--font-mono)">High</span></td></tr>
+          <tr><td class="num">10</td><td>No witness or co-signature</td><td>Resident notes need attending co-sign; consent under an interpreter needs a second signer; declines need a witness.</td><td><span class="a-tag blue" style="font-family:var(--font-mono)">Medium</span></td></tr>
+          <tr><td class="num">11</td><td>No revocation state</td><td>Withdrawing consent is a right. The record must show a revoked signature, not lose it.</td><td><span class="a-tag blue" style="font-family:var(--font-mono)">Medium</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================== -->
+<section id="outcomes">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="sec-num">03 — The outcome model</span>
+      <h2>Seven things that happen when you ask someone to sign</h2>
+      <p>
+        This is the part of the design that is genuinely different, so it comes
+        before the features rather than after them. Everything else in this
+        brief is downstream of getting this right.
+      </p>
+    </div>
+
+    <div class="prose">
+      <p>
+        Ask a ward clerk what happens when they put a consent form in front of a
+        patient and you get seven answers, not two. The component's value type
+        is a discriminated union over exactly those seven, because a union is
+        the only shape that makes the unhappy paths as expressible — and as
+        type-checked — as the happy one.
+      </p>
+    </div>
+
+    <div class="tw">
+      <table>
+        <thead>
+          <tr>
+            <th style="width:9rem">Outcome</th>
+            <th>What actually happened</th>
+            <th>What the record must carry</th>
+            <th style="width:11rem">ISO / FHIR signature type</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>signed</code></td>
+            <td>They signed. Draw, type or upload.</td>
+            <td>Ink, method, signer, capacity, meaning, timestamp, document hash.</td>
+            <td>Consent / Author's / Verification, per <code>meaning</code></td>
+          </tr>
+          <tr>
+            <td><code>declined</code></td>
+            <td>They read it and refused. A decision, not a failure.</td>
+            <td>Reason (free text and/or coded), who recorded it, witness, timestamp.</td>
+            <td>None — this is a <code>Provenance</code> entry, not a signature</td>
+          </tr>
+          <tr>
+            <td><code>unable</code></td>
+            <td>They would sign but physically or cognitively cannot — intubated, restrained, casted, delirious, no assistive device to hand.</td>
+            <td>Reason from a controlled list, mandatory witness, timestamp. <strong>Not the same as declined</strong> and must never be collapsed into it.</td>
+            <td>Witness signature on the attestation</td>
+          </tr>
+          <tr>
+            <td><code>verbal</code></td>
+            <td>Consent given by phone or video. Routine in telehealth.</td>
+            <td>Mandatory witness, the words used, timestamp, channel.</td>
+            <td>Event Witness / Verification</td>
+          </tr>
+          <tr>
+            <td><code>on-paper</code></td>
+            <td>Wet signature on a form that will be scanned later, or already has been.</td>
+            <td>Pointer to the scanned document, who witnessed the paper signing, timestamp.</td>
+            <td>Source signature, target is the scan</td>
+          </tr>
+          <tr>
+            <td><code>pending</code></td>
+            <td>Signed by one party, awaiting another — the classic resident note awaiting attending co-sign.</td>
+            <td>Who signed so far, who is awaited, in what capacity, since when.</td>
+            <td>Author's signature present; Coauthor's absent</td>
+          </tr>
+          <tr>
+            <td><code>revoked</code></td>
+            <td>Consent withdrawn. The signature was valid and no longer is.</td>
+            <td>The <strong>original signature, still rendered</strong>, plus who revoked it, when, and why. Never deleted.</td>
+            <td>Original type, superseded</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="note warn">
+      <span class="lbl">The one that will get argued about</span>
+      <p>
+        <code>declined</code> and <code>unable</code> look like the same
+        "didn't sign" bucket and are not. Declined is an exercise of autonomy
+        and may need escalation, a second conversation, or a documented refusal
+        of treatment. Unable is a capacity or physical barrier and usually
+        triggers a witness or proxy pathway instead. Collapsing them loses the
+        distinction that decides what happens next, which is exactly the failure
+        mode <code>AbsentValue</code> exists to prevent one tier down.
+      </p>
+    </div>
+
+    <h3>Why a union rather than flags</h3>
+    <p class="prose">
+      A flags-and-nullable-fields shape (<code>{ image?, declined?, reason?,
+      witness? }</code>) permits states that cannot exist — declined <em>and</em>
+      an image, unable with no witness — and pushes the validation into every
+      consumer. The union makes each outcome carry exactly its own evidence, and
+      makes "unable without a witness" a compile error rather than a code review
+      comment.
+    </p>
+
+    <pre><code><span class="c-c">// The whole component, in one type.</span>
+<span class="c-k">export type</span> SignatureValue =
+  | { outcome: <span class="c-s">"signed"</span>;    method: SignatureMethod; ink: Ink; signer: Signer;
+      capacity: Capacity; meaning: SignatureMeaning; capturedAt: string;
+      onBehalfOf?: Subject; documentHash?: string; provenance: CaptureContext }
+  | { outcome: <span class="c-s">"declined"</span>;  reason: string; reasonCode?: string;
+      recordedBy: Signer; witness?: Signer; recordedAt: string }
+  | { outcome: <span class="c-s">"unable"</span>;    reason: UnableReason; detail?: string;
+      witness: Signer;  <span class="c-c">// mandatory — not optional, by design</span>
+      recordedBy: Signer; recordedAt: string }
+  | { outcome: <span class="c-s">"verbal"</span>;    script: string; channel: <span class="c-s">"phone"</span> | <span class="c-s">"video"</span> | <span class="c-s">"in-person"</span>;
+      witness: Signer; recordedBy: Signer; recordedAt: string }
+  | { outcome: <span class="c-s">"on-paper"</span>;  scanRef?: string; recordedBy: Signer; recordedAt: string }
+  | { outcome: <span class="c-s">"pending"</span>;   awaiting: Capacity; since: string; sofar: SignatureValue[] }
+  | { outcome: <span class="c-s">"revoked"</span>;   original: Extract&lt;SignatureValue, { outcome: <span class="c-s">"signed"</span> }&gt;;
+      revokedBy: Signer; revokedAt: string; reason: string };</code></pre>
+  </div>
+</section>
+
+<!-- ================================================================== -->
+<section id="features">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="sec-num">04 — Feature inventory</span>
+      <h2>Fifty-one things it could do, and which ones make v1</h2>
+      <p>
+        The brief asked for exploration, so this is the full list rather than
+        the shortlist. <span class="badge ref">reference</span> is in the
+        supplied design already; <span class="badge new">new</span> is proposed;
+        <span class="badge law">compliance</span> is driven by a regulation or
+        standard; <span class="badge a11y">a11y</span> is driven by WCAG 2.2.
+        The <b>v1</b> column is the honest cut.
+      </p>
+    </div>
+
+    <h3>A · Capture</h3>
+    <div class="tw">
+      <table>
+        <thead><tr><th style="width:2.5rem">#</th><th style="width:15rem">Feature</th><th>Notes</th><th style="width:4.5rem">v1</th></tr></thead>
+        <tbody>
+          <tr><td class="num">1</td><td>Draw on canvas <span class="badge ref">ref</span></td><td>Pointer Events only — one code path for mouse, touch and stylus. <code>touch-action: none</code>, <code>setPointerCapture</code> so a stroke that leaves the box still tracks.</td><td>✅</td></tr>
+          <tr><td class="num">2</td><td>Type a name <span class="badge ref">ref</span> <span class="badge a11y">a11y</span></td><td>The single-pointer path. Promoted to equal visual weight — see §06.</td><td>✅</td></tr>
+          <tr><td class="num">3</td><td>Upload an image <span class="badge ref">ref</span></td><td>PNG/JPEG. Strip EXIF (a phone photo of a signed page carries GPS), honour orientation first, then discard.</td><td>✅</td></tr>
+          <tr><td class="num">4</td><td>Stroke model, not pixels <span class="badge new">new</span></td><td><code>{x, y, t, pressure, tiltX, tiltY, pointerType}</code> per point. Everything else is a render of it. The single most consequential decision in the component.</td><td>✅</td></tr>
+          <tr><td class="num">5</td><td>Undo <span class="badge ref">ref</span></td><td>"Back" in the reference. Per stroke, exact because the model is retained.</td><td>✅</td></tr>
+          <tr><td class="num">6</td><td>Redo <span class="badge new">new</span></td><td>Missing from the reference. Undo without redo destroys work irreversibly.</td><td>✅</td></tr>
+          <tr><td class="num">7</td><td>Clear <span class="badge ref">ref</span></td><td>Confirm when there is meaningful ink — an accidental Clear on a completed signature is a bad afternoon.</td><td>✅</td></tr>
+          <tr><td class="num">8</td><td>Minimum-ink gate <span class="badge new">new</span></td><td>Reject a dot. Threshold on total path length, bounding-box area and stroke count. Without it, a stray tap commits as a legal signature.</td><td>✅</td></tr>
+          <tr><td class="num">9</td><td>Velocity-based stroke width <span class="badge new">new</span></td><td>Width as a function of speed, smoothed. This is the difference between ink and a wire.</td><td>✅</td></tr>
+          <tr><td class="num">10</td><td>Curve smoothing <span class="badge new">new</span></td><td>Quadratic or Catmull–Rom between sampled points. Also the cheapest accommodation for tremor.</td><td>✅</td></tr>
+          <tr><td class="num">11</td><td>Trim to ink bounds on export <span class="badge new">new</span></td><td>With a configurable margin, so a signature drawn in the corner does not export as mostly whitespace.</td><td>✅</td></tr>
+          <tr><td class="num">12</td><td>Device-pixel-ratio backing store <span class="badge new">new</span></td><td>Crisp on retina, and export at a target DPI (300) for print rather than whatever the screen was.</td><td>✅</td></tr>
+          <tr><td class="num">13</td><td>Baseline guide + "Sign here" cue <span class="badge ref">ref</span></td><td>Present in the reference. Keep, make optional, and make the exported crop relative to it.</td><td>✅</td></tr>
+          <tr><td class="num">14</td><td>Palm rejection <span class="badge new">new</span></td><td>Ignore <code>pointerType: "touch"</code> while a <code>"pen"</code> is active. A real bedside-tablet problem.</td><td>✅</td></tr>
+          <tr><td class="num">15</td><td>Ink colour <span class="badge new">new</span></td><td>Black or blue. Some institutions still require blue to distinguish an original from a photocopy; the convention followed people into software.</td><td>✅</td></tr>
+          <tr><td class="num">16</td><td>Full-bleed capture on narrow screens <span class="badge new">new</span></td><td>Signing on a 375&nbsp;px portrait phone is genuinely bad. Offer a landscape sheet.</td><td>◐</td></tr>
+          <tr><td class="num">17</td><td>Initials variant <span class="badge new">new</span></td><td><code>variant="initials"</code>: smaller box, used per page on consent forms.</td><td>◐</td></tr>
+          <tr><td class="num">18</td><td>Adopt and apply <span class="badge new">new</span></td><td>Capture once, apply to N fields — the pattern every e-signature product converged on.</td><td>✗</td></tr>
+          <tr><td class="num">19</td><td>Saved signatures <span class="badge ref">ref</span></td><td>"Save Sign" implies a store. Needs a destination decision before it can ship — see §14.</td><td>✗</td></tr>
+          <tr><td class="num">20</td><td>Script face choice for typed <span class="badge new">new</span></td><td>Customers will ask. Note that the legal force comes from intent, not from cursive.</td><td>◐</td></tr>
+          <tr><td class="num">21</td><td>Background removal on upload <span class="badge new">new</span></td><td>Threshold a photo of paper to alpha so it does not render as a grey rectangle.</td><td>◐</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>B · Identity, capacity and meaning</h3>
+    <div class="tw">
+      <table>
+        <thead><tr><th style="width:2.5rem">#</th><th style="width:15rem">Feature</th><th>Notes</th><th style="width:4.5rem">v1</th></tr></thead>
+        <tbody>
+          <tr><td class="num">22</td><td>Attestation statement <span class="badge new">new</span> <span class="badge law">law</span></td><td>The sentence above the pad. Without it the signature has no meaning to display, and the person does not know what they agreed to.</td><td>✅</td></tr>
+          <tr><td class="num">23</td><td>Signature meaning <span class="badge new">new</span> <span class="badge law">law</span></td><td>Author, review, verification, consent, witness. Maps to the ISO&nbsp;E1762 codes FHIR uses.</td><td>✅</td></tr>
+          <tr><td class="num">24</td><td>Printed name and credential <span class="badge new">new</span> <span class="badge law">law</span></td><td>Displayed with the ink, always. This is what a manifestation is.</td><td>✅</td></tr>
+          <tr><td class="num">25</td><td>Capacity <span class="badge new">new</span></td><td>Self, parent/guardian, healthcare proxy, legal representative, interpreter, witness, clinician. The healthcare-specific axis.</td><td>✅</td></tr>
+          <tr><td class="num">26</td><td>Signing on behalf of <span class="badge new">new</span></td><td>Relationship to the patient captured alongside. FHIR <code>onBehalfOf</code>.</td><td>✅</td></tr>
+          <tr><td class="num">27</td><td>Read-before-sign gate <span class="badge new">new</span></td><td>Optional scroll-to-end before the pad enables. Must have a keyboard path and must not be the only route.</td><td>◐</td></tr>
+          <tr><td class="num">28</td><td>Witness signature <span class="badge new">new</span></td><td>Second signer on the same record. Mandatory for <code>unable</code> and <code>verbal</code>.</td><td>◐</td></tr>
+          <tr><td class="num">29</td><td>Countersignature / co-sign <span class="badge new">new</span></td><td>Resident signs, attending countersigns. Sequential, with a <code>pending</code> state in between.</td><td>◐</td></tr>
+          <tr><td class="num">30</td><td>Interpreter attestation <span class="badge new">new</span></td><td>Language plus interpreter identity, for consent obtained through an interpreter.</td><td>✗</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>C · Provenance and integrity</h3>
+    <div class="tw">
+      <table>
+        <thead><tr><th style="width:2.5rem">#</th><th style="width:15rem">Feature</th><th>Notes</th><th style="width:4.5rem">v1</th></tr></thead>
+        <tbody>
+          <tr><td class="num">31</td><td>Host-supplied timestamp <span class="badge law">law</span></td><td>Never <code>new Date()</code> inside the component — this repository already lints against reading the clock in a component, and for a legal record the client clock is not evidence.</td><td>✅</td></tr>
+          <tr><td class="num">32</td><td>Document hash binding <span class="badge new">new</span> <span class="badge law">law</span></td><td>Take a hash of what is being signed and carry it in the value. Makes post-signing tampering detectable.</td><td>✅</td></tr>
+          <tr><td class="num">33</td><td>Capture context <span class="badge new">new</span></td><td>Method, pointer type, device, viewport, user agent. Host supplies IP and session.</td><td>✅</td></tr>
+          <tr><td class="num">34</td><td>Audit event stream <span class="badge new">new</span></td><td><code>onAuditEvent</code> for opened, method-changed, cleared, committed, declined. The host writes the trail; the component never does.</td><td>✅</td></tr>
+          <tr><td class="num">35</td><td>Never transmits <span class="badge new">new</span></td><td>No fetch, no beacon, no analytics. Already lint-enforced across this registry.</td><td>✅</td></tr>
+          <tr><td class="num">36</td><td>Stroke biometrics payload <span class="badge new">new</span></td><td>Timing, velocity and pressure have real forensic value and real privacy exposure. <strong>Default off, explicit opt-in</strong> — see §07.</td><td>◐</td></tr>
+          <tr><td class="num">37</td><td>Clear on unmount / kiosk mode <span class="badge new">new</span></td><td>A signature left on a waiting-room screen is a disclosure. No persistence between patients, no autofill.</td><td>✅</td></tr>
+          <tr><td class="num">38</td><td>Offline capture <span class="badge new">new</span></td><td>The stroke model is small JSON. Bedside tablets lose Wi-Fi; the host queues.</td><td>◐</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>D · Rendering the result</h3>
+    <div class="tw">
+      <table>
+        <thead><tr><th style="width:2.5rem">#</th><th style="width:15rem">Feature</th><th>Notes</th><th style="width:4.5rem">v1</th></tr></thead>
+        <tbody>
+          <tr><td class="num">39</td><td>Read-only manifest <span class="badge new">new</span> <span class="badge law">law</span></td><td>Ink, printed name, credential, capacity, meaning, timestamp, method. The piece nobody ships, and the reason a regulated buyer picks this library.</td><td>✅</td></tr>
+          <tr><td class="num">40</td><td>SVG export <span class="badge new">new</span></td><td>Vector, so print is not a 96&nbsp;dpi smear and the archive is resolution-independent.</td><td>✅</td></tr>
+          <tr><td class="num">41</td><td>PNG export <span class="badge ref">ref</span></td><td>Transparent background, trimmed, at a requested DPI.</td><td>✅</td></tr>
+          <tr><td class="num">42</td><td>Print stylesheet <span class="badge new">new</span></td><td>The manifest must survive being printed, because it will be.</td><td>✅</td></tr>
+          <tr><td class="num">43</td><td>Verification state <span class="badge new">new</span></td><td>"Document unchanged since signing" / "does not match" — computed by the host from the hash, displayed by the manifest.</td><td>◐</td></tr>
+          <tr><td class="num">44</td><td>Revoked rendering <span class="badge new">new</span></td><td>Struck through, reason and date shown, original ink still visible. Never deleted.</td><td>◐</td></tr>
+          <tr><td class="num">45</td><td>FHIR mapping helper <span class="badge new">new</span></td><td><code>toFhirSignature()</code> and <code>toFhirProvenance()</code>. The library already ships a FHIR package.</td><td>✅</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>E · Platform</h3>
+    <div class="tw">
+      <table>
+        <thead><tr><th style="width:2.5rem">#</th><th style="width:15rem">Feature</th><th>Notes</th><th style="width:4.5rem">v1</th></tr></thead>
+        <tbody>
+          <tr><td class="num">46</td><td>antd <code>Form.Item</code> integration <span class="badge new">new</span></td><td><code>value</code>/<code>onChange</code>, custom <code>validator</code>, validation status reaching the control.</td><td>✅</td></tr>
+          <tr><td class="num">47</td><td>Light, dark and high-contrast <span class="badge new">new</span></td><td>Ink must remain legible on all three. The library already has three themes and three densities.</td><td>✅</td></tr>
+          <tr><td class="num">48</td><td>i18n, including patient wording <span class="badge new">new</span></td><td>The <code>intl</code> package already requires both clinician and patient phrasings for every term.</td><td>◐</td></tr>
+          <tr><td class="num">49</td><td>RTL <span class="badge new">new</span></td><td>The chrome mirrors. The signature does not — a signature is not a glyph to be flipped.</td><td>◐</td></tr>
+          <tr><td class="num">50</td><td>Cross-framework element <span class="badge new">new</span></td><td>A custom-element build, as the loaders have. The smoke-app harness that proves it already exists.</td><td>✗</td></tr>
+          <tr><td class="num">51</td><td>SSR-safe <span class="badge new">new</span></td><td>No <code>HTMLElement</code>, <code>window</code> or <code>canvas</code> at module scope. Already a hard-won lesson in this repo.</td><td>✅</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="note">
+      <span class="lbl">Reading the v1 column</span>
+      <p>
+        ✅ ships in v1 · ◐ designed in v1, built in v1.1 · ✗ deliberately deferred.
+        Twenty-eight items at ✅ is roughly three weeks of work for one engineer,
+        which matches the audit's own estimate of two to three days per component
+        at <code>beta</code> across the four components this decomposes into.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================== -->
+<section id="mockups">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="sec-num">05 — Mockups</span>
+      <h2>The design, in true Ant Design tokens</h2>
+      <p>
+        Every mockup below is live HTML using Ant Design's real values —
+        <code>#1677ff</code>, 6&nbsp;px and 8&nbsp;px radii, 32&nbsp;px control
+        height, antd's own three-layer modal shadow, and the
+        <code>darkAlgorithm</code> palette in 5.7. Nothing here is a picture of
+        a design; it is the design at 1:1, so what you are judging is what will
+        be built.
+      </p>
+    </div>
+
+    <!-- ---------------------------------------------------------------- -->
+    <h3>5.1 &nbsp; Draw — the proposed replacement for the reference</h3>
+    <p class="prose">
+      Same skeleton as the supplied design. What is added is everything above
+      and below the pad: who is signing, in what capacity, what they are
+      agreeing to, and the way out for the people who will not or cannot sign.
+    </p>
+
+    <figure>
+      <div class="stage">
+        <div class="antd anno" style="max-width:640px;margin:0 auto">
+          <div class="a-modal">
+            <div class="a-modal-head">
+              <div>
+                <div class="a-modal-title">Sign consent for treatment</div>
+                <div class="a-modal-sub">Randall, Josh · MRN 4471902 · DOB 12 Mar 1978</div>
+              </div>
+              <div class="a-modal-x">&#10005;</div>
+            </div>
+
+            <div class="a-modal-body">
+              <!-- attestation -->
+              <div class="a-alert" style="margin-bottom:16px">
+                <span class="ic">&#9432;</span>
+                <div>
+                  <div style="font-weight:600;margin-bottom:2px">What you are signing</div>
+                  <div style="color:var(--a-text-2)">
+                    I have read the information about this procedure, I have had
+                    the chance to ask questions, and I agree to go ahead.
+                  </div>
+                </div>
+              </div>
+
+              <!-- who + capacity -->
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
+                <div>
+                  <span class="a-label"><span class="req">*</span>Full name</span>
+                  <div class="a-input">Josh Randall</div>
+                </div>
+                <div>
+                  <span class="a-label"><span class="req">*</span>Signing as</span>
+                  <div class="a-input a-select"><span>The patient</span><span style="color:var(--a-text-3)">&#9662;</span></div>
+                </div>
+              </div>
+
+              <div class="a-tabs" style="margin-bottom:16px">
+                <div class="a-tab on"><span>&#9998;</span> Draw</div>
+                <div class="a-tab"><span>&#9000;</span> Type</div>
+                <div class="a-tab"><span>&#8679;</span> Upload</div>
+              </div>
+
+              <div class="a-pad">
+                <div class="a-pad-bar">
+                  <span class="a-btn text sm">&#8630; Undo</span>
+                  <span class="a-btn text sm" style="color:var(--a-text-4)">&#8631; Redo</span>
+                  <span class="div"></span>
+                  <span class="a-btn text sm">&#9003; Clear</span>
+                  <span class="sp"></span>
+                  <span style="font-size:12px;color:var(--a-text-3)">Black ink</span>
+                  <span style="width:14px;height:14px;border-radius:50%;background:#141414;border:1px solid var(--a-border);margin-inline-start:6px"></span>
+                  <span style="width:14px;height:14px;border-radius:50%;background:#1d39c4;border:1px solid var(--a-border);margin-inline-start:4px;opacity:0.4"></span>
+                </div>
+                <div class="a-pad-canvas">
+                  <svg class="ink-svg" viewBox="0 0 420 120" width="320" height="91"
+                       role="img" aria-label="Signature of Josh Randall"
+                       style="color:#141414;position:absolute;inset-block-start:16px">
+                    <path d="M52 84 C 54 52 64 26 78 28 C 90 30 84 60 72 80 C 64 94 50 94 50 82 C 52 66 68 60 78 68 C 86 74 82 86 74 84 C 66 82 68 66 80 60 C 92 54 102 66 96 78 C 92 86 82 84 84 74 C 88 58 104 46 116 46 C 126 46 124 62 116 76" stroke-width="4.5"/>
+                    <path d="M186 92 C 188 60 194 26 206 24 C 218 22 216 44 202 58 C 190 70 176 74 176 74 C 190 72 204 76 210 86 C 216 96 222 92 226 82 C 232 66 244 56 252 60 C 258 63 254 76 248 84 C 244 90 250 92 256 84 C 264 72 276 62 284 66 C 290 69 286 82 282 88 C 279 93 286 94 292 86 C 300 74 312 40 316 26 C 318 18 322 20 320 34 C 316 62 310 82 314 88 C 318 94 328 88 336 76 C 342 66 348 46 350 32 C 352 22 356 24 354 38 C 350 66 346 84 352 88 C 358 92 372 84 384 66" stroke-width="4.5"/>
+                  </svg>
+                  <div class="baseline"></div>
+                  <div class="xmark">&#10005;</div>
+                </div>
+              </div>
+              <div class="a-extra">Sign above the line. Your signature is saved with this form only.</div>
+            </div>
+
+            <div class="a-modal-foot split">
+              <span class="a-btn text" style="color:var(--a-primary)">Can't sign?</span>
+              <span style="display:flex;gap:8px">
+                <span class="a-btn">Cancel</span>
+                <span class="a-btn primary">Sign and continue</span>
+              </span>
+            </div>
+          </div>
+
+          <span class="mark" style="inset-inline-end:-11px;inset-block-start:78px">1</span>
+          <span class="mark" style="inset-inline-end:-11px;inset-block-start:168px">2</span>
+          <span class="mark" style="inset-inline-start:-11px;inset-block-start:236px">3</span>
+          <span class="mark" style="inset-inline-end:-11px;inset-block-start:290px">4</span>
+          <span class="mark" style="inset-inline-start:-11px;inset-block-end:20px">5</span>
+        </div>
+      </div>
+      <figcaption>
+        <b>5.1 — Draw, signed.</b> The commit button is now a sentence
+        ("Sign and continue"), not a shrug ("Done"), because WCAG 3.3.4 asks a
+        legal commitment to be confirmed rather than merely completed.
+      </figcaption>
+    </figure>
+
+    <ul class="anno-key">
+      <li><span class="n">1</span><span><b>Attestation, above the pad and unavoidable.</b> The sentence the signature <em>means</em>. Supplied by the host, rendered verbatim, and carried into the record so the manifest can print it later.</span></li>
+      <li><span class="n">2</span><span><b>Name and capacity, captured as data.</b> "Signing as" is the healthcare-specific field: the patient, a parent, a healthcare proxy, a legal representative, a witness, or the clinician. It drives the FHIR signature type and <code>onBehalfOf</code>.</span></li>
+      <li><span class="n">3</span><span><b>Three modes as a real tablist</b> with equal visual weight. Redo joins Undo. Ink colour is exposed because institutions ask for blue.</span></li>
+      <li><span class="n">4</span><span><b>The pad states its own retention policy.</b> "Saved with this form only" is the answer to the reference's unanswered "Save Sign" question, and it belongs where the person can read it.</span></li>
+      <li><span class="n">5</span><span><b>"Can't sign?" is a first-class exit</b>, on the left where destructive-adjacent actions live in antd. It opens the outcome sheet in 5.4 rather than dead-ending at the X.</span></li>
+    </ul>
+
+    <!-- ---------------------------------------------------------------- -->
+    <h3 style="margin-top:3rem">5.2 &nbsp; Type — the conformance path, given equal billing</h3>
+    <p class="prose">
+      This is the tab that makes the component conform at Level A. It gets the
+      same layout, the same weight, and copy that presents it as a choice rather
+      than an accommodation.
+    </p>
+
+    <figure>
+      <div class="stage">
+        <div class="antd" style="max-width:640px;margin:0 auto">
+          <div class="a-modal">
+            <div class="a-modal-head">
+              <div>
+                <div class="a-modal-title">Sign consent for treatment</div>
+                <div class="a-modal-sub">Randall, Josh · MRN 4471902 · DOB 12 Mar 1978</div>
+              </div>
+              <div class="a-modal-x">&#10005;</div>
+            </div>
+            <div class="a-modal-body">
+              <div class="a-tabs" style="margin-bottom:16px">
+                <div class="a-tab"><span>&#9998;</span> Draw</div>
+                <div class="a-tab on"><span>&#9000;</span> Type</div>
+                <div class="a-tab"><span>&#8679;</span> Upload</div>
+              </div>
+
+              <span class="a-label"><span class="req">*</span>Type your name to sign</span>
+              <div class="a-input lg" style="margin-bottom:4px">Josh Randall</div>
+              <div class="a-extra" style="margin-bottom:16px">
+                Typing your name here has the same legal effect as signing by hand.
+                <b>Never pre-filled</b> &mdash; it must be typed by the person signing.
+              </div>
+
+              <div class="a-pad">
+                <div class="a-pad-bar">
+                  <span style="font-size:12px;color:var(--a-text-3)">Style</span>
+                  <span class="a-btn sm" style="margin-inline-start:8px;border-color:var(--a-primary);color:var(--a-primary)">Formal</span>
+                  <span class="a-btn sm">Script</span>
+                  <span class="a-btn sm">Plain</span>
+                </div>
+                <div class="a-pad-canvas" style="height:150px">
+                  <div style="font-family:'Snell Roundhand','Apple Chancery','Segoe Script','Brush Script MT',cursive;font-size:44px;color:#141414;position:absolute;inset-block-start:34px">Josh Randall</div>
+                  <div class="baseline"></div>
+                </div>
+              </div>
+            </div>
+            <div class="a-modal-foot split">
+              <span class="a-btn text" style="color:var(--a-primary)">Can't sign?</span>
+              <span style="display:flex;gap:8px">
+                <span class="a-btn">Cancel</span>
+                <span class="a-btn primary">Sign and continue</span>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <figcaption>
+        <b>5.2 — Type.</b> The explanatory line is doing real work: people
+        hesitate to type a name because they assume it is not "a real
+        signature". Under ESIGN and UETA it is, and saying so removes the
+        hesitation that pushes users back to the inaccessible tab. The field is
+        deliberately labelled "type your name <em>to sign</em>" and is never
+        pre-filled — both are evidence of intent, which is the one element
+        every authority in §9.2 turns on.
+      </figcaption>
+    </figure>
+
+    <!-- ---------------------------------------------------------------- -->
+    <h3 style="margin-top:3rem">5.3 &nbsp; Upload</h3>
+    <figure>
+      <div class="stage">
+        <div class="antd" style="max-width:640px;margin:0 auto">
+          <div class="a-modal">
+            <div class="a-modal-head">
+              <div><div class="a-modal-title">Sign consent for treatment</div></div>
+              <div class="a-modal-x">&#10005;</div>
+            </div>
+            <div class="a-modal-body">
+              <div class="a-tabs" style="margin-bottom:16px">
+                <div class="a-tab"><span>&#9998;</span> Draw</div>
+                <div class="a-tab"><span>&#9000;</span> Type</div>
+                <div class="a-tab on"><span>&#8679;</span> Upload</div>
+              </div>
+              <div class="a-dragger">
+                <div class="big">&#8679;</div>
+                <div class="t">Click or drag an image of your signature here</div>
+                <div class="s">PNG or JPEG, up to 2&nbsp;MB. Location data is removed automatically.</div>
+              </div>
+              <div class="a-alert warning" style="margin-top:16px">
+                <span class="ic">&#9888;</span>
+                <div>An uploaded image cannot be checked against the person signing. Your organisation may require a witness for uploaded signatures.</div>
+              </div>
+            </div>
+            <div class="a-modal-foot split">
+              <span class="a-btn text" style="color:var(--a-primary)">Can't sign?</span>
+              <span style="display:flex;gap:8px">
+                <span class="a-btn">Cancel</span>
+                <span class="a-btn primary dis">Sign and continue</span>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <figcaption>
+        <b>5.3 — Upload.</b> Two things the reference does not say: EXIF is
+        stripped (a phone photo of a signed page carries GPS coordinates), and
+        an uploaded image has materially weaker attribution than a live capture.
+        The second is a warning, not a block — the host decides policy.
+      </figcaption>
+    </figure>
+
+    <!-- ---------------------------------------------------------------- -->
+    <h3 style="margin-top:3rem">5.4 &nbsp; "Can't sign?" — the outcomes sheet</h3>
+    <p class="prose">
+      The screen that does not exist anywhere in the reference, and the one that
+      makes the component usable on a real ward.
+    </p>
+
+    <figure>
+      <div class="stage">
+        <div class="antd" style="max-width:560px;margin:0 auto">
+          <div class="a-modal">
+            <div class="a-modal-head">
+              <div>
+                <div class="a-modal-title">Record what happened instead</div>
+                <div class="a-modal-sub">This is recorded in the chart either way.</div>
+              </div>
+              <div class="a-modal-x">&#10005;</div>
+            </div>
+            <div class="a-modal-body">
+              <div class="a-radio on"><span class="dot"></span><div><div>The patient declined to sign</div><div style="color:var(--a-text-3);font-size:13px">They read it and chose not to agree.</div></div></div>
+              <div class="a-radio"><span class="dot"></span><div><div>The patient is unable to sign</div><div style="color:var(--a-text-3);font-size:13px">Physically or cognitively unable right now. A witness is required.</div></div></div>
+              <div class="a-radio"><span class="dot"></span><div><div>Consent was given verbally</div><div style="color:var(--a-text-3);font-size:13px">By phone or video. A witness is required.</div></div></div>
+              <div class="a-radio"><span class="dot"></span><div><div>Signed on paper</div><div style="color:var(--a-text-3);font-size:13px">A wet signature was taken and will be scanned.</div></div></div>
+
+              <div style="height:1px;background:var(--a-border-2);margin:16px 0"></div>
+
+              <span class="a-label"><span class="req">*</span>Reason</span>
+              <div class="a-input" style="height:auto;min-height:64px;align-items:flex-start;padding-top:8px;color:var(--a-text)">Wants to discuss with her daughter before deciding.</div>
+              <div class="a-extra" style="margin-bottom:12px">Recorded by A. Okafor, RN · 16 Aug 2026, 14:32</div>
+
+              <div class="a-alert">
+                <span class="ic">&#9432;</span>
+                <div>A decline is not a dead end. The care team will see it on the chart and can revisit the conversation.</div>
+              </div>
+            </div>
+            <div class="a-modal-foot">
+              <span class="a-btn">Back</span>
+              <span class="a-btn primary">Record decline</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <figcaption>
+        <b>5.4 — Outcomes.</b> Four of the seven outcomes are reachable here;
+        <code>pending</code> and <code>revoked</code> are produced by workflow
+        rather than by a person at this modal. Note that "unable" and "verbal"
+        both say <em>a witness is required</em> in the option text, because the
+        type makes the witness mandatory and the UI should not surprise anyone
+        with that two screens later.
+      </figcaption>
+    </figure>
+
+    <!-- ---------------------------------------------------------------- -->
+    <h3 style="margin-top:3rem">5.5 &nbsp; The manifest — the piece nobody ships</h3>
+    <p class="prose">
+      What the record looks like afterwards, on screen and on paper. This is the
+      artifact an auditor asks for, and the reason a regulated buyer chooses a
+      healthcare component library over <code>signature_pad</code> plus a
+      weekend.
+    </p>
+
+    <figure>
+      <div class="stage">
+        <div class="antd" style="max-width:720px;margin:0 auto">
+          <div class="a-desc">
+            <div class="a-desc-head">
+              <div style="font-weight:600">Consent for treatment — signature record</div>
+              <span class="a-tag green">&#10003; Valid · document unchanged</span>
+            </div>
+            <div style="padding:20px 16px;border-bottom:1px solid var(--a-border-2);display:flex;align-items:center;gap:24px;flex-wrap:wrap">
+              <svg class="ink-svg" viewBox="0 0 420 120" width="240" height="69" role="img"
+                   aria-label="Signature of Josh Randall, signed 16 August 2026" style="color:var(--a-text)">
+                <path d="M52 84 C 54 52 64 26 78 28 C 90 30 84 60 72 80 C 64 94 50 94 50 82 C 52 66 68 60 78 68 C 86 74 82 86 74 84 C 66 82 68 66 80 60 C 92 54 102 66 96 78 C 92 86 82 84 84 74 C 88 58 104 46 116 46 C 126 46 124 62 116 76" stroke-width="4.5"/>
+                <path d="M186 92 C 188 60 194 26 206 24 C 218 22 216 44 202 58 C 190 70 176 74 176 74 C 190 72 204 76 210 86 C 216 96 222 92 226 82 C 232 66 244 56 252 60 C 258 63 254 76 248 84 C 244 90 250 92 256 84 C 264 72 276 62 284 66 C 290 69 286 82 282 88 C 279 93 286 94 292 86 C 300 74 312 40 316 26 C 318 18 322 20 320 34 C 316 62 310 82 314 88 C 318 94 328 88 336 76 C 342 66 348 46 350 32 C 352 22 356 24 354 38 C 350 66 346 84 352 88 C 358 92 372 84 384 66" stroke-width="4.5"/>
+              </svg>
+              <div>
+                <div style="font-weight:600;font-size:16px">Josh Randall</div>
+                <div style="color:var(--a-text-2)">The patient · signing for himself</div>
+              </div>
+            </div>
+            <dl style="margin:0">
+              <div class="a-desc-row"><dt>Meaning</dt><dd>Consent — agreement to the procedure described</dd></div>
+              <div class="a-desc-row"><dt>Statement signed</dt><dd style="color:var(--a-text-2)">"I have read the information about this procedure, I have had the chance to ask questions, and I agree to go ahead."</dd></div>
+              <div class="a-desc-row"><dt>Signed</dt><dd class="num">16 August 2026 at 14:36:02 BST</dd></div>
+              <div class="a-desc-row"><dt>Method</dt><dd>Drawn on a touchscreen · 4 strokes · Apple Pencil</dd></div>
+              <div class="a-desc-row"><dt>Document version</dt><dd><code style="font-size:12px">sha256:9f4b…c210</code> · Consent for treatment v3</dd></div>
+              <div class="a-desc-row"><dt>Recorded by</dt><dd>A. Okafor, RN · Ward 7 tablet</dd></div>
+              <div class="a-desc-row"><dt>Integrity</dt><dd><span class="a-tag gold">Graphical only</span> <span style="color:var(--a-text-3)">Image of a mark. Not a cryptographic signature.</span></dd></div>
+            </dl>
+          </div>
+        </div>
+      </div>
+      <figcaption>
+        <b>5.5 — The manifest.</b> Everything a signature manifestation is
+        required to display, in one printable block. The last row is the one
+        every other library omits: a PNG of a mark provides <em>no</em>
+        cryptographic integrity guarantee, and pretending otherwise is how
+        integrators end up over-trusting the artifact. If the deployment needs
+        non-repudiation, a JWS goes alongside — see §09.
+      </figcaption>
+    </figure>
+
+    <!-- ---------------------------------------------------------------- -->
+    <h3 style="margin-top:3rem">5.6 &nbsp; The states, side by side</h3>
+    <figure>
+      <div class="stage">
+        <div class="antd" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px">
+
+          <div>
+            <div style="font-size:12px;color:var(--a-text-3);margin-bottom:8px;font-family:ui-monospace,monospace">EMPTY · REQUIRED</div>
+            <span class="a-label"><span class="req">*</span>Patient signature</span>
+            <div class="a-pad" style="border-style:dashed">
+              <div class="a-pad-canvas" style="height:96px">
+                <span class="a-btn primary">&#9998; Add signature</span>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div style="font-size:12px;color:var(--a-text-3);margin-bottom:8px;font-family:ui-monospace,monospace">ERROR</div>
+            <span class="a-label"><span class="req">*</span>Patient signature</span>
+            <div class="a-pad" style="border-style:dashed;border-color:var(--a-error)">
+              <div class="a-pad-canvas" style="height:96px">
+                <span class="a-btn primary">&#9998; Add signature</span>
+              </div>
+            </div>
+            <div class="a-help">A signature is required before this form can be submitted.</div>
+          </div>
+
+          <div>
+            <div style="font-size:12px;color:var(--a-text-3);margin-bottom:8px;font-family:ui-monospace,monospace">SIGNED</div>
+            <span class="a-label">Patient signature</span>
+            <div class="a-pad">
+              <div style="padding:12px 16px;display:flex;align-items:center;gap:12px">
+                <svg class="ink-svg" viewBox="0 0 420 120" width="120" height="34" role="img" aria-label="Signature of Josh Randall, signed 16 August 2026" style="color:var(--a-text)">
+                  <path d="M52 84 C 54 52 64 26 78 28 C 90 30 84 60 72 80 C 64 94 50 94 50 82 C 52 66 68 60 78 68 C 86 74 82 86 74 84 C 66 82 68 66 80 60 C 92 54 102 66 96 78 C 92 86 82 84 84 74 C 88 58 104 46 116 46 C 126 46 124 62 116 76" stroke-width="6"/>
+                  <path d="M186 92 C 188 60 194 26 206 24 C 218 22 216 44 202 58 C 190 70 176 74 176 74 C 190 72 204 76 210 86 C 216 96 222 92 226 82 C 232 66 244 56 252 60 C 258 63 254 76 248 84 C 244 90 250 92 256 84 C 264 72 276 62 284 66 C 290 69 286 82 282 88 C 279 93 286 94 292 86 C 300 74 312 40 316 26 C 318 18 322 20 320 34 C 316 62 310 82 314 88 C 318 94 328 88 336 76 C 342 66 348 46 350 32 C 352 22 356 24 354 38 C 350 66 346 84 352 88 C 358 92 372 84 384 66" stroke-width="6"/>
+                </svg>
+                <div style="flex:1">
+                  <div style="font-weight:600;font-size:13px">Josh Randall</div>
+                  <div style="font-size:12px;color:var(--a-text-3)" class="num">16 Aug 2026, 14:36</div>
+                </div>
+                <span class="a-btn text sm" style="color:var(--a-primary)">View</span>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div style="font-size:12px;color:var(--a-text-3);margin-bottom:8px;font-family:ui-monospace,monospace">DECLINED</div>
+            <span class="a-label">Patient signature</span>
+            <div class="a-pad" style="border-color:var(--a-warning-border);background:var(--a-warning-bg)">
+              <div style="padding:12px 16px">
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+                  <span class="a-tag gold">Declined</span>
+                  <span style="font-size:12px;color:var(--a-text-3)" class="num">16 Aug 2026, 14:32</span>
+                </div>
+                <div style="font-size:13px;color:var(--a-text-2)">"Wants to discuss with her daughter before deciding." — recorded by A. Okafor, RN</div>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div style="font-size:12px;color:var(--a-text-3);margin-bottom:8px;font-family:ui-monospace,monospace">UNABLE · WITNESSED</div>
+            <span class="a-label">Patient signature</span>
+            <div class="a-pad" style="border-color:var(--a-warning-border);background:var(--a-warning-bg)">
+              <div style="padding:12px 16px">
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+                  <span class="a-tag gold">Unable to sign</span>
+                  <span style="font-size:12px;color:var(--a-text-3)" class="num">16 Aug 2026, 09:04</span>
+                </div>
+                <div style="font-size:13px;color:var(--a-text-2)">Intubated. Witnessed by M. Silva, MD.</div>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div style="font-size:12px;color:var(--a-text-3);margin-bottom:8px;font-family:ui-monospace,monospace">PENDING CO-SIGN</div>
+            <span class="a-label">Clinician attestation</span>
+            <div class="a-pad">
+              <div style="padding:12px 16px">
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+                  <span class="a-tag blue">Awaiting countersignature</span>
+                </div>
+                <div style="font-size:13px;color:var(--a-text-2)">Signed by R. Adeyemi, MD (resident). Awaiting attending since 16 Aug, 11:20.</div>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div style="font-size:12px;color:var(--a-text-3);margin-bottom:8px;font-family:ui-monospace,monospace">REVOKED</div>
+            <span class="a-label">Patient signature</span>
+            <div class="a-pad" style="border-color:var(--a-error-border);background:var(--a-error-bg)">
+              <div style="padding:12px 16px;display:flex;align-items:center;gap:12px">
+                <svg class="ink-svg" viewBox="0 0 420 120" width="110" height="31" role="img" aria-label="Revoked signature of Josh Randall" style="color:var(--a-text-4)">
+                  <path d="M52 84 C 54 52 64 26 78 28 C 90 30 84 60 72 80 C 64 94 50 94 50 82 C 52 66 68 60 78 68 C 86 74 82 86 74 84 C 66 82 68 66 80 60 C 92 54 102 66 96 78 C 92 86 82 84 84 74 C 88 58 104 46 116 46 C 126 46 124 62 116 76" stroke-width="6"/>
+                  <path d="M186 92 C 188 60 194 26 206 24 C 218 22 216 44 202 58 C 190 70 176 74 176 74 C 190 72 204 76 210 86 C 216 96 222 92 226 82 C 232 66 244 56 252 60 C 258 63 254 76 248 84 C 244 90 250 92 256 84 C 264 72 276 62 284 66 C 290 69 286 82 282 88 C 279 93 286 94 292 86 C 300 74 312 40 316 26 C 318 18 322 20 320 34 C 316 62 310 82 314 88 C 318 94 328 88 336 76 C 342 66 348 46 350 32 C 352 22 356 24 354 38 C 350 66 346 84 352 88 C 358 92 372 84 384 66" stroke-width="6"/>
+                  <path d="M30 60 L 400 60" stroke-width="3" style="stroke:var(--a-error)"/>
+                </svg>
+                <div>
+                  <span class="a-tag red">Consent withdrawn</span>
+                  <div style="font-size:12px;color:var(--a-text-2);margin-top:4px">18 Aug 2026 — patient withdrew before the procedure.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div style="font-size:12px;color:var(--a-text-3);margin-bottom:8px;font-family:ui-monospace,monospace">DISABLED / READ-ONLY</div>
+            <span class="a-label">Patient signature</span>
+            <div class="a-pad" style="background:var(--a-fill-3)">
+              <div class="a-pad-canvas" style="height:70px">
+                <span style="font-size:13px;color:var(--a-text-4)">This form is locked and cannot be changed.</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+      <figcaption>
+        <b>5.6 — Eight states.</b> Note that <code>declined</code>,
+        <code>unable</code> and <code>revoked</code> are all <em>present and
+        legible</em> in the form rather than rendering as an empty field. The
+        colour is doing supporting work only; every state is also named in text,
+        which is what keeps it readable in forced-colors mode and for anyone who
+        cannot distinguish the tints.
+      </figcaption>
+    </figure>
+
+    <!-- ---------------------------------------------------------------- -->
+    <h3 style="margin-top:3rem">5.7 &nbsp; Dark, and the bedside tablet</h3>
+    <figure>
+      <div class="stage dark">
+        <div class="antd dark" style="max-width:560px;margin:0 auto">
+          <div class="a-modal">
+            <div class="a-modal-head">
+              <div>
+                <div class="a-modal-title">Sign consent for treatment</div>
+                <div class="a-modal-sub">Randall, Josh · MRN 4471902</div>
+              </div>
+              <div class="a-modal-x">&#10005;</div>
+            </div>
+            <div class="a-modal-body">
+              <div class="a-tabs" style="margin-bottom:16px">
+                <div class="a-tab on"><span>&#9998;</span> Draw</div>
+                <div class="a-tab"><span>&#9000;</span> Type</div>
+                <div class="a-tab"><span>&#8679;</span> Upload</div>
+              </div>
+              <div class="a-pad">
+                <div class="a-pad-bar">
+                  <span class="a-btn text sm">&#8630; Undo</span>
+                  <span class="a-btn text sm" style="color:var(--a-text-4)">&#8631; Redo</span>
+                  <span class="div"></span>
+                  <span class="a-btn text sm">&#9003; Clear</span>
+                </div>
+                <div class="a-pad-canvas" style="height:150px">
+                  <svg class="ink-svg" viewBox="0 0 420 120" width="280" height="80" role="img"
+                       aria-label="Signature of Josh Randall" style="color:rgba(255,255,255,0.85);position:absolute;inset-block-start:12px">
+                    <path d="M52 84 C 54 52 64 26 78 28 C 90 30 84 60 72 80 C 64 94 50 94 50 82 C 52 66 68 60 78 68 C 86 74 82 86 74 84 C 66 82 68 66 80 60 C 92 54 102 66 96 78 C 92 86 82 84 84 74 C 88 58 104 46 116 46 C 126 46 124 62 116 76" stroke-width="4.5"/>
+                    <path d="M186 92 C 188 60 194 26 206 24 C 218 22 216 44 202 58 C 190 70 176 74 176 74 C 190 72 204 76 210 86 C 216 96 222 92 226 82 C 232 66 244 56 252 60 C 258 63 254 76 248 84 C 244 90 250 92 256 84 C 264 72 276 62 284 66 C 290 69 286 82 282 88 C 279 93 286 94 292 86 C 300 74 312 40 316 26 C 318 18 322 20 320 34 C 316 62 310 82 314 88 C 318 94 328 88 336 76 C 342 66 348 46 350 32 C 352 22 356 24 354 38 C 350 66 346 84 352 88 C 358 92 372 84 384 66" stroke-width="4.5"/>
+                  </svg>
+                  <div class="baseline"></div>
+                </div>
+              </div>
+            </div>
+            <div class="a-modal-foot split">
+              <span class="a-btn text" style="color:var(--a-primary)">Can't sign?</span>
+              <span class="a-btn primary">Sign and continue</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <figcaption>
+        <b>5.7 — Dark mode</b>, using antd's <code>darkAlgorithm</code> values.
+        The ink inverts to light because it is drawn from the stroke model at
+        render time, not stored as dark pixels — a bitmap captured in light mode
+        would be invisible here. One more reason the stroke model is the right
+        primitive.
+      </figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- ================================================================== -->
+<section id="a11y">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="sec-num">06 — Accessibility</span>
+      <h2>A draw-only signature pad fails WCAG at Level A</h2>
+      <p>
+        Not Level AA, and not on a technicality. This section sets out the
+        argument carefully, including the counterargument, because it is the
+        single most consequential design constraint on the component and it will
+        be challenged.
+      </p>
+    </div>
+
+    <div class="prose">
+      <h3>6.1 &nbsp; The argument, at the right level</h3>
+      <p>
+        The tempting version of this argument is: <em>drawing is a dragging
+        movement, WCAG 2.2 added SC 2.5.7 requiring a single-pointer
+        alternative, therefore a draw-only pad fails AA.</em> That version is
+        weaker than it looks, and it is worth knowing why before relying on it.
+      </p>
+      <p>
+        WCAG's normative glossary defines a dragging movement as one where
+        <em>an element</em> follows the pointer between the down- and up-events.
+        Freehand ink moves no element. An auditor can argue 2.5.7 does not
+        apply. Worse, the W3C has already conceded the exception in the
+        Understanding document for SC&nbsp;2.5.1:
+      </p>
+
+      <div class="note warn">
+        <span class="lbl">The sentence a vendor will quote at you</span>
+        <p style="font-size:1.02rem">
+          "An exception is made for functionality that is inherently and
+          necessarily based on complex paths or multipoint gestures. For
+          example, <strong>entering your signature may be inherently
+          path-based</strong> (although acknowledging something or confirming
+          your identity need not be)."
+        </p>
+        <p style="margin-top:0.6rem;font-size:0.88rem">
+          — <a href="https://www.w3.org/WAI/WCAG22/Understanding/pointer-gestures.html">Understanding SC 2.5.1 Pointer Gestures</a>
+        </p>
+      </div>
+
+      <p>
+        Read only the bolded half and the essential exception appears to swallow
+        the whole component. The parenthesis is what saves it, and it is the
+        hinge of the entire argument: <strong>acknowledging something or
+        confirming your identity need not be path-based.</strong> WCAG defines
+        <em>functionality</em> as processes and outcomes achievable through user
+        action. The function here is recording assent — not producing a bitmap
+        of cursive. The technique is path-based; the function is not.
+      </p>
+
+      <p>
+        And that distinction is not an interpretation. It is stated in the
+        Recommendation itself, in the normative note to a <strong>Level
+        A</strong> criterion, using handwriting as the worked example:
+      </p>
+
+      <div class="note ok">
+        <span class="lbl">The citation to lead with</span>
+        <p style="font-size:1.02rem">
+          "<strong>Note 1:</strong> This exception relates to the underlying
+          function, not the input technique. For example, if using handwriting
+          to enter text, the input technique (handwriting) requires
+          path-dependent input but <strong>the underlying function (text input)
+          does not</strong>."
+        </p>
+        <p style="margin-top:0.6rem;font-size:0.88rem">
+          — <a href="https://www.w3.org/TR/WCAG22/#keyboard">SC 2.1.1 Keyboard</a>, Level A. Normative text, not guidance.
+        </p>
+      </div>
+
+      <p>
+        So the finding to put in the conformance report is a
+        <strong>Level A keyboard failure</strong>, which is materially more
+        serious than an AA dragging failure — and it is discharged by exactly
+        the same mechanism the reference design already contains.
+      </p>
+    </div>
+
+    <div class="tw">
+      <table>
+        <thead>
+          <tr><th style="width:9rem">Criterion</th><th style="width:4rem">Level</th><th>What a draw-only pad does</th><th style="width:13rem">Discharged by</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><b>2.1.1</b> Keyboard</td><td><span class="a-tag red" style="font-family:var(--font-mono)">A</span></td><td><b>Fails.</b> No keyboard route to the function. Note 1 explicitly refuses the path-dependence excuse for handwriting.</td><td rowspan="3" style="vertical-align:middle"><b>The Type tab.</b> One mechanism, three criteria — which is why it is not optional and not subordinate.</td></tr>
+          <tr><td><b>2.5.1</b> Pointer Gestures</td><td><span class="a-tag red" style="font-family:var(--font-mono)">A</span></td><td><b>Fails.</b> Freehand ink is unambiguously path-based. Applies even if an auditor rejects 2.5.7's scoping.</td></tr>
+          <tr><td><b>2.5.7</b> Dragging Movements</td><td><span class="a-tag gold" style="font-family:var(--font-mono)">AA</span></td><td><b>Probably fails</b>, but contested — see 6.1. Treat as the third argument, never the first.</td></tr>
+          <tr><td><b>1.1.1</b> Non-text Content</td><td><span class="a-tag red" style="font-family:var(--font-mono)">A</span></td><td>Two <em>different</em> obligations that are routinely conflated. See 6.2.</td><td>Name on the surface; descriptive alt on the result</td></tr>
+          <tr><td><b>4.1.2</b> Name, Role, Value</td><td><span class="a-tag red" style="font-family:var(--font-mono)">A</span></td><td>A bare <code>&lt;canvas&gt;</code> has no implicit role and no value. Nothing is exposed.</td><td>Real DOM controls; canvas is one mode's affordance</td></tr>
+          <tr><td><b>1.3.1</b> Info and Relationships</td><td><span class="a-tag red" style="font-family:var(--font-mono)">A</span></td><td>Label, instruction and error relate to the field only visually.</td><td><code>role="group"</code> + <code>aria-labelledby</code>/<code>describedby</code></td></tr>
+          <tr><td><b>3.3.2</b> Labels or Instructions</td><td><span class="a-tag red" style="font-family:var(--font-mono)">A</span></td><td>Instructions must cover both modes and how to switch between them.</td><td>Visible label and hint per 5.1</td></tr>
+          <tr><td><b>3.3.4</b> Error Prevention (Legal)</td><td><span class="a-tag gold" style="font-family:var(--font-mono)">AA</span></td><td>Applies — the Understanding doc lists "a contract of any type" as a legal commitment.</td><td>Reversible + Confirmed: clearable ink, explicit "Sign and continue"</td></tr>
+          <tr><td><b>1.4.11</b> Non-text Contrast</td><td><span class="a-tag gold" style="font-family:var(--font-mono)">AA</span></td><td>The field boundary and the baseline guide need 3:1. So does the default ink colour, which is author-chosen.</td><td>Token-driven, gated by the existing contrast build step</td></tr>
+          <tr><td><b>2.5.8</b> Target Size</td><td><span class="a-tag gold" style="font-family:var(--font-mono)">AA</span></td><td><b>Not a canvas problem.</b> Note 1 makes spatially-selected areas a single target. It is a <em>chrome</em> problem: Undo, Redo, Clear, the tabs, the close affordance.</td><td>24×24 minimum on every control in the toolbar</td></tr>
+          <tr><td><b>2.2.1</b> Timing Adjustable</td><td><span class="a-tag red" style="font-family:var(--font-mono)">A</span></td><td>Only engaged if the host imposes a session timeout — routine in healthcare. Then: turn off, adjust, or warn and extend.</td><td>Host concern; documented, not swallowed</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="prose">
+      <h3>6.2 &nbsp; The two different text alternatives</h3>
+      <p>
+        SC 1.1.1 treats these as distinct cases and getting them the same way
+        round is the common bug:
+      </p>
+      <ul>
+        <li>
+          <b>The capture surface accepts input</b>, so it falls under the
+          <em>Controls, Input</em> exception and needs a <strong>name that
+          describes its purpose</strong> — not a description.
+          <code>"Draw your signature here"</code>. A long description here is
+          wrong.
+        </li>
+        <li>
+          <b>The completed signature is non-text content presented to the
+          user</b>, and needs an alternative <em>serving the equivalent
+          purpose</em>. The equivalent purpose of a signature image is
+          <strong>whose it is and that it was given</strong> — never the shape
+          of the strokes. So:
+          <code>alt="Signature of Josh Randall, signed 16 August 2026"</code>,
+          and never <code>alt="handwritten signature"</code>.
+        </li>
+      </ul>
+
+      <h3>6.3 &nbsp; There is no ARIA role for a drawing surface</h3>
+      <p>
+        <code>&lt;canvas&gt;</code> has no implicit role and permits any role,
+        which is total freedom and zero guidance. There is no role meaning
+        "freehand drawing surface", and that absence is itself an argument for
+        the architecture:
+      </p>
+      <ol>
+        <li>
+          <b>Do not make the canvas the control.</b> It is the visual affordance
+          for <em>one mode</em>. The operable control tree is native HTML.
+        </li>
+        <li>
+          <b>Wrap the widget in <code>role="group"</code></b> with
+          <code>aria-labelledby</code> at the visible label and
+          <code>aria-describedby</code> at the instructions. That is what
+          satisfies 1.3.1.
+        </li>
+        <li>
+          <b>Expose Draw / Type / Upload as a real tablist</b>, so the
+          accessible path is <em>discoverable</em> rather than merely present.
+        </li>
+        <li>
+          <b>Announce state through a polite live region</b> — "Signature
+          captured", "Signature cleared". Canvas bitmap changes are invisible to
+          assistive technology and nothing else will report them.
+        </li>
+        <li>
+          <b><code>role="img"</code> is correct for the finished signature and
+          wrong for the surface.</b> On the surface it asserts a
+          non-interactive graphic, which is a lie about an element that takes
+          input, and it discards state — a direct 4.1.2 problem.
+        </li>
+      </ol>
+
+      <h3>6.4 &nbsp; Forced colors will erase the signature</h3>
+      <p>
+        Forced-colors mode rewrites CSS <code>&lt;color&gt;</code> properties. A
+        canvas bitmap is painted by script, so <strong>the ink pixels are never
+        recoloured</strong> — while the container's background <em>is</em>. The
+        classic result is black ink on a transparent canvas inside a
+        forced-black container: the signature simply disappears. Three fixes,
+        all cheap:
+      </p>
+      <ul>
+        <li><b>Paint an opaque background into the bitmap</b> before inking, so ink and ground always travel together — and the exported PNG becomes self-contained as a side effect.</li>
+        <li><b>Re-theme under <code>@media (forced-colors: active)</code></b>, reading <code>CanvasText</code> / <code>Canvas</code> from a probe element and repainting the stroke. Repaint on media-query change.</li>
+        <li><b>Give the field a real CSS border</b>, not a shadow or a gradient — <code>box-shadow</code> computes to <code>none</code> under forced colors and a faked boundary vanishes with it.</li>
+      </ul>
+      <p>
+        The typed path needs none of this. It is plain DOM text and is
+        system-coloured for free — an argument for the same design decision that
+        has nothing to do with WCAG conformance and everything to do with the
+        component still working.
+      </p>
+
+      <h3>6.5 &nbsp; The population, not the edge case</h3>
+      <p>
+        Worth stating plainly because it changes how the trade-off feels:
+        the people asked to sign in a healthcare product are
+        disproportionately those with tremor, Parkinson's, arthritis,
+        post-stroke weakness, neuropathy, or a cannula in the back of the
+        signing hand. Stroke smoothing helps a little. The typed path is the
+        answer, and treating it as the accommodation rather than the norm gets
+        the design backwards.
+      </p>
+
+      <div class="note bad">
+        <span class="lbl">One honest caveat</span>
+        <p>
+          Two links in this chain are inference rather than quotation.
+          SC&nbsp;3.3.4's Understanding document never names healthcare consent
+          — "a contract of any type" is the bridge, and it is a strong bridge
+          but it is a bridge. And no primary source states that canvas bitmaps
+          are exempt from forced colors; it follows from the spec enumerating
+          only CSS colour properties, and it matches observed behaviour. Both
+          are flagged here rather than presented as settled.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================== -->
+<section id="api">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="sec-num">07 — API</span>
+      <h2>Four components and a hook, shaped like Ant Design</h2>
+      <p>
+        antd names things plainly — <code>Upload</code>, <code>Rate</code>,
+        <code>Transfer</code>, <code>Mentions</code> — and composes with dot
+        notation: <code>Input.TextArea</code>, <code>Upload.Dragger</code>,
+        <code>Card.Meta</code>. This follows both conventions.
+      </p>
+    </div>
+
+    <div class="grid g2">
+      <div class="card">
+        <span class="k">The form control</span>
+        <h4><code>&lt;Signature /&gt;</code></h4>
+        <p style="font-size:0.92rem;color:var(--ink-2)">
+          What you put in a <code>Form.Item</code>. Renders the empty
+          affordance or the captured result, opens the modal, and speaks the
+          <code>value</code>/<code>onChange</code> contract. This is the default
+          export and the only thing most people touch.
+        </p>
+      </div>
+      <div class="card">
+        <span class="k">The capture surface</span>
+        <h4><code>&lt;Signature.Pad /&gt;</code></h4>
+        <p style="font-size:0.92rem;color:var(--ink-2)">
+          Just the pad: canvas, toolbar, stroke model. No modal, no tabs, no
+          identity fields. For products that want the capture inline, or want to
+          build their own chrome around it.
+        </p>
+      </div>
+      <div class="card">
+        <span class="k">The dialog</span>
+        <h4><code>&lt;Signature.Modal /&gt;</code></h4>
+        <p style="font-size:0.92rem;color:var(--ink-2)">
+          The screen in §5.1 — tabs, identity, attestation, outcomes. Usable
+          standalone when the trigger is somewhere else entirely, such as a
+          toolbar action on a document viewer.
+        </p>
+      </div>
+      <div class="card">
+        <span class="k">The record</span>
+        <h4><code>&lt;Signature.Manifest /&gt;</code></h4>
+        <p style="font-size:0.92rem;color:var(--ink-2)">
+          Read-only. Takes a <code>SignatureValue</code> and renders §5.5,
+          including the non-signed outcomes. Prints correctly. The piece that
+          justifies the whole component.
+        </p>
+      </div>
+    </div>
+
+    <h3 style="margin-top:2rem">The common case</h3>
+    <pre><code><span class="c-k">import</span> { Form, Button } <span class="c-k">from</span> <span class="c-s">"antd"</span>;
+<span class="c-k">import</span> { Signature } <span class="c-k">from</span> <span class="c-s">"@oxygenui-design/signature"</span>;
+
+&lt;Form form={form} layout=<span class="c-s">"vertical"</span> onFinish={submit}&gt;
+  &lt;Form.Item
+    name=<span class="c-s">"patientSignature"</span>
+    label=<span class="c-s">"Patient signature"</span>
+    <span class="c-c">// `required` on Form.Item only draws the asterisk. The rule is what enforces.</span>
+    rules={[{ required: <span class="c-k">true</span>, message: <span class="c-s">"A signature is required to continue."</span> }]}
+  &gt;
+    &lt;Signature
+      meaning=<span class="c-s">"consent"</span>
+      attestation=<span class="c-s">"I have read the information about this procedure, I have had the
+                   chance to ask questions, and I agree to go ahead."</span>
+      subject={{ display: <span class="c-s">"Randall, Josh"</span>, reference: <span class="c-s">"Patient/4471902"</span> }}
+      capacities={[<span class="c-s">"self"</span>, <span class="c-s">"parent"</span>, <span class="c-s">"proxy"</span>, <span class="c-s">"legal-representative"</span>]}
+      methods={[<span class="c-s">"draw"</span>, <span class="c-s">"type"</span>, <span class="c-s">"upload"</span>]}
+      outcomes={[<span class="c-s">"declined"</span>, <span class="c-s">"unable"</span>, <span class="c-s">"verbal"</span>, <span class="c-s">"on-paper"</span>]}
+      documentHash={form.documentHash}
+      now={serverTime}            <span class="c-c">// the clock is injected, never read</span>
+      onAuditEvent={audit.write}
+    /&gt;
+  &lt;/Form.Item&gt;
+&lt;/Form&gt;</code></pre>
+
+    <div class="note">
+      <span class="lbl">Three antd contracts this satisfies exactly</span>
+      <p>
+        <b>1. The custom-control contract is three props</b> —
+        <code>id</code>, <code>value</code>, <code>onChange</code>. The
+        <code>id</code> is what <code>Form.Item</code> passes so
+        <code>&lt;label htmlFor&gt;</code> resolves; a component that ignores it
+        has a decorative label. <b>2. The value is passed directly</b>, not
+        wrapped in an event, matching <code>Select</code> and
+        <code>DatePicker</code> rather than <code>Input</code> — so no
+        <code>getValueFromEvent</code> is needed. <b>3. Validation state is read
+        from context</b> with <code>Form.Item.useStatus()</code>, which is how
+        antd's own controls get their error border; an explicit
+        <code>status</code> prop is accepted too, for use outside a form.
+      </p>
+    </div>
+
+    <h3>Props</h3>
+    <div class="tw">
+      <table>
+        <thead><tr><th style="width:12rem">Prop</th><th style="width:16rem">Type</th><th>Notes</th></tr></thead>
+        <tbody>
+          <tr><td><code>value</code></td><td><code>SignatureValue</code></td><td>Controlled. The discriminated union from §03.</td></tr>
+          <tr><td><code>defaultValue</code></td><td><code>SignatureValue</code></td><td>Uncontrolled.</td></tr>
+          <tr><td><code>onChange</code></td><td><code>(v: SignatureValue) =&gt; void</code></td><td>The value directly, antd composite-control style.</td></tr>
+          <tr><td><code>id</code></td><td><code>string</code></td><td>Supplied by <code>Form.Item</code>. Attached to the focusable trigger.</td></tr>
+          <tr><td><code>meaning</code></td><td><code>SignatureMeaning</code></td><td><code>consent | author | verification | validation | witness | review</code>. Maps to the ISO E1762 code.</td></tr>
+          <tr><td><code>attestation</code></td><td><code>ReactNode</code></td><td>The statement being signed. Rendered verbatim; stored in the value.</td></tr>
+          <tr><td><code>subject</code></td><td><code>Reference</code></td><td>Who the signature is <em>about</em> — usually the patient.</td></tr>
+          <tr><td><code>signer</code></td><td><code>Signer</code></td><td>Pre-fills name and credential when the host already knows who is signing.</td></tr>
+          <tr><td><code>capacities</code></td><td><code>Capacity[]</code></td><td>Which "signing as" options to offer. Single-element array hides the control.</td></tr>
+          <tr><td><code>methods</code></td><td><code>("draw"|"type"|"upload")[]</code></td><td>Which tabs. <strong>Omitting <code>"type"</code> is a lint error</strong> — see §06.</td></tr>
+          <tr><td><code>outcomes</code></td><td><code>Outcome[]</code></td><td>Which non-signature exits to offer. <code>[]</code> hides "Can't sign?".</td></tr>
+          <tr><td><code>documentHash</code></td><td><code>string</code></td><td>Hash of what is being signed. Carried into the value; not computed here.</td></tr>
+          <tr><td><code>now</code></td><td><code>string</code></td><td>Server time, ISO 8601. Injected, because the client clock is not evidence — and this repo lints against reading the clock in a component.</td></tr>
+          <tr><td><code>status</code></td><td><code>"error" | "warning"</code></td><td>antd's two values. Overrides the context value.</td></tr>
+          <tr><td><code>size</code></td><td><code>"large"|"middle"|"small"</code></td><td>antd v5 spelling. See §11 on <code>"medium"</code> in v6.</td></tr>
+          <tr><td><code>variant</code></td><td><code>"outlined"|"filled"|"borderless"</code></td><td>antd 5.13+ control variants.</td></tr>
+          <tr><td><code>disabled</code></td><td><code>boolean</code></td><td>Locked form. Renders the read-only state from §5.6.</td></tr>
+          <tr><td><code>ink</code></td><td><code>"black" | "blue" | string</code></td><td>Default black. Institutions ask for blue.</td></tr>
+          <tr><td><code>minInk</code></td><td><code>number | false</code></td><td>Rejection threshold for a stray tap. Default on.</td></tr>
+          <tr><td><code>captureBiometrics</code></td><td><code>boolean</code></td><td><strong>Default <code>false</code>.</strong> Opt-in stroke timing and pressure — see §09.</td></tr>
+          <tr><td><code>onAuditEvent</code></td><td><code>(e: AuditEvent) =&gt; void</code></td><td>opened · method-changed · cleared · committed · declined. The host writes the trail.</td></tr>
+          <tr><td><code>locale</code></td><td><code>SignatureLocale</code></td><td>All chrome strings, with the clinician/patient pairing the intl package requires.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>The headless hook</h3>
+    <p class="prose">
+      Everything above is built on it, and it is exported because a customer
+      with their own design system will want the engine without the chrome.
+    </p>
+    <pre><code><span class="c-k">const</span> pad = useSignatureCapture({ minInk: <span class="c-k">true</span>, smoothing: <span class="c-s">"catmull-rom"</span> });
+
+pad.bind          <span class="c-c">// spread onto the canvas: pointer handlers + ref + touch-action</span>
+pad.strokes       <span class="c-c">// Stroke[] — the source of truth</span>
+pad.isEmpty       <span class="c-c">// below the minimum-ink threshold</span>
+pad.undo() / redo() / clear()
+pad.canUndo / canRedo
+pad.toSVG({ trim: <span class="c-k">true</span>, margin: 8 })
+pad.toPNG({ dpi: 300, background: <span class="c-s">"transparent"</span> })
+pad.bounds        <span class="c-c">// ink bounding box, for trimming and for layout</span></code></pre>
+  </div>
+</section>
+
+<!-- ================================================================== -->
+<section id="data">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="sec-num">08 — Data contract</span>
+      <h2>FHIR, and the thing everyone gets wrong</h2>
+      <p>
+        The library already ships <code>@oxygenui-design/fhir</code>, so the
+        signature component should emit FHIR rather than a bespoke shape. One
+        finding here is load-bearing and surprising.
+      </p>
+    </div>
+
+    <div class="note bad">
+      <span class="lbl">The finding</span>
+      <p>
+        <strong>The <code>Consent</code> resource has no signature element.</strong>
+        Not in R4, not in R5. Neither does <code>Composition.attester</code> nor
+        <code>DocumentReference.attester</code>. Only
+        <code>Provenance.signature</code>, <code>Contract.signer.signature</code>
+        and <code>Bundle.signature</code> carry the <code>Signature</code>
+        datatype at all.
+      </p>
+      <p>
+        So a component that "produces a consent signature" cannot emit one
+        resource. It must emit a <strong>pair</strong>: the consent or
+        attestation resource, plus a <code>Provenance</code> whose
+        <code>.target</code> points at it and whose <code>.signature</code>
+        carries the ink. The output type is a transaction <code>Bundle</code>,
+        and designing it as anything else means rework later.
+      </p>
+    </div>
+
+    <h3>The <code>Signature</code> datatype</h3>
+    <div class="tw">
+      <table>
+        <thead><tr><th style="width:9rem">Element</th><th style="width:14rem">Type</th><th style="width:4rem">R4</th><th style="width:4rem">R5</th><th>What we put in it</th></tr></thead>
+        <tbody>
+          <tr><td><code>type</code></td><td><code>Coding</code></td><td class="num">1..*</td><td class="num">0..*</td><td>The ISO E1762 code for the <code>meaning</code> prop.</td></tr>
+          <tr><td><code>when</code></td><td><code>instant</code></td><td class="num">1..1</td><td class="num">0..1</td><td>The injected server time. <strong>Not</strong> <code>Consent.date</code> — see below.</td></tr>
+          <tr><td><code>who</code></td><td><code>Reference(…)</code></td><td class="num">1..1</td><td class="num">0..1</td><td>The signer. Practitioner, Patient, RelatedPerson, Device, Organization.</td></tr>
+          <tr><td><code>onBehalfOf</code></td><td><code>Reference(…)</code></td><td class="num">0..1</td><td class="num">0..1</td><td>The proxy case. Set whenever <code>capacity ≠ "self"</code>.</td></tr>
+          <tr><td><code>targetFormat</code></td><td><code>code</code></td><td class="num">0..1</td><td class="num">0..1</td><td>Which bytes were signed — <code>application/fhir+json</code>.</td></tr>
+          <tr><td><code>sigFormat</code></td><td><code>code</code></td><td class="num">0..1</td><td class="num">0..1</td><td><code>image/png</code> for the ink.</td></tr>
+          <tr><td><code>data</code></td><td><code>base64Binary</code></td><td class="num">0..1</td><td class="num">0..1</td><td>The trimmed PNG.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p class="prose">
+      The only R4→R5 change is cardinality relaxation on the first three. That
+      makes the rule simple: <strong>always write the R4 shape.</strong> R4's
+      stricter cardinality is a strict subset of what R5 accepts, so populating
+      <code>type</code>, <code>when</code> and <code>who</code> unconditionally
+      produces a payload valid in both releases. Do not let R5's relaxation
+      tempt you into omitting <code>who</code> — it is the element that makes a
+      signature attributable at all.
+    </p>
+
+    <h3>The codes are OIDs, not integers</h3>
+    <p class="prose">
+      A detail worth stating because it is easy to get wrong from the prose
+      pages: the codes in <code>urn:iso-astm:E1762-95:2013</code> are full
+      dotted OID strings, not the short numbers the display order suggests.
+      Five of the eighteen matter here.
+    </p>
+    <div class="tw">
+      <table>
+        <thead><tr><th style="width:16rem">Code</th><th style="width:14rem">Display</th><th>When this component emits it</th></tr></thead>
+        <tbody>
+          <tr><td><code>1.2.840.10065.1.12.1.7</code></td><td>Consent Signature</td><td><code>meaning="consent"</code> — the patient-consent case.</td></tr>
+          <tr><td><code>1.2.840.10065.1.12.1.1</code></td><td>Author's Signature</td><td><code>meaning="author"</code> — a clinician signing their own note.</td></tr>
+          <tr><td><code>1.2.840.10065.1.12.1.5</code></td><td>Verification Signature</td><td><code>meaning="verification"</code> — countersigning a verbal order.</td></tr>
+          <tr><td><code>1.2.840.10065.1.12.1.8</code></td><td>Signature Witness</td><td>The witness on <code>unable</code>, <code>verbal</code>, or an uploaded image.</td></tr>
+          <tr><td><code>1.2.840.10065.1.12.1.12</code></td><td>Interpreter Signature</td><td>Consent obtained through an interpreter.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="prose" style="font-size:0.92rem;color:var(--muted)">
+      Note that <code>.1.11</code> Consent Witness means witnessing the
+      <em>counselling</em>, and <code>.1.8</code> Signature Witness means
+      witnessing the <em>signing</em>. They are different events and the
+      component should not conflate them. R5 additionally admits ETSI codes
+      (<code>ProofOfApproval</code> and friends) that R4 does not; since the
+      binding is only <em>preferred</em> this does not break interop, but
+      emitting them would look foreign to an R4 consumer, so we do not.
+    </p>
+
+    <h3>Where each signature lives</h3>
+    <div class="tw">
+      <table>
+        <thead><tr><th style="width:14rem">The signature</th><th>Home</th></tr></thead>
+        <tbody>
+          <tr><td><b>Patient consent</b></td><td><code>Consent</code> + <code>Provenance.signature</code> with <code>type = …1.7</code>, <code>who = Patient</code>, <code>Provenance.target → Consent</code>. Human-readable form on <code>Consent.sourceAttachment</code>.</td></tr>
+          <tr><td><b>Clinician attestation</b></td><td><code>Composition.attester</code> with <code>mode = legal</code> or <code>professional</code> for the human-readable fact, <em>plus</em> <code>Provenance.signature</code> for the bytes. <code>attester</code> alone records that someone attested but cannot carry the ink.</td></tr>
+          <tr><td><b>Witness</b></td><td>A second entry in the same <code>Provenance.signature</code> array — the element is <code>0..*</code>, so co-signers live together naturally.</td></tr>
+          <tr><td><b>Multi-party form</b></td><td><code>Contract.signer</code>, the only place FHIR models a signature <em>as</em> a party-role pair, with <code>.signature</code> at <code>1..*</code>. The right shape for patient + witness + interpreter on one instrument.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="note warn">
+      <span class="lbl">Two release traps to abstract behind an adapter</span>
+      <p>
+        <code>Consent.scope</code> was <strong>removed</strong> in R5, and
+        <code>Consent.dateTime</code> became <code>Consent.date</code> — renamed
+        <em>and</em> narrowed from <code>dateTime</code> to <code>date</code>,
+        which silently discards the time of day. Never use
+        <code>Consent.date</code> as the signing timestamp; that is what
+        <code>Signature.when</code> is for, and it is an <code>instant</code>.
+        Also renamed: <code>patient</code> → <code>subject</code>, and
+        <code>provision.type</code> moved up to a root-level
+        <code>Consent.decision</code>.
+      </p>
+    </div>
+
+    <h3>Say what a PNG is not</h3>
+    <p class="prose">
+      <code>sigFormat: "image/png"</code> is an honest declaration that this is
+      a <em>graphical</em> signature — a picture of a mark, carrying no
+      cryptographic integrity guarantee whatsoever. Anyone can crop it out and
+      paste it somewhere else. Integrators routinely assume
+      <code>Signature</code> implies cryptographic signing, and a component that
+      does not say otherwise is letting them.
+    </p>
+    <p class="prose">
+      Where non-repudiation is actually required, the mature pattern is two
+      entries in the same <code>Provenance.signature</code> array sharing
+      <code>who</code> and <code>when</code>: one <code>image/png</code> holding
+      the ink for human review, one <code>application/jose</code> holding a JWS
+      over the canonical resource bytes with
+      <code>targetFormat: "application/fhir+json"</code>. The component emits
+      the first and leaves a documented seam for the second, because signing
+      keys are a deployment concern and do not belong in a UI component.
+    </p>
+
+    <pre><code><span class="c-k">import</span> { toFhirBundle } <span class="c-k">from</span> <span class="c-s">"@oxygenui-design/signature/fhir"</span>;
+
+<span class="c-k">const</span> bundle = toFhirBundle(value, {
+  release: <span class="c-s">"R4"</span>,                       <span class="c-c">// R4 shape is valid in both</span>
+  subject: { reference: <span class="c-s">"Patient/4471902"</span> },
+  target:  { reference: <span class="c-s">"Consent/9f4b"</span> },
+});
+
+<span class="c-c">// → Bundle(transaction) containing:
+//     Consent      … status, subject, sourceAttachment, decision
+//     Provenance   … target → Consent, recorded, agent[], signature[]
+//                    signature[0] = { type: [1.2.840.10065.1.12.1.7],
+//                                     when, who, onBehalfOf?,
+//                                     sigFormat: "image/png", data }</span></code></pre>
+  </div>
+</section>
+
+<!-- ================================================================== -->
+<section id="law">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="sec-num">09 — Compliance</span>
+      <h2>What the law actually requires, and what it does not</h2>
+      <p>
+        A component library cannot make a customer compliant. It can make
+        compliance <em>reachable</em> — by capturing what the regulations
+        require and refusing to imply guarantees it does not provide. Every
+        quotation below is from the primary source and linked.
+      </p>
+    </div>
+
+    <h3>9.1 &nbsp; 21 CFR Part 11 — and why it shapes the manifest</h3>
+    <p class="prose">
+      Part 11 governs electronic records and signatures in
+      <strong>FDA-regulated</strong> contexts — clinical trials, device and
+      pharmaceutical manufacturing. It does <em>not</em> govern ordinary
+      clinical care records. But §11.50 is worth designing to regardless,
+      because it is a good specification for a signature manifestation and it
+      costs nothing to satisfy:
+    </p>
+
+    <div class="note">
+      <span class="lbl">21 CFR §11.50(a) — Signature manifestations</span>
+      <p>
+        Signed electronic records must contain information showing
+        <strong>the printed name of the signer</strong>,
+        <strong>the date and time when the signature was executed</strong>, and
+        <strong>the meaning</strong> — "such as review, approval,
+        responsibility, or authorship" — <strong>associated with the
+        signature</strong>.
+      </p>
+      <p style="margin-top:0.6rem">
+        §11.50(b) adds that these must be subject to the same controls as the
+        record itself and <strong>included in any human-readable form</strong>,
+        displayed or printed.
+      </p>
+      <p style="margin-top:0.6rem;font-size:0.88rem">
+        — <a href="https://www.law.cornell.edu/cfr/text/21/11.50">21 CFR 11.50</a>
+      </p>
+    </div>
+
+    <p class="prose">
+      That is the manifest in §5.5, almost line for line, and it is why
+      <code>meaning</code> is a required prop rather than a nicety: a signature
+      that does not say what it meant fails the only clause in Part 11 that
+      describes what a signature should look like on screen.
+    </p>
+
+    <div class="note warn">
+      <span class="lbl">Where the component stops</span>
+      <p>
+        §11.200(a) requires non-biometric electronic signatures to employ
+        <strong>at least two distinct identification components</strong>, with
+        all components used at the first signing in a continuous session and at
+        least one component "only executable by, and designed to be used only
+        by, the individual" for subsequent signings — and requires that
+        unauthorized use "requires collaboration of two or more individuals."
+      </p>
+      <p style="margin-top:0.6rem">
+        <strong>That is authentication, and it is not a UI component's job.</strong>
+        A signature pad does not know who is holding the stylus. The component
+        renders the identity the host asserts and records the ink; the identity
+        assurance behind it belongs to the application's session and auth layer.
+        Saying so plainly in the API documentation is the difference between a
+        customer building a compliant system and a customer assuming they
+        already have one.
+      </p>
+      <p style="margin-top:0.6rem;font-size:0.88rem">
+        — <a href="https://www.law.cornell.edu/cfr/text/21/11.200">21 CFR 11.200</a>
+      </p>
+    </div>
+
+    <h3 style="margin-top:2rem">9.2 &nbsp; ESIGN — the typed name is a real signature</h3>
+    <p class="prose">
+      This is the legal fact the accessibility argument in §06 leans on, and it
+      is worth quoting exactly because the design decision rests on it. The
+      ESIGN Act defines an electronic signature as:
+    </p>
+
+    <div class="note ok">
+      <span class="lbl">15 U.S.C. §7006(5)</span>
+      <p style="font-size:1.02rem">
+        "an electronic sound, symbol, or process, attached to or logically
+        associated with a contract or other record and <strong>executed or
+        adopted by a person with the intent to sign the record</strong>."
+      </p>
+      <p style="margin-top:0.6rem;font-size:0.88rem">
+        — <a href="https://www.law.cornell.edu/uscode/text/15/7006">15 U.S.C. 7006</a>
+      </p>
+    </div>
+
+    <p class="prose">
+      Nothing in that definition mentions handwriting, cursive, or a path. A
+      typed name is a <em>symbol</em>, <em>adopted</em>, <em>with intent</em> —
+      and the legal weight sits entirely on the intent, which is what the
+      attestation statement and the "Sign and continue" button exist to
+      establish. The drawn mark is one way to manifest intent; it is not the
+      thing that creates the obligation.
+    </p>
+    <p class="prose">
+      This closes the loop on §06. WCAG's "essential" exception fails when the
+      outcome can be achieved another way that conforms. It can be, and the
+      statute is what proves it. So the copy in mockup 5.2 — "Typing your name
+      here has the same legal effect as signing by hand" — is accurate, and
+      removing the user's hesitation about it is a conformance act as much as a
+      usability one.
+    </p>
+
+    <p class="prose">
+      Three further authorities make the point harder than a definitional
+      argument alone would:
+    </p>
+    <ul class="prose">
+      <li>
+        <b>UETA's Official Comments say it outright.</b> Comment 7 to §2: "No
+        specific technology need be used in order to create a valid signature."
+        And Comment 1 to §9 lists worked examples of attributable signatures,
+        of which the first is simply: "The person types his/her name as part of
+        an e-mail purchase order."
+      </li>
+      <li>
+        <b>The IRS lists them as equals.</b> Publication 1345 (Rev. 12-2025)
+        enumerates acceptable electronic signature methods under the heading
+        "No specific technology is required", and the same list contains both
+        "a handwritten signature, mark or command input on a display screen by
+        a stylus device" and "a typed name … typed into a signature block on a
+        website form by a signer". A federal agency, in a current publication,
+        treating the drawn and typed paths as co-equal members of one list is
+        about as direct as this gets.
+      </li>
+      <li>
+        <b>No state may lawfully prefer the drawn one.</b> ESIGN's preemption
+        clause, 15 U.S.C. §7002(a)(2)(A)(ii), permits state variation only where
+        it does "not require, or accord greater legal status or effect to, the
+        implementation or application of a specific technology". A rule
+        demanding a drawn mark and refusing a typed name is exactly that.
+      </li>
+    </ul>
+
+    <div class="note bad">
+      <span class="lbl">The counter-case — and it is a design requirement, not a caveat</span>
+      <p>
+        <em>Cunningham v. Zurich American Insurance Co.</em> (Tex. App. 2011)
+        held that an email signature block was <strong>not</strong> a signature,
+        because "nothing in the email suggests" it was typed "with the intention
+        that the block be her signature" — and no evidence showed it "was typed
+        purposefully rather than generated automatically." Later courts
+        disagreed with it, but the reasoning matters more than the outcome:
+        <strong>it failed on evidence of intent, not on typed-name-ness.</strong>
+      </p>
+      <p style="margin-top:0.6rem">
+        Every authority in this section turns on the same single element —
+        intent to sign. So the typed path must be built to evidence it:
+      </p>
+      <ul style="margin-top:0.5rem;margin-bottom:0">
+        <li><strong>Never pre-fill the typed signature field.</strong> An autofilled name is precisely the <em>Cunningham</em> fact pattern. The identity field in 5.1 may be pre-filled; the signature field in 5.2 must be typed by the person signing.</li>
+        <li>Label the field as the signature, not as a name — the label is evidence.</li>
+        <li>Carry the attestation and an explicit affirmation into the value, so the record shows what the intent attached to.</li>
+        <li>Record the timestamp and the keystroke-origin method in the capture context.</li>
+      </ul>
+    </div>
+
+    <h3 style="margin-top:2rem">9.3 &nbsp; Medical-record authentication</h3>
+    <div class="note">
+      <span class="lbl">42 CFR §482.24(c)(1) — CMS Conditions of Participation</span>
+      <p>
+        "All patient medical record entries must be legible, complete, dated,
+        timed, and <strong>authenticated</strong> in written or electronic form
+        <strong>by the person responsible for providing or evaluating the
+        service provided</strong>, consistent with hospital policies and
+        procedures."
+      </p>
+      <p style="margin-top:0.6rem;font-size:0.88rem">
+        — <a href="https://www.law.cornell.edu/cfr/text/42/482.24">42 CFR 482.24</a>
+      </p>
+    </div>
+    <p class="prose">
+      Two design consequences. "Dated, timed" is why the timestamp is injected
+      from the server rather than read from the browser clock. And "by the
+      person responsible for providing or evaluating the service" is why
+      <code>capacity</code> is a first-class field — the rule is about
+      <em>who</em>, and a component that captures only a mark cannot evidence it.
+    </p>
+
+    <h3 style="margin-top:2rem">9.4 &nbsp; Biometric privacy — the good news</h3>
+    <p class="prose">
+      The obvious worry about capturing stroke dynamics is Illinois BIPA, which
+      carries a private right of action and has produced the largest biometric
+      settlements in the US. The statute answers the question directly:
+    </p>
+
+    <div class="note ok">
+      <span class="lbl">740 ILCS 14/10 — Illinois Biometric Information Privacy Act</span>
+      <p>
+        "'Biometric identifier' means a retina or iris scan, fingerprint,
+        voiceprint, or scan of hand or face geometry. <strong>Biometric
+        identifiers do not include writing samples, written signatures</strong>,
+        photographs, human biological samples used for valid scientific testing
+        or screening, demographic data, tattoo descriptions, or physical
+        descriptions…"
+      </p>
+      <p style="margin-top:0.6rem">
+        And, separately: "Biometric identifiers do not include
+        <strong>information captured from a patient in a health care
+        setting</strong> or information collected, used, or stored for health
+        care treatment, payment, or operations under" HIPAA.
+      </p>
+    </div>
+
+    <p class="prose">
+      Texas reaches the same result by a different route: CUBI's definition is a
+      closed enumeration — "a retina or iris scan, fingerprint, voiceprint, or
+      record of hand or face geometry" — with no signature in it and no
+      exclusion list at all. Enforcement there is the Attorney General's alone,
+      at up to $25,000 per violation, with no private right of action.
+      <span style="color:var(--muted)">(Texas amended §503.001 effective
+      1 January 2026 via HB 149; the definition was renumbered to (a)(2) but its
+      wording is unchanged.)</span>
+    </p>
+
+    <div class="note warn">
+      <span class="lbl">Which does not make it a free action</span>
+      <p>
+        A <em>written signature</em> is excluded. Whether <em>stroke
+        dynamics</em> — the timing, velocity and pressure series behind it — are
+        a "writing sample" or something else is not settled by the text, and the
+        argument that they are a behavioural biometric is not frivolous. The
+        design position stands: capture them into the model because the model
+        needs them to render, <strong>never emit them by default</strong>, and
+        make <code>captureBiometrics</code> an explicit decision the integrator
+        makes with their counsel rather than a default they inherit from us.
+      </p>
+    </div>
+
+    <h3 style="margin-top:2rem">9.5 &nbsp; What this component must never claim</h3>
+    <div class="tw">
+      <table>
+        <thead><tr><th style="width:15rem">Regime</th><th>Position</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><b>DEA EPCS</b><br><span style="color:var(--muted);font-size:0.85rem">controlled-substance e-prescribing</span></td>
+            <td>A separate and far stricter regime — identity proofing, two-factor authentication, and a certified application. <strong>This component does not satisfy it and must not be presented as if it might.</strong> An explicit disclaimer belongs in the README, not in a footnote.</td>
+          </tr>
+          <tr>
+            <td><b>eIDAS</b><br><span style="color:var(--muted);font-size:0.85rem">EU</span></td>
+            <td>Three tiers: simple, advanced, and qualified. A mark drawn on a screen is a <em>simple</em> electronic signature. Advanced and qualified require cryptographic key material and, for qualified, a trust-service provider. <span style="color:var(--muted)">Stated from general knowledge; not verified against the Regulation in this pass.</span></td>
+          </tr>
+          <tr>
+            <td><b>Cryptographic non-repudiation</b></td>
+            <td>A PNG of a mark provides none. §08 sets out the two-signature pattern for deployments that need it, and the manifest in 5.5 labels the graphical-only case on its face.</td>
+          </tr>
+          <tr>
+            <td><b>Identity assurance</b></td>
+            <td>The component records who the host says is signing. It cannot verify it. §11.200's two-component rule lives in the application's auth layer.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="note bad">
+      <span class="lbl">Verification status, stated plainly</span>
+      <p>
+        §§9.1–9.4 are quoted from primary sources and linked. The eIDAS row in
+        9.5 and the DEA EPCS characterisation are from general knowledge and
+        were <strong>not</strong> verified against the primary text in this
+        pass — they are directional, and the DEA one is a disclaimer rather than
+        a claim, so neither is load-bearing. Nothing in this brief should be
+        read as legal advice; the point of citing the sources is so that
+        somebody qualified can check the reasoning quickly.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================== -->
+<section id="arch">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="sec-num">10 — Architecture</span>
+      <h2>Four layers, and one thing not to build</h2>
+    </div>
+
+    <pre><code>packages/signature-core/     <span class="c-c">zero deps · no React · no antd · SSR-safe</span>
+  ├── strokes.ts             <span class="c-c">the model: Stroke[] of {x,y,t,pressure,tilt,pointerType}</span>
+  ├── capture.ts             <span class="c-c">Pointer Events → strokes. capture, palm rejection, coalescing</span>
+  ├── smooth.ts              <span class="c-c">Catmull-Rom + velocity→width</span>
+  ├── render.ts              <span class="c-c">strokes → SVG path / canvas ops. one geometry, two targets</span>
+  ├── export.ts              <span class="c-c">toSVG, toPNG, bounds, trim, DPI</span>
+  ├── gate.ts                <span class="c-c">minimum-ink</span>
+  └── value.ts               <span class="c-c">the SignatureValue union + guards + invariants</span>
+
+packages/signature/          <span class="c-c">React + antd</span>
+  ├── use-signature-capture  <span class="c-c">the headless hook</span>
+  ├── Signature              <span class="c-c">the Form control</span>
+  ├── Signature.Pad          <span class="c-c">the surface</span>
+  ├── Signature.Modal        <span class="c-c">the dialog</span>
+  ├── Signature.Manifest     <span class="c-c">the record</span>
+  └── fhir.ts                <span class="c-c">toFhirBundle — depends on @oxygenui-design/fhir</span></code></pre>
+
+    <div class="grid g2" style="margin-top:1.5rem">
+      <div class="card">
+        <span class="k">Why core is separate</span>
+        <h4>The engine is testable without a DOM</h4>
+        <p style="font-size:0.92rem;color:var(--ink-2)">
+          Synthetic pointer sequences in, deterministic <code>Stroke[]</code>
+          out, golden SVG compared as text. No canvas pixel-diffing, no
+          headless browser, no flake. It is also what makes a future
+          custom-element build — or a React Native one — a shell rather than a
+          rewrite.
+        </p>
+      </div>
+      <div class="card">
+        <span class="k">Why one geometry</span>
+        <h4>SVG and canvas from the same path</h4>
+        <p style="font-size:0.92rem;color:var(--ink-2)">
+          The loaders in this library already carry a parity test proving the
+          React and custom-element renderings agree; it caught a mistyped bezier
+          and a missing keyframe. The same technique applies: render the same
+          strokes to both targets and assert the path data matches.
+        </p>
+      </div>
+    </div>
+
+    <div class="note warn">
+      <span class="lbl">The thing not to build</span>
+      <p>
+        <strong>Do not reimplement variable-width Bézier stroke smoothing.</strong>
+        <code>signature_pad</code> has solved it, and the three most-used React
+        signature packages are all wrappers around it. Reimplementing that maths
+        is a tarpit with no differentiation at the end of it. Wrap it behind
+        <code>signature-core</code>'s interface and spend the effort on
+        everything above the ink — the outcome model, the manifest, the antd
+        surface, the FHIR mapping. That is where the value is and where nobody
+        else is working.
+      </p>
+      <p style="margin-top:0.6rem">
+        <code>@zag-js/signature-pad</code> is worth reading before writing a
+        line: it is a headless state machine that already models the hidden
+        form input, the label association, and the guide line. It is the closest
+        prior art to the accessible architecture in §6.3.
+      </p>
+    </div>
+
+    <h3>Prior art</h3>
+    <div class="tw">
+      <table>
+        <thead><tr><th style="width:15rem">Package</th><th style="width:8rem">State</th><th>Relevance</th></tr></thead>
+        <tbody>
+          <tr><td><code>signature_pad</code></td><td>The engine</td><td>What everything wraps. Variable-width Bézier smoothing, pointer handling. <b>Wrap this.</b></td></tr>
+          <tr><td><code>@zag-js/signature-pad</code></td><td>1.43.0, current</td><td>Headless state machine with the a11y architecture already thought through. <b>Read this.</b></td></tr>
+          <tr><td><code>react-signature-pad-wrapper</code></td><td>4.3.3, actively maintained</td><td>The healthy React wrapper.</td></tr>
+          <tr><td><code>react-signature-canvas</code></td><td>1.1.0-<b>alpha</b></td><td>The de-facto default, stuck in alpha. Worth knowing customers are probably on it.</td></tr>
+          <tr><td><code>antd-img-crop</code></td><td>—</td><td>Not a signature library — the <em>packaging pattern</em> for an antd-shaped add-on. Study how it names and distributes itself.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="note ok">
+      <span class="lbl">The commercial read</span>
+      <p>
+        Every existing signature package is canvas-only. None ships Draw / Type
+        / Upload, none is design-token aware, none models capacity, none has a
+        manifest, and none emits FHIR. <strong>Ant Design itself has no
+        signature component in v5 or v6</strong> — the Data Entry section has
+        eighteen components and this is not one of them. That is genuine white
+        space, in a category where the differentiator is the part everyone else
+        skipped.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================== -->
+<section id="antd">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="sec-num">11 — The Ant Design question</span>
+      <h2>Two decisions to make before any code is written</h2>
+      <p>
+        "We will follow Ant Design" is clear as a direction and ambiguous as an
+        instruction. There are two separate questions inside it and they have
+        different answers.
+      </p>
+    </div>
+
+    <div class="note bad">
+      <span class="lbl">Time-sensitive, and new since the instruction was given</span>
+      <p>
+        <strong>Ant Design v6.6.0 shipped on 10 August 2026 — six days ago.</strong>
+        The v5 line ended at 5.29.3, and <code>ant.design/components/*</code>
+        now serves v6 documentation; v5's docs have moved to
+        <code>5x.ant.design</code>. A component designed this week against v5
+        is being designed against a superseded major, and will meet v6
+        applications.
+      </p>
+    </div>
+
+    <h3>11.1 &nbsp; Which major</h3>
+    <p class="prose">
+      The renames that touch this component directly. None is deep — they are
+      almost all prop-name churn — but they decide what the API table in §07
+      actually says.
+    </p>
+    <div class="tw">
+      <table>
+        <thead><tr><th style="width:16rem">v5</th><th style="width:16rem">v6</th><th>Bearing here</th></tr></thead>
+        <tbody>
+          <tr><td><code>size="middle"</code></td><td><code>size="medium"</code></td><td>Our <code>size</code> prop. Affects Button, Tabs, Input, Form too.</td></tr>
+          <tr><td><code>Tabs tabPosition</code></td><td><code>tabPlacement</code></td><td>The Draw/Type/Upload tablist.</td></tr>
+          <tr><td><code>Modal maskClosable</code></td><td><code>mask.closable</code></td><td>A signing modal should probably not be mask-closable at all.</td></tr>
+          <tr><td><code>Modal focusTriggerAfterClose</code></td><td><code>focusable.focusTriggerAfterClose</code></td><td>Focus restoration after signing.</td></tr>
+          <tr><td><code>Button iconPosition</code></td><td><code>iconPlacement</code></td><td>Toolbar buttons.</td></tr>
+          <tr><td><code>destroyOnClose</code></td><td colspan="2"><code>destroyOnHidden</code> — <b>already available in v5.25.0. Use it now</b> and this one costs nothing.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="prose">
+      <b>Recommendation:</b> target <strong>v6</strong>, and keep a v5 adapter
+      only if a named customer is pinned there. Building new against a major
+      that ended three weeks ago buys nothing.
+    </p>
+
+    <h3 style="margin-top:2rem">11.2 &nbsp; Wrap, match, or migrate</h3>
+    <p class="prose">
+      The bigger question, and the one that decides what this library
+      <em>is</em>. Today it is a shadcn-style registry: components are copied
+      into the customer's repo as readable source, styled with Tailwind v4
+      utilities generated from DTCG tokens, with no antd dependency anywhere.
+      Ant Design is a different architecture, not a different skin.
+    </p>
+
+    <div class="grid g3">
+      <div class="card">
+        <span class="k">Option A</span>
+        <h4>Wrap antd</h4>
+        <p style="font-size:0.9rem;color:var(--ink-2)">
+          Compose real antd components; antd becomes a peer dependency.
+        </p>
+        <p style="font-size:0.9rem;margin-top:0.6rem"><b>Gets:</b> Modal's focus trap, Tabs' full ARIA and roving tabindex, Form wiring, theming — free and correct.</p>
+        <p style="font-size:0.9rem"><b>Costs:</b> ends copy-as-source distribution, makes every consumer carry antd, and couples the roadmap to antd's majors. The registry channel effectively closes.</p>
+      </div>
+      <div class="card">
+        <span class="k">Option B</span>
+        <h4>Match antd</h4>
+        <p style="font-size:0.9rem;color:var(--ink-2)">
+          Independent implementations that follow antd's API and visual
+          language, with Oxygen's token layer mapped onto antd's token names.
+        </p>
+        <p style="font-size:0.9rem;margin-top:0.6rem"><b>Gets:</b> keeps the registry, keeps "readable source you own", keeps the token pipeline and its contrast gate.</p>
+        <p style="font-size:0.9rem"><b>Costs:</b> reimplements Modal and Tabs behaviour, including the accessibility antd already got right. Real work, easy to get subtly wrong.</p>
+      </div>
+      <div class="card">
+        <span class="k">Option C</span>
+        <h4>Migrate wholesale</h4>
+        <p style="font-size:0.9rem;color:var(--ink-2)">
+          Adopt antd as the foundation and retire the registry channel.
+        </p>
+        <p style="font-size:0.9rem;margin-top:0.6rem"><b>Gets:</b> one system, no impedance, fastest per-component velocity from here.</p>
+        <p style="font-size:0.9rem"><b>Costs:</b> discards the token pipeline, the brand axis, the dual-channel distribution, and the differentiator in the strategy — that customers own the source.</p>
+      </div>
+    </div>
+
+    <div class="note">
+      <span class="lbl">Recommendation, with the reasoning visible</span>
+      <p>
+        <strong>Option A for this component specifically; defer the general
+        decision.</strong> The signature component is unusually
+        antd-shaped — it is a Modal containing Tabs and a Form control, which is
+        three of the four things antd does best and where its accessibility is
+        genuinely good (Tabs ship correct <code>role="tablist"</code>, roving
+        tabindex, arrow-key navigation and <code>aria-controls</code> wiring).
+        Reimplementing a focus-trapped modal to avoid a peer dependency, for a
+        component whose entire argument is accessibility, is the wrong trade.
+      </p>
+      <p style="margin-top:0.6rem">
+        Meanwhile <code>signature-core</code> has no antd dependency at all, so
+        the expensive half of the work is portable whichever way the general
+        decision lands. That is the hedge: build the engine framework-free,
+        wrap antd for the surface, and let one component's experience inform the
+        library-wide call rather than deciding it in the abstract.
+      </p>
+    </div>
+
+    <h3 style="margin-top:2rem">11.3 &nbsp; What antd does not give you</h3>
+    <p class="prose">
+      Worth knowing before Option A is chosen on the assumption that antd
+      handles accessibility. It largely does not, and it says so: there is no
+      accessibility page in the v5 or v6 documentation, and the maintainers'
+      stated position on WCAG compliance is "no plans yet, willing to accept
+      community contributions."
+    </p>
+    <div class="tw">
+      <table>
+        <thead><tr><th style="width:14rem">Gap</th><th>What we must add</th></tr></thead>
+        <tbody>
+          <tr><td><b>Modal has no accessible name without <code>title</code></b></td><td><code>aria-labelledby</code> is wired only when <code>title</code> is passed. Our header is custom (title + patient line), so we must supply the name ourselves or pass <code>title</code> and style it.</td></tr>
+          <tr><td><b>Initial focus lands on an invisible sentinel</b></td><td>The focus trap is implemented with two hidden <code>tabIndex={0}</code> divs, and focus opens on the first one — an unlabelled landing spot for a screen-reader user. Move focus deliberately to the active tab on open.</td></tr>
+          <tr><td><b>Tabs drop their ARIA wiring without an <code>id</code></b></td><td><code>aria-controls</code> and <code>aria-labelledby</code> are emitted only when <code>&lt;Tabs id&gt;</code> is set. Omit it and the tab↔panel relationship is invisible to assistive technology. <b>Always pass <code>id</code>.</b></td></tr>
+          <tr><td><b>Upload nests <code>role="button"</code> inside a <code>&lt;button&gt;</code></b></td><td>A real WCAG failure antd ships today. <code>Upload.Dragger</code> is a drop zone rather than a nested button and sidesteps it — which is why §5.3 uses the dragger.</td></tr>
+          <tr><td><b>Close button's label is hardcoded English</b></td><td><code>aria-label="Close"</code> bypasses antd's locale system entirely. Ours must come from the intl package.</td></tr>
+          <tr><td><b>No <code>aria-describedby</code> anywhere</b></td><td>The attestation text must be wired to the control by hand.</td></tr>
+          <tr><td><b>Focus is not restored when <code>mask={false}</code></b></td><td>The restore branch is gated on the mask. Keep the mask, or restore focus ourselves.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 style="margin-top:2rem">11.4 &nbsp; Tokens, correctly placed</h3>
+    <p class="prose">
+      antd has three token layers and half the ones this component needs are not
+      alias tokens, which matters because overriding at the wrong layer produces
+      surprising cascades.
+    </p>
+    <div class="tw">
+      <table>
+        <thead><tr><th style="width:13rem">Token</th><th style="width:6rem">Layer</th><th>Used for</th></tr></thead>
+        <tbody>
+          <tr><td><code>colorPrimary</code></td><td><b>Seed</b></td><td>The active pen affordance. Changing it recalculates the whole palette.</td></tr>
+          <tr><td><code>borderRadius</code></td><td><b>Seed</b></td><td>Toolbar controls. Default 6.</td></tr>
+          <tr><td><code>controlHeight</code></td><td><b>Seed</b></td><td>Toolbar sizing. Default 32.</td></tr>
+          <tr><td><code>colorBgElevated</code></td><td>Map</td><td><b>The modal surface</b> — not <code>colorBgContainer</code>. In dark mode it is deliberately a little brighter.</td></tr>
+          <tr><td><code>colorBgContainer</code></td><td>Map</td><td>The canvas fill.</td></tr>
+          <tr><td><code>colorBorder</code></td><td>Map</td><td>The pad frame and the baseline guide. Must clear 3:1 — see §06.</td></tr>
+          <tr><td><code>borderRadiusLG</code></td><td>Map</td><td>The modal and the pad. antd's own note names Card and Modal for this one.</td></tr>
+          <tr><td><code>colorTextDescription</code></td><td>Alias</td><td>"Sign above the line" and the retention note.</td></tr>
+          <tr><td><code>paddingLG</code>, <code>marginSM</code></td><td>Alias</td><td>Vertical rhythm inside the modal.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="prose" style="font-size:0.92rem;color:var(--muted)">
+      Read them with <code>theme.useToken()</code>, which returns
+      <code>{ theme, token, hashId }</code> — an object, not a tuple. With
+      <code>cssVar</code> enabled the values are CSS-variable references, so do
+      not do arithmetic on them.
+    </p>
+  </div>
+</section>
+
+<!-- ================================================================== -->
+<section id="tests">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="sec-num">12 — Test plan</span>
+      <h2>What CI has to hold, and how to test a canvas without flake</h2>
+      <p>
+        The library already runs 852 tests, a story-derived accessibility sweep,
+        deterministic visual regression, and six cross-framework smoke apps in
+        three engines. This slots into that machinery rather than inventing a
+        second one.
+      </p>
+    </div>
+
+    <div class="note">
+      <span class="lbl">The governing idea</span>
+      <p>
+        <strong>Never pixel-diff a canvas in a unit test.</strong> Feed synthetic
+        pointer sequences into <code>signature-core</code>, get a deterministic
+        <code>Stroke[]</code> out, and compare the rendered SVG <em>as text</em>.
+        Same input, byte-identical output, no headless browser, no flake. Pixels
+        are checked exactly once, in the Playwright visual-regression layer,
+        where the existing config already disables animation and fixes the
+        device scale factor.
+      </p>
+    </div>
+
+    <h3>Layer by layer</h3>
+    <div class="tw">
+      <table>
+        <thead><tr><th style="width:11rem">Layer</th><th style="width:8rem">Tool</th><th>What it proves</th></tr></thead>
+        <tbody>
+          <tr>
+            <td rowspan="6"><b>signature-core</b><br><span style="color:var(--muted);font-size:0.85rem">pure, no DOM</span></td>
+            <td>Vitest, node env</td><td>Synthetic pointer sequence → expected <code>Stroke[]</code>. Coalesced events, pointer leaving and re-entering the surface, a stroke interrupted by <code>pointercancel</code>.</td>
+          </tr>
+          <tr><td>Vitest</td><td><b>Undo/redo is an involution.</b> N undos followed by N redos returns the identical model — property-tested over random stroke counts rather than one worked example.</td></tr>
+          <tr><td>Vitest</td><td><b>Export determinism.</b> The same strokes produce byte-identical SVG across runs. This is what makes the VRT layer trustworthy.</td></tr>
+          <tr><td>Vitest</td><td><b>The minimum-ink gate.</b> A single tap is rejected; a three-pixel scribble is rejected; a real signature is accepted. Table-driven, with the fixtures committed.</td></tr>
+          <tr><td>Vitest</td><td><b>Trim correctness.</b> Ink bounds are exact, the margin is honoured, and a signature drawn in one corner exports the same as one drawn in the centre.</td></tr>
+          <tr><td>Vitest</td><td><b>Union invariants.</b> <code>unable</code> without a witness does not typecheck and does not construct. Every outcome round-trips through <code>toFhirBundle</code> and back.</td></tr>
+          <tr>
+            <td rowspan="4"><b>React surface</b></td>
+            <td>Testing Library</td><td>Controlled and uncontrolled both work; <code>id</code> from <code>Form.Item</code> reaches a focusable node so <code>&lt;label for&gt;</code> resolves.</td>
+          </tr>
+          <tr><td>Testing Library</td><td><b>A keyboard-only signing test that never dispatches a pointer event.</b> If this passes, the Level A argument in §06 is not a claim — it is a test result.</td></tr>
+          <tr><td>Testing Library</td><td>Form integration: a <code>required</code> rule blocks submit while empty, <code>Form.Item.useStatus()</code> drives the error border, and a declined outcome satisfies the rule (it is a recorded answer, not a blank).</td></tr>
+          <tr><td>axe-core</td><td>Every story × 3 themes × 3 densities, through the existing story-derived harness.</td></tr>
+          <tr>
+            <td rowspan="4"><b>Browser</b></td>
+            <td>Playwright</td><td>Real pointer, real pen pressure, real touch. Chromium, Firefox and WebKit — the projects already exist.</td>
+          </tr>
+          <tr><td>Playwright</td><td><b>Forced-colors:</b> emulate it, draw, and assert the ink is still visible against the forced background. This is the check §6.4 exists for.</td></tr>
+          <tr><td>Playwright VRT</td><td>The manifest at print widths, and each of the eight states in §5.6, in both themes.</td></tr>
+          <tr><td>Playwright</td><td>320&nbsp;px reflow, 200% zoom, focus-visible on every control — the existing <code>@a11y</code> and <code>@reflow</code> projects pick these up for free.</td></tr>
+          <tr>
+            <td><b>Cross-framework</b></td><td>Playwright</td>
+            <td>Only if the custom-element build happens. The harness in <code>apps/smoke</code> already drives six frameworks and found three real defects the day it was written.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Two guards worth adding to the lint plugin</h3>
+    <div class="grid g2">
+      <div class="card">
+        <span class="k">Rule</span>
+        <h4><code>signature-requires-typed-path</code></h4>
+        <p style="font-size:0.92rem;color:var(--ink-2)">
+          <code>&lt;Signature methods={["draw"]} /&gt;</code> is an error. It
+          produces a component that fails WCAG 2.1.1 at Level A, it looks
+          entirely reasonable in review, and it will otherwise be written by
+          someone who thought the Type tab was optional. Exactly the shape of
+          the existing <code>no-absence-placeholder</code> rule: a defect that
+          renders fine.
+        </p>
+      </div>
+      <div class="card">
+        <span class="k">Rule</span>
+        <h4><code>no-client-clock-in-signature</code></h4>
+        <p style="font-size:0.92rem;color:var(--ink-2)">
+          The repository already warns on <code>Date.now()</code> inside a
+          component for visual-regression determinism. On a signature the same
+          call is a legal problem, not a testing one — the client clock is not
+          evidence. Same rule, escalated to an error in this package.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================== -->
+<section id="plan">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="sec-num">13 — Implementation plan</span>
+      <h2>Seven phases, about four weeks to beta</h2>
+      <p>
+        Sized against the readiness audit's own metric of two to three
+        person-days per component at <code>beta</code>. This decomposes into one
+        engine package and four components, so four weeks at one engineer is the
+        honest number — not three days because it "is just a signature pad".
+      </p>
+    </div>
+
+    <div class="phases">
+      <div class="phase">
+        <div class="rail"><div class="dot">P0</div><div class="line"></div></div>
+        <div class="body">
+          <h4>Decide, before writing anything</h4>
+          <div class="meta">Blocking · half a day · §11 and §14</div>
+          <p style="color:var(--ink-2)">
+            Which antd major. Wrap, match or migrate. Whether saved signatures
+            exist at all. Whether stroke biometrics are ever captured. Each of
+            these changes the shape of the code, and all four are cheap now and
+            expensive in week three.
+          </p>
+        </div>
+      </div>
+
+      <div class="phase">
+        <div class="rail"><div class="dot">P1</div><div class="line"></div></div>
+        <div class="body">
+          <h4><code>signature-core</code> — the engine</h4>
+          <div class="meta">4 days · no React, no antd, no DOM in tests</div>
+          <p style="color:var(--ink-2)">
+            Stroke model, pointer capture with palm rejection, smoothing,
+            SVG/PNG export with trimming and DPI, the minimum-ink gate, the
+            <code>SignatureValue</code> union and its guards. Wraps
+            <code>signature_pad</code> for the stroke maths rather than
+            reimplementing it. Ships with the full property-test suite from §12
+            — this phase is done when the engine is provably deterministic.
+          </p>
+        </div>
+      </div>
+
+      <div class="phase">
+        <div class="rail"><div class="dot">P2</div><div class="line"></div></div>
+        <div class="body">
+          <h4><code>Signature.Pad</code> — the surface and its accessibility</h4>
+          <div class="meta">3 days · the architecture from §6.3</div>
+          <p style="color:var(--ink-2)">
+            <code>role="group"</code>, real DOM controls, the live region, the
+            toolbar at 24×24 minimum, forced-colors handling, focus management.
+            The keyboard-only test lands here and must pass before P3 starts.
+          </p>
+        </div>
+      </div>
+
+      <div class="phase">
+        <div class="rail"><div class="dot">P3</div><div class="line"></div></div>
+        <div class="body">
+          <h4><code>Signature</code> + <code>Signature.Modal</code></h4>
+          <div class="meta">4 days · the antd surface</div>
+          <p style="color:var(--ink-2)">
+            The three tabs, the identity and capacity fields, the attestation
+            block, <code>Form.Item</code> integration via
+            <code>Form.Item.useStatus()</code>, and every antd gap in §11.3
+            closed by hand. Mockups 5.1 through 5.3.
+          </p>
+        </div>
+      </div>
+
+      <div class="phase">
+        <div class="rail"><div class="dot">P4</div><div class="line"></div></div>
+        <div class="body">
+          <h4>The outcomes</h4>
+          <div class="meta">3 days · the differentiator</div>
+          <p style="color:var(--ink-2)">
+            Declined, unable, verbal, on-paper — the sheet in 5.4, the witness
+            requirement enforced by the type rather than by a validator, and the
+            in-form renderings in 5.6.
+          </p>
+        </div>
+      </div>
+
+      <div class="phase">
+        <div class="rail"><div class="dot">P5</div><div class="line"></div></div>
+        <div class="body">
+          <h4><code>Signature.Manifest</code> and the FHIR mapping</h4>
+          <div class="meta">3 days · what an auditor asks for</div>
+          <p style="color:var(--ink-2)">
+            The record block from 5.5, the print stylesheet, and
+            <code>toFhirBundle()</code> emitting the Consent + Provenance pair
+            from §08. Round-trip tests for all seven outcomes.
+          </p>
+        </div>
+      </div>
+
+      <div class="phase">
+        <div class="rail"><div class="dot">P6</div><div class="line"></div></div>
+        <div class="body">
+          <h4>Hardening to the tier bar</h4>
+          <div class="meta">3 days · nothing merges below beta</div>
+          <p style="color:var(--ink-2)">
+            Stories for every state, axe across three themes and three
+            densities, VRT baselines, the forced-colors browser check, the two
+            new lint rules, the docs page, and the coverage gate at 90% lines /
+            85% branches.
+          </p>
+        </div>
+      </div>
+
+      <div class="phase">
+        <div class="rail"><div class="dot">P7</div></div>
+        <div class="body">
+          <h4>Deferred, deliberately</h4>
+          <div class="meta">Not in the four weeks</div>
+          <p style="color:var(--ink-2)">
+            Witness and countersignature workflows, interpreter attestation,
+            adopt-and-apply, saved signatures, the custom-element build,
+            offline queueing. Each is real and none blocks a first release.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================== -->
+<section id="decide">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="sec-num">14 — Open decisions</span>
+      <h2>What only you can decide</h2>
+      <p>
+        Six of these are cheap now and expensive later. They are ordered by how
+        much of the code they change.
+      </p>
+    </div>
+
+    <div class="feat">
+      <div>
+        <div class="n">1</div>
+        <div>
+          <div class="t">Wrap antd, match antd, or migrate to antd?</div>
+          <div class="d">
+            The library today is a shadcn-style registry with no antd dependency
+            anywhere. "Follow Ant Design" could mean any of the three and they
+            produce different products. <b>My recommendation: wrap for this
+            component, defer the general decision</b> — the engine is
+            framework-free either way, so the expensive half of the work is
+            portable. §11.2.
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="n">2</div>
+        <div>
+          <div class="t">antd v5 or v6?</div>
+          <div class="d">
+            v6.6.0 shipped six days ago; v5 ended at 5.29.3. <b>My
+            recommendation: v6</b>, unless a named customer is pinned to v5. The
+            deltas are prop renames, not architecture. §11.1.
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="n">3</div>
+        <div>
+          <div class="t">Do saved signatures exist?</div>
+          <div class="d">
+            The reference's "Save Sign" implies a store, and a store implies a
+            location, a retention period, and a policy for shared bedside
+            devices. <b>My recommendation: not in v1.</b> Ship "saved with this
+            form only", which is a defensible sentence, and add reuse when
+            there is a named customer and a storage decision behind it.
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="n">4</div>
+        <div>
+          <div class="t">Are stroke biometrics ever captured?</div>
+          <div class="d">
+            Timing, velocity and pressure have genuine forensic value and
+            genuine privacy exposure. <b>My recommendation: capture into the
+            model, never emit by default</b>, behind an explicit
+            <code>captureBiometrics</code> flag with the legal position
+            documented at the call site. See §09 for what the biometric-privacy
+            statutes actually say about handwritten signatures.
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="n">5</div>
+        <div>
+          <div class="t">Is 21 CFR Part 11 in scope for the first release?</div>
+          <div class="d">
+            It applies to FDA-regulated records — clinical trials, device and
+            pharma manufacturing — and not to ordinary clinical care. If a
+            target customer is in that space the manifest and the audit-event
+            stream need to be designed to its requirements from P1 rather than
+            retro-fitted. <b>My recommendation: design the manifest to satisfy
+            it regardless</b>, because it costs almost nothing and it is the
+            difference between passing and failing a procurement review.
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="n">6</div>
+        <div>
+          <div class="t">Which comes first — this, or the Phase 4 catalog?</div>
+          <div class="d">
+            The readiness audit's Phase 4 queued StatusBadge, AbsentValue,
+            Alert, Skeleton and EmptyState, and 86 component-tier tokens are
+            currently orphaned waiting for them. This component is four weeks
+            and consumes almost none of those tokens. <b>Both are defensible;
+            they are not the same bet.</b> Catalog breadth makes the library
+            adoptable. The signature component makes it <em>differentiated</em>,
+            and nobody else in the antd ecosystem has one.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <h3 style="margin-top:2.5rem">Naming</h3>
+    <p class="prose">
+      antd names plainly and composes with dots, so <code>Signature</code> with
+      <code>.Pad</code>, <code>.Modal</code> and <code>.Manifest</code> is the
+      native-feeling choice. The alternatives considered and rejected:
+    </p>
+    <div class="tw">
+      <table>
+        <thead><tr><th style="width:12rem">Candidate</th><th>Verdict</th></tr></thead>
+        <tbody>
+          <tr><td><code>Signature</code></td><td><b>Recommended.</b> antd's own instinct — <code>Upload</code>, <code>Rate</code>, <code>Transfer</code>. Short, obvious, and the dot-composition reads naturally.</td></tr>
+          <tr><td><code>SignaturePad</code></td><td>What every existing library calls itself, which is precisely the problem: it names the fifteen percent of the component that is not the point.</td></tr>
+          <tr><td><code>ESignature</code></td><td>Legalistic, dated, and invites the assumption of cryptographic signing that §08 works hard to deny.</td></tr>
+          <tr><td><code>Attestation</code></td><td>Right for the clinician case, wrong for patient consent. Too narrow.</td></tr>
+          <tr><td><code>SignatureField</code></td><td>Accurate but redundant once it lives in <code>Form.Item</code>.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="prose">
+      npm package: <code>@oxygenui-design/signature</code> and
+      <code>@oxygenui-design/signature-core</code>, matching the existing scope
+      and the loaders' split.
+    </p>
+
+    <div class="note ok" style="margin-top:2rem">
+      <span class="lbl">Where this leaves us</span>
+      <p>
+        The reference design is a sound starting point and about a third of the
+        finished component. The two-thirds that is missing — the outcome model,
+        the identity and capacity capture, the manifest, and the accessible
+        path treated as the primary path rather than the fallback — is also the
+        two-thirds that nobody else has built, in a category where Ant Design
+        itself ships nothing at all.
+      </p>
+      <p style="margin-top:0.6rem">
+        Answer the six questions above and P1 can start the same day.
+      </p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div>
+      <b>Oxygen Signature</b> — component brief, 16 August 2026. Prepared for
+      Zowork. Mockups are live HTML at 1:1 using Ant Design v5 token values.
+    </div>
+    <div>
+      Regulatory and standards citations are linked inline. Where a claim is
+      inference rather than quotation it is marked as such in the section that
+      makes it.
+    </div>
+    <div style="margin-top:1rem">
+      <b>Not a medical device.</b> Oxygen UI provides user-interface components.
+      It makes no clinical claim, performs no clinical calculation, and is not
+      intended for diagnosis or treatment. Signature capture does not by itself
+      establish the legal validity of any record; that depends on the
+      deployment, the jurisdiction, and the operating procedures around it.
+    </div>
+  </div>
+</footer>
