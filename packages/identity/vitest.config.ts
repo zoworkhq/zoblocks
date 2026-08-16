@@ -50,5 +50,16 @@ export default defineConfig({
     globals: true,
     setupFiles: ["./test/setup.ts"],
     include: ["src/**/*.test.tsx", "test/**/*.test.tsx"],
+    /**
+     * Headroom for a shared CI runner, matching packages/signature.
+     *
+     * These are interaction tests driven through `userEvent` against antd
+     * components, and the spread between a developer machine and a shared
+     * runner on this repo has been measured at roughly 7x. The slowest test
+     * here runs in ~0.8s locally, which lands uncomfortably close to the 5s
+     * default once multiplied. A ceiling that is never reached costs nothing;
+     * a timeout flake reads as a component bug and gets debugged as one.
+     */
+    testTimeout: 20_000,
   },
 });

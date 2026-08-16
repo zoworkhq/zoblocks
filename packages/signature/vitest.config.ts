@@ -34,5 +34,22 @@ export default defineConfig({
     globals: true,
     setupFiles: ["./test/setup.ts"],
     include: ["src/**/*.test.tsx", "test/**/*.test.tsx"],
+    /**
+     * Four times the default, because these are the slowest tests in the repo
+     * and the default was written for unit tests.
+     *
+     * "signs with the keyboard alone" drives a full typed signature through
+     * `userEvent` — every keystroke separately, inside an antd Modal, against a
+     * canvas — and each keystroke costs a jsdom layout pass. It runs in ~0.7s on
+     * a developer machine and took 5.13s on a shared CI runner, which is a 7×
+     * spread against a 5s budget.
+     *
+     * Raised rather than the test trimmed: what makes it worth having is that
+     * it types a real name key by key, which is the path a keyboard-only signer
+     * actually takes. Sampling fewer keystrokes to fit a timer would test
+     * something nobody does. A generous ceiling costs nothing when the suite
+     * passes and prevents a flake that reads as a component bug.
+     */
+    testTimeout: 20_000,
   },
 });
