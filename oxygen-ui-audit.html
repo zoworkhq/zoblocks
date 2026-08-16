@@ -321,6 +321,14 @@
       </div>
       <div class="vscale"><span>0</span><span>was 4.7 · now 8.2</span><span>target 8.9</span><span>10</span></div>
       <p class="note"><strong style="color:#8ff0d5">All eight critical findings closed, phases 0–4 delivered</strong> in <a href="https://github.com/zoworkhq/oxygenui/pull/15" style="color:#8ff0d5">PR #15</a>. The catalog quality gate is armed, i18n shipped at five components, and visual regression runs across three engines. What remains needs a person: a screen-reader pass, a VPAT, catalog breadth, and the phase-5 launch.</p>
+      <p class="note" style="border-color:#e2b04a"><strong style="color:#e2b04a">One correction, on CodeQL.</strong>
+      An earlier revision of this report counted it as delivered. The workflow is written and correct, but it cannot run here:
+      uploading results needs code scanning enabled, and on a <em>private</em> repository that needs GitHub Advanced Security,
+      which is not available on a personal account. It failed on every pull request for four minutes and then died on the upload.
+      It is now conditional — skipped until the repository goes public (phase 5) or <code>ENABLE_CODEQL</code> is set — because a
+      permanently red check is one everybody learns to scroll past, and the next real failure scrolls past with it.
+      Standing in for it today: a blocking <code>pnpm audit</code> gate, dependency-cruiser layer rules, the PHI scan, and the
+      <code>no-forbidden-capability</code> lint rule, which caught a real XSS vector in the signature manifest during implementation.</p>
     </div>
   </div>
 </header>
@@ -799,10 +807,10 @@
   // roadmap. `was` is the original audit figure. Phase 5 (open-source launch)
   // is deliberately out of scope.
   const DATA = [
-    ["Security", 3, 9, 9, "Zero advisories; SECURITY.md, CodeQL, SBOM, Dependabot, audit gate, injection sinks closed, publint"],
-    ["Test coverage & reliability", 5, 9, 9, "779 tests. Stories consumed four ways, VRT across 3 engines, thresholds enforced, gen --strict armed"],
-    ["Open-source readiness", 1, 8, 9, "Governance set, ENGINEERING.md, commit hooks, all 9 ADRs ratified. Remaining: apps/hq extraction (phase 5)"],
-    ["Framework interoperability", 3, 8, 9, "SSR fixed and tested; React package with peer deps; Chromium + Firefox + WebKit. Remaining: framework smoke apps"],
+    ["Security", 3, 8, 9, "Zero advisories; SECURITY.md, SBOM, Dependabot, blocking audit gate, injection sinks closed, publint. CodeQL is written but inert \u2014 see below"],
+    ["Test coverage & reliability", 5, 9, 9, "1,113 tests. Stories consumed four ways, VRT across 3 engines, coverage thresholds are a CI gate, gen --strict armed"],
+    ["Open-source readiness", 1, 8, 9, "Governance set, ENGINEERING.md, commit hooks, all 9 ADRs ratified. Remaining: apps/hq extraction, and going public is what arms CodeQL"],
+    ["Framework interoperability", 3, 9, 9, "Six smoke apps \u2014 HTML, React 18 and 19, Vue, Angular, Svelte \u2014 each built by its own compiler and driven in 3 engines. Found 3 real defects on its first run"],
     ["CI/CD", 4, 9, 9, "Deploy gate fixed, release gated, strict catalog gate, e2e, size budgets, dependency rules, permissions"],
     ["Documentation", 4, 8, 9, "105 props documented; README rewritten; CHANGELOG; stories as docs. Remaining: versioned docs, migration guides"],
     ["NPM packaging", 4, 9, 9, "Node import fixed; five packages publint-clean with tarball gates; React and intl added"],
@@ -810,7 +818,7 @@
     ["Accessibility", 5, 8, 9, "Palette fixed, gate widened, reflow + zoom + forced-colours + focus tested in 3 engines. Remaining: SR matrix and VPAT"],
     ["Architecture", 6, 9, 9, "React channels generated from one source; the layer rule is executable and caught a real cycle"],
     ["Code quality", 7, 9, 9, "Shipped source governed by all six Oxygen rules; 0 errors; no import cycles; budget 35 → 8"],
-    ["Design tokens & theming", 6, 8, 9, "Contrast gate widened, validator tested, alias leak fixed. Remaining: brand axis and DTCG compliance"],
+    ["Design tokens & theming", 6, 9, 9, "Contrast gate widened, validator tested, alias leak fixed, brand axis shipped with all three rejection paths proven"],
     ["Release management", 4, 8, 9, "Release fully gated; CHANGELOG; five changesets queued. Remaining: the first real release"],
     ["Performance", 6, 8, 9, "size-limit budgets enforced in CI, set from measurements. Remaining: runtime frame-rate traces"],
     ["Developer experience", 5, 8, 9, "Stories, commit hooks, .nvmrc, .editorconfig, contributor docs. Remaining: Storybook as a renderer"],

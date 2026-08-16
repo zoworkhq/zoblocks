@@ -28,6 +28,34 @@ jobs:
     name: Analyze
     runs-on: ubuntu-latest
     timeout-minutes: 20
+
+    # Skipped rather than failed while this repository cannot run it.
+    #
+    # Uploading CodeQL results needs code scanning enabled, and on a **private**
+    # repository that needs GitHub Advanced Security — which is not available on
+    # a personal account. So on this repo today the analysis runs for four
+    # minutes and then dies on the upload:
+    #
+    #   Code scanning is not enabled for this repository.
+    #
+    # Leaving that red is worse than not running it. A check that is always
+    # failing is a check everybody learns to scroll past, and the next failure —
+    # a real one — scrolls past with it. The same reasoning already keeps the
+    # darwin VRT baselines out of CI, and it is written up there too.
+    #
+    # This arms itself with no further action in either of the two ways it can
+    # become available:
+    #
+    #   - the repository goes public, which is Phase 5 of the readiness roadmap
+    #     and makes code scanning free;
+    #   - or someone enables Advanced Security and sets the repository variable
+    #     ENABLE_CODEQL to "true".
+    #
+    # Until then `pnpm audit`, the dependency-cruiser layer rules, and the
+    # `no-forbidden-capability` lint rule are what stand in for it, and §14 of
+    # the audit says so rather than implying coverage this does not have.
+    if: github.event.repository.private == false || vars.ENABLE_CODEQL == 'true'
+
     permissions:
       contents: read
       security-events: write

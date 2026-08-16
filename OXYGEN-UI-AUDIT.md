@@ -876,12 +876,41 @@ Phases 2 and 3 parallelise cleanly: Phase 2 is architecture/testing work, Phase 
 | NPM packaging                | 4   | **9**  | React package + scope + `publint`                                    |
 | CI/CD                        | 4   | **9**  | Release gates + matrix + scanning + artifact promotion               |
 | Release management           | 4   | **9**  | CHANGELOG + changeset enforcement + first real release               |
-| Security                     | 3   | **9**  | Advisories + SECURITY.md + CodeQL + SBOM + SHA pinning               |
+| Security                     | 3   | **9**  | Advisories + SECURITY.md + SBOM + SHA pinning (CodeQL: see below)    |
 | Open-source readiness        | 1   | **9**  | The governance file set                                              |
 | Developer experience         | 5   | **9**  | Storybook + hooks + contributor docs                                 |
 | Governance & maintainability | 3   | **9**  | `ENGINEERING.md` + CODEOWNERS + ratified ADRs                        |
 
 **Target unweighted mean: 8.9 / 10.**
+
+### A correction on CodeQL
+
+The remediation added `.github/workflows/codeql.yml`, and an earlier revision of
+this report counted it as delivered. It is not, and the distinction matters for
+a security questionnaire.
+
+Uploading CodeQL results requires code scanning to be enabled, and on a
+**private** repository that requires GitHub Advanced Security. `zoworkhq/oxygenui`
+is private and owned by a personal account, where GHAS is not available — so the
+analysis ran for four minutes on every pull request and then failed on the
+upload with `Code scanning is not enabled for this repository`.
+
+The workflow is now conditional. It skips while neither condition holds, and
+arms itself with no further action when either does:
+
+- the repository goes public (Phase 5), which makes code scanning free; or
+- Advanced Security is enabled and the repository variable `ENABLE_CODEQL` is
+  set to `true`.
+
+Leaving it red was the worse option. A check that always fails is a check
+everybody learns to scroll past, and the next failure scrolls past with it —
+the same reasoning that keeps the darwin visual-regression baselines out of CI.
+
+**What actually stands in for SAST today:** `pnpm audit --audit-level=high` as a
+blocking gate, dependency-cruiser layer rules, the `no-forbidden-capability`
+lint rule (which caught a real XSS vector in the signature manifest during
+implementation), and the PHI regex scan. That is a defensible answer to a vendor
+questionnaire. "We run CodeQL" is not yet one.
 
 ### Where the gains actually come from
 
