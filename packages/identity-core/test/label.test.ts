@@ -62,9 +62,19 @@ describe("identityLabel", () => {
     );
   });
 
-  it("names the sensitivity categories in words, not codes", () => {
+  it("says a record is sensitive without naming the categories below full disclosure", () => {
+    // Naming them here would hand a screen-reader user the thing the audited
+    // reveal exists to record — an accessibility path around a disclosure
+    // control, and a case of the label disagreeing with the pixels.
     const label = identityLabel(resolveIdentity(F.sensitive, P), P);
     expect(label).toContain("Sensitive record");
+    expect(label).not.toMatch(/Substance use|Psychiatry/);
+    expect(label).not.toContain("ETH");
+  });
+
+  it("names the categories in words, not codes, at full disclosure", () => {
+    const full = policy({ now: F.NOW, disclosure: "full" });
+    const label = identityLabel(resolveIdentity(F.sensitive, full), full);
     expect(label).toMatch(/Substance use|Psychiatry/);
     expect(label).not.toContain("ETH");
   });

@@ -138,9 +138,9 @@ describe("PatientBanner — four states, not one pill", () => {
 });
 
 describe("PatientBanner — sensitivity and disclosure", () => {
-  it("withholds the programme and says it is doing so", () => {
+  it("marks the record sensitive and offers an audited reveal", () => {
     F.renderWithPolicy(<PatientBanner patient={F.sensitive} context="navigation" />);
-    expect(screen.getByText(/Programme and care team withheld/)).toBeInTheDocument();
+    expect(screen.getByText(/This record carries sensitivity labels/)).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Reveal" })).toBeInTheDocument();
   });
 

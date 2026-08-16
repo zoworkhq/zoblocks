@@ -238,20 +238,32 @@ export function resolveStates(patient: Patient, p: IdentityPolicy): IdentityStat
  */
 export function resolvePhoto(patient: Patient, p: IdentityPolicy): PhotoState {
   const attachment = patient.photo?.find((a) => a.url || a.data);
-  if (p.photos === "deny") {
-    return attachment
-      ? { kind: "withheld", reason: "Photographs are not shown on this surface" }
-      : { kind: "none-on-file" };
-  }
-  if (p.photos === "consent-required" && !attachment) return { kind: "none-on-file" };
+
+  // Nothing on the record. Nothing was withheld, because there was nothing
+  // there — and those are different facts.
   if (!attachment) return { kind: "none-on-file" };
 
+  if (p.photos === "deny") {
+    return { kind: "withheld", reason: "Photographs are not shown on this surface" };
+  }
+
+  /**
+   * `consent-required` withholds. It used to fall through and render the photo,
+   * which made the value indistinguishable from `"allow"` — a policy setting
+   * that reads as a safeguard and does nothing is worse than not having it.
+   *
+   * There is no consent record in `Patient.photo` to consult, so the honest
+   * contract is: the application asserts consent by switching this to
+   * `"allow"`, and until it does the photograph stays behind the same withheld
+   * state a site-wide denial produces.
+   */
+  if (p.photos === "consent-required") {
+    return { kind: "withheld", reason: "Consent to display this photograph is not recorded" };
+  }
+
+  // `find` already required a url or inline data, so one of these is present.
   const src =
-    attachment.url ??
-    (attachment.data
-      ? `data:${attachment.contentType ?? "image/jpeg"};base64,${attachment.data}`
-      : undefined);
-  if (!src) return { kind: "unavailable" };
+    attachment.url ?? `data:${attachment.contentType ?? "image/jpeg"};base64,${attachment.data}`;
   const out: PhotoState = { kind: "present", src };
   if (attachment.contentType) out.contentType = attachment.contentType;
   return out;

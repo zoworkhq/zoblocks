@@ -18,9 +18,17 @@ export default defineConfig({
       reporter: ["text-summary", "json-summary", "lcov"],
       include: ["src/**/*.{ts,tsx}"],
       exclude: ["src/index.ts", "**/*.d.ts"],
-      // The tier bar from the readiness audit: nothing merges below `beta`,
-      // and `beta` is 90% lines / 85% branches.
-      thresholds: { lines: 90, functions: 90, branches: 85, statements: 90 },
+      /**
+       * Ratcheted to what the suite actually reaches, not to the repo floor.
+       *
+       * What is left uncovered is the class of branch that cannot be reached by
+       * construction: the `?? fallback` arms that `noUncheckedIndexedAccess`
+       * forces on every indexed read, and the `never` default that makes a new
+       * union member a compile error. A test that claimed to exercise those
+       * would be asserting on a lie, so the ceiling sits just under them and the
+       * gate protects the rest.
+       */
+      thresholds: { lines: 99, functions: 100, branches: 89, statements: 99 },
     },
     environment: "node",
     include: ["src/**/*.test.ts", "test/**/*.test.ts"],

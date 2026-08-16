@@ -52,7 +52,7 @@ export function spellDigits(value: string): string {
   return (compact.match(/.{1,3}/g) ?? [compact]).join(", ");
 }
 
-function stateLabel(identity: Identity): string[] {
+function stateLabel(identity: Identity, p: IdentityPolicy): string[] {
   const out: string[] = [];
   for (const s of identity.states) {
     switch (s.kind) {
@@ -69,7 +69,21 @@ function stateLabel(identity: Identity): string[] {
         out.push("Test record, not a person");
         break;
       case "restricted":
-        out.push(`Sensitive record: ${s.codes.map((c) => SENSITIVITY_LABEL[c]).join(", ")}`);
+        /**
+         * The categories are named only at full disclosure.
+         *
+         * Below it the visible banner withholds them behind an audited reveal,
+         * and a label that named them anyway would hand a screen-reader user
+         * the thing the reveal exists to record — an accessibility path around
+         * a disclosure control, and a case of the label and the pixels
+         * disagreeing, which is the exact failure `identityLabel` exists to
+         * prevent.
+         */
+        out.push(
+          p.disclosure === "full"
+            ? `Sensitive record: ${s.codes.map((c) => SENSITIVITY_LABEL[c]).join(", ")}`
+            : "Sensitive record",
+        );
         break;
       default:
         break;
@@ -111,10 +125,9 @@ export function identityLabel(
     }
   }
 
-  const states = stateLabel(identity);
+  const states = stateLabel(identity, p);
   const status = states.length > 0 ? states : ["Active"];
 
-  void p;
   return `${parts.join(", ")}. ${status.join(". ")}.`;
 }
 

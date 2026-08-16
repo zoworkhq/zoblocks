@@ -11,11 +11,7 @@
  * twelve men cannot separate red from green.
  */
 
-import {
-  SENSITIVITY_LABEL,
-  type Identity,
-  type IdentityState,
-} from "@oxygenui-design/identity-core";
+import { type Identity, type IdentityState } from "@oxygenui-design/identity-core";
 import type { ReactNode } from "react";
 
 export interface StateTagsProps {
@@ -58,11 +54,15 @@ export function describeState(state: IdentityState): Rendered {
     case "test":
       return { tone: "warn", icon: "⚠", text: "TEST PATIENT — not a person" };
     case "restricted":
-      return {
-        tone: "restricted",
-        icon: "🔒",
-        text: `Sensitive record: ${state.codes.map((c) => SENSITIVITY_LABEL[c]).join(", ")}`,
-      };
+      /**
+       * The tag says the record is sensitive; it does not say which categories.
+       *
+       * Naming them here would put a substance-use or psychiatry label on the
+       * banner unconditionally, which is the disclosure the audited reveal
+       * exists to control. One place decides that — the banner's sensitivity
+       * row — and the tag, the accessible label and that row now agree.
+       */
+      return { tone: "restricted", icon: "🔒", text: "Sensitive record" };
     default: {
       // Exhaustiveness: a new state added to the engine fails the build here
       // rather than silently rendering as nothing.
@@ -121,12 +121,24 @@ export function StateTags({ identity, size = "sm", showActive }: StateTagsProps)
   );
 }
 
-/** The accent rail colour for a banner carrying these states. */
+/**
+ * The accent rail colour for a banner carrying these states.
+ *
+ * Highest priority wins, not first-in-the-array. An earlier version returned on
+ * the first state it recognised, so a record that was both deceased *and*
+ * restricted rendered a neutral rail — losing the restriction signal entirely,
+ * because `deceased` happened to be extracted first. Restriction is a
+ * disclosure control and outranks everything else on the rail.
+ */
+const RAIL_PRIORITY: Array<{ tone: string; matches: (s: IdentityState) => boolean }> = [
+  { tone: "restricted", matches: (s) => s.kind === "restricted" },
+  { tone: "warn", matches: (s) => s.kind === "test" || s.kind === "merged" },
+  { tone: "neutral", matches: (s) => s.kind === "deceased" || s.kind === "inactive" },
+];
+
 export function railTone(identity: Identity): string {
-  for (const s of identity.states) {
-    if (s.kind === "restricted") return "restricted";
-    if (s.kind === "test" || s.kind === "merged") return "warn";
-    if (s.kind === "deceased") return "neutral";
+  for (const rung of RAIL_PRIORITY) {
+    if (identity.states.some(rung.matches)) return rung.tone;
   }
   return "none";
 }

@@ -17,9 +17,14 @@
  *      a form disagree with it.
  */
 
-import { identityLabel, switchAnnouncement, type Identity } from "@oxygenui-design/identity-core";
+import {
+  SENSITIVITY_LABEL,
+  identityLabel,
+  switchAnnouncement,
+  type Identity,
+} from "@oxygenui-design/identity-core";
 import type { OperationOutcome, Patient } from "@oxygenui-design/fhir";
-import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { BannerAvatar } from "./IdentityAvatar.js";
 import { useIdentity, useIdentityPolicy } from "./IdentityProvider.js";
 import { PatientContextProvider, useBannerRegistration } from "./PatientGuard.js";
@@ -312,12 +317,36 @@ export function PatientBanner(props: PatientBannerProps): ReactNode {
               ))}
             {showWard && ward && <Fld field="ward" label="Ward" value={ward} />}
           </div>
-          {withheld && (
+          {/*
+            The banner does not render a programme name or a care team — those
+            are not fields it has. An earlier version said "Programme and care
+            team withheld", which claimed to be hiding information the component
+            never held: a safeguard that describes a protection it is not
+            providing is worse than no message.
+
+            What it *does* hold, and can honestly withhold, is which sensitivity
+            categories the record carries. Before the reveal a reader knows the
+            record is sensitive; after it, they know it is a substance-use or a
+            psychiatry record — and the application has been told, so it can
+            unmask whatever else it holds and write the audit entry.
+          */}
+          {restricted?.kind === "restricted" && (
             <div className="ox-banner__withheld">
-              Programme and care team withheld. Revealing this is recorded against your account.
-              <button type="button" className="ox-banner__reveal" onClick={reveal}>
-                Reveal
-              </button>
+              {withheld ? (
+                <>
+                  <span>
+                    This record carries sensitivity labels. Revealing which ones is recorded against
+                    your account.
+                  </span>
+                  <button type="button" className="ox-banner__reveal" onClick={reveal}>
+                    Reveal
+                  </button>
+                </>
+              ) : (
+                <span data-ox-field="sensitivity">
+                  Sensitivity: {restricted.codes.map((c) => SENSITIVITY_LABEL[c]).join(", ")}
+                </span>
+              )}
             </div>
           )}
         </div>
@@ -398,9 +427,4 @@ function PatientSwitchAnnouncer({ identity }: { identity: Identity }): ReactNode
 
 function joined(...parts: Array<string | undefined | false>): string {
   return parts.filter(Boolean).join(" ");
-}
-
-/** Convenience for the memoised field list. Exported for tests. */
-export function useRenderedFields(fields: Field[] = DEFAULT_FIELDS): Field[] {
-  return useMemo(() => [...fields], [fields]);
 }

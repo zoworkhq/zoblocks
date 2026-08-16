@@ -210,18 +210,31 @@ export function metaphone(input: string): string {
         out += "K";
         i++;
         break;
-      case "S":
-        if (next === "H") {
+      case "S": {
+        /**
+         * A doubled S still palatalises before "IO" or "IA".
+         *
+         * The generic doubled-consonant skip above runs first, so the second S
+         * of "Mission" was consumed before this branch could look past it —
+         * which meant "Mission" and "Mishon" did not collapse, and the whole
+         * point of the sound-alike pass is that they should.
+         */
+        const doubled = next === "S";
+        const after = doubled ? i + 2 : i + 1;
+        const a = s[after] ?? "";
+        const b = s[after + 1] ?? "";
+        if (a === "H") {
           out += "X";
-          i += 2;
-        } else if (next === "I" && ((s[i + 2] ?? "") === "O" || (s[i + 2] ?? "") === "A")) {
+          i = after + 1;
+        } else if (a === "I" && (b === "O" || b === "A")) {
           out += "X";
-          i += 3;
+          i = after + 2;
         } else {
           out += "S";
-          i++;
+          i = after;
         }
         break;
+      }
       case "T":
         if (next === "H") {
           out += "0";

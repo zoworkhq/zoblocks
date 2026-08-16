@@ -11,7 +11,7 @@ reference range, the restricted record, the patient who refused to sign.
 [![CI](https://github.com/zoworkhq/oxygenui/actions/workflows/ci.yml/badge.svg)](https://github.com/zoworkhq/oxygenui/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178C6.svg?logo=typescript&logoColor=white)](packages/tsconfig/base.json)
-[![Tests](https://img.shields.io/badge/tests-1%2C528%20passing-brightgreen.svg)](#quality-is-a-gate-not-a-goal)
+[![Tests](https://img.shields.io/badge/tests-1%2C622%20passing-brightgreen.svg)](#quality-is-a-gate-not-a-goal)
 [![Coverage](https://img.shields.io/badge/coverage-gated%2090%25%2F85%25-brightgreen.svg)](#quality-is-a-gate-not-a-goal)
 [![WCAG 2.2 AA](https://img.shields.io/badge/WCAG%202.2-AA%20tested-success.svg)](#accessibility-is-tested-not-claimed)
 [![FHIR R4](https://img.shields.io/badge/FHIR-R4-e6007e.svg)](packages/fhir)
@@ -193,7 +193,7 @@ aspirational.
 
 | Gate                    | What it holds                                                                                                            |
 | ----------------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| **1,528 tests**         | Package tests, registry components rendered from the source customers receive, and story-derived a11y.                   |
+| **1,622 tests**         | Package tests, registry components rendered from the source customers receive, and story-derived a11y.                   |
 | **Coverage thresholds** | 90% lines / 85% branches, enforced per package. The build fails below them.                                              |
 | **Six frameworks**      | HTML, React 18, React 19, Vue, Angular, Svelte — each built by its own compiler, driven in Chromium, Firefox and WebKit. |
 | **Contrast gate**       | 21 token pairs × 3 themes × every brand. A palette edit that breaks a floor does not build.                              |
