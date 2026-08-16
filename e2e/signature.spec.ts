@@ -41,6 +41,13 @@ const PAGE = "/components/signature";
 async function settle(page: Page) {
   await page.waitForLoadState("networkidle");
   await page.locator(".instrument-demo[data-hydrated]").waitFor({ state: "attached" });
+  /*
+   * The hero signature draws itself and then loops. Waiting for the finished
+   * state is what makes a screenshot of it meaningful — captured at an
+   * arbitrary moment it is a different half-written name every run, which is
+   * precisely the noise ADR 0007 says kills visual regression.
+   */
+  await page.locator("[data-drawing-complete]").waitFor({ state: "attached" });
   await page.evaluate(() => {
     document
       .querySelectorAll("[data-reveal]")
@@ -294,21 +301,127 @@ test.describe("accessibility in a real layout engine", () => {
   });
 });
 
+test.describe("the replayed signature", () => {
+  /*
+   * How much of the signature is inked, and how much there is to ink.
+   *
+   * Both read from the DOM rather than from a constant. The mark is artwork
+   * and its segment count changes whenever it is redrawn or the engine's
+   * smoothing is tuned — which it has been, from 33 segments to 146. A
+   * hardcoded total turns any such change into three mysteriously failing
+   * tests about animation. The ghost layer underneath is always the complete
+   * set, so it is the honest denominator.
+   */
+  const segments = (page: Page, layer: 0 | 1) =>
+    page
+      .locator('[data-signature-band="hero"] svg g')
+      .nth(layer)
+      .evaluate((el) => el.children.length);
+
+  const drawn = (page: Page) => segments(page, 1);
+  const total = (page: Page) => segments(page, 0);
+
+  test("@framework draws progressively rather than appearing at once", async ({ page }) => {
+    await page.goto(PAGE);
+    await page.waitForLoadState("networkidle");
+
+    /*
+     * The thing worth testing is that it is an animation of the recorded
+     * model, not a static image with a spinner over it. Sampled rather than
+     * asserted at one instant: a single reading cannot distinguish "drawing"
+     * from "already finished", and the run may join at any point in the loop.
+     */
+    const samples: number[] = [];
+    for (let i = 0; i < 16; i++) {
+      samples.push(await drawn(page));
+      await page.waitForTimeout(110);
+    }
+
+    const whole = await total(page);
+    expect(whole, "the signature has no segments at all").toBeGreaterThan(20);
+
+    const partial = samples.filter((n) => n > 0 && n < whole);
+    expect(
+      partial.length,
+      `never observed a partial signature: ${samples.join(",")} of ${whole}`,
+    ).toBeGreaterThan(0);
+    expect(Math.max(...samples), "never finished the signature").toBe(whole);
+  });
+
+  test("@framework holds the finished name rather than stopping halfway", async ({ page }) => {
+    await page.goto(PAGE);
+    await settle(page);
+    // `settle` waits for completion, so the whole name must be inked.
+    expect(await drawn(page)).toBe(await total(page));
+  });
+
+  test("@motion reduced motion shows the signature, not a faster one", async ({ page }) => {
+    /*
+     * SC 2.3.3, and the reason the accommodation is skip-to-end rather than
+     * speed-up: the still state here *is* the content. Shortening the
+     * animation would keep the movement and lose only the legibility, which
+     * is the wrong half to give up.
+     */
+    await page.goto(PAGE);
+    await page.waitForLoadState("networkidle");
+
+    await expect(page.locator("[data-drawing-complete]")).toBeAttached();
+
+    const samples: number[] = [];
+    for (let i = 0; i < 6; i++) {
+      samples.push(await drawn(page));
+      await page.waitForTimeout(150);
+    }
+    // Never restarts, never partial — there is no animation to observe.
+    const whole = await total(page);
+    expect(
+      samples.every((n) => n === whole),
+      `saw ${samples.join(",")} of ${whole}`,
+    ).toBe(true);
+  });
+});
+
 test.describe("visual regression", () => {
-  test("@vrt the demo is visually stable across scenarios", async ({ page }) => {
+  /*
+   * Captured band by band rather than as one tall element.
+   *
+   * The demo is taller than the viewport, and Playwright captures an
+   * oversized element by scrolling and stitching — which drags the sticky
+   * section nav across the top of the result. A baseline with a floating
+   * navbar painted over it is not a baseline of the component, and the diff
+   * it produces is about scroll position rather than about anything anyone
+   * changed. Three shorter shots each fit, and each fails for one reason.
+   */
+  const band = (page: Page, name: string) => page.locator(`[data-signature-band="${name}"]`);
+
+  test("@vrt the replayed signature settles on the finished name", async ({ page }) => {
+    await page.goto(PAGE);
+    await settle(page);
+    // `settle` already waited for the drawing to finish, so this is the
+    // completed state every time rather than whichever frame the run landed on.
+    await expect(band(page, "hero")).toHaveScreenshot("signature-hero.png");
+  });
+
+  test("@vrt the live component is stable across scenarios", async ({ page }) => {
     await page.goto(PAGE);
     await settle(page);
 
-    const preview = demo(page);
-    await expect(preview).toBeVisible();
-
-    // Every scenario, so a state that silently stops rendering is caught.
-    // `pending` and `revoked` are here for that reason above all: they are the
-    // two the demo cannot reach by interaction, so nothing else exercises them.
+    const live = demo(page).locator(".ant-form").first();
     for (const scenario of ["Consent", "Can't sign", "Locked", "Awaiting", "Withdrawn"]) {
       await page.getByRole("tab", { name: scenario }).click();
       const slug = scenario.toLowerCase().replace(/[^a-z]+/g, "-");
-      await expect(preview).toHaveScreenshot(`signature-${slug}.png`);
+      await expect(live).toHaveScreenshot(`signature-${slug}.png`);
+    }
+  });
+
+  test("@vrt the stroke anatomy is stable in each stage", async ({ page }) => {
+    await page.goto(PAGE);
+    await settle(page);
+
+    const anatomy = band(page, "anatomy");
+    for (const stage of ["Sampled", "Joined", "Rendered"]) {
+      await anatomy.getByRole("button", { name: stage }).click();
+      await expect(anatomy).toHaveScreenshot(`signature-anatomy-${stage.toLowerCase()}.png`);
     }
   });
 

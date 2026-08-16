@@ -61,6 +61,8 @@ export interface SignatureLocale {
   back: string;
 
   /* Outcomes */
+  confirmClear: string;
+  confirmClearYes: string;
   outcomeTitle: string;
   outcomeSubtitle: string;
   outcomeDeclined: string;
@@ -150,6 +152,12 @@ export const DEFAULT_LOCALE: SignatureLocale = {
   close: "Close without signing",
   cantSign: "Can't sign?",
   back: "Back",
+
+  // Names what is lost, not what the button is. "Are you sure?" makes the
+  // person work out the consequence themselves, which is the moment they get
+  // it wrong.
+  confirmClear: "Erase this signature and start again?",
+  confirmClearYes: "Erase",
 
   outcomeTitle: "Record what happened instead",
   outcomeSubtitle: "This is recorded in the chart either way.",

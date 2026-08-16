@@ -105,13 +105,24 @@ jobs:
           done
           exit $failed
 
+      # The four inputs below were renamed by changesets/action, and the action
+      # hard-errors on the old spellings rather than falling back — so this step
+      # failed on every push to main, which is every merge. Nothing was
+      # published and no "Version packages" PR was opened; the failure is at the
+      # end of a long green job, which is why it read as noise for a while.
+      #
+      # Worth noting for next time: the rename shipped inside the `v2` tag we
+      # pin to, so pinning a major is not the protection it looks like. A digest
+      # pin would have held. Left as a tag to match every other action in this
+      # repository — changing that is its own decision, not a drive-by.
       - name: Version PR or publish
         uses: changesets/action@v2
         with:
-          version: pnpm changeset version
-          publish: pnpm changeset publish
-          commit: "Version packages"
-          title: "Version packages"
+          version-script: pnpm changeset version
+          publish-script: pnpm changeset publish
+          commit-message: "Version packages"
+          pr-title: "Version packages"
+          github-token: ${{ secrets.GITHUB_TOKEN }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           # Optional. Preferred setup is npm trusted publishing (OIDC), which

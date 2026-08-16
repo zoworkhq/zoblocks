@@ -325,3 +325,44 @@ function viewBox(svg: string): [number, number, number, number] {
   if (!match) throw new Error("no viewBox");
   return match.slice(1).map(Number) as [number, number, number, number];
 }
+
+describe("tilt in the biometric summary", () => {
+  function penStroke(tilts: Array<number | undefined>): Stroke {
+    return {
+      pointerType: "pen",
+      points: tilts.map((tiltX, i) => ({
+        x: 10 + i * 20,
+        y: 40 + (i % 2) * 15,
+        t: i * 16,
+        pressure: 0.5,
+        ...(tiltX === undefined ? {} : { tiltX }),
+      })),
+    };
+  }
+
+  it("reports the mean and the spread, which is the informative half", () => {
+    // A hand rolls the pen while writing, so a real signature has a range of
+    // several degrees. A traced or replayed one tends to a single angle.
+    const summary = summariseBiometrics([penStroke([10, 14, 18, 22])]);
+    expect(summary.meanTilt).toBeCloseTo(16, 5);
+    expect(summary.tiltRange).toBeCloseTo(12, 5);
+  });
+
+  it("says nothing at all when no device reported tilt", () => {
+    // Absent, not zero: reporting a mean of 0° for a mouse would assert a
+    // measurement nobody took.
+    const summary = summariseBiometrics([penStroke([undefined, undefined])]);
+    expect(summary.meanTilt).toBeUndefined();
+    expect(summary.tiltRange).toBeUndefined();
+    // The rest of the summary is unaffected.
+    expect(summary.meanPressure).toBeGreaterThan(0);
+  });
+
+  it("averages only the points that carried a reading", () => {
+    // Mixed input — a stylus that drops tilt for part of a stroke. Averaging
+    // the gaps in as zeros would drag a real pen towards upright.
+    const summary = summariseBiometrics([penStroke([20, undefined, 20, undefined])]);
+    expect(summary.meanTilt).toBeCloseTo(20, 5);
+    expect(summary.tiltRange).toBe(0);
+  });
+});

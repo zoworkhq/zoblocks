@@ -16,7 +16,7 @@
  * Nothing here touches a canvas or the DOM, so it runs on a server.
  */
 
-import type { Ink, InkPath, Stroke } from "./value";
+import type { Ink, InkPath, Point, Stroke } from "./value";
 import {
   DEFAULT_WIDTH,
   decimate,
@@ -114,17 +114,62 @@ export function toInkPaths(
       continue;
     }
 
+    /*
+     * Curved segments, not straight ones.
+     *
+     * Variable width forces the ink to be cut into pieces — SVG has one
+     * `stroke-width` per element, so a stroke whose weight changes cannot be a
+     * single path. The obvious way to cut it is a line between each pair of
+     * samples, and that was what this did; the cost is that every sample
+     * becomes a visible corner. On a signature captured at 60Hz the result is
+     * a polygon of someone's name, and the faster the pen moved the coarser it
+     * got — exactly backwards, since a fast stroke is the smooth one.
+     *
+     * So each piece spans midpoint to midpoint with the sample between them as
+     * a quadratic control, which is the same smoothing `toPathData` applies to
+     * the fixed-width path. Consecutive pieces share their endpoints exactly,
+     * so there are no gaps to hide, and the curve passes through the midpoints
+     * rather than the samples — which is also a mild low-pass on hand tremor.
+     */
     const w = widths(points, options.width);
-    for (let i = 1; i < points.length; i++) {
-      const a = points[i - 1];
-      const b = points[i];
-      if (!a || !b) continue;
-      const segment = ((w[i - 1] ?? options.width.base) + (w[i] ?? options.width.base)) / 2;
+    const mid = (a: Point, b: Point) => ({ x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 });
+    const at = (i: number) => round(w[i] ?? options.width.base);
+
+    const first = points[0];
+    const second = points[1];
+    if (!first || !second) continue;
+    const firstMid = mid(first, second);
+
+    // The lead-in: from the point the pen landed to the first midpoint. There
+    // is no earlier sample to curve through, so it is a line.
+    out.push({
+      d: `M ${round(first.x)} ${round(first.y)} L ${round(firstMid.x)} ${round(firstMid.y)}`,
+      width: at(0),
+    });
+
+    for (let i = 1; i < points.length - 1; i++) {
+      const previous = points[i - 1];
+      const point = points[i];
+      const next = points[i + 1];
+      if (!previous || !point || !next) continue;
+
+      const from = mid(previous, point);
+      const to = mid(point, next);
       out.push({
-        d: `M ${round(a.x)} ${round(a.y)} L ${round(b.x)} ${round(b.y)}`,
-        width: round(segment),
+        d: `M ${round(from.x)} ${round(from.y)} Q ${round(point.x)} ${round(point.y)} ${round(to.x)} ${round(to.y)}`,
+        width: at(i),
       });
     }
+
+    // And the lift, from the last midpoint to where the pen left the surface.
+    const last = points[points.length - 1];
+    const penultimate = points[points.length - 2];
+    if (!last || !penultimate) continue;
+    const lastMid = mid(penultimate, last);
+    out.push({
+      d: `M ${round(lastMid.x)} ${round(lastMid.y)} L ${round(last.x)} ${round(last.y)}`,
+      width: at(points.length - 1),
+    });
   }
 
   return out;

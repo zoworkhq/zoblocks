@@ -11,7 +11,7 @@
 
 import * as React from "react";
 import { describe, expect, it, vi } from "vitest";
-import { render, screen, waitFor, within } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { Button, Form } from "antd";
 import axe from "axe-core";
@@ -144,6 +144,36 @@ describe("SignaturePad accessibility", () => {
 
   it("passes axe", async () => {
     const { container } = render(<SignaturePad label="Signature" hint="Sign here." />);
+    expect(await noViolations(container)).toEqual([]);
+  });
+
+  it("passes axe while the clear confirmation is open", async () => {
+    // A new interactive state, so a new audit. The question and its two
+    // answers are a labelled group, not three loose buttons.
+    const user = userEvent.setup();
+    const { container } = render(<SignaturePad label="Signature" />);
+
+    const surface = container.querySelector<HTMLElement>("[data-ox-signature-pad]");
+    if (!surface) throw new Error("no capture surface");
+    // Long enough to clear the minimum-ink gate, which is also what decides
+    // whether erasing is worth confirming.
+    fireEvent.pointerDown(surface, { clientX: 40, clientY: 120, pointerId: 1, button: 0 });
+    for (const [x, y] of [
+      [70, 60],
+      [110, 140],
+      [150, 60],
+      [190, 130],
+      [230, 70],
+      [270, 120],
+      [310, 80],
+      [350, 120],
+    ]) {
+      fireEvent.pointerMove(surface, { clientX: x, clientY: y, pointerId: 1 });
+    }
+    fireEvent.pointerUp(surface, { clientX: 350, clientY: 120, pointerId: 1 });
+
+    await user.click(screen.getByRole("button", { name: /clear/i }));
+    expect(screen.getByRole("group", { name: /erase this signature/i })).toBeInTheDocument();
     expect(await noViolations(container)).toEqual([]);
   });
 

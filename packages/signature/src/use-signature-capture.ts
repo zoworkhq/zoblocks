@@ -118,6 +118,10 @@ export function useSignatureCapture(options: UseSignatureCaptureOptions = {}): S
       // Chrome reports 0 pressure for a mouse; 0.5 is the neutral value that
       // leaves the width curve unmodified.
       pressure: event.pressure > 0 ? event.pressure : 0.5,
+      // Only forwarded when the hardware actually measured it. A mouse
+      // reports 0/0, which is indistinguishable from an upright stylus, so
+      // passing it on would record a pen angle that was never observed.
+      ...(event.pointerType === "pen" ? { tiltX: event.tiltX, tiltY: event.tiltY } : {}),
       pointerType: normalisePointerType(event.pointerType),
       pointerId: event.pointerId,
     };
@@ -188,6 +192,22 @@ export function useSignatureCapture(options: UseSignatureCaptureOptions = {}): S
     void version; // recomputed on every commit
     return engine.current.snapshot();
   }, [version]);
+
+  /*
+   * Nothing survives the pad being taken off screen.
+   *
+   * The kiosk case from the brief: a bedside or waiting-room terminal moves
+   * from one patient to the next, and a signature still sitting in memory
+   * belongs to whoever signed it last. React discards this hook's state on
+   * unmount, but the engine is a ref — a mutable object that outlives the
+   * render — and a host using the headless hook can hold that reference
+   * across a route change. Emptying it here means the strokes are gone
+   * whichever way the pad left the screen.
+   */
+  React.useEffect(() => {
+    const capture = engine.current;
+    return () => capture.clear();
+  }, []);
 
   return {
     committedCount: snapshot.committedCount,

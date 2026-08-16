@@ -79,11 +79,28 @@ describe("the docs catalog mark", () => {
   const committed = parsePaths(extractArray(source, "SIGNATURE_PATHS"));
 
   it("parses the committed data at all", () => {
-    // Guards the test itself: a silent parse failure would make every
-    // assertion below vacuously pass.
-    expect(strokes.length).toBe(2);
-    expect(strokes[0]?.points.length).toBeGreaterThan(20);
+    /*
+     * Guards the test itself: a silent parse failure would make every
+     * assertion below vacuously pass against two empty arrays.
+     *
+     * Deliberately not pinned to an exact stroke count. The mark is artwork —
+     * it has already been redrawn once — and a test that fails because the
+     * signature gained a flourish is a test that gets edited without being
+     * read. What must hold is that something was parsed, and that it is the
+     * shape of a signature rather than a stray bracket.
+     */
+    expect(strokes.length).toBeGreaterThan(1);
+    expect(strokes.every((s) => s.points.length > 2)).toBe(true);
     expect(committed.length).toBeGreaterThan(20);
+
+    // Every point carries all three coordinates, so a regex that silently
+    // matched half the file would still fail here.
+    for (const stroke of strokes) {
+      for (const point of stroke.points) {
+        expect(Number.isFinite(point.x) && Number.isFinite(point.y)).toBe(true);
+        expect(Number.isFinite(point.t)).toBe(true);
+      }
+    }
   });
 
   it("still matches what the engine produces", () => {

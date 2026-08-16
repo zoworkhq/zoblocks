@@ -157,6 +157,19 @@ function renderType(checker: ts.TypeChecker, type: ts.Type, at: ts.Node): string
     .trim();
 }
 
+/**
+ * Drop a trailing `| undefined` from a union, leaving everything else alone.
+ *
+ * Text rather than type surgery: `getNonNullableType` would also strip `null`,
+ * which is a value a prop can meaningfully accept and distinct from being
+ * absent — `background: string | null` on the rasteriser means "deliberately
+ * transparent", not "unset".
+ */
+function withoutUndefined(type: string): string {
+  const parts = type.split(" | ").filter((part) => part !== "undefined");
+  return parts.length ? parts.join(" | ") : type;
+}
+
 function propsFromType(
   checker: ts.TypeChecker,
   type: ts.Type,
@@ -190,7 +203,17 @@ function propsFromType(
 
     props.push({
       name: symbol.getName(),
-      type: renderType(checker, propType, at),
+      // `| undefined` is dropped from an optional prop's type.
+      //
+      // tsc reports `Capacity[] | undefined` for `capacities?: Capacity[]`,
+      // which is true and useless in a table that already has a column for
+      // whether a prop is required — it repeats that fact on every row and
+      // pushes the part a reader came for off the edge on narrow screens. It
+      // is only stripped when the prop is optional, so a required prop that
+      // genuinely accepts `undefined` still says so.
+      type: optional
+        ? withoutUndefined(renderType(checker, propType, at))
+        : renderType(checker, propType, at),
       description: ts
         .displayPartsToString(symbol.getDocumentationComment(checker))
         .replace(/\s+/g, " ")
@@ -244,15 +267,17 @@ function classPropsType(checker: ts.TypeChecker, node: ts.ClassDeclaration): ts.
 }
 
 export function extractProps(components: LoadedComponent[]): Map<string, ExtractedExport[]> {
+  // `propsFile`, not `sourceFile`: a package component has no registry source
+  // and still has a public API to document.
   const program = ts.createProgram(
-    components.map((c) => c.sourceFile),
+    components.map((c) => c.propsFile).filter(Boolean),
     compilerOptions(components),
   );
   const checker = program.getTypeChecker();
   const byComponent = new Map<string, ExtractedExport[]>();
 
   for (const component of components) {
-    const sourceFile = program.getSourceFile(component.sourceFile);
+    const sourceFile = component.propsFile ? program.getSourceFile(component.propsFile) : undefined;
     if (!sourceFile) {
       byComponent.set(component.meta.name, []);
       continue;
