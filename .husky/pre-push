@@ -1,0 +1,25 @@
+# The gate that pre-commit structurally cannot be.
+#
+# `pre-commit` runs `lint-staged`, which only ever sees the files in that
+# commit. It cannot catch a new lint rule firing on a package you did not
+# touch, a shared lockfile breaking someone else's tests, a cross-package type
+# error, or `format:check` — all of which are repo-wide and all of which fail
+# CI. Push is the last moment those are cheap to find.
+#
+# Tests are skipped here (`--fast`): they are the slowest gate and the one CI
+# is best at. Everything skipped is still checked in CI — this hook is about
+# catching the failures that are embarrassing to discover from a red PR, not
+# about replacing CI.
+#
+# Escape hatches, in order of preference:
+#
+#   pnpm verify              run the full gate yourself, including tests
+#   SKIP_VERIFY=1 git push   push anyway (WIP branch, or CI is the faster loop)
+#   git push --no-verify     same, via git
+
+if [ "${SKIP_VERIFY:-0}" = "1" ]; then
+  echo "pre-push: SKIP_VERIFY=1 — skipping local gates, CI will still run them"
+  exit 0
+fi
+
+pnpm verify --fast

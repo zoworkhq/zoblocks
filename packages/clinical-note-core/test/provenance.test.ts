@@ -102,7 +102,9 @@ describe("the mark spec", () => {
   });
 
   it("discards an unparseable confidence rather than storing NaN", () => {
-    expect(getAttrs(el({ "data-ox-origin": "dictated", "data-ox-confidence": "wat" }))).toMatchObject({
+    expect(
+      getAttrs(el({ "data-ox-origin": "dictated", "data-ox-confidence": "wat" })),
+    ).toMatchObject({
       confidence: null,
     });
   });

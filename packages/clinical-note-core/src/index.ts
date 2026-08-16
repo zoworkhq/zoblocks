@@ -115,12 +115,7 @@ export {
   type Severity,
 } from "./gate.js";
 
-export {
-  canonicallyEqual,
-  stableStringify,
-  toCanonical,
-  type Json,
-} from "./canonical.js";
+export { canonicallyEqual, stableStringify, toCanonical, type Json } from "./canonical.js";
 
 export {
   XHTML_NS,

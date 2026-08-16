@@ -47,10 +47,25 @@ ruleTester.run("tabs-semantic-mode", tabsSemanticMode, {
     { code: 'const a = <Tabs as="steps" items={items} />;' },
     { code: 'const a = <Tabs as="nav" items={[{ value: "a", href: "/a" }]} />;' },
 
-    // A default import, and an aliased one — the two import shapes the
-    // specifier check has to see through as well as the named case above.
+    // Somebody else's Tabs. antd exports one, it has no `as` prop, and
+    // demanding a prop the component does not accept is worse advice than
+    // silence. This is the case that fired on SignatureModal.tsx.
+    //
+    // Every import shape the specifier check has to see through: named,
+    // named-among-others, default, and aliased.
+    { code: 'import { Tabs } from "antd";\nconst a = <Tabs id="x" items={items} />;' },
+    { code: 'import { Tabs, Modal } from "antd";\nconst a = <Tabs items={items} />;' },
     { code: 'import Tabs from "rc-tabs";\nconst a = <Tabs items={items} />;' },
     { code: 'import { Tabs as Foo } from "antd";\nconst a = <Tabs items={items} as="tabs" />;' },
+
+    // Oxygen's own Tabs is still required to declare itself, however it is
+    // imported — otherwise the fix above would disable the rule everywhere.
+    {
+      code: 'import { Tabs } from "@oxygenui-design/react";\nconst a = <Tabs as="tabs" items={items} />;',
+    },
+    {
+      code: 'import { Tabs } from "./tabs.js";\nconst a = <Tabs as="nav" items={[{ href: "/a" }]} />;',
+    },
 
     // The compound root, both spellings.
     { code: 'const a = <TabsRoot as="tabs" />;' },
@@ -83,6 +98,22 @@ ruleTester.run("tabs-semantic-mode", tabsSemanticMode, {
   ],
 
   invalid: [
+    // Imported from a workspace package: still ours, still required.
+    {
+      code: 'import { Tabs } from "@oxygenui-design/react";\nconst a = <Tabs items={items} />;',
+      errors: [{ messageId: "missingMode" }],
+    },
+    // Relative import: ours.
+    {
+      code: 'import { Tabs } from "../tabs.js";\nconst a = <Tabs items={items} />;',
+      errors: [{ messageId: "missingMode" }],
+    },
+    // An antd import elsewhere in the file must not launder an unqualified
+    // Tabs that came from somewhere else.
+    {
+      code: 'import { Modal } from "antd";\nconst a = <Tabs items={items} />;',
+      errors: [{ messageId: "missingMode" }],
+    },
     {
       // The default that does not exist, and must not.
       code: "const a = <Tabs items={items} />;",

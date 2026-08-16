@@ -50,7 +50,8 @@ export function stableStringify(value: Json): string {
     // Non-finite numbers have no JSON representation; `JSON.stringify` silently
     // writes `null` for them. Silence is the wrong behaviour when the output is
     // about to be signed.
-    if (!Number.isFinite(value)) throw new TypeError(`Cannot canonicalise non-finite number: ${value}`);
+    if (!Number.isFinite(value))
+      throw new TypeError(`Cannot canonicalise non-finite number: ${value}`);
     // `-0` and `0` are the same number and must not produce two encodings.
     return Object.is(value, -0) ? "0" : JSON.stringify(value);
   }

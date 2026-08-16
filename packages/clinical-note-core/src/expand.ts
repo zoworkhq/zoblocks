@@ -83,7 +83,10 @@ export function tokenize(line: string): Token[] {
     if (match[2] !== undefined) {
       // A pick list. Empty options are dropped rather than rendered as a blank
       // choice — `{mild::severe}` is a typo, not a three-way decision.
-      const options = match[2].split(":").map((s) => s.trim()).filter((s) => s !== "");
+      const options = match[2]
+        .split(":")
+        .map((s) => s.trim())
+        .filter((s) => s !== "");
       if (options.length > 0) out.push({ kind: "choice", options });
       else out.push({ kind: "text", text: match[0] });
     } else {

@@ -148,7 +148,13 @@ export function stalePulls(doc: PMNode, maxAgeMs: number, now: Date): StalePull[
     if (Number.isNaN(at)) continue;
     const age = now.getTime() - at;
     if (age > maxAgeMs) {
-      out.push({ from: range.from, to: range.to, text: range.text, source: range.attrs.source, ageMs: age });
+      out.push({
+        from: range.from,
+        to: range.to,
+        text: range.text,
+        source: range.attrs.source,
+        ageMs: age,
+      });
     }
   }
   return out;

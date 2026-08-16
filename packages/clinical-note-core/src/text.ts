@@ -80,7 +80,9 @@ function blocks(node: PMNode, opts: Required<TextOptions>, depth: number): strin
           inner.forEach((line, i) => {
             // Only the first line of a multi-paragraph item is numbered; the
             // rest are indented under it, which is what a reader expects.
-            lines.push(i === 0 ? `${"  ".repeat(depth)}${n}. ${line}` : `${"  ".repeat(depth + 1)}${line}`);
+            lines.push(
+              i === 0 ? `${"  ".repeat(depth)}${n}. ${line}` : `${"  ".repeat(depth + 1)}${line}`,
+            );
           });
           n++;
         });

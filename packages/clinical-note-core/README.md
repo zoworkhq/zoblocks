@@ -59,24 +59,24 @@ composition(doc).ratio.copied; // 0.62 — measured, not estimated
 
 ## What it does
 
-| Module          | Responsibility                                                        |
-| --------------- | --------------------------------------------------------------------- |
-| `schema.ts`     | LOINC-coded sections as ProseMirror nodes. Invalid notes are unbuildable. |
-| `provenance.ts` | The six origins, as a mark that survives arbitrary editing.            |
+| Module          | Responsibility                                                                  |
+| --------------- | ------------------------------------------------------------------------------- |
+| `schema.ts`     | LOINC-coded sections as ProseMirror nodes. Invalid notes are unbuildable.       |
+| `provenance.ts` | The six origins, as a mark that survives arbitrary editing.                     |
 | `compose.ts`    | Origin ratios, copy-forward measurement, stale pulls, cross-patient text, diff. |
-| `gate.ts`       | The rule engine and nine default rules. Nothing signs while a `block` stands. |
-| `expand.ts`     | Dot phrases, `***` blanks, `{a:b:c}` pick lists, F2 traversal.         |
-| `canonical.ts`  | Same document, same bytes, forever. What a signature is computed over. |
-| `narrative.ts`  | FHIR-legal XHTML, as a string. A total function.                      |
-| `text.ts`       | Plain text for HL7 v2 `OBX`. A real serializer, not `textContent`.     |
-| `fhir.ts`       | `Composition` + `DocumentReference` + `Provenance`, as a transaction Bundle. |
+| `gate.ts`       | The rule engine and nine default rules. Nothing signs while a `block` stands.   |
+| `expand.ts`     | Dot phrases, `***` blanks, `{a:b:c}` pick lists, F2 traversal.                  |
+| `canonical.ts`  | Same document, same bytes, forever. What a signature is computed over.          |
+| `narrative.ts`  | FHIR-legal XHTML, as a string. A total function.                                |
+| `text.ts`       | Plain text for HL7 v2 `OBX`. A real serializer, not `textContent`.              |
+| `fhir.ts`       | `Composition` + `DocumentReference` + `Provenance`, as a transaction Bundle.    |
 
 ---
 
 ## Three decisions worth knowing about
 
 **The schema is a subset of what FHIR narrative permits.** A note that could not
-be transmitted cannot be *constructed*, so `toNarrative()` has no failure branch
+be transmitted cannot be _constructed_, so `toNarrative()` has no failure branch
 and there is no validation step that fails twenty minutes into a note. That
 guarantee is why the formatting menu is four buttons: no underline (reads as a
 link), no strikethrough (silently dropped by some renderers, which applied to a
@@ -154,7 +154,7 @@ withDigest(bundle, doc, (bytes) => createHash("sha256").update(bytes).digest("ba
 ```
 
 Signatures land on `Provenance.signature` — `Composition.attester` records
-*that* someone attested but has no element for the signature itself, in R4 or
+_that_ someone attested but has no element for the signature itself, in R4 or
 R5.
 
 ---

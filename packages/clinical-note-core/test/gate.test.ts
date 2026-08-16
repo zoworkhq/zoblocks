@@ -38,8 +38,14 @@ describe("runGate", () => {
   it("signs a clean note", () => {
     const clean = doc(
       section({ code: "10154-3", title: "Chief complaint" }, p(t("Transfusion.", "typed"))),
-      section({ code: "10164-2", title: "History of present illness", required: true }, p(t("Fatigue.", "typed"))),
-      section({ code: "51847-2", title: "Assessment and plan", required: true }, p(t("Transfuse.", "typed"))),
+      section(
+        { code: "10164-2", title: "History of present illness", required: true },
+        p(t("Fatigue.", "typed")),
+      ),
+      section(
+        { code: "51847-2", title: "Assessment and plan", required: true },
+        p(t("Transfuse.", "typed")),
+      ),
     );
     const result = runGate(clean, DEFAULT_RULES, ctx);
     expect(result.canSign).toBe(true);
@@ -81,12 +87,25 @@ describe("runGate", () => {
   });
 
   it("reports a non-Error throw too", () => {
-    const result = runGate(emptyNote("progress"), [{ id: "odd", run() { throw "just a string"; } }], ctx);
+    const result = runGate(
+      emptyNote("progress"),
+      [
+        {
+          id: "odd",
+          run() {
+            throw "just a string";
+          },
+        },
+      ],
+      ctx,
+    );
     expect(result.findings[0]!.detail).toContain("just a string");
   });
 
   it("skips rules that decline to answer", () => {
-    expect(runGate(emptyNote("progress"), [{ id: "quiet", run: () => null }], ctx).findings).toHaveLength(0);
+    expect(
+      runGate(emptyNote("progress"), [{ id: "quiet", run: () => null }], ctx).findings,
+    ).toHaveLength(0);
   });
 });
 
@@ -177,9 +196,7 @@ describe("noForeignContent", () => {
 
 describe("copyForward", () => {
   it("warns above the threshold, with the number", () => {
-    const d = doc(
-      section({ code: "1", title: "S" }, p(t("aaaaaaaa", "copied"), t("bb", "typed"))),
-    );
+    const d = doc(section({ code: "1", title: "S" }, p(t("aaaaaaaa", "copied"), t("bb", "typed"))));
     const finding = run(copyForward, d)[0]!;
     expect(finding.severity).toBe("warn");
     expect(finding.title).toBe("80% of this note is copied from earlier documentation");
@@ -211,7 +228,9 @@ describe("freshPulls", () => {
   });
 
   it("passes when the host's window is wider", () => {
-    expect(run(freshPulls, sampleNote(), { ...ctx, maxPullAgeMs: 24 * 3600_000 })[0]!.severity).toBe("pass");
+    expect(
+      run(freshPulls, sampleNote(), { ...ctx, maxPullAgeMs: 24 * 3600_000 })[0]!.severity,
+    ).toBe("pass");
   });
 
   it("uses singular grammar for a single stale value", () => {
@@ -236,12 +255,16 @@ describe("uneditedTemplate", () => {
   it("warns when boilerplate dominates", () => {
     // A normal-exam macro firing eleven systems onto a patient with an
     // obviously abnormal abdomen is a lie nobody typed.
-    const d = doc(section({ code: "1", title: "S" }, p(t("aaaaaaaa", "template"), t("bb", "typed"))));
+    const d = doc(
+      section({ code: "1", title: "S" }, p(t("aaaaaaaa", "template"), t("bb", "typed"))),
+    );
     expect(run(uneditedTemplate, d)[0]!.severity).toBe("warn");
   });
 
   it("passes at a normal proportion", () => {
-    const d = doc(section({ code: "1", title: "S" }, p(t("aa", "template"), t("bbbbbbbb", "typed"))));
+    const d = doc(
+      section({ code: "1", title: "S" }, p(t("aa", "template"), t("bbbbbbbb", "typed"))),
+    );
     expect(run(uneditedTemplate, d)[0]!.severity).toBe("pass");
   });
 

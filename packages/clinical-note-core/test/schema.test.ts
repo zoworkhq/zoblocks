@@ -56,8 +56,12 @@ describe("note types", () => {
 
   it("requires a physical exam on an H&P but not on a progress note", () => {
     // The schema doing clinical work: an H&P without an exam is not an H&P.
-    const hp = NOTE_TYPES.historyAndPhysical.sections.find((s) => s.code === SECTIONS.physicalExam.code);
-    const progress = NOTE_TYPES.progress.sections.find((s) => s.code === SECTIONS.physicalExam.code);
+    const hp = NOTE_TYPES.historyAndPhysical.sections.find(
+      (s) => s.code === SECTIONS.physicalExam.code,
+    );
+    const progress = NOTE_TYPES.progress.sections.find(
+      (s) => s.code === SECTIONS.physicalExam.code,
+    );
     expect(hp?.required).toBe(true);
     expect(progress?.required).toBe(false);
   });
@@ -136,7 +140,11 @@ describe("DOM round trip", () => {
 
   it("serialises a section without leaking the requirement flag into the DOM", () => {
     const node = section({ code: "1", title: "S", required: true });
-    const out = noteSchema.nodes["section"]!.spec.toDOM!(node) as [string, Record<string, string>, number];
+    const out = noteSchema.nodes["section"]!.spec.toDOM!(node) as [
+      string,
+      Record<string, string>,
+      number,
+    ];
     expect(out[0]).toBe("section");
     expect(out[1]["data-ox-code"]).toBe("1");
     expect(out[1]["data-ox-required"]).toBeUndefined();
@@ -144,9 +152,15 @@ describe("DOM round trip", () => {
 
   it("round-trips a blank, hinted and bare", () => {
     const spec = noteSchema.nodes["wildcard"]!.spec;
-    expect(spec.parseDOM![0]!.getAttrs!(el({ "data-ox-wildcard": "dose" }))).toEqual({ hint: "dose" });
+    expect(spec.parseDOM![0]!.getAttrs!(el({ "data-ox-wildcard": "dose" }))).toEqual({
+      hint: "dose",
+    });
     expect(spec.parseDOM![0]!.getAttrs!(el({}))).toEqual({ hint: "" });
-    expect(spec.toDOM!(blank("dose"))).toEqual(["span", { "data-ox-wildcard": "dose" }, "***dose***"]);
+    expect(spec.toDOM!(blank("dose"))).toEqual([
+      "span",
+      { "data-ox-wildcard": "dose" },
+      "***dose***",
+    ]);
     expect(spec.toDOM!(blank())).toEqual(["span", { "data-ox-wildcard": "" }, "***"]);
   });
 
@@ -188,11 +202,13 @@ describe("DOM round trip", () => {
   it("serialises the formatting marks as semantic elements", () => {
     // Not styled spans: a screen reader cannot convey emphasis that is only a
     // font-weight declaration.
-    expect(noteSchema.marks["strong"]!.spec.toDOM!(noteSchema.marks["strong"]!.create(), false)).toEqual([
-      "strong",
+    expect(
+      noteSchema.marks["strong"]!.spec.toDOM!(noteSchema.marks["strong"]!.create(), false),
+    ).toEqual(["strong", 0]);
+    expect(noteSchema.marks["em"]!.spec.toDOM!(noteSchema.marks["em"]!.create(), false)).toEqual([
+      "em",
       0,
     ]);
-    expect(noteSchema.marks["em"]!.spec.toDOM!(noteSchema.marks["em"]!.create(), false)).toEqual(["em", 0]);
   });
 });
 

@@ -81,7 +81,9 @@ describe("toComposition", () => {
     // admissible, and it falls out of the same model that satisfies a patient's
     // right to amend under 45 CFR 164.526.
     const c = toComposition(sampleNote(), { ...base, appendsTo: { reference: "Composition/1" } });
-    expect(c.relatesTo).toEqual([{ code: "appends", targetReference: { reference: "Composition/1" } }]);
+    expect(c.relatesTo).toEqual([
+      { code: "appends", targetReference: { reference: "Composition/1" } },
+    ]);
   });
 
   it("carries an encounter when the host supplies one", () => {
@@ -114,7 +116,9 @@ describe("toDocumentReference", () => {
 
   it("tracks the signing state in docStatus", () => {
     expect(toDocumentReference(sampleNote(), base, "x").docStatus).toBe("preliminary");
-    expect(toDocumentReference(sampleNote(), { ...base, attestations: signed }, "x").docStatus).toBe("final");
+    expect(
+      toDocumentReference(sampleNote(), { ...base, attestations: signed }, "x").docStatus,
+    ).toBe("final");
   });
 });
 
@@ -138,15 +142,26 @@ describe("toProvenance", () => {
   });
 
   it("takes an explicit purpose over the positional default", () => {
-    const purpose = { system: SIGNATURE_TYPE_SYSTEM, code: "1.2.840.10065.1.12.1.5", display: "Verification Signature" };
-    const p = toProvenance(sampleNote(), { ...base, attestations: [{ who: AUTHOR, when: DATE, purpose }] }, target);
+    const purpose = {
+      system: SIGNATURE_TYPE_SYSTEM,
+      code: "1.2.840.10065.1.12.1.5",
+      display: "Verification Signature",
+    };
+    const p = toProvenance(
+      sampleNote(),
+      { ...base, attestations: [{ who: AUTHOR, when: DATE, purpose }] },
+      target,
+    );
     expect(p.signature![0]!.type[0]).toEqual(purpose);
   });
 
   it("carries signature bytes when the host captured them", () => {
     const p = toProvenance(
       sampleNote(),
-      { ...base, attestations: [{ who: AUTHOR, when: DATE, data: "AAAA", sigFormat: "image/png" }] },
+      {
+        ...base,
+        attestations: [{ who: AUTHOR, when: DATE, data: "AAAA", sigFormat: "image/png" }],
+      },
       target,
     );
     expect(p.signature![0]!.data).toBe("AAAA");
@@ -168,14 +183,20 @@ describe("toProvenance", () => {
   it("records the warnings the author acknowledged", () => {
     // A signature over a note with five acknowledged warnings is a different
     // artifact from one with none, and the record should say so.
-    const p = toProvenance(sampleNote(), { ...base, acknowledgedWarnings: ["copy-forward", "stale-pull"] }, target);
+    const p = toProvenance(
+      sampleNote(),
+      { ...base, acknowledgedWarnings: ["copy-forward", "stale-pull"] },
+      target,
+    );
     const ext = p.extension!.find((e) => e.url === COMPOSITION_EXTENSION)!;
     const acknowledged = ext.extension!.filter((e) => e.url === "acknowledgedWarning");
     expect(acknowledged.map((e) => e.valueString)).toEqual(["copy-forward", "stale-pull"]);
   });
 
   it("can be told to omit the non-standard extension", () => {
-    expect(toProvenance(sampleNote(), { ...base, includeComposition: false }, target).extension).toBeUndefined();
+    expect(
+      toProvenance(sampleNote(), { ...base, includeComposition: false }, target).extension,
+    ).toBeUndefined();
   });
 
   it("advertises the extension as ours rather than pretending it is standard", () => {
@@ -187,7 +208,11 @@ describe("toProvenance", () => {
 
 describe("toFhirBundle", () => {
   it("returns all three resources, because no one of them carries everything", () => {
-    const bundle = toFhirBundle(sampleNote(), { ...base, attestations: signed }, toText(sampleNote()));
+    const bundle = toFhirBundle(
+      sampleNote(),
+      { ...base, attestations: signed },
+      toText(sampleNote()),
+    );
     expect(bundle.type).toBe("transaction");
     expect(bundle.entry.map((e) => e.resource.resourceType)).toEqual([
       "Composition",
@@ -253,7 +278,9 @@ describe("withDigest", () => {
       .readFileSync(new URL("../src/fhir.ts", import.meta.url), "utf8")
       .replace(/\/\*[\s\S]*?\*\//g, "")
       .replace(/\/\/.*$/gm, "");
-    expect(source).not.toMatch(/from ["']node:crypto|require\(["']crypto|createHash|crypto\.subtle/);
+    expect(source).not.toMatch(
+      /from ["']node:crypto|require\(["']crypto|createHash|crypto\.subtle/,
+    );
   });
 });
 

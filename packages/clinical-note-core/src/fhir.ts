@@ -160,7 +160,8 @@ export const COAUTHORS_SIGNATURE: FhirCoding = {
  * survive a round trip — which is a fact a customer's integration engineer
  * should learn from our documentation, not from their own debugging.
  */
-export const COMPOSITION_EXTENSION = "https://oxygenui.design/fhir/StructureDefinition/note-composition";
+export const COMPOSITION_EXTENSION =
+  "https://oxygenui.design/fhir/StructureDefinition/note-composition";
 
 /* ------------------------------------------------------------------ */
 /* Options                                                             */
@@ -282,7 +283,11 @@ export function toComposition(doc: PMNode, options: ToFhirOptions): FhirComposit
 }
 
 /** Build the `DocumentReference`. */
-export function toDocumentReference(doc: PMNode, options: ToFhirOptions, text: string): FhirDocumentReference {
+export function toDocumentReference(
+  doc: PMNode,
+  options: ToFhirOptions,
+  text: string,
+): FhirDocumentReference {
   const def = noteType(options.noteType);
   const signed = (options.attestations ?? []).length > 0;
   return {
@@ -309,7 +314,11 @@ export function toDocumentReference(doc: PMNode, options: ToFhirOptions, text: s
 }
 
 /** Build the `Provenance` — the resource that carries signatures. */
-export function toProvenance(doc: PMNode, options: ToFhirOptions, target: FhirReference): FhirProvenance {
+export function toProvenance(
+  doc: PMNode,
+  options: ToFhirOptions,
+  target: FhirReference,
+): FhirProvenance {
   const attestations = options.attestations ?? [];
 
   const provenance: FhirProvenance = {
@@ -333,9 +342,7 @@ export function toProvenance(doc: PMNode, options: ToFhirOptions, target: FhirRe
   }
 
   if (options.includeComposition !== false) {
-    provenance.extension = [
-      ratioExtension(composition(doc), options.acknowledgedWarnings ?? []),
-    ];
+    provenance.extension = [ratioExtension(composition(doc), options.acknowledgedWarnings ?? [])];
   }
 
   return provenance;

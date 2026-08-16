@@ -27,12 +27,7 @@
 
 import type { Node as PMNode } from "prosemirror-model";
 import { blanks } from "./expand.js";
-import {
-  composition,
-  foreignContent,
-  stalePulls,
-  unreviewedAi,
-} from "./compose.js";
+import { composition, foreignContent, stalePulls, unreviewedAi } from "./compose.js";
 import {
   isSectionEmpty,
   noteType,
@@ -203,7 +198,11 @@ export const requiredSections: GateRule = {
     }
 
     if (missing.length > 0) return missing;
-    return { id: "required-sections", severity: "pass", title: "All required sections have content" };
+    return {
+      id: "required-sections",
+      severity: "pass",
+      title: "All required sections have content",
+    };
   },
 };
 
@@ -274,7 +273,11 @@ export const noForeignContent: GateRule = {
     const foreign = foreignContent(doc, ctx.subject);
     const first = foreign[0];
     if (first === undefined) {
-      return { id: "foreign-content", severity: "pass", title: "All content belongs to this patient" };
+      return {
+        id: "foreign-content",
+        severity: "pass",
+        title: "All content belongs to this patient",
+      };
     }
     return {
       id: "foreign-content",
@@ -299,7 +302,11 @@ export const copyForward: GateRule = {
     const threshold = ctx.copyForwardWarnAt ?? 0.5;
     const c = composition(doc);
     if (c.total === 0 || c.ratio.copied <= threshold) {
-      return { id: "copy-forward", severity: "pass", title: "Copy-forward is within your organisation's threshold" };
+      return {
+        id: "copy-forward",
+        severity: "pass",
+        title: "Copy-forward is within your organisation's threshold",
+      };
     }
     const pct = Math.round(c.ratio.copied * 100);
     return {
@@ -349,7 +356,11 @@ export const uneditedTemplate: GateRule = {
   run(doc) {
     const c = composition(doc);
     if (c.total === 0 || c.ratio.template < 0.4) {
-      return { id: "unedited-template", severity: "pass", title: "Template content is within range" };
+      return {
+        id: "unedited-template",
+        severity: "pass",
+        title: "Template content is within range",
+      };
     }
     return {
       id: "unedited-template",
@@ -491,9 +502,15 @@ export const lowConfidenceDictation: GateRule = {
       (a) => a.origin === "dictated" && a.confidence !== null && a.confidence < 0.75,
     );
     if (shaky.length === 0) {
-      return { id: "low-confidence-dictation", severity: "pass", title: "Dictation confidence is acceptable" };
+      return {
+        id: "low-confidence-dictation",
+        severity: "pass",
+        title: "Dictation confidence is acceptable",
+      };
     }
-    const worst = shaky.reduce((a, b) => ((b.attrs.confidence ?? 1) < (a.attrs.confidence ?? 1) ? b : a));
+    const worst = shaky.reduce((a, b) =>
+      (b.attrs.confidence ?? 1) < (a.attrs.confidence ?? 1) ? b : a,
+    );
     return {
       id: "low-confidence-dictation",
       severity: "warn",

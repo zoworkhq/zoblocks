@@ -33,19 +33,22 @@ describe("toText", () => {
   });
 
   it("renders bullets", () => {
-    const text = toText(doc(section({ code: "1", title: "A" }, ul(li(p(t("one"))), li(p(t("two")))))));
+    const text = toText(
+      doc(section({ code: "1", title: "A" }, ul(li(p(t("one"))), li(p(t("two")))))),
+    );
     expect(text).toBe("A\n- one\n- two");
   });
 
   it("numbers ordered lists", () => {
-    const text = toText(doc(section({ code: "1", title: "A" }, ol(li(p(t("one"))), li(p(t("two")))))));
+    const text = toText(
+      doc(section({ code: "1", title: "A" }, ol(li(p(t("one"))), li(p(t("two")))))),
+    );
     expect(text).toBe("A\n1. one\n2. two");
   });
 
   it("indents continuation paragraphs under their numbered item", () => {
     const text = toText(
-      doc(section({ code: "1", title: "A" }, ol(li(p(t("first")), p(t("continued"))))),
-      ),
+      doc(section({ code: "1", title: "A" }, ol(li(p(t("first")), p(t("continued")))))),
     );
     expect(text).toBe("A\n1. first\n  continued");
   });

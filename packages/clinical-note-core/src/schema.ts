@@ -70,7 +70,11 @@ export const SECTIONS = {
   allergies: { code: "48765-2", title: "Allergies and adverse reactions", required: false },
   reviewOfSystems: { code: "10187-3", title: "Review of systems", required: false },
   physicalExam: { code: "29545-1", title: "Physical examination", required: true },
-  results: { code: "30954-2", title: "Relevant diagnostic tests and laboratory data", required: false },
+  results: {
+    code: "30954-2",
+    title: "Relevant diagnostic tests and laboratory data",
+    required: false,
+  },
   assessmentAndPlan: { code: "51847-2", title: "Assessment and plan", required: true },
   hospitalCourse: { code: "8648-8", title: "Hospital course", required: false },
   dischargeInstructions: { code: "8653-8", title: "Discharge instructions", required: false },

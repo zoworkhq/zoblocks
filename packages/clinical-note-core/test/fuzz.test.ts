@@ -109,7 +109,9 @@ function assertInvariants(doc: PMNode, seed: number, step: number): void {
 
   // 3. Ranges are ordered and never overlap.
   for (let i = 1; i < ranges.length; i++) {
-    expect(ranges[i]!.from, `${where}: ranges out of order`).toBeGreaterThanOrEqual(ranges[i - 1]!.to);
+    expect(ranges[i]!.from, `${where}: ranges out of order`).toBeGreaterThanOrEqual(
+      ranges[i - 1]!.to,
+    );
   }
 
   // 4. Ranges say what the document says at those positions.
@@ -132,18 +134,25 @@ function assertInvariants(doc: PMNode, seed: number, step: number): void {
 
   // 6. Composition accounts for every character exactly once.
   const c = composition(doc);
-  expect(ORIGINS.reduce((sum, o) => sum + c.chars[o], 0), where).toBe(c.total);
+  expect(
+    ORIGINS.reduce((sum, o) => sum + c.chars[o], 0),
+    where,
+  ).toBe(c.total);
   expect(c.total, where).toBe(ranges.reduce((sum, r) => sum + r.text.length, 0));
   if (c.total > 0) {
-    expect(ORIGINS.reduce((sum, o) => sum + c.ratio[o], 0), where).toBeCloseTo(1, 8);
+    expect(
+      ORIGINS.reduce((sum, o) => sum + c.ratio[o], 0),
+      where,
+    ).toBeCloseTo(1, 8);
   }
 
   // 7. Canonical serialization is stable and survives a JSON round trip. This
   //    is the property a stored signature depends on.
   expect(toCanonical(doc), where).toBe(toCanonical(doc));
-  expect(toCanonical(noteSchema.nodeFromJSON(JSON.parse(JSON.stringify(doc.toJSON())))), where).toBe(
-    toCanonical(doc),
-  );
+  expect(
+    toCanonical(noteSchema.nodeFromJSON(JSON.parse(JSON.stringify(doc.toJSON())))),
+    where,
+  ).toBe(toCanonical(doc));
 
   // 8. The narrative is well-formed and contains nothing FHIR forbids —
   //    whatever the document has been put through.

@@ -51,7 +51,9 @@ describe("sectionNarrative", () => {
   });
 
   it("emits lists", () => {
-    const bullets = sectionNarrative(section({ code: "1", title: "S" }, ul(li(p(t("one"))), li(p(t("two"))))));
+    const bullets = sectionNarrative(
+      section({ code: "1", title: "S" }, ul(li(p(t("one"))), li(p(t("two"))))),
+    );
     expect(bullets).toContain("<ul><li><p>one</p></li><li><p>two</p></li></ul>");
     const numbered = sectionNarrative(section({ code: "1", title: "S" }, ol(li(p(t("one"))))));
     expect(numbered).toContain("<ol><li><p>one</p></li></ol>");
@@ -72,7 +74,9 @@ describe("sectionNarrative", () => {
   it("renders an unfilled blank rather than silently dropping it", () => {
     // A draft narrative is a legitimate thing to produce, and a dropped blank
     // would make the draft look complete.
-    expect(sectionNarrative(section({ code: "1", title: "S" }, p(blank("dose"))))).toContain("***dose***");
+    expect(sectionNarrative(section({ code: "1", title: "S" }, p(blank("dose"))))).toContain(
+      "***dose***",
+    );
     expect(sectionNarrative(section({ code: "1", title: "S" }, p(blank())))).toContain("***");
   });
 
@@ -87,7 +91,9 @@ describe("sectionNarrative", () => {
     // Per-range provenance is not standardised in FHIR; it travels as custom
     // attributes a conforming server may legitimately strip. Opting in is what
     // stops that being a surprise for someone else's integration engineer.
-    expect(sectionNarrative(section({ code: "1", title: "S" }, p(t("x", "ai"))))).not.toContain("data-ox-");
+    expect(sectionNarrative(section({ code: "1", title: "S" }, p(t("x", "ai"))))).not.toContain(
+      "data-ox-",
+    );
   });
 
   it("emits provenance when asked, in a fixed attribute order", () => {
@@ -104,7 +110,9 @@ describe("sectionNarrative", () => {
   });
 
   it("emits the review flag only for AI ranges", () => {
-    const ai = sectionNarrative(section({ code: "1", title: "S" }, p(t("x", "ai"))), { provenance: true });
+    const ai = sectionNarrative(section({ code: "1", title: "S" }, p(t("x", "ai"))), {
+      provenance: true,
+    });
     expect(ai).toContain('data-ox-reviewed="false"');
     const typed = sectionNarrative(section({ code: "1", title: "S" }, p(t("x", "typed"))), {
       provenance: true,
@@ -121,10 +129,9 @@ describe("sectionNarrative", () => {
   });
 
   it("nests marks in a fixed order, so the same document always hashes the same", () => {
-    const html = sectionNarrative(
-      section({ code: "1", title: "S" }, p(noteSchemaText())),
-      { provenance: true },
-    );
+    const html = sectionNarrative(section({ code: "1", title: "S" }, p(noteSchemaText())), {
+      provenance: true,
+    });
     // provenance outermost, then strong, then em.
     expect(html.indexOf("<span")).toBeLessThan(html.indexOf("<strong>"));
     expect(html.indexOf("<strong>")).toBeLessThan(html.indexOf("<em>"));
@@ -153,7 +160,10 @@ describe("recursing into unknown containers", () => {
     // block serializer has no case for `section`, so it recurses. Worth
     // supporting because it is what a caller reaching for "just render this
     // subtree" will do.
-    const d = doc(section({ code: "1", title: "A" }, p(t("one"))), section({ code: "2", title: "B" }, p(t("two"))));
+    const d = doc(
+      section({ code: "1", title: "A" }, p(t("one"))),
+      section({ code: "2", title: "B" }, p(t("two"))),
+    );
     expect(sectionNarrative(d)).toBe(`<div xmlns="${XHTML_NS}"><p>one</p><p>two</p></div>`);
   });
 });
@@ -170,11 +180,15 @@ describe("toNarrative", () => {
   });
 
   it("escapes section titles", () => {
-    expect(toNarrative(doc(section({ code: "1", title: "A & B" }, p(t("x")))))).toContain("<h2>A &amp; B</h2>");
+    expect(toNarrative(doc(section({ code: "1", title: "A & B" }, p(t("x")))))).toContain(
+      "<h2>A &amp; B</h2>",
+    );
   });
 
   it("produces a well-formed, empty div for an empty note", () => {
-    expect(toNarrative(emptyNote("progress"))).toMatch(/^<div xmlns="[^"]+">(<h2>[^<]*<\/h2>)*<\/div>$/);
+    expect(toNarrative(emptyNote("progress"))).toMatch(
+      /^<div xmlns="[^"]+">(<h2>[^<]*<\/h2>)*<\/div>$/,
+    );
   });
 });
 

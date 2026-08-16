@@ -112,16 +112,18 @@ describe("expand", () => {
   });
 
   it("accepts a caller-chosen provenance", () => {
-    const { content } = expand("dictated words", { provenance: { origin: "dictated", confidence: 0.9 } });
+    const { content } = expand("dictated words", {
+      provenance: { origin: "dictated", confidence: 0.9 },
+    });
     expect(content.firstChild!.firstChild!.marks[0]!.attrs["confidence"]).toBe(0.9);
   });
 
   it("produces content the schema accepts", () => {
     const { content } = expand("A ***b*** c\n\nsecond");
     expect(() =>
-      noteSchema.nodes["doc"]!
-        .createChecked(null, [noteSchema.nodes["section"]!.createChecked(null, content)])
-        .check(),
+      noteSchema.nodes["doc"]!.createChecked(null, [
+        noteSchema.nodes["section"]!.createChecked(null, content),
+      ]).check(),
     ).not.toThrow();
   });
 
@@ -185,7 +187,12 @@ describe("searchPhrases", () => {
     // Ordered so the top hit is stable while typing. Fuzzy matching where `.ap`
     // and `.aphasia` are both real phrases changes the top hit mid-keystroke,
     // and the muscle memory that makes dot phrases fast depends on it not.
-    expect(searchPhrases(phrases, "ros").map((p) => p.id)).toEqual(["ros", "rosbrief", "exam", "ap"]);
+    expect(searchPhrases(phrases, "ros").map((p) => p.id)).toEqual([
+      "ros",
+      "rosbrief",
+      "exam",
+      "ap",
+    ]);
   });
 
   it("keeps library order for ties", () => {

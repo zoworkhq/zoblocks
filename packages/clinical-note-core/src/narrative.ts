@@ -99,7 +99,8 @@ function openTag(mark: Mark, options: NarrativeOptions): string {
   const parts: string[] = [`data-ox-origin="${escapeXml(String(a["origin"] ?? "typed"))}"`];
   if (a["source"] != null) parts.push(`data-ox-source="${escapeXml(String(a["source"]))}"`);
   if (a["at"] != null) parts.push(`data-ox-at="${escapeXml(String(a["at"]))}"`);
-  if (a["confidence"] != null) parts.push(`data-ox-confidence="${escapeXml(String(a["confidence"]))}"`);
+  if (a["confidence"] != null)
+    parts.push(`data-ox-confidence="${escapeXml(String(a["confidence"]))}"`);
   if (a["origin"] === "ai") parts.push(`data-ox-reviewed="${a["reviewed"] === true}"`);
   return `<span ${parts.join(" ")}>`;
 }

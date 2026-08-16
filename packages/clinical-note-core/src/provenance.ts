@@ -241,7 +241,10 @@ export interface ProvenanceRange {
  * ProseMirror. Reporting "5 unreviewed AI passages" when there is one is how a
  * gate loses its credibility.
  */
-export function provenanceRanges(doc: PMNode, filter?: (attrs: ProvenanceAttrs) => boolean): ProvenanceRange[] {
+export function provenanceRanges(
+  doc: PMNode,
+  filter?: (attrs: ProvenanceAttrs) => boolean,
+): ProvenanceRange[] {
   const out: ProvenanceRange[] = [];
 
   doc.descendants((node, pos) => {

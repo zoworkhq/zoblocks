@@ -11,11 +11,7 @@ import { noteSchema, LOINC } from "../src/schema.js";
 import { provenance, type Origin, type ProvenanceAttrs } from "../src/provenance.js";
 
 /** Marked text. `origin` omitted means unmarked, i.e. implicitly typed. */
-export function t(
-  text: string,
-  origin?: Origin,
-  extra: Partial<ProvenanceAttrs> = {},
-): PMNode {
+export function t(text: string, origin?: Origin, extra: Partial<ProvenanceAttrs> = {}): PMNode {
   if (origin === undefined) return noteSchema.text(text);
   const attrs = provenance({ ...extra, origin });
   return noteSchema.text(text, [
@@ -94,7 +90,11 @@ export function sampleNote(): PMNode {
     ),
     section(
       { code: "10187-3", title: "Review of systems" },
-      p(t("Constitutional — positive for fatigue; denies fever.", "template", { source: "phrase/ros" })),
+      p(
+        t("Constitutional — positive for fatigue; denies fever.", "template", {
+          source: "phrase/ros",
+        }),
+      ),
     ),
     section({ code: "51847-2", title: "Assessment and plan", required: true }),
   );

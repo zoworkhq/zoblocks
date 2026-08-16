@@ -1,7 +1,7 @@
 {
   "name": "@oxygenui-design/tabs",
   "version": "0.1.0",
-  "description": "Tabs that know what they are. Four semantic modes — view switch, navigation, form value, wizard — across eleven skins, with the WAI-ARIA keyboard model, priority-plus overflow and WCAG 2.2 AA states.",
+  "description": "Tabs that know what they are. Four semantic modes \u2014 view switch, navigation, form value, wizard \u2014 across eleven skins, with the WAI-ARIA keyboard model, priority-plus overflow and WCAG 2.2 AA states.",
   "license": "MIT",
   "homepage": "https://oxygenui.design/components/tabs",
   "repository": {

@@ -170,14 +170,16 @@ describe("diffLines", () => {
   });
 
   it("handles trailing additions and removals past the common prefix", () => {
-    expect(diffLines("a", "a\nb\nc").filter((l) => l.kind === "added").map((l) => l.text)).toEqual([
-      "b",
-      "c",
-    ]);
-    expect(diffLines("a\nb\nc", "a").filter((l) => l.kind === "removed").map((l) => l.text)).toEqual([
-      "b",
-      "c",
-    ]);
+    expect(
+      diffLines("a", "a\nb\nc")
+        .filter((l) => l.kind === "added")
+        .map((l) => l.text),
+    ).toEqual(["b", "c"]);
+    expect(
+      diffLines("a\nb\nc", "a")
+        .filter((l) => l.kind === "removed")
+        .map((l) => l.text),
+    ).toEqual(["b", "c"]);
   });
 
   it("preserves every line of the newer text", () => {
