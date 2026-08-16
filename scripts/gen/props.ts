@@ -122,7 +122,29 @@ function defaultsFromParameter(parameter: ts.ParameterDeclaration): Map<string, 
   return defaults;
 }
 
-/** Collapses the whitespace tsc emits inside object and union types onto one line. */
+/**
+ * Type text fit to publish: one line, and no filesystem paths.
+ *
+ * TypeScript prints a type imported from another module as
+ * `import("/abs/path/to/module").LoaderAnnounce`, with the path *absolute* and
+ * machine-specific. Three things go wrong if that reaches the output:
+ *
+ *   1. **The generated catalog can never be stable.** It differs on every
+ *      machine, so the "no stale generated files" check fails for everyone
+ *      whose checkout is not at the same path — which is how this was found,
+ *      as a 44-line diff between a laptop and CI.
+ *   2. **It publishes the author's home directory.** The catalog is rendered
+ *      on the docs site, so `/Users/<name>/...` ends up on a public page.
+ *   3. **It is unreadable.** A props table should say `LoaderAnnounce`, not a
+ *      path to the file that declares it.
+ *
+ * Stripping the wrapper leaves exactly the name a reader wants. It is done on
+ * the text rather than with a TypeFormatFlag because no flag suppresses it:
+ * `UseFullyQualifiedType` controls qualification, not the `import(...)` form,
+ * which tsc emits whenever the type has no local alias in scope.
+ */
+const IMPORT_PATH = /\bimport\((?:"[^"]*"|'[^']*')\)\./g;
+
 function renderType(checker: ts.TypeChecker, type: ts.Type, at: ts.Node): string {
   return checker
     .typeToString(
@@ -130,6 +152,7 @@ function renderType(checker: ts.TypeChecker, type: ts.Type, at: ts.Node): string
       at,
       ts.TypeFormatFlags.NoTruncation | ts.TypeFormatFlags.UseSingleQuotesForStringLiteralType,
     )
+    .replace(IMPORT_PATH, "")
     .replace(/\s+/g, " ")
     .trim();
 }

@@ -39,7 +39,7 @@ export const CATALOG: ComponentDoc[] = [
       },
       {
         "name": "announce",
-        "type": "import(\"/Users/rahulrajeevan/zowork/OxygenUI/.claude/worktrees/better-care-design-research-e11521/registry/oxygen/lib/loader\").LoaderAnnounce | undefined",
+        "type": "LoaderAnnounce | undefined",
         "description": "Live-region politeness while indeterminate.",
         "required": false
       },
@@ -75,13 +75,13 @@ export const CATALOG: ComponentDoc[] = [
       },
       {
         "name": "mode",
-        "type": "import(\"/Users/rahulrajeevan/zowork/OxygenUI/.claude/worktrees/better-care-design-research-e11521/registry/oxygen/lib/loader\").LoaderMode | undefined",
+        "type": "LoaderMode | undefined",
         "description": "`inline` sits in the flow; `overlay` covers its positioned ancestor; `page` covers the viewport.",
         "required": false
       },
       {
         "name": "motion",
-        "type": "import(\"/Users/rahulrajeevan/zowork/OxygenUI/.claude/worktrees/better-care-design-research-e11521/registry/oxygen/lib/loader\").LoaderMotion | undefined",
+        "type": "LoaderMotion | undefined",
         "description": "`auto` follows the OS; `reduced` forces the still state; `full` opts out of the OS preference.",
         "required": false
       },
@@ -117,7 +117,7 @@ export const CATALOG: ComponentDoc[] = [
       },
       {
         "name": "size",
-        "type": "number | import(\"/Users/rahulrajeevan/zowork/OxygenUI/.claude/worktrees/better-care-design-research-e11521/registry/oxygen/lib/loader\").LoaderSize | undefined",
+        "type": "number | LoaderSize | undefined",
         "description": "Named step or an explicit art width in pixels.",
         "required": false
       },
@@ -154,7 +154,7 @@ export const CATALOG: ComponentDoc[] = [
           },
           {
             "name": "announce",
-            "type": "import(\"/Users/rahulrajeevan/zowork/OxygenUI/.claude/worktrees/better-care-design-research-e11521/registry/oxygen/lib/loader\").LoaderAnnounce | undefined",
+            "type": "LoaderAnnounce | undefined",
             "description": "Live-region politeness while indeterminate.",
             "required": false
           },
@@ -190,13 +190,13 @@ export const CATALOG: ComponentDoc[] = [
           },
           {
             "name": "mode",
-            "type": "import(\"/Users/rahulrajeevan/zowork/OxygenUI/.claude/worktrees/better-care-design-research-e11521/registry/oxygen/lib/loader\").LoaderMode | undefined",
+            "type": "LoaderMode | undefined",
             "description": "`inline` sits in the flow; `overlay` covers its positioned ancestor; `page` covers the viewport.",
             "required": false
           },
           {
             "name": "motion",
-            "type": "import(\"/Users/rahulrajeevan/zowork/OxygenUI/.claude/worktrees/better-care-design-research-e11521/registry/oxygen/lib/loader\").LoaderMotion | undefined",
+            "type": "LoaderMotion | undefined",
             "description": "`auto` follows the OS; `reduced` forces the still state; `full` opts out of the OS preference.",
             "required": false
           },
@@ -232,7 +232,7 @@ export const CATALOG: ComponentDoc[] = [
           },
           {
             "name": "size",
-            "type": "number | import(\"/Users/rahulrajeevan/zowork/OxygenUI/.claude/worktrees/better-care-design-research-e11521/registry/oxygen/lib/loader\").LoaderSize | undefined",
+            "type": "number | LoaderSize | undefined",
             "description": "Named step or an explicit art width in pixels.",
             "required": false
           },
@@ -332,7 +332,7 @@ export const CATALOG: ComponentDoc[] = [
       },
       {
         "name": "announce",
-        "type": "import(\"/Users/rahulrajeevan/zowork/OxygenUI/.claude/worktrees/better-care-design-research-e11521/registry/oxygen/lib/loader\").LoaderAnnounce | undefined",
+        "type": "LoaderAnnounce | undefined",
         "description": "Live-region politeness while indeterminate.",
         "required": false
       },
@@ -362,13 +362,13 @@ export const CATALOG: ComponentDoc[] = [
       },
       {
         "name": "mode",
-        "type": "import(\"/Users/rahulrajeevan/zowork/OxygenUI/.claude/worktrees/better-care-design-research-e11521/registry/oxygen/lib/loader\").LoaderMode | undefined",
+        "type": "LoaderMode | undefined",
         "description": "`inline` sits in the flow; `overlay` covers its positioned ancestor; `page` covers the viewport.",
         "required": false
       },
       {
         "name": "motion",
-        "type": "import(\"/Users/rahulrajeevan/zowork/OxygenUI/.claude/worktrees/better-care-design-research-e11521/registry/oxygen/lib/loader\").LoaderMotion | undefined",
+        "type": "LoaderMotion | undefined",
         "description": "`auto` follows the OS; `reduced` forces the still state; `full` opts out of the OS preference.",
         "required": false
       },
@@ -404,7 +404,7 @@ export const CATALOG: ComponentDoc[] = [
       },
       {
         "name": "size",
-        "type": "number | import(\"/Users/rahulrajeevan/zowork/OxygenUI/.claude/worktrees/better-care-design-research-e11521/registry/oxygen/lib/loader\").LoaderSize | undefined",
+        "type": "number | LoaderSize | undefined",
         "description": "Named step or an explicit art width in pixels.",
         "required": false
       },
@@ -440,7 +440,7 @@ export const CATALOG: ComponentDoc[] = [
           },
           {
             "name": "announce",
-            "type": "import(\"/Users/rahulrajeevan/zowork/OxygenUI/.claude/worktrees/better-care-design-research-e11521/registry/oxygen/lib/loader\").LoaderAnnounce | undefined",
+            "type": "LoaderAnnounce | undefined",
             "description": "Live-region politeness while indeterminate.",
             "required": false
           },
@@ -470,13 +470,13 @@ export const CATALOG: ComponentDoc[] = [
           },
           {
             "name": "mode",
-            "type": "import(\"/Users/rahulrajeevan/zowork/OxygenUI/.claude/worktrees/better-care-design-research-e11521/registry/oxygen/lib/loader\").LoaderMode | undefined",
+            "type": "LoaderMode | undefined",
             "description": "`inline` sits in the flow; `overlay` covers its positioned ancestor; `page` covers the viewport.",
             "required": false
           },
           {
             "name": "motion",
-            "type": "import(\"/Users/rahulrajeevan/zowork/OxygenUI/.claude/worktrees/better-care-design-research-e11521/registry/oxygen/lib/loader\").LoaderMotion | undefined",
+            "type": "LoaderMotion | undefined",
             "description": "`auto` follows the OS; `reduced` forces the still state; `full` opts out of the OS preference.",
             "required": false
           },
@@ -512,7 +512,7 @@ export const CATALOG: ComponentDoc[] = [
           },
           {
             "name": "size",
-            "type": "number | import(\"/Users/rahulrajeevan/zowork/OxygenUI/.claude/worktrees/better-care-design-research-e11521/registry/oxygen/lib/loader\").LoaderSize | undefined",
+            "type": "number | LoaderSize | undefined",
             "description": "Named step or an explicit art width in pixels.",
             "required": false
           },
@@ -612,7 +612,7 @@ export const CATALOG: ComponentDoc[] = [
       },
       {
         "name": "announce",
-        "type": "import(\"/Users/rahulrajeevan/zowork/OxygenUI/.claude/worktrees/better-care-design-research-e11521/registry/oxygen/lib/loader\").LoaderAnnounce | undefined",
+        "type": "LoaderAnnounce | undefined",
         "description": "Live-region politeness while indeterminate.",
         "required": false
       },
@@ -642,13 +642,13 @@ export const CATALOG: ComponentDoc[] = [
       },
       {
         "name": "mode",
-        "type": "import(\"/Users/rahulrajeevan/zowork/OxygenUI/.claude/worktrees/better-care-design-research-e11521/registry/oxygen/lib/loader\").LoaderMode | undefined",
+        "type": "LoaderMode | undefined",
         "description": "`inline` sits in the flow; `overlay` covers its positioned ancestor; `page` covers the viewport.",
         "required": false
       },
       {
         "name": "motion",
-        "type": "import(\"/Users/rahulrajeevan/zowork/OxygenUI/.claude/worktrees/better-care-design-research-e11521/registry/oxygen/lib/loader\").LoaderMotion | undefined",
+        "type": "LoaderMotion | undefined",
         "description": "`auto` follows the OS; `reduced` forces the still state; `full` opts out of the OS preference.",
         "required": false
       },
@@ -684,7 +684,7 @@ export const CATALOG: ComponentDoc[] = [
       },
       {
         "name": "size",
-        "type": "number | import(\"/Users/rahulrajeevan/zowork/OxygenUI/.claude/worktrees/better-care-design-research-e11521/registry/oxygen/lib/loader\").LoaderSize | undefined",
+        "type": "number | LoaderSize | undefined",
         "description": "Named step or an explicit art width in pixels.",
         "required": false
       },
@@ -720,7 +720,7 @@ export const CATALOG: ComponentDoc[] = [
           },
           {
             "name": "announce",
-            "type": "import(\"/Users/rahulrajeevan/zowork/OxygenUI/.claude/worktrees/better-care-design-research-e11521/registry/oxygen/lib/loader\").LoaderAnnounce | undefined",
+            "type": "LoaderAnnounce | undefined",
             "description": "Live-region politeness while indeterminate.",
             "required": false
           },
@@ -750,13 +750,13 @@ export const CATALOG: ComponentDoc[] = [
           },
           {
             "name": "mode",
-            "type": "import(\"/Users/rahulrajeevan/zowork/OxygenUI/.claude/worktrees/better-care-design-research-e11521/registry/oxygen/lib/loader\").LoaderMode | undefined",
+            "type": "LoaderMode | undefined",
             "description": "`inline` sits in the flow; `overlay` covers its positioned ancestor; `page` covers the viewport.",
             "required": false
           },
           {
             "name": "motion",
-            "type": "import(\"/Users/rahulrajeevan/zowork/OxygenUI/.claude/worktrees/better-care-design-research-e11521/registry/oxygen/lib/loader\").LoaderMotion | undefined",
+            "type": "LoaderMotion | undefined",
             "description": "`auto` follows the OS; `reduced` forces the still state; `full` opts out of the OS preference.",
             "required": false
           },
@@ -792,7 +792,7 @@ export const CATALOG: ComponentDoc[] = [
           },
           {
             "name": "size",
-            "type": "number | import(\"/Users/rahulrajeevan/zowork/OxygenUI/.claude/worktrees/better-care-design-research-e11521/registry/oxygen/lib/loader\").LoaderSize | undefined",
+            "type": "number | LoaderSize | undefined",
             "description": "Named step or an explicit art width in pixels.",
             "required": false
           },
@@ -892,7 +892,7 @@ export const CATALOG: ComponentDoc[] = [
       },
       {
         "name": "announce",
-        "type": "import(\"/Users/rahulrajeevan/zowork/OxygenUI/.claude/worktrees/better-care-design-research-e11521/registry/oxygen/lib/loader\").LoaderAnnounce | undefined",
+        "type": "LoaderAnnounce | undefined",
         "description": "Live-region politeness while indeterminate.",
         "required": false
       },
@@ -928,13 +928,13 @@ export const CATALOG: ComponentDoc[] = [
       },
       {
         "name": "mode",
-        "type": "import(\"/Users/rahulrajeevan/zowork/OxygenUI/.claude/worktrees/better-care-design-research-e11521/registry/oxygen/lib/loader\").LoaderMode | undefined",
+        "type": "LoaderMode | undefined",
         "description": "`inline` sits in the flow; `overlay` covers its positioned ancestor; `page` covers the viewport.",
         "required": false
       },
       {
         "name": "motion",
-        "type": "import(\"/Users/rahulrajeevan/zowork/OxygenUI/.claude/worktrees/better-care-design-research-e11521/registry/oxygen/lib/loader\").LoaderMotion | undefined",
+        "type": "LoaderMotion | undefined",
         "description": "`auto` follows the OS; `reduced` forces the still state; `full` opts out of the OS preference.",
         "required": false
       },
@@ -970,7 +970,7 @@ export const CATALOG: ComponentDoc[] = [
       },
       {
         "name": "size",
-        "type": "number | import(\"/Users/rahulrajeevan/zowork/OxygenUI/.claude/worktrees/better-care-design-research-e11521/registry/oxygen/lib/loader\").LoaderSize | undefined",
+        "type": "number | LoaderSize | undefined",
         "description": "Named step or an explicit art width in pixels.",
         "required": false
       },
@@ -1007,7 +1007,7 @@ export const CATALOG: ComponentDoc[] = [
           },
           {
             "name": "announce",
-            "type": "import(\"/Users/rahulrajeevan/zowork/OxygenUI/.claude/worktrees/better-care-design-research-e11521/registry/oxygen/lib/loader\").LoaderAnnounce | undefined",
+            "type": "LoaderAnnounce | undefined",
             "description": "Live-region politeness while indeterminate.",
             "required": false
           },
@@ -1043,13 +1043,13 @@ export const CATALOG: ComponentDoc[] = [
           },
           {
             "name": "mode",
-            "type": "import(\"/Users/rahulrajeevan/zowork/OxygenUI/.claude/worktrees/better-care-design-research-e11521/registry/oxygen/lib/loader\").LoaderMode | undefined",
+            "type": "LoaderMode | undefined",
             "description": "`inline` sits in the flow; `overlay` covers its positioned ancestor; `page` covers the viewport.",
             "required": false
           },
           {
             "name": "motion",
-            "type": "import(\"/Users/rahulrajeevan/zowork/OxygenUI/.claude/worktrees/better-care-design-research-e11521/registry/oxygen/lib/loader\").LoaderMotion | undefined",
+            "type": "LoaderMotion | undefined",
             "description": "`auto` follows the OS; `reduced` forces the still state; `full` opts out of the OS preference.",
             "required": false
           },
@@ -1085,7 +1085,7 @@ export const CATALOG: ComponentDoc[] = [
           },
           {
             "name": "size",
-            "type": "number | import(\"/Users/rahulrajeevan/zowork/OxygenUI/.claude/worktrees/better-care-design-research-e11521/registry/oxygen/lib/loader\").LoaderSize | undefined",
+            "type": "number | LoaderSize | undefined",
             "description": "Named step or an explicit art width in pixels.",
             "required": false
           },
@@ -1122,7 +1122,7 @@ export const CATALOG: ComponentDoc[] = [
           },
           {
             "name": "announce",
-            "type": "import(\"/Users/rahulrajeevan/zowork/OxygenUI/.claude/worktrees/better-care-design-research-e11521/registry/oxygen/lib/loader\").LoaderAnnounce | undefined",
+            "type": "LoaderAnnounce | undefined",
             "description": "Live-region politeness while indeterminate.",
             "required": false
           },
@@ -1158,14 +1158,14 @@ export const CATALOG: ComponentDoc[] = [
           },
           {
             "name": "mode",
-            "type": "import(\"/Users/rahulrajeevan/zowork/OxygenUI/.claude/worktrees/better-care-design-research-e11521/registry/oxygen/lib/loader\").LoaderMode | undefined",
+            "type": "LoaderMode | undefined",
             "description": "`inline` sits in the flow; `overlay` covers its positioned ancestor; `page` covers the viewport.",
             "required": false,
             "default": "\"page\""
           },
           {
             "name": "motion",
-            "type": "import(\"/Users/rahulrajeevan/zowork/OxygenUI/.claude/worktrees/better-care-design-research-e11521/registry/oxygen/lib/loader\").LoaderMotion | undefined",
+            "type": "LoaderMotion | undefined",
             "description": "`auto` follows the OS; `reduced` forces the still state; `full` opts out of the OS preference.",
             "required": false
           },
@@ -1201,7 +1201,7 @@ export const CATALOG: ComponentDoc[] = [
           },
           {
             "name": "size",
-            "type": "number | import(\"/Users/rahulrajeevan/zowork/OxygenUI/.claude/worktrees/better-care-design-research-e11521/registry/oxygen/lib/loader\").LoaderSize | undefined",
+            "type": "number | LoaderSize | undefined",
             "description": "Named step or an explicit art width in pixels.",
             "required": false,
             "default": "\"xl\""
@@ -1306,7 +1306,7 @@ export const CATALOG: ComponentDoc[] = [
       },
       {
         "name": "announce",
-        "type": "import(\"/Users/rahulrajeevan/zowork/OxygenUI/.claude/worktrees/better-care-design-research-e11521/registry/oxygen/lib/loader\").LoaderAnnounce | undefined",
+        "type": "LoaderAnnounce | undefined",
         "description": "Live-region politeness while indeterminate.",
         "required": false
       },
@@ -1342,13 +1342,13 @@ export const CATALOG: ComponentDoc[] = [
       },
       {
         "name": "mode",
-        "type": "import(\"/Users/rahulrajeevan/zowork/OxygenUI/.claude/worktrees/better-care-design-research-e11521/registry/oxygen/lib/loader\").LoaderMode | undefined",
+        "type": "LoaderMode | undefined",
         "description": "`inline` sits in the flow; `overlay` covers its positioned ancestor; `page` covers the viewport.",
         "required": false
       },
       {
         "name": "motion",
-        "type": "import(\"/Users/rahulrajeevan/zowork/OxygenUI/.claude/worktrees/better-care-design-research-e11521/registry/oxygen/lib/loader\").LoaderMotion | undefined",
+        "type": "LoaderMotion | undefined",
         "description": "`auto` follows the OS; `reduced` forces the still state; `full` opts out of the OS preference.",
         "required": false
       },
@@ -1384,7 +1384,7 @@ export const CATALOG: ComponentDoc[] = [
       },
       {
         "name": "size",
-        "type": "number | import(\"/Users/rahulrajeevan/zowork/OxygenUI/.claude/worktrees/better-care-design-research-e11521/registry/oxygen/lib/loader\").LoaderSize | undefined",
+        "type": "number | LoaderSize | undefined",
         "description": "Named step or an explicit art width in pixels.",
         "required": false
       },
@@ -1421,7 +1421,7 @@ export const CATALOG: ComponentDoc[] = [
           },
           {
             "name": "announce",
-            "type": "import(\"/Users/rahulrajeevan/zowork/OxygenUI/.claude/worktrees/better-care-design-research-e11521/registry/oxygen/lib/loader\").LoaderAnnounce | undefined",
+            "type": "LoaderAnnounce | undefined",
             "description": "Live-region politeness while indeterminate.",
             "required": false
           },
@@ -1457,13 +1457,13 @@ export const CATALOG: ComponentDoc[] = [
           },
           {
             "name": "mode",
-            "type": "import(\"/Users/rahulrajeevan/zowork/OxygenUI/.claude/worktrees/better-care-design-research-e11521/registry/oxygen/lib/loader\").LoaderMode | undefined",
+            "type": "LoaderMode | undefined",
             "description": "`inline` sits in the flow; `overlay` covers its positioned ancestor; `page` covers the viewport.",
             "required": false
           },
           {
             "name": "motion",
-            "type": "import(\"/Users/rahulrajeevan/zowork/OxygenUI/.claude/worktrees/better-care-design-research-e11521/registry/oxygen/lib/loader\").LoaderMotion | undefined",
+            "type": "LoaderMotion | undefined",
             "description": "`auto` follows the OS; `reduced` forces the still state; `full` opts out of the OS preference.",
             "required": false
           },
@@ -1499,7 +1499,7 @@ export const CATALOG: ComponentDoc[] = [
           },
           {
             "name": "size",
-            "type": "number | import(\"/Users/rahulrajeevan/zowork/OxygenUI/.claude/worktrees/better-care-design-research-e11521/registry/oxygen/lib/loader\").LoaderSize | undefined",
+            "type": "number | LoaderSize | undefined",
             "description": "Named step or an explicit art width in pixels.",
             "required": false
           },
