@@ -15,6 +15,9 @@
       "@/components/oxygen/breath-loader": [
         "./registry/oxygen/breath-loader/breath-loader.tsx"
       ],
+      "@/components/oxygen/consult": [
+        "./registry/oxygen/consult/consult.tsx"
+      ],
       "@/components/oxygen/helix-loader": [
         "./registry/oxygen/helix-loader/helix-loader.tsx"
       ],

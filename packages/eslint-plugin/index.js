@@ -12,6 +12,7 @@ import noAmbiguousClinicalCopy from "./rules/no-ambiguous-clinical-copy.js";
 import noDynamicClassName from "./rules/no-dynamic-class-name.js";
 import noForbiddenCapability from "./rules/no-forbidden-capability.js";
 import noPrimitiveToken from "./rules/no-primitive-token.js";
+import noStigmatisingLanguage from "./rules/no-stigmatising-language.js";
 import preferLogicalProperties from "./rules/prefer-logical-properties.js";
 import signatureRequiresTypedPath from "./rules/signature-requires-typed-path.js";
 
@@ -23,6 +24,7 @@ const plugin = {
     "no-dynamic-class-name": noDynamicClassName,
     "no-forbidden-capability": noForbiddenCapability,
     "no-primitive-token": noPrimitiveToken,
+    "no-stigmatising-language": noStigmatisingLanguage,
     "prefer-logical-properties": preferLogicalProperties,
     "signature-requires-typed-path": signatureRequiresTypedPath,
   },
@@ -50,6 +52,9 @@ plugin.configs = {
       // legitimate use somewhere — the rule exists to make the author look at
       // it once, not to forbid a word.
       "@oxygenui/no-ambiguous-clinical-copy": "warn",
+      // Same reasoning, higher stakes. A patient's own words are exempt, and
+      // the alternative is always offered rather than the term merely banned.
+      "@oxygenui/no-stigmatising-language": "warn",
     },
   },
 };

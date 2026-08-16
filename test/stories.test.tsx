@@ -66,7 +66,7 @@ const storyModules = import.meta.glob("../registry/oxygen/*/*.stories.tsx", {
 
 const metaModules = import.meta.glob("../registry/oxygen/*/*.meta.ts", {
   eager: true,
-}) as Record<string, { default: { name: string; states: string[] } }>;
+}) as Record<string, { default: { name: string; states: string[]; categories: string[] } }>;
 
 function nameFromPath(filePath: string): string {
   return path.basename(path.dirname(filePath));
@@ -90,8 +90,10 @@ for (const [filePath, mod] of Object.entries(storyModules)) {
 }
 
 const declaredStates = new Map<string, string[]>();
+const declaredCategories = new Map<string, string[]>();
 for (const [filePath, mod] of Object.entries(metaModules)) {
   declaredStates.set(nameFromPath(filePath), mod.default.states);
+  declaredCategories.set(nameFromPath(filePath), mod.default.categories);
 }
 
 /**
@@ -158,9 +160,22 @@ describe("story coverage", () => {
     expect(undeclared, `${name} has stories for states missing from its meta.ts`).toEqual([]);
   });
 
-  it("titles every story file under the Loaders category", () => {
+  /**
+   * The title's first segment is the component's own category, not a hardcoded
+   * one. This used to assert `^Loaders/` because loaders were the only
+   * components; that stopped being true the moment a `pattern`-layer component
+   * arrived, and a harness that only admits one category is a harness that
+   * blocks the second component someone writes.
+   */
+  it("titles every story file under one of its declared categories", () => {
     for (const entry of entries) {
-      expect(entry.meta.title, entry.component).toMatch(/^Loaders\//);
+      const categories = declaredCategories.get(entry.component) ?? [];
+      const segment = entry.meta.title?.split("/")[0];
+      expect(categories, `${entry.component} declares no categories`).not.toEqual([]);
+      expect(
+        categories,
+        `${entry.component}: story title "${entry.meta.title}" is not one of ${categories.join(", ")}`,
+      ).toContain(segment);
     }
   });
 });
@@ -175,7 +190,13 @@ describe("every story renders", () => {
       // A story that renders nothing is either a broken fixture or a state that
       // deliberately shows nothing — and the second must say so.
       if (entry.story.parameters?.skipVrt) return;
-      expect(view.container.querySelector("[data-ox-loader]")).not.toBeNull();
+      // Any component root will do. Asserting `[data-ox-loader]` specifically
+      // was only ever a proxy for "something rendered", and it silently failed
+      // every component that is not a loader.
+      expect(
+        view.container.firstElementChild,
+        `${entry.component} › ${entry.exportName} rendered nothing and did not set skipVrt`,
+      ).not.toBeNull();
     },
   );
 });

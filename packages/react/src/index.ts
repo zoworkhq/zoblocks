@@ -11,6 +11,7 @@ export * from "./lib/loader";
 export { cn } from "./lib/utils";
 
 export * from "./components/breath-loader/breath-loader";
+export * from "./components/consult/consult";
 export * from "./components/helix-loader/helix-loader";
 export * from "./components/infusion-loader/infusion-loader";
 export * from "./components/pulse-loader/pulse-loader";

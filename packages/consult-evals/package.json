@@ -1,0 +1,42 @@
+{
+  "name": "@oxygenui-design/consult-evals",
+  "version": "0.1.0",
+  "description": "The eval harness behind Oxygen Consult. Five suites and one release gate — because below roughly 70% reliability, automation makes clinicians worse than no automation.",
+  "license": "MIT",
+  "homepage": "https://oxygenui.design/components/consult",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zoworkhq/oxygenui.git",
+    "directory": "packages/consult-evals"
+  },
+  "keywords": ["evals", "healthcare", "ai", "safety", "clinical-decision-support"],
+  "type": "module",
+  "sideEffects": false,
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": { ".": "./src/index.ts", "./package.json": "./package.json" },
+  "files": ["dist", "src", "!src/**/*.test.ts"],
+  "engines": { "node": ">=20.11.0" },
+  "publishConfig": {
+    "access": "public",
+    "main": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "exports": {
+      ".": { "types": "./dist/index.d.ts", "default": "./dist/index.js" },
+      "./package.json": "./package.json"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage"
+  },
+  "dependencies": { "@oxygenui-design/consult-core": "workspace:*" },
+  "devDependencies": {
+    "@oxygenui-design/tsconfig": "workspace:*",
+    "@vitest/coverage-v8": "^3.2.7",
+    "typescript": "^5.7.2",
+    "vitest": "^3.2.7"
+  }
+}

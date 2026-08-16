@@ -85,6 +85,33 @@
       ]
     },
     {
+      "name": "consult",
+      "type": "registry:component",
+      "title": "Consult",
+      "description": "Model-agnostic clinical assistant with mode-level scope contracts, inline source attribution, a deterministic crisis interrupt, and FHIR audit output. The engine and the accessibility behaviour ship as npm packages; this item is the Tailwind skin over them.",
+      "categories": [
+        "patterns",
+        "ai"
+      ],
+      "dependencies": [
+        "clsx",
+        "tailwind-merge",
+        "@oxygenui-design/consult-core",
+        "@oxygenui-design/consult-react"
+      ],
+      "registryDependencies": [
+        "https://oxygenui.design/r/utils.json",
+        "https://oxygenui.design/r/tokens.json"
+      ],
+      "files": [
+        {
+          "path": "registry/oxygen/consult/consult.tsx",
+          "type": "registry:component",
+          "target": "components/oxygen/consult.tsx"
+        }
+      ]
+    },
+    {
       "name": "helix-loader",
       "type": "registry:component",
       "title": "Helix Loader",
