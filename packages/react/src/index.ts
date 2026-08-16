@@ -9,6 +9,7 @@
 
 export * from "./lib/loader";
 export * from "./lib/accordion-core";
+export * from "./lib/switch";
 export { cn } from "./lib/utils";
 
 export * from "./components/accordion/accordion";
@@ -19,3 +20,4 @@ export * from "./components/infusion-loader/infusion-loader";
 export * from "./components/pulse-loader/pulse-loader";
 export * from "./components/rhythm-loader/rhythm-loader";
 export * from "./components/safety-plan/safety-plan";
+export * from "./components/switch/switch";

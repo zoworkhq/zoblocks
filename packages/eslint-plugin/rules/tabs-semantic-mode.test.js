@@ -47,6 +47,11 @@ ruleTester.run("tabs-semantic-mode", tabsSemanticMode, {
     { code: 'const a = <Tabs as="steps" items={items} />;' },
     { code: 'const a = <Tabs as="nav" items={[{ value: "a", href: "/a" }]} />;' },
 
+    // A default import, and an aliased one — the two import shapes the
+    // specifier check has to see through as well as the named case above.
+    { code: 'import Tabs from "rc-tabs";\nconst a = <Tabs items={items} />;' },
+    { code: 'import { Tabs as Foo } from "antd";\nconst a = <Tabs items={items} as="tabs" />;' },
+
     // The compound root, both spellings.
     { code: 'const a = <TabsRoot as="tabs" />;' },
     { code: 'const a = <Tabs.Root as="tabs" />;' },
@@ -81,6 +86,21 @@ ruleTester.run("tabs-semantic-mode", tabsSemanticMode, {
     {
       // The default that does not exist, and must not.
       code: "const a = <Tabs items={items} />;",
+      errors: [{ messageId: "missingMode" }],
+    },
+    {
+      // Ours, by package specifier — the rule still applies.
+      code: 'import { Tabs } from "@oxygenui-design/tabs";\nconst a = <Tabs items={items} />;',
+      errors: [{ messageId: "missingMode" }],
+    },
+    {
+      // Ours, by relative path — the tabs package's own source and stories.
+      code: 'import { Tabs } from "./tabs";\nconst a = <Tabs items={items} />;',
+      errors: [{ messageId: "missingMode" }],
+    },
+    {
+      // Ours, by the specifier the shadcn CLI writes into a consumer project.
+      code: 'import { Tabs } from "@/components/oxygen/tabs";\nconst a = <Tabs items={items} />;',
       errors: [{ messageId: "missingMode" }],
     },
     {

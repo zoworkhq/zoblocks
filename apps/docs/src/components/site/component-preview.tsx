@@ -19,6 +19,7 @@ import { RhythmLoader } from "@/registry/oxygen/rhythm-loader/rhythm-loader";
 import { BreathLoader } from "@/registry/oxygen/breath-loader/breath-loader";
 import { HelixLoader } from "@/registry/oxygen/helix-loader/helix-loader";
 import { InfusionLoader } from "@/registry/oxygen/infusion-loader/infusion-loader";
+import { Switch, SwitchField, SwitchList } from "@/registry/oxygen/switch/switch";
 import { InstrumentGlow } from "@/components/site/interactions";
 import { SignatureDemo } from "@/components/site/signature-demo";
 import { cn } from "@/lib/utils";
@@ -79,7 +80,206 @@ function AdvancingInfusion() {
   );
 }
 
+/**
+ * The Switch demo has to be driven, because the whole argument is that a
+ * switch is a request rather than a change. A static one would show the
+ * component's least interesting claim.
+ *
+ * `flaky` fails every other write, which is the state nobody builds a demo
+ * for and the one this component exists for.
+ */
+function LiveSwitch({
+  flaky = false,
+  ...props
+}: { flaky?: boolean } & React.ComponentProps<typeof Switch>) {
+  const [value, setValue] = React.useState<boolean | "unknown">(
+    (props.checked as boolean | "unknown" | undefined) ?? false,
+  );
+  const attempts = React.useRef(0);
+
+  return (
+    <Switch
+      {...props}
+      checked={value}
+      onCommit={async (next) => {
+        await new Promise((resolve) => setTimeout(resolve, 700));
+        attempts.current += 1;
+        if (flaky && attempts.current % 2 === 1) {
+          throw new Error("Could not reach the record.");
+        }
+        setValue(next);
+      }}
+    />
+  );
+}
+
 const SCENARIOS: Record<string, Scenario[]> = {
+  switch: [
+    {
+      id: "commit",
+      label: "The write, and the write that fails",
+      note: "A switch is a request, not a change. The first control saves; the second fails every other attempt — watch it animate back to the value the record actually holds and say so, rather than snapping back while nobody is looking.",
+      render: () => (
+        <Centered>
+          <div className="flex flex-col gap-7">
+            <LiveSwitch
+              label="Contact precautions"
+              stateLabels="in-effect"
+              tone="caution"
+              size="large"
+            />
+            <LiveSwitch
+              label="Falls risk"
+              stateLabels="in-effect"
+              size="large"
+              flaky
+              description="This one fails every other write, on purpose."
+            />
+          </div>
+        </Centered>
+      ),
+    },
+    {
+      id: "absence",
+      label: "Off, and never asked",
+      note: "The clinical difference a two-state control cannot hold. Four switches in the same visual state saying four different things — and the word changes, not the colour.",
+      render: () => (
+        <Centered>
+          <div className="grid gap-6 sm:grid-cols-2">
+            <Switch
+              label="Advance directive"
+              checked="unknown"
+              absentReason="not-collected"
+              stateLabels="yes-no"
+            />
+            <Switch
+              label="Interpreter needed"
+              checked="unknown"
+              absentReason="declined"
+              stateLabels="yes-no"
+            />
+            <Switch
+              label="Substance use screen"
+              checked="unknown"
+              absentReason="masked"
+              readOnly
+              stateLabels="yes-no"
+            />
+            <Switch
+              label="MRSA screen"
+              checked="unknown"
+              absentReason="pending"
+              stateLabels="yes-no"
+            />
+          </div>
+        </Centered>
+      ),
+    },
+    {
+      id: "panel",
+      label: "A real panel",
+      note: "Five rows, five different situations, and not one of them rendered as an ordinary off. The count says two of four — “not asked” is reported apart, because folding it into off is the failure this component exists to prevent.",
+      render: () => (
+        <SwitchList
+          title="Isolation precautions"
+          counts={{ on: 2, total: 4, unknown: 1 }}
+          provenance={{ by: "S. Mehta", at: "2026-08-16T14:07:00.000Z" }}
+        >
+          <SwitchField
+            label="Contact"
+            description="Gown and gloves on entry."
+            stateLabels="in-effect"
+            tone="caution"
+            checked
+          />
+          <SwitchField
+            label="Droplet"
+            description="Surgical mask within two metres."
+            stateLabels="in-effect"
+            tone="caution"
+            checked
+          />
+          <SwitchField
+            label="Airborne"
+            description="Negative-pressure room and N95."
+            stateLabels="in-effect"
+            checked={false}
+            readOnly
+            lockedReason="No negative-pressure room available on this unit."
+          />
+          <SwitchField
+            label="Enteric"
+            description="Dedicated commode; soap and water, not alcohol gel."
+            stateLabels="in-effect"
+            checked="unknown"
+            absentReason="not-collected"
+          />
+        </SwitchList>
+      ),
+    },
+    {
+      id: "appearances",
+      label: "One value, five renderings",
+      note: "The same state model behind every one. Segmented is the only appearance that changes the ARIA role — two labelled cells that both look pressable are a radiogroup, and calling them a switch would be a lie to a screen reader.",
+      render: () => (
+        <Centered>
+          <div className="flex w-full max-w-md flex-col gap-6">
+            <Switch label="Interpreter required" stateLabels="yes-no" checked />
+            <Switch
+              label="Interpreter required"
+              appearance="labeled"
+              stateLabels="active-inactive"
+              checked
+            />
+            <Switch
+              label="Latex allergy"
+              appearance="segmented"
+              stateLabels="yes-no"
+              checked="unknown"
+              absentReason="not-collected"
+            />
+            <div className="flex flex-wrap gap-2">
+              <Switch label="My patients" appearance="chip" checked />
+              <Switch label="Unacknowledged" appearance="chip" checked={false} />
+              <Switch label="Discharge today" appearance="chip" checked />
+            </div>
+            <Switch
+              label="Text me when my results are ready"
+              description="To the mobile ending 4471. Standard rates apply."
+              appearance="row"
+              audience="patient"
+              checked
+            />
+          </div>
+        </Centered>
+      ),
+    },
+    {
+      id: "tone",
+      label: "When on is the dangerous state",
+      note: "Half the switches in a clinical system are suppressions. All four here are on; only the middle two are situations anyone needs to know about — and the colour, the glyph and the word all say so.",
+      render: () => (
+        <Centered>
+          <div className="flex flex-col gap-6">
+            <Switch label="Allergy interaction checking" stateLabels="enabled-disabled" checked />
+            <Switch
+              label="Suppress duplicate-therapy alerts"
+              tone="caution"
+              stateLabels="in-effect"
+              checked
+            />
+            <Switch
+              label="Bypass allergy check for this order"
+              tone="critical"
+              stateLabels="allowed-blocked"
+              checked
+            />
+            <Switch label="Show archived encounters" tone="neutral" checked />
+          </div>
+        </Centered>
+      ),
+    },
+  ],
   "pulse-loader": [
     {
       id: "page",

@@ -160,23 +160,13 @@ describe("story coverage", () => {
     expect(undeclared, `${name} has stories for states missing from its meta.ts`).toEqual([]);
   });
 
-  /**
-   * A story title's first segment is its sidebar group, and the catalog already
-   * has a field for that. Asserting they agree keeps Storybook's navigation and
-   * the docs catalog from drifting into two different taxonomies — which is the
-   * same class of drift the generated catalog exists to prevent.
-   *
-   * This replaced a hardcoded `/^Loaders\//`, which was correct while loaders
-   * were the only components and became a barrier to the sixth.
-   */
-  it.each(componentNames)("%s titles its stories under a declared category", (name) => {
-    const categories = declaredCategories.get(name) ?? [];
-    for (const entry of entries.filter((e) => e.component === name)) {
-      const group = entry.meta.title?.split("/")[0];
+  it("titles every story file under a category the component declares", () => {
+    for (const entry of entries) {
+      const category = String(entry.meta.title ?? "").split("/")[0];
       expect(
-        categories,
-        `${name} › story title "${entry.meta.title}" is grouped under "${group}", which is not one of its declared categories`,
-      ).toContain(group);
+        declaredCategories.get(entry.component) ?? [],
+        `${entry.component}: story title "${entry.meta.title}" names a category its meta.ts does not declare`,
+      ).toContain(category);
     }
   });
 });
@@ -191,10 +181,13 @@ describe("every story renders", () => {
       // A story that renders nothing is either a broken fixture or a state that
       // deliberately shows nothing — and the second must say so.
       if (entry.story.parameters?.skipVrt) return;
+      const rooted = Array.from(view.container.querySelectorAll<HTMLElement>("*")).some((el) =>
+        Array.from(el.attributes).some((attr) => attr.name.startsWith("data-ox-")),
+      );
       expect(
-        view.container.firstElementChild,
-        `${entry.component} › ${entry.exportName} rendered nothing. If that is the state, set parameters.skipVrt.`,
-      ).not.toBeNull();
+        rooted,
+        `${entry.component} › ${entry.exportName} rendered no element carrying a data-ox-* root marker`,
+      ).toBe(true);
     },
   );
 });

@@ -82,6 +82,27 @@ const SUPPORT_ITEMS: BuildableItem[] = [
     ],
   },
   {
+    name: "switch-core",
+    type: "registry:lib",
+    title: "Switch core",
+    description:
+      "The three-axis state model behind Oxygen's Switch: the commit phase machine, the state-label presets, and the absence vocabulary. Installed automatically with Switch.",
+    dependencies: ["clsx", "tailwind-merge"],
+    registryDependencies: ["utils"],
+    files: [
+      {
+        path: "registry/oxygen/lib/switch.tsx",
+        type: "registry:lib",
+        target: "lib/oxygen-switch.tsx",
+      },
+      {
+        path: "registry/oxygen/lib/switch.css",
+        type: "registry:file",
+        target: "styles/oxygen-switch.css",
+      },
+    ],
+  },
+  {
     name: "tokens",
     type: "registry:style",
     title: "Oxygen tokens",

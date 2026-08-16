@@ -415,6 +415,11 @@ export function Accordion({
       ref={rootRef}
       className={cn("ox-accordion", classNames?.root, className)}
       style={rootStyle}
+      // The root marker every Oxygen component carries, matching the loaders'
+      // `data-ox-loader`. It is what a test, a VRT fixture or a host stylesheet
+      // uses to find the component without depending on a class name that
+      // customisation is explicitly allowed to replace.
+      data-ox-accordion=""
       data-variant={resolvedVariant}
       data-bordered={bordered ? "true" : "false"}
       data-icon-placement={expandIconPlacement}

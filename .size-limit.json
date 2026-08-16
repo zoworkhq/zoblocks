@@ -12,6 +12,12 @@
     "limit": "11 KB"
   },
   {
+    "name": "elements — <ox-switch>",
+    "path": "packages/elements/dist/switch.js",
+    "import": "*",
+    "limit": "8 KB"
+  },
+  {
     "name": "react — one loader (includes loader-core and the rhythm delegate)",
     "path": "packages/react/dist/components/pulse-loader/pulse-loader.js",
     "import": "{ PulseLoader }",
@@ -22,7 +28,14 @@
     "name": "react — the whole barrel",
     "path": "packages/react/dist/index.js",
     "import": "*",
-    "limit": "15 KB",
+    "limit": "22 KB",
+    "ignore": ["react", "react-dom"]
+  },
+  {
+    "name": "react — Switch alone (includes switch-core)",
+    "path": "packages/react/dist/components/switch/switch.js",
+    "import": "{ Switch }",
+    "limit": "13 KB",
     "ignore": ["react", "react-dom"]
   },
   {
@@ -55,20 +68,25 @@
     "limit": "6 KB"
   },
   {
-    "name": "identity-core \u2014 the whole engine (includes Jaro\u2013Winkler and Metaphone)",
+    "name": "switch stylesheet",
+    "path": "registry/oxygen/lib/switch.css",
+    "limit": "12 KB"
+  },
+  {
+    "name": "identity-core — the whole engine (includes Jaro–Winkler and Metaphone)",
     "path": "packages/identity-core/dist/index.js",
     "import": "*",
     "limit": "9 KB"
   },
   {
-    "name": "identity \u2014 the avatar alone",
+    "name": "identity — the avatar alone",
     "path": "packages/identity/dist/IdentityAvatar.js",
     "import": "{ IdentityAvatar }",
     "limit": "3 KB",
     "ignore": ["react", "react-dom", "antd"]
   },
   {
-    "name": "identity \u2014 the whole barrel",
+    "name": "identity — the whole barrel",
     "path": "packages/identity/dist/index.js",
     "import": "*",
     "limit": "16 KB",

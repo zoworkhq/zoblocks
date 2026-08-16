@@ -47,6 +47,8 @@ function rewriteImports(source: string, fromDepth: number): string {
       .replace(/(["'])@\/lib\/oxygen-loader\1/g, `"${up}lib/loader"`)
       // The accordion core.
       .replace(/(["'])@\/lib\/oxygen-accordion\1/g, `"${up}lib/accordion-core"`)
+      // The switch core.
+      .replace(/(["'])@\/lib\/oxygen-switch\1/g, `"${up}lib/switch"`)
       // A sibling component, by the path the CLI writes in a consumer's project.
       .replace(
         /(["'])@\/components\/oxygen\/([a-z0-9-]+)\1/g,
@@ -89,6 +91,7 @@ export async function emitReactPackage(
     ["lib/utils.ts", "lib/utils.ts", 1],
     ["lib/loader.tsx", "lib/loader.tsx", 1],
     ["lib/accordion-core.tsx", "lib/accordion-core.tsx", 1],
+    ["lib/switch.tsx", "lib/switch.tsx", 1],
   ] as const) {
     const source = await readFile(path.join(COMPONENTS_DIR, file), "utf8");
     await emitter.emit(
@@ -113,6 +116,7 @@ export async function emitReactPackage(
   for (const [file, target] of [
     ["lib/loader.css", "styles/loader.css"],
     ["lib/accordion.css", "styles/accordion.css"],
+    ["lib/switch.css", "styles/switch.css"],
   ] as const) {
     const css = await readFile(path.join(COMPONENTS_DIR, file), "utf8");
     await emitter.emit(path.join(PACKAGE_SRC, target), css);
@@ -152,6 +156,7 @@ export async function emitReactPackage(
 
 export * from "./lib/loader";
 export * from "./lib/accordion-core";
+export * from "./lib/switch";
 export { cn } from "./lib/utils";
 
 ${exports}
