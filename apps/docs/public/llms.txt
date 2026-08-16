@@ -42,6 +42,10 @@ Rules that matter when generating code with these components:
   install: pnpm dlx shadcn@latest add https://oxygenui.design/r/rhythm-loader.json
   states: Indeterminate, Delayed (not yet shown), Slow wait, Reduced motion, Inline
   status: beta
+- [Switch](https://oxygenui.design/components/switch): A binary control for a record that is shared, asynchronous, and often missing the fact you are asking it about.
+  install: pnpm dlx shadcn@latest add https://oxygenui.design/r/switch.json
+  states: On, Off, Unknown (absence, with a reason), Pending — the write is in flight, Committed, Reverted — the write failed, Blocked — refused before trying, Queued — offline, Stale — changed by someone else, Read-only, with a reason, Disabled, Time-boxed (until), Awaiting confirmation, Segmented — both answers visible, Chip — a filter bar, Row — the whole row is the target
+  status: experimental
 
 ## Machine-readable catalog
 

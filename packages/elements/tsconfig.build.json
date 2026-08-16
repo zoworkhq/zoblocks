@@ -1,0 +1,10 @@
+{
+  // Build-only: emits dist, and is the sole config that excludes tests.
+  //
+  // The exclude has to be declared *here* rather than inherited. TypeScript
+  // resolves relative paths in an extended config against the directory of the
+  // file they came from, so an exclude in @oxygenui-design/tsconfig globs that
+  // package's own directory and matches nothing here.
+  "extends": "./tsconfig.json",
+  "exclude": ["**/*.test.ts"]
+}

@@ -46,6 +46,31 @@
       ]
     },
     {
+      "name": "switch-core",
+      "type": "registry:lib",
+      "title": "Switch core",
+      "description": "The three-axis state model behind Oxygen's Switch: the commit phase machine, the state-label presets, and the absence vocabulary. Installed automatically with Switch.",
+      "dependencies": [
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "https://oxygenui.design/r/utils.json"
+      ],
+      "files": [
+        {
+          "path": "registry/oxygen/lib/switch.tsx",
+          "type": "registry:lib",
+          "target": "lib/oxygen-switch.tsx"
+        },
+        {
+          "path": "registry/oxygen/lib/switch.css",
+          "type": "registry:file",
+          "target": "styles/oxygen-switch.css"
+        }
+      ]
+    },
+    {
       "name": "tokens",
       "type": "registry:style",
       "title": "Oxygen tokens",
@@ -186,6 +211,32 @@
           "path": "registry/oxygen/rhythm-loader/rhythm-loader.tsx",
           "type": "registry:component",
           "target": "components/oxygen/rhythm-loader.tsx"
+        }
+      ]
+    },
+    {
+      "name": "switch",
+      "type": "registry:component",
+      "title": "Switch",
+      "description": "Switch with three independent axes: the value the record holds, the phase of the write, and whether you may change it. Models the request and the outcome separately, so it never renders a state it cannot substantiate.",
+      "categories": [
+        "forms",
+        "primitives"
+      ],
+      "dependencies": [
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "https://oxygenui.design/r/utils.json",
+        "https://oxygenui.design/r/tokens.json",
+        "https://oxygenui.design/r/switch-core.json"
+      ],
+      "files": [
+        {
+          "path": "registry/oxygen/switch/switch.tsx",
+          "type": "registry:component",
+          "target": "components/oxygen/switch.tsx"
         }
       ]
     }

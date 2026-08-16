@@ -27,8 +27,14 @@
       "@/components/oxygen/rhythm-loader": [
         "./registry/oxygen/rhythm-loader/rhythm-loader.tsx"
       ],
+      "@/components/oxygen/switch": [
+        "./registry/oxygen/switch/switch.tsx"
+      ],
       "@/lib/oxygen-loader": [
         "./registry/oxygen/lib/loader.tsx"
+      ],
+      "@/lib/oxygen-switch": [
+        "./registry/oxygen/lib/switch.tsx"
       ],
       "@/lib/utils": [
         "./registry/oxygen/lib/utils.ts"

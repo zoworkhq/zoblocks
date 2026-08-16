@@ -1,146 +1,509 @@
 {
   "$description": "Component tier — the override surface.\n\nEvery token here resolves to a semantic token, never to a primitive. That is enforced by the build, not by review: a component token pointing at {ref.red.700} would silently ignore a brand override on exactly the value a brand most needs to control.\n\nWhy this tier exists at all, and why it matters more here than it would at a platform vendor: Oxygen ships source into the customer's repository. Without an override point, 'customise the badge' means 'edit the copied file', and an edited file can never receive an upstream fix. Every fork is a component that silently stops being maintained. This tier is what keeps customisation and the upgrade channel compatible.\n\nBecause these resolve to semantic tokens, they follow light, dark and high-contrast automatically. A component token needs a per-theme value only when it must break from the semantic it normally tracks — which so far, nothing does.",
-
   "badge": {
     "$description": "StatusBadge. The shared severity chip — critical must read identically on a lab result, a medication and an allergy, which is why every component routes severity through this one set rather than styling its own.",
     "$type": "color",
-    "critical-fg": { "$value": "{status.critical}" },
-    "critical-bg": { "$value": "{status.critical-bg}" },
-    "critical-border": { "$value": "{status.critical-border}" },
-    "high-fg": { "$value": "{status.high}" },
-    "high-bg": { "$value": "{status.high-bg}" },
-    "high-border": { "$value": "{status.high-border}" },
-    "low-fg": { "$value": "{status.low}" },
-    "low-bg": { "$value": "{status.low-bg}" },
-    "low-border": { "$value": "{status.low-border}" },
-    "normal-fg": { "$value": "{status.normal}" },
-    "normal-bg": { "$value": "{status.normal-bg}" },
-    "normal-border": { "$value": "{status.normal-border}" },
-    "unknown-fg": { "$value": "{status.unknown}" },
-    "unknown-bg": { "$value": "{status.unknown-bg}" },
-    "unknown-border": { "$value": "{status.unknown-border}" },
-    "radius": { "$type": "dimension", "$value": "{radius-full}" }
+    "critical-fg": {
+      "$value": "{status.critical}"
+    },
+    "critical-bg": {
+      "$value": "{status.critical-bg}"
+    },
+    "critical-border": {
+      "$value": "{status.critical-border}"
+    },
+    "high-fg": {
+      "$value": "{status.high}"
+    },
+    "high-bg": {
+      "$value": "{status.high-bg}"
+    },
+    "high-border": {
+      "$value": "{status.high-border}"
+    },
+    "low-fg": {
+      "$value": "{status.low}"
+    },
+    "low-bg": {
+      "$value": "{status.low-bg}"
+    },
+    "low-border": {
+      "$value": "{status.low-border}"
+    },
+    "normal-fg": {
+      "$value": "{status.normal}"
+    },
+    "normal-bg": {
+      "$value": "{status.normal-bg}"
+    },
+    "normal-border": {
+      "$value": "{status.normal-border}"
+    },
+    "unknown-fg": {
+      "$value": "{status.unknown}"
+    },
+    "unknown-bg": {
+      "$value": "{status.unknown-bg}"
+    },
+    "unknown-border": {
+      "$value": "{status.unknown-border}"
+    },
+    "radius": {
+      "$type": "dimension",
+      "$value": "{radius-full}"
+    }
   },
-
   "alert": {
     "$description": "AlertBanner. Severity tiers are an interruption budget — only critical may take focus. The tokens are separate from badge so a product can make an inline badge quiet without also making a critical interruption quiet.",
     "$type": "color",
-    "critical-fg": { "$value": "{status.critical}" },
-    "critical-bg": { "$value": "{status.critical-bg}" },
-    "critical-border": { "$value": "{status.critical-border}" },
-    "warning-fg": { "$value": "{status.high}" },
-    "warning-bg": { "$value": "{status.high-bg}" },
-    "warning-border": { "$value": "{status.high-border}" },
-    "info-fg": { "$value": "{status.low}" },
-    "info-bg": { "$value": "{status.low-bg}" },
-    "info-border": { "$value": "{status.low-border}" },
-    "radius": { "$type": "dimension", "$value": "{radius}" },
-    "pad-x": { "$type": "dimension", "$value": "{density.pad-x}" },
-    "pad-y": { "$type": "dimension", "$value": "{density.pad-y}" }
+    "critical-fg": {
+      "$value": "{status.critical}"
+    },
+    "critical-bg": {
+      "$value": "{status.critical-bg}"
+    },
+    "critical-border": {
+      "$value": "{status.critical-border}"
+    },
+    "warning-fg": {
+      "$value": "{status.high}"
+    },
+    "warning-bg": {
+      "$value": "{status.high-bg}"
+    },
+    "warning-border": {
+      "$value": "{status.high-border}"
+    },
+    "info-fg": {
+      "$value": "{status.low}"
+    },
+    "info-bg": {
+      "$value": "{status.low-bg}"
+    },
+    "info-border": {
+      "$value": "{status.low-border}"
+    },
+    "radius": {
+      "$type": "dimension",
+      "$value": "{radius}"
+    },
+    "pad-x": {
+      "$type": "dimension",
+      "$value": "{density.pad-x}"
+    },
+    "pad-y": {
+      "$type": "dimension",
+      "$value": "{density.pad-y}"
+    }
   },
-
   "value": {
     "$description": "ClinicalValue. The unit is deliberately a separate colour from the number — it is context, not the reading — but both live in one element so they cannot drift apart under truncation or wrapping.",
     "$type": "color",
-    "fg": { "$value": "{text}" },
-    "unit-fg": { "$value": "{text-muted}" },
-    "font": { "$type": "fontFamily", "$value": "{font-numeric}" }
+    "fg": {
+      "$value": "{text}"
+    },
+    "unit-fg": {
+      "$value": "{text-muted}"
+    },
+    "font": {
+      "$type": "fontFamily",
+      "$value": "{font-numeric}"
+    }
   },
-
   "absent": {
     "$description": "AbsentValue. Absence is rendered as a statement, never as a blank or a dash, so it gets real typographic weight rather than being styled out of the way.",
     "$type": "color",
-    "fg": { "$value": "{text-subtle}" },
-    "restricted-fg": { "$value": "{flag.restricted}" },
-    "error-fg": { "$value": "{status.critical}" }
+    "fg": {
+      "$value": "{text-subtle}"
+    },
+    "restricted-fg": {
+      "$value": "{flag.restricted}"
+    },
+    "error-fg": {
+      "$value": "{status.critical}"
+    }
   },
-
   "range": {
     "$description": "ReferenceRange. The band is the normal interval; the marker is where this result fell. Both are overridable because the visual weight between them is the one thing customers reliably want to tune.",
     "$type": "color",
-    "track": { "$value": "{bg-muted}" },
-    "band": { "$value": "{status.normal-bg}" },
-    "band-border": { "$value": "{status.normal-border}" },
-    "marker": { "$value": "{text}" },
-    "marker-abnormal": { "$value": "{status.critical}" },
-    "height": { "$type": "dimension", "$value": "0.5rem" }
+    "track": {
+      "$value": "{bg-muted}"
+    },
+    "band": {
+      "$value": "{status.normal-bg}"
+    },
+    "band-border": {
+      "$value": "{status.normal-border}"
+    },
+    "marker": {
+      "$value": "{text}"
+    },
+    "marker-abnormal": {
+      "$value": "{status.critical}"
+    },
+    "height": {
+      "$type": "dimension",
+      "$value": "0.5rem"
+    }
   },
-
   "banner": {
     "$description": "PatientBanner. Persistent identity header. Restricted and deceased states change the whole bar rather than adding a chip to it, because an identity header that looks normal for a restricted record is the failure this component exists to prevent.",
     "$type": "color",
-    "bg": { "$value": "{surface}" },
-    "border": { "$value": "{border}" },
-    "fg": { "$value": "{text}" },
-    "meta-fg": { "$value": "{text-muted}" },
-    "restricted-bg": { "$value": "{flag.restricted-bg}" },
-    "restricted-border": { "$value": "{flag.restricted}" },
-    "deceased-fg": { "$value": "{flag.deceased}" }
+    "bg": {
+      "$value": "{surface}"
+    },
+    "border": {
+      "$value": "{border}"
+    },
+    "fg": {
+      "$value": "{text}"
+    },
+    "meta-fg": {
+      "$value": "{text-muted}"
+    },
+    "restricted-bg": {
+      "$value": "{flag.restricted-bg}"
+    },
+    "restricted-border": {
+      "$value": "{flag.restricted}"
+    },
+    "deceased-fg": {
+      "$value": "{flag.deceased}"
+    }
   },
-
   "surface-card": {
     "$description": "Shared by every card-shaped clinical component — medication, appointment, coverage. One set rather than three so a customer restyling 'cards' changes cards, not one of them.",
     "$type": "color",
-    "bg": { "$value": "{surface}" },
-    "border": { "$value": "{border}" },
-    "radius": { "$type": "dimension", "$value": "{radius-lg}" },
-    "shadow": { "$type": "shadow", "$value": "{shadow-sm}" },
-    "pad-x": { "$type": "dimension", "$value": "{density.pad-x}" },
-    "pad-y": { "$type": "dimension", "$value": "{density.pad-y}" }
+    "bg": {
+      "$value": "{surface}"
+    },
+    "border": {
+      "$value": "{border}"
+    },
+    "radius": {
+      "$type": "dimension",
+      "$value": "{radius-lg}"
+    },
+    "shadow": {
+      "$type": "shadow",
+      "$value": "{shadow-sm}"
+    },
+    "pad-x": {
+      "$type": "dimension",
+      "$value": "{density.pad-x}"
+    },
+    "pad-y": {
+      "$type": "dimension",
+      "$value": "{density.pad-y}"
+    }
   },
-
   "field": {
     "$description": "Shared by every input — dose, quantity, ratio, identifier, and the questionnaire renderer's controls. Invalid is a border-and-text change rather than a background wash, so it survives forced-colors mode.",
     "$type": "color",
-    "bg": { "$value": "{surface}" },
-    "border": { "$value": "{border-strong}" },
-    "border-focus": { "$value": "{focus-ring}" },
-    "border-invalid": { "$value": "{status.critical}" },
-    "fg": { "$value": "{text}" },
-    "placeholder-fg": { "$value": "{text-subtle}" },
-    "label-fg": { "$value": "{text}" },
-    "hint-fg": { "$value": "{text-muted}" },
-    "error-fg": { "$value": "{status.critical}" },
+    "bg": {
+      "$value": "{surface}"
+    },
+    "border": {
+      "$value": "{border-strong}"
+    },
+    "border-focus": {
+      "$value": "{focus-ring}"
+    },
+    "border-invalid": {
+      "$value": "{status.critical}"
+    },
+    "fg": {
+      "$value": "{text}"
+    },
+    "placeholder-fg": {
+      "$value": "{text-subtle}"
+    },
+    "label-fg": {
+      "$value": "{text}"
+    },
+    "hint-fg": {
+      "$value": "{text-muted}"
+    },
+    "error-fg": {
+      "$value": "{status.critical}"
+    },
     "prefilled-bg": {
       "$value": "{accent-subtle}",
       "$description": "A prefilled answer is marked, not hidden. A clinician signing a form does not always notice which values were carried forward, and an unmarked prefill is a signature on data nobody re-read."
     },
-    "prefilled-border": { "$value": "{accent-border}" },
-    "radius": { "$type": "dimension", "$value": "{radius}" },
-    "pad-x": { "$type": "dimension", "$value": "{density.pad-x}" },
-    "pad-y": { "$type": "dimension", "$value": "{density.pad-y}" }
+    "prefilled-border": {
+      "$value": "{accent-border}"
+    },
+    "radius": {
+      "$type": "dimension",
+      "$value": "{radius}"
+    },
+    "pad-x": {
+      "$type": "dimension",
+      "$value": "{density.pad-x}"
+    },
+    "pad-y": {
+      "$type": "dimension",
+      "$value": "{density.pad-y}"
+    }
   },
-
+  "switch": {
+    "$description": "Switch — the binary control, and the override surface for its geometry as well as its colour.\n\nTwo things here are unusual and deliberate.\n\n`target-min` is the hit area, and it is a SEPARATE token from `track-w`/`track-h`. That decoupling is what lets a 26x14px switch sit in a dense flowsheet row while keeping a 44px target: shrinking the pill must never shrink the target, because a mis-tap on a clinical flag is not a cosmetic defect.\n\n`track-off-bg` resolves to {border-strong} rather than a light grey. The off track IS the control's boundary, so SC 1.4.11 asks for 3:1 against the page — and the conventional rgba(0,0,0,0.25) treatment lands near 1.9:1. The pair is in the contrast gate.\n\nOn/off track luminance is close enough that colour alone cannot carry the state, which is why the component renders thumb position, a thumb glyph and a text state word as well. These tokens are the fourth signal, never the first.",
+    "$type": "color",
+    "track-off-bg": {
+      "$value": "{border-strong}",
+      "$description": "Also the control's boundary — see the group description."
+    },
+    "track-off-border": {
+      "$value": "{border-strong}"
+    },
+    "track-on-bg": {
+      "$value": "{accent}"
+    },
+    "track-on-border": {
+      "$value": "{accent}"
+    },
+    "track-unknown-bg": {
+      "$value": "{status.unknown-bg}"
+    },
+    "track-unknown-border": {
+      "$value": "{status.unknown}"
+    },
+    "track-caution-bg": {
+      "$value": "{status.high}",
+      "$description": "tone=\"caution\" — an on-state that removes a safety net reads amber, not brand green."
+    },
+    "track-critical-bg": {
+      "$value": "{status.critical}",
+      "$description": "tone=\"critical\" — an on-state that suppresses a clinical check."
+    },
+    "track-neutral-bg": {
+      "$value": "{text-muted}",
+      "$description": "tone=\"neutral\" — a view preference with no clinical direction."
+    },
+    "thumb-bg": {
+      "$value": "{surface}"
+    },
+    "thumb-fg": {
+      "$value": "{text-muted}"
+    },
+    "thumb-unknown-bg": {
+      "$value": "{status.unknown}"
+    },
+    "thumb-unknown-fg": {
+      "$value": "{bg}"
+    },
+    "label-on-fg": {
+      "$value": "{text-on-accent}"
+    },
+    "label-off-fg": {
+      "$value": "{text-on-accent}"
+    },
+    "state-fg": {
+      "$value": "{text-muted}"
+    },
+    "state-on-fg": {
+      "$value": "{accent}"
+    },
+    "desc-fg": {
+      "$value": "{text-muted}"
+    },
+    "focus-ring": {
+      "$value": "{focus-ring}"
+    },
+    "locked-fg": {
+      "$value": "{flag.restricted}"
+    },
+    "locked-bg": {
+      "$value": "{bg-subtle}"
+    },
+    "error-fg": {
+      "$value": "{status.critical}"
+    },
+    "pending-fg": {
+      "$value": "{status.low}"
+    },
+    "queued-fg": {
+      "$value": "{status.low}"
+    },
+    "stale-fg": {
+      "$value": "{flag.restricted}"
+    },
+    "stale-bg": {
+      "$value": "{flag.restricted-bg}"
+    },
+    "until-fg": {
+      "$value": "{status.high}"
+    },
+    "until-bg": {
+      "$value": "{status.high-bg}"
+    },
+    "until-border": {
+      "$value": "{status.high-border}"
+    },
+    "impact-fg": {
+      "$value": "{text}"
+    },
+    "impact-bg": {
+      "$value": "{status.low-bg}"
+    },
+    "impact-border": {
+      "$value": "{status.low}"
+    },
+    "hold-ring": {
+      "$value": "{status.high}"
+    },
+    "segment-bg": {
+      "$value": "{surface}"
+    },
+    "segment-fg": {
+      "$value": "{text-muted}"
+    },
+    "segment-border": {
+      "$value": "{border-strong}"
+    },
+    "segment-divider": {
+      "$value": "{border}"
+    },
+    "segment-hover-bg": {
+      "$value": "{bg-subtle}"
+    },
+    "segment-unasked-bg": {
+      "$value": "{status.unknown-bg}"
+    },
+    "segment-unasked-fg": {
+      "$value": "{status.unknown}"
+    },
+    "prov-fg": {
+      "$value": "{text-subtle}"
+    },
+    "track-w": {
+      "$type": "dimension",
+      "$value": "2.75rem"
+    },
+    "track-h": {
+      "$type": "dimension",
+      "$value": "1.5rem"
+    },
+    "thumb-size": {
+      "$type": "dimension",
+      "$value": "1.25rem"
+    },
+    "pad": {
+      "$type": "dimension",
+      "$value": "0.125rem",
+      "$description": "Gap between the thumb and the track edge. Travel is computed from this, never hard-coded."
+    },
+    "radius": {
+      "$type": "dimension",
+      "$value": "{radius-full}"
+    },
+    "gap": {
+      "$type": "dimension",
+      "$value": "{density.gap}"
+    },
+    "target-min": {
+      "$type": "dimension",
+      "$value": "{density.target}",
+      "$description": "The hit area — see the group description. Decoupled from track-w/track-h on purpose."
+    },
+    "label-font": {
+      "$type": "dimension",
+      "$value": "{text-2xs}"
+    },
+    "state-font": {
+      "$type": "dimension",
+      "$value": "{text-xs}"
+    },
+    "focus-width": {
+      "$type": "dimension",
+      "$value": "2px"
+    },
+    "focus-offset": {
+      "$type": "dimension",
+      "$value": "2px"
+    },
+    "duration": {
+      "$type": "duration",
+      "$value": "{duration}"
+    },
+    "ease": {
+      "$value": "{ease}"
+    },
+    "hold-ms": {
+      "$type": "duration",
+      "$value": "600ms",
+      "$description": "Hold-to-confirm duration. A host may set this to 0ms to disable the hold entirely in favour of the dialog path — holding is a timed input and SC 2.2.1 applies, so it must be removable without a fork."
+    }
+  },
   "chart": {
     "$description": "ObservationTrend, Flowsheet and ClinicalScale.\n\nThese exist as tokens rather than hard-coded SVG attributes for a specific reason: a chart is the one surface where the reader cannot re-read a mislabelled value, so the axis, grid and band weights have to be tunable per product without editing the drawing code.\n\nThe status hues are NOT re-declared here. A point that is high on a chart uses the same amber as a badge that says high, because a colour that means something in a table and something else in a graph on the same screen is worse than no colour at all.",
     "$type": "color",
-    "axis": { "$value": "{border-strong}" },
-    "grid": { "$value": "{border}" },
-    "label-fg": { "$value": "{text-muted}" },
-    "line": { "$value": "{text}" },
-    "band-bg": { "$value": "{status.normal-bg}" },
-    "band-border": { "$value": "{status.normal-border}" },
-    "point": { "$value": "{text}" },
-    "surface": { "$value": "{surface}" },
-    "line-width": { "$type": "dimension", "$value": "1.5px" },
-    "point-radius": { "$type": "dimension", "$value": "3px" },
+    "axis": {
+      "$value": "{border-strong}"
+    },
+    "grid": {
+      "$value": "{border}"
+    },
+    "label-fg": {
+      "$value": "{text-muted}"
+    },
+    "line": {
+      "$value": "{text}"
+    },
+    "band-bg": {
+      "$value": "{status.normal-bg}"
+    },
+    "band-border": {
+      "$value": "{status.normal-border}"
+    },
+    "point": {
+      "$value": "{text}"
+    },
+    "surface": {
+      "$value": "{surface}"
+    },
+    "line-width": {
+      "$type": "dimension",
+      "$value": "1.5px"
+    },
+    "point-radius": {
+      "$type": "dimension",
+      "$value": "3px"
+    },
     "point-radius-flagged": {
       "$type": "dimension",
       "$value": "4.5px",
       "$description": "An out-of-range point is larger as well as differently shaped and differently coloured. Three redundant encodings, because this is the mark a reader is scanning for."
     }
   },
-
   "nav": {
     "$description": "ContextBar, SectionNav and ClinicalBreadcrumb. Current-section state carries a border as well as a background, so it survives forced-colors mode where background-color is discarded.",
     "$type": "color",
-    "bg": { "$value": "{surface}" },
-    "border": { "$value": "{border}" },
-    "fg": { "$value": "{text-muted}" },
-    "fg-current": { "$value": "{text}" },
-    "bg-current": { "$value": "{accent-subtle}" },
-    "border-current": { "$value": "{accent}" },
-    "bg-hover": { "$value": "{bg-muted}" },
-    "radius": { "$type": "dimension", "$value": "{radius}" }
+    "bg": {
+      "$value": "{surface}"
+    },
+    "border": {
+      "$value": "{border}"
+    },
+    "fg": {
+      "$value": "{text-muted}"
+    },
+    "fg-current": {
+      "$value": "{text}"
+    },
+    "bg-current": {
+      "$value": "{accent-subtle}"
+    },
+    "border-current": {
+      "$value": "{accent}"
+    },
+    "bg-hover": {
+      "$value": "{bg-muted}"
+    },
+    "radius": {
+      "$type": "dimension",
+      "$value": "{radius}"
+    }
   }
 }

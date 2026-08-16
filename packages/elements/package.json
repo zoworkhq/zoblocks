@@ -1,0 +1,73 @@
+{
+  "name": "@oxygenui-design/elements",
+  "version": "0.1.0",
+  "description": "Oxygen UI controls as dependency-free custom elements. A clinical switch that distinguishes off from never-asked, renders a write in flight without removing the control, and says which value the record holds when one fails. Works in React, Vue, Angular, Svelte, or plain HTML.",
+  "license": "MIT",
+  "homepage": "https://oxygenui.design/components",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zoworkhq/oxygenui.git",
+    "directory": "packages/elements"
+  },
+  "keywords": [
+    "switch",
+    "toggle",
+    "custom-elements",
+    "web-components",
+    "healthcare",
+    "clinical",
+    "fhir",
+    "accessibility",
+    "react",
+    "vue",
+    "angular",
+    "svelte"
+  ],
+  "type": "module",
+  "//sideEffects": "Each entry point DEFINES a custom element. Marking this package side-effect-free would let a bundler drop the import and leave the page full of undefined elements.",
+  "sideEffects": true,
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./switch": "./src/switch.ts",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "src",
+    "!src/**/*.test.ts"
+  ],
+  "engines": {
+    "node": ">=20.11.0"
+  },
+  "publishConfig": {
+    "access": "public",
+    "main": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "exports": {
+      ".": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "./switch": {
+        "types": "./dist/switch.d.ts",
+        "default": "./dist/switch.js"
+      },
+      "./package.json": "./package.json"
+    }
+  },
+  "scripts": {
+    "prepublishOnly": "node scripts/require-pnpm.mjs",
+    "build": "tsc -p tsconfig.build.json && node scripts/fix-esm-extensions.mjs",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "check-tarball": "node scripts/check-tarball.mjs"
+  },
+  "devDependencies": {
+    "@oxygenui-design/tsconfig": "workspace:*",
+    "jsdom": "^25",
+    "typescript": "^5.7.2",
+    "vitest": "^3.2.7"
+  }
+}
