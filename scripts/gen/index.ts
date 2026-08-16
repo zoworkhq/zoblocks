@@ -90,7 +90,10 @@ async function main() {
     process.exit(1);
   }
 
-  const props = extractProps(registryComponents);
+  // Every component, not just the registry ones. The props table is the bulk
+  // of a component's documentation, and a package component that renders three
+  // empty headings looks broken rather than undocumented.
+  const props = extractProps(components);
 
   const registryProblems = await emitRegistry(registryComponents, emitter);
   if (registryProblems.length) {

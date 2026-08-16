@@ -73,9 +73,25 @@ describe("the docs catalog", () => {
   it("still resolves those types to something nameable", () => {
     // Guards the fix from over-reaching: stripping the wrapper must leave the
     // type name, not an empty string or a bare `.`.
-    expect(catalog).toContain('"type": "LoaderAnnounce | undefined"');
+    //
+    // No `| undefined` on the expectation: optional props have it stripped,
+    // because the table has a column for whether a prop is required and does
+    // not need the same fact repeated in every row. The union arm that
+    // matters is the named one, which is what this asserts survived.
+    expect(catalog).toContain('"type": "LoaderAnnounce"');
     expect(catalog).not.toMatch(/"type": "\s*\.\s*/);
     expect(catalog).not.toMatch(/"type": ""/);
+  });
+
+  it("does not repeat optionality in the type column", () => {
+    // `capacities?: Capacity[]` resolves to `Capacity[] | undefined`, which is
+    // true and useless beside a Required column. A required prop that really
+    // accepts undefined still says so, which is why this checks optional rows
+    // rather than banning the word outright.
+    const optionalWithUndefined = [
+      ...catalog.matchAll(/"type": "([^"]*\| undefined)"[^}]*?"required": false/g),
+    ];
+    expect(optionalWithUndefined.map((m) => m[1])).toEqual([]);
   });
 
   it("keeps every prop type on one line", () => {

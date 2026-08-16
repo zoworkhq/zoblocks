@@ -118,6 +118,22 @@ export interface Point {
   t: number;
   /** 0–1 where the device reports it, 0.5 where it does not. */
   pressure: number;
+  /**
+   * Pen angle in degrees, −90 to 90 on each axis, where the device reports it.
+   *
+   * Absent rather than zeroed on hardware that does not measure it, because
+   * zero is a real reading — a stylus held perfectly upright — and a record
+   * that cannot tell "vertical" from "unknown" is worse than one that omits
+   * the field. Every consumer treats `undefined` as no data.
+   *
+   * Kept because tilt is part of what distinguishes a signature written by a
+   * hand from one traced or replayed: the angle drifts continuously with the
+   * wrist and is hard to fake convincingly. It shares the privacy posture of
+   * the rest of the stroke dynamics — captured into the model, never emitted
+   * in the value unless the integrator opts in.
+   */
+  tiltX?: number;
+  tiltY?: number;
 }
 
 /** One continuous mark, from pointer-down to pointer-up. */
@@ -200,6 +216,21 @@ export interface CaptureContext {
   /** Viewport at capture, for reproducing what the signer actually saw. */
   viewport?: { width: number; height: number };
   /**
+   * What it was signed on, and in what.
+   *
+   * Both are supplied by the host rather than read here. The component runs on
+   * a server as readily as a tablet, and a record that says "Chrome" because
+   * the engine happened to be imported into a browser bundle would be a fact
+   * about the build, not about the signing.
+   *
+   * `device` is the deployment's own name for the terminal — "Bay 4 tablet",
+   * an asset tag — which is what an auditor reconstructing a signing session
+   * can actually act on. A user-agent string alone identifies a browser
+   * build; it does not tell anyone which machine was at the bedside.
+   */
+  device?: string;
+  userAgent?: string;
+  /**
    * Stroke timing and pressure, for forensic comparison.
    *
    * Off unless the integrator explicitly opts in. A written signature is
@@ -218,6 +249,16 @@ export interface BiometricSummary {
   meanPressure: number;
   /** Time the pen was off the surface between strokes, in ms. */
   pauseMs: number[];
+  /**
+   * Mean pen tilt in degrees, and how far it wandered.
+   *
+   * Absent unless a stylus reported tilt. The spread is the informative half:
+   * a hand rolls the pen continuously while writing, so a real signature has
+   * a range of several degrees, where a traced or machine-replayed one tends
+   * to a single angle or to none at all.
+   */
+  meanTilt?: number;
+  tiltRange?: number;
 }
 
 /* ------------------------------------------------------------------ */

@@ -40,7 +40,7 @@ export const CATALOG: ComponentDoc[] = [
       },
       {
         "name": "announce",
-        "type": "LoaderAnnounce | undefined",
+        "type": "LoaderAnnounce",
         "description": "Live-region politeness while indeterminate.",
         "required": false
       },
@@ -52,91 +52,91 @@ export const CATALOG: ComponentDoc[] = [
       },
       {
         "name": "delay",
-        "type": "number | undefined",
+        "type": "number",
         "description": "Wait this long before appearing, so a fast response never flashes a loader.",
         "required": false
       },
       {
         "name": "hint",
-        "type": "string | undefined",
+        "type": "string",
         "description": "A second line under the label. Never a substitute for it.",
         "required": false
       },
       {
         "name": "label",
-        "type": "string | undefined",
+        "type": "string",
         "description": "What is loading. Always rendered — visibly when `showLabel`, and to assistive technology either way, because a loader nobody can hear is a silent wait.",
         "required": false
       },
       {
         "name": "minDuration",
-        "type": "number | undefined",
+        "type": "number",
         "description": "Once visible, stay at least this long, so the loader never blinks out.",
         "required": false
       },
       {
         "name": "mode",
-        "type": "LoaderMode | undefined",
+        "type": "LoaderMode",
         "description": "`inline` sits in the flow; `overlay` covers its positioned ancestor; `page` covers the viewport.",
         "required": false
       },
       {
         "name": "motion",
-        "type": "LoaderMotion | undefined",
+        "type": "LoaderMotion",
         "description": "`auto` follows the OS; `reduced` forces the still state; `full` opts out of the OS preference.",
         "required": false
       },
       {
         "name": "onSlow",
-        "type": "(() => void) | undefined",
+        "type": "(() => void)",
         "description": "Fires once, when `slowAfter` elapses.",
         "required": false
       },
       {
         "name": "open",
-        "type": "boolean | undefined",
+        "type": "boolean",
         "description": "Controlled visibility. Setting false runs the exit and respects `minDuration`.",
         "required": false
       },
       {
         "name": "progress",
-        "type": "number | undefined",
+        "type": "number",
         "description": "0–100 turns the loader determinate. Omit for an unknown wait.",
         "required": false
       },
       {
         "name": "scrim",
-        "type": "boolean | undefined",
+        "type": "boolean",
         "description": "Translucent backdrop behind `overlay` and `page`.",
         "required": false
       },
       {
         "name": "showLabel",
-        "type": "boolean | undefined",
+        "type": "boolean",
         "description": "Show the label as text. Defaults to true for `overlay` and `page`.",
         "required": false
       },
       {
         "name": "size",
-        "type": "number | LoaderSize | undefined",
+        "type": "number | LoaderSize",
         "description": "Named step or an explicit art width in pixels.",
         "required": false
       },
       {
         "name": "slowAfter",
-        "type": "number | undefined",
+        "type": "number",
         "description": "Announce a stall after this long. 0 disables.",
         "required": false
       },
       {
         "name": "slowHint",
-        "type": "string | undefined",
+        "type": "string",
         "description": "Replaces the default stall wording.",
         "required": false
       },
       {
         "name": "speed",
-        "type": "number | undefined",
+        "type": "number",
         "description": "Cadence multiplier, 0.5–2. Clamped.",
         "required": false,
         "default": "1"
@@ -155,7 +155,7 @@ export const CATALOG: ComponentDoc[] = [
           },
           {
             "name": "announce",
-            "type": "LoaderAnnounce | undefined",
+            "type": "LoaderAnnounce",
             "description": "Live-region politeness while indeterminate.",
             "required": false
           },
@@ -167,91 +167,91 @@ export const CATALOG: ComponentDoc[] = [
           },
           {
             "name": "delay",
-            "type": "number | undefined",
+            "type": "number",
             "description": "Wait this long before appearing, so a fast response never flashes a loader.",
             "required": false
           },
           {
             "name": "hint",
-            "type": "string | undefined",
+            "type": "string",
             "description": "A second line under the label. Never a substitute for it.",
             "required": false
           },
           {
             "name": "label",
-            "type": "string | undefined",
+            "type": "string",
             "description": "What is loading. Always rendered — visibly when `showLabel`, and to assistive technology either way, because a loader nobody can hear is a silent wait.",
             "required": false
           },
           {
             "name": "minDuration",
-            "type": "number | undefined",
+            "type": "number",
             "description": "Once visible, stay at least this long, so the loader never blinks out.",
             "required": false
           },
           {
             "name": "mode",
-            "type": "LoaderMode | undefined",
+            "type": "LoaderMode",
             "description": "`inline` sits in the flow; `overlay` covers its positioned ancestor; `page` covers the viewport.",
             "required": false
           },
           {
             "name": "motion",
-            "type": "LoaderMotion | undefined",
+            "type": "LoaderMotion",
             "description": "`auto` follows the OS; `reduced` forces the still state; `full` opts out of the OS preference.",
             "required": false
           },
           {
             "name": "onSlow",
-            "type": "(() => void) | undefined",
+            "type": "(() => void)",
             "description": "Fires once, when `slowAfter` elapses.",
             "required": false
           },
           {
             "name": "open",
-            "type": "boolean | undefined",
+            "type": "boolean",
             "description": "Controlled visibility. Setting false runs the exit and respects `minDuration`.",
             "required": false
           },
           {
             "name": "progress",
-            "type": "number | undefined",
+            "type": "number",
             "description": "0–100 turns the loader determinate. Omit for an unknown wait.",
             "required": false
           },
           {
             "name": "scrim",
-            "type": "boolean | undefined",
+            "type": "boolean",
             "description": "Translucent backdrop behind `overlay` and `page`.",
             "required": false
           },
           {
             "name": "showLabel",
-            "type": "boolean | undefined",
+            "type": "boolean",
             "description": "Show the label as text. Defaults to true for `overlay` and `page`.",
             "required": false
           },
           {
             "name": "size",
-            "type": "number | LoaderSize | undefined",
+            "type": "number | LoaderSize",
             "description": "Named step or an explicit art width in pixels.",
             "required": false
           },
           {
             "name": "slowAfter",
-            "type": "number | undefined",
+            "type": "number",
             "description": "Announce a stall after this long. 0 disables.",
             "required": false
           },
           {
             "name": "slowHint",
-            "type": "string | undefined",
+            "type": "string",
             "description": "Replaces the default stall wording.",
             "required": false
           },
           {
             "name": "speed",
-            "type": "number | undefined",
+            "type": "number",
             "description": "Cadence multiplier, 0.5–2. Clamped.",
             "required": false,
             "default": "1"
@@ -334,97 +334,97 @@ export const CATALOG: ComponentDoc[] = [
       },
       {
         "name": "announce",
-        "type": "LoaderAnnounce | undefined",
+        "type": "LoaderAnnounce",
         "description": "Live-region politeness while indeterminate.",
         "required": false
       },
       {
         "name": "delay",
-        "type": "number | undefined",
+        "type": "number",
         "description": "Wait this long before appearing, so a fast response never flashes a loader.",
         "required": false
       },
       {
         "name": "hint",
-        "type": "string | undefined",
+        "type": "string",
         "description": "A second line under the label. Never a substitute for it.",
         "required": false
       },
       {
         "name": "label",
-        "type": "string | undefined",
+        "type": "string",
         "description": "What is loading. Always rendered — visibly when `showLabel`, and to assistive technology either way, because a loader nobody can hear is a silent wait.",
         "required": false
       },
       {
         "name": "minDuration",
-        "type": "number | undefined",
+        "type": "number",
         "description": "Once visible, stay at least this long, so the loader never blinks out.",
         "required": false
       },
       {
         "name": "mode",
-        "type": "LoaderMode | undefined",
+        "type": "LoaderMode",
         "description": "`inline` sits in the flow; `overlay` covers its positioned ancestor; `page` covers the viewport.",
         "required": false
       },
       {
         "name": "motion",
-        "type": "LoaderMotion | undefined",
+        "type": "LoaderMotion",
         "description": "`auto` follows the OS; `reduced` forces the still state; `full` opts out of the OS preference.",
         "required": false
       },
       {
         "name": "onSlow",
-        "type": "(() => void) | undefined",
+        "type": "(() => void)",
         "description": "Fires once, when `slowAfter` elapses.",
         "required": false
       },
       {
         "name": "open",
-        "type": "boolean | undefined",
+        "type": "boolean",
         "description": "Controlled visibility. Setting false runs the exit and respects `minDuration`.",
         "required": false
       },
       {
         "name": "progress",
-        "type": "number | undefined",
+        "type": "number",
         "description": "0–100 turns the loader determinate. Omit for an unknown wait.",
         "required": false
       },
       {
         "name": "scrim",
-        "type": "boolean | undefined",
+        "type": "boolean",
         "description": "Translucent backdrop behind `overlay` and `page`.",
         "required": false
       },
       {
         "name": "showLabel",
-        "type": "boolean | undefined",
+        "type": "boolean",
         "description": "Show the label as text. Defaults to true for `overlay` and `page`.",
         "required": false
       },
       {
         "name": "size",
-        "type": "number | LoaderSize | undefined",
+        "type": "number | LoaderSize",
         "description": "Named step or an explicit art width in pixels.",
         "required": false
       },
       {
         "name": "slowAfter",
-        "type": "number | undefined",
+        "type": "number",
         "description": "Announce a stall after this long. 0 disables.",
         "required": false
       },
       {
         "name": "slowHint",
-        "type": "string | undefined",
+        "type": "string",
         "description": "Replaces the default stall wording.",
         "required": false
       },
       {
         "name": "speed",
-        "type": "number | undefined",
+        "type": "number",
         "description": "Cadence multiplier, 0.5–2. Clamped.",
         "required": false,
         "default": "1"
@@ -442,97 +442,97 @@ export const CATALOG: ComponentDoc[] = [
           },
           {
             "name": "announce",
-            "type": "LoaderAnnounce | undefined",
+            "type": "LoaderAnnounce",
             "description": "Live-region politeness while indeterminate.",
             "required": false
           },
           {
             "name": "delay",
-            "type": "number | undefined",
+            "type": "number",
             "description": "Wait this long before appearing, so a fast response never flashes a loader.",
             "required": false
           },
           {
             "name": "hint",
-            "type": "string | undefined",
+            "type": "string",
             "description": "A second line under the label. Never a substitute for it.",
             "required": false
           },
           {
             "name": "label",
-            "type": "string | undefined",
+            "type": "string",
             "description": "What is loading. Always rendered — visibly when `showLabel`, and to assistive technology either way, because a loader nobody can hear is a silent wait.",
             "required": false
           },
           {
             "name": "minDuration",
-            "type": "number | undefined",
+            "type": "number",
             "description": "Once visible, stay at least this long, so the loader never blinks out.",
             "required": false
           },
           {
             "name": "mode",
-            "type": "LoaderMode | undefined",
+            "type": "LoaderMode",
             "description": "`inline` sits in the flow; `overlay` covers its positioned ancestor; `page` covers the viewport.",
             "required": false
           },
           {
             "name": "motion",
-            "type": "LoaderMotion | undefined",
+            "type": "LoaderMotion",
             "description": "`auto` follows the OS; `reduced` forces the still state; `full` opts out of the OS preference.",
             "required": false
           },
           {
             "name": "onSlow",
-            "type": "(() => void) | undefined",
+            "type": "(() => void)",
             "description": "Fires once, when `slowAfter` elapses.",
             "required": false
           },
           {
             "name": "open",
-            "type": "boolean | undefined",
+            "type": "boolean",
             "description": "Controlled visibility. Setting false runs the exit and respects `minDuration`.",
             "required": false
           },
           {
             "name": "progress",
-            "type": "number | undefined",
+            "type": "number",
             "description": "0–100 turns the loader determinate. Omit for an unknown wait.",
             "required": false
           },
           {
             "name": "scrim",
-            "type": "boolean | undefined",
+            "type": "boolean",
             "description": "Translucent backdrop behind `overlay` and `page`.",
             "required": false
           },
           {
             "name": "showLabel",
-            "type": "boolean | undefined",
+            "type": "boolean",
             "description": "Show the label as text. Defaults to true for `overlay` and `page`.",
             "required": false
           },
           {
             "name": "size",
-            "type": "number | LoaderSize | undefined",
+            "type": "number | LoaderSize",
             "description": "Named step or an explicit art width in pixels.",
             "required": false
           },
           {
             "name": "slowAfter",
-            "type": "number | undefined",
+            "type": "number",
             "description": "Announce a stall after this long. 0 disables.",
             "required": false
           },
           {
             "name": "slowHint",
-            "type": "string | undefined",
+            "type": "string",
             "description": "Replaces the default stall wording.",
             "required": false
           },
           {
             "name": "speed",
-            "type": "number | undefined",
+            "type": "number",
             "description": "Cadence multiplier, 0.5–2. Clamped.",
             "required": false,
             "default": "1"
@@ -615,97 +615,97 @@ export const CATALOG: ComponentDoc[] = [
       },
       {
         "name": "announce",
-        "type": "LoaderAnnounce | undefined",
+        "type": "LoaderAnnounce",
         "description": "Live-region politeness while indeterminate.",
         "required": false
       },
       {
         "name": "delay",
-        "type": "number | undefined",
+        "type": "number",
         "description": "Wait this long before appearing, so a fast response never flashes a loader.",
         "required": false
       },
       {
         "name": "hint",
-        "type": "string | undefined",
+        "type": "string",
         "description": "A second line under the label. Never a substitute for it.",
         "required": false
       },
       {
         "name": "label",
-        "type": "string | undefined",
+        "type": "string",
         "description": "What is loading. Always rendered — visibly when `showLabel`, and to assistive technology either way, because a loader nobody can hear is a silent wait.",
         "required": false
       },
       {
         "name": "minDuration",
-        "type": "number | undefined",
+        "type": "number",
         "description": "Once visible, stay at least this long, so the loader never blinks out.",
         "required": false
       },
       {
         "name": "mode",
-        "type": "LoaderMode | undefined",
+        "type": "LoaderMode",
         "description": "`inline` sits in the flow; `overlay` covers its positioned ancestor; `page` covers the viewport.",
         "required": false
       },
       {
         "name": "motion",
-        "type": "LoaderMotion | undefined",
+        "type": "LoaderMotion",
         "description": "`auto` follows the OS; `reduced` forces the still state; `full` opts out of the OS preference.",
         "required": false
       },
       {
         "name": "onSlow",
-        "type": "(() => void) | undefined",
+        "type": "(() => void)",
         "description": "Fires once, when `slowAfter` elapses.",
         "required": false
       },
       {
         "name": "open",
-        "type": "boolean | undefined",
+        "type": "boolean",
         "description": "Controlled visibility. Setting false runs the exit and respects `minDuration`.",
         "required": false
       },
       {
         "name": "progress",
-        "type": "number | undefined",
+        "type": "number",
         "description": "0–100 turns the loader determinate. Omit for an unknown wait.",
         "required": false
       },
       {
         "name": "scrim",
-        "type": "boolean | undefined",
+        "type": "boolean",
         "description": "Translucent backdrop behind `overlay` and `page`.",
         "required": false
       },
       {
         "name": "showLabel",
-        "type": "boolean | undefined",
+        "type": "boolean",
         "description": "Show the label as text. Defaults to true for `overlay` and `page`.",
         "required": false
       },
       {
         "name": "size",
-        "type": "number | LoaderSize | undefined",
+        "type": "number | LoaderSize",
         "description": "Named step or an explicit art width in pixels.",
         "required": false
       },
       {
         "name": "slowAfter",
-        "type": "number | undefined",
+        "type": "number",
         "description": "Announce a stall after this long. 0 disables.",
         "required": false
       },
       {
         "name": "slowHint",
-        "type": "string | undefined",
+        "type": "string",
         "description": "Replaces the default stall wording.",
         "required": false
       },
       {
         "name": "speed",
-        "type": "number | undefined",
+        "type": "number",
         "description": "Cadence multiplier, 0.5–2. Clamped.",
         "required": false,
         "default": "1"
@@ -723,97 +723,97 @@ export const CATALOG: ComponentDoc[] = [
           },
           {
             "name": "announce",
-            "type": "LoaderAnnounce | undefined",
+            "type": "LoaderAnnounce",
             "description": "Live-region politeness while indeterminate.",
             "required": false
           },
           {
             "name": "delay",
-            "type": "number | undefined",
+            "type": "number",
             "description": "Wait this long before appearing, so a fast response never flashes a loader.",
             "required": false
           },
           {
             "name": "hint",
-            "type": "string | undefined",
+            "type": "string",
             "description": "A second line under the label. Never a substitute for it.",
             "required": false
           },
           {
             "name": "label",
-            "type": "string | undefined",
+            "type": "string",
             "description": "What is loading. Always rendered — visibly when `showLabel`, and to assistive technology either way, because a loader nobody can hear is a silent wait.",
             "required": false
           },
           {
             "name": "minDuration",
-            "type": "number | undefined",
+            "type": "number",
             "description": "Once visible, stay at least this long, so the loader never blinks out.",
             "required": false
           },
           {
             "name": "mode",
-            "type": "LoaderMode | undefined",
+            "type": "LoaderMode",
             "description": "`inline` sits in the flow; `overlay` covers its positioned ancestor; `page` covers the viewport.",
             "required": false
           },
           {
             "name": "motion",
-            "type": "LoaderMotion | undefined",
+            "type": "LoaderMotion",
             "description": "`auto` follows the OS; `reduced` forces the still state; `full` opts out of the OS preference.",
             "required": false
           },
           {
             "name": "onSlow",
-            "type": "(() => void) | undefined",
+            "type": "(() => void)",
             "description": "Fires once, when `slowAfter` elapses.",
             "required": false
           },
           {
             "name": "open",
-            "type": "boolean | undefined",
+            "type": "boolean",
             "description": "Controlled visibility. Setting false runs the exit and respects `minDuration`.",
             "required": false
           },
           {
             "name": "progress",
-            "type": "number | undefined",
+            "type": "number",
             "description": "0–100 turns the loader determinate. Omit for an unknown wait.",
             "required": false
           },
           {
             "name": "scrim",
-            "type": "boolean | undefined",
+            "type": "boolean",
             "description": "Translucent backdrop behind `overlay` and `page`.",
             "required": false
           },
           {
             "name": "showLabel",
-            "type": "boolean | undefined",
+            "type": "boolean",
             "description": "Show the label as text. Defaults to true for `overlay` and `page`.",
             "required": false
           },
           {
             "name": "size",
-            "type": "number | LoaderSize | undefined",
+            "type": "number | LoaderSize",
             "description": "Named step or an explicit art width in pixels.",
             "required": false
           },
           {
             "name": "slowAfter",
-            "type": "number | undefined",
+            "type": "number",
             "description": "Announce a stall after this long. 0 disables.",
             "required": false
           },
           {
             "name": "slowHint",
-            "type": "string | undefined",
+            "type": "string",
             "description": "Replaces the default stall wording.",
             "required": false
           },
           {
             "name": "speed",
-            "type": "number | undefined",
+            "type": "number",
             "description": "Cadence multiplier, 0.5–2. Clamped.",
             "required": false,
             "default": "1"
@@ -896,103 +896,103 @@ export const CATALOG: ComponentDoc[] = [
       },
       {
         "name": "announce",
-        "type": "LoaderAnnounce | undefined",
+        "type": "LoaderAnnounce",
         "description": "Live-region politeness while indeterminate.",
         "required": false
       },
       {
         "name": "bpm",
-        "type": "number | undefined",
+        "type": "number",
         "description": "Beats per minute, 40–100. Clamped, because this is decoration on a healthcare screen and a loader beating at 180 would be read as a number by the only people qualified to read it.",
         "required": false
       },
       {
         "name": "delay",
-        "type": "number | undefined",
+        "type": "number",
         "description": "Wait this long before appearing, so a fast response never flashes a loader.",
         "required": false
       },
       {
         "name": "hint",
-        "type": "string | undefined",
+        "type": "string",
         "description": "A second line under the label. Never a substitute for it.",
         "required": false
       },
       {
         "name": "label",
-        "type": "string | undefined",
+        "type": "string",
         "description": "What is loading. Always rendered — visibly when `showLabel`, and to assistive technology either way, because a loader nobody can hear is a silent wait.",
         "required": false
       },
       {
         "name": "minDuration",
-        "type": "number | undefined",
+        "type": "number",
         "description": "Once visible, stay at least this long, so the loader never blinks out.",
         "required": false
       },
       {
         "name": "mode",
-        "type": "LoaderMode | undefined",
+        "type": "LoaderMode",
         "description": "`inline` sits in the flow; `overlay` covers its positioned ancestor; `page` covers the viewport.",
         "required": false
       },
       {
         "name": "motion",
-        "type": "LoaderMotion | undefined",
+        "type": "LoaderMotion",
         "description": "`auto` follows the OS; `reduced` forces the still state; `full` opts out of the OS preference.",
         "required": false
       },
       {
         "name": "onSlow",
-        "type": "(() => void) | undefined",
+        "type": "(() => void)",
         "description": "Fires once, when `slowAfter` elapses.",
         "required": false
       },
       {
         "name": "open",
-        "type": "boolean | undefined",
+        "type": "boolean",
         "description": "Controlled visibility. Setting false runs the exit and respects `minDuration`.",
         "required": false
       },
       {
         "name": "progress",
-        "type": "number | undefined",
+        "type": "number",
         "description": "0–100 turns the loader determinate. Omit for an unknown wait.",
         "required": false
       },
       {
         "name": "scrim",
-        "type": "boolean | undefined",
+        "type": "boolean",
         "description": "Translucent backdrop behind `overlay` and `page`.",
         "required": false
       },
       {
         "name": "showLabel",
-        "type": "boolean | undefined",
+        "type": "boolean",
         "description": "Show the label as text. Defaults to true for `overlay` and `page`.",
         "required": false
       },
       {
         "name": "size",
-        "type": "number | LoaderSize | undefined",
+        "type": "number | LoaderSize",
         "description": "Named step or an explicit art width in pixels.",
         "required": false
       },
       {
         "name": "slowAfter",
-        "type": "number | undefined",
+        "type": "number",
         "description": "Announce a stall after this long. 0 disables.",
         "required": false
       },
       {
         "name": "slowHint",
-        "type": "string | undefined",
+        "type": "string",
         "description": "Replaces the default stall wording.",
         "required": false
       },
       {
         "name": "speed",
-        "type": "number | undefined",
+        "type": "number",
         "description": "Cadence multiplier, 0.5–2. Clamped.",
         "required": false,
         "default": "1"
@@ -1011,103 +1011,103 @@ export const CATALOG: ComponentDoc[] = [
           },
           {
             "name": "announce",
-            "type": "LoaderAnnounce | undefined",
+            "type": "LoaderAnnounce",
             "description": "Live-region politeness while indeterminate.",
             "required": false
           },
           {
             "name": "bpm",
-            "type": "number | undefined",
+            "type": "number",
             "description": "Beats per minute, 40–100. Clamped, because this is decoration on a healthcare screen and a loader beating at 180 would be read as a number by the only people qualified to read it.",
             "required": false
           },
           {
             "name": "delay",
-            "type": "number | undefined",
+            "type": "number",
             "description": "Wait this long before appearing, so a fast response never flashes a loader.",
             "required": false
           },
           {
             "name": "hint",
-            "type": "string | undefined",
+            "type": "string",
             "description": "A second line under the label. Never a substitute for it.",
             "required": false
           },
           {
             "name": "label",
-            "type": "string | undefined",
+            "type": "string",
             "description": "What is loading. Always rendered — visibly when `showLabel`, and to assistive technology either way, because a loader nobody can hear is a silent wait.",
             "required": false
           },
           {
             "name": "minDuration",
-            "type": "number | undefined",
+            "type": "number",
             "description": "Once visible, stay at least this long, so the loader never blinks out.",
             "required": false
           },
           {
             "name": "mode",
-            "type": "LoaderMode | undefined",
+            "type": "LoaderMode",
             "description": "`inline` sits in the flow; `overlay` covers its positioned ancestor; `page` covers the viewport.",
             "required": false
           },
           {
             "name": "motion",
-            "type": "LoaderMotion | undefined",
+            "type": "LoaderMotion",
             "description": "`auto` follows the OS; `reduced` forces the still state; `full` opts out of the OS preference.",
             "required": false
           },
           {
             "name": "onSlow",
-            "type": "(() => void) | undefined",
+            "type": "(() => void)",
             "description": "Fires once, when `slowAfter` elapses.",
             "required": false
           },
           {
             "name": "open",
-            "type": "boolean | undefined",
+            "type": "boolean",
             "description": "Controlled visibility. Setting false runs the exit and respects `minDuration`.",
             "required": false
           },
           {
             "name": "progress",
-            "type": "number | undefined",
+            "type": "number",
             "description": "0–100 turns the loader determinate. Omit for an unknown wait.",
             "required": false
           },
           {
             "name": "scrim",
-            "type": "boolean | undefined",
+            "type": "boolean",
             "description": "Translucent backdrop behind `overlay` and `page`.",
             "required": false
           },
           {
             "name": "showLabel",
-            "type": "boolean | undefined",
+            "type": "boolean",
             "description": "Show the label as text. Defaults to true for `overlay` and `page`.",
             "required": false
           },
           {
             "name": "size",
-            "type": "number | LoaderSize | undefined",
+            "type": "number | LoaderSize",
             "description": "Named step or an explicit art width in pixels.",
             "required": false
           },
           {
             "name": "slowAfter",
-            "type": "number | undefined",
+            "type": "number",
             "description": "Announce a stall after this long. 0 disables.",
             "required": false
           },
           {
             "name": "slowHint",
-            "type": "string | undefined",
+            "type": "string",
             "description": "Replaces the default stall wording.",
             "required": false
           },
           {
             "name": "speed",
-            "type": "number | undefined",
+            "type": "number",
             "description": "Cadence multiplier, 0.5–2. Clamped.",
             "required": false,
             "default": "1"
@@ -1126,105 +1126,105 @@ export const CATALOG: ComponentDoc[] = [
           },
           {
             "name": "announce",
-            "type": "LoaderAnnounce | undefined",
+            "type": "LoaderAnnounce",
             "description": "Live-region politeness while indeterminate.",
             "required": false
           },
           {
             "name": "bpm",
-            "type": "number | undefined",
+            "type": "number",
             "description": "Beats per minute, 40–100. Clamped, because this is decoration on a healthcare screen and a loader beating at 180 would be read as a number by the only people qualified to read it.",
             "required": false
           },
           {
             "name": "delay",
-            "type": "number | undefined",
+            "type": "number",
             "description": "Wait this long before appearing, so a fast response never flashes a loader.",
             "required": false
           },
           {
             "name": "hint",
-            "type": "string | undefined",
+            "type": "string",
             "description": "A second line under the label. Never a substitute for it.",
             "required": false
           },
           {
             "name": "label",
-            "type": "string | undefined",
+            "type": "string",
             "description": "What is loading. Always rendered — visibly when `showLabel`, and to assistive technology either way, because a loader nobody can hear is a silent wait.",
             "required": false
           },
           {
             "name": "minDuration",
-            "type": "number | undefined",
+            "type": "number",
             "description": "Once visible, stay at least this long, so the loader never blinks out.",
             "required": false
           },
           {
             "name": "mode",
-            "type": "LoaderMode | undefined",
+            "type": "LoaderMode",
             "description": "`inline` sits in the flow; `overlay` covers its positioned ancestor; `page` covers the viewport.",
             "required": false,
             "default": "\"page\""
           },
           {
             "name": "motion",
-            "type": "LoaderMotion | undefined",
+            "type": "LoaderMotion",
             "description": "`auto` follows the OS; `reduced` forces the still state; `full` opts out of the OS preference.",
             "required": false
           },
           {
             "name": "onSlow",
-            "type": "(() => void) | undefined",
+            "type": "(() => void)",
             "description": "Fires once, when `slowAfter` elapses.",
             "required": false
           },
           {
             "name": "open",
-            "type": "boolean | undefined",
+            "type": "boolean",
             "description": "Controlled visibility. Setting false runs the exit and respects `minDuration`.",
             "required": false
           },
           {
             "name": "progress",
-            "type": "number | undefined",
+            "type": "number",
             "description": "0–100 turns the loader determinate. Omit for an unknown wait.",
             "required": false
           },
           {
             "name": "scrim",
-            "type": "boolean | undefined",
+            "type": "boolean",
             "description": "Translucent backdrop behind `overlay` and `page`.",
             "required": false
           },
           {
             "name": "showLabel",
-            "type": "boolean | undefined",
+            "type": "boolean",
             "description": "Show the label as text. Defaults to true for `overlay` and `page`.",
             "required": false
           },
           {
             "name": "size",
-            "type": "number | LoaderSize | undefined",
+            "type": "number | LoaderSize",
             "description": "Named step or an explicit art width in pixels.",
             "required": false,
             "default": "\"xl\""
           },
           {
             "name": "slowAfter",
-            "type": "number | undefined",
+            "type": "number",
             "description": "Announce a stall after this long. 0 disables.",
             "required": false
           },
           {
             "name": "slowHint",
-            "type": "string | undefined",
+            "type": "string",
             "description": "Replaces the default stall wording.",
             "required": false
           },
           {
             "name": "speed",
-            "type": "number | undefined",
+            "type": "number",
             "description": "Cadence multiplier, 0.5–2. Clamped.",
             "required": false
           }
@@ -1311,103 +1311,103 @@ export const CATALOG: ComponentDoc[] = [
       },
       {
         "name": "announce",
-        "type": "LoaderAnnounce | undefined",
+        "type": "LoaderAnnounce",
         "description": "Live-region politeness while indeterminate.",
         "required": false
       },
       {
         "name": "bpm",
-        "type": "number | undefined",
+        "type": "number",
         "description": "Beats per minute, 40–100. Clamped to a resting range.",
         "required": false
       },
       {
         "name": "delay",
-        "type": "number | undefined",
+        "type": "number",
         "description": "Wait this long before appearing, so a fast response never flashes a loader.",
         "required": false
       },
       {
         "name": "hint",
-        "type": "string | undefined",
+        "type": "string",
         "description": "A second line under the label. Never a substitute for it.",
         "required": false
       },
       {
         "name": "label",
-        "type": "string | undefined",
+        "type": "string",
         "description": "What is loading. Always rendered — visibly when `showLabel`, and to assistive technology either way, because a loader nobody can hear is a silent wait.",
         "required": false
       },
       {
         "name": "minDuration",
-        "type": "number | undefined",
+        "type": "number",
         "description": "Once visible, stay at least this long, so the loader never blinks out.",
         "required": false
       },
       {
         "name": "mode",
-        "type": "LoaderMode | undefined",
+        "type": "LoaderMode",
         "description": "`inline` sits in the flow; `overlay` covers its positioned ancestor; `page` covers the viewport.",
         "required": false
       },
       {
         "name": "motion",
-        "type": "LoaderMotion | undefined",
+        "type": "LoaderMotion",
         "description": "`auto` follows the OS; `reduced` forces the still state; `full` opts out of the OS preference.",
         "required": false
       },
       {
         "name": "onSlow",
-        "type": "(() => void) | undefined",
+        "type": "(() => void)",
         "description": "Fires once, when `slowAfter` elapses.",
         "required": false
       },
       {
         "name": "open",
-        "type": "boolean | undefined",
+        "type": "boolean",
         "description": "Controlled visibility. Setting false runs the exit and respects `minDuration`.",
         "required": false
       },
       {
         "name": "progress",
-        "type": "number | undefined",
+        "type": "number",
         "description": "0–100 turns the loader determinate. Omit for an unknown wait.",
         "required": false
       },
       {
         "name": "scrim",
-        "type": "boolean | undefined",
+        "type": "boolean",
         "description": "Translucent backdrop behind `overlay` and `page`.",
         "required": false
       },
       {
         "name": "showLabel",
-        "type": "boolean | undefined",
+        "type": "boolean",
         "description": "Show the label as text. Defaults to true for `overlay` and `page`.",
         "required": false
       },
       {
         "name": "size",
-        "type": "number | LoaderSize | undefined",
+        "type": "number | LoaderSize",
         "description": "Named step or an explicit art width in pixels.",
         "required": false
       },
       {
         "name": "slowAfter",
-        "type": "number | undefined",
+        "type": "number",
         "description": "Announce a stall after this long. 0 disables.",
         "required": false
       },
       {
         "name": "slowHint",
-        "type": "string | undefined",
+        "type": "string",
         "description": "Replaces the default stall wording.",
         "required": false
       },
       {
         "name": "speed",
-        "type": "number | undefined",
+        "type": "number",
         "description": "Cadence multiplier, 0.5–2. Clamped.",
         "required": false,
         "default": "1"
@@ -1426,103 +1426,103 @@ export const CATALOG: ComponentDoc[] = [
           },
           {
             "name": "announce",
-            "type": "LoaderAnnounce | undefined",
+            "type": "LoaderAnnounce",
             "description": "Live-region politeness while indeterminate.",
             "required": false
           },
           {
             "name": "bpm",
-            "type": "number | undefined",
+            "type": "number",
             "description": "Beats per minute, 40–100. Clamped to a resting range.",
             "required": false
           },
           {
             "name": "delay",
-            "type": "number | undefined",
+            "type": "number",
             "description": "Wait this long before appearing, so a fast response never flashes a loader.",
             "required": false
           },
           {
             "name": "hint",
-            "type": "string | undefined",
+            "type": "string",
             "description": "A second line under the label. Never a substitute for it.",
             "required": false
           },
           {
             "name": "label",
-            "type": "string | undefined",
+            "type": "string",
             "description": "What is loading. Always rendered — visibly when `showLabel`, and to assistive technology either way, because a loader nobody can hear is a silent wait.",
             "required": false
           },
           {
             "name": "minDuration",
-            "type": "number | undefined",
+            "type": "number",
             "description": "Once visible, stay at least this long, so the loader never blinks out.",
             "required": false
           },
           {
             "name": "mode",
-            "type": "LoaderMode | undefined",
+            "type": "LoaderMode",
             "description": "`inline` sits in the flow; `overlay` covers its positioned ancestor; `page` covers the viewport.",
             "required": false
           },
           {
             "name": "motion",
-            "type": "LoaderMotion | undefined",
+            "type": "LoaderMotion",
             "description": "`auto` follows the OS; `reduced` forces the still state; `full` opts out of the OS preference.",
             "required": false
           },
           {
             "name": "onSlow",
-            "type": "(() => void) | undefined",
+            "type": "(() => void)",
             "description": "Fires once, when `slowAfter` elapses.",
             "required": false
           },
           {
             "name": "open",
-            "type": "boolean | undefined",
+            "type": "boolean",
             "description": "Controlled visibility. Setting false runs the exit and respects `minDuration`.",
             "required": false
           },
           {
             "name": "progress",
-            "type": "number | undefined",
+            "type": "number",
             "description": "0–100 turns the loader determinate. Omit for an unknown wait.",
             "required": false
           },
           {
             "name": "scrim",
-            "type": "boolean | undefined",
+            "type": "boolean",
             "description": "Translucent backdrop behind `overlay` and `page`.",
             "required": false
           },
           {
             "name": "showLabel",
-            "type": "boolean | undefined",
+            "type": "boolean",
             "description": "Show the label as text. Defaults to true for `overlay` and `page`.",
             "required": false
           },
           {
             "name": "size",
-            "type": "number | LoaderSize | undefined",
+            "type": "number | LoaderSize",
             "description": "Named step or an explicit art width in pixels.",
             "required": false
           },
           {
             "name": "slowAfter",
-            "type": "number | undefined",
+            "type": "number",
             "description": "Announce a stall after this long. 0 disables.",
             "required": false
           },
           {
             "name": "slowHint",
-            "type": "string | undefined",
+            "type": "string",
             "description": "Replaces the default stall wording.",
             "required": false
           },
           {
             "name": "speed",
-            "type": "number | undefined",
+            "type": "number",
             "description": "Cadence multiplier, 0.5–2. Clamped.",
             "required": false,
             "default": "1"
@@ -1708,8 +1708,281 @@ export const CATALOG: ComponentDoc[] = [
       "Required and empty",
       "Locked / read-only"
     ],
-    "props": [],
-    "exports": [],
+    "props": [
+      {
+        "name": "now",
+        "type": "string",
+        "description": "ISO 8601 from the server. The component never reads the clock.",
+        "required": true
+      },
+      {
+        "name": "attestation",
+        "type": "React.ReactNode",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "capacities",
+        "type": "Capacity[]",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "captureBiometrics",
+        "type": "boolean",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "className",
+        "type": "string",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "defaultValue",
+        "type": "SignatureValue",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "disabled",
+        "type": "boolean",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "documentHash",
+        "type": "string",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "id",
+        "type": "string",
+        "description": "Supplied by `Form.Item`. Attached to the trigger so the label resolves.",
+        "required": false
+      },
+      {
+        "name": "locale",
+        "type": "Partial<SignatureLocale>",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "meaning",
+        "type": "SignatureMeaning",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "methods",
+        "type": "CaptureMethod[]",
+        "description": "Which capture methods to offer. Omitting `\"type\"` produces a component that fails WCAG 2.1.1 at Level A: drawing is a path-dependent input technique, and without the typed path this control is not operable without a pointer. It is permitted because a host may have a genuinely equivalent alternative elsewhere on the page, but it is never the default — and `@oxygenui/signature-requires-typed-path` makes it a lint error rather than a runtime console message, because a component has no business writing to a customer's console.",
+        "required": false,
+        "default": "[\"draw\", \"type\", \"upload\"]"
+      },
+      {
+        "name": "onAuditEvent",
+        "type": "((event: { type: string; at: string; detail?: string; }) => void)",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "onChange",
+        "type": "((value: SignatureValue) => void)",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "outcomes",
+        "type": "('declined' | 'unable' | 'verbal' | 'on-paper')[]",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "recordedBy",
+        "type": "Signer",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "signer",
+        "type": "Partial<Signer>",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "status",
+        "type": "'error' | 'warning'",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "subject",
+        "type": "Subject",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "subtitle",
+        "type": "React.ReactNode",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "title",
+        "type": "React.ReactNode",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "value",
+        "type": "SignatureValue",
+        "description": "",
+        "required": false
+      }
+    ],
+    "exports": [
+      {
+        "name": "Signature",
+        "props": [
+          {
+            "name": "now",
+            "type": "string",
+            "description": "ISO 8601 from the server. The component never reads the clock.",
+            "required": true
+          },
+          {
+            "name": "attestation",
+            "type": "React.ReactNode",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "capacities",
+            "type": "Capacity[]",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "captureBiometrics",
+            "type": "boolean",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "className",
+            "type": "string",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "defaultValue",
+            "type": "SignatureValue",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "disabled",
+            "type": "boolean",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "documentHash",
+            "type": "string",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "id",
+            "type": "string",
+            "description": "Supplied by `Form.Item`. Attached to the trigger so the label resolves.",
+            "required": false
+          },
+          {
+            "name": "locale",
+            "type": "Partial<SignatureLocale>",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "meaning",
+            "type": "SignatureMeaning",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "methods",
+            "type": "CaptureMethod[]",
+            "description": "Which capture methods to offer. Omitting `\"type\"` produces a component that fails WCAG 2.1.1 at Level A: drawing is a path-dependent input technique, and without the typed path this control is not operable without a pointer. It is permitted because a host may have a genuinely equivalent alternative elsewhere on the page, but it is never the default — and `@oxygenui/signature-requires-typed-path` makes it a lint error rather than a runtime console message, because a component has no business writing to a customer's console.",
+            "required": false,
+            "default": "[\"draw\", \"type\", \"upload\"]"
+          },
+          {
+            "name": "onAuditEvent",
+            "type": "((event: { type: string; at: string; detail?: string; }) => void)",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "onChange",
+            "type": "((value: SignatureValue) => void)",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "outcomes",
+            "type": "('declined' | 'unable' | 'verbal' | 'on-paper')[]",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "recordedBy",
+            "type": "Signer",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "signer",
+            "type": "Partial<Signer>",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "status",
+            "type": "'error' | 'warning'",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "subject",
+            "type": "Subject",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "subtitle",
+            "type": "React.ReactNode",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "title",
+            "type": "React.ReactNode",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "value",
+            "type": "SignatureValue",
+            "description": "",
+            "required": false
+          }
+        ]
+      }
+    ],
     "usage": "import { Form } from \"antd\";\nimport { Signature, signatureRequired } from \"@oxygenui-design/signature\";\nimport \"@oxygenui-design/signature/styles.css\";\n\n// signatureRequired() accepts a decline as an answer. A rule demanding\n// outcome === \"signed\" would make refusal impossible to submit.\n<Form.Item name=\"consent\" label=\"Patient signature\" rules={[signatureRequired()]}>\n  <Signature\n    now={serverTime}\n    meaning=\"consent\"\n    attestation=\"I have read the information about this procedure, I have had the chance to ask questions, and I agree to go ahead.\"\n    subject={{ display: \"Randall, Josh\", reference: \"Patient/4471902\" }}\n    recordedBy={{ name: \"A. Okafor\", credential: \"RN\" }}\n    outcomes={[\"declined\", \"unable\", \"verbal\", \"on-paper\"]}\n  />\n</Form.Item>;",
     "guidance": {
       "use": [

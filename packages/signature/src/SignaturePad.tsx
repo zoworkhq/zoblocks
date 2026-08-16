@@ -30,7 +30,7 @@
  */
 
 import * as React from "react";
-import { toInkPaths, type Stroke } from "@oxygenui-design/signature-core";
+import { assessInk, toInkPaths, type Stroke } from "@oxygenui-design/signature-core";
 import { useSignatureCapture, type UseSignatureCaptureOptions } from "./use-signature-capture";
 import { useLocale, type SignatureLocale } from "./locale";
 
@@ -44,6 +44,15 @@ export interface SignaturePadProps extends UseSignatureCaptureOptions {
   error?: React.ReactNode;
   /** The "sign above this line" rule. */
   baseline?: boolean;
+  /**
+   * `initials` narrows the box for the per-page initialling on consent forms.
+   *
+   * Only the frame changes. A set of initials is a signature with fewer
+   * letters — the same stroke model, the same evidence, the same value — and
+   * treating it as a lesser kind of mark is how a record ends up unable to say
+   * that someone initialled every page.
+   */
+  variant?: "signature" | "initials";
   height?: number;
   /** `currentColor` by default, which is what makes the ink theme-correct. */
   ink?: string;
@@ -64,7 +73,8 @@ export function SignaturePad({
   hint,
   error,
   baseline = true,
-  height = 190,
+  variant = "signature",
+  height,
   ink,
   locale: localeOverrides,
   className,
@@ -75,6 +85,10 @@ export function SignaturePad({
 }: SignaturePadProps) {
   const t = useLocale(localeOverrides);
   const reactId = React.useId();
+  // Initials are written smaller, so the default box is shorter. An explicit
+  // height still wins — the variant sets a default, not a ceiling.
+  const boxHeight = height ?? (variant === "initials" ? 120 : 190);
+
   const base = id ?? `${reactId}${nextId()}`.replace(/:/g, "");
 
   const labelId = `${base}-label`;
@@ -92,6 +106,20 @@ export function SignaturePad({
    * speech while somebody is trying to write their name, which is worse than
    * silence.
    */
+  /*
+   * Clear asks first, but only when there is something worth losing.
+   *
+   * Undo is per-stroke and Clear is not, so Clear is the one control in the
+   * toolbar whose mistake cannot be walked back — and it sits next to the two
+   * that can. Guarding it unconditionally would be worse than not guarding it:
+   * a confirmation that fires on an empty pad is one people learn to dismiss
+   * without reading, which is exactly the habit that loses the real signature.
+   * So the gate is the same minimum-ink verdict that decides whether a mark
+   * counts as a signature at all — a stray dot clears immediately.
+   */
+  const [confirmingClear, setConfirmingClear] = React.useState(false);
+  const confirmRef = React.useRef<HTMLButtonElement>(null);
+
   const [announcement, setAnnouncement] = React.useState("");
   // Committed strokes, not `strokes.length` — the latter includes the one
   // being drawn, so announcing off it speaks the moment the pen lands.
@@ -111,6 +139,21 @@ export function SignaturePad({
     );
   }, [strokeCount, t]);
 
+  React.useEffect(() => {
+    if (isEmpty) setConfirmingClear(false);
+  }, [isEmpty]);
+
+  // Focus follows the question, so a keyboard user is not left on a button
+  // that has just been replaced by two others.
+  React.useEffect(() => {
+    if (confirmingClear) confirmRef.current?.focus();
+  }, [confirmingClear]);
+
+  const requestClear = React.useCallback(() => {
+    if (assessInk(strokes).ok) setConfirmingClear(true);
+    else capture.clear();
+  }, [strokes, capture]);
+
   const describedBy = [hint ? hintId : null, error ? errorId : null].filter(Boolean).join(" ");
   // Structured segments, never markup: the pad has no business injecting HTML,
   // and this is the same path the manifest uses.
@@ -118,7 +161,12 @@ export function SignaturePad({
 
   return (
     <div
-      className={["ox-signature", disabled ? "ox-signature--disabled" : "", className ?? ""]
+      className={[
+        "ox-signature",
+        variant === "initials" ? "ox-signature--initials" : "",
+        disabled ? "ox-signature--disabled" : "",
+        className ?? "",
+      ]
         .filter(Boolean)
         .join(" ")}
       style={style}
@@ -148,12 +196,36 @@ export function SignaturePad({
             icon="↷"
           />
           <span className="ox-signature__divider" aria-hidden="true" />
-          <PadButton
-            onClick={capture.clear}
-            disabled={disabled || isEmpty}
-            label={t.clear}
-            icon="⌫"
-          />
+          {confirmingClear ? (
+            <span className="ox-signature__confirm" role="group" aria-label={t.confirmClear}>
+              <span className="ox-signature__confirm-text">{t.confirmClear}</span>
+              <button
+                ref={confirmRef}
+                type="button"
+                className="ox-signature__confirm-yes"
+                onClick={() => {
+                  capture.clear();
+                  setConfirmingClear(false);
+                }}
+              >
+                {t.confirmClearYes}
+              </button>
+              <button
+                type="button"
+                className="ox-signature__confirm-no"
+                onClick={() => setConfirmingClear(false)}
+              >
+                {t.cancel}
+              </button>
+            </span>
+          ) : (
+            <PadButton
+              onClick={requestClear}
+              disabled={disabled || isEmpty}
+              label={t.clear}
+              icon="⌫"
+            />
+          )}
         </div>
 
         <div
@@ -162,7 +234,7 @@ export function SignaturePad({
           // hook measures for coordinate mapping.
           data-ox-signature-pad=""
           className="ox-signature__surface"
-          style={{ height, ...(ink ? { color: ink } : {}) }}
+          style={{ height: boxHeight, ...(ink ? { color: ink } : {}) }}
         >
           {baseline ? <span className="ox-signature__baseline" aria-hidden="true" /> : null}
           {baseline ? (

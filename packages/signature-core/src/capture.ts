@@ -26,6 +26,9 @@ export interface Sample {
   t: number;
   /** 0–1. Devices that do not report pressure should send 0.5. */
   pressure?: number;
+  /** Pen angle in degrees. Omit entirely on hardware that cannot measure it. */
+  tiltX?: number;
+  tiltY?: number;
   pointerType?: Stroke["pointerType"];
   /** Stable per contact, so two fingers do not merge into one stroke. */
   pointerId?: number;
@@ -288,8 +291,24 @@ export class SignatureCapture {
       // 0.5 is the neutral value a device without a pressure sensor reports,
       // and the value at which the width curve is unmodified.
       pressure: clamp01(sample.pressure ?? 0.5),
+      // Spread rather than assigned: a stylus held upright reports 0, so
+      // defaulting to 0 would make every mouse look like a vertical pen.
+      ...tilt(sample),
     };
   }
+}
+
+/** The tilt pair, or nothing at all when the device reported nothing. */
+function tilt(sample: Sample): { tiltX?: number; tiltY?: number } {
+  const out: { tiltX?: number; tiltY?: number } = {};
+  if (Number.isFinite(sample.tiltX)) out.tiltX = clampAngle(sample.tiltX as number);
+  if (Number.isFinite(sample.tiltY)) out.tiltY = clampAngle(sample.tiltY as number);
+  return out;
+}
+
+/** The Pointer Events range for tiltX/tiltY. */
+function clampAngle(n: number): number {
+  return Math.min(90, Math.max(-90, n));
 }
 
 function clamp01(n: number): number {

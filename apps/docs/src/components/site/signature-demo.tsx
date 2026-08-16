@@ -27,6 +27,7 @@ import {
 } from "@oxygenui-design/signature";
 import "@oxygenui-design/signature/styles.css";
 import { InstrumentGlow } from "@/components/site/interactions";
+import { SignatureDrawing, StrokeAnatomy } from "@/components/site/signature-showcase";
 import { cn } from "@/lib/utils";
 
 /** Fixed, because the component takes the clock as a prop and never reads it. */
@@ -191,7 +192,38 @@ export function SignatureDemo() {
     <div className="instrument instrument-demo" data-hydrated={hydrated || undefined}>
       <InstrumentGlow />
 
-      <div className="relative flex flex-wrap items-center justify-between gap-3 border-b border-panel-rule px-4 py-2.5">
+      {/*
+        The signature writes itself, at the speed it was written.
+
+        This sits above the live component rather than replacing it: it is the
+        one thing a static catalog card could never show, and it is the whole
+        argument for keeping strokes instead of a bitmap — the same recorded
+        model that draws this replays at any size, on any screen, in any
+        theme, because nothing here was ever flattened to pixels.
+      */}
+      <div
+        data-signature-band="hero"
+        className="relative flex flex-col gap-4 border-b border-panel-rule px-4 py-5 sm:flex-row sm:items-center sm:gap-6 sm:px-6"
+      >
+        <div className="text-panel-fg sm:w-52 sm:shrink-0">
+          <SignatureDrawing />
+        </div>
+        <div className="min-w-0">
+          <p className="eyebrow text-panel-muted">Replayed from the stroke model</p>
+          <p className="mt-2 max-w-lg text-[0.8125rem] leading-relaxed text-panel-muted">
+            Not a video, and not a tween. Every segment appears at the millisecond its point was
+            sampled at, so the pause before the surname is the one the signer actually took. The
+            component stores <span className="text-panel-fg">points, time and pressure</span> — the
+            picture is derived, which is why it is still sharp at any size and still legible in dark
+            mode.
+          </p>
+        </div>
+      </div>
+
+      <div
+        data-signature-band="live"
+        className="relative flex flex-wrap items-center justify-between gap-3 border-b border-panel-rule px-4 py-2.5"
+      >
         <div className="flex items-center gap-2.5">
           <span className="size-1.5 rounded-full bg-trace shadow-[0_0_8px_var(--color-trace)]" />
           <span className="eyebrow text-panel-muted">Live · the real component</span>
@@ -278,6 +310,20 @@ export function SignatureDemo() {
         <p className="animate-rail-settle mt-3 max-w-2xl text-[0.8125rem] leading-relaxed text-panel-muted">
           {current.note}
         </p>
+      </div>
+
+      {/*
+        Why the stroke model is the load-bearing decision, shown rather than
+        argued. Hand back a PNG and the width curve, the smoothing and the
+        export resolution are all frozen at capture time — against whatever
+        screen happened to be in front of the patient.
+      */}
+      <div
+        data-signature-band="anatomy"
+        className="relative border-t border-panel-rule px-3 py-4 sm:px-4"
+      >
+        <p className="eyebrow text-panel-muted">Stored as strokes, rendered as ink</p>
+        <StrokeAnatomy className="mt-3" />
       </div>
     </div>
   );
