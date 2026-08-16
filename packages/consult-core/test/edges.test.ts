@@ -125,7 +125,12 @@ describe("auditExchange — the remaining outcomes", () => {
       outcome: "blocked",
       safety: {
         crisis: SAFE_VERDICT.crisis,
-        injection: { severity: "hostile", rules: ["override.ignore"], neutralised: 1, blocking: true },
+        injection: {
+          severity: "hostile",
+          rules: ["override.ignore"],
+          neutralised: 1,
+          blocking: true,
+        },
         blocking: true,
       },
     });
@@ -258,9 +263,8 @@ describe("createStaticProvider", () => {
         disclosure,
         delayMs: 50,
       });
-      const iterator = provider.send({} as never, new AbortController().signal)[
-        Symbol.asyncIterator
-      ]();
+      const stream = provider.send({} as never, new AbortController().signal);
+      const iterator = stream[Symbol.asyncIterator]();
       const pending = iterator.next();
       await vi.advanceTimersByTimeAsync(50);
       expect((await pending).value).toMatchObject({ type: "delta" });
@@ -325,7 +329,14 @@ describe("telemetry median", () => {
   it("counts sources-opened against answered, not against submitted", () => {
     const events: TelemetryEvent[] = [
       { type: "submitted", exchangeId: "1", modeId: "look-up" },
-      { type: "answered", exchangeId: "1", modeId: "look-up", register: "grounded", sourceCount: 2, findingCount: 0 },
+      {
+        type: "answered",
+        exchangeId: "1",
+        modeId: "look-up",
+        register: "grounded",
+        sourceCount: 2,
+        findingCount: 0,
+      },
       { type: "sources-opened", exchangeId: "1", msToOpen: 80, sourceCount: 2 },
     ];
     expect(summarise(events).verificationRate).toBe(1);
@@ -390,7 +401,10 @@ describe("severity ranking in mergeVerdicts", () => {
     ["none", "clinical-risk"],
   ] as const)("ranks %s below %s", (lower, higher) => {
     const merged = mergeVerdicts(
-      { ...base, crisis: { severity: lower, audience: "user", rules: [], blocking: lower !== "none" } },
+      {
+        ...base,
+        crisis: { severity: lower, audience: "user", rules: [], blocking: lower !== "none" },
+      },
       { ...base, crisis: { severity: higher, audience: "user", rules: ["r"], blocking: true } },
     );
     expect(merged.crisis.severity).toBe(higher);

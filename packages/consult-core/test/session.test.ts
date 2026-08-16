@@ -80,7 +80,9 @@ describe("composing", () => {
   it("returns to composing from complete, so a follow-up is one keystroke away", () => {
     const state = run(submitted(), { type: "complete", messageId: "m2", checks, finish: "stop" });
     expect(state.status).toBe("complete");
-    expect(reduce(state, { type: "set-draft", draft: "and in pregnancy?" }).status).toBe("composing");
+    expect(reduce(state, { type: "set-draft", draft: "and in pregnancy?" }).status).toBe(
+      "composing",
+    );
   });
 });
 
@@ -261,7 +263,12 @@ describe("crisis is terminal", () => {
     run(submitted(), {
       type: "crisis",
       safety: {
-        crisis: { severity: "imminent", audience: "user", rules: ["ideation.kill-self"], blocking: true },
+        crisis: {
+          severity: "imminent",
+          audience: "user",
+          rules: ["ideation.kill-self"],
+          blocking: true,
+        },
         blocking: true,
       },
     });
@@ -272,7 +279,10 @@ describe("crisis is terminal", () => {
       { type: "event", event: { type: "delta", text: "Here is some advice" } },
       {
         type: "crisis",
-        safety: { crisis: { severity: "ideation", audience: "user", rules: [], blocking: true }, blocking: true },
+        safety: {
+          crisis: { severity: "ideation", audience: "user", rules: [], blocking: true },
+          blocking: true,
+        },
       },
     );
     expect(state.status).toBe("crisis");
@@ -387,7 +397,10 @@ describe("errors and refusals", () => {
     const after = run(
       before,
       { type: "event", event: { type: "usage", input: 10, output: 20 } },
-      { type: "event", event: { type: "tool-call", call: { id: "t", name: "search", arguments: {} } } },
+      {
+        type: "event",
+        event: { type: "tool-call", call: { id: "t", name: "search", arguments: {} } },
+      },
       { type: "event", event: { type: "done", finish: "stop" } },
     );
     expect(after.current).toEqual(before.current);

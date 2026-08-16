@@ -51,9 +51,7 @@ export const EMPTY_ANSWER: Answer = {
  */
 export function uncitedSpans(answer: Answer): readonly (readonly [number, number])[] {
   if (answer.text.length === 0) return [];
-  const covered = [...answer.claims]
-    .map((c) => c.span)
-    .sort((a, b) => a[0] - b[0]);
+  const covered = [...answer.claims].map((c) => c.span).sort((a, b) => a[0] - b[0]);
 
   const gaps: Array<readonly [number, number]> = [];
   let cursor = 0;

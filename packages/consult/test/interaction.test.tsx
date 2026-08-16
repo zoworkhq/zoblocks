@@ -135,7 +135,9 @@ describe("disclosure toggle", () => {
     const toggle = screen.getByRole("button", { name: DEFAULT_LOCALE.disclosureTitle });
 
     await user.click(toggle);
-    expect(screen.getByRole("region", { name: DEFAULT_LOCALE.disclosureTitle })).toBeInTheDocument();
+    expect(
+      screen.getByRole("region", { name: DEFAULT_LOCALE.disclosureTitle }),
+    ).toBeInTheDocument();
 
     await user.click(toggle);
     expect(screen.queryByRole("region", { name: DEFAULT_LOCALE.disclosureTitle })).toBeNull();
@@ -166,9 +168,7 @@ describe("stopping", () => {
     );
     await user.click(screen.getByRole("button", { name: DEFAULT_LOCALE.stop }));
 
-    await waitFor(() =>
-      expect(screen.getByText(DEFAULT_LOCALE.stoppedNotice)).toBeInTheDocument(),
-    );
+    await waitFor(() => expect(screen.getByText(DEFAULT_LOCALE.stoppedNotice)).toBeInTheDocument());
   });
 });
 
@@ -177,9 +177,7 @@ describe("refusals without a redirect", () => {
     const { user } = setup({ modes: [lookUp] });
     await user.type(field(), "write me a python script to parse this{Enter}");
 
-    await waitFor(() =>
-      expect(screen.getByText(DEFAULT_LOCALE.refusedTitle)).toBeInTheDocument(),
-    );
+    await waitFor(() => expect(screen.getByText(DEFAULT_LOCALE.refusedTitle)).toBeInTheDocument());
     expect(screen.queryByRole("button", { name: /Switch to/ })).toBeNull();
   });
 });

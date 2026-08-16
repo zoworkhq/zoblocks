@@ -276,7 +276,14 @@ export function useConsult(options: UseConsultOptions): ConsultApi {
             ...(classifiers ? { classifiers } : {}),
             ...(onAudit ? { audit: onAudit } : {}),
             ...(onTelemetry ? { telemetry: onTelemetry } : {}),
-            ...(actor ? { actor: { display: actor.display, ...(actor.reference ? { reference: actor.reference } : {}) } } : {}),
+            ...(actor
+              ? {
+                  actor: {
+                    display: actor.display,
+                    ...(actor.reference ? { reference: actor.reference } : {}),
+                  },
+                }
+              : {}),
             now,
             newId,
           },
@@ -329,7 +336,11 @@ export function useConsult(options: UseConsultOptions): ConsultApi {
       // Never auto-submits. A human sees the words before they are sent,
       // because speech recognition errors in drug names are the classic harm.
       stop: (final?: string) =>
-        dispatch(final === undefined ? { type: "dictation-stop" } : { type: "dictation-stop", transcript: final }),
+        dispatch(
+          final === undefined
+            ? { type: "dictation-stop" }
+            : { type: "dictation-stop", transcript: final },
+        ),
     }),
     [state.status, state.transcript, dispatch],
   );
@@ -339,10 +350,7 @@ export function useConsult(options: UseConsultOptions): ConsultApi {
   // Destructured first: the exhaustive-deps rule treats any `.current` access
   // as a ref, and `state.current` is the streaming answer rather than one.
   const streaming = state.current;
-  const sources = useMemo(
-    () => (streaming ? [...streaming.sources.values()] : []),
-    [streaming],
-  );
+  const sources = useMemo(() => (streaming ? [...streaming.sources.values()] : []), [streaming]);
 
   const openSources = useCallback(() => {
     setSourcesOpen(true);

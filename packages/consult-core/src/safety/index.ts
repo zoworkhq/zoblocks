@@ -52,7 +52,8 @@ export function mergeVerdicts(
   remote: SafetyVerdict | undefined,
 ): SafetyVerdict {
   if (!remote) return local;
-  const crisis = severityRank(remote.crisis) > severityRank(local.crisis) ? remote.crisis : local.crisis;
+  const crisis =
+    severityRank(remote.crisis) > severityRank(local.crisis) ? remote.crisis : local.crisis;
   const merged: SafetyVerdict = {
     crisis,
     injection: worstInjection(local.injection, remote.injection),
@@ -81,7 +82,8 @@ function worstInjection(
 ): InjectionVerdict | undefined {
   if (!a) return b;
   if (!b) return a;
-  const rank = (v: InjectionVerdict) => (v.severity === "hostile" ? 2 : v.severity === "suspicious" ? 1 : 0);
+  const rank = (v: InjectionVerdict) =>
+    v.severity === "hostile" ? 2 : v.severity === "suspicious" ? 1 : 0;
   return rank(b) > rank(a) ? b : a;
 }
 

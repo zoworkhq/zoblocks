@@ -110,11 +110,7 @@ describe("happy path", () => {
     expect(h.state().status).toBe("complete");
     expect(h.audits).toHaveLength(1);
     expect(h.audits[0]?.outcomeDesc).toBe("answered");
-    expect(h.telemetry.map((t) => t.type)).toEqual([
-      "submitted",
-      "first-token",
-      "answered",
-    ]);
+    expect(h.telemetry.map((t) => t.type)).toEqual(["submitted", "first-token", "answered"]);
   });
 
   it("dispatches submit before anything else, so the question renders immediately", async () => {
@@ -549,7 +545,10 @@ describe("output contract enforcement", () => {
   it("marks the general register when the provider cannot cite at all", async () => {
     const h = harness({
       provider: createStaticProvider({
-        events: [{ type: "delta", text: "Answer." }, { type: "done", finish: "stop" }],
+        events: [
+          { type: "delta", text: "Answer." },
+          { type: "done", finish: "stop" },
+        ],
         disclosure,
         capabilities: { citations: false },
       }),

@@ -127,7 +127,13 @@ export function CheckNotices(props: { findings: readonly CheckFinding[] }): Reac
       {sorted.map((finding, index) => (
         <Alert
           key={`${finding.code}-${index}`}
-          type={finding.severity === "refuse" ? "error" : finding.severity === "downgrade" ? "warning" : "info"}
+          type={
+            finding.severity === "refuse"
+              ? "error"
+              : finding.severity === "downgrade"
+                ? "warning"
+                : "info"
+          }
           message={finding.message}
           {...(finding.detail ? { description: finding.detail } : {})}
           showIcon
@@ -239,10 +245,7 @@ function Highlighted(props: {
  * one that matters most. A summary that silently excludes a Part 2 record and
  * says nothing has actively created a false belief.
  */
-export function ScopeStrip(props: {
-  scope: ScopeSummary;
-  onChange?: () => void;
-}): React.ReactNode {
+export function ScopeStrip(props: { scope: ScopeSummary; onChange?: () => void }): React.ReactNode {
   const locale = useLocale();
   const { scope } = props;
 
@@ -257,8 +260,7 @@ export function ScopeStrip(props: {
   return (
     <p className="ox-consult-scope">
       <span className="ox-consult-scope-text">
-        {locale.reading}{" "}
-        <strong>{scope.subject?.display ?? scope.subject?.reference ?? ""}</strong>
+        {locale.reading} <strong>{scope.subject?.display ?? scope.subject?.reference ?? ""}</strong>
         {" · "}
         {scope.categories.join(", ")}
       </span>

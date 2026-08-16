@@ -91,7 +91,8 @@ export function Consult({
         data-status={api.state.status}
         className={cn(
           "z-[900] flex flex-col items-center gap-2",
-          anchor !== "inline" && "fixed inset-x-0 bottom-0 px-4 pb-[max(1rem,env(safe-area-inset-bottom))]",
+          anchor !== "inline" &&
+            "fixed inset-x-0 bottom-0 px-4 pb-[max(1rem,env(safe-area-inset-bottom))]",
           anchor === "bottom-right" && "items-end",
           "pointer-events-none [&>*]:pointer-events-auto",
           className,
@@ -100,7 +101,11 @@ export function Consult({
         <ConsultLiveRegion message={api.announcer.message} />
 
         {threadOpen ? (
-          <ConsultPanel api={api} {...(onInsert ? { onInsert } : {})} {...(onRiskProtocol ? { onRiskProtocol } : {})} />
+          <ConsultPanel
+            api={api}
+            {...(onInsert ? { onInsert } : {})}
+            {...(onRiskProtocol ? { onRiskProtocol } : {})}
+          />
         ) : null}
 
         <ConsultDockRegion className="flex w-full max-w-2xl flex-col gap-1.5">
@@ -138,7 +143,9 @@ export function Consult({
                       <span className="block text-sm text-[--ox-text]">{suggestion.label}</span>
                       {/* The scope, shown at the point of choice. */}
                       {suggestion.reads ? (
-                        <span className="block text-xs text-[--ox-text-muted]">{suggestion.reads}</span>
+                        <span className="block text-xs text-[--ox-text-muted]">
+                          {suggestion.reads}
+                        </span>
                       ) : null}
                     </button>
                   </li>
@@ -280,7 +287,10 @@ function ScopeStrip({ api }: { api: ReturnType<typeof useConsult> }) {
   return (
     <p className="m-0 flex flex-wrap items-center gap-2 rounded-lg border border-[--ox-rule] bg-[--ox-surface] px-3 py-1 text-xs text-[--ox-text-muted]">
       <span>
-        Reading <strong className="text-[--ox-text]">{scope.subject?.display ?? scope.subject?.reference}</strong>
+        Reading{" "}
+        <strong className="text-[--ox-text]">
+          {scope.subject?.display ?? scope.subject?.reference}
+        </strong>
         {" · "}
         {scope.categories.join(", ")}
       </span>
@@ -338,7 +348,8 @@ function ConsultPanel({
                       "bg-[--ox-status-normal]/15 text-[--ox-status-normal]",
                     message.answer.register === "general" &&
                       "bg-[--ox-status-high]/15 text-[--ox-status-high]",
-                    message.answer.register === "declined" && "bg-[--ox-surface-2] text-[--ox-text-muted]",
+                    message.answer.register === "declined" &&
+                      "bg-[--ox-surface-2] text-[--ox-text-muted]",
                   )}
                 >
                   {message.answer.register === "grounded"
@@ -362,10 +373,14 @@ function ConsultPanel({
                     <span
                       key={index}
                       className={cn(
-                        segment.uncited && "underline decoration-[--ox-status-high] decoration-wavy underline-offset-4",
+                        segment.uncited &&
+                          "underline decoration-[--ox-status-high] decoration-wavy underline-offset-4",
                       )}
                       {...(segment.uncited
-                        ? { title: "No source was cited for this sentence. Verify it before acting." }
+                        ? {
+                            title:
+                              "No source was cited for this sentence. Verify it before acting.",
+                          }
                         : {})}
                     >
                       {segment.text}
@@ -386,10 +401,18 @@ function ConsultPanel({
               ) : null}
 
               <div className="flex flex-wrap items-center gap-2 text-xs">
-                <button type="button" onClick={() => api.sendFeedback("up")} className="min-h-6 px-1">
+                <button
+                  type="button"
+                  onClick={() => api.sendFeedback("up")}
+                  className="min-h-6 px-1"
+                >
                   Helpful
                 </button>
-                <button type="button" onClick={() => api.sendFeedback("down")} className="min-h-6 px-1">
+                <button
+                  type="button"
+                  onClick={() => api.sendFeedback("down")}
+                  className="min-h-6 px-1"
+                >
                   Not helpful
                 </button>
                 <button
@@ -400,7 +423,11 @@ function ConsultPanel({
                   Show sources
                 </button>
                 {onInsert ? (
-                  <button type="button" onClick={() => onInsert(message.text)} className="min-h-6 px-1">
+                  <button
+                    type="button"
+                    onClick={() => onInsert(message.text)}
+                    className="min-h-6 px-1"
+                  >
                     Insert into note
                   </button>
                 ) : null}
@@ -486,22 +513,41 @@ function ConsultPanel({
       {/* The verification surface. The passage itself, not a link — following a
           link costs a tab and a search, and people accept rather than pay it. */}
       {api.sourcesOpen ? (
-        <section aria-label="Basis of this answer" className="max-h-72 overflow-y-auto border-t border-[--ox-rule] p-3">
+        <section
+          aria-label="Basis of this answer"
+          className="max-h-72 overflow-y-auto border-t border-[--ox-rule] p-3"
+        >
           <div className="mb-1 flex items-center justify-between">
             <strong className="text-sm text-[--ox-text]">Basis of this answer</strong>
-            <button type="button" aria-label="Close" onClick={api.closeSources} className="min-h-6 px-1">
+            <button
+              type="button"
+              aria-label="Close"
+              onClick={api.closeSources}
+              className="min-h-6 px-1"
+            >
               ✕
             </button>
           </div>
           <ol className="m-0 list-none p-0">
             {api.sources.map((source, index) => (
-              <li key={source.id} className="border-t border-[--ox-rule] pt-2 first:border-t-0 first:pt-0">
+              <li
+                key={source.id}
+                className="border-t border-[--ox-rule] pt-2 first:border-t-0 first:pt-0"
+              >
                 <div className="flex items-baseline gap-1.5 text-sm">
-                  <span aria-hidden="true" className="rounded bg-[--ox-status-accent]/15 px-1 text-xs">
+                  <span
+                    aria-hidden="true"
+                    className="rounded bg-[--ox-status-accent]/15 px-1 text-xs"
+                  >
                     {index + 1}
                   </span>
                   {source.url ? (
-                    <a href={source.url} target="_blank" rel="noreferrer noopener" className="text-[--ox-text]">
+                    <a
+                      href={source.url}
+                      target="_blank"
+                      rel="noreferrer noopener"
+                      className="text-[--ox-text]"
+                    >
                       {source.title}
                     </a>
                   ) : (

@@ -11,14 +11,7 @@
  * problem; `aria-live="off"` on a streaming container is not.
  */
 
-import {
-  createContext,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-  type ReactNode,
-} from "react";
+import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import type { Answer, Source } from "@oxygenui-design/consult-core";
 import type { ConsultApi } from "./use-consult.js";
 
@@ -28,10 +21,7 @@ import type { ConsultApi } from "./use-consult.js";
 
 const ConsultContext = createContext<ConsultApi | null>(null);
 
-export function ConsultRoot(props: {
-  api: ConsultApi;
-  children: ReactNode;
-}): ReactNode {
+export function ConsultRoot(props: { api: ConsultApi; children: ReactNode }): ReactNode {
   // Law 5. When the host says the clinician is mid-procedure, nothing renders:
   // no dock, no dictation indicator, no motion, no listener. The most valuable
   // thing this component does is disappear.

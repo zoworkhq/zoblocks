@@ -113,8 +113,7 @@ describe("useAnnouncer — the completion summary", () => {
     ["stopped", /stopped/],
   ] as const)("announces the %s state", (status, pattern) => {
     const { result, rerender } = renderHook(
-      (props: { status: string }) =>
-        useAnnouncer({ status: props.status as never, answer: null }),
+      (props: { status: string }) => useAnnouncer({ status: props.status as never, answer: null }),
       { initialProps: { status: "streaming" } },
     );
     rerender({ status });

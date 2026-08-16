@@ -50,7 +50,10 @@ const guideline: Source = {
 };
 
 const faithful: ConsultEvent[] = [
-  { type: "delta", text: "Rate control is a reasonable initial approach for patients without severe symptoms." },
+  {
+    type: "delta",
+    text: "Rate control is a reasonable initial approach for patients without severe symptoms.",
+  },
   { type: "citation", marker: 1, source: guideline },
   { type: "claim", claim: { span: [0, 81], markers: [1] } },
   { type: "done", finish: "stop" },
@@ -155,9 +158,9 @@ describe("the release gate", () => {
 
 describe("defaultGrade", () => {
   it("accepts a claim the passage supports", () => {
-    expect(
-      defaultGrade("Rate control is a reasonable initial approach", guideline.passage),
-    ).toBe(true);
+    expect(defaultGrade("Rate control is a reasonable initial approach", guideline.passage)).toBe(
+      true,
+    );
   });
 
   it("rejects a claim about something else", () => {
@@ -212,7 +215,10 @@ describe("citationFaithfulness", () => {
   it("fails an answer that cites nothing at all", async () => {
     const suite = await citationFaithfulness({
       provider: createStaticProvider({
-        events: [{ type: "delta", text: "Just trust me." }, { type: "done", finish: "stop" }],
+        events: [
+          { type: "delta", text: "Just trust me." },
+          { type: "done", finish: "stop" },
+        ],
         disclosure,
       }),
       mode: lookUp,
@@ -297,7 +303,11 @@ describe("release gate — built-in classifiers against the shipped fixtures", (
       modes: defaultModes,
       mode: prepare,
       cases: [
-        { id: "meds-in-prepare", question: "what are this patient's current medications", expect: "accept" },
+        {
+          id: "meds-in-prepare",
+          question: "what are this patient's current medications",
+          expect: "accept",
+        },
       ],
     });
     expect(suite.rate).toBe(1);

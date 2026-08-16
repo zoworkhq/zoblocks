@@ -211,10 +211,14 @@ describe("provenanceForInsertion", () => {
 
   it("renders an actor without a credential cleanly", () => {
     const plain = provenanceForInsertion({
-      confirmed: confirmProposal(proposal(), { display: "Sam Patel" }, {
-        confirmedAt: "2026-08-16T09:00:00.000Z",
-        dwellMs: 3000,
-      }),
+      confirmed: confirmProposal(
+        proposal(),
+        { display: "Sam Patel" },
+        {
+          confirmedAt: "2026-08-16T09:00:00.000Z",
+          dwellMs: 3000,
+        },
+      ),
       target: { reference: "DocumentReference/n" },
       modelId: "m@1",
     });

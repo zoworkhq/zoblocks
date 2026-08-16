@@ -51,7 +51,9 @@ export function filterShortcuts(
   if (!isShortcutQuery(draft)) return [];
   const query = shortcutQuery(draft);
   return shortcuts
-    .filter((s) => !s.roles || s.roles.length === 0 || (role !== undefined && s.roles.includes(role)))
+    .filter(
+      (s) => !s.roles || s.roles.length === 0 || (role !== undefined && s.roles.includes(role)),
+    )
     .filter((s) => {
       if (query === "") return true;
       const keyword = (s.keyword ?? s.id).toLowerCase();

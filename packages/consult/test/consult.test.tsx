@@ -134,7 +134,9 @@ describe("answering", () => {
     await user.click(screen.getByRole("button", { name: DEFAULT_LOCALE.showSources }));
 
     const panel = screen.getByRole("region", { name: DEFAULT_LOCALE.basisOfAnswer });
-    expect(within(panel).getByText(/Rate control is a reasonable initial approach/)).toBeInTheDocument();
+    expect(
+      within(panel).getByText(/Rate control is a reasonable initial approach/),
+    ).toBeInTheDocument();
     expect(within(panel).getByText(/2023\.1/)).toBeInTheDocument();
   });
 
@@ -207,9 +209,7 @@ describe("refusals", () => {
     const { user } = setup();
     await ask(user, "what are this patient's current medications");
 
-    await waitFor(() =>
-      expect(screen.getByText(DEFAULT_LOCALE.refusedTitle)).toBeInTheDocument(),
-    );
+    await waitFor(() => expect(screen.getByText(DEFAULT_LOCALE.refusedTitle)).toBeInTheDocument());
     expect(screen.getByRole("button", { name: /Switch to Prepare/ })).toBeInTheDocument();
   });
 

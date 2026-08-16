@@ -22,7 +22,7 @@ and hand to a compliance officer, rather than one you infer from English.
 
 **Verification is designed to cost less than acceptance.** Automation bias is an
 effort asymmetry, not a character flaw: if accepting costs one click and
-checking costs four and a new tab, people accept. Citations resolve *during*
+checking costs four and a new tab, people accept. Citations resolve _during_
 streaming so the sources drawer opens from cache, and it shows the retrieved
 passage with the supporting clause highlighted — a link is a citation, a passage
 is a verification.

@@ -65,9 +65,7 @@ describe("ConsultAnswerRegion", () => {
   });
 
   it("clears busy when the stream finishes", () => {
-    const { container } = render(
-      <ConsultAnswerRegion busy={false}>Done.</ConsultAnswerRegion>,
-    );
+    const { container } = render(<ConsultAnswerRegion busy={false}>Done.</ConsultAnswerRegion>);
     expect(container.firstElementChild).toHaveAttribute("aria-busy", "false");
   });
 
@@ -193,9 +191,7 @@ describe("segmentAnswer", () => {
 
 describe("citationLabel", () => {
   it("names the source rather than reading a bare number", () => {
-    expect(citationLabel(1, source)).toBe(
-      "Source 1, 2023 ACC/AHA AF Guideline, version 2023.1",
-    );
+    expect(citationLabel(1, source)).toBe("Source 1, 2023 ACC/AHA AF Guideline, version 2023.1");
   });
 
   it("omits the version when there is none", () => {
@@ -301,9 +297,7 @@ describe("useSummonShortcut", () => {
     renderHook(() => useSummonShortcut({ onSummon }));
 
     act(() => {
-      input.dispatchEvent(
-        new KeyboardEvent("keydown", { key: "k", metaKey: true, bubbles: true }),
-      );
+      input.dispatchEvent(new KeyboardEvent("keydown", { key: "k", metaKey: true, bubbles: true }));
     });
     expect(onSummon).not.toHaveBeenCalled();
     input.remove();

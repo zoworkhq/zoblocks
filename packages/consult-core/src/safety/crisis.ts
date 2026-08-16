@@ -84,22 +84,49 @@ interface Rule {
 
 /** Present-tense first-person ideation. */
 const IDEATION: readonly Rule[] = [
-  { name: "ideation.kill-self", pattern: /\bi\s+(?:want|need|am going|plan|intend)\s+to\s+(?:kill|end)\s+(?:myself|my\s+life)\b/i },
+  {
+    name: "ideation.kill-self",
+    pattern:
+      /\bi\s+(?:want|need|am going|plan|intend)\s+to\s+(?:kill|end)\s+(?:myself|my\s+life)\b/i,
+  },
   { name: "ideation.kill-self-bare", pattern: /\bkill(?:ing)?\s+myself\b/i },
   { name: "ideation.end-life", pattern: /\bend(?:ing)?\s+(?:my\s+life|it\s+all)\b/i },
-  { name: "ideation.want-to-die", pattern: /\bi\s+(?:want|wish)\s+(?:to\s+die|i\s+(?:was|were)\s+dead)\b/i },
+  {
+    name: "ideation.want-to-die",
+    pattern: /\bi\s+(?:want|wish)\s+(?:to\s+die|i\s+(?:was|were)\s+dead)\b/i,
+  },
   { name: "ideation.suicidal", pattern: /\bi(?:'m|\s+am)\s+(?:feeling\s+)?suicidal\b/i },
-  { name: "ideation.no-point-living", pattern: /\b(?:no\s+point|no\s+reason)\s+(?:in\s+)?(?:living|going\s+on)\b/i },
-  { name: "ideation.better-off-dead", pattern: /\b(?:i(?:'d|\s+would)\s+be\s+better\s+off\s+dead|better\s+off\s+without\s+me)\b/i },
-  { name: "ideation.self-harm", pattern: /\bi\s+(?:want|need)\s+to\s+(?:hurt|harm|cut)\s+myself\b/i },
+  {
+    name: "ideation.no-point-living",
+    pattern: /\b(?:no\s+point|no\s+reason)\s+(?:in\s+)?(?:living|going\s+on)\b/i,
+  },
+  {
+    name: "ideation.better-off-dead",
+    pattern: /\b(?:i(?:'d|\s+would)\s+be\s+better\s+off\s+dead|better\s+off\s+without\s+me)\b/i,
+  },
+  {
+    name: "ideation.self-harm",
+    pattern: /\bi\s+(?:want|need)\s+to\s+(?:hurt|harm|cut)\s+myself\b/i,
+  },
 ];
 
 /** Means, plan, timing or farewell — the escalation from ideation to imminent. */
 const IMMINENCE: readonly Rule[] = [
-  { name: "imminent.means-held", pattern: /\bi\s+(?:have|got|bought|saved\s+up)\s+(?:the\s+)?(?:pills|tablets|a\s+gun|a\s+rope|a\s+knife|enough\s+\w+)\b/i },
-  { name: "imminent.tonight", pattern: /\b(?:tonight|today|right\s+now|in\s+an?\s+hour|this\s+evening)\b/i },
+  {
+    name: "imminent.means-held",
+    pattern:
+      /\bi\s+(?:have|got|bought|saved\s+up)\s+(?:the\s+)?(?:pills|tablets|a\s+gun|a\s+rope|a\s+knife|enough\s+\w+)\b/i,
+  },
+  {
+    name: "imminent.tonight",
+    pattern: /\b(?:tonight|today|right\s+now|in\s+an?\s+hour|this\s+evening)\b/i,
+  },
   { name: "imminent.plan", pattern: /\bi\s+(?:have|made)\s+a\s+plan\b/i },
-  { name: "imminent.farewell", pattern: /\b(?:goodbye|this\s+is\s+my\s+last|thank\s+you\s+for\s+everything|won'?t\s+be\s+here\s+tomorrow)\b/i },
+  {
+    name: "imminent.farewell",
+    pattern:
+      /\b(?:goodbye|this\s+is\s+my\s+last|thank\s+you\s+for\s+everything|won'?t\s+be\s+here\s+tomorrow)\b/i,
+  },
   { name: "imminent.in-progress", pattern: /\bi\s+(?:have|just)\s+(?:taken|swallowed)\s+/i },
 ];
 
@@ -108,14 +135,25 @@ const IMMINENCE: readonly Rule[] = [
  * patient who is at risk right now.
  */
 const THIRD_PARTY: readonly Rule[] = [
-  { name: "third.patient", pattern: /\b(?:the\s+)?(?:patient|client|pt|service\s+user|he|she|they)\s+(?:is|are|has|have|reports?|endorses?|expresses?|disclosed?|admits?)\b/i },
+  {
+    name: "third.patient",
+    pattern:
+      /\b(?:the\s+)?(?:patient|client|pt|service\s+user|he|she|they)\s+(?:is|are|has|have|reports?|endorses?|expresses?|disclosed?|admits?)\b/i,
+  },
   { name: "third.possessive", pattern: /\bmy\s+(?:patient|client|service\s+user)\b/i },
 ];
 
 /** Risk language attached to a third party rather than the speaker. */
 const THIRD_PARTY_RISK: readonly Rule[] = [
-  { name: "third.risk-si", pattern: /\b(?:suicidal\s+ideation|si\b|self[-\s]?harm|overdose|od\b|took\s+an?\s+overdose)/i },
-  { name: "third.risk-plan", pattern: /\b(?:has\s+a\s+plan|means\s+and\s+intent|actively\s+suicidal|at\s+imminent\s+risk)\b/i },
+  {
+    name: "third.risk-si",
+    pattern: /\b(?:suicidal\s+ideation|si\b|self[-\s]?harm|overdose|od\b|took\s+an?\s+overdose)/i,
+  },
+  {
+    name: "third.risk-plan",
+    pattern:
+      /\b(?:has\s+a\s+plan|means\s+and\s+intent|actively\s+suicidal|at\s+imminent\s+risk)\b/i,
+  },
 ];
 
 /**
@@ -127,15 +165,35 @@ const THIRD_PARTY_RISK: readonly Rule[] = [
  * where it needs to work.
  */
 const NEGATION: readonly Rule[] = [
-  { name: "negated.denies", pattern: /\b(?:denies|denied|no\s+current|nil|negative\s+for|rules?\s+out|ruled\s+out|without)\s+(?:\w+\s+){0,3}?(?:suicidal|ideation|si\b|self[-\s]?harm|intent|plan)/i },
-  { name: "negated.no-si", pattern: /\bno\s+(?:active\s+)?(?:suicidal\s+ideation|si|self[-\s]?harm|intent|plan)\b/i },
-  { name: "negated.contracts", pattern: /\b(?:contracts?\s+for\s+safety|safety\s+plan\s+in\s+place|able\s+to\s+contract)\b/i },
-  { name: "negated.screening", pattern: /\b(?:c-?ssrs|phq-?9\s+item\s+9|asq|columbia\s+protocol)\s+(?:negative|screen(?:ed)?\s+negative|low\s+risk)\b/i },
+  {
+    name: "negated.denies",
+    pattern:
+      /\b(?:denies|denied|no\s+current|nil|negative\s+for|rules?\s+out|ruled\s+out|without)\s+(?:\w+\s+){0,3}?(?:suicidal|ideation|si\b|self[-\s]?harm|intent|plan)/i,
+  },
+  {
+    name: "negated.no-si",
+    pattern: /\bno\s+(?:active\s+)?(?:suicidal\s+ideation|si|self[-\s]?harm|intent|plan)\b/i,
+  },
+  {
+    name: "negated.contracts",
+    pattern: /\b(?:contracts?\s+for\s+safety|safety\s+plan\s+in\s+place|able\s+to\s+contract)\b/i,
+  },
+  {
+    name: "negated.screening",
+    pattern:
+      /\b(?:c-?ssrs|phq-?9\s+item\s+9|asq|columbia\s+protocol)\s+(?:negative|screen(?:ed)?\s+negative|low\s+risk)\b/i,
+  },
 ];
 
 const HISTORICAL: readonly Rule[] = [
-  { name: "historical.past", pattern: /\b(?:history\s+of|previous|prior|past|in\s+\d{4}|years?\s+ago|hx\s+of)\b/i },
-  { name: "historical.remote", pattern: /\b(?:no\s+attempts?\s+since|last\s+attempt\s+(?:was\s+)?(?:in\s+)?\d{4})\b/i },
+  {
+    name: "historical.past",
+    pattern: /\b(?:history\s+of|previous|prior|past|in\s+\d{4}|years?\s+ago|hx\s+of)\b/i,
+  },
+  {
+    name: "historical.remote",
+    pattern: /\b(?:no\s+attempts?\s+since|last\s+attempt\s+(?:was\s+)?(?:in\s+)?\d{4})\b/i,
+  },
 ];
 
 /**
@@ -144,8 +202,16 @@ const HISTORICAL: readonly Rule[] = [
  * asking.
  */
 const EDUCATIONAL: readonly Rule[] = [
-  { name: "educational.what-is", pattern: /\b(?:what\s+is|define|definition\s+of|how\s+do\s+i\s+(?:score|administer|use)|guidance\s+(?:on|for)|guideline)\b/i },
-  { name: "educational.instrument", pattern: /\b(?:c-?ssrs|columbia|phq-?9|gad-?7|sad\s+persons|safety\s+planning\s+intervention)\b.*\b(?:score|scoring|administer|cut[-\s]?off|threshold|training)\b/i },
+  {
+    name: "educational.what-is",
+    pattern:
+      /\b(?:what\s+is|define|definition\s+of|how\s+do\s+i\s+(?:score|administer|use)|guidance\s+(?:on|for)|guideline)\b/i,
+  },
+  {
+    name: "educational.instrument",
+    pattern:
+      /\b(?:c-?ssrs|columbia|phq-?9|gad-?7|sad\s+persons|safety\s+planning\s+intervention)\b.*\b(?:score|scoring|administer|cut[-\s]?off|threshold|training)\b/i,
+  },
 ];
 
 function matched(rules: readonly Rule[], text: string): string[] {

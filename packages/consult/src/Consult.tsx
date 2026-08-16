@@ -213,7 +213,10 @@ function ConsultSurface(props: SurfaceProps): React.ReactNode {
           </ul>
         ) : null}
 
-        <ScopeStrip scope={api.scope} {...(props.onChangeScope ? { onChange: props.onChangeScope } : {})} />
+        <ScopeStrip
+          scope={api.scope}
+          {...(props.onChangeScope ? { onChange: props.onChangeScope } : {})}
+        />
 
         <div className="ox-consult-dock">
           <Tooltip title={locale.shortcuts}>
@@ -243,7 +246,11 @@ function ConsultSurface(props: SurfaceProps): React.ReactNode {
             {...menu.inputProps}
           />
 
-          <Button size="small" onClick={() => setTrayOpen((open) => !open)} aria-expanded={trayOpen}>
+          <Button
+            size="small"
+            onClick={() => setTrayOpen((open) => !open)}
+            aria-expanded={trayOpen}
+          >
             {api.mode.label}
           </Button>
 
@@ -423,9 +430,7 @@ function ConsultPanel(props: {
         <ProposalCard api={api} />
       </div>
 
-      {api.sourcesOpen ? (
-        <SourcesPanel sources={api.sources} onClose={api.closeSources} />
-      ) : null}
+      {api.sourcesOpen ? <SourcesPanel sources={api.sources} onClose={api.closeSources} /> : null}
 
       <p className="ox-consult-disclaimer">{locale.disclaimer}</p>
     </section>

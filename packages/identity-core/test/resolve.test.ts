@@ -326,9 +326,7 @@ describe("resolveName — no name matches the preferred use order", () => {
     // to prevent.
     const patient = {
       resourceType: "Patient" as const,
-      name: [
-        { use: "maiden" as const, family: "Okonkwo", given: ["Amara"] },
-      ],
+      name: [{ use: "maiden" as const, family: "Okonkwo", given: ["Amara"] }],
     };
     const resolved = resolveName(patient, P);
     expect(resolved.text).toContain("Okonkwo");

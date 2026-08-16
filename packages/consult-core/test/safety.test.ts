@@ -75,15 +75,14 @@ describe("classifyScope — refusals", () => {
     expect(result.inScope).toBe(true);
   });
 
-  it.each([
-    "what disease does this patient have",
-    "diagnose this patient",
-    "what's the diagnosis",
-  ])("refuses %j as asking for a diagnosis", (question) => {
-    const result = scope(question, workUp);
-    expect(result.inScope).toBe(false);
-    if (!result.inScope) expect(result.reason).toBe("asks-for-diagnosis");
-  });
+  it.each(["what disease does this patient have", "diagnose this patient", "what's the diagnosis"])(
+    "refuses %j as asking for a diagnosis",
+    (question) => {
+      const result = scope(question, workUp);
+      expect(result.inScope).toBe(false);
+      if (!result.inScope) expect(result.reason).toBe("asks-for-diagnosis");
+    },
+  );
 
   it.each([
     "write me a python script to parse this",

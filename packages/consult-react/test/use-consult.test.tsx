@@ -58,9 +58,7 @@ describe("basic flow", () => {
   });
 
   it("honours an explicit initial mode", () => {
-    const { result } = renderHook(() =>
-      useConsult(baseOptions({ initialModeId: "prepare" })),
-    );
+    const { result } = renderHook(() => useConsult(baseOptions({ initialModeId: "prepare" })));
     expect(result.current.mode.id).toBe("prepare");
   });
 
@@ -152,15 +150,13 @@ describe("patient-facing guard", () => {
   it("throws on render for a patient surface rather than degrading", () => {
     // Nevada prohibits AI from providing behavioral healthcare outright. A
     // developer wiring this up wrongly should find out on first paint.
-    expect(() =>
-      renderHook(() => useConsult(baseOptions({ surface: "patient" }))),
-    ).toThrow(PatientFacingNotSupportedError);
+    expect(() => renderHook(() => useConsult(baseOptions({ surface: "patient" })))).toThrow(
+      PatientFacingNotSupportedError,
+    );
   });
 
   it("renders normally on a clinician surface", () => {
-    expect(() =>
-      renderHook(() => useConsult(baseOptions({ surface: "clinician" }))),
-    ).not.toThrow();
+    expect(() => renderHook(() => useConsult(baseOptions({ surface: "clinician" })))).not.toThrow();
   });
 });
 
@@ -297,7 +293,9 @@ describe("proposals", () => {
 
   it("surfaces a proposal without committing anything", async () => {
     const { result } = renderHook(() =>
-      useConsult(baseOptions({ provider: createStaticProvider({ events: withProposal, disclosure }) })),
+      useConsult(
+        baseOptions({ provider: createStaticProvider({ events: withProposal, disclosure }) }),
+      ),
     );
     await act(async () => {
       await result.current.submit("summarise for the note");

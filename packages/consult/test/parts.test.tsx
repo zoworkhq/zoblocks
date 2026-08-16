@@ -161,10 +161,7 @@ describe("SourcesPanel", () => {
 
   it("links out when a url is present", () => {
     render(
-      <SourcesPanel
-        sources={[{ ...source, url: "https://example.org/af" }]}
-        onClose={vi.fn()}
-      />,
+      <SourcesPanel sources={[{ ...source, url: "https://example.org/af" }]} onClose={vi.fn()} />,
     );
     const link = screen.getByRole("link", { name: "AF Guideline" });
     expect(link).toHaveAttribute("href", "https://example.org/af");
@@ -173,12 +170,7 @@ describe("SourcesPanel", () => {
 
   it("clamps an out-of-range highlight rather than throwing", () => {
     expect(() =>
-      render(
-        <SourcesPanel
-          sources={[{ ...source, highlight: [-10, 9999] }]}
-          onClose={vi.fn()}
-        />,
-      ),
+      render(<SourcesPanel sources={[{ ...source, highlight: [-10, 9999] }]} onClose={vi.fn()} />),
     ).not.toThrow();
   });
 
@@ -237,9 +229,7 @@ describe("CrisisNotice", () => {
     const onProtocol = vi.fn();
     const onPage = vi.fn();
     const user = userEvent.setup();
-    render(
-      <CrisisNotice audience="user" lines={[]} onProtocol={onProtocol} onPage={onPage} />,
-    );
+    render(<CrisisNotice audience="user" lines={[]} onProtocol={onProtocol} onPage={onPage} />);
 
     await user.click(screen.getByRole("button", { name: DEFAULT_LOCALE.crisisProtocol }));
     await user.click(screen.getByRole("button", { name: DEFAULT_LOCALE.crisisOnCall }));
@@ -249,10 +239,7 @@ describe("CrisisNotice", () => {
 
   it("disables a line with no dialable number rather than rendering a broken link", () => {
     render(
-      <CrisisNotice
-        audience="user"
-        lines={[{ label: "Local emergency services", number: "" }]}
-      />,
+      <CrisisNotice audience="user" lines={[{ label: "Local emergency services", number: "" }]} />,
     );
     expect(screen.getByRole("button", { name: "Local emergency services" })).toBeDisabled();
   });
@@ -464,9 +451,7 @@ describe("non-happy states", () => {
     await ask(user, "I want to kill myself");
 
     const alert = await screen.findByRole("alert");
-    await user.click(
-      within(alert).getByRole("button", { name: DEFAULT_LOCALE.crisisProtocol }),
-    );
+    await user.click(within(alert).getByRole("button", { name: DEFAULT_LOCALE.crisisProtocol }));
     expect(onRiskProtocol).toHaveBeenCalled();
   });
 

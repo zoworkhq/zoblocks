@@ -138,14 +138,18 @@ export function auditExchange(input: AuditExchangeInput): AuditEvent {
   return {
     resourceType: "AuditEvent",
     type: { system: DCM, code: "110100", display: "Application Activity" },
-    subtype: [{ system: CONSULT_SYSTEM, code: `consult-${outcome}`, display: `Consult ${outcome}` }],
+    subtype: [
+      { system: CONSULT_SYSTEM, code: `consult-${outcome}`, display: `Consult ${outcome}` },
+    ],
     action: "E",
     recorded,
     outcome: outcomeCode(outcome),
     outcomeDesc: outcome,
     agent: [
       {
-        who: actor ? { display: actor.display, ...(actor.reference ? { reference: actor.reference } : {}) } : { display: "unknown" },
+        who: actor
+          ? { display: actor.display, ...(actor.reference ? { reference: actor.reference } : {}) }
+          : { display: "unknown" },
         requestor: true,
         purposeOfEvent: [
           {

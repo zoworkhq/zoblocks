@@ -42,14 +42,20 @@ const guideline: Source = {
 };
 
 const groundedStream: ConsultEvent[] = [
-  { type: "delta", text: "Rate control is a reasonable initial approach for most patients without severe symptoms." },
+  {
+    type: "delta",
+    text: "Rate control is a reasonable initial approach for most patients without severe symptoms.",
+  },
   { type: "citation", marker: 1, source: guideline },
   { type: "claim", claim: { span: [0, 86], markers: [1] } },
   { type: "done", finish: "stop" },
 ];
 
 const uncitedStream: ConsultEvent[] = [
-  { type: "delta", text: "Rhythm control is often preferred in younger, more symptomatic patients." },
+  {
+    type: "delta",
+    text: "Rhythm control is often preferred in younger, more symptomatic patients.",
+  },
   { type: "done", finish: "stop" },
 ];
 
@@ -87,10 +93,7 @@ const field = (canvasElement: HTMLElement) =>
 /** Put text in the field without submitting it. */
 function type(canvasElement: HTMLElement, text: string) {
   const input = field(canvasElement) as HTMLInputElement;
-  const setter = Object.getOwnPropertyDescriptor(
-    window.HTMLInputElement.prototype,
-    "value",
-  )?.set;
+  const setter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, "value")?.set;
   setter?.call(input, text);
   input.dispatchEvent(new Event("input", { bubbles: true }));
   return input;
@@ -262,9 +265,7 @@ export const ErrorState: Story = {
   play: async ({ canvasElement }) => {
     await ask(canvasElement, "First line for new onset AF?");
     const canvas = within(canvasElement);
-    await waitFor(() =>
-      expect(canvas.getByText("The assistant could not answer")).toBeTruthy(),
-    );
+    await waitFor(() => expect(canvas.getByText("The assistant could not answer")).toBeTruthy());
   },
 };
 
@@ -300,7 +301,12 @@ export const ControlsWalkthrough: Story = {
   },
   args: {
     shortcuts: [
-      { id: "history", label: "Patient history", modeId: "prepare", question: "Summarise the history." },
+      {
+        id: "history",
+        label: "Patient history",
+        modeId: "prepare",
+        question: "Summarise the history.",
+      },
     ],
     // The walkthrough switches into Prepare, which reads the record — so it
     // needs a covered provider and a resolver, exactly as a real deployment
@@ -409,7 +415,9 @@ export const KeyboardSummon: Story = {
   play: async ({ canvasElement }) => {
     // Cmd+K from outside the field. Law 6: the fast path is keyboard-complete.
     document.body.focus();
-    document.dispatchEvent(new KeyboardEvent("keydown", { key: "k", metaKey: true, bubbles: true }));
+    document.dispatchEvent(
+      new KeyboardEvent("keydown", { key: "k", metaKey: true, bubbles: true }),
+    );
     await waitFor(() => expect(document.activeElement).toBe(field(canvasElement)));
   },
 };

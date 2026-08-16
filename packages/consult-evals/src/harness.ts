@@ -112,7 +112,9 @@ export function buildReport(suites: readonly SuiteResult[]): HarnessReport {
 
   const blockingFailures = suites
     .filter((s) => s.blocking)
-    .flatMap((s) => s.cases.filter((c) => !c.passed).map((c) => `${s.suite}/${c.id}: ${c.detail ?? "failed"}`));
+    .flatMap((s) =>
+      s.cases.filter((c) => !c.passed).map((c) => `${s.suite}/${c.id}: ${c.detail ?? "failed"}`),
+    );
 
   const passed = suites.every((s) => !s.blocking || s.rate >= RELIABILITY_FLOOR);
 

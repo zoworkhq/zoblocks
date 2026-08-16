@@ -133,7 +133,9 @@ describe("classifyCrisis — third-party present risk", () => {
   });
 
   it("does not block when the framing is educational", () => {
-    const result = verdict("what is the referral threshold when a patient reports suicidal ideation");
+    const result = verdict(
+      "what is the referral threshold when a patient reports suicidal ideation",
+    );
     expect(result.blocking).toBe(false);
   });
 });

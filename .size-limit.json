@@ -1,32 +1,39 @@
 [
   {
-    "name": "elements \u2014 one loader (pulse + its deps)",
+    "name": "elements — one loader (pulse + its deps)",
     "path": "packages/loaders/dist/pulse.js",
     "import": "*",
     "limit": "9 KB"
   },
   {
-    "name": "elements \u2014 all five",
+    "name": "elements — all five",
     "path": "packages/loaders/dist/index.js",
     "import": "*",
     "limit": "11 KB"
   },
   {
-    "name": "react \u2014 one loader (includes loader-core and the rhythm delegate)",
+    "name": "react — one loader (includes loader-core and the rhythm delegate)",
     "path": "packages/react/dist/components/pulse-loader/pulse-loader.js",
     "import": "{ PulseLoader }",
     "limit": "8.5 KB",
     "ignore": ["react", "react-dom"]
   },
   {
-    "name": "react \u2014 the whole barrel",
-    "path": "packages/react/dist/index.js",
-    "import": "*",
-    "limit": "9 KB",
+    "name": "react — consult alone (pattern layer: pulls consult-core and consult-react)",
+    "path": "packages/react/dist/components/consult/consult.js",
+    "import": "{ Consult }",
+    "limit": "22 KB",
     "ignore": ["react", "react-dom"]
   },
   {
-    "name": "tokens \u2014 the stylesheet every consumer loads",
+    "name": "react — the whole barrel",
+    "path": "packages/react/dist/index.js",
+    "import": "*",
+    "limit": "24 KB",
+    "ignore": ["react", "react-dom"]
+  },
+  {
+    "name": "tokens — the stylesheet every consumer loads",
     "path": "packages/tokens/src/oxygen-tokens.css",
     "limit": "5 KB"
   },
@@ -36,20 +43,20 @@
     "limit": "4 KB"
   },
   {
-    "name": "identity-core \u2014 the whole engine (includes Jaro\u2013Winkler and Metaphone)",
+    "name": "identity-core — the whole engine (includes Jaro–Winkler and Metaphone)",
     "path": "packages/identity-core/dist/index.js",
     "import": "*",
     "limit": "9 KB"
   },
   {
-    "name": "identity \u2014 the avatar alone",
+    "name": "identity — the avatar alone",
     "path": "packages/identity/dist/IdentityAvatar.js",
     "import": "{ IdentityAvatar }",
     "limit": "3 KB",
     "ignore": ["react", "react-dom", "antd"]
   },
   {
-    "name": "identity \u2014 the whole barrel",
+    "name": "identity — the whole barrel",
     "path": "packages/identity/dist/index.js",
     "import": "*",
     "limit": "16 KB",

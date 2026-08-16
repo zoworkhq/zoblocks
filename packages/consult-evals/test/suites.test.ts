@@ -44,7 +44,11 @@ describe("crisisResponse — failure reporting", () => {
       cases: [
         // Ordinary clinical text asserted to be a crisis — the classifier is
         // right and the case is wrong, which is what the message must convey.
-        { id: "wrong-expectation", question: "what is the dose of sertraline", expectBlocking: true },
+        {
+          id: "wrong-expectation",
+          question: "what is the dose of sertraline",
+          expectBlocking: true,
+        },
       ],
     });
     expect(suite.rate).toBe(0);
@@ -110,7 +114,11 @@ describe("refusalCorrectness — failure reporting", () => {
       modes: defaultModes,
       mode: lookUp,
       cases: [
-        { id: "missed", question: "first line treatment for atrial fibrillation", expect: "refuse" },
+        {
+          id: "missed",
+          question: "first line treatment for atrial fibrillation",
+          expect: "refuse",
+        },
       ],
     });
     expect(suite.cases[0]?.detail).toMatch(/should have been refused/);
@@ -164,7 +172,11 @@ describe("citationFaithfulness — mixed results", () => {
   it("passes a claim when any one of several markers supports it", async () => {
     const multi: ConsultEvent[] = [
       { type: "delta", text: "Rate control is a reasonable initial approach." },
-      { type: "citation", marker: 1, source: { ...source, id: "unrelated", passage: "Levothyroxine dosing." } },
+      {
+        type: "citation",
+        marker: 1,
+        source: { ...source, id: "unrelated", passage: "Levothyroxine dosing." },
+      },
       { type: "citation", marker: 2, source },
       { type: "claim", claim: { span: [0, 45], markers: [1, 2] } },
       { type: "done", finish: "stop" },
@@ -196,7 +208,10 @@ describe("citationFaithfulness — mixed results", () => {
 describe("retrievalAccuracy — empty results", () => {
   it("says 'nothing' rather than an empty bracket when no source surfaced", async () => {
     const suite = await retrievalAccuracy({
-      provider: provider([{ type: "delta", text: "No sources." }, { type: "done", finish: "stop" }]),
+      provider: provider([
+        { type: "delta", text: "No sources." },
+        { type: "done", finish: "stop" },
+      ]),
       mode: lookUp,
       cases: [{ id: "none", question: "AF?", expectAnyOf: ["acc-aha-af"] }],
     });
@@ -237,7 +252,14 @@ describe("the report", () => {
 
   it("uses 'failed' when a case gives no detail", () => {
     const report = buildReport([
-      { suite: "s", blocking: true, cases: [{ id: "bare", passed: false }], passed: 0, total: 1, rate: 0 },
+      {
+        suite: "s",
+        blocking: true,
+        cases: [{ id: "bare", passed: false }],
+        passed: 0,
+        total: 1,
+        rate: 0,
+      },
     ]);
     expect(report.blockingFailures[0]).toBe("s/bare: failed");
   });

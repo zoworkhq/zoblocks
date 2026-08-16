@@ -116,7 +116,10 @@ describe("useShortcutMenu", () => {
       "aria-autocomplete": "list",
       "aria-controls": "consult-shortcuts-list",
     });
-    expect(result.current.listProps).toMatchObject({ role: "listbox", id: "consult-shortcuts-list" });
+    expect(result.current.listProps).toMatchObject({
+      role: "listbox",
+      id: "consult-shortcuts-list",
+    });
   });
 
   it("moves the active option with ArrowDown, wrapping at the end", () => {

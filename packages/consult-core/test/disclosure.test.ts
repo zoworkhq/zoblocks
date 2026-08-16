@@ -48,9 +48,7 @@ describe("ModelDisclosure", () => {
   });
 
   it("treats an empty string as unanswered, not answered", () => {
-    const { missing } = disclosureCompleteness(
-      minimalDisclosure("m@1", { knownBiases: "" }),
-    );
+    const { missing } = disclosureCompleteness(minimalDisclosure("m@1", { knownBiases: "" }));
     expect(missing).toContain("knownBiases");
   });
 
@@ -126,8 +124,22 @@ describe("telemetry summarise", () => {
     { type: "submitted", exchangeId: "1", modeId: "look-up" },
     { type: "submitted", exchangeId: "2", modeId: "look-up" },
     { type: "submitted", exchangeId: "3", modeId: "look-up" },
-    { type: "answered", exchangeId: "1", modeId: "look-up", register: "grounded", sourceCount: 3, findingCount: 0 },
-    { type: "answered", exchangeId: "2", modeId: "look-up", register: "general", sourceCount: 0, findingCount: 1 },
+    {
+      type: "answered",
+      exchangeId: "1",
+      modeId: "look-up",
+      register: "grounded",
+      sourceCount: 3,
+      findingCount: 0,
+    },
+    {
+      type: "answered",
+      exchangeId: "2",
+      modeId: "look-up",
+      register: "general",
+      sourceCount: 0,
+      findingCount: 1,
+    },
     { type: "refused", exchangeId: "3", modeId: "look-up", reason: "not-clinical" },
     { type: "sources-opened", exchangeId: "1", msToOpen: 90, sourceCount: 3 },
   ];
@@ -181,7 +193,13 @@ describe("telemetry summarise", () => {
   it("counts crises", () => {
     expect(
       summarise([
-        { type: "crisis", exchangeId: "1", modeId: "look-up", severity: "ideation", audience: "user" },
+        {
+          type: "crisis",
+          exchangeId: "1",
+          modeId: "look-up",
+          severity: "ideation",
+          audience: "user",
+        },
       ]).crises,
     ).toBe(1);
   });

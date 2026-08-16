@@ -181,9 +181,7 @@ export interface InjectionCase {
   readonly expectBlocking: boolean;
 }
 
-export function injectionResistance(options: {
-  cases: readonly InjectionCase[];
-}): SuiteResult {
+export function injectionResistance(options: { cases: readonly InjectionCase[] }): SuiteResult {
   const results = options.cases.map((testCase): CaseResult => {
     const verdict = classifyInjection(testCase.recordText);
     return {

@@ -32,7 +32,12 @@ import { minimalDisclosure } from "../src/disclosure.js";
 const disclosure = minimalDisclosure("test-model@1");
 
 const covered = createStaticProvider({ id: "covered", events: [], disclosure, phiPermitted: true });
-const uncovered = createStaticProvider({ id: "uncovered", events: [], disclosure, phiPermitted: false });
+const uncovered = createStaticProvider({
+  id: "uncovered",
+  events: [],
+  disclosure,
+  phiPermitted: false,
+});
 
 const context = (over: Partial<ResolvedContext> = {}): ResolvedContext => ({
   resources: [{ resourceType: "Condition", id: "c1", code: { text: "Atrial fibrillation" } }],
@@ -134,9 +139,13 @@ describe("resolveContext", () => {
   });
 
   it("turns a resolver throw into a retryable error rather than propagating", async () => {
-    const outcome = await resolveContext(prepare, { reference: "Patient/1" }, {
-      resolve: () => Promise.reject(new Error("EHR down")),
-    });
+    const outcome = await resolveContext(
+      prepare,
+      { reference: "Patient/1" },
+      {
+        resolve: () => Promise.reject(new Error("EHR down")),
+      },
+    );
     expect(outcome.ok).toBe(false);
     if (!outcome.ok) {
       expect(outcome.error.retryable).toBe(true);

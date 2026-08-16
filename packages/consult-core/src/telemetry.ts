@@ -107,12 +107,7 @@ export type TelemetryEvent =
  * `no-source` is a retrieval problem, `wrong` is a model problem.
  */
 export type FeedbackReason =
-  | "wrong"
-  | "outdated"
-  | "not-relevant"
-  | "unsafe"
-  | "no-source"
-  | "too-long";
+  "wrong" | "outdated" | "not-relevant" | "unsafe" | "no-source" | "too-long";
 
 export type TelemetrySink = (event: TelemetryEvent) => void;
 

@@ -191,10 +191,7 @@ export function ConsultLocaleProvider(props: {
   value?: Partial<ConsultLocale>;
   children: ReactNode;
 }): ReactNode {
-  const merged = useMemo(
-    () => ({ ...DEFAULT_LOCALE, ...props.value }),
-    [props.value],
-  );
+  const merged = useMemo(() => ({ ...DEFAULT_LOCALE, ...props.value }), [props.value]);
   return <LocaleContext.Provider value={merged}>{props.children}</LocaleContext.Provider>;
 }
 

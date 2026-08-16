@@ -44,8 +44,7 @@ export interface ToolCall {
 }
 
 export type ToolDecision =
-  | { readonly allowed: true }
-  | { readonly allowed: false; readonly reason: string };
+  { readonly allowed: true } | { readonly allowed: false; readonly reason: string };
 
 /**
  * Is this tool permitted in this mode?
@@ -145,7 +144,8 @@ export function classifyProposal(
  */
 const DOSE_PATTERN =
   /\b\d+(?:\.\d+)?\s?(?:mcg|microgram|micrograms|mg|milligram|milligrams|g|gram|grams|kg|ml|millilitre|millilitres|milliliter|milliliters|l|unit|units|iu|mmol|mEq|meq)\b/i;
-const FREQUENCY_PATTERN = /\b(?:od|bd|tds|qds|qid|tid|bid|prn|nocte|mane|q\d+h|hourly|daily|weekly)\b/i;
+const FREQUENCY_PATTERN =
+  /\b(?:od|bd|tds|qds|qid|tid|bid|prn|nocte|mane|q\d+h|hourly|daily|weekly)\b/i;
 
 export function containsDosing(text: string): boolean {
   return DOSE_PATTERN.test(text) || FREQUENCY_PATTERN.test(text);
@@ -188,7 +188,10 @@ export interface ConfirmedProposal {
 
 export class ProposalProhibitedError extends Error {
   readonly code = "proposal-prohibited" as const;
-  constructor(readonly proposalId: string, reason: string) {
+  constructor(
+    readonly proposalId: string,
+    reason: string,
+  ) {
     super(`Proposal ${proposalId} cannot be confirmed: ${reason}`);
     this.name = "ProposalProhibitedError";
   }

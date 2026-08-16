@@ -49,17 +49,47 @@ interface Rule {
  * numbers pretending to be derived.
  */
 const RULES: readonly Rule[] = [
-  { name: "override.ignore", pattern: /ignore (?:all |any )?(?:previous|prior|above) instructions?/i, weight: 5 },
-  { name: "override.disregard", pattern: /disregard (?:all |any )?(?:previous|prior|above)/i, weight: 5 },
+  {
+    name: "override.ignore",
+    pattern: /ignore (?:all |any )?(?:previous|prior|above) instructions?/i,
+    weight: 5,
+  },
+  {
+    name: "override.disregard",
+    pattern: /disregard (?:all |any )?(?:previous|prior|above)/i,
+    weight: 5,
+  },
   { name: "override.forget", pattern: /forget (?:everything|all) (?:you|above)/i, weight: 4 },
-  { name: "role.reassign", pattern: /you are (?:now )?(?:a|an|the) [a-z ]{3,40}(?:assistant|model|agent|system)/i, weight: 4 },
+  {
+    name: "role.reassign",
+    pattern: /you are (?:now )?(?:a|an|the) [a-z ]{3,40}(?:assistant|model|agent|system)/i,
+    weight: 4,
+  },
   { name: "role.impersonate", pattern: /^\s*(?:system|assistant|developer)\s*:/im, weight: 4 },
-  { name: "delimiter.chatml", pattern: /<\|(?:im_start|im_end|system|assistant|user)\|>/i, weight: 5 },
+  {
+    name: "delimiter.chatml",
+    pattern: /<\|(?:im_start|im_end|system|assistant|user)\|>/i,
+    weight: 5,
+  },
   { name: "delimiter.xmlish", pattern: /<\/?(?:system|instructions?|prompt)>/i, weight: 3 },
-  { name: "exfil.send", pattern: /\b(?:send|email|post|upload|export|forward)\b[^.\n]{0,40}\b(?:to|at)\b[^.\n]{0,40}(?:https?:\/\/|@|external)/i, weight: 5 },
+  {
+    name: "exfil.send",
+    pattern:
+      /\b(?:send|email|post|upload|export|forward)\b[^.\n]{0,40}\b(?:to|at)\b[^.\n]{0,40}(?:https?:\/\/|@|external)/i,
+    weight: 5,
+  },
   { name: "exfil.url", pattern: /\b(?:curl|fetch|wget|http-request)\b/i, weight: 3 },
-  { name: "secret.request", pattern: /\b(?:reveal|print|show|repeat)\b[^.\n]{0,30}\b(?:system prompt|instructions|api key|token)\b/i, weight: 5 },
-  { name: "tool.invoke", pattern: /\b(?:call|invoke|execute|run)\s+(?:the\s+)?(?:tool|function|command)\b/i, weight: 3 },
+  {
+    name: "secret.request",
+    pattern:
+      /\b(?:reveal|print|show|repeat)\b[^.\n]{0,30}\b(?:system prompt|instructions|api key|token)\b/i,
+    weight: 5,
+  },
+  {
+    name: "tool.invoke",
+    pattern: /\b(?:call|invoke|execute|run)\s+(?:the\s+)?(?:tool|function|command)\b/i,
+    weight: 3,
+  },
   { name: "encoding.base64-blob", pattern: /[A-Za-z0-9+/]{120,}={0,2}/, weight: 2 },
 ];
 

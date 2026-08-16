@@ -8,7 +8,13 @@
 
 import { describe, expect, it } from "vitest";
 import { runChecks } from "../src/checks.js";
-import { EMPTY_ANSWER, citationCoverage, deriveRegister, uncitedSpans, type Answer } from "../src/answer.js";
+import {
+  EMPTY_ANSWER,
+  citationCoverage,
+  deriveRegister,
+  uncitedSpans,
+  type Answer,
+} from "../src/answer.js";
 import { defineMode, lookUp, prepare, workUp } from "../src/modes.js";
 import type { Source } from "../src/provider.js";
 
@@ -266,22 +272,17 @@ describe("runChecks — dosing", () => {
     expect(finding?.message).toMatch(/verify every dose/i);
   });
 
-  it.each([
-    "500 mg",
-    "12.5 microgram",
-    "10 units",
-    "1 g",
-    "take bd",
-    "one tablet tds",
-    "q6h",
-  ])("detects %j as dosing", (text) => {
-    const result = runChecks({
-      answer: answer({ text: `Something ${text} something.` }),
-      mode: lookUp,
-      providerCanCite: true,
-    });
-    expect(result.findings.some((f) => f.code === "dosing-forbidden")).toBe(true);
-  });
+  it.each(["500 mg", "12.5 microgram", "10 units", "1 g", "take bd", "one tablet tds", "q6h"])(
+    "detects %j as dosing",
+    (text) => {
+      const result = runChecks({
+        answer: answer({ text: `Something ${text} something.` }),
+        mode: lookUp,
+        providerCanCite: true,
+      });
+      expect(result.findings.some((f) => f.code === "dosing-forbidden")).toBe(true);
+    },
+  );
 
   it("does not treat an ordinary number as a dose", () => {
     const result = runChecks({

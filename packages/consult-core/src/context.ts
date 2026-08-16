@@ -32,11 +32,7 @@ import type { ConsultProvider, ConsultRequest, ConsultTurn, ContextBlock } from 
 /* Withheld records                                                    */
 /* ------------------------------------------------------------------ */
 
-export type WithheldReason =
-  | ExclusionCategory
-  | "break-glass-required"
-  | "policy"
-  | "unavailable";
+export type WithheldReason = ExclusionCategory | "break-glass-required" | "policy" | "unavailable";
 
 /**
  * A category of record the host did not supply.
@@ -91,9 +87,7 @@ export function hasDisclosableWithholding(context: ResolvedContext): boolean {
 
 /** Total count across disclosable withholdings. Drives "N records withheld". */
 export function disclosableWithheldCount(context: ResolvedContext): number {
-  return context.withheld
-    .filter((w) => w.disclosable)
-    .reduce((total, w) => total + w.count, 0);
+  return context.withheld.filter((w) => w.disclosable).reduce((total, w) => total + w.count, 0);
 }
 
 /**

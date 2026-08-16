@@ -101,9 +101,7 @@ export function useAnnouncer(options: UseAnnouncerOptions): Announcer {
           setMessage(messages.answering);
           return;
         case "complete":
-          setMessage(
-            answer?.partial ? messages.partial(words) : messages.complete(words, sources),
-          );
+          setMessage(answer?.partial ? messages.partial(words) : messages.complete(words, sources));
           return;
         case "refused":
           setMessage(messages.refused);

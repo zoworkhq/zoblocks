@@ -33,12 +33,7 @@ export {
   SourcesPanel,
 } from "./parts.js";
 
-export {
-  ConsultLocaleProvider,
-  DEFAULT_LOCALE,
-  useLocale,
-  type ConsultLocale,
-} from "./locale.js";
+export { ConsultLocaleProvider, DEFAULT_LOCALE, useLocale, type ConsultLocale } from "./locale.js";
 
 // Re-exported so a consumer never needs to reach past this package for the
 // modes, the provider contract, or the value types.

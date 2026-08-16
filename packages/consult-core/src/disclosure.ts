@@ -25,11 +25,7 @@
 
 /** Grouping used by the disclosure sheet's headings. Mirrors HTI-1's own. */
 export type DisclosureSection =
-  | "details"
-  | "development"
-  | "fairness"
-  | "performance"
-  | "maintenance";
+  "details" | "development" | "fairness" | "performance" | "maintenance";
 
 export interface ModelDisclosure {
   /* --- Details (HTI-1 attributes 1–9) --------------------------------- */
@@ -135,12 +131,7 @@ const SECTION_FIELDS: Record<DisclosureSection, readonly (keyof ModelDisclosure)
     "localValidation",
     "uncertaintyQuantification",
   ],
-  maintenance: [
-    "updateFrequency",
-    "monitoringApproach",
-    "changeNotification",
-    "deprecationPolicy",
-  ],
+  maintenance: ["updateFrequency", "monitoringApproach", "changeNotification", "deprecationPolicy"],
 };
 
 export const DISCLOSURE_SECTIONS = Object.keys(SECTION_FIELDS) as readonly DisclosureSection[];
@@ -154,9 +145,7 @@ export const DISCLOSURE_LABELS: Record<DisclosureSection, string> = {
   maintenance: "Maintenance",
 };
 
-export function disclosureFields(
-  section: DisclosureSection,
-): readonly (keyof ModelDisclosure)[] {
+export function disclosureFields(section: DisclosureSection): readonly (keyof ModelDisclosure)[] {
   return SECTION_FIELDS[section];
 }
 

@@ -55,22 +55,50 @@ interface Rule {
  */
 const NEEDS_PATIENT: readonly Rule[] = [
   { name: "patient.deictic", pattern: /\b(?:this|my|the)\s+(?:patient|client|pt|case)\b/i },
-  { name: "patient.possessive-result", pattern: /\b(?:his|her|their|this\s+patient'?s)\s+(?:results?|labs?|bloods?|meds?|medications?|history|notes?)\b/i },
-  { name: "patient.chart-deixis", pattern: /\b(?:in\s+the\s+chart|on\s+the\s+problem\s+list|last\s+(?:visit|encounter|admission))\b/i },
+  {
+    name: "patient.possessive-result",
+    pattern:
+      /\b(?:his|her|their|this\s+patient'?s)\s+(?:results?|labs?|bloods?|meds?|medications?|history|notes?)\b/i,
+  },
+  {
+    name: "patient.chart-deixis",
+    pattern:
+      /\b(?:in\s+the\s+chart|on\s+the\s+problem\s+list|last\s+(?:visit|encounter|admission))\b/i,
+  },
 ];
 
 /** Requests for a definitive answer the component must not give. */
 const ASKS_DIAGNOSIS: readonly Rule[] = [
-  { name: "dx.definitive", pattern: /\b(?:what\s+(?:disease|condition)\s+does\s+(?:he|she|they|this\s+patient)\s+have|diagnose\s+(?:this|him|her|them)|what'?s\s+the\s+diagnosis)\b/i },
-  { name: "dx.confirm", pattern: /\b(?:confirm|rule\s+out)\s+(?:the\s+)?diagnosis\s+(?:of|for)\b.*\?/i },
+  {
+    name: "dx.definitive",
+    pattern:
+      /\b(?:what\s+(?:disease|condition)\s+does\s+(?:he|she|they|this\s+patient)\s+have|diagnose\s+(?:this|him|her|them)|what'?s\s+the\s+diagnosis)\b/i,
+  },
+  {
+    name: "dx.confirm",
+    pattern: /\b(?:confirm|rule\s+out)\s+(?:the\s+)?diagnosis\s+(?:of|for)\b.*\?/i,
+  },
 ];
 
 /** Requests for the component to act rather than advise. */
 const ASKS_ACTION: readonly Rule[] = [
-  { name: "action.order", pattern: /\b(?:place|submit|sign|send|file|put\s+in)\s+(?:the\s+|an?\s+)?(?:order|referral|prescription|script|message)\b/i },
-  { name: "action.prescribe", pattern: /\b(?:prescribe|write\s+(?:a\s+)?(?:script|prescription))\b/i },
-  { name: "action.message-patient", pattern: /\b(?:message|email|text|call)\s+(?:the\s+)?(?:patient|client|family)\b/i },
-  { name: "action.chart", pattern: /\b(?:update|amend|edit|sign\s+off)\s+(?:the\s+)?(?:chart|note|record)\b/i },
+  {
+    name: "action.order",
+    pattern:
+      /\b(?:place|submit|sign|send|file|put\s+in)\s+(?:the\s+|an?\s+)?(?:order|referral|prescription|script|message)\b/i,
+  },
+  {
+    name: "action.prescribe",
+    pattern: /\b(?:prescribe|write\s+(?:a\s+)?(?:script|prescription))\b/i,
+  },
+  {
+    name: "action.message-patient",
+    pattern: /\b(?:message|email|text|call)\s+(?:the\s+)?(?:patient|client|family)\b/i,
+  },
+  {
+    name: "action.chart",
+    pattern: /\b(?:update|amend|edit|sign\s+off)\s+(?:the\s+)?(?:chart|note|record)\b/i,
+  },
 ];
 
 /** Plainly non-clinical. Kept narrow — the cost of a false positive is high. */
@@ -82,8 +110,15 @@ const NOT_CLINICAL: readonly Rule[] = [
     pattern:
       /\b(?:write|refactor|debug)\s+(?:me\s+)?(?:an?\s+|some\s+)?(?:\w+\s+)?(?:code|function|script|program|query|python|javascript|typescript|sql|regex)\b/i,
   },
-  { name: "off.creative", pattern: /\b(?:write\s+(?:me\s+)?a\s+(?:poem|song|story|joke)|tell\s+me\s+a\s+joke)\b/i },
-  { name: "off.personal", pattern: /\b(?:what(?:'s| is)\s+the\s+weather|book\s+(?:me\s+)?a\s+(?:flight|table|holiday)|who\s+won\s+the)\b/i },
+  {
+    name: "off.creative",
+    pattern: /\b(?:write\s+(?:me\s+)?a\s+(?:poem|song|story|joke)|tell\s+me\s+a\s+joke)\b/i,
+  },
+  {
+    name: "off.personal",
+    pattern:
+      /\b(?:what(?:'s| is)\s+the\s+weather|book\s+(?:me\s+)?a\s+(?:flight|table|holiday)|who\s+won\s+the)\b/i,
+  },
 ];
 
 function matched(rules: readonly Rule[], text: string): string[] {
