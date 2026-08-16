@@ -56,11 +56,22 @@ export default defineConfig({
       // A coverage report nothing enforces is a number in a log. These are set
       // at the level the current suite already clears, so they ratchet rather
       // than aspire; raise them, never lower them.
+      //
+      // Raised from 90/90/85/90 when the accordion landed. Statements and lines
+      // are at 100 deliberately: every line of a component that ships into a
+      // customer's repository is a line they will read and run, and there is no
+      // such thing as a line of it we do not need to have executed once.
+      //
+      // Branches and functions sit just under, and the gap is honest rather
+      // than aspirational. The remaining branches are type-narrowing guards for
+      // states the caller has already excluded, and the remaining functions are
+      // render callbacks in story files, which are fixtures rather than
+      // shipped code.
       thresholds: {
-        lines: 90,
-        statements: 90,
-        branches: 85,
-        functions: 90,
+        lines: 100,
+        statements: 100,
+        branches: 97,
+        functions: 96,
       },
     },
   },

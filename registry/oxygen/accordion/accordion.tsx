@@ -34,6 +34,7 @@ import {
   useAccordion,
   type AccessDescriptor,
   type AccessReason,
+  type GatedAccess,
   type AccordionHeadingLevel,
   type AccordionItem,
   type AccordionLocale,
@@ -151,8 +152,18 @@ function Chevron() {
   );
 }
 
-/** The gate's own copy, chosen by access kind. */
-function gateTitle(access: AccessDescriptor, locale: AccordionLocale): string {
+/**
+ * The gate's own copy, chosen by access kind.
+ *
+ * Takes `GatedAccess` rather than the full union on purpose.
+ *
+ * `open` and `withheld` have no gate to title, and `Gate` has already returned
+ * null for both by the time this is called. Narrowing the parameter is what
+ * lets the switch be exhaustive: a fifth gate kind becomes a type error here
+ * instead of falling through a `default` that silently renders an empty
+ * heading — which would look like a rendering glitch rather than a missing case.
+ */
+function gateTitle(access: GatedAccess, locale: AccordionLocale): string {
   switch (access.kind) {
     case "advisory":
       return access.notice;
@@ -167,8 +178,6 @@ function gateTitle(access: AccessDescriptor, locale: AccordionLocale): string {
         : access.state === "expired"
           ? locale.consentExpired
           : locale.consentMissing;
-    default:
-      return "";
   }
 }
 
@@ -302,8 +311,32 @@ export function Accordion({
 
   const rootRef = React.useRef<HTMLDivElement | null>(null);
 
+  /**
+   * The accordion-level `collapsible` is folded into each item before the hook
+   * sees it.
+   *
+   * The behaviour layer reasons about items, not about the component's props —
+   * that is what keeps it usable by someone who rebuilt the visuals. So an
+   * accordion-wide `collapsible="disabled"` has to arrive as a property of
+   * every item, or the hook has no way to know about it.
+   *
+   * Without this the trigger rendered `aria-disabled="true"` and still toggled:
+   * a control that announces itself disabled and then works is worse than one
+   * that is plainly enabled, because a screen-reader user is told not to bother
+   * with a section that would in fact have opened.
+   */
+  const resolvedItems = React.useMemo<readonly AccordionItem[]>(
+    () =>
+      collapsible === undefined
+        ? items
+        : items.map((item) =>
+            item.collapsible === undefined ? ({ ...item, collapsible } as AccordionItem) : item,
+          ),
+    [collapsible, items],
+  );
+
   const api = useAccordion({
-    items,
+    items: resolvedItems,
     policy,
     ...(activeKey === undefined ? {} : { activeKey }),
     ...(defaultActiveKey === undefined ? {} : { defaultActiveKey }),
@@ -387,7 +420,7 @@ export function Accordion({
       data-icon-placement={expandIconPlacement}
       {...(density ? { "data-ox-density": density } : {})}
     >
-      {items.map((item) => {
+      {resolvedItems.map((item) => {
         const access = accessOf(item);
         const open = api.isOpen(item.key);
         const disclosed = api.isDisclosed(item.key);

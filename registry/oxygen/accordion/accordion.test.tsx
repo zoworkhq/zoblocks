@@ -700,6 +700,158 @@ describe("customisation", () => {
     expect(root.getAttribute("data-icon-placement")).toBe("end");
   });
 
+  it("applies per-slot inline styles", () => {
+    // The other half of antd v6's semantic DOM. `classNames` was covered and
+    // `styles` was not, which is exactly the asymmetry a customer would hit
+    // first: inline styles are what you reach for when a token does not exist
+    // yet.
+    const view = render(
+      <Accordion
+        items={plain(1)}
+        styles={{
+          root: { outlineWidth: "1px" },
+          item: { marginTop: "1px" },
+          header: { letterSpacing: "0.01em" },
+          trigger: { columnGap: "3px" },
+          label: { fontWeight: 700 },
+          summary: { opacity: 0.9 },
+          panel: { zIndex: 1 },
+          body: { paddingTop: "2px" },
+        }}
+      />,
+    );
+
+    const root = view.container.querySelector(".ox-accordion") as HTMLElement;
+    expect(root.style.outlineWidth).toBe("1px");
+    expect(
+      (view.container.querySelector(".ox-accordion__item") as HTMLElement).style.marginTop,
+    ).toBe("1px");
+    expect(
+      (view.container.querySelector(".ox-accordion__heading") as HTMLElement).style.letterSpacing,
+    ).toBe("0.01em");
+    expect((triggers(view.container)[0] as HTMLElement).style.columnGap).toBe("3px");
+    expect(
+      (view.container.querySelector(".ox-accordion__label") as HTMLElement).style.fontWeight,
+    ).toBe("700");
+    expect((panels(view.container)[0] as HTMLElement).style.zIndex).toBe("1");
+    expect(
+      (view.container.querySelector(".ox-accordion__inner") as HTMLElement).style.paddingTop,
+    ).toBe("2px");
+  });
+
+  it("lets an item override the accordion's slot styles", () => {
+    const view = render(
+      <Accordion
+        items={[
+          {
+            key: "a",
+            label: "A",
+            summary: "S",
+            styles: { trigger: { columnGap: "9px" } },
+            children: <p>a</p>,
+          },
+        ]}
+        styles={{ trigger: { columnGap: "3px" }, summary: { opacity: 0.5 } }}
+      />,
+    );
+    // The item wins on the slot it names, and inherits the rest.
+    expect((triggers(view.container)[0] as HTMLElement).style.columnGap).toBe("9px");
+    expect(
+      (view.container.querySelector(".ox-accordion__summary") as HTMLElement).style.opacity,
+    ).toBe("0.5");
+  });
+
+  it("renders extra content outside the trigger", () => {
+    // Outside on purpose: a control inside a button is a control nobody can
+    // reach with a keyboard without also toggling the section.
+    const view = render(
+      <Accordion
+        items={[
+          {
+            key: "a",
+            label: "A",
+            extra: <button type="button">Print</button>,
+            children: <p>a</p>,
+          },
+        ]}
+      />,
+    );
+    const extra = view.container.querySelector(".ox-accordion__extra");
+    expect(extra).toBeTruthy();
+    expect(extra?.closest("button.ox-accordion__trigger")).toBeNull();
+    expect(within(extra as HTMLElement).getByRole("button", { name: "Print" })).toBeTruthy();
+  });
+
+  it("records bordered=false on the root without changing the contract", () => {
+    const view = render(<Accordion items={plain(1)} bordered={false} />);
+    const root = view.container.querySelector(".ox-accordion") as HTMLElement;
+    expect(root.getAttribute("data-bordered")).toBe("false");
+    // Still a button in a heading, still wired.
+    expect(triggers(view.container)[0]?.parentElement?.tagName).toMatch(/^H[1-6]$/);
+  });
+
+  it("maps ghost to the ghost variant and keeps bordered separate", () => {
+    const view = render(<Accordion items={plain(1)} ghost />);
+    const root = view.container.querySelector(".ox-accordion") as HTMLElement;
+    expect(root.getAttribute("data-variant")).toBe("ghost");
+  });
+
+  it("lets an explicit variant win over the antd booleans", () => {
+    const view = render(<Accordion items={plain(1)} ghost variant="separate" />);
+    expect(
+      (view.container.querySelector(".ox-accordion") as HTMLElement).getAttribute("data-variant"),
+    ).toBe("separate");
+  });
+
+  it.each(["small", "medium", "large"] as const)("sets the font token for size=%s", (size) => {
+    const view = render(<Accordion items={plain(1)} size={size} />);
+    const root = view.container.querySelector(".ox-accordion") as HTMLElement;
+    expect(root.style.getPropertyValue("--ox-accordion-font")).not.toBe("");
+  });
+
+  it("hides the chevron when an item asks", () => {
+    const view = render(
+      <Accordion items={[{ key: "a", label: "A", showArrow: false, children: <p>a</p> }]} />,
+    );
+    expect(view.container.querySelector(".ox-accordion__icon")).toBeNull();
+  });
+
+  it("honours collapsible=disabled on a single item", async () => {
+    const user = userEvent.setup();
+    const view = render(
+      <Accordion
+        items={[
+          { key: "a", label: "Open me", children: <p>a</p> },
+          { key: "b", label: "Locked", collapsible: "disabled", children: <p>b</p> },
+        ]}
+      />,
+    );
+    const locked = trigger(view.container, /Locked/);
+    expect(locked.getAttribute("aria-disabled")).toBe("true");
+    await user.click(locked);
+    expect(locked.getAttribute("aria-expanded")).toBe("false");
+  });
+
+  it("honours collapsible=disabled set on the whole accordion", async () => {
+    const user = userEvent.setup();
+    const view = render(<Accordion items={plain(2)} collapsible="disabled" />);
+    for (const t of triggers(view.container)) {
+      expect(t.getAttribute("aria-disabled")).toBe("true");
+    }
+    await user.click(triggers(view.container)[0] as HTMLElement);
+    expect(triggers(view.container)[0]?.getAttribute("aria-expanded")).toBe("false");
+  });
+
+  it("takes replacement wording through locale", () => {
+    const view = render(
+      <Accordion
+        items={[{ key: "w", label: "W", access: { kind: "withheld", reason: "r" } }]}
+        locale={{ withheldLabel: "Beperkt — niet getoond" }}
+      />,
+    );
+    expect(view.getByText("Beperkt — niet getoond")).toBeTruthy();
+  });
+
   it("renders a summary beside the label", () => {
     const view = render(
       <Accordion
@@ -755,5 +907,42 @@ describe("Disclosure", () => {
       <Disclosure defaultOpen item={{ key: "one", label: "One", children: <p>body</p> }} />,
     );
     expect(view.getByText("body")).toBeTruthy();
+  });
+
+  it("honours a controlled open and does not move on its own", async () => {
+    const user = userEvent.setup();
+    const view = render(
+      <Disclosure open={false} item={{ key: "one", label: "One", children: <p>CONTENT</p> }} />,
+    );
+    await user.click(triggers(view.container)[0] as HTMLElement);
+    expect(triggers(view.container)[0]?.getAttribute("aria-expanded")).toBe("false");
+    expect(view.container.innerHTML).not.toContain("CONTENT");
+  });
+
+  it("renders open when controlled open is true", () => {
+    const view = render(
+      <Disclosure open item={{ key: "one", label: "One", children: <p>body</p> }} />,
+    );
+    expect(triggers(view.container)[0]?.getAttribute("aria-expanded")).toBe("true");
+    expect(view.getByText("body")).toBeTruthy();
+  });
+
+  it("gates a lone section the same way a group does", async () => {
+    const user = userEvent.setup();
+    const view = render(
+      <Disclosure
+        defaultOpen
+        onDisclose={() => true}
+        item={{
+          key: "one",
+          label: "One",
+          access: { kind: "advisory", notice: "Mentions self-harm" },
+          children: <p>BODY</p>,
+        }}
+      />,
+    );
+    expect(view.container.innerHTML).not.toContain("BODY");
+    await user.click(view.getByRole("button", { name: "Show it" }));
+    expect(view.container.innerHTML).toContain("BODY");
   });
 });

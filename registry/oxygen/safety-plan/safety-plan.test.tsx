@@ -175,4 +175,73 @@ describe("SafetyPlan", () => {
       view.container.querySelectorAll('[role="tab"],[role="tablist"],[role="tabpanel"]'),
     ).toHaveLength(0);
   });
+
+  it("renders a contact who has only a name", () => {
+    // Plans are written in a room, at speed. "Mum" with no number is what
+    // someone actually wrote, and it is still the person they would call —
+    // dropping the row because a field is blank loses the plan's content.
+    const view = render(<SafetyPlan steps={{ professionals: { contacts: [{ name: "Mum" }] } }} />);
+    const crisis = crisisItem(view.container);
+    expect(within(crisis).getByText("Mum")).toBeTruthy();
+    expect(crisis.querySelectorAll("dt")).toHaveLength(1);
+    expect(crisis.querySelector(".ox-safety-plan__detail")).toBeNull();
+    expect(crisis.querySelector(".ox-safety-plan__availability")).toBeNull();
+  });
+
+  it("renders a contact with a number but no stated hours", () => {
+    const view = render(
+      <SafetyPlan
+        steps={{ professionals: { contacts: [{ name: "Clinic", detail: "555 0148" }] } }}
+      />,
+    );
+    const crisis = crisisItem(view.container);
+    expect(within(crisis).getByText("555 0148")).toBeTruthy();
+    // Availability is absent rather than invented — "24 hours" is a fact, and
+    // assuming it for a clinic that closes is the wrong kind of helpful.
+    expect(crisis.querySelector(".ox-safety-plan__availability")).toBeNull();
+  });
+
+  it("renders a contact with hours but no number", () => {
+    const view = render(
+      <SafetyPlan
+        steps={{ professionals: { contacts: [{ name: "Rachel", availability: "Mon–Thu, 9–5" }] } }}
+      />,
+    );
+    const crisis = crisisItem(view.container);
+    expect(within(crisis).getByText("Mon–Thu, 9–5")).toBeTruthy();
+    expect(crisis.querySelector(".ox-safety-plan__detail")).toBeNull();
+  });
+
+  it("renders a step that holds both free text and contacts", async () => {
+    const user = userEvent.setup();
+    const view = render(
+      <SafetyPlan
+        steps={{
+          distractions: {
+            entries: ["The cafe on Bell Street"],
+            contacts: [{ name: "Priya", detail: "Sister" }],
+          },
+        }}
+      />,
+    );
+    await user.click(triggers(view.container)[2] as HTMLElement);
+    expect(view.getByText("The cafe on Bell Street")).toBeTruthy();
+    expect(view.getByText("Priya")).toBeTruthy();
+  });
+
+  it("treats a step whose lists are present but empty as unfinished", async () => {
+    // `{ entries: [] }` is what a form produces when someone opened a step and
+    // wrote nothing. It is the same fact as never having opened it.
+    const user = userEvent.setup();
+    const view = render(<SafetyPlan steps={{ warningSigns: { entries: [], contacts: [] } }} />);
+    await user.click(triggers(view.container)[0] as HTMLElement);
+    expect(view.getAllByText(/Not filled in yet/).length).toBeGreaterThan(0);
+  });
+
+  it("omits the revision line entirely when no date is recorded", () => {
+    // Not "Revised —". CONTENT.md §1: a placeholder claims a value exists.
+    const view = render(<SafetyPlan steps={PLAN} />);
+    expect(view.container.querySelector("time")).toBeNull();
+    expect(view.container.querySelector(".ox-safety-plan__revised")).toBeNull();
+  });
 });

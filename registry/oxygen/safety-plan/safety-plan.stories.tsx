@@ -7,7 +7,7 @@
  */
 
 import type { Meta, StoryObj } from "@oxygenui-design/component-meta";
-import { expect, within } from "../../../test/story-kit";
+import { expect, userEvent, within } from "../../../test/story-kit";
 import { SafetyPlan, type SafetyPlanSteps } from "./safety-plan";
 
 const PLAN: SafetyPlanSteps = {
@@ -83,7 +83,7 @@ export const CrisisPinned: Story = {
     expect(trigger.getAttribute("aria-disabled")).toBe("true");
 
     // Pressing it does nothing, and the header says why rather than looking broken.
-    trigger.click();
+    await userEvent.click(trigger);
     expect(trigger.getAttribute("aria-expanded")).toBe("true");
     expect(within(crisis).getByText("Always open")).toBeTruthy();
   },
@@ -103,7 +103,7 @@ export const Unfinished: Story = {
     // Still six steps. A four-step plan numbered one to four would claim the
     // others were never part of the instrument.
     expect(canvasElement.querySelectorAll("button.ox-accordion__trigger")).toHaveLength(6);
-    canvas.getByRole("button", { name: /Making home safer/ }).click();
+    await userEvent.click(canvas.getByRole("button", { name: /Making home safer/ }));
     await canvas.findByText(/Not filled in yet/);
   },
 };

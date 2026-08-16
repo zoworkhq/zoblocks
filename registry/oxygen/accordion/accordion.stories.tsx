@@ -12,7 +12,7 @@
  */
 
 import type { Meta, StoryObj } from "@oxygenui-design/component-meta";
-import { expect, within } from "../../../test/story-kit";
+import { expect, userEvent, within } from "../../../test/story-kit";
 import { Accordion } from "./accordion";
 import type { AccordionItem } from "@/lib/oxygen-accordion";
 
@@ -245,7 +245,7 @@ export const ConsentRefused: Story = {
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    canvas.getByRole("button", { name: "Request consent" }).click();
+    await userEvent.click(canvas.getByRole("button", { name: "Request consent" }));
     // Names what did not happen and what is still usable — CONTENT.md §5.
     await canvas.findByText(/was not opened/);
     expect(canvasElement.textContent).not.toContain("Intensive outpatient");
@@ -287,7 +287,7 @@ export const SingleOpen: Story = {
   args: { accordion: true, defaultActiveKey: ["risk"] },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    canvas.getByRole("button", { name: /Medications/ }).click();
+    await userEvent.click(canvas.getByRole("button", { name: /Medications/ }));
     // One boolean, one behaviour change. The roles are identical to the
     // multi-open story — no tablist appears here.
     expect(canvasElement.querySelectorAll('[role="tab"],[role="tablist"]')).toHaveLength(0);

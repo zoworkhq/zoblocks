@@ -8,7 +8,7 @@
  */
 
 import type { Meta, StoryObj } from "@oxygenui-design/component-meta";
-import { expect, within } from "../../../test/story-kit";
+import { expect, userEvent, within } from "../../../test/story-kit";
 import { ChartAccordion, type ChartSection } from "./chart-accordion";
 
 const RECORD: ChartSection[] = [
@@ -84,7 +84,7 @@ export const Expanded: Story = {
     const canvas = within(canvasElement);
     await canvas.findByText(/Ideation 3/);
     // Expand all is how a record becomes printable and searchable in one press.
-    canvas.getByRole("button", { name: "Expand all" }).click();
+    await userEvent.click(canvas.getByRole("button", { name: "Expand all" }));
   },
 };
 
@@ -148,7 +148,7 @@ export const WithheldSection: Story = {
     const canvas = within(canvasElement);
     await canvas.findByText("Restricted — not shown");
     // Expand all does not reach it, because there is nothing behind it.
-    canvas.getByRole("button", { name: "Expand all" }).click();
+    await userEvent.click(canvas.getByRole("button", { name: "Expand all" }));
     expect(canvasElement.querySelector('[data-access="withheld"]')?.getAttribute("data-open")).toBe(
       "false",
     );

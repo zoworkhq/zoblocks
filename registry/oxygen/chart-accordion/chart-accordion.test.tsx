@@ -155,4 +155,95 @@ describe("ChartAccordion", () => {
       view.container.querySelectorAll('[role="tab"],[role="tablist"],[role="tabpanel"]'),
     ).toHaveLength(0);
   });
+
+  it("renders a status with no severity as a neutral chip", () => {
+    // Severity requires a status; the reverse is not true. A section can have
+    // something worth saying and nothing worth colouring.
+    const view = render(
+      <ChartAccordion
+        sections={[{ key: "roi", label: "Release of information", status: "3 active" }]}
+      />,
+    );
+    const chip = view.container.querySelector(".ox-chip");
+    expect(chip?.textContent).toBe("3 active");
+    expect(chip?.className).toBe("ox-chip");
+    expect(view.container.querySelector("[data-severity]")).toBeNull();
+  });
+
+  it("treats an explicitly null status as no status, not as empty text", () => {
+    // `status: null` is what a data layer produces for "nothing to say". An
+    // empty chip would read as a value that failed to load.
+    const view = render(
+      <ChartAccordion sections={[{ key: "a", label: "A", status: null, count: "2 items" }]} />,
+    );
+    expect(view.container.querySelector(".ox-chip")).toBeNull();
+    expect(view.getByText("2 items")).toBeTruthy();
+  });
+
+  it("renders no summary at all when there is nothing to say", () => {
+    const view = render(<ChartAccordion sections={[{ key: "a", label: "Notes" }]} />);
+    expect(view.container.querySelector(".ox-accordion__summary")).toBeNull();
+    expect(triggers(view.container)).toHaveLength(1);
+  });
+
+  it("passes a pinned section through to the primitive", () => {
+    // A record can have a section that must stay open — an active alert the
+    // reader is not allowed to dismiss.
+    const view = render(
+      <ChartAccordion
+        sections={[
+          { key: "a", label: "A", children: <p>a</p> },
+          { key: "alert", label: "Active alert", pinned: true, children: <p>Elopement risk</p> },
+        ]}
+      />,
+    );
+    const pinned = view.container.querySelector('[data-pinned="true"]');
+    expect(pinned).not.toBeNull();
+    expect(
+      within(pinned as HTMLElement)
+        .getByRole("button")
+        .getAttribute("aria-expanded"),
+    ).toBe("true");
+    expect(view.getByText("Elopement risk")).toBeTruthy();
+  });
+
+  it("carries a gate on a section that has no children yet", async () => {
+    // The consent has not resolved, so the application has nothing to hand
+    // over. The row must still exist and still explain itself.
+    const user = userEvent.setup();
+    const view = render(
+      <ChartAccordion
+        sections={[
+          {
+            key: "sud",
+            label: "Substance use treatment",
+            access: { kind: "consent", policy: "42 CFR Part 2", state: "missing" },
+          },
+        ]}
+        onDisclose={() => true}
+      />,
+    );
+    await user.click(triggers(view.container)[0] as HTMLElement);
+    expect(view.getByText("No consent on file covers this")).toBeTruthy();
+    expect(view.getByText(/42 CFR Part 2/)).toBeTruthy();
+  });
+
+  it("renders every severity in the scale with its own rail and chip", () => {
+    const view = render(
+      <ChartAccordion
+        sections={[
+          { key: "a", label: "A", severity: "critical", status: "Critical" },
+          { key: "b", label: "B", severity: "high", status: "High" },
+          { key: "c", label: "C", severity: "low", status: "Low" },
+          { key: "d", label: "D", severity: "normal", status: "Normal" },
+          { key: "e", label: "E", severity: "unknown", status: "Not asked" },
+        ]}
+      />,
+    );
+    for (const severity of ["critical", "high", "low", "normal", "unknown"]) {
+      const item = view.container.querySelector(`[data-severity="${severity}"]`);
+      expect(item, severity).not.toBeNull();
+      expect(item?.querySelector(`.ox-chip--${severity}`), severity).not.toBeNull();
+    }
+  });
 });
