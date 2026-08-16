@@ -79,7 +79,7 @@
     "@types/react-dom": "^19.0.2",
     "@vitest/coverage-v8": "^4.1.10",
     "antd": "^6.6.0",
-    "axe-core": "^4.12.1",
+    "axe-core": "^4.13.0",
     "jsdom": "^30",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",

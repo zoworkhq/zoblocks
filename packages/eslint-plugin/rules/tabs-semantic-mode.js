@@ -28,28 +28,6 @@
 const TAB_COMPONENTS = new Set(["Tabs", "TabsRoot", "Tabs.Root"]);
 const VALID_MODES = new Set(["tabs", "nav", "radiogroup", "steps"]);
 
-/**
- * Whether a module specifier names Oxygen's Tabs.
- *
- * The rule is about *our* component's contract, and `Tabs` is one of the most
- * common component names there is — antd exports one, and so does nearly every
- * other design system. Firing on those reports a defect the author cannot fix:
- * antd's Tabs has no `as` prop, so the only way to satisfy the rule would be to
- * spread an unknown attribute onto a foreign component. A rule that demands an
- * impossible change gets disabled wholesale, and then it protects nothing.
- *
- * A relative specifier counts, so the rule still applies inside the tabs
- * package's own source and stories.
- */
-function isOxygenTabsSource(source) {
-  if (source.startsWith(".")) return /tabs/i.test(source);
-  return (
-    /^@oxygenui(-design)?\/tabs(-core)?$/.test(source) ||
-    source === "@/components/oxygen/tabs" ||
-    source === "@/lib/oxygen-tabs"
-  );
-}
-
 function elementName(node) {
   const name = node.name;
   if (name.type === "JSXIdentifier") return name.name;
@@ -130,18 +108,24 @@ export default {
 
   create(context) {
     /**
-     * Local names bound to a non-Oxygen `Tabs`.
+     * Names bound by an import from somewhere that is not Oxygen.
      *
-     * Collected rather than resolved through the scope manager because the
-     * only question is which module the name came from, and an import
-     * declaration answers it directly.
+     * The rule matches on the element name, which is the only thing available
+     * at a JSX site — and `Tabs` is what antd calls its own tab strip too.
+     * `packages/signature` imports antd's, which has no `as` prop at all, so
+     * the rule was demanding an attribute that would forward an unknown
+     * property to the DOM. Flagging code that cannot comply is how a rule gets
+     * disabled wholesale, and then it protects nothing.
      */
     const foreign = new Set();
 
     return {
       ImportDeclaration(node) {
         const source = node.source.value;
-        if (typeof source !== "string" || isOxygenTabsSource(source)) return;
+        if (typeof source !== "string") return;
+        if (source.startsWith("@oxygenui") || source.startsWith(".") || source.startsWith("@/")) {
+          return;
+        }
         for (const specifier of node.specifiers) {
           if (specifier.local?.type === "Identifier") foreign.add(specifier.local.name);
         }
@@ -150,10 +134,8 @@ export default {
       JSXOpeningElement(node) {
         const name = elementName(node);
         if (!name || !TAB_COMPONENTS.has(name)) return;
-
-        // `Tabs.Root` is reached through its object; `Tabs` through itself.
-        const binding = name.includes(".") ? name.split(".")[0] : name;
-        if (foreign.has(binding)) return;
+        // Someone else's Tabs. It is not ours to make claims about.
+        if (foreign.has(name.split(".")[0])) return;
 
         // A spread could carry `as`, and flagging it would be a guess. A rule
         // that guesses gets disabled wholesale, and then it protects nothing.

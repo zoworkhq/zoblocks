@@ -88,6 +88,28 @@ export default defineConfig({
       grep: /@reflow/,
       use: { ...devices["iPhone SE"] },
     },
+    {
+      /*
+       * The @motion suite had no project, so it never ran.
+       *
+       * Every project here carries a `grep`, which means a tag with no project
+       * matches nothing — Playwright reports the remaining tests as passing
+       * and says nothing about the ones it never collected. The reduced-motion
+       * test was written, committed, and silently skipped from that day on.
+       * `playwright test --list` is what surfaces this; it prints exactly the
+       * tests that will run, and anything absent from it is not being tested.
+       *
+       * `reducedMotion` belongs on a project rather than in the test, so the
+       * preference is set before first paint instead of after the page has
+       * already animated. It goes under `contextOptions`: unlike
+       * `colorScheme`, it is not a top-level `use` key in Playwright 1.62, and
+       * putting it there is accepted silently and then ignored — which is how
+       * this test came to assert its own emulation is active.
+       */
+      name: "motion-reduced",
+      grep: /@motion/,
+      use: { ...devices["Desktop Chrome"], contextOptions: { reducedMotion: "reduce" } },
+    },
 
     // The cross-framework claim, run in all three engines. Custom elements are
     // the one part of this library whose behaviour genuinely differs per

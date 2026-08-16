@@ -21,7 +21,7 @@ import { HelixLoader } from "@/registry/oxygen/helix-loader/helix-loader";
 import { InfusionLoader } from "@/registry/oxygen/infusion-loader/infusion-loader";
 import { Switch, SwitchField, SwitchList } from "@/registry/oxygen/switch/switch";
 import { InstrumentGlow } from "@/components/site/interactions";
-import { SignatureMark } from "@/components/site/signature-mark";
+import { SignatureDemo } from "@/components/site/signature-demo";
 import { cn } from "@/lib/utils";
 
 type Density = "patient" | "standard" | "clinical";
@@ -542,32 +542,10 @@ export function ComponentPreview({ name }: { name: string }) {
   const [scenarioId, setScenarioId] = React.useState(scenarios?.[0]?.id ?? "");
   const [density, setDensity] = React.useState<Density>("standard");
 
-  /*
-   * Signature is shipped, so "coming with the next release" would be false —
-   * but it wraps Ant Design, which this site does not carry, so it cannot be
-   * mounted here either. It gets the engine's own output and a straight
-   * explanation instead of a placeholder that misstates its status.
-   */
-  if (name === "signature") {
-    return (
-      <div className="instrument instrument-demo">
-        <InstrumentGlow />
-        <div className="relative flex items-center gap-2.5 border-b border-panel-rule px-4 py-2.5">
-          <span className="size-1.5 rounded-full bg-trace shadow-[0_0_8px_var(--color-trace)]" />
-          <span className="eyebrow text-panel-muted">Drawn by the real capture engine</span>
-        </div>
-        <div className="relative flex flex-col items-center gap-5 px-6 py-10 text-panel-fg">
-          <SignatureMark size={140} />
-          <p className="max-w-lg text-center text-[0.8125rem] leading-relaxed text-panel-muted">
-            The geometry above is <code className="font-mono">toInkPaths()</code> from{" "}
-            <code className="font-mono">@oxygenui-design/signature-core</code> — the same function
-            the live pad calls on every pointer move. The interactive component needs Ant Design,
-            which this site does not ship, so run it from the package instead.
-          </p>
-        </div>
-      </div>
-    );
-  }
+  // Signature is the one component the site loads Ant Design for. Showing a
+  // static mark instead would undercut its entire argument: the only way to
+  // demonstrate that a decline is recordable is to let someone record one.
+  if (name === "signature") return <SignatureDemo />;
 
   if (!scenarios?.length) {
     return (
