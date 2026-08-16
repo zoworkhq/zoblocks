@@ -131,3 +131,27 @@ export function shouldCollapse(
 ): boolean {
   return itemCount > 2 && containerWidth > 0 && containerWidth < threshold;
 }
+
+/**
+ * The window of triggers worth observing individually.
+ *
+ * Above a few dozen tabs the per-trigger `ResizeObserver` — the one that
+ * catches a count changing from 9 to 10 without the list resizing — becomes
+ * the dominant cost. Past the threshold the component observes the list and
+ * the selected trigger only, and lets everything else be caught by the list
+ * resize.
+ *
+ * Note what this deliberately does *not* do: it never removes a trigger from
+ * the DOM. A tablist whose children come and go reports "n of m" from whatever
+ * happens to be rendered, so a screen-reader user is told there are twenty
+ * tabs when there are two hundred and forty. Rendering stays complete;
+ * only the measurement is windowed.
+ */
+export function observationWindow(
+  total: number,
+  selectedIndex: number,
+  threshold = 40,
+): { observeAll: boolean; focus: number } {
+  if (total <= threshold) return { observeAll: true, focus: selectedIndex };
+  return { observeAll: false, focus: selectedIndex };
+}

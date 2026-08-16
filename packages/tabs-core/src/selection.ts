@@ -38,6 +38,17 @@ export interface ChangeGate {
   readonly pending: boolean;
   /** Current value, tracked so the gate can refuse a no-op. */
   sync(value: string | undefined): void;
+  /**
+   * Re-arm a disposed gate.
+   *
+   * `dispose` has to be reversible because React's StrictMode mounts, cleans
+   * up, and mounts again — so a gate that treated disposal as terminal would
+   * be dead before the user ever touched it, and every request would return
+   * `superseded`. That is a completely inert tab strip in the default
+   * configuration of every Next.js app, which is exactly the kind of bug that
+   * ships.
+   */
+  activate(): void;
   dispose(): void;
 }
 
@@ -60,6 +71,10 @@ export function createChangeGate(options: ChangeGateOptions): ChangeGate {
 
     sync(value) {
       current = value;
+    },
+
+    activate() {
+      disposed = false;
     },
 
     dispose() {

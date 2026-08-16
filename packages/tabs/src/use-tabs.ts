@@ -132,7 +132,10 @@ export function useTabs(options: UseTabsOptions): UseTabsApi {
   );
 
   React.useEffect(() => gate.sync(value), [gate, value]);
-  React.useEffect(() => () => gate.dispose(), [gate]);
+  React.useEffect(() => {
+    gate.activate();
+    return () => gate.dispose();
+  }, [gate]);
 
   const select = React.useCallback(
     (next: string, source: ChangeSource = "programmatic") => {

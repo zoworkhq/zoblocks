@@ -42,6 +42,10 @@ Rules that matter when generating code with these components:
   install: pnpm dlx shadcn@latest add https://oxygenui.design/r/rhythm-loader.json
   states: Indeterminate, Delayed (not yet shown), Slow wait, Reduced motion, Inline
   status: beta
+- [Tabs](https://oxygenui.design/components/tabs): Tabs that know what they are: a view switch, a link list, a form value or a wizard — four accessibility trees behind one silhouette.
+  install: pnpm dlx shadcn@latest add https://oxygenui.design/r/tabs.json
+  states: Selected, Unselected, Disabled with a stated reason, Restricted (present, gated, explained), Stale — showing cached data, Unavailable offline, Unsaved changes pending, Locked step, Completed step, Overflowing into a menu, Collapsed to a native picker, Awaiting an async guard
+  status: beta
 
 ## Clinical
 

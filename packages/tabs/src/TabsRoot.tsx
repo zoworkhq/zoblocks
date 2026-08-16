@@ -46,8 +46,10 @@ import {
 import { useTabsLocale } from "./locale.js";
 import {
   REGISTRY_UNRELIABLE,
+  runWithTransition,
   useBaseId,
   useControllableValue,
+  useTabsHotkeys,
   useValidateConfig,
 } from "./internal.js";
 
@@ -89,6 +91,19 @@ export interface TabsRootProps extends Omit<React.HTMLAttributes<HTMLDivElement>
   syncTo?: SyncTarget;
   syncKey?: string;
   syncHistory?: "replace" | "push";
+  /**
+   * Ctrl/Cmd + 1…9 to jump to a tab. Off by default: on Windows and Linux
+   * those belong to the browser, and claiming them takes a shortcut the user
+   * already had for something else.
+   */
+  hotkeys?: boolean;
+  /**
+   * Above ~40 triggers, observe the list rather than every trigger.
+   *
+   * Never removes a trigger from the DOM — a tablist whose children come and
+   * go reports "n of m" from whatever happens to be rendered.
+   */
+  virtualise?: boolean;
   locale?: Partial<TabsLocale>;
   onAuditEvent?: (event: AuditEvent) => void;
   /**
@@ -122,6 +137,8 @@ export const TabsRoot = React.forwardRef<HTMLDivElement, TabsRootProps>(function
     syncTo = false,
     syncKey = "tab",
     syncHistory = "replace",
+    hotkeys = false,
+    virtualise = false,
     locale: localeOverrides,
     onAuditEvent,
     now,
@@ -189,6 +206,10 @@ export const TabsRoot = React.forwardRef<HTMLDivElement, TabsRootProps>(function
     onChange: onChange ? (next, via) => onChange(next, { via }) : undefined,
   });
 
+  // Read through a ref so the gate is not rebuilt when the prop changes.
+  const transitionRef = React.useRef(transition);
+  transitionRef.current = transition;
+
   const auditRef = React.useRef(onAuditEvent);
   auditRef.current = onAuditEvent;
   const nowRef = React.useRef(now);
@@ -206,7 +227,7 @@ export const TabsRoot = React.forwardRef<HTMLDivElement, TabsRootProps>(function
       createChangeGate({
         onBeforeChange,
         onCommit: (next, source) => {
-          setValue(next, source);
+          runWithTransition(transitionRef.current === "view", () => setValue(next, source));
           setVisited((current) => {
             if (current.has(next)) return current;
             const copy = new Set(current);
@@ -223,7 +244,12 @@ export const TabsRoot = React.forwardRef<HTMLDivElement, TabsRootProps>(function
     [setValue, audit],
   );
 
-  React.useEffect(() => () => gate.dispose(), [gate]);
+  // Arm on mount, disarm on unmount — and arm *again* if StrictMode remounts
+  // us, which is the whole reason `activate` exists.
+  React.useEffect(() => {
+    gate.activate();
+    return () => gate.dispose();
+  }, [gate]);
 
   // Uncontrolled instances need a starting value once triggers have
   // registered — before that, `items` is empty and there is nothing to pick.
@@ -331,6 +357,12 @@ export const TabsRoot = React.forwardRef<HTMLDivElement, TabsRootProps>(function
     };
   }, []);
 
+  useTabsHotkeys({
+    enabled: hotkeys,
+    getItems: () => triggers.current.map((entry) => entry.item),
+    select: (next, source, item) => selectRef.current(next, source, item),
+  });
+
   const register = React.useCallback((entry: RegisteredTrigger) => {
     triggers.current.push(entry);
     setRegistryVersion((n) => n + 1);
@@ -371,6 +403,7 @@ export const TabsRoot = React.forwardRef<HTMLDivElement, TabsRootProps>(function
       fill,
       mount,
       keepScroll,
+      virtualise,
       locale,
       value,
       pending,
@@ -401,6 +434,7 @@ export const TabsRoot = React.forwardRef<HTMLDivElement, TabsRootProps>(function
       fill,
       mount,
       keepScroll,
+      virtualise,
       locale,
       value,
       pending,
@@ -429,6 +463,7 @@ export const TabsRoot = React.forwardRef<HTMLDivElement, TabsRootProps>(function
         data-ox-fill={fill}
         data-ox-overflow={overflow}
         data-ox-transition={transition}
+        data-ox-virtualised={virtualise || undefined}
         data-ox-indicator={resolveIndicator(indicator, variant)}
         data-ox-pending={pending || undefined}
       >

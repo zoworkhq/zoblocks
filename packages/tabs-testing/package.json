@@ -1,25 +1,22 @@
 {
-  "name": "@oxygenui-design/tabs-core",
+  "name": "@oxygenui-design/tabs-testing",
   "version": "0.1.0",
-  "description": "The selection engine behind Oxygen's tab system. Semantic modes, the WAI-ARIA keyboard model, priority-plus overflow and indicator geometry — no React, no DOM, no dependencies.",
+  "description": "Assertions that read the accessibility tree of a tab strip. Catches the defects a snapshot test passes: a tablist of links, a strip with no tab stop, a dangling aria-controls.",
   "license": "MIT",
   "homepage": "https://oxygenui.design/components/tabs",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/zoworkhq/oxygenui.git",
-    "directory": "packages/tabs-core"
+    "directory": "packages/tabs-testing"
   },
   "keywords": [
     "tabs",
-    "tablist",
-    "segmented-control",
-    "radiogroup",
-    "headless",
+    "testing",
     "accessibility",
-    "wcag",
     "aria",
-    "keyboard-navigation",
-    "healthcare"
+    "wcag",
+    "testing-library",
+    "playwright"
   ],
   "type": "module",
   "sideEffects": false,
@@ -58,6 +55,7 @@
   "devDependencies": {
     "@oxygenui-design/tsconfig": "workspace:*",
     "@vitest/coverage-v8": "^4.1.10",
+    "jsdom": "^30",
     "typescript": "^5.7.2",
     "vitest": "^4.1.10"
   }

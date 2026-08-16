@@ -953,6 +953,7 @@
       <span class="pill">SSR / RSC-safe</span>
       <span class="pill">Headless core</span>
       <span class="pill">11 variants</span>
+      <span class="pill on">Shipped</span>
       <span class="pill">4 semantic modes</span>
     </div>
   </div>
@@ -2800,7 +2801,9 @@
           <tr><td>3 — Overflow</td><td>scroll, menu, collapse, wrap + container queries</td><td>23 tabs at 360 px reachable by keyboard, pointer and screen reader in every strategy</td><td class="yes">Shipped</td></tr>
           <tr><td>4 — Stateful</td><td>enclosed/editable, stepper, <code>onBeforeChange</code>, audit events, availability</td><td>Close-focus order and guard veto covered by tests; audit payload reviewed</td><td class="yes">Shipped</td></tr>
           <tr><td>5 — Composed</td><td>card, stat, command; antd <code>ConfigProvider</code> bridge; <code>syncTo</code> adapters</td><td>Docs site rebuilt on Oxygen Tabs — dogfooded before release</td><td class="mid">Shipped, not yet dogfooded</td></tr>
-          <tr><td>6 — Tests</td><td>Core units, React integration, SSR, axe across variants and modes</td><td>483 tests; 100 % statement and line coverage on both packages</td><td class="yes">Shipped</td></tr>
+          <tr><td>6 — Tests</td><td>Core units, React integration, SSR, StrictMode, axe across variants and modes</td><td>100 % statement and line coverage on both packages</td><td class="yes">Shipped</td></tr>
+          <tr><td>7 — Docs</td><td>Live gallery on the component page: every variant, mode, overflow strategy, state and the nine-cell matrix</td><td>Dogfooded — the gallery's own chapter switcher is the component</td><td class="yes">Shipped</td></tr>
+          <tr><td>8 — Browser</td><td>Playwright: indicator geometry, overflow, RTL, reflow at 320 px, visual baselines</td><td>Three of the bugs above were found here and nowhere else</td><td class="yes">Shipped</td></tr>
         </tbody>
       </table>
     </div>
@@ -2846,6 +2849,31 @@
         briefly incomplete — and the tabs at those positions ended up in neither the visible set
         nor the overflow set. They simply stopped existing.</li>
       </ul>
+      <p>
+        Three more surfaced only when the component was mounted in a real application and a real
+        browser, which is the argument for doing both rather than trusting a green unit suite:
+      </p>
+      <ul>
+        <li><b>React StrictMode left every strip completely inert.</b> StrictMode mounts, runs
+        cleanup, and mounts again; the cleanup disposed the change gate, and disposal was
+        terminal — so by the time a user could click, every request returned
+        <code>superseded</code>. Nothing responded: no click, no arrow key, no guard. StrictMode
+        is on in the default Next.js template, and Testing Library does not wrap renders in it,
+        so the entire suite was green while the component did not work at all.</li>
+        <li><b>Flipping <code>dir</code> re-measured nothing.</b> §08 listed six triggers; there
+        are seven. A direction change mirrors every offset while changing no element's size, so
+        no <code>ResizeObserver</code> fires and the indicator stays at its LTR position — which
+        is precisely what a live locale switch does.</li>
+        <li><b>The indicator was anchored with both <code>left</code> and
+        <code>inset-inline-start</code>.</b> In RTL that is an over-constrained absolutely
+        positioned box, and the over-constrained rule drops the start edge — so the thumb
+        anchored to the right edge and then translated further right, landing a whole tab away.
+        The offsets driving it are physical, so the anchor has to be too.</li>
+      </ul>
+      <p class="note">
+        The first of those is the one worth remembering. It was invisible to 252 passing tests
+        and obvious within ten seconds of opening the page.
+      </p>
     </div>
 
     <div class="callout" style="margin-top:1.5rem">

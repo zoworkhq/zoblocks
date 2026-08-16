@@ -14,6 +14,16 @@
    so the docs render the same file a customer installs, not a copy of it. */
 @import "../../../../registry/oxygen/lib/loader.css";
 
+/* The tab system's own stylesheet, imported from the package rather than
+   copied — so the docs demo the exact file a customer installs. Its tokens
+   resolve through --ox-* to --ant-* to a literal, which is why it needs no
+   theme wiring here to look right. */
+@import "../../../../packages/tabs/src/styles.css";
+
+/* The gallery frame, and the demo-theme scopes that let one page show the
+   component in light, dark and high contrast at once. */
+@import "./tabs-gallery.css";
+
 /* ===========================================================================
  * oxygenui.design — site design layer
  *

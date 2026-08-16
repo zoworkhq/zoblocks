@@ -149,11 +149,14 @@ alias you can rename. The npm packages it pulls in are published under
 | `@oxygenui-design/loaders`        | The five loaders as custom elements. Zero dependencies, SSR-safe.     |
 | `@oxygenui-design/signature`      | Signature capture for Ant Design. antd is a peer dependency.          |
 | `@oxygenui-design/signature-core` | The capture engine. No React, no antd, no DOM, no dependencies.       |
+| `@oxygenui-design/tabs`           | Tabs that know what they are. Four semantic modes, eleven skins.      |
+| `@oxygenui-design/tabs-core`      | The selection engine. No React, no DOM, no dependencies.              |
+| `@oxygenui-design/tabs-testing`   | Assertions that read a tab strip's accessibility tree.                |
 | `@oxygenui-design/react`          | Generated React package — same source as the registry, one build.     |
 | `@oxygenui-design/fhir`           | FHIR R4 types and pure read helpers.                                  |
 | `@oxygenui-design/tokens`         | Semantic clinical tokens: 3 themes × 3 densities × a brand axis.      |
 | `@oxygenui-design/intl`           | Terminology that requires both a clinician and a patient phrasing.    |
-| `@oxygenui-design/eslint-plugin`  | Seven rules enforcing the invariants above.                           |
+| `@oxygenui-design/eslint-plugin`  | Eight rules enforcing the invariants above.                           |
 | `@oxygenui-design/fixtures`       | Synthetic, non-PHI FHIR fixtures that over-represent the hard states. |
 
 ---

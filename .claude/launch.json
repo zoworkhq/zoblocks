@@ -5,7 +5,8 @@
       "name": "docs",
       "runtimeExecutable": "pnpm",
       "runtimeArgs": ["--filter", "@oxygenui-design/docs", "dev"],
-      "port": 6001
+      "port": 6001,
+      "autoPort": true
     }
   ]
 }

@@ -4,7 +4,7 @@
   "private": true,
   "description": "oxygenui.design — marketing site, component catalog, and registry host.",
   "scripts": {
-    "dev": "next dev --turbopack --port 6001",
+    "dev": "next dev --turbopack --port ${PORT:-6001}",
     "build": "next build",
     "start": "next start --port 6001",
     "typecheck": "tsc --noEmit",
@@ -13,6 +13,7 @@
   "dependencies": {
     "@oxygenui-design/fhir": "workspace:*",
     "@oxygenui-design/fixtures": "workspace:*",
+    "@oxygenui-design/tabs": "workspace:*",
     "@oxygenui-design/tokens": "workspace:*",
     "clsx": "^2.1.1",
     "lucide-react": "^0.468.0",

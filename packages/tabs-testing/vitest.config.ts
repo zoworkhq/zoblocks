@@ -6,12 +6,7 @@ export default defineConfig({
       provider: "v8",
       reporter: ["text-summary", "json-summary", "lcov"],
       include: ["src/**/*.ts"],
-      exclude: ["src/index.ts", "**/*.d.ts"],
-      // Well above the `beta` bar from the readiness audit (90% lines / 85%
-      // branches), and set at what the suite actually clears. Ratchet these
-      // up; never down. The remaining branch gap is a handful of defensive
-      // guards whose only reachable form would be a faked global — a test of
-      // the mock rather than of the code.
+      exclude: ["**/*.d.ts"],
       /*
        * Set at what the suite reaches under Vitest 4.
        *
@@ -24,12 +19,11 @@ export default defineConfig({
        *
        * Ratchet these up; never down.
        */
-      thresholds: { lines: 96, functions: 95, branches: 93, statements: 95 },
+      thresholds: { lines: 100, functions: 100, branches: 93, statements: 98 },
     },
-    // No DOM: that is the point of this package, and running it in jsdom would
-    // let a DOM dependency creep in without failing anything.
-    environment: "node",
+    // It reads the DOM, so it needs one — but only the DOM, never React.
+    environment: "jsdom",
     globals: true,
-    include: ["src/**/*.test.ts", "test/**/*.test.ts"],
+    include: ["test/**/*.test.ts"],
   },
 });
