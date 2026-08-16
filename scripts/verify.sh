@@ -15,10 +15,16 @@
 # Every one of those is invisible to `lint-staged` and fatal in CI. This script
 # closes that gap, and `.husky/pre-push` runs it so nobody has to remember.
 #
-#   pnpm verify          run everything
-#   pnpm verify --fast   skip tests and build (lint, format, types, generated)
+#   pnpm verify          run everything CI runs
+#   pnpm verify --fast   the quick pass: generated, lint, format, types, deps
 #
-# Turbo caches typecheck and test, so a second run costs seconds.
+# Full gates, in CI's order: generated artifacts · lint · format · typecheck ·
+# dependency rules · tests · coverage thresholds · build.
+#
+# Turbo caches typecheck, test and build, so a second run costs seconds.
+#
+# If you add a step to .github/workflows/ci.yml, add it here too. A gate that
+# only exists in CI is a gate you find out about from a red pull request.
 
 set -uo pipefail
 
@@ -58,14 +64,20 @@ printf "\n%sVerifying%s %s(the same gates CI runs)%s\n\n" "$BOLD" "$OFF" "$DIM" 
 
 # Order mirrors .github/workflows/ci.yml so that whichever gate fails here is
 # the one that would have failed there.
-step "generated artifacts"  "pnpm gen"              pnpm gen:check
-step "lint"                 "pnpm lint:fix"         pnpm lint
-step "format"               "pnpm format"           pnpm format:check
-step "typecheck"            "fix the type errors"   pnpm typecheck
-step "dependency rules"     "see ARCHITECTURE.md"   pnpm deps
+step "generated artifacts"  "pnpm gen"                    pnpm gen:check
+step "lint"                 "pnpm lint:fix"               pnpm lint
+step "format"               "pnpm format"                 pnpm format:check
+step "typecheck"            "fix the type errors"         pnpm typecheck
+step "dependency rules"     "see ARCHITECTURE.md"         pnpm deps
 
 if [ "$FAST" -eq 0 ]; then
-  step "tests"              "fix the failing tests" pnpm test
+  step "tests"              "fix the failing tests"       pnpm test
+  # A separate gate from `tests`, and it has to be: coverage thresholds are
+  # declared per package and a suite can pass while its package drops below
+  # the bar for its stability tier. CI runs this as its own step; leaving it
+  # out here was the second thing that reached a red PR.
+  step "coverage"           "raise coverage, or justify"  pnpm test:coverage
+  step "build"              "fix the build"               pnpm build
 fi
 
 if [ ${#FAILED[@]} -eq 0 ]; then
