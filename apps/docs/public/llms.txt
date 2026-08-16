@@ -43,6 +43,13 @@ Rules that matter when generating code with these components:
   states: Indeterminate, Delayed (not yet shown), Slow wait, Reduced motion, Inline
   status: beta
 
+## Clinical
+
+- [Signature](https://oxygenui.design/components/signature): Signature capture that records the times nobody signed — declined, unable, verbal, on paper — not just the times they did.
+  install: pnpm dlx shadcn@latest add https://oxygenui.design/r/signature.json
+  states: Signed, Declined to sign, Unable to sign (witnessed), Consented verbally (witnessed), Signed on paper, Awaiting countersignature, Consent withdrawn, Required and empty, Locked / read-only
+  status: beta
+
 ## Pattern
 
 - [Consult](https://oxygenui.design/components/consult): A floating clinical copilot: a dock above the chart that takes a question and opens into a sourced, auditable thread.

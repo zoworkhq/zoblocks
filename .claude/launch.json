@@ -2,16 +2,10 @@
   "version": "0.0.1",
   "configurations": [
     {
-      "name": "smoke",
+      "name": "docs",
       "runtimeExecutable": "pnpm",
-      "runtimeArgs": ["--filter", "@oxygenui-design/smoke", "preview"],
-      "port": 6010
-    },
-    {
-      "name": "briefs",
-      "runtimeExecutable": "python3",
-      "runtimeArgs": ["-m", "http.server", "6020"],
-      "port": 6020
+      "runtimeArgs": ["--filter", "@oxygenui-design/docs", "dev"],
+      "port": 6001
     }
   ]
 }

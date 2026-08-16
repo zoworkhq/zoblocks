@@ -62,23 +62,37 @@ async function main() {
   }
   await emitTokens(tokenSource, emitter);
 
+  /*
+   * Two audiences from here on.
+   *
+   * `registryComponents` are the ones with source in registry/oxygen — the
+   * files copied verbatim into a customer's repository. Everything that reads,
+   * typechecks, or republishes that source takes this list.
+   *
+   * `components` is everything the *catalog* should show, including package
+   * components like Signature, which have no registry source at all. Handing a
+   * package component to a registry emitter is how it ends up trying to read an
+   * empty path.
+   */
+  const registryComponents = components.filter((c) => c.meta.distribution === "registry");
+
   // Path mappings are emitted before anything reads types, so a newly added
   // component's imports resolve on the same run that introduces it.
-  await emitTsconfigPaths(components, emitter);
+  await emitTsconfigPaths(registryComponents, emitter);
 
   // These are the exact files copied into a customer's repository. Typechecking
   // them here is the only place it happens — the root tsconfig that covers them
   // is not part of any workspace task.
-  const diagnostics = diagnoseComponents(components);
+  const diagnostics = diagnoseComponents(registryComponents);
   if (diagnostics.length) {
     report(`${diagnostics.length} type error(s) in component source`, diagnostics);
     console.error("  These files ship to customers verbatim. Fix them before generating.\n");
     process.exit(1);
   }
 
-  const props = extractProps(components);
+  const props = extractProps(registryComponents);
 
-  const registryProblems = await emitRegistry(components, emitter);
+  const registryProblems = await emitRegistry(registryComponents, emitter);
   if (registryProblems.length) {
     report(`${registryProblems.length} registry problem(s)`, registryProblems);
     process.exit(1);
@@ -88,10 +102,10 @@ async function main() {
   // hand-written beside it — see emit/react-package.ts for why the direction
   // runs this way.
   await ensureReactPackageDirs();
-  await emitReactPackage(components, emitter);
+  await emitReactPackage(registryComponents, emitter);
 
   await emitCatalog(buildCatalog(components, props), emitter);
-  await emitTailwindSources(components, emitter);
+  await emitTailwindSources(registryComponents, emitter);
   await emitAgentManifest(components, emitter);
 
   const coverage = buildCoverage(components, props);
