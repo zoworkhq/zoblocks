@@ -31,7 +31,7 @@ import type {
   SignatureValue,
   SignedValue,
   Subject,
-} from "./value.js";
+} from "./value";
 
 /* ------------------------------------------------------------------ */
 /* Codes                                                               */

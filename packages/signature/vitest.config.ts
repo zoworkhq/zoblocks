@@ -30,26 +30,24 @@ export default defineConfig({
       // and `beta` is 90% lines / 85% branches.
       thresholds: { lines: 90, functions: 90, branches: 85, statements: 90 },
     },
+    /**
+     * 15s, not the 5s default.
+     *
+     * `signs with the keyboard alone` drives a whole signing flow through
+     * `userEvent.tab()` and `.keyboard()` — no pointer events anywhere, which
+     * is the point of it — and every one of those keystrokes yields to the
+     * event loop. Under jsdom 30 that flow lands near five seconds, so the test
+     * passed alone and failed intermittently in a full parallel run.
+     *
+     * The timeout is the honest lever here. Shortening the interaction would
+     * weaken the WCAG 2.1.1 argument the test exists to make, and
+     * `delay: null` would remove the async gaps that make it resemble a real
+     * keyboard user.
+     */
+    testTimeout: 15_000,
     environment: "jsdom",
     globals: true,
     setupFiles: ["./test/setup.ts"],
     include: ["src/**/*.test.tsx", "test/**/*.test.tsx"],
-    /**
-     * Four times the default, because these are the slowest tests in the repo
-     * and the default was written for unit tests.
-     *
-     * "signs with the keyboard alone" drives a full typed signature through
-     * `userEvent` — every keystroke separately, inside an antd Modal, against a
-     * canvas — and each keystroke costs a jsdom layout pass. It runs in ~0.7s on
-     * a developer machine and took 5.13s on a shared CI runner, which is a 7×
-     * spread against a 5s budget.
-     *
-     * Raised rather than the test trimmed: what makes it worth having is that
-     * it types a real name key by key, which is the path a keyboard-only signer
-     * actually takes. Sampling fewer keystrokes to fit a timer would test
-     * something nobody does. A generous ceiling costs nothing when the suite
-     * passes and prevents a flake that reads as a component bug.
-     */
-    testTimeout: 20_000,
   },
 });

@@ -29,8 +29,8 @@
 
 import * as React from "react";
 import type { SignatureValue, SignedValue } from "@oxygenui-design/signature-core";
-import { SignatureInk } from "./SignatureInk.js";
-import { useLocale, type SignatureLocale } from "./locale.js";
+import { SignatureInk } from "./SignatureInk";
+import { useLocale, type SignatureLocale } from "./locale";
 
 export interface SignatureManifestProps {
   value: SignatureValue;

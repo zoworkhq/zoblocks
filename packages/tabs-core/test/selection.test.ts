@@ -258,9 +258,8 @@ describe("re-entrant requests", () => {
     // instead" — is a real pattern, and the first request must not land after
     // the second has already committed.
     const commits: string[] = [];
-    // Self-referential by design: the callback reaches the gate it belongs to.
-    // `const` is safe because the closure only runs after the assignment has
-    // completed, so the reference is never in the temporal dead zone.
+    // `const`, even though the callback below references it: the arrow captures
+    // the binding, and it does not run until after initialisation completes.
     const gate: ReturnType<typeof createChangeGate> = createChangeGate({
       onBeforeChange: (next) => {
         if (next === "b") void gate.request("c", "programmatic");
