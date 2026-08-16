@@ -49,7 +49,7 @@ jobs:
           echo "### SBOM generated" >> "$GITHUB_STEP_SUMMARY"
           echo "\`$count\` runtime components, CycloneDX 1.5." >> "$GITHUB_STEP_SUMMARY"
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: sbom
           path: sbom.cyclonedx.json
