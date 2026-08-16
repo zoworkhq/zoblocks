@@ -148,6 +148,45 @@ describe("the accordion prop", () => {
   });
 });
 
+describe("malformed input", () => {
+  it("still reports on an element whose tag is never closed", () => {
+    // A file mid-edit, or one the transform was pointed at by a glob that
+    // caught a template. Reading to the end of the buffer rather than giving up
+    // is what keeps the note from silently disappearing on the file someone was
+    // actually working in.
+    const note = messages('import { Collapse } from "antd";\n<Collapse items={items}');
+    expect(note.some((m) => m.includes("Set headingLevel"))).toBe(true);
+  });
+
+  it("goes quiet rather than guessing when an unterminated tag runs into the next", () => {
+    // An unterminated element has no attribute boundary, so the scan runs on
+    // into the following element and sees *its* headingLevel. Both go
+    // unreported.
+    //
+    // That is a false negative, and it is the one to prefer. This input is a
+    // file mid-keystroke; a codemod that fires spuriously on half-typed JSX is
+    // a codemod people run once and then stop reading. Under-reporting on
+    // malformed input costs a second pass after the file is saved.
+    const { notes } = run("<Collapse items={a}\n<Collapse headingLevel={2} items={b} />");
+    expect(notes.filter((n) => n.message.includes("Set headingLevel"))).toHaveLength(0);
+  });
+
+  it("survives an empty file", () => {
+    expect(run("")).toEqual({ code: "", notes: [], changed: false });
+  });
+
+  it("survives an import with an empty specifier list", () => {
+    const source = 'import {} from "antd";\n<Collapse items={x} />';
+    expect(run(source).code).toContain("<Accordion");
+    expect(run(source).code).toContain('import {} from "antd";');
+  });
+
+  it("handles trailing commas in the specifier list", () => {
+    const { code } = run('import { Button, Collapse, } from "antd";');
+    expect(code).toContain('import { Button } from "antd";');
+  });
+});
+
 describe("notes", () => {
   it("reports 1-indexed lines, so they line up with an editor", () => {
     const { notes } = run("const a = 1;\nconst b = 2;\n<Collapse items={items} />");
