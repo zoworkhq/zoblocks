@@ -47,6 +47,13 @@ Rules that matter when generating code with these components:
   states: On, Off, Unknown (absence, with a reason), Pending — the write is in flight, Committed, Reverted — the write failed, Blocked — refused before trying, Queued — offline, Stale — changed by someone else, Read-only, with a reason, Disabled, Time-boxed (until), Awaiting confirmation, Segmented — both answers visible, Chip — a filter bar, Row — the whole row is the target
   status: experimental
 
+## Clinical
+
+- [Signature](https://oxygenui.design/components/signature): Signature capture that records the times nobody signed — declined, unable, verbal, on paper — not just the times they did.
+  install: pnpm dlx shadcn@latest add https://oxygenui.design/r/signature.json
+  states: Signed, Declined to sign, Unable to sign (witnessed), Consented verbally (witnessed), Signed on paper, Awaiting countersignature, Consent withdrawn, Required and empty, Locked / read-only
+  status: beta
+
 ## Machine-readable catalog
 
 - Index: https://oxygenui.design/r/index.json

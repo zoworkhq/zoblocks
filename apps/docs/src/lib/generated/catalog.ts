@@ -15,6 +15,7 @@ export const CATALOG: ComponentDoc[] = [
     "status": "beta",
     "since": "0.2.0",
     "layer": "primitive",
+    "distribution": "registry",
     "summary": "Three rings expanding and fading from a soft core, paced at a resting breath rather than a spinner's tempo.",
     "description": "Symbol-free loader cycling at roughly fifteen a minute, the rate of calm breathing. Carries no clinical imagery, so it suits any specialty, and its core accepts a customer's logo mark.",
     "rationale": "A spinner's tempo tells a reader the system is working hard; breathing tells them they can wait. On a patient-facing screen — a results page, a portal sign-in, a check-in kiosk — the second is almost always what the product means to say. It is also the one loader in the set with no clinical symbol at all, which is what makes it safe across specialties: nothing here reads as cardiac, oncological, or obstetric to someone who is about to receive news. That neutrality is a feature, not an absence of one.",
@@ -309,6 +310,7 @@ export const CATALOG: ComponentDoc[] = [
     "status": "beta",
     "since": "0.2.0",
     "layer": "primitive",
+    "distribution": "registry",
     "summary": "Two strands of dots turning on a slow sine. For the parts of a product that are laboratory rather than bedside.",
     "description": "Loader for genomics, pathology, and diagnostics surfaces. Depth comes from scale and opacity rather than a 3D transform, so the strands cross convincingly while staying cheap to composite.",
     "rationale": "The most specific loader in the set, and deliberately so. Sequencing, pathology, and diagnostics screens are waiting on analysis rather than on a person, and a cardiac mark says the wrong thing there — as does a generic ring, which says nothing at all. Depth is faked with scale and opacity rather than a 3D transform because a rotateY helix renders differently across browsers and costs a layer per dot; eighteen phase-offset dots on one keyframe read as a rotation and cost nothing.",
@@ -588,6 +590,7 @@ export const CATALOG: ComponentDoc[] = [
     "status": "beta",
     "since": "0.2.0",
     "layer": "primitive",
+    "distribution": "registry",
     "summary": "A capsule with a soft slug — the only loader in the set that can tell the truth about how much is left.",
     "description": "Determinate and indeterminate progress in one component. Pass progress for a real 0–100 measurement with role=progressbar; omit it and the slug drifts as an honest unknown.",
     "rationale": "Named for the one device in a hospital that displays a percentage and means it. The two modes are deliberately different animations rather than one animation with a value bolted on: a determinate bar that also drifts tells a reader a measurement is moving when it is not, and on an import, a batch upload, or a records transfer, movement is exactly the fact being watched. It is the only loader here that should ever carry a number, and only when the application genuinely knows it — a fabricated percentage parked at ninety is worse than a loader that never claimed to know.",
@@ -868,6 +871,7 @@ export const CATALOG: ComponentDoc[] = [
     "status": "beta",
     "since": "0.2.0",
     "layer": "primitive",
+    "distribution": "registry",
     "summary": "An open heart with a rhythm line running through it, beating at a resting sixty. The library's signature wait.",
     "description": "Page and region loader: an open heart that draws itself once, then beats at a resting 60bpm while a monitor sweep crosses the rhythm line. Renders as Rhythm Loader below 40px, where the heart's detail would collapse.",
     "rationale": "A page loader is the first thing a clinician or a patient sees, it plays while the system is at its most fragile, and it is judged in the first three hundred milliseconds. This one is built from measured cardiac timing rather than from a spinner's tempo: sixty beats a minute is a resting sinus rhythm, the beat scales by seven percent so it is noticed peripherally and never tracked, and the heart draws in once rather than once per loop so the animation has no seam. Every colour is a semantic token and the whole thing is SVG and CSS, which means it renders before any JavaScript bundle has loaded — the one requirement a page loader has that a component loader does not.",
@@ -1282,6 +1286,7 @@ export const CATALOG: ComponentDoc[] = [
     "status": "beta",
     "since": "0.2.0",
     "layer": "primitive",
+    "distribution": "registry",
     "summary": "One rhythm strip, swept like a monitor. The quietest way for an interface to say it is still there.",
     "description": "Loader drawn as a single PQRST complex on a baseline, swept once per beat by a bright head with a fading tail. Nothing scales and nothing grows, and it stays legible down to 20px.",
     "rationale": "The clinical default, and the loader to reach for when a beating heart would be the wrong thing to put in front of someone. It carries no symbol, only the artifact a clinician already reads all day: P wave, QRS complex, T wave, in those proportions rather than the decorative zig-zag that generic ECG graphics use. Because it never scales, it is also the only cardiac loader that survives at twenty pixels — so it is what Pulse Loader renders when it is asked to be small, and what belongs beside a button label or in a table row.",
@@ -1576,6 +1581,7 @@ export const CATALOG: ComponentDoc[] = [
     "status": "experimental",
     "since": "0.3.0",
     "layer": "primitive",
+    "distribution": "registry",
     "summary": "A binary control for a record that is shared, asynchronous, and often missing the fact you are asking it about.",
     "description": "Switch with three independent axes: the value the record holds, the phase of the write, and whether you may change it. Models the request and the outcome separately, so it never renders a state it cannot substantiate.",
     "rationale": "A switch promises something it usually cannot keep — that a thing is now true. In healthcare that promise gets made over a hospital network, about a fact that may never have been asked, on a record that may already be signed and that somebody else may be editing. Every one of those is a state a clinician acts on, and a conventional switch renders all of them as ordinary on or off. This one separates the request from the outcome: a write in flight is visible and still operable, a failed write animates back and interrupts rather than snapping back silently, an absent answer says which kind of absence it is, and a value someone else changed underneath you shows both readings and asks. The API matches Ant Design's exactly and takes no dependency on it, so an existing antd form migrates by changing an import.",
@@ -1673,6 +1679,91 @@ export const CATALOG: ComponentDoc[] = [
       "tailwind-merge"
     ],
     "install": "pnpm dlx shadcn@latest add https://oxygenui.design/r/switch.json"
+  },
+  {
+    "name": "signature",
+    "title": "Signature",
+    "tier": "free",
+    "status": "beta",
+    "since": "0.1.0",
+    "layer": "clinical",
+    "distribution": "package",
+    "packageName": "@oxygenui-design/signature",
+    "summary": "Signature capture that records the times nobody signed — declined, unable, verbal, on paper — not just the times they did.",
+    "description": "Draw, type or upload a signature inside an Ant Design form, and record the outcomes a signature pad has no answer for. The value is a discriminated union over seven outcomes rather than a base64 string, so a refusal is a fact the record can hold.",
+    "rationale": "Almost every signature component solves one problem: get ink from a pointer onto a canvas and hand back a PNG. That is about fifteen percent of what a healthcare product needs. The rest is everything the PNG does not say — who signed, in what capacity, what they were agreeing to, and, most often of all, what to record when nobody signed at all. A patient who refused and a form nobody opened are different facts with different consequences, and a component whose only states are empty and signed makes the difference unrecordable. That is the same argument AbsentValue makes one tier down, at a much higher stake.",
+    "categories": [
+      "Clinical",
+      "Data Entry"
+    ],
+    "fhir": [],
+    "states": [
+      "Signed",
+      "Declined to sign",
+      "Unable to sign (witnessed)",
+      "Consented verbally (witnessed)",
+      "Signed on paper",
+      "Awaiting countersignature",
+      "Consent withdrawn",
+      "Required and empty",
+      "Locked / read-only"
+    ],
+    "props": [],
+    "exports": [],
+    "usage": "import { Form } from \"antd\";\nimport { Signature, signatureRequired } from \"@oxygenui-design/signature\";\nimport \"@oxygenui-design/signature/styles.css\";\n\n// signatureRequired() accepts a decline as an answer. A rule demanding\n// outcome === \"signed\" would make refusal impossible to submit.\n<Form.Item name=\"consent\" label=\"Patient signature\" rules={[signatureRequired()]}>\n  <Signature\n    now={serverTime}\n    meaning=\"consent\"\n    attestation=\"I have read the information about this procedure, I have had the chance to ask questions, and I agree to go ahead.\"\n    subject={{ display: \"Randall, Josh\", reference: \"Patient/4471902\" }}\n    recordedBy={{ name: \"A. Okafor\", credential: \"RN\" }}\n    outcomes={[\"declined\", \"unable\", \"verbal\", \"on-paper\"]}\n  />\n</Form.Item>;",
+    "guidance": {
+      "use": [
+        "Consent forms, treatment authorisations, and anywhere a refusal must be recordable rather than left blank.",
+        "Clinician attestation and countersignature, where the record must say who is accountable and in what capacity.",
+        "Signing on behalf of someone — a parent for a minor, a proxy for an incapacitated adult — which the capacity field captures explicitly.",
+        "Inside an Ant Design form: it satisfies the custom-control contract, so `Form.Item` wiring and validation status work with no adapter."
+      ],
+      "avoid": [
+        "Controlled-substance prescribing. DEA EPCS is a separate and far stricter regime — identity proofing, two-factor, a certified application — and this does not satisfy it.",
+        "Anywhere you need cryptographic non-repudiation from the component alone. A PNG of a mark carries no integrity guarantee; pair it with a detached JWS.",
+        "As an identity check. It records the identity the host asserts and cannot verify it; 21 CFR 11.200's two-component rule lives in your auth layer.",
+        "Draw-only configurations. `methods={[\"draw\"]}` is a WCAG Level A failure that renders perfectly and passes every other test."
+      ]
+    },
+    "accessibility": [
+      {
+        "label": "Operable without a pointer",
+        "detail": "Drawing is a path-dependent input technique, and WCAG 2.1.1 (Level A) requires the underlying function — recording assent — to be operable by keyboard. The typed path is that mechanism, not a fallback, and a test signs the form using only tab and keyboard events. Removing it is a lint error."
+      },
+      {
+        "label": "The canvas is not the control",
+        "detail": "A canvas has no implicit ARIA role, and role=img on a live capture surface would assert a non-interactive graphic. The widget is a labelled group with real DOM controls; the surface is aria-hidden and the operable path is native HTML."
+      },
+      {
+        "label": "State is announced, because nothing else reports it",
+        "detail": "SVG and canvas changes are invisible to assistive technology. A polite live region announces capture and clearing, counting finished strokes only so it does not speak while someone is mid-signature."
+      },
+      {
+        "label": "A finished signature is named by whose it is",
+        "detail": "The equivalent purpose of a signature image under SC 1.1.1 is whose it is and that it was given — never a description of the strokes. Alt text reads 'Signature of Josh Randall, signed 16 August 2026'."
+      },
+      {
+        "label": "Legible under forced colors",
+        "detail": "The ink is currentColor on real SVG elements rather than a script-painted canvas bitmap, so it is recoloured with everything else instead of vanishing against a forced background."
+      },
+      {
+        "label": "Targets meet the 24px floor",
+        "detail": "SC 2.5.8 exempts the canvas — a spatially-selected area counts as one target — so it is entirely a toolbar concern. Undo, redo and clear are all at least 24 by 24."
+      }
+    ],
+    "limitations": [
+      "Ant Design is a peer dependency. This is the only Oxygen component that is not distributed as copy-as-source, because copying antd's Modal and Form into a consumer's repository would be a fork rather than a component.",
+      "Signature.data is a graphical signature only — an image of a mark. Deployments needing non-repudiation add a second Signature entry carrying a JWS.",
+      "The timestamp is a required prop, not read from the clock. A browser clock is not evidence, and 42 CFR 482.24(c)(1) wants entries dated by whoever is accountable.",
+      "Stroke biometrics are captured into the model but never emitted unless explicitly opted in, because whether stroke dynamics are a 'writing sample' is unsettled under BIPA and CUBI.",
+      "Interpreter attestation, adopt-and-apply, and saved signatures are designed but not built."
+    ],
+    "related": [],
+    "dependencies": [
+      "antd",
+      "@oxygenui-design/signature-core"
+    ],
+    "install": "pnpm dlx shadcn@latest add https://oxygenui.design/r/signature.json"
   }
 ];
 
