@@ -199,6 +199,11 @@
   --ox-duration: var(--ox-ref-duration-base);
   --ox-duration-slow: var(--ox-ref-duration-slow);
   --ox-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --ox-duration-identity-swap: 180ms;
+  --ox-duration-identity-reveal: 220ms;
+  --ox-duration-identity-escalate: 260ms;
+  --ox-duration-alert: 0ms;
+  --ox-duration-skeleton-loop: 1400ms;
 
   /* Semantic — light theme ----------------------------------------------
    * The key space every other theme must match. A theme missing a key here

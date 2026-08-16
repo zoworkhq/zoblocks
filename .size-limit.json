@@ -34,5 +34,30 @@
     "name": "loader stylesheet",
     "path": "registry/oxygen/lib/loader.css",
     "limit": "4 KB"
+  },
+  {
+    "name": "identity-core \u2014 the whole engine (includes Jaro\u2013Winkler and Metaphone)",
+    "path": "packages/identity-core/dist/index.js",
+    "import": "*",
+    "limit": "9 KB"
+  },
+  {
+    "name": "identity \u2014 the avatar alone",
+    "path": "packages/identity/dist/IdentityAvatar.js",
+    "import": "{ IdentityAvatar }",
+    "limit": "3 KB",
+    "ignore": ["react", "react-dom", "antd"]
+  },
+  {
+    "name": "identity \u2014 the whole barrel",
+    "path": "packages/identity/dist/index.js",
+    "import": "*",
+    "limit": "16 KB",
+    "ignore": ["react", "react-dom", "antd"]
+  },
+  {
+    "name": "identity stylesheet",
+    "path": "packages/identity/dist/styles.css",
+    "limit": "6 KB"
   }
 ]
