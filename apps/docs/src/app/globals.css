@@ -14,6 +14,11 @@
    so the docs render the same file a customer installs, not a copy of it. */
 @import "../../../../registry/oxygen/lib/loader.css";
 
+/* Switch structure, phases and forced-colours handling. Shipped to customers as
+   styles/oxygen-switch.css by the `switch-core` registry item; imported here so
+   the previews render the same file a customer installs, not a copy of it. */
+@import "../../../../registry/oxygen/lib/switch.css";
+
 /* ===========================================================================
  * oxygenui.design — site design layer
  *
