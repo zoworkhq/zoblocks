@@ -66,7 +66,7 @@ const storyModules = import.meta.glob("../registry/oxygen/*/*.stories.tsx", {
 
 const metaModules = import.meta.glob("../registry/oxygen/*/*.meta.ts", {
   eager: true,
-}) as Record<string, { default: { name: string; states: string[] } }>;
+}) as Record<string, { default: { name: string; states: string[]; categories: string[] } }>;
 
 function nameFromPath(filePath: string): string {
   return path.basename(path.dirname(filePath));
@@ -90,8 +90,10 @@ for (const [filePath, mod] of Object.entries(storyModules)) {
 }
 
 const declaredStates = new Map<string, string[]>();
+const declaredCategories = new Map<string, string[]>();
 for (const [filePath, mod] of Object.entries(metaModules)) {
   declaredStates.set(nameFromPath(filePath), mod.default.states);
+  declaredCategories.set(nameFromPath(filePath), mod.default.categories);
 }
 
 /**
@@ -158,9 +160,13 @@ describe("story coverage", () => {
     expect(undeclared, `${name} has stories for states missing from its meta.ts`).toEqual([]);
   });
 
-  it("titles every story file under the Loaders category", () => {
+  it("titles every story file under a category the component declares", () => {
     for (const entry of entries) {
-      expect(entry.meta.title, entry.component).toMatch(/^Loaders\//);
+      const category = String(entry.meta.title ?? "").split("/")[0];
+      expect(
+        declaredCategories.get(entry.component) ?? [],
+        `${entry.component}: story title "${entry.meta.title}" names a category its meta.ts does not declare`,
+      ).toContain(category);
     }
   });
 });
@@ -175,7 +181,13 @@ describe("every story renders", () => {
       // A story that renders nothing is either a broken fixture or a state that
       // deliberately shows nothing — and the second must say so.
       if (entry.story.parameters?.skipVrt) return;
-      expect(view.container.querySelector("[data-ox-loader]")).not.toBeNull();
+      const rooted = Array.from(view.container.querySelectorAll<HTMLElement>("*")).some((el) =>
+        Array.from(el.attributes).some((attr) => attr.name.startsWith("data-ox-")),
+      );
+      expect(
+        rooted,
+        `${entry.component} › ${entry.exportName} rendered no element carrying a data-ox-* root marker`,
+      ).toBe(true);
     },
   );
 });

@@ -17,6 +17,12 @@ import noRoomNumberIdentifier from "./rules/no-room-number-identifier.js";
 import noTruncatedIdentity from "./rules/no-truncated-identity.js";
 import preferLogicalProperties from "./rules/prefer-logical-properties.js";
 import signatureRequiresTypedPath from "./rules/signature-requires-typed-path.js";
+import {
+  noDisabledWithReason,
+  switchAuditNeedsNow,
+  switchNeedsCommitStrategy,
+  switchNotForQuestions,
+} from "./rules/switch-usage.js";
 import tabsSemanticMode from "./rules/tabs-semantic-mode.js";
 
 const plugin = {
@@ -32,6 +38,10 @@ const plugin = {
     "no-truncated-identity": noTruncatedIdentity,
     "prefer-logical-properties": preferLogicalProperties,
     "signature-requires-typed-path": signatureRequiresTypedPath,
+    "switch-not-for-questions": switchNotForQuestions,
+    "switch-needs-commit-strategy": switchNeedsCommitStrategy,
+    "no-disabled-with-reason": noDisabledWithReason,
+    "switch-audit-needs-now": switchAuditNeedsNow,
     "tabs-semantic-mode": tabsSemanticMode,
   },
 };
@@ -57,6 +67,13 @@ plugin.configs = {
       // An error, not a warning: a draw-only signature control is a WCAG
       // Level A failure that renders perfectly and passes every other test.
       "@oxygenui/signature-requires-typed-path": "error",
+      // A switch inside a form that submits promises something it does not do,
+      // and `disabled` beside a reason throws the reason away. Both are errors
+      // because both render perfectly.
+      "@oxygenui/switch-needs-commit-strategy": "error",
+      "@oxygenui/no-disabled-with-reason": "error",
+      // An audit event stamped with nothing is not an audit trail.
+      "@oxygenui/switch-audit-needs-now": "error",
       // An error for the same reason: a tablist of links renders perfectly,
       // passes every automated checker, and destroys a keyboard user's focus
       // the first time they press an arrow key.
@@ -68,6 +85,10 @@ plugin.configs = {
       // legitimate use somewhere — the rule exists to make the author look at
       // it once, not to forbid a word.
       "@oxygenui/no-ambiguous-clinical-copy": "warn",
+      // Warn by design: a question-shaped label is sometimes the right words
+      // for a control that genuinely holds one answer. The rule exists to make
+      // the author reach for `segmented` deliberately rather than by default.
+      "@oxygenui/switch-not-for-questions": "warn",
     },
   },
 };

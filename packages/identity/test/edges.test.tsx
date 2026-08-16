@@ -416,3 +416,72 @@ describe("the library writes nothing to the console", () => {
     }
   });
 });
+
+describe("re-render paths the feature suites do not reach", () => {
+  it("does not announce a switch when the same patient re-renders", async () => {
+    // The banner's announcer fires on a patient *change*. A new Patient object
+    // describing the same person resolves to the same identity key, and
+    // announcing that would talk over a screen-reader user for nothing.
+    const { rerender } = F.renderWithPolicy(<PatientBanner patient={F.ada} context="navigation" />);
+    await waitFor(() => expect(screen.getByRole("region")).toBeInTheDocument());
+
+    // A structurally identical copy — a fresh object from a refetch.
+    rerender(<PatientBanner patient={{ ...F.ada }} context="navigation" />);
+    await new Promise((r) => setTimeout(r, 200));
+
+    const live = [...document.querySelectorAll("[aria-live]")]
+      .map((n) => n.textContent ?? "")
+      .join(" ");
+    expect(live).not.toMatch(/now showing/i);
+  });
+
+  it("tolerates the same patient appearing twice in one set", async () => {
+    // Two chips, one person — a worklist that lists an encounter and its
+    // follow-up. Both register the identical memoised Identity, and both
+    // deregister the same key on unmount. Neither the duplicate registration
+    // nor the second removal may disturb the map.
+    const onDisambiguate = vi.fn();
+    const { rerender } = F.renderWithPolicy(
+      <IdentitySet onDisambiguate={onDisambiguate}>
+        <PatientChip patient={F.ada} />
+        <PatientChip patient={F.ada} />
+      </IdentitySet>,
+    );
+    await waitFor(() => expect(onDisambiguate.mock.calls.at(-1)?.[0].total).toBe(1));
+
+    rerender(<IdentitySet onDisambiguate={onDisambiguate}>{null}</IdentitySet>);
+    await waitFor(() => expect(onDisambiguate.mock.calls.at(-1)?.[0].total).toBe(0));
+  });
+
+  it("adds the date of birth when two records share a name entirely", async () => {
+    // Rung 1 of the ladder is skipped when the given names already match, so
+    // the date of birth is the first thing that tells these two apart.
+    const onDisambiguate = vi.fn();
+    const older = F.patient({
+      id: "pat-7001",
+      name: [{ use: "official", given: ["Rosa"], family: "Iyer" }],
+      birthDate: "1948-02-11",
+      identifier: [{ system: F.MRN, value: "770112001" }],
+    });
+    const younger = F.patient({
+      id: "pat-7002",
+      name: [{ use: "official", given: ["Rosa"], family: "Iyer" }],
+      birthDate: "1991-07-04",
+      identifier: [{ system: F.MRN, value: "770112002" }],
+    });
+
+    const { container } = F.renderWithPolicy(
+      <IdentitySet onDisambiguate={onDisambiguate}>
+        <PatientChip patient={older} />
+        <PatientChip patient={younger} />
+      </IdentitySet>,
+    );
+
+    await waitFor(() => expect(onDisambiguate.mock.calls.at(-1)?.[0].escalated).toBe(2));
+    await waitFor(() => {
+      // Both dates on screen, because one without the other identifies nobody.
+      expect(container.textContent).toMatch(/1948/);
+      expect(container.textContent).toMatch(/1991/);
+    });
+  });
+});

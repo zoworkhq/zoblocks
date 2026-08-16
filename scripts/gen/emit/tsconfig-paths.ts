@@ -39,6 +39,7 @@ export const WORKSPACE_ALIASES: Record<string, string[]> = {
   // project by the shadcn CLI under lib/, and imported by that path. They
   // resolve here the same way component specifiers do.
   "@/lib/oxygen-loader": ["./registry/oxygen/lib/loader.tsx"],
+  "@/lib/oxygen-switch": ["./registry/oxygen/lib/switch.tsx"],
 };
 
 export async function emitTsconfigPaths(
