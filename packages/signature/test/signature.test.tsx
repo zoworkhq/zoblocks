@@ -478,6 +478,168 @@ describe("SignatureManifest", () => {
       unmount();
     }
   });
+
+  /*
+   * The evidence each outcome carries.
+   *
+   * `passes axe for every outcome` above renders most of the union, but only
+   * ever in its barest form — so the fields that make a non-signed outcome an
+   * actual record, rather than a label, went unasserted. Each of these is a
+   * field §11.50 or the pathway depends on: what was read out, where the scan
+   * went, who watched, what is still outstanding.
+   */
+
+  it("renders a countersignature that is still outstanding", () => {
+    // Signed by the resident, awaiting the attending. Rendering this as an
+    // empty field is the case the union exists to prevent.
+    render(
+      <SignatureManifest
+        value={{
+          outcome: "pending",
+          awaiting: "clinician",
+          since: NOW,
+          soFar: [SIGNED],
+          recordedAt: NOW,
+          recordedBy: { name: "A. Okafor", credential: "RN" },
+        }}
+      />,
+    );
+
+    expect(screen.getByText("Awaiting countersignature")).toBeInTheDocument();
+    expect(screen.getByText("Clinician")).toBeInTheDocument();
+    expect(document.querySelector("time")).toHaveAttribute("datetime", NOW);
+  });
+
+  it("spells out an unable reason and keeps the free text beside it", () => {
+    // The coded reason drives the pathway; `detail` is what the nurse actually
+    // saw. Showing only one of them loses half the record.
+    render(
+      <SignatureManifest
+        value={{
+          outcome: "unable",
+          reason: "physically-unable",
+          detail: "Right arm in a cast after this morning's fall.",
+          witness: { name: "M. Silva", credential: "MD" },
+          recordedAt: NOW,
+          recordedBy: { name: "A. Okafor", credential: "RN" },
+        }}
+      />,
+    );
+
+    expect(screen.getByText(/physically unable to hold a pen or stylus/i)).toBeInTheDocument();
+    expect(screen.getByText(/right arm in a cast/i)).toBeInTheDocument();
+    expect(screen.getByText("M. Silva, MD")).toBeInTheDocument();
+  });
+
+  it("shows the wording that was read out, not just that a call happened", () => {
+    render(
+      <SignatureManifest
+        value={{
+          outcome: "verbal",
+          channel: "phone",
+          script: "I have explained the risks and she confirmed she understood them.",
+          witness: { name: "M. Silva", credential: "MD" },
+          recordedAt: NOW,
+          recordedBy: { name: "A. Okafor", credential: "RN" },
+        }}
+      />,
+    );
+
+    expect(screen.getByText("Consented verbally")).toBeInTheDocument();
+    expect(screen.getByText(/confirmed she understood/i)).toBeInTheDocument();
+  });
+
+  it("points at the scan once one exists", () => {
+    render(
+      <SignatureManifest
+        value={{
+          outcome: "on-paper",
+          scanRef: "DocumentReference/scan-4471",
+          recordedAt: NOW,
+          recordedBy: { name: "A. Okafor", credential: "RN" },
+        }}
+      />,
+    );
+
+    expect(screen.getByText("Signed on paper")).toBeInTheDocument();
+    expect(screen.getByText("DocumentReference/scan-4471")).toBeInTheDocument();
+  });
+
+  it("names the witness to a decline when there was one", () => {
+    render(
+      <SignatureManifest
+        value={{
+          outcome: "declined",
+          reason: "Wants to discuss with her daughter first.",
+          witness: { name: "M. Silva", credential: "MD" },
+          recordedAt: NOW,
+          recordedBy: { name: "A. Okafor", credential: "RN" },
+        }}
+      />,
+    );
+
+    expect(screen.getByText("M. Silva, MD")).toBeInTheDocument();
+  });
+
+  it("distinguishes an unchecked document from a checked one", () => {
+    // An absent check and a passing check must not look the same — the whole
+    // reason `verified` is optional rather than defaulting to false.
+    const { rerender } = render(<SignatureManifest value={SIGNED} title="Record" />);
+    expect(screen.queryByText(/document/i)).not.toBeInTheDocument();
+
+    rerender(<SignatureManifest value={SIGNED} title="Record" verified />);
+    expect(screen.getByText(/valid — document unchanged/i)).toBeInTheDocument();
+
+    rerender(<SignatureManifest value={SIGNED} title="Record" verified={false} />);
+    expect(screen.getByText(/document has changed since signing/i)).toBeInTheDocument();
+  });
+
+  it("says who the signer was acting for when it is not themselves", () => {
+    render(
+      <SignatureManifest
+        value={{
+          ...SIGNED,
+          capacity: "proxy",
+          onBehalfOf: { display: "Eleanor Randall" },
+          signer: { name: "Josh Randall", credential: "Healthcare proxy" },
+        }}
+      />,
+    );
+
+    expect(
+      screen.getByText(/healthcare proxy · on behalf of eleanor randall/i),
+    ).toBeInTheDocument();
+  });
+
+  it("describes a drawn mark by its strokes and the pointer that made it", () => {
+    const drawn: SignatureValue = {
+      ...SIGNED,
+      method: "draw",
+      documentHash: "sha256:9f2c",
+      provenance: { method: "draw", pointerType: "pen", strokeCount: 3 },
+    };
+    const { rerender } = render(<SignatureManifest value={drawn} />);
+    expect(screen.getByText("Drawn · 3 strokes · stylus")).toBeInTheDocument();
+    expect(screen.getByText("sha256:9f2c")).toBeInTheDocument();
+
+    // Singular, because "1 strokes" on a legal record reads as a bug.
+    rerender(
+      <SignatureManifest
+        value={{ ...drawn, provenance: { method: "draw", pointerType: "touch", strokeCount: 1 } }}
+      />,
+    );
+    expect(screen.getByText("Drawn · 1 stroke · finger on a touchscreen")).toBeInTheDocument();
+  });
+
+  it("falls back to the raw timestamp rather than printing 'Invalid Date'", () => {
+    render(<SignatureManifest value={{ ...SIGNED, recordedAt: "not-a-date" }} />);
+    expect(screen.getByText("not-a-date")).toBeInTheDocument();
+  });
+
+  it("drops the integrity note when the host has its own", () => {
+    render(<SignatureManifest value={SIGNED} hideIntegrityNote />);
+    expect(screen.queryByText(/not a cryptographic signature/i)).not.toBeInTheDocument();
+  });
 });
 
 describe("the field", () => {
