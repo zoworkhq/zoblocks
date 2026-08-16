@@ -11,7 +11,7 @@ reference range, the restricted record, the patient who refused to sign.
 [![CI](https://github.com/zoworkhq/oxygenui/actions/workflows/ci.yml/badge.svg)](https://github.com/zoworkhq/oxygenui/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178C6.svg?logo=typescript&logoColor=white)](packages/tsconfig/base.json)
-[![Tests](https://img.shields.io/badge/tests-1%2C113%20passing-brightgreen.svg)](#quality-is-a-gate-not-a-goal)
+[![Tests](https://img.shields.io/badge/tests-1%2C622%20passing-brightgreen.svg)](#quality-is-a-gate-not-a-goal)
 [![Coverage](https://img.shields.io/badge/coverage-gated%2090%25%2F85%25-brightgreen.svg)](#quality-is-a-gate-not-a-goal)
 [![WCAG 2.2 AA](https://img.shields.io/badge/WCAG%202.2-AA%20tested-success.svg)](#accessibility-is-tested-not-claimed)
 [![FHIR R4](https://img.shields.io/badge/FHIR-R4-e6007e.svg)](packages/fhir)
@@ -98,6 +98,32 @@ with different consequences. `unable` without a witness is a compile error.
 Emits a FHIR transaction Bundle, because `Consent` carries no signature element
 in R4 or R5 — only `Provenance.signature` does.
 
+### Identity — the banner is a safety control, not a heading
+
+A patient avatar, chip and banner. The banner is the last surface a clinician
+reads before they act, so it is built like a control: two person-specific
+identifiers before a care action are a **compile error**, not a review comment
+(Joint Commission NPSG.01.01.01), and `Patient.gender` is not a renderable field
+at all — it is administrative gender, and a bare "M" beside a dose is a
+prescriber reading the wrong reference range.
+
+```tsx
+<PatientBanner patient={patient} context="action" identifiers={[{ kind: "mrn" }, { kind: "nhs" }]}>
+  <PatientGuard expect={openedFor.id}>
+    <OrderForm />
+  </PatientGuard>
+</PatientBanner>
+```
+
+`PatientGuard` refuses to render when the chart on screen is not the chart the
+form was opened for. `disambiguate()` keeps two patients who share a name apart
+on a worklist, adding the minimum that separates them — full given name, then
+date of birth, then identifier — and it handles the newborn-twins case that
+colour and initials both fail. Absence is five states, not one fallback: a
+photograph that **could not load** is not a record with **no photograph**, and
+conflating them silently degrades a control that measurably reduces
+wrong-patient orders.
+
 **Not React?** The loaders also ship as dependency-free custom elements for Vue,
 Angular, Svelte, or plain HTML — see [`@oxygenui-design/loaders`](packages/loaders/README.md).
 
@@ -149,11 +175,13 @@ alias you can rename. The npm packages it pulls in are published under
 | `@oxygenui-design/loaders`        | The five loaders as custom elements. Zero dependencies, SSR-safe.     |
 | `@oxygenui-design/signature`      | Signature capture for Ant Design. antd is a peer dependency.          |
 | `@oxygenui-design/signature-core` | The capture engine. No React, no antd, no DOM, no dependencies.       |
+| `@oxygenui-design/identity`       | Patient avatar, chip and banner for Ant Design. antd is a peer.       |
+| `@oxygenui-design/identity-core`  | The identity engine. No React, no antd, no DOM.                       |
 | `@oxygenui-design/react`          | Generated React package — same source as the registry, one build.     |
 | `@oxygenui-design/fhir`           | FHIR R4 types and pure read helpers.                                  |
 | `@oxygenui-design/tokens`         | Semantic clinical tokens: 3 themes × 3 densities × a brand axis.      |
 | `@oxygenui-design/intl`           | Terminology that requires both a clinician and a patient phrasing.    |
-| `@oxygenui-design/eslint-plugin`  | Seven rules enforcing the invariants above.                           |
+| `@oxygenui-design/eslint-plugin`  | Ten rules enforcing the invariants above.                             |
 | `@oxygenui-design/fixtures`       | Synthetic, non-PHI FHIR fixtures that over-represent the hard states. |
 
 ---
@@ -165,7 +193,7 @@ aspirational.
 
 | Gate                    | What it holds                                                                                                            |
 | ----------------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| **1,113 tests**         | Package tests, registry components rendered from the source customers receive, and story-derived a11y.                   |
+| **1,622 tests**         | Package tests, registry components rendered from the source customers receive, and story-derived a11y.                   |
 | **Coverage thresholds** | 90% lines / 85% branches, enforced per package. The build fails below them.                                              |
 | **Six frameworks**      | HTML, React 18, React 19, Vue, Angular, Svelte — each built by its own compiler, driven in Chromium, Firefox and WebKit. |
 | **Contrast gate**       | 21 token pairs × 3 themes × every brand. A palette edit that breaks a floor does not build.                              |

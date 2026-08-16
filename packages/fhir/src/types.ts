@@ -145,6 +145,48 @@ export interface Patient extends Resource {
     country?: string;
   }>;
   managingOrganization?: Reference;
+  /**
+   * Record linkage. `replaced-by` is the one that changes what a UI may claim:
+   * it means this chart is not where care is being recorded, which is a
+   * different fact from inactive and must not render as one.
+   *
+   * https://hl7.org/fhir/R4/patient.html#Patient.link
+   */
+  link?: PatientLink[];
+  /**
+   * Extensions carried by the resource. Typed loosely on purpose — the set is
+   * open by definition, and the alternative is a union that goes stale every
+   * time an implementation guide ships.
+   *
+   * Oxygen reads four: `individual-pronouns`, `individual-genderIdentity`,
+   * `individual-recordedSexOrGender`, and `patient-sexParameterForClinicalUse`.
+   */
+  extension?: Extension[];
+}
+
+/** https://hl7.org/fhir/R4/patient.html#Patient.link */
+export interface PatientLink {
+  other: Reference;
+  type?: "replaced-by" | "replaces" | "refer" | "seealso";
+}
+
+/**
+ * https://hl7.org/fhir/R4/extensibility.html
+ *
+ * Only the value types Oxygen actually reads are enumerated. Anything else is
+ * reachable through `extension` nesting, which is how the complex extensions
+ * in the Gender Harmony guide are shaped anyway.
+ */
+export interface Extension {
+  url: string;
+  valueString?: string;
+  valueCode?: string;
+  valueBoolean?: boolean;
+  valueDateTime?: string;
+  valueCodeableConcept?: CodeableConcept;
+  valueCoding?: Coding;
+  valuePeriod?: Period;
+  extension?: Extension[];
 }
 
 /** https://hl7.org/fhir/R4/observation.html#Observation.referenceRange */

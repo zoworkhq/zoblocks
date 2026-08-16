@@ -31,5 +31,31 @@
   },
   "duration": { "$type": "duration", "$value": "{ref.duration.base}" },
   "duration-slow": { "$type": "duration", "$value": "{ref.duration.slow}" },
-  "ease": { "$type": "cubicBezier", "$value": "cubic-bezier(0.22, 1, 0.36, 1)" }
+  "ease": { "$type": "cubicBezier", "$value": "cubic-bezier(0.22, 1, 0.36, 1)" },
+
+  "duration-identity-swap": {
+    "$type": "duration",
+    "$value": "180ms",
+    "$description": "A patient change, applied to the whole identity block as one unit — never field by field. Staggering the fields lets a reader catch one patient's identifier beside another patient's name for roughly a tenth of a second, which is a wrong-patient hazard created by the animation rather than prevented by it."
+  },
+  "duration-identity-reveal": {
+    "$type": "duration",
+    "$value": "220ms",
+    "$description": "Break-the-glass on a sensitive record, and any field entering a row. Information animates in; it never animates out. A graceful exit means a stale value is still readable while it leaves."
+  },
+  "duration-identity-escalate": {
+    "$type": "duration",
+    "$value": "260ms",
+    "$description": "The disambiguation pass adding a date of birth or an identifier to a row that collided with another."
+  },
+  "duration-alert": {
+    "$type": "duration",
+    "$value": "0ms",
+    "$description": "Deliberately zero, and the one value in this file worth arguing about. An error or a wrong-patient block must be present the instant it is true; animating it in leaves a window in which a keystroke can still land on the form underneath it."
+  },
+  "duration-skeleton-loop": {
+    "$type": "duration",
+    "$value": "1400ms",
+    "$description": "The only infinite animation the system permits. Anything else that loops on a clinical surface becomes furniture within a day, and then hides the one occasion it means something."
+  }
 }

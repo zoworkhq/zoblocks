@@ -1,0 +1,688 @@
+/**
+ * Oxygen Identity — styles.
+ *
+ * Two rules govern this file:
+ *
+ *   1. **Never truncate a name or an identifier.** There is no
+ *      `text-overflow: ellipsis` anywhere below, at any width. A truncated MRN
+ *      is not a shorter MRN, it is a different number. Fields leave whole, in
+ *      reverse priority order, via the container queries at the bottom.
+ *   2. **Motion means "this changed."** Durations are tokens, the only loop is
+ *      the skeleton shimmer, and `prefers-reduced-motion` sets every duration
+ *      to zero rather than shortening it — a fade at any duration is still a
+ *      window in which two states are simultaneously legible.
+ */
+
+:where(.ox-banner, .ox-chip, .ox-avatar, .ox-verify, .ox-guard) {
+  /* Motion tokens. See §7 of the identity brief. */
+  --ox-dur-swap: 180ms;
+  --ox-dur-reveal: 220ms;
+  --ox-dur-escalate: 260ms;
+  --ox-dur-alert: 0ms; /* deliberately zero — an error must be present the instant it is true */
+  --ox-loop-skeleton: 1400ms;
+  --ox-ease: cubic-bezier(0.2, 0, 0, 1);
+
+  /* Fall back to antd's tokens where the host app supplies them. */
+  --ox-fg: var(--ox-text, rgba(0, 0, 0, 0.88));
+  --ox-fg-2: var(--ox-text-secondary, rgba(0, 0, 0, 0.65));
+  --ox-fg-3: var(--ox-text-tertiary, rgba(0, 0, 0, 0.45));
+  --ox-fg-4: var(--ox-text-quaternary, rgba(0, 0, 0, 0.25));
+  --ox-bg: var(--ox-bg-container, #fff);
+  --ox-line: var(--ox-border, #d9d9d9);
+  --ox-line-2: var(--ox-border-secondary, #f0f0f0);
+  --ox-fill: var(--ox-fill-tertiary, rgba(0, 0, 0, 0.04));
+  --ox-fill-2: var(--ox-fill-quaternary, rgba(0, 0, 0, 0.02));
+  --ox-radius: 6px;
+  --ox-radius-lg: 8px;
+}
+
+.ox-visually-hidden {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* --------------------------------------------------------------------- */
+/* IdentityAvatar                                                         */
+/* --------------------------------------------------------------------- */
+
+.ox-avatar {
+  --ox-av-size: 32px;
+  inline-size: var(--ox-av-size);
+  block-size: var(--ox-av-size);
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  overflow: hidden;
+  position: relative;
+  user-select: none;
+  font-weight: 600;
+  font-size: calc(var(--ox-av-size) * 0.4);
+  line-height: 1;
+  background-color: var(--ox-sw-bg, var(--ox-fill));
+  color: var(--ox-sw-fg, var(--ox-fg-2));
+  border: 1px solid var(--ox-sw-border, var(--ox-line));
+  background-size: cover;
+  background-position: center;
+  /* The tint is decoration; in forced-colors it goes and the border carries it. */
+  forced-color-adjust: none;
+}
+
+.ox-avatar--20 {
+  --ox-av-size: 20px;
+  font-size: 8px;
+}
+.ox-avatar--24 {
+  --ox-av-size: 24px;
+  font-size: 10px;
+}
+.ox-avatar--32 {
+  --ox-av-size: 32px;
+  font-size: 13px;
+}
+.ox-avatar--40 {
+  --ox-av-size: 40px;
+  font-size: 16px;
+}
+.ox-avatar--56 {
+  --ox-av-size: 56px;
+  font-size: 21px;
+}
+
+.ox-avatar > svg {
+  inline-size: 58%;
+  block-size: 58%;
+  display: block;
+}
+.ox-avatar--img > img {
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Six decorative swatches. Values come from packages/tokens; the fallbacks
+   below keep the component legible when the token sheet is not installed. */
+.ox-avatar--sw1 {
+  --ox-sw-fg: var(--ox-swatch-1, #115e59);
+  --ox-sw-bg: var(--ox-swatch-1-bg, #f0fdfa);
+  --ox-sw-border: var(--ox-swatch-1-border, #99f6e4);
+}
+.ox-avatar--sw2 {
+  --ox-sw-fg: var(--ox-swatch-2, #155e75);
+  --ox-sw-bg: var(--ox-swatch-2-bg, #ecfeff);
+  --ox-sw-border: var(--ox-swatch-2-border, #a5f3fc);
+}
+.ox-avatar--sw3 {
+  --ox-sw-fg: var(--ox-swatch-3, #3730a3);
+  --ox-sw-bg: var(--ox-swatch-3-bg, #eef2ff);
+  --ox-sw-border: var(--ox-swatch-3-border, #c7d2fe);
+}
+.ox-avatar--sw4 {
+  --ox-sw-fg: var(--ox-swatch-4, #86198f);
+  --ox-sw-bg: var(--ox-swatch-4-bg, #fdf4ff);
+  --ox-sw-border: var(--ox-swatch-4-border, #f5d0fe);
+}
+.ox-avatar--sw5 {
+  --ox-sw-fg: var(--ox-swatch-5, #3f6212);
+  --ox-sw-bg: var(--ox-swatch-5-bg, #f7fee7);
+  --ox-sw-border: var(--ox-swatch-5-border, #d9f99d);
+}
+.ox-avatar--sw6 {
+  --ox-sw-fg: var(--ox-swatch-6, #44403c);
+  --ox-sw-bg: var(--ox-swatch-6-bg, #fafaf9);
+  --ox-sw-border: var(--ox-swatch-6-border, #e7e5e4);
+}
+
+/* The five absences, each visually distinct. */
+.ox-avatar--none-on-file {
+  background-color: var(--ox-fill-2);
+  border-style: dashed;
+  border-color: var(--ox-line);
+  color: var(--ox-fg-4);
+}
+.ox-avatar--unavailable {
+  background-color: var(--ox-error-bg, #fff2f0);
+  border-color: var(--ox-error-border, #ffccc7);
+  color: var(--ox-error, #ff4d4f);
+}
+.ox-avatar--withheld {
+  background-color: var(--ox-flag-restricted-bg, #f5f3ff);
+  border-color: var(--ox-flag-restricted, #7c3aed);
+  color: var(--ox-flag-restricted, #7c3aed);
+}
+.ox-avatar--loading {
+  background-color: var(--ox-fill);
+  border-color: var(--ox-line-2);
+  color: transparent;
+}
+.ox-avatar--loading::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(100deg, transparent 22%, rgb(255 255 255 / 0.6) 50%, transparent 78%);
+  animation: ox-shimmer var(--ox-loop-skeleton) linear infinite;
+}
+@keyframes ox-shimmer {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(100%);
+  }
+}
+
+.ox-avatar--deceased {
+  filter: grayscale(1);
+  border-style: double;
+  border-width: 3px;
+}
+.ox-avatar--test {
+  border-style: dashed;
+  border-color: var(--ox-warning, #faad14);
+  background-image: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 3px,
+    var(--ox-warning-bg, #fffbe6) 3px,
+    var(--ox-warning-bg, #fffbe6) 6px
+  );
+}
+
+/* Hover darkens the border. Nothing scales — at 5,000 rows a transform is
+   5,000 composited layers waiting to happen. */
+.ox-avatar {
+  transition: border-color 140ms var(--ox-ease);
+}
+.ox-avatar:hover {
+  border-color: var(--ox-sw-fg, var(--ox-fg-3));
+}
+
+/* --------------------------------------------------------------------- */
+/* PatientChip                                                            */
+/* --------------------------------------------------------------------- */
+
+.ox-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  max-inline-size: 100%;
+  font-variant-numeric: tabular-nums;
+}
+.ox-chip__text {
+  min-inline-size: 0;
+}
+.ox-chip__name {
+  font-weight: 600;
+  color: var(--ox-fg);
+}
+.ox-chip__detail {
+  display: block;
+  font-size: 12px;
+  line-height: 1.35;
+  color: var(--ox-fg-3);
+  /* Entering information animates; leaving does not. A graceful exit means the
+     value is still readable while it leaves, and readable-but-stale is the
+     problem this component exists to prevent. */
+  animation: ox-enter var(--ox-dur-escalate) var(--ox-ease);
+}
+@keyframes ox-enter {
+  from {
+    opacity: 0;
+    transform: translateY(-2px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.ox-chip--escalated {
+  background: var(--ox-warning-bg, #fffbe6);
+  border-radius: var(--ox-radius);
+  padding-inline: 4px;
+}
+.ox-chip__skeleton {
+  display: inline-block;
+  inline-size: 110px;
+  block-size: 14px;
+  border-radius: 4px;
+  background: var(--ox-fill);
+}
+
+.ox-identity-notice {
+  padding: 8px 12px;
+  border-block-start: 1px solid var(--ox-line-2);
+  background: var(--ox-warning-bg, #fffbe6);
+  font-size: 12px;
+  color: var(--ox-warning-text, #ad6800);
+}
+
+/* --------------------------------------------------------------------- */
+/* Tags                                                                   */
+/* --------------------------------------------------------------------- */
+
+.ox-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 7px;
+  border-radius: 4px;
+  border: 1px solid var(--ox-line);
+  background: var(--ox-fill-2);
+  color: var(--ox-fg-2);
+  font-size: 12px;
+  line-height: 18px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+.ox-tag--xs {
+  font-size: 11px;
+  line-height: 16px;
+  padding: 0 5px;
+}
+.ox-tag--ok {
+  background: var(--ox-success-bg, #f6ffed);
+  border-color: var(--ox-success-border, #b7eb8f);
+  color: var(--ox-success-text, #237804);
+}
+.ox-tag--warn {
+  background: var(--ox-warning-bg, #fffbe6);
+  border-color: var(--ox-warning-border, #ffe58f);
+  color: var(--ox-warning-text, #ad6800);
+}
+.ox-tag--error {
+  background: var(--ox-error-bg, #fff2f0);
+  border-color: var(--ox-error-border, #ffccc7);
+  color: var(--ox-error-text, #a8071a);
+}
+.ox-tag--restricted {
+  background: var(--ox-flag-restricted-bg, #f5f3ff);
+  border-color: var(--ox-flag-restricted, #7c3aed);
+  color: var(--ox-flag-restricted, #7c3aed);
+}
+.ox-tag--neutral {
+  color: var(--ox-flag-deceased, #334155);
+}
+
+/* --------------------------------------------------------------------- */
+/* PatientBanner                                                          */
+/* --------------------------------------------------------------------- */
+
+.ox-banner {
+  container-type: inline-size;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: var(--ox-bg);
+  border: 1px solid var(--ox-line-2);
+  border-radius: var(--ox-radius-lg);
+  font-variant-numeric: tabular-nums;
+  /* The whole block transitions as one unit. Never field by field: staggering
+     lets a reader catch the old MRN beside the new name, which is a
+     wrong-patient hazard created by the animation. */
+  transition: opacity var(--ox-dur-swap) var(--ox-ease);
+}
+.ox-banner__rail {
+  inline-size: 3px;
+  align-self: stretch;
+  border-radius: 3px;
+  flex: 0 0 auto;
+  background: transparent;
+}
+.ox-banner__rail--neutral {
+  background: var(--ox-fg-4);
+}
+.ox-banner__rail--warn {
+  background: var(--ox-warning, #faad14);
+}
+.ox-banner__rail--restricted {
+  background: var(--ox-flag-restricted, #7c3aed);
+}
+.ox-banner__rail--error {
+  background: var(--ox-error, #ff4d4f);
+}
+.ox-banner__rail--none {
+  display: none;
+}
+
+.ox-banner__block {
+  flex: 1 1 auto;
+  min-inline-size: 0;
+}
+.ox-banner__line1 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.ox-banner__line2 {
+  display: flex;
+  align-items: center;
+  gap: 6px 10px;
+  flex-wrap: wrap;
+  margin-block-start: 3px;
+  font-size: 12px;
+  color: var(--ox-fg-2);
+}
+.ox-banner__name {
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+  color: var(--ox-fg);
+}
+.ox-banner__pronouns {
+  font-size: 12px;
+  color: var(--ox-fg-3);
+}
+.ox-banner__fld {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 5px;
+  white-space: nowrap;
+}
+.ox-banner__lbl {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--ox-fg-3);
+}
+.ox-banner__val {
+  color: var(--ox-fg-2);
+}
+.ox-banner__assigner {
+  font-size: 11px;
+  color: var(--ox-fg-4);
+}
+.ox-banner__invalid {
+  color: var(--ox-error, #ff4d4f);
+}
+.ox-banner__actions {
+  margin-inline-start: auto;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex: 0 0 auto;
+}
+
+.ox-banner--restricted {
+  border-color: var(--ox-flag-restricted, #7c3aed);
+}
+.ox-banner--test {
+  border-color: var(--ox-warning, #faad14);
+  background-image: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 8px,
+    var(--ox-warning-bg, #fffbe6) 8px,
+    var(--ox-warning-bg, #fffbe6) 16px
+  );
+}
+.ox-banner--error {
+  border-color: var(--ox-error-border, #ffccc7);
+  background: var(--ox-error-bg, #fff2f0);
+  transition-duration: var(--ox-dur-alert);
+}
+
+.ox-banner__withheld {
+  margin-block-start: 6px;
+  font-size: 12px;
+  color: var(--ox-flag-restricted, #7c3aed);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.ox-banner__reveal {
+  font: inherit;
+  font-size: 12px;
+  padding: 2px 8px;
+  border: 1px solid var(--ox-line);
+  border-radius: var(--ox-radius);
+  background: var(--ox-bg);
+  color: var(--ox-fg);
+  cursor: pointer;
+}
+.ox-banner__skeleton {
+  display: block;
+  border-radius: 4px;
+  background: var(--ox-fill);
+}
+.ox-banner__skeleton--name {
+  inline-size: 190px;
+  block-size: 20px;
+  margin-block-end: 6px;
+}
+.ox-banner__skeleton--line {
+  inline-size: 250px;
+  block-size: 14px;
+  background: var(--ox-fill-2);
+}
+
+/* --------------------------------------------------------------------- */
+/* Verify and Guard                                                       */
+/* --------------------------------------------------------------------- */
+
+.ox-verify,
+.ox-guard {
+  display: flex;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: var(--ox-radius-lg);
+  border: 1px solid var(--ox-error-border, #ffccc7);
+  background: var(--ox-error-bg, #fff2f0);
+  /* Zero. An error must be present the instant it is true; animating it in
+     leaves a window in which a keystroke can still land on the form beneath. */
+  animation-duration: var(--ox-dur-alert);
+}
+.ox-verify--confirmed {
+  border-color: var(--ox-success-border, #b7eb8f);
+  background: var(--ox-success-bg, #f6ffed);
+}
+.ox-verify__rail,
+.ox-guard__rail {
+  inline-size: 3px;
+  align-self: stretch;
+  border-radius: 3px;
+  background: var(--ox-error, #ff4d4f);
+  flex: 0 0 auto;
+}
+.ox-verify__body,
+.ox-guard > div {
+  flex: 1 1 auto;
+  min-inline-size: 0;
+}
+.ox-verify__title,
+.ox-guard__title {
+  margin: 0 0 4px;
+  font-size: 15px;
+  font-weight: 600;
+}
+.ox-verify__prompt,
+.ox-guard__body {
+  margin: 0;
+  font-size: 13px;
+  color: var(--ox-fg-2);
+}
+.ox-verify__row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-block-start: 12px;
+  flex-wrap: wrap;
+}
+.ox-verify__who {
+  display: flex;
+  flex-direction: column;
+}
+.ox-verify__name {
+  font-weight: 600;
+}
+.ox-verify__detail {
+  font-size: 12px;
+  color: var(--ox-fg-2);
+}
+.ox-verify__field {
+  margin-inline-start: auto;
+}
+.ox-verify__input {
+  inline-size: 110px;
+  padding: 5px 10px;
+  border: 1px solid var(--ox-line);
+  border-radius: var(--ox-radius);
+  background: var(--ox-bg);
+  color: var(--ox-fg);
+  font: inherit;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.ox-verify__result {
+  margin: 10px 0 0;
+  font-size: 12px;
+  min-block-size: 18px;
+}
+.ox-verify--wrong .ox-verify__result {
+  color: var(--ox-error-text, #a8071a);
+}
+.ox-verify--confirmed .ox-verify__result {
+  color: var(--ox-success-text, #237804);
+}
+
+.ox-btn {
+  font: inherit;
+  padding: 4px 12px;
+  border: 1px solid var(--ox-line);
+  border-radius: var(--ox-radius);
+  background: var(--ox-bg);
+  color: var(--ox-fg);
+  cursor: pointer;
+}
+.ox-btn--primary {
+  background: var(--ox-primary, #1677ff);
+  border-color: var(--ox-primary, #1677ff);
+  color: #fff;
+}
+
+/* --------------------------------------------------------------------- */
+/* The size ladder — a container query, not a prop                        */
+/* --------------------------------------------------------------------- */
+
+/* Fields leave whole, in reverse priority order. There is no ellipsis in this
+   file: a truncated MRN is a different number, and a truncated name is two
+   people on the same ward. */
+@container (max-width: 700px) {
+  .ox-banner .ox-drop-4 {
+    display: none;
+  }
+}
+@container (max-width: 560px) {
+  .ox-banner .ox-drop-3 {
+    display: none;
+  }
+}
+@container (max-width: 430px) {
+  .ox-banner .ox-drop-2 {
+    display: none;
+  }
+}
+@container (max-width: 340px) {
+  .ox-banner .ox-drop-1 {
+    display: none;
+  }
+  .ox-banner__name {
+    font-size: 14px;
+    white-space: normal;
+  }
+}
+
+.ox-avatar--auto {
+  --ox-av-size: 40px;
+}
+@container (max-width: 560px) {
+  .ox-avatar--auto {
+    --ox-av-size: 32px;
+  }
+}
+@container (max-width: 340px) {
+  .ox-avatar--auto {
+    --ox-av-size: 24px;
+  }
+}
+
+/* --------------------------------------------------------------------- */
+/* Print                                                                  */
+/* --------------------------------------------------------------------- */
+
+@media print {
+  /* Everything that was dropped comes back: paper has no container query, and
+     a printed banner is read away from the system that could fill the gaps. */
+  .ox-banner .ox-drop-1,
+  .ox-banner .ox-drop-2,
+  .ox-banner .ox-drop-3,
+  .ox-banner .ox-drop-4 {
+    display: inline-flex !important;
+  }
+  /* Ink, and privacy: a photograph on a printout leaves the building. */
+  .ox-avatar--img > img,
+  .ox-avatar[data-ox-photo="present"] {
+    background-image: none !important;
+  }
+  .ox-avatar--img > img {
+    display: none;
+  }
+  .ox-banner {
+    border-color: #000;
+    box-shadow: none;
+  }
+  .ox-banner__reveal,
+  .ox-banner__actions {
+    display: none;
+  }
+}
+
+/* --------------------------------------------------------------------- */
+/* Reduced motion, forced colors                                          */
+/* --------------------------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  /* Removed, not shortened. A fade at any duration is a window in which two
+     states are simultaneously legible. */
+  :where(.ox-banner, .ox-chip, .ox-avatar, .ox-verify, .ox-guard) {
+    --ox-dur-swap: 0ms;
+    --ox-dur-reveal: 0ms;
+    --ox-dur-escalate: 0ms;
+  }
+  .ox-avatar--loading::after {
+    animation: none;
+  }
+  .ox-chip__detail {
+    animation: none;
+  }
+}
+
+@media (forced-colors: active) {
+  /* The tint is the first thing to give up its contrast budget — the token
+     layer already collapses all six swatches in high contrast. Border and
+     initials carry identity from here. */
+  .ox-avatar {
+    forced-color-adjust: auto;
+    border-width: 2px;
+  }
+  .ox-banner,
+  .ox-tag,
+  .ox-verify,
+  .ox-guard {
+    border-width: 2px;
+  }
+  .ox-avatar--loading::after {
+    display: none;
+  }
+}
