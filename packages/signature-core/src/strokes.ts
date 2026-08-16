@@ -19,7 +19,7 @@
  * whole engine be tested by feeding it synthetic samples and diffing SVG text.
  */
 
-import type { Bounds, Point, Stroke, BiometricSummary } from "./value.js";
+import type { Bounds, Point, Stroke, BiometricSummary } from "./value";
 
 /* ------------------------------------------------------------------ */
 /* Geometry                                                            */

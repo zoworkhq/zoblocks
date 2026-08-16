@@ -22,9 +22,33 @@ import {
   signatureAffirmative,
   signatureRequired,
   type SignatureValue,
-} from "../src/index.js";
+} from "../src/index";
 
 const NOW = "2026-08-16T14:36:02.000Z";
+
+/**
+ * Walk focus to `target` with Tab presses only.
+ *
+ * Deliberately not `target.focus()`: the claim being tested is that a keyboard
+ * can *reach* the control, and a programmatic focus call proves nothing about
+ * that. Bounded so a control that is genuinely unreachable fails with a useful
+ * message instead of hanging.
+ */
+async function tabTo(
+  user: ReturnType<typeof userEvent.setup>,
+  target: HTMLElement,
+  limit = 40,
+): Promise<void> {
+  for (let i = 0; i < limit; i++) {
+    if (document.activeElement === target) return;
+    await user.tab();
+  }
+  if (document.activeElement !== target) {
+    throw new Error(
+      `never reached ${target.tagName}[${target.getAttribute("aria-label") ?? target.textContent?.trim().slice(0, 40)}] with ${limit} Tab presses`,
+    );
+  }
+}
 
 const SIGNED: SignatureValue = {
   outcome: "signed",
@@ -133,10 +157,15 @@ describe("SignaturePad accessibility", () => {
 
 describe("the typed path", () => {
   it("signs with the keyboard alone", async () => {
-    // No pointer events anywhere in this test. `userEvent.tab()` and
-    // `.keyboard()` only produce keyboard input, so if this passes the
-    // component is operable without a pointer — which is what SC 2.1.1
-    // (Level A) requires, and what a draw-only pad cannot do.
+    /*
+     * No pointer events anywhere in this test — that is the whole point, and
+     * it is easy to lose. This used to reach each control with `user.click()`,
+     * which dispatches a full pointer sequence, so the test that the WCAG
+     * 2.1.1 (Level A) argument rests on was quietly proving the component
+     * works with a mouse. Only `user.tab()` and `user.keyboard()` appear
+     * below; `tabTo` walks focus the way a keyboard actually does rather than
+     * calling `.focus()`, which no keyboard can do.
+     */
     const user = userEvent.setup();
     const onChange = vi.fn();
 
@@ -147,14 +176,30 @@ describe("the typed path", () => {
     await user.keyboard("{Enter}");
 
     const dialog = await screen.findByRole("dialog");
-    await user.click(within(dialog).getByRole("tab", { name: /type/i }));
 
-    await user.click(within(dialog).getByLabelText(/full name/i));
-    await user.keyboard("Josh Randall");
-    await user.click(within(dialog).getByLabelText(/type your name to sign/i));
+    // The dialog opens with focus on the first required field, so the signer's
+    // name is typed without moving at all. Waited for rather than asserted
+    // outright: antd moves focus in `afterOpenChange`, which fires when the
+    // open transition ends, so the dialog exists in the DOM slightly before it
+    // has decided where focus goes.
+    const fullName = within(dialog).getByLabelText(/full name/i);
+    await waitFor(() => expect(fullName).toHaveFocus());
     await user.keyboard("Josh Randall");
 
-    await user.click(within(dialog).getByRole("button", { name: /sign and continue/i }));
+    // antd's Tabs use manual activation: arrow keys move focus along the
+    // tablist and Enter selects. Tabbing past the tablist would skip it.
+    await tabTo(user, within(dialog).getByRole("tab", { name: /draw/i }));
+    await user.keyboard("{ArrowRight}{Enter}");
+    expect(within(dialog).getByRole("tab", { name: /type/i })).toHaveAttribute(
+      "aria-selected",
+      "true",
+    );
+
+    await tabTo(user, within(dialog).getByLabelText(/type your name to sign/i));
+    await user.keyboard("Josh Randall");
+
+    await tabTo(user, within(dialog).getByRole("button", { name: /sign and continue/i }));
+    await user.keyboard("{Enter}");
 
     await waitFor(() => expect(onChange).toHaveBeenCalled());
     const value = onChange.mock.calls[0]?.[0] as SignatureValue;

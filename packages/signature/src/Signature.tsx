@@ -32,9 +32,9 @@ import {
   type Signer,
   type Subject,
 } from "@oxygenui-design/signature-core";
-import { SignatureModal } from "./SignatureModal.js";
-import { SignatureManifest } from "./SignatureManifest.js";
-import { useLocale, type SignatureLocale } from "./locale.js";
+import { SignatureModal } from "./SignatureModal";
+import { SignatureManifest } from "./SignatureManifest";
+import { useLocale, type SignatureLocale } from "./locale";
 
 export interface SignatureProps {
   /** Supplied by `Form.Item`. Attached to the trigger so the label resolves. */

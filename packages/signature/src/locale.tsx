@@ -41,6 +41,8 @@ export interface SignatureLocale {
   typeHelp: string;
   typePlaceholder: string;
   typeStyle: string;
+  inkColour: string;
+  ink: { black: string; blue: string };
   uploadPrompt: string;
   uploadHint: string;
   uploadWarning: string;
@@ -118,6 +120,8 @@ export const DEFAULT_LOCALE: SignatureLocale = {
   typeHelp: "Typing your name here has the same legal effect as signing by hand.",
   typePlaceholder: "Your full name",
   typeStyle: "Style",
+  inkColour: "Ink",
+  ink: { black: "Black", blue: "Blue" },
   uploadPrompt: "Click or drag an image of your signature here",
   uploadHint: "PNG or JPEG, up to 2 MB. Location data is removed automatically.",
   uploadWarning:

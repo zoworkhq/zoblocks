@@ -16,7 +16,7 @@
  * Nothing here touches a canvas or the DOM, so it runs on a server.
  */
 
-import type { Ink, InkPath, Stroke } from "./value.js";
+import type { Ink, InkPath, Stroke } from "./value";
 import {
   DEFAULT_WIDTH,
   decimate,
@@ -24,7 +24,7 @@ import {
   toPathData,
   widths,
   type WidthOptions,
-} from "./strokes.js";
+} from "./strokes";
 
 export interface RenderOptions {
   /** Padding around the ink, in capture units. */

@@ -14,7 +14,8 @@
  *      *and* an explicit `aria-labelledby` via `modalRender`.
  *   2. **Sane initial focus.** antd's trap opens focus on an invisible
  *      sentinel `<div tabIndex={0}>` — an unlabelled landing spot for a
- *      screen-reader user. `afterOpenChange` moves it to the active tab.
+ *      screen-reader user. `afterOpenChange` moves it to the first required
+ *      field, so tabbing forward follows the order the dialog is read in.
  *   3. **Tab/panel wiring.** `aria-controls` and `aria-labelledby` are emitted
  *      only when `<Tabs id>` is set. Omit it and the relationship is invisible
  *      to assistive technology, so `id` is always passed.
@@ -28,6 +29,7 @@
 
 import * as React from "react";
 import { Alert, Button, Input, Modal, Select, Tabs, Upload } from "antd";
+import type { InputRef } from "antd";
 import {
   assessInk,
   isAffirmative,
@@ -40,10 +42,11 @@ import {
   type Stroke,
   type Subject,
 } from "@oxygenui-design/signature-core";
-import { SignaturePad } from "./SignaturePad.js";
-import { OutcomeSheet } from "./OutcomeSheet.js";
-import { useLocale, type SignatureLocale } from "./locale.js";
-import { renderTypedSignature, readImageFile } from "./typed.js";
+import { SignaturePad } from "./SignaturePad";
+import { OutcomeSheet } from "./OutcomeSheet";
+import { useLocale, type SignatureLocale } from "./locale";
+import { renderTypedSignature, readImageFile } from "./typed";
+import { rasterise } from "./rasterise";
 
 export interface SignatureModalProps {
   open: boolean;
@@ -70,6 +73,9 @@ export interface SignatureModalProps {
   locale?: Partial<SignatureLocale>;
   onAuditEvent?: (event: { type: string; at: string; detail?: string }) => void;
 }
+
+/** Real ink colours, not tokens: these are baked into the archived PNG. */
+const INK_HEX = { black: "#141414", blue: "#1d39c4" } as const;
 
 const TYPE_STYLES = ["formal", "script", "plain"] as const;
 type TypeStyle = (typeof TYPE_STYLES)[number];
@@ -101,6 +107,8 @@ export function SignatureModal({
   const tabsId = `${base}-tabs`;
 
   const [method, setMethod] = React.useState<CaptureMethod>(methods[0] ?? "draw");
+  // Focused when the dialog opens; see `focusName` below.
+  const nameRef = React.useRef<InputRef>(null);
   const [strokes, setStrokes] = React.useState<Stroke[]>([]);
   const [typedName, setTypedName] = React.useState("");
   const [typeStyle, setTypeStyle] = React.useState<TypeStyle>("formal");
@@ -113,6 +121,41 @@ export function SignatureModal({
   const [capacity, setCapacity] = React.useState<Capacity>(capacities[0] ?? "self");
   const [showOutcomes, setShowOutcomes] = React.useState(false);
   const [tooLittleInk, setTooLittleInk] = React.useState(false);
+  // Black or blue. Some institutions still require blue to distinguish an
+  // original from a photocopy, and the convention followed people into
+  // software; it costs nothing to honour and is jarring to be denied.
+  const [inkColour, setInkColour] = React.useState<"black" | "blue">("black");
+
+  /*
+   * Put focus on the first required field when the dialog opens.
+   *
+   * antd lands focus on an invisible sentinel `<div tabIndex={0}>`, which is
+   * an unlabelled place for a screen-reader user to start. It used to be moved
+   * to the active tab, which was better but still wrong: the name field sits
+   * *above* the tablist, so a keyboard user starting there had to cycle the
+   * whole dialog — past the pad, the actions and the close button — to reach
+   * the first thing they have to fill in. Landing on the name makes forward
+   * tabbing follow the order the dialog is read in.
+   *
+   * Called from two places on purpose. `afterOpenChange` is the correct hook
+   * in a browser, because it runs after the focus trap has claimed focus — but
+   * it fires on the end of the open transition, and an environment that never
+   * runs the transition never fires it. jsdom 30 is such an environment, and
+   * the regression it caused was silent: the dialog opened, everything
+   * rendered, and focus simply stayed on the trigger. The effect below covers
+   * that. Both target the same element, so whichever runs last is harmless.
+   */
+  const focusName = React.useCallback(() => {
+    nameRef.current?.focus();
+  }, []);
+
+  React.useEffect(() => {
+    if (!open) return;
+    // A frame later: the modal body mounts before antd's trap moves focus, so
+    // focusing synchronously here would just be overridden.
+    const frame = requestAnimationFrame(focusName);
+    return () => cancelAnimationFrame(frame);
+  }, [open, focusName]);
 
   const audit = React.useCallback(
     (type: string, detail?: string) => onAuditEvent?.({ type, at: now, detail }),
@@ -130,6 +173,7 @@ export function SignatureModal({
     setTooLittleInk(false);
     setName(signerDefaults?.name ?? "");
     setMethod(methods[0] ?? "draw");
+    setInkColour("black");
     audit("opened");
   }, [open]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -144,11 +188,14 @@ export function SignatureModal({
 
   const canSubmit = hasMark && name.trim().length > 0;
 
-  const submit = () => {
-    if (!canSubmit) {
-      if (method === "draw") setTooLittleInk(true);
+  const [committing, setCommitting] = React.useState(false);
+
+  const submit = async () => {
+    if (!canSubmit || committing) {
+      if (method === "draw" && !canSubmit) setTooLittleInk(true);
       return;
     }
+    setCommitting(true);
 
     const ink =
       method === "draw"
@@ -169,10 +216,28 @@ export function SignatureModal({
               bounds: { x: 0, y: 0, width: uploaded?.width ?? 0, height: uploaded?.height ?? 0 },
             };
 
+    /*
+     * The PNG is produced here rather than in the engine, because rasterising
+     * needs a canvas and the engine has to run on a server.
+     *
+     * It is not optional decoration: `Signature.data` in the FHIR mapping *is*
+     * this PNG, so without it a drawn or typed signature produces a FHIR
+     * Signature element with no payload. A failure is swallowed rather than
+     * blocking the commit — a signature recorded without its raster is
+     * recoverable from the stroke model, whereas a signature the person could
+     * not complete is not.
+     */
+    let png: string | undefined;
+    try {
+      png = await rasterise(ink.svg, { color: INK_HEX[inkColour] });
+    } catch {
+      png = undefined;
+    }
+
     const value: SignatureValue = {
       outcome: "signed",
       method,
-      ink,
+      ink: png ? { ...ink, png } : ink,
       signer: { ...signerDefaults, name: name.trim() },
       capacity,
       meaning,
@@ -191,6 +256,7 @@ export function SignatureModal({
     };
 
     audit("signed", method);
+    setCommitting(false);
     onSubmit(value);
   };
 
@@ -202,17 +268,72 @@ export function SignatureModal({
     destroyOnHidden: false,
     children:
       m === "draw" ? (
-        <SignaturePad
-          height={190}
-          hideLabel
-          label={t.padLabel}
-          locale={localeOverrides}
-          error={tooLittleInk ? t.tooLittleInk : undefined}
-          onChange={(next) => {
-            setStrokes(next);
-            setTooLittleInk(false);
-          }}
-        />
+        <>
+          <div
+            role="radiogroup"
+            aria-label={t.inkColour}
+            style={{ display: "flex", alignItems: "center", gap: 8, marginBlockEnd: 8 }}
+          >
+            <span
+              style={{ fontSize: 12, color: "var(--ant-color-text-description, rgba(0,0,0,0.45))" }}
+            >
+              {t.inkColour}
+            </span>
+            {(["black", "blue"] as const).map((colour) => (
+              <button
+                key={colour}
+                type="button"
+                role="radio"
+                aria-checked={inkColour === colour}
+                aria-label={t.ink[colour]}
+                onClick={() => setInkColour(colour)}
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 6,
+                  // 24px minimum, per SC 2.5.8.
+                  minHeight: 24,
+                  padding: "2px 8px",
+                  borderRadius: "var(--ant-border-radius, 6px)",
+                  border: `1px solid ${
+                    inkColour === colour
+                      ? "var(--ant-color-primary, #1677ff)"
+                      : "var(--ant-color-border, #d9d9d9)"
+                  }`,
+                  background: "transparent",
+                  font: "inherit",
+                  fontSize: 12,
+                  cursor: "pointer",
+                }}
+              >
+                <span
+                  aria-hidden="true"
+                  style={{
+                    width: 12,
+                    height: 12,
+                    borderRadius: "50%",
+                    background: INK_HEX[colour],
+                    border: "1px solid var(--ant-color-border, #d9d9d9)",
+                  }}
+                />
+                {/* Named, never colour alone — the swatch is decoration. */}
+                {t.ink[colour]}
+              </button>
+            ))}
+          </div>
+          <SignaturePad
+            height={190}
+            hideLabel
+            label={t.padLabel}
+            locale={localeOverrides}
+            ink={INK_HEX[inkColour]}
+            error={tooLittleInk ? t.tooLittleInk : undefined}
+            onChange={(next) => {
+              setStrokes(next);
+              setTooLittleInk(false);
+            }}
+          />
+        </>
       ) : m === "type" ? (
         <TypePane
           value={typedName}
@@ -257,11 +378,10 @@ export function SignatureModal({
       title={<span id={titleId}>{title ?? "Signature"}</span>}
       closable={{ "aria-label": t.close }}
       afterOpenChange={(isOpen) => {
-        // antd opens focus on an invisible sentinel div. Move it somewhere a
-        // screen-reader user can make sense of.
-        if (!isOpen) return;
-        const first = document.getElementById(`${tabsId}-tab-${method}`);
-        first?.focus();
+        // Runs when the open transition ends, which is after antd's focus
+        // trap has claimed focus — so this is the call that wins in a real
+        // browser. See `focusName` for why it is not the only one.
+        if (isOpen) focusName();
       }}
       modalRender={(node) => (
         <div
@@ -282,7 +402,12 @@ export function SignatureModal({
           )}
           <span style={{ display: "flex", gap: 8 }}>
             <Button onClick={onCancel}>{t.cancel}</Button>
-            <Button type="primary" onClick={submit} disabled={!canSubmit}>
+            <Button
+              type="primary"
+              onClick={() => void submit()}
+              disabled={!canSubmit}
+              loading={committing}
+            >
               {t.sign}
             </Button>
           </span>
@@ -313,6 +438,7 @@ export function SignatureModal({
             {t.fullName}
           </div>
           <Input
+            ref={nameRef}
             value={name}
             onChange={(e) => setName(e.target.value)}
             required
