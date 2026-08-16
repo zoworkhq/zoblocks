@@ -363,123 +363,123 @@ export const CATALOG: ComponentDoc[] = [
       },
       {
         "name": "actor",
-        "type": "Actor | undefined",
+        "type": "Actor",
         "description": "",
         "required": false
       },
       {
         "name": "anchor",
-        "type": "'inline' | 'bottom-center' | 'bottom-right' | undefined",
+        "type": "'inline' | 'bottom-center' | 'bottom-right'",
         "description": "",
         "required": false,
         "default": "\"bottom-center\""
       },
       {
         "name": "announcementMode",
-        "type": "AnnouncementMode | undefined",
+        "type": "AnnouncementMode",
         "description": "",
         "required": false
       },
       {
         "name": "classifiers",
-        "type": "SafetyClassifiers | undefined",
+        "type": "SafetyClassifiers",
         "description": "",
         "required": false
       },
       {
         "name": "className",
-        "type": "string | undefined",
+        "type": "string",
         "description": "",
         "required": false
       },
       {
         "name": "context",
-        "type": "ConsultContextResolver | undefined",
+        "type": "ConsultContextResolver",
         "description": "",
         "required": false
       },
       {
         "name": "crisisLines",
-        "type": "Readonly<Record<string, readonly CrisisLine[]>> | undefined",
+        "type": "Readonly<Record<string, readonly CrisisLine[]>>",
         "description": "",
         "required": false
       },
       {
         "name": "initialModeId",
-        "type": "string | undefined",
+        "type": "string",
         "description": "",
         "required": false
       },
       {
         "name": "locale",
-        "type": "string | undefined",
+        "type": "string",
         "description": "",
         "required": false
       },
       {
         "name": "newId",
-        "type": "(() => string) | undefined",
+        "type": "(() => string)",
         "description": "",
         "required": false
       },
       {
         "name": "now",
-        "type": "(() => string) | undefined",
+        "type": "(() => string)",
         "description": "Injected for tests. Defaults to real implementations.",
         "required": false
       },
       {
         "name": "onAudit",
-        "type": "AuditSink | undefined",
+        "type": "AuditSink",
         "description": "",
         "required": false
       },
       {
         "name": "onInsert",
-        "type": "((text: string) => void) | undefined",
+        "type": "((text: string) => void)",
         "description": "",
         "required": false
       },
       {
         "name": "onRiskProtocol",
-        "type": "(() => void) | undefined",
+        "type": "(() => void)",
         "description": "",
         "required": false
       },
       {
         "name": "onTelemetry",
-        "type": "TelemetrySink | undefined",
+        "type": "TelemetrySink",
         "description": "",
         "required": false
       },
       {
         "name": "role",
-        "type": "string | undefined",
+        "type": "string",
         "description": "",
         "required": false
       },
       {
         "name": "shortcuts",
-        "type": "readonly ConsultShortcut[] | undefined",
+        "type": "readonly ConsultShortcut[]",
         "description": "",
         "required": false,
         "default": "[]"
       },
       {
         "name": "subject",
-        "type": "Reference | undefined",
+        "type": "Reference",
         "description": "",
         "required": false
       },
       {
         "name": "suppressed",
-        "type": "boolean | undefined",
+        "type": "boolean",
         "description": "Law 5, and the FDA's time-critical clause in criterion 4. When true the hook refuses to submit and the skin renders nothing at all.",
         "required": false
       },
       {
         "name": "surface",
-        "type": "'clinician' | 'patient' | undefined",
+        "type": "'clinician' | 'patient'",
         "description": "Which surface this is. `patient` throws for every built-in mode.",
         "required": false
       }
@@ -503,123 +503,123 @@ export const CATALOG: ComponentDoc[] = [
           },
           {
             "name": "actor",
-            "type": "Actor | undefined",
+            "type": "Actor",
             "description": "",
             "required": false
           },
           {
             "name": "anchor",
-            "type": "'inline' | 'bottom-center' | 'bottom-right' | undefined",
+            "type": "'inline' | 'bottom-center' | 'bottom-right'",
             "description": "",
             "required": false,
             "default": "\"bottom-center\""
           },
           {
             "name": "announcementMode",
-            "type": "AnnouncementMode | undefined",
+            "type": "AnnouncementMode",
             "description": "",
             "required": false
           },
           {
             "name": "classifiers",
-            "type": "SafetyClassifiers | undefined",
+            "type": "SafetyClassifiers",
             "description": "",
             "required": false
           },
           {
             "name": "className",
-            "type": "string | undefined",
+            "type": "string",
             "description": "",
             "required": false
           },
           {
             "name": "context",
-            "type": "ConsultContextResolver | undefined",
+            "type": "ConsultContextResolver",
             "description": "",
             "required": false
           },
           {
             "name": "crisisLines",
-            "type": "Readonly<Record<string, readonly CrisisLine[]>> | undefined",
+            "type": "Readonly<Record<string, readonly CrisisLine[]>>",
             "description": "",
             "required": false
           },
           {
             "name": "initialModeId",
-            "type": "string | undefined",
+            "type": "string",
             "description": "",
             "required": false
           },
           {
             "name": "locale",
-            "type": "string | undefined",
+            "type": "string",
             "description": "",
             "required": false
           },
           {
             "name": "newId",
-            "type": "(() => string) | undefined",
+            "type": "(() => string)",
             "description": "",
             "required": false
           },
           {
             "name": "now",
-            "type": "(() => string) | undefined",
+            "type": "(() => string)",
             "description": "Injected for tests. Defaults to real implementations.",
             "required": false
           },
           {
             "name": "onAudit",
-            "type": "AuditSink | undefined",
+            "type": "AuditSink",
             "description": "",
             "required": false
           },
           {
             "name": "onInsert",
-            "type": "((text: string) => void) | undefined",
+            "type": "((text: string) => void)",
             "description": "",
             "required": false
           },
           {
             "name": "onRiskProtocol",
-            "type": "(() => void) | undefined",
+            "type": "(() => void)",
             "description": "",
             "required": false
           },
           {
             "name": "onTelemetry",
-            "type": "TelemetrySink | undefined",
+            "type": "TelemetrySink",
             "description": "",
             "required": false
           },
           {
             "name": "role",
-            "type": "string | undefined",
+            "type": "string",
             "description": "",
             "required": false
           },
           {
             "name": "shortcuts",
-            "type": "readonly ConsultShortcut[] | undefined",
+            "type": "readonly ConsultShortcut[]",
             "description": "",
             "required": false,
             "default": "[]"
           },
           {
             "name": "subject",
-            "type": "Reference | undefined",
+            "type": "Reference",
             "description": "",
             "required": false
           },
           {
             "name": "suppressed",
-            "type": "boolean | undefined",
+            "type": "boolean",
             "description": "Law 5, and the FDA's time-critical clause in criterion 4. When true the hook refuses to submit and the skin renders nothing at all.",
             "required": false
           },
           {
             "name": "surface",
-            "type": "'clinician' | 'patient' | undefined",
+            "type": "'clinician' | 'patient'",
             "description": "Which surface this is. `patient` throws for every built-in mode.",
             "required": false
           }
