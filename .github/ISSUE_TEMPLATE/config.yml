@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security vulnerability
+    url: https://github.com/zoworkhq/oxygenui/security/advisories/new
+    about: Report privately. Never open a public issue for a security problem.
+  - name: Question or idea
+    url: https://github.com/zoworkhq/oxygenui/discussions
+    about: Ask in Discussions — issues are for defects and tracked work.
+  - name: Commercial support
+    url: mailto:hello@zowork.com
+    about: Implementation support, SLAs, and conformance documentation.

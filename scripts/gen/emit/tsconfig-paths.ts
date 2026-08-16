@@ -22,11 +22,23 @@ import { banner, paths } from "../config";
 import type { LoadedComponent } from "../load";
 import type { Emitter } from "../write";
 
-const WORKSPACE_ALIASES: Record<string, string[]> = {
+/**
+ * Aliases that are not derived from the component list.
+ *
+ * Exported because `../props.ts` typechecks component source with its own
+ * in-memory compiler options and needs the same map. It used to hold a second
+ * copy, and the copies drifted the moment a support module was added — the
+ * generator reported "cannot find module" for a path it had just written.
+ */
+export const WORKSPACE_ALIASES: Record<string, string[]> = {
   "@oxygenui-design/fhir": ["./packages/fhir/src/index.ts"],
   "@oxygenui-design/fixtures": ["./packages/fixtures/src/index.ts"],
   "@oxygenui-design/component-meta": ["./packages/component-meta/src/index.ts"],
   "@/lib/utils": ["./registry/oxygen/lib/utils.ts"],
+  // Support modules under registry/oxygen/lib are installed into a consumer's
+  // project by the shadcn CLI under lib/, and imported by that path. They
+  // resolve here the same way component specifiers do.
+  "@/lib/oxygen-loader": ["./registry/oxygen/lib/loader.tsx"],
 };
 
 export async function emitTsconfigPaths(

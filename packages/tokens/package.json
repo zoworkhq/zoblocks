@@ -27,14 +27,39 @@
     "./package.json": "./package.json"
   },
   "files": [
+    "dist",
     "src",
-    "tokens"
+    "tokens",
+    "!src/**/*.test.ts"
   ],
   "publishConfig": {
-    "access": "public"
+    "access": "public",
+    "main": "./dist/tokens.js",
+    "types": "./dist/tokens.d.ts",
+    "exports": {
+      ".": {
+        "types": "./dist/tokens.d.ts",
+        "default": "./dist/tokens.js"
+      },
+      "./oxygen-tokens.css": "./src/oxygen-tokens.css",
+      "./tailwind.css": "./src/tailwind.css",
+      "./tokens.json": "./src/tokens.json",
+      "./contrast.json": "./src/contrast.json",
+      "./package.json": "./package.json"
+    }
   },
   "scripts": {
-    "build": "echo \"[tokens] css is published as source\"",
-    "typecheck": "echo \"[tokens] no typescript\""
+    "prepublishOnly": "node scripts/require-pnpm.mjs",
+    "build": "tsc -p tsconfig.build.json && node scripts/fix-esm-extensions.mjs",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "check-tarball": "node scripts/check-tarball.mjs"
+  },
+  "type": "module",
+  "main": "./src/tokens.ts",
+  "types": "./src/tokens.ts",
+  "//publishConfig": "main/types/exports are rewritten to ./dist at publish time. That rewrite is a pnpm feature \u2014 publishing with npm ships raw TypeScript, which is exactly what 0.1.0 did.",
+  "devDependencies": {
+    "@oxygenui-design/tsconfig": "workspace:*",
+    "typescript": "^5.7.2"
   }
 }

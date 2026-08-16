@@ -18,6 +18,7 @@
 
 import path from "node:path";
 import ts from "typescript";
+import { WORKSPACE_ALIASES } from "./emit/tsconfig-paths";
 import type { PropDoc } from "@oxygenui-design/component-meta";
 import { ROOT } from "./config";
 import type { LoadedComponent } from "./load";
@@ -41,12 +42,9 @@ export interface ExtractedExport {
  * than fail.
  */
 function compilerOptions(components: LoadedComponent[]): ts.CompilerOptions {
-  const paths: ts.MapLike<string[]> = {
-    "@oxygenui-design/fhir": ["./packages/fhir/src/index.ts"],
-    "@oxygenui-design/fixtures": ["./packages/fixtures/src/index.ts"],
-    "@oxygenui-design/component-meta": ["./packages/component-meta/src/index.ts"],
-    "@/lib/utils": ["./registry/oxygen/lib/utils.ts"],
-  };
+  // Shared with the emitted tsconfig.generated.json rather than restated. A
+  // second copy of this map drifts the first time a support module is added.
+  const paths: ts.MapLike<string[]> = { ...WORKSPACE_ALIASES };
 
   for (const component of components) {
     paths[component.consumerSpecifier] = [`./${component.sourcePath.split(path.sep).join("/")}`];
@@ -66,6 +64,19 @@ function compilerOptions(components: LoadedComponent[]): ts.CompilerOptions {
     baseUrl: ROOT,
     paths,
   };
+}
+
+/**
+ * Is this declaration ours, or something we inherited from a dependency?
+ *
+ * "Ours" means it is inside the repository and not inside node_modules — which
+ * covers `registry/` today and `packages/react/` after Phase 1, without either
+ * path being named here.
+ */
+function isOwnSource(fileName: string): boolean {
+  const resolved = path.resolve(fileName);
+  if (resolved.split(path.sep).includes("node_modules")) return false;
+  return resolved.startsWith(path.resolve(ROOT) + path.sep);
 }
 
 /** A component export, as opposed to a hook or a helper. */
@@ -136,11 +147,20 @@ function propsFromType(
     const declaration = symbol.declarations?.[0];
     if (!declaration) continue;
 
-    // A prop declared in the component's own file is part of its designed API.
-    // Anything reached through `extends React.HTMLAttributes<...>` is the HTML
-    // surface — around 280 properties, none of them this component's design.
-    // Those are summarised as a single `extendsType` line instead.
-    if (path.resolve(declaration.getSourceFile().fileName) !== path.resolve(ownFile)) continue;
+    // A prop this repository declares is part of the designed API, wherever in
+    // the repository it lives. Anything reached through
+    // `extends React.HTMLAttributes<...>` is the HTML surface — around 280
+    // properties, none of them this component's design — and is summarised as a
+    // single `extendsType` line instead.
+    //
+    // This used to compare against the component's OWN file. That was correct
+    // while every prop was declared beside its component, and silently wrong
+    // the moment a shared interface appeared: PulseLoader documented one prop
+    // (`bpm`) and hid the twenty in `LoaderCommonProps`, because that interface
+    // lives in lib/loader.tsx. The docs said a loader took no label, no mode,
+    // and no progress. The boundary that matters is ours-versus-vendored, not
+    // this-file-versus-that-file.
+    if (!isOwnSource(declaration.getSourceFile().fileName)) continue;
 
     const optional = (symbol.flags & ts.SymbolFlags.Optional) !== 0;
     const propType = checker.getTypeOfSymbolAtLocation(symbol, declaration);

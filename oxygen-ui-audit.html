@@ -1,0 +1,812 @@
+<title>Oxygen UI Readiness Audit</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<style>
+  /* ==================================================================
+     Oxygen UI — Enterprise Readiness Audit
+     Design direction: the library's own visual grammar, turned on itself.
+     Oxygen renders clinical values against reference ranges; this report
+     renders the library's scores the same way — a track, a reading, a
+     target. Calm paper document with dark instrument panels embedded,
+     matching apps/docs/src/app/globals.css.
+     ================================================================== */
+
+  :root {
+    --paper: #f7f9f8;
+    --paper-sunk: #eef3f1;
+    --surface: #ffffff;
+    --ink: #08110f;
+    --ink-2: #2c3d39;
+    --muted: #5a6b67;
+    --faint: #8397924d;
+    --rule: #dde5e2;
+    --rule-strong: #c6d3cf;
+
+    --accent: #059478;        /* validated ≥3:1 on paper */
+    --accent-deep: #045b4b;
+    --accent-wash: #e8f6f1;
+
+    /* Instrument panel — always dark, in both themes. */
+    --panel: #08110f;
+    --panel-2: #0e1a18;
+    --panel-fg: #dff3ec;
+    --panel-muted: #7d968f;
+    --panel-rule: #1a2b28;
+    --panel-accent: #4fd6c0;
+
+    /* Status. Chips only, always with a text label — never colour alone. */
+    --critical: #b91c1c;
+    --critical-bg: #fdeaea;
+    --warn: #b45309;
+    --warn-bg: #fdf3e3;
+    --good: #047857;
+    --good-bg: #e7f5ef;
+    --neutral: #64748b;
+    --neutral-bg: #eef1f4;
+
+    --shadow: 0 1px 2px rgb(8 17 15 / 0.05), 0 10px 30px -18px rgb(8 17 15 / 0.28);
+    --font-display: "Avenir Next", "Segoe UI Variable Display", "Helvetica Neue", ui-sans-serif, system-ui, sans-serif;
+    --font-body: -apple-system, BlinkMacSystemFont, "Segoe UI Variable Text", "Segoe UI", ui-sans-serif, system-ui, sans-serif;
+    --font-mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
+    color-scheme: light;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper: #0b1413;
+      --paper-sunk: #0f1c1a;
+      --surface: #101d1b;
+      --ink: #e8f2ef;
+      --ink-2: #c2d5d0;
+      --muted: #90a8a2;
+      --faint: #4a5f5a4d;
+      --rule: #1e2e2a;
+      --rule-strong: #2b403b;
+
+      --accent: #5fe0c9;      /* validated ≥3:1 on the dark ground */
+      --accent-deep: #a5f0e2;
+      --accent-wash: #0f2b26;
+
+      --panel: #060f0e;
+      --panel-2: #0b1615;
+      --panel-fg: #dff3ec;
+      --panel-muted: #7d968f;
+      --panel-rule: #162624;
+      --panel-accent: #5fe0c9;
+
+      --critical: #fb7185;
+      --critical-bg: #2c1216;
+      --warn: #fbbf24;
+      --warn-bg: #2a2010;
+      --good: #4ade80;
+      --good-bg: #0f2a1c;
+      --neutral: #94a3b8;
+      --neutral-bg: #1b262b;
+
+      --shadow: 0 1px 2px rgb(0 0 0 / 0.5), 0 12px 34px -18px rgb(0 0 0 / 0.7);
+      color-scheme: dark;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --paper: #0b1413;
+    --paper-sunk: #0f1c1a;
+    --surface: #101d1b;
+    --ink: #e8f2ef;
+    --ink-2: #c2d5d0;
+    --muted: #90a8a2;
+    --faint: #4a5f5a4d;
+    --rule: #1e2e2a;
+    --rule-strong: #2b403b;
+    --accent: #5fe0c9;
+    --accent-deep: #a5f0e2;
+    --accent-wash: #0f2b26;
+    --panel: #060f0e;
+    --panel-2: #0b1615;
+    --panel-fg: #dff3ec;
+    --panel-muted: #7d968f;
+    --panel-rule: #162624;
+    --panel-accent: #5fe0c9;
+    --critical: #fb7185;
+    --critical-bg: #2c1216;
+    --warn: #fbbf24;
+    --warn-bg: #2a2010;
+    --good: #4ade80;
+    --good-bg: #0f2a1c;
+    --neutral: #94a3b8;
+    --neutral-bg: #1b262b;
+    --shadow: 0 1px 2px rgb(0 0 0 / 0.5), 0 12px 34px -18px rgb(0 0 0 / 0.7);
+    color-scheme: dark;
+  }
+
+  /* ---------------------------------------------------------------- */
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } * { animation: none !important; transition: none !important; } }
+  body {
+    margin: 0; background: var(--paper); color: var(--ink);
+    font-family: var(--font-body); font-size: 16px; line-height: 1.62;
+    -webkit-font-smoothing: antialiased;
+  }
+  h1,h2,h3,h4 { font-family: var(--font-display); letter-spacing: -0.018em; text-wrap: balance; margin: 0; }
+  h1 { font-size: clamp(2.3rem, 5vw, 3.6rem); line-height: 1.02; font-weight: 600; }
+  h2 { font-size: clamp(1.5rem, 2.6vw, 1.95rem); line-height: 1.15; font-weight: 600; }
+  h3 { font-size: 1.12rem; line-height: 1.3; font-weight: 600; }
+  h4 { font-size: 0.95rem; font-weight: 600; }
+  p { margin: 0; text-wrap: pretty; }
+  p + p { margin-top: 0.8em; }
+  ul, ol { margin: 0.45em 0 0; padding-inline-start: 1.15em; }
+  li + li { margin-top: 0.3em; }
+  a { color: var(--accent-deep); text-underline-offset: 3px; text-decoration-color: color-mix(in oklab, var(--accent) 45%, transparent); }
+  a:hover { text-decoration-color: var(--accent); }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
+  code, .mono { font-family: var(--font-mono); font-size: 0.85em; }
+  :not(pre) > code { background: var(--paper-sunk); border: 1px solid var(--rule); padding: 0.05em 0.34em; border-radius: 5px; color: var(--ink); white-space: nowrap; }
+  strong { font-weight: 600; color: var(--ink); }
+  .eyebrow { font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); }
+  .eyebrow.on { color: var(--accent-deep); }
+  .muted { color: var(--muted); }
+  .small { font-size: 0.9rem; }
+  .num { font-variant-numeric: tabular-nums; }
+
+  .wrap { max-width: 1140px; margin: 0 auto; padding: 0 clamp(1rem, 4vw, 2.5rem); }
+  section.block { padding: 3.5rem 0; border-top: 1px solid var(--rule); }
+  section.block:first-of-type { border-top: 0; }
+  .head { display: grid; gap: 0.55rem; margin-bottom: 1.75rem; max-width: 72ch; }
+  .head p { color: var(--ink-2); }
+
+  /* ---------- masthead ---------- */
+  header.mast { padding: 3rem 0 2.5rem; border-bottom: 1px solid var(--rule); }
+  .mast-grid { display: grid; gap: 2.5rem; grid-template-columns: minmax(0,1.35fr) minmax(300px,1fr); align-items: start; }
+  @media (max-width: 900px) { .mast-grid { grid-template-columns: 1fr; } }
+  .lede { font-size: 1.14rem; color: var(--ink-2); max-width: 58ch; margin-top: 1.1rem; }
+  .meta { display: flex; flex-wrap: wrap; gap: 0.4rem 1.6rem; margin-top: 1.4rem; font-family: var(--font-mono); font-size: 0.74rem; color: var(--muted); }
+  .meta b { color: var(--ink); font-weight: 600; }
+
+  /* the verdict instrument */
+  .verdict {
+    background: var(--panel); color: var(--panel-fg); border-radius: 16px; padding: 1.4rem 1.5rem;
+    box-shadow: var(--shadow); position: relative; overflow: hidden;
+    background-image: linear-gradient(var(--panel-rule) 1px, transparent 1px), linear-gradient(90deg, var(--panel-rule) 1px, transparent 1px);
+    background-size: 26px 26px;
+  }
+  .verdict .row { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; font-family: var(--font-mono); font-size: 0.66rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--panel-muted); }
+  .verdict .reading { display: flex; align-items: baseline; gap: 0.65rem; margin: 0.9rem 0 0.2rem; }
+  .verdict .now { font-family: var(--font-display); font-size: 3.6rem; font-weight: 600; line-height: 1; color: var(--panel-fg); font-variant-numeric: tabular-nums; }
+  .verdict .arrow { color: var(--panel-muted); font-size: 1.3rem; }
+  .verdict .goal { font-family: var(--font-display); font-size: 2.1rem; font-weight: 600; line-height: 1; color: var(--panel-accent); font-variant-numeric: tabular-nums; }
+  .verdict .unit { font-family: var(--font-mono); font-size: 0.72rem; color: var(--panel-muted); }
+  .vtrack { position: relative; height: 8px; border-radius: 99px; background: #ffffff14; margin-top: 1.1rem; overflow: hidden; }
+  .vtrack i { position: absolute; inset-block: 0; inset-inline-start: 0; border-radius: 99px; background: var(--panel-accent); }
+  .vtrack u { position: absolute; inset-block: -3px; width: 2px; background: var(--panel-fg); opacity: .75; }
+  .vscale { display: flex; justify-content: space-between; font-family: var(--font-mono); font-size: 0.6rem; color: var(--panel-muted); margin-top: 0.35rem; }
+  .verdict .note { margin-top: 1rem; font-size: 0.83rem; line-height: 1.55; color: #bcd6ce; border-top: 1px solid var(--panel-rule); padding-top: 0.85rem; }
+
+  /* ---------- generic pieces ---------- */
+  .card { background: var(--surface); border: 1px solid var(--rule); border-radius: 13px; padding: 1.15rem 1.25rem; }
+  .grid2 { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(290px,1fr)); }
+  .grid3 { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(215px,1fr)); }
+  .chip { display: inline-flex; align-items: center; gap: 0.38em; padding: 0.16em 0.6em; border-radius: 999px; font-family: var(--font-mono); font-size: 0.66rem; letter-spacing: 0.07em; text-transform: uppercase; font-weight: 600; border: 1px solid; white-space: nowrap; }
+  .chip.crit { color: var(--critical); background: var(--critical-bg); border-color: color-mix(in oklab, var(--critical) 35%, transparent); }
+  .chip.warn { color: var(--warn); background: var(--warn-bg); border-color: color-mix(in oklab, var(--warn) 35%, transparent); }
+  .chip.good { color: var(--good); background: var(--good-bg); border-color: color-mix(in oklab, var(--good) 35%, transparent); }
+  .chip.neu  { color: var(--neutral); background: var(--neutral-bg); border-color: color-mix(in oklab, var(--neutral) 32%, transparent); }
+  .chip .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; flex: none; }
+
+  .tablewrap { overflow-x: auto; border: 1px solid var(--rule); border-radius: 12px; background: var(--surface); }
+  table { border-collapse: collapse; width: 100%; font-size: 0.89rem; min-width: 540px; }
+  th, td { text-align: start; vertical-align: top; padding: 0.62rem 0.8rem; border-bottom: 1px solid var(--rule); }
+  th { font-family: var(--font-mono); font-size: 0.67rem; letter-spacing: 0.09em; text-transform: uppercase; color: var(--muted); font-weight: 600; background: var(--paper-sunk); position: sticky; top: 0; }
+  tbody tr:last-child td { border-bottom: 0; }
+  td.num, th.num { text-align: end; font-variant-numeric: tabular-nums; }
+
+  /* ---------- finding cards ---------- */
+  .finding { background: var(--surface); border: 1px solid var(--rule); border-inline-start: 3px solid var(--critical); border-radius: 12px; padding: 1.1rem 1.25rem; display: grid; gap: 0.55rem; }
+  .finding.high { border-inline-start-color: var(--warn); }
+  .finding .fhead { display: flex; align-items: center; gap: 0.7rem; flex-wrap: wrap; }
+  .finding .id { font-family: var(--font-mono); font-size: 0.72rem; font-weight: 700; color: var(--muted); }
+  .finding .ev { font-family: var(--font-mono); font-size: 0.755rem; line-height: 1.55; background: var(--paper-sunk); border: 1px solid var(--rule); border-radius: 8px; padding: 0.55rem 0.7rem; color: var(--ink-2); overflow-x: auto; }
+  .finding .ev b { color: var(--critical); font-weight: 600; }
+
+  /* ---------- scorecard: the reference-range readout ---------- */
+  .scores { display: grid; gap: 0; border: 1px solid var(--rule); border-radius: 12px; overflow: hidden; background: var(--surface); }
+  .srow { display: grid; grid-template-columns: minmax(150px, 1.15fr) 3.2rem minmax(160px, 2.6fr) 3.2rem minmax(105px, auto); gap: 0.75rem; align-items: center; padding: 0.62rem 0.95rem; border-bottom: 1px solid var(--rule); }
+  .srow:last-child { border-bottom: 0; }
+  .srow:nth-child(even) { background: color-mix(in oklab, var(--paper-sunk) 55%, transparent); }
+  .srow .name { font-size: 0.885rem; font-weight: 500; }
+  .srow .v { font-family: var(--font-mono); font-size: 0.95rem; font-weight: 700; font-variant-numeric: tabular-nums; text-align: end; }
+  .srow .v.t { color: var(--accent-deep); font-weight: 600; font-size: 0.86rem; }
+  .track { position: relative; height: 10px; border-radius: 99px; background: var(--paper-sunk); border: 1px solid var(--rule); overflow: visible; }
+  .track .fill { position: absolute; inset-block: 0; inset-inline-start: 0; border-radius: 99px; background: var(--accent); }
+  .track .tgt { position: absolute; inset-block: -4px; width: 2px; background: var(--ink); opacity: 0.55; border-radius: 2px; }
+  .track .gap { position: absolute; inset-block: 3px; border-radius: 99px; background: repeating-linear-gradient(135deg, var(--faint) 0 3px, transparent 3px 6px); }
+  @media (max-width: 720px) {
+    .srow { grid-template-columns: 1fr 2.6rem; grid-template-areas: "name now" "track track" "chip chip"; gap: 0.4rem 0.6rem; }
+    .srow .name { grid-area: name; } .srow .v:not(.t) { grid-area: now; }
+    .srow .track { grid-area: track; } .srow .v.t { display: none; }
+    .srow .chip { grid-area: chip; justify-self: start; }
+  }
+  .slegend { display: flex; flex-wrap: wrap; gap: 0.5rem 1.4rem; margin-top: 0.7rem; font-size: 0.78rem; color: var(--muted); align-items: center; }
+  .slegend span { display: inline-flex; align-items: center; gap: 0.4rem; }
+  .swatch { width: 14px; height: 9px; border-radius: 3px; background: var(--accent); flex: none; }
+  .swatch.tgt { width: 2px; height: 14px; background: var(--ink); opacity: .55; border-radius: 2px; }
+  .swatch.gap { background: repeating-linear-gradient(135deg, var(--rule-strong) 0 3px, transparent 3px 6px); border: 1px solid var(--rule); }
+
+  /* ---------- quadrants ---------- */
+  .quad { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(250px,1fr)); }
+  .quad .card { display: grid; gap: 0.5rem; align-content: start; }
+  .quad h4 { display: flex; align-items: center; gap: 0.5rem; }
+  .quad ul { font-size: 0.86rem; color: var(--ink-2); }
+
+  /* ---------- architecture ---------- */
+  .arch { background: var(--panel); color: var(--panel-fg); border-radius: 14px; padding: 1.3rem; overflow-x: auto; box-shadow: var(--shadow); }
+  .arch pre { margin: 0; font-family: var(--font-mono); font-size: 0.76rem; line-height: 1.65; white-space: pre; color: #c8ded7; }
+  .arch pre b { color: var(--panel-accent); font-weight: 600; }
+  .arch pre i { color: #f0a5b0; font-style: normal; }
+  .arch pre u { color: var(--panel-muted); text-decoration: none; }
+  .archcap { font-family: var(--font-mono); font-size: 0.66rem; letter-spacing: 0.11em; text-transform: uppercase; color: var(--panel-muted); margin-bottom: 0.8rem; display: flex; justify-content: space-between; gap: 1rem; }
+
+  /* ---------- roadmap ---------- */
+  .phase { display: grid; grid-template-columns: 7.5rem 1fr; gap: 0.6rem 1.2rem; padding: 1rem 0; border-bottom: 1px solid var(--rule); }
+  .phase:last-child { border-bottom: 0; }
+  @media (max-width: 640px) { .phase { grid-template-columns: 1fr; } }
+  .phase .when { font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.05em; text-transform: uppercase; color: var(--accent-deep); padding-top: 0.15rem; }
+  .phase .when b { display: block; color: var(--ink); font-size: 1.5rem; font-family: var(--font-display); letter-spacing: -0.02em; }
+  .phase .body { display: grid; gap: 0.5rem; }
+  .phase .body > p { color: var(--ink-2); font-size: 0.93rem; }
+  .kv { display: grid; grid-template-columns: max-content 1fr; gap: 0.25rem 0.9rem; font-size: 0.85rem; margin-top: 0.2rem; }
+  .kv dt { font-family: var(--font-mono); font-size: 0.65rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); padding-top: 0.32em; }
+  .kv dd { margin: 0; color: var(--ink-2); }
+
+  .gantt { display: grid; gap: 0.3rem; margin-top: 0.5rem; }
+  .grow { display: grid; grid-template-columns: 5.5rem 1fr; gap: 0.8rem; align-items: center; font-size: 0.8rem; }
+  .gbar { position: relative; height: 20px; background: var(--paper-sunk); border: 1px solid var(--rule); border-radius: 5px; }
+  .gbar i { position: absolute; inset-block: 2px; border-radius: 3px; background: var(--accent); }
+  .gbar i.soft { background: color-mix(in oklab, var(--accent) 38%, transparent); }
+  .gaxis { display: grid; grid-template-columns: 5.5rem 1fr; gap: 0.8rem; font-family: var(--font-mono); font-size: 0.62rem; color: var(--muted); }
+  .gaxis div:last-child { display: flex; justify-content: space-between; }
+
+  .callout { border-radius: 12px; padding: 1rem 1.2rem; border: 1px solid var(--rule); background: var(--surface); }
+  .callout.on { background: var(--accent-wash); border-color: color-mix(in oklab, var(--accent) 32%, var(--rule)); }
+  .callout.bad { background: var(--critical-bg); border-color: color-mix(in oklab, var(--critical) 30%, var(--rule)); }
+
+  footer.colo { border-top: 1px solid var(--rule); padding: 1.5rem 0 3rem; color: var(--muted); font-size: 0.83rem; }
+</style>
+
+<header class="mast">
+  <div class="wrap mast-grid">
+    <div>
+      <p class="eyebrow on">Zowork · engineering audit · 16 August 2026</p>
+      <h1>Oxygen&nbsp;UI<br />Readiness Audit</h1>
+      <p class="lede">An evidence-based assessment of the component library against enterprise, production, and open-source standards — and a costed path from where it is to where Netsmart or CVS could be shown it without caveats.</p>
+      <div class="meta">
+        <span>Files inspected <b>278</b></span>
+        <span>Components <b>5</b></span>
+        <span>Tests <b>439</b></span>
+        <span>Critical findings <b>8</b></span>
+        <span>Method <b>inspection + execution</b></span>
+      </div>
+    </div>
+
+    <div class="verdict">
+      <div class="row"><span>Overall readiness</span><span>18 categories</span></div>
+      <div class="reading">
+        <span class="now">4.7</span>
+        <span class="arrow">→</span>
+        <span class="goal">8.9</span>
+        <span class="unit">/ 10</span>
+      </div>
+      <div class="vtrack">
+        <i style="width:47%"></i>
+        <u style="inset-inline-start:89%"></u>
+      </div>
+      <div class="vscale"><span>0</span><span>current 4.7</span><span>target 8.9</span><span>10</span></div>
+      <p class="note">The architecture is stronger than the score suggests; the score is held down by delivery, governance, and security — the layers enterprise buyers actually audit. <strong style="color:#fff">Reachable in ~7 weeks with two engineers.</strong></p>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <!-- ============================================================ -->
+  <section class="block">
+    <div class="head">
+      <p class="eyebrow">01 — The verdict</p>
+      <h2>A strong spine and a small body</h2>
+      <p>Oxygen has a metadata generator, a contrast-gating token validator, and six domain-specific lint rules that are better than what most Series-B companies ship. Against that, it currently contains five components in one category, all <code>beta</code>, and the distribution and institutional layers are largely absent. <strong>The gap is not quality — it is surface area and readiness.</strong></p>
+    </div>
+
+    <div class="grid3">
+      <div class="card">
+        <p class="eyebrow">Genuinely excellent</p>
+        <ul class="small" style="margin-top:.5rem">
+          <li>Generator: adding a component touches one directory</li>
+          <li>Token validator gates on contrast <em>and</em> 60° hue separation</li>
+          <li>Components structurally cannot fetch, log, or read env</li>
+          <li>axe in CI, 9 pages × 2 themes, passing</li>
+          <li>Zero hardcoded hex in shipped source</li>
+        </ul>
+      </div>
+      <div class="card">
+        <p class="eyebrow">Partly built</p>
+        <ul class="small" style="margin-top:.5rem">
+          <li>Testing: 439 tests, but one layer of eight</li>
+          <li>Quality gate exists and <em>cannot be switched on</em></li>
+          <li>Cross-framework: shipped and broken under SSR</li>
+          <li>Release automation without release gates</li>
+          <li>Docs site whose props tables are wrong</li>
+        </ul>
+      </div>
+      <div class="card">
+        <p class="eyebrow">Absent</p>
+        <ul class="small" style="margin-top:.5rem">
+          <li>Every governance file — contributing, security, owners</li>
+          <li>Storybook, visual regression, E2E, coverage gates</li>
+          <li>A React package installable from npm</li>
+          <li>i18n, despite an ADR warning about the deadline</li>
+          <li>Dependency scanning, SAST, SBOM</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <section class="block">
+    <div class="head">
+      <p class="eyebrow">02 — Triage</p>
+      <h2>Eight critical findings</h2>
+      <p>Each was verified by running something, not by reading. Three would be visible to a customer today.</p>
+    </div>
+
+    <div style="display:grid; gap:.85rem">
+
+      <article class="finding">
+        <div class="fhead"><span class="id">C1</span><span class="chip crit"><span class="dot"></span>Ship blocker</span><h3>The npm package crashes on import in Node</h3></div>
+        <p class="small"><code>class OxLoaderElement extends HTMLElement</code> evaluates at module scope. Any server-rendering context — Nuxt, Angular Universal, Astro, SvelteKit, a Next.js server component — throws before the loader renders. The package README explicitly promises Nuxt and Angular Universal support.</p>
+        <div class="ev">$ node -e "import('./dist/index.js')"<br /><b>ReferenceError: HTMLElement is not defined</b><br /><span class="muted">packages/loaders/src/base.ts:135 · jsdom tests passed because jsdom provides HTMLElement; there is no Node-environment test</span></div>
+      </article>
+
+      <article class="finding">
+        <div class="fhead"><span class="id">C2</span><span class="chip crit"><span class="dot"></span>Broken now</span><h3>CI on <code>main</code> fails on the next merge</h3></div>
+        <p class="small">The docs deploy gate fetches a registry item that no longer exists, then pipes an empty body into <code>JSON.parse</code>. It also asserts a FHIR dependency that no current component has.</p>
+        <div class="ev">.github/workflows/ci.yml:265<br />url="https://oxygenui.design/r/<b>vitals-panel.json</b>?ci=${GITHUB_SHA}"<br /><span class="muted">$ ls apps/docs/public/r/ | grep -c vitals → 0</span></div>
+      </article>
+
+      <article class="finding">
+        <div class="fhead"><span class="id">C3</span><span class="chip crit"><span class="dot"></span>Adoption blocker</span><h3>The documentation understates every API by 95%</h3></div>
+        <p class="small">The props table for <code>pulse-loader</code> renders <strong>one</strong> prop. The component has about twenty. The extractor deliberately excludes props not declared in the component's own file — a rule written to hide 280 inherited HTML attributes, which now also hides Oxygen's own shared interface.</p>
+        <div class="ev">scripts/gen/props.ts:141<br />if (path.resolve(declaration.getSourceFile().fileName) !== path.resolve(ownFile)) <b>continue;</b><br /><span class="muted">generated catalog → prop count: 1 · extendsType: "LoaderCommonProps"</span></div>
+      </article>
+
+      <article class="finding">
+        <div class="fhead"><span class="id">C7</span><span class="chip crit"><span class="dot"></span>WCAG failure</span><h3>Three contrast failures are shipping in the light palette</h3></div>
+        <p class="small">All three sit outside the validator's checked pair list. The focus indicator is the serious one: it governs every focusable element in every component Oxygen will ever ship, and it is well under the 3:1 floor.</p>
+        <div class="ev">focus-ring #10b995 on bg #ffffff = <b>2.50:1</b> &nbsp;(needs 3:1 — SC 1.4.11 / 2.4.11)<br />text-on-accent #ffffff on accent #059478 = <b>3.81:1</b> &nbsp;(needs 4.5:1 — SC 1.4.3)<br />border-strong #cbd5e1 on bg = <b>1.48:1</b> &nbsp;(needs 3:1 — backs --ox-field-border)</div>
+      </article>
+
+      <article class="finding">
+        <div class="fhead"><span class="id">C8</span><span class="chip crit"><span class="dot"></span>Live defect</span><h3>The published tokens package predates the token pipeline</h3></div>
+        <p class="small"><code>@oxygenui-design/tokens@0.1.0</code> on npm is nine days behind the source and still contains a bug fixed in the repository: an eight-digit zero-alpha <code>surface-overlay</code> that renders every dialog and popover fully transparent. No changeset is pending to correct it. The shadcn channel serves current CSS; the npm channel does not.</p>
+        <div class="ev">npm view → published 2026-08-05 · <b>4 files, 2 exports</b> &nbsp;(repo: 12 files, 6 exports)<br />tag predates pipeline commit 4bacb7e (2026-08-13)<br /><span class="muted">packages/tokens/tokens/semantic/dark.json:13 documents the fix</span></div>
+      </article>
+
+      <article class="finding">
+        <div class="fhead"><span class="id">C4</span><span class="chip crit"><span class="dot"></span>Process</span><h3>Releases are gated on less than merges are</h3></div>
+        <p class="small">The release workflow runs install → build → test → tarball → publish. No lint, no typecheck, no format, no generator drift check, no PHI scan, no accessibility audit — and no dependency on CI having passed. A commit with red CI can publish to npm.</p>
+        <div class="ev">.github/workflows/release.yml:48–78 &nbsp;<span class="muted">— compare ci.yml, which runs eight gates</span></div>
+      </article>
+
+      <article class="finding">
+        <div class="fhead"><span class="id">C5</span><span class="chip crit"><span class="dot"></span>Security</span><h3>One critical and five high advisories</h3></div>
+        <p class="small">All in build tooling — <code>vitest</code>, <code>vite</code>, <code>esbuild</code>, <code>nanoid</code>, and <code>postcss</code>/<code>sharp</code> via Next. The published runtime surface has zero dependencies and is clean. That distinction will not survive a procurement reviewer running <code>npm audit</code> and seeing "critical".</p>
+        <div class="ev">$ pnpm audit → {"moderate":5,"high":5,<b>"critical":1</b>}</div>
+      </article>
+
+      <article class="finding high">
+        <div class="fhead"><span class="id">C6</span><span class="chip warn"><span class="dot"></span>High</span><h3>The README installs a component that no longer exists</h3></div>
+        <p class="small">Five references to <code>vitals-panel</code> and <code>ObservationPanel</code>, including the primary install command and the quick-start example. Both 404.</p>
+        <div class="ev">README.md:27, 29, 51, 59, 163</div>
+      </article>
+
+    </div>
+
+    <div class="callout bad" style="margin-top:1.1rem">
+      <p class="eyebrow" style="color:var(--critical)">Ownership note</p>
+      <p class="small" style="margin-top:.3rem">C1 and C2 were introduced during the most recent work stream — the SSR crash because the element tests run in jsdom, which supplies <code>HTMLElement</code>, and the CI break because a deleted component was still named in a deploy gate. Both are cheap to fix. The absence of a Node-environment import test is the more important defect, and it is on the Phase 0 list.</p>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <section class="block">
+    <div class="head">
+      <p class="eyebrow">03 — Scorecard</p>
+      <h2>Eighteen categories, read against target</h2>
+      <p>Bar length is the current score; the vertical rule is the target after the roadmap; the hatched span is the gap to close. Sorted by gap, so the largest levers sit at the top.</p>
+    </div>
+
+    <div class="scores" id="scores"></div>
+
+    <div class="slegend">
+      <span><i class="swatch"></i> Current score</span>
+      <span><i class="swatch tgt"></i> Target after roadmap</span>
+      <span><i class="swatch gap"></i> Gap to close</span>
+      <span class="muted">· Scale 0–10 · Band labels accompany every colour</span>
+    </div>
+
+    <div class="grid2" style="margin-top:1.5rem">
+      <div class="callout on">
+        <p class="eyebrow on">Where the gains actually come from</p>
+        <div class="tablewrap" style="margin-top:.6rem; border:0; background:transparent">
+          <table style="min-width:0">
+            <thead><tr><th>Investment</th><th class="num">Effort</th><th class="num">Δ mean</th></tr></thead>
+            <tbody>
+              <tr><td>Phase 0 critical fixes</td><td class="num">6 d</td><td class="num"><strong>+1.3</strong></td></tr>
+              <tr><td>Storybook + stories + VRT</td><td class="num">12 d</td><td class="num"><strong>+1.0</strong></td></tr>
+              <tr><td>React package + core consolidation</td><td class="num">25 d</td><td class="num"><strong>+0.9</strong></td></tr>
+              <tr><td>Governance + security file set</td><td class="num">8 d</td><td class="num"><strong>+0.8</strong></td></tr>
+              <tr><td>Internationalisation</td><td class="num">6 d</td><td class="num"><strong>+0.3</strong></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="card">
+        <p class="eyebrow">The highest-leverage week</p>
+        <p class="small" style="margin-top:.4rem">Six days of Phase 0 moves the mean further than any other six days in the plan — because it converts <em>broken</em> into <em>working</em> rather than <em>good</em> into <em>better</em>. Every other investment compounds on top of it, and two of the eight items are visible to a customer today.</p>
+        <p class="small">Open-source readiness scores 1/10 and is almost entirely additive files. It is the cheapest large gain on the board.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <section class="block">
+    <div class="head">
+      <p class="eyebrow">04 — Architecture</p>
+      <h2>Two implementations held together by a test</h2>
+      <p>This is the central architectural finding. The React components and the custom elements are independent hand-written implementations of identical behaviour, reconciled by assertions a human wrote. That parity suite caught a mistyped bezier control point and a NaN-handling divergence within its first run — evidence both that it works, and that divergence is the normal case rather than the exception.</p>
+    </div>
+
+    <div class="arch">
+      <div class="archcap"><span>Current — two sources</span><span>5 components · parity by hand</span></div>
+<pre><b>registry/oxygen/lib/loader.tsx</b>   <u>React · copy-source via shadcn · React only</u>
+        <i>╎</i>
+        <i>╎</i>  <u>test/loader-parity.test.ts — 62 assertions,</u>
+        <i>╎</i>  <u>the ONLY thing keeping these in step</u>
+        <i>╎</i>
+<b>packages/loaders/src/base.ts</b>     <u>Custom elements · npm · everyone else</u>
+</pre>
+    </div>
+
+    <div class="arch" style="margin-top:1rem">
+      <div class="archcap"><span>Target — one source, generated channels</span><span>scales past 50 components</span></div>
+<pre><b>packages/core</b>          <u>framework-free · geometry, state machines, ARIA contracts, CSS</u>
+   │
+   ├─► <b>packages/react</b>    <u>peerDeps react ^18 || ^19 · thin bindings · SSR-safe</u>
+   │        └─► <b>registry/</b> <u>shadcn copy-source, GENERATED — not a second source</u>
+   │
+   └─► <b>packages/elements</b> <u>custom elements for Vue / Angular / Svelte / HTML</u>
+            └─► <u>optional typed wrappers, added on customer demand</u>
+</pre>
+    </div>
+
+    <div class="grid2" style="margin-top:1.1rem">
+      <div class="card">
+        <h4>Why the copy-source channel stays</h4>
+        <p class="small" style="margin-top:.35rem">“The source lands in your repository where you can read every line before you trust it” is a genuinely strong argument in a healthcare procurement review. The change is not to remove it — it is to <strong>generate</strong> it from the React package so it stops being a second place where behaviour is written.</p>
+      </div>
+      <div class="card">
+        <h4>Other structural weaknesses</h4>
+        <ul class="small" style="margin-top:.35rem">
+          <li><strong>No React npm package at all</strong> — copy-source is the only React channel, so there is no versioning or upgrade path</li>
+          <li><code>loader-core</code> exports 20 symbols and is copy-source: all of it is public API, with no extraction guard</li>
+          <li>The docs app doubles as the registry CDN — a docs build failure takes the install channel down</li>
+          <li><code>apps/hq</code> is 104 MB and proprietary, inside the repository intended to be open-sourced</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <section class="block">
+    <div class="head">
+      <p class="eyebrow">05 — Framework strategy</p>
+      <h2>Which cross-framework approach, and why</h2>
+      <p>Five viable strategies, assessed against Oxygen's buyer mix and the repository as it stands.</p>
+    </div>
+
+    <div class="tablewrap">
+      <table>
+        <thead>
+          <tr><th>Strategy</th><th>Developer experience</th><th>Accessibility</th><th>Maintenance</th><th>Scales to 50+?</th><th class="num">Verdict</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Separate native impls</strong><br /><span class="muted small">one per framework</span></td>
+            <td>Best possible, per framework</td>
+            <td>Each implementation re-solves a11y — highest defect risk</td>
+            <td>N× everything</td>
+            <td>No — fails past ~20</td>
+            <td class="num"><span class="chip crit"><span class="dot"></span>Reject</span></td>
+          </tr>
+          <tr>
+            <td><strong>Web Components only</strong></td>
+            <td>Weak in React; good elsewhere</td>
+            <td>Shadow DOM complicates cross-boundary <code>aria-*</code>, labels, focus</td>
+            <td>Lowest</td>
+            <td>Yes, but React adoption suffers</td>
+            <td class="num"><span class="chip crit"><span class="dot"></span>Reject</span></td>
+          </tr>
+          <tr>
+            <td><strong>Core + adapters</strong></td>
+            <td>Good across the board</td>
+            <td>Solved once in core</td>
+            <td>Medium</td>
+            <td>Yes</td>
+            <td class="num"><span class="chip neu"><span class="dot"></span>Viable</span></td>
+          </tr>
+          <tr>
+            <td><strong>Headless + renderers</strong></td>
+            <td>Consumers build their own UI</td>
+            <td>Primitives correct; consumers can break it</td>
+            <td>Medium</td>
+            <td>Yes, narrower audience</td>
+            <td class="num"><span class="chip crit"><span class="dot"></span>Reject</span></td>
+          </tr>
+          <tr style="background:var(--accent-wash)">
+            <td><strong>Hybrid</strong><br /><span class="muted small">core + native React + elements</span></td>
+            <td>Native in React, good elsewhere</td>
+            <td>Solved once, verified per channel</td>
+            <td>Medium</td>
+            <td>Yes — matches the buyer mix</td>
+            <td class="num"><span class="chip good"><span class="dot"></span>Recommend</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="grid2" style="margin-top:1.1rem">
+      <div class="callout on">
+        <p class="eyebrow on">Recommendation</p>
+        <p class="small" style="margin-top:.35rem"><strong>Hybrid — and make the two existing channels generated from one source rather than hand-written twins.</strong> React is the buyer reality for Netsmart, Heidi Health, and most digital-health startups; making it a second-class Web Component consumer would be strategically wrong. Web Components remain the right <em>compatibility</em> layer for the Angular and Vue long tail — but the SSR friction demonstrated by C1 makes them a poor <em>primary</em> layer.</p>
+      </div>
+      <div class="card">
+        <h4>What must be verified, and is not</h4>
+        <p class="small" style="margin-top:.35rem">There is no smoke-test application for any framework. The Vue, Angular, and Svelte support claims in the package README are unverified by any automated test — and the one verification actually run (a Node import) fails. Phase 2 adds five smoke apps to CI, each asserting render, SSR, and accessibility.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <section class="block">
+    <div class="head">
+      <p class="eyebrow">06 — Roadmap</p>
+      <h2>Six weeks of work, sequenced</h2>
+      <p>Phases 2 and 3 parallelise cleanly — one is architecture and testing, the other is governance, i18n, and documentation. With two engineers, enterprise-ready lands in roughly seven weeks.</p>
+    </div>
+
+    <div class="card" style="margin-bottom:1.5rem">
+      <p class="eyebrow">Sequencing · 1 FTE unless parallelised</p>
+      <div class="gantt" style="margin-top:.7rem">
+        <div class="grow"><span class="mono">Phase 0</span><div class="gbar"><i style="inset-inline-start:0%; width:7%"></i></div></div>
+        <div class="grow"><span class="mono">Phase 1</span><div class="gbar"><i style="inset-inline-start:7%; width:21%"></i></div></div>
+        <div class="grow"><span class="mono">Phase 2</span><div class="gbar"><i style="inset-inline-start:28%; width:29%"></i></div></div>
+        <div class="grow"><span class="mono">Phase 3</span><div class="gbar"><i class="soft" style="inset-inline-start:28%; width:29%"></i></div></div>
+        <div class="grow"><span class="mono">Phase 4</span><div class="gbar"><i class="soft" style="inset-inline-start:57%; width:43%"></i></div></div>
+        <div class="grow"><span class="mono">Phase 5</span><div class="gbar"><i class="soft" style="inset-inline-start:86%; width:14%"></i></div></div>
+        <div class="gaxis" style="margin-top:.35rem"><div></div><div><span>wk 1</span><span>wk 4</span><span>wk 7</span><span>wk 10</span><span>wk 14</span></div></div>
+      </div>
+      <p class="small muted" style="margin-top:.7rem">Solid = critical path. Soft = parallelisable or ongoing. Phase 3 runs alongside Phase 2 with a second engineer.</p>
+    </div>
+
+    <div class="phase">
+      <div class="when">Phase 0<b>6 d</b>P0</div>
+      <div class="body">
+        <h3>Stop the bleeding</h3>
+        <p>Nothing shipped is broken; nothing published is unsafe. All eight critical findings closed.</p>
+        <dl class="kv">
+          <dt>Deliverables</dt><dd>Green CI on <code>main</code> · a loaders package importable in Node · accurate props tables · corrected palette · republished tokens</dd>
+          <dt>Acceptance</dt><dd><code>node -e "import(…)"</code> exits 0 · <code>pnpm audit --audit-level=high</code> exits 0 · props table shows ≥15 rows · <code>contrast.json</code> shows ≥3:1 for focus and borders</dd>
+          <dt>Risk</dt><dd>Upgrading vitest 2→3 may need test adjustments — timebox one day, else pin transitives</dd>
+          <dt>Done when</dt><dd>All eight items closed, verified by command output pasted in the PR</dd>
+        </dl>
+      </div>
+    </div>
+
+    <div class="phase">
+      <div class="when">Phase 1<b>15 d</b>P0</div>
+      <div class="body">
+        <h3>The React package and the quality gate</h3>
+        <p>React consumers can <code>npm install</code>; the catalog gate can finally be armed.</p>
+        <dl class="kv">
+          <dt>Scope</dt><dd><code>packages/react</code> with peer deps · Storybook 8 · stories for every declared state · coverage thresholds · lint coverage extended to all shipped packages</dd>
+          <dt>Acceptance</dt><dd><code>pnpm gen --strict</code> exits 0 · coverage gate fails on a deliberate regression · <code>eslint --print-config</code> lists the Oxygen rules for every shipped package</dd>
+          <dt>Risk</dt><dd>Generating self-contained registry files from the React package is the hard part — keep the parity test until it is proven</dd>
+          <dt>Done when</dt><dd>A React consumer can install from npm <em>or</em> copy source, and both behave identically</dd>
+        </dl>
+      </div>
+    </div>
+
+    <div class="phase">
+      <div class="when">Phase 2<b>20 d</b>P1</div>
+      <div class="body">
+        <h3>Single source and visual safety</h3>
+        <p>No behaviour written twice; visual regressions cannot merge.</p>
+        <dl class="kv">
+          <dt>Scope</dt><dd><code>packages/core</code> · both channels rebuilt as bindings · Playwright VRT per story × theme × density · five framework smoke apps · api-extractor · dependency-cruiser</dd>
+          <dt>Acceptance</dt><dd>Deleting a line of core breaks both channels · VRT catches a 1px change · every smoke app server-renders without error</dd>
+          <dt>Risk</dt><dd>VRT flakiness — mitigate with pinned browser, frozen time, paused animations, fixed viewport, subset fonts</dd>
+          <dt>Done when</dt><dd>The parity test can be deleted without loss of safety</dd>
+        </dl>
+      </div>
+    </div>
+
+    <div class="phase">
+      <div class="when">Phase 3<b>20 d</b>P1</div>
+      <div class="body">
+        <h3>Enterprise and open-source readiness</h3>
+        <p>Survive a procurement review and a public launch. Runs parallel to Phase 2.</p>
+        <dl class="kv">
+          <dt>Scope</dt><dd>i18n package and string extraction · the full governance file set · Dependabot, CodeQL, SBOM, SHA-pinned actions · manual screen-reader pass · VPAT · CHANGELOG and migration templates · <code>ENGINEERING.md</code> · ratify the eight proposed ADRs</dd>
+          <dt>Acceptance</dt><dd>No hardcoded user-visible English in any shipped package · CodeQL and SBOM run per release · VPAT published · every ADR accepted or superseded</dd>
+          <dt>Risk</dt><dd>i18n is invasive — but the cost only grows; ADR 0008 puts it at a week now and “an enormous project” later</dd>
+          <dt>Done when</dt><dd>A security questionnaire and an accessibility questionnaire can both be answered from published artifacts</dd>
+        </dl>
+      </div>
+    </div>
+
+    <div class="phase">
+      <div class="when">Phase 4<b>ongoing</b>P2</div>
+      <div class="body">
+        <h3>Catalog breadth</h3>
+        <p>Foundations first — Button, Input, Select, Dialog, Table, Tabs — then the clinical layer that composes them. <strong>Explicitly not before Phase 2.</strong></p>
+        <dl class="kv">
+          <dt>Rate</dt><dd>~2–3 days per component at <code>beta</code>, ~4–5 at <code>stable</code></dd>
+          <dt>Gate</dt><dd>Nothing merges below the <code>beta</code> testing bar; nothing ships <code>stable</code> without stories, VRT, and a screen-reader pass</dd>
+        </dl>
+      </div>
+    </div>
+
+    <div class="phase">
+      <div class="when">Phase 5<b>10 d</b>Gated</div>
+      <div class="body">
+        <h3>Open-source launch</h3>
+        <p>Extract <code>apps/hq</code> to its own repository, rewrite history, audit for secrets, review the three internal strategy documents sitting at the repository root, decide DCO versus CLA, announce.</p>
+        <dl class="kv">
+          <dt>Gate</dt><dd>Phases 0–3 complete and zero high advisories</dd>
+        </dl>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <section class="block">
+    <div class="head">
+      <p class="eyebrow">07 — Risk</p>
+      <h2>What could go wrong</h2>
+    </div>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>Risk</th><th>Likelihood</th><th>Impact</th><th>Mitigation</th></tr></thead>
+        <tbody>
+          <tr><td>An enterprise pilot starts before Phase 0 and hits the SSR crash</td><td><span class="chip crit"><span class="dot"></span>High</span></td><td>Critical — first impression with a named account</td><td>Fix C1 this week; do not demo the npm package until then</td></tr>
+          <tr><td>Breadth is prioritised over foundation — 40 components on the current architecture</td><td><span class="chip warn"><span class="dot"></span>Medium</span></td><td>Critical — 40× the duplication debt</td><td>Hard gate: no new component category before Phase 2 completes</td></tr>
+          <tr><td>The two implementations diverge silently</td><td><span class="chip crit"><span class="dot"></span>High</span><br /><span class="muted small">already twice</span></td><td>High</td><td>Parity suite now; single core in Phase 2</td></tr>
+          <tr><td>A palette change breaks contrast in a pair the gate does not check</td><td><span class="chip crit"><span class="dot"></span>High</span></td><td>Critical in a clinical UI</td><td>Widen the gate to every pair the system composes; unit-test the validator</td></tr>
+          <tr><td>i18n deferred past 50 components</td><td><span class="chip warn"><span class="dot"></span>Medium</span></td><td>High — quantified by ADR 0008</td><td>Do it at five components, in Phase 3</td></tr>
+          <tr><td>Procurement stalls on a missing VPAT or SBOM</td><td><span class="chip crit"><span class="dot"></span>High</span></td><td>High — blocks revenue, not just adoption</td><td>Phase 3 produces both as release artifacts</td></tr>
+          <tr><td>Open-sourcing exposes <code>apps/hq</code> or the internal strategy documents</td><td><span class="chip warn"><span class="dot"></span>Medium</span></td><td>High</td><td>Extract and rewrite history before launch</td></tr>
+          <tr><td>The <code>@oxygenui</code> npm scope is taken by a third party</td><td><span class="chip warn"><span class="dot"></span>Medium</span></td><td>High — name-confusion attack surface on a healthcare library</td><td>Register it this week regardless of which scope you publish under</td></tr>
+          <tr><td>Single-maintainer bus factor</td><td><span class="chip crit"><span class="dot"></span>High</span></td><td>High</td><td><code>ENGINEERING.md</code>, ADRs, CODEOWNERS; the generator already lowers onboarding cost</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <section class="block">
+    <div class="head">
+      <p class="eyebrow">08 — Next</p>
+      <h2>This week, and what only you can decide</h2>
+    </div>
+
+    <div class="grid2">
+      <div class="card">
+        <h3 style="margin-bottom:.6rem">Five days, one engineer</h3>
+        <div class="tablewrap" style="border:0; background:transparent">
+          <table style="min-width:0">
+            <thead><tr><th class="num">Day</th><th>Task</th></tr></thead>
+            <tbody>
+              <tr><td class="num">1</td><td>Fix the Node/SSR crash; add a Node-environment import test. Register the <code>@oxygenui</code> npm scope.</td></tr>
+              <tr><td class="num">2</td><td>Fix props extraction and the deploy verification; add regression tests for both.</td></tr>
+              <tr><td class="num">3</td><td>Resolve the advisories; add <code>pnpm audit --audit-level=high</code> and the full gate set to the release workflow.</td></tr>
+              <tr><td class="num">4</td><td>Rewrite the README; add <code>SECURITY.md</code>. Fix the eslint globs so shipped packages get the Oxygen rules.</td></tr>
+              <tr><td class="num">5</td><td>Correct the palette and widen the contrast gate; republish tokens; publish loaders and verify from a clean Vue, Angular, and Node project.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3 style="margin-bottom:.6rem">Decisions needed before Phase 1</h3>
+        <ol class="small" style="margin-top:.2rem">
+          <li><strong>npm scope</strong> — consolidate on <code>@oxygenui</code> if it can be secured, or standardise on <code>@oxygenui-design</code> and align the registry namespace. Two similar scopes reads as a typosquat to a security reviewer. <em>Recommend <code>@oxygenui</code>.</em></li>
+          <li><strong>React version floor</strong> — 18 or 19? Determines peer dependencies and whether custom elements are viable for React at all. <em>Recommend <code>^18 || ^19</code>.</em></li>
+          <li><strong>Open-source timing</strong> — before or after the first enterprise pilot? <em>Recommend after; use pilots to harden the API.</em></li>
+          <li><strong>Headcount</strong> — one engineer means ~14 weeks; two means ~7. <em>Recommend two.</em></li>
+          <li><strong>Phase 4 order</strong> — foundations or clinical first? <em>Recommend foundations; the clinical components compose them.</em></li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="callout on" style="margin-top:1.2rem">
+      <p class="eyebrow on">For leadership, in one sentence</p>
+      <p style="margin-top:.4rem; font-size:1.05rem; color:var(--ink)">Oxygen UI has an architecture worth building on and a governance layer that does not yet exist; six days of critical fixes and roughly seven weeks of two-engineer work turn a promising internal project into something Netsmart or CVS can be shown without caveats.</p>
+    </div>
+  </section>
+
+</div>
+
+<footer class="colo">
+  <div class="wrap">
+    Prepared by direct repository inspection — 278 tracked files, all workflows, every package, plus executed verification (<code>pnpm audit</code>, Node import tests, <code>eslint --print-config</code>, <code>pnpm gen --strict</code>, tarball packing). Every finding is reproducible from the commands and file references cited. Findings marked critical were verified by execution, not by reading. · Zowork · 16 August 2026
+  </div>
+</footer>
+
+<script>
+(() => {
+  "use strict";
+  /* The scorecard renders as a reference-range readout: a track, a reading,
+     and a target rule — the same grammar Oxygen's own clinical components use.
+     Magnitude is carried by bar LENGTH in a single validated hue; severity is
+     carried by a labelled chip, so colour is never the only signal. */
+  const DATA = [
+    ["Open-source readiness", 1, 9, "LICENSE only — every governance file missing"],
+    ["Framework interoperability", 3, 9, "SSR crash; no React npm package; zero smoke apps"],
+    ["Security", 3, 9, "1 critical + 5 high advisories; no disclosure policy"],
+    ["Governance & maintainability", 3, 9, "8 of 9 ADRs unratified; no CODEOWNERS"],
+    ["Documentation", 4, 9, "Props tables show 1 of ~20 props; README 404s"],
+    ["NPM packaging", 4, 9, "Package broken in Node; tokens stale on npm"],
+    ["CI/CD", 4, 9, "main is broken; release bypasses every gate"],
+    ["Release management", 4, 9, "No CHANGELOG; nothing released; no enforcement"],
+    ["Test coverage & reliability", 5, 9, "439 tests but one layer of eight; no thresholds"],
+    ["Developer experience", 5, 9, "No Storybook, no hooks, no contributor docs"],
+    ["Accessibility", 5, 9, "Focus ring at 2.50:1; no SR testing; no VPAT"],
+    ["UI/UX consistency", 5, 8, "One component category; unprovable at this size"],
+    ["Design tokens & theming", 6, 9, "Excellent pipeline; stale package, no brand axis"],
+    ["Architecture", 6, 9, "Strong generator; two hand-written implementations"],
+    ["Component quality", 6, 9, "Well built, well tested — but five of them"],
+    ["Performance", 6, 9, "8.1 KB gz measured; no budgets enforced"],
+    ["Code quality", 7, 9, "0 lint problems; shipped npm source ungoverned"],
+    ["API consistency", 7, 9, "Genuinely consistent; no ref forwarding, no api-extractor"],
+  ];
+
+  const band = (n) =>
+    n <= 4 ? ["crit", "Critical"] : n <= 6 ? ["warn", "Needs work"] : n <= 7 ? ["neu", "Approaching"] : ["good", "Meets bar"];
+
+  const root = document.getElementById("scores");
+  const frag = document.createDocumentFragment();
+
+  for (const [name, now, target, why] of DATA) {
+    const [cls, label] = band(now);
+    const row = document.createElement("div");
+    row.className = "srow";
+    row.title = why;
+
+    const pctNow = (now / 10) * 100;
+    const pctTgt = (target / 10) * 100;
+
+    row.innerHTML =
+      '<span class="name">' + name + "</span>" +
+      '<span class="v">' + now + "</span>" +
+      '<div class="track" role="img" aria-label="' + name + ": scores " + now +
+        " out of 10 today, target " + target + '. ' + label + '. ' + why + '">' +
+        '<span class="gap" style="inset-inline-start:' + pctNow + "%; inset-inline-end:" + (100 - pctTgt) + '%"></span>' +
+        '<span class="fill" style="width:' + pctNow + '%"></span>' +
+        '<span class="tgt" style="inset-inline-start:calc(' + pctTgt + '% - 1px)"></span>' +
+      "</div>" +
+      '<span class="v t">→ ' + target + "</span>" +
+      '<span class="chip ' + cls + '"><span class="dot"></span>' + label + "</span>";
+
+    frag.append(row);
+  }
+  root.append(frag);
+})();
+</script>

@@ -12,51 +12,46 @@
  *   1. Hierarchy. Two components carry the product's argument — the ones that
  *      handle interpretation and identity — so they get a featured cell with a
  *      live render. The rest are standard.
- *   2. Cards show their states instead of describing them. The strip is built
- *      from the real StatusBadge, so a card cannot claim a state the component
- *      does not actually render.
+ *   2. Cards show their states instead of describing them. Once the rebuilt
+ *      StatusBadge exists the strip should be built from it, so a card cannot
+ *      claim a state the component does not actually render.
+ *
+ * The featured-preview map is empty while the catalog is rebuilt; add an entry
+ * per featured component (real component, real fixtures) as each one ships.
  */
 
 import * as React from "react";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-import { observations, patients } from "@oxygenui-design/fixtures";
-import { PatientBanner } from "@/registry/oxygen/patient-banner/patient-banner";
-import { ObservationPanel } from "@/registry/oxygen/vitals-panel/vitals-panel";
-import { StatusBadge, type StatusTone } from "@/registry/oxygen/status-badge/status-badge";
+import { PulseLoader } from "@/registry/oxygen/pulse-loader/pulse-loader";
+import { InfusionLoader } from "@/registry/oxygen/infusion-loader/infusion-loader";
 import { STATUS_LABEL, type ComponentDoc } from "@/lib/catalog";
 import { cn } from "@/lib/utils";
 
-const AS_OF = new Date("2026-08-03T00:00:00Z");
-
+/**
+ * Keyed by the stability tiers in ADR 0006. These used to be "shipping",
+ * "review", and "design" — labels from an earlier vocabulary that no longer
+ * match anything a component can declare, so every badge silently rendered
+ * unstyled.
+ */
 const STATUS_STYLE: Record<string, string> = {
-  shipping: "border-oxygen/30 bg-oxygen/8 text-oxygen-deep",
-  review: "border-rule-strong bg-paper-sunk text-graphite",
-  design: "border-rule bg-transparent text-graphite-soft",
+  stable: "border-oxygen/30 bg-oxygen/8 text-oxygen-deep",
+  beta: "border-rule-strong bg-paper-sunk text-graphite",
+  experimental: "border-rule bg-transparent text-graphite-soft",
+  deprecated: "border-rule bg-transparent text-graphite-soft line-through",
 };
 
-/** A representative tone per component, so the strip reads as real severity. */
-const STATE_TONES: Record<string, StatusTone[]> = {
-  "patient-banner": ["normal", "unknown", "critical", "neutral"],
-  "vitals-panel": ["critical", "high", "low", "normal", "unknown"],
-  "medication-card": ["normal", "high", "critical", "neutral"],
-  "allergy-list": ["critical", "high", "unknown", "neutral"],
-  "appointment-card": ["normal", "high", "critical", "neutral"],
-  "condition-list": ["normal", "high", "unknown", "neutral"],
-  "coverage-card": ["normal", "critical", "high", "neutral"],
-  "status-badge": ["critical", "high", "low", "normal", "unknown", "neutral"],
-};
-
-/** Compact live renders for the featured cells. Real components, real fixtures. */
+/** Compact live renders for the featured cells. Real components, unedited. */
 const FEATURED_PREVIEW: Record<string, () => React.ReactNode> = {
-  "vitals-panel": () => (
-    <ObservationPanel
-      observations={[observations.potassiumCritical, observations.bloodPressure]}
-      label="Featured preview"
-    />
+  "pulse-loader": () => (
+    <div className="flex min-h-[120px] items-center justify-center">
+      <PulseLoader size={92} label="Loading your records" />
+    </div>
   ),
-  "patient-banner": () => (
-    <PatientBanner headingLevel={4} patient={patients.restricted} maskIdentifiers asOf={AS_OF} />
+  "infusion-loader": () => (
+    <div className="flex min-h-[120px] items-center justify-center">
+      <InfusionLoader size={150} progress={62} label="Importing records" />
+    </div>
   ),
 };
 
@@ -70,7 +65,6 @@ export function ComponentCard({
   featured?: boolean;
 }) {
   const preview = featured ? FEATURED_PREVIEW[component.name] : undefined;
-  const tones = STATE_TONES[component.name] ?? ["normal", "unknown"];
 
   return (
     <Link
@@ -110,7 +104,11 @@ export function ComponentCard({
         </span>
       </div>
 
-      <p className="numeric mt-2 text-xs text-oxygen-deep">{component.resource}</p>
+      {/* Primitives take no FHIR resource; an empty line here would just be a
+          gap the reader has to account for. */}
+      {component.resource ? (
+        <p className="numeric mt-2 text-xs text-oxygen-deep">{component.resource}</p>
+      ) : null}
 
       <p
         className={cn(
@@ -136,10 +134,13 @@ export function ComponentCard({
         </div>
       ) : (
         <div className="mt-4 flex flex-wrap gap-1.5" aria-hidden="true">
-          {tones.map((tone, i) => (
-            <StatusBadge key={i} tone={tone} icon={null} className="px-1.5 py-0.5 text-[0.5625rem]">
-              {component.states[i]?.split(" ")[0] ?? ""}
-            </StatusBadge>
+          {component.states.slice(0, 4).map((state) => (
+            <span
+              key={state}
+              className="rounded-full border border-rule px-1.5 py-0.5 font-mono text-[0.5625rem] uppercase tracking-wider text-graphite"
+            >
+              {state.split(" ")[0]}
+            </span>
           ))}
         </div>
       )}

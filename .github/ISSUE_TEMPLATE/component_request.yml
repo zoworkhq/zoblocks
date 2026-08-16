@@ -1,0 +1,27 @@
+name: Component or feature request
+description: Something the library should do and does not.
+labels: ["enhancement", "needs triage"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: The clinical or product problem
+      description: What is the workflow, and who is looking at the screen? Start here, not with the solution.
+    validations: { required: true }
+  - type: textarea
+    id: states
+    attributes:
+      label: The states it must handle
+      description: |
+        The states a demo would skip are the reason this library exists. Absent
+        values, unverified data, restricted records, partial failures, long waits.
+    validations: { required: true }
+  - type: input
+    id: fhir
+    attributes:
+      label: FHIR resource, if it takes one
+      placeholder: "Observation"
+  - type: textarea
+    id: workaround
+    attributes:
+      label: What you are doing today instead

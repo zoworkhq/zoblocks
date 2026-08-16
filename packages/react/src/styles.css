@@ -1,0 +1,460 @@
+/**
+ * Oxygen loaders — structure and motion.
+ *
+ * Install target: styles/oxygen-loader.css. Import it once, next to the token
+ * stylesheet:
+ *
+ *   @import "./styles/oxygen-tokens.css";
+ *   @import "./styles/oxygen-loader.css";
+ *
+ * Two deliberate choices:
+ *
+ *   1. No Tailwind utilities. Keyframes cannot be expressed as tokens, and a
+ *      loader whose motion depends on the host's Tailwind config renders
+ *      unstyled in a Vue or Angular app. Everything the loaders need is here.
+ *   2. Every colour is a semantic token, never a palette value, so a brand
+ *      override reaches the loaders without touching this file.
+ *
+ * Six numbers govern the whole system, and they are the calm:
+ *
+ *   beat        1000ms at 60bpm — a resting sinus rhythm
+ *   beat scale  1.07 — noticed peripherally, never tracked
+ *   cycle       4000ms — roughly a breath at 15/min
+ *   track       22% — keeps the shape legible between beats
+ *   enter/exit  160ms / 220ms
+ *   still       2400ms opacity breath, the reduced-motion state
+ */
+
+.ox-loader {
+  /* Defaults; each component overwrites what it uses via inline custom
+     properties. Declared here so the CSS is complete on its own. */
+  --ox-loader-size: 32px;
+  --ox-loader-color: var(--ox-accent, currentColor);
+  --ox-loader-track: color-mix(in oklab, var(--ox-loader-color) 22%, transparent);
+  --ox-loader-stroke: 2.4px;
+  --ox-loader-beat: 1000ms;
+  --ox-loader-cycle: 4000ms;
+  --ox-loader-scrim: color-mix(in oklab, var(--ox-bg, Canvas) 72%, transparent);
+  --ox-loader-z: 1000;
+  --ox-loader-ease: cubic-bezier(0.45, 0, 0.55, 1);
+  --ox-loader-ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+  display: inline-grid;
+  justify-items: center;
+  gap: 0.6em;
+  color: var(--ox-loader-color);
+  font-family: var(--ox-font-sans, inherit);
+  font-size: var(--ox-text-sm, 0.875rem);
+  line-height: 1.45;
+  text-align: center;
+  animation: ox-loader-enter 160ms var(--ox-ease, ease-out) both;
+}
+
+.ox-loader--overlay,
+.ox-loader--page {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  z-index: var(--ox-loader-z);
+}
+
+.ox-loader--page {
+  position: fixed;
+}
+
+.ox-loader--overlay[data-ox-scrim="true"],
+.ox-loader--page[data-ox-scrim="true"] {
+  background: var(--ox-loader-scrim);
+}
+
+.ox-loader__art {
+  display: block;
+  line-height: 0;
+}
+
+.ox-loader__art > svg {
+  display: block;
+  width: var(--ox-loader-size);
+  height: auto;
+  overflow: visible;
+}
+
+.ox-loader__label {
+  color: var(--ox-text, currentColor);
+  font-weight: 500;
+}
+
+.ox-loader__value {
+  color: var(--ox-text, currentColor);
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
+.ox-loader__hint {
+  color: var(--ox-text-muted, currentColor);
+  font-size: var(--ox-text-xs, 0.8125rem);
+  max-width: 34ch;
+}
+
+.ox-loader__actions {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+}
+
+/* Visually hidden, still announced. The label is always in the DOM because an
+   empty live region announces nothing at all. */
+.ox-loader__sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Shared stroke treatment. `non-scaling-stroke` is what keeps the line the same
+   weight at 20px and at 160px — without it the mark thickens into a blob as it
+   grows and vanishes as it shrinks. */
+.ox-loader__stroke {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: var(--ox-loader-stroke);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.ox-loader__fill {
+  fill: currentColor;
+}
+
+.ox-loader__track {
+  opacity: 0.22;
+}
+
+/* ---------------------------------------------------------------- */
+/* Pulse and Rhythm — the cardiac pair                               */
+/* ---------------------------------------------------------------- */
+
+/* Draws once on mount, then stays. The reference redrew the heart at the top of
+   every loop, which put a visible seam in the animation every 7 seconds. */
+.ox-loader__draw {
+  stroke-dasharray: 100;
+  stroke-dashoffset: 100;
+  animation: ox-loader-draw 700ms var(--ox-loader-ease-out) forwards;
+}
+
+.ox-loader__beat {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: ox-loader-beat var(--ox-loader-beat) var(--ox-loader-ease) infinite;
+  animation-delay: 400ms;
+}
+
+/* A monitor sweep: a bright head with a dimmer tail behind it, over a faint
+   static track. The shape never disappears between beats. */
+.ox-loader__head {
+  stroke-dasharray: 22 200;
+  stroke-dashoffset: 22;
+  animation: ox-loader-head var(--ox-loader-beat) cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  animation-delay: 400ms;
+}
+
+.ox-loader__tail {
+  stroke-dasharray: 44 200;
+  stroke-dashoffset: 44;
+  opacity: 0.35;
+  animation: ox-loader-tail var(--ox-loader-beat) cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  animation-delay: 400ms;
+}
+
+@keyframes ox-loader-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes ox-loader-beat {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.07);
+  }
+}
+
+@keyframes ox-loader-head {
+  to {
+    stroke-dashoffset: -100;
+  }
+}
+
+@keyframes ox-loader-tail {
+  to {
+    stroke-dashoffset: -78;
+  }
+}
+
+/* ---------------------------------------------------------------- */
+/* Breath                                                            */
+/* ---------------------------------------------------------------- */
+
+.ox-loader__ring {
+  transform-box: fill-box;
+  transform-origin: center;
+  opacity: 0;
+  animation: ox-loader-ring var(--ox-loader-cycle) cubic-bezier(0.2, 0.6, 0.4, 1) infinite;
+}
+
+.ox-loader__ring:nth-of-type(2) {
+  animation-delay: calc(var(--ox-loader-cycle) / -3);
+}
+
+.ox-loader__ring:nth-of-type(3) {
+  animation-delay: calc(var(--ox-loader-cycle) * -2 / 3);
+}
+
+.ox-loader__core {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: ox-loader-core var(--ox-loader-cycle) var(--ox-loader-ease) infinite;
+}
+
+@keyframes ox-loader-ring {
+  0% {
+    transform: scale(0.3);
+    opacity: 0.55;
+  }
+  70% {
+    opacity: 0.08;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0;
+  }
+}
+
+@keyframes ox-loader-core {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.18);
+  }
+}
+
+/* ---------------------------------------------------------------- */
+/* Helix                                                             */
+/* ---------------------------------------------------------------- */
+
+/* Depth is faked with scale and opacity so the two strands read as passing in
+   front of and behind each other without a 3D transform. */
+.ox-loader__dot {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: ox-loader-helix calc(var(--ox-loader-cycle) * 0.65) ease-in-out infinite;
+  animation-delay: calc(var(--ox-loader-cycle) * 0.65 * var(--ox-loader-phase, 0));
+}
+
+@keyframes ox-loader-helix {
+  0% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+  25% {
+    transform: translateY(-12px) scale(0.85);
+    opacity: 0.85;
+  }
+  50% {
+    transform: translateY(0) scale(0.6);
+    opacity: 0.45;
+  }
+  75% {
+    transform: translateY(12px) scale(0.85);
+    opacity: 0.85;
+  }
+  100% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+/* ---------------------------------------------------------------- */
+/* Infusion                                                          */
+/* ---------------------------------------------------------------- */
+
+.ox-loader__slug {
+  animation: ox-loader-slug calc(var(--ox-loader-cycle) * 0.7) var(--ox-loader-ease) infinite
+    alternate;
+}
+
+/* Determinate: the slug is a measurement, so it must not also drift. */
+.ox-loader[data-ox-determinate="true"] .ox-loader__slug {
+  animation: none;
+  transform: none;
+}
+
+@keyframes ox-loader-slug {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(88px);
+  }
+}
+
+/* ---------------------------------------------------------------- */
+/* Enter                                                             */
+/* ---------------------------------------------------------------- */
+
+@keyframes ox-loader-enter {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes ox-loader-still {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.55;
+  }
+}
+
+/* ---------------------------------------------------------------- */
+/* Reduced motion                                                    */
+/* ---------------------------------------------------------------- */
+
+/*
+ * The still state is designed, not merely paused.
+ *
+ * Pausing leaves the sweep frozen mid-path and the heart part-drawn, which
+ * looks like a component that failed rather than one that respects a
+ * preference. Instead: the shape completes, the track comes up to full
+ * strength, and the whole mark breathes in opacity. Nothing moves, nothing
+ * scales, and it still reads as "working".
+ *
+ * `motion="full"` opts out — for an application that offers its own motion
+ * setting and has already asked.
+ */
+@media (prefers-reduced-motion: reduce) {
+  .ox-loader:not([data-ox-motion="full"]) .ox-loader__draw,
+  .ox-loader:not([data-ox-motion="full"]) .ox-loader__beat,
+  .ox-loader:not([data-ox-motion="full"]) .ox-loader__head,
+  .ox-loader:not([data-ox-motion="full"]) .ox-loader__tail,
+  .ox-loader:not([data-ox-motion="full"]) .ox-loader__ring,
+  .ox-loader:not([data-ox-motion="full"]) .ox-loader__core,
+  .ox-loader:not([data-ox-motion="full"]) .ox-loader__dot,
+  .ox-loader:not([data-ox-motion="full"]) .ox-loader__slug {
+    animation: none;
+  }
+
+  .ox-loader:not([data-ox-motion="full"]) {
+    animation: none;
+  }
+
+  .ox-loader:not([data-ox-motion="full"]) .ox-loader__draw {
+    stroke-dashoffset: 0;
+  }
+
+  .ox-loader:not([data-ox-motion="full"]) .ox-loader__head,
+  .ox-loader:not([data-ox-motion="full"]) .ox-loader__tail {
+    opacity: 0;
+  }
+
+  .ox-loader:not([data-ox-motion="full"]) .ox-loader__track {
+    opacity: 1;
+  }
+
+  .ox-loader:not([data-ox-motion="full"]) .ox-loader__ring {
+    opacity: 0;
+  }
+
+  .ox-loader:not([data-ox-motion="full"]) .ox-loader__ring:nth-of-type(1) {
+    opacity: 0.35;
+    transform: scale(0.7);
+  }
+
+  .ox-loader:not([data-ox-motion="full"]) .ox-loader__art {
+    animation: ox-loader-still 2400ms var(--ox-loader-ease) infinite;
+  }
+}
+
+/* The same still state, forced by the `motion` prop rather than by the OS. */
+.ox-loader[data-ox-motion="reduced"] .ox-loader__draw,
+.ox-loader[data-ox-motion="reduced"] .ox-loader__beat,
+.ox-loader[data-ox-motion="reduced"] .ox-loader__head,
+.ox-loader[data-ox-motion="reduced"] .ox-loader__tail,
+.ox-loader[data-ox-motion="reduced"] .ox-loader__ring,
+.ox-loader[data-ox-motion="reduced"] .ox-loader__core,
+.ox-loader[data-ox-motion="reduced"] .ox-loader__dot,
+.ox-loader[data-ox-motion="reduced"] .ox-loader__slug {
+  animation: none;
+}
+
+.ox-loader[data-ox-motion="reduced"] {
+  animation: none;
+}
+
+.ox-loader[data-ox-motion="reduced"] .ox-loader__draw {
+  stroke-dashoffset: 0;
+}
+
+.ox-loader[data-ox-motion="reduced"] .ox-loader__head,
+.ox-loader[data-ox-motion="reduced"] .ox-loader__tail {
+  opacity: 0;
+}
+
+.ox-loader[data-ox-motion="reduced"] .ox-loader__track {
+  opacity: 1;
+}
+
+.ox-loader[data-ox-motion="reduced"] .ox-loader__ring {
+  opacity: 0;
+}
+
+.ox-loader[data-ox-motion="reduced"] .ox-loader__ring:nth-of-type(1) {
+  opacity: 0.35;
+  transform: scale(0.7);
+}
+
+.ox-loader[data-ox-motion="reduced"] .ox-loader__art {
+  animation: ox-loader-still 2400ms var(--ox-loader-ease) infinite;
+}
+
+/* ---------------------------------------------------------------- */
+/* Forced colours                                                    */
+/* ---------------------------------------------------------------- */
+
+/*
+ * Windows High Contrast discards every custom colour, which is why the track is
+ * raised here: at 22% of a colour that no longer exists, the shape would be
+ * invisible rather than faint.
+ */
+@media (forced-colors: active) {
+  .ox-loader {
+    color: CanvasText;
+  }
+
+  .ox-loader--overlay[data-ox-scrim="true"],
+  .ox-loader--page[data-ox-scrim="true"] {
+    background: Canvas;
+  }
+
+  .ox-loader__track {
+    opacity: 0.5;
+  }
+}

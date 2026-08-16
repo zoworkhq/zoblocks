@@ -7,5 +7,16 @@
   "access": "public",
   "baseBranch": "main",
   "updateInternalDependencies": "patch",
-  "ignore": ["@oxygenui-design/docs", "@oxygenui-design/fixtures"]
+  "ignore": [
+    "@oxygenui-design/docs",
+    "@oxygenui-design/hq",
+    "@oxygenui-design/fixtures",
+    "@oxygenui-design/component-meta",
+    "@oxygenui-design/eslint-plugin",
+    "@oxygenui-design/tsconfig"
+  ],
+  "privatePackages": {
+    "version": false,
+    "tag": false
+  }
 }

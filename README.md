@@ -20,18 +20,23 @@ that came back preliminary, a reference range that doesn't exist, a record
 flagged restricted, or a potassium of 6.8. Those aren't edge cases in
 healthcare — they are the normal working set.
 
-Oxygen components take FHIR resources as props directly. No adapter layer, no
-bespoke prop shape to learn:
+Every component ships the states a demo would skip, handles reduced motion with
+a designed still state rather than a paused one, and announces itself in words:
 
 ```tsx
-import { ObservationPanel } from "@/components/oxygen/vitals-panel";
+import { PageLoader } from "@/components/oxygen/pulse-loader";
 
-<ObservationPanel observations={bundle.entry.map((e) => e.resource)} />;
+<PageLoader label="Loading your records" />;
 ```
 
-Reference ranges, interpretation flags, preliminary and corrected status,
-absent values, and critical escalation are handled — and an uninterpreted
-result reads **"Not interpreted"**, never "Normal".
+The catalog is being rebuilt. The **Loaders** category ships today — five
+independently installable components paced to resting physiology rather than to
+a spinner. The clinical layer, which takes FHIR resources as props directly with
+no adapter and no bespoke prop shape, follows on the rebuilt foundation.
+
+**Not React?** The same loaders ship as dependency-free custom elements for Vue,
+Angular, Svelte, or plain HTML — see
+[`@oxygenui-design/loaders`](packages/loaders/README.md).
 
 ## Install
 
@@ -48,7 +53,7 @@ Register the namespace once, in your project's `components.json`:
 Then add components by name:
 
 ```bash
-pnpm dlx shadcn@latest add @oxygenui/vitals-panel
+pnpm dlx shadcn@latest add @oxygenui/pulse-loader
 ```
 
 Without that `registries` entry the CLI has no way to resolve `@oxygenui`, so
@@ -56,12 +61,15 @@ the add command fails before it reaches the network. If you would rather not
 edit `components.json`, pass the URL directly instead:
 
 ```bash
-pnpm dlx shadcn@latest add https://oxygenui.design/r/vitals-panel.json
+pnpm dlx shadcn@latest add https://oxygenui.design/r/pulse-loader.json
 ```
 
 Components are distributed as source. The CLI writes the files into your
-project and adds `@oxygenui-design/fhir` (types and pure helpers, zero runtime
-dependencies) to your `package.json`.
+project, pulls in anything they share (`loader-core`, `utils`, `tokens`), and
+adds any runtime dependencies to your `package.json`. The loaders add none.
+
+Available today: `pulse-loader` · `rhythm-loader` · `breath-loader` ·
+`helix-loader` · `infusion-loader`.
 
 The `@oxygenui` in the install command is a shadcn registry namespace, not an
 npm scope — it is a local alias for the URL above, and you can name it whatever
@@ -160,7 +168,7 @@ look fine on screen:
 
 ```tsx
 it("shows an uninterpreted result as uninterpreted, never as normal", () => {
-  render(<ObservationPanel observations={[observations.uninterpreted]} />);
+  render(<PulseLoader label="Loading results" />);
   expect(screen.getByText(/not interpreted/i)).toBeInTheDocument();
   expect(screen.queryByText(/^normal$/i)).not.toBeInTheDocument();
 });
@@ -215,6 +223,16 @@ validation remain yours.
 
 It is well-built UI with healthcare implementation guidance. That is the claim,
 and it is the only one we make.
+
+## Contributing
+
+Read [`ENGINEERING.md`](ENGINEERING.md) first — it is the standard every
+component, fix, and release is evaluated against, and it opens with a
+one-page definition of done. Then [`CONTRIBUTING.md`](CONTRIBUTING.md) for the
+mechanics.
+
+Security issues go to the process in [`SECURITY.md`](SECURITY.md), never to a
+public issue.
 
 ## License
 

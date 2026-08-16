@@ -32,6 +32,8 @@ export const paths = {
   tailwindSources: path.join(ROOT, "apps", "docs", "src", "app", "generated-sources.css"),
   llmsTxt: path.join(ROOT, "apps", "docs", "public", "llms.txt"),
   coverage: path.join(ROOT, "apps", "docs", "public", "r", "coverage.json"),
+  /** The npm React channel, generated from the registry source. */
+  reactPackage: path.join(ROOT, "packages", "react"),
 } as const;
 
 /**

@@ -12,6 +12,8 @@ apps/docs/public/r
 registry.json
 tsconfig.generated.json
 apps/docs/src/lib/generated
+apps/docs/src/app/generated-sources.css
+packages/react/src
 apps/hq/drizzle/meta
 
 # Token build outputs. The DTCG source in packages/tokens/tokens/ is

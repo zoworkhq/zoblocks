@@ -21,7 +21,7 @@ export interface WriteResult {
 export class Emitter {
   readonly results: WriteResult[] = [];
 
-  constructor(private readonly checkOnly: boolean) {}
+  constructor(readonly checkOnly: boolean) {}
 
   async emit(absolute: string, content: string): Promise<void> {
     const normalised = content.endsWith("\n") ? content : `${content}\n`;

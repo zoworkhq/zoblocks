@@ -21,6 +21,31 @@
       ]
     },
     {
+      "name": "loader-core",
+      "type": "registry:lib",
+      "title": "Loader core",
+      "description": "Shared frame, timing gate, and stylesheet behind every Oxygen loader. Installed automatically with any loader.",
+      "dependencies": [
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "https://oxygenui.design/r/utils.json"
+      ],
+      "files": [
+        {
+          "path": "registry/oxygen/lib/loader.tsx",
+          "type": "registry:lib",
+          "target": "lib/oxygen-loader.tsx"
+        },
+        {
+          "path": "registry/oxygen/lib/loader.css",
+          "type": "registry:file",
+          "target": "styles/oxygen-loader.css"
+        }
+      ]
+    },
+    {
       "name": "tokens",
       "type": "registry:style",
       "title": "Oxygen tokens",
@@ -34,811 +59,133 @@
       ]
     },
     {
-      "name": "absent-value",
+      "name": "breath-loader",
       "type": "registry:component",
-      "title": "Absent Value",
-      "description": "Renders the absence of a clinical value as a statement rather than a blank. Distinguishes not-asked, declined, masked, pending, and error — reasons that mean different things and must not share a dash.",
+      "title": "Breath Loader",
+      "description": "Symbol-free loader cycling at roughly fifteen a minute, the rate of calm breathing. Carries no clinical imagery, so it suits any specialty, and its core accepts a customer's logo mark.",
       "categories": [
-        "primitive",
-        "clinical"
+        "loaders",
+        "feedback"
       ],
       "dependencies": [
-        "@oxygenui-design/fhir@^0.1.0",
-        "lucide-react",
-        "clsx",
-        "tailwind-merge"
-      ],
-      "registryDependencies": [
-        "https://oxygenui.design/r/utils.json",
-        "https://oxygenui.design/r/tokens.json"
-      ],
-      "files": [
-        {
-          "path": "registry/oxygen/absent-value/absent-value.tsx",
-          "type": "registry:component",
-          "target": "components/oxygen/absent-value.tsx"
-        }
-      ]
-    },
-    {
-      "name": "action-gate",
-      "type": "registry:component",
-      "title": "Action Gate",
-      "description": "Two-step confirmation for consequential clinical actions. States the specific consequence and names the patient, escalates friction for irreversible actions, and emits a structured audit event.",
-      "categories": [
-        "primitive",
-        "system"
-      ],
-      "dependencies": [
-        "lucide-react",
-        "clsx",
-        "tailwind-merge"
-      ],
-      "registryDependencies": [
-        "https://oxygenui.design/r/utils.json",
-        "https://oxygenui.design/r/tokens.json"
-      ],
-      "files": [
-        {
-          "path": "registry/oxygen/action-gate/action-gate.tsx",
-          "type": "registry:component",
-          "target": "components/oxygen/action-gate.tsx"
-        }
-      ]
-    },
-    {
-      "name": "alert-banner",
-      "type": "registry:component",
-      "title": "Alert Banner",
-      "description": "Severity tiers as an interruption budget. Only critical may take focus, the specific finding is stated rather than a category, and dismissal captures a reason so rules can be measured.",
-      "categories": [
-        "primitive",
-        "clinical"
-      ],
-      "dependencies": [
-        "@oxygenui-design/fhir@^0.1.0",
-        "lucide-react",
-        "clsx",
-        "tailwind-merge"
-      ],
-      "registryDependencies": [
-        "https://oxygenui.design/r/utils.json",
-        "https://oxygenui.design/r/tokens.json"
-      ],
-      "files": [
-        {
-          "path": "registry/oxygen/alert-banner/alert-banner.tsx",
-          "type": "registry:component",
-          "target": "components/oxygen/alert-banner.tsx"
-        }
-      ]
-    },
-    {
-      "name": "allergy-list",
-      "type": "registry:component",
-      "title": "Allergy List",
-      "description": "Allergies and intolerances from FHIR AllergyIntolerance. Distinguishes a recorded no-known-allergies assertion from an empty list, because one means asked-and-answered and the other means nobody asked.",
-      "categories": [
-        "clinical-data",
-        "clinical"
-      ],
-      "dependencies": [
-        "@oxygenui-design/fhir@^0.1.0",
-        "lucide-react",
         "clsx",
         "tailwind-merge"
       ],
       "registryDependencies": [
         "https://oxygenui.design/r/utils.json",
         "https://oxygenui.design/r/tokens.json",
-        "https://oxygenui.design/r/status-badge.json"
+        "https://oxygenui.design/r/loader-core.json"
       ],
       "files": [
         {
-          "path": "registry/oxygen/allergy-list/allergy-list.tsx",
+          "path": "registry/oxygen/breath-loader/breath-loader.tsx",
           "type": "registry:component",
-          "target": "components/oxygen/allergy-list.tsx"
+          "target": "components/oxygen/breath-loader.tsx"
         }
       ]
     },
     {
-      "name": "app-shell",
+      "name": "helix-loader",
       "type": "registry:component",
-      "title": "App Shell",
-      "description": "Outermost frame composed from the user's permissions rather than rendered-then-disabled. Patient context is a landmark, context changes are guarded, and session expiry warns before it acts.",
+      "title": "Helix Loader",
+      "description": "Loader for genomics, pathology, and diagnostics surfaces. Depth comes from scale and opacity rather than a 3D transform, so the strands cross convincingly while staying cheap to composite.",
       "categories": [
-        "navigation",
-        "system"
+        "loaders",
+        "feedback"
       ],
       "dependencies": [
-        "lucide-react",
-        "clsx",
-        "tailwind-merge"
-      ],
-      "registryDependencies": [
-        "https://oxygenui.design/r/utils.json",
-        "https://oxygenui.design/r/tokens.json"
-      ],
-      "files": [
-        {
-          "path": "registry/oxygen/app-shell/app-shell.tsx",
-          "type": "registry:component",
-          "target": "components/oxygen/app-shell.tsx"
-        }
-      ]
-    },
-    {
-      "name": "appointment-card",
-      "type": "registry:component",
-      "title": "Appointment Card",
-      "description": "Scheduled appointment from a FHIR Appointment resource. Time zone is a required prop rather than inferred from the browser, and no-show is treated as distinct from cancelled.",
-      "categories": [
-        "scheduling"
-      ],
-      "dependencies": [
-        "@oxygenui-design/fhir@^0.1.0",
-        "lucide-react",
         "clsx",
         "tailwind-merge"
       ],
       "registryDependencies": [
         "https://oxygenui.design/r/utils.json",
         "https://oxygenui.design/r/tokens.json",
-        "https://oxygenui.design/r/status-badge.json"
+        "https://oxygenui.design/r/loader-core.json"
       ],
       "files": [
         {
-          "path": "registry/oxygen/appointment-card/appointment-card.tsx",
+          "path": "registry/oxygen/helix-loader/helix-loader.tsx",
           "type": "registry:component",
-          "target": "components/oxygen/appointment-card.tsx"
+          "target": "components/oxygen/helix-loader.tsx"
         }
       ]
     },
     {
-      "name": "care-team",
+      "name": "infusion-loader",
       "type": "registry:component",
-      "title": "Care Team Panel",
-      "description": "Everyone involved and who is actually reachable now. Coverage sits beside the assignment rather than replacing it, and non-clinical members are first-class.",
+      "title": "Infusion Loader",
+      "description": "Determinate and indeterminate progress in one component. Pass progress for a real 0–100 measurement with role=progressbar; omit it and the slug drifts as an honest unknown.",
       "categories": [
-        "patient-identity",
-        "clinical"
+        "loaders",
+        "feedback"
       ],
       "dependencies": [
-        "@oxygenui-design/fhir@^0.1.0",
-        "lucide-react",
-        "clsx",
-        "tailwind-merge"
-      ],
-      "registryDependencies": [
-        "https://oxygenui.design/r/utils.json",
-        "https://oxygenui.design/r/tokens.json"
-      ],
-      "files": [
-        {
-          "path": "registry/oxygen/care-team/care-team.tsx",
-          "type": "registry:component",
-          "target": "components/oxygen/care-team.tsx"
-        }
-      ]
-    },
-    {
-      "name": "clinical-skeleton",
-      "type": "registry:component",
-      "title": "Clinical Skeleton",
-      "description": "Loading placeholders shaped like layout, never like a value, plus a progressive section that keeps partial failure and stale cache visible instead of silently omitting content.",
-      "categories": [
-        "primitive",
-        "system"
-      ],
-      "dependencies": [
-        "lucide-react",
-        "clsx",
-        "tailwind-merge"
-      ],
-      "registryDependencies": [
-        "https://oxygenui.design/r/utils.json",
-        "https://oxygenui.design/r/tokens.json"
-      ],
-      "files": [
-        {
-          "path": "registry/oxygen/clinical-skeleton/clinical-skeleton.tsx",
-          "type": "registry:component",
-          "target": "components/oxygen/clinical-skeleton.tsx"
-        }
-      ]
-    },
-    {
-      "name": "clinical-time",
-      "type": "registry:component",
-      "title": "Clinical Time",
-      "description": "A clinical instant with a required time zone. Preserves FHIR partial-date precision, keeps absolute time always available, and flags future timestamps as the data errors they usually are.",
-      "categories": [
-        "primitive",
-        "clinical"
-      ],
-      "dependencies": [
-        "@oxygenui-design/fhir@^0.1.0",
-        "lucide-react",
-        "clsx",
-        "tailwind-merge"
-      ],
-      "registryDependencies": [
-        "https://oxygenui.design/r/utils.json",
-        "https://oxygenui.design/r/tokens.json"
-      ],
-      "files": [
-        {
-          "path": "registry/oxygen/clinical-time/clinical-time.tsx",
-          "type": "registry:component",
-          "target": "components/oxygen/clinical-time.tsx"
-        }
-      ]
-    },
-    {
-      "name": "clinical-value",
-      "type": "registry:component",
-      "title": "Clinical Value",
-      "description": "One measured quantity, unit, comparator, and interpretation as a single atomic element. Preserves reported precision and never lets a value drift apart from its unit.",
-      "categories": [
-        "primitive",
-        "clinical"
-      ],
-      "dependencies": [
-        "@oxygenui-design/fhir@^0.1.0",
-        "lucide-react",
         "clsx",
         "tailwind-merge"
       ],
       "registryDependencies": [
         "https://oxygenui.design/r/utils.json",
         "https://oxygenui.design/r/tokens.json",
-        "https://oxygenui.design/r/absent-value.json"
+        "https://oxygenui.design/r/loader-core.json"
       ],
       "files": [
         {
-          "path": "registry/oxygen/clinical-value/clinical-value.tsx",
+          "path": "registry/oxygen/infusion-loader/infusion-loader.tsx",
           "type": "registry:component",
-          "target": "components/oxygen/clinical-value.tsx"
+          "target": "components/oxygen/infusion-loader.tsx"
         }
       ]
     },
     {
-      "name": "code-status",
+      "name": "pulse-loader",
       "type": "registry:component",
-      "title": "Code Status",
-      "description": "Resuscitation status, advance directives, and healthcare proxy. Unknown is a loud state, never a silent default to full code, and conflicting directives are surfaced rather than resolved.",
+      "title": "Pulse Loader",
+      "description": "Page and region loader: an open heart that draws itself once, then beats at a resting 60bpm while a monitor sweep crosses the rhythm line. Renders as Rhythm Loader below 40px, where the heart's detail would collapse.",
       "categories": [
-        "patient-identity",
-        "clinical"
+        "loaders",
+        "feedback"
       ],
       "dependencies": [
-        "@oxygenui-design/fhir@^0.1.0",
-        "lucide-react",
-        "clsx",
-        "tailwind-merge"
-      ],
-      "registryDependencies": [
-        "https://oxygenui.design/r/utils.json",
-        "https://oxygenui.design/r/tokens.json"
-      ],
-      "files": [
-        {
-          "path": "registry/oxygen/code-status/code-status.tsx",
-          "type": "registry:component",
-          "target": "components/oxygen/code-status.tsx"
-        }
-      ]
-    },
-    {
-      "name": "concept-chip",
-      "type": "registry:component",
-      "title": "Concept Chip",
-      "description": "A coded clinical concept with its coding one interaction away. Marks text-only concepts, unrecognised systems, and codes outside an expected value set.",
-      "categories": [
-        "primitive",
-        "clinical"
-      ],
-      "dependencies": [
-        "@oxygenui-design/fhir@^0.1.0",
-        "lucide-react",
-        "clsx",
-        "tailwind-merge"
-      ],
-      "registryDependencies": [
-        "https://oxygenui.design/r/utils.json",
-        "https://oxygenui.design/r/tokens.json"
-      ],
-      "files": [
-        {
-          "path": "registry/oxygen/concept-chip/concept-chip.tsx",
-          "type": "registry:component",
-          "target": "components/oxygen/concept-chip.tsx"
-        }
-      ]
-    },
-    {
-      "name": "condition-list",
-      "type": "registry:component",
-      "title": "Condition List",
-      "description": "Problem list from FHIR Condition resources. Separates active from resolved, preserves vague onset as recorded, and never presents a provisional diagnosis as confirmed.",
-      "categories": [
-        "clinical-data",
-        "clinical"
-      ],
-      "dependencies": [
-        "@oxygenui-design/fhir@^0.1.0",
-        "lucide-react",
         "clsx",
         "tailwind-merge"
       ],
       "registryDependencies": [
         "https://oxygenui.design/r/utils.json",
         "https://oxygenui.design/r/tokens.json",
-        "https://oxygenui.design/r/status-badge.json"
+        "https://oxygenui.design/r/loader-core.json",
+        "https://oxygenui.design/r/rhythm-loader.json"
       ],
       "files": [
         {
-          "path": "registry/oxygen/condition-list/condition-list.tsx",
+          "path": "registry/oxygen/pulse-loader/pulse-loader.tsx",
           "type": "registry:component",
-          "target": "components/oxygen/condition-list.tsx"
+          "target": "components/oxygen/pulse-loader.tsx"
         }
       ]
     },
     {
-      "name": "coverage-card",
+      "name": "rhythm-loader",
       "type": "registry:component",
-      "title": "Coverage Card",
-      "description": "Insurance coverage from a FHIR Coverage resource. Effective state is derived from status and period together, so a coverage marked active but past its end date reads as lapsed.",
+      "title": "Rhythm Loader",
+      "description": "Loader drawn as a single PQRST complex on a baseline, swept once per beat by a bright head with a fading tail. Nothing scales and nothing grows, and it stays legible down to 20px.",
       "categories": [
-        "billing-and-coverage"
+        "loaders",
+        "feedback"
       ],
       "dependencies": [
-        "@oxygenui-design/fhir@^0.1.0",
-        "lucide-react",
         "clsx",
         "tailwind-merge"
       ],
       "registryDependencies": [
         "https://oxygenui.design/r/utils.json",
         "https://oxygenui.design/r/tokens.json",
-        "https://oxygenui.design/r/status-badge.json"
+        "https://oxygenui.design/r/loader-core.json"
       ],
       "files": [
         {
-          "path": "registry/oxygen/coverage-card/coverage-card.tsx",
+          "path": "registry/oxygen/rhythm-loader/rhythm-loader.tsx",
           "type": "registry:component",
-          "target": "components/oxygen/coverage-card.tsx"
-        }
-      ]
-    },
-    {
-      "name": "density-provider",
-      "type": "registry:component",
-      "title": "Density Provider",
-      "description": "Sets the surface profile for a subtree: spacing, WCAG 2.2 target-size floor, which vocabulary the surface speaks, and how much is disclosed before asking. Three profiles, nestable, and clamped so clinical density can never shrink a control below the accessible minimum.",
-      "categories": [
-        "primitive",
-        "system"
-      ],
-      "dependencies": [
-        "lucide-react",
-        "clsx",
-        "tailwind-merge"
-      ],
-      "registryDependencies": [
-        "https://oxygenui.design/r/utils.json",
-        "https://oxygenui.design/r/tokens.json"
-      ],
-      "files": [
-        {
-          "path": "registry/oxygen/density-provider/density-provider.tsx",
-          "type": "registry:component",
-          "target": "components/oxygen/density-provider.tsx"
-        }
-      ]
-    },
-    {
-      "name": "dose-input",
-      "type": "registry:component",
-      "title": "Dose Input",
-      "description": "Numeric entry for doses with ISMP formatting rules, plausibility warnings separated from hard maximums, and weight-based calculation that shows its arithmetic.",
-      "categories": [
-        "primitive",
-        "clinical"
-      ],
-      "dependencies": [
-        "@oxygenui-design/fhir@^0.1.0",
-        "lucide-react",
-        "clsx",
-        "tailwind-merge"
-      ],
-      "registryDependencies": [
-        "https://oxygenui.design/r/utils.json",
-        "https://oxygenui.design/r/tokens.json"
-      ],
-      "files": [
-        {
-          "path": "registry/oxygen/dose-input/dose-input.tsx",
-          "type": "registry:component",
-          "target": "components/oxygen/dose-input.tsx"
-        }
-      ]
-    },
-    {
-      "name": "empty-state",
-      "type": "registry:component",
-      "title": "Empty State",
-      "description": "Distinguishes never-recorded, filtered-to-empty, source-unavailable, restricted, and pending. An unavailable section is never rendered as an empty one.",
-      "categories": [
-        "primitive",
-        "system"
-      ],
-      "dependencies": [
-        "lucide-react",
-        "clsx",
-        "tailwind-merge"
-      ],
-      "registryDependencies": [
-        "https://oxygenui.design/r/utils.json",
-        "https://oxygenui.design/r/tokens.json"
-      ],
-      "files": [
-        {
-          "path": "registry/oxygen/empty-state/empty-state.tsx",
-          "type": "registry:component",
-          "target": "components/oxygen/empty-state.tsx"
-        }
-      ]
-    },
-    {
-      "name": "error-boundary",
-      "type": "registry:component",
-      "title": "Error Boundary",
-      "description": "Contains a failure to one section and never renders a partial record as a complete one. Reports without PHI, and marks boundaries whose failure invalidates the surrounding screen.",
-      "categories": [
-        "primitive",
-        "system"
-      ],
-      "dependencies": [
-        "lucide-react",
-        "clsx",
-        "tailwind-merge"
-      ],
-      "registryDependencies": [
-        "https://oxygenui.design/r/utils.json",
-        "https://oxygenui.design/r/tokens.json"
-      ],
-      "files": [
-        {
-          "path": "registry/oxygen/error-boundary/error-boundary.tsx",
-          "type": "registry:component",
-          "target": "components/oxygen/error-boundary.tsx"
-        }
-      ]
-    },
-    {
-      "name": "identity-token",
-      "type": "registry:component",
-      "title": "Identity Token",
-      "description": "Compact, privacy-aware representation of a person. Photos require asserted consent, deceased and restricted are text, and initials infer nothing demographic.",
-      "categories": [
-        "primitive",
-        "patient-identity"
-      ],
-      "dependencies": [
-        "@oxygenui-design/fhir@^0.1.0",
-        "lucide-react",
-        "clsx",
-        "tailwind-merge"
-      ],
-      "registryDependencies": [
-        "https://oxygenui.design/r/utils.json",
-        "https://oxygenui.design/r/tokens.json"
-      ],
-      "files": [
-        {
-          "path": "registry/oxygen/identity-token/identity-token.tsx",
-          "type": "registry:component",
-          "target": "components/oxygen/identity-token.tsx"
-        }
-      ]
-    },
-    {
-      "name": "medication-card",
-      "type": "registry:component",
-      "title": "Medication Card",
-      "description": "Medication order from a FHIR MedicationRequest. On-hold, stopped, completed, and expired each get their own label and tone rather than one greyed-out style, because they lead to opposite next actions.",
-      "categories": [
-        "medication",
-        "clinical"
-      ],
-      "dependencies": [
-        "@oxygenui-design/fhir@^0.1.0",
-        "lucide-react",
-        "clsx",
-        "tailwind-merge"
-      ],
-      "registryDependencies": [
-        "https://oxygenui.design/r/utils.json",
-        "https://oxygenui.design/r/tokens.json",
-        "https://oxygenui.design/r/status-badge.json"
-      ],
-      "files": [
-        {
-          "path": "registry/oxygen/medication-card/medication-card.tsx",
-          "type": "registry:component",
-          "target": "components/oxygen/medication-card.tsx"
-        }
-      ]
-    },
-    {
-      "name": "observation-trend",
-      "type": "registry:component",
-      "title": "Observation Trend",
-      "description": "A time series for FHIR Observations sharing one code. Draws the reference band only when a numeric range was actually stated, encodes each point's interpretation as a distinct shape as well as a colour, annotates only what crosses, and ships a real data table that assistive technology reads instead of the drawing.",
-      "categories": [
-        "clinical",
-        "visualisation"
-      ],
-      "dependencies": [
-        "@oxygenui-design/fhir@^0.1.0",
-        "lucide-react",
-        "clsx",
-        "tailwind-merge"
-      ],
-      "registryDependencies": [
-        "https://oxygenui.design/r/utils.json",
-        "https://oxygenui.design/r/tokens.json",
-        "https://oxygenui.design/r/absent-value.json"
-      ],
-      "files": [
-        {
-          "path": "registry/oxygen/observation-trend/observation-trend.tsx",
-          "type": "registry:component",
-          "target": "components/oxygen/observation-trend.tsx"
-        }
-      ]
-    },
-    {
-      "name": "patient-banner",
-      "type": "registry:component",
-      "title": "Patient Banner",
-      "description": "Persistent patient identity header driven by a FHIR R4 Patient resource. Handles restricted records, deceased status, masked identifiers, and missing demographics.",
-      "categories": [
-        "patient-identity",
-        "clinical"
-      ],
-      "dependencies": [
-        "@oxygenui-design/fhir@^0.1.0",
-        "lucide-react",
-        "clsx",
-        "tailwind-merge"
-      ],
-      "registryDependencies": [
-        "https://oxygenui.design/r/utils.json",
-        "https://oxygenui.design/r/tokens.json"
-      ],
-      "files": [
-        {
-          "path": "registry/oxygen/patient-banner/patient-banner.tsx",
-          "type": "registry:component",
-          "target": "components/oxygen/patient-banner.tsx"
-        }
-      ]
-    },
-    {
-      "name": "patient-snapshot",
-      "type": "registry:component",
-      "title": "Patient Snapshot",
-      "description": "One-screen pre-encounter summary. Each section carries its own recency and failure, truncation is counted rather than silent, and changes since last review lead.",
-      "categories": [
-        "patient-identity",
-        "clinical"
-      ],
-      "dependencies": [
-        "@oxygenui-design/fhir@^0.1.0",
-        "lucide-react",
-        "clsx",
-        "tailwind-merge"
-      ],
-      "registryDependencies": [
-        "https://oxygenui.design/r/utils.json",
-        "https://oxygenui.design/r/tokens.json",
-        "https://oxygenui.design/r/empty-state.json",
-        "https://oxygenui.design/r/clinical-skeleton.json"
-      ],
-      "files": [
-        {
-          "path": "registry/oxygen/patient-snapshot/patient-snapshot.tsx",
-          "type": "registry:component",
-          "target": "components/oxygen/patient-snapshot.tsx"
-        }
-      ]
-    },
-    {
-      "name": "precautions-bar",
-      "type": "registry:component",
-      "title": "Precautions Bar",
-      "description": "What staff must do before entering the room, ordered by required action. Lapsed precautions are dropped rather than greyed, and behavioral flags describe the approach, not the person.",
-      "categories": [
-        "patient-identity",
-        "clinical"
-      ],
-      "dependencies": [
-        "@oxygenui-design/fhir@^0.1.0",
-        "lucide-react",
-        "clsx",
-        "tailwind-merge"
-      ],
-      "registryDependencies": [
-        "https://oxygenui.design/r/utils.json",
-        "https://oxygenui.design/r/tokens.json"
-      ],
-      "files": [
-        {
-          "path": "registry/oxygen/precautions-bar/precautions-bar.tsx",
-          "type": "registry:component",
-          "target": "components/oxygen/precautions-bar.tsx"
-        }
-      ]
-    },
-    {
-      "name": "provenance",
-      "type": "registry:component",
-      "title": "Provenance Tag",
-      "description": "Who recorded a datum, when, from what source, and whether it has been amended. Separates event time from charting time and states an absent source rather than guessing.",
-      "categories": [
-        "primitive",
-        "system"
-      ],
-      "dependencies": [
-        "@oxygenui-design/fhir@^0.1.0",
-        "lucide-react",
-        "clsx",
-        "tailwind-merge"
-      ],
-      "registryDependencies": [
-        "https://oxygenui.design/r/utils.json",
-        "https://oxygenui.design/r/tokens.json"
-      ],
-      "files": [
-        {
-          "path": "registry/oxygen/provenance/provenance.tsx",
-          "type": "registry:component",
-          "target": "components/oxygen/provenance.tsx"
-        }
-      ]
-    },
-    {
-      "name": "reference-range",
-      "type": "registry:component",
-      "title": "Reference Range",
-      "description": "Positions a result against its own reference range. Refuses to draw when no numeric bound was stated, and marks off-scale and one-sided ranges rather than implying bounds nobody gave.",
-      "categories": [
-        "primitive",
-        "clinical"
-      ],
-      "dependencies": [
-        "@oxygenui-design/fhir@^0.1.0",
-        "lucide-react",
-        "clsx",
-        "tailwind-merge"
-      ],
-      "registryDependencies": [
-        "https://oxygenui.design/r/utils.json",
-        "https://oxygenui.design/r/tokens.json"
-      ],
-      "files": [
-        {
-          "path": "registry/oxygen/reference-range/reference-range.tsx",
-          "type": "registry:component",
-          "target": "components/oxygen/reference-range.tsx"
-        }
-      ]
-    },
-    {
-      "name": "restricted-shield",
-      "type": "registry:component",
-      "title": "Restricted Shield",
-      "description": "Wraps content restricted by sensitivity policy. Redacted by default, discloses only with a stated reason, re-hides on a timer, and can conceal that content exists at all.",
-      "categories": [
-        "primitive",
-        "system",
-        "clinical"
-      ],
-      "dependencies": [
-        "lucide-react",
-        "clsx",
-        "tailwind-merge"
-      ],
-      "registryDependencies": [
-        "https://oxygenui.design/r/utils.json",
-        "https://oxygenui.design/r/tokens.json"
-      ],
-      "files": [
-        {
-          "path": "registry/oxygen/restricted-shield/restricted-shield.tsx",
-          "type": "registry:component",
-          "target": "components/oxygen/restricted-shield.tsx"
-        }
-      ]
-    },
-    {
-      "name": "status-badge",
-      "type": "registry:component",
-      "title": "Status Badge",
-      "description": "Shared severity and status chip used by every Oxygen component, so critical reads identically on a lab result, a medication, and an allergy. Label is required — there is no icon-only variant.",
-      "categories": [
-        "primitive"
-      ],
-      "dependencies": [
-        "lucide-react",
-        "clsx",
-        "tailwind-merge"
-      ],
-      "registryDependencies": [
-        "https://oxygenui.design/r/utils.json",
-        "https://oxygenui.design/r/tokens.json"
-      ],
-      "files": [
-        {
-          "path": "registry/oxygen/status-badge/status-badge.tsx",
-          "type": "registry:component",
-          "target": "components/oxygen/status-badge.tsx"
-        }
-      ]
-    },
-    {
-      "name": "unsaved-guard",
-      "type": "registry:component",
-      "title": "Unsaved Guard",
-      "description": "Central registry that stops clinical documentation being lost to a navigation, a patient switch, or a closed tab. Distinguishes recoverable drafts from work that exists only in this tab.",
-      "categories": [
-        "primitive",
-        "system"
-      ],
-      "dependencies": [
-        "lucide-react",
-        "clsx",
-        "tailwind-merge"
-      ],
-      "registryDependencies": [
-        "https://oxygenui.design/r/utils.json",
-        "https://oxygenui.design/r/tokens.json"
-      ],
-      "files": [
-        {
-          "path": "registry/oxygen/unsaved-guard/unsaved-guard.tsx",
-          "type": "registry:component",
-          "target": "components/oxygen/unsaved-guard.tsx"
-        }
-      ]
-    },
-    {
-      "name": "vitals-panel",
-      "type": "registry:component",
-      "title": "Observation Panel",
-      "description": "Results table for FHIR R4 Observation resources. Renders values, units, reference ranges, and interpretation — with uninterpreted results shown as uninterpreted, never as normal.",
-      "categories": [
-        "clinical-data",
-        "clinical"
-      ],
-      "dependencies": [
-        "@oxygenui-design/fhir@^0.1.0",
-        "lucide-react",
-        "clsx",
-        "tailwind-merge"
-      ],
-      "registryDependencies": [
-        "https://oxygenui.design/r/utils.json",
-        "https://oxygenui.design/r/tokens.json",
-        "https://oxygenui.design/r/absent-value.json"
-      ],
-      "files": [
-        {
-          "path": "registry/oxygen/vitals-panel/vitals-panel.tsx",
-          "type": "registry:component",
-          "target": "components/oxygen/vitals-panel.tsx"
+          "target": "components/oxygen/rhythm-loader.tsx"
         }
       ]
     }

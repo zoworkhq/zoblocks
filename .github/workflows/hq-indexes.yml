@@ -24,6 +24,9 @@ concurrency:
   group: hq-indexes
   cancel-in-progress: false
 
+permissions:
+  contents: read
+
 jobs:
   indexes:
     name: Apply indexes
@@ -34,8 +37,14 @@ jobs:
 
     steps:
       - name: Check confirmation
+        env:
+          # Through the environment, never interpolated into the script body.
+          # `${{ inputs.confirm }}` is free-form text expanded before the shell
+          # parses the line — in a job that holds a production DATABASE_URL,
+          # that is a command-injection sink.
+          CONFIRM: ${{ inputs.confirm }}
         run: |
-          if [ "${{ inputs.confirm }}" != "apply" ]; then
+          if [ "${CONFIRM:-}" != "apply" ]; then
             echo "::error::Not confirmed. Re-run and type apply in the confirmation field."
             exit 1
           fi

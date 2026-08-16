@@ -21,9 +21,13 @@ import type { LoadedComponent } from "../load";
 import type { Emitter } from "../write";
 
 /**
- * Registry items that are not components: the shared utility module and the
- * token stylesheet. They have no props, no states, and no docs page, so they do
- * not carry component metadata.
+ * Registry items that are not components: shared modules and stylesheets. They
+ * have no props, no states, and no docs page, so they do not carry component
+ * metadata.
+ *
+ * Adding one here is also what makes it nameable in a component's
+ * `registryDependencies` — see SUPPORT_ITEM_NAMES in ../load.ts, which reads
+ * this list so the two cannot disagree.
  */
 const SUPPORT_ITEMS: BuildableItem[] = [
   {
@@ -34,6 +38,27 @@ const SUPPORT_ITEMS: BuildableItem[] = [
     dependencies: ["clsx", "tailwind-merge"],
     registryDependencies: [] as string[],
     files: [{ path: "registry/oxygen/lib/utils.ts", type: "registry:lib", target: "lib/utils.ts" }],
+  },
+  {
+    name: "loader-core",
+    type: "registry:lib",
+    title: "Loader core",
+    description:
+      "Shared frame, timing gate, and stylesheet behind every Oxygen loader. Installed automatically with any loader.",
+    dependencies: ["clsx", "tailwind-merge"],
+    registryDependencies: ["utils"],
+    files: [
+      {
+        path: "registry/oxygen/lib/loader.tsx",
+        type: "registry:lib",
+        target: "lib/oxygen-loader.tsx",
+      },
+      {
+        path: "registry/oxygen/lib/loader.css",
+        type: "registry:file",
+        target: "styles/oxygen-loader.css",
+      },
+    ],
   },
   {
     name: "tokens",
@@ -52,6 +77,16 @@ const SUPPORT_ITEMS: BuildableItem[] = [
     ],
   },
 ];
+
+/**
+ * The names a component may list in `registryDependencies` without being a
+ * component itself. Derived from SUPPORT_ITEMS rather than restated, because a
+ * second hand-written list is how "this dependency does not exist" becomes a
+ * confusing error about a file that is right there.
+ */
+export const SUPPORT_ITEM_NAMES: ReadonlySet<string> = new Set(
+  SUPPORT_ITEMS.map((item) => item.name),
+);
 
 interface BuildableItem {
   name: string;

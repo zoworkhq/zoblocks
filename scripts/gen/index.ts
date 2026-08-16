@@ -22,6 +22,7 @@
 import { emitAgentManifest } from "./emit/agents";
 import { buildCatalog, emitCatalog } from "./emit/catalog";
 import { buildCoverage, emitCoverage } from "./emit/coverage";
+import { emitReactPackage, ensureReactPackageDirs } from "./emit/react-package";
 import { emitRegistry } from "./emit/registry";
 import { emitTailwindSources } from "./emit/tailwind-sources";
 import { emitTsconfigPaths } from "./emit/tsconfig-paths";
@@ -82,6 +83,12 @@ async function main() {
     report(`${registryProblems.length} registry problem(s)`, registryProblems);
     process.exit(1);
   }
+
+  // The npm React channel is derived from the registry source rather than
+  // hand-written beside it — see emit/react-package.ts for why the direction
+  // runs this way.
+  await ensureReactPackageDirs();
+  await emitReactPackage(components, emitter);
 
   await emitCatalog(buildCatalog(components, props), emitter);
   await emitTailwindSources(components, emitter);

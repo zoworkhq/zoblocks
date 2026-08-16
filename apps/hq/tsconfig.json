@@ -12,29 +12,15 @@
     "plugins": [{ "name": "next" }],
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"],
-      "@/lib/utils": ["./src/lib/utils.ts"],
       // Oxygen components are consumed by the same specifier the shadcn CLI
-      // writes into a customer's project, mapped back to the registry source.
-      // That is the point of this app: it installs them the way a customer
-      // would, so a broken component breaks our own daily tool first.
-      "@/components/oxygen/app-shell": ["../../registry/oxygen/app-shell/app-shell.tsx"],
-      "@/components/oxygen/status-badge": ["../../registry/oxygen/status-badge/status-badge.tsx"],
-      "@/components/oxygen/empty-state": ["../../registry/oxygen/empty-state/empty-state.tsx"],
-      "@/components/oxygen/action-gate": ["../../registry/oxygen/action-gate/action-gate.tsx"],
-      "@/components/oxygen/error-boundary": [
-        "../../registry/oxygen/error-boundary/error-boundary.tsx"
-      ],
-      "@/components/oxygen/unsaved-guard": [
-        "../../registry/oxygen/unsaved-guard/unsaved-guard.tsx"
-      ],
-      "@/components/oxygen/density-provider": [
-        "../../registry/oxygen/density-provider/density-provider.tsx"
-      ],
-      "@/components/oxygen/clinical-skeleton": [
-        "../../registry/oxygen/clinical-skeleton/clinical-skeleton.tsx"
-      ],
-      "@/components/oxygen/alert-banner": ["../../registry/oxygen/alert-banner/alert-banner.tsx"]
+      // writes into a customer's project (`@/components/oxygen/app-shell`).
+      // While the registry is being rebuilt those files live under
+      // src/components/oxygen/ — exactly a customer's install layout — and
+      // resolve through the plain `@/*` alias. When the new registry lands,
+      // map each specifier back to `../../registry/...` here so a broken
+      // component breaks our own daily tool first.
+      "@/*": ["./src/*"],
+      "@/lib/utils": ["./src/lib/utils.ts"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],

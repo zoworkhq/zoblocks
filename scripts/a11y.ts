@@ -19,41 +19,26 @@
 import { chromium } from "@playwright/test";
 import { readFileSync } from "node:fs";
 import { createRequire } from "node:module";
+import { CATALOG } from "../apps/docs/src/lib/generated/catalog";
 
 const requireFrom = createRequire(process.cwd() + "/");
 const AXE_SOURCE = readFileSync(requireFrom.resolve("axe-core/axe.min.js"), "utf8");
 
 const BASE = process.argv[2] ?? "http://localhost:6001";
+
+/**
+ * Every static page, plus one detail page per component in the generated
+ * catalog. The component list used to be written out by hand here, which meant
+ * a new component was audited only if someone remembered to add it, and a
+ * removed one made the run fail on a 404. Deriving it from `pnpm gen` output
+ * keeps the audit and the catalog the same list.
+ */
 const PAGES = [
   "/",
   "/components",
   "/pro",
   "/showcase",
-  "/components/vitals-panel",
-  "/components/patient-banner",
-  "/components/coverage-card",
-  "/components/status-badge",
-  "/components/absent-value",
-  "/components/clinical-value",
-  "/components/reference-range",
-  "/components/clinical-time",
-  "/components/identity-token",
-  "/components/concept-chip",
-  "/components/density-provider",
-  "/components/restricted-shield",
-  "/components/action-gate",
-  "/components/empty-state",
-  "/components/clinical-skeleton",
-  "/components/dose-input",
-  "/components/provenance",
-  "/components/unsaved-guard",
-  "/components/error-boundary",
-  "/components/app-shell",
-  "/components/code-status",
-  "/components/precautions-bar",
-  "/components/care-team",
-  "/components/alert-banner",
-  "/components/patient-snapshot",
+  ...CATALOG.map((component) => `/components/${component.name}`),
 ];
 const TAGS = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"];
 

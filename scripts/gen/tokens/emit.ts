@@ -26,7 +26,7 @@ import {
   type TokenMap,
   type TokenSource,
 } from "./load";
-import { measureContrast, resolveTheme } from "./validate";
+import { measureContrast, resolveFlat, resolveTheme } from "./validate";
 
 export const tokenPaths = {
   css: path.join(ROOT, "packages", "tokens", "src", "oxygen-tokens.css"),
@@ -306,15 +306,23 @@ function buildJson(source: TokenSource): string {
     );
   }
 
+  // Resolved, like the theme and component blocks above. This used to publish
+  // `token.value` raw, so three density entries shipped the literal string
+  // "{ref.size.md}" to anything consuming the file the header describes as a
+  // flat map for external tooling. Reference resolution was checked; output
+  // shape was not, which is why it survived.
   const density: Record<string, Record<string, string>> = {};
   for (const profile of DENSITIES) {
     density[profile] = Object.fromEntries(
-      [...source.density[profile]].map(([key, token]) => [`--ox-density-${key}`, token.value]),
+      [...resolveFlat(source, source.density[profile])].map(([key, value]) => [
+        `--ox-density-${key}`,
+        value,
+      ]),
     );
   }
 
   const component = Object.fromEntries(
-    [...source.component].map(([name, token]) => [cssVar(name), toCssValue(token.value)]),
+    [...resolveFlat(source, source.component)].map(([name, value]) => [cssVar(name), value]),
   );
 
   return JSON.stringify({ themes, density, component }, null, 2);

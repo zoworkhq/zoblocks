@@ -8,7 +8,15 @@ on:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  # Cancel superseded PR runs, never a run that is mid-deploy on main. Two
+  # merges in quick succession used to cancel the first one's `vercel deploy`.
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+# Least privilege. There was no permissions block, so every job inherited the
+# repository default while running `pnpm dlx` on network-fetched code. Jobs that
+# need more than read declare it themselves.
+permissions:
+  contents: read
 
 # Identifiers, not credentials — they appear in .vercel/project.json on every
 # machine that has ever run `vercel link`. The only secret is VERCEL_TOKEN.
@@ -87,6 +95,11 @@ jobs:
       # The number may go down. It may not go up: a new warning fails the build,
       # so adding one means fixing it, or fixing another to make room. When it
       # reaches zero, both rules become errors and the flag goes away.
+      # C5: a critical advisory in the toolchain is a critical advisory. This
+      # fails the build rather than waiting for a procurement reviewer to run it.
+      - name: Audit dependencies
+        run: pnpm audit --audit-level=high
+
       - name: Lint
         run: pnpm lint
 
@@ -259,28 +272,40 @@ jobs:
       # returns 200 but serves a stale or malformed registry is a broken
       # install for everyone, and it is exactly what went unnoticed for three
       # merges. Assert the deployed artifact, not just the response code.
+      # Verifies the deployed registry against what this commit actually built,
+      # rather than against a component named here. The previous version fetched
+      # `vitals-panel.json` by name; when that component was removed the gate
+      # kept asking for it, so the next merge to main would have failed on a
+      # component that was deliberately deleted. A gate must not carry its own
+      # expiry date.
       - name: Verify the deployed registry
         run: |
           set -euo pipefail
-          url="https://oxygenui.design/r/vitals-panel.json?ci=${GITHUB_SHA}"
+          expected=$(node -e 'process.stdout.write(require("./registry.json").items.map(i=>i.name).sort().join(","))')
+          echo "Expecting: $expected"
+
+          url="https://oxygenui.design/r/index.json?ci=${GITHUB_SHA}"
           for i in $(seq 1 10); do
             body=$(curl -fsS --max-time 20 "$url" || true)
             if [ -n "$body" ]; then break; fi
             sleep 6
           done
-          echo "$body" | node -e '
-            const d = JSON.parse(require("fs").readFileSync(0, "utf8"));
-            const deps = d.dependencies ?? [];
-            const fhir = deps.find((x) => x.startsWith("@oxygenui-design/fhir"));
-            if (!fhir) {
-              console.error("::error::Deployed registry does not reference @oxygenui-design/fhir. Got: " + JSON.stringify(deps));
+
+          if [ -z "$body" ]; then
+            echo "::error::Deployed registry index was unreachable after 10 attempts."
+            exit 1
+          fi
+
+          echo "$body" | EXPECTED="$expected" node -e '
+            const served = JSON.parse(require("fs").readFileSync(0, "utf8"));
+            const names = (served.items ?? []).map((i) => i.name).sort().join(",");
+            if (names !== process.env.EXPECTED) {
+              console.error("::error::Deployed registry does not match this build.");
+              console.error("  built:  " + process.env.EXPECTED);
+              console.error("  served: " + names);
               process.exit(1);
             }
-            if (!fhir.includes("@^")) {
-              console.error("::error::Deployed registry dependency is unpinned: " + fhir);
-              process.exit(1);
-            }
-            console.log("Registry verified: " + fhir);
+            console.log("Registry verified: " + (served.items ?? []).length + " items served");
           '
 
   # hq is a separate Vercel project. The job self-skips until VERCEL_PROJECT_ID_HQ
@@ -298,9 +323,13 @@ jobs:
 
     steps:
       - name: Check the project exists
-        id: gate
+        env:
+          # Through the environment, never interpolated into the script body.
+          # `${{ vars.X }}` is expanded before the shell parses the line, so a
+          # value containing shell syntax executes.
+          PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID_HQ }}
         run: |
-          if [ -z "${{ vars.VERCEL_PROJECT_ID_HQ }}" ]; then
+          if [ -z "${PROJECT_ID:-}" ]; then
             echo "skip=true" >> "$GITHUB_OUTPUT"
             echo "VERCEL_PROJECT_ID_HQ is not set — skipping. Create the Vercel project, then add the variable." \
               >> "$GITHUB_STEP_SUMMARY"
@@ -393,7 +422,12 @@ jobs:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
         run: |
           if [ -z "${VERCEL_TOKEN:-}" ]; then
-            echo "VERCEL_TOKEN not set — skipping preview." >> "$GITHUB_STEP_SUMMARY"
+            # Fork PRs never receive secrets, so this is the normal path for an
+            # outside contribution. Say so plainly instead of reporting a green
+            # "deployed" that deployed nothing.
+            echo "### Preview skipped" >> "$GITHUB_STEP_SUMMARY"
+            echo "No \`VERCEL_TOKEN\` in this context — expected on a fork PR. A maintainer preview runs after review." >> "$GITHUB_STEP_SUMMARY"
+            echo "::notice::Preview deployment skipped: no VERCEL_TOKEN (expected on fork PRs)."
             exit 0
           fi
           pnpm dlx vercel@48 pull --yes --environment=preview --token "$VERCEL_TOKEN"
