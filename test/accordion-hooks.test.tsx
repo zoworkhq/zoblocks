@@ -131,6 +131,61 @@ describe("useAccordion prop getters", () => {
     expect(new Set(ids).size).toBe(ids.length);
   });
 
+  it("ignores a key that is not in the list rather than throwing", () => {
+    // `toggle` takes a key, and the caller owns it. A stale key from a
+    // previous render, or one whose section was filtered out by a permission
+    // check between render and click, must be a no-op — not a crash that takes
+    // the whole record down with it.
+    function Probe() {
+      const api = useAccordion({ items: items(2) });
+      return (
+        <div>
+          <span data-testid="open-keys">{api.openKeys.join(",")}</span>
+          <button
+            type="button"
+            data-testid="ghost"
+            onClick={() => {
+              api.toggle("gone");
+              api.open("gone");
+              api.close("gone");
+            }}
+          >
+            ghost
+          </button>
+        </div>
+      );
+    }
+    const view = render(<Probe />);
+    expect(() => view.getByTestId("ghost").click()).not.toThrow();
+    expect(openKeys(view.container)).toBe("");
+  });
+
+  it.each([
+    ["disabled", { key: "x", label: "X", collapsible: "disabled" as const }],
+    ["pinned", { key: "x", label: "X", pinned: true }],
+    ["withheld", { key: "x", label: "X", access: { kind: "withheld" as const, reason: "r" } }],
+  ])("refuses to toggle a %s section even when toggle is called directly", (_label, subject) => {
+    // Our own trigger checks inertness before calling toggle, so this guard is
+    // belt-and-braces there. It is the front line for a customer's renderer,
+    // which calls `toggle(key)` from its own markup and has no reason to know
+    // that some sections are not toggleable.
+    function Probe() {
+      const api = useAccordion({ items: [subject as AccordionItem] });
+      return (
+        <div>
+          <span data-testid="open-keys">{api.openKeys.join(",")}</span>
+          <button type="button" data-testid="go" onClick={() => api.toggle("x")}>
+            go
+          </button>
+        </div>
+      );
+    }
+    const view = render(<Probe />);
+    const before = openKeys(view.container);
+    view.getByTestId("go").click();
+    expect(openKeys(view.container)).toBe(before);
+  });
+
   it("honours an explicit idPrefix", () => {
     const view = render(<Harness options={{ items: items(1), idPrefix: "chart" }} />);
     expect(triggers(view.container)[0]?.id).toBe("chart-t0");
