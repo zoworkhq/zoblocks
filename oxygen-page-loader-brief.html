@@ -712,7 +712,7 @@
             <tr><td><code>speed</code></td><td>0.5–2</td><td>1</td><td>Cadence multiplier for every variant. Cardiac variants use <code>bpm</code> if given, else <code>60 × speed</code>.</td></tr>
             <tr><td><code>delay</code></td><td>ms</td><td>0 page · 200 inline/overlay</td><td>Wait before becoming visible, so a 120 ms fetch never flashes a loader (Fluent and Atlassian spinners do the same).</td></tr>
             <tr><td><code>min-duration</code> / <code>minDuration</code></td><td>ms</td><td>400</td><td>Once shown, stay at least this long, so a loader never blinks on and off.</td></tr>
-            <tr><td><code>slow-after</code> / <code>slowAfter</code></td><td>ms · 0 = off</td><td>8000</td><td>After this, show <code>slow-hint</code> and fire <code>ox-loader:slow</code>. Nielsen’s 10 s attention limit, minus a margin.</td></tr>
+            <tr><td><code>slow-after</code> / <code>slowAfter</code></td><td>ms · 0 = off</td><td>8000</td><td>After this, show <code>slow-hint</code> and fire <code>ox-loader-slow</code>. Nielsen’s 10 s attention limit, minus a margin.</td></tr>
             <tr><td><code>slow-hint</code> / <code>slowHint</code></td><td>string</td><td><code>"Still loading. You can keep waiting or go back."</code></td><td>Names the situation and what remains possible, per CONTENT.md §5. Slot <code>actions</code> can add Retry / Go back.</td></tr>
             <tr><td><code>open</code></td><td>boolean</td><td>true</td><td>Controls visibility with an enter fade (160 ms) and an exit fade (220 ms). Setting <code>false</code> before <code>min-duration</code> elapses defers the exit.</td></tr>
             <tr><td><code>motion</code></td><td><code>auto · reduced · full</code></td><td><code>auto</code></td><td><em>auto</em> follows <code>prefers-reduced-motion</code>; <em>reduced</em> forces the still fallback; <em>full</em> is only for apps with their own motion setting and is documented as such.</td></tr>
@@ -746,7 +746,7 @@
           <h3>Parts, events, density</h3>
           <dl class="kv" style="margin-top:.75rem">
             <dt>Parts</dt><dd><code>::part(scrim)</code> · <code>::part(art)</code> · <code>::part(label)</code> · <code>::part(hint)</code> · <code>::part(progress)</code> — style hooks through the shadow boundary.</dd>
-            <dt>Events</dt><dd><code>ox-loader:show</code> · <code>ox-loader:hide</code> · <code>ox-loader:slow</code> (bubbling, composed). React: <code>onShow</code>, <code>onHide</code>, <code>onSlow</code>.</dd>
+            <dt>Events</dt><dd><code>ox-loader-show</code> · <code>ox-loader-hide</code> · <code>ox-loader-slow</code> (bubbling, composed). React: <code>onShow</code>, <code>onHide</code>, <code>onSlow</code>.</dd>
             <dt>Density</dt><dd>Reads <code>data-ox-density</code>: <em>patient</em> enlarges label text and default size one step; <em>clinical</em> drops the hint and tightens spacing.</dd>
             <dt>Themes</dt><dd>Inherits <code>--ox-*</code>; nothing hard-coded. In forced-colours mode the stroke becomes <code>CanvasText</code> and the scrim <code>Canvas</code>.</dd>
             <dt>Copy defaults</dt><dd>Two register catalogs, per CONTENT.md §7: clinician “Loading” / patient “Loading your information”. Apps override per surface.</dd>
@@ -837,7 +837,7 @@ pnpm dlx shadcn@latest add @oxygenui/loader
 <span class="c">// vite.config: vue({ template: { compilerOptions: { isCustomElement: t =&gt; t.startsWith("ox-") } } })</span>
 
 &lt;ox-loader variant=<span class="s">"breath"</span> mode=<span class="s">"page"</span> :open=<span class="s">"pending"</span>
-           label=<span class="s">"Loading your information"</span> @ox-loader:slow=<span class="s">"onSlow"</span> /&gt;</pre>
+           label=<span class="s">"Loading your information"</span> @ox-loader-slow=<span class="s">"onSlow"</span> /&gt;</pre>
         </div>
         <div>
           <p class="eyebrow">Angular 17+</p>

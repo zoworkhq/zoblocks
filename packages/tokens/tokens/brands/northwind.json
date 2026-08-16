@@ -1,0 +1,21 @@
+{
+  "$description": "Northwind Health — a worked example, and the fixture the brand tests run against. Overrides the brand ramp and the accent-adjacent neutrals only; every status colour is inherited, because what critical looks like is not a brand decision.",
+
+  "ref": {
+    "brand": {
+      "$type": "color",
+      "50": { "$value": "#eff6ff" },
+      "200": { "$value": "#bfdbfe" },
+      "500": { "$value": "#3b82f6" },
+      "600": { "$value": "#1d63c9" },
+      "700": { "$value": "#1a53a8" },
+      "800": { "$value": "#17458a" }
+    },
+
+    "cyan": {
+      "$type": "color",
+      "200": { "$value": "#bae6fd" },
+      "300": { "$value": "#7dd3fc" }
+    }
+  }
+}

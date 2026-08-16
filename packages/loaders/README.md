@@ -55,6 +55,21 @@ resting physiology instead:
 
 ## Framework setup
 
+Every framework below has a running application in
+[`apps/smoke`](../../apps/smoke), built by that framework's real compiler and
+driven through the same script in Chromium, Firefox, and WebKit on every CI run.
+"Works in Vue" is a test result here, not a claim — and it was not always true:
+the smoke apps' first run found the elements broken in React 19, in Vue, and in
+Angular, for three different reasons.
+
+| Framework  | Tested version | Setup required                            |
+| ---------- | -------------- | ----------------------------------------- |
+| Plain HTML | —              | none                                      |
+| React      | 18.3 and 19.2  | none                                      |
+| Vue        | 3.5            | one `isCustomElement` line                |
+| Angular    | 19.2           | `CUSTOM_ELEMENTS_SCHEMA` on the component |
+| Svelte     | 5.19           | none                                      |
+
 ### Vue 3 / Nuxt
 
 ```ts
@@ -82,9 +97,18 @@ import "@oxygenui-design/loaders/pulse";
 ```
 
 ```html
-<ox-pulse-loader mode="overlay" [attr.progress]="progress()" label="Loading results">
+<ox-pulse-loader
+  mode="overlay"
+  label="Loading results"
+  [attr.progress]="progress()"
+  (ox-loader-slow)="onSlow()"
+>
 </ox-pulse-loader>
 ```
+
+Angular's `(event)` syntax reserves the colon for its global-target form —
+`(window:resize)` — so an event named `ox-loader:slow` would not compile. That
+is why these events are hyphenated; see [Events](#events).
 
 ### Svelte, Solid, Lit, plain HTML
 
@@ -92,9 +116,14 @@ Import the module and use the tag. No wrapper needed.
 
 ### React
 
-React 19 passes attributes and events to custom elements natively, so the
-elements work directly. For a React project we recommend the registry
-components instead — they are copied into your repo as readable source:
+Both React 18 and React 19 work, by different routes. React 19 writes a DOM
+property when the element has one and an attribute otherwise; React 18 has no
+property path and stringifies everything into an attribute. The elements reflect
+every property to its attribute and read state back from attributes only, so the
+two majors converge on identical DOM.
+
+For a React project we still recommend the registry components — they are copied
+into your repo as readable source:
 
 ```bash
 pnpm dlx shadcn@latest add @oxygenui/pulse-loader
@@ -122,7 +151,7 @@ JavaScript, copy the static markup and stylesheet from the
 | `speed`        | 0.5–2                    | 1                     | Cadence multiplier for every loader. Clamped.                             |
 | `delay`        | ms                       | 0                     | Wait before appearing, so a fast response never flashes a loader.         |
 | `min-duration` | ms                       | 400                   | Once shown, stay at least this long.                                      |
-| `slow-after`   | ms, 0 = off              | 8000                  | Show the stall hint and fire `ox-loader:slow`.                            |
+| `slow-after`   | ms, 0 = off              | 8000                  | Show the stall hint and fire `ox-loader-slow`.                            |
 | `slow-hint`    | string                   | see below             | Replaces the stall wording.                                               |
 | `open`         | `"false"` to close       | open                  | Controlled visibility; respects `min-duration`.                           |
 | `motion`       | `auto\|reduced\|full`    | `auto`                | `auto` follows the OS; `full` opts out of it.                             |
@@ -132,14 +161,38 @@ JavaScript, copy the static markup and stylesheet from the
 Default stall wording: _"Still loading. You can keep waiting or go back."_ — it
 names the situation and says what remains possible, rather than apologising.
 
-## Events
+## Properties
 
-`ox-loader:show`, `ox-loader:slow`, `ox-loader:hide`. All bubble and cross the
-shadow boundary.
+Every attribute above is also a property, in camelCase — `show-label` is
+`showLabel`, `min-duration` is `minDuration`. Setting one writes the attribute:
 
 ```js
-loader.addEventListener("ox-loader:slow", () => analytics.track("slow_wait"));
+loader.label = "Loading imaging study"; //  → label="Loading imaging study"
+loader.progress = 40; //  → progress="40"
+loader.open = false; //  → open="false"
+loader.label = null; //  → attribute removed, default restored
 ```
+
+Attributes stay the single source of truth; properties are a typed way to write
+them. This matters more than it looks: React 19, Vue, Solid, and Lit all decide
+per binding whether to write a property or an attribute, and they all decide the
+same way — `if (key in element)`. A property that exists but cannot be assigned
+throws, which is what these elements did before `apps/smoke` existed.
+
+`sizePx` is derived from `size` and is read-only.
+
+## Events
+
+`ox-loader-show`, `ox-loader-slow`, `ox-loader-hide` — exported as
+`LOADER_EVENTS`. All bubble and cross the shadow boundary, so you can listen on
+a wrapper rather than on the element.
+
+```js
+loader.addEventListener("ox-loader-slow", () => analytics.track("slow_wait"));
+```
+
+Hyphens rather than colons, because Angular's `(event)` binding reserves the
+colon for global targets and cannot bind a name that contains one.
 
 ## Styling
 

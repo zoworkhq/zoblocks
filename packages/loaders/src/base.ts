@@ -28,6 +28,32 @@ export type LoaderMode = "inline" | "overlay" | "page";
 export type LoaderMotion = "auto" | "reduced" | "full";
 export type LoaderAnnounce = "polite" | "assertive" | "off";
 
+/**
+ * Events every loader dispatches. All bubble and cross the shadow boundary.
+ *
+ * Hyphens, not colons, and that is not a style preference.
+ *
+ * These were `ox-loader:show` / `:slow` / `:hide` until apps/smoke tried to
+ * bind them in an Angular template. Angular reserves the colon in `(event)`
+ * bindings for its *global target* syntax — `(window:resize)`, `(document:
+ * click)` — so `(ox-loader:show)` is parsed as the event `show` on a target
+ * named `ox-loader` and rejected at compile time:
+ *
+ *     Unexpected global target 'ox-loader' defined for 'show' event.
+ *     Supported list of global targets: window,document,body.
+ *
+ * There is no escape syntax. An Angular consumer would have had to drop to
+ * `ElementRef` and `addEventListener` for every subscription — in a package
+ * whose description claims Angular support. Hyphenated names cost nothing,
+ * bind natively in all five frameworks, and match what the rest of the web
+ * components ecosystem emits.
+ *
+ * `packages/loaders/test/reflection.test.ts` fails on any event name
+ * containing a colon, so this cannot come back by habit.
+ */
+export const LOADER_EVENTS = ["ox-loader-show", "ox-loader-slow", "ox-loader-hide"] as const;
+export type LoaderEvent = (typeof LOADER_EVENTS)[number];
+
 /** Attributes every loader observes. Subclasses append their own. */
 export const COMMON_ATTRIBUTES = [
   "size",
@@ -150,30 +176,125 @@ export abstract class OxLoaderElement extends ElementBase {
   }
 
   /* -------------------------------------------------------------- */
-  /* Attribute readers                                               */
+  /* Properties                                                      */
   /* -------------------------------------------------------------- */
 
-  get speed(): number {
-    return clamp(Number.parseFloat(this.getAttribute("speed") ?? "1") || 1, 0.5, 2);
+  /**
+   * Every observed attribute has a matching property, and every one of those
+   * properties is writable.
+   *
+   * This is not API surface for its own sake — it is the difference between
+   * working in React and Vue and not. Both frameworks decide per binding
+   * whether to write a DOM property or an attribute, and both use the same
+   * test: `if (key in element)`. A getter with no setter passes that test and
+   * then throws on assignment:
+   *
+   *     TypeError: Cannot set property label of #<OxLoaderElement>
+   *                which has only a getter
+   *
+   * which is what these elements did in React 19 and Vue 3 until
+   * apps/smoke caught it. Nothing in the jsdom suite could: it constructs
+   * elements and calls `setAttribute` directly, which is the *other* path.
+   *
+   * Attributes stay the source of truth. A setter writes the attribute and
+   * the getter reads it back, so a property write and an attribute write are
+   * indistinguishable afterwards, and `attributeChangedCallback` fires for
+   * both. Reflection in one direction only, which is what avoids the
+   * property/attribute desync every hand-rolled two-way binding eventually
+   * grows.
+   *
+   * `packages/loaders/test/reflection.test.ts` walks COMMON_ATTRIBUTES and
+   * fails if any of them loses its setter, so a new attribute cannot
+   * reintroduce the bug.
+   */
+  #reflect(attribute: string, value: unknown): void {
+    // null and undefined mean "unset", restoring the documented default. Every
+    // other value is stringified, including `false` — see `open`.
+    if (value === null || value === undefined) this.removeAttribute(attribute);
+    else this.setAttribute(attribute, String(value));
   }
 
+  get size(): LoaderSize | number | null {
+    const raw = this.getAttribute("size");
+    if (raw === null) return null;
+    const parsed = Number.parseFloat(raw);
+    return Number.isNaN(parsed) ? (raw as LoaderSize) : parsed;
+  }
+  set size(value: LoaderSize | number | null | undefined) {
+    this.#reflect("size", value);
+  }
+
+  /** The resolved pixel size. Derived, so deliberately read-only. */
   get sizePx(): number {
     return resolveSize(this.getAttribute("size"), this.defaultSize);
   }
 
+  get speed(): number {
+    return clamp(Number.parseFloat(this.getAttribute("speed") ?? "1") || 1, 0.5, 2);
+  }
+  set speed(value: number | null | undefined) {
+    this.#reflect("speed", value);
+  }
+
   get label(): string {
     return this.getAttribute("label") || "Loading";
+  }
+  set label(value: string | null | undefined) {
+    this.#reflect("label", value);
   }
 
   get mode(): LoaderMode {
     const value = this.getAttribute("mode");
     return value === "overlay" || value === "page" ? value : "inline";
   }
+  set mode(value: LoaderMode | null | undefined) {
+    this.#reflect("mode", value);
+  }
 
   get showLabel(): boolean {
     const value = this.getAttribute("show-label");
     if (value === null) return this.mode !== "inline";
     return value !== "false";
+  }
+  set showLabel(value: boolean | null | undefined) {
+    this.#reflect("show-label", value);
+  }
+
+  get hint(): string {
+    return this.getAttribute("hint") ?? "";
+  }
+  set hint(value: string | null | undefined) {
+    this.#reflect("hint", value);
+  }
+
+  get slowHint(): string {
+    return this.getAttribute("slow-hint") || DEFAULT_SLOW_HINT;
+  }
+  set slowHint(value: string | null | undefined) {
+    this.#reflect("slow-hint", value);
+  }
+
+  get motion(): LoaderMotion {
+    const value = this.getAttribute("motion");
+    return value === "reduced" || value === "full" ? value : "auto";
+  }
+  set motion(value: LoaderMotion | null | undefined) {
+    this.#reflect("motion", value);
+  }
+
+  get scrim(): string | null {
+    return this.getAttribute("scrim");
+  }
+  set scrim(value: string | null | undefined) {
+    this.#reflect("scrim", value);
+  }
+
+  get announce(): LoaderAnnounce {
+    const value = this.getAttribute("announce");
+    return value === "assertive" || value === "off" ? value : "polite";
+  }
+  set announce(value: LoaderAnnounce | null | undefined) {
+    this.#reflect("announce", value);
   }
 
   /** A number in 0–100, or null when the wait is of unknown length. */
@@ -183,9 +304,50 @@ export abstract class OxLoaderElement extends ElementBase {
     const parsed = Number.parseFloat(raw);
     return Number.isNaN(parsed) ? null : clamp(parsed, 0, 100);
   }
+  set progress(value: number | null | undefined) {
+    this.#reflect("progress", value);
+  }
 
-  get isOpen(): boolean {
+  get delay(): number {
+    return this.#num("delay", 0);
+  }
+  set delay(value: number | null | undefined) {
+    this.#reflect("delay", value);
+  }
+
+  get minDuration(): number {
+    return this.#num("min-duration", 400);
+  }
+  set minDuration(value: number | null | undefined) {
+    this.#reflect("min-duration", value);
+  }
+
+  get slowAfter(): number {
+    return this.#num("slow-after", 8000);
+  }
+  set slowAfter(value: number | null | undefined) {
+    this.#reflect("slow-after", value);
+  }
+
+  /**
+   * Whether the loader is showing.
+   *
+   * An absent attribute means open, so `open = false` writes the string
+   * "false" rather than removing the attribute. That asymmetry is deliberate
+   * and it is also what makes React 18 work: React 18 has no property path at
+   * all and stringifies `open={false}` to `open="false"`, so both majors end
+   * up at the same attribute value by different routes.
+   */
+  get open(): boolean {
     return this.getAttribute("open") !== "false";
+  }
+  set open(value: boolean | null | undefined) {
+    this.#reflect("open", value);
+  }
+
+  /** @deprecated Use `open`. Kept so existing callers keep compiling. */
+  get isOpen(): boolean {
+    return this.open;
   }
 
   #num(attribute: string, fallback: number): number {
@@ -252,7 +414,7 @@ export abstract class OxLoaderElement extends ElementBase {
   }
 
   #syncGate(): void {
-    const delay = this.#num("delay", 0);
+    const delay = this.delay;
 
     if (this.isOpen) {
       clearTimeout(this.#hideTimer);
@@ -291,7 +453,7 @@ export abstract class OxLoaderElement extends ElementBase {
     this.#visible = true;
     this.#applyVisibility();
 
-    const minDuration = this.#num("min-duration", 400);
+    const minDuration = this.minDuration;
     clearTimeout(this.#holdTimer);
     this.#held = minDuration > 0;
     this.#pendingClose = false;
@@ -303,15 +465,15 @@ export abstract class OxLoaderElement extends ElementBase {
     }
 
     this.#render();
-    this.dispatchEvent(new CustomEvent("ox-loader:show", { bubbles: true, composed: true }));
+    this.dispatchEvent(new CustomEvent("ox-loader-show", { bubbles: true, composed: true }));
 
-    const slowAfter = this.#num("slow-after", 8000);
+    const slowAfter = this.slowAfter;
     clearTimeout(this.#slowTimer);
     if (slowAfter > 0) {
       this.#slowTimer = setTimeout(() => {
         this.#slow = true;
         this.#render();
-        this.dispatchEvent(new CustomEvent("ox-loader:slow", { bubbles: true, composed: true }));
+        this.dispatchEvent(new CustomEvent("ox-loader-slow", { bubbles: true, composed: true }));
       }, slowAfter);
     }
   }
@@ -319,7 +481,7 @@ export abstract class OxLoaderElement extends ElementBase {
   #hide(): void {
     this.#visible = false;
     this.#applyVisibility();
-    this.dispatchEvent(new CustomEvent("ox-loader:hide", { bubbles: true, composed: true }));
+    this.dispatchEvent(new CustomEvent("ox-loader-hide", { bubbles: true, composed: true }));
   }
 
   #applyVisibility(): void {
@@ -386,9 +548,9 @@ export abstract class OxLoaderElement extends ElementBase {
       this.setAttribute("aria-label", this.label);
     } else {
       this.setAttribute("role", "status");
-      const announce = this.getAttribute("announce");
+      const announce = this.announce;
       if (announce === "off") this.removeAttribute("aria-live");
-      else this.setAttribute("aria-live", announce === "assertive" ? "assertive" : "polite");
+      else this.setAttribute("aria-live", announce);
       for (const attribute of [
         "aria-valuemin",
         "aria-valuemax",
@@ -416,9 +578,7 @@ export abstract class OxLoaderElement extends ElementBase {
 
     const hint = root.querySelector<HTMLElement>("[part='hint']");
     if (hint) {
-      const message = this.#slow
-        ? this.getAttribute("slow-hint") || DEFAULT_SLOW_HINT
-        : this.getAttribute("hint") || "";
+      const message = this.#slow ? this.slowHint : this.hint;
       hint.textContent = showLabel ? message : "";
     }
   }

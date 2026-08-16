@@ -289,7 +289,7 @@ describe("timing and events", () => {
 
   it("emits show, slow, and hide across the shadow boundary", () => {
     const events: string[] = [];
-    for (const type of ["ox-loader:show", "ox-loader:slow", "ox-loader:hide"]) {
+    for (const type of ["ox-loader-show", "ox-loader-slow", "ox-loader-hide"]) {
       document.addEventListener(type, () => events.push(type));
     }
 
@@ -298,7 +298,7 @@ describe("timing and events", () => {
     element.setAttribute("open", "false");
     vi.advanceTimersByTime(10);
 
-    expect(events).toEqual(["ox-loader:show", "ox-loader:slow", "ox-loader:hide"]);
+    expect(events).toEqual(["ox-loader-show", "ox-loader-slow", "ox-loader-hide"]);
   });
 
   it("shows the stall wording, and says what is still possible", () => {
@@ -329,11 +329,11 @@ describe("timing and events", () => {
 
   it("clears its timers when removed from the document", () => {
     const onSlow = vi.fn();
-    document.addEventListener("ox-loader:slow", onSlow);
+    document.addEventListener("ox-loader-slow", onSlow);
     const element = mount("ox-breath-loader", { "slow-after": "1000" });
     element.remove();
     vi.advanceTimersByTime(5000);
     expect(onSlow).not.toHaveBeenCalled();
-    document.removeEventListener("ox-loader:slow", onSlow);
+    document.removeEventListener("ox-loader-slow", onSlow);
   });
 });

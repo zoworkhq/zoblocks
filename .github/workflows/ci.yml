@@ -196,7 +196,15 @@ jobs:
       #   docker run --rm -v "$PWD:/w" -w /w mcr.microsoft.com/playwright:v1.56.0-jammy \
       #     sh -c "corepack enable && pnpm i --frozen-lockfile && pnpm build && pnpm e2e:update"
       # then swap this step for `pnpm e2e`.
-      - name: Browser accessibility (reflow, zoom, forced colours, focus, motion)
+      #
+      # This step also runs the @framework suite: six applications in
+      # apps/smoke and apps/smoke-react18, one per supported framework, each
+      # built by that framework's own compiler and driven through an identical
+      # script in all three engines. Playwright's webServer config builds and
+      # serves them, so no extra step is needed here — and the build itself is
+      # half the test, since Angular and Vue reject bad markup at compile time.
+      # Its first run found the elements broken in React 19, Vue, and Angular.
+      - name: Browser accessibility and cross-framework smoke
         env:
           OXYGEN_BASE_URL: http://localhost:6001
         run: pnpm e2e:ci

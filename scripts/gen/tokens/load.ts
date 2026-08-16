@@ -9,7 +9,8 @@
  * See content/decisions/0005-three-tier-token-pipeline.md.
  */
 
-import { readFile } from "node:fs/promises";
+import { readFile, readdir } from "node:fs/promises";
+import { existsSync } from "node:fs";
 import path from "node:path";
 import { ROOT } from "../config";
 
@@ -103,6 +104,26 @@ async function load(relative: string): Promise<TokenMap> {
   return out;
 }
 
+/**
+ * A customer palette, overriding primitives only.
+ *
+ * ADR 0005's headline claim is that a new brand is a JSON file and a build. The
+ * tier discipline is what makes that true: components reference semantic tokens,
+ * semantic tokens reference primitives, so replacing the palette reaches every
+ * component without any component knowing a brand exists.
+ *
+ * Deliberately primitives only. Letting a brand override the semantic tier would
+ * let it redefine what *critical* means, and that is the one thing a clinical
+ * design system does not delegate.
+ */
+export interface Brand {
+  /** Directory-derived id, used as the `[data-ox-brand]` value. */
+  name: string;
+  description?: string;
+  /** Primitive overrides, keyed like the base primitive map (`ref.brand.600`). */
+  primitive: TokenMap;
+}
+
 export interface TokenSource {
   /** Primitive tier. Paths are prefixed `ref.`. */
   primitive: TokenMap;
@@ -116,6 +137,46 @@ export interface TokenSource {
   densityRoot: TokenMap;
   /** Component tier. Resolves to semantic tokens only. */
   component: TokenMap;
+  /** Customer palettes. Empty is the normal case. */
+  brands: Brand[];
+}
+
+/**
+ * Reads every `brands/*.json`.
+ *
+ * Absent directory, or only the README, is the normal case and not an error —
+ * most installs have no customer brand.
+ */
+async function loadBrands(): Promise<Brand[]> {
+  const dir = path.join(TOKENS_DIR, "brands");
+  if (!existsSync(dir)) return [];
+
+  const files = (await readdir(dir)).filter((f) => f.endsWith(".json")).sort();
+
+  const brands: Brand[] = [];
+  for (const file of files) {
+    const name = file.replace(/\.json$/, "");
+    if (!/^[a-z0-9]+(-[a-z0-9]+)*$/.test(name)) {
+      throw new Error(
+        `brands/${file}: name must be kebab-case — it becomes the [data-ox-brand] value and a CSS attribute selector`,
+      );
+    }
+    const map = await load(path.join("brands", file));
+    const doc = JSON.parse(await readFile(path.join(dir, file), "utf8")) as {
+      $description?: string;
+    };
+
+    for (const key of map.keys()) {
+      if (!key.startsWith("ref.")) {
+        throw new Error(
+          `brands/${file}: "${key}" is not a primitive. A brand overrides the palette (ref.*), never the semantic tier — that is what keeps "critical" meaning the same thing for every customer.`,
+        );
+      }
+    }
+
+    brands.push({ name, description: doc.$description, primitive: map });
+  }
+  return brands;
 }
 
 export async function loadTokenSource(): Promise<TokenSource> {
@@ -157,6 +218,7 @@ export async function loadTokenSource(): Promise<TokenSource> {
     density,
     densityRoot,
     component,
+    brands: await loadBrands(),
   };
 }
 

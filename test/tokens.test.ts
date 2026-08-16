@@ -254,3 +254,80 @@ describe("generated prop documentation", () => {
     expect(propsOf("helix-loader")).not.toContain("bpm");
   });
 });
+
+/* ------------------------------------------------------------------ */
+/* Brands — ADR 0005's headline claim                                  */
+/* ------------------------------------------------------------------ */
+
+describe("brand axis", () => {
+  const css = readFileSync(path.join(ROOT, "packages/tokens/src/oxygen-tokens.css"), "utf8");
+  const branded = tokens as typeof tokens & {
+    brands?: Record<string, Record<string, Record<string, string>>>;
+  };
+
+  it("emits a scoped block per brand", () => {
+    // "A new customer brand is a JSON file and a build" — the claim is only
+    // true if the build actually produces something a page can switch on.
+    expect(css).toContain('[data-ox-brand="northwind"]');
+  });
+
+  it("replaces primitives, so every semantic token downstream follows", () => {
+    const base = tokens.themes.light?.["--ox-accent"];
+    const brand = branded.brands?.northwind?.light?.["--ox-accent"];
+    expect(brand).toBeDefined();
+    expect(brand).not.toBe(base);
+  });
+
+  it("re-themes in dark as well as light, without a second brand file", () => {
+    const light = branded.brands?.northwind?.light?.["--ox-accent"];
+    const dark = branded.brands?.northwind?.dark?.["--ox-accent"];
+    expect(light).toBeDefined();
+    expect(dark).toBeDefined();
+    expect(dark).not.toBe(light);
+  });
+
+  it("inherits every status colour", () => {
+    // The one thing a clinical design system does not delegate: a brand may
+    // not redefine what critical looks like.
+    for (const theme of ["light", "dark", "high-contrast"]) {
+      for (const status of ["critical", "high", "low", "normal", "unknown"]) {
+        expect(
+          branded.brands?.northwind?.[theme]?.[`--ox-status-${status}`],
+          `${theme} status.${status} must be inherited`,
+        ).toBe(tokens.themes[theme]?.[`--ox-status-${status}`]);
+      }
+    }
+  });
+
+  it("holds every brand to the same contrast floors as the base palette", () => {
+    // The gate that makes branding safe: a customer palette that pushes the
+    // focus ring or a label under its floor does not build.
+    for (const [name, themes] of Object.entries(branded.brands ?? {})) {
+      for (const [theme, map] of Object.entries(themes)) {
+        const floor = theme === "high-contrast" ? 7 : 4.5;
+        expect(
+          ratio(map["--ox-text-on-accent"] ?? "", map["--ox-accent"] ?? ""),
+          `${name}/${theme}: label on a primary action`,
+        ).toBeGreaterThanOrEqual(floor);
+        expect(
+          ratio(map["--ox-focus-ring"] ?? "", map["--ox-bg"] ?? ""),
+          `${name}/${theme}: focus indicator`,
+        ).toBeGreaterThanOrEqual(theme === "high-contrast" ? 4.5 : 3);
+      }
+    }
+  });
+
+  it("gives a brand the same key space as the base theme", () => {
+    for (const [name, themes] of Object.entries(branded.brands ?? {})) {
+      for (const [theme, map] of Object.entries(themes)) {
+        expect(Object.keys(map).sort(), `${name}/${theme}`).toEqual(
+          Object.keys(tokens.themes[theme] ?? {}).sort(),
+        );
+      }
+    }
+  });
+
+  it("places brand blocks after the base palette, so they win on source order", () => {
+    expect(css.indexOf('[data-ox-brand="northwind"]')).toBeGreaterThan(css.indexOf(":root {"));
+  });
+});

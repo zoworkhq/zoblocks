@@ -1,0 +1,26 @@
+{
+  "name": "@oxygenui-design/smoke-react18",
+  "version": "0.0.0",
+  "private": true,
+  "description": "The React 18 half of the cross-framework proof. Separate package because two React majors cannot share a node_modules.",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview --port 6011 --strictPort",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@oxygenui-design/loaders": "workspace:*",
+    "@oxygenui-design/tokens": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.18",
+    "@types/react-dom": "^18.3.5",
+    "@vitejs/plugin-react": "^4.3.4",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "typescript": "^5.7.2",
+    "vite": "^6.0.7"
+  }
+}

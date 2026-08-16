@@ -26,6 +26,7 @@ export { OxHelixLoader } from "./helix.js";
 export { OxInfusionLoader, slugWidth } from "./infusion.js";
 
 export {
+  LOADER_EVENTS,
   OxLoaderElement,
   beatMs,
   clamp,
@@ -34,6 +35,7 @@ export {
   resolveSize,
   strokePx,
   type LoaderAnnounce,
+  type LoaderEvent,
   type LoaderMode,
   type LoaderMotion,
 } from "./base.js";

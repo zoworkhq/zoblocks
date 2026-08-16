@@ -88,14 +88,70 @@ export default defineConfig({
       grep: /@reflow/,
       use: { ...devices["iPhone SE"] },
     },
+
+    // The cross-framework claim, run in all three engines. Custom elements are
+    // the one part of this library whose behaviour genuinely differs per
+    // engine — attribute reflection, upgrade timing, and `adoptedStyleSheets`
+    // support all diverge — so a Chromium-only pass would not be evidence.
+    {
+      name: "framework-chromium",
+      grep: /@framework/,
+      use: { ...devices["Desktop Chrome"] },
+    },
+    {
+      name: "framework-firefox",
+      grep: /@framework/,
+      use: { ...devices["Desktop Firefox"] },
+    },
+    {
+      name: "framework-webkit",
+      grep: /@framework/,
+      use: { ...devices["Desktop Safari"] },
+    },
   ],
 
-  webServer: process.env.OXYGEN_BASE_URL
-    ? undefined
-    : {
-        command: "pnpm --filter @oxygenui-design/docs start",
-        url: "http://localhost:6001",
-        reuseExistingServer: !process.env.CI,
-        timeout: 120_000,
-      },
+  // Three hosts, because the smoke apps cannot share one: React 18 and React 19
+  // need separate installs. Each smoke server builds before it serves, so the
+  // framework compilers run on every e2e invocation — half the value of these
+  // pages is that Angular's and Vue's compilers get a chance to reject the
+  // markup before any assertion runs.
+  //
+  // Each override variable skips only its own server. They used to be one
+  // ternary over the docs variable, which meant pointing the docs suite at a
+  // deployed URL also silently stopped the smoke apps from starting, and the
+  // framework suite failed on connection refused rather than on anything real.
+  webServer: [
+    ...(process.env.OXYGEN_BASE_URL
+      ? []
+      : [
+          {
+            command: "pnpm --filter @oxygenui-design/docs start",
+            url: "http://localhost:6001",
+            reuseExistingServer: !process.env.CI,
+            timeout: 120_000,
+          },
+        ]),
+    ...(process.env.OXYGEN_SMOKE_URL
+      ? []
+      : [
+          {
+            command:
+              "pnpm --filter @oxygenui-design/smoke build && pnpm --filter @oxygenui-design/smoke preview",
+            url: "http://localhost:6010",
+            reuseExistingServer: !process.env.CI,
+            timeout: 120_000,
+          },
+        ]),
+    ...(process.env.OXYGEN_SMOKE_18_URL
+      ? []
+      : [
+          {
+            command:
+              "pnpm --filter @oxygenui-design/smoke-react18 build && pnpm --filter @oxygenui-design/smoke-react18 preview",
+            url: "http://localhost:6011",
+            reuseExistingServer: !process.env.CI,
+            timeout: 120_000,
+          },
+        ]),
+  ],
 });

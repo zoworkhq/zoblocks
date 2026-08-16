@@ -20,6 +20,7 @@ import {
   type TokenSource,
   referenceTarget,
   toCssValue,
+  type Brand,
 } from "./load";
 
 export interface TokenProblem {
@@ -130,14 +131,29 @@ function resolveLiteral(
   return resolveLiteral(next, lookup, [...seen, target]);
 }
 
-function themeLookup(source: TokenSource, theme: Theme) {
+/**
+ * A palette with a brand's overrides applied on top.
+ *
+ * Overlaying rather than replacing is what makes a brand a *partial* file: it
+ * supplies the steps it cares about and inherits the rest, so a brand cannot
+ * accidentally delete a colour by not mentioning it.
+ */
+function brandedPrimitive(source: TokenSource, brand: Brand | undefined): TokenMap {
+  if (!brand) return source.primitive;
+  const merged = new Map(source.primitive);
+  for (const [key, token] of brand.primitive) merged.set(key, token);
+  return merged;
+}
+
+function themeLookup(source: TokenSource, theme: Theme, brand?: Brand) {
+  const primitive = brandedPrimitive(source, brand);
   return (path: string): string | undefined => {
     const semantic = source.semantic[theme].get(path);
     if (semantic) return semantic.value;
     const shared = source.shared.get(path);
     if (shared) return shared.value;
-    const primitive = source.primitive.get(path);
-    if (primitive) return primitive.value;
+    const ref = primitive.get(path);
+    if (ref) return ref.value;
     return undefined;
   };
 }
@@ -248,9 +264,9 @@ function checkComponentTier(source: TokenSource, problems: TokenProblem[]): void
  * software is allowed to have opinions its customers cannot override, and this
  * is the one that matters most.
  */
-function checkStatusContrast(source: TokenSource, problems: TokenProblem[]): void {
+function checkStatusContrast(source: TokenSource, problems: TokenProblem[], brand?: Brand): void {
   for (const theme of THEMES) {
-    const lookup = themeLookup(source, theme);
+    const lookup = themeLookup(source, theme, brand);
     const floor = floorFor(theme);
     const hues: Partial<Record<(typeof STATUS_PAIRS)[number], number>> = {};
 
@@ -362,9 +378,9 @@ function floorForPair(theme: Theme, kind: ContrastPair["kind"]): number {
   return kind === "text" ? 4.5 : 3;
 }
 
-function checkTextContrast(source: TokenSource, problems: TokenProblem[]): void {
+function checkTextContrast(source: TokenSource, problems: TokenProblem[], brand?: Brand): void {
   for (const theme of THEMES) {
-    const lookup = themeLookup(source, theme);
+    const lookup = themeLookup(source, theme, brand);
 
     for (const { fg: fgKey, bg: bgKey, kind } of CONTRAST_PAIRS) {
       const fgRaw = lookup(fgKey);
@@ -432,6 +448,40 @@ function checkReferencesResolve(source: TokenSource, problems: TokenProblem[]): 
   }
 }
 
+/**
+ * Every brand is held to the base palette's bar.
+ *
+ * A brand overriding the palette can quietly push the focus ring or a status
+ * colour under its contrast floor — and the customer would ship it, because the
+ * base build was green. Each brand therefore re-runs the full contrast and hue
+ * gate against its own resolved values, in every theme.
+ *
+ * Customers get their colours. They do not get an unreadable clinical display.
+ */
+function checkBrands(source: TokenSource, problems: TokenProblem[]): void {
+  const baseKeys = new Set(source.primitive.keys());
+
+  for (const brand of source.brands) {
+    // A typo in a brand file must be a build failure, not a line the build
+    // silently ignores while the customer wonders why nothing changed.
+    for (const key of brand.primitive.keys()) {
+      if (!baseKeys.has(key)) {
+        problems.push({
+          message: `brand "${brand.name}" overrides "${key}", which the base palette does not define. A brand may only replace steps that exist.`,
+        });
+      }
+    }
+
+    const brandProblems: TokenProblem[] = [];
+    checkStatusContrast(source, brandProblems, brand);
+    checkTextContrast(source, brandProblems, brand);
+
+    for (const problem of brandProblems) {
+      problems.push({ message: `brand "${brand.name}": ${problem.message}` });
+    }
+  }
+}
+
 export function validateTokens(source: TokenSource): TokenProblem[] {
   const problems: TokenProblem[] = [];
 
@@ -441,6 +491,7 @@ export function validateTokens(source: TokenSource): TokenProblem[] {
   checkComponentTier(source, problems);
   checkStatusContrast(source, problems);
   checkTextContrast(source, problems);
+  checkBrands(source, problems);
 
   return problems;
 }
@@ -454,8 +505,12 @@ export function validateTokens(source: TokenSource): TokenProblem[] {
  * the browser — chart geometry, canvas rendering, and the contrast table in the
  * accessibility docs.
  */
-export function resolveTheme(source: TokenSource, theme: Theme): Map<string, string> {
-  const lookup = themeLookup(source, theme);
+export function resolveTheme(
+  source: TokenSource,
+  theme: Theme,
+  brand?: Brand,
+): Map<string, string> {
+  const lookup = themeLookup(source, theme, brand);
   const out = new Map<string, string>();
 
   for (const map of [source.shared, source.semantic[theme]]) {

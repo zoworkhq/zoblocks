@@ -369,6 +369,20 @@
   --ox-nav-radius: var(--ox-radius);
 }
 
+  /* Brand — northwind ---------------------------------------------------
+   * Northwind Health — a worked example, and the fixture the brand tests run against. Overrides the brand ramp and the accent-adjacent neutrals only; every status colour is inherited, because what critical looks like is not a brand decision.
+   */
+[data-ox-brand="northwind"] {
+  --ox-ref-brand-50: #eff6ff;
+  --ox-ref-brand-200: #bfdbfe;
+  --ox-ref-brand-500: #3b82f6;
+  --ox-ref-brand-600: #1d63c9;
+  --ox-ref-brand-700: #1a53a8;
+  --ox-ref-brand-800: #17458a;
+  --ox-ref-cyan-200: #bae6fd;
+  --ox-ref-cyan-300: #7dd3fc;
+}
+
 /* Density profiles. Nestable — innermost wins. */
 [data-ox-density="patient"] {
   --ox-density-row-height: 3.25rem;

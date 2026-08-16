@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Oxygen loaders — plain HTML</title>
+    <link rel="stylesheet" href="../shared.css" />
+  </head>
+  <body>
+    <h1>Framework: <span id="framework">html</span></h1>
+
+    <!--
+      The baseline. No framework, no build-time template — the attributes below
+      are exactly what ends up in the DOM. If this page fails, nothing above it
+      can pass, so it is the first thing to look at when the suite goes red.
+    -->
+    <div class="row">
+      <ox-pulse-loader
+        id="loader"
+        label="Loading patient record"
+        mode="inline"
+        min-duration="0"
+      ></ox-pulse-loader>
+      <button id="toggle" type="button">Toggle</button>
+    </div>
+
+    <div class="row">
+      <ox-rhythm-loader
+        id="determinate"
+        label="Uploading study"
+        mode="inline"
+        min-duration="0"
+        progress="0"
+      ></ox-rhythm-loader>
+      <button id="step" type="button">Step</button>
+    </div>
+
+    <p>Events: <span id="events">0</span></p>
+
+    <script type="module" src="./main.ts"></script>
+  </body>
+</html>
