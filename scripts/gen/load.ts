@@ -25,9 +25,15 @@ export interface LoadedComponent {
   meta: ComponentMeta;
   /** Absolute path to the component's directory. */
   dir: string;
-  /** Absolute path to the implementation file. */
+  /**
+   * Absolute path to the implementation file.
+   *
+   * Empty for a `package` component: its source lives in its own package and is
+   * never copied into a consumer's repository, so there is nothing here for the
+   * registry to read.
+   */
   sourceFile: string;
-  /** Repo-relative path to the implementation file. */
+  /** Repo-relative path to the implementation file. Empty for a package component. */
   sourcePath: string;
   /** Import specifier a consumer uses after installing, e.g. "@/components/oxygen/vitals-panel". */
   consumerSpecifier: string;
@@ -49,6 +55,26 @@ async function listComponentDirs(): Promise<string[]> {
   return entries
     .filter((e) => e.isDirectory() && !NON_COMPONENT_DIRS.has(e.name))
     .map((e) => e.name)
+    .sort();
+}
+
+/**
+ * Package components, discovered by their metadata file.
+ *
+ * A package keeps its own `component.meta.ts` beside its source rather than
+ * putting a stub in `registry/oxygen`. The metadata belongs with the thing it
+ * describes, and a registry directory containing no source would be a
+ * standing invitation to `shadcn add` something that ships on npm.
+ */
+async function listPackageMetaFiles(): Promise<string[]> {
+  const packagesDir = path.join(ROOT, "packages");
+  if (!existsSync(packagesDir)) return [];
+
+  const entries = await readdir(packagesDir, { withFileTypes: true });
+  return entries
+    .filter((e) => e.isDirectory())
+    .map((e) => path.join(packagesDir, e.name, "component.meta.ts"))
+    .filter((file) => existsSync(file))
     .sort();
 }
 
@@ -109,6 +135,68 @@ export async function loadComponents(): Promise<LoadedComponent[]> {
       hasStory: existsSync(path.join(dir, `${name}.stories.tsx`)),
       hasTest: existsSync(path.join(dir, `${name}.test.tsx`)),
     });
+  }
+
+  /* ------------------------------------------------------------------ */
+  /* Package components                                                  */
+  /* ------------------------------------------------------------------ */
+
+  for (const metaFile of await listPackageMetaFiles()) {
+    const dir = path.dirname(metaFile);
+
+    const module = (await import(pathToFileURL(metaFile).href)) as { default?: unknown };
+    if (module.default === undefined) {
+      problems.push(
+        `${rel(metaFile)}: no default export — use \`export default defineComponentMeta({...})\``,
+      );
+      continue;
+    }
+
+    const parsed = componentMetaSchema.safeParse(module.default);
+    if (!parsed.success) {
+      for (const issue of parsed.error.issues) {
+        const where = issue.path.length ? issue.path.join(".") : "(root)";
+        problems.push(`${rel(metaFile)} → ${where}: ${issue.message}`);
+      }
+      continue;
+    }
+
+    // The file is only read because it sits in a package, so declaring
+    // `registry` here would produce a component the registry cannot build and
+    // the docs would offer a `shadcn add` command for something on npm.
+    if (parsed.data.distribution !== "package") {
+      problems.push(
+        `${rel(metaFile)}: a component.meta.ts inside packages/ must set distribution: "package". Registry components live in registry/oxygen.`,
+      );
+      continue;
+    }
+
+    loaded.push({
+      meta: parsed.data,
+      dir,
+      // No registry source: nothing here is copied into a consumer's project.
+      sourceFile: "",
+      sourcePath: "",
+      consumerSpecifier: parsed.data.packageName ?? "",
+      consumerTarget: "",
+      hasStory: existsSync(path.join(dir, "src", `${parsed.data.name}.stories.tsx`)),
+      // A package owns its own suite; `test/` is the convention across this
+      // workspace, so its presence is the honest signal for the coverage gate.
+      hasTest: existsSync(path.join(dir, "test")) || existsSync(path.join(dir, "src", "__tests__")),
+    });
+  }
+
+  // Two components cannot share a name: the name is the URL slug, and a
+  // collision would make one of them unreachable in the docs.
+  const seen = new Map<string, string>();
+  for (const component of loaded) {
+    const previous = seen.get(component.meta.name);
+    if (previous) {
+      problems.push(
+        `duplicate component name "${component.meta.name}" — declared in both ${previous} and ${rel(component.dir)}`,
+      );
+    }
+    seen.set(component.meta.name, rel(component.dir));
   }
 
   // Cross-references are validated only once every component has loaded,

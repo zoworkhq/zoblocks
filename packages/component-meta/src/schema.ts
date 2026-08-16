@@ -41,6 +41,25 @@ export const tierSchema = z.enum(["free", "pro"]);
  */
 export const layerSchema = z.enum(["primitive", "clinical", "pattern", "block"]);
 
+/**
+ * How a consumer gets this component.
+ *
+ * `registry` is the default and the house style: the source is copied into the
+ * customer's repository by the shadcn CLI, so it must be self-contained and
+ * readable on its own.
+ *
+ * `package` is for components that cannot satisfy that constraint. Signature is
+ * the first: it wraps Ant Design, and a component that copies antd's Modal,
+ * Tabs and Form into someone's repo is not "source you own", it is a fork of a
+ * framework. So it ships as an npm package with antd as a peer dependency.
+ *
+ * The axis exists because without it a package component is simply *invisible*.
+ * The catalog is generated from the registry directory, so Signature was built,
+ * tested, merged and documented, and still did not appear at /components — a
+ * component nobody can find is a component that does not exist.
+ */
+export const distributionSchema = z.enum(["registry", "package"]);
+
 const nonEmpty = (label: string) => z.string().min(1, `${label} must not be empty`);
 
 export const fhirResourceSchema = z.object({
@@ -110,6 +129,17 @@ export const componentMetaSchema = z
     layer: layerSchema,
 
     /**
+     * How the component is delivered. Defaults to `registry`.
+     *
+     * A `package` component has no source in `registry/oxygen`, emits no
+     * registry item, and shows an `npm install` command rather than a
+     * `shadcn add` one. Its `packageName` is what a consumer installs.
+     */
+    distribution: distributionSchema.default("registry"),
+    /** npm package name. Required when `distribution` is `package`. */
+    packageName: z.string().optional(),
+
+    /**
      * Three lengths for three surfaces. They are separate fields because each
      * is read in a different place, under different attention, and collapsing
      * them produces text that is wrong for at least two of the three.
@@ -172,6 +202,37 @@ export const componentMetaSchema = z
   })
   .strict()
   .superRefine((meta, ctx) => {
+    // A package component that does not say what to install is undocumentable:
+    // the docs page has no install command to render and the reader is told the
+    // component exists with no way to get it.
+    if (meta.distribution === "package" && !meta.packageName?.trim()) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["packageName"],
+        message:
+          'distribution is "package", so packageName is required — it is what a consumer installs',
+      });
+    }
+    if (meta.distribution === "registry" && meta.packageName) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["packageName"],
+        message:
+          'packageName is only meaningful when distribution is "package"; a registry component is copied as source, not installed',
+      });
+    }
+    // Registry dependencies are resolved to registry URLs, which a package
+    // component has none of. Left unchecked this produces a docs page telling
+    // someone to `shadcn add` a component that ships on npm.
+    if (meta.distribution === "package" && meta.registryDependencies.length > 0) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["registryDependencies"],
+        message:
+          "a package component cannot have registry dependencies — express them as npm `dependencies` instead",
+      });
+    }
+
     // Scaffolded placeholders must be replaced before a component generates.
     // Checked structurally rather than left to review, because unfilled
     // guidance is the field most likely to survive a rushed pull request —
@@ -219,6 +280,7 @@ export type ComponentMetaInput = z.input<typeof componentMetaSchema>;
 export type Stability = z.infer<typeof stabilitySchema>;
 export type Tier = z.infer<typeof tierSchema>;
 export type Layer = z.infer<typeof layerSchema>;
+export type Distribution = z.infer<typeof distributionSchema>;
 export type A11yNote = z.infer<typeof a11yNoteSchema>;
 export type FhirResource = z.infer<typeof fhirResourceSchema>;
 

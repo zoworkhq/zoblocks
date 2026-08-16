@@ -9,7 +9,7 @@
  * Produced by scripts/gen/emit/catalog.ts. Never written by hand.
  */
 
-import type { A11yNote, FhirResource, Layer, Stability, Tier } from "./schema";
+import type { A11yNote, Distribution, FhirResource, Layer, Stability, Tier } from "./schema";
 
 export interface PropDoc {
   name: string;
@@ -36,6 +36,13 @@ export interface ComponentDoc {
   status: Stability;
   since: string;
   layer: Layer;
+  /**
+   * How a consumer gets it. Drives the install command the docs page shows —
+   * a `shadcn add` line for a registry component, `npm install` for a package.
+   */
+  distribution: Distribution;
+  /** npm package name. Present only for `package` components. */
+  packageName?: string;
   deprecation?: {
     deprecatedIn: string;
     removeIn: string;
