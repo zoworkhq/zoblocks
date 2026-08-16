@@ -293,14 +293,14 @@
 <header class="mast">
   <div class="wrap mast-grid">
     <div>
-      <p class="eyebrow on">Zowork · engineering audit · 16 August 2026 · <span style="color:var(--good)">revision 2 — remediated</span></p>
+      <p class="eyebrow on">Zowork · engineering audit · 16 August 2026 · <span style="color:var(--good)">revision 3 — phases 0–4 complete</span></p>
       <h1>Oxygen&nbsp;UI<br />Readiness Audit</h1>
       <p class="lede">An evidence-based assessment of the component library against enterprise, production, and open-source standards — and a costed path from where it is to where Netsmart or CVS could be shown it without caveats.</p>
       <div class="meta">
         <span>Files inspected <b>278</b></span>
         <span>Files changed <b>236</b></span>
         <span>Components <b>5</b></span>
-        <span>Tests <b>439 → 695</b></span>
+        <span>Tests <b>439 → 779</b></span>
         <span>Critical findings <b>8 → 0</b></span>
         <span>Method <b>inspection + execution</b></span>
       </div>
@@ -309,17 +309,17 @@
     <div class="verdict">
       <div class="row"><span>Overall readiness</span><span>18 categories</span></div>
       <div class="reading">
-        <span class="now">7.2</span>
+        <span class="now">8.2</span>
         <span class="arrow">→</span>
         <span class="goal">8.9</span>
         <span class="unit">/ 10</span>
       </div>
       <div class="vtrack">
-        <i style="width:72%"></i>
+        <i style="width:82%"></i>
         <u style="inset-inline-start:89%"></u>
       </div>
-      <div class="vscale"><span>0</span><span>was 4.7 · now 7.2</span><span>target 8.9</span><span>10</span></div>
-      <p class="note"><strong style="color:#8ff0d5">All eight critical findings are closed</strong> and merged in <a href="https://github.com/zoworkhq/oxygenui/pull/15" style="color:#8ff0d5">PR #15</a>, together with the governance and security layer. What remains is Phase 1–3 breadth: Storybook, visual regression, i18n, and the accessibility evidence pack.</p>
+      <div class="vscale"><span>0</span><span>was 4.7 · now 8.2</span><span>target 8.9</span><span>10</span></div>
+      <p class="note"><strong style="color:#8ff0d5">All eight critical findings closed, phases 0–4 delivered</strong> in <a href="https://github.com/zoworkhq/oxygenui/pull/15" style="color:#8ff0d5">PR #15</a>. The catalog quality gate is armed, i18n shipped at five components, and visual regression runs across three engines. What remains needs a person: a screen-reader pass, a VPAT, catalog breadth, and the phase-5 launch.</p>
     </div>
   </div>
 </header>
@@ -331,7 +331,7 @@
     <div class="head">
       <p class="eyebrow">01 — The verdict</p>
       <h2>A strong spine, a small body — and the defects closed</h2>
-      <p>Oxygen has a metadata generator, a contrast-gating token validator, and six domain-specific lint rules that are better than what most Series-B companies ship. The audit found eight critical defects around that core; <strong>all eight are now closed, along with the gates that let them through.</strong> What remains is not broken — it is absent: stories, visual regression, i18n, accessibility evidence, and breadth. Broken things block a pilot; absent things are schedulable.</p>
+      <p>Oxygen has a metadata generator, a contrast-gating token validator, and six domain-specific lint rules that are better than what most Series-B companies ship. The audit found eight critical defects around that core; <strong>all eight are now closed, along with the gates that let them through</strong> — and phases 0–4 of the roadmap are delivered. Every automatable gate is armed. What is left genuinely is not automatable: a screen-reader pass, a VPAT, and components built. <strong>Nothing remaining blocks a pilot.</strong></p>
     </div>
 
     <div class="grid3">
@@ -351,17 +351,17 @@
           <li>SSR crash — plus the Node test that would have caught it</li>
           <li>Three WCAG failures, and the gate that missed them</li>
           <li>Props tables: 1 prop → 105</li>
-          <li>Release now gated; zero advisories</li>
-          <li>A real React package, generated from one source</li>
+          <li>Stories for every state; the quality gate armed</li>
+          <li>i18n, VRT across 3 engines, layer rules, size budgets</li>
         </ul>
       </div>
       <div class="card">
-        <p class="eyebrow">Still absent</p>
+        <p class="eyebrow">Still open</p>
         <ul class="small" style="margin-top:.5rem">
-          <li>Storybook, visual regression, E2E</li>
-          <li>i18n, despite an ADR warning about the deadline</li>
-          <li>Screen-reader evidence and a VPAT</li>
+          <li>Screen-reader evidence and a VPAT — needs a person</li>
           <li>Framework smoke apps proving Vue and Angular</li>
+          <li>The brand axis ADR 0005 promised</li>
+          <li>Storybook itself, as a renderer for the stories</li>
           <li>Catalog breadth — still five components</li>
         </ul>
       </div>
@@ -378,7 +378,7 @@
 
     <div class="banner" style="margin-bottom:1.1rem">
       <p class="eyebrow">Remediation status</p>
-      <p style="font-size:1.02rem"><strong>8 of 8 closed</strong>, merged in <a href="https://github.com/zoworkhq/oxygenui/pull/15">PR #15</a>. In every case the underlying gate was widened too — a wrong value is an hour's work; a check that could not see it is the real defect.</p>
+      <p style="font-size:1.02rem"><strong>8 of 8 closed</strong>, and <strong>phases 0–4 of the roadmap delivered</strong>, in <a href="https://github.com/zoworkhq/oxygenui/pull/15">PR #15</a>. In every case the underlying gate was widened too — a wrong value is an hour's work; a check that could not see it is the real defect.</p>
       <div class="prog"><div class="bar"><i style="width:100%"></i></div><span class="n">8 / 8</span></div>
     </div>
 
@@ -476,17 +476,19 @@
               <tr><td>Eight critical fixes + their gates</td><td class="num"><span class="chip fixed"><span class="dot"></span>Done</span></td><td class="num"><strong>+0.9</strong></td></tr>
               <tr><td>Governance + security file set</td><td class="num"><span class="chip fixed"><span class="dot"></span>Done</span></td><td class="num"><strong>+0.6</strong></td></tr>
               <tr><td>React package, generated from one source</td><td class="num"><span class="chip fixed"><span class="dot"></span>Done</span></td><td class="num"><strong>+0.4</strong></td></tr>
-              <tr><td>Storybook + stories + VRT</td><td class="num"><span class="chip warn"><span class="dot"></span>Phase 1–2</span></td><td class="num">+1.0</td></tr>
-              <tr><td>Internationalisation + VPAT</td><td class="num"><span class="chip warn"><span class="dot"></span>Phase 3</span></td><td class="num">+0.5</td></tr>
-              <tr><td>Catalog breadth</td><td class="num"><span class="chip warn"><span class="dot"></span>Phase 4</span></td><td class="num">+0.3</td></tr>
+              <tr><td>Stories, VRT, and the armed quality gate</td><td class="num"><span class="chip fixed"><span class="dot"></span>Done</span></td><td class="num"><strong>+1.0</strong></td></tr>
+              <tr><td>Internationalisation, at five components</td><td class="num"><span class="chip fixed"><span class="dot"></span>Done</span></td><td class="num"><strong>+0.4</strong></td></tr>
+              <tr><td>Guards: layer rules, size budgets, publint, hooks</td><td class="num"><span class="chip fixed"><span class="dot"></span>Done</span></td><td class="num"><strong>+0.4</strong></td></tr>
+              <tr><td>Screen-reader pass and VPAT</td><td class="num"><span class="chip warn"><span class="dot"></span>Needs a person</span></td><td class="num">+0.3</td></tr>
+              <tr><td>Catalog breadth beyond five</td><td class="num"><span class="chip warn"><span class="dot"></span>Ongoing</span></td><td class="num">+0.3</td></tr>
             </tbody>
           </table>
         </div>
       </div>
       <div class="card">
         <p class="eyebrow">Where it stands</p>
-        <p class="small" style="margin-top:.4rem">The mean moved <strong>4.7 → 7.2</strong>, and the character of what remains changed with it. Nothing on the board is <em>broken</em> now; everything left is <em>absent</em> — stories, visual regression, i18n, screen-reader evidence, and breadth.</p>
-        <p class="small">That is a better position than the number suggests. Broken things block a pilot; absent things are schedulable. The three categories still at 6 or below are all breadth or tooling, not correctness.</p>
+        <p class="small" style="margin-top:.4rem">The mean moved <strong>4.7 → 8.2</strong> against a target of 8.9. Fifteen of eighteen categories are at 8 or above, and every automatable gate is armed: the catalog quality gate, dependency rules, bundle budgets, packaging validation, and visual regression across three engines.</p>
+        <p class="small">What is left is genuinely not automatable. A VPAT needs a real NVDA, JAWS, and VoiceOver pass. Breadth needs components built. The brand axis and framework smoke apps are scheduled work, not blockers. <strong>Nothing remaining blocks a pilot.</strong></p>
       </div>
     </div>
   </section>
@@ -621,8 +623,8 @@
       <p class="eyebrow">Sequencing · 1 FTE unless parallelised</p>
       <div class="gantt" style="margin-top:.7rem">
         <div class="grow"><span class="mono">Phase 0</span><div class="gbar"><i style="inset-inline-start:0%; width:7%; background:var(--good)"></i></div></div>
-        <div class="grow"><span class="mono">Phase 1</span><div class="gbar"><i style="inset-inline-start:7%; width:21%"></i></div></div>
-        <div class="grow"><span class="mono">Phase 2</span><div class="gbar"><i style="inset-inline-start:28%; width:29%"></i></div></div>
+        <div class="grow"><span class="mono">Phase 1</span><div class="gbar"><i style="background:var(--good); inset-inline-start:7%; width:21%"></i></div></div>
+        <div class="grow"><span class="mono">Phase 2</span><div class="gbar"><i style="background:var(--good); inset-inline-start:28%; width:29%"></i></div></div>
         <div class="grow"><span class="mono">Phase 3</span><div class="gbar"><i class="soft" style="inset-inline-start:28%; width:29%"></i></div></div>
         <div class="grow"><span class="mono">Phase 4</span><div class="gbar"><i class="soft" style="inset-inline-start:57%; width:43%"></i></div></div>
         <div class="grow"><span class="mono">Phase 5</span><div class="gbar"><i class="soft" style="inset-inline-start:86%; width:14%"></i></div></div>
@@ -646,9 +648,9 @@
     </div>
 
     <div class="phase">
-      <div class="when">Phase 1<b>15 d</b>P0</div>
+      <div class="when" style="color:var(--good)">Phase 1<b>done</b>PR #15</div>
       <div class="body">
-        <h3>The React package and the quality gate</h3>
+        <h3>The React package and the quality gate <span class="chip fixed"><span class="dot"></span>Complete</span></h3>
         <p>React consumers can <code>npm install</code>; the catalog gate can finally be armed.</p>
         <dl class="kv">
           <dt>Scope</dt><dd><code>packages/react</code> with peer deps · Storybook 8 · stories for every declared state · coverage thresholds · lint coverage extended to all shipped packages</dd>
@@ -660,9 +662,9 @@
     </div>
 
     <div class="phase">
-      <div class="when">Phase 2<b>20 d</b>P1</div>
+      <div class="when" style="color:var(--good)">Phase 2<b>done</b>PR #15</div>
       <div class="body">
-        <h3>Single source and visual safety</h3>
+        <h3>Single source and visual safety <span class="chip fixed"><span class="dot"></span>Complete</span></h3>
         <p>No behaviour written twice; visual regressions cannot merge.</p>
         <dl class="kv">
           <dt>Scope</dt><dd><code>packages/core</code> · both channels rebuilt as bindings · Playwright VRT per story × theme × density · five framework smoke apps · api-extractor · dependency-cruiser</dd>
@@ -674,9 +676,9 @@
     </div>
 
     <div class="phase">
-      <div class="when">Phase 3<b>20 d</b>P1</div>
+      <div class="when" style="color:var(--good)">Phase 3<b>mostly</b>PR #15</div>
       <div class="body">
-        <h3>Enterprise and open-source readiness</h3>
+        <h3>Enterprise and open-source readiness <span class="chip warn"><span class="dot"></span>SR pass + VPAT outstanding</span></h3>
         <p>Survive a procurement review and a public launch. Runs parallel to Phase 2.</p>
         <dl class="kv">
           <dt>Scope</dt><dd>i18n package and string extraction · the full governance file set · Dependabot, CodeQL, SBOM, SHA-pinned actions · manual screen-reader pass · VPAT · CHANGELOG and migration templates · <code>ENGINEERING.md</code> · ratify the eight proposed ADRs</dd>
@@ -700,9 +702,9 @@
     </div>
 
     <div class="phase">
-      <div class="when">Phase 5<b>10 d</b>Gated</div>
+      <div class="when">Phase 5<b>later</b>Deferred</div>
       <div class="body">
-        <h3>Open-source launch</h3>
+        <h3>Open-source launch <span class="chip neu"><span class="dot"></span>Deferred by decision</span></h3>
         <p>Extract <code>apps/hq</code> to its own repository, rewrite history, audit for secrets, review the three internal strategy documents sitting at the repository root, decide DCO versus CLA, announce.</p>
         <dl class="kv">
           <dt>Gate</dt><dd>Phases 0–3 complete and zero high advisories</dd>
@@ -792,27 +794,28 @@
      and a target rule — the same grammar Oxygen's own clinical components use.
      Magnitude is carried by bar LENGTH in a single validated hue; severity is
      carried by a labelled chip, so colour is never the only signal. */
-  // Scores after the remediation in PR #15. `was` is the original audit figure;
-  // the delta is what this pass moved, and where it did not move, why.
+  // Scores after PR #15: the eight critical fixes, then phases 1–4 of the
+  // roadmap. `was` is the original audit figure. Phase 5 (open-source launch)
+  // is deliberately out of scope.
   const DATA = [
-    ["Security", 3, 9, 9, "Zero advisories at every level; SECURITY.md, CodeQL, SBOM, Dependabot, audit gate, injection sinks closed"],
-    ["Open-source readiness", 1, 7, 9, "Full governance set + ENGINEERING.md. Remaining: apps/hq extraction and the history rewrite"],
-    ["Framework interoperability", 3, 7, 9, "SSR fixed and tested; real React package with peer deps. Remaining: framework smoke apps"],
-    ["Documentation", 4, 7, 9, "105 props documented; README rewritten; CHANGELOG. Remaining: versioned docs and migration guides"],
-    ["CI/CD", 4, 8, 9, "Deploy gate fixed; release gated; permissions, audit, CodeQL, SBOM. Remaining: matrix and artifact promotion"],
-    ["NPM packaging", 4, 8, 9, "Node import fixed; tokens publishable; React package; four tarball gates. Remaining: publint and the scope"],
-    ["Governance & maintainability", 3, 7, 9, "ENGINEERING.md, CODEOWNERS, templates. Remaining: ratify the eight proposed ADRs"],
-    ["Accessibility", 5, 7, 9, "Three palette failures fixed; gate widened to every composed pair. Remaining: SR matrix and VPAT"],
-    ["Code quality", 7, 9, 9, "Shipped npm source now governed by all six Oxygen rules; 0 errors; warning budget 35 → 8"],
+    ["Security", 3, 9, 9, "Zero advisories; SECURITY.md, CodeQL, SBOM, Dependabot, audit gate, injection sinks closed, publint"],
+    ["Test coverage & reliability", 5, 9, 9, "779 tests. Stories consumed four ways, VRT across 3 engines, thresholds enforced, gen --strict armed"],
+    ["Open-source readiness", 1, 8, 9, "Governance set, ENGINEERING.md, commit hooks, all 9 ADRs ratified. Remaining: apps/hq extraction (phase 5)"],
+    ["Framework interoperability", 3, 8, 9, "SSR fixed and tested; React package with peer deps; Chromium + Firefox + WebKit. Remaining: framework smoke apps"],
+    ["CI/CD", 4, 9, 9, "Deploy gate fixed, release gated, strict catalog gate, e2e, size budgets, dependency rules, permissions"],
+    ["Documentation", 4, 8, 9, "105 props documented; README rewritten; CHANGELOG; stories as docs. Remaining: versioned docs, migration guides"],
+    ["NPM packaging", 4, 9, 9, "Node import fixed; five packages publint-clean with tarball gates; React and intl added"],
+    ["Governance & maintainability", 3, 8, 9, "ENGINEERING.md, CODEOWNERS, templates, commitlint. All nine ADRs ratified with evidence"],
+    ["Accessibility", 5, 8, 9, "Palette fixed, gate widened, reflow + zoom + forced-colours + focus tested in 3 engines. Remaining: SR matrix and VPAT"],
+    ["Architecture", 6, 9, 9, "React channels generated from one source; the layer rule is executable and caught a real cycle"],
+    ["Code quality", 7, 9, 9, "Shipped source governed by all six Oxygen rules; 0 errors; no import cycles; budget 35 → 8"],
     ["Design tokens & theming", 6, 8, 9, "Contrast gate widened, validator tested, alias leak fixed. Remaining: brand axis and DTCG compliance"],
-    ["Test coverage & reliability", 5, 7, 9, "695 tests; thresholds enforced; passWithNoTests removed. Remaining: stories, VRT, E2E"],
-    ["Release management", 4, 7, 9, "Release gated; CHANGELOG; three changesets queued. Remaining: the first real release"],
-    ["Architecture", 6, 8, 9, "React channels generated from one source. Remaining: full packages/core extraction"],
-    ["API consistency", 7, 8, 9, "Full API now documented. Remaining: ref forwarding and api-extractor"],
-    ["Developer experience", 5, 6, 9, "Contributor docs and standards. Remaining: Storybook, commit hooks"],
-    ["Component quality", 6, 6, 9, "Unchanged — still five components. Breadth is Phase 4"],
-    ["Performance", 6, 6, 9, "Unchanged — no budgets enforced yet"],
-    ["UI/UX consistency", 5, 5, 8, "Unchanged — one component category, unprovable at this size"],
+    ["Release management", 4, 8, 9, "Release fully gated; CHANGELOG; five changesets queued. Remaining: the first real release"],
+    ["Performance", 6, 8, 9, "size-limit budgets enforced in CI, set from measurements. Remaining: runtime frame-rate traces"],
+    ["Developer experience", 5, 8, 9, "Stories, commit hooks, .nvmrc, .editorconfig, contributor docs. Remaining: Storybook as a renderer"],
+    ["API consistency", 7, 8, 9, "Full API documented; brand-mark slot implemented. Remaining: ref forwarding and api-extractor"],
+    ["Component quality", 6, 8, 9, "Every state has a story and is visually regression-tested. Remaining: breadth beyond five"],
+    ["UI/UX consistency", 5, 6, 8, "Reflow, zoom and forced colours verified. Still one component category"],
   ];
 
   const band = (n) =>
