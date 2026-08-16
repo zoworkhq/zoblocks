@@ -33,6 +33,11 @@ export {
   type UseSignatureCaptureOptions,
 } from "./use-signature-capture";
 export { renderTypedSignature, readImageFile } from "./typed";
+// Exported for the same reason as the two above: the modal uses it, and a host
+// that stores `Ink` and later needs the archival PNG — for a PDF, an email, a
+// printout — would otherwise have to reimplement the currentColor
+// substitution and the opaque-background rule to get a usable one.
+export { rasterise, type RasteriseOptions } from "./rasterise";
 export { DEFAULT_LOCALE, SignatureLocaleProvider, useLocale, type SignatureLocale } from "./locale";
 
 // Re-exported so a consumer never needs to reach past this package for the

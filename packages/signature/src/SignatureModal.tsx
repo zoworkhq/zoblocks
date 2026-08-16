@@ -107,7 +107,7 @@ export function SignatureModal({
   const tabsId = `${base}-tabs`;
 
   const [method, setMethod] = React.useState<CaptureMethod>(methods[0] ?? "draw");
-  // Focused on open; see afterOpenChange below.
+  // Focused when the dialog opens; see `focusName` below.
   const nameRef = React.useRef<InputRef>(null);
   const [strokes, setStrokes] = React.useState<Stroke[]>([]);
   const [typedName, setTypedName] = React.useState("");
@@ -125,6 +125,37 @@ export function SignatureModal({
   // original from a photocopy, and the convention followed people into
   // software; it costs nothing to honour and is jarring to be denied.
   const [inkColour, setInkColour] = React.useState<"black" | "blue">("black");
+
+  /*
+   * Put focus on the first required field when the dialog opens.
+   *
+   * antd lands focus on an invisible sentinel `<div tabIndex={0}>`, which is
+   * an unlabelled place for a screen-reader user to start. It used to be moved
+   * to the active tab, which was better but still wrong: the name field sits
+   * *above* the tablist, so a keyboard user starting there had to cycle the
+   * whole dialog — past the pad, the actions and the close button — to reach
+   * the first thing they have to fill in. Landing on the name makes forward
+   * tabbing follow the order the dialog is read in.
+   *
+   * Called from two places on purpose. `afterOpenChange` is the correct hook
+   * in a browser, because it runs after the focus trap has claimed focus — but
+   * it fires on the end of the open transition, and an environment that never
+   * runs the transition never fires it. jsdom 30 is such an environment, and
+   * the regression it caused was silent: the dialog opened, everything
+   * rendered, and focus simply stayed on the trigger. The effect below covers
+   * that. Both target the same element, so whichever runs last is harmless.
+   */
+  const focusName = React.useCallback(() => {
+    nameRef.current?.focus();
+  }, []);
+
+  React.useEffect(() => {
+    if (!open) return;
+    // A frame later: the modal body mounts before antd's trap moves focus, so
+    // focusing synchronously here would just be overridden.
+    const frame = requestAnimationFrame(focusName);
+    return () => cancelAnimationFrame(frame);
+  }, [open, focusName]);
 
   const audit = React.useCallback(
     (type: string, detail?: string) => onAuditEvent?.({ type, at: now, detail }),
@@ -347,19 +378,10 @@ export function SignatureModal({
       title={<span id={titleId}>{title ?? "Signature"}</span>}
       closable={{ "aria-label": t.close }}
       afterOpenChange={(isOpen) => {
-        /*
-         * antd opens focus on an invisible sentinel div — an unlabelled
-         * landing spot. Move it to the first required field.
-         *
-         * This used to focus the active tab, which was better than a sentinel
-         * but still wrong: the name field sits *above* the tablist, so a
-         * keyboard user starting there had to cycle the entire dialog — past
-         * the pad, the actions, and the close button — before reaching the
-         * first thing they have to fill in. Landing on the name makes forward
-         * tabbing follow the order the dialog is actually read in.
-         */
-        if (!isOpen) return;
-        nameRef.current?.focus();
+        // Runs when the open transition ends, which is after antd's focus
+        // trap has claimed focus — so this is the call that wins in a real
+        // browser. See `focusName` for why it is not the only one.
+        if (isOpen) focusName();
       }}
       modalRender={(node) => (
         <div

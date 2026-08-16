@@ -236,11 +236,15 @@ test.describe("accessibility in a real layout engine", () => {
      */
     await tabTo(page, dialog.getByRole("tab", { name: /Draw/ }));
     await page.keyboard.press("ArrowRight");
+
+    // Focus has to land before Enter can activate it. Sending both keys back
+    // to back made this fail in Firefox roughly one run in six, because Enter
+    // arrived while focus was still on Draw and re-selected the tab that was
+    // already selected.
+    const typeTab = dialog.getByRole("tab", { name: /Type/ });
+    await expect(typeTab).toBeFocused();
     await page.keyboard.press("Enter");
-    await expect(dialog.getByRole("tab", { name: /Type/ })).toHaveAttribute(
-      "aria-selected",
-      "true",
-    );
+    await expect(typeTab).toHaveAttribute("aria-selected", "true");
 
     await tabTo(page, dialog.getByLabel(/type your name to sign/i));
     await page.keyboard.type("Josh Randall");
