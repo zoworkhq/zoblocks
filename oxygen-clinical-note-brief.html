@@ -1,0 +1,2919 @@
+<meta charset="utf-8" />
+<title>Oxygen ClinicalNote</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<style>
+  /* ------------------------------------------------------------------ */
+  /* Document tokens — Oxygen's own identity.                            */
+  /* The mockups further down deliberately do NOT use these: they use    */
+  /* Ant Design's real token values, so what you are judging is antd,    */
+  /* not a teal impression of it.                                        */
+  /* ------------------------------------------------------------------ */
+  :root {
+    --paper: #f6faf8;
+    --surface: #ffffff;
+    --surface-2: #eef4f2;
+    --ink: #0e1c19;
+    --ink-2: #33473f;
+    --muted: #5d716b;
+    --rule: #d8e4df;
+    --rule-2: #c3d3cd;
+    --accent: #059478;
+    --accent-2: #0bb08f;
+    --accent-soft: #e6f7f1;
+    --accent-ink: #045b4b;
+    --stage: #0b1716;
+    --stage-2: #10201e;
+    --stage-fg: #dff3ec;
+    --stage-muted: #7f9c94;
+    --stage-rule: #1c3230;
+    --warn: #b7791f;
+    --warn-soft: #fbf3e0;
+    --warn-rule: #e4c98a;
+    --bad: #b4423a;
+    --bad-soft: #fbeceb;
+    --bad-rule: #e8b5b0;
+    --ok: #1f8f5f;
+    --ok-soft: #e6f6ee;
+    --ok-rule: #a9dcc3;
+    --code-bg: #0f1e1c;
+    --code-fg: #d9ece6;
+    --code-k: #7ee0cd;
+    --code-s: #f2c98a;
+    --code-c: #7f9c94;
+    --shadow: 0 1px 2px rgb(14 28 25 / 0.06), 0 8px 24px -12px rgb(14 28 25 / 0.18);
+    --font-display: "Avenir Next", "Segoe UI Variable Display", "Helvetica Neue", ui-sans-serif, system-ui, sans-serif;
+    --font-body: -apple-system, BlinkMacSystemFont, "Segoe UI Variable Text", "Segoe UI", ui-sans-serif, system-ui, sans-serif;
+    --font-mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper: #0b1514;
+      --surface: #101d1b;
+      --surface-2: #142522;
+      --ink: #e7f2ee;
+      --ink-2: #c3d6d0;
+      --muted: #93aca5;
+      --rule: #1f312e;
+      --rule-2: #2c423e;
+      --accent: #5fe0c9;
+      --accent-2: #8aeedd;
+      --accent-soft: #10302b;
+      --accent-ink: #b8f3e7;
+      --stage: #070f0e;
+      --stage-2: #0d1a19;
+      --stage-fg: #dff3ec;
+      --stage-muted: #7f9c94;
+      --stage-rule: #1a2d2b;
+      --warn: #e2b04a;
+      --warn-soft: #2a2410;
+      --warn-rule: #4d4020;
+      --bad: #f0928a;
+      --bad-soft: #2c1614;
+      --bad-rule: #552a26;
+      --ok: #5fd39a;
+      --ok-soft: #10281d;
+      --ok-rule: #23503a;
+      --code-bg: #0a1413;
+      --code-fg: #d9ece6;
+      --shadow: 0 1px 2px rgb(0 0 0 / 0.4), 0 10px 30px -14px rgb(0 0 0 / 0.6);
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper: #0b1514;
+    --surface: #101d1b;
+    --surface-2: #142522;
+    --ink: #e7f2ee;
+    --ink-2: #c3d6d0;
+    --muted: #93aca5;
+    --rule: #1f312e;
+    --rule-2: #2c423e;
+    --accent: #5fe0c9;
+    --accent-2: #8aeedd;
+    --accent-soft: #10302b;
+    --accent-ink: #b8f3e7;
+    --stage: #070f0e;
+    --stage-2: #0d1a19;
+    --stage-fg: #dff3ec;
+    --stage-muted: #7f9c94;
+    --stage-rule: #1a2d2b;
+    --warn: #e2b04a;
+    --warn-soft: #2a2410;
+    --warn-rule: #4d4020;
+    --bad: #f0928a;
+    --bad-soft: #2c1614;
+    --bad-rule: #552a26;
+    --ok: #5fd39a;
+    --ok-soft: #10281d;
+    --ok-rule: #23503a;
+    --code-bg: #0a1413;
+    --code-fg: #d9ece6;
+    --shadow: 0 1px 2px rgb(0 0 0 / 0.4), 0 10px 30px -14px rgb(0 0 0 / 0.6);
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+  a { color: var(--accent-ink); text-decoration-color: color-mix(in oklab, var(--accent) 50%, transparent); text-underline-offset: 3px; }
+  a:hover { text-decoration-color: var(--accent); }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+  h1, h2, h3, h4 { font-family: var(--font-display); letter-spacing: -0.015em; text-wrap: balance; margin: 0; }
+  h1 { font-size: clamp(2.2rem, 4.5vw, 3.4rem); line-height: 1.05; font-weight: 600; }
+  h2 { font-size: 1.75rem; line-height: 1.2; font-weight: 600; }
+  h3 { font-size: 1.2rem; line-height: 1.3; font-weight: 600; margin-top: 2rem; }
+  h4 { font-size: 1rem; line-height: 1.35; font-weight: 600; }
+  p { margin: 0 0 1rem; }
+  ul, ol { margin: 0 0 1rem; padding-inline-start: 1.35rem; }
+  li { margin-bottom: 0.4rem; }
+  li::marker { color: var(--accent); }
+  strong { font-weight: 600; color: var(--ink); }
+  code { font-family: var(--font-mono); font-size: 0.86em; background: var(--surface-2); padding: 0.1em 0.35em; border-radius: 4px; }
+
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 0 clamp(1rem, 4vw, 2.5rem); }
+  .prose { max-width: 68ch; }
+
+  header.hero {
+    padding: clamp(3rem, 9vw, 6.5rem) 0 clamp(2rem, 5vw, 3.5rem);
+    border-bottom: 1px solid var(--rule);
+    background:
+      radial-gradient(1100px 420px at 12% -12%, color-mix(in oklab, var(--accent) 11%, transparent), transparent 62%),
+      var(--paper);
+  }
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--accent-ink);
+    margin-bottom: 1.1rem;
+  }
+  .hero .lede { font-size: clamp(1.05rem, 2vw, 1.3rem); color: var(--ink-2); max-width: 62ch; margin-top: 1.25rem; }
+  .hero-meta { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: 2rem; }
+  .pill {
+    font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.05em;
+    padding: 0.35rem 0.7rem; border-radius: 999px;
+    border: 1px solid var(--rule-2); background: var(--surface); color: var(--muted);
+  }
+  .pill.on { border-color: color-mix(in oklab, var(--accent) 45%, transparent); background: var(--accent-soft); color: var(--accent-ink); }
+
+  nav.toc { border-bottom: 1px solid var(--rule); background: var(--surface); position: sticky; top: 0; z-index: 40; }
+  nav.toc .wrap { display: flex; gap: 0.25rem; overflow-x: auto; padding-block: 0.5rem; scrollbar-width: thin; }
+  nav.toc a {
+    flex: 0 0 auto; font-size: 0.8rem; padding: 0.35rem 0.65rem; border-radius: 6px;
+    color: var(--muted); text-decoration: none; white-space: nowrap;
+  }
+  nav.toc a:hover { background: var(--surface-2); color: var(--ink); }
+
+  section { padding: clamp(2.75rem, 6vw, 4.5rem) 0; border-bottom: 1px solid var(--rule); scroll-margin-top: 3.5rem; }
+  section > .wrap > .sec-head { margin-bottom: 2rem; }
+  .sec-num {
+    font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.14em;
+    color: var(--accent); text-transform: uppercase; display: block; margin-bottom: 0.5rem;
+  }
+  .sec-head p { color: var(--ink-2); max-width: 66ch; margin-top: 0.75rem; }
+
+  .grid { display: grid; gap: 1rem; }
+  .g2 { grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
+  .g3 { grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); }
+  .g4 { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
+
+  .card {
+    background: var(--surface); border: 1px solid var(--rule);
+    border-radius: 12px; padding: 1.25rem 1.35rem; box-shadow: var(--shadow);
+  }
+  .card h4 { margin-bottom: 0.5rem; }
+  .card p:last-child, .card ul:last-child { margin-bottom: 0; }
+  .card .k { font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); display: block; margin-bottom: 0.4rem; }
+
+  .note {
+    border-inline-start: 3px solid var(--accent);
+    background: var(--accent-soft); color: var(--accent-ink);
+    padding: 1rem 1.15rem; border-radius: 0 10px 10px 0; margin: 1.5rem 0;
+  }
+  .note.warn { border-color: var(--warn); background: var(--warn-soft); color: var(--ink); }
+  .note.bad { border-color: var(--bad); background: var(--bad-soft); color: var(--ink); }
+  .note.ok { border-color: var(--ok); background: var(--ok-soft); color: var(--ink); }
+  .note p:last-child { margin-bottom: 0; }
+  .note .lbl { font-family: var(--font-mono); font-size: 0.68rem; letter-spacing: 0.12em; text-transform: uppercase; display: block; margin-bottom: 0.4rem; opacity: 0.85; }
+
+  .tw { overflow-x: auto; border: 1px solid var(--rule); border-radius: 12px; background: var(--surface); margin: 1.5rem 0; }
+  table { border-collapse: collapse; width: 100%; font-size: 0.88rem; min-width: 560px; }
+  th, td { text-align: start; padding: 0.7rem 0.9rem; border-bottom: 1px solid var(--rule); vertical-align: top; }
+  th { font-family: var(--font-mono); font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); background: var(--surface-2); position: sticky; top: 0; }
+  tr:last-child td { border-bottom: 0; }
+  td code { white-space: nowrap; }
+  .num { font-variant-numeric: tabular-nums; }
+  .yes { color: var(--ok); font-weight: 600; }
+  .no { color: var(--bad); font-weight: 600; }
+  .meh { color: var(--warn); font-weight: 600; }
+
+  pre {
+    background: var(--code-bg); color: var(--code-fg); border-radius: 12px;
+    padding: 1.1rem 1.25rem; overflow-x: auto; font-family: var(--font-mono);
+    font-size: 0.8rem; line-height: 1.65; margin: 1.25rem 0; border: 1px solid var(--stage-rule);
+  }
+  pre code { background: none; padding: 0; font-size: inherit; color: inherit; }
+  .c-k { color: var(--code-k); }
+  .c-s { color: var(--code-s); }
+  .c-c { color: var(--code-c); font-style: italic; }
+
+  figure { margin: 1.75rem 0; }
+  figcaption {
+    font-size: 0.82rem; color: var(--muted); margin-top: 0.75rem;
+    padding-inline-start: 0.9rem; border-inline-start: 2px solid var(--rule-2);
+  }
+  figcaption b { color: var(--ink-2); font-weight: 600; }
+  .stage {
+    background:
+      linear-gradient(var(--surface-2) 0 0) padding-box,
+      var(--surface);
+    border: 1px solid var(--rule); border-radius: 14px;
+    padding: clamp(1rem, 3vw, 2rem); overflow-x: auto;
+  }
+  .stage.dark { background: #1f1f1f; border-color: #303030; }
+
+  /* ------------------------------------------------------------------ */
+  /* ANT DESIGN mockup primitives — real antd v6 default token values.   */
+  /* Kept in their own namespace so the document's teal never leaks in.  */
+  /* ------------------------------------------------------------------ */
+  .antd {
+    --a-primary: #1677ff;
+    --a-primary-hover: #4096ff;
+    --a-primary-bg: #e6f4ff;
+    --a-primary-border: #91caff;
+    --a-success: #52c41a;
+    --a-success-bg: #f6ffed;
+    --a-success-border: #b7eb8f;
+    --a-warning: #faad14;
+    --a-warning-bg: #fffbe6;
+    --a-warning-border: #ffe58f;
+    --a-error: #ff4d4f;
+    --a-error-bg: #fff2f0;
+    --a-error-border: #ffccc7;
+    --a-purple: #722ed1;
+    --a-purple-bg: #f9f0ff;
+    --a-purple-border: #d3adf7;
+    --a-cyan: #13c2c2;
+    --a-cyan-bg: #e6fffb;
+    --a-cyan-border: #87e8de;
+    --a-text: rgba(0, 0, 0, 0.88);
+    --a-text-2: rgba(0, 0, 0, 0.65);
+    --a-text-3: rgba(0, 0, 0, 0.45);
+    --a-text-4: rgba(0, 0, 0, 0.25);
+    --a-border: #d9d9d9;
+    --a-border-2: #f0f0f0;
+    --a-bg: #ffffff;
+    --a-bg-layout: #f5f5f5;
+    --a-fill-3: rgba(0, 0, 0, 0.04);
+    --a-fill-2: rgba(0, 0, 0, 0.06);
+    --a-radius: 6px;
+    --a-radius-lg: 8px;
+    --a-radius-sm: 4px;
+    --a-h: 32px;
+    --a-h-lg: 40px;
+    --a-h-sm: 24px;
+    --a-shadow: 0 6px 16px 0 rgb(0 0 0 / 0.08), 0 3px 6px -4px rgb(0 0 0 / 0.12), 0 9px 28px 8px rgb(0 0 0 / 0.05);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+    font-size: 14px;
+    line-height: 1.5714;
+    color: var(--a-text);
+  }
+  .antd.dark {
+    --a-primary: #1668dc;
+    --a-primary-hover: #3c89e8;
+    --a-primary-bg: #111a2c;
+    --a-primary-border: #15325b;
+    --a-success: #49aa19;
+    --a-success-bg: #162312;
+    --a-success-border: #274916;
+    --a-warning: #d89614;
+    --a-warning-bg: #2b2111;
+    --a-warning-border: #594214;
+    --a-error: #dc4446;
+    --a-error-bg: #2c1618;
+    --a-error-border: #5b2526;
+    --a-purple: #642ab5;
+    --a-purple-bg: #1a1325;
+    --a-purple-border: #301c4d;
+    --a-cyan: #13a8a8;
+    --a-cyan-bg: #112123;
+    --a-cyan-border: #144848;
+    --a-text: rgba(255, 255, 255, 0.85);
+    --a-text-2: rgba(255, 255, 255, 0.65);
+    --a-text-3: rgba(255, 255, 255, 0.45);
+    --a-text-4: rgba(255, 255, 255, 0.25);
+    --a-border: #424242;
+    --a-border-2: #303030;
+    --a-bg: #141414;
+    --a-bg-layout: #000000;
+    --a-fill-3: rgba(255, 255, 255, 0.08);
+    --a-fill-2: rgba(255, 255, 255, 0.12);
+  }
+
+  .a-modal {
+    background: var(--a-bg); border-radius: var(--a-radius-lg);
+    box-shadow: var(--a-shadow); width: 100%; max-width: 640px; margin: 0 auto;
+    overflow: hidden;
+  }
+  .a-modal.wide { max-width: 900px; }
+  /* annotated mockups: let the pins hang past the frame instead of being clipped */
+  .a-modal.pins { overflow: visible; }
+  /* the document's code token is dark; inside an antd surface it must not be */
+  .antd code {
+    background: var(--a-fill-3); color: var(--a-text);
+    border: 1px solid var(--a-border-2); border-radius: var(--a-radius-sm);
+    padding: 1px 5px; font-size: 12px;
+  }
+  .a-modal.pins > .a-modal-head { border-radius: var(--a-radius-lg) var(--a-radius-lg) 0 0; }
+  .a-modal.pins > .a-modal-foot { border-radius: 0 0 var(--a-radius-lg) var(--a-radius-lg); }
+  .a-modal.xwide { max-width: 1040px; }
+  .a-modal-head {
+    display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem;
+    padding: 16px 24px; border-bottom: 1px solid var(--a-border-2);
+  }
+  .a-modal-title { font-size: 16px; font-weight: 600; line-height: 1.5; color: var(--a-text); }
+  .a-modal-sub { font-size: 12px; color: var(--a-text-3); margin-top: 2px; }
+  .a-modal-x { color: var(--a-text-3); font-size: 16px; line-height: 1; cursor: default; padding: 4px; border-radius: var(--a-radius-sm); }
+  .a-modal-body { padding: 20px 24px; }
+  .a-modal-body.flush { padding: 0; }
+  .a-modal-foot {
+    display: flex; align-items: center; justify-content: flex-end; gap: 8px;
+    padding: 12px 24px 16px; border-top: 1px solid var(--a-border-2);
+  }
+  .a-modal-foot.split { justify-content: space-between; }
+
+  .a-btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+    height: var(--a-h); padding: 0 15px; border-radius: var(--a-radius);
+    border: 1px solid var(--a-border); background: var(--a-bg); color: var(--a-text);
+    font-size: 14px; font-weight: 400; white-space: nowrap;
+  }
+  .a-btn.primary { background: var(--a-primary); border-color: var(--a-primary); color: #fff; }
+  .a-btn.primary.dis { background: var(--a-primary); border-color: var(--a-primary); opacity: 0.45; }
+  .a-btn.text { border-color: transparent; background: transparent; color: var(--a-text-2); }
+  .a-btn.link { border-color: transparent; background: transparent; color: var(--a-primary); }
+  .a-btn.danger { border-color: var(--a-error); color: var(--a-error); }
+  .a-btn.dis { color: var(--a-text-4); border-color: var(--a-border); background: var(--a-fill-3); }
+  .a-btn.sm { height: var(--a-h-sm); padding: 0 7px; font-size: 12px; }
+  .a-btn.lg { height: var(--a-h-lg); padding: 0 15px; font-size: 16px; }
+  .a-btn.on { color: var(--a-primary); border-color: var(--a-primary); background: var(--a-primary-bg); }
+
+  .a-tabs { border-bottom: 1px solid var(--a-border-2); display: flex; gap: 32px; }
+  .a-tab { padding: 12px 0; font-size: 14px; color: var(--a-text); display: flex; align-items: center; gap: 8px; position: relative; }
+  .a-tab.on { color: var(--a-primary); font-weight: 500; }
+  .a-tab.on::after { content: ""; position: absolute; inset-inline: 0; bottom: -1px; height: 2px; background: var(--a-primary); border-radius: 2px; }
+  .a-tab.off { color: var(--a-text-4); }
+
+  .a-label { display: block; font-size: 14px; color: var(--a-text); margin-bottom: 8px; }
+  .a-label .req { color: var(--a-error); font-family: SimSun, sans-serif; margin-inline-end: 4px; }
+  .a-input {
+    height: var(--a-h); border: 1px solid var(--a-border); border-radius: var(--a-radius);
+    padding: 4px 11px; display: flex; align-items: center; color: var(--a-text); background: var(--a-bg);
+  }
+  .a-input.ph { color: var(--a-text-4); }
+  .a-input.err { border-color: var(--a-error); }
+  .a-help { font-size: 14px; color: var(--a-error); margin-top: 4px; }
+  .a-extra { font-size: 14px; color: var(--a-text-3); margin-top: 4px; }
+  .a-check { display: flex; align-items: flex-start; gap: 8px; padding: 4px 0; }
+  .a-check .box { width: 16px; height: 16px; border-radius: var(--a-radius-sm); border: 1px solid var(--a-border); flex: 0 0 auto; margin-top: 3px; }
+  .a-check.on .box { background: var(--a-primary); border-color: var(--a-primary); position: relative; }
+  .a-check.on .box::after { content: ""; position: absolute; inset-inline-start: 5px; top: 1.5px; width: 4px; height: 8px; border: 2px solid #fff; border-block-start: 0; border-inline-start: 0; transform: rotate(45deg); }
+
+  .a-alert {
+    display: flex; gap: 8px; align-items: flex-start;
+    padding: 8px 12px; border-radius: var(--a-radius); font-size: 14px;
+    border: 1px solid var(--a-primary-border); background: var(--a-primary-bg); color: var(--a-text);
+  }
+  .a-alert.warning { border-color: var(--a-warning-border); background: var(--a-warning-bg); }
+  .a-alert.error { border-color: var(--a-error-border); background: var(--a-error-bg); }
+  .a-alert.success { border-color: var(--a-success-border); background: var(--a-success-bg); }
+  .a-alert .ic { flex: 0 0 auto; line-height: 1.5714; }
+
+  .a-tag {
+    display: inline-flex; align-items: center; gap: 4px; height: 22px; padding: 0 7px;
+    font-size: 12px; line-height: 20px; border-radius: var(--a-radius-sm);
+    border: 1px solid var(--a-border); background: var(--a-fill-3); color: var(--a-text-2);
+  }
+  .a-tag.blue { border-color: var(--a-primary-border); background: var(--a-primary-bg); color: var(--a-primary); }
+  .a-tag.green { border-color: var(--a-success-border); background: var(--a-success-bg); color: var(--a-success); }
+  .a-tag.gold { border-color: var(--a-warning-border); background: var(--a-warning-bg); color: #d48806; }
+  .a-tag.red { border-color: var(--a-error-border); background: var(--a-error-bg); color: var(--a-error); }
+  .a-tag.purple { border-color: var(--a-purple-border); background: var(--a-purple-bg); color: var(--a-purple); }
+  .a-tag.cyan { border-color: var(--a-cyan-border); background: var(--a-cyan-bg); color: var(--a-cyan); }
+
+  .a-desc { border: 1px solid var(--a-border-2); border-radius: var(--a-radius-lg); overflow: hidden; }
+  .a-desc-row { display: grid; grid-template-columns: minmax(120px, 200px) 1fr; border-bottom: 1px solid var(--a-border-2); }
+  .a-desc-row:last-child { border-bottom: 0; }
+  .a-desc-row dt { padding: 10px 16px; background: var(--a-fill-3); color: var(--a-text-2); font-size: 14px; }
+  .a-desc-row dd { padding: 10px 16px; margin: 0; color: var(--a-text); font-size: 14px; }
+
+  /* ------------------------------------------------------------------ */
+  /* Icons — Lucide geometry: 24px grid, 2px stroke, round caps.         */
+  /* Inlined as a sprite: no CDN, no runtime, no icon-font hack.         */
+  /* ------------------------------------------------------------------ */
+  .i {
+    width: 16px; height: 16px; flex: 0 0 auto; display: block;
+    fill: none; stroke: currentColor; stroke-width: 2;
+    stroke-linecap: round; stroke-linejoin: round;
+    vector-effect: non-scaling-stroke;
+  }
+  .i-14 { width: 14px; height: 14px; stroke-width: 2.15; }
+  .i-18 { width: 18px; height: 18px; stroke-width: 1.9; }
+  .i-20 { width: 20px; height: 20px; stroke-width: 1.85; }
+
+  /* ------------------------------------------------------------------ */
+  /* Editor mockup primitives                                            */
+  /* ------------------------------------------------------------------ */
+  .ed { border: 1px solid var(--a-border-2); border-radius: var(--a-radius-lg); overflow: hidden; background: var(--a-bg); }
+
+  /* Toolbar: clustered segments, not a row of loose buttons + hairlines. */
+  .ed-bar {
+    display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+    padding: 8px 14px; background: var(--a-bg);
+    border-bottom: 1px solid var(--a-border-2);
+  }
+  .ed-bar .sp { flex: 1 1 auto; }
+  .clus {
+    display: inline-flex; align-items: center; gap: 1px;
+    padding: 2px; border-radius: 8px; background: var(--a-fill-3);
+  }
+  .clus.plain { background: transparent; padding: 0; gap: 4px; }
+  .tbtn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+    min-width: 28px; height: 28px; padding: 0 7px; border-radius: 6px;
+    color: var(--a-text-2); font-size: 13px; border: 0; background: transparent;
+    font-variant-numeric: tabular-nums; white-space: nowrap;
+  }
+  .tbtn.on { background: var(--a-bg); color: var(--a-primary); box-shadow: 0 1px 2px rgb(0 0 0 / 0.08), 0 0 0 1px var(--a-border-2); }
+  .tbtn.dis { color: var(--a-text-4); }
+  .tbtn.accent { background: var(--a-primary-bg); color: var(--a-primary); box-shadow: inset 0 0 0 1px var(--a-primary-border); }
+  /* key-cap chip: the trigger character IS the affordance, so show it */
+  .keycap {
+    display: inline-grid; place-items: center; min-width: 18px; height: 18px; padding: 0 4px;
+    border-radius: 4px; background: var(--a-bg); box-shadow: inset 0 0 0 1px var(--a-border);
+    font-family: var(--font-mono); font-size: 11px; font-weight: 600; color: var(--a-text-2);
+    line-height: 1;
+  }
+  .tbtn.on .keycap, .tbtn.accent .keycap { color: var(--a-primary); box-shadow: inset 0 0 0 1px var(--a-primary-border); }
+  .kbd {
+    font-family: var(--font-mono); font-size: 10px; color: var(--a-text-4);
+    border: 1px solid var(--a-border-2); border-radius: 3px; padding: 0 3px; line-height: 15px;
+  }
+  .scale { display: inline-flex; align-items: center; gap: 2px; padding: 2px; border-radius: 8px; box-shadow: inset 0 0 0 1px var(--a-border-2); }
+  .scale .v { font-size: 12px; color: var(--a-text-2); min-width: 38px; text-align: center; font-variant-numeric: tabular-nums; }
+
+  /* Status strip */
+  .ed-status {
+    display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+    padding: 7px 14px; border-bottom: 1px solid var(--a-border-2);
+    background: linear-gradient(var(--a-fill-3), var(--a-fill-3)) padding-box, var(--a-bg);
+    font-size: 12px; color: var(--a-text-2);
+  }
+  .ed-status .sp { flex: 1 1 auto; }
+  .ed-status .seg { display: inline-flex; align-items: center; gap: 6px; }
+  .live { position: relative; width: 7px; height: 7px; border-radius: 50%; background: var(--a-success); flex: 0 0 auto; }
+  .live::after { content: ""; position: absolute; inset: -3px; border-radius: 50%; border: 1px solid var(--a-success); opacity: 0.35; }
+  .live.warn { background: var(--a-warning); } .live.warn::after { border-color: var(--a-warning); }
+  .live.err { background: var(--a-error); } .live.err::after { border-color: var(--a-error); }
+  .stat {
+    display: inline-flex; align-items: center; gap: 6px; height: 22px; padding: 0 8px;
+    border-radius: 999px; font-size: 11.5px; font-variant-numeric: tabular-nums;
+    background: var(--a-bg); box-shadow: inset 0 0 0 1px var(--a-border-2); color: var(--a-text-2);
+  }
+  .stat b { font-weight: 600; color: var(--a-text); }
+  .stat.gold { box-shadow: inset 0 0 0 1px var(--a-warning-border); background: var(--a-warning-bg); }
+  .stat.green { box-shadow: inset 0 0 0 1px var(--a-success-border); background: var(--a-success-bg); }
+
+  /* Body + rail */
+  .ed-body { display: grid; grid-template-columns: 218px 1fr; min-height: 340px; }
+  .ed-body.solo { grid-template-columns: 1fr; }
+  .ed-nav { border-inline-end: 1px solid var(--a-border-2); padding: 14px 10px; background: var(--a-bg); font-size: 13px; }
+  .ed-nav .navh {
+    font-size: 10.5px; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--a-text-4); padding: 0 8px 8px; white-space: nowrap;
+  }
+  .ed-nav .it {
+    position: relative; display: flex; align-items: center; justify-content: space-between;
+    gap: 6px; padding: 6px 7px 6px 10px; border-radius: 6px; color: var(--a-text-2);
+    text-decoration: none; font-size: 12.5px;
+  }
+  .ed-nav .it .lb { min-width: 0; }
+  .ed-nav .it.on { background: var(--a-primary-bg); color: var(--a-primary); font-weight: 500; }
+  .ed-nav .it.on::before {
+    content: ""; position: absolute; inset-inline-start: 0; top: 6px; bottom: 6px;
+    width: 2px; border-radius: 2px; background: var(--a-primary);
+  }
+  .req-dot {
+    flex: 0 0 auto; font-size: 10px; line-height: 16px; height: 16px; padding: 0 6px;
+    border-radius: 999px; background: var(--a-error-bg); color: var(--a-error);
+    box-shadow: inset 0 0 0 1px var(--a-error-border);
+  }
+
+  /* Origins: one stacked bar beats five swatch rows */
+  .obar { display: flex; height: 8px; border-radius: 999px; overflow: hidden; margin: 2px 8px 10px; box-shadow: inset 0 0 0 1px var(--a-border-2); }
+  .obar > i { display: block; height: 100%; }
+  .okey { display: grid; gap: 5px; padding: 0 8px; font-size: 11.5px; color: var(--a-text-2); font-variant-numeric: tabular-nums; }
+  .okey > span { display: grid; grid-template-columns: 9px 1fr auto; gap: 7px; align-items: center; }
+  .okey i { width: 9px; height: 9px; border-radius: 3px; display: block; }
+  .okey b { font-weight: 500; color: var(--a-text-3); }
+
+  /* Document */
+  .ed-doc { padding: 24px 30px; font-size: 14.5px; line-height: 1.65; color: var(--a-text); max-width: 74ch; }
+  .ed-doc.bleed { max-width: none; }
+  .ed-doc h5 {
+    display: flex; align-items: baseline; gap: 8px;
+    margin: 22px 0 7px; font-size: 11.5px; font-weight: 600; letter-spacing: 0.09em;
+    text-transform: uppercase; color: var(--a-text-3);
+  }
+  .ed-doc h5:first-child { margin-top: 0; }
+  .ed-doc h5 .loinc {
+    font-family: var(--font-mono); font-size: 10px; font-weight: 400; color: var(--a-text-4);
+    letter-spacing: 0; text-transform: none; padding: 1px 5px; border-radius: 4px; background: var(--a-fill-3);
+  }
+  .ed-doc h5 .rule { flex: 1 1 auto; height: 1px; background: var(--a-border-2); }
+  .ed-doc p { margin: 0 0 12px; }
+  .caret { display: inline-block; width: 1.5px; height: 1.05em; background: var(--a-primary); vertical-align: -0.18em; margin: 0 1px; border-radius: 1px; }
+
+  /* Provenance. Each origin carries a distinct underline STYLE as well as a
+     hue, so the six are still separable in greyscale, under any colour-vision
+     deficiency, and in forced-colors mode. Colour is never the only channel.
+     text-decoration (not box-shadow) because it is the only thing that wraps
+     correctly across line boxes. */
+  .pv {
+    text-decoration-line: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 4px;
+    text-decoration-skip-ink: none;
+    border-radius: 2px;
+    box-decoration-break: clone; -webkit-box-decoration-break: clone;
+  }
+  .pv-typed { text-decoration-line: none; background: transparent; }
+  .pv-dict  { text-decoration-style: wavy;   text-decoration-color: #13c2c2; text-decoration-thickness: 1.5px; background: color-mix(in srgb, #13c2c2 6%, transparent); }
+  .pv-tmpl  { text-decoration-style: dashed; text-decoration-color: #9254de; background: color-mix(in srgb, #722ed1 5%, transparent); }
+  .pv-pull  { text-decoration-style: dotted; text-decoration-color: #1677ff; text-decoration-thickness: 2.5px; background: color-mix(in srgb, #1677ff 6%, transparent); }
+  .pv-copy  { text-decoration-style: solid;  text-decoration-color: #d48806; background: color-mix(in srgb, #faad14 8%, transparent); }
+  .pv-ai    { text-decoration-style: double; text-decoration-color: #52c41a; text-underline-offset: 3px; background: color-mix(in srgb, #52c41a 6%, transparent); }
+  .pv-ai.unrev {
+    background: color-mix(in srgb, #52c41a 10%, transparent);
+    box-shadow: 0 0 0 1px color-mix(in srgb, #52c41a 45%, transparent);
+  }
+  .pv-flag {
+    display: inline-flex; align-items: center; gap: 3px; vertical-align: 0.5px;
+    font-size: 10px; font-family: var(--font-mono); letter-spacing: 0.02em;
+    padding: 0 4px; border-radius: 3px; margin-inline-start: 3px;
+    background: var(--a-success-bg); color: #389e0d; box-shadow: inset 0 0 0 1px var(--a-success-border);
+  }
+  .pv-flag.blue { background: var(--a-primary-bg); color: var(--a-primary); box-shadow: inset 0 0 0 1px var(--a-primary-border); }
+
+  /* Command palette */
+  .pal {
+    border: 1px solid var(--a-border-2); border-radius: 10px;
+    box-shadow: var(--a-shadow); background: var(--a-bg); width: 100%; max-width: 420px; overflow: hidden;
+  }
+  .pal-in {
+    padding: 10px 14px; border-bottom: 1px solid var(--a-border-2);
+    font-size: 14px; color: var(--a-text); display: flex; align-items: center; gap: 8px;
+  }
+  .pal-in .trig { font-family: var(--font-mono); color: var(--a-primary); font-weight: 700; }
+  .pal-grp {
+    font-size: 10.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--a-text-4);
+    padding: 10px 14px 4px; display: flex; align-items: center; gap: 8px;
+  }
+  .pal-grp .rule { flex: 1 1 auto; height: 1px; background: var(--a-border-2); }
+  .pal-it { display: flex; align-items: center; gap: 10px; padding: 8px 14px; font-size: 13px; color: var(--a-text); position: relative; }
+  .pal-it.on { background: var(--a-primary-bg); }
+  .pal-it.on::before { content: ""; position: absolute; inset-inline-start: 0; top: 4px; bottom: 4px; width: 2px; background: var(--a-primary); border-radius: 2px; }
+  .pal-it .ic {
+    width: 26px; height: 26px; border-radius: 7px; background: var(--a-fill-3);
+    display: grid; place-items: center; color: var(--a-text-2); flex: 0 0 auto;
+  }
+  .pal-it.on .ic { background: var(--a-bg); color: var(--a-primary); box-shadow: 0 0 0 1px var(--a-primary-border); }
+  .pal-it .t { flex: 1 1 auto; min-width: 0; }
+  .pal-it .t b { font-weight: 500; }
+  .pal-it .t small { display: block; color: var(--a-text-3); font-size: 11.5px; line-height: 1.45; font-variant-numeric: tabular-nums; }
+  .pal-foot {
+    border-top: 1px solid var(--a-border-2); padding: 7px 14px; font-size: 11px;
+    color: var(--a-text-4); display: flex; gap: 14px; align-items: center; flex-wrap: wrap;
+  }
+  .pal-foot .k { display: inline-flex; align-items: center; gap: 4px; }
+
+  /* Sign gate */
+  .gate { display: grid; gap: 0; border: 1px solid var(--a-border-2); border-radius: 10px; overflow: hidden; }
+  .gate > div {
+    display: grid; grid-template-columns: 18px 1fr auto; gap: 11px;
+    padding: 11px 14px; border-bottom: 1px solid var(--a-border-2); font-size: 13px; align-items: start;
+  }
+  .gate > div:last-child { border-bottom: 0; }
+  .gate > div.blocks { background: color-mix(in srgb, #ff4d4f 3.5%, transparent); }
+  .gate .ic { margin-top: 1px; }
+  .gate .t { color: var(--a-text); min-width: 0; }
+  .gate .t small { display: block; color: var(--a-text-3); font-size: 12px; margin-top: 2px; line-height: 1.5; }
+  .gate .t small a { color: var(--a-primary); text-decoration: none; }
+  .gate .blk { color: var(--a-error); }
+  .gate .warnc { color: #d48806; }
+  .gate .okc { color: var(--a-success); }
+  .sev {
+    font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase;
+    height: 20px; line-height: 18px; padding: 0 7px; border-radius: 999px; white-space: nowrap;
+  }
+  .sev.b { color: var(--a-error); background: var(--a-error-bg); box-shadow: inset 0 0 0 1px var(--a-error-border); }
+  .sev.w { color: #d48806; background: var(--a-warning-bg); box-shadow: inset 0 0 0 1px var(--a-warning-border); }
+  .sev.p { color: var(--a-success); background: var(--a-success-bg); box-shadow: inset 0 0 0 1px var(--a-success-border); }
+
+  /* ------------------------------------------------------------------ */
+  /* Annotation pins — anchored to the element they describe, never to   */
+  /* guessed pixel offsets on the frame. Pixel-correct under any reflow. */
+  /* ------------------------------------------------------------------ */
+  .rel { position: relative; }
+  .pin {
+    position: absolute; z-index: 6;
+    width: 20px; height: 20px; border-radius: 50%;
+    background: var(--accent); color: #fff;
+    font-family: var(--font-mono); font-size: 10px; font-weight: 700;
+    display: grid; place-items: center; line-height: 1;
+    box-shadow: 0 0 0 2px var(--a-bg), 0 0 0 3.5px color-mix(in oklab, var(--accent) 40%, transparent);
+  }
+  .pin.bad { background: var(--bad); box-shadow: 0 0 0 2px var(--a-bg), 0 0 0 3.5px color-mix(in oklab, var(--bad) 40%, transparent); }
+  .pin-tl { top: -10px; inset-inline-start: -10px; }
+  .pin-tr { top: -10px; inset-inline-end: -10px; }
+  .pin-bl { bottom: -10px; inset-inline-start: -10px; }
+  .pin-br { bottom: -10px; inset-inline-end: -10px; }
+  .pin-l  { top: 50%; inset-inline-start: -10px; transform: translateY(-50%); }
+  .pin-r  { top: 50%; inset-inline-end: -10px; transform: translateY(-50%); }
+
+  .anno-key { margin-top: 1.25rem; display: grid; gap: 0.6rem; padding: 0; }
+  .anno-key li { display: flex; gap: 0.65rem; align-items: flex-start; font-size: 0.88rem; color: var(--ink-2); list-style: none; }
+  .anno-key .n {
+    flex: 0 0 auto; width: 20px; height: 20px; border-radius: 50%;
+    background: var(--accent); color: #fff; font-family: var(--font-mono);
+    font-size: 10px; font-weight: 700; display: grid; place-items: center; margin-top: 2px;
+  }
+  .anno-key .n.bad { background: var(--bad); }
+
+  .feat { display: grid; gap: 0; border: 1px solid var(--rule); border-radius: 12px; overflow: hidden; background: var(--surface); margin: 1.5rem 0; }
+  .feat > div { display: grid; grid-template-columns: 2.5rem 1fr; gap: 0.9rem; padding: 0.85rem 1.1rem; border-bottom: 1px solid var(--rule); }
+  .feat > div:last-child { border-bottom: 0; }
+  .feat .n { font-family: var(--font-mono); font-size: 0.75rem; color: var(--muted); padding-top: 0.15rem; }
+  .feat .t { font-weight: 600; margin-bottom: 0.15rem; }
+  .feat .d { font-size: 0.9rem; color: var(--ink-2); }
+  .feat .badge { font-family: var(--font-mono); font-size: 0.62rem; letter-spacing: 0.08em; text-transform: uppercase; padding: 0.1rem 0.4rem; border-radius: 4px; margin-inline-start: 0.5rem; vertical-align: 0.1em; white-space: nowrap; }
+  .badge.v1 { background: var(--accent-soft); color: var(--accent-ink); border: 1px solid color-mix(in oklab, var(--accent) 35%, transparent); }
+  .badge.v2 { background: var(--surface-2); color: var(--muted); border: 1px solid var(--rule-2); }
+  .badge.host { background: var(--warn-soft); color: var(--warn); border: 1px solid var(--warn-rule); }
+  .badge.never { background: var(--bad-soft); color: var(--bad); border: 1px solid var(--bad-rule); }
+  .badge.law { background: var(--warn-soft); color: var(--warn); border: 1px solid var(--warn-rule); }
+  .badge.a11y { background: var(--ok-soft); color: var(--ok); border: 1px solid var(--ok-rule); }
+  .grp-h { font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); margin: 2rem 0 0.5rem; }
+
+  .phases { display: grid; gap: 1rem; }
+  .phase { display: grid; grid-template-columns: auto 1fr; gap: 1.1rem; }
+  .phase .rail { display: grid; grid-template-rows: auto 1fr; justify-items: center; }
+  .phase .dot { width: 30px; height: 30px; border-radius: 50%; background: var(--accent-soft); border: 2px solid var(--accent); color: var(--accent-ink); font-family: var(--font-mono); font-size: 0.72rem; font-weight: 700; display: grid; place-items: center; }
+  .phase .line { width: 2px; background: var(--rule); margin-top: 4px; min-height: 1rem; }
+  .phase:last-child .line { display: none; }
+  .phase .body { padding-bottom: 1.25rem; }
+  .phase .body h4 { margin-bottom: 0.3rem; }
+  .phase .meta { font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.5rem; }
+
+  .layers { display: grid; gap: 0; border: 1px solid var(--rule); border-radius: 12px; overflow: hidden; font-family: var(--font-mono); font-size: 0.8rem; }
+  .layers > div { padding: 0.85rem 1.1rem; border-bottom: 1px solid var(--rule); background: var(--surface); display: grid; grid-template-columns: 3.5rem 1fr; gap: 1rem; align-items: baseline; }
+  .layers > div:last-child { border-bottom: 0; }
+  .layers .l { color: var(--accent); font-weight: 700; }
+  .layers .d { color: var(--ink-2); font-family: var(--font-body); font-size: 0.88rem; }
+
+  footer { padding: 3rem 0 4rem; color: var(--muted); font-size: 0.85rem; }
+  footer .wrap > div + div { margin-top: 0.5rem; }
+
+  @media (max-width: 720px) {
+    .ed-body { grid-template-columns: 1fr; }
+    .ed-nav { display: none; }
+  }
+  @media print {
+    nav.toc { display: none; }
+    section { break-inside: avoid; }
+  }
+</style>
+
+<!-- ====================================================================
+     Icon sprite — Lucide (ISC, MIT-compatible). 24px grid, 2px stroke,
+     round caps and joins. Inlined as <symbol> so the document has no
+     network dependency and no icon font. The real component imports
+     from `lucide-react` and tree-shakes; this is the same geometry.
+     ==================================================================== -->
+<svg width="0" height="0" style="position: absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <symbol id="i-undo" viewBox="0 0 24 24"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 5.5 5.5 5.5 5.5 0 0 1-5.5 5.5H11"/></symbol>
+    <symbol id="i-redo" viewBox="0 0 24 24"><path d="m15 14 5-5-5-5"/><path d="M20 9H9.5A5.5 5.5 0 0 0 4 14.5 5.5 5.5 0 0 0 9.5 20H13"/></symbol>
+    <symbol id="i-type" viewBox="0 0 24 24"><path d="M4 7V4h16v3"/><path d="M9 20h6"/><path d="M12 4v16"/></symbol>
+    <symbol id="i-pen" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></symbol>
+    <symbol id="i-bold" viewBox="0 0 24 24"><path d="M6 12h9a4 4 0 0 1 0 8H7a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h7a4 4 0 0 1 0 8"/></symbol>
+    <symbol id="i-italic" viewBox="0 0 24 24"><path d="M19 4h-9"/><path d="M14 20H5"/><path d="m15 4-6 16"/></symbol>
+    <symbol id="i-list" viewBox="0 0 24 24"><path d="M3 6h.01"/><path d="M3 12h.01"/><path d="M3 18h.01"/><path d="M8 6h13"/><path d="M8 12h13"/><path d="M8 18h13"/></symbol>
+    <symbol id="i-list-ordered" viewBox="0 0 24 24"><path d="M10 6h11"/><path d="M10 12h11"/><path d="M10 18h11"/><path d="M4 6h1v4"/><path d="M4 10h2"/><path d="M6 18H4c0-1 2-2 2-3s-1-1.5-2-1"/></symbol>
+    <symbol id="i-underline" viewBox="0 0 24 24"><path d="M6 4v6a6 6 0 0 0 12 0V4"/><path d="M4 20h16"/></symbol>
+    <symbol id="i-strike" viewBox="0 0 24 24"><path d="M16 4H9a3 3 0 0 0-2.83 4"/><path d="M14 12a4 4 0 0 1 0 8H6"/><path d="M4 12h16"/></symbol>
+    <symbol id="i-align" viewBox="0 0 24 24"><path d="M17 12H7"/><path d="M19 18H5"/><path d="M21 6H3"/></symbol>
+    <symbol id="i-image" viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="3" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.09-3.09a2 2 0 0 0-2.82 0L6 21"/></symbol>
+    <symbol id="i-sparkles" viewBox="0 0 24 24"><path d="M9.94 14.34 12 20l2.06-5.66L20 12l-5.94-2.34L12 4l-2.06 5.66L4 12z"/><path d="M18 4v4"/><path d="M20 6h-4"/></symbol>
+    <symbol id="i-link" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="M12 5v14"/></symbol>
+    <symbol id="i-minus" viewBox="0 0 24 24"><path d="M5 12h14"/></symbol>
+    <symbol id="i-zoom" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/><path d="M8 11h6"/><path d="M11 8v6"/></symbol>
+    <symbol id="i-contrast" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 18a6 6 0 0 0 0-12z" fill="currentColor" stroke="none"/></symbol>
+    <symbol id="i-heading" viewBox="0 0 24 24"><path d="M6 12h12"/><path d="M6 20V4"/><path d="M18 20V4"/></symbol>
+    <symbol id="i-check-circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></symbol>
+    <symbol id="i-x-circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></symbol>
+    <symbol id="i-alert-tri" viewBox="0 0 24 24"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/></symbol>
+    <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></symbol>
+    <symbol id="i-shield-check" viewBox="0 0 24 24"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></symbol>
+    <symbol id="i-database" viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14a9 3 0 0 0 18 0V5"/><path d="M3 12a9 3 0 0 0 18 0"/></symbol>
+    <symbol id="i-activity" viewBox="0 0 24 24"><path d="M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.49 12H2"/></symbol>
+    <symbol id="i-text-quote" viewBox="0 0 24 24"><path d="M17 6H3"/><path d="M21 12H8"/><path d="M21 18H8"/><path d="M3 12v6"/></symbol>
+    <symbol id="i-asterisk" viewBox="0 0 24 24"><path d="M12 6v12"/><path d="M17.196 9 6.804 15"/><path d="m6.804 9 10.392 6"/></symbol>
+    <symbol id="i-printer" viewBox="0 0 24 24"><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 9V3h12v6"/><rect x="6" y="14" width="12" height="8" rx="1"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></symbol>
+    <symbol id="i-user" viewBox="0 0 24 24"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></symbol>
+    <symbol id="i-users" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></symbol>
+    <symbol id="i-corner-down-right" viewBox="0 0 24 24"><path d="m15 10 5 5-5 5"/><path d="M4 4v7a4 4 0 0 0 4 4h12"/></symbol>
+    <symbol id="i-arrow-right" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></symbol>
+    <symbol id="i-arrow-up-down" viewBox="0 0 24 24"><path d="m21 16-4 4-4-4"/><path d="M17 20V4"/><path d="m3 8 4-4 4 4"/><path d="M7 4v16"/></symbol>
+    <symbol id="i-corner-down-left" viewBox="0 0 24 24"><path d="m9 10-5 5 5 5"/><path d="M20 4v7a4 4 0 0 1-4 4H4"/></symbol>
+    <symbol id="i-hash" viewBox="0 0 24 24"><path d="M4 9h16"/><path d="M4 15h16"/><path d="M10 3 8 21"/><path d="m16 3-2 18"/></symbol>
+    <symbol id="i-wifi-off" viewBox="0 0 24 24"><path d="M12 20h.01"/><path d="M8.5 16.429a5 5 0 0 1 7 0"/><path d="M5 12.859a10 10 0 0 1 5.17-2.69"/><path d="M19 12.859a10 10 0 0 0-2.007-1.523"/><path d="M2 8.82a15 15 0 0 1 4.177-2.643"/><path d="M22 8.82a15 15 0 0 0-11.288-3.764"/><path d="m2 2 20 20"/></symbol>
+    <symbol id="i-eraser" viewBox="0 0 24 24"><path d="m7 21-4.3-4.3a1 1 0 0 1 0-1.4l9.6-9.6a1 1 0 0 1 1.4 0l5.6 5.6a1 1 0 0 1 0 1.4L13 21"/><path d="M22 21H7"/><path d="m5 11 9 9"/></symbol>
+  </defs>
+</svg>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="eyebrow">Oxygen UI · component brief · 16 August 2026</div>
+    <h1>ClinicalNote</h1>
+    <p class="lede">
+      A rich text editor is a solved problem. A clinical note is not. The gap between
+      them is where this component lives — and the interesting engineering is not in
+      bold and italic, it is in knowing <em>who wrote every character</em> and refusing
+      to let anyone sign what they have not read.
+    </p>
+    <div class="hero-meta">
+      <span class="pill on">engine · ProseMirror</span>
+      <span class="pill on">shell · antd v6</span>
+      <span class="pill">FHIR · Composition + DocumentReference</span>
+      <span class="pill">WCAG 2.2 AA</span>
+      <span class="pill">tier · pro</span>
+      <span class="pill on">engine · built &amp; tested</span>
+    </div>
+  </div>
+</header>
+
+<nav class="toc">
+  <div class="wrap">
+    <a href="#thesis">01 · Thesis</a>
+    <a href="#reference">02 · The reference, read closely</a>
+    <a href="#scenarios">03 · Nine things that happen</a>
+    <a href="#engine">04 · Which engine</a>
+    <a href="#features">05 · Sixty-three features</a>
+    <a href="#mockups">06 · The design</a>
+    <a href="#a11y">07 · Accessibility</a>
+    <a href="#api">08 · The API</a>
+    <a href="#data">09 · Data contract</a>
+    <a href="#law">10 · Law</a>
+    <a href="#arch">11 · Architecture</a>
+    <a href="#tests">12 · Testing</a>
+    <a href="#plan">13 · Plan</a>
+    <a href="#decide">14 · Your call</a>
+  </div>
+</nav>
+
+<!-- ================================================================== -->
+<section id="thesis">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="sec-num">01 — Thesis</span>
+      <h2>A clinical note is not a document. It is a statement someone is accountable for.</h2>
+      <p>
+        Every editor decision follows from that sentence, and most editors get it wrong
+        because they start from Google Docs instead.
+      </p>
+    </div>
+
+    <div class="prose">
+      <p>
+        Here is the thing nobody builds, and it is the reason this component is worth
+        building at all.
+      </p>
+      <p>
+        <strong>Every character in a clinical note has an origin.</strong> Some of it the
+        clinician typed. Some was dictated and transcribed with errors. Some came from a
+        template that fired six paragraphs of normal-exam boilerplate. Some was pulled
+        from structured data — a lab value, a medication list — and was true at the moment
+        it was pulled and may not be true now. Some was copied forward from a note written
+        three weeks ago by a different person about a different admission. And increasingly,
+        some of it was written by a model.
+      </p>
+      <p>
+        In every EHR shipping today, all of that collapses into identical black text the
+        moment it lands on screen. The clinician then signs the whole thing, and in doing so
+        attests to it equally — the sentence they wrote and the sentence a machine wrote and
+        the sentence that was true in March.
+      </p>
+      <p>
+        Three well-documented problems fall out of that single missing data structure:
+      </p>
+
+      <div class="tw">
+        <table>
+          <thead>
+            <tr><th>Problem</th><th>What is measured</th><th>Root cause</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Note bloat / copy-forward</strong></td>
+              <td>A 2022 analysis of over 100 million notes found <span class="num">50.1%</span> of all note text duplicated from prior documentation on the same patient. In one UCSF study of 23,630 progress notes, <span class="num">18%</span> was manually entered, <span class="num">46%</span> copied, <span class="num">36%</span> imported.</td>
+              <td>Copied text is indistinguishable from written text, so nobody can see the ratio — including the author.</td>
+            </tr>
+            <tr>
+              <td><strong>Copy-paste error</strong></td>
+              <td>Copy-and-paste has been implicated in roughly a third of errors in ambulatory patient-safety analyses.</td>
+              <td>Stale text has no expiry, no source link, and no visual weight difference from fresh text.</td>
+            </tr>
+            <tr>
+              <td><strong>AI attribution</strong></td>
+              <td>CMS's July 2025 revision of its Medicare signature guidance treats an AI scribe exactly like a human scribe: the clinician signs, and the clinician is accountable. The tool need not even be named in the record.</td>
+              <td>If AI text is visually identical to typed text, "the clinician reviewed it" is an unverifiable claim — including to the clinician.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>
+        Same missing structure, three times. Fix the structure and all three become
+        addressable at once — not solved, but <em>visible</em>, which is the prerequisite.
+      </p>
+
+      <div class="note">
+        <span class="lbl">The thesis in one line</span>
+        <p>
+          <strong>Provenance is a property of text, not of the document.</strong> Store it
+          per range, render it on demand, gate the signature on it, and serialize it
+          alongside the note. Everything else in this brief is downstream of that decision.
+        </p>
+      </div>
+
+      <p>
+        The second load-bearing idea is smaller and just as consequential:
+      </p>
+
+      <div class="note ok">
+        <span class="lbl">Corollary</span>
+        <p>
+          <strong>A signed note is append-only.</strong> "Save" is the wrong verb after
+          signature. The only legal operation on a signed clinical record is an
+          <em>addendum</em>, and an editor whose primary button mutates the document in place
+          is modelling the wrong object. This is not a preference; it is what makes the
+          record admissible.
+        </p>
+      </div>
+
+      <h3>Why this is technically hard, stated honestly</h3>
+      <p>
+        Any competent developer can wire a toolbar to <code>document.execCommand</code>. The
+        parts of this that are genuinely difficult, in rough order:
+      </p>
+      <ol>
+        <li>
+          <strong>Provenance marks that survive every edit.</strong> Type inside AI text and
+          the range splits into three. Delete across a boundary and two marks merge. Paste
+          into the middle of a pulled lab value and you need a fourth. Position mapping through
+          arbitrary transforms is the whole problem, and it is exactly what ProseMirror's
+          mark + step model already solves — which is most of the engine argument in §04.
+        </li>
+        <li>
+          <strong>Deterministic serialization.</strong> The same document must produce the
+          same bytes every time, or you cannot hash it, cannot detach a signature over it, and
+          cannot prove a stored note was not altered. That means a hand-written serializer with
+          stable attribute ordering, not <code>DOMSerializer</code> plus <code>innerHTML</code>.
+        </li>
+        <li>
+          <strong>Structure the schema guarantees.</strong> A note that cannot be expressed
+          as a valid <code>Composition</code> should be impossible to <em>construct</em>, not
+          rejected at save time. Schema-first editors give this; schema-less ones do not.
+        </li>
+        <li>
+          <strong>Offline that is not a second code path.</strong> A clinician on a ward with
+          no signal must not lose a note. The honest solution is that the audit log and the
+          offline queue are the same list of steps, replayed. Two mechanisms means two bugs.
+        </li>
+        <li>
+          <strong>An editor that a screen reader can actually use.</strong> <code>contenteditable</code>
+          is the most hostile surface in the platform for assistive technology, and no toolbar
+          of icon buttons fixes it. §07.
+        </li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================== -->
+<section id="reference">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="sec-num">02 — The reference, read closely</span>
+      <h2>What the supplied "Scribble" design gets right, and the fourteen things it cannot survive</h2>
+      <p>
+        The mockup is a good general-purpose editor. Read as a clinical document surface,
+        it has a specific set of failures — and the most serious one is in the footer, in
+        four characters.
+      </p>
+    </div>
+
+    <div class="prose">
+      <h3>What it gets right, and should be kept</h3>
+      <ul>
+        <li><strong>Sections as the visual unit.</strong> Chief Complaint, HPI, PMH, ROS as bold headings with body beneath is the correct mental model. It should become the <em>actual</em> model, not just the look of one.</li>
+        <li><strong>The ink toggle.</strong> The <code>T</code>/pen pair in the toolbar is the most interesting thing in the design and the most under-used. Oxygen already ships a stroke engine for it.</li>
+        <li><strong>A modal, not an inline field.</strong> Documentation deserves the whole screen. Correct.</li>
+        <li><strong>Restraint.</strong> Twelve toolbar controls, not forty. The instinct is right even where the specific twelve are wrong.</li>
+        <li><strong>A text-scale control.</strong> Shared workstations at a nursing station are used by people of every age and eyesight. Keep it — but see #9.</li>
+      </ul>
+    </div>
+
+    <figure>
+      <div class="stage">
+        <div class="antd">
+          <div class="a-modal xwide pins">
+            <div class="a-modal-head">
+              <div class="rel">
+                <span class="pin bad" style="top: -12px; inset-inline-start: -36px;">1</span>
+                <div class="a-modal-title">Scribble</div>
+              </div>
+              <div class="a-modal-x"><svg class="i"><use href="#i-x"/></svg></div>
+            </div>
+            <div class="ed-bar" style="gap: 4px;">
+              <span class="tbtn"><svg class="i"><use href="#i-undo"/></svg></span>
+              <span class="tbtn dis"><svg class="i"><use href="#i-redo"/></svg></span>
+              <span class="clus">
+                <span class="tbtn on"><svg class="i"><use href="#i-type"/></svg></span>
+                <span class="tbtn"><svg class="i"><use href="#i-pen"/></svg></span>
+              </span>
+              <span class="rel" style="display: inline-flex; gap: 2px; margin-inline-start: 6px;">
+                <span class="pin bad" style="top: -12px; inset-inline-start: -12px;">2</span>
+                <span class="tbtn"><svg class="i"><use href="#i-bold"/></svg></span>
+                <span class="tbtn"><svg class="i"><use href="#i-italic"/></svg></span>
+                <span class="tbtn"><svg class="i"><use href="#i-underline"/></svg></span>
+                <span class="tbtn"><svg class="i"><use href="#i-strike"/></svg></span>
+              </span>
+              <span class="tbtn"><svg class="i"><use href="#i-list"/></svg></span>
+              <span class="tbtn"><svg class="i"><use href="#i-list-ordered"/></svg></span>
+              <span class="rel" style="display: inline-flex; gap: 2px; margin-inline-start: 6px;">
+                <span class="pin bad" style="top: -12px; inset-inline-start: -12px;">3</span>
+                <span class="pin bad" style="top: -12px; inset-inline-end: -12px;">4</span>
+                <span class="tbtn"><svg class="i"><use href="#i-align"/></svg></span>
+                <span class="tbtn"><svg class="i"><use href="#i-image"/></svg></span>
+                <span class="tbtn" style="color: #52c41a;"><svg class="i"><use href="#i-sparkles"/></svg></span>
+                <span class="tbtn"><svg class="i"><use href="#i-link"/></svg></span>
+              </span>
+              <span class="sp"></span>
+              <span class="rel">
+                <span class="pin" style="top: -12px; inset-inline-end: -12px;">9</span>
+                <span class="a-btn sm" style="gap: 5px;"><svg class="i i-14"><use href="#i-zoom"/></svg> 100%</span>
+              </span>
+            </div>
+            <div class="ed-body solo" style="background: var(--a-bg-layout);">
+              <div class="ed-doc bleed">
+                <div class="rel" style="display: inline-block;">
+                  <span class="pin bad" style="top: -4px; inset-inline-start: -42px;">8</span>
+                  <h5 style="font-size: 15px; text-transform: none; letter-spacing: 0; color: var(--a-text); margin-top: 0;">Chief Complaints</h5>
+                </div>
+                <p>Admitted to hospital for blood transfusion</p>
+                <h5 style="font-size: 15px; text-transform: none; letter-spacing: 0; color: var(--a-text);">History Of Present Illness</h5>
+                <p>Mr. Randol is a 30-year-old man with type 2 diabetes mellitus who presents with six weeks of progressive fatigue and exertional dyspnea. Symptoms began gradually and have worsened over the past two weeks, now limiting him to one flight of stairs.</p>
+                <p style="color: var(--a-text-3);">CBC drawn in clinic today showed hemoglobin 7.1 g/dL, down from 11.8 g/dL in March 2026.</p>
+              </div>
+            </div>
+            <div class="a-modal-foot split">
+              <div class="rel" style="font-size: 12px; color: var(--a-text-3);">
+                <span class="pin bad" style="top: -6px; inset-inline-start: -36px;">5</span>
+                Last updated today, 14:38 AM
+              </div>
+              <div class="rel" style="display: flex; gap: 8px;">
+                <span class="pin bad" style="top: -13px; inset-inline-end: -11px;">6</span>
+                <span class="a-btn">Cancel</span>
+                <span class="a-btn primary">Save</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <figcaption>
+        The reference design, redrawn in real antd tokens so the critique is about
+        structure rather than styling. Red markers are defects; green is a keeper.
+      </figcaption>
+    </figure>
+
+    <div class="prose">
+      <h3>The fourteen</h3>
+      <ol class="anno-key" style="counter-reset: none;">
+        <li><span class="n bad">1</span><div><strong>"Scribble" is the wrong name for a medical record.</strong> A scribble is illegible, careless writing — the single most-litigated criticism of paper charts for fifty years. It is also a poor component name in a catalog: it does not say what it does. Call the component <code>ClinicalNote</code>. Keep "Scribble" as a product nickname if you like it, but not on the tin.</div></li>
+        <li><span class="n bad">2</span><div><strong>B / I / U / S do almost nothing here, and underline is actively harmful.</strong> Underlined text in a clinical viewer reads as a hyperlink. Worse: this formatting does not survive the transports. FHIR narrative permits a restricted XHTML subset; C-CDA is stricter still; and HL7 v2 <code>OBX</code> — still how a great many notes actually move — is plain text. Bold survives, italic mostly survives, strikethrough silently vanishes in some renderers, which is catastrophic for the one case where it means something ("<s>rule out MI</s>"). Ship bold and italic, drop underline and strikethrough, and give the note a real retraction affordance instead.</div></li>
+        <li><span class="n bad">3</span><div><strong>The image button, as drawn, is a PHI incident.</strong> A wound photo dropped into a note becomes a base64 blob inside the narrative — outside the imaging pipeline, with no consent record, no de-identification, no <code>Media</code> resource, no retention policy, and it will be silently stripped by any conforming FHIR narrative validator. Images belong as a reference to a stored <code>Media</code>/<code>DocumentReference</code>, uploaded through the host's pipeline, never inlined.</div></li>
+        <li><span class="n bad">4</span><div><strong>The sparkle has no accept, no reject, no diff, and no attribution.</strong> This is the highest-liability control on the screen and it is a 24-pixel icon with no state. Under CMS's guidance the signer owns every word the model produced. An AI action that writes directly into the document, indistinguishable from typed text, makes "I reviewed it" unfalsifiable.</div></li>
+        <li><span class="n bad">5</span><div><strong>"Last updated today, 14:38 AM" is invalid, and this is the one that would end up in a deposition.</strong> Three defects in six words: a 24-hour clock with an AM suffix is not a time; "today" is meaningless to anyone reading the record later; and there is no timezone or offset, so a note written at 23:50 in one zone lands on the wrong calendar day in another. 42 CFR 482.24(c)(1) requires record entries to be dated, timed, and authenticated. Render <code>16 Aug 2026, 14:38 IST (UTC+05:30)</code> and put the relative form in a tooltip, never the reverse.</div></li>
+        <li><span class="n bad">6</span><div><strong>"Save" is the wrong primary action, and "Cancel" is a trap.</strong> Clinical documentation has three distinct commits — <em>save draft</em>, <em>sign</em>, and <em>addend</em> — with different legal consequences and different reversibility. Collapsing them into one blue button means either the note is legally signed by an autosave, or a signed note is silently mutated. And "Cancel" next to twenty minutes of typing, with no destructive-action confirmation, will destroy someone's work this week.</div></li>
+        <li><span class="n bad">7</span><div><strong>No author, no co-signer, no role.</strong> The note has no visible attribution. In teaching settings this is the norm rather than the exception: a resident writes, an attending countersigns with an attestation; a scribe documents, the physician attests to presence and accuracy. Neither is expressible here.</div></li>
+        <li><span class="n bad">8</span><div><strong>Sections are bold text, not structure.</strong> "Chief Complaints" is styled to look like a heading. Nothing knows it is one — so nothing can validate that an H&amp;P has an exam, nothing can map it to LOINC 10154-3, nothing can jump to it, and the C-CDA export has to guess by regex. Also: it is <em>Chief Complaint</em>, singular. The plural is a small tell, and clinicians notice small tells.</div></li>
+        <li><span class="n">9</span><div><strong>"100%" is a text-scale control mislabelled as zoom, which is fine — once it is honest.</strong> Browser zoom already exists and users know where it is. What this control is actually good for is per-user text scale that persists across shared workstations. Label it, persist it to the user profile rather than the session, and make sure it changes the <em>document</em> and not the chrome.</div></li>
+        <li><span class="n bad">10</span><div><strong>No autosave state, no draft recovery.</strong> Clinicians are interrupted mid-sentence as a matter of routine. Between the pager, the workstation timeout, and the browser tab that gets closed by the next person at the terminal, a note with no visible save state and no local persistence will lose work. This is the number-one complaint about every documentation tool ever shipped.</div></li>
+        <li><span class="n bad">11</span><div><strong>No dot phrases, no smart links, no wildcards.</strong> The single highest-value feature in clinical documentation is text expansion, and it is absent. Every US clinician has muscle memory for <code>.</code>-triggered phrases; the omission is the difference between a 90-second note and a nine-minute one.</div></li>
+        <li><span class="n bad">12</span><div><strong>Browser spellcheck will underline every drug name in the document.</strong> Out of the box, <code>dyspnea</code>, <code>hematochezia</code>, <code>metformin</code> and <code>epistaxis</code> are all "misspelled". Clinicians respond by turning spellcheck off entirely, which is how <code>hyponatremia</code> becomes <code>hypernatremia</code> in a signed note. This needs a medical dictionary, not a toggle.</div></li>
+        <li><span class="n bad">13</span><div><strong>The body text is set at roughly 17px with a ~1900px measure.</strong> At that line length the eye loses its place returning to the start of a line, and clinical text is scanned rather than read. Cap the measure at ~80 characters and let the rest breathe.</div></li>
+        <li><span class="n bad">14</span><div><strong>Nothing in this screen knows which patient it is about.</strong> There is no patient banner. Wrong-patient documentation is a named, tracked safety event, and the standard mitigation is a persistent identity banner in the same viewport as the entry surface — plus a check on paste, because pasted text from another chart is the most common way it happens.</div></li>
+      </ol>
+
+      <div class="note warn">
+        <span class="lbl">The pattern behind all fourteen</span>
+        <p>
+          Every defect is the same category error: the design treats a clinical note as a
+          <em>document</em> when it is a <em>record of an event</em>. Documents get saved,
+          edited, and formatted. Records get authored, attested, timestamped, amended, and
+          — years later — read aloud in a room where the author has to explain them.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================== -->
+<section id="scenarios">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="sec-num">03 — Nine things that happen</span>
+      <h2>What actually happens when a clinician writes a note</h2>
+      <p>
+        Feature lists come from scenarios, not from competitor screenshots. These nine are
+        the ones that break naive editors.
+      </p>
+    </div>
+
+    <div class="grid g2">
+      <div class="card">
+        <span class="k">Scenario 1</span>
+        <h4>The interruption</h4>
+        <p>
+          Twelve minutes into an H&amp;P, a code is called. The clinician walks away. The
+          workstation locks after four minutes. Someone else badges in.
+        </p>
+        <p><strong>Requires:</strong> local durable draft keyed to note + author, survives lock, tab close, browser crash and power loss; explicit recovery on return; and the draft must <em>not</em> be visible to the next person at that terminal.</p>
+      </div>
+      <div class="card">
+        <span class="k">Scenario 2</span>
+        <h4>The copy-forward</h4>
+        <p>
+          Day 4 of an admission. The clinician copies yesterday's assessment and edits two
+          sentences. Eighty percent of today's note is a description of yesterday.
+        </p>
+        <p><strong>Requires:</strong> paste-source detection, per-range copy provenance, a visible ratio before signing, and — the useful part — a way to see <em>only</em> what changed.</p>
+      </div>
+      <div class="card">
+        <span class="k">Scenario 3</span>
+        <h4>The AI draft</h4>
+        <p>
+          An ambient scribe produces a full note from the visit audio. It is 90% right. The
+          10% includes a medication the patient stopped taking in March.
+        </p>
+        <p><strong>Requires:</strong> AI text visually distinct and marked unreviewed; sign blocked until every AI range has been read or accepted; provenance recorded so the review can be evidenced later.</p>
+      </div>
+      <div class="card">
+        <span class="k">Scenario 4</span>
+        <h4>The countersignature</h4>
+        <p>
+          A resident writes the note at 02:00. The attending reviews it at 08:00, adds a
+          three-line attestation, and signs. Both signatures matter, in order, with times.
+        </p>
+        <p><strong>Requires:</strong> multi-party signature state, pending-cosign as a first-class value, attestation blocks that are attributable to the second author, and no silent mutation of the first author's text.</p>
+      </div>
+      <div class="card">
+        <span class="k">Scenario 5</span>
+        <h4>The amendment</h4>
+        <p>
+          Three days after signing, a pathology result contradicts the documented
+          assessment. The note must be corrected.
+        </p>
+        <p><strong>Requires:</strong> the original is immutable and stays readable; the correction is an appended, separately-signed, separately-timed addendum; both versions render together, in order, forever.</p>
+      </div>
+      <div class="card">
+        <span class="k">Scenario 6</span>
+        <h4>The patient reads it</h4>
+        <p>
+          Under the Cures Act information-blocking rules, notes are released to the patient
+          portal — often before the patient's next appointment, sometimes within minutes.
+        </p>
+        <p><strong>Requires:</strong> the author knows this while writing, not after; reading-level and stigmatizing-language hints; a sensitive-content path that is a deliberate, logged decision rather than a habit.</p>
+      </div>
+      <div class="card">
+        <span class="k">Scenario 7</span>
+        <h4>The dictation</h4>
+        <p>
+          The clinician dictates. "Patient denies chest pain" is transcribed as "patient
+          denies test pain". It is one character from clinically wrong and the clinician
+          reads what they meant to say.
+        </p>
+        <p><strong>Requires:</strong> dictated ranges marked distinctly, low-confidence spans flagged by the recognizer surfaced as such, and undo that treats a dictated utterance as one unit rather than 200 keystrokes.</p>
+      </div>
+      <div class="card">
+        <span class="k">Scenario 8</span>
+        <h4>The wrong chart</h4>
+        <p>
+          Two charts open in two tabs. Text is copied from one, pasted into the other.
+          Different patient.
+        </p>
+        <p><strong>Requires:</strong> clipboard payloads carry their source patient identifier; paste into a different subject warns loudly and requires confirmation; the event is logged whichever way the clinician answers.</p>
+      </div>
+      <div class="card">
+        <span class="k">Scenario 9</span>
+        <h4>The template that fired</h4>
+        <p>
+          A normal-exam macro inserts eleven systems of boilerplate. The patient has an
+          obviously abnormal abdominal exam. The boilerplate says otherwise, and it is now
+          signed.
+        </p>
+        <p><strong>Requires:</strong> template ranges marked as untouched-boilerplate; unfilled <code>***</code> wildcards block signing; and the sign gate is honest that "you inserted 400 words and edited none of them" is worth saying out loud.</p>
+      </div>
+    </div>
+
+    <div class="prose">
+      <div class="note">
+        <span class="lbl">Observe</span>
+        <p>
+          Seven of the nine are solved by the same two mechanisms: <strong>provenance marks</strong>
+          and <strong>a sign gate</strong>. That is a strong signal that they are the right
+          primitives — and that most of the rest of the feature list is decoration on top of them.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- ================================================================== -->
+<section id="engine">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="sec-num">04 — Which engine</span>
+      <h2>You asked about Quill. Quill is the wrong answer, and its data model is the right one.</h2>
+      <p>
+        Five real candidates, scored against what this component actually has to do rather
+        than against a generic feature matrix.
+      </p>
+    </div>
+
+    <div class="prose">
+      <h3>The five requirements that decide it</h3>
+      <ol>
+        <li><strong>Attributed ranges</strong> that survive arbitrary edits — the provenance model.</li>
+        <li><strong>A validated schema</strong> — invalid notes must be unconstructable, not merely rejected.</li>
+        <li><strong>A DOM-free core</strong> — so the schema, serializers, lint rules and FHIR mapping are unit-tested in Node in milliseconds, exactly as <code>signature-core</code> is.</li>
+        <li><strong>An invertible, serializable edit log</strong> — because the audit trail, undo, offline sync and collaborative merge are all the same list.</li>
+        <li><strong>MIT, no vendor, no cloud tier</strong> — this is a component library for regulated buyers; a hosted dependency in the critical path is a procurement conversation you do not want to have.</li>
+      </ol>
+    </div>
+
+    <div class="tw">
+      <table>
+        <thead>
+          <tr>
+            <th>Engine</th>
+            <th>Attributed ranges</th>
+            <th>Schema</th>
+            <th>DOM-free core</th>
+            <th>Edit log</th>
+            <th>License risk</th>
+            <th>Verdict</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Quill 2.x</strong><br /><span style="color: var(--muted); font-size: 0.9em;">Delta + Parchment</span></td>
+            <td class="yes">Excellent — a Delta <em>is</em> attributed ranges</td>
+            <td class="no">None. Blots, not a validated schema</td>
+            <td class="meh">Partial — <code>quill-delta</code> is standalone, the editor is not</td>
+            <td class="yes">Ops are the log; OT-ready</td>
+            <td class="yes">BSD-3, no vendor</td>
+            <td class="no">No</td>
+          </tr>
+          <tr>
+            <td><strong>ProseMirror</strong><br /><span style="color: var(--muted); font-size: 0.9em;">model / state / transform / view</span></td>
+            <td class="yes">Marks, with position mapping through every step</td>
+            <td class="yes">Schema-first; invalid documents cannot exist</td>
+            <td class="yes">Yes — model, state and transform run in Node</td>
+            <td class="yes">Steps: invertible, serializable, rebasable</td>
+            <td class="yes">MIT, no vendor, no cloud tier</td>
+            <td class="yes">Recommended</td>
+          </tr>
+          <tr>
+            <td><strong>Tiptap 3</strong><br /><span style="color: var(--muted); font-size: 0.9em;">ProseMirror + DX</span></td>
+            <td class="yes">Inherits ProseMirror's</td>
+            <td class="yes">Inherits ProseMirror's</td>
+            <td class="meh">Inherits, but the wrapper assumes a view</td>
+            <td class="yes">Inherits ProseMirror's</td>
+            <td class="meh">Core MIT; comments, snapshots and AI are Pro/Cloud (from ~$49/mo, Team $149, Business $999)</td>
+            <td class="meh">Reconsider at v2</td>
+          </tr>
+          <tr>
+            <td><strong>Lexical</strong><br /><span style="color: var(--muted); font-size: 0.9em;">Meta</span></td>
+            <td class="meh">Node-based; range attribution is hand-rolled</td>
+            <td class="no">No formal schema; validity is convention</td>
+            <td class="no">Editor state creation assumes a browser</td>
+            <td class="meh">Editor state snapshots, not invertible steps</td>
+            <td class="yes">MIT</td>
+            <td class="meh">Strong runner-up</td>
+          </tr>
+          <tr>
+            <td><strong>Slate</strong></td>
+            <td class="yes">Good — text nodes carry arbitrary marks</td>
+            <td class="no">Normalizers, not a schema</td>
+            <td class="yes">Core is plain JSON</td>
+            <td class="yes">Operations exist</td>
+            <td class="yes">MIT</td>
+            <td class="no">No — IME/Android history</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="prose">
+      <h3>Why Quill loses, in detail — because your instinct about it was half right</h3>
+      <p>
+        Quill's Delta format is genuinely the best idea in this space. A document is a list
+        of insert operations, each carrying an attribute map. That is <em>exactly</em> the
+        provenance model, expressed natively, with no invention required:
+      </p>
+      <pre><code><span class="c-c">// A Delta already says "this range has these properties".</span>
+{ ops: [
+  { insert: <span class="c-s">"Patient reports "</span>, attributes: { src: <span class="c-s">"typed"</span> } },
+  { insert: <span class="c-s">"progressive fatigue"</span>, attributes: { src: <span class="c-s">"dictated"</span>, conf: 0.71 } },
+  { insert: <span class="c-s">" and exertional dyspnea."</span>, attributes: { src: <span class="c-s">"ai"</span>, reviewed: <span class="c-k">false</span> } },
+] }</code></pre>
+      <p>
+        So the data model is right. Four things sink it anyway:
+      </p>
+      <ul>
+        <li>
+          <strong>No schema.</strong> Quill has no way to state "a note is a sequence of coded
+          sections; a section contains blocks; a signature block may not appear inside a
+          section". Parchment blots describe rendering, not validity. Without a schema, every
+          invariant becomes a runtime check you wrote and will forget to write next time —
+          and the FHIR narrative constraint becomes a post-hoc validation that fails after the
+          clinician has typed for twenty minutes.
+        </li>
+        <li>
+          <strong>Weak block structure.</strong> Deltas are flat. Nesting — sections containing
+          sub-sections containing tables — is expressed by attribute conventions, and every
+          consumer must re-derive the tree. For a document whose entire value proposition is
+          <em>structure</em>, that is backwards.
+        </li>
+        <li>
+          <strong>Extension cost.</strong> Custom nodes (a live vitals table, an ink block, a
+          wildcard placeholder) mean writing Blots against a 2013-era imperative API with a
+          React wrapper bolted on. Every one of those is a day in ProseMirror and a week in Quill.
+        </li>
+        <li>
+          <strong>Trajectory.</strong> Quill 2.x is maintained — 2.4.5 shipped as a build-only
+          maintenance release in mid-2026 — but it is a maintenance choice, not a growth one,
+          and it is no longer the default recommendation for a greenfield React editor.
+        </li>
+      </ul>
+
+      <div class="note ok">
+        <span class="lbl">Steal this</span>
+        <p>
+          Keep the Delta idea and drop the library. ProseMirror marks give the same
+          attributed-range semantics <em>plus</em> a schema, and <code>ReplaceStep</code> gives
+          the same op log <em>plus</em> invertibility. You lose nothing you wanted from Quill.
+        </p>
+      </div>
+
+      <h3>Why not Tiptap, given that everyone uses Tiptap</h3>
+      <p>
+        Tiptap is the right default for a CMS. It is the wrong dependency for this, for one
+        structural reason: the three features Tiptap adds on top of ProseMirror that we would
+        actually want — <strong>comments, document history, and AI</strong> — are precisely the
+        ones behind the paid Cloud platform. So we would take the vendor dependency and still
+        build those ourselves, because our versions have to be different anyway: our "comments"
+        are clinical queries with a resolution workflow, our "history" is a legal addendum
+        chain, and our "AI" is a review gate rather than a generator.
+      </p>
+      <p>
+        Tiptap's DX advantage is real and worth roughly two weeks. It is not worth a
+        third-party pricing page in the middle of a healthcare procurement review. If Tiptap
+        open-sources the collaboration stack, revisit it — this is a reversible decision,
+        because a Tiptap extension is a thin wrapper over the same ProseMirror plugin we would
+        write anyway.
+      </p>
+
+      <h3>Why not Lexical, which is the closest call</h3>
+      <p>
+        Lexical is faster, has the best accessibility investment of the five, and is MIT with
+        no commercial tier. It loses on two things and they are the two that matter here:
+        there is no schema, so document validity is a convention rather than a guarantee; and
+        its editor state is snapshot-shaped rather than step-shaped, which means the audit log,
+        the offline queue and the addendum chain each become separate machinery instead of
+        three readings of one list.
+      </p>
+      <p>
+        If a future Oxygen decision is "we need a mobile-native editor with the same document
+        model", Lexical becomes the stronger choice, and the <code>-core</code> package split
+        below is what makes that switch cost weeks rather than quarters.
+      </p>
+
+      <div class="note">
+        <span class="lbl">Decision</span>
+        <p>
+          <strong>ProseMirror directly, with no framework wrapper.</strong> The document model,
+          schema, transforms, serializers, lint rules and FHIR mapping live in
+          <code>@oxygenui-design/clinical-note-core</code> and run in Node with zero DOM. The
+          view layer and the antd shell live in <code>@oxygenui-design/clinical-note</code>.
+          Same split as <code>signature</code> / <code>signature-core</code>, for the same
+          reason: the expensive half is portable.
+        </p>
+      </div>
+
+      <div class="note warn">
+        <span class="lbl">Cost, stated plainly</span>
+        <p>
+          ProseMirror is roughly three to five times the code of Quill for the same visible
+          toolbar. That cost buys the schema guarantee, the step log, and no vendor. If this
+          component were a comment box, Quill would be correct and this brief would be one page.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================== -->
+<section id="features">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="sec-num">05 — Sixty-three features</span>
+      <h2>Sixty-three things it could do, and the fourteen that make v1</h2>
+      <p>
+        You asked what to consider. Here is everything worth considering, honestly labelled.
+        <span class="badge v1">v1</span> ships first.
+        <span class="badge v2">v2</span> is real but later.
+        <span class="badge host">host</span> is the integrator's job and we provide the seam.
+        <span class="badge never">no</span> is a deliberate refusal.
+      </p>
+    </div>
+
+    <div class="prose">
+      <div class="note">
+        <span class="lbl">On "backslash in editor"</span>
+        <p>
+          You are describing a trigger-character command system — and in this domain there are
+          <strong>four</strong> of them, not one, because clinicians already have muscle memory
+          for three. Getting these right is the difference between a 90-second note and a
+          nine-minute one, and it is the single highest-ROI feature in the list.
+        </p>
+      </div>
+
+      <div class="tw">
+        <table>
+          <thead>
+            <tr><th>Trigger</th><th>Opens</th><th>Why this character</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>/</code></td>
+              <td>Block insert menu — section, table, vitals, ink pad, wildcard, addendum</td>
+              <td>The modern convention (Notion, Linear, Slack). Non-clinical staff already know it. Only fires at the start of an empty block, so a date like <code>7/8</code> never triggers it.</td>
+            </tr>
+            <tr>
+              <td><code>.</code></td>
+              <td>Dot phrases — <code>.ros</code>, <code>.normalexam</code>, <code>.dcinstructions</code></td>
+              <td><strong>The one that matters.</strong> Epic's SmartPhrase trigger, learned by essentially every US clinician. Fires only after whitespace and only when followed by a letter, so sentence-ending periods and <code>7.1 g/dL</code> are untouched.</td>
+            </tr>
+            <tr>
+              <td><code>@</code></td>
+              <td>Smart links — pull live patient data: <code>@age</code>, <code>@meds</code>, <code>@lastcbc</code>, <code>@allergies</code></td>
+              <td>Distinguishes "insert boilerplate" from "insert a fact about this patient", which is a genuinely different operation with a genuinely different provenance mark and staleness clock.</td>
+            </tr>
+            <tr>
+              <td><code>***</code> + <kbd>F2</kbd></td>
+              <td>Jumps to the next unfilled wildcard in the document. A hint is one token — <code>***severity***</code>, not <code>***how bad***</code> — so that two blanks on one line stay two blanks</td>
+              <td>SmartList muscle memory. The template inserts blanks; F2 walks them. Unfilled wildcards at sign time are a blocking error — this is how boilerplate stops being a lie.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="grp-h">A · Input speed — the reason clinicians will tolerate a new editor</div>
+    <div class="feat">
+      <div><div class="n">01</div><div><div class="t">Slash command menu <span class="badge v1">v1</span></div><div class="d">Fuzzy-matched block insertion, keyboard-driven, escape-safe.</div></div></div>
+      <div><div class="n">02</div><div><div class="t">Dot phrases with a user + org phrase library <span class="badge v1">v1</span></div><div class="d">Expansion is a single undo unit and inserts a <code>template</code> provenance mark over the whole range.</div></div></div>
+      <div><div class="n">03</div><div><div class="t">Smart links to live patient data <span class="badge v1">v1</span></div><div class="d">Resolved by a host-supplied async resolver. Result carries the source, the value, and the time it was true.</div></div></div>
+      <div><div class="n">04</div><div><div class="t">Wildcards with F2 traversal <span class="badge v1">v1</span></div><div class="d">A real node type, not a text convention, so it cannot be half-deleted into an invisible fragment.</div></div></div>
+      <div><div class="n">05</div><div><div class="t">Inline pick lists <code>{mild:moderate:severe}</code> <span class="badge v2">v2</span></div><div class="d">Arrow-key selection collapses to the chosen token. SmartList parity.</div></div></div>
+      <div><div class="n">06</div><div><div class="t">Medical spellcheck dictionary <span class="badge v1">v1</span></div><div class="d">Ships as a data package the host supplies; without one we disable native spellcheck rather than underline every drug name.</div></div></div>
+      <div><div class="n">07</div><div><div class="t">Abbreviation expansion with a blocklist <span class="badge v1">v1</span></div><div class="d">The Joint Commission "Do Not Use" set — <code>U</code>, <code>IU</code>, <code>QD</code>, <code>QOD</code>, <code>MS</code>, <code>MSO4</code>, <code>MgSO4</code>, trailing zeros, missing leading zeros — is linted, with the safe expansion offered inline.</div></div></div>
+      <div><div class="n">08</div><div><div class="t">Problem / med / allergy autocomplete <span class="badge host">host</span></div><div class="d">We own the popup, the keyboard model and the inserted node. The terminology service is theirs — SNOMED and ICD-10 licensing is not ours to redistribute.</div></div></div>
+      <div><div class="n">09</div><div><div class="t">Dictation input channel <span class="badge v1">v1</span></div><div class="d">A documented API for streaming interim and final transcript segments, with per-segment confidence. We do not ship a recognizer.</div></div></div>
+      <div><div class="n">10</div><div><div class="t">Dictation voice commands <span class="badge v2">v2</span></div><div class="d">"new paragraph", "scratch that", "go to assessment" mapped onto the same commands the keyboard uses.</div></div></div>
+      <div><div class="n">11</div><div><div class="t">Ambient draft ingestion <span class="badge v2">v2</span></div><div class="d">A whole note arrives from a scribe vendor, lands entirely marked <code>ai · unreviewed</code>, and cannot be signed in that state.</div></div></div>
+      <div><div class="n">12</div><div><div class="t">Semantic undo units <span class="badge v1">v1</span></div><div class="d">One template expansion, one dictated utterance, one AI insertion = one undo. Not 400 keystrokes.</div></div></div>
+      <div><div class="n">13</div><div><div class="t">Macro recording <span class="badge never">no</span></div><div class="d">Solves a problem dot phrases already solve, and produces unauditable text. Refuse.</div></div></div>
+    </div>
+
+    <div class="grp-h">B · Structure — what makes the note a record rather than a blob</div>
+    <div class="feat">
+      <div><div class="n">14</div><div><div class="t">LOINC-coded sections as schema nodes <span class="badge v1">v1</span></div><div class="d">The single most important structural feature. A section is a node with a code, not styled bold text.</div></div></div>
+      <div><div class="n">15</div><div><div class="t">Note types with required-section rules <span class="badge v1">v1</span></div><div class="d">H&amp;P, progress, consult, procedure, discharge summary. An H&amp;P without an exam does not sign.</div></div></div>
+      <div><div class="n">16</div><div><div class="t">Section navigator with completeness state <span class="badge v1">v1</span></div><div class="d">Left rail: jump, reorder, and see at a glance what is empty. Doubles as the a11y landmark map.</div></div></div>
+      <div><div class="n">17</div><div><div class="t">Keyboard section reorder <span class="badge v2">v2</span></div><div class="d">Alt+↑/↓. Drag is the secondary affordance, never the only one.</div></div></div>
+      <div><div class="n">18</div><div><div class="t">Live data islands — vitals, meds, problems <span class="badge v2">v2</span></div><div class="d">Non-editable nodes that render structured data, know when they were fetched, and refresh in place.</div></div></div>
+      <div><div class="n">19</div><div><div class="t">Lab chips with reference ranges <span class="badge v2">v2</span></div><div class="d">Reuses the existing <code>ClinicalValue</code> and <code>ReferenceRange</code> components inside the document. Abnormal flags never rely on colour alone.</div></div></div>
+      <div><div class="n">20</div><div><div class="t">Tables <span class="badge v2">v2</span></div><div class="d">Flowsheet-shaped only. Constrained, headers required, and they must survive the FHIR narrative subset — which permits tables, so this is achievable.</div></div></div>
+      <div><div class="n">21</div><div><div class="t">Bold and italic <span class="badge v1">v1</span></div><div class="d">Both survive every downstream transport. That is the entire selection criterion.</div></div></div>
+      <div><div class="n">22</div><div><div class="t">Underline and strikethrough <span class="badge never">no</span></div><div class="d">Underline reads as a link; strikethrough silently disappears in some renderers, and "silently disappears" applied to a retraction is a safety defect. Use the retraction affordance (#38).</div></div></div>
+      <div><div class="n">23</div><div><div class="t">Lists, ordered and unordered <span class="badge v1">v1</span></div><div class="d">Clinicians write in lists constantly. Survives every transport.</div></div></div>
+      <div><div class="n">24</div><div><div class="t">Text alignment <span class="badge never">no</span></div><div class="d">Centre-aligned clinical prose has no meaning and does not round-trip. Cut it from the reference toolbar.</div></div></div>
+      <div><div class="n">25</div><div><div class="t">Arbitrary hyperlinks <span class="badge never">no</span></div><div class="d">A link out of a medical record is an exfiltration vector and a dead URL in five years. Allow only internal resource references (<code>Patient/…</code>, <code>Observation/…</code>) rendered as chips.</div></div></div>
+    </div>
+
+    <div class="grp-h">C · Provenance and safety — the differentiator</div>
+    <div class="feat">
+      <div><div class="n">26</div><div><div class="t">Per-range provenance marks <span class="badge v1">v1</span></div><div class="d">Six origins: typed · dictated · template · pulled · copied · ai. The foundation everything else stands on.</div></div></div>
+      <div><div class="n">27</div><div><div class="t">Provenance ribbon (show origins) <span class="badge v1">v1</span></div><div class="d">A toggle that tints the document by origin. Off by default — this is a review tool, not a reading mode.</div></div></div>
+      <div><div class="n">28</div><div><div class="t">Copy-forward measurement <span class="badge v1">v1</span></div><div class="d">"62% of this note is copied from earlier documentation." Shown at the gate, computed from the marks, and — critically — recorded in the output so it can be audited.</div></div></div>
+      <div><div class="n">29</div><div><div class="t">Unreviewed-AI block <span class="badge v1">v1</span></div><div class="d">Sign is disabled while any AI range remains untouched. Reviewing means reading it in place and accepting, not clicking "accept all" — so the accept-all path is deliberately one extra keystroke.</div></div></div>
+      <div><div class="n">30</div><div><div class="t">Staleness clock on pulled data <span class="badge v1">v1</span></div><div class="d">Every pulled value carries the instant it was true. Beyond a host-configured threshold it is flagged at sign time, because a four-hour-old potassium is a different fact from a current one.</div></div></div>
+      <div><div class="n">31</div><div><div class="t">Cross-patient paste guard <span class="badge v1">v1</span></div><div class="d">Clipboard payloads carry their subject id. Pasting across subjects requires explicit confirmation and is logged either way.</div></div></div>
+      <div><div class="n">32</div><div><div class="t">The sign gate <span class="badge v1">v1</span></div><div class="d">A composable rule engine. Rules return <code>block</code>, <code>warn</code> or <code>pass</code>. Hosts add their own. Nothing signs while a <code>block</code> stands.</div></div></div>
+      <div><div class="n">33</div><div><div class="t">Do-not-use abbreviation lint <span class="badge v1">v1</span></div><div class="d">Warn, not block — an accreditation standard, not a statute, and false positives in prose are real.</div></div></div>
+      <div><div class="n">34</div><div><div class="t">Unfilled wildcard lint <span class="badge v1">v1</span></div><div class="d">Blocks. A signed note containing <code>***</code> is unambiguous evidence the template was not read.</div></div></div>
+      <div><div class="n">35</div><div><div class="t">Internal contradiction check <span class="badge v2">v2</span></div><div class="d">"denies chest pain" in HPI against "chest pain" in ROS; laterality mismatches; sex/procedure conflicts. Warn only, and only with a host-supplied rule set — this is the feature most likely to be wrong, so it must never block.</div></div></div>
+      <div><div class="n">36</div><div><div class="t">Implausible-value check <span class="badge v2">v2</span></div><div class="d">Hgb 71 g/dL, BP 12/8, weight 700 kg. Catches transposition and unit slips at the point of entry.</div></div></div>
+      <div><div class="n">37</div><div><div class="t">Reading-level and stigmatizing-language hints <span class="badge v2">v2</span></div><div class="d">Because the patient will read this. "Patient refuses" → "patient declines"; "denies" is jargon that reads as accusation. Advisory, dismissible, never blocking.</div></div></div>
+      <div><div class="n">38</div><div><div class="t">Retraction affordance <span class="badge v2">v2</span></div><div class="d">The legitimate use of strikethrough, done properly: text marked retracted stays in the record, renders visibly retracted, and carries who retracted it and when.</div></div></div>
+      <div><div class="n">39</div><div><div class="t">Clinical decision support hooks <span class="badge never">no</span></div><div class="d">The moment a UI component suggests a diagnosis or a dose it is arguably a regulated device. The seam exists; the content never ships from us.</div></div></div>
+    </div>
+
+    <div class="grp-h">D · Signature, amendment, audit</div>
+    <div class="feat">
+      <div><div class="n">40</div><div><div class="t">Three distinct commits: draft · sign · addend <span class="badge v1">v1</span></div><div class="d">Three verbs, three buttons, three legal meanings. Never one blue "Save".</div></div></div>
+      <div><div class="n">41</div><div><div class="t">Append-only after signature <span class="badge v1">v1</span></div><div class="d">The editor becomes read-only over the signed body; new content goes into a new, separately-signed addendum node.</div></div></div>
+      <div><div class="n">42</div><div><div class="t">Co-signature / attestation flow <span class="badge v1">v1</span></div><div class="d">Reuses <code>@oxygenui-design/signature-core</code>'s <code>pending</code> outcome verbatim. It was designed for exactly this and it already exists.</div></div></div>
+      <div><div class="n">43</div><div><div class="t">Version diff <span class="badge v1">v1</span></div><div class="d">Against the previous signed version, against the AI draft, against yesterday's note. One mechanism, three uses.</div></div></div>
+      <div><div class="n">44</div><div><div class="t">Step-level audit log <span class="badge v1">v1</span></div><div class="d">We emit the steps; the host stores them. Nothing is buffered in a component's memory that a regulator would want.</div></div></div>
+      <div><div class="n">45</div><div><div class="t">Deterministic canonical serialization <span class="badge v1">v1</span></div><div class="d">Same document → same bytes, byte-for-byte, forever. Prerequisite for hashing and for #46.</div></div></div>
+      <div><div class="n">46</div><div><div class="t">Detached JWS over the canonical bytes <span class="badge host">host</span></div><div class="d">The seam is <code>withDetachedSignature()</code>, already shipped in <code>signature-core</code>. Signing keys are a deployment concern and stay out of the UI package.</div></div></div>
+      <div><div class="n">47</div><div><div class="t">Late-entry marking <span class="badge v2">v2</span></div><div class="d">A note authored well after the encounter is a distinct, disclosable thing. The gate should notice and the record should say so.</div></div></div>
+    </div>
+
+    <div class="grp-h">E · Reliability — where documentation tools actually lose users</div>
+    <div class="feat">
+      <div><div class="n">48</div><div><div class="t">Durable local drafts <span class="badge v1">v1</span></div><div class="d">Step log to IndexedDB, keyed by note and author. Survives crash, lock and power loss. Cleared on successful commit, and on author change.</div></div></div>
+      <div><div class="n">49</div><div><div class="t">Explicit save state, always visible <span class="badge v1">v1</span></div><div class="d">Four honest states — <em>saved</em>, <em>saving</em>, <em>offline, held locally</em>, <em>failed</em>. Never a silent spinner, never a lie.</div></div></div>
+      <div><div class="n">50</div><div><div class="t">Draft recovery on return <span class="badge v1">v1</span></div><div class="d">Explicit, with a preview and a timestamp. Never silently restored, because silent restoration into the wrong chart is worse than losing the draft.</div></div></div>
+      <div><div class="n">51</div><div><div class="t">Offline authoring <span class="badge v1">v1</span></div><div class="d">Full function with no network. The queue is the step log, replayed. One mechanism.</div></div></div>
+      <div><div class="n">52</div><div><div class="t">Workstation-lock behaviour <span class="badge v1">v1</span></div><div class="d">On idle, blur the document and require re-auth to reveal. Shoulder-surfing at a hallway terminal is the threat model.</div></div></div>
+      <div><div class="n">53</div><div><div class="t">Multi-tab guard <span class="badge v1">v1</span></div><div class="d">Same note open twice, same browser: one editable, the other read-only with a clear reason.</div></div></div>
+      <div><div class="n">54</div><div><div class="t">Real-time collaboration <span class="badge v2">v2</span></div><div class="d">ProseMirror's collab module is in-tree and battle-tested. Genuinely wanted for resident + attending and for OR/procedure notes. Not v1 — it needs a server.</div></div></div>
+    </div>
+
+    <div class="grp-h">F · Presentation, ink, output</div>
+    <div class="feat">
+      <div><div class="n">55</div><div><div class="t">Ink annotation mode <span class="badge v2">v2</span></div><div class="d">The pen icon, done properly: an <code>ink</code> node whose content is <code>Stroke[]</code> from <code>signature-core</code> — vector, themeable, printable, undoable per stroke. The engine already exists and is already tested.</div></div></div>
+      <div><div class="n">56</div><div><div class="t">Ink over a body map or diagram <span class="badge v2">v2</span></div><div class="d">Wound location, pain distribution, dermatology mapping. Strokes are stored in the diagram's coordinate space, so they survive rescaling.</div></div></div>
+      <div><div class="n">57</div><div><div class="t">Text scale, persisted per user <span class="badge v1">v1</span></div><div class="d">The reference's "100%", labelled honestly and stored against the user rather than the workstation.</div></div></div>
+      <div><div class="n">58</div><div><div class="t">Density modes <span class="badge v1">v1</span></div><div class="d"><code>data-ox-density</code> — patient · standard · clinical. Already the library-wide convention.</div></div></div>
+      <div><div class="n">59</div><div><div class="t">Print / PDF as the legal record <span class="badge v1">v1</span></div><div class="d">Patient identity on every page, "Page 2 of 4", author and credentials, signature block with absolute timestamps, addenda in order. The printed artifact is what gets subpoenaed.</div></div></div>
+      <div><div class="n">60</div><div><div class="t">Dark mode that prints light <span class="badge v1">v1</span></div><div class="d">Night shift is real. So is the printer.</div></div></div>
+      <div><div class="n">61</div><div><div class="t">FHIR export — Composition + DocumentReference + Provenance <span class="badge v1">v1</span></div><div class="d">§09.</div></div></div>
+      <div><div class="n">62</div><div><div class="t">Plain-text degradation for HL7 v2 <span class="badge v1">v1</span></div><div class="d">A deterministic, readable text rendering. Not <code>innerText</code> — a real serializer with tests, because a great many notes still travel this way.</div></div></div>
+      <div><div class="n">63</div><div><div class="t">De-identification pass <span class="badge never">no</span></div><div class="d">Safe Harbor de-identification is a data-governance function with real legal consequences for getting it wrong. A UI library must not imply it has done it.</div></div></div>
+    </div>
+
+    <div class="prose">
+      <div class="note ok">
+        <span class="lbl">The v1 cut, in one paragraph</span>
+        <p>
+          Coded sections · the four trigger characters · provenance marks and the ribbon ·
+          the sign gate with five rules · draft/sign/addend · append-only after signature ·
+          co-signature via <code>signature-core</code> · durable offline drafts with honest
+          save state · deterministic serialization · FHIR and plain-text export · print ·
+          full keyboard and screen-reader operation. <strong>Everything else waits.</strong>
+          That is a genuinely differentiated component; adding tables and collaboration to it
+          would only make it later.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- ================================================================== -->
+<section id="mockups">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="sec-num">06 — The design</span>
+      <h2>The design, in real Ant Design v6 tokens</h2>
+      <p>
+        Every value below is antd's actual default token — <code>#1677ff</code>,
+        <code>rgba(0,0,0,0.88)</code>, 6px radius, 32px control height. What you are judging
+        is antd, not a teal impression of it.
+      </p>
+    </div>
+
+    <div class="prose">
+      <h3 style="margin-top: 0;">First, the icon set — because it is a design-system decision, not a detail</h3>
+      <p>
+        The reference design uses a thin-stroke, rounded-cap, 24px-grid icon set, and it is
+        right to. <strong>Recommendation: Lucide</strong>, imported from
+        <code>lucide-react</code>, tree-shaken per icon.
+      </p>
+      <div class="tw">
+        <table>
+          <thead><tr><th>Option</th><th>Fit</th><th>Verdict</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><strong>Lucide</strong></td>
+              <td>ISC licence, ~1,600 icons, 24px grid with 2px stroke, one React component per icon, actively maintained. It is also <em>already the house set for shadcn/ui</em>, which is the distribution channel half this repo ships through.</td>
+              <td class="yes">Use this</td>
+            </tr>
+            <tr>
+              <td><strong>@ant-design/icons</strong></td>
+              <td>The obvious choice given antd. But it is a <em>filled</em>, 1024-grid set designed for a different visual density, it ships a large barrel that resists tree-shaking, and its metaphors are weak for this domain.</td>
+              <td class="no">No — mixing filled antd icons with the reference's line aesthetic is exactly what makes a UI look assembled rather than designed</td>
+            </tr>
+            <tr>
+              <td><strong>Phosphor · Remix · Tabler</strong></td>
+              <td>All good sets. Phosphor has the best weight range; Tabler the largest count.</td>
+              <td class="meh">Viable, but none beats Lucide's alignment with the existing shadcn channel</td>
+            </tr>
+            <tr>
+              <td><strong>Emoji / unicode glyphs</strong></td>
+              <td>Render differently on every platform, cannot inherit <code>currentColor</code>, ignore stroke weight, and are announced aloud by screen readers as their CLDR name.</td>
+              <td class="no">Never — this is what the mockup you saw first was doing, and it is why it looked cheap</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p>
+        Two rules that follow, and they are the ones that actually decide whether a UI reads as
+        crafted: <strong>one set, one weight, one grid</strong> — never mix icon families in a
+        single surface; and <strong>every icon in this component is decorative</strong>, marked
+        <code>aria-hidden</code>, because the accessible name comes from the button's text or
+        label. An icon that carries meaning nothing else carries is a bug, not a design.
+      </p>
+      <p style="color: var(--muted); font-size: 0.9em;">
+        The mockups on this page use an inlined <code>&lt;symbol&gt;</code> sprite of Lucide
+        geometry so the document has no network dependency. The component itself imports the
+        real package.
+      </p>
+    </div>
+
+    <h3>A · The editor</h3>
+    <figure>
+      <div class="stage">
+        <div class="antd">
+          <div class="a-modal xwide pins">
+            <div class="a-modal-head rel" style="align-items: center; padding-block: 14px;">
+              <span class="pin pin-tl" style="top: -11px; inset-inline-start: -11px;">1</span>
+              <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                <div>
+                  <div class="a-modal-title" style="display: flex; align-items: center; gap: 8px;">
+                    Progress note
+                    <span class="a-tag blue" style="height: 20px; font-size: 11px;">Draft</span>
+                  </div>
+                  <div class="a-modal-sub" style="font-variant-numeric: tabular-nums; margin-top: 3px;">
+                    <b style="font-weight: 600; color: var(--a-text-2);">RANDOL, Joshua</b>
+                    <span style="color: var(--a-text-4);"> · </span>30y M
+                    <span style="color: var(--a-text-4);"> · </span>MRN 4471902
+                    <span style="color: var(--a-text-4);"> · </span>DOB 12 Mar 1996
+                    <span style="color: var(--a-text-4);"> · </span>Bed 4E-12
+                  </div>
+                </div>
+              </div>
+              <div class="a-modal-x"><svg class="i i-18"><use href="#i-x"/></svg></div>
+            </div>
+
+            <div class="ed-bar">
+              <span class="clus plain">
+                <span class="tbtn"><svg class="i"><use href="#i-undo"/></svg></span>
+                <span class="tbtn dis"><svg class="i"><use href="#i-redo"/></svg></span>
+              </span>
+              <span class="clus">
+                <span class="tbtn on"><svg class="i"><use href="#i-type"/></svg></span>
+                <span class="tbtn"><svg class="i"><use href="#i-pen"/></svg></span>
+              </span>
+              <span class="clus">
+                <span class="tbtn"><svg class="i"><use href="#i-bold"/></svg></span>
+                <span class="tbtn"><svg class="i"><use href="#i-italic"/></svg></span>
+                <span class="tbtn"><svg class="i"><use href="#i-list"/></svg></span>
+                <span class="tbtn"><svg class="i"><use href="#i-list-ordered"/></svg></span>
+              </span>
+              <span class="rel clus">
+                <span class="pin pin-tl" style="top: -12px; inset-inline-start: -12px;">2</span>
+                <span class="tbtn"><span class="keycap">/</span> Insert</span>
+                <span class="tbtn"><span class="keycap">.</span> Phrase</span>
+                <span class="tbtn"><span class="keycap">@</span> Data</span>
+                <span class="tbtn"><span class="keycap">***</span> Blank <span class="kbd">F2</span></span>
+              </span>
+              <span class="sp"></span>
+              <span class="rel">
+                <span class="pin pin-tl" style="top: -12px; inset-inline-start: -12px;">3</span>
+                <span class="tbtn accent"><svg class="i"><use href="#i-contrast"/></svg> Origins</span>
+              </span>
+              <span class="scale">
+                <span class="tbtn" style="min-width: 24px; height: 24px; padding: 0;"><svg class="i i-14"><use href="#i-minus"/></svg></span>
+                <span class="v">100%</span>
+                <span class="tbtn" style="min-width: 24px; height: 24px; padding: 0;"><svg class="i i-14"><use href="#i-plus"/></svg></span>
+              </span>
+            </div>
+
+            <div class="ed-status rel">
+              <span class="pin pin-l" style="inset-inline-start: -11px;">4</span>
+              <span class="seg">
+                <span class="live"></span>
+                <span style="font-variant-numeric: tabular-nums;">Saved locally 14:38:02 IST</span>
+              </span>
+              <span class="seg">
+                <svg class="i i-14" style="color: var(--a-text-4);"><use href="#i-user"/></svg>
+                <b style="font-weight: 600; color: var(--a-text);">R. Menon, MD</b>
+                <span style="color: var(--a-text-4);">resident · cosign required</span>
+              </span>
+              <span class="sp"></span>
+              <span class="stat gold"><svg class="i i-14"><use href="#i-alert-tri"/></svg> <b>62%</b> copied forward</span>
+              <span class="stat green"><svg class="i i-14"><use href="#i-sparkles"/></svg> <b>2</b> AI ranges unreviewed</span>
+            </div>
+
+            <div class="ed-body">
+              <div class="ed-nav rel">
+                <span class="pin" style="top: 92px; inset-inline-start: -11px;">5</span>
+                <div class="navh">Progress note · 5 sections</div>
+                <div>
+                  <div class="it"><span class="lb">Chief complaint</span></div>
+                  <div class="it on"><span class="lb">History of present illness</span></div>
+                  <div class="it"><span class="lb">Past medical history</span></div>
+                  <div class="it"><span class="lb">Review of systems</span></div>
+                  <div class="it"><span class="lb">Assessment &amp; plan</span><span class="req-dot">required</span></div>
+                </div>
+                <div style="border-top: 1px solid var(--a-border-2); margin: 14px 8px 12px;"></div>
+                <div class="navh">Origins</div>
+                <div class="obar">
+                  <i style="width: 21%; background: repeating-linear-gradient(45deg, var(--a-fill-2) 0 2px, transparent 2px 4px);"></i>
+                  <i style="width: 62%; background: #faad14;"></i>
+                  <i style="width: 9%; background: #b37feb;"></i>
+                  <i style="width: 5%; background: #52c41a;"></i>
+                  <i style="width: 3%; background: #4096ff;"></i>
+                </div>
+                <div class="okey">
+                  <span><i style="background: repeating-linear-gradient(45deg, var(--a-fill-2) 0 2px, transparent 2px 4px); box-shadow: inset 0 0 0 1px var(--a-border-2);"></i> Typed <b>21%</b></span>
+                  <span><i style="background: #faad14;"></i> Copied <b>62%</b></span>
+                  <span><i style="background: #b37feb;"></i> Template <b>9%</b></span>
+                  <span><i style="background: #52c41a;"></i> AI <b>5%</b></span>
+                  <span><i style="background: #4096ff;"></i> Pulled <b>3%</b></span>
+                </div>
+              </div>
+
+              <div class="ed-doc">
+                <h5>Chief complaint <span class="loinc">10154-3</span><span class="rule"></span></h5>
+                <p>Admitted for blood transfusion.</p>
+
+                <h5>History of present illness <span class="loinc">10164-2</span><span class="rule"></span></h5>
+                <p>
+                  <span class="pv pv-copy">Mr. Randol is a 30-year-old man with type 2 diabetes mellitus who presents
+                  with six weeks of progressive fatigue and exertional dyspnea. Symptoms began gradually and have
+                  worsened over the past two weeks, now limiting him to one flight of stairs.</span>
+                  <span class="pv pv-typed">Today he reports the lightheadedness has resolved since the first unit.</span>
+                </p>
+                <p class="rel">
+                  <span class="pin" style="top: 50%; inset-inline-end: -30px; transform: translateY(-50%);">6</span>
+                  <span class="pv pv-ai unrev">He denies overt bleeding — no melena, hematochezia,
+                  hematuria or epistaxis.</span><span class="pv-flag">AI&nbsp;·&nbsp;unread</span>
+                  <span class="pv pv-pull">Hemoglobin 7.1 g/dL</span><span class="pv-flag blue">8h&nbsp;26m&nbsp;old</span><span class="pv pv-typed">, down from 11.8 g/dL in March.</span><span class="caret"></span>
+                </p>
+
+                <h5>Review of systems <span class="loinc">10187-3</span><span class="rule"></span></h5>
+                <p>
+                  <span class="pv pv-tmpl">Constitutional — positive for fatigue; denies fever, night sweats or weight
+                  loss. Cardiovascular — positive for exertional dyspnea; denies chest pain or edema. Gastrointestinal —
+                  denies abdominal pain, melena or change in bowel habit.</span>
+                </p>
+
+                <div>
+                  <h5>Assessment &amp; plan <span class="loinc">51847-2</span><span class="rule"></span></h5>
+                  <p style="color: var(--a-text-4); display: flex; align-items: center; gap: 7px;">
+                    <svg class="i i-14" style="color: var(--a-error);"><use href="#i-x-circle"/></svg>
+                    Required before signing — type
+                    <span class="keycap" style="font-size: 10.5px;">.ap</span>
+                    to insert a template
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div class="a-modal-foot split">
+              <div style="font-size: 12px; color: var(--a-text-4); font-variant-numeric: tabular-nums; display: flex; align-items: center; gap: 6px;">
+                <svg class="i i-14"><use href="#i-clock"/></svg>
+                Created 16 Aug 2026, 14:02 IST (UTC+05:30) · edited 14:38 IST
+              </div>
+              <div class="rel" style="display: flex; gap: 8px;">
+                <span class="pin" style="top: -17px; inset-inline-end: -15px;">7</span>
+                <span class="a-btn text">Close</span>
+                <span class="a-btn">Save draft</span>
+                <span class="a-btn primary dis" style="gap: 7px;"><svg class="i i-14"><use href="#i-shield-check"/></svg> Sign &amp; file</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <ul class="anno-key">
+        <li><span class="n">1</span><div><strong>Patient identity is in the same viewport as the text.</strong> Name, age, sex, MRN, date of birth and location. Two independent identifiers minimum. This is the wrong-patient mitigation and it never scrolls away.</div></li>
+        <li><span class="n">2</span><div><strong>The trigger characters are printed on the buttons, as key caps.</strong> This is the detail that makes the feature discoverable without a tutorial: the button teaches you the keystroke that replaces it, the way a good menu prints its shortcut. Nobody will click "<span class="keycap" style="font-size: 10px;">.</span> Phrase" twice — they will type <code>.</code> forever after. Note also that the toolbar is <em>four clustered segments</em> rather than fifteen loose buttons separated by hairlines: grouping carries the relationship, so the dividers disappear and the row gets quieter.</div></li>
+        <li><span class="n">3</span><div><strong>"Origins" is a toggle, not a mode.</strong> Off by default. When on, the document tints by provenance and the ratios appear in the rail. This is the feature nobody else has and it costs one button.</div></li>
+        <li><span class="n">4</span><div><strong>The status strip is where the honesty lives.</strong> Save state with an absolute time, the author and their role, the cosign requirement, and the two numbers a reviewer would ask for. Nothing here is decorative.</div></li>
+        <li><span class="n">5</span><div><strong>Sections are nodes with codes, and the rail is a completeness map.</strong> The LOINC code is shown in the mockup for this audience; in the product it lives in the DOM and the export, not on screen. The active item takes a 2px accent bar rather than a filled pill — quieter, and it survives forced-colors. The required-but-empty section is flagged <em>here</em>, before the clinician reaches the sign button, not after.</div></li>
+        <li><span class="n">6</span><div><strong>Pulled data states when it was true, inline.</strong> "8h 26m old" is the fact a reader needs and the fact the sign gate acts on. A number with no timestamp is an assertion; a number with one is evidence. The age rides in a small chip next to the value rather than in parentheses inside the prose, so it reads as metadata and not as something the clinician wrote.</div></li>
+        <li><span class="n">7</span><div><strong>Three commits, three buttons, and the primary is disabled with a reason.</strong> Hovering "Sign &amp; file" says what is blocking. Nothing is greyed out mysteriously — the rail already told you, and §06C says it again in full.</div></li>
+      </ul>
+      <figcaption>
+        <b>Note the measure.</b> The document column is capped near 80 characters even though
+        the modal is 1040px wide. The reference's full-bleed line length is the single easiest
+        thing to fix and the one most likely to be argued about.
+      </figcaption>
+    </figure>
+
+    <h3>B · The four triggers</h3>
+    <figure>
+      <div class="stage">
+        <div class="antd" style="display: flex; gap: 20px; flex-wrap: wrap; justify-content: center;">
+          <div class="pal">
+            <div class="pal-in"><span class="trig">.</span>ros<span class="caret"></span></div>
+            <div class="pal-grp">My phrases <span class="rule"></span></div>
+            <div class="pal-it on">
+              <span class="ic"><svg class="i i-14"><use href="#i-text-quote"/></svg></span>
+              <span class="t"><b>.ros</b><small>Review of systems — 10 systems, negative</small></span>
+              <svg class="i i-14" style="color: var(--a-primary);"><use href="#i-corner-down-left"/></svg>
+            </div>
+            <div class="pal-it">
+              <span class="ic"><svg class="i i-14"><use href="#i-text-quote"/></svg></span>
+              <span class="t"><b>.rosbrief</b><small>Constitutional, CV, resp, GI only</small></span>
+            </div>
+            <div class="pal-grp">Cardiology · shared <span class="rule"></span></div>
+            <div class="pal-it">
+              <span class="ic"><svg class="i i-14"><use href="#i-users"/></svg></span>
+              <span class="t"><b>.roscard</b><small>Cardiac-focused ROS</small></span>
+              <span class="stat gold" style="height: 20px; font-size: 10.5px;"><svg class="i i-14"><use href="#i-asterisk"/></svg> 3 blanks</span>
+            </div>
+            <div class="pal-foot">
+              <span class="k"><svg class="i i-14"><use href="#i-arrow-up-down"/></svg> move</span>
+              <span class="k"><svg class="i i-14"><use href="#i-corner-down-left"/></svg> insert</span>
+              <span class="k"><span class="kbd">esc</span> cancel</span>
+            </div>
+          </div>
+
+          <div class="pal">
+            <div class="pal-in"><span class="trig">@</span>last<span class="caret"></span></div>
+            <div class="pal-grp">Patient data · live <span class="rule"></span></div>
+            <div class="pal-it on">
+              <span class="ic"><svg class="i i-14"><use href="#i-database"/></svg></span>
+              <span class="t"><b>@lastcbc</b><small>Hgb 7.1 · WBC 6.2 · Plt 190 — drawn 8h 26m ago</small></span>
+              <svg class="i i-14" style="color: var(--a-primary);"><use href="#i-corner-down-left"/></svg>
+            </div>
+            <div class="pal-it">
+              <span class="ic"><svg class="i i-14"><use href="#i-database"/></svg></span>
+              <span class="t"><b>@lastbmp</b><small>Na 138 · K 4.1 · Cr 0.9 — drawn 8h 26m ago</small></span>
+            </div>
+            <div class="pal-it">
+              <span class="ic"><svg class="i i-14"><use href="#i-activity"/></svg></span>
+              <span class="t"><b>@lastvitals</b><small>BP 118/72 · HR 96 · T 37.1 °C — 41m ago</small></span>
+            </div>
+            <div class="pal-foot">
+              <svg class="i i-14"><use href="#i-clock"/></svg>
+              <span>Inserted values are marked <b style="color: var(--a-text-2);">pulled</b> and carry the time they were true</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <figcaption>
+        Two of the four triggers. <b>Left:</b> dot phrases — the preview line is what makes a
+        phrase library usable at 200 phrases, and the <b>3 blanks</b> chip warns that this one leaves
+        three blanks to fill. <b>Right:</b> smart links show the value <em>and its age</em> in
+        the picker, so a stale pull is refused before it is inserted rather than flagged after.
+      </figcaption>
+    </figure>
+
+    <h3>C · The sign gate</h3>
+    <figure>
+      <div class="stage">
+        <div class="antd">
+          <div class="a-modal">
+            <div class="a-modal-head">
+              <div>
+                <div class="a-modal-title">Sign &amp; file progress note</div>
+                <div class="a-modal-sub" style="font-variant-numeric: tabular-nums;">RANDOL, Joshua · MRN 4471902 · 16 Aug 2026, 14:38 IST</div>
+              </div>
+              <div class="a-modal-x"><svg class="i i-18"><use href="#i-x"/></svg></div>
+            </div>
+            <div class="a-modal-body">
+              <div class="a-alert error" style="margin-bottom: 16px; align-items: center;">
+                <svg class="i ic" style="color: var(--a-error);"><use href="#i-x-circle"/></svg>
+                <div><b style="font-weight: 600;">2 blocking</b> · 3 warnings · 2 passed</div>
+              </div>
+
+              <div class="gate">
+                <div class="blocks">
+                  <svg class="i i-18 ic blk"><use href="#i-x-circle"/></svg>
+                  <span class="t">Assessment &amp; plan is empty
+                    <small>A progress note requires this section. <a href="#mockups">Go to section →</a></small></span>
+                  <span class="sev b">Blocks</span>
+                </div>
+                <div class="blocks">
+                  <svg class="i i-18 ic blk"><use href="#i-x-circle"/></svg>
+                  <span class="t">2 AI-drafted passages have not been reviewed
+                    <small>HPI paragraph 2, ROS sentence 3. <a href="#mockups">Review each in place →</a></small></span>
+                  <span class="sev b">Blocks</span>
+                </div>
+                <div>
+                  <svg class="i i-18 ic warnc"><use href="#i-alert-tri"/></svg>
+                  <span class="t">62% of this note is copied from earlier documentation
+                    <small style="font-variant-numeric: tabular-nums;">1,180 of 1,904 characters, from your note of 15 Aug 2026. <a href="#mockups">Show what changed →</a></small></span>
+                  <span class="sev w">Warns</span>
+                </div>
+                <div>
+                  <svg class="i i-18 ic warnc"><use href="#i-clock"/></svg>
+                  <span class="t">Hemoglobin value was pulled 8h 26m ago
+                    <small>Your organisation flags pulled results older than 4h. <a href="#mockups">Refresh →</a></small></span>
+                  <span class="sev w">Warns</span>
+                </div>
+                <div>
+                  <svg class="i i-18 ic warnc"><use href="#i-alert-tri"/></svg>
+                  <span class="t">“MgSO4” appears in Assessment &amp; plan
+                    <small>Joint Commission “Do Not Use” list — write “magnesium sulfate”. <a href="#mockups">Fix →</a></small></span>
+                  <span class="sev w">Warns</span>
+                </div>
+                <div>
+                  <svg class="i i-18 ic okc"><use href="#i-check-circle"/></svg>
+                  <span class="t">No unfilled blanks</span>
+                  <span class="sev p">Pass</span>
+                </div>
+                <div>
+                  <svg class="i i-18 ic okc"><use href="#i-check-circle"/></svg>
+                  <span class="t">All content belongs to this patient</span>
+                  <span class="sev p">Pass</span>
+                </div>
+              </div>
+
+              <div style="margin-top: 18px; border-top: 1px solid var(--a-border-2); padding-top: 16px;">
+                <div class="a-check on">
+                  <span class="box"></span>
+                  <span>I have reviewed this note in its entirety and attest that it accurately reflects
+                    the care I provided.</span>
+                </div>
+                <div class="a-extra" style="margin-inline-start: 24px; display: flex; align-items: flex-start; gap: 7px;">
+                  <svg class="i i-14" style="margin-top: 4px; color: var(--a-text-4);"><use href="#i-users"/></svg>
+                  <span>Signing as <b style="color: var(--a-text-2);">Rohit Menon, MD</b> · Resident, Internal Medicine.
+                    <b style="color: var(--a-text-2);">Dr. A. Iyer</b> will be notified to countersign.</span>
+                </div>
+              </div>
+            </div>
+            <div class="a-modal-foot split">
+              <span class="a-btn text">Save as draft instead</span>
+              <div style="display: flex; gap: 8px;">
+                <span class="a-btn">Back to note</span>
+                <span class="a-btn primary dis" style="gap: 7px;"><svg class="i i-14"><use href="#i-shield-check"/></svg> Sign</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <figcaption>
+        <b>Three severities and only one of them stops you.</b> Warnings are shown, counted,
+        and recorded in the output — a signature over a note with five acknowledged warnings is
+        a different artifact from one with none, and the record should say so. Every row has a
+        link that puts the caret on the problem; a gate that reports a defect without navigating
+        to it will be dismissed on reflex within a week. The attestation sentence is the host's
+        to supply, because its exact wording is a legal and organisational decision, not ours.
+      </figcaption>
+    </figure>
+
+    <h3>D · After signature</h3>
+    <figure>
+      <div class="stage">
+        <div class="antd">
+          <div class="a-modal wide">
+            <div class="a-modal-head" style="align-items: center;">
+              <div>
+                <div class="a-modal-title">Progress note</div>
+                <div class="a-modal-sub">RANDOL, Joshua · MRN 4471902 · 1 addendum</div>
+              </div>
+              <span class="a-tag green" style="height: 24px;"><svg class="i i-14"><use href="#i-shield-check"/></svg> Signed</span>
+            </div>
+            <div class="a-modal-body">
+              <div class="a-desc" style="margin-bottom: 16px;">
+                <div class="a-desc-row">
+                  <dt>Signed by</dt>
+                  <dd>Rohit Menon, MD · Resident, Internal Medicine<br />
+                    <span style="color: var(--a-text-3);">16 Aug 2026, 14:41:07 IST (UTC+05:30)</span></dd>
+                </div>
+                <div class="a-desc-row">
+                  <dt>Countersigned by</dt>
+                  <dd>Anjali Iyer, MD · Attending, Internal Medicine<br />
+                    <span style="color: var(--a-text-3);">16 Aug 2026, 18:02:55 IST (UTC+05:30)</span></dd>
+                </div>
+                <div class="a-desc-row">
+                  <dt>Attestation</dt>
+                  <dd>"I have reviewed the note and the patient, and agree with the findings and plan."</dd>
+                </div>
+                <div class="a-desc-row">
+                  <dt>Composition</dt>
+                  <dd>21% typed · 62% copied forward · 9% template · 5% AI (reviewed) · 3% pulled</dd>
+                </div>
+                <div class="a-desc-row">
+                  <dt>Warnings acknowledged</dt>
+                  <dd>3 at signing — copy ratio, pulled-value age, abbreviation</dd>
+                </div>
+                <div class="a-desc-row">
+                  <dt>Integrity</dt>
+                  <dd><code style="font-size: 12px;">sha-256:9f2c…a41e</code> over the canonical serialization</dd>
+                </div>
+              </div>
+
+              <div style="border: 1px solid var(--a-border-2); border-radius: var(--a-radius-lg); overflow: hidden;">
+                <div style="padding: 9px 14px; background: var(--a-fill-3); font-size: 12px; color: var(--a-text-2); display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;">
+                  <span style="display: flex; align-items: center; gap: 7px; font-variant-numeric: tabular-nums;">
+                    <svg class="i i-14" style="color: var(--a-text-4);"><use href="#i-corner-down-right"/></svg>
+                    <b style="font-weight: 600; color: var(--a-text);">Addendum 1</b> · Anjali Iyer, MD · 19 Aug 2026, 09:14 IST
+                  </span>
+                  <span class="a-tag green"><svg class="i i-14"><use href="#i-shield-check"/></svg> Signed</span>
+                </div>
+                <div style="padding: 14px; font-size: 14px;">
+                  Bone marrow biopsy performed 18 Aug returned consistent with iron deficiency;
+                  the assessment of anemia of chronic disease documented above is superseded.
+                  Iron studies and GI referral ordered.
+                </div>
+              </div>
+
+              <div class="a-alert" style="margin-top: 16px; align-items: center;">
+                <svg class="i ic" style="color: var(--a-primary);"><use href="#i-info"/></svg>
+                <div>The signed note above cannot be edited. Corrections are made by adding a further addendum.</div>
+              </div>
+            </div>
+            <div class="a-modal-foot split">
+              <span class="a-btn text" style="gap: 7px;"><svg class="i i-14"><use href="#i-printer"/></svg> Print / export</span>
+              <div style="display: flex; gap: 8px;">
+                <span class="a-btn">Close</span>
+                <span class="a-btn" style="gap: 7px;"><svg class="i i-14"><use href="#i-plus"/></svg> Add addendum</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <figcaption>
+        <b>The original text is not shown as corrected — it is shown as superseded.</b> Both
+        statements stand, in order, with their own authors and times. This is the difference
+        between a record and a document, rendered. Note also that the composition breakdown and
+        the acknowledged warnings are <em>part of the signed artifact</em>: they were true at the
+        moment of signature and are as much a fact about the note as the text is.
+      </figcaption>
+    </figure>
+
+    <h3>E · Ink</h3>
+    <figure>
+      <div class="stage">
+        <div class="antd" style="max-width: 620px; margin: 0 auto;">
+          <div class="ed" >
+            <div class="ed-bar">
+              <span class="clus">
+                <span class="tbtn"><svg class="i"><use href="#i-type"/></svg></span>
+                <span class="tbtn on"><svg class="i"><use href="#i-pen"/></svg></span>
+              </span>
+              <span class="clus">
+                <span class="tbtn"><i style="width: 4px; height: 4px; border-radius: 50%; background: currentColor; display: block;"></i></span>
+                <span class="tbtn on"><i style="width: 7px; height: 7px; border-radius: 50%; background: currentColor; display: block;"></i></span>
+                <span class="tbtn"><i style="width: 11px; height: 11px; border-radius: 50%; background: currentColor; display: block;"></i></span>
+              </span>
+              <span class="clus plain">
+                <span class="tbtn"><svg class="i"><use href="#i-undo"/></svg> Undo stroke</span>
+                <span class="tbtn"><svg class="i"><use href="#i-eraser"/></svg></span>
+              </span>
+              <span class="sp"></span>
+              <span class="stat" style="box-shadow: inset 0 0 0 1px var(--a-cyan-border); background: var(--a-cyan-bg); color: var(--a-cyan);">
+                <svg class="i i-14"><use href="#i-pen"/></svg> pen · palm rejection on
+              </span>
+            </div>
+            <div style="padding: 18px 20px;">
+              <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 12px; font-size: 13px; color: var(--a-text-2); margin-bottom: 10px;">
+                <span>Assessment &amp; plan · annotation</span>
+                <span style="font-size: 11px; color: var(--a-text-4); font-variant-numeric: tabular-nums;">17 strokes · vector · 2.1 KB</span>
+              </div>
+              <div style="border: 1px solid var(--a-border); border-radius: var(--a-radius); background: var(--a-bg); position: relative; height: 170px; overflow: hidden;">
+                <svg viewBox="0 0 560 170" style="display: block; width: 100%; height: 100%; color: var(--a-text);" aria-hidden="true">
+                  <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2">
+                    <path d="M36 44 H524" stroke-width="1" stroke-dasharray="2 6" opacity="0.28"/>
+                    <path d="M36 100 H524" stroke-width="1" stroke-dasharray="2 6" opacity="0.28"/>
+                    <path d="M36 148 H420" stroke-width="1" stroke-dasharray="2 6" opacity="0.28"/>
+                    <path d="M44 44c4-30 10-46 16-44s4 26 0 40c-3 10-4 18 0 18 6 0 10-12 14-22 4-10 10-10 11 0 1 8-2 16 0 22 5-1 9-11 13-21 4-10 11-9 11 2 0 9-2 15 1 19 6-2 9-12 14-22 5-10 12-8 12 3 0 10-2 14 1 19 7-3 11-30 18-52 5-16 12-14 11 2-1 18-5 34-3 50"/>
+                    <path d="M186 42c3-22 9-32 14-30s4 20 1 30c-2 8-3 14 1 14 5 0 9-10 12-18 4-9 10-9 11 0 1 7-1 13 1 18 6-2 10-14 15-26 4-10 11-8 11 3 0 10-3 16 0 22"/>
+                    <path d="M270 20c8-4 16-2 18 6 2 8-4 14-12 16-6 2-10 6-8 12 2 8 12 10 20 6"/>
+                    <path d="M310 44c2-18 7-28 12-26s4 18 1 26c-2 6-2 10 1 10 5 0 9-9 13-17 4-9 10-8 10 1 0 8-2 12 1 16 6-3 10-16 16-28 4-9 11-7 10 4-1 12-4 20-2 24"/>
+                    <path d="M410 44c3-24 9-34 14-32s4 22 0 32"/>
+                    <path d="M106 12l24-4"/><path d="M348 14l20-3"/>
+                    <path d="M232 6h.8"/>
+                    <path d="M44 100c4-26 10-40 15-38s4 22 1 32c-3 9-3 14 1 14 5 0 9-11 13-20 4-10 11-9 11 1 0 9-2 14 1 18 6-2 10-13 15-24 4-10 11-8 11 3 0 9-2 14 1 18 7-2 11-24 17-42 4-13 11-11 10 3-1 15-4 27-2 41"/>
+                    <path d="M172 98c3-20 8-30 13-28s4 18 1 26c-2 7-2 12 2 12 5 0 9-10 12-18 4-9 10-8 11 1 1 7-1 12 1 17 6-3 11-18 17-32 4-10 11-8 10 3-1 11-4 18-2 22"/>
+                    <path d="M258 98c4-22 10-32 15-30s4 20 0 30c-3 8-3 12 1 12 6 0 11-12 16-24 4-10 11-8 11 3 0 10-3 15 0 19"/>
+                    <path d="M334 76c9-3 17 0 18 8 1 8-6 13-14 14-7 1-11 5-9 11 2 7 12 9 20 5"/>
+                    <path d="M132 68l22-4"/><path d="M292 66l18-3"/>
+                    <path d="M44 148c5-20 11-28 15-26s3 16 0 24c-2 6-2 10 2 10 5 0 9-9 12-16 4-9 10-8 11 1 1 7-1 12 1 16 6-3 11-15 16-26 4-9 11-7 10 4-1 10-3 16-1 20"/>
+                    <path d="M164 148c3-18 8-26 12-24s3 16 0 24"/>
+                    <path d="M212 130c8-2 15 1 15 8 0 7-6 11-13 12-6 1-9 5-7 10 2 6 11 8 18 4"/>
+                    <path d="M100 122l20-3"/>
+                  </g>
+                </svg>
+              </div>
+              <div class="a-extra" style="margin-top: 8px;">
+                Stored as <code style="font-size: 12px;">Stroke[]</code> — resolution independent, themeable,
+                undoable per stroke, and legible when this chart is printed in 2031.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <figcaption>
+        <b>The pen icon in the reference design, taken seriously.</b> This is not a canvas
+        bitmap: it is the same stroke model
+        <code>@oxygenui-design/signature-core</code> already ships, embedded as a document node.
+        That means palm rejection, the ink gate, per-stroke undo, and SVG export come for free —
+        the expensive half of this feature was already built and tested for Signature.
+      </figcaption>
+    </figure>
+
+    <div class="prose">
+      <div class="note">
+        <span class="lbl">Dark mode is not an afterthought here</span>
+        <p>
+          Night shift is when the worst documentation happens, and every mockup above has a
+          dark counterpart driven by antd's dark algorithm. The one rule that matters:
+          <strong>the provenance tints must survive the theme flip and forced-colors mode</strong>,
+          which means each origin carries a distinguishing underline weight in addition to its
+          hue. Colour alone would fail both a colour-blind reader and Windows High Contrast — and
+          this is exactly the surface where a missed distinction has consequences.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================== -->
+<section id="a11y">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="sec-num">07 — Accessibility</span>
+      <h2>A toolbar of icon buttons is not an accessibility strategy</h2>
+      <p>
+        <code>contenteditable</code> is the most hostile surface the web platform offers to
+        assistive technology. Most editors respond by adding <code>aria-label</code> to the
+        buttons and declaring victory. Here is the actual list.
+      </p>
+    </div>
+
+    <div class="prose">
+      <div class="note bad">
+        <span class="lbl">Start here</span>
+        <p>
+          A clinician with low vision, RSI, or a tremor is not an edge case in a hospital — they
+          are a colleague, and documentation is the task they cannot delegate. An editor they
+          cannot use is an editor that removes them from clinical practice.
+        </p>
+      </div>
+
+      <div class="tw">
+        <table>
+          <thead>
+            <tr><th>Requirement</th><th>What it means here</th><th>Why editors get it wrong</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Toolbar as one tab stop</strong><br /><span style="color: var(--muted);">WAI-ARIA toolbar pattern</span></td>
+              <td><code>role="toolbar"</code>, roving <code>tabindex</code>, arrow keys within, one <kbd>Tab</kbd> in and one out.</td>
+              <td>Fifteen individually-focusable buttons means fifteen <kbd>Tab</kbd> presses between the document and the sign button. Every time.</td>
+            </tr>
+            <tr>
+              <td><strong>Every action has a keyboard path</strong><br /><span style="color: var(--muted);">2.1.1 Level A</span></td>
+              <td>Including section insert, wildcard traversal, provenance toggle, AI accept/reject, and moving between sections.</td>
+              <td>Slash menus and hover affordances are mouse-shaped by default; the keyboard path is added last and tested never.</td>
+            </tr>
+            <tr>
+              <td><strong>No keyboard trap</strong><br /><span style="color: var(--muted);">2.1.2 Level A</span></td>
+              <td><kbd>Esc</kbd> closes the palette but must not close the modal underneath it, and <kbd>Tab</kbd> inside the document must insert a tab in a list context and move focus everywhere else.</td>
+              <td>This exact conflict — <kbd>Tab</kbd> for indent vs <kbd>Tab</kbd> for focus — is the classic editor trap. The resolution: <kbd>Tab</kbd> indents only inside a list item; <kbd>Esc</kbd> then <kbd>Tab</kbd> always escapes.</td>
+            </tr>
+            <tr>
+              <td><strong>Formatting is announced</strong><br /><span style="color: var(--muted);">4.1.2 / 1.3.1</span></td>
+              <td>Marks must be real semantic elements (<code>&lt;strong&gt;</code>, <code>&lt;em&gt;</code>), not styled spans, so a screen reader can convey them at all.</td>
+              <td>Editors that render bold as <code>&lt;span style="font-weight:600"&gt;</code> make emphasis literally invisible to a screen-reader user.</td>
+            </tr>
+            <tr>
+              <td><strong>Provenance is not colour</strong><br /><span style="color: var(--muted);">1.4.1 Level A</span></td>
+              <td>Each origin has a hue <em>and</em> a distinct underline style <em>and</em> an accessible-name annotation reachable from the caret.</td>
+              <td>A tinted-background approach fails colour-blind users, forced-colors mode, and print simultaneously.</td>
+            </tr>
+            <tr>
+              <td><strong>Status changes reach AT</strong><br /><span style="color: var(--muted);">4.1.3 Level AA</span></td>
+              <td>Save state, offline transitions, autosave failures and sign-gate results announce via <code>aria-live="polite"</code>; a failed save is <code>assertive</code>.</td>
+              <td>A silent "saving…" spinner is a status change nobody hears. And a save failure nobody hears is lost work.</td>
+            </tr>
+            <tr>
+              <td><strong>Landmark navigation</strong><br /><span style="color: var(--muted);">2.4.1</span></td>
+              <td><kbd>F6</kbd> cycles patient banner → toolbar → section rail → document → footer. Sections are real headings, so heading navigation works.</td>
+              <td>Only possible because sections are schema nodes. This is the accessibility dividend of feature #14.</td>
+            </tr>
+            <tr>
+              <td><strong>Focus is always visible</strong><br /><span style="color: var(--muted);">2.4.7 / 2.4.11 AA</span></td>
+              <td>Including the caret inside <code>contenteditable</code> at 400% zoom, and the focused item in the command palette.</td>
+              <td>Custom carets and virtualised documents lose the native caret and never replace it.</td>
+            </tr>
+            <tr>
+              <td><strong>Reflow to 320 CSS px</strong><br /><span style="color: var(--muted);">1.4.10 AA</span></td>
+              <td>At 400% zoom the rail collapses to a menu, the toolbar wraps, and the document stays in one column with no horizontal scroll.</td>
+              <td>Fixed-width editor chrome is the most common 1.4.10 failure on the web.</td>
+            </tr>
+            <tr>
+              <td><strong>Target size</strong><br /><span style="color: var(--muted);">2.5.8 AA (2.2)</span></td>
+              <td>24×24 minimum with adequate spacing — and clinical density mode is where this gets violated, so the density tokens have a floor.</td>
+              <td>"Compact" modes routinely ship 20px targets. On a tablet at the bedside, with gloves on, that is unusable.</td>
+            </tr>
+            <tr>
+              <td><strong>Dragging has an alternative</strong><br /><span style="color: var(--muted);">2.5.7 AA (2.2)</span></td>
+              <td>Section reorder works with <kbd>Alt</kbd>+<kbd>↑</kbd>/<kbd>↓</kbd>. Drag is additive.</td>
+              <td>Drag-only reorder is a 2.2 failure and excludes anyone with a tremor.</td>
+            </tr>
+            <tr>
+              <td><strong>IME and Android composition</strong></td>
+              <td>Composition events must not be interrupted by autosave, lint decorations, or provenance mark application. Decorations apply on <code>compositionend</code>, never during.</td>
+              <td>This is where Slate historically bled, and it is not optional in a product shipping to India or East Asia.</td>
+            </tr>
+            <tr>
+              <td><strong>Reduced motion</strong><br /><span style="color: var(--muted);">2.3.3 AAA, cheap</span></td>
+              <td>Palette open, section jump, and diff transitions all become instant.</td>
+              <td>Nobody remembers the palette animation.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="note warn">
+        <span class="lbl">The antd gaps we already know about</span>
+        <p>
+          From the Signature work: antd's Modal has <strong>no accessible name</strong> unless
+          you pass <code>title</code>; its initial focus lands on an <strong>invisible sentinel
+          div</strong>; Tabs <strong>drop <code>aria-controls</code></strong> unless given an
+          <code>id</code>; and the close button's <code>aria-label</code> is
+          <strong>hardcoded English</strong>. All four bite this component too, all four are
+          fixed in the wrapper, and all four need a regression test — because they are antd
+          behaviours we are patching from outside and an antd upgrade can silently reintroduce
+          them.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================== -->
+<section id="api">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="sec-num">08 — The API</span>
+      <h2>Five components and two hooks, shaped like Ant Design</h2>
+      <p>
+        Controlled and uncontrolled, <code>value</code>/<code>onChange</code>, a
+        <code>Form.Item</code>-compatible surface, and every clinical concern injected rather
+        than assumed.
+      </p>
+    </div>
+
+    <div class="prose">
+      <pre><code><span class="c-c">// @oxygenui-design/clinical-note</span>
+
+<span class="c-k">import</span> { ClinicalNote } <span class="c-k">from</span> <span class="c-s">"@oxygenui-design/clinical-note"</span>;
+
+&lt;<span class="c-k">ClinicalNote</span>
+  <span class="c-c">/* identity — required, and there is no default */</span>
+  subject={{ reference: <span class="c-s">"Patient/4471902"</span>, display: <span class="c-s">"RANDOL, Joshua"</span>,
+             identifiers: [{ system: <span class="c-s">"…/mrn"</span>, value: <span class="c-s">"4471902"</span> }],
+             birthDate: <span class="c-s">"1996-03-12"</span> }}
+  author={{ reference: <span class="c-s">"Practitioner/88"</span>, display: <span class="c-s">"Rohit Menon, MD"</span>,
+            role: <span class="c-s">"resident"</span>, requiresCosign: <span class="c-k">true</span> }}
+
+  <span class="c-c">/* what kind of note — drives required sections and the gate */</span>
+  noteType={<span class="c-k">NOTE_TYPES</span>.progress}
+  value={doc}
+  onChange={setDoc}
+
+  <span class="c-c">/* the clock belongs to the host, exactly as in signature-core */</span>
+  now={() =&gt; serverTime()}
+  timeZone=<span class="c-s">"Asia/Kolkata"</span>
+
+  <span class="c-c">/* everything clinical is injected */</span>
+  phrases={phraseLibrary}          <span class="c-c">// dot phrases: user + org</span>
+  resolveSmartLink={fetchPatientDatum}
+  dictionary={medicalDictionary}
+  gate={[...<span class="c-k">DEFAULT_RULES</span>, ourRule]}
+  onCommit={handleCommit}          <span class="c-c">// "draft" | "sign" | "addend"</span>
+  onSteps={appendToAuditLog}       <span class="c-c">// we emit; you store</span>
+
+  <span class="c-c">/* honest about state */</span>
+  saveState={{ kind: <span class="c-s">"offline"</span>, pendingSteps: 42, lastSavedAt: t }}
+  readOnly={note.status === <span class="c-s">"signed"</span>}
+/&gt;</code></pre>
+
+      <div class="tw">
+        <table>
+          <thead>
+            <tr><th>Export</th><th>Package</th><th>What it is</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><code>&lt;ClinicalNote /&gt;</code></td><td>clinical-note</td><td>The full editor. Composed of the four below; use this unless you have a reason not to.</td></tr>
+            <tr><td><code>&lt;ClinicalNote.Editor /&gt;</code></td><td>clinical-note</td><td>The document surface alone — no chrome, no toolbar. For hosts with their own shell.</td></tr>
+            <tr><td><code>&lt;ClinicalNote.Toolbar /&gt;</code></td><td>clinical-note</td><td>The antd toolbar, with the roving-tabindex behaviour. Composable.</td></tr>
+            <tr><td><code>&lt;ClinicalNote.SignGate /&gt;</code></td><td>clinical-note</td><td>The modal in §06C. Usable standalone against any document.</td></tr>
+            <tr><td><code>&lt;ClinicalNote.Reader /&gt;</code></td><td>clinical-note</td><td>Read-only render of a signed note plus addenda, print-shaped. No editor loaded — most viewers of a note never edit one, and this keeps that bundle small.</td></tr>
+            <tr><td><code>useClinicalNote()</code></td><td>clinical-note</td><td>Headless: state, commands, gate results, save state. For a completely custom UI.</td></tr>
+            <tr><td><code>useDictation()</code></td><td>clinical-note</td><td>The transcript-segment channel, decoupled from any recognizer.</td></tr>
+            <tr><td colspan="3" style="background: var(--surface-2); font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted);">core — no React, no DOM, no antd</td></tr>
+            <tr><td><code>noteSchema(noteType)</code></td><td>clinical-note-core</td><td>The ProseMirror schema for a note type. Sections, marks, wildcards, ink.</td></tr>
+            <tr><td><code>provenance</code></td><td>clinical-note-core</td><td>The mark spec, the six origins, and the merge/split rules.</td></tr>
+            <tr><td><code>composition(doc)</code></td><td>clinical-note-core</td><td>The origin ratios. Pure function of the document.</td></tr>
+            <tr><td><code>runGate(doc, rules, ctx)</code></td><td>clinical-note-core</td><td>The rule engine. Deterministic, synchronous, trivially testable.</td></tr>
+            <tr><td><code>toCanonical(doc)</code></td><td>clinical-note-core</td><td>Deterministic bytes. Same document, same output, every time.</td></tr>
+            <tr><td><code>toNarrative(doc)</code></td><td>clinical-note-core</td><td>The FHIR-legal XHTML subset, as a string. No DOM involved.</td></tr>
+            <tr><td><code>toText(doc)</code></td><td>clinical-note-core</td><td>Plain text for HL7 v2 <code>OBX</code>. A real serializer with tests.</td></tr>
+            <tr><td><code>toFhirBundle(note, opts)</code></td><td>clinical-note-core</td><td>§09.</td></tr>
+            <tr><td><code>expand(phrase, ctx)</code></td><td>clinical-note-core</td><td>Dot-phrase expansion including wildcards and pick lists. Pure.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="note">
+        <span class="lbl">The API rule that matters most</span>
+        <p>
+          <strong>Nothing clinical is hard-coded and nothing clinical has a default.</strong>
+          No phrase library, no terminology, no abbreviation list, no attestation wording, and
+          no clock ships in the package. Every one of those is a jurisdictional, organisational
+          or licensing decision. A component that guesses at them is confidently wrong in a
+          domain where confidently wrong is the failure mode that hurts people.
+        </p>
+      </div>
+
+      <p>
+        Two consequences of that rule worth stating, because they will come up in review:
+      </p>
+      <ul>
+        <li>
+          <strong>The do-not-use list is the one exception</strong>, and only because it is a
+          short, stable, published list of things that are always wrong. It ships as data the
+          host can replace, defaults to on, and warns rather than blocks.
+        </li>
+        <li>
+          <strong>Empty defaults must fail loudly in development.</strong> A <code>ClinicalNote</code>
+          with no <code>now</code> prop should throw in dev, not silently call
+          <code>Date.now()</code>. That lesson is already learned in <code>signature-core</code>
+          and is enforced there by a test that greps the source.
+        </li>
+      </ul>
+    </div>
+  </div>
+</section>
+<!-- ================================================================== -->
+<section id="data">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="sec-num">09 — Data contract</span>
+      <h2>FHIR, and the constraint that decides the whole formatting menu</h2>
+      <p>
+        The narrative subset is not a detail to handle at export time. It determines which
+        toolbar buttons may exist at all.
+      </p>
+    </div>
+
+    <div class="prose">
+      <h3>The constraint</h3>
+      <p>
+        FHIR narrative <code>div</code> content must be an XHTML fragment containing only the
+        basic HTML formatting elements from chapters 7–11 (excluding §4 of chapter 9) and
+        chapter 15 of HTML 4.0, plus <code>&lt;a&gt;</code> elements and images, with styling
+        applied through inline <code>style</code> attributes. It <strong>must not</strong>
+        contain <code>head</code>, <code>body</code>, external stylesheet references,
+        deprecated elements, scripts, forms, <code>base</code>/<code>link</code>/<code>xlink</code>,
+        frames, iframes, objects, or event attributes such as <code>onClick</code> — so that
+        the narrative is self-contained and carries no active content.
+      </p>
+
+      <div class="note ok">
+        <span class="lbl">Why this is good news</span>
+        <p>
+          <strong>Design the schema to be a subset of what FHIR permits, and the export becomes
+          a total function.</strong> No validation step, no lossy conversion, no "this note
+          cannot be transmitted" error twenty minutes after it was written. The schema is the
+          contract. This is the argument for a schema-first engine, made concrete — and it is
+          why the formatting menu in §06A is four buttons rather than twelve.
+        </p>
+      </div>
+
+      <h3>What we emit</h3>
+      <pre><code><span class="c-c">// A transaction Bundle, because no single resource carries all of it.</span>
+{
+  resourceType: <span class="c-s">"Bundle"</span>, type: <span class="c-s">"transaction"</span>,
+  entry: [
+    { resource: {
+        resourceType: <span class="c-s">"Composition"</span>,
+        status: <span class="c-s">"final"</span>,                 <span class="c-c">// preliminary while draft</span>
+        type: { coding: [{ system: <span class="c-s">"http://loinc.org"</span>, code: <span class="c-s">"11506-3"</span>,
+                           display: <span class="c-s">"Progress note"</span> }] },
+        subject: { reference: <span class="c-s">"Patient/4471902"</span> },
+        date: <span class="c-s">"2026-08-16T14:41:07+05:30"</span>,   <span class="c-c">// host clock, with offset</span>
+        author: [{ reference: <span class="c-s">"Practitioner/88"</span> }],
+        attester: [
+          { mode: <span class="c-s">"personal"</span>,  time: <span class="c-s">"2026-08-16T14:41:07+05:30"</span>, party: {…} },
+          { mode: <span class="c-s">"official"</span>,  time: <span class="c-s">"2026-08-16T18:02:55+05:30"</span>, party: {…} },
+        ],
+        section: [
+          { title: <span class="c-s">"Chief complaint"</span>,
+            code: { coding: [{ system: <span class="c-s">"http://loinc.org"</span>, code: <span class="c-s">"10154-3"</span> }] },
+            text: { status: <span class="c-s">"additional"</span>, div: <span class="c-s">"&lt;div xmlns=…&gt;&lt;p&gt;Admitted for…&lt;/p&gt;&lt;/div&gt;"</span> } },
+          …
+        ],
+      } },
+    { resource: {
+        resourceType: <span class="c-s">"DocumentReference"</span>,   <span class="c-c">// how it is found and retrieved</span>
+        status: <span class="c-s">"current"</span>, docStatus: <span class="c-s">"final"</span>,
+        content: [{ attachment: { contentType: <span class="c-s">"text/plain"</span>, … } }],  <span class="c-c">// v2 path</span>
+      } },
+    { resource: {
+        resourceType: <span class="c-s">"Provenance"</span>,          <span class="c-c">// the part that carries provenance + signature</span>
+        target: [{ reference: <span class="c-s">"Composition/…"</span> }],
+        recorded: <span class="c-s">"2026-08-16T14:41:07+05:30"</span>,
+        agent: [{ type: {…author…} }, { type: {…AI assistant, if used…} }],
+        signature: [{ type: [{ system: <span class="c-s">"urn:iso-astm:E1762-95:2013"</span>,
+                               code: <span class="c-s">"1.2.840.10065.1.12.1.1"</span> }],  <span class="c-c">// Author's signature</span>
+                      when: …, who: …, sigFormat: <span class="c-s">"image/png"</span>, data: … }],
+      } },
+  ],
+}</code></pre>
+
+      <div class="tw">
+        <table>
+          <thead><tr><th>Concern</th><th>Where it lands</th><th>Note</th></tr></thead>
+          <tbody>
+            <tr><td>The text</td><td><code>Composition.section[].text.div</code></td><td>One narrative per coded section, not one blob.</td></tr>
+            <tr><td>Signature</td><td><code>Provenance.signature</code></td><td>Same choice as the Signature component, for the same reason: <code>Composition.attester</code> has no signature element, in R4 or R5.</td></tr>
+            <tr><td>Countersignature</td><td>Second <code>attester</code> + second <code>Provenance</code></td><td>Two signatures, two times, two actors, ordered.</td></tr>
+            <tr><td>Addendum</td><td>New <code>Composition</code>, <code>relatesTo: { code: "appends", target: … }</code></td><td>Not an edit of the first. The original stays <code>final</code> and unchanged.</td></tr>
+            <tr><td>Provenance marks</td><td><span class="meh">Extension</span></td><td>There is no standard element for per-range authorship. We define one Oxygen extension, document it plainly as non-standard, and make it optional — an unrecognised extension is safely ignored by conforming servers.</td></tr>
+            <tr><td>Composition ratios</td><td>Same extension, plus the audit log</td><td>The copy-forward percentage at signing is a fact about the signature event, so <code>Provenance</code> is its natural home.</td></tr>
+            <tr><td>Integrity hash</td><td><code>Provenance.signature.data</code> (detached JWS)</td><td>Over <code>toCanonical(doc)</code>. Optional, host-keyed. The seam exists in <code>signature-core</code> today.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="note warn">
+        <span class="lbl">Be honest in the docs about this one</span>
+        <p>
+          <strong>Provenance-per-range is not standardised anywhere, and we should say so
+          loudly rather than imply a conformance we do not have.</strong> It is the most valuable
+          thing this component produces and it travels as a custom extension. That is an
+          acceptable trade if it is stated — and a credibility problem the first time a customer's
+          integration engineer discovers it themselves.
+        </p>
+      </div>
+
+      <h3>The LOINC section codes</h3>
+      <p>
+        The codes shown throughout this brief are the common C-CDA section codes —
+        <code>10154-3</code> chief complaint, <code>10164-2</code> HPI, <code>11348-0</code>
+        past illness, <code>10187-3</code> review of systems, <code>29545-1</code> physical
+        exam, <code>51847-2</code> assessment and plan, with note types
+        <code>11506-3</code> progress, <code>34117-2</code> H&amp;P, <code>18842-5</code>
+        discharge summary, <code>11488-4</code> consultation.
+      </p>
+      <div class="note bad">
+        <span class="lbl">Verify before shipping</span>
+        <p>
+          These are from working memory and match common usage, but section codes and their
+          C-CDA cardinality rules must be checked against the current C-CDA implementation
+          guide and LOINC release before a single one is hard-coded into a default note type.
+          A wrong section code is a silent interoperability failure that surfaces at a customer's
+          integration, not at ours.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================== -->
+<section id="law">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="sec-num">10 — Law</span>
+      <h2>What the rules actually require, and what they do not</h2>
+      <p>
+        Enough to design correctly. Not legal advice, and every one of these needs the
+        customer's counsel for their jurisdiction and deployment.
+      </p>
+    </div>
+
+    <div class="tw">
+      <table>
+        <thead><tr><th>Rule</th><th>What it says</th><th>What the component does</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>42 CFR 482.24(c)(1)</strong><br /><span style="color: var(--muted);">Medicare CoP, medical records</span></td>
+            <td>Record entries must be dated, timed, and authenticated by the person responsible for providing or evaluating the service.</td>
+            <td>Absolute timestamps with an offset, never relative. Author identity and role are required props. The clock comes from the host, because a browser clock is not evidence.</td>
+          </tr>
+          <tr>
+            <td><strong>CMS signature guidance</strong><br /><span style="color: var(--muted);">revised July 2025 to cover AI</span></td>
+            <td>Where a scribe is used — <em>including artificial intelligence technology</em> — the treating clinician signs the entry to authenticate the documentation and the care provided. Identifying who or what transcribed is not required.</td>
+            <td>Two consequences. First: attribution is <em>ours</em> to offer, not a mandate — so provenance is a safety and review feature, not a compliance checkbox, and we should sell it as such. Second: since the signer owns every word regardless, the review gate is the thing that actually protects them.</td>
+          </tr>
+          <tr>
+            <td><strong>21 CFR Part 11</strong><br /><span style="color: var(--muted);">where it applies — research, trials, regulated manufacturing</span></td>
+            <td>Electronic signatures need two identification components, signature manifestations showing printed name, date, time and meaning, and audit trails that are computer-generated, time-stamped and do not obscure prior entries.</td>
+            <td>The signature manifestation block in §06D is exactly that. Audit trails are emitted as steps; storage is the host's. Two-component authentication lives in the host's auth layer, never in a UI package.</td>
+          </tr>
+          <tr>
+            <td><strong>21st Century Cures Act</strong><br /><span style="color: var(--muted);">information blocking</span></td>
+            <td>Clinical notes must be released to patients without delay, with narrow exceptions.</td>
+            <td>The author is told, in the editor, that the patient will read this. Reading-level and language hints are advisory. A sensitive-content path exists but is a deliberate, logged decision.</td>
+          </tr>
+          <tr>
+            <td><strong>HIPAA 45 CFR 164.526</strong><br /><span style="color: var(--muted);">right to amend</span></td>
+            <td>A patient may request amendment of their record. A granted amendment is appended and linked; the original is retained.</td>
+            <td>Falls out of the addendum model for free. This is a second, independent reason the append-only design is correct.</td>
+          </tr>
+          <tr>
+            <td><strong>Joint Commission "Do Not Use"</strong><br /><span style="color: var(--muted);">accreditation standard, not statute</span></td>
+            <td><code>U</code>, <code>IU</code>, <code>QD</code>, <code>QOD</code>, <code>MS</code>, <code>MSO4</code>, <code>MgSO4</code>, trailing zeros and missing leading zeros are prohibited in handwritten and free-text entries. Trailing zeros remain permissible where precision genuinely requires them — lab results, lesion sizes, catheter sizes.</td>
+            <td>Lint, warn, offer the expansion. Never block: it is a standard, not a law, and that trailing-zero carve-out guarantees false positives in exactly the text clinicians write most.</td>
+          </tr>
+          <tr>
+            <td><strong>MDR / FDA device rules</strong></td>
+            <td>Software that interprets clinical data to inform a diagnosis or treatment decision may be a regulated medical device.</td>
+            <td>Hard boundary. The component displays, structures and lints text; it never suggests a diagnosis, a dose, or a treatment. The CDS seam exists for hosts; nothing clinical ships through it from us.</td>
+          </tr>
+          <tr>
+            <td><strong>DPDP Act 2023 · GDPR</strong></td>
+            <td>Health data is sensitive personal data with residency, purpose-limitation, and minimisation obligations.</td>
+            <td>Nothing leaves the browser. The local draft store is opt-in, scoped to the author, and cleared on commit and on author change. No telemetry, ever — and this is worth saying in the README, because buyers ask.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="prose">
+      <div class="note bad">
+        <span class="lbl">The line, stated the way it must appear in the README</span>
+        <p>
+          Oxygen UI provides user-interface components. This component does not make an
+          application HIPAA, GDPR or DPDP compliant, is not a medical device, is not clinical
+          decision support, and does not by itself establish the legal validity or admissibility
+          of any record. That depends on the deployment, the jurisdiction, and the procedures
+          around it.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================== -->
+<section id="arch">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="sec-num">11 — Architecture</span>
+      <h2>Two packages, four layers, and three things not to build</h2>
+    </div>
+
+    <div class="prose">
+      <div class="layers">
+        <div><span class="l">L0</span><span class="d"><code>@oxygenui-design/fhir</code> · <code>tokens</code> · <code>intl</code> — types, tokens, locale. No React. Exists today.</span></div>
+        <div><span class="l">L1</span><span class="d"><code>@oxygenui-design/clinical-note-core</code> — <strong>the engine.</strong> Schema, provenance marks, gate rules, expansion, canonical/narrative/text serializers, FHIR mapping. ProseMirror <code>model</code> + <code>transform</code> only — <code>state</code> turned out to be view-side and is not needed here. No <code>view</code>, no DOM, no React, no antd.</span></div>
+        <div><span class="l">L1</span><span class="d"><code>@oxygenui-design/signature-core</code> — reused verbatim for ink strokes and the co-signature outcome union. Already shipped, already tested.</span></div>
+        <div><span class="l">L2</span><span class="d"><code>@oxygenui-design/clinical-note</code> — the React view, the antd shell, the toolbar, the palettes, the gate modal, the reader. antd v6 as a peer dependency.</span></div>
+        <div><span class="l">L3</span><span class="d">Blocks — a full documentation screen: chart context, prior notes, orders. Later, and only once someone asks.</span></div>
+      </div>
+
+      <p>
+        The split is the same one <code>signature</code> / <code>signature-core</code> made, for
+        the same reason and with the same payoff: <strong>the expensive half is portable and
+        testable without a browser.</strong> If the library-wide antd decision reverses, or if a
+        React Native target appears, or if Lexical becomes the better view layer in 2028, none of
+        that reaches the engine.
+      </p>
+
+      <h3>The directory, per the repo's fixed layout</h3>
+      <pre><code>packages/clinical-note-core/src/
+├── schema.ts          <span class="c-c">// note types → ProseMirror schema. The contract.</span>
+├── provenance.ts      <span class="c-c">// the six origins; merge/split under transforms</span>
+├── gate.ts            <span class="c-c">// rule engine + the five default rules</span>
+├── expand.ts          <span class="c-c">// dot phrases, wildcards, pick lists</span>
+├── canonical.ts       <span class="c-c">// deterministic bytes</span>
+├── narrative.ts       <span class="c-c">// FHIR-legal XHTML, as a string</span>
+├── text.ts            <span class="c-c">// HL7 v2 plain text</span>
+├── fhir.ts            <span class="c-c">// Bundle: Composition + DocumentReference + Provenance</span>
+├── compose.ts         <span class="c-c">// origin ratios, diff, copy-forward measurement</span>
+└── index.ts
+
+packages/clinical-note/src/
+├── ClinicalNote.tsx · Editor.tsx · Toolbar.tsx · SignGate.tsx · Reader.tsx
+├── Palette.tsx · SectionRail.tsx · InkBlock.tsx · ProvenanceLayer.tsx
+├── use-clinical-note.ts · use-dictation.ts · use-local-draft.ts
+├── locale.tsx · typed.ts · styles.css · index.ts</code></pre>
+
+      <h3>Three things not to build</h3>
+      <div class="grid g3">
+        <div class="card">
+          <span class="k">Do not build</span>
+          <h4>A speech recognizer</h4>
+          <p>
+            Months of work, a hard vendor market, and the wrong core competency. Build the
+            <em>channel</em> — a typed API for transcript segments with confidence — and let
+            Deepgram, Nuance or the platform's own recognizer plug into it. The channel is the
+            defensible part anyway, because it is what carries provenance.
+          </p>
+        </div>
+        <div class="card">
+          <span class="k">Do not build</span>
+          <h4>A collaboration server</h4>
+          <p>
+            ProseMirror's collab module needs an authority. That is infrastructure, not a
+            component, and shipping it would make Oxygen a hosting company. Document the
+            integration, ship an example against a plain WebSocket authority, and stop there.
+          </p>
+        </div>
+        <div class="card">
+          <span class="k">Do not build</span>
+          <h4>Terminology or content</h4>
+          <p>
+            SNOMED, ICD-10 and RxNorm carry licensing we cannot redistribute, and a phrase
+            library is an organisational asset with clinical governance behind it. We own the
+            popup, the keyboard model, and the inserted node. They own the words.
+          </p>
+        </div>
+      </div>
+
+      <h3>Bundle budget</h3>
+      <p>
+        ProseMirror is not small, and pretending otherwise in a library that enforces
+        <code>size-limit</code> in CI would be dishonest. Rough shape, to be asserted rather than
+        estimated once real:
+      </p>
+      <div class="tw">
+        <table>
+          <thead><tr><th>Entry point</th><th>Contains</th><th>Budget posture</th></tr></thead>
+          <tbody>
+            <tr><td><code>clinical-note/reader</code></td><td>Read-only render + print. No editor, no ProseMirror view.</td><td>Tight. Most people who open a note never edit one, and this is the path that must stay cheap.</td></tr>
+            <tr><td><code>clinical-note-core</code></td><td>Schema, gate, serializers. No view.</td><td>Moderate — and it is the piece a server also imports, so it is worth keeping honest.</td></tr>
+            <tr><td><code>clinical-note</code></td><td>The full editor.</td><td>Generous, and lazily loaded by the host. An editor is not on the critical rendering path of any chart view.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>
+        The rule: <strong>the reader must not pull the editor.</strong> If that separation is
+        not enforced by a size budget in CI, it will be violated by the third import someone adds.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================== -->
+<section id="tests">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="sec-num">12 — Testing</span>
+      <h2>How to test an editor without a flaky test suite</h2>
+      <p>
+        The general rule: if it needs a real browser to assert, it is in the wrong package.
+      </p>
+    </div>
+
+    <div class="prose">
+      <div class="tw">
+        <table>
+          <thead><tr><th>Layer</th><th>How</th><th>Speed</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><strong>Schema invariants</strong></td>
+              <td>Property-based. Generate random documents from the schema; assert every one serializes to valid FHIR narrative and survives a round trip. <em>This is the test that makes the schema-first argument pay.</em></td>
+              <td>Node, milliseconds</td>
+            </tr>
+            <tr>
+              <td><strong>Provenance under transforms</strong></td>
+              <td>Fuzz: apply thousands of random steps to a marked document and assert marks never lose coverage, never overlap incorrectly, and never leave orphaned zero-length ranges. This is where the bugs will be, so this is where the fuzzer goes.</td>
+              <td>Node, milliseconds</td>
+            </tr>
+            <tr>
+              <td><strong>Serializer determinism</strong></td>
+              <td>Golden files, plus: serialize twice from independently-built equal documents and diff the bytes. Attribute ordering bugs only appear this way.</td>
+              <td>Node, milliseconds</td>
+            </tr>
+            <tr>
+              <td><strong>Gate rules</strong></td>
+              <td>Table-driven. Each rule is a pure function of (document, context) → verdict. No editor needed to test any of them.</td>
+              <td>Node, milliseconds</td>
+            </tr>
+            <tr>
+              <td><strong>Expansion</strong></td>
+              <td>Golden: phrase in, document fragment out. Includes wildcard counting and nested pick lists.</td>
+              <td>Node, milliseconds</td>
+            </tr>
+            <tr>
+              <td><strong>Keyboard and palette</strong></td>
+              <td>Testing Library, real key events, no <code>fireEvent.change</code> shortcuts. Assert the roving-tabindex contract explicitly — one Tab in, one Tab out.</td>
+              <td>jsdom, fast</td>
+            </tr>
+            <tr>
+              <td><strong>IME / composition</strong></td>
+              <td>Synthetic <code>compositionstart</code>/<code>update</code>/<code>end</code> sequences, asserting no decoration is applied mid-composition. Then a real Playwright run on an actual IME, because jsdom will lie to you here.</td>
+              <td>jsdom + one real browser</td>
+            </tr>
+            <tr>
+              <td><strong>Accessibility</strong></td>
+              <td>axe per story, zero violations, enforced by the existing coverage manifest. Plus one manual NVDA and one VoiceOver pass per release — <strong>axe cannot tell you whether an editor is usable</strong>, only that it is not obviously broken.</td>
+              <td>CI + human</td>
+            </tr>
+            <tr>
+              <td><strong>Visual</strong></td>
+              <td>Playwright VRT on the existing <code>@vrt</code> tag: light, dark, forced-colors, three densities, 400% zoom, 320px width, and the print stylesheet.</td>
+              <td>CI</td>
+            </tr>
+            <tr>
+              <td><strong>Offline and crash</strong></td>
+              <td>Playwright: kill the context mid-edit, reopen, assert the draft recovers with the right content and the right author. Then assert it does <em>not</em> recover for a different author.</td>
+              <td>CI</td>
+            </tr>
+            <tr>
+              <td><strong>No-clock, no-DOM discipline</strong></td>
+              <td>A test that greps <code>clinical-note-core</code> for <code>Date.now</code>, <code>new Date(</code>, <code>document.</code> and <code>window.</code> and fails on a hit. Crude, and it has already earned its place in <code>signature-core</code>.</td>
+              <td>Node, instant</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="note">
+        <span class="lbl">The number that matters</span>
+        <p>
+          If the core test suite does not run in under a second, the fuzz tests will be
+          deleted within a month and the provenance bugs will ship. Keeping the engine DOM-free
+          is not architectural purity — it is what makes the tests fast enough that people keep
+          running them.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================== -->
+<section id="plan">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="sec-num">13 — Plan</span>
+      <h2>Eight phases, roughly seven weeks to beta</h2>
+      <p>
+        Ordered so that the riskiest thing is proven first and every phase ends with something
+        demonstrable. Estimates assume one focused developer.
+      </p>
+    </div>
+
+    <div class="phases">
+      <div class="phase">
+        <div class="rail"><div class="dot">0</div><div class="line"></div></div>
+        <div class="body">
+          <div class="meta">~2 days · decisions, not code</div>
+          <h4>Settle the three open questions in §14</h4>
+          <p>
+            Name, antd scope, and pro/free tier. Each of these changes the package layout, and
+            discovering that in week four is expensive. Then scaffold both packages with
+            <code>pnpm gen:component</code> so nothing shared is edited by hand.
+          </p>
+        </div>
+      </div>
+      <div class="phase">
+        <div class="rail"><div class="dot">1</div><div class="line"></div></div>
+        <div class="body">
+          <div class="meta">~5 days · the whole bet</div>
+          <h4>Schema, provenance marks, and the fuzzer — core only, no UI</h4>
+          <p>
+            The note-type schema, the six-origin mark, and the fuzz suite that proves marks
+            survive arbitrary transforms. <strong>Nothing renders yet, and that is the point.</strong>
+            If provenance under transforms does not hold up, the entire thesis is wrong and it is
+            better to know in week one than in week six. This is the phase that de-risks the project.
+          </p>
+        </div>
+      </div>
+      <div class="phase">
+        <div class="rail"><div class="dot">2</div><div class="line"></div></div>
+        <div class="body">
+          <div class="meta">~4 days</div>
+          <h4>Serializers: canonical, narrative, text — and the FHIR bundle</h4>
+          <p>
+            Determinism tests, property-based round trips, golden files. Still no UI. At the end
+            of this phase the package can take a JSON document and produce a valid, hashable
+            <code>Bundle</code> — which is a demo you can show an integration engineer.
+          </p>
+        </div>
+      </div>
+      <div class="phase">
+        <div class="rail"><div class="dot">3</div><div class="line"></div></div>
+        <div class="body">
+          <div class="meta">~6 days · first pixels</div>
+          <h4>The editor view and the antd shell</h4>
+          <p>
+            ProseMirror view, the toolbar with the roving-tabindex contract, the section rail,
+            the modal wrapper with the four antd a11y patches, density and text scale. Bold,
+            italic, lists. The provenance ribbon, because the marks already exist and rendering
+            them is an afternoon.
+          </p>
+        </div>
+      </div>
+      <div class="phase">
+        <div class="rail"><div class="dot">4</div><div class="line"></div></div>
+        <div class="body">
+          <div class="meta">~5 days · the speed features</div>
+          <h4>The four triggers</h4>
+          <p>
+            Palette component, dot phrases, smart links with the staleness clock, wildcards with
+            F2, and semantic undo units. This is the phase that decides whether a clinician
+            tolerates the editor, so it gets a usability pass rather than only a test pass.
+          </p>
+        </div>
+      </div>
+      <div class="phase">
+        <div class="rail"><div class="dot">5</div><div class="line"></div></div>
+        <div class="body">
+          <div class="meta">~4 days · the differentiator, assembled</div>
+          <h4>The sign gate, commits, and the addendum chain</h4>
+          <p>
+            Five default rules, the gate modal, draft/sign/addend, append-only enforcement,
+            co-signature via <code>signature-core</code>'s <code>pending</code> outcome, and the
+            signed reader with the manifestation block.
+          </p>
+        </div>
+      </div>
+      <div class="phase">
+        <div class="rail"><div class="dot">6</div><div class="line"></div></div>
+        <div class="body">
+          <div class="meta">~4 days · where products are actually lost</div>
+          <h4>Durable drafts, offline, save state, recovery</h4>
+          <p>
+            IndexedDB step log, the four honest save states, explicit recovery, multi-tab guard,
+            idle blur. Then the Playwright kill-the-context tests, including the negative case:
+            a different author must not see the draft.
+          </p>
+        </div>
+      </div>
+      <div class="phase">
+        <div class="rail"><div class="dot">7</div><div class="line"></div></div>
+        <div class="body">
+          <div class="meta">~5 days</div>
+          <h4>Accessibility hardening, print, docs, beta</h4>
+          <p>
+            Full keyboard audit, NVDA and VoiceOver passes, 400% reflow, forced-colors, target
+            sizes in clinical density. The print stylesheet as a first-class deliverable. Stories,
+            <code>*.meta.ts</code>, the README with the boundaries stated plainly, and a changeset.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="prose">
+      <div class="note warn">
+        <span class="lbl">What is deliberately not in these seven weeks</span>
+        <p>
+          Tables, live data islands, lab chips, real-time collaboration, ink, contradiction
+          checking, reading-level hints, pick lists, and voice commands. Every one is real. None
+          is worth delaying the thing that makes this component different from an <code>npm install
+          react-quill</code> — which is provenance, the gate, and the addendum model.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================== -->
+<section id="decide">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="sec-num">14 — Your call</span>
+      <h2>Three decisions before any code is written</h2>
+      <p>Each one changes the package layout, so each one is cheap now and expensive in week four.</p>
+    </div>
+
+    <div class="grid g3">
+      <div class="card">
+        <span class="k">Decision 1</span>
+        <h4>The name</h4>
+        <p>
+          <strong>Recommendation: <code>ClinicalNote</code></strong>, package
+          <code>@oxygenui-design/clinical-note</code>, registry item <code>clinical-note</code>.
+        </p>
+        <p>
+          It sits in the family the repo already has — <code>ClinicalValue</code>,
+          <code>ReferenceRange</code> — and it is what a buyer searches for. "Scribble" is a
+          fine product nickname and a poor component name: a scribble is illegible writing,
+          which is the oldest criticism of medical records there is.
+        </p>
+        <p style="color: var(--muted); font-size: 0.9em;">
+          Rejected: <code>Scribe</code> (now means ambient AI, collides with the vendor
+          category), <code>Chart</code> (collides with <code>pro-charts</code>),
+          <code>Note</code> (unsearchable at catalog scale).
+        </p>
+      </div>
+      <div class="card">
+        <span class="k">Decision 2</span>
+        <h4>How far antd goes</h4>
+        <p>
+          Signature was the pilot for wrapping antd. This component is <em>much</em> bigger and
+          would make the antd dependency structural rather than experimental.
+        </p>
+        <p>
+          <strong>Recommendation: wrap antd for the shell only</strong> — Modal, Button, Tabs,
+          Alert, Tag, Dropdown — and keep the editor surface, palette and provenance layer as
+          plain elements with tokens. That keeps the antd surface small enough that a future
+          registry-channel version is a shell swap rather than a rewrite.
+        </p>
+        <p style="color: var(--muted); font-size: 0.9em;">
+          The open question from the Signature work stands: if the shadcn registry channel is to
+          survive, the wrap/match/migrate call has to be made before the second big antd
+          component. This is the second one.
+        </p>
+      </div>
+      <div class="card">
+        <span class="k">Decision 3</span>
+        <h4>Free or Pro</h4>
+        <p>
+          <strong>Recommendation: <code>tier: "pro"</code>, with <code>Reader</code> free.</strong>
+        </p>
+        <p>
+          This is the most valuable component in the catalog and the most expensive to build. The
+          read-only renderer being free means notes produced by a Pro editor can be displayed
+          anywhere, which is good for adoption and costs nothing — the editor is the asset.
+        </p>
+        <p>
+          It also fits the services-and-contracts revenue model: this is the component a
+          health-tech buyer books a call about rather than swiping a card for.
+        </p>
+      </div>
+    </div>
+
+    <div class="prose">
+      <h3>And one thing I would push back on, if you disagree</h3>
+      <p>
+        If the reaction to this brief is "that is a lot — can we just ship the reference design
+        on Quill in a week": yes, and it would be a mistake worth naming. That version competes
+        with every rich text editor on npm on price and polish, and it loses. The version in this
+        brief competes with nothing, because provenance-marked clinical text with a composable
+        sign gate is not a product anyone else sells as a component.
+      </p>
+      <p>
+        The middle path, if seven weeks is too long: <strong>build phases 0–3 and 5</strong> —
+        schema, provenance, serializers, the shell, and the gate — and ship without the trigger
+        characters. That is four weeks, it is still differentiated, and phase 4 slots in
+        afterwards without rework because the palette is additive. What should <em>not</em> be
+        cut is phase 1, because it is the phase that proves the idea works at all.
+      </p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div>
+      <strong>Oxygen UI — ClinicalNote brief.</strong> 16 August 2026.
+      Phases 0–2 of §13 are implemented: <code>@oxygenui-design/clinical-note-core</code> ships the
+      schema, the provenance model, the sign gate and every serializer, with 262 tests at 99% line
+      and 100% function coverage — including the transform fuzzer that phase 1 exists to run.
+      The React and Ant Design surface (phases 3–7) is not built. The three decisions in §14 are
+      still open.
+    </div>
+    <div>
+      Mockups use Ant Design v6 default token values. Clinical claims are cited in §01, §09 and
+      §10; LOINC codes and C-CDA cardinality are flagged in §09 as requiring verification against
+      the current implementation guide before any default note type hard-codes them.
+    </div>
+    <div>
+      Oxygen UI provides user-interface components. It is not a compliance boundary, not a
+      medical device, and not clinical decision support.
+    </div>
+  </div>
+</footer>
