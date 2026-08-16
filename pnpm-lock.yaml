@@ -155,9 +155,15 @@ importers:
       '@oxygenui-design/fixtures':
         specifier: workspace:*
         version: link:../../packages/fixtures
+      '@oxygenui-design/signature':
+        specifier: workspace:*
+        version: link:../../packages/signature
       '@oxygenui-design/tokens':
         specifier: workspace:*
         version: link:../../packages/tokens
+      antd:
+        specifier: ^6.6.0
+        version: 6.6.0(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       clsx:
         specifier: ^2.1.1
         version: 2.1.1
@@ -505,6 +511,21 @@ importers:
       react-dom:
         specifier: ^19.0.0
         version: 19.2.8(react@19.2.8)
+      typescript:
+        specifier: ^5.7.2
+        version: 5.9.3
+      vitest:
+        specifier: ^4.1.10
+        version: 4.1.10(@types/node@22.20.1)(@vitest/coverage-v8@4.1.10)(jsdom@30.0.1)(vite@8.2.1(@types/node@22.20.1)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.12)(yaml@2.9.0))
+
+  packages/elements:
+    devDependencies:
+      '@oxygenui-design/tsconfig':
+        specifier: workspace:*
+        version: link:../tsconfig
+      jsdom:
+        specifier: ^30
+        version: 30.0.1
       typescript:
         specifier: ^5.7.2
         version: 5.9.3

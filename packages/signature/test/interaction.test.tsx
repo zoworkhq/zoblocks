@@ -16,10 +16,11 @@ import {
   SignatureInk,
   SignatureLocaleProvider,
   SignaturePad,
+  rasterise,
   readImageFile,
   renderTypedSignature,
   type SignatureValue,
-} from "../src/index.js";
+} from "../src/index";
 
 const NOW = "2026-08-16T14:36:02.000Z";
 
@@ -941,5 +942,377 @@ describe("SignatureInk", () => {
     const svg = container.querySelector("svg");
     expect(svg).toHaveAttribute("width", "120");
     expect(svg).toHaveAttribute("viewBox", "0 0 100 40");
+  });
+});
+
+describe("PNG export", () => {
+  /**
+   * The gap this closes: `Signature.data` in the FHIR mapping *is* the PNG, so
+   * before the rasteriser existed a drawn or typed signature produced a FHIR
+   * Signature element with no payload at all. Only an upload carried one,
+   * because an upload arrives as a bitmap already.
+   */
+  function stubRaster() {
+    const drawn: string[] = [];
+    vi.spyOn(HTMLCanvasElement.prototype, "getContext").mockReturnValue({
+      drawImage: () => drawn.push("drawn"),
+      fillRect: () => {},
+      set fillStyle(_v: string) {},
+    } as unknown as CanvasRenderingContext2D);
+    vi.spyOn(HTMLCanvasElement.prototype, "toDataURL").mockReturnValue(
+      "data:image/png;base64,UE5H",
+    );
+
+    const seen: string[] = [];
+    class StubImage {
+      onload: (() => void) | null = null;
+      onerror: (() => void) | null = null;
+      width = 200;
+      height = 80;
+      set src(value: string) {
+        seen.push(value);
+        queueMicrotask(() => this.onload?.());
+      }
+    }
+    vi.stubGlobal("Image", StubImage);
+    return { seen, drawn };
+  }
+
+  it("gives a drawn signature a PNG, so FHIR Signature.data is populated", async () => {
+    const { seen } = stubRaster();
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    render(<Signature now={NOW} onChange={onChange} signer={{ name: "Josh Randall" }} />);
+
+    await user.click(screen.getByRole("button", { name: /add signature/i }));
+    const dialog = await screen.findByRole("dialog");
+    draw(dialog.querySelector<HTMLElement>("[data-ox-signature-pad]")!, SIGNATURE);
+    await user.click(within(dialog).getByRole("button", { name: /sign and continue/i }));
+
+    await waitFor(() => expect(onChange).toHaveBeenCalled());
+    const value = onChange.mock.calls[0]?.[0] as SignatureValue;
+    expect(value.outcome === "signed" && value.ink.png).toBe("data:image/png;base64,UE5H");
+
+    // currentColor cannot resolve in a standalone raster; it must be
+    // substituted before serialising or the PNG comes out blank.
+    expect(seen[0]).toBeDefined();
+    expect(decodeURIComponent(seen[0]!)).not.toContain("currentColor");
+    expect(decodeURIComponent(seen[0]!)).toContain("#141414");
+  });
+
+  it("commits without a PNG rather than blocking when rasterising fails", async () => {
+    // A signature recorded without its raster is recoverable from the stroke
+    // model. A signature the person could not complete is not.
+    vi.spyOn(HTMLCanvasElement.prototype, "getContext").mockReturnValue(null);
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    render(<Signature now={NOW} onChange={onChange} signer={{ name: "Josh Randall" }} />);
+
+    await user.click(screen.getByRole("button", { name: /add signature/i }));
+    const dialog = await screen.findByRole("dialog");
+    draw(dialog.querySelector<HTMLElement>("[data-ox-signature-pad]")!, SIGNATURE);
+    await user.click(within(dialog).getByRole("button", { name: /sign and continue/i }));
+
+    await waitFor(() => expect(onChange).toHaveBeenCalled());
+    expect((onChange.mock.calls[0]?.[0] as SignatureValue).outcome).toBe("signed");
+  });
+
+  it("bakes the chosen ink colour into the raster", async () => {
+    const { seen } = stubRaster();
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    render(<Signature now={NOW} onChange={onChange} signer={{ name: "Josh Randall" }} />);
+
+    await user.click(screen.getByRole("button", { name: /add signature/i }));
+    const dialog = await screen.findByRole("dialog");
+    await user.click(within(dialog).getByRole("radio", { name: /blue/i }));
+    draw(dialog.querySelector<HTMLElement>("[data-ox-signature-pad]")!, SIGNATURE);
+    await user.click(within(dialog).getByRole("button", { name: /sign and continue/i }));
+
+    await waitFor(() => expect(onChange).toHaveBeenCalled());
+    expect(decodeURIComponent(seen[0]!)).toContain("#1d39c4");
+  });
+});
+
+describe("ink colour", () => {
+  it("names each colour rather than relying on the swatch", async () => {
+    // Two unlabelled dots are unusable by keyboard and invisible to a screen
+    // reader — and colour alone is never a control label here.
+    const user = userEvent.setup();
+    render(<Signature now={NOW} />);
+    await user.click(screen.getByRole("button", { name: /add signature/i }));
+    const dialog = await screen.findByRole("dialog");
+
+    const group = within(dialog).getByRole("radiogroup", { name: /ink/i });
+    expect(within(group).getByRole("radio", { name: /black/i })).toBeInTheDocument();
+    expect(within(group).getByRole("radio", { name: /blue/i })).toBeInTheDocument();
+  });
+
+  it("defaults to black and reports the selection", async () => {
+    const user = userEvent.setup();
+    render(<Signature now={NOW} />);
+    await user.click(screen.getByRole("button", { name: /add signature/i }));
+    const dialog = await screen.findByRole("dialog");
+
+    expect(within(dialog).getByRole("radio", { name: /black/i })).toHaveAttribute(
+      "aria-checked",
+      "true",
+    );
+    await user.click(within(dialog).getByRole("radio", { name: /blue/i }));
+    expect(within(dialog).getByRole("radio", { name: /blue/i })).toHaveAttribute(
+      "aria-checked",
+      "true",
+    );
+  });
+});
+
+/* ------------------------------------------------------------------ */
+
+/**
+ * The rasteriser, on its own.
+ *
+ * `PNG export` above proves the modal produces a raster; this covers the
+ * decisions inside it. They are easy to get wrong in ways that only show up
+ * later — a signature that comes out blank because `currentColor` had nothing
+ * to resolve against, invisible because a transparent PNG landed on a dark
+ * viewer, or a name that throws because `btoa` cannot encode it.
+ */
+describe("rasterise", () => {
+  /** A canvas that records what was asked of it. */
+  function stubCanvas(options: { context?: boolean } = {}) {
+    const calls = { fills: [] as string[], rects: 0, drawn: 0, size: { w: 0, h: 0 } };
+
+    vi.spyOn(HTMLCanvasElement.prototype, "getContext").mockImplementation(function (
+      this: HTMLCanvasElement,
+    ) {
+      if (options.context === false) return null;
+      calls.size = { w: this.width, h: this.height };
+      return {
+        drawImage: () => {
+          calls.drawn += 1;
+        },
+        fillRect: () => {
+          calls.rects += 1;
+        },
+        set fillStyle(value: string) {
+          calls.fills.push(value);
+        },
+      } as unknown as CanvasRenderingContext2D;
+    });
+
+    vi.spyOn(HTMLCanvasElement.prototype, "toDataURL").mockReturnValue(
+      "data:image/png;base64,UE5H",
+    );
+    return calls;
+  }
+
+  /** An `Image` that reports every src it is given, then loads or fails. */
+  function stubImage(mode: "load" | "error" = "load") {
+    const seen: string[] = [];
+    class StubImage {
+      onload: (() => void) | null = null;
+      onerror: (() => void) | null = null;
+      set src(value: string) {
+        seen.push(value);
+        queueMicrotask(() => (mode === "load" ? this.onload?.() : this.onerror?.()));
+      }
+    }
+    vi.stubGlobal("Image", StubImage);
+    return seen;
+  }
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+    vi.unstubAllGlobals();
+  });
+
+  it("returns nothing for an empty signature rather than a blank PNG", async () => {
+    // A 1×1 white square is a worse answer than no answer: it looks like a
+    // signature was captured.
+    expect(await rasterise("")).toBe("");
+    expect(await rasterise("   \n  ")).toBe("");
+  });
+
+  it("substitutes the ink colour, because currentColor cannot resolve", async () => {
+    stubCanvas();
+    const seen = stubImage();
+
+    await rasterise('<svg width="200" height="60"><path stroke="currentColor"/></svg>', {
+      color: "#1d39c4",
+    });
+
+    const url = decodeURIComponent(seen[0] ?? "");
+    expect(url).toContain("#1d39c4");
+    expect(url).not.toContain("currentColor");
+  });
+
+  it("flattens onto an opaque background by default", async () => {
+    const calls = stubCanvas();
+    stubImage();
+
+    await rasterise('<svg width="100" height="40"><path/></svg>');
+    expect(calls.rects).toBe(1);
+    expect(calls.fills).toContain("#ffffff");
+  });
+
+  it("keeps the alpha channel when a background is refused", async () => {
+    const calls = stubCanvas();
+    stubImage();
+
+    await rasterise('<svg width="100" height="40"><path/></svg>', { background: null });
+    expect(calls.rects).toBe(0);
+    expect(calls.drawn).toBe(1);
+  });
+
+  it("scales by the requested factor", async () => {
+    const calls = stubCanvas();
+    stubImage();
+
+    await rasterise('<svg width="100" height="40"><path/></svg>', { scale: 2 });
+    expect(calls.size).toEqual({ w: 200, h: 80 });
+  });
+
+  it("clamps a large capture so the PNG cannot run away", async () => {
+    // 4000 × 3 would be 12000px on the long edge. A signature that large is a
+    // multi-megabyte payload attached to every consent record.
+    const calls = stubCanvas();
+    stubImage();
+
+    await rasterise('<svg width="4000" height="1000"><path/></svg>', { maxEdge: 2400 });
+    expect(calls.size.w).toBe(2400);
+    expect(calls.size.h).toBe(600);
+  });
+
+  it("falls back to the viewBox when there are no width and height attributes", async () => {
+    const calls = stubCanvas();
+    stubImage();
+
+    await rasterise('<svg viewBox="0 0 300 100"><path/></svg>', { scale: 1 });
+    expect(calls.size).toEqual({ w: 300, h: 100 });
+  });
+
+  it("does not produce a zero-sized canvas when it can read no dimensions at all", async () => {
+    // `canvas.width = 0` throws in some engines and silently yields an empty
+    // image in others, so the floor is 1.
+    const calls = stubCanvas();
+    stubImage();
+
+    await rasterise("<svg><path/></svg>");
+    expect(calls.size.w).toBeGreaterThanOrEqual(1);
+    expect(calls.size.h).toBeGreaterThanOrEqual(1);
+  });
+
+  it("encodes a name no matter the script it is written in", async () => {
+    // The reason this uses encodeURIComponent rather than btoa, which throws
+    // on any character above U+00FF. A signature component that fails on a
+    // non-Latin name would be a poor thing to ship.
+    stubCanvas();
+    const seen = stubImage();
+
+    await rasterise('<svg width="200" height="60"><text>ラフル・ラジーヴァン</text></svg>');
+    expect(seen[0]).toMatch(/^data:image\/svg\+xml;charset=utf-8,/);
+    expect(decodeURIComponent(seen[0] ?? "")).toContain("ラフル");
+  });
+
+  it("reports a missing 2D context rather than returning a broken URL", async () => {
+    stubCanvas({ context: false });
+    stubImage();
+
+    await expect(rasterise('<svg width="10" height="10"><path/></svg>')).rejects.toThrow(
+      /context is unavailable/i,
+    );
+  });
+
+  it("rejects when the image cannot be decoded", async () => {
+    stubCanvas();
+    stubImage("error");
+
+    await expect(rasterise('<svg width="10" height="10"><path/></svg>')).rejects.toThrow(
+      /could not be rasterised/i,
+    );
+  });
+});
+
+/* ------------------------------------------------------------------ */
+
+/**
+ * The upload path.
+ *
+ * The least interesting of the three capture methods and the one most likely
+ * to be handed a file that is not what it claims — a 12 MB photo of a form, a
+ * PDF renamed to .png, a HEIC the browser cannot decode. Each of those has to
+ * say so rather than fail silently, because the person uploading is usually
+ * not the person who will notice the record is empty.
+ */
+describe("uploading a photographed signature", () => {
+  async function openUpload() {
+    const user = userEvent.setup();
+    render(<Signature now={NOW} methods={["upload"]} />);
+    await user.click(screen.getByRole("button", { name: /add signature/i }));
+    const dialog = await screen.findByRole("dialog");
+    const input = dialog.querySelector<HTMLInputElement>('input[type="file"]');
+    if (!input) throw new Error("no file input");
+    return { user, dialog, input };
+  }
+
+  function imageFile(name: string, bytes: number, type = "image/png") {
+    const file = new File([new Uint8Array(1)], name, { type });
+    // Files that big cannot be built in memory in a test; only the reported
+    // size is read, and that is what the guard reads too.
+    Object.defineProperty(file, "size", { value: bytes });
+    return file;
+  }
+
+  it("refuses an image too large to store and says how large is too large", async () => {
+    const { input } = await openUpload();
+
+    await userEvent.upload(input, imageFile("consent.png", 3 * 1024 * 1024));
+
+    // The number is in the message on purpose: "file too large" leaves the
+    // person guessing whether to crop, rescan, or give up.
+    expect(await screen.findByText(/larger than 2 MB/i)).toBeInTheDocument();
+  });
+
+  it("reports a file it cannot read as an image", async () => {
+    /*
+     * A truncated or corrupt PNG — the common case, from a transfer that ended
+     * early or a camera app that crashed mid-write. It satisfies the accept
+     * filter, so it reaches the reader and fails there.
+     *
+     * The decode is the browser's, so it is the browser that has to be made to
+     * fail: `Image` is stubbed to fire `onerror`, which is what Chrome does
+     * when handed bytes it cannot decode.
+     */
+    class FailingImage {
+      onload: (() => void) | null = null;
+      onerror: (() => void) | null = null;
+      set src(_value: string) {
+        queueMicrotask(() => this.onerror?.());
+      }
+    }
+    vi.stubGlobal("Image", FailingImage);
+
+    const { input } = await openUpload();
+    await userEvent.upload(input, imageFile("scan.png", 1024));
+
+    expect(await screen.findByText(/could not be read as an image/i)).toBeInTheDocument();
+    vi.unstubAllGlobals();
+  });
+
+  it("never sends the file anywhere", async () => {
+    // beforeUpload returns false rather than letting antd POST it. A consent
+    // signature leaving the browser for antd's default endpoint would be a
+    // disclosure, and the default is to upload.
+    const fetchSpy = vi.spyOn(globalThis, "fetch").mockResolvedValue(new Response(null));
+    const xhr = vi.spyOn(XMLHttpRequest.prototype, "send").mockImplementation(() => {});
+    const { input } = await openUpload();
+
+    await userEvent.upload(input, imageFile("signature.png", 1024));
+    await waitFor(() => expect(screen.queryByText(/larger than 2 MB/i)).not.toBeInTheDocument());
+
+    expect(fetchSpy).not.toHaveBeenCalled();
+    expect(xhr).not.toHaveBeenCalled();
+    fetchSpy.mockRestore();
+    xhr.mockRestore();
   });
 });

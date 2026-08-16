@@ -26,11 +26,31 @@ const ruleTester = new RuleTester({
 
 ruleTester.run("tabs-semantic-mode", tabsSemanticMode, {
   valid: [
+    // antd's Tabs is a different component that happens to share the name and
+    // has no `as` prop. Demanding one would forward an unknown property to the
+    // DOM, and a rule that flags code which cannot comply gets disabled
+    // wholesale — after which it protects nothing.
+    {
+      code: `import { Tabs } from "antd";\nconst a = <Tabs items={items} />;`,
+    },
+    {
+      code: `import { Modal, Tabs } from "antd";\nconst a = <Tabs activeKey={k} onChange={f} />;`,
+    },
+    // A relative or @/ import is ours, and still has to declare itself — the
+    // registry copies components in under those specifiers.
+    {
+      code: `import { Tabs } from "./tabs";\nconst a = <Tabs as="tabs" items={items} />;`,
+    },
     // Every mode, spelled out.
     { code: 'const a = <Tabs as="tabs" items={items} />;' },
     { code: 'const a = <Tabs as="radiogroup" items={items} />;' },
     { code: 'const a = <Tabs as="steps" items={items} />;' },
     { code: 'const a = <Tabs as="nav" items={[{ value: "a", href: "/a" }]} />;' },
+
+    // A default import, and an aliased one — the two import shapes the
+    // specifier check has to see through as well as the named case above.
+    { code: 'import Tabs from "rc-tabs";\nconst a = <Tabs items={items} />;' },
+    { code: 'import { Tabs as Foo } from "antd";\nconst a = <Tabs items={items} as="tabs" />;' },
 
     // The compound root, both spellings.
     { code: 'const a = <TabsRoot as="tabs" />;' },
@@ -66,6 +86,21 @@ ruleTester.run("tabs-semantic-mode", tabsSemanticMode, {
     {
       // The default that does not exist, and must not.
       code: "const a = <Tabs items={items} />;",
+      errors: [{ messageId: "missingMode" }],
+    },
+    {
+      // Ours, by package specifier — the rule still applies.
+      code: 'import { Tabs } from "@oxygenui-design/tabs";\nconst a = <Tabs items={items} />;',
+      errors: [{ messageId: "missingMode" }],
+    },
+    {
+      // Ours, by relative path — the tabs package's own source and stories.
+      code: 'import { Tabs } from "./tabs";\nconst a = <Tabs items={items} />;',
+      errors: [{ messageId: "missingMode" }],
+    },
+    {
+      // Ours, by the specifier the shadcn CLI writes into a consumer project.
+      code: 'import { Tabs } from "@/components/oxygen/tabs";\nconst a = <Tabs items={items} />;',
       errors: [{ messageId: "missingMode" }],
     },
     {

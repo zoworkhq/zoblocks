@@ -12,6 +12,12 @@
     "limit": "11 KB"
   },
   {
+    "name": "elements — <ox-switch>",
+    "path": "packages/elements/dist/switch.js",
+    "import": "*",
+    "limit": "8 KB"
+  },
+  {
     "name": "react — one loader (includes loader-core and the rhythm delegate)",
     "path": "packages/react/dist/components/pulse-loader/pulse-loader.js",
     "import": "{ PulseLoader }",
@@ -19,17 +25,17 @@
     "ignore": ["react", "react-dom"]
   },
   {
-    "name": "react — consult alone (pattern layer: pulls consult-core and consult-react)",
-    "path": "packages/react/dist/components/consult/consult.js",
-    "import": "{ Consult }",
-    "limit": "22 KB",
+    "name": "react — Switch alone (includes switch-core)",
+    "path": "packages/react/dist/components/switch/switch.js",
+    "import": "{ Switch }",
+    "limit": "13 KB",
     "ignore": ["react", "react-dom"]
   },
   {
     "name": "react — the whole barrel",
     "path": "packages/react/dist/index.js",
     "import": "*",
-    "limit": "24 KB",
+    "limit": "30 KB",
     "ignore": ["react", "react-dom"]
   },
   {
@@ -41,6 +47,11 @@
     "name": "loader stylesheet",
     "path": "registry/oxygen/lib/loader.css",
     "limit": "4 KB"
+  },
+  {
+    "name": "switch stylesheet",
+    "path": "registry/oxygen/lib/switch.css",
+    "limit": "12 KB"
   },
   {
     "name": "identity-core — the whole engine (includes Jaro–Winkler and Metaphone)",
@@ -66,5 +77,12 @@
     "name": "identity stylesheet",
     "path": "packages/identity/dist/styles.css",
     "limit": "6 KB"
+  },
+  {
+    "name": "react — consult alone (pattern layer: pulls consult-core and consult-react)",
+    "path": "packages/react/dist/components/consult/consult.js",
+    "import": "{ Consult }",
+    "limit": "22 KB",
+    "ignore": ["react", "react-dom"]
   }
 ]

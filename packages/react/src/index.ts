@@ -8,6 +8,7 @@
 // Generated from the registry. Run `pnpm gen`.
 
 export * from "./lib/loader";
+export * from "./lib/switch";
 export { cn } from "./lib/utils";
 
 export * from "./components/breath-loader/breath-loader";
@@ -16,3 +17,4 @@ export * from "./components/helix-loader/helix-loader";
 export * from "./components/infusion-loader/infusion-loader";
 export * from "./components/pulse-loader/pulse-loader";
 export * from "./components/rhythm-loader/rhythm-loader";
+export * from "./components/switch/switch";

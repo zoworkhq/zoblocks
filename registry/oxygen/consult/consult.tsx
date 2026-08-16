@@ -87,8 +87,8 @@ export function Consult({
   return (
     <ConsultRoot api={api}>
       <div
-        data-slot="consult"
-        data-status={api.state.status}
+        data-ox-consult=""
+        data-ox-status={api.state.status}
         className={cn(
           "z-[900] flex flex-col items-center gap-2",
           anchor !== "inline" &&

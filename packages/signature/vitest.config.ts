@@ -30,6 +30,21 @@ export default defineConfig({
       // and `beta` is 90% lines / 85% branches.
       thresholds: { lines: 90, functions: 90, branches: 85, statements: 90 },
     },
+    /**
+     * 15s, not the 5s default.
+     *
+     * `signs with the keyboard alone` drives a whole signing flow through
+     * `userEvent.tab()` and `.keyboard()` — no pointer events anywhere, which
+     * is the point of it — and every one of those keystrokes yields to the
+     * event loop. Under jsdom 30 that flow lands near five seconds, so the test
+     * passed alone and failed intermittently in a full parallel run.
+     *
+     * The timeout is the honest lever here. Shortening the interaction would
+     * weaken the WCAG 2.1.1 argument the test exists to make, and
+     * `delay: null` would remove the async gaps that make it resemble a real
+     * keyboard user.
+     */
+    testTimeout: 15_000,
     environment: "jsdom",
     /*
      * 20s, against Vitest's 5s default.

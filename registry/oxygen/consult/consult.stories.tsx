@@ -281,7 +281,7 @@ export const Suppressed: Story = {
   play: async ({ canvasElement }) => {
     // Law 5, and the FDA's time-critical clause. The most valuable thing this
     // component does is disappear.
-    expect(canvasElement.querySelector('[data-slot="consult"]')).toBeNull();
+    expect(canvasElement.querySelector("[data-ox-consult]")).toBeNull();
   },
 };
 

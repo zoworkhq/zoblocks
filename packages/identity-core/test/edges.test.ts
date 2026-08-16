@@ -76,6 +76,27 @@ describe("initials — the pools the happy path does not exercise", () => {
   });
 });
 
+describe("names outside the resolution order", () => {
+  it("shows a name marked old when it is the only one the record has", () => {
+    // `old` is in neither the display nor the legal order — it is a superseded
+    // name. A record that carries nothing else still has to render something,
+    // and the superseded name beats "Name not recorded", which would claim the
+    // record is anonymous when it plainly is not.
+    const p = F.patient({ name: [{ use: "old", given: ["Amara"], family: "Okonkwo" }] });
+    expect(resolveIdentity(p, P).name.text).toBe("Amara Okonkwo");
+  });
+
+  it("skips an old name entry that carries nothing", () => {
+    const p = F.patient({ name: [{ use: "old" }, { use: "old", family: "Okonkwo" }] });
+    expect(resolveIdentity(p, P).name.text).toBe("Okonkwo");
+  });
+
+  it("falls back through a name whose given array is all whitespace", () => {
+    const p = F.patient({ name: [{ use: "old", given: ["  ", "\t"] }] });
+    expect(resolveIdentity(p, P).name.text).toBe("Name not recorded");
+  });
+});
+
 describe("label — the states the main suite skips", () => {
   it("says what inactive means, not just the word", () => {
     const label = identityLabel(resolveIdentity(F.patient({ active: false }), P), P);

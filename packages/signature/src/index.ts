@@ -21,24 +21,24 @@ export {
   signatureRequired,
   signatureAffirmative,
   type SignatureProps,
-} from "./Signature.js";
-export { SignaturePad, type SignaturePadProps } from "./SignaturePad.js";
-export { SignatureModal, type SignatureModalProps } from "./SignatureModal.js";
-export { SignatureManifest, type SignatureManifestProps } from "./SignatureManifest.js";
-export { SignatureInk, type SignatureInkProps } from "./SignatureInk.js";
-export { OutcomeSheet, type OutcomeSheetProps } from "./OutcomeSheet.js";
+} from "./Signature";
+export { SignaturePad, type SignaturePadProps } from "./SignaturePad";
+export { SignatureModal, type SignatureModalProps } from "./SignatureModal";
+export { SignatureManifest, type SignatureManifestProps } from "./SignatureManifest";
+export { SignatureInk, type SignatureInkProps } from "./SignatureInk";
+export { OutcomeSheet, type OutcomeSheetProps } from "./OutcomeSheet";
 export {
   useSignatureCapture,
   type SignatureCaptureApi,
   type UseSignatureCaptureOptions,
-} from "./use-signature-capture.js";
-export { renderTypedSignature, readImageFile } from "./typed.js";
-export {
-  DEFAULT_LOCALE,
-  SignatureLocaleProvider,
-  useLocale,
-  type SignatureLocale,
-} from "./locale.js";
+} from "./use-signature-capture";
+export { renderTypedSignature, readImageFile } from "./typed";
+// Exported for the same reason as the two above: the modal uses it, and a host
+// that stores `Ink` and later needs the archival PNG — for a PDF, an email, a
+// printout — would otherwise have to reimplement the currentColor
+// substitution and the opaque-background rule to get a usable one.
+export { rasterise, type RasteriseOptions } from "./rasterise";
+export { DEFAULT_LOCALE, SignatureLocaleProvider, useLocale, type SignatureLocale } from "./locale";
 
 // Re-exported so a consumer never needs to reach past this package for the
 // value type, the guards, or the FHIR mapping.

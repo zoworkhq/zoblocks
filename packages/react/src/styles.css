@@ -476,3 +476,834 @@
     opacity: 0.5;
   }
 }
+
+/**
+ * Oxygen Switch — the stylesheet.
+ *
+ * Every colour resolves through a `--ox-switch-*` component token, so a brand
+ * restyles the control by overriding tokens rather than editing this file.
+ * Deliberately no Tailwind utilities: keyframes cannot be expressed as tokens,
+ * and a component whose motion depends on the host's Tailwind config renders
+ * unstyled in a Vue app.
+ *
+ * Logical properties throughout. `left`/`right` do not flip in RTL and the bug
+ * is invisible until somebody opens the interface in Arabic.
+ */
+
+/* ------------------------------------------------------------------ */
+/* Root                                                                */
+/* ------------------------------------------------------------------ */
+
+.ox-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ox-switch-gap);
+  color: var(--ox-text);
+  font-size: var(--ox-density-font);
+  vertical-align: middle;
+}
+
+/* Tone selects the on-state fill. Never the only signal — see the state word. */
+.ox-switch[data-ox-tone="caution"] {
+  --ox-switch-track-on-bg: var(--ox-switch-track-caution-bg);
+  --ox-switch-track-on-border: var(--ox-switch-track-caution-bg);
+  --ox-switch-state-on-fg: var(--ox-switch-track-caution-bg);
+}
+.ox-switch[data-ox-tone="critical"] {
+  --ox-switch-track-on-bg: var(--ox-switch-track-critical-bg);
+  --ox-switch-track-on-border: var(--ox-switch-track-critical-bg);
+  --ox-switch-state-on-fg: var(--ox-switch-track-critical-bg);
+}
+.ox-switch[data-ox-tone="neutral"] {
+  --ox-switch-track-on-bg: var(--ox-switch-track-neutral-bg);
+  --ox-switch-track-on-border: var(--ox-switch-track-neutral-bg);
+  --ox-switch-state-on-fg: var(--ox-switch-track-neutral-bg);
+}
+
+/* ------------------------------------------------------------------ */
+/* Control and hit area                                                */
+/* ------------------------------------------------------------------ */
+
+.ox-switch__control {
+  appearance: none;
+  -webkit-appearance: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  position: relative;
+  flex: none;
+  touch-action: manipulation;
+}
+
+/**
+ * The hit area, decoupled from the visual size.
+ *
+ * This is what lets a 26x14px switch sit in a dense flowsheet row and still
+ * clear SC 2.5.8. Shrinking the pill does not shrink the target.
+ */
+.ox-switch__control::before {
+  content: "";
+  position: absolute;
+  inset-block-start: 50%;
+  inset-inline-start: 50%;
+  translate: -50% -50%;
+  inline-size: max(var(--ox-switch-track-w), var(--ox-switch-target-min));
+  block-size: max(var(--ox-switch-track-h), var(--ox-switch-target-min));
+}
+
+.ox-switch__control:focus-visible {
+  outline: none;
+}
+.ox-switch__control:focus-visible .ox-switch__track {
+  outline: var(--ox-switch-focus-width) solid var(--ox-switch-focus-ring);
+  outline-offset: var(--ox-switch-focus-offset);
+}
+
+/* ------------------------------------------------------------------ */
+/* Track                                                               */
+/* ------------------------------------------------------------------ */
+
+.ox-switch__track {
+  position: relative;
+  display: grid;
+  align-items: center;
+  inline-size: var(--ox-switch-track-w);
+  block-size: var(--ox-switch-track-h);
+  border-radius: var(--ox-switch-radius);
+  background: var(--ox-switch-track-off-bg);
+  border: 1px solid var(--ox-switch-track-off-border);
+  transition:
+    background var(--ox-switch-duration) var(--ox-switch-ease),
+    border-color var(--ox-switch-duration) var(--ox-switch-ease);
+}
+
+.ox-switch[data-ox-state="on"] .ox-switch__track {
+  background: var(--ox-switch-track-on-bg);
+  border-color: var(--ox-switch-track-on-border);
+}
+
+.ox-switch[data-ox-state="unknown"] .ox-switch__track {
+  background: var(--ox-switch-track-unknown-bg);
+  border-color: var(--ox-switch-track-unknown-border);
+  border-style: dashed;
+}
+
+/* ------------------------------------------------------------------ */
+/* Thumb                                                               */
+/* ------------------------------------------------------------------ */
+
+.ox-switch__thumb {
+  position: absolute;
+  inset-block-start: 50%;
+  inset-inline-start: var(--ox-switch-pad);
+  translate: 0 -50%;
+  inline-size: var(--ox-switch-thumb-size);
+  block-size: var(--ox-switch-thumb-size);
+  border-radius: var(--ox-switch-radius);
+  background: var(--ox-switch-thumb-bg);
+  color: var(--ox-switch-thumb-fg);
+  box-shadow: 0 1px 2px rgb(2 6 23 / 0.28);
+  display: grid;
+  place-items: center;
+  transition:
+    inset-inline-start var(--ox-switch-duration) var(--ox-switch-ease),
+    translate var(--ox-switch-duration) var(--ox-switch-ease);
+}
+
+.ox-switch[data-ox-state="on"] .ox-switch__thumb {
+  inset-inline-start: calc(100% - var(--ox-switch-thumb-size) - var(--ox-switch-pad));
+}
+
+.ox-switch[data-ox-state="unknown"] .ox-switch__thumb {
+  inset-inline-start: 50%;
+  translate: -50% -50%;
+  background: var(--ox-switch-thumb-unknown-bg);
+  color: var(--ox-switch-thumb-unknown-fg);
+}
+
+.ox-switch__glyph {
+  inline-size: 62%;
+  block-size: 62%;
+  display: block;
+}
+.ox-switch[data-ox-size="micro"] .ox-switch__glyph,
+.ox-switch[data-ox-size="small"] .ox-switch__glyph {
+  inline-size: 78%;
+  block-size: 78%;
+}
+
+/* ------------------------------------------------------------------ */
+/* appearance="labeled" — the word inside the track                    */
+/* ------------------------------------------------------------------ */
+
+.ox-switch[data-ox-appearance="labeled"] .ox-switch__track {
+  inline-size: auto;
+  min-inline-size: var(--ox-switch-track-w);
+  padding-inline: calc(var(--ox-switch-thumb-size) + var(--ox-switch-pad) * 2) 0;
+}
+.ox-switch[data-ox-appearance="labeled"][data-ox-state="on"] .ox-switch__track {
+  padding-inline: 0 calc(var(--ox-switch-thumb-size) + var(--ox-switch-pad) * 2);
+}
+
+/**
+ * Both words occupy one grid cell, so the track is sized by the longer of the
+ * two and the thumb travel is constant.
+ *
+ * A switch that resizes as it toggles reflows everything after it — in a table
+ * row, the whole row jumps.
+ */
+.ox-switch__words {
+  display: grid;
+  padding-inline: 0.45em;
+}
+.ox-switch__words > * {
+  grid-area: 1 / 1;
+}
+.ox-switch__word {
+  font-size: var(--ox-switch-label-font);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  line-height: 1;
+  white-space: nowrap;
+  text-align: center;
+  transition: opacity var(--ox-switch-duration) var(--ox-switch-ease);
+}
+.ox-switch__word--on {
+  color: var(--ox-switch-label-on-fg);
+  opacity: 0;
+}
+.ox-switch__word--off {
+  color: var(--ox-switch-label-off-fg);
+  opacity: 1;
+}
+.ox-switch[data-ox-state="on"] .ox-switch__word--on {
+  opacity: 1;
+}
+.ox-switch[data-ox-state="on"] .ox-switch__word--off {
+  opacity: 0;
+}
+.ox-switch[data-ox-state="unknown"] .ox-switch__word {
+  opacity: 0;
+}
+
+/* ------------------------------------------------------------------ */
+/* appearance="segmented" — the explicit binary                        */
+/* ------------------------------------------------------------------ */
+
+.ox-switch__segments {
+  display: inline-flex;
+  align-items: stretch;
+  border: 1px solid var(--ox-switch-segment-border);
+  border-radius: var(--ox-radius);
+  overflow: hidden;
+  background: var(--ox-switch-segment-bg);
+}
+
+.ox-switch__segment {
+  appearance: none;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-size: var(--ox-switch-state-font);
+  font-weight: 600;
+  color: var(--ox-switch-segment-fg);
+  padding-inline: 0.85rem;
+  padding-block: 0.35rem;
+  cursor: pointer;
+  min-block-size: max(1.75rem, var(--ox-switch-target-min));
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  border-inline-end: 1px solid var(--ox-switch-segment-divider);
+  transition:
+    background var(--ox-switch-duration) var(--ox-switch-ease),
+    color var(--ox-switch-duration) var(--ox-switch-ease);
+}
+.ox-switch__segment:last-child {
+  border-inline-end: 0;
+}
+.ox-switch__segment:hover:not([aria-checked="true"]):not(:disabled) {
+  background: var(--ox-switch-segment-hover-bg);
+  color: var(--ox-text);
+}
+.ox-switch__segment[aria-checked="true"] {
+  background: var(--ox-switch-track-on-bg);
+  color: var(--ox-switch-label-on-fg);
+}
+.ox-switch__segment:focus-visible {
+  outline: var(--ox-switch-focus-width) solid var(--ox-switch-focus-ring);
+  outline-offset: calc(var(--ox-switch-focus-offset) * -1);
+}
+
+/**
+ * The unasked cell is a `<span>`, not a button, and it disappears once
+ * answered. A user may leave "unknown"; a user may never enter it.
+ */
+.ox-switch__segment--unasked {
+  background: var(--ox-switch-segment-unasked-bg);
+  color: var(--ox-switch-segment-unasked-fg);
+  cursor: default;
+  font-style: italic;
+  font-weight: 500;
+}
+
+/* ------------------------------------------------------------------ */
+/* appearance="chip" — a filter bar                                    */
+/* ------------------------------------------------------------------ */
+
+.ox-switch__chip {
+  appearance: none;
+  font: inherit;
+  font-size: var(--ox-switch-state-font);
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding-inline: 0.55rem 0.7rem;
+  padding-block: 0.3rem;
+  border-radius: var(--ox-switch-radius);
+  cursor: pointer;
+  border: 1px solid var(--ox-switch-segment-border);
+  background: var(--ox-switch-segment-bg);
+  color: var(--ox-switch-segment-fg);
+  min-block-size: max(1.75rem, var(--ox-switch-target-min));
+  transition:
+    background var(--ox-switch-duration) var(--ox-switch-ease),
+    color var(--ox-switch-duration) var(--ox-switch-ease),
+    border-color var(--ox-switch-duration) var(--ox-switch-ease);
+}
+.ox-switch[data-ox-state="on"] .ox-switch__chip {
+  background: var(--ox-switch-track-on-bg);
+  border-color: var(--ox-switch-track-on-border);
+  color: var(--ox-switch-label-on-fg);
+}
+.ox-switch__chip .ox-switch__glyph {
+  inline-size: 0.85em;
+  block-size: 0.85em;
+  opacity: 0;
+  transition: opacity var(--ox-switch-duration) var(--ox-switch-ease);
+}
+.ox-switch[data-ox-state="on"] .ox-switch__chip .ox-switch__glyph,
+.ox-switch[data-ox-state="unknown"] .ox-switch__chip .ox-switch__glyph {
+  opacity: 1;
+}
+.ox-switch__chip:focus-visible {
+  outline: var(--ox-switch-focus-width) solid var(--ox-switch-focus-ring);
+  outline-offset: var(--ox-switch-focus-offset);
+}
+
+/* ------------------------------------------------------------------ */
+/* appearance="row" — the whole row is the target                      */
+/* ------------------------------------------------------------------ */
+
+.ox-switch[data-ox-appearance="row"] {
+  display: block;
+  inline-size: 100%;
+}
+.ox-switch[data-ox-appearance="row"] .ox-switch__control {
+  inline-size: 100%;
+  display: flex;
+  align-items: center;
+  gap: var(--ox-switch-gap);
+  padding-inline: var(--ox-density-pad-x);
+  padding-block: var(--ox-density-pad-y);
+  text-align: start;
+  border: 1px solid var(--ox-border);
+  border-radius: var(--ox-radius);
+  background: var(--ox-surface);
+}
+.ox-switch[data-ox-appearance="row"] .ox-switch__control::before {
+  content: none;
+}
+.ox-switch[data-ox-appearance="row"] .ox-switch__control:hover {
+  background: var(--ox-bg-subtle);
+}
+.ox-switch[data-ox-appearance="row"] .ox-switch__control:focus-visible {
+  outline: var(--ox-switch-focus-width) solid var(--ox-switch-focus-ring);
+  outline-offset: var(--ox-switch-focus-offset);
+}
+.ox-switch[data-ox-appearance="row"] .ox-switch__control:focus-visible .ox-switch__track {
+  outline: none;
+}
+.ox-switch[data-ox-appearance="row"] .ox-switch__rowtext {
+  flex: 1;
+  min-inline-size: 0;
+  display: grid;
+  gap: 0.15rem;
+}
+.ox-switch[data-ox-appearance="row"] .ox-switch__track {
+  flex: none;
+}
+
+/* ------------------------------------------------------------------ */
+/* Commit phases                                                       */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Pending keeps the control. No `disabled`, no `aria-disabled`, focus
+ * retained, name unchanged — a spinner that removes the control is a disabled
+ * state wearing a costume, and on a slow network it is a dead pixel for as
+ * long as the request takes.
+ */
+.ox-switch[data-ox-phase="pending"] .ox-switch__track {
+  background: repeating-linear-gradient(
+    135deg,
+    var(--ox-switch-track-on-bg) 0 6px,
+    color-mix(in oklab, var(--ox-switch-track-on-bg) 62%, var(--ox-bg)) 6px 12px
+  );
+  animation: ox-switch-march 900ms linear infinite;
+}
+.ox-switch[data-ox-phase="pending"][data-ox-state="off"] .ox-switch__track {
+  background: repeating-linear-gradient(
+    135deg,
+    var(--ox-switch-track-off-bg) 0 6px,
+    color-mix(in oklab, var(--ox-switch-track-off-bg) 62%, var(--ox-bg)) 6px 12px
+  );
+}
+
+@keyframes ox-switch-march {
+  to {
+    background-position: 34px 0;
+  }
+}
+
+.ox-switch[data-ox-phase="committed"] .ox-switch__thumb {
+  animation: ox-switch-confirm 600ms var(--ox-switch-ease);
+}
+
+@keyframes ox-switch-confirm {
+  from {
+    box-shadow:
+      0 1px 2px rgb(2 6 23 / 0.28),
+      0 0 0 0 color-mix(in oklab, var(--ox-switch-track-on-bg) 60%, transparent);
+  }
+  to {
+    box-shadow:
+      0 1px 2px rgb(2 6 23 / 0.28),
+      0 0 0 10px transparent;
+  }
+}
+
+.ox-switch[data-ox-phase="reverted"] .ox-switch__track,
+.ox-switch[data-ox-phase="blocked"] .ox-switch__track {
+  outline: 2px solid var(--ox-switch-error-fg);
+  outline-offset: 2px;
+}
+
+.ox-switch[data-ox-phase="queued"] .ox-switch__track {
+  background: var(--ox-bg-subtle);
+  border: 1px dashed var(--ox-switch-queued-fg);
+}
+.ox-switch[data-ox-phase="queued"] .ox-switch__thumb {
+  background: var(--ox-switch-queued-fg);
+  color: var(--ox-bg);
+  box-shadow: none;
+}
+
+.ox-switch[data-ox-phase="stale"] .ox-switch__track {
+  outline: 2px dashed var(--ox-switch-stale-fg);
+  outline-offset: 2px;
+}
+
+/* ------------------------------------------------------------------ */
+/* Availability                                                        */
+/* ------------------------------------------------------------------ */
+
+.ox-switch[data-ox-disabled="true"] {
+  opacity: 0.45;
+}
+.ox-switch[data-ox-disabled="true"] .ox-switch__control,
+.ox-switch[data-ox-disabled="true"] .ox-switch__chip,
+.ox-switch[data-ox-disabled="true"] .ox-switch__segment {
+  cursor: not-allowed;
+}
+
+/**
+ * Read-only is a different object, not a weaker one.
+ *
+ * Dimming reads as "inactive", which is a value rather than an availability —
+ * and `disabled` would take the control out of the tab order, so a
+ * screen-reader user would never learn it exists or why it cannot be changed.
+ */
+.ox-switch[data-ox-readonly="true"] .ox-switch__control {
+  cursor: default;
+}
+.ox-switch[data-ox-readonly="true"] .ox-switch__track {
+  background: var(--ox-switch-locked-bg);
+  border: 1px dashed var(--ox-switch-track-off-border);
+}
+.ox-switch[data-ox-readonly="true"][data-ox-state="on"] .ox-switch__track {
+  background: var(--ox-accent-subtle);
+  border-color: var(--ox-switch-track-on-bg);
+}
+.ox-switch[data-ox-readonly="true"] .ox-switch__thumb {
+  background: var(--ox-switch-track-off-bg);
+  color: var(--ox-bg);
+  box-shadow: none;
+}
+
+/* ------------------------------------------------------------------ */
+/* Text beside the control                                             */
+/* ------------------------------------------------------------------ */
+
+.ox-switch__text {
+  display: grid;
+  gap: 0.1rem;
+  min-inline-size: 0;
+}
+.ox-switch__label {
+  line-height: 1.35;
+}
+.ox-switch__state {
+  font-size: var(--ox-switch-state-font);
+  font-weight: 600;
+  color: var(--ox-switch-state-fg);
+}
+.ox-switch[data-ox-state="on"] .ox-switch__state {
+  color: var(--ox-switch-state-on-fg);
+}
+.ox-switch[data-ox-state="unknown"] .ox-switch__state {
+  color: var(--ox-switch-segment-unasked-fg);
+}
+.ox-switch__desc {
+  font-size: var(--ox-switch-state-font);
+  color: var(--ox-switch-desc-fg);
+  line-height: 1.45;
+}
+
+.ox-switch__note {
+  font-size: var(--ox-switch-state-font);
+  line-height: 1.45;
+  margin-block-start: 0.3rem;
+}
+.ox-switch__note--error {
+  color: var(--ox-switch-error-fg);
+  font-weight: 600;
+}
+.ox-switch__note--locked {
+  color: var(--ox-switch-locked-fg);
+}
+.ox-switch__note--pending {
+  color: var(--ox-switch-pending-fg);
+}
+
+.ox-switch__provenance {
+  font-size: var(--ox-text-2xs);
+  color: var(--ox-switch-prov-fg);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ------------------------------------------------------------------ */
+/* until — the time-boxed on-state                                     */
+/* ------------------------------------------------------------------ */
+
+.ox-switch__until {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: var(--ox-text-2xs);
+  font-weight: 600;
+  padding-inline: 0.45rem;
+  padding-block: 0.1rem;
+  border-radius: var(--ox-switch-radius);
+  background: var(--ox-switch-until-bg);
+  color: var(--ox-switch-until-fg);
+  border: 1px solid var(--ox-switch-until-border);
+  font-variant-numeric: tabular-nums;
+}
+.ox-switch__until--lapsed {
+  background: var(--ox-switch-track-unknown-bg);
+  color: var(--ox-switch-segment-unasked-fg);
+  border-color: var(--ox-switch-track-unknown-border);
+}
+
+/* ------------------------------------------------------------------ */
+/* impact — the consequence, before the click                          */
+/* ------------------------------------------------------------------ */
+
+.ox-switch__impact {
+  margin-block-start: 0.45rem;
+  padding-inline: 0.65rem;
+  padding-block: 0.5rem;
+  border-inline-start: 3px solid var(--ox-switch-impact-border);
+  background: var(--ox-switch-impact-bg);
+  color: var(--ox-switch-impact-fg);
+  font-size: var(--ox-switch-state-font);
+  border-start-end-radius: var(--ox-radius);
+  border-end-end-radius: var(--ox-radius);
+}
+.ox-switch__impact ul {
+  margin: 0.3rem 0 0;
+  padding-inline-start: 1.1rem;
+}
+
+/* ------------------------------------------------------------------ */
+/* stale — the conflict panel                                          */
+/* ------------------------------------------------------------------ */
+
+.ox-switch__conflict {
+  display: grid;
+  gap: 0.2rem;
+  margin-block-start: 0.4rem;
+  padding-inline: 0.65rem;
+  padding-block: 0.5rem;
+  border-radius: var(--ox-radius);
+  background: var(--ox-switch-stale-bg);
+  border: 1px solid var(--ox-switch-stale-fg);
+  font-size: var(--ox-switch-state-font);
+}
+.ox-switch__conflict-actions {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+  margin-block-start: 0.4rem;
+}
+
+/* ------------------------------------------------------------------ */
+/* Confirmation                                                        */
+/* ------------------------------------------------------------------ */
+
+.ox-switch__ring {
+  position: absolute;
+  inset: -6px;
+  border-radius: var(--ox-switch-radius);
+  pointer-events: none;
+}
+.ox-switch__ring circle {
+  fill: none;
+  stroke-width: 2.5;
+}
+.ox-switch__ring-track {
+  stroke: color-mix(in oklab, var(--ox-switch-hold-ring) 30%, transparent);
+}
+.ox-switch__ring-value {
+  stroke: var(--ox-switch-hold-ring);
+  stroke-linecap: round;
+  stroke-dasharray: var(--ox-switch-hold-progress, 0) 999;
+}
+
+.ox-switch__dialog {
+  margin-block-start: 0.5rem;
+  padding-inline: 0.8rem;
+  padding-block: 0.7rem;
+  border-radius: var(--ox-radius);
+  border: 1px solid var(--ox-switch-until-border);
+  background: var(--ox-switch-until-bg);
+  font-size: var(--ox-switch-state-font);
+  display: grid;
+  gap: 0.5rem;
+}
+.ox-switch__dialog-actions {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+.ox-switch__attest {
+  font: inherit;
+  font-size: var(--ox-switch-state-font);
+  inline-size: 100%;
+  padding-inline: 0.5rem;
+  padding-block: 0.35rem;
+  border-radius: var(--ox-radius-sm);
+  border: 1px solid var(--ox-switch-segment-border);
+  background: var(--ox-surface);
+  color: var(--ox-text);
+}
+
+.ox-switch__action {
+  font: inherit;
+  font-size: var(--ox-switch-state-font);
+  font-weight: 600;
+  padding-inline: 0.7rem;
+  padding-block: 0.25rem;
+  min-block-size: max(1.75rem, var(--ox-switch-target-min));
+  border-radius: var(--ox-switch-radius);
+  border: 1px solid var(--ox-switch-segment-border);
+  background: var(--ox-surface);
+  color: var(--ox-text);
+  cursor: pointer;
+}
+.ox-switch__action:hover {
+  background: var(--ox-bg-subtle);
+}
+.ox-switch__action:focus-visible {
+  outline: var(--ox-switch-focus-width) solid var(--ox-switch-focus-ring);
+  outline-offset: var(--ox-switch-focus-offset);
+}
+
+/* ------------------------------------------------------------------ */
+/* Countersign                                                         */
+/* ------------------------------------------------------------------ */
+
+.ox-switch__countersign {
+  margin-block-start: 0.5rem;
+  border: 1px solid var(--ox-switch-until-border);
+  background: var(--ox-switch-until-bg);
+  border-radius: var(--ox-radius);
+  padding-inline: 0.8rem;
+  padding-block: 0.7rem;
+  font-size: var(--ox-switch-state-font);
+}
+.ox-switch__countersign-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-block-start: 0.45rem;
+}
+.ox-switch__countersign-slot {
+  flex: 1;
+  border: 1px dashed var(--ox-switch-until-fg);
+  border-radius: var(--ox-radius-sm);
+  padding-inline: 0.5rem;
+  padding-block: 0.35rem;
+  color: var(--ox-switch-until-fg);
+  font-style: italic;
+}
+.ox-switch__countersign-slot--done {
+  border-style: solid;
+  font-style: normal;
+  background: var(--ox-surface);
+  color: var(--ox-text);
+}
+
+/* ------------------------------------------------------------------ */
+/* SwitchList                                                          */
+/* ------------------------------------------------------------------ */
+
+.ox-switch-list {
+  display: grid;
+  border: 1px solid var(--ox-border);
+  border-radius: var(--ox-radius);
+  overflow: hidden;
+  background: var(--ox-surface);
+}
+.ox-switch-list__head {
+  padding-inline: var(--ox-density-pad-x);
+  padding-block: var(--ox-density-pad-y);
+  background: var(--ox-bg-subtle);
+  border-block-end: 1px solid var(--ox-border);
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--ox-switch-gap);
+  flex-wrap: wrap;
+}
+.ox-switch-list__title {
+  font-weight: 600;
+}
+.ox-switch-list__summary {
+  font-size: var(--ox-switch-state-font);
+  color: var(--ox-switch-desc-fg);
+  font-variant-numeric: tabular-nums;
+}
+.ox-switch-list__items {
+  display: grid;
+}
+
+.ox-switch-field {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--ox-switch-gap);
+  padding-inline: var(--ox-density-pad-x);
+  padding-block: var(--ox-density-pad-y);
+  border-block-end: 1px solid var(--ox-border);
+}
+.ox-switch-field:last-child {
+  border-block-end: 0;
+}
+.ox-switch-field__body {
+  flex: 1;
+  min-inline-size: 0;
+}
+.ox-switch-field__side {
+  display: grid;
+  justify-items: end;
+  gap: 0.3rem;
+}
+.ox-switch-field--standalone {
+  border-block-end: 0;
+  padding: 0;
+}
+
+/* ------------------------------------------------------------------ */
+/* Visually hidden — live regions and the "record no" affordance       */
+/* ------------------------------------------------------------------ */
+
+.ox-switch__sr {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ------------------------------------------------------------------ */
+/* Reduced motion — a designed still state, not a frozen one           */
+/* ------------------------------------------------------------------ */
+
+@media (prefers-reduced-motion: reduce) {
+  .ox-switch__track,
+  .ox-switch__thumb,
+  .ox-switch__word,
+  .ox-switch__segment,
+  .ox-switch__chip {
+    transition-duration: 1ms;
+  }
+  /* The stripe holds a static diagonal rather than freezing mid-march. */
+  .ox-switch[data-ox-phase="pending"] .ox-switch__track {
+    animation: none;
+  }
+  .ox-switch[data-ox-phase="committed"] .ox-switch__thumb {
+    animation: none;
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Forced colours — our tokens are discarded entirely here             */
+/* ------------------------------------------------------------------ */
+
+@media (forced-colors: active) {
+  .ox-switch__track {
+    forced-color-adjust: none;
+    border: 1px solid CanvasText;
+    background: Canvas !important;
+  }
+  .ox-switch[data-ox-state="on"] .ox-switch__track {
+    background: Highlight !important;
+  }
+  .ox-switch__thumb {
+    background: CanvasText !important;
+    color: Canvas !important;
+    box-shadow: none;
+  }
+  .ox-switch[data-ox-state="on"] .ox-switch__thumb {
+    background: HighlightText !important;
+    color: Highlight !important;
+  }
+  .ox-switch__word,
+  .ox-switch__state,
+  .ox-switch__segment {
+    color: CanvasText !important;
+  }
+  .ox-switch__segment[aria-checked="true"] {
+    forced-color-adjust: none;
+    background: Highlight !important;
+    color: HighlightText !important;
+  }
+  .ox-switch[data-ox-state="on"] .ox-switch__chip {
+    forced-color-adjust: none;
+    background: Highlight !important;
+    color: HighlightText !important;
+  }
+}

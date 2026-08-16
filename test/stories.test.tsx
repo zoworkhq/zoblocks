@@ -160,22 +160,13 @@ describe("story coverage", () => {
     expect(undeclared, `${name} has stories for states missing from its meta.ts`).toEqual([]);
   });
 
-  /**
-   * The title's first segment is the component's own category, not a hardcoded
-   * one. This used to assert `^Loaders/` because loaders were the only
-   * components; that stopped being true the moment a `pattern`-layer component
-   * arrived, and a harness that only admits one category is a harness that
-   * blocks the second component someone writes.
-   */
-  it("titles every story file under one of its declared categories", () => {
+  it("titles every story file under a category the component declares", () => {
     for (const entry of entries) {
-      const categories = declaredCategories.get(entry.component) ?? [];
-      const segment = entry.meta.title?.split("/")[0];
-      expect(categories, `${entry.component} declares no categories`).not.toEqual([]);
+      const category = String(entry.meta.title ?? "").split("/")[0];
       expect(
-        categories,
-        `${entry.component}: story title "${entry.meta.title}" is not one of ${categories.join(", ")}`,
-      ).toContain(segment);
+        declaredCategories.get(entry.component) ?? [],
+        `${entry.component}: story title "${entry.meta.title}" names a category its meta.ts does not declare`,
+      ).toContain(category);
     }
   });
 });
@@ -190,13 +181,13 @@ describe("every story renders", () => {
       // A story that renders nothing is either a broken fixture or a state that
       // deliberately shows nothing — and the second must say so.
       if (entry.story.parameters?.skipVrt) return;
-      // Any component root will do. Asserting `[data-ox-loader]` specifically
-      // was only ever a proxy for "something rendered", and it silently failed
-      // every component that is not a loader.
+      const rooted = Array.from(view.container.querySelectorAll<HTMLElement>("*")).some((el) =>
+        Array.from(el.attributes).some((attr) => attr.name.startsWith("data-ox-")),
+      );
       expect(
-        view.container.firstElementChild,
-        `${entry.component} › ${entry.exportName} rendered nothing and did not set skipVrt`,
-      ).not.toBeNull();
+        rooted,
+        `${entry.component} › ${entry.exportName} rendered no element carrying a data-ox-* root marker`,
+      ).toBe(true);
     },
   );
 });

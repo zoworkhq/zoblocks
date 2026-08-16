@@ -15,9 +15,9 @@ import {
   summariseBiometrics,
   toPathData,
   widths,
-} from "../src/strokes.js";
-import { toInk, toPathMarkup, toSVG } from "../src/export.js";
-import type { Point, Stroke } from "../src/value.js";
+} from "../src/strokes";
+import { toInk, toPathMarkup, toSVG } from "../src/export";
+import type { Point, Stroke } from "../src/value";
 
 const point = (x: number, y: number, t: number, pressure = 0.5): Point => ({ x, y, t, pressure });
 

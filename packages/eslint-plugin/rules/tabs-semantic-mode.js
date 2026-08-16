@@ -107,10 +107,35 @@ export default {
   },
 
   create(context) {
+    /**
+     * Names bound by an import from somewhere that is not Oxygen.
+     *
+     * The rule matches on the element name, which is the only thing available
+     * at a JSX site — and `Tabs` is what antd calls its own tab strip too.
+     * `packages/signature` imports antd's, which has no `as` prop at all, so
+     * the rule was demanding an attribute that would forward an unknown
+     * property to the DOM. Flagging code that cannot comply is how a rule gets
+     * disabled wholesale, and then it protects nothing.
+     */
+    const foreign = new Set();
+
     return {
+      ImportDeclaration(node) {
+        const source = node.source.value;
+        if (typeof source !== "string") return;
+        if (source.startsWith("@oxygenui") || source.startsWith(".") || source.startsWith("@/")) {
+          return;
+        }
+        for (const specifier of node.specifiers) {
+          if (specifier.local?.type === "Identifier") foreign.add(specifier.local.name);
+        }
+      },
+
       JSXOpeningElement(node) {
         const name = elementName(node);
         if (!name || !TAB_COMPONENTS.has(name)) return;
+        // Someone else's Tabs. It is not ours to make claims about.
+        if (foreign.has(name.split(".")[0])) return;
 
         // A spread could carry `as`, and flagging it would be a guess. A rule
         // that guesses gets disabled wholesale, and then it protects nothing.
