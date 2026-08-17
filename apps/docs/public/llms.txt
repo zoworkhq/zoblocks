@@ -61,6 +61,11 @@ Rules that matter when generating code with these components:
   install: pnpm dlx shadcn@latest add https://oxygenui.design/r/chart-accordion.json
   states: Closed, with summaries, Expanded, Severity across the scale, Consent gate, Withheld section, Section that failed to load, No sections
   status: beta
+- [Patient identity](https://oxygenui.design/components/identity): An avatar, a chip and a patient banner — with the pass that keeps two patients who share a name apart on the same worklist.
+  install: pnpm dlx shadcn@latest add https://oxygenui.design/r/identity.json
+  fhir: Patient
+  states: Active, Inactive — discharged, transferred, or disengaged, Deceased, with the age frozen at age-at-death, Record merged — care is recorded elsewhere, Test patient (meta.security HTEST), Sensitive record, categories withheld pending an audited reveal, Photo on file, No photo on file, Photo could not be loaded, Photo withheld by site policy, Loading — a skeleton, never a half-identity, Could not load the record, Escalated: a similar name is on this list, Wrong patient — the form and the chart disagree, Identifier failing its check digit
+  status: beta
 - [Signature](https://oxygenui.design/components/signature): Signature capture that records the times nobody signed — declined, unable, verbal, on paper — not just the times they did.
   install: pnpm dlx shadcn@latest add https://oxygenui.design/r/signature.json
   states: Signed, Declined to sign, Unable to sign (witnessed), Consented verbally (witnessed), Signed on paper, Awaiting countersignature, Consent withdrawn, Required and empty, Locked / read-only

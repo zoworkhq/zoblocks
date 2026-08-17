@@ -190,15 +190,19 @@ export async function loadComponents(): Promise<LoadedComponent[]> {
      * so its statements are export declarations rather than the interface the
      * props live on, and reading it yields nothing at all.
      */
-    const propsFile =
-      [
-        path.join(dir, "src", `${parsed.data.title}.tsx`),
-        path.join(dir, "src", `${parsed.data.name}.tsx`),
-      ].find(existsSync) ?? "";
+    const candidates = parsed.data.propsSource
+      ? [path.join(dir, "src", parsed.data.propsSource)]
+      : [
+          path.join(dir, "src", `${parsed.data.title}.tsx`),
+          path.join(dir, "src", `${parsed.data.name}.tsx`),
+        ];
+    const propsFile = candidates.find(existsSync) ?? "";
 
     if (!propsFile) {
       problems.push(
-        `${rel(metaFile)}: no props source found — expected src/${parsed.data.title}.tsx, so the docs page would render an empty props table`,
+        parsed.data.propsSource
+          ? `${rel(metaFile)}: propsSource points at src/${parsed.data.propsSource}, which does not exist`
+          : `${rel(metaFile)}: no props source found — expected src/${parsed.data.title}.tsx. A package whose public surface is several components can name one explicitly with propsSource.`,
       );
       continue;
     }

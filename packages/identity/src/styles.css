@@ -14,26 +14,72 @@
  */
 
 :where(.ox-banner, .ox-chip, .ox-avatar, .ox-verify, .ox-guard) {
-  /* Motion tokens. See §7 of the identity brief. */
-  --ox-dur-swap: 180ms;
-  --ox-dur-reveal: 220ms;
-  --ox-dur-escalate: 260ms;
-  --ox-dur-alert: 0ms; /* deliberately zero — an error must be present the instant it is true */
-  --ox-loop-skeleton: 1400ms;
-  --ox-ease: cubic-bezier(0.2, 0, 0, 1);
+  /*
+   * Three tiers, one reference rule.
+   *
+   * Every value below is an `--ox-identity-*` token; each resolves to a
+   * semantic `--ox-*` token, then to an Ant Design `--ant-*` variable, then to
+   * a literal. That chain is what makes one stylesheet correct in three places:
+   * an Oxygen app where the brand and theme flow through, a plain antd app
+   * where ConfigProvider drives it with no JavaScript, and a bare page where
+   * the literals keep it legible.
+   *
+   * An earlier version of this file declared `--ox-fg`, `--ox-bg` and
+   * `--ox-radius` here — shadowing the semantic tier for everything nested
+   * inside a banner — and read three names that do not exist
+   * (`--ox-bg-container`, `--ox-text-secondary`, `--ox-fill-tertiary`). The
+   * result looked fine on a white page and ignored the theme entirely: light
+   * chrome on a dark app, and no response to a brand at all.
+   *
+   * `--ox-identity-*` is the documented override surface. A brand sets those
+   * and nothing else.
+   */
 
-  /* Fall back to antd's tokens where the host app supplies them. */
-  --ox-fg: var(--ox-text, rgba(0, 0, 0, 0.88));
-  --ox-fg-2: var(--ox-text-secondary, rgba(0, 0, 0, 0.65));
-  --ox-fg-3: var(--ox-text-tertiary, rgba(0, 0, 0, 0.45));
-  --ox-fg-4: var(--ox-text-quaternary, rgba(0, 0, 0, 0.25));
-  --ox-bg: var(--ox-bg-container, #fff);
-  --ox-line: var(--ox-border, #d9d9d9);
-  --ox-line-2: var(--ox-border-secondary, #f0f0f0);
-  --ox-fill: var(--ox-fill-tertiary, rgba(0, 0, 0, 0.04));
-  --ox-fill-2: var(--ox-fill-quaternary, rgba(0, 0, 0, 0.02));
-  --ox-radius: 6px;
-  --ox-radius-lg: 8px;
+  /* ---- motion: see §7 of the identity brief -------------------------- */
+  --ox-identity-dur-swap: var(--ox-duration-identity-swap, 180ms);
+  --ox-identity-dur-reveal: var(--ox-duration-identity-reveal, 220ms);
+  --ox-identity-dur-escalate: var(--ox-duration-identity-escalate, 260ms);
+  /* Deliberately zero: an error must be present the instant it is true. */
+  --ox-identity-dur-alert: var(--ox-duration-alert, 0ms);
+  --ox-identity-loop-skeleton: var(--ox-duration-skeleton-loop, 1400ms);
+  --ox-identity-ease: var(--ox-ease, cubic-bezier(0.2, 0, 0, 1));
+
+  /* ---- text ---------------------------------------------------------- */
+  --ox-identity-fg: var(--ox-text, var(--ant-color-text, #0f172a));
+  --ox-identity-fg-muted: var(--ox-text-muted, var(--ant-color-text-secondary, #475569));
+  --ox-identity-fg-subtle: var(--ox-text-subtle, var(--ant-color-text-tertiary, #64748b));
+  --ox-identity-fg-faint: var(--ox-text-subtle, var(--ant-color-text-quaternary, #94a3b8));
+
+  /* ---- surfaces ------------------------------------------------------ */
+  --ox-identity-surface: var(--ox-surface, var(--ant-color-bg-container, #ffffff));
+  --ox-identity-border: var(--ox-border, var(--ant-color-border, #d9d9d9));
+  --ox-identity-border-subtle: var(--ox-border, var(--ant-color-border-secondary, #f0f0f0));
+  --ox-identity-fill: var(--ox-bg-muted, var(--ant-color-fill-tertiary, #f1f5f9));
+  --ox-identity-fill-subtle: var(--ox-bg-subtle, var(--ant-color-fill-quaternary, #f8fafc));
+
+  /* ---- status -------------------------------------------------------- */
+  --ox-identity-critical: var(--ox-status-critical, var(--ant-color-error, #b4423a));
+  --ox-identity-critical-bg: var(--ox-status-critical-bg, var(--ant-color-error-bg, #fbeceb));
+  --ox-identity-critical-border: var(
+    --ox-status-critical-border,
+    var(--ant-color-error-border, #e8b5b0)
+  );
+  --ox-identity-warn: var(--ox-status-high, var(--ant-color-warning, #b7791f));
+  --ox-identity-warn-bg: var(--ox-status-high-bg, var(--ant-color-warning-bg, #fbf3e0));
+  --ox-identity-warn-border: var(--ox-status-high-border, var(--ant-color-warning-border, #e4c98a));
+  --ox-identity-ok: var(--ox-status-normal, var(--ant-color-success, #1f8f5f));
+  --ox-identity-ok-bg: var(--ox-status-normal-bg, var(--ant-color-success-bg, #e6f6ee));
+  --ox-identity-ok-border: var(--ox-status-normal-border, var(--ant-color-success-border, #a9dcc3));
+  --ox-identity-accent: var(--ox-accent, var(--ant-color-primary, #059478));
+
+  /* ---- record flags: already semantic, read straight through ---------- */
+  --ox-identity-restricted: var(--ox-flag-restricted, #7c3aed);
+  --ox-identity-restricted-bg: var(--ox-flag-restricted-bg, #f5f3ff);
+  --ox-identity-deceased: var(--ox-flag-deceased, #334155);
+
+  /* ---- shape --------------------------------------------------------- */
+  --ox-identity-radius: var(--ox-radius, 6px);
+  --ox-identity-radius-lg: var(--ox-radius-lg, 8px);
 }
 
 .ox-visually-hidden {
@@ -67,9 +113,9 @@
   font-weight: 600;
   font-size: calc(var(--ox-av-size) * 0.4);
   line-height: 1;
-  background-color: var(--ox-sw-bg, var(--ox-fill));
-  color: var(--ox-sw-fg, var(--ox-fg-2));
-  border: 1px solid var(--ox-sw-border, var(--ox-line));
+  background-color: var(--ox-sw-bg, var(--ox-identity-fill));
+  color: var(--ox-sw-fg, var(--ox-identity-fg-muted));
+  border: 1px solid var(--ox-sw-border, var(--ox-identity-border));
   background-size: cover;
   background-position: center;
   /* The tint is decoration; in forced-colors it goes and the border carries it. */
@@ -144,24 +190,24 @@
 
 /* The five absences, each visually distinct. */
 .ox-avatar--none-on-file {
-  background-color: var(--ox-fill-2);
+  background-color: var(--ox-identity-fill-subtle);
   border-style: dashed;
-  border-color: var(--ox-line);
-  color: var(--ox-fg-4);
+  border-color: var(--ox-identity-border);
+  color: var(--ox-identity-fg-faint);
 }
 .ox-avatar--unavailable {
-  background-color: var(--ox-error-bg, #fff2f0);
-  border-color: var(--ox-error-border, #ffccc7);
-  color: var(--ox-error, #ff4d4f);
+  background-color: var(--ox-identity-critical-bg, #fff2f0);
+  border-color: var(--ox-identity-critical-border, #ffccc7);
+  color: var(--ox-identity-critical, #ff4d4f);
 }
 .ox-avatar--withheld {
-  background-color: var(--ox-flag-restricted-bg, #f5f3ff);
-  border-color: var(--ox-flag-restricted, #7c3aed);
-  color: var(--ox-flag-restricted, #7c3aed);
+  background-color: var(--ox-identity-restricted-bg, #f5f3ff);
+  border-color: var(--ox-identity-restricted, #7c3aed);
+  color: var(--ox-identity-restricted, #7c3aed);
 }
 .ox-avatar--loading {
-  background-color: var(--ox-fill);
-  border-color: var(--ox-line-2);
+  background-color: var(--ox-identity-fill);
+  border-color: var(--ox-identity-border-subtle);
   color: transparent;
 }
 .ox-avatar--loading::after {
@@ -169,7 +215,7 @@
   position: absolute;
   inset: 0;
   background: linear-gradient(100deg, transparent 22%, rgb(255 255 255 / 0.6) 50%, transparent 78%);
-  animation: ox-shimmer var(--ox-loop-skeleton) linear infinite;
+  animation: ox-shimmer var(--ox-identity-loop-skeleton) linear infinite;
 }
 @keyframes ox-shimmer {
   from {
@@ -187,23 +233,23 @@
 }
 .ox-avatar--test {
   border-style: dashed;
-  border-color: var(--ox-warning, #faad14);
+  border-color: var(--ox-identity-warn, #faad14);
   background-image: repeating-linear-gradient(
     45deg,
     transparent,
     transparent 3px,
-    var(--ox-warning-bg, #fffbe6) 3px,
-    var(--ox-warning-bg, #fffbe6) 6px
+    var(--ox-identity-warn-bg, #fffbe6) 3px,
+    var(--ox-identity-warn-bg, #fffbe6) 6px
   );
 }
 
 /* Hover darkens the border. Nothing scales — at 5,000 rows a transform is
    5,000 composited layers waiting to happen. */
 .ox-avatar {
-  transition: border-color 140ms var(--ox-ease);
+  transition: border-color 140ms var(--ox-identity-ease);
 }
 .ox-avatar:hover {
-  border-color: var(--ox-sw-fg, var(--ox-fg-3));
+  border-color: var(--ox-sw-fg, var(--ox-identity-fg-subtle));
 }
 
 /* --------------------------------------------------------------------- */
@@ -222,17 +268,17 @@
 }
 .ox-chip__name {
   font-weight: 600;
-  color: var(--ox-fg);
+  color: var(--ox-identity-fg);
 }
 .ox-chip__detail {
   display: block;
   font-size: 12px;
   line-height: 1.35;
-  color: var(--ox-fg-3);
+  color: var(--ox-identity-fg-subtle);
   /* Entering information animates; leaving does not. A graceful exit means the
      value is still readable while it leaves, and readable-but-stale is the
      problem this component exists to prevent. */
-  animation: ox-enter var(--ox-dur-escalate) var(--ox-ease);
+  animation: ox-enter var(--ox-identity-dur-escalate) var(--ox-identity-ease);
 }
 @keyframes ox-enter {
   from {
@@ -245,8 +291,8 @@
   }
 }
 .ox-chip--escalated {
-  background: var(--ox-warning-bg, #fffbe6);
-  border-radius: var(--ox-radius);
+  background: var(--ox-identity-warn-bg, #fffbe6);
+  border-radius: var(--ox-identity-radius);
   padding-inline: 4px;
 }
 .ox-chip__skeleton {
@@ -254,15 +300,15 @@
   inline-size: 110px;
   block-size: 14px;
   border-radius: 4px;
-  background: var(--ox-fill);
+  background: var(--ox-identity-fill);
 }
 
 .ox-identity-notice {
   padding: 8px 12px;
-  border-block-start: 1px solid var(--ox-line-2);
-  background: var(--ox-warning-bg, #fffbe6);
+  border-block-start: 1px solid var(--ox-identity-border-subtle);
+  background: var(--ox-identity-warn-bg, #fffbe6);
   font-size: 12px;
-  color: var(--ox-warning-text, #ad6800);
+  color: var(--ox-identity-warn, #ad6800);
 }
 
 /* --------------------------------------------------------------------- */
@@ -275,9 +321,9 @@
   gap: 4px;
   padding: 0 7px;
   border-radius: 4px;
-  border: 1px solid var(--ox-line);
-  background: var(--ox-fill-2);
-  color: var(--ox-fg-2);
+  border: 1px solid var(--ox-identity-border);
+  background: var(--ox-identity-fill-subtle);
+  color: var(--ox-identity-fg-muted);
   font-size: 12px;
   line-height: 18px;
   font-weight: 500;
@@ -289,27 +335,27 @@
   padding: 0 5px;
 }
 .ox-tag--ok {
-  background: var(--ox-success-bg, #f6ffed);
-  border-color: var(--ox-success-border, #b7eb8f);
-  color: var(--ox-success-text, #237804);
+  background: var(--ox-identity-ok-bg, #f6ffed);
+  border-color: var(--ox-identity-ok-border, #b7eb8f);
+  color: var(--ox-identity-ok, #237804);
 }
 .ox-tag--warn {
-  background: var(--ox-warning-bg, #fffbe6);
-  border-color: var(--ox-warning-border, #ffe58f);
-  color: var(--ox-warning-text, #ad6800);
+  background: var(--ox-identity-warn-bg, #fffbe6);
+  border-color: var(--ox-identity-warn-border, #ffe58f);
+  color: var(--ox-identity-warn, #ad6800);
 }
 .ox-tag--error {
-  background: var(--ox-error-bg, #fff2f0);
-  border-color: var(--ox-error-border, #ffccc7);
-  color: var(--ox-error-text, #a8071a);
+  background: var(--ox-identity-critical-bg, #fff2f0);
+  border-color: var(--ox-identity-critical-border, #ffccc7);
+  color: var(--ox-identity-critical, #a8071a);
 }
 .ox-tag--restricted {
-  background: var(--ox-flag-restricted-bg, #f5f3ff);
-  border-color: var(--ox-flag-restricted, #7c3aed);
-  color: var(--ox-flag-restricted, #7c3aed);
+  background: var(--ox-identity-restricted-bg, #f5f3ff);
+  border-color: var(--ox-identity-restricted, #7c3aed);
+  color: var(--ox-identity-restricted, #7c3aed);
 }
 .ox-tag--neutral {
-  color: var(--ox-flag-deceased, #334155);
+  color: var(--ox-identity-deceased, #334155);
 }
 
 /* --------------------------------------------------------------------- */
@@ -322,14 +368,14 @@
   align-items: center;
   gap: 12px;
   padding: 12px 16px;
-  background: var(--ox-bg);
-  border: 1px solid var(--ox-line-2);
-  border-radius: var(--ox-radius-lg);
+  background: var(--ox-identity-surface);
+  border: 1px solid var(--ox-identity-border-subtle);
+  border-radius: var(--ox-identity-radius-lg);
   font-variant-numeric: tabular-nums;
   /* The whole block transitions as one unit. Never field by field: staggering
      lets a reader catch the old MRN beside the new name, which is a
      wrong-patient hazard created by the animation. */
-  transition: opacity var(--ox-dur-swap) var(--ox-ease);
+  transition: opacity var(--ox-identity-dur-swap) var(--ox-identity-ease);
 }
 .ox-banner__rail {
   inline-size: 3px;
@@ -339,16 +385,16 @@
   background: transparent;
 }
 .ox-banner__rail--neutral {
-  background: var(--ox-fg-4);
+  background: var(--ox-identity-fg-faint);
 }
 .ox-banner__rail--warn {
-  background: var(--ox-warning, #faad14);
+  background: var(--ox-identity-warn, #faad14);
 }
 .ox-banner__rail--restricted {
-  background: var(--ox-flag-restricted, #7c3aed);
+  background: var(--ox-identity-restricted, #7c3aed);
 }
 .ox-banner__rail--error {
-  background: var(--ox-error, #ff4d4f);
+  background: var(--ox-identity-critical, #ff4d4f);
 }
 .ox-banner__rail--none {
   display: none;
@@ -371,17 +417,17 @@
   flex-wrap: wrap;
   margin-block-start: 3px;
   font-size: 12px;
-  color: var(--ox-fg-2);
+  color: var(--ox-identity-fg-muted);
 }
 .ox-banner__name {
   font-size: 16px;
   font-weight: 600;
   letter-spacing: -0.005em;
-  color: var(--ox-fg);
+  color: var(--ox-identity-fg);
 }
 .ox-banner__pronouns {
   font-size: 12px;
-  color: var(--ox-fg-3);
+  color: var(--ox-identity-fg-subtle);
 }
 .ox-banner__fld {
   display: inline-flex;
@@ -393,17 +439,17 @@
   font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  color: var(--ox-fg-3);
+  color: var(--ox-identity-fg-subtle);
 }
 .ox-banner__val {
-  color: var(--ox-fg-2);
+  color: var(--ox-identity-fg-muted);
 }
 .ox-banner__assigner {
   font-size: 11px;
-  color: var(--ox-fg-4);
+  color: var(--ox-identity-fg-faint);
 }
 .ox-banner__invalid {
-  color: var(--ox-error, #ff4d4f);
+  color: var(--ox-identity-critical, #ff4d4f);
 }
 .ox-banner__actions {
   margin-inline-start: auto;
@@ -414,28 +460,28 @@
 }
 
 .ox-banner--restricted {
-  border-color: var(--ox-flag-restricted, #7c3aed);
+  border-color: var(--ox-identity-restricted, #7c3aed);
 }
 .ox-banner--test {
-  border-color: var(--ox-warning, #faad14);
+  border-color: var(--ox-identity-warn, #faad14);
   background-image: repeating-linear-gradient(
     45deg,
     transparent,
     transparent 8px,
-    var(--ox-warning-bg, #fffbe6) 8px,
-    var(--ox-warning-bg, #fffbe6) 16px
+    var(--ox-identity-warn-bg, #fffbe6) 8px,
+    var(--ox-identity-warn-bg, #fffbe6) 16px
   );
 }
 .ox-banner--error {
-  border-color: var(--ox-error-border, #ffccc7);
-  background: var(--ox-error-bg, #fff2f0);
-  transition-duration: var(--ox-dur-alert);
+  border-color: var(--ox-identity-critical-border, #ffccc7);
+  background: var(--ox-identity-critical-bg, #fff2f0);
+  transition-duration: var(--ox-identity-dur-alert);
 }
 
 .ox-banner__withheld {
   margin-block-start: 6px;
   font-size: 12px;
-  color: var(--ox-flag-restricted, #7c3aed);
+  color: var(--ox-identity-restricted, #7c3aed);
   display: flex;
   align-items: center;
   gap: 8px;
@@ -445,16 +491,16 @@
   font: inherit;
   font-size: 12px;
   padding: 2px 8px;
-  border: 1px solid var(--ox-line);
-  border-radius: var(--ox-radius);
-  background: var(--ox-bg);
-  color: var(--ox-fg);
+  border: 1px solid var(--ox-identity-border);
+  border-radius: var(--ox-identity-radius);
+  background: var(--ox-identity-surface);
+  color: var(--ox-identity-fg);
   cursor: pointer;
 }
 .ox-banner__skeleton {
   display: block;
   border-radius: 4px;
-  background: var(--ox-fill);
+  background: var(--ox-identity-fill);
 }
 .ox-banner__skeleton--name {
   inline-size: 190px;
@@ -464,7 +510,7 @@
 .ox-banner__skeleton--line {
   inline-size: 250px;
   block-size: 14px;
-  background: var(--ox-fill-2);
+  background: var(--ox-identity-fill-subtle);
 }
 
 /* --------------------------------------------------------------------- */
@@ -476,23 +522,23 @@
   display: flex;
   gap: 12px;
   padding: 12px 16px;
-  border-radius: var(--ox-radius-lg);
-  border: 1px solid var(--ox-error-border, #ffccc7);
-  background: var(--ox-error-bg, #fff2f0);
+  border-radius: var(--ox-identity-radius-lg);
+  border: 1px solid var(--ox-identity-critical-border, #ffccc7);
+  background: var(--ox-identity-critical-bg, #fff2f0);
   /* Zero. An error must be present the instant it is true; animating it in
      leaves a window in which a keystroke can still land on the form beneath. */
-  animation-duration: var(--ox-dur-alert);
+  animation-duration: var(--ox-identity-dur-alert);
 }
 .ox-verify--confirmed {
-  border-color: var(--ox-success-border, #b7eb8f);
-  background: var(--ox-success-bg, #f6ffed);
+  border-color: var(--ox-identity-ok-border, #b7eb8f);
+  background: var(--ox-identity-ok-bg, #f6ffed);
 }
 .ox-verify__rail,
 .ox-guard__rail {
   inline-size: 3px;
   align-self: stretch;
   border-radius: 3px;
-  background: var(--ox-error, #ff4d4f);
+  background: var(--ox-identity-critical, #ff4d4f);
   flex: 0 0 auto;
 }
 .ox-verify__body,
@@ -510,7 +556,7 @@
 .ox-guard__body {
   margin: 0;
   font-size: 13px;
-  color: var(--ox-fg-2);
+  color: var(--ox-identity-fg-muted);
 }
 .ox-verify__row {
   display: flex;
@@ -528,7 +574,7 @@
 }
 .ox-verify__detail {
   font-size: 12px;
-  color: var(--ox-fg-2);
+  color: var(--ox-identity-fg-muted);
 }
 .ox-verify__field {
   margin-inline-start: auto;
@@ -536,10 +582,10 @@
 .ox-verify__input {
   inline-size: 110px;
   padding: 5px 10px;
-  border: 1px solid var(--ox-line);
-  border-radius: var(--ox-radius);
-  background: var(--ox-bg);
-  color: var(--ox-fg);
+  border: 1px solid var(--ox-identity-border);
+  border-radius: var(--ox-identity-radius);
+  background: var(--ox-identity-surface);
+  color: var(--ox-identity-fg);
   font: inherit;
   letter-spacing: 0.14em;
   text-transform: uppercase;
@@ -550,24 +596,24 @@
   min-block-size: 18px;
 }
 .ox-verify--wrong .ox-verify__result {
-  color: var(--ox-error-text, #a8071a);
+  color: var(--ox-identity-critical, #a8071a);
 }
 .ox-verify--confirmed .ox-verify__result {
-  color: var(--ox-success-text, #237804);
+  color: var(--ox-identity-ok, #237804);
 }
 
 .ox-btn {
   font: inherit;
   padding: 4px 12px;
-  border: 1px solid var(--ox-line);
-  border-radius: var(--ox-radius);
-  background: var(--ox-bg);
-  color: var(--ox-fg);
+  border: 1px solid var(--ox-identity-border);
+  border-radius: var(--ox-identity-radius);
+  background: var(--ox-identity-surface);
+  color: var(--ox-identity-fg);
   cursor: pointer;
 }
 .ox-btn--primary {
-  background: var(--ox-primary, #1677ff);
-  border-color: var(--ox-primary, #1677ff);
+  background: var(--ox-identity-accent, #1677ff);
+  border-color: var(--ox-identity-accent, #1677ff);
   color: #fff;
 }
 

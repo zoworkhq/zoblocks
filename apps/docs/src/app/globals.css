@@ -33,6 +33,12 @@
    theme wiring here to look right. */
 @import "../../../../packages/tabs/src/styles.css";
 
+/* Patient identity, same reasoning as tabs: the exact file a customer installs,
+   not a copy of it. It takes no Ant Design dependency at all — every colour is
+   an --ox-* custom property with a literal fallback, so the demo is correct
+   with no theme wiring and stays correct inside an antd app that supplies one. */
+@import "../../../../packages/identity/src/styles.css";
+
 /* The gallery frame, and the demo-theme scopes that let one page show the
    component in light, dark and high contrast at once. */
 @import "./tabs-gallery.css";
