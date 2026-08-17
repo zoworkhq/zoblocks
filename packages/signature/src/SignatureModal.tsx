@@ -145,7 +145,52 @@ export function SignatureModal({
    * rendered, and focus simply stayed on the trigger. The effect below covers
    * that. Both target the same element, so whichever runs last is harmless.
    */
+  /*
+   * Has the reader started navigating for themselves?
+   *
+   * `focusName` runs twice, and the note above used to call the second call
+   * harmless on the grounds that both target the same element. That holds only
+   * while nothing has moved focus in between — and something does.
+   * `afterOpenChange` fires at the *end* of the open transition, a few hundred
+   * milliseconds after the frame-later effect has already placed focus. A
+   * keyboard user who starts tabbing inside that window was hauled back to the
+   * first field mid-journey, with the dialog sitting there looking idle.
+   *
+   * Reading `document.activeElement` instead cannot answer this: antd's trap
+   * parks focus on the close button, a real and visible control, so "focus is
+   * on something inside the dialog" is equally true of the trap's default
+   * landing spot and of a field the reader chose. Only the *reason* focus is
+   * where it is distinguishes them, and that is an input event, not a state.
+   */
+  const readerNavigated = React.useRef(false);
+
+  React.useEffect(() => {
+    if (!open) {
+      readerNavigated.current = false;
+      return;
+    }
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      // Typing into the field we just focused is not moving on; Tab and the
+      // arrow keys are. Escape closes, so it needs no opinion here.
+      if (event.key === "Tab" || event.key.startsWith("Arrow")) readerNavigated.current = true;
+    };
+    const onPointerDown = () => {
+      readerNavigated.current = true;
+    };
+
+    // Capture phase, so a handler that stops propagation cannot hide the fact
+    // that the reader acted.
+    document.addEventListener("keydown", onKeyDown, true);
+    document.addEventListener("pointerdown", onPointerDown, true);
+    return () => {
+      document.removeEventListener("keydown", onKeyDown, true);
+      document.removeEventListener("pointerdown", onPointerDown, true);
+    };
+  }, [open]);
+
   const focusName = React.useCallback(() => {
+    if (readerNavigated.current) return;
     nameRef.current?.focus();
   }, []);
 

@@ -94,6 +94,55 @@ async function tabTo(page: Page, target: ReturnType<Page["locator"]>, limit = 40
   throw new Error(`never reached ${await target.textContent()} with ${limit} Tab presses`);
 }
 
+const isFocused = (target: ReturnType<Page["locator"]>) =>
+  target.evaluate((el) => el === document.activeElement);
+
+/**
+ * Step along a tablist with an arrow key, and mean it.
+ *
+ * antd's Tabs use manual activation, so ArrowRight moves focus and Enter
+ * selects. `tabTo` returns the instant it observes `document.activeElement`,
+ * which is true before antd has finished adopting that focus into its own
+ * roving-tabindex state — and in Firefox the arrow key is occasionally
+ * delivered inside that window. antd then computes the next index from the tab
+ * it still believes is current, and focus does not move at all. Measured at
+ * roughly one run in ten on `main`, in a test that already carries one fix for
+ * an earlier form of the same race.
+ *
+ * Pressing again is safe *only* while focus has not moved, which is the
+ * condition this loop presses on — so a first press that was slow rather than
+ * lost cannot overshoot into the tab beyond. A genuine failure still fails, on
+ * the assertion at the end rather than on a timeout.
+ */
+async function arrowAlong(
+  page: Page,
+  key: "ArrowRight" | "ArrowLeft",
+  from: ReturnType<Page["locator"]>,
+  to: ReturnType<Page["locator"]>,
+) {
+  for (let attempt = 0; attempt < 5; attempt += 1) {
+    if (await isFocused(to)) break;
+    // Only press while the origin still holds focus. If it does not, focus is
+    // somewhere unexpected and another press would make the failure harder to
+    // read, not easier.
+    if (!(await isFocused(from))) break;
+    await page.keyboard.press(key);
+    await page.waitForTimeout(60);
+  }
+
+  if (!(await isFocused(to))) {
+    // Name what actually has focus. `toBeFocused` reports only that the target
+    // does not, which is the least useful half of the answer for a race.
+    const holder = await page.evaluate(() => {
+      const el = document.activeElement as HTMLElement | null;
+      if (!el) return "nothing";
+      const label = (el.textContent || el.getAttribute("aria-label") || "").trim().slice(0, 40);
+      return `<${el.tagName.toLowerCase()} role=${el.getAttribute("role")} tabindex=${el.getAttribute("tabindex")}> ${label}`;
+    });
+    throw new Error(`${key} did not move focus to the expected tab. Focus is on: ${holder}`);
+  }
+}
+
 test.describe("the live demo", () => {
   test("@framework mounts with its real dependency", async ({ page }) => {
     const failures: string[] = [];
@@ -241,15 +290,17 @@ test.describe("accessibility in a real layout engine", () => {
      * The focused tab's accessible name also gains antd's "Tab 2 of 3"
      * position prefix, so these match on a substring rather than exactly.
      */
-    await tabTo(page, dialog.getByRole("tab", { name: /Draw/ }));
-    await page.keyboard.press("ArrowRight");
+    const drawTab = dialog.getByRole("tab", { name: /Draw/ });
+    const typeTab = dialog.getByRole("tab", { name: /Type/ });
+    await tabTo(page, drawTab);
 
     // Focus has to land before Enter can activate it. Sending both keys back
     // to back made this fail in Firefox roughly one run in six, because Enter
     // arrived while focus was still on Draw and re-selected the tab that was
-    // already selected.
-    const typeTab = dialog.getByRole("tab", { name: /Type/ });
-    await expect(typeTab).toBeFocused();
+    // already selected. Waiting for focus fixed that and left a second race
+    // behind it — the arrow key itself going missing — which is what
+    // `arrowAlong` handles.
+    await arrowAlong(page, "ArrowRight", drawTab, typeTab);
     await page.keyboard.press("Enter");
     await expect(typeTab).toHaveAttribute("aria-selected", "true");
 
