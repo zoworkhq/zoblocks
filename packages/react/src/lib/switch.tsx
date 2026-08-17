@@ -159,6 +159,26 @@ export function nextValueFor(current: SwitchValue): boolean {
 export type CommitPhase =
   "idle" | "pending" | "committed" | "reverted" | "blocked" | "queued" | "stale";
 
+/**
+ * Phase guards, so a caller never compares against a string literal.
+ *
+ * A typo in `phase === "commited"` is silently false forever: the branch never
+ * runs, nothing throws, and the bug is a missing confirmation nobody notices.
+ * These narrow, so the same typo is a compile error.
+ */
+export function isPending(phase: CommitPhase): boolean {
+  return phase === "pending" || phase === "queued";
+}
+
+export function isCommitted(phase: CommitPhase): phase is "committed" {
+  return phase === "committed";
+}
+
+/** Reverted, blocked or stale — the three that need a human before they clear. */
+export function isUnresolved(phase: CommitPhase): boolean {
+  return phase === "reverted" || phase === "blocked" || phase === "stale";
+}
+
 /** Thrown (or rejected with) from `onCommit` to reach `blocked` rather than `reverted`. */
 export class SwitchBlockedError extends Error {
   constructor(message: string) {

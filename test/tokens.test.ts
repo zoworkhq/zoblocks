@@ -331,3 +331,74 @@ describe("brand axis", () => {
     expect(css.indexOf('[data-ox-brand="northwind"]')).toBeGreaterThan(css.indexOf(":root {"));
   });
 });
+
+describe("density-linked component tokens", () => {
+  const css = readFileSync(path.join(ROOT, "packages/tokens/src/oxygen-tokens.css"), "utf8");
+
+  /** The declarations inside one `[data-ox-density="…"]` block. */
+  function densityBlock(profile: string): string {
+    const start = css.indexOf(`[data-ox-density="${profile}"] {`);
+    expect(start, `no block for density "${profile}"`).toBeGreaterThan(-1);
+    return css.slice(start, css.indexOf("\n}", start));
+  }
+
+  /**
+   * The bug this guards is silent and was shipped.
+   *
+   * `var()` inside a custom-property declaration is substituted against the
+   * element the declaration applies to. `--ox-switch-target-min:
+   * var(--ox-density-target)` written once on `:root` therefore captures the
+   * root profile's value and inherits that literal — so a container marked
+   * `data-ox-density="clinical"` moved `--ox-density-target` beneath it while
+   * every switch inside kept the root profile's hit area.
+   *
+   * Nothing looked wrong. The component's own accessibility note claimed the
+   * target followed density, and it did not.
+   */
+  const DENSITY_LINKED = [
+    "--ox-switch-target-min",
+    "--ox-switch-gap",
+    "--ox-accordion-target",
+    "--ox-accordion-pad-x",
+    "--ox-accordion-pad-y",
+  ];
+
+  for (const profile of ["patient", "standard", "clinical"]) {
+    it(`re-declares every density-linked component token under "${profile}"`, () => {
+      const block = densityBlock(profile);
+      for (const token of DENSITY_LINKED) {
+        expect(
+          block,
+          `${token} is not re-declared in the "${profile}" block, so it will resolve against :root and ignore this profile`,
+        ).toContain(`${token}:`);
+      }
+    });
+  }
+
+  it("keeps every density-linked component token pointing at a density var", () => {
+    // If one of these ever resolves to a literal, the profile blocks stop
+    // meaning anything and the freeze comes back by a different route.
+    const block = densityBlock("clinical");
+    for (const token of DENSITY_LINKED) {
+      const line = block.split("\n").find((l) => l.trim().startsWith(`${token}:`));
+      expect(line, `${token} missing`).toBeDefined();
+      expect(line, `${token} should reference a --ox-density-* var`).toMatch(
+        /var\(--ox-density-[a-z-]+\)/,
+      );
+    }
+  });
+
+  it("finds no density-linked component token left only on :root", () => {
+    const root = css.slice(css.indexOf(":root {"), css.indexOf("\n}", css.indexOf(":root {")));
+    const linked = [
+      ...root.matchAll(/(--ox-(?!density)[a-z0-9-]+):\s*var\(--ox-density-[a-z-]+\)/g),
+    ]
+      .map((m) => m[1] as string)
+      .filter((name) => !densityBlock("clinical").includes(`${name}:`));
+
+    expect(
+      linked,
+      "these component tokens reference density but are declared only on :root, so they freeze at the root profile",
+    ).toEqual([]);
+  });
+});

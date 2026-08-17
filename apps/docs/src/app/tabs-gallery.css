@@ -123,10 +123,15 @@
   grid-column: 1 / -1;
 }
 
-/* Motion off, applied to the component rather than the page. */
+/* Motion off, applied to the component rather than the page.
+   Named per component rather than `*`, so the switch used to toggle motion
+   never freezes itself mid-travel while the reader is watching it. */
 .ox-gallery__stage[data-ox-motion="off"] .ox-tabs *,
 .ox-gallery__stage[data-ox-motion="off"] .ox-tabs *::before,
-.ox-gallery__stage[data-ox-motion="off"] .ox-tabs *::after {
+.ox-gallery__stage[data-ox-motion="off"] .ox-tabs *::after,
+.ox-gallery__stage[data-ox-motion="off"] .ox-switch *,
+.ox-gallery__stage[data-ox-motion="off"] .ox-switch *::before,
+.ox-gallery__stage[data-ox-motion="off"] .ox-switch *::after {
   transition-duration: 1ms !important;
   animation-duration: 1ms !important;
 }
