@@ -42,8 +42,31 @@ describe("PatientChip — on its own", () => {
 
   it("renders a skeleton rather than a partial identity", () => {
     const { container } = F.renderWithPolicy(<PatientChip />);
-    expect(container.querySelector(".ox-chip--loading")).toBeInTheDocument();
+    expect(container.querySelector(".ox-patient-chip--loading")).toBeInTheDocument();
     expect(screen.getByText("Loading patient")).toBeInTheDocument();
+  });
+
+  it("fills the inline axis on request, for worklists", () => {
+    const { container } = F.renderWithPolicy(<PatientChip patient={F.amaraA} block />);
+    expect(container.querySelector(".ox-patient-chip--block")).toBeInTheDocument();
+  });
+
+  it("keeps the block modifier while loading, so a list does not reflow", () => {
+    // The skeleton is the widest a row ever is in a real list. If it hugs its
+    // content and the loaded row fills the axis, every row jumps sideways the
+    // moment the data lands.
+    const { container } = F.renderWithPolicy(<PatientChip block />);
+    const chip = container.querySelector(".ox-patient-chip--loading");
+    expect(chip).toHaveClass("ox-patient-chip--block");
+  });
+
+  it("stays out of the accordion's badge namespace", () => {
+    // `.ox-chip` belongs to Accordion's severity badge. A chip that renders it
+    // inherits a border, a background and text padding on a box that has to
+    // hold an avatar. See test/css-namespace.test.ts.
+    const { container } = F.renderWithPolicy(<PatientChip patient={F.amaraA} />);
+    expect(container.querySelector(".ox-chip")).toBeNull();
+    expect(container.querySelector(".ox-patient-chip")).toBeInTheDocument();
   });
 
   it("keeps a mononym whole", () => {
@@ -71,7 +94,7 @@ describe("PatientChip — on its own", () => {
     // Avatar + wrapper + text wrapper + name = 4. The performance budget in the
     // brief is "no more than 4 nodes per chip".
     const { container } = F.renderWithPolicy(<PatientChip patient={F.amaraA} />);
-    const chip = container.querySelector(".ox-chip") as HTMLElement;
+    const chip = container.querySelector(".ox-patient-chip") as HTMLElement;
     const visible = [...chip.querySelectorAll("*")].filter(
       (el) => !el.classList.contains("ox-visually-hidden"),
     );
@@ -111,7 +134,7 @@ describe("PatientChip — inside an IdentitySet", () => {
     await waitFor(() => expect(screen.getByText("Amara Chinelo Okonkwo")).toBeInTheDocument());
     // Ada may share a swatch, which escalates quietly; what must not happen is
     // her row being marked as a name collision.
-    const adaRow = [...container.querySelectorAll(".ox-chip")].find((c) =>
+    const adaRow = [...container.querySelectorAll(".ox-patient-chip")].find((c) =>
       c.textContent?.includes("Lovelace"),
     );
     expect(adaRow?.getAttribute("data-ox-escalated")).toBeNull();
@@ -210,5 +233,90 @@ describe("PatientChip — states", () => {
     // disclosure one.
     const { container } = F.renderWithPolicy(<PatientChip patient={F.deceased} />);
     expect(container.querySelector(".ox-visually-hidden")?.textContent).toContain("Deceased");
+  });
+});
+
+describe("IdentitySet — enabled", () => {
+  it("escalates by default", () => {
+    const { container } = rows([F.amaraA, F.amaraB]);
+    expect(container.querySelectorAll(".ox-patient-chip--escalated")).toHaveLength(2);
+  });
+
+  it("escalates nothing when the pass is turned off", () => {
+    const { container } = F.renderWithPolicy(
+      <IdentitySet enabled={false}>
+        <ul>
+          {[F.amaraA, F.amaraB].map((p) => (
+            <li key={p.id}>
+              <PatientChip patient={p} />
+            </li>
+          ))}
+        </ul>
+        <IdentitySetNotice />
+      </IdentitySet>,
+    );
+    expect(container.querySelector(".ox-patient-chip--escalated")).toBeNull();
+    expect(container.querySelectorAll(".ox-patient-chip")).toHaveLength(2);
+  });
+
+  it("keeps the same DOM nodes when the pass is toggled", async () => {
+    /*
+     * The reason `enabled` exists rather than callers wrapping the list in a
+     * ternary. Swapping `<IdentitySet>` for a bare list unmounts every row, so
+     * the browser has no before-state to transition from and the escalation
+     * appears to snap into place — on the one component whose whole purpose is
+     * to make a reader slow down and look again.
+     *
+     * Node identity is the assertion because it is what the browser uses: same
+     * element, so `transition` runs; new element, so it cannot.
+     */
+    const { container, rerender } = F.renderWithPolicy(
+      <IdentitySet enabled>
+        <ul>
+          {[F.amaraA, F.amaraB].map((p) => (
+            <li key={p.id}>
+              <PatientChip patient={p} />
+            </li>
+          ))}
+        </ul>
+      </IdentitySet>,
+    );
+
+    const before = container.querySelector(".ox-patient-chip");
+    expect(before).toHaveClass("ox-patient-chip--escalated");
+
+    rerender(
+      <IdentitySet enabled={false}>
+        <ul>
+          {[F.amaraA, F.amaraB].map((p) => (
+            <li key={p.id}>
+              <PatientChip patient={p} />
+            </li>
+          ))}
+        </ul>
+      </IdentitySet>,
+    );
+
+    await waitFor(() => {
+      const after = container.querySelector(".ox-patient-chip");
+      expect(after).toBe(before);
+      expect(after).not.toHaveClass("ox-patient-chip--escalated");
+    });
+  });
+
+  it("suppresses the list notice too, not just the rows", () => {
+    const { container } = F.renderWithPolicy(
+      <IdentitySet enabled={false}>
+        <ul>
+          {[F.amaraA, F.amaraB].map((p) => (
+            <li key={p.id}>
+              <PatientChip patient={p} />
+            </li>
+          ))}
+        </ul>
+        <IdentitySetNotice />
+      </IdentitySet>,
+    );
+    expect(container.querySelector(".ox-identity-notice")).toBeNull();
   });
 });

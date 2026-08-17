@@ -241,9 +241,9 @@ function IdentityArt({ featured }: { featured: boolean }) {
     <ScaledArt scale={featured ? 0.95 : 0.86}>
       <IdentityProvider now={IDENTITY_NOW} disclosure="clinical" photos="deny">
         <IdentitySet>
-          <div className="flex w-full max-w-[280px] flex-col gap-2">
+          <div className="flex w-full max-w-[280px] flex-col gap-1">
             {IDENTITY_ROWS.map((patient) => (
-              <PatientChip key={patient.id} patient={patient} />
+              <PatientChip key={patient.id} patient={patient} block />
             ))}
           </div>
         </IdentitySet>

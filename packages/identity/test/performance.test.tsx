@@ -63,7 +63,7 @@ function markup(patients: Patient[]): string {
 describe("five thousand rows", () => {
   it("renders without a set, and stays inside the node budget per chip", () => {
     const html = markup(panel(2000));
-    const chips = (html.match(/class="ox-chip"/g) ?? []).length;
+    const chips = (html.match(/class="ox-patient-chip"/g) ?? []).length;
     expect(chips).toBe(2000);
 
     // Avatar + wrapper + text wrapper + name, plus the visually-hidden label.

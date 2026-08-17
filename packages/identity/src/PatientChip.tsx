@@ -25,6 +25,21 @@ export interface PatientChipProps {
   hideAvatar?: boolean;
   /** Show status tags. Off by default; a chip is a reference, not a summary. */
   showStates?: boolean;
+  /**
+   * Fill the inline axis, for worklists and ward lists. A column of
+   * content-width chips is a staircase with no left edge to scan, and the
+   * ragged right edge reads as a rendering fault rather than as information.
+   *
+   * To stagger the escalation down a list, set `--ox-row` to the row index on
+   * each row's wrapper — the value inherits, so the chip needs no prop for it:
+   *
+   * ```tsx
+   * <li style={{ "--ox-row": i } as React.CSSProperties}>
+   *   <PatientChip patient={p} block />
+   * </li>
+   * ```
+   */
+  block?: boolean;
   className?: string;
 }
 
@@ -36,6 +51,7 @@ export function PatientChip(props: PatientChipProps): ReactNode {
     size = 24,
     hideAvatar,
     showStates,
+    block,
     className,
   } = props;
   const resolved = useIdentity(patient, identityKey);
@@ -49,9 +65,18 @@ export function PatientChip(props: PatientChipProps): ReactNode {
 
   if (!identity) {
     return (
-      <span className={["ox-chip", "ox-chip--loading", className].filter(Boolean).join(" ")}>
+      <span
+        className={[
+          "ox-patient-chip",
+          "ox-patient-chip--loading",
+          block ? "ox-patient-chip--block" : "",
+          className,
+        ]
+          .filter(Boolean)
+          .join(" ")}
+      >
         <span className="ox-avatar ox-avatar--24 ox-avatar--loading" aria-hidden="true" />
-        <span className="ox-chip__skeleton" aria-hidden="true" />
+        <span className="ox-patient-chip__skeleton" aria-hidden="true" />
         <span className="ox-visually-hidden">Loading patient</span>
       </span>
     );
@@ -74,8 +99,9 @@ export function PatientChip(props: PatientChipProps): ReactNode {
     detail.push(`${id.label} ${id.text}`);
   }
 
-  const classes = ["ox-chip"];
-  if (escalation?.mark) classes.push("ox-chip--escalated");
+  const classes = ["ox-patient-chip"];
+  if (block) classes.push("ox-patient-chip--block");
+  if (escalation?.mark) classes.push("ox-patient-chip--escalated");
   if (className) classes.push(className);
 
   return (
@@ -93,9 +119,9 @@ export function PatientChip(props: PatientChipProps): ReactNode {
             : {})}
         />
       )}
-      <span className="ox-chip__text">
-        <span className="ox-chip__name">{displayName}</span>
-        {detail.length > 0 && <span className="ox-chip__detail">{detail.join(" · ")}</span>}
+      <span className="ox-patient-chip__text">
+        <span className="ox-patient-chip__name">{displayName}</span>
+        {detail.length > 0 && <span className="ox-patient-chip__detail">{detail.join(" · ")}</span>}
         {showStates && <StateTags identity={identity} size="xs" />}
       </span>
       {/*
