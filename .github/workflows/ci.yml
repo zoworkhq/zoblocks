@@ -35,7 +35,19 @@ jobs:
   verify:
     name: Typecheck, test, build
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    # This one job does everything: install, generate, lint, format, typecheck,
+    # the unit suites, the same suites again under coverage, every build, the
+    # axe audit over sixteen pages in two themes, and the browser suite in
+    # three engines. Fifteen minutes fitted that when the catalog had six
+    # components; it now has twelve, plus three package families that did not
+    # exist. The run that prompted this was killed mid-e2e at 15m16s with
+    # nothing failing — a timeout reported as a test failure, which is the most
+    # expensive kind of red.
+    #
+    # Deliberately not fixed by dropping the separate `Test` step: eight
+    # packages define `test` without `test:coverage`, so the coverage run does
+    # not cover them and removing it would quietly stop running their suites.
+    timeout-minutes: 25
 
     steps:
       - uses: actions/checkout@v7

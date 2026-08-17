@@ -7,6 +7,7 @@
 import * as React from "react";
 import {
   formatProblems,
+  hotkeyIndex,
   isTypeaheadKey,
   keyToIntent,
   matchTypeahead,
@@ -272,4 +273,69 @@ export function useDirection(ref: React.RefObject<HTMLElement | null>): boolean 
 export function useBaseId(provided?: string): string {
   const generated = React.useId();
   return provided ?? `ox-tabs-${generated.replace(/:/g, "")}`;
+}
+
+/**
+ * `Ctrl`/`Cmd` + 1…9, bound at the document.
+ *
+ * Document-level because a shortcut that only works while the strip already
+ * has focus is not a shortcut — the whole point is reaching a tab from
+ * wherever you are. It is opt-in for the reason in `hotkeyIndex`: on Windows
+ * and Linux these belong to the browser first.
+ */
+export function useTabsHotkeys(options: {
+  enabled: boolean;
+  getItems: () => readonly TabItem[];
+  select: (value: string, source: ChangeSource, item?: TabItem) => void;
+}): void {
+  const ref = React.useRef(options);
+  ref.current = options;
+
+  React.useEffect(() => {
+    if (!options.enabled) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      const { getItems, select } = ref.current;
+      const items = getItems();
+      const index = hotkeyIndex(
+        event.key,
+        {
+          ctrl: event.ctrlKey,
+          meta: event.metaKey,
+          alt: event.altKey,
+          shift: event.shiftKey,
+        },
+        items.length,
+      );
+      if (index === null) return;
+      const item = items[index];
+      if (!item) return;
+      event.preventDefault();
+      select(item.value, "keyboard", item);
+    };
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, [options.enabled]);
+}
+
+/**
+ * Runs an update inside a View Transition when the host asked for one.
+ *
+ * Opt-in, and not the default: `startViewTransition` serialises the update, so
+ * arrowing quickly through a strip queues transitions instead of keeping up.
+ * Unsupported engines fall through to a plain call rather than a polyfill —
+ * the standard transition is already correct, and this is decoration on top.
+ */
+export function runWithTransition(enabled: boolean, update: () => void): void {
+  if (!enabled || typeof document === "undefined") {
+    update();
+    return;
+  }
+  // Feature-detected rather than assumed: Firefox has not shipped it, and the
+  // standard transition is already correct without it.
+  const start = (document as Partial<Document>).startViewTransition;
+  if (typeof start !== "function") {
+    update();
+    return;
+  }
+  start.call(document, update);
 }

@@ -1,0 +1,88 @@
+{
+  "name": "@oxygenui-design/consult",
+  "version": "0.1.0",
+  "description": "A floating clinical copilot for Ant Design. Model-agnostic, source-attributed, and designed so that checking the answer is cheaper than accepting it.",
+  "license": "MIT",
+  "homepage": "https://oxygenui.design/components/consult",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zoworkhq/oxygenui.git",
+    "directory": "packages/consult"
+  },
+  "keywords": [
+    "antd",
+    "ant-design",
+    "healthcare",
+    "clinical-decision-support",
+    "ai",
+    "copilot",
+    "fhir",
+    "accessibility",
+    "wcag",
+    "react"
+  ],
+  "type": "module",
+  "sideEffects": [
+    "*.css"
+  ],
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./styles.css": "./src/styles.css",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "src",
+    "!src/**/*.test.tsx"
+  ],
+  "engines": {
+    "node": ">=20.11.0"
+  },
+  "publishConfig": {
+    "access": "public",
+    "main": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "exports": {
+      ".": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "./styles.css": "./dist/styles.css",
+      "./package.json": "./package.json"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json && cp src/styles.css dist/styles.css",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage"
+  },
+  "dependencies": {
+    "@oxygenui-design/consult-core": "workspace:*",
+    "@oxygenui-design/consult-react": "workspace:*"
+  },
+  "peerDependencies": {
+    "antd": ">=5.20.0 || >=6.0.0",
+    "react": "^18.2.0 || ^19.0.0",
+    "react-dom": "^18.2.0 || ^19.0.0"
+  },
+  "devDependencies": {
+    "@oxygenui-design/tsconfig": "workspace:*",
+    "@testing-library/dom": "^10",
+    "@testing-library/jest-dom": "^7",
+    "@testing-library/react": "^16",
+    "@testing-library/user-event": "^14",
+    "@types/react": "^19.0.2",
+    "@types/react-dom": "^19.0.2",
+    "@vitest/coverage-v8": "^4.1.10",
+    "antd": "^6.6.0",
+    "axe-core": "^4.13.0",
+    "jsdom": "^30",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "typescript": "^5.7.2",
+    "vitest": "^4.1.10"
+  }
+}

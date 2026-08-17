@@ -19,6 +19,16 @@
    the previews render the same file a customer installs, not a copy of it. */
 @import "../../../../registry/oxygen/lib/switch.css";
 
+/* The tab system's own stylesheet, imported from the package rather than
+   copied — so the docs demo the exact file a customer installs. Its tokens
+   resolve through --ox-* to --ant-* to a literal, which is why it needs no
+   theme wiring here to look right. */
+@import "../../../../packages/tabs/src/styles.css";
+
+/* The gallery frame, and the demo-theme scopes that let one page show the
+   component in light, dark and high contrast at once. */
+@import "./tabs-gallery.css";
+
 /* ===========================================================================
  * oxygenui.design — site design layer
  *
@@ -160,6 +170,19 @@
 html {
   scroll-behavior: smooth;
   -webkit-text-size-adjust: 100%;
+
+  /*
+   * The site header is sticky, so "scrolled into view" and "visible" are not
+   * the same thing: anything the browser scrolls to lands at y=0, underneath
+   * it. Individual sections have carried `scroll-mt-*` classes to compensate,
+   * which works for the ones someone remembered and for nothing else —
+   * including every control inside a demo, and every `scrollIntoView` a script
+   * makes. This states it once, where the browser can apply it to all of them.
+   *
+   * The header is 52px; the rest is breathing room, so a heading does not sit
+   * flush against the chrome above it.
+   */
+  scroll-padding-top: 4.5rem;
 }
 
 body {

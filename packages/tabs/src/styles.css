@@ -357,8 +357,17 @@
   position: absolute;
   z-index: 0;
   pointer-events: none;
-  inset-block-start: 0;
-  inset-inline-start: 0;
+  /*
+   * `top`/`left` only — deliberately physical, and deliberately NOT paired
+   * with `inset-inline-start`.
+   *
+   * Setting both meant that in RTL the box was over-constrained (`left: 0`
+   * plus a resolved `right: 0` plus a width), and the over-constrained rule
+   * says the *start* edge loses — so the thumb anchored to the right edge and
+   * then translated further right, landing a whole tab away. The offsets
+   * driving it are physical, so the anchor has to be too.
+   */
+  top: 0;
   left: 0;
   transform: translate3d(var(--ox-tabs-ind-x, 0), var(--ox-tabs-ind-y, 0), 0);
   inline-size: var(--ox-tabs-ind-w, 0);
@@ -732,6 +741,15 @@
   opacity: 0.25;
   cursor: default;
 }
+/*
+ * Both edges reached means the strip does not scroll at all, so the nudges
+ * are pointing at nothing. They are already aria-hidden and out of the tab
+ * order, so removing them costs no affordance — it only removes clutter from
+ * every short strip that happens to use the default overflow strategy.
+ */
+.ox-tabs__bar[data-ox-start="true"][data-ox-end="true"] .ox-tabs__nudge {
+  display: none;
+}
 /* Fades belong to the container, not the track, so they work on any
    background — including a dark theme, where a white-to-transparent gradient
    would be a grey smear. */
@@ -869,6 +887,40 @@
   from {
     opacity: 0;
   }
+}
+
+/*
+ * Virtualised strips.
+ *
+ * `content-visibility` lets the browser skip layout and paint for triggers
+ * that are scrolled out of view, which is where the cost of a two-hundred-tab
+ * strip actually goes. The intrinsic size is essential: without it every
+ * skipped trigger reports zero and the scrollbar jumps as you scroll.
+ *
+ * Note what is *not* here: the triggers stay in the DOM. Removing them would
+ * make a screen reader announce "20 tabs" when there are 240.
+ */
+.ox-tabs[data-ox-virtualised] .ox-tabs__tab {
+  content-visibility: auto;
+  contain-intrinsic-size: auto var(--ox-tabs-min-h) auto 7rem;
+}
+/* The selected trigger is what the indicator measures against, so it is never
+   allowed to skip layout. */
+.ox-tabs[data-ox-virtualised] .ox-tabs__tab[data-ox-selected] {
+  content-visibility: visible;
+}
+
+/*
+ * View Transitions, when the host opts in with transition="view".
+ *
+ * Named so a host can target the pair in its own `::view-transition-*` rules.
+ */
+.ox-tabs[data-ox-transition="view"] .ox-tabs__panel:not([hidden]) {
+  view-transition-name: ox-tabs-panel;
+}
+.ox-tabs[data-ox-transition="view"] .ox-tabs__thumb,
+.ox-tabs[data-ox-transition="view"] .ox-tabs__line {
+  view-transition-name: ox-tabs-indicator;
 }
 
 /* =====================================================================

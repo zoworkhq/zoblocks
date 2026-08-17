@@ -1,0 +1,2224 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Oxygen Accordion</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<style>
+  /* ------------------------------------------------------------------ */
+  /* Document tokens — Oxygen's own identity.                            */
+  /* The mockups further down deliberately do NOT use these: they use    */
+  /* Ant Design v6's real token values, so what you are judging is antd, */
+  /* not a teal impression of it.                                        */
+  /* ------------------------------------------------------------------ */
+  :root {
+    --paper: #f6faf8;
+    --surface: #ffffff;
+    --surface-2: #eef4f2;
+    --ink: #0e1c19;
+    --ink-2: #33473f;
+    --muted: #5d716b;
+    --rule: #d8e4df;
+    --rule-2: #c3d3cd;
+    --accent: #059478;
+    --accent-2: #0bb08f;
+    --accent-soft: #e6f7f1;
+    --accent-ink: #045b4b;
+    --stage: #0b1716;
+    --stage-2: #10201e;
+    --stage-fg: #dff3ec;
+    --stage-muted: #7f9c94;
+    --stage-rule: #1c3230;
+    --warn: #b7791f;
+    --warn-soft: #fbf3e0;
+    --warn-rule: #e4c98a;
+    --bad: #b4423a;
+    --bad-soft: #fbeceb;
+    --bad-rule: #e8b5b0;
+    --ok: #1f8f5f;
+    --ok-soft: #e6f6ee;
+    --ok-rule: #a9dcc3;
+    --code-bg: #0f1e1c;
+    --code-fg: #d9ece6;
+    --code-k: #7ee0cd;
+    --code-s: #f2c98a;
+    --code-c: #7f9c94;
+    --shadow: 0 1px 2px rgb(14 28 25 / 0.06), 0 8px 24px -12px rgb(14 28 25 / 0.18);
+    --font-display: "Avenir Next", "Segoe UI Variable Display", "Helvetica Neue", ui-sans-serif, system-ui, sans-serif;
+    --font-body: -apple-system, BlinkMacSystemFont, "Segoe UI Variable Text", "Segoe UI", ui-sans-serif, system-ui, sans-serif;
+    --font-mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper: #0b1514; --surface: #101d1b; --surface-2: #142522;
+      --ink: #e7f2ee; --ink-2: #c3d6d0; --muted: #93aca5;
+      --rule: #1f312e; --rule-2: #2c423e;
+      --accent: #5fe0c9; --accent-2: #8aeedd; --accent-soft: #10302b; --accent-ink: #b8f3e7;
+      --stage: #070f0e; --stage-2: #0d1a19; --stage-rule: #1a2d2b;
+      --warn: #e2b04a; --warn-soft: #2a2410; --warn-rule: #4d4020;
+      --bad: #f0928a; --bad-soft: #2c1614; --bad-rule: #552a26;
+      --ok: #5fd39a; --ok-soft: #10281d; --ok-rule: #23503a;
+      --code-bg: #0a1413; --code-fg: #d9ece6;
+      --shadow: 0 1px 2px rgb(0 0 0 / 0.4), 0 10px 30px -14px rgb(0 0 0 / 0.6);
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper: #0b1514; --surface: #101d1b; --surface-2: #142522;
+    --ink: #e7f2ee; --ink-2: #c3d6d0; --muted: #93aca5;
+    --rule: #1f312e; --rule-2: #2c423e;
+    --accent: #5fe0c9; --accent-2: #8aeedd; --accent-soft: #10302b; --accent-ink: #b8f3e7;
+    --stage: #070f0e; --stage-2: #0d1a19; --stage-rule: #1a2d2b;
+    --warn: #e2b04a; --warn-soft: #2a2410; --warn-rule: #4d4020;
+    --bad: #f0928a; --bad-soft: #2c1614; --bad-rule: #552a26;
+    --ok: #5fd39a; --ok-soft: #10281d; --ok-rule: #23503a;
+    --code-bg: #0a1413; --code-fg: #d9ece6;
+    --shadow: 0 1px 2px rgb(0 0 0 / 0.4), 0 10px 30px -14px rgb(0 0 0 / 0.6);
+    color-scheme: dark;
+  }
+
+  /* Base ------------------------------------------------------------- */
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0; background: var(--paper); color: var(--ink);
+    font-family: var(--font-body); font-size: 16px; line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+  a { color: var(--accent-ink); text-decoration-color: color-mix(in oklab, var(--accent) 50%, transparent); text-underline-offset: 3px; }
+  a:hover { text-decoration-color: var(--accent); }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+  h1, h2, h3, h4, h5 { font-family: var(--font-display); letter-spacing: -0.015em; text-wrap: balance; margin: 0; }
+  h1 { font-size: clamp(2.2rem, 4.5vw, 3.4rem); line-height: 1.05; font-weight: 600; }
+  h2 { font-size: 1.75rem; line-height: 1.2; font-weight: 600; }
+  h3 { font-size: 1.2rem; line-height: 1.3; font-weight: 600; }
+  h4 { font-size: 1rem; line-height: 1.35; font-weight: 600; }
+  h5 { font-size: 0.9rem; line-height: 1.35; font-weight: 600; }
+  p { margin: 0 0 1rem; }
+  ul, ol { margin: 0 0 1rem; padding-inline-start: 1.35rem; }
+  li { margin: 0 0 0.4rem; }
+  strong { font-weight: 640; }
+  code { font-family: var(--font-mono); font-size: 0.87em; background: var(--surface-2); padding: 0.1em 0.36em; border-radius: 4px; border: 1px solid var(--rule); }
+  hr { border: 0; border-top: 1px solid var(--rule); margin: 3rem 0; }
+
+  /* Layout ----------------------------------------------------------- */
+  .wrap { max-width: 78rem; margin: 0 auto; padding: 0 1.5rem; }
+  .narrow { max-width: 46rem; }
+  header.top {
+    padding: 5rem 0 3.5rem;
+    background:
+      radial-gradient(120% 90% at 80% -10%, color-mix(in oklab, var(--accent) 16%, transparent), transparent 60%),
+      linear-gradient(to bottom, var(--surface), var(--paper));
+    border-bottom: 1px solid var(--rule);
+  }
+  .eyebrow { font-family: var(--font-mono); font-size: 0.75rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent-ink); margin: 0 0 1rem; }
+  .lede { font-size: 1.2rem; color: var(--ink-2); max-width: 44rem; margin-top: 1.5rem; }
+  .meta-row { display: flex; flex-wrap: wrap; gap: 0.5rem 1.5rem; margin-top: 2rem; font-size: 0.85rem; color: var(--muted); font-family: var(--font-mono); }
+
+  section.doc { padding: 3.5rem 0; border-bottom: 1px solid var(--rule); }
+  section.doc:last-of-type { border-bottom: 0; }
+  .secnum { font-family: var(--font-mono); font-size: 0.75rem; letter-spacing: 0.1em; color: var(--accent-ink); text-transform: uppercase; margin-bottom: 0.6rem; }
+  .sechead { margin-bottom: 2rem; }
+  .sechead p { color: var(--ink-2); max-width: 44rem; margin-top: 0.75rem; }
+  h3.sub { margin: 2.5rem 0 1rem; padding-top: 1.25rem; border-top: 1px solid var(--rule); }
+  h4.sub { margin: 1.75rem 0 0.75rem; color: var(--ink); }
+
+  /* TOC -------------------------------------------------------------- */
+  nav.toc { background: var(--surface); border: 1px solid var(--rule); border-radius: 12px; padding: 1.5rem 1.75rem; margin: 2.5rem 0 0; box-shadow: var(--shadow); }
+  nav.toc ol { list-style: none; padding: 0; margin: 0; columns: 2; column-gap: 2.5rem; }
+  @media (max-width: 680px) { nav.toc ol { columns: 1; } }
+  nav.toc li { break-inside: avoid; margin: 0 0 0.55rem; font-size: 0.92rem; }
+  nav.toc a { text-decoration: none; color: var(--ink-2); display: flex; gap: 0.7rem; }
+  nav.toc a:hover { color: var(--accent-ink); }
+  nav.toc .n { font-family: var(--font-mono); font-size: 0.75rem; color: var(--muted); min-width: 1.4rem; padding-top: 0.15rem; }
+
+  /* Callouts --------------------------------------------------------- */
+  .note { border-inline-start: 3px solid var(--accent); background: var(--accent-soft); padding: 1rem 1.25rem; border-radius: 0 8px 8px 0; margin: 1.5rem 0; color: var(--ink-2); }
+  .note.warn { border-color: var(--warn); background: var(--warn-soft); }
+  .note.bad { border-color: var(--bad); background: var(--bad-soft); }
+  .note.ok { border-color: var(--ok); background: var(--ok-soft); }
+  .note > :last-child { margin-bottom: 0; }
+  .note .lbl { font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; display: block; margin-bottom: 0.4rem; opacity: 0.85; }
+
+  .claim { display: grid; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); gap: 1rem; margin: 2rem 0; }
+  .claim > div { background: var(--surface); border: 1px solid var(--rule); border-radius: 10px; padding: 1.25rem; box-shadow: var(--shadow); }
+  .claim h4 { margin-bottom: 0.5rem; }
+  .claim p { font-size: 0.92rem; color: var(--ink-2); margin: 0; }
+  .claim .num { font-family: var(--font-mono); font-size: 0.72rem; color: var(--accent-ink); letter-spacing: 0.1em; display: block; margin-bottom: 0.5rem; }
+
+  /* Tables ----------------------------------------------------------- */
+  .tblwrap { overflow-x: auto; margin: 1.5rem 0; border: 1px solid var(--rule); border-radius: 10px; background: var(--surface); }
+  table { border-collapse: collapse; width: 100%; font-size: 0.9rem; min-width: 40rem; }
+  th, td { text-align: start; padding: 0.7rem 0.9rem; border-bottom: 1px solid var(--rule); vertical-align: top; }
+  thead th { background: var(--surface-2); font-family: var(--font-display); font-weight: 600; font-size: 0.82rem; letter-spacing: 0.01em; position: sticky; top: 0; }
+  tbody tr:last-child td { border-bottom: 0; }
+  td code { font-size: 0.82em; }
+  .sev { font-family: var(--font-mono); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.06em; padding: 0.15rem 0.45rem; border-radius: 4px; white-space: nowrap; }
+  .sev.a { background: var(--bad-soft); color: var(--bad); border: 1px solid var(--bad-rule); }
+  .sev.b { background: var(--warn-soft); color: var(--warn); border: 1px solid var(--warn-rule); }
+  .sev.c { background: var(--surface-2); color: var(--muted); border: 1px solid var(--rule); }
+
+  /* Code ------------------------------------------------------------- */
+  pre { background: var(--code-bg); color: var(--code-fg); padding: 1.15rem 1.25rem; border-radius: 10px; overflow-x: auto; font-family: var(--font-mono); font-size: 0.82rem; line-height: 1.65; margin: 1.25rem 0; border: 1px solid var(--stage-rule); }
+  pre code { background: none; border: 0; padding: 0; font-size: inherit; color: inherit; }
+  .k { color: var(--code-k); } .s { color: var(--code-s); } .c { color: var(--code-c); font-style: italic; }
+
+  /* Stage — where mockups live -------------------------------------- */
+  .stage {
+    background: var(--stage); border: 1px solid var(--stage-rule); border-radius: 14px;
+    padding: 2rem; margin: 1.5rem 0 2rem; position: relative;
+  }
+  .stage .cap { font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--stage-muted); margin-bottom: 1.25rem; display: flex; gap: 0.6rem; align-items: baseline; flex-wrap: wrap; }
+  .stage .cap b { color: var(--stage-fg); font-weight: 600; letter-spacing: 0.04em; }
+  .stage .foot { font-size: 0.84rem; color: var(--stage-muted); margin: 1.25rem 0 0; line-height: 1.6; }
+  .stage .foot code { background: var(--stage-2); border-color: var(--stage-rule); color: var(--stage-fg); }
+  .stage-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(19rem, 1fr)); gap: 1.5rem; }
+
+  /* ================================================================== */
+  /* ANT DESIGN v6 — real token values. Everything inside .antd uses     */
+  /* only these. No Oxygen colours leak in.                             */
+  /* ================================================================== */
+  .antd {
+    --colorPrimary: #1677ff;
+    --colorPrimaryBg: #e6f4ff;
+    --colorPrimaryBorder: #91caff;
+    --colorSuccess: #52c41a; --colorSuccessBg: #f6ffed; --colorSuccessBorder: #b7eb8f;
+    --colorWarning: #faad14; --colorWarningBg: #fffbe6; --colorWarningBorder: #ffe58f;
+    --colorError: #ff4d4f;   --colorErrorBg: #fff2f0;   --colorErrorBorder: #ffccc7;
+    --colorText: rgba(0,0,0,0.88);
+    --colorTextSecondary: rgba(0,0,0,0.65);
+    --colorTextTertiary: rgba(0,0,0,0.45);
+    --colorTextQuaternary: rgba(0,0,0,0.25);
+    --colorBorder: #d9d9d9;
+    --colorBorderSecondary: #f0f0f0;
+    --colorFillAlter: rgba(0,0,0,0.02);
+    --colorFillSecondary: rgba(0,0,0,0.06);
+    --colorFillTertiary: rgba(0,0,0,0.04);
+    --colorBgContainer: #ffffff;
+    --colorBgLayout: #f5f5f5;
+    --colorPurple: #722ed1; --colorPurpleBg: #f9f0ff; --colorPurpleBorder: #d3adf7;
+    --borderRadius: 6px;
+    --borderRadiusLG: 8px;
+    --fontSize: 14px;
+    --fontSizeSM: 12px;
+    --fontSizeLG: 16px;
+    --lineHeight: 1.5714;
+    --fontFamily: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --fontFamilyCode: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    --motionDurationMid: 0.2s;
+    --motionEaseInOut: cubic-bezier(0.645, 0.045, 0.355, 1);
+
+    background: var(--colorBgContainer);
+    color: var(--colorText);
+    font-family: var(--fontFamily);
+    font-size: var(--fontSize);
+    line-height: var(--lineHeight);
+    border-radius: var(--borderRadiusLG);
+    padding: 20px;
+  }
+  .antd.layout { background: var(--colorBgLayout); }
+  .antd.dark {
+    --colorText: rgba(255,255,255,0.85);
+    --colorTextSecondary: rgba(255,255,255,0.65);
+    --colorTextTertiary: rgba(255,255,255,0.45);
+    --colorTextQuaternary: rgba(255,255,255,0.25);
+    --colorBorder: #424242;
+    --colorBorderSecondary: #303030;
+    --colorFillAlter: rgba(255,255,255,0.04);
+    --colorFillSecondary: rgba(255,255,255,0.12);
+    --colorFillTertiary: rgba(255,255,255,0.08);
+    --colorBgContainer: #141414;
+    --colorBgLayout: #000000;
+    --colorPrimary: #1668dc; --colorPrimaryBg: #111a2c; --colorPrimaryBorder: #15325b;
+    --colorSuccess: #49aa19; --colorSuccessBg: #162312; --colorSuccessBorder: #274916;
+    --colorWarning: #d89614; --colorWarningBg: #2b2111; --colorWarningBorder: #594214;
+    --colorError: #dc4446;   --colorErrorBg: #2c1618;   --colorErrorBorder: #5b2526;
+    --colorPurple: #854eca; --colorPurpleBg: #1a1325; --colorPurpleBorder: #3e2069;
+  }
+  .antd * { box-sizing: border-box; }
+  .antd p { margin: 0 0 8px; font-size: var(--fontSize); }
+  .antd p:last-child { margin-bottom: 0; }
+
+  /* ---- The proposed accordion, in antd clothes --------------------- */
+  .ox-acc {
+    border: 1px solid var(--colorBorder);
+    border-radius: var(--borderRadiusLG);
+    background: var(--colorBgContainer);
+    overflow: hidden;
+    /* density: standard */
+    --ox-acc-pad-x: 16px;
+    --ox-acc-pad-y: 12px;
+    --ox-acc-gap: 12px;
+    --ox-acc-font: var(--fontSize);
+    --ox-acc-dur: var(--motionDurationMid);
+  }
+  .ox-acc[data-density="patient"] { --ox-acc-pad-x: 18px; --ox-acc-pad-y: 16px; --ox-acc-gap: 14px; --ox-acc-font: var(--fontSizeLG); --ox-acc-dur: 0.24s; }
+  .ox-acc[data-density="clinical"] { --ox-acc-pad-x: 10px; --ox-acc-pad-y: 5px; --ox-acc-gap: 8px; --ox-acc-font: var(--fontSizeSM); --ox-acc-dur: 0.14s; }
+  .ox-acc[data-variant="separate"] { border: 0; background: none; display: grid; gap: 8px; overflow: visible; }
+  .ox-acc[data-variant="separate"] .ox-acc__item { border: 1px solid var(--colorBorder); border-radius: var(--borderRadiusLG); overflow: hidden; }
+  .ox-acc[data-variant="ghost"] { border: 0; background: none; overflow: visible; }
+  .ox-acc[data-variant="ghost"] .ox-acc__item { border-bottom: 1px solid var(--colorBorderSecondary); }
+  .ox-acc[data-variant="ghost"] .ox-acc__trigger { background: none; }
+
+  .ox-acc__item + .ox-acc__item { border-top: 1px solid var(--colorBorder); }
+  .ox-acc[data-variant="separate"] .ox-acc__item + .ox-acc__item { border-top: 1px solid var(--colorBorder); }
+  .ox-acc__heading { margin: 0; font-size: inherit; font-weight: inherit; font-family: inherit; }
+  .ox-acc__trigger {
+    display: flex; align-items: center; gap: var(--ox-acc-gap);
+    width: 100%; min-height: 24px;
+    padding: var(--ox-acc-pad-y) var(--ox-acc-pad-x);
+    background: var(--colorFillAlter);
+    border: 0; margin: 0; text-align: start; cursor: pointer;
+    font-family: inherit; font-size: var(--ox-acc-font); line-height: var(--lineHeight);
+    color: var(--colorText);
+    transition: background var(--ox-acc-dur) var(--motionEaseInOut);
+  }
+  .ox-acc__trigger:hover { background: var(--colorFillTertiary); }
+  .ox-acc__trigger:focus-visible { outline: 2px solid var(--colorPrimary); outline-offset: -2px; }
+  .ox-acc__trigger[aria-disabled="true"] { cursor: default; }
+  .ox-acc__icon { flex: none; width: 14px; height: 14px; color: var(--colorTextSecondary); transition: transform var(--ox-acc-dur) var(--motionEaseInOut); }
+  .ox-acc__item[data-open="true"] .ox-acc__icon { transform: rotate(180deg); }
+  .ox-acc__item[data-open="true"] > .ox-acc__heading .ox-acc__trigger { background: var(--colorBgContainer); }
+  .ox-acc__label { font-weight: 600; flex: none; }
+  .ox-acc__spacer { flex: 1 1 auto; min-width: 8px; }
+  .ox-acc__summary { display: flex; align-items: center; gap: 8px; flex: none; color: var(--colorTextSecondary); font-size: var(--fontSizeSM); }
+  .ox-acc__panel { display: grid; grid-template-rows: 0fr; transition: grid-template-rows var(--ox-acc-dur) var(--motionEaseInOut); }
+  .ox-acc__panel[hidden] { content-visibility: hidden; }
+  .ox-acc__item[data-open="true"] > .ox-acc__panel { grid-template-rows: 1fr; }
+  .ox-acc__body { overflow: hidden; min-height: 0; }
+  .ox-acc__body > .inner { padding: var(--ox-acc-pad-y) var(--ox-acc-pad-x) calc(var(--ox-acc-pad-y) + 4px); border-top: 1px solid var(--colorBorderSecondary); color: var(--colorTextSecondary); }
+  @media (prefers-reduced-motion: reduce) {
+    .ox-acc__panel, .ox-acc__icon, .ox-acc__trigger { transition-duration: 0.01ms !important; }
+  }
+
+  /* Severity rail — the left edge carries state at a glance */
+  .ox-acc__item { position: relative; }
+  .ox-acc__item[data-severity]:not([data-severity="none"]) > .ox-acc__heading .ox-acc__trigger { box-shadow: inset 3px 0 0 var(--rail); }
+  .ox-acc__item[data-severity="critical"] { --rail: var(--colorError); }
+  .ox-acc__item[data-severity="high"] { --rail: var(--colorWarning); }
+  .ox-acc__item[data-severity="normal"] { --rail: var(--colorSuccess); }
+  .ox-acc__item[data-severity="restricted"] { --rail: var(--colorPurple); }
+
+  /* Chips */
+  .chip { display: inline-flex; align-items: center; gap: 4px; font-size: var(--fontSizeSM); line-height: 20px; padding: 0 8px; border-radius: var(--borderRadius); border: 1px solid var(--colorBorder); background: var(--colorFillTertiary); color: var(--colorTextSecondary); white-space: nowrap; }
+  .chip.crit { background: var(--colorErrorBg); border-color: var(--colorErrorBorder); color: var(--colorError); font-weight: 600; }
+  .chip.warn { background: var(--colorWarningBg); border-color: var(--colorWarningBorder); color: #ad6800; }
+  .antd.dark .chip.warn { color: var(--colorWarning); }
+  .chip.ok { background: var(--colorSuccessBg); border-color: var(--colorSuccessBorder); color: #389e0d; }
+  .antd.dark .chip.ok { color: var(--colorSuccess); }
+  .chip.info { background: var(--colorPrimaryBg); border-color: var(--colorPrimaryBorder); color: var(--colorPrimary); }
+  .chip.lock { background: var(--colorPurpleBg); border-color: var(--colorPurpleBorder); color: var(--colorPurple); }
+  .num { font-variant-numeric: tabular-nums; font-weight: 600; color: var(--colorText); }
+  .ts { font-size: var(--fontSizeSM); color: var(--colorTextTertiary); font-variant-numeric: tabular-nums; }
+
+  /* Gate panel */
+  .gate { border: 1px solid var(--colorBorder); border-radius: var(--borderRadius); padding: 14px 16px; background: var(--colorFillAlter); }
+  .gate.consent { border-color: var(--colorPurpleBorder); background: var(--colorPurpleBg); }
+  .gate.advisory { border-color: var(--colorPrimaryBorder); background: var(--colorPrimaryBg); }
+  .gate h5 { font-family: var(--fontFamily); font-size: var(--fontSize); margin: 0 0 6px; color: var(--colorText); }
+  .gate p { color: var(--colorTextSecondary); font-size: var(--fontSizeSM); margin: 0 0 10px; }
+  .btn { font-family: inherit; font-size: var(--fontSize); height: 32px; padding: 0 15px; border-radius: var(--borderRadius); border: 1px solid var(--colorBorder); background: var(--colorBgContainer); color: var(--colorText); cursor: pointer; }
+  .btn:hover { border-color: var(--colorPrimary); color: var(--colorPrimary); }
+  .btn.primary { background: var(--colorPrimary); border-color: var(--colorPrimary); color: #fff; }
+  .btn.primary:hover { opacity: 0.88; color: #fff; }
+  .btn:focus-visible { outline: 2px solid var(--colorPrimary); outline-offset: 2px; }
+  .btnrow { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+
+  /* Withheld / static section */
+  .ox-acc__item[data-access="withheld"] .ox-acc__trigger { cursor: not-allowed; color: var(--colorTextTertiary); }
+  .ox-acc__item[data-access="withheld"] .ox-acc__label { color: var(--colorTextSecondary); }
+
+  .kv { display: grid; grid-template-columns: max-content 1fr; gap: 4px 16px; font-size: var(--fontSize); }
+  .kv dt { color: var(--colorTextTertiary); }
+  .kv dd { margin: 0; color: var(--colorText); }
+
+  .toolbar { display: flex; gap: 8px; align-items: center; justify-content: space-between; margin-bottom: 10px; flex-wrap: wrap; }
+  .toolbar .t-left { font-weight: 600; color: var(--colorText); }
+  .linkbtn { background: none; border: 0; color: var(--colorPrimary); cursor: pointer; font-family: inherit; font-size: var(--fontSizeSM); padding: 4px 6px; border-radius: var(--borderRadius); }
+  .linkbtn:hover { background: var(--colorPrimaryBg); }
+  .linkbtn:focus-visible { outline: 2px solid var(--colorPrimary); outline-offset: 1px; }
+
+  .steps-status { flex: none; display: inline-flex; width: 18px; height: 18px; align-items: center; justify-content: center; border-radius: 50%; font-size: 11px; font-weight: 700; }
+  .steps-status.done { background: var(--colorSuccess); color: #fff; }
+  .steps-status.todo { background: var(--colorFillSecondary); color: var(--colorTextTertiary); }
+  .steps-status.now { background: var(--colorPrimary); color: #fff; }
+
+  .spark { display: block; }
+
+  .legend { display: flex; flex-wrap: wrap; gap: 0.5rem 1.25rem; font-size: 0.8rem; color: var(--stage-muted); margin-top: 1rem; font-family: var(--font-mono); }
+  .legend span::before { content: "▍"; margin-inline-end: 0.35rem; }
+  .legend .l-crit::before { color: #ff4d4f; }
+  .legend .l-high::before { color: #faad14; }
+  .legend .l-ok::before { color: #52c41a; }
+  .legend .l-res::before { color: #722ed1; }
+
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+  @media (max-width: 820px) { .two { grid-template-columns: 1fr; } }
+
+  footer.end { padding: 4rem 0 6rem; color: var(--muted); font-size: 0.88rem; }
+  .srcs { font-size: 0.84rem; color: var(--muted); }
+  .srcs li { margin-bottom: 0.3rem; }
+
+  @media print {
+    .stage { background: #fff; border-color: #ccc; }
+    .stage .cap, .stage .foot { color: #555; }
+    pre { background: #f4f4f4; color: #111; border-color: #ddd; }
+    .ox-acc__panel { grid-template-rows: 1fr !important; content-visibility: visible !important; }
+    nav.toc { break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <p class="eyebrow">Oxygen UI · Component brief · 16 August 2026 · <b style="color:var(--ok)">implemented</b></p>
+    <h1>An accordion decides what a clinician does not see.</h1>
+    <p class="lede">
+      In every other product category, a collapsed section hides convenience. In behavioral
+      health it hides a suicide-risk item, a safety plan, a note the patient has a legal right
+      to read, or a substance-use record governed by a different federal rule than the chart
+      around it. The generic accordion assumes hidden means unneeded. That assumption is what
+      this component has to replace.
+    </p>
+    <div class="meta-row">
+      <span>Status · built, phases 0–6</span>
+      <span>Layer · L1 behaviour + L2 component + L3 block</span>
+      <span>Base system · Ant Design v6</span>
+      <span>Mockups are live — click, Tab, press Space, use ↑ ↓</span>
+    </div>
+
+    <div class="note ok" style="margin-top:2rem">
+      <span class="lbl">What changed once it was built</span>
+      <p>
+        This brief was written first and the component was then implemented against it. Four
+        claims did not survive contact and have been corrected in place, each marked
+        <b>↻ revised</b> where it appears:
+      </p>
+      <ul style="margin-bottom:0">
+        <li><b>React cannot render <code>hidden="until-found"</code>.</b> React 19 treats
+          <code>hidden</code> as a boolean attribute and serialises the string to
+          <code>hidden=""</code> — verified against react-dom 19.2 in both
+          <code>renderToString</code> and the client. §04.4 said the attribute was rendered
+          directly; it is now rendered as a boolean and upgraded after commit, which is also what
+          keeps the server-rendered markup correct.</li>
+        <li><b>No feature detection is needed</b>, and the brief was wrong to call for it.
+          <code>hidden="until-found"</code> degrades on its own: a browser without support sees a
+          present boolean attribute and hides the panel.</li>
+        <li><b>Motion durations are 120 / 180 / 280ms</b>, not 140 / 200 / 240. The token build
+          requires density values to reference primitives, and the existing
+          <code>ref.duration</code> scale already had three steps that mean the right things.
+          Inventing three more primitives to hit invented numbers would have been the wrong trade.</li>
+        <li><b>Two of the four proposed blocks were not built.</b>
+          <code>TreatmentPlan</code> is a nested <code>ChartAccordion</code> and
+          <code>RestrictedSection</code> is an item state — shipping them as components would have
+          been wrappers that add nothing. <code>IntakeChecklist</code> is cut for now and noted in
+          §12.</li>
+      </ul>
+    </div>
+
+    <nav class="toc" aria-label="Contents">
+      <ol>
+        <li><a href="#s1"><span class="n">01</span><span>The claim, and the three things that follow from it</span></a></li>
+        <li><a href="#s2"><span class="n">02</span><span>What the reference gets right, and the assumption it inherits</span></a></li>
+        <li><a href="#s3"><span class="n">03</span><span>Eleven behavioral-health surfaces, and what each one demands</span></a></li>
+        <li><a href="#s4"><span class="n">04</span><span>Seven design moves</span></a></li>
+        <li><a href="#s5"><span class="n">05</span><span>The mockups, in true Ant Design tokens</span></a></li>
+        <li><a href="#s6"><span class="n">06</span><span>What antd's Collapse actually renders — nine findings</span></a></li>
+        <li><a href="#s7"><span class="n">07</span><span>The API, shaped like Ant Design</span></a></li>
+        <li><a href="#s8"><span class="n">08</span><span>Eight axes of customisation</span></a></li>
+        <li><a href="#s9"><span class="n">09</span><span>Tokens, correctly placed</span></a></li>
+        <li><a href="#s10"><span class="n">10</span><span>Architecture, and the data structure that removes the special cases</span></a></li>
+        <li><a href="#s11"><span class="n">11</span><span>What CI has to hold</span></a></li>
+        <li><a href="#s12"><span class="n">12</span><span>Implementation plan — seven phases, about four weeks</span></a></li>
+        <li><a href="#s13"><span class="n">13</span><span>What only you can decide</span></a></li>
+      </ol>
+    </nav>
+  </div>
+</header>
+
+<!-- ================================================================== -->
+<section class="doc" id="s1">
+  <div class="wrap">
+    <div class="sechead narrow">
+      <p class="secnum">01</p>
+      <h2>The claim, and the three things that follow from it</h2>
+      <p>
+        <code>CONTENT.md</code> already states the governing idea for this library:
+        <strong>an interface that omits a fact it already has is making a claim.</strong>
+        An accordion is a machine for omitting facts on purpose. So it is the one component
+        where that rule has to be built into the mechanism rather than into the copy.
+      </p>
+    </div>
+
+    <div class="claim narrow" style="max-width:none">
+      <div>
+        <span class="num">CLAIM 01</span>
+        <h4>Collapsed is not absent</h4>
+        <p>
+          If collapsing a section could change what the reader does next, the header must carry
+          the fact that would change it. A row that says only <em>"Assessments"</em> costs a
+          clinician an interaction to learn whether anything happened. Multiply by fourteen
+          sections and you have designed a chart nobody reads.
+        </p>
+      </div>
+      <div>
+        <span class="num">CLAIM 02</span>
+        <h4>Disclosure is an event, not a state change</h4>
+        <p>
+          Opening a substance-use section under 42 CFR Part 2, or a note held under a Cures Act
+          exception, is an <em>access</em>. It may need a consent on file, a reason code, or a
+          log entry. A component whose only output is <code>onChange(keys)</code> cannot express
+          that, so every product rebuilds it badly.
+        </p>
+      </div>
+      <div>
+        <span class="num">CLAIM 03</span>
+        <h4>The reader may be the person the record is about</h4>
+        <p>
+          Under the information-blocking rules the same section serves the clinician and the
+          patient. Trauma-informed practice says: never ambush. A disclosure widget is exactly
+          the right shape for <em>you choose when this appears</em> — but only if it knows the
+          difference between a section that is closed and a section that is guarded.
+        </p>
+      </div>
+    </div>
+
+    <div class="note narrow" style="max-width:none">
+      <span class="lbl">Boundary</span>
+      <p>
+        This component displays what the record holds. It does not compute severity, score an
+        instrument, or interpret a result. Severity arrives as a prop from the application,
+        alongside the text that states it. <code>ARCHITECTURE.md</code> §9 is the constraint:
+        nothing in this library may present itself as clinical decision support, and an accordion
+        that decided on its own which sections were urgent would be doing exactly that.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================== -->
+<section class="doc" id="s2">
+  <div class="wrap">
+    <div class="sechead narrow">
+      <p class="secnum">02</p>
+      <h2>What the reference gets right, and the assumption it inherits</h2>
+      <p>
+        Three references came with the brief. Read together they describe the whole spectrum
+        from decorative to load-bearing, which is useful: the gap between them is the product.
+      </p>
+    </div>
+
+    <div class="tblwrap">
+      <table>
+        <thead>
+          <tr><th style="width:22%">Reference</th><th style="width:39%">What it gets right</th><th style="width:39%">What it cannot survive</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>1 — The blue accordion</strong><br /><span class="ts">Rounded cards, active card tinted, chevron end-aligned</span></td>
+            <td>Selection is carried by <em>surface</em>, not by a border alone, so the open card survives a monochrome print. Generous 56px header height. Chevron rotates rather than swapping glyphs.</td>
+            <td>Every header is identical. Four rows of <em>"Accordion Title"</em> is the failure mode drawn to scale: the component has no way to say anything while closed. The leading icon is decorative and repeated, which spends the most valuable slot in the row on nothing.</td>
+          </tr>
+          <tr>
+            <td><strong>2 — The store setup checklist</strong><br /><span class="ts">Status glyph, grouped headings, "Ready" chip, one open at a time</span></td>
+            <td>This is the strongest of the three, and it is strong for one reason: <strong>the header carries state.</strong> A green check, a spinner, a <em>Ready</em> chip. You can read the whole list closed and know exactly where you are. It also groups sections under real headings rather than flattening.</td>
+            <td>The state vocabulary is binary — done or not. Clinical state is five-valued at minimum, and one of the values is <em>withheld</em>. There is also no notion of a section you are not permitted to open, which is the case this domain cannot avoid.</td>
+          </tr>
+          <tr>
+            <td><strong>3 — The minimal list</strong><br /><span class="ts">Three states shown: flat, hovered, open</span></td>
+            <td>Honest about hover and open being different surfaces. Tight, quiet, works at density.</td>
+            <td>Same as reference 1, without the padding to soften it. <em>"Accordion Content"</em> is a placeholder standing in for the actual question: what goes in there, and how much of it does the reader need before deciding to open?</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="note bad">
+      <span class="lbl">The inherited assumption</span>
+      <p>
+        All three are built on the FAQ model: a list of questions where the reader knows from the
+        question whether they want the answer. That model is correct for an FAQ and wrong for a
+        chart, because in a chart <strong>the reader does not know what the question is until
+        they have seen the answer.</strong> "Recent assessments" tells you nothing. "PHQ-9 · 21 ·
+        severe · item 9 endorsed · 3 days ago" tells you to open it, or tells you to call someone.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================== -->
+<section class="doc" id="s3">
+  <div class="wrap">
+    <div class="sechead narrow">
+      <p class="secnum">03</p>
+      <h2>Eleven behavioral-health surfaces, and what each one demands</h2>
+      <p>
+        This is the exploration you asked for. Each row is a real surface in a behavioral health
+        product; the right-hand column is the component requirement it produces. The requirements
+        are the specification — §04 is just those requirements arranged into designs.
+      </p>
+    </div>
+
+    <div class="tblwrap">
+      <table>
+        <thead>
+          <tr><th style="width:20%">Surface</th><th style="width:38%">What it holds</th><th style="width:42%">Requirement it creates</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Safety plan</strong><br /><span class="ts">Stanley-Brown SPI</span></td>
+            <td>Six ordered steps: warning signs → internal coping → people and settings that distract → people to ask for help → professionals and agencies → making the environment safe. Written collaboratively, read alone, often on a phone, often at 2am.</td>
+            <td><strong>A step that cannot be collapsed.</strong> Step 5 holds the crisis numbers; a person in crisis does not scroll and does not hunt for a chevron. The component needs a <code>pinned</code> item that renders open and disables its own trigger — which APG explicitly provides for via <code>aria-disabled</code> on a visible non-collapsible panel.</td>
+          </tr>
+          <tr>
+            <td><strong>Assessment battery</strong><br /><span class="ts">PHQ-9, GAD-7, C-SSRS, AUDIT, ASSIST</span></td>
+            <td>Scored instruments, repeated over months. The score is the point, the item responses are the detail, and one specific item — PHQ-9 item 9 — is a suicide-risk screen validated against the C-SSRS.</td>
+            <td><strong>A summary slot with severity and trend.</strong> The collapsed header must show score, band, direction, and date. If item 9 is endorsed, that must be legible without opening anything. Severity is supplied by the app; the component renders it and never derives it.</td>
+          </tr>
+          <tr>
+            <td><strong>Progress notes</strong><br /><span class="ts">SOAP · DAP · BIRP</span></td>
+            <td>One long-form note per encounter, dozens to hundreds per patient, strictly chronological.</td>
+            <td><strong>Find-in-page must work, and printing must not print an empty page.</strong> Both are broken by default in every accordion that hides with <code>display:none</code>. Also: lazy mount, and a real answer for 200 items.</td>
+          </tr>
+          <tr>
+            <td><strong>Treatment plan</strong></td>
+            <td>Problem → goal → objective → intervention. Genuinely three levels deep, and the levels mean different things.</td>
+            <td><strong>Heading level as a prop.</strong> A nested accordion that hardcodes <code>h3</code> destroys the document outline, and the outline is the entire navigation model for a screen-reader user on a long chart.</td>
+          </tr>
+          <tr>
+            <td><strong>Substance-use record</strong><br /><span class="ts">42 CFR Part 2</span></td>
+            <td>SUD treatment records carried under a separate federal confidentiality regime from the rest of the chart. The 2024 final rule aligned much of it with HIPAA and permits a single TPO consent — enforcement began 16 February 2026 — but it also created a distinct category for an SUD clinician's session notes that a broad consent does not cover.</td>
+            <td><strong>A section that announces its own existence without revealing its content, and reports when it is opened.</strong> The rule neither requires nor forbids segmentation, which means the interface decision is genuinely the product's — so the component has to be able to express it either way.</td>
+          </tr>
+          <tr>
+            <td><strong>Psychotherapy notes</strong><br /><span class="ts">Cures Act exception</span></td>
+            <td>Process notes kept separately from the record may be withheld from patient access. Diagnosis, functional status, treatment plan, symptoms, prognosis and progress may not.</td>
+            <td><strong>Withheld renders as a statement, never as an omission.</strong> This is <code>CONTENT.md</code> §1's <em>masked</em> case: "Restricted — not shown", with the reason. A chart that silently drops the section claims it does not exist.</td>
+          </tr>
+          <tr>
+            <td><strong>Medication</strong><br /><span class="ts">psychotropics</span></td>
+            <td>Titration schedules, black-box warnings, clozapine ANC monitoring, lithium levels, long-acting injectable due dates.</td>
+            <td><strong>A warning must survive collapse.</strong> Same summary-slot requirement, different vocabulary — and the severity chip has to route through the existing <code>--ox-badge-*</code> tokens so critical reads identically here and on a lab result.</td>
+          </tr>
+          <tr>
+            <td><strong>Intake &amp; onboarding</strong></td>
+            <td>Consents, ROI, insurance, demographics, screeners, first-appointment scheduling. Reference image 2 is exactly this shape.</td>
+            <td><strong>A checklist variant:</strong> per-step status, single-open policy, auto-advance on completion, and a progress statement that is text and not only a bar.</td>
+          </tr>
+          <tr>
+            <td><strong>Group therapy note</strong></td>
+            <td>One session, attendance, then a per-member note that is that member's record and nobody else's.</td>
+            <td><strong>Per-item access, not per-accordion access.</strong> The gate has to sit on the item, because in one list some members' notes are open to this reader and others are not.</td>
+          </tr>
+          <tr>
+            <td><strong>Release of information &amp; care team</strong></td>
+            <td>Who may see what, with expiry dates. A living answer, not a static one.</td>
+            <td><strong>Consent state as a first-class item state,</strong> with an expiry that the header shows before it lapses rather than after.</td>
+          </tr>
+          <tr>
+            <td><strong>Patient portal — "my care"</strong></td>
+            <td>The same data, read by the person it describes, at grade-8 reading level, on a phone, possibly right after a hard session.</td>
+            <td><strong>Patient density plus an advisory gate.</strong> Progressive disclosure at the reader's pace is the core trauma-informed move; the component should make the calm version the easy one to build.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="note">
+      <span class="lbl">The pattern across all eleven</span>
+      <p>
+        Five of the eleven need something no accordion library ships: a per-item notion of
+        <em>whether this reader may open this section, and what happens when they do.</em>
+        Four need the header to carry a clinical fact. Two need the component to be honest about
+        content it will not show. None of that is exotic — it is just absent, because accordions
+        were designed for FAQs and never revisited.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================== -->
+<section class="doc" id="s4">
+  <div class="wrap">
+    <div class="sechead narrow">
+      <p class="secnum">04</p>
+      <h2>Seven design moves</h2>
+      <p>
+        Each one is a requirement from §03 turned into a mechanism. Six of the seven are things
+        the component enforces rather than documents, because a rule that lives only in a
+        guidance page is a rule that holds for about three sprints.
+      </p>
+    </div>
+
+    <h3 class="sub">1 · The header is a summary, not a label</h3>
+    <p class="narrow">
+      Every item gets a <code>summary</code> slot rendered end-aligned in the trigger, and an
+      optional <code>severity</code> that paints a 3px rail down the leading edge of the header.
+      The rule the component is built around:
+    </p>
+    <div class="note">
+      <p style="margin:0">
+        <strong>If collapsing the section could change what the reader does next, the header
+        carries the fact that would change it.</strong> A lint rule enforces the mechanical half:
+        an item with <code>severity</code> set and no <code>summary</code> is an error, because
+        colouring a rail red while saying nothing is exactly the "colour alone" failure
+        <code>CONTENT.md</code> §3 already forbids.
+      </p>
+    </div>
+
+    <h3 class="sub">2 · A section that cannot be closed</h3>
+    <p class="narrow">
+      <code>pinned</code> renders the item open, disables its trigger, and sets
+      <code>aria-disabled="true"</code> — which is precisely the case the ARIA Authoring Practices
+      Guide carves out: set it "only if the panel is visible and the accordion prevents collapsing
+      that panel." Crisis contacts in a safety plan are the motivating case. The trigger stays in
+      the tab order and stays focusable, so a keyboard user still lands on it and hears the label;
+      it simply does not toggle.
+    </p>
+
+    <h3 class="sub">3 · The disclosure gate — the piece nobody ships</h3>
+    <p class="narrow">
+      An item's <code>access</code> describes what standing between the reader and the content.
+      Five values, and they are deliberately not a boolean:
+    </p>
+    <div class="tblwrap">
+      <table>
+        <thead><tr><th style="width:14%">Value</th><th style="width:30%">Means</th><th style="width:28%">What the reader sees closed</th><th style="width:28%">What opening does</th></tr></thead>
+        <tbody>
+          <tr><td><code>"open"</code></td><td>Ordinary content</td><td>Label and summary</td><td>Opens. Default.</td></tr>
+          <tr><td><code>"advisory"</code></td><td>Content that may be distressing to this reader</td><td>Label, and a stated content note</td><td>Shows the note and a confirm control. No log, no consent — a choice. This is the trauma-informed case, and the point is that the reader decides, not that the content is hidden.</td></tr>
+          <tr><td><code>"reason"</code></td><td>Permitted, but the access is recorded</td><td>Label, summary, and that opening is logged</td><td>Collects a reason code, calls <code>onDisclose</code>, opens on resolve. Break-the-glass.</td></tr>
+          <tr><td><code>"consent"</code></td><td>Requires a consent that is on file</td><td>Label, the policy that governs it, and the consent's state</td><td>Opens if consent resolves; otherwise states what is missing and offers the request path. The 42 CFR Part 2 case.</td></tr>
+          <tr><td><code>"withheld"</code></td><td>This reader cannot obtain it</td><td>Label, "Restricted — not shown", and the reason</td><td>Nothing. The trigger does not toggle. The section still exists, because deleting it would claim the chart is complete.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="narrow">
+      <code>onDisclose</code> returns <code>boolean | Promise&lt;boolean&gt;</code>. That single
+      signature covers a synchronous policy check, an async consent lookup, and a modal that
+      resolves when the user confirms — and it lets the application refuse without the component
+      having to know why. The component never decides access; it only refuses to open without an
+      answer.
+    </p>
+    <div class="note warn">
+      <span class="lbl">Deliberate non-goal</span>
+      <p>
+        The component emits the event. It does not write an audit record, does not talk to a
+        consent service, and does not persist anything. <code>ARCHITECTURE.md</code> §14 rules out
+        data fetching, and an audit trail that lives in a UI component is an audit trail that
+        disappears the first time someone renders it in a test.
+      </p>
+    </div>
+
+    <h3 class="sub">4 · Find-in-page, deep links, and print</h3>
+    <p class="narrow">
+      A clinician presses <kbd>Ctrl</kbd>+<kbd>F</kbd> and types <em>clozapine</em>. In every
+      accordion built on <code>display:none</code> — which is all of them, including antd's — the
+      browser finds nothing, and the clinician concludes the chart does not mention it. That is
+      not a usability complaint. That is a wrong answer to a medication question.
+    </p>
+    <p class="narrow">
+      The fix is <code>hidden="until-found"</code>, which became Baseline in December 2025. The
+      browser fires <code>beforematch</code> on the panel, we open the item, and the browser
+      scrolls to the match. The same mechanism handles fragment navigation, so
+      <code>#section-medications</code> in a URL opens the section rather than scrolling to a
+      closed row.
+    </p>
+
+    <div class="note warn">
+      <span class="lbl">↻ Revised — React cannot express this attribute</span>
+      <p>
+        Found during implementation, and it is the reason no React accordion ships this today:
+        <strong>React 19 treats <code>hidden</code> as a boolean attribute</strong> and serialises
+        <code>hidden="until-found"</code> as <code>hidden=""</code>. Verified against react-dom
+        19.2 in <code>renderToString</code> and on the client.
+      </p>
+      <p style="margin-bottom:0">
+        So the component renders the boolean and <strong>upgrades the attribute after commit</strong>.
+        That ordering is not a workaround, it is what makes the server output correct: a panel that
+        only became hidden after hydration would flash an entire expanded record on first paint.
+        Between commit and effect the panel carries <code>hidden=""</code> — still hidden, still out
+        of the accessibility tree, just not yet findable. React does not re-touch an attribute whose
+        prop did not change, so the upgraded value survives every re-render in which the panel stays
+        closed. No feature detection is involved, and the brief was wrong to ask for it: the
+        attribute degrades on its own, because a browser without support sees a present boolean.
+      </p>
+    </div>
+    <p class="narrow">
+      There is a second reason to prefer it, and it is the one that makes the animation work:
+      <code>hidden="until-found"</code> is specified as <code>content-visibility: hidden</code>,
+      not <code>display: none</code>. The element still generates a box. So it can be
+      transitioned, and it is still removed from the accessibility tree. One attribute buys
+      correct hiding, findable content, and an animatable panel.
+    </p>
+    <pre><code><span class="c">/* The recommended CSS. Author `display:grid` beats the UA's
+   [hidden]{display:none}, so re-assert the hiding explicitly. */</span>
+<span class="k">.ox-accordion__panel</span> {
+  display: grid;
+  grid-template-rows: <span class="s">0fr</span>;                  <span class="c">/* works everywhere */</span>
+  transition: grid-template-rows 200ms var(--ox-ease);
+}
+<span class="k">.ox-accordion__panel[hidden]</span> { content-visibility: hidden; }
+<span class="k">.ox-accordion__panel > .body</span>   { overflow: hidden; min-height: 0; }
+<span class="k">[data-open="true"] > .ox-accordion__panel</span> { grid-template-rows: <span class="s">1fr</span>; }
+
+<span class="c">/* Progressive enhancement, Chromium today (~71%): the same
+   transition against a real intrinsic height. */</span>
+<span class="k">@supports (interpolate-size: allow-keywords)</span> { <span class="k">:root</span> { interpolate-size: allow-keywords; } }</code></pre>
+    <p class="narrow">
+      Ordering matters and is the part implementations get wrong: on open, remove
+      <code>hidden</code> <em>before</em> starting the transition or you animate an empty box; on
+      close, set it on <code>transitionend</code> or the content vanishes before it has moved.
+      Under <code>prefers-reduced-motion</code> both happen immediately.
+    </p>
+    <p class="narrow">
+      Printing gets the same treatment from the other direction. <code>printExpanded</code>
+      (default <code>true</code>) opens every permitted section in <code>@media print</code> —
+      never a <code>withheld</code> one — so a printed chart is a chart and not a table of
+      contents.
+    </p>
+
+    <h3 class="sub">5 · Heading level is a prop</h3>
+    <p class="narrow">
+      APG requires the trigger to be wrapped in an element with role <code>heading</code> and an
+      <code>aria-level</code> "appropriate for the information architecture". The appropriate
+      level is not knowable by the component, so <code>headingLevel</code> is required at the
+      nesting boundary and defaults to <code>3</code>. A nested accordion without one is a lint
+      warning. This is the single highest-value accessibility decision in the component: for a
+      screen-reader user, the heading list <em>is</em> the chart's table of contents.
+    </p>
+
+    <h3 class="sub">6 · Region role, but only up to six</h3>
+    <p class="narrow">
+      APG puts <code>role="region"</code> on the panel with <code>aria-labelledby</code> pointing
+      at its trigger — and then says to avoid it when more than roughly six panels can be expanded
+      at once, because a screen reader's landmark list stops being navigation and becomes noise.
+      A fourteen-section chart in multi-open mode is exactly that case. So the component counts:
+      <code>region</code> when the number of simultaneously-openable items is ≤ 6, omitted above
+      it, and overridable with <code>panelRole</code>. Almost nobody implements the second half of
+      that rule.
+    </p>
+
+    <h3 class="sub">7 · Motion borrowed from the loaders</h3>
+    <p class="narrow">
+      The five loaders in this library already argue that tempo is content — a spinner's cadence
+      says the system is straining, a breath's says you can wait. The accordion inherits it
+      through density rather than through a prop: <strong>120ms clinical, 180ms standard, 280ms
+      patient.</strong> A dense worklist should not feel slow; a patient reading their own care
+      plan should not feel hurried. Reduced motion collapses all three to instant, and no state is
+      carried by motion alone.
+    </p>
+    <div class="note">
+      <span class="lbl">↻ Revised — the numbers came from the token build, not from taste</span>
+      <p style="margin:0">
+        The brief proposed 140 / 200 / 240ms. The token build requires a density value to reference
+        a primitive, and <code>ref.duration</code> already had three steps meaning fast, base and
+        slow — 120, 180 and 280. Adding three new primitives to hit three invented numbers would
+        have widened the palette to preserve a preference. The existing scale says the same thing,
+        so density now carries <code>duration</code> as a fourth key, and every profile must define
+        it or the build fails — the same rule that already stops a theme silently missing a status
+        colour.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================== -->
+<section class="doc" id="s5">
+  <div class="wrap">
+    <div class="sechead narrow">
+      <p class="secnum">05</p>
+      <h2>The mockups, in true Ant Design tokens</h2>
+      <p>
+        Everything below uses antd v6's real token values — <code>#1677ff</code>,
+        <code>rgba(0,0,0,0.88)</code>, <code>colorFillAlter</code> for the header,
+        <code>borderRadiusLG</code> at 8px — so what you are judging is antd, not a teal
+        impression of it. They are also <em>live</em>: click a header, Tab to it and press
+        <kbd>Space</kbd>, use <kbd>↑</kbd> <kbd>↓</kbd> <kbd>Home</kbd> <kbd>End</kbd>. Each one
+        renders the exact DOM §06 argues for — heading wrapper, real
+        <code>&lt;button&gt;</code>, <code>aria-controls</code>, <code>hidden="until-found"</code>.
+        Try <kbd>Ctrl</kbd>+<kbd>F</kbd> for a word inside a closed section.
+      </p>
+    </div>
+
+    <!-- 5.1 --------------------------------------------------------- -->
+    <h3 class="sub">5.1 &nbsp; The reference, rebuilt</h3>
+    <p class="narrow">
+      Left is reference 1 and 3 rendered faithfully in antd tokens. Right is the same four
+      sections with the summary slot filled. Nothing else changed — same height, same rhythm,
+      same chevron. The right one can be read closed.
+    </p>
+    <div class="stage">
+      <div class="stage-grid">
+        <div>
+          <p class="cap"><b>Before</b> — the header is a label</p>
+          <div class="antd">
+            <div class="ox-acc" data-policy="multiple" data-variant="separate">
+              <div class="ox-acc__item" data-open="false">
+                <h4 class="ox-acc__heading"><button class="ox-acc__trigger" aria-expanded="false" aria-controls="a1p" id="a1t">
+                  <svg class="ox-acc__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+                  <span class="ox-acc__label">Assessments</span><span class="ox-acc__spacer"></span></button></h4>
+                <div class="ox-acc__panel" id="a1p" role="region" aria-labelledby="a1t" hidden="until-found"><div class="ox-acc__body"><div class="inner"><p>Accordion content.</p></div></div></div>
+              </div>
+              <div class="ox-acc__item" data-open="false">
+                <h4 class="ox-acc__heading"><button class="ox-acc__trigger" aria-expanded="false" aria-controls="a2p" id="a2t">
+                  <svg class="ox-acc__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+                  <span class="ox-acc__label">Medications</span><span class="ox-acc__spacer"></span></button></h4>
+                <div class="ox-acc__panel" id="a2p" role="region" aria-labelledby="a2t" hidden="until-found"><div class="ox-acc__body"><div class="inner"><p>Accordion content.</p></div></div></div>
+              </div>
+              <div class="ox-acc__item" data-open="false">
+                <h4 class="ox-acc__heading"><button class="ox-acc__trigger" aria-expanded="false" aria-controls="a3p" id="a3t">
+                  <svg class="ox-acc__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+                  <span class="ox-acc__label">Safety plan</span><span class="ox-acc__spacer"></span></button></h4>
+                <div class="ox-acc__panel" id="a3p" role="region" aria-labelledby="a3t" hidden="until-found"><div class="ox-acc__body"><div class="inner"><p>Accordion content.</p></div></div></div>
+              </div>
+              <div class="ox-acc__item" data-open="false">
+                <h4 class="ox-acc__heading"><button class="ox-acc__trigger" aria-expanded="false" aria-controls="a4p" id="a4t">
+                  <svg class="ox-acc__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+                  <span class="ox-acc__label">Substance use</span><span class="ox-acc__spacer"></span></button></h4>
+                <div class="ox-acc__panel" id="a4p" role="region" aria-labelledby="a4t" hidden="until-found"><div class="ox-acc__body"><div class="inner"><p>Accordion content.</p></div></div></div>
+              </div>
+            </div>
+          </div>
+          <p class="foot">Four rows, four interactions required before the reader knows anything. This is the reference drawn honestly.</p>
+        </div>
+
+        <div>
+          <p class="cap"><b>After</b> — the header is a summary</p>
+          <div class="antd">
+            <div class="ox-acc" data-policy="multiple" data-variant="separate">
+              <div class="ox-acc__item" data-open="false" data-severity="critical">
+                <h4 class="ox-acc__heading"><button class="ox-acc__trigger" aria-expanded="false" aria-controls="b1p" id="b1t">
+                  <svg class="ox-acc__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+                  <span class="ox-acc__label">Assessments</span><span class="ox-acc__spacer"></span>
+                  <span class="ox-acc__summary"><span class="chip crit">PHQ-9 · 21 · severe</span><span class="ts">3 Aug</span></span></button></h4>
+                <div class="ox-acc__panel" id="b1p" role="region" aria-labelledby="b1t" hidden="until-found"><div class="ox-acc__body"><div class="inner"><p>PHQ-9 21 (severe), GAD-7 16 (severe), C-SSRS screen positive. Item 9 endorsed — "more than half the days".</p></div></div></div>
+              </div>
+              <div class="ox-acc__item" data-open="false" data-severity="high">
+                <h4 class="ox-acc__heading"><button class="ox-acc__trigger" aria-expanded="false" aria-controls="b2p" id="b2t">
+                  <svg class="ox-acc__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+                  <span class="ox-acc__label">Medications</span><span class="ox-acc__spacer"></span>
+                  <span class="ox-acc__summary"><span class="chip warn">ANC due</span><span class="ts">4 active</span></span></button></h4>
+                <div class="ox-acc__panel" id="b2p" role="region" aria-labelledby="b2t" hidden="until-found"><div class="ox-acc__body"><div class="inner"><p>Clozapine 300&nbsp;mg nightly — absolute neutrophil count due 18 Aug. Sertraline 100&nbsp;mg, lithium carbonate 900&nbsp;mg, hydroxyzine 25&nbsp;mg as needed.</p></div></div></div>
+              </div>
+              <div class="ox-acc__item" data-open="false" data-severity="normal">
+                <h4 class="ox-acc__heading"><button class="ox-acc__trigger" aria-expanded="false" aria-controls="b3p" id="b3t">
+                  <svg class="ox-acc__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+                  <span class="ox-acc__label">Safety plan</span><span class="ox-acc__spacer"></span>
+                  <span class="ox-acc__summary"><span class="chip ok">Current</span><span class="ts">Rev. 11 Aug</span></span></button></h4>
+                <div class="ox-acc__panel" id="b3p" role="region" aria-labelledby="b3t" hidden="until-found"><div class="ox-acc__body"><div class="inner"><p>Six steps complete. Means-restriction step reviewed with patient and sister on 11 August.</p></div></div></div>
+              </div>
+              <div class="ox-acc__item" data-open="false" data-severity="restricted" data-access="consent">
+                <h4 class="ox-acc__heading"><button class="ox-acc__trigger" aria-expanded="false" aria-controls="b4p" id="b4t">
+                  <svg class="ox-acc__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+                  <span class="ox-acc__label">Substance use</span><span class="ox-acc__spacer"></span>
+                  <span class="ox-acc__summary"><span class="chip lock">Consent required · 42 CFR Part 2</span></span></button></h4>
+                <div class="ox-acc__panel" id="b4p" role="region" aria-labelledby="b4t" hidden="until-found"><div class="ox-acc__body"><div class="inner">
+                  <div class="gate consent"><h5>This section is held under 42 CFR Part 2</h5>
+                  <p>A consent covering treatment, payment and operations is on file, signed 2 Feb 2026. Opening this section records the access against your account.</p>
+                  <div class="btnrow"><button class="btn primary" type="button">Open with consent on file</button><button class="btn" type="button">View the consent</button></div></div>
+                </div></div></div>
+              </div>
+            </div>
+          </div>
+          <p class="foot">Same four rows. The reader now knows to open the first one, and knows the fourth one exists without seeing what is in it.</p>
+        </div>
+      </div>
+      <div class="legend">
+        <span class="l-crit">critical</span><span class="l-high">high</span><span class="l-ok">normal</span><span class="l-res">restricted</span>
+      </div>
+    </div>
+
+    <!-- 5.2 --------------------------------------------------------- -->
+    <h3 class="sub">5.2 &nbsp; The chart accordion — clinician, clinical density</h3>
+    <p class="narrow">
+      Fourteen sections is a realistic behavioral health chart. At <code>clinical</code> density
+      the header is 30px and the type is 12px, but the target floor holds at 24px — dense means
+      tighter rows, never smaller buttons. Note the toolbar: <em>Expand all</em> is not a
+      convenience, it is how a clinician makes the chart printable and searchable in one action,
+      and GOV.UK's accordion has carried a "show all sections" control for the same reason.
+    </p>
+    <div class="stage">
+      <p class="cap"><b>ChartAccordion</b> · density=clinical · policy=multiple · 14 items · region role omitted above six</p>
+      <div class="antd layout" style="padding:16px">
+        <div class="toolbar">
+          <span class="t-left">Ada Lovelace · 38 · MRN 4471902</span>
+          <span><button class="linkbtn" type="button" data-expand-all>Expand all</button><button class="linkbtn" type="button" data-collapse-all>Collapse all</button></span>
+        </div>
+        <div class="ox-acc" data-density="clinical" data-policy="multiple" id="chart">
+          <div class="ox-acc__item" data-open="false" data-severity="critical">
+            <h4 class="ox-acc__heading"><button class="ox-acc__trigger" aria-expanded="false" aria-controls="c1p" id="c1t">
+              <svg class="ox-acc__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+              <span class="ox-acc__label">Risk &amp; suicidality</span><span class="ox-acc__spacer"></span>
+              <span class="ox-acc__summary"><span class="chip crit">C-SSRS positive</span><span class="ts">Screened 13 Aug 09:12 IST</span></span></button></h4>
+            <div class="ox-acc__panel" id="c1p" role="region" aria-labelledby="c1t" hidden="until-found"><div class="ox-acc__body"><div class="inner">
+              <dl class="kv"><dt>C-SSRS</dt><dd>Ideation 3 · no plan · no intent · no preparatory behaviour</dd><dt>PHQ-9 item 9</dt><dd>Endorsed — "more than half the days"</dd><dt>Last attempt</dt><dd>Not recorded</dd><dt>Screened by</dt><dd>R. Okafor, LCSW · 13 Aug 2026 09:12 IST</dd></dl>
+            </div></div></div>
+          </div>
+          <div class="ox-acc__item" data-open="false" data-severity="critical">
+            <h4 class="ox-acc__heading"><button class="ox-acc__trigger" aria-expanded="false" aria-controls="c2p" id="c2t">
+              <svg class="ox-acc__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+              <span class="ox-acc__label">Assessments</span><span class="ox-acc__spacer"></span>
+              <span class="ox-acc__summary"><span class="chip crit">PHQ-9 21</span><span class="chip warn">GAD-7 16</span><span class="ts">3 Aug</span></span></button></h4>
+            <div class="ox-acc__panel" id="c2p" role="region" aria-labelledby="c2t" hidden="until-found"><div class="ox-acc__body"><div class="inner"><p>See §5.4 for the expanded instrument view.</p></div></div></div>
+          </div>
+          <div class="ox-acc__item" data-open="false" data-severity="high">
+            <h4 class="ox-acc__heading"><button class="ox-acc__trigger" aria-expanded="false" aria-controls="c3p" id="c3t">
+              <svg class="ox-acc__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+              <span class="ox-acc__label">Medications</span><span class="ox-acc__spacer"></span>
+              <span class="ox-acc__summary"><span class="chip warn">Clozapine ANC due 18 Aug</span><span class="ts">4 active</span></span></button></h4>
+            <div class="ox-acc__panel" id="c3p" role="region" aria-labelledby="c3t" hidden="until-found"><div class="ox-acc__body"><div class="inner">
+              <dl class="kv"><dt>Clozapine</dt><dd>300&nbsp;mg PO nightly · ANC monitoring due 18 Aug 2026</dd><dt>Lithium carbonate</dt><dd>900&nbsp;mg PO nightly · level 0.8&nbsp;mmol/L on 2 Aug</dd><dt>Sertraline</dt><dd>100&nbsp;mg PO daily</dd><dt>Hydroxyzine</dt><dd>25&nbsp;mg PO as needed for anxiety</dd></dl>
+            </div></div></div>
+          </div>
+          <div class="ox-acc__item" data-open="false" data-severity="normal">
+            <h4 class="ox-acc__heading"><button class="ox-acc__trigger" aria-expanded="false" aria-controls="c4p" id="c4t">
+              <svg class="ox-acc__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+              <span class="ox-acc__label">Safety plan</span><span class="ox-acc__spacer"></span>
+              <span class="ox-acc__summary"><span class="chip ok">Current</span><span class="ts">Rev. 11 Aug</span></span></button></h4>
+            <div class="ox-acc__panel" id="c4p" role="region" aria-labelledby="c4t" hidden="until-found"><div class="ox-acc__body"><div class="inner"><p>Six steps complete. See §5.3.</p></div></div></div>
+          </div>
+          <div class="ox-acc__item" data-open="false">
+            <h4 class="ox-acc__heading"><button class="ox-acc__trigger" aria-expanded="false" aria-controls="c5p" id="c5t">
+              <svg class="ox-acc__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+              <span class="ox-acc__label">Treatment plan</span><span class="ox-acc__spacer"></span>
+              <span class="ox-acc__summary"><span class="chip">3 problems · 7 goals</span><span class="ts">Review due 1 Sep</span></span></button></h4>
+            <div class="ox-acc__panel" id="c5p" role="region" aria-labelledby="c5t" hidden="until-found"><div class="ox-acc__body"><div class="inner">
+              <div class="ox-acc" data-density="clinical" data-policy="multiple" data-variant="ghost">
+                <div class="ox-acc__item" data-open="false">
+                  <h5 class="ox-acc__heading"><button class="ox-acc__trigger" aria-expanded="false" aria-controls="c5ap" id="c5at">
+                    <svg class="ox-acc__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+                    <span class="ox-acc__label">Major depressive disorder, recurrent, severe</span><span class="ox-acc__spacer"></span><span class="ox-acc__summary"><span class="ts">3 goals</span></span></button></h5>
+                  <div class="ox-acc__panel" id="c5ap" role="region" aria-labelledby="c5at" hidden="until-found"><div class="ox-acc__body"><div class="inner"><p>Goal · reduce PHQ-9 below 10 by 1 Nov 2026. Objective · attend weekly individual therapy. Intervention · CBT, behavioural activation.</p></div></div></div>
+                </div>
+                <div class="ox-acc__item" data-open="false">
+                  <h5 class="ox-acc__heading"><button class="ox-acc__trigger" aria-expanded="false" aria-controls="c5bp" id="c5bt">
+                    <svg class="ox-acc__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+                    <span class="ox-acc__label">Alcohol use disorder, moderate</span><span class="ox-acc__spacer"></span><span class="ox-acc__summary"><span class="ts">2 goals</span></span></button></h5>
+                  <div class="ox-acc__panel" id="c5bp" role="region" aria-labelledby="c5bt" hidden="until-found"><div class="ox-acc__body"><div class="inner"><p>Goal · abstinence maintained 90 days. Objective · attend twice-weekly group. Intervention · motivational interviewing, naltrexone.</p></div></div></div>
+                </div>
+              </div>
+              <p style="margin-top:10px;font-size:12px;color:var(--colorTextTertiary)">Nested one level. Outer triggers are <code>h4</code>, inner are <code>h5</code> — set by <code>headingLevel</code>, not hardcoded.</p>
+            </div></div></div>
+          </div>
+          <div class="ox-acc__item" data-open="false" data-severity="restricted" data-access="consent">
+            <h4 class="ox-acc__heading"><button class="ox-acc__trigger" aria-expanded="false" aria-controls="c6p" id="c6t">
+              <svg class="ox-acc__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+              <span class="ox-acc__label">Substance use treatment</span><span class="ox-acc__spacer"></span>
+              <span class="ox-acc__summary"><span class="chip lock">42 CFR Part 2</span><span class="ts">Opening is recorded</span></span></button></h4>
+            <div class="ox-acc__panel" id="c6p" role="region" aria-labelledby="c6t" hidden="until-found"><div class="ox-acc__body"><div class="inner">
+              <div class="gate consent"><h5>Held under 42 CFR Part 2</h5><p>TPO consent on file, signed 2 Feb 2026, expires 2 Feb 2027. Opening records the access against your account.</p><div class="btnrow"><button class="btn primary" type="button">Open</button><button class="btn" type="button">View consent</button></div></div>
+            </div></div></div>
+          </div>
+          <div class="ox-acc__item" data-open="false" data-access="withheld">
+            <h4 class="ox-acc__heading"><button class="ox-acc__trigger" aria-expanded="false" aria-disabled="true" aria-controls="c7p" id="c7t">
+              <svg class="ox-acc__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="opacity:.35"><path d="m6 9 6 6 6-6"/></svg>
+              <span class="ox-acc__label">Psychotherapy notes</span><span class="ox-acc__spacer"></span>
+              <span class="ox-acc__summary"><span class="chip">Restricted — not shown</span><span class="ts">Author only</span></span></button></h4>
+            <div class="ox-acc__panel" id="c7p" hidden="until-found"><div class="ox-acc__body"><div class="inner"></div></div></div>
+          </div>
+          <div class="ox-acc__item" data-open="false">
+            <h4 class="ox-acc__heading"><button class="ox-acc__trigger" aria-expanded="false" aria-controls="c8p" id="c8t">
+              <svg class="ox-acc__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+              <span class="ox-acc__label">Progress notes</span><span class="ox-acc__spacer"></span>
+              <span class="ox-acc__summary"><span class="chip">142 encounters</span><span class="ts">Last 13 Aug</span></span></button></h4>
+            <div class="ox-acc__panel" id="c8p" role="region" aria-labelledby="c8t" hidden="until-found"><div class="ox-acc__body"><div class="inner"><p>142 notes, virtualised. BIRP format. Most recent: individual therapy, 50 minutes, 13 Aug 2026.</p></div></div></div>
+          </div>
+          <div class="ox-acc__item" data-open="false">
+            <h4 class="ox-acc__heading"><button class="ox-acc__trigger" aria-expanded="false" aria-controls="c9p" id="c9t">
+              <svg class="ox-acc__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+              <span class="ox-acc__label">Release of information</span><span class="ox-acc__spacer"></span>
+              <span class="ox-acc__summary"><span class="chip warn">1 expires in 14 days</span><span class="ts">3 active</span></span></button></h4>
+            <div class="ox-acc__panel" id="c9p" role="region" aria-labelledby="c9t" hidden="until-found"><div class="ox-acc__body"><div class="inner"><p>Primary care — expires 30 Aug 2026. Sister (emergency contact) — no expiry. County crisis team — expires 2 Feb 2027.</p></div></div></div>
+          </div>
+          <div class="ox-acc__item" data-open="false">
+            <h4 class="ox-acc__heading"><button class="ox-acc__trigger" aria-expanded="false" aria-controls="c10p" id="c10t">
+              <svg class="ox-acc__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+              <span class="ox-acc__label">Allergies</span><span class="ox-acc__spacer"></span>
+              <span class="ox-acc__summary"><span class="chip">No known allergies</span><span class="ts">Asserted 2 Feb</span></span></button></h4>
+            <div class="ox-acc__panel" id="c10p" role="region" aria-labelledby="c10t" hidden="until-found"><div class="ox-acc__body"><div class="inner"><p>"No known allergies" is a clinical assertion recorded by K. Mensah, RN on 2 Feb 2026 — not an empty list.</p></div></div></div>
+          </div>
+          <div class="ox-acc__item" data-open="false" data-severity="critical">
+            <h4 class="ox-acc__heading"><button class="ox-acc__trigger" aria-expanded="false" aria-controls="c11p" id="c11t">
+              <svg class="ox-acc__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+              <span class="ox-acc__label">Care team</span><span class="ox-acc__spacer"></span>
+              <span class="ox-acc__summary"><span class="chip crit">Could not load</span><span class="ts">Retry</span></span></button></h4>
+            <div class="ox-acc__panel" id="c11p" role="region" aria-labelledby="c11t" hidden="until-found"><div class="ox-acc__body"><div class="inner"><p><strong>Could not load the care team.</strong> This list may be incomplete. The rest of this chart loaded normally.</p><div class="btnrow" style="margin-top:8px"><button class="btn" type="button">Retry</button></div></div></div></div>
+          </div>
+        </div>
+      </div>
+      <p class="foot">
+        Eleven of the fourteen shown. Every one of them is readable closed. The error state is
+        contained to its own section and says what remains usable, per <code>CONTENT.md</code> §5 —
+        a failed panel must never look like a patient with nothing in it.
+      </p>
+    </div>
+
+    <!-- 5.3 --------------------------------------------------------- -->
+    <h3 class="sub">5.3 &nbsp; The safety plan — patient density, and the step that will not close</h3>
+    <p class="narrow">
+      Six ordered steps, the Stanley-Brown structure. Step 5 is <code>pinned</code>: it renders
+      open, its trigger carries <code>aria-disabled="true"</code>, and there is no interaction
+      that closes it. The reasoning is not decorative. A person opening this at 2am should reach
+      a phone number without making a single correct decision about a chevron.
+    </p>
+    <div class="stage">
+      <p class="cap"><b>SafetyPlan</b> · density=patient · policy=single · step 5 pinned · patient register</p>
+      <div class="antd" style="max-width:38rem;margin-inline:auto">
+        <p style="font-weight:600;font-size:16px;margin-bottom:4px">Your safety plan</p>
+        <p style="color:var(--colorTextSecondary);font-size:14px;margin-bottom:14px">Written with Rachel on 11 August. You can change any of it at your next appointment.</p>
+        <div class="ox-acc" data-density="patient" data-policy="single" data-variant="separate">
+          <div class="ox-acc__item" data-open="false">
+            <h4 class="ox-acc__heading"><button class="ox-acc__trigger" aria-expanded="false" aria-controls="d1p" id="d1t">
+              <svg class="ox-acc__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+              <span class="ox-acc__label">1 · Signs that things are getting harder</span><span class="ox-acc__spacer"></span></button></h4>
+            <div class="ox-acc__panel" id="d1p" role="region" aria-labelledby="d1t" hidden="until-found"><div class="ox-acc__body"><div class="inner">
+              <p>Sleeping less than four hours. Not answering messages for two days. The thought that everyone would manage without me.</p></div></div></div>
+          </div>
+          <div class="ox-acc__item" data-open="false">
+            <h4 class="ox-acc__heading"><button class="ox-acc__trigger" aria-expanded="false" aria-controls="d2p" id="d2t">
+              <svg class="ox-acc__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+              <span class="ox-acc__label">2 · Things I can do on my own</span><span class="ox-acc__spacer"></span></button></h4>
+            <div class="ox-acc__panel" id="d2p" role="region" aria-labelledby="d2t" hidden="until-found"><div class="ox-acc__body"><div class="inner">
+              <p>Walk to the end of the road and back. Cold water on my wrists. The breathing count Rachel showed me — four in, six out, ten times.</p></div></div></div>
+          </div>
+          <div class="ox-acc__item" data-open="false">
+            <h4 class="ox-acc__heading"><button class="ox-acc__trigger" aria-expanded="false" aria-controls="d3p" id="d3t">
+              <svg class="ox-acc__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+              <span class="ox-acc__label">3 · People and places that take my mind off it</span><span class="ox-acc__spacer"></span></button></h4>
+            <div class="ox-acc__panel" id="d3p" role="region" aria-labelledby="d3t" hidden="until-found"><div class="ox-acc__body"><div class="inner">
+              <p>The café on Bell Street before 11am. Priya — she doesn't ask questions. The Sunday running group.</p></div></div></div>
+          </div>
+          <div class="ox-acc__item" data-open="false">
+            <h4 class="ox-acc__heading"><button class="ox-acc__trigger" aria-expanded="false" aria-controls="d4p" id="d4t">
+              <svg class="ox-acc__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+              <span class="ox-acc__label">4 · People I can ask for help</span><span class="ox-acc__spacer"></span>
+              <span class="ox-acc__summary"><span class="chip">2 people</span></span></button></h4>
+            <div class="ox-acc__panel" id="d4p" role="region" aria-labelledby="d4t" hidden="until-found"><div class="ox-acc__body"><div class="inner">
+              <dl class="kv"><dt>Priya</dt><dd>Sister · any time</dd><dt>Marcus</dt><dd>Flatmate · home most evenings</dd></dl></div></div></div>
+          </div>
+          <div class="ox-acc__item" data-open="true" data-pinned="true" data-severity="critical">
+            <h4 class="ox-acc__heading"><button class="ox-acc__trigger" aria-expanded="true" aria-disabled="true" aria-controls="d5p" id="d5t">
+              <svg class="ox-acc__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="opacity:.3"><path d="m6 9 6 6 6-6"/></svg>
+              <span class="ox-acc__label">5 · If none of that is working</span><span class="ox-acc__spacer"></span>
+              <span class="ox-acc__summary"><span class="chip crit">Always open</span></span></button></h4>
+            <div class="ox-acc__panel" id="d5p" role="region" aria-labelledby="d5t"><div class="ox-acc__body"><div class="inner" style="background:var(--colorErrorBg);border-top-color:var(--colorErrorBorder)">
+              <dl class="kv" style="font-size:16px">
+                <dt>Call or text</dt><dd><strong style="color:var(--colorText);font-size:20px;font-variant-numeric:tabular-nums">988</strong> — Suicide &amp; Crisis Lifeline, 24 hours</dd>
+                <dt>Rachel Okafor</dt><dd>Your therapist · Mon–Thu, 9–5</dd>
+                <dt>County crisis team</dt><dd>555 0148 · 24 hours</dd>
+                <dt>Nearest emergency</dt><dd>St. Anne's, 2.1 km</dd>
+              </dl>
+              <p style="margin-top:10px;font-size:13px;color:var(--colorTextSecondary)">This part of your plan stays open. You do not have to look for it.</p>
+            </div></div></div>
+          </div>
+          <div class="ox-acc__item" data-open="false">
+            <h4 class="ox-acc__heading"><button class="ox-acc__trigger" aria-expanded="false" aria-controls="d6p" id="d6t">
+              <svg class="ox-acc__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+              <span class="ox-acc__label">6 · Making home safer</span><span class="ox-acc__spacer"></span>
+              <span class="ox-acc__summary"><span class="chip ok">Reviewed 11 Aug</span></span></button></h4>
+            <div class="ox-acc__panel" id="d6p" role="region" aria-labelledby="d6t" hidden="until-found"><div class="ox-acc__body"><div class="inner">
+              <p>Priya is holding the paracetamol and the spare keys to the garage. We agreed to review this at every appointment.</p></div></div></div>
+          </div>
+        </div>
+      </div>
+      <p class="foot">
+        Patient density: 16px type, 57px headers, 240ms motion. Register is grade-8 and second
+        person throughout, per <code>CONTENT.md</code> §7 — a different catalog, not a softened
+        version of the clinical one. Step 5's trigger is still focusable and still announces
+        "5 · If none of that is working, expanded"; it simply reports itself disabled rather than
+        silently ignoring the press.
+      </p>
+    </div>
+
+    <!-- 5.4 --------------------------------------------------------- -->
+    <h3 class="sub">5.4 &nbsp; Assessments — the score in the header, the items behind it</h3>
+    <p class="narrow">
+      Measurement-based care produces a repeating instrument every visit. The collapsed header
+      carries score, band, direction and date; the sparkline is decorative and
+      <code>aria-hidden</code>, with the same trend stated in words beside it. PHQ-9 item 9 is a
+      validated suicide-risk screen, so its endorsement is a chip in the header rather than a line
+      nine rows into a panel nobody opened.
+    </p>
+    <div class="stage">
+      <p class="cap"><b>AssessmentPanel</b> · density=standard · policy=multiple · summary carries score + band + delta</p>
+      <div class="antd">
+        <div class="ox-acc" data-policy="multiple" data-variant="separate">
+          <div class="ox-acc__item" data-open="true" data-severity="critical">
+            <h4 class="ox-acc__heading"><button class="ox-acc__trigger" aria-expanded="true" aria-controls="e1p" id="e1t">
+              <svg class="ox-acc__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+              <span class="ox-acc__label">PHQ-9</span><span class="ox-acc__spacer"></span>
+              <span class="ox-acc__summary">
+                <svg class="spark" width="56" height="18" viewBox="0 0 56 18" aria-hidden="true"><polyline points="2,4 15,6 28,9 41,7 54,13" fill="none" stroke="var(--colorTextTertiary)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <span class="chip crit">Item 9 endorsed</span>
+                <span><span class="num">21</span> <span class="ts">severe · down 4 · 3 Aug</span></span>
+              </span></button></h4>
+            <div class="ox-acc__panel" id="e1p" role="region" aria-labelledby="e1t"><div class="ox-acc__body"><div class="inner">
+              <p style="color:var(--colorText)">Score 21 of 27 — severe. Previous 25 on 20 July; down 4 over two weeks.</p>
+              <dl class="kv" style="margin-top:8px">
+                <dt>Item 9</dt><dd style="color:var(--colorError);font-weight:600">Thoughts of being better off dead or of hurting yourself — more than half the days</dd>
+                <dt>Sleep</dt><dd>Nearly every day</dd>
+                <dt>Energy</dt><dd>More than half the days</dd>
+                <dt>Administered</dt><dd>Self-report, in clinic · 3 Aug 2026 14:40 IST</dd>
+              </dl>
+              <p style="margin-top:10px;font-size:12px;color:var(--colorTextTertiary)">Band labels come from the instrument's published scoring. The component renders them; it does not compute them.</p>
+            </div></div></div>
+          </div>
+          <div class="ox-acc__item" data-open="false" data-severity="high">
+            <h4 class="ox-acc__heading"><button class="ox-acc__trigger" aria-expanded="false" aria-controls="e2p" id="e2t">
+              <svg class="ox-acc__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+              <span class="ox-acc__label">GAD-7</span><span class="ox-acc__spacer"></span>
+              <span class="ox-acc__summary">
+                <svg class="spark" width="56" height="18" viewBox="0 0 56 18" aria-hidden="true"><polyline points="2,10 15,8 28,7 41,6 54,5" fill="none" stroke="var(--colorTextTertiary)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <span><span class="num">16</span> <span class="ts">severe · up 2 · 3 Aug</span></span>
+              </span></button></h4>
+            <div class="ox-acc__panel" id="e2p" role="region" aria-labelledby="e2t" hidden="until-found"><div class="ox-acc__body"><div class="inner"><p>Score 16 of 21 — severe. Previous 14 on 20 July; up 2 over two weeks.</p></div></div></div>
+          </div>
+          <div class="ox-acc__item" data-open="false" data-severity="critical">
+            <h4 class="ox-acc__heading"><button class="ox-acc__trigger" aria-expanded="false" aria-controls="e3p" id="e3t">
+              <svg class="ox-acc__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+              <span class="ox-acc__label">C-SSRS screener</span><span class="ox-acc__spacer"></span>
+              <span class="ox-acc__summary"><span class="chip crit">Positive</span><span class="ts">13 Aug</span></span></button></h4>
+            <div class="ox-acc__panel" id="e3p" role="region" aria-labelledby="e3t" hidden="until-found"><div class="ox-acc__body"><div class="inner"><p>Ideation level 3 — active thoughts, no plan, no intent, no preparatory behaviour. Administered by R. Okafor, LCSW.</p></div></div></div>
+          </div>
+          <div class="ox-acc__item" data-open="false">
+            <h4 class="ox-acc__heading"><button class="ox-acc__trigger" aria-expanded="false" aria-controls="e4p" id="e4t">
+              <svg class="ox-acc__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+              <span class="ox-acc__label">AUDIT</span><span class="ox-acc__spacer"></span>
+              <span class="ox-acc__summary"><span class="chip">Not asked this visit</span><span class="ts">Last 2 Feb</span></span></button></h4>
+            <div class="ox-acc__panel" id="e4p" role="region" aria-labelledby="e4t" hidden="until-found"><div class="ox-acc__body"><div class="inner"><p>Not administered on 3 August. Last score 14 on 2 February 2026.</p></div></div></div>
+          </div>
+        </div>
+      </div>
+      <p class="foot">
+        The AUDIT row is the <code>CONTENT.md</code> §1 case: <em>not asked</em> is a fact, and it
+        is different from a zero, from a dash, and from an absent row. Every summary states its
+        direction in words as well as in the sparkline, because the sparkline disappears in
+        forced-colors mode and on a fax.
+      </p>
+    </div>
+
+    <!-- 5.5 --------------------------------------------------------- -->
+    <h3 class="sub">5.5 &nbsp; The four gates, side by side</h3>
+    <p class="narrow">
+      These are live — open each one. The distinction that matters: <em>advisory</em> costs the
+      reader nothing but a choice and logs nothing; <em>reason</em> and <em>consent</em> produce
+      an event the application must handle; <em>withheld</em> never opens and never pretends the
+      section is not there.
+    </p>
+    <div class="stage">
+      <p class="cap"><b>access</b> · "advisory" · "reason" · "consent" · "withheld"</p>
+      <div class="antd">
+        <div class="ox-acc" data-policy="multiple" data-variant="separate">
+          <div class="ox-acc__item" data-open="false">
+            <h4 class="ox-acc__heading"><button class="ox-acc__trigger" aria-expanded="false" aria-controls="f1p" id="f1t">
+              <svg class="ox-acc__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+              <span class="ox-acc__label">Your session summary — 13 August</span><span class="ox-acc__spacer"></span>
+              <span class="ox-acc__summary"><span class="chip info">Mentions self-harm</span></span></button></h4>
+            <div class="ox-acc__panel" id="f1p" role="region" aria-labelledby="f1t" hidden="until-found"><div class="ox-acc__body"><div class="inner">
+              <div class="gate advisory">
+                <h5>This summary talks about self-harm</h5>
+                <p>You can read it now, later, or with Rachel at your next appointment. Nothing is recorded either way, and this note will still be here.</p>
+                <div class="btnrow"><button class="btn primary" type="button">Show it</button><button class="btn" type="button">Not now</button></div>
+              </div>
+            </div></div></div>
+          </div>
+          <div class="ox-acc__item" data-open="false" data-severity="high">
+            <h4 class="ox-acc__heading"><button class="ox-acc__trigger" aria-expanded="false" aria-controls="f2p" id="f2t">
+              <svg class="ox-acc__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+              <span class="ox-acc__label">Records from another organisation</span><span class="ox-acc__spacer"></span>
+              <span class="ox-acc__summary"><span class="chip warn">Access is recorded</span></span></button></h4>
+            <div class="ox-acc__panel" id="f2p" role="region" aria-labelledby="f2t" hidden="until-found"><div class="ox-acc__body"><div class="inner">
+              <div class="gate">
+                <h5>Opening this records who you are and why</h5>
+                <p>You are not on this patient's care team. Give a reason, and the access is written to the audit log with your name and the time.</p>
+                <div class="btnrow" style="margin-bottom:10px">
+                  <select class="btn" style="height:32px;padding-inline:10px" aria-label="Reason for access">
+                    <option>Emergency treatment</option><option>Covering clinician</option><option>Care coordination</option><option>Quality review</option>
+                  </select>
+                  <button class="btn primary" type="button">Open and record</button>
+                </div>
+                <p style="margin:0">Ada Lovelace's record. This cannot be undone.</p>
+              </div>
+            </div></div></div>
+          </div>
+          <div class="ox-acc__item" data-open="false" data-severity="restricted">
+            <h4 class="ox-acc__heading"><button class="ox-acc__trigger" aria-expanded="false" aria-controls="f3p" id="f3t">
+              <svg class="ox-acc__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+              <span class="ox-acc__label">Substance use treatment</span><span class="ox-acc__spacer"></span>
+              <span class="ox-acc__summary"><span class="chip lock">Consent needed · 42 CFR Part 2</span></span></button></h4>
+            <div class="ox-acc__panel" id="f3p" role="region" aria-labelledby="f3t" hidden="until-found"><div class="ox-acc__body"><div class="inner">
+              <div class="gate consent">
+                <h5>No consent on file covers this disclosure</h5>
+                <p>These records are held under 42 CFR Part 2. The consent signed on 2 February 2026 covers treatment, payment and operations — it does not cover the counselling session notes in this section, which need their own consent.</p>
+                <div class="btnrow"><button class="btn primary" type="button">Request consent</button><button class="btn" type="button">What is Part 2?</button></div>
+              </div>
+            </div></div></div>
+          </div>
+          <div class="ox-acc__item" data-open="false" data-access="withheld">
+            <h4 class="ox-acc__heading"><button class="ox-acc__trigger" aria-expanded="false" aria-disabled="true" aria-controls="f4p" id="f4t">
+              <svg class="ox-acc__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="opacity:.35"><path d="m6 9 6 6 6-6"/></svg>
+              <span class="ox-acc__label">Psychotherapy process notes</span><span class="ox-acc__spacer"></span>
+              <span class="ox-acc__summary"><span class="chip">Restricted — not shown</span><span class="ts">Kept separately by the author</span></span></button></h4>
+            <div class="ox-acc__panel" id="f4p" hidden="until-found"><div class="ox-acc__body"><div class="inner"></div></div></div>
+          </div>
+        </div>
+      </div>
+      <p class="foot">
+        The withheld row is the whole argument in one line. Removing it would be easier to build
+        and would tell the reader the chart is complete. It is not, and the interface should say
+        so — that is <code>CONTENT.md</code> §1's <em>masked</em> case with a component behind it.
+      </p>
+    </div>
+
+    <!-- 5.6 --------------------------------------------------------- -->
+    <h3 class="sub">5.6 &nbsp; Intake — reference image 2, made clinical</h3>
+    <p class="narrow">
+      The checklist variant. Single-open, status per step, grouped under real headings, and a
+      progress statement that is a sentence rather than only a bar. The status glyph is paired
+      with a text label in every case, so nothing is carried by the green alone.
+    </p>
+    <div class="stage">
+      <p class="cap"><b>IntakeChecklist</b> · variant=checklist · policy=single · auto-advance on completion</p>
+      <div class="antd layout" style="max-width:40rem;margin-inline:auto;padding:20px">
+        <p style="font-weight:600;margin-bottom:2px">Before your first appointment</p>
+        <p style="color:var(--colorTextSecondary);font-size:13px;margin-bottom:14px">Two of six done. You can stop and come back — nothing is lost.</p>
+
+        <p style="font-size:13px;color:var(--colorTextSecondary);font-weight:600;margin:0 0 8px">Consent and privacy</p>
+        <div class="ox-acc" data-policy="single" style="margin-bottom:16px">
+          <div class="ox-acc__item" data-open="false">
+            <h4 class="ox-acc__heading"><button class="ox-acc__trigger" aria-expanded="false" aria-controls="g1p" id="g1t">
+              <span class="steps-status done" aria-hidden="true">✓</span>
+              <span class="ox-acc__label">Consent to treatment</span><span class="ox-acc__spacer"></span>
+              <span class="ox-acc__summary"><span class="chip ok">Signed</span><span class="ts">12 Aug</span></span>
+              <svg class="ox-acc__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button></h4>
+            <div class="ox-acc__panel" id="g1p" role="region" aria-labelledby="g1t" hidden="until-found"><div class="ox-acc__body"><div class="inner"><p>Signed electronically on 12 August 2026 at 18:04 IST.</p></div></div></div>
+          </div>
+          <div class="ox-acc__item" data-open="true">
+            <h4 class="ox-acc__heading"><button class="ox-acc__trigger" aria-expanded="true" aria-controls="g2p" id="g2t">
+              <span class="steps-status now" aria-hidden="true">2</span>
+              <span class="ox-acc__label">Release of information</span><span class="ox-acc__spacer"></span>
+              <span class="ox-acc__summary"><span class="chip info">In progress</span></span>
+              <svg class="ox-acc__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button></h4>
+            <div class="ox-acc__panel" id="g2p" role="region" aria-labelledby="g2t"><div class="ox-acc__body"><div class="inner">
+              <p style="color:var(--colorText)">Who may we share your records with? You can change this at any time, and you do not have to name anyone.</p>
+              <div class="btnrow" style="margin-top:10px"><button class="btn primary" type="button">Add a person</button><button class="btn" type="button">Nobody for now</button></div>
+            </div></div></div>
+          </div>
+          <div class="ox-acc__item" data-open="false">
+            <h4 class="ox-acc__heading"><button class="ox-acc__trigger" aria-expanded="false" aria-controls="g3p" id="g3t">
+              <span class="steps-status done" aria-hidden="true">✓</span>
+              <span class="ox-acc__label">Privacy notice</span><span class="ox-acc__spacer"></span>
+              <span class="ox-acc__summary"><span class="chip ok">Read</span><span class="ts">12 Aug</span></span>
+              <svg class="ox-acc__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button></h4>
+            <div class="ox-acc__panel" id="g3p" role="region" aria-labelledby="g3t" hidden="until-found"><div class="ox-acc__body"><div class="inner"><p>Acknowledged 12 August 2026.</p></div></div></div>
+          </div>
+        </div>
+
+        <p style="font-size:13px;color:var(--colorTextSecondary);font-weight:600;margin:0 0 8px">About you</p>
+        <div class="ox-acc" data-policy="single">
+          <div class="ox-acc__item" data-open="false">
+            <h4 class="ox-acc__heading"><button class="ox-acc__trigger" aria-expanded="false" aria-controls="g4p" id="g4t">
+              <span class="steps-status todo" aria-hidden="true">4</span>
+              <span class="ox-acc__label">Contact details</span><span class="ox-acc__spacer"></span>
+              <span class="ox-acc__summary"><span class="chip">Not started</span></span>
+              <svg class="ox-acc__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button></h4>
+            <div class="ox-acc__panel" id="g4p" role="region" aria-labelledby="g4t" hidden="until-found"><div class="ox-acc__body"><div class="inner"><p>Phone, address, and how you would like us to reach you.</p></div></div></div>
+          </div>
+          <div class="ox-acc__item" data-open="false">
+            <h4 class="ox-acc__heading"><button class="ox-acc__trigger" aria-expanded="false" aria-controls="g5p" id="g5t">
+              <span class="steps-status todo" aria-hidden="true">5</span>
+              <span class="ox-acc__label">A few questions about how you have been</span><span class="ox-acc__spacer"></span>
+              <span class="ox-acc__summary"><span class="chip">About 5 minutes</span></span>
+              <svg class="ox-acc__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button></h4>
+            <div class="ox-acc__panel" id="g5p" role="region" aria-labelledby="g5t" hidden="until-found"><div class="ox-acc__body"><div class="inner"><p>Nine questions about mood and sleep over the last two weeks. You can skip any of them.</p></div></div></div>
+          </div>
+          <div class="ox-acc__item" data-open="false">
+            <h4 class="ox-acc__heading"><button class="ox-acc__trigger" aria-expanded="false" aria-controls="g6p" id="g6t">
+              <span class="steps-status todo" aria-hidden="true">6</span>
+              <span class="ox-acc__label">Choose your first appointment</span><span class="ox-acc__spacer"></span>
+              <span class="ox-acc__summary"><span class="chip">3 times available</span></span>
+              <svg class="ox-acc__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button></h4>
+            <div class="ox-acc__panel" id="g6p" role="region" aria-labelledby="g6t" hidden="until-found"><div class="ox-acc__body"><div class="inner"><p>Tue 19 Aug 10:00, Wed 20 Aug 15:30, Fri 22 Aug 09:00 — all IST.</p></div></div></div>
+          </div>
+        </div>
+      </div>
+      <p class="foot">
+        The chevron moves to the end here and the status glyph takes the leading slot —
+        <code>expandIconPlacement="end"</code>, antd v6's name for it. Two accordions, not one,
+        because the group headings are real headings and swallowing them into items would flatten
+        an information architecture the reader needs.
+      </p>
+    </div>
+
+    <!-- 5.7 --------------------------------------------------------- -->
+    <h3 class="sub">5.7 &nbsp; Density, and dark</h3>
+    <p class="narrow">
+      The same three items at all three densities. Density changes spacing, type size and motion
+      duration. It never changes which facts appear — <code>density.json</code> states that as a
+      contract, and hiding a fact to save a row is a defect rather than a density mode.
+    </p>
+    <div class="stage">
+      <div class="stage-grid">
+        <div>
+          <p class="cap"><b>clinical</b> · 32px rows · 12px · 140ms</p>
+          <div class="antd" style="padding:12px">
+            <div class="ox-acc" data-density="clinical" data-policy="multiple">
+              <div class="ox-acc__item" data-open="false" data-severity="critical"><h4 class="ox-acc__heading"><button class="ox-acc__trigger" aria-expanded="false" aria-controls="h1p" id="h1t"><svg class="ox-acc__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg><span class="ox-acc__label">Risk</span><span class="ox-acc__spacer"></span><span class="ox-acc__summary"><span class="chip crit">C-SSRS positive</span></span></button></h4><div class="ox-acc__panel" id="h1p" role="region" aria-labelledby="h1t" hidden="until-found"><div class="ox-acc__body"><div class="inner"><p>Ideation 3, no plan, no intent.</p></div></div></div></div>
+              <div class="ox-acc__item" data-open="false" data-severity="high"><h4 class="ox-acc__heading"><button class="ox-acc__trigger" aria-expanded="false" aria-controls="h2p" id="h2t"><svg class="ox-acc__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg><span class="ox-acc__label">Medications</span><span class="ox-acc__spacer"></span><span class="ox-acc__summary"><span class="chip warn">ANC due</span></span></button></h4><div class="ox-acc__panel" id="h2p" role="region" aria-labelledby="h2t" hidden="until-found"><div class="ox-acc__body"><div class="inner"><p>Clozapine 300&nbsp;mg nightly.</p></div></div></div></div>
+              <div class="ox-acc__item" data-open="false" data-severity="normal"><h4 class="ox-acc__heading"><button class="ox-acc__trigger" aria-expanded="false" aria-controls="h3p" id="h3t"><svg class="ox-acc__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg><span class="ox-acc__label">Safety plan</span><span class="ox-acc__spacer"></span><span class="ox-acc__summary"><span class="chip ok">Current</span></span></button></h4><div class="ox-acc__panel" id="h3p" role="region" aria-labelledby="h3t" hidden="until-found"><div class="ox-acc__body"><div class="inner"><p>Reviewed 11 Aug.</p></div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <p class="cap"><b>patient</b> · 57px rows · 16px · 240ms</p>
+          <div class="antd" style="padding:12px">
+            <div class="ox-acc" data-density="patient" data-policy="multiple">
+              <div class="ox-acc__item" data-open="false" data-severity="critical"><h4 class="ox-acc__heading"><button class="ox-acc__trigger" aria-expanded="false" aria-controls="i1p" id="i1t"><svg class="ox-acc__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg><span class="ox-acc__label">How you have been</span><span class="ox-acc__spacer"></span></button></h4><div class="ox-acc__panel" id="i1p" role="region" aria-labelledby="i1t" hidden="until-found"><div class="ox-acc__body"><div class="inner"><p>Your answers from 3 August, and what Rachel said about them.</p></div></div></div></div>
+              <div class="ox-acc__item" data-open="false" data-severity="high"><h4 class="ox-acc__heading"><button class="ox-acc__trigger" aria-expanded="false" aria-controls="i2p" id="i2t"><svg class="ox-acc__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg><span class="ox-acc__label">Your medicines</span><span class="ox-acc__spacer"></span><span class="ox-acc__summary"><span class="chip warn">Blood test due</span></span></button></h4><div class="ox-acc__panel" id="i2p" role="region" aria-labelledby="i2t" hidden="until-found"><div class="ox-acc__body"><div class="inner"><p>Four medicines. One needs a blood test before 18 August.</p></div></div></div></div>
+              <div class="ox-acc__item" data-open="false" data-severity="normal"><h4 class="ox-acc__heading"><button class="ox-acc__trigger" aria-expanded="false" aria-controls="i3p" id="i3t"><svg class="ox-acc__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg><span class="ox-acc__label">Your safety plan</span><span class="ox-acc__spacer"></span><span class="ox-acc__summary"><span class="chip ok">Up to date</span></span></button></h4><div class="ox-acc__panel" id="i3p" role="region" aria-labelledby="i3t" hidden="until-found"><div class="ox-acc__body"><div class="inner"><p>You and Rachel wrote this on 11 August.</p></div></div></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top:1.5rem">
+        <p class="cap"><b>dark</b> · antd's real dark algorithm values · same component, no variant</p>
+        <div class="antd dark" style="padding:16px">
+          <div class="ox-acc" data-policy="multiple" data-variant="separate">
+            <div class="ox-acc__item" data-open="true" data-severity="critical"><h4 class="ox-acc__heading"><button class="ox-acc__trigger" aria-expanded="true" aria-controls="j1p" id="j1t"><svg class="ox-acc__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg><span class="ox-acc__label">Risk &amp; suicidality</span><span class="ox-acc__spacer"></span><span class="ox-acc__summary"><span class="chip crit">C-SSRS positive</span><span class="ts">13 Aug</span></span></button></h4><div class="ox-acc__panel" id="j1p" role="region" aria-labelledby="j1t"><div class="ox-acc__body"><div class="inner"><dl class="kv"><dt>C-SSRS</dt><dd>Ideation 3 · no plan · no intent</dd><dt>PHQ-9 item 9</dt><dd>Endorsed</dd></dl></div></div></div></div>
+            <div class="ox-acc__item" data-open="false" data-severity="restricted"><h4 class="ox-acc__heading"><button class="ox-acc__trigger" aria-expanded="false" aria-controls="j2p" id="j2t"><svg class="ox-acc__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg><span class="ox-acc__label">Substance use treatment</span><span class="ox-acc__spacer"></span><span class="ox-acc__summary"><span class="chip lock">42 CFR Part 2</span></span></button></h4><div class="ox-acc__panel" id="j2p" role="region" aria-labelledby="j2t" hidden="until-found"><div class="ox-acc__body"><div class="inner"><div class="gate consent"><h5>Held under 42 CFR Part 2</h5><p>Opening records the access.</p><div class="btnrow"><button class="btn primary" type="button">Open</button></div></div></div></div></div></div>
+            <div class="ox-acc__item" data-open="false" data-access="withheld"><h4 class="ox-acc__heading"><button class="ox-acc__trigger" aria-expanded="false" aria-disabled="true" aria-controls="j3p" id="j3t"><svg class="ox-acc__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="opacity:.35"><path d="m6 9 6 6 6-6"/></svg><span class="ox-acc__label">Psychotherapy notes</span><span class="ox-acc__spacer"></span><span class="ox-acc__summary"><span class="chip">Restricted — not shown</span></span></button></h4><div class="ox-acc__panel" id="j3p" hidden="until-found"><div class="ox-acc__body"><div class="inner"></div></div></div></div>
+          </div>
+        </div>
+      </div>
+
+      <p class="foot">
+        Dark is the same component with the same class names — antd's dark algorithm swaps the
+        token values, nothing else. The severity rail survives because it is a token reference,
+        not a hex. In forced-colors mode the rail is discarded by the OS and the chips carry the
+        state in text, which is why every rail has a chip beside it.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================== -->
+<section class="doc" id="s6">
+  <div class="wrap">
+    <div class="sechead narrow">
+      <p class="secnum">06</p>
+      <h2>What antd's Collapse actually renders — nine findings</h2>
+      <p>
+        Ant Design v6 is the base system, so the first question is whether to wrap
+        <code>Collapse</code> the way Signature wraps <code>Modal</code>. To answer it I read
+        <code>rc-collapse</code>'s source rather than its documentation. What follows is from
+        <code>src/Panel.tsx</code> and <code>src/Collapse.tsx</code>, not from testing folklore.
+      </p>
+    </div>
+
+    <p class="narrow">Here is the header, as it is actually constructed:</p>
+    <pre><code><span class="c">// rc-collapse/src/Panel.tsx</span>
+<span class="k">const</span> collapsibleProps = {
+  onClick: () => { onItemClick?.(panelKey); },
+  onKeyDown: (e) => {
+    <span class="k">if</span> (e.key === <span class="s">'Enter'</span> || e.keyCode === KeyCode.ENTER ...) {
+      onItemClick?.(panelKey);
+    }
+  },
+  role: accordion ? <span class="s">'tab'</span> : <span class="s">'button'</span>,
+  [<span class="s">'aria-expanded'</span>]: isActive,
+  [<span class="s">'aria-disabled'</span>]: disabled,
+  tabIndex: disabled ? -1 : 0,
+};</code></pre>
+
+    <div class="tblwrap">
+      <table>
+        <thead><tr><th style="width:4%">#</th><th style="width:32%">What it renders</th><th style="width:42%">Consequence in a chart</th><th style="width:22%">Against</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td>Header is a <code>&lt;div&gt;</code>/<code>&lt;span&gt;</code> with <code>role="button"</code>, and the keydown handler matches <strong>Enter only</strong>.</td><td><strong>Space does not toggle.</strong> Worse: on a non-button element Space scrolls the page, so a keyboard user pressing Space on a chart section scrolls away from the thing they were trying to open.</td><td><span class="sev a">WCAG 2.1.1 (A)</span> APG: "Enter or Space"</td></tr>
+          <tr><td>2</td><td>No heading element anywhere. The trigger is a bare div.</td><td><strong>Zero entries in the screen-reader heading list.</strong> A fourteen-section chart has no outline and no way to skim. For a screen-reader user this is the difference between a navigable record and a wall.</td><td><span class="sev a">APG required</span></td></tr>
+          <tr><td>3</td><td>No <code>aria-controls</code> on the trigger.</td><td>The relationship between trigger and panel is never stated. Expanding announces nothing about where the content went.</td><td><span class="sev a">APG required</span></td></tr>
+          <tr><td>4</td><td>No <code>id</code> on the panel, and in non-accordion mode no <code>role</code> and no <code>aria-labelledby</code>.</td><td>The panel is an anonymous div — and without an id, finding 3 is not fixable from outside the library.</td><td><span class="sev a">APG</span></td></tr>
+          <tr><td>5</td><td>The <code>accordion</code> boolean switches the container to <code>role="tablist"</code>, the header to <code>role="tab"</code>, and the body to <code>role="tabpanel"</code>.</td><td><strong>One boolean prop silently swaps the accessibility contract</strong> from a disclosure pattern to a tab pattern. An accordion is not a tabset: tabs are alternative views of one region, accordion sections are independent regions of one document. This is the special case that ate the design.</td><td><span class="sev a">Wrong pattern</span></td></tr>
+          <tr><td>6</td><td><code>role="tab"</code> is set with <code>aria-expanded</code> and <strong>no <code>aria-selected</code></strong>.</td><td>Invalid ARIA. <code>aria-selected</code> is a required state for <code>tab</code>; without it the tablist has no selected tab.</td><td><span class="sev a">ARIA 1.2</span></td></tr>
+          <tr><td>7</td><td>Every tab gets <code>tabIndex={0}</code>, and no arrow-key handling exists.</td><td>A tablist is supposed to be <em>one</em> tab stop with arrow keys inside it. Here fourteen sections produce fourteen tab stops and no arrow navigation — precisely inverted.</td><td><span class="sev a">APG Tabs</span></td></tr>
+          <tr><td>8</td><td><code>role="tabpanel"</code> with no <code>aria-labelledby</code>.</td><td>An unlabeled panel. The one thing the tab pattern buys you is the panel/tab association, and it is not wired.</td><td><span class="sev b">APG Tabs</span></td></tr>
+          <tr><td>9</td><td>Hidden content is removed with <code>display:none</code> (<code>ant-collapse-content-hidden</code>).</td><td><strong>Find-in-page cannot see it and printing prints nothing.</strong> Not a WCAG failure — a clinical one. See §04 move 4.</td><td><span class="sev b">Clinical</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="note">
+      <span class="lbl">Be fair about this</span>
+      <p>
+        None of the above is carelessness about <code>Collapse</code> specifically. Ant Design
+        ships no accessibility documentation and its maintainers' stated position on WCAG is that
+        there are no plans yet; issue #6017, "Collapse supports ARIA", has been open for years
+        pointing at the same APG page cited here. This is a known, declared gap, not a regression.
+        It just happens to land on the component where the gap is structural.
+      </p>
+    </div>
+
+    <h3 class="sub">The wrap-or-build decision, and why it differs from Signature's</h3>
+    <p class="narrow">
+      Signature wraps antd's <code>Modal</code> and <code>Tabs</code>, and that was right: antd's
+      focus trap and dialog lifecycle are genuinely good, and reimplementing them for a component
+      whose whole argument is accessibility would have been the wrong trade. The gaps there were
+      at the edges — a missing accessible name, focus landing on a sentinel — and edges are
+      patchable from outside.
+    </p>
+    <div class="note ok">
+      <p style="margin:0">
+        <strong>Here the defects are the DOM itself.</strong> Findings 1–8 are all "the markup
+        antd emits is the wrong markup". You cannot add a heading wrapper, change a div to a
+        button, or delete <code>role="tab"</code> from outside the component — <code>classNames</code>
+        and <code>styles</code>, v6's new customisation surface, reach CSS and not semantics.
+        Wrapping <code>Collapse</code> would mean shipping every one of those nine findings under
+        an Oxygen label, in the library whose differentiator is that it does not do that.
+        <strong>Recommendation: build on our own headless primitive, and match antd's API exactly.</strong>
+      </p>
+    </div>
+    <p class="narrow">
+      That recommendation has a second, larger payoff, and it happens to resolve the question left
+      open when Signature took its antd dependency. A from-scratch accordion has
+      <strong>no antd runtime dependency</strong>, which means it still ships through the shadcn
+      registry as copy-source. Wrapping would have made this the second component to close that
+      channel. Building keeps both channels open and keeps the "wrap, match, or migrate" decision
+      genuinely open rather than settled by accumulation.
+    </p>
+
+    <h3 class="sub">Prior art worth stealing from</h3>
+    <div class="tblwrap">
+      <table>
+        <thead><tr><th style="width:20%">Source</th><th style="width:50%">What it does that we should copy</th><th style="width:30%">What it does not cover</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Radix Accordion</strong></td><td>Heading wrapper as a real sub-component, correct <code>aria-controls</code> wiring, arrow-key navigation, CSS-variable height for animation. The reference implementation of the APG contract.</td><td>No summary slot, no access model, no density, no find-in-page.</td></tr>
+          <tr><td><strong>React Aria</strong></td><td>Disclosure and DisclosureGroup separated — the single and the many are different components with a shared state contract. We should copy that split exactly.</td><td>Same three gaps.</td></tr>
+          <tr><td><strong>GOV.UK Frontend</strong></td><td>"Show all sections", and an accordion that adopted <code>hidden="until-found"</code> deliberately (PR #3053) after reasoning about find-in-page. The closest prior art to our §04 move 4.</td><td>Not a clinical vocabulary; no per-item access.</td></tr>
+          <tr><td><strong>Bootstrap</strong></td><td>Open issue #41479 asking for the same <code>hidden=until-found</code> support — useful evidence the pattern is converging, not exotic.</td><td>Not shipped.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================== -->
+<section class="doc" id="s7">
+  <div class="wrap">
+    <div class="sechead narrow">
+      <p class="secnum">07</p>
+      <h2>The API, shaped like Ant Design</h2>
+      <p>
+        "Follow Ant Design" is a standing constraint, and it should bind the API surface even
+        where we replace the implementation. Everything antd's <code>Collapse</code> accepts is
+        accepted here with the same name, the same type and the same default — including the v6
+        renames. Additions are additive.
+      </p>
+    </div>
+
+    <h3 class="sub">Inherited unchanged from antd v6</h3>
+    <div class="tblwrap">
+      <table>
+        <thead><tr><th style="width:26%">Prop</th><th style="width:40%">Type</th><th style="width:12%">Default</th><th style="width:22%">Note</th></tr></thead>
+        <tbody>
+          <tr><td><code>items</code></td><td><code>AccordionItem[]</code></td><td>—</td><td>Extended — see below</td></tr>
+          <tr><td><code>activeKey</code> / <code>defaultActiveKey</code></td><td><code>Key | Key[]</code></td><td>—</td><td>Controlled and uncontrolled, one implementation</td></tr>
+          <tr><td><code>onChange</code></td><td><code>(keys: Key[]) =&gt; void</code></td><td>—</td><td>Always an array, even single-open</td></tr>
+          <tr><td><code>accordion</code></td><td><code>boolean</code></td><td><code>false</code></td><td><strong>Deviation — see below</strong></td></tr>
+          <tr><td><code>bordered</code> · <code>ghost</code></td><td><code>boolean</code></td><td><code>true</code> · <code>false</code></td><td>Same visuals</td></tr>
+          <tr><td><code>size</code></td><td><code>"large" | "medium" | "small"</code></td><td><code>"medium"</code></td><td>v6 name — not <code>"middle"</code></td></tr>
+          <tr><td><code>expandIcon</code></td><td><code>(props) =&gt; ReactNode</code></td><td>chevron</td><td>Rotation handled by CSS, not by swapping glyphs</td></tr>
+          <tr><td><code>expandIconPlacement</code></td><td><code>"start" | "end"</code></td><td><code>"start"</code></td><td>v6 name — not <code>expandIconPosition</code></td></tr>
+          <tr><td><code>collapsible</code></td><td><code>"header" | "icon" | "disabled"</code></td><td><code>"header"</code></td><td>antd defaults this to <code>"disabled"</code>; we default to <code>"header"</code>, which is what antd's own examples actually do</td></tr>
+          <tr><td><code>destroyOnHidden</code></td><td><code>boolean</code></td><td><code>false</code></td><td>v6 name — not <code>destroyOnClose</code></td></tr>
+          <tr><td><code>classNames</code> · <code>styles</code></td><td><code>Record&lt;Slot, …&gt;</code></td><td>—</td><td>v6 semantic DOM. Slots: <code>root header icon label summary panel body</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 class="sub">Added, because §03 requires it</h3>
+    <div class="tblwrap">
+      <table>
+        <thead><tr><th style="width:24%">Prop</th><th style="width:38%">Type</th><th style="width:12%">Default</th><th style="width:26%">Why</th></tr></thead>
+        <tbody>
+          <tr><td><code>headingLevel</code></td><td><code>1 | 2 | 3 | 4 | 5 | 6</code></td><td><code>3</code></td><td>The outline is the navigation model (§04.5)</td></tr>
+          <tr><td><code>density</code></td><td><code>"patient" | "standard" | "clinical"</code></td><td>inherited</td><td>Falls back to <code>data-ox-density</code> from any ancestor</td></tr>
+          <tr><td><code>findable</code></td><td><code>boolean</code></td><td><code>true</code></td><td><code>hidden="until-found"</code>, feature-detected</td></tr>
+          <tr><td><code>printExpanded</code></td><td><code>boolean</code></td><td><code>true</code></td><td>Never expands a <code>withheld</code> item</td></tr>
+          <tr><td><code>panelRole</code></td><td><code>"region" | "none" | "auto"</code></td><td><code>"auto"</code></td><td><code>region</code> at ≤ 6 openable items, omitted above (§04.6)</td></tr>
+          <tr><td><code>onDisclose</code></td><td><code>(e: DisclosureEvent) =&gt; boolean | Promise&lt;boolean&gt;</code></td><td>—</td><td>The gate. Refuse by resolving <code>false</code></td></tr>
+          <tr><td><code>persistKey</code></td><td><code>string</code></td><td>—</td><td>Remembers which sections this user opens. Never persists a gated item — a consent re-asked is the correct cost</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h4 class="sub">The item</h4>
+    <pre><code><span class="k">interface</span> AccordionItem {
+  <span class="c">// antd's ItemType, unchanged</span>
+  key: React.Key;
+  label: React.ReactNode;
+  children?: React.ReactNode;
+  extra?: React.ReactNode;
+  showArrow?: boolean;
+  forceRender?: boolean;
+  collapsible?: <span class="s">"header"</span> | <span class="s">"icon"</span> | <span class="s">"disabled"</span>;
+  classNames?: Partial&lt;Record&lt;Slot, string&gt;&gt;;
+  styles?: Partial&lt;Record&lt;Slot, React.CSSProperties&gt;&gt;;
+
+  <span class="c">// Oxygen additions</span>
+  summary?: React.ReactNode;      <span class="c">// what the header says while closed</span>
+  severity?: <span class="s">"critical"</span> | <span class="s">"high"</span> | <span class="s">"low"</span> | <span class="s">"normal"</span> | <span class="s">"unknown"</span>;
+  pinned?: boolean;               <span class="c">// renders open, cannot be closed</span>
+  access?: AccessDescriptor;      <span class="c">// the gate</span>
+  updatedAt?: string;             <span class="c">// FHIR dateTime; precision preserved</span>
+}
+
+<span class="k">type</span> AccessDescriptor =
+  | { kind: <span class="s">"open"</span> }
+  | { kind: <span class="s">"advisory"</span>;  notice: string }
+  | { kind: <span class="s">"reason"</span>;    reasons: ReasonCode[] }
+  | { kind: <span class="s">"consent"</span>;   policy: string; state: <span class="s">"granted"</span> | <span class="s">"missing"</span> | <span class="s">"expired"</span>; expiresAt?: string }
+  | { kind: <span class="s">"withheld"</span>;  reason: string };
+
+<span class="k">interface</span> DisclosureEvent {
+  key: React.Key;
+  access: AccessDescriptor;
+  reasonCode?: string;            <span class="c">// present for kind: "reason"</span>
+  at: string;                     <span class="c">// ISO 8601 with offset — never a bare local time</span>
+}</code></pre>
+
+    <div class="note warn">
+      <span class="lbl">One deliberate deviation from antd, and it is a bug fix</span>
+      <p>
+        <code>accordion</code> keeps its antd name and its antd meaning — one panel open at a
+        time. It does <strong>not</strong> change the ARIA pattern. There is no
+        <code>tablist</code>, no <code>tab</code>, no <code>tabpanel</code>: the markup is
+        identical in both modes and only the state policy differs. Finding 5 in §06 is the reason,
+        and it is worth naming as a principle rather than a patch — <em>a prop that changes the
+        state policy must not change the accessibility contract.</em> Anyone migrating from antd
+        gets a component that behaves the same and announces itself correctly, with no code change.
+      </p>
+    </div>
+
+    <h4 class="sub">The common case</h4>
+    <pre><code><span class="k">import</span> { Accordion } <span class="k">from</span> <span class="s">"@oxygenui-design/react"</span>;
+
+&lt;<span class="k">Accordion</span>
+  headingLevel={2}
+  density=<span class="s">"clinical"</span>
+  persistKey=<span class="s">"chart:sections"</span>
+  onDisclose={<span class="k">async</span> (e) =&gt; {
+    <span class="k">await</span> audit.record({ subject: patient.id, section: e.key, reason: e.reasonCode, at: e.at });
+    <span class="k">return</span> <span class="k">true</span>;
+  }}
+  items={[
+    { key: <span class="s">"risk"</span>, label: <span class="s">"Risk &amp; suicidality"</span>, severity: <span class="s">"critical"</span>,
+      summary: &lt;StatusBadge severity=<span class="s">"critical"</span>&gt;C-SSRS positive&lt;/StatusBadge&gt;,
+      children: &lt;RiskPanel {...risk} /&gt; },
+
+    { key: <span class="s">"sud"</span>, label: <span class="s">"Substance use treatment"</span>,
+      access: { kind: <span class="s">"consent"</span>, policy: <span class="s">"42 CFR Part 2"</span>, state: consent.state, expiresAt: consent.expiresAt },
+      children: &lt;SudPanel {...sud} /&gt; },
+
+    { key: <span class="s">"psychotherapy"</span>, label: <span class="s">"Psychotherapy notes"</span>,
+      access: { kind: <span class="s">"withheld"</span>, reason: <span class="s">"Kept separately by the author"</span> } },
+  ]}
+/&gt;</code></pre>
+    <p class="narrow">
+      Note what the last item does not have: <code>children</code>. A withheld section has no
+      content to pass, and the type reflects that — passing children alongside
+      <code>kind: "withheld"</code> is a type error, so the content cannot sit in the bundle
+      waiting for a CSS mistake to reveal it.
+    </p>
+
+    <h4 class="sub">The headless hook</h4>
+    <pre><code><span class="k">import</span> { useAccordion } <span class="k">from</span> <span class="s">"@oxygenui-design/primitives"</span>;
+
+<span class="k">const</span> { openKeys, isOpen, toggle, getTriggerProps, getPanelProps, getHeadingProps } =
+  useAccordion({ items, policy: <span class="s">"multiple"</span>, headingLevel: 2, onDisclose });
+
+<span class="c">// Rebuild the visuals entirely; keep the part that is correct.</span>
+&lt;div&gt;
+  {items.map((item) =&gt; (
+    &lt;section key={item.key}&gt;
+      &lt;h2 {...getHeadingProps(item)}&gt;&lt;button {...getTriggerProps(item)}&gt;{item.label}&lt;/button&gt;&lt;/h2&gt;
+      &lt;div {...getPanelProps(item)}&gt;{item.children}&lt;/div&gt;
+    &lt;/section&gt;
+  ))}
+&lt;/div&gt;</code></pre>
+    <p class="narrow">
+      This is <code>ARCHITECTURE.md</code> §2's argument made concrete: when a customer needs
+      their own visual language they rebuild L2 and keep L1, and L1 is where the accessibility
+      correctness lives — the part they should not be rewriting. The hook has no DOM opinion, no
+      styling, and no antd.
+    </p>
+  </div>
+</section>
+
+<!-- ================================================================== -->
+<section class="doc" id="s8">
+  <div class="wrap">
+    <div class="sechead narrow">
+      <p class="secnum">08</p>
+      <h2>Eight axes of customisation</h2>
+      <p>
+        "Super customisable" is easy to claim and usually means a large props object. The
+        useful test is different: <em>how far can a customer diverge before they have to fork?</em>
+        Because in this library a fork is permanent — a copied file has no upgrade channel — the
+        override points are the thing that keeps customisation and maintenance compatible.
+      </p>
+    </div>
+    <div class="tblwrap">
+      <table>
+        <thead><tr><th style="width:6%">#</th><th style="width:20%">Axis</th><th style="width:44%">Mechanism</th><th style="width:30%">Reaches</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td><strong>Tokens</strong></td><td><code>--ox-accordion-*</code>, resolving to semantic tokens, overridable per brand / theme / density without touching code</td><td>Colour, spacing, radius, motion, rail width</td></tr>
+          <tr><td>2</td><td><strong>Semantic slots</strong></td><td>antd v6's <code>classNames</code> / <code>styles</code>, seven slots, per-accordion or per-item</td><td>Any CSS on any part</td></tr>
+          <tr><td>3</td><td><strong>Content slots</strong></td><td><code>summary</code>, <code>extra</code>, <code>expandIcon</code>, and <code>label</code> all take ReactNode</td><td>Arbitrary composition inside the header</td></tr>
+          <tr><td>4</td><td><strong>Variants</strong></td><td><code>bordered</code>, <code>ghost</code>, <code>separate</code>, <code>checklist</code>, <code>timeline</code></td><td>Structural shape without custom CSS</td></tr>
+          <tr><td>5</td><td><strong>Density</strong></td><td>Three profiles, inherited from any ancestor, overridable per instance; custom profiles are a data file</td><td>Spacing, type, target size, motion</td></tr>
+          <tr><td>6</td><td><strong>Policy</strong></td><td><code>single</code> · <code>multiple</code> · <code>exclusive</code> · <code>atLeastOne</code> · a custom reducer</td><td>Which combinations of open are legal</td></tr>
+          <tr><td>7</td><td><strong>Access</strong></td><td><code>access</code> per item plus <code>onDisclose</code>; gate rendering itself is a slot</td><td>Consent, audit, and content-warning behaviour</td></tr>
+          <tr><td>8</td><td><strong>Headless</strong></td><td><code>useAccordion</code> — total visual replacement, correctness retained</td><td>Everything, without forking</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="note">
+      <p style="margin:0">
+        Axes 1, 2, 5 and 8 are the ones that matter commercially, because each is a customer who
+        would otherwise have copied the file and stopped receiving fixes. That is the whole
+        argument for the component token tier as <code>component.json</code> already states it:
+        without an override point, "customise the accordion" means "edit the copied file", and
+        every edited file is a component that silently stopped being maintained.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================== -->
+<section class="doc" id="s9">
+  <div class="wrap">
+    <div class="sechead narrow">
+      <p class="secnum">09</p>
+      <h2>Tokens, correctly placed</h2>
+      <p>
+        New entries in <code>packages/tokens/tokens/component.json</code>. Every one resolves to
+        a semantic token, never to a primitive — which is what makes a brand override reach them
+        and what makes light, dark and high-contrast follow automatically.
+      </p>
+    </div>
+    <pre><code><span class="s">"accordion"</span>: {
+  <span class="s">"$description"</span>: <span class="s">"Accordion / Disclosure. The severity rail and the restricted treatment are</span>
+<span class="s">   the two things a product reliably wants to tune, and both are load-bearing: the rail is</span>
+<span class="s">   the only signal that survives a collapsed section, and restricted must never read as</span>
+<span class="s">   merely disabled."</span>,
+  <span class="s">"$type"</span>: <span class="s">"color"</span>,
+
+  <span class="s">"header-bg"</span>:         { <span class="s">"$value"</span>: <span class="s">"{bg-muted}"</span> },
+  <span class="s">"header-bg-hover"</span>:   { <span class="s">"$value"</span>: <span class="s">"{bg-subtle}"</span> },
+  <span class="s">"header-bg-open"</span>:    { <span class="s">"$value"</span>: <span class="s">"{surface}"</span> },
+  <span class="s">"header-fg"</span>:         { <span class="s">"$value"</span>: <span class="s">"{text}"</span> },
+  <span class="s">"summary-fg"</span>:        { <span class="s">"$value"</span>: <span class="s">"{text-muted}"</span> },
+  <span class="s">"icon-fg"</span>:           { <span class="s">"$value"</span>: <span class="s">"{text-muted}"</span> },
+  <span class="s">"border"</span>:            { <span class="s">"$value"</span>: <span class="s">"{border}"</span> },
+  <span class="s">"divider"</span>:           { <span class="s">"$value"</span>: <span class="s">"{border-subtle}"</span> },
+  <span class="s">"body-fg"</span>:           { <span class="s">"$value"</span>: <span class="s">"{text-muted}"</span> },
+
+  <span class="c">// The rail. Routed through the same status set as StatusBadge so that</span>
+  <span class="c">// "critical" reads identically on a lab result, a medication and a section.</span>
+  <span class="s">"rail-critical"</span>:     { <span class="s">"$value"</span>: <span class="s">"{status.critical}"</span> },
+  <span class="s">"rail-high"</span>:         { <span class="s">"$value"</span>: <span class="s">"{status.high}"</span> },
+  <span class="s">"rail-low"</span>:          { <span class="s">"$value"</span>: <span class="s">"{status.low}"</span> },
+  <span class="s">"rail-normal"</span>:       { <span class="s">"$value"</span>: <span class="s">"{status.normal}"</span> },
+  <span class="s">"rail-restricted"</span>:   { <span class="s">"$value"</span>: <span class="s">"{flag.restricted}"</span> },
+  <span class="s">"rail-width"</span>:        { <span class="s">"$type"</span>: <span class="s">"dimension"</span>, <span class="s">"$value"</span>: <span class="s">"3px"</span> },
+
+  <span class="c">// Restricted is a record-level flag, not a severity — it describes the</span>
+  <span class="c">// record's legal standing, not a measurement. flag.* already exists for</span>
+  <span class="c">// exactly this distinction, and PatientBanner already uses it.</span>
+  <span class="s">"restricted-bg"</span>:     { <span class="s">"$value"</span>: <span class="s">"{flag.restricted-bg}"</span> },
+  <span class="s">"restricted-fg"</span>:     { <span class="s">"$value"</span>: <span class="s">"{flag.restricted}"</span> },
+  <span class="s">"withheld-fg"</span>:       { <span class="s">"$value"</span>: <span class="s">"{text-subtle}"</span> },
+
+  <span class="s">"radius"</span>:            { <span class="s">"$type"</span>: <span class="s">"dimension"</span>, <span class="s">"$value"</span>: <span class="s">"{radius-lg}"</span> },
+  <span class="s">"pad-x"</span>:             { <span class="s">"$type"</span>: <span class="s">"dimension"</span>, <span class="s">"$value"</span>: <span class="s">"{density.pad-x}"</span> },
+  <span class="s">"pad-y"</span>:             { <span class="s">"$type"</span>: <span class="s">"dimension"</span>, <span class="s">"$value"</span>: <span class="s">"{density.pad-y}"</span> },
+  <span class="s">"gap"</span>:               { <span class="s">"$type"</span>: <span class="s">"dimension"</span>, <span class="s">"$value"</span>: <span class="s">"{density.gap}"</span> },
+  <span class="s">"target"</span>:            { <span class="s">"$type"</span>: <span class="s">"dimension"</span>, <span class="s">"$value"</span>: <span class="s">"{density.target}"</span> },
+  <span class="s">"duration"</span>:          { <span class="s">"$type"</span>: <span class="s">"duration"</span>,  <span class="s">"$value"</span>: <span class="s">"{density.duration}"</span> }
+}</code></pre>
+    <div class="note warn">
+      <span class="lbl">One token file change outside the accordion</span>
+      <p>
+        <code>density.json</code> gains a <code>duration</code> key per profile — 140ms clinical,
+        200ms standard, 240ms patient. Every profile must define it or the build fails, which is
+        the same rule that already prevents a theme from silently missing a status colour. This is
+        the first component to need motion from density; making it a fourth key rather than a
+        per-component constant is what stops the next twenty components from each inventing their
+        own timing.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================== -->
+<section class="doc" id="s10">
+  <div class="wrap">
+    <div class="sechead narrow">
+      <p class="secnum">10</p>
+      <h2>Architecture, and the data structure that removes the special cases</h2>
+      <p>
+        The nine findings in §06 share one cause, and it is not sloppiness. It is that
+        <code>rc-collapse</code> models the accordion as a rendering problem with a boolean
+        modifier, so <code>accordion</code> became an <code>if</code> in the render path and
+        dragged a whole second ARIA pattern in behind it. Get the state model right and that
+        branch has nowhere to live.
+      </p>
+    </div>
+
+    <h3 class="sub">The state is a set and a policy, not a mode</h3>
+    <pre><code><span class="k">type</span> AccordionState = {
+  open: <span class="k">ReadonlySet</span>&lt;Key&gt;;
+  pending: <span class="k">ReadonlyMap</span>&lt;Key, DisclosureRequest&gt;;   <span class="c">// gates in flight</span>
+};
+
+<span class="c">// Every mode the component supports is this function, and nothing else.</span>
+<span class="k">type</span> Policy = (open: ReadonlySet&lt;Key&gt;, key: Key, items: Item[]) =&gt; Set&lt;Key&gt;;
+
+<span class="k">const</span> POLICIES: <span class="k">Record</span>&lt;PolicyName, Policy&gt; = {
+  multiple:   (open, k) =&gt; toggle(open, k),
+  single:     (open, k) =&gt; open.has(k) ? empty() : only(k),
+  exclusive:  (open, k) =&gt; only(k),                       <span class="c">// cannot close by clicking</span>
+  atLeastOne: (open, k) =&gt; open.has(k) &amp;&amp; open.size === 1 ? open : toggle(open, k),
+};
+
+<span class="c">// Pinned is not a branch either — it is a filter applied after the policy,</span>
+<span class="c">// so a pinned item is simply one the policy is not permitted to remove.</span>
+<span class="k">const</span> next = union(POLICIES[policy](state.open, key, items), pinnedKeys(items));</code></pre>
+
+    <div class="note ok">
+      <p style="margin:0">
+        Four modes, one pinning rule, one gate mechanism — and <strong>zero conditionals in the
+        render path.</strong> The markup is identical for every configuration, which is exactly
+        what makes the accessibility contract impossible to vary by accident. The bug in §06
+        finding 5 is not reachable from this shape.
+      </p>
+    </div>
+
+    <h3 class="sub">Where the pieces live</h3>
+    <div class="tblwrap">
+      <table>
+        <thead><tr><th style="width:8%">Layer</th><th style="width:30%">Package</th><th style="width:38%">Contents</th><th style="width:24%">Budget</th></tr></thead>
+        <tbody>
+          <tr><td><strong>L0</strong></td><td><code>@oxygenui-design/tokens</code></td><td><code>accordion.*</code> component tokens; <code>density.duration</code></td><td>—</td></tr>
+          <tr><td><strong>L1</strong></td><td><code>@oxygenui-design/primitives</code></td><td><code>useDisclosure</code>, <code>useAccordion</code>, the policy table, the prop getters, the gate state machine. No DOM, no React DOM, no antd.</td><td>&lt; 2.0 kB gz</td></tr>
+          <tr><td><strong>L2</strong></td><td><code>@oxygenui-design/react</code></td><td><code>Accordion</code>, <code>Accordion.Item</code>, <code>Disclosure</code> — the styled, token-driven implementation</td><td>&lt; 4.5 kB gz</td></tr>
+          <tr><td><strong>L2</strong></td><td><code>@oxygenui-design/react</code></td><td><code>ChartAccordion</code>, <code>RestrictedSection</code> — the clinical vocabulary over the primitive</td><td>&lt; 2.5 kB gz</td></tr>
+          <tr><td><strong>L3</strong></td><td><code>@oxygenui-design/blocks</code></td><td><code>SafetyPlan</code>, <code>AssessmentPanel</code>, <code>IntakeChecklist</code>, <code>TreatmentPlan</code></td><td>per block</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 class="sub">Performance, and the rule about measurement</h3>
+    <ul class="narrow">
+      <li><strong>No measurement in the toggle path.</strong> No <code>ResizeObserver</code>, no
+        <code>scrollHeight</code> read, no forced reflow to compute a target height. The
+        <code>0fr → 1fr</code> grid transition is pure CSS. Every accordion that animates by
+        measuring gets slower as sections get longer, and a 142-encounter note list is where that
+        shows up.</li>
+      <li><strong>Lazy mount, retained after.</strong> <code>mount: "lazy" | "eager" | "unmount"</code>.
+        Lazy is the default; <code>unmount</code> maps to antd's <code>destroyOnHidden</code>.</li>
+      <li><strong><code>content-visibility: auto</code> plus <code>contain-intrinsic-size</code></strong>
+        on closed panels, so a hundred collapsed sections cost layout once rather than every frame.</li>
+      <li><strong>SSR and RSC safe.</strong> Open state derives from props on the server;
+        <code>hidden="until-found"</code> is a server-renderable attribute, so there is no
+        post-hydration flash and no layout effect in the critical path.</li>
+      <li><strong>Virtualisation is an escape hatch, not the default.</strong> Above roughly 200
+        items, <code>renderItem</code> plus a windowing adapter. Below it, do not — a virtualised
+        list breaks find-in-page, which is the thing §04 move 4 just fixed.</li>
+    </ul>
+
+    <h3 class="sub">Two lint rules for the plugin</h3>
+    <div class="tblwrap">
+      <table>
+        <thead><tr><th style="width:32%">Rule</th><th style="width:12%">Severity</th><th style="width:56%">Catches</th></tr></thead>
+        <tbody>
+          <tr><td><code>@oxygenui/require-accordion-summary</code></td><td><span class="sev a">error</span></td><td>An item literal with <code>severity</code> set and no <code>summary</code>. A coloured rail with nothing beside it is colour carrying meaning alone — already forbidden by <code>CONTENT.md</code> §3, now mechanically checkable in the one place it is easy to get wrong.</td></tr>
+          <tr><td><code>@oxygenui/no-heading-level-drift</code></td><td><span class="sev b">warning</span></td><td>An <code>&lt;Accordion&gt;</code> in the JSX subtree of another <code>&lt;Accordion&gt;</code>'s item without an explicit <code>headingLevel</code>. Nested accordions with a default level silently flatten the outline, and nothing at runtime complains.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================== -->
+<section class="doc" id="s11">
+  <div class="wrap">
+    <div class="sechead narrow">
+      <p class="secnum">11</p>
+      <h2>What CI has to hold</h2>
+      <p>
+        The coverage gate exists and reports; this component should be among the first to run it
+        with <code>--strict</code>. Beyond the standard pyramid, four checks are specific to this
+        component and are the ones worth writing first, because each maps to a finding in §06.
+      </p>
+    </div>
+    <div class="tblwrap">
+      <table>
+        <thead><tr><th style="width:22%">Check</th><th style="width:48%">Asserts</th><th style="width:30%">Catches the regression</th></tr></thead>
+        <tbody>
+          <tr><td><strong>ARIA contract snapshot</strong></td><td>For every combination of policy × pinned × access, the emitted attributes match a committed table: heading element and level, <code>&lt;button&gt;</code> element, <code>aria-expanded</code>, <code>aria-controls</code>, panel <code>id</code>, <code>role</code>, <code>aria-labelledby</code>, <code>aria-disabled</code>. And that <strong>no <code>tab</code>, <code>tablist</code> or <code>tabpanel</code> role appears in any configuration.</strong></td><td>§06 findings 2–8. This is the test that makes the deviation in §07 permanent rather than a comment.</td></tr>
+          <tr><td><strong>Keyboard matrix</strong></td><td>Enter and Space both toggle. Space does not scroll. Tab produces one stop per header. ↑ ↓ Home End move focus and never toggle. A pinned trigger is focusable, announces expanded, and does not close.</td><td>§06 finding 1</td></tr>
+          <tr><td><strong>Disclosure invariants</strong></td><td>A <code>withheld</code> item never renders <code>children</code> into the DOM at any point in its lifecycle. A gated item does not open until <code>onDisclose</code> resolves <code>true</code>. A rejected gate leaves the item closed and the event unreconciled. <code>persistKey</code> never stores a gated key.</td><td>The failure that would actually matter: content leaking past a gate.</td></tr>
+          <tr><td><strong>Findability &amp; print</strong></td><td>Closed panels carry <code>hidden="until-found"</code> where supported and plain <code>hidden</code> where not. A synthetic <code>beforematch</code> opens the item. <code>@media print</code> expands every permitted section and no withheld one.</td><td>§06 finding 9</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="narrow">
+      Standard gates on top of those: axe on every story × 2 themes × 3 densities plus
+      forced-colors; Playwright VRT with animation frozen and fonts pinned; <code>expect-type</code>
+      on the public prop contract — particularly the <code>withheld</code>-excludes-<code>children</code>
+      union, which is a type-level safety property and should fail loudly if someone widens it;
+      <code>size-limit</code> against the four budgets in §10; and a screen-reader matrix recorded
+      per release across NVDA, JAWS and VoiceOver.
+    </p>
+    <div class="note">
+      <p style="margin:0">
+        The ARIA contract snapshot is the highest-value test in the list and costs about a day.
+        Every one of the nine findings in §06 is a thing that a committed attribute table would
+        have caught on the pull request that introduced it.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================== -->
+<section class="doc" id="s12">
+  <div class="wrap">
+    <div class="sechead narrow">
+      <p class="secnum">12</p>
+      <h2>Implementation plan — seven phases, about four weeks to beta</h2>
+      <p>
+        Ordered so that the load-bearing decisions are proved first and the wide, mechanical work
+        comes last. Phases 1 and 2 are the whole component; 4 is the product.
+      </p>
+    </div>
+
+    <div class="note ok">
+      <span class="lbl">Built — phases 0 through 6</span>
+      <p>
+        All seven phases are implemented and on the branch. What shipped, and what did not:
+      </p>
+      <ul>
+        <li><b>Built:</b> <code>accordion-core</code> (L1 headless, 1.86 kB gz, dependency-free),
+          <code>Accordion</code> and <code>Disclosure</code> (L2),
+          <code>ChartAccordion</code> (L2 clinical), <code>SafetyPlan</code> (L3 block),
+          the full five-value access model, the token tier, two lint rules, and
+          <code>@oxygenui-design/codemod</code> with the antd transform.</li>
+        <li><b>Not built, on purpose:</b> <code>TreatmentPlan</code> is a nested
+          <code>ChartAccordion</code> and is demonstrated as one in the nested story;
+          <code>RestrictedSection</code> is <code>access: {"{"} kind: "withheld" {"}"}</code> on an
+          item. Both would have been wrappers that add nothing, and a catalog fills up with those
+          faster than it fills up with components.</li>
+        <li><b>Cut, and worth revisiting:</b> <code>IntakeChecklist</code>. It is a real variant
+          rather than a wrapper — per-step status, auto-advance, grouped headings — but it is the
+          least clinically load-bearing of the four and nothing else depends on it.</li>
+      </ul>
+      <p style="margin-bottom:0">
+        <b>1,449 tests pass</b> across the workspace, 769 of them in the registry suite — up from
+        492 before this work. <code>pnpm gen --check</code>, <code>typecheck</code>,
+        <code>lint</code>, <code>deps</code> and <code>size</code> are all green.
+      </p>
+    </div>
+
+    <div class="tblwrap">
+      <table>
+        <thead><tr><th style="width:6%">Phase</th><th style="width:22%">Work</th><th style="width:50%">Deliverable</th><th style="width:10%">Est.</th><th style="width:12%">Gate to pass</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>0</strong></td><td>Decide</td>
+            <td>§13 answered — wrap-or-build, gate scope, naming. Nothing below starts until the first is settled, because it determines whether the registry channel survives.</td>
+            <td>½ day</td><td>—</td>
+          </tr>
+          <tr>
+            <td><strong>1</strong></td><td>L1 headless</td>
+            <td><code>useDisclosure</code>, <code>useAccordion</code>, the policy table, controlled/uncontrolled state, prop getters, pinned filter. Unit tests including the keyboard matrix against a bare-markup harness.</td>
+            <td>3 days</td><td>ARIA contract snapshot green</td>
+          </tr>
+          <tr>
+            <td><strong>2</strong></td><td>L2 styled</td>
+            <td><code>Accordion</code>, <code>Accordion.Item</code>, <code>Disclosure</code>. Tokens landed in <code>component.json</code> and <code>density.duration</code>. Variants, motion, <code>hidden="until-found"</code> with feature detection, print behaviour, deep-link handling.</td>
+            <td>4 days</td><td>axe × 2 themes × 3 densities; VRT baselines</td>
+          </tr>
+          <tr>
+            <td><strong>3</strong></td><td>The access model</td>
+            <td><code>AccessDescriptor</code>, the four gate renderings, <code>onDisclose</code> with async resolution and rejection, the withheld state, <code>persistKey</code> with its gated-key exclusion.</td>
+            <td>3 days</td><td>Disclosure invariants green</td>
+          </tr>
+          <tr>
+            <td><strong>4</strong></td><td>Clinical compositions</td>
+            <td><code>ChartAccordion</code>, <code>RestrictedSection</code>, then the L3 blocks: <code>SafetyPlan</code>, <code>AssessmentPanel</code>, <code>IntakeChecklist</code>, <code>TreatmentPlan</code>. Fixtures in <code>@oxygenui-design/fixtures</code> — synthetic only, and the PHI scan stays on.</td>
+            <td>5 days</td><td>Clinical review of the safety-plan block</td>
+          </tr>
+          <tr>
+            <td><strong>5</strong></td><td>Accessibility &amp; i18n</td>
+            <td>Screen-reader matrix across NVDA, JAWS, VoiceOver. Forced-colors, 200% zoom, 320px reflow. Every string through <code>@oxygenui-design/intl</code> with both clinician and patient catalogs — the gate copy is patient-facing and must not be retrofitted later.</td>
+            <td>3 days</td><td>Matrix recorded; no untranslated string</td>
+          </tr>
+          <tr>
+            <td><strong>6</strong></td><td>Ship</td>
+            <td><code>accordion.meta.ts</code>, stories, docs, registry entry, <code>llms.txt</code>. A codemod in <code>@oxygenui-design/codemod</code> that rewrites antd <code>&lt;Collapse&gt;</code> to <code>&lt;Accordion&gt;</code> — the props are the same names, so it is mostly an import rewrite plus a <code>headingLevel</code> insertion.</td>
+            <td>2 days</td><td><code>pnpm gen --check</code>; coverage gate <code>--strict</code></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 class="sub">Files, matching the layout the generator expects</h3>
+    <pre><code>packages/primitives/src/
+├── use-disclosure.ts                  <span class="c">L1 · single section</span>
+├── use-accordion.ts                   <span class="c">L1 · the set, the policy, the gate</span>
+├── policies.ts                        <span class="c">L1 · the four policies, pure</span>
+└── test/{use-accordion,policies,gate}.test.ts
+
+packages/react/src/components/accordion/
+├── index.ts                           <span class="c">generated barrel</span>
+├── accordion.tsx                      <span class="c">Accordion, Accordion.Item, Disclosure</span>
+├── accordion.meta.ts                  <span class="c">the source of truth</span>
+├── accordion.stories.tsx              <span class="c">docs + VRT + a11y + interaction</span>
+├── accordion.test.tsx
+└── accordion.css                      <span class="c">grid transition + content-visibility; tokens cannot express these</span>
+
+packages/react/src/components/chart-accordion/   <span class="c">same six files</span>
+packages/react/src/components/restricted-section/ <span class="c">same six files</span>
+
+packages/tokens/tokens/component.json   <span class="c">+ accordion.*</span>
+packages/tokens/tokens/density.json     <span class="c">+ duration per profile</span>
+packages/eslint-plugin/rules/           <span class="c">+ 2 rules, + cases in content-rules.test.js</span>
+registry/oxygen/accordion/              <span class="c">generated — not hand-written</span></code></pre>
+    <p class="narrow">
+      Nothing shared is edited by hand. <code>registry.json</code>, the docs catalog, the tsconfig
+      paths and the Tailwind source list all fall out of <code>pnpm gen</code>, and
+      <code>--check</code> fails CI if they drift.
+    </p>
+  </div>
+</section>
+
+<!-- ================================================================== -->
+<section class="doc" id="s13">
+  <div class="wrap">
+    <div class="sechead narrow">
+      <p class="secnum">13</p>
+      <h2>What only you can decide</h2>
+      <p>
+        These were open when the brief was written. All five were decided during implementation —
+        the call taken is stated first, then the reasoning that was already here.
+      </p>
+    </div>
+
+    <div class="note ok">
+      <span class="lbl">Decided</span>
+      <ul style="margin-bottom:0">
+        <li><b>1 · Build, not wrap.</b> No antd dependency, so the registry channel survives.</li>
+        <li><b>2 · All five access kinds in v1</b>, not the reduced pair. The gate is the
+          differentiator and the async path is what makes it real; halving it would have shipped
+          the easy half.</li>
+        <li><b>3 · Reviewed default copy</b>, replaceable through <code>locale</code>. Every string
+          the behaviour layer needs is in one object with English defaults.</li>
+        <li><b>4 · <code>Accordion</code> / <code>Disclosure</code> / <code>ChartAccordion</code> /
+          <code>SafetyPlan</code>.</b> <code>ChartAccordion</code> over <code>ChartSections</code> —
+          discoverability wins for a name people will search for.</li>
+        <li><b>5 · <code>SafetyPlan</code> is the demo.</b> It is the most specific to behavioral
+          health and the pinned crisis step is the clearest single-frame argument in this document.</li>
+      </ul>
+    </div>
+
+    <h4 class="sub">1 · Wrap antd's Collapse, or build on our own primitive</h4>
+    <p class="narrow">
+      <strong>Recommendation: build.</strong> §06 is the argument — the defects are the DOM, and
+      <code>classNames</code>/<code>styles</code> reach CSS but not semantics, so wrapping means
+      shipping nine findings under an Oxygen label. Building also keeps the registry channel open,
+      which matters more than this one component: Signature closed it for itself, and a second
+      antd-dependent component would start closing it by accumulation rather than by decision.
+      The counter-argument is real and worth stating: building means we own an accordion's
+      keyboard and focus behaviour forever, and antd will keep shipping fixes we no longer inherit.
+      For this component that trade is clearly right; it is not obviously right for the next one.
+    </p>
+
+    <h4 class="sub">2 · Is the disclosure gate in v1, or does the app own it?</h4>
+    <p class="narrow">
+      It is the differentiator, and it is also the part most likely to collide with how a customer
+      already does consent. A middle option worth considering: ship <code>withheld</code> and
+      <code>advisory</code> in v1 — both are purely presentational and need no service — and hold
+      <code>reason</code> and <code>consent</code> for v1.1 once a real customer's audit contract
+      is in front of us. That halves phase 3 and loses none of the design argument.
+    </p>
+
+    <h4 class="sub">3 · How opinionated should the patient-facing gate be?</h4>
+    <p class="narrow">
+      A content warning is a clinical and ethical position, not only a UI one — badly worded it
+      becomes a deterrent rather than a choice. The component can supply the mechanism and leave
+      every string to the customer, or it can ship default copy that has been through clinical
+      review. The second is worth more and costs a reviewer. Given the revenue model is services
+      and contracts rather than volume, the reviewed default is probably the asset.
+    </p>
+
+    <h4 class="sub">4 · Naming</h4>
+    <p class="narrow">
+      The loaders are named poetically because they are decorative; structural components in this
+      library take plain names. So: <code>Accordion</code> for the many, <code>Disclosure</code>
+      for the one — which also matches React Aria's split and the ARIA vocabulary. Clinical
+      compositions take the domain's own words: <code>ChartAccordion</code>,
+      <code>RestrictedSection</code>, <code>SafetyPlan</code>, <code>AssessmentPanel</code>,
+      <code>IntakeChecklist</code>. The one open question is whether the composed clinical
+      component should be <code>ChartAccordion</code> or <code>ChartSections</code>; the first is
+      more discoverable, the second describes what it is rather than how it moves.
+    </p>
+
+    <h4 class="sub">5 · Which surface goes first</h4>
+    <p class="narrow">
+      If the point is a demo that sells, <code>SafetyPlan</code> is the one — it is the most
+      specific to behavioral health, the pinned crisis step is the clearest single-frame argument
+      in this brief, and nobody else's component library can render it. If the point is coverage,
+      <code>ChartAccordion</code> is the one, because ten of the eleven surfaces in §03 are
+      instances of it.
+    </p>
+  </div>
+</section>
+
+<!-- ================================================================== -->
+<section class="doc">
+  <div class="wrap narrow">
+    <h3 style="margin-bottom:1rem">Sources</h3>
+    <ul class="srcs">
+      <li><a href="https://www.w3.org/WAI/ARIA/apg/patterns/accordion/">WAI-ARIA Authoring Practices — Accordion pattern</a> — heading wrapper, <code>aria-controls</code>, the <code>aria-disabled</code> rule for non-collapsible panels, and the ≤6 guidance for <code>role="region"</code>.</li>
+      <li><a href="https://github.com/react-component/collapse/blob/master/src/Panel.tsx">rc-collapse — <code>src/Panel.tsx</code></a> and <a href="https://github.com/react-component/collapse/blob/master/src/Collapse.tsx"><code>src/Collapse.tsx</code></a> — the source behind all nine findings in §06.</li>
+      <li><a href="https://ant.design/components/collapse">Ant Design v6 — Collapse API</a> — prop names, defaults, and the <code>expandIconPosition</code> → <code>expandIconPlacement</code> rename.</li>
+      <li><a href="https://github.com/ant-design/ant-design/issues/6017">ant-design#6017 — "Collapse supports ARIA"</a>.</li>
+      <li><a href="https://developer.chrome.com/docs/css-ui/hidden-until-found">Chrome for Developers — Making collapsed content accessible with <code>hidden=until-found</code></a>, and <a href="https://developer.mozilla.org/docs/Web/API/Element/beforematch_event">MDN — <code>beforematch</code></a>. Baseline since December 2025.</li>
+      <li><a href="https://github.com/alphagov/govuk-frontend/pull/3053">govuk-frontend#3053</a> and <a href="https://github.com/twbs/bootstrap/issues/41479">bootstrap#41479</a> — prior art for the same move.</li>
+      <li><a href="https://developer.mozilla.org/en-US/docs/Web/CSS/interpolate-size">MDN — <code>interpolate-size</code></a> and <a href="https://developer.chrome.com/docs/css-ui/animate-to-height-auto">Chrome — animating to <code>height: auto</code></a>. Chromium only today, hence progressive enhancement over the grid transition.</li>
+      <li><a href="https://www.psychiatry.org/psychiatrists/practice/practice-management/hipaa/42-cfr-part-2">APA — 42 CFR Part 2 final rule</a> and <a href="https://coephi.org/resource/commonly-asked-questions-about-the-2024-part-2-final-rule/">Focus:PHI — 2024 Part 2 final rule FAQ</a>. Effective 16 April 2024, enforcement from 16 February 2026; segmentation neither required nor prohibited; SUD clinician's notes carved out from broad TPO consent.</li>
+      <li><a href="https://suicidesafetyplan.com/">Stanley-Brown Safety Planning Intervention</a> — the six steps and their order.</li>
+      <li><a href="https://www.opennotes.org/onc-federal-rule/">OpenNotes — the federal rule</a> and <a href="https://blog.therapynotes.com/how-the-cures-act-and-opennotes-apply-to-behavioral-healthcare">Cures Act and OpenNotes in behavioral healthcare</a> — what must be shared, and the psychotherapy-notes exception.</li>
+      <li><a href="https://www.sciencedirect.com/science/article/abs/pii/S0165032717309655">PHQ-9 item 9 validated against the C-SSRS</a> — why item 9 belongs in a collapsed header.</li>
+      <li><a href="https://uxcontent.com/a-guide-to-trauma-informed-content-design/">Trauma-informed content design</a> and <a href="https://contentdesign.london/blog/using-trauma-informed-principles-with-content-design">Content Design London — trauma-informed principles</a> — progressive disclosure at the reader's pace, and content warnings as choice rather than concealment.</li>
+      <li>In-repo: <code>ARCHITECTURE.md</code> §§2, 9, 10, 14 · <code>CONTENT.md</code> §§1, 3, 5, 7 · <code>DESIGN.md</code> · <code>packages/tokens/tokens/{component,density}.json</code>.</li>
+    </ul>
+  </div>
+</section>
+
+<footer class="end">
+  <div class="wrap narrow">
+    <p>
+      Oxygen UI is not a compliance boundary. It does not make an application HIPAA, GDPR, DPDP or
+      42 CFR Part 2 compliant, and it is not a medical device or clinical decision support. The
+      access model in §04 is a user-interface affordance for a policy the application owns and
+      enforces elsewhere — a gate in a component is not an access control, and this brief should
+      not be read as claiming otherwise.
+    </p>
+    <p style="margin-bottom:0">
+      All names, scores and dates in the mockups are synthetic. Proposed · 16 August 2026.
+    </p>
+  </div>
+</footer>
+
+<script>
+(function () {
+  "use strict";
+  var REDUCED = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var SUPPORTS_UNTIL_FOUND = "onbeforematch" in document.body;
+
+  function items(acc) {
+    return Array.prototype.filter.call(acc.children, function (el) {
+      return el.classList.contains("ox-acc__item");
+    });
+  }
+  function triggerOf(item) { return item.querySelector(":scope > .ox-acc__heading > .ox-acc__trigger"); }
+  function panelOf(item) { return item.querySelector(":scope > .ox-acc__panel"); }
+
+  function open(item) {
+    if (item.dataset.open === "true") return;
+    var panel = panelOf(item), trig = triggerOf(item);
+    panel.removeAttribute("hidden");
+    void panel.offsetHeight;                 // start the transition from a rendered box
+    item.dataset.open = "true";
+    trig.setAttribute("aria-expanded", "true");
+  }
+
+  function close(item) {
+    if (item.dataset.open !== "true") return;
+    if (item.dataset.pinned === "true") return;
+    var panel = panelOf(item), trig = triggerOf(item);
+    item.dataset.open = "false";
+    trig.setAttribute("aria-expanded", "false");
+    var hide = function () { panel.setAttribute("hidden", SUPPORTS_UNTIL_FOUND ? "until-found" : ""); };
+    if (REDUCED) { hide(); return; }
+    var done = false;
+    var onEnd = function (e) {
+      if (e.target !== panel || done) return;
+      done = true; panel.removeEventListener("transitionend", onEnd); hide();
+    };
+    panel.addEventListener("transitionend", onEnd);
+    setTimeout(function () { if (!done) { done = true; panel.removeEventListener("transitionend", onEnd); hide(); } }, 500);
+  }
+
+  function toggle(acc, item) {
+    if (item.dataset.access === "withheld" || item.dataset.pinned === "true") return;
+    var isOpen = item.dataset.open === "true";
+    if (isOpen) { close(item); return; }
+    if (acc.dataset.policy === "single") {
+      items(acc).forEach(function (other) { if (other !== item) close(other); });
+    }
+    open(item);
+  }
+
+  document.querySelectorAll(".ox-acc").forEach(function (acc) {
+    var list = items(acc);
+    list.forEach(function (item) {
+      var trig = triggerOf(item), panel = panelOf(item);
+      if (!trig || !panel) return;
+
+      trig.addEventListener("click", function () { toggle(acc, item); });
+
+      // A real <button> already handles Enter and Space. These are the
+      // optional APG extras that make a long chart navigable.
+      trig.addEventListener("keydown", function (e) {
+        var i = list.indexOf(item), next = null;
+        if (e.key === "ArrowDown") next = list[(i + 1) % list.length];
+        else if (e.key === "ArrowUp") next = list[(i - 1 + list.length) % list.length];
+        else if (e.key === "Home") next = list[0];
+        else if (e.key === "End") next = list[list.length - 1];
+        if (next) { e.preventDefault(); triggerOf(next).focus(); }
+      });
+
+      // Find-in-page and fragment navigation reveal the section.
+      panel.addEventListener("beforematch", function () { open(item); });
+    });
+  });
+
+  document.querySelectorAll("[data-expand-all]").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      var acc = btn.closest(".antd").querySelector(".ox-acc");
+      items(acc).forEach(function (it) { if (it.dataset.access !== "withheld") open(it); });
+    });
+  });
+  document.querySelectorAll("[data-collapse-all]").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      var acc = btn.closest(".antd").querySelector(".ox-acc");
+      items(acc).forEach(close);
+    });
+  });
+
+  // Printing a chart must print the chart.
+  window.addEventListener("beforeprint", function () {
+    document.querySelectorAll(".ox-acc__panel[hidden]").forEach(function (p) { p.removeAttribute("hidden"); });
+  });
+})();
+</script>
+</body>
+</html>

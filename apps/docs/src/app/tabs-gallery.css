@@ -1,0 +1,541 @@
+/*
+ * Styling for the tab gallery.
+ *
+ * Two jobs, and they are worth keeping separate in your head:
+ *
+ *   1. The frame — the site's instrument aesthetic around each demo.
+ *   2. The demo theme scope — `[data-ox-demo-theme]`, which redefines the
+ *      component's own `--ox-*` semantic tokens so the same strip can be shown
+ *      in light, dark and high-contrast side by side on one page.
+ *
+ * The second is the interesting one. The tab package resolves every value
+ * through `--ox-tabs-*` → `--ox-*` → `--ant-*` → a literal, so overriding the
+ * middle tier here is enough to retheme it completely — no props, no JS, and
+ * no fork of the stylesheet. If that chain is ever broken, this file stops
+ * working, which makes the matrix a live test of the token contract.
+ */
+
+.ox-gallery {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+/* ---- control bar ------------------------------------------------- */
+.ox-gallery__bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.5rem;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--color-rule);
+  border-radius: 0.875rem;
+  background: var(--color-paper-sunk);
+}
+.ox-gallery__group {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+.ox-gallery__legend {
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-graphite);
+  margin-inline-end: 0.15rem;
+}
+.ox-gallery__switch {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: 0.4rem;
+  color: var(--color-graphite);
+  transition:
+    background-color 180ms var(--ease-out-expo),
+    color 180ms var(--ease-out-expo);
+  cursor: pointer;
+}
+.ox-gallery__switch:hover {
+  color: var(--color-ink);
+}
+.ox-gallery__switch[aria-pressed="true"] {
+  background: var(--color-ink);
+  color: var(--color-paper);
+}
+
+/*
+ * The chapter switcher is site chrome that happens to be built from the
+ * component — so it maps the component's semantic tier onto the site's own
+ * tokens and follows light/dark with the rest of the page, rather than sitting
+ * in a demo theme that has nothing to do with the surrounding surface.
+ */
+.ox-gallery__chapters {
+  --ox-bg: var(--color-paper);
+  --ox-bg-subtle: var(--color-paper-sunk);
+  --ox-bg-muted: var(--color-paper-sunk);
+  --ox-surface: var(--color-paper);
+  --ox-surface-raised: var(--color-paper);
+  --ox-fg: var(--color-ink);
+  --ox-fg-muted: var(--color-graphite);
+  --ox-fg-subtle: var(--color-graphite-soft);
+  --ox-border: var(--color-rule);
+  --ox-border-strong: var(--color-rule-strong);
+  --ox-accent: var(--color-oxygen);
+  --ox-accent-hover: var(--color-oxygen-deep);
+  --ox-accent-subtle: color-mix(in oklab, var(--color-oxygen) 12%, transparent);
+  --ox-accent-border: color-mix(in oklab, var(--color-oxygen) 45%, transparent);
+  --ox-focus-ring: var(--color-oxygen);
+
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1rem;
+}
+.ox-gallery__blurb {
+  font-size: 0.8125rem;
+  color: var(--color-graphite);
+  margin: 0;
+}
+
+/* ---- stage ------------------------------------------------------- */
+.ox-gallery__stage {
+  border-radius: 1rem;
+}
+.ox-gallery__grid {
+  display: grid;
+  gap: 1.25rem;
+  /* `min()` in the floor is load-bearing: a bare minmax(340px, 1fr) cannot
+     shrink below its floor and overflows the page on a phone. */
+  grid-template-columns: repeat(auto-fit, minmax(min(340px, 100%), 1fr));
+}
+/* A demo that needs the room takes the whole row rather than being squeezed
+   into a column where its own content would wrap into nonsense. */
+.ox-gallery__grid > .ox-demo:has(.ox-demo__stage--wide) {
+  grid-column: 1 / -1;
+}
+
+/* Motion off, applied to the component rather than the page. */
+.ox-gallery__stage[data-ox-motion="off"] .ox-tabs *,
+.ox-gallery__stage[data-ox-motion="off"] .ox-tabs *::before,
+.ox-gallery__stage[data-ox-motion="off"] .ox-tabs *::after {
+  transition-duration: 1ms !important;
+  animation-duration: 1ms !important;
+}
+
+/* ---- one demo ----------------------------------------------------- */
+.ox-demo {
+  margin: 0;
+  border: 1px solid var(--color-rule);
+  border-radius: 0.875rem;
+  background: var(--color-paper);
+  overflow: hidden;
+}
+.ox-demo__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 0.85rem;
+  border-bottom: 1px solid var(--color-rule);
+  background: var(--color-paper-sunk);
+}
+.ox-demo__id {
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  letter-spacing: 0.06em;
+  padding: 0.1rem 0.35rem;
+  border-radius: 0.3rem;
+  background: var(--color-ink);
+  color: var(--color-paper);
+}
+.ox-demo__name {
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+.ox-demo__api {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  color: var(--color-graphite);
+}
+.ox-demo__tag {
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  padding: 0.1rem 0.4rem;
+  border-radius: 999px;
+  border: 1px solid var(--color-rule);
+  color: var(--color-graphite);
+}
+.ox-demo__stage {
+  padding: 1.5rem 1.25rem;
+  background: var(--ox-bg);
+  container-type: inline-size;
+}
+.ox-demo__note {
+  margin: 0;
+  padding: 0.75rem 0.85rem;
+  border-top: 1px solid var(--color-rule);
+  background: var(--color-paper-sunk);
+  font-size: 0.8125rem;
+  line-height: 1.55;
+  color: var(--color-graphite);
+}
+
+/* ---- furniture inside a demo -------------------------------------- */
+.ox-demo-panel {
+  border: 1px dashed var(--ox-border);
+  border-radius: 0.75rem;
+  padding: 0.85rem 1rem;
+  font-size: 0.8125rem;
+  color: var(--ox-fg-muted);
+  background: var(--ox-bg-subtle);
+}
+.ox-demo-panel b {
+  color: var(--ox-fg);
+}
+
+.ox-demo-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.8125rem;
+  padding: 0.35rem 0.7rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--ox-border);
+  background: var(--ox-surface);
+  color: var(--ox-fg);
+  cursor: pointer;
+}
+.ox-demo-btn--primary {
+  background: var(--ox-accent);
+  border-color: var(--ox-accent);
+  color: var(--ox-accent-fg, #fff);
+}
+
+.ox-alert {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.65rem 0.85rem;
+  margin-block-end: 0.75rem;
+  border-radius: 0.5rem;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  border: 1px solid var(--ox-status-critical-border);
+  background: var(--ox-status-critical-bg);
+  color: var(--ox-fg);
+}
+
+.ox-log {
+  list-style: none;
+  margin: 0.75rem 0 0;
+  padding: 0.5rem 0.65rem;
+  border: 1px solid var(--ox-border);
+  border-radius: 0.5rem;
+  background: var(--ox-bg-subtle);
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  color: var(--ox-fg-muted);
+  display: grid;
+  gap: 0.2rem;
+}
+.ox-log li:first-child {
+  color: var(--ox-fg);
+}
+
+.ox-sheet {
+  margin-block-start: 0.9rem;
+  padding: 0.9rem 1rem;
+  border: 1px solid var(--ox-border);
+  border-radius: 0.75rem;
+  background: var(--ox-surface);
+  max-width: 26rem;
+}
+.ox-sheet h5 {
+  margin: 0 0 0.3rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--ox-fg);
+}
+.ox-sheet p {
+  margin: 0 0 0.75rem;
+  font-size: 0.8125rem;
+  color: var(--ox-fg-muted);
+}
+.ox-sheet__actions {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+}
+
+.ox-chart {
+  border: 1px solid var(--ox-border);
+  border-radius: 0.75rem;
+  background: var(--ox-surface);
+  padding: 1rem 1.1rem 0;
+  width: 100%;
+}
+.ox-chart__head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-block-end: 0.85rem;
+}
+.ox-chart__name {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--ox-fg);
+}
+.ox-chart__mrn {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--ox-fg-muted);
+}
+.ox-chart__actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.ox-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  text-align: start;
+}
+.ox-card__title {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--ox-fg);
+}
+.ox-card__body {
+  font-size: 0.8rem;
+  font-weight: 400;
+  line-height: 1.45;
+  color: var(--ox-fg-muted);
+  white-space: normal;
+}
+
+.ox-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  text-align: start;
+}
+.ox-stat__key {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--ox-fg-muted);
+}
+.ox-stat__value {
+  font-family: var(--font-mono);
+  font-size: 1.4rem;
+  font-weight: 600;
+  line-height: 1.1;
+  color: var(--ox-fg);
+  font-variant-numeric: tabular-nums;
+}
+.ox-stat__delta {
+  font-size: 0.7rem;
+  font-weight: 400;
+}
+.ox-stat__delta.is-good {
+  color: var(--ox-status-normal);
+}
+.ox-stat__delta.is-bad {
+  color: var(--ox-status-critical);
+}
+
+/* A small animated chart, so switching a stat tile is worth doing. */
+.ox-spark {
+  display: flex;
+  align-items: flex-end;
+  gap: 4px;
+  height: 110px;
+  padding: 0.75rem;
+  border: 1px dashed var(--ox-border);
+  border-radius: 0.75rem;
+  background: var(--ox-bg-subtle);
+}
+.ox-spark > span {
+  flex: 1;
+  border-radius: 3px 3px 0 0;
+  background: var(--ox-accent);
+  opacity: 0.45;
+  transform-origin: bottom;
+  animation: ox-spark-rise 520ms var(--ease-out-expo) both;
+}
+.ox-spark > span:last-child {
+  opacity: 1;
+}
+@keyframes ox-spark-rise {
+  from {
+    transform: scaleY(0.05);
+    opacity: 0;
+  }
+}
+
+.ox-variants {
+  display: grid;
+  gap: 1rem;
+}
+.ox-variants__row {
+  display: grid;
+  gap: 0.45rem;
+}
+.ox-variants__row > code {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  color: var(--ox-fg-muted);
+}
+
+/* ---- the nine-cell matrix ----------------------------------------- */
+.ox-matrix {
+  display: grid;
+  gap: 0.85rem;
+  grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr));
+}
+.ox-matrix__cell {
+  border: 1px solid var(--color-rule);
+  border-radius: 0.75rem;
+  overflow: hidden;
+}
+.ox-matrix__label {
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-graphite);
+  padding: 0.45rem 0.7rem;
+  border-bottom: 1px solid var(--color-rule);
+  background: var(--color-paper-sunk);
+}
+.ox-matrix__body {
+  display: grid;
+  gap: 0.85rem;
+  padding: 1rem 0.85rem;
+  background: var(--ox-bg);
+}
+
+/* ===================================================================
+ * Demo theme scopes.
+ *
+ * These redefine the component's *semantic* tier only. Nothing here touches
+ * `--ox-tabs-*`, which is the component tier — so if a future change reaches
+ * past the semantic tokens to a literal, these scopes stop having an effect
+ * and the matrix visibly breaks. That is the intent.
+ * ================================================================== */
+
+[data-ox-demo-theme="light"] {
+  --ox-bg: #ffffff;
+  --ox-bg-subtle: #f8fafc;
+  --ox-bg-muted: #f1f5f9;
+  --ox-surface: #ffffff;
+  --ox-surface-raised: #ffffff;
+  --ox-fg: #0f172a;
+  --ox-fg-muted: #475569;
+  --ox-fg-subtle: #94a3b8;
+  --ox-border: #e2e8f0;
+  --ox-border-strong: #cbd5e1;
+  --ox-accent: #059478;
+  --ox-accent-hover: #067662;
+  --ox-accent-subtle: #ecfdf8;
+  --ox-accent-border: #a4f3df;
+  --ox-accent-fg: #ffffff;
+  --ox-focus-ring: #059478;
+  --ox-status-critical: #b91c1c;
+  --ox-status-critical-bg: #fef2f2;
+  --ox-status-critical-border: #fecaca;
+  --ox-status-high: #b45309;
+  --ox-status-high-bg: #fffbeb;
+  --ox-status-high-border: #fde68a;
+  --ox-status-normal: #15803d;
+  color-scheme: light;
+}
+
+/* Retuned rather than reused: the light values do not hold contrast on a dark
+   surface, and critical has to stay unmistakable. */
+[data-ox-demo-theme="dark"] {
+  --ox-bg: #0b1220;
+  --ox-bg-subtle: #0f172a;
+  --ox-bg-muted: #1e293b;
+  --ox-surface: #0f172a;
+  --ox-surface-raised: #27334a;
+  --ox-fg: #e2e8f0;
+  --ox-fg-muted: #94a3b8;
+  --ox-fg-subtle: #64748b;
+  --ox-border: #1e293b;
+  --ox-border-strong: #334155;
+  --ox-accent: #2dd4b0;
+  --ox-accent-hover: #6ce7cb;
+  --ox-accent-subtle: #0a2c26;
+  --ox-accent-border: #10554a;
+  --ox-accent-fg: #012e28;
+  --ox-focus-ring: #2dd4b0;
+  --ox-status-critical: #fb7185;
+  --ox-status-critical-bg: #2a1214;
+  --ox-status-critical-border: #5c1f24;
+  --ox-status-high: #fbbf24;
+  --ox-status-high-bg: #2a2010;
+  --ox-status-high-border: #5c451a;
+  --ox-status-normal: #4ade80;
+  color-scheme: dark;
+}
+
+/* Borders do the work, not fills. In high contrast a control whose only
+   selection cue is a background has, effectively, no selection cue. */
+[data-ox-demo-theme="hc"] {
+  --ox-bg: #ffffff;
+  --ox-bg-subtle: #ffffff;
+  --ox-bg-muted: #ffffff;
+  --ox-surface: #ffffff;
+  --ox-surface-raised: #ffffff;
+  --ox-fg: #000000;
+  --ox-fg-muted: #1a1a1a;
+  --ox-fg-subtle: #404040;
+  --ox-border: #000000;
+  --ox-border-strong: #000000;
+  --ox-accent: #005c47;
+  --ox-accent-hover: #00402f;
+  --ox-accent-subtle: #ffffff;
+  --ox-accent-border: #005c47;
+  --ox-accent-fg: #ffffff;
+  --ox-focus-ring: #000000;
+  --ox-status-critical: #8a0000;
+  --ox-status-critical-bg: #ffffff;
+  --ox-status-critical-border: #8a0000;
+  --ox-status-high: #6b3b00;
+  --ox-status-high-bg: #ffffff;
+  --ox-status-high-border: #6b3b00;
+  --ox-status-normal: #00521f;
+  color-scheme: light;
+}
+[data-ox-demo-theme="hc"] .ox-tabs {
+  --ox-tabs-thumb-shadow: none;
+  --ox-tabs-weight-selected: 700;
+  --ox-tabs-indicator-size: 3px;
+}
+[data-ox-demo-theme="hc"] .ox-tabs__tab[data-ox-selected] {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* Density, scoped to the demo rather than the page. */
+[data-ox-density="patient"] {
+  --ox-density-pad-x: 1.125rem;
+  --ox-density-pad-y: 0.875rem;
+  --ox-density-font: 1rem;
+  --ox-density-target: 3rem;
+}
+[data-ox-density="standard"] {
+  --ox-density-pad-x: 0.875rem;
+  --ox-density-pad-y: 0.625rem;
+  --ox-density-font: 0.875rem;
+  --ox-density-target: 2.75rem;
+}
+[data-ox-density="clinical"] {
+  --ox-density-pad-x: 0.5rem;
+  --ox-density-pad-y: 0.25rem;
+  --ox-density-font: 0.8125rem;
+  --ox-density-target: 1.875rem;
+}

@@ -35,6 +35,7 @@ export { ariaOrientation, disabledProps, rolesFor, type RoleSpec } from "./roles
 
 export {
   focusAfterClose,
+  hotkeyIndex,
   isTypeaheadKey,
   keyToIntent,
   matchTypeahead,
@@ -51,6 +52,7 @@ export {
 export {
   fitTabs,
   nudgeDistance,
+  observationWindow,
   scrollEdges,
   shouldCollapse,
   type FitOptions,

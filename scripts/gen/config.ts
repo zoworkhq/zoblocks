@@ -33,6 +33,7 @@ export const SUPPORT_ITEM_NAMES: ReadonlySet<string> = new Set([
   "utils",
   "tokens",
   "loader-core",
+  "accordion-core",
   "switch-core",
 ]);
 

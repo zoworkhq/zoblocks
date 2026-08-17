@@ -34,6 +34,12 @@ export interface UseIndicatorOptions {
   /** Returns the currently selected trigger element, or null. */
   getSelected: () => HTMLElement | null;
   enabled: boolean;
+  /**
+   * Observe the list only, not every trigger. Above a few dozen tabs the
+   * per-trigger observers become the dominant cost, and a label whose width
+   * changes without the list resizing is rare enough to trade away.
+   */
+  observeListOnly?: boolean;
   /** Any change to this re-measures. */
   deps: React.DependencyList;
 }
@@ -48,6 +54,7 @@ export function useIndicator({
   listRef,
   getSelected,
   enabled,
+  observeListOnly = false,
   deps,
 }: UseIndicatorOptions): IndicatorState {
   const [geometry, setGeometry] = React.useState<IndicatorGeometry | null>(null);
@@ -108,12 +115,20 @@ export function useIndicator({
     // handler that silently stops firing.
     const observer = new ResizeObserver(remeasure);
     observer.observe(list);
-    for (const child of Array.from(list.querySelectorAll("[data-ox-tab]"))) {
-      observer.observe(child);
+    if (observeListOnly) {
+      // Still watch the selected trigger: it is the one the indicator is sized
+      // to, so its width changing is never negligible. Everything else is left
+      // to the list resize, which is what makes a 200-tab strip affordable.
+      const selected = getSelectedRef.current();
+      if (selected) observer.observe(selected);
+    } else {
+      for (const child of Array.from(list.querySelectorAll("[data-ox-tab]"))) {
+        observer.observe(child);
+      }
     }
     return () => observer.disconnect();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [enabled, listRef, remeasure, ...deps]);
+  }, [enabled, listRef, remeasure, observeListOnly, ...deps]);
 
   React.useEffect(() => {
     if (!enabled) return;

@@ -1,0 +1,62 @@
+{
+  "name": "@oxygenui-design/consult-core",
+  "version": "0.1.0",
+  "description": "The engine behind Oxygen's clinical copilot. Session state machine, provider contract, mode scope contracts, safety pipeline and FHIR audit mapping — no React, no DOM, no dependencies.",
+  "license": "MIT",
+  "homepage": "https://oxygenui.design/components/consult",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zoworkhq/oxygenui.git",
+    "directory": "packages/consult-core"
+  },
+  "keywords": [
+    "clinical-decision-support",
+    "healthcare",
+    "ai",
+    "llm",
+    "fhir",
+    "audit",
+    "provenance",
+    "safety"
+  ],
+  "type": "module",
+  "sideEffects": false,
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "src",
+    "!src/**/*.test.ts"
+  ],
+  "engines": {
+    "node": ">=20.11.0"
+  },
+  "publishConfig": {
+    "access": "public",
+    "main": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "exports": {
+      ".": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "./package.json": "./package.json"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage"
+  },
+  "devDependencies": {
+    "@oxygenui-design/tsconfig": "workspace:*",
+    "@vitest/coverage-v8": "^4.1.10",
+    "typescript": "^5.7.2",
+    "vitest": "^4.1.10"
+  }
+}

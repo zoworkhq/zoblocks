@@ -26,9 +26,12 @@
   ],
   "main": "./src/index.ts",
   "types": "./src/index.ts",
+  "//exports": "styles.css is the documented entry point and carries everything. The per-concern sheets exist so an application that installs only loaders does not ship accordion CSS it never renders.",
   "exports": {
     ".": "./src/index.ts",
     "./styles.css": "./src/styles.css",
+    "./styles/loader.css": "./src/styles/loader.css",
+    "./styles/accordion.css": "./src/styles/accordion.css",
     "./package.json": "./package.json"
   },
   "files": [
@@ -64,6 +67,8 @@
         "default": "./dist/index.js"
       },
       "./styles.css": "./dist/styles.css",
+      "./styles/loader.css": "./dist/styles/loader.css",
+      "./styles/accordion.css": "./dist/styles/accordion.css",
       "./package.json": "./package.json"
     }
   },

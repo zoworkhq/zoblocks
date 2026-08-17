@@ -102,17 +102,58 @@ export function useOverflow({
     );
   }, [listRef, strategy, count, selectedIndex, reserve, measureWidths]);
 
+  /*
+   * Coalesce a burst of notifications into one pass — and then one more.
+   *
+   * This used to `return` when a frame was already queued, which drops the
+   * notification rather than deferring it. That is only safe if the size a
+   * dropped notification carried is the size the queued pass will read, and it
+   * often is not: the pass reads at the *start* of the frame, so any change
+   * arriving after that is lost, and ResizeObserver never repeats itself
+   * because the change has already happened. The strip is then laid out for a
+   * width it no longer has, permanently.
+   *
+   * It shows up as everything and nothing: a strip that never collapses to its
+   * picker, an indicator still sized for the density before last, a menu
+   * button in the wrong place. All of it needs several size changes inside one
+   * frame to reproduce — page load with a webfont swap, or a contended CI
+   * runner — which is why it survived a suite that passes locally.
+   */
+  const again = React.useRef(false);
+
   const refresh = React.useCallback(() => {
-    if (frame.current !== null) return;
     if (typeof requestAnimationFrame === "undefined") {
       readEdges();
       refit();
       return;
     }
+    if (frame.current !== null) {
+      again.current = true;
+      return;
+    }
     frame.current = requestAnimationFrame(() => {
       frame.current = null;
+      /*
+       * The cache is dropped on every resize, not only when the tab set
+       * changes.
+       *
+       * `refit` re-measures when the *number* of tabs changes, which catches a
+       * tab being added and misses every reason a tab's width changes while
+       * the set stays the same: a density switch, a webfont arriving, a label
+       * translated, the container narrowing enough to wrap. The fit then runs
+       * against widths measured against an earlier layout, and decides to hide
+       * or show exactly the wrong tabs.
+       */
+      widths.current = null;
       readEdges();
       refit();
+
+      // Something changed while that was queued, and its notification is not
+      // coming again.
+      if (again.current) {
+        again.current = false;
+        refresh();
+      }
     });
   }, [readEdges, refit]);
 

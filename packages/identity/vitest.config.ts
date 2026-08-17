@@ -44,6 +44,15 @@ export default defineConfig({
       thresholds: { lines: 98, functions: 100, branches: 92, statements: 97 },
     },
     environment: "jsdom",
+    /*
+     * 20s, against Vitest's 5s default.
+     *
+     * These suites drive real antd overlays through jsdom, which has no layout
+     * engine — the longest interaction chains sit seconds rather than
+     * milliseconds, and a CI runner is slower again. Two signature tests failed
+     * on exactly this. Browser timing is asserted in the Playwright suite.
+     */
+    testTimeout: 20_000,
     globals: true,
     setupFiles: ["./test/setup.ts"],
     include: ["src/**/*.test.tsx", "test/**/*.test.tsx"],

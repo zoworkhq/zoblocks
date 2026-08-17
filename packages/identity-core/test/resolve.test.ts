@@ -316,3 +316,39 @@ describe("IdentityCache", () => {
     expect(cache.size).toBe(0);
   });
 });
+
+describe("resolveName — no name matches the preferred use order", () => {
+  it("falls back to the first name carrying any content", () => {
+    // Every entry has an unexpected `use`, so neither LEGAL_ORDER nor
+    // DISPLAY_ORDER matches and the fallback scan is what produces a name.
+    // Without it a patient whose record only has, say, a "maiden" name would
+    // render as unnamed — which is the identity failure this package exists
+    // to prevent.
+    const patient = {
+      resourceType: "Patient" as const,
+      name: [{ use: "maiden" as const, family: "Okonkwo", given: ["Amara"] }],
+    };
+    const resolved = resolveName(patient, P);
+    expect(resolved.text).toContain("Okonkwo");
+  });
+
+  it("skips entries that are structurally present but empty", () => {
+    const patient = {
+      resourceType: "Patient" as const,
+      name: [
+        { use: "maiden" as const, family: "   ", given: ["  "] },
+        { use: "maiden" as const, family: "Okonkwo", given: ["Amara"] },
+      ],
+    };
+    const resolved = resolveName(patient, P);
+    expect(resolved.text).toContain("Okonkwo");
+  });
+
+  it("accepts an entry that only has free-text", () => {
+    const patient = {
+      resourceType: "Patient" as const,
+      name: [{ use: "maiden" as const, text: "Amara Okonkwo" }],
+    };
+    expect(resolveName(patient, P).text).toContain("Okonkwo");
+  });
+});

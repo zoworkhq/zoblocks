@@ -45,6 +45,8 @@ function rewriteImports(source: string, fromDepth: number): string {
       .replace(/(["'])@\/lib\/utils\1/g, `"${up}lib/utils"`)
       // The loader core.
       .replace(/(["'])@\/lib\/oxygen-loader\1/g, `"${up}lib/loader"`)
+      // The accordion core.
+      .replace(/(["'])@\/lib\/oxygen-accordion\1/g, `"${up}lib/accordion-core"`)
       // The switch core.
       .replace(/(["'])@\/lib\/oxygen-switch\1/g, `"${up}lib/switch"`)
       // A sibling component, by the path the CLI writes in a consumer's project.
@@ -88,6 +90,7 @@ export async function emitReactPackage(
   for (const [file, target, depth] of [
     ["lib/utils.ts", "lib/utils.ts", 1],
     ["lib/loader.tsx", "lib/loader.tsx", 1],
+    ["lib/accordion-core.tsx", "lib/accordion-core.tsx", 1],
     ["lib/switch.tsx", "lib/switch.tsx", 1],
   ] as const) {
     const source = await readFile(path.join(COMPONENTS_DIR, file), "utf8");
@@ -97,14 +100,35 @@ export async function emitReactPackage(
     );
   }
 
-  // The stylesheet is copied verbatim — no specifiers to rewrite, and one file
-  // means a fix cannot land in one channel and not the other.
-  const stylesheets = await Promise.all(
-    ["lib/loader.css", "lib/switch.css"].map((file) =>
-      readFile(path.join(COMPONENTS_DIR, file), "utf8"),
-    ),
+  // ---- stylesheets ----------------------------------------------------
+  //
+  // Copied verbatim — no specifiers to rewrite, and one file per concern means
+  // a fix cannot land in one channel and not the other.
+  //
+  // Both a per-concern file and a combined bundle are emitted. The bundle is
+  // the documented entry point and stays `@oxygenui-design/react/styles.css`;
+  // the individual files exist so an application that installs only loaders
+  // does not ship accordion CSS it never renders. Concatenated rather than
+  // `@import`-ed, because a bare `@import "./styles/…"` inside a published
+  // package resolves differently in every bundler, and the failure mode is a
+  // component that renders unstyled in the customer's build and not in ours.
+  const sheets: Array<[string, string]> = [];
+  for (const [file, target] of [
+    ["lib/loader.css", "styles/loader.css"],
+    ["lib/accordion.css", "styles/accordion.css"],
+    ["lib/switch.css", "styles/switch.css"],
+  ] as const) {
+    const css = await readFile(path.join(COMPONENTS_DIR, file), "utf8");
+    await emitter.emit(path.join(PACKAGE_SRC, target), css);
+    sheets.push([`registry/oxygen/${file}`, css]);
+  }
+
+  await emitter.emit(
+    path.join(PACKAGE_SRC, "styles.css"),
+    `${banner("/*")}\n\n${sheets
+      .map(([source, css]) => `/* ---- ${source} ---- */\n${css.trim()}`)
+      .join("\n\n")}\n`,
   );
-  await emitter.emit(path.join(PACKAGE_SRC, "styles.css"), stylesheets.join("\n"));
 
   // ---- components -----------------------------------------------------
   for (const component of components) {
@@ -131,6 +155,7 @@ export async function emitReactPackage(
 // Generated from the registry. Run \`pnpm gen\`.
 
 export * from "./lib/loader";
+export * from "./lib/accordion-core";
 export * from "./lib/switch";
 export { cn } from "./lib/utils";
 

@@ -1,0 +1,62 @@
+{
+  "name": "@oxygenui-design/tabs-testing",
+  "version": "0.1.0",
+  "description": "Assertions that read the accessibility tree of a tab strip. Catches the defects a snapshot test passes: a tablist of links, a strip with no tab stop, a dangling aria-controls.",
+  "license": "MIT",
+  "homepage": "https://oxygenui.design/components/tabs",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zoworkhq/oxygenui.git",
+    "directory": "packages/tabs-testing"
+  },
+  "keywords": [
+    "tabs",
+    "testing",
+    "accessibility",
+    "aria",
+    "wcag",
+    "testing-library",
+    "playwright"
+  ],
+  "type": "module",
+  "sideEffects": false,
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "src",
+    "!src/**/*.test.ts"
+  ],
+  "engines": {
+    "node": ">=20.11.0"
+  },
+  "publishConfig": {
+    "access": "public",
+    "main": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "exports": {
+      ".": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "./package.json": "./package.json"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage"
+  },
+  "devDependencies": {
+    "@oxygenui-design/tsconfig": "workspace:*",
+    "@vitest/coverage-v8": "^4.1.10",
+    "jsdom": "^30",
+    "typescript": "^5.7.2",
+    "vitest": "^4.1.10"
+  }
+}

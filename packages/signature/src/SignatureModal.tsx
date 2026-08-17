@@ -460,7 +460,6 @@ export function SignatureModal({
           />
         </label>
       </div>
-
       <Tabs
         // Without an id, antd emits no aria-controls or aria-labelledby and the
         // tab/panel relationship is invisible to assistive technology.

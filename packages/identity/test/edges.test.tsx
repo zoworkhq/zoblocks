@@ -264,6 +264,43 @@ describe("IdentitySet — churn and idempotence", () => {
     expect(onDisambiguate.mock.calls.length).toBe(before);
   });
 
+  it("removes a member when its chip unmounts", async () => {
+    // The deregister path. A ward list is not static — patients are discharged,
+    // filters change — and a set that kept ghosts would keep escalating a
+    // confusability that no longer exists on screen.
+    const onDisambiguate = vi.fn();
+    const { rerender } = F.renderWithPolicy(
+      <IdentitySet onDisambiguate={onDisambiguate}>
+        <PatientChip patient={F.amaraA} />
+        <PatientChip patient={F.amaraB} />
+      </IdentitySet>,
+    );
+    await waitFor(() => expect(onDisambiguate.mock.calls.at(-1)?.[0].escalated).toBe(2));
+
+    rerender(
+      <IdentitySet onDisambiguate={onDisambiguate}>
+        <PatientChip patient={F.amaraA} />
+      </IdentitySet>,
+    );
+
+    await waitFor(() => expect(onDisambiguate.mock.calls.at(-1)?.[0].total).toBe(1));
+    expect(onDisambiguate.mock.calls.at(-1)?.[0].escalated).toBe(0);
+  });
+
+  it("survives every member unmounting", async () => {
+    const onDisambiguate = vi.fn();
+    const { rerender } = F.renderWithPolicy(
+      <IdentitySet onDisambiguate={onDisambiguate}>
+        <PatientChip patient={F.amaraA} />
+        <PatientChip patient={F.amaraB} />
+      </IdentitySet>,
+    );
+    await waitFor(() => expect(onDisambiguate.mock.calls.at(-1)?.[0].total).toBe(2));
+
+    rerender(<IdentitySet onDisambiguate={onDisambiguate}>{null}</IdentitySet>);
+    await waitFor(() => expect(onDisambiguate.mock.calls.at(-1)?.[0].total).toBe(0));
+  });
+
   it("renders no notice outside a set", () => {
     const { container } = F.renderWithPolicy(<IdentitySetNotice />);
     expect(container.querySelector(".ox-identity-notice")).toBeNull();
