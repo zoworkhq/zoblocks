@@ -285,9 +285,20 @@ jobs:
       # serves them, so no extra step is needed here — and the build itself is
       # half the test, since Angular and Vue reject bad markup at compile time.
       # Its first run found the elements broken in React 19, Vue, and Angular.
+      #
+      # `OXYGEN_BASE_URL` is deliberately NOT set here.
+      #
+      # Setting it tells playwright.config.ts to skip starting the docs server,
+      # on the assumption that one is already running — which used to be true by
+      # accident: the accessibility step above started a server with `&` and
+      # never stopped it, and this step inherited it. Moving that step into a
+      # script that cleans up after itself broke the assumption, and every
+      # browser test failed with ERR_CONNECTION_REFUSED.
+      #
+      # Unset, Playwright starts and stops its own server, which is what makes
+      # this step self-contained rather than dependent on a leak two steps
+      # earlier.
       - name: Browser accessibility and cross-framework smoke
-        env:
-          OXYGEN_BASE_URL: http://localhost:6001
         run: pnpm e2e:ci
 
       # A retried-but-passed test leaves no signal anyone reads: the job is
