@@ -1,7 +1,6 @@
 ---
 "@oxygenui-design/tabs": minor
 "@oxygenui-design/tabs-core": minor
-"@oxygenui-design/eslint-plugin": minor
 ---
 
 New package: `@oxygenui-design/tabs`, a tab system built on the framework-free

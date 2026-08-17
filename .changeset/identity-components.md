@@ -3,7 +3,6 @@
 "@oxygenui-design/identity": minor
 "@oxygenui-design/fhir": minor
 "@oxygenui-design/tokens": minor
-"@oxygenui-design/eslint-plugin": minor
 ---
 
 Patient identity: avatar, chip and banner, with the engine underneath.
