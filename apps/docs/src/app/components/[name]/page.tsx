@@ -8,6 +8,7 @@ import { CATALOG, STATUS_LABEL, getComponent } from "@/lib/catalog";
 import { SiteFooter, SiteHeader } from "@/components/site/chrome";
 import { ComponentPreview } from "@/components/site/component-preview";
 import { TabsGallery } from "@/components/site/tabs-gallery";
+import { SwitchGallery } from "@/components/site/switch-gallery";
 import { InstallCommand, RevealRoot } from "@/components/site/interactions";
 import { SectionRail, type RailSection } from "@/components/site/section-rail";
 
@@ -206,6 +207,30 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
             clipped last label as if that were the design rather than the demo
             being too small to hold it.
           */}
+          {/*
+            Switch earns a gallery for the same reason Tabs does, and a
+            different one. Tabs has to show that eleven skins share one
+            accessibility tree; Switch has to show that three axes are
+            independent and that seven commit phases are seven different
+            recoveries — and a claim about a *set* cannot be made one card at a
+            time. The scenario switcher above shows one state; this shows them
+            beside each other, which is where the absence reasons stop looking
+            like four greys and the phases stop looking like one spinner.
+          */}
+          {component.name === "switch" && (
+            <div className="mx-auto max-w-[92rem] px-5 pb-[clamp(2.75rem,5vw,4.5rem)] sm:px-8">
+              <div data-reveal>
+                <SectionHeading
+                  eyebrow="Gallery"
+                  title="Every state, phase and surface — live, on the page."
+                />
+                <div className="mt-8">
+                  <SwitchGallery />
+                </div>
+              </div>
+            </div>
+          )}
+
           {component.name === "tabs" && (
             <div className="mx-auto max-w-[92rem] px-5 pb-[clamp(2.75rem,5vw,4.5rem)] sm:px-8">
               <div data-reveal>
