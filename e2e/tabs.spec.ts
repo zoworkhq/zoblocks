@@ -68,6 +68,38 @@ async function clickClear(target: Locator) {
 async function chooseChapter(page: Page, label: string) {
   await clickClear(page.locator(".ox-gallery__chapters").getByRole("radio", { name: label }));
   await page.waitForTimeout(250);
+
+  /*
+   * Wait for the strips to have measured themselves.
+   *
+   * A tab list sets `data-ox-measured` once the indicator geometry is known;
+   * before that the fit is still being decided and the whole strip is moving.
+   * Interacting during that window is what produced clicks landing on the
+   * wrong element on CI — a fixed timeout is a guess at how long a slower,
+   * more contended runner needs, and it was the wrong guess.
+   */
+  const strips = page.locator(".ox-gallery [data-ox-list]");
+  const count = await strips.count();
+  for (let i = 0; i < count; i++) {
+    await strips.nth(i).evaluate((element) => {
+      if (element.hasAttribute("hidden")) return;
+      return new Promise<void>((resolve) => {
+        if (element.hasAttribute("data-ox-measured")) return resolve();
+        const observer = new MutationObserver(() => {
+          if (element.hasAttribute("data-ox-measured")) {
+            observer.disconnect();
+            resolve();
+          }
+        });
+        observer.observe(element, { attributes: true, attributeFilter: ["data-ox-measured"] });
+        // A strip with no indicator never sets it, and that is not a failure.
+        setTimeout(() => {
+          observer.disconnect();
+          resolve();
+        }, 2000);
+      });
+    });
+  }
 }
 
 async function setControl(page: Page, group: string, value: string) {
@@ -177,16 +209,44 @@ test.describe("overflow @a11y", () => {
     await openGallery(page);
     await chooseChapter(page, "Overflow");
     const demo = page.locator("#o2");
-    // `visible`, not `count`: whether anything overflows depends on the width
-    // the fonts happen to produce, so a run where nothing is hidden is a real
-    // outcome rather than a failure — but a button that exists and cannot be
-    // clicked is not.
+
+    /*
+     * Opened from the keyboard rather than with a pointer, and not only
+     * because this is an @a11y test.
+     *
+     * A click is hit-tested: Playwright scrolls, waits for the box to hold
+     * still, then checks what is actually on top at that point. In a
+     * priority-plus strip the box moves while the fit is being decided, and on
+     * CI's Linux font metrics it kept moving long enough for the click to land
+     * on a neighbouring tab label instead — twice, in two engines, having
+     * never once done so on macOS.
+     *
+     * Focus and Enter answer the question the test is asking without depending
+     * on where anything currently sits, and they exercise the path that
+     * matters more for a menu button: the one a keyboard user takes.
+     */
     const more = demo.getByRole("button", { name: /More/ }).first();
+
+    // `isVisible`, not `count`: whether anything overflows at all depends on
+    // the width the fonts produce, so a run with nothing hidden is a real
+    // outcome rather than a failure.
     if (await more.isVisible()) {
-      await clickClear(more);
+      await expect(more).toHaveAttribute("aria-haspopup", "menu");
+      await expect(more).toHaveAttribute("aria-expanded", "false");
+
+      await more.focus();
+      await page.keyboard.press("Enter");
+
       await expect(page.getByRole("menu")).toBeVisible();
+      await expect(more).toHaveAttribute("aria-expanded", "true");
+
       await page.keyboard.press("Escape");
+      await expect(page.getByRole("menu")).toBeHidden();
+      // Focus comes back to the trigger, or the keyboard user is stranded
+      // wherever the menu used to be.
+      await expect(more).toBeFocused();
     }
+
     // Whatever the fit decided, the selected tab is never the one hidden.
     await expect(demo.locator('[role="tab"][aria-selected="true"]')).toBeVisible();
   });
