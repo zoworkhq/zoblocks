@@ -41,6 +41,15 @@ import {
 } from "@oxygenui-design/consult-core";
 import { InstrumentGlow } from "@/components/site/interactions";
 import { SignatureDemo } from "@/components/site/signature-demo";
+import {
+  IdentityAbsenceDemo,
+  IdentityBannerDemo,
+  IdentityDisclosureDemo,
+  IdentityGuardDemo,
+  IdentityStatesDemo,
+  IdentityVerifyDemo,
+  IdentityWorklistDemo,
+} from "@/components/site/identity-demo";
 import { cn } from "@/lib/utils";
 
 type Density = "patient" | "standard" | "clinical";
@@ -464,6 +473,79 @@ function completeNote() {
 }
 
 const SCENARIOS: Record<string, Scenario[]> = {
+  identity: [
+    {
+      id: "banner",
+      label: "The banner",
+      note: 'The last surface a clinician reads before they act. Two identifiers because `context="action"` requires them at the type level; `08 Mar 1985` because `08/03/1985` is 3 August in Delhi and 8 March in Denver; SPCU rather than a bare “F”, because administrative gender is not a dosing fact and `Patient.gender` is not a renderable field at all.',
+      render: () => (
+        <InstrumentStage>
+          <IdentityBannerDemo />
+        </InstrumentStage>
+      ),
+    },
+    {
+      id: "worklist",
+      label: "Two patients, one name",
+      note: "The pass no other component library ships. It reads what is actually on screen and adds the minimum that separates each collided row — full given name, then date of birth, then identifier — stopping at the first rung that works. Toggle it off to see what a ward list looks like without it.",
+      render: () => (
+        <InstrumentStage>
+          <IdentityWorklistDemo />
+        </InstrumentStage>
+      ),
+    },
+    {
+      id: "states",
+      label: "Four states, not one pill",
+      note: "Deceased, inactive, merged and test come from four unrelated places in FHIR and mean four unrelated things. Collapsing them into one grey “Inactive” is how an automated appointment reminder reaches a bereaved family. The last row carries an NHS number that fails its check digit — a matching failure that has already happened, shown rather than hidden.",
+      render: () => (
+        <InstrumentStage>
+          <IdentityStatesDemo />
+        </InstrumentStage>
+      ),
+    },
+    {
+      id: "disclosure",
+      label: "Who is looking",
+      note: "One resource, four audiences. Sensitivity categories stay behind an audited reveal below full disclosure — and they are withheld from the accessible name too, because naming them there would hand a screen-reader user the thing the reveal exists to record.",
+      render: () => (
+        <InstrumentStage>
+          <IdentityDisclosureDemo />
+        </InstrumentStage>
+      ),
+    },
+    {
+      id: "guard",
+      label: "Wrong patient",
+      note: "The coupling that makes a banner a control rather than a heading. The form knows which patient it was opened for, the banner knows which chart is displayed, and the component refuses to let those disagree — silently or otherwise. Switch the chart and watch the order form withdraw.",
+      render: () => (
+        <InstrumentStage>
+          <IdentityGuardDemo />
+        </InstrumentStage>
+      ),
+    },
+    {
+      id: "verify",
+      label: "Confirm before ordering",
+      note: "Adelman et al., 901,776 ordering sessions: a dismissible alert cut wrong-patient orders with an odds ratio of 0.84, and making the clinician re-enter the initials cut them with an odds ratio of 0.60. Everyone builds the first. Type AO.",
+      render: () => (
+        <InstrumentStage>
+          <IdentityVerifyDemo />
+        </InstrumentStage>
+      ),
+    },
+    {
+      id: "absence",
+      label: "Five kinds of missing",
+      note: "Every design system collapses these into “show initials”. A photograph in the banner is associated with measurably fewer wrong-patient orders, so a silently missing one is a silently degraded safety control — and “no photo on record” and “we could not load the photo we have” are different facts.",
+      render: () => (
+        <InstrumentStage>
+          <IdentityAbsenceDemo />
+        </InstrumentStage>
+      ),
+    },
+  ],
+
   consult: [
     {
       id: "rest",

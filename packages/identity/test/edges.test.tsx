@@ -375,6 +375,70 @@ describe("the last reachable branches", () => {
   });
 });
 
+describe("disclosure reduces the fields, not only the identifiers", () => {
+  it("shows only a short name at waiting-room level", () => {
+    // The level exists so a named person can recognise themselves being called.
+    // Anything past that is readable by whoever else is in the room.
+    const { container } = F.renderWithPolicy(
+      <PatientBanner patient={F.amaraA} context="navigation" />,
+      { disclosure: "public" },
+    );
+    expect(screen.getByText("A. Okonkwo")).toBeInTheDocument();
+    expect(container.textContent).not.toContain("Amara Chinelo Okonkwo");
+  });
+
+  it("withholds the date of birth, the age and the clinical sex in public", () => {
+    const { container } = F.renderWithPolicy(
+      <PatientBanner patient={F.withSpcu} context="navigation" />,
+      { disclosure: "public" },
+    );
+    expect(container.textContent).not.toContain("08 Mar 1985");
+    expect(container.textContent).not.toContain("female-typical");
+    expect(container.querySelector('[data-ox-field="dob"]')).toBeNull();
+    expect(container.querySelector('[data-ox-field="identifier"]')).toBeNull();
+  });
+
+  it("withholds them from the accessible name too", () => {
+    // Reducing the pixels and leaving the label intact would hand a
+    // screen-reader user exactly what the level was built to withhold.
+    F.renderWithPolicy(<PatientBanner patient={F.amaraA} context="navigation" />, {
+      disclosure: "public",
+    });
+    const label = screen.getByRole("region").getAttribute("aria-label") ?? "";
+    expect(label).toContain("A. Okonkwo");
+    expect(label).not.toContain("Amara Chinelo");
+    expect(label).not.toContain("8 March 1985");
+    expect(label).not.toContain("M R N");
+  });
+
+  it("gives reception the date of birth and a masked identifier, but not the clinical sex", () => {
+    const { container } = F.renderWithPolicy(
+      <PatientBanner patient={F.withSpcu} context="navigation" />,
+      { disclosure: "reception" },
+    );
+    expect(container.textContent).toContain("08 Mar 1985");
+    expect(container.textContent).not.toContain("female-typical");
+    expect(container.textContent).not.toContain("41 y");
+  });
+
+  it("gives a clinician everything", () => {
+    const { container } = F.renderWithPolicy(
+      <PatientBanner patient={F.withSpcu} context="navigation" />,
+      { disclosure: "clinical" },
+    );
+    expect(container.textContent).toContain("female-typical");
+    expect(container.textContent).toContain("08 Mar 1985");
+  });
+
+  it("keeps a mononym whole even in the short form", () => {
+    const p = F.patient({ id: "mono", name: [{ use: "official", given: ["Suryanto"] }] });
+    F.renderWithPolicy(<PatientBanner patient={p} context="navigation" />, {
+      disclosure: "public",
+    });
+    expect(screen.getByText("Suryanto")).toBeInTheDocument();
+  });
+});
+
 describe("exhaustiveness", () => {
   it("describes every state the engine can produce", () => {
     const states: IdentityState[] = [

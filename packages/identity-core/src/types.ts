@@ -266,3 +266,30 @@ export interface IdentityPolicy {
   /** Bumped whenever the policy changes; part of the resolution cache key. */
   version: string;
 }
+
+// ---------------------------------------------------------------------------
+// Disclosure
+// ---------------------------------------------------------------------------
+
+/**
+ * What a disclosure level permits, beyond identifier masking.
+ *
+ * `disclosure` originally reached only `resolveIdentifiers`, so a waiting-room
+ * screen masked the medical record number and then printed the patient's full
+ * name, date of birth and sex parameter for clinical use beside it — the exact
+ * disclosure the level exists to prevent, with the one field nobody reads from
+ * across a room removed and the ones they do read left in place.
+ *
+ * Both the renderer and `identityLabel` consult this, so the pixels and the
+ * accessible name cannot disagree about what is being withheld.
+ */
+export interface DisclosureAllowance {
+  /** `short` is an initial and a family name — enough to recognise yourself. */
+  name: "full" | "short";
+  birthDate: boolean;
+  age: boolean;
+  /** Sex parameter for clinical use, and the other coded sex fields. */
+  clinicalSex: boolean;
+  pronouns: boolean;
+  identifiers: boolean;
+}

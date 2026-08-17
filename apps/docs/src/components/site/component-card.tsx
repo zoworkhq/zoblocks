@@ -44,6 +44,7 @@ import { Tabs } from "@oxygenui-design/tabs";
 import { Consult } from "@/registry/oxygen/consult/consult";
 import { createStaticProvider, lookUp, minimalDisclosure } from "@oxygenui-design/consult-core";
 import { SignatureMark } from "@/components/site/signature-mark";
+import { IdentityProvider, PatientChip, IdentitySet } from "@oxygenui-design/identity";
 import { STATUS_LABEL, type ComponentDoc } from "@/lib/catalog";
 import { cn } from "@/lib/utils";
 
@@ -188,6 +189,14 @@ const PREVIEW: Record<string, (featured: boolean) => React.ReactNode> = {
   "safety-plan": (featured) => <SafetyPlanArt featured={featured} />,
 
   /*
+   * Two rows rather than seven, and the two that carry the argument: the same
+   * surname, escalated to the point where a reader can tell them apart. A
+   * single banner would be a prettier thumbnail and would show the half of this
+   * component every other library also has.
+   */
+  identity: (featured) => <IdentityArt featured={featured} />,
+
+  /*
    * The dock at rest, inline rather than floating: `anchor="bottom-center"` is
    * fixed to the viewport, which inside a card would park the copilot over the
    * page instead of in the cell. The provider is scripted and never asked for
@@ -199,6 +208,49 @@ const PREVIEW: Record<string, (featured: boolean) => React.ReactNode> = {
     </div>
   ),
 };
+
+/**
+ * A fixed clock.
+ *
+ * Age is derived, and a card that read the wall clock would change on a
+ * birthday and drift a visual-regression baseline with it.
+ */
+const IDENTITY_NOW = new Date("2026-08-16T09:00:00Z");
+
+const IDENTITY_MRN = "urn:oid:2.16.840.1.113883.4.1";
+
+const IDENTITY_ROWS = [
+  {
+    resourceType: "Patient" as const,
+    id: "card-1",
+    name: [{ use: "official" as const, given: ["Amara", "Chinelo"], family: "Okonkwo" }],
+    birthDate: "1985-03-08",
+    identifier: [{ system: IDENTITY_MRN, value: "123456789" }],
+  },
+  {
+    resourceType: "Patient" as const,
+    id: "card-2",
+    name: [{ use: "official" as const, given: ["Amara", "Nkechi"], family: "Okonkwo" }],
+    birthDate: "1991-09-22",
+    identifier: [{ system: IDENTITY_MRN, value: "998220106" }],
+  },
+];
+
+function IdentityArt({ featured }: { featured: boolean }) {
+  return (
+    <ScaledArt scale={featured ? 0.95 : 0.86}>
+      <IdentityProvider now={IDENTITY_NOW} disclosure="clinical" photos="deny">
+        <IdentitySet>
+          <div className="flex w-full max-w-[280px] flex-col gap-2">
+            {IDENTITY_ROWS.map((patient) => (
+              <PatientChip key={patient.id} patient={patient} />
+            ))}
+          </div>
+        </IdentitySet>
+      </IdentityProvider>
+    </ScaledArt>
+  );
+}
 
 const CARD_CONSULT_PROVIDER = createStaticProvider({
   events: [{ type: "done", finish: "stop" }],

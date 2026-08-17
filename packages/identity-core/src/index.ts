@@ -24,6 +24,7 @@
 export type {
   Age,
   CodedValue,
+  DisclosureAllowance,
   DisclosureLevel,
   Identity,
   IdentifierSystemSpec,
@@ -88,6 +89,7 @@ export {
   EXT_SPCU,
   IdentityCache,
   identityKey,
+  disclosureAllows,
   policy,
   resolveIdentity,
   resolveName,
@@ -95,6 +97,7 @@ export {
   resolvePronouns,
   resolveSensitivity,
   resolveStates,
+  shortName,
   type ResolveOptions,
 } from "./resolve.js";
 
