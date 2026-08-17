@@ -78,6 +78,10 @@ if [ "$FAST" -eq 0 ]; then
   # out here was the second thing that reached a red PR.
   step "coverage"           "raise coverage, or justify"  pnpm test:coverage
   step "build"              "fix the build"               pnpm build
+  # After build, because it measures dist. CI has always run this and this
+  # script never did, so a blown budget could only be discovered from a red
+  # pipeline — which is exactly how the last one was found.
+  step "bundle budgets"     "trim it, or raise the budget"  pnpm size
 fi
 
 if [ ${#FAILED[@]} -eq 0 ]; then
