@@ -560,7 +560,14 @@ describe("the sources panel", () => {
     fireEvent.click(await screen.findByRole("button", { name: "Show sources" }, { timeout: 4000 }));
     const panel = await screen.findByRole("region", { name: "Basis of this answer" });
 
-    const link = within(panel).getByRole("link", { name: /NICE NG196/ });
+    /*
+     * `findByRole`, not `getByRole`. The region and its list are two renders:
+     * the drawer opens on click, and the resolved sources land with the next
+     * commit. A synchronous get here is a coin-flip that mostly lands heads —
+     * which is worse than a test that fails every time, because it fails in
+     * someone else's unrelated PR.
+     */
+    const link = await within(panel).findByRole("link", { name: /NICE NG196/ });
     expect(link.getAttribute("href")).toBe("https://www.nice.org.uk/guidance/ng196");
     expect(within(panel).queryByText(/version/)).not.toBeInTheDocument();
   });

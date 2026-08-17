@@ -219,12 +219,12 @@ describe("PatientChip — the remaining paths", () => {
 
   it("keeps the caller className", () => {
     const { container } = F.renderWithPolicy(<PatientChip patient={F.amaraA} className="mine" />);
-    expect(container.querySelector(".ox-chip.mine")).toBeInTheDocument();
+    expect(container.querySelector(".ox-patient-chip.mine")).toBeInTheDocument();
   });
 
   it("keeps the caller className on the loading skeleton too", () => {
     const { container } = F.renderWithPolicy(<PatientChip className="mine" />);
-    expect(container.querySelector(".ox-chip--loading.mine")).toBeInTheDocument();
+    expect(container.querySelector(".ox-patient-chip--loading.mine")).toBeInTheDocument();
   });
 
   it("renders a mononym without an initial-and-dot", () => {

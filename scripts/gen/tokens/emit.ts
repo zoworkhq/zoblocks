@@ -164,9 +164,40 @@ function buildCss(source: TokenSource): string {
 
   // -- density profiles ----------------------------------------------------
   out.push("/* Density profiles. Nestable — innermost wins. */");
+
+  /**
+   * Component tokens that track density have to be re-declared per profile.
+   *
+   * `var()` inside a custom-property *declaration* is substituted using the
+   * referenced value as computed on the element the declaration applies to. So
+   * `--ox-switch-target-min: var(--ox-density-target)` written once on `:root`
+   * captures the root profile's 2.75rem and inherits that literal everywhere —
+   * and `data-ox-density="clinical"` on a container changes
+   * `--ox-density-target` beneath it while the component token stays frozen at
+   * whatever the root said.
+   *
+   * That is not a cosmetic drift. `--ox-switch-target-min` is the hit area, and
+   * the accessibility note for that component claims it follows the density
+   * profile. It did not: every switch on every page presented the root
+   * profile's target no matter what scope it sat in.
+   *
+   * Re-emitting them inside each profile makes the reference resolve against
+   * that profile. The override surface is unchanged — these carry the same
+   * specificity as the profile block a host would write, and an inline style
+   * or a more specific selector still wins.
+   */
+  const densityLinked = [...source.component].filter(([, token]) =>
+    /\{density\./.test(token.value),
+  );
+
   for (const profile of DENSITIES) {
     out.push(`[data-ox-density="${profile}"] {`);
     out.push(...declarations(source.density[profile], (key) => `--ox-density-${key}`));
+    if (densityLinked.length) {
+      out.push("");
+      out.push("  /* Component tokens that track density — see the note above. */");
+      out.push(...declarations(new Map(densityLinked)));
+    }
     out.push("}");
     out.push("");
   }

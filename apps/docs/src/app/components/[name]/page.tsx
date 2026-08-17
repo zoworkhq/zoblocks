@@ -9,6 +9,7 @@ import { SiteFooter, SiteHeader } from "@/components/site/chrome";
 import { ComponentPreview } from "@/components/site/component-preview";
 import { TabsGallery } from "@/components/site/tabs-gallery";
 import { CopilotGallery } from "@/components/site/copilot-gallery";
+import { SwitchGallery } from "@/components/site/switch-gallery";
 import { InstallCommand, RevealRoot } from "@/components/site/interactions";
 import { SectionRail, type RailSection } from "@/components/site/section-rail";
 
@@ -176,10 +177,38 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
 
         {/* Preview ------------------------------------------------------ */}
         <section id="preview" className="scroll-mt-24 border-b border-rule bg-paper-sunk/40">
-          <div className="mx-auto max-w-6xl section-minor px-5 sm:px-8">
-            <SectionHeading eyebrow="Preview" title="Every state, switchable." />
+          {/*
+            Switch takes the whole width and shows everything at once rather
+            than one card behind a switcher.
+
+            The scenario switcher is the right shape for a component whose
+            states are alternatives — a loader is spinning or it is not. It is
+            the wrong shape for one whose argument is that three axes are
+            independent and seven commit phases are seven different recoveries:
+            those are a *set*, and a set shown one card at a time reads as a
+            list of unrelated screenshots. The absence reasons in particular
+            only make their point side by side, where the word changes and the
+            colour does not.
+          */}
+          <div
+            className={`mx-auto section-minor px-5 sm:px-8 ${
+              component.name === "switch" ? "max-w-[92rem]" : "max-w-6xl"
+            }`}
+          >
+            <SectionHeading
+              eyebrow="Preview"
+              title={
+                component.name === "switch"
+                  ? "Every state, phase and surface — live, on the page."
+                  : "Every state, switchable."
+              }
+            />
             <div className="mt-8" data-reveal>
-              <ComponentPreview name={component.name} />
+              {component.name === "switch" ? (
+                <SwitchGallery />
+              ) : (
+                <ComponentPreview name={component.name} />
+              )}
             </div>
 
             <div className="mt-6 flex flex-wrap gap-2" data-reveal>
@@ -207,6 +236,18 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
             clipped last label as if that were the design rather than the demo
             being too small to hold it.
           */}
+
+          {component.name === "tabs" && (
+            <div className="mx-auto max-w-[92rem] px-5 pb-[clamp(2.75rem,5vw,4.5rem)] sm:px-8">
+              <div data-reveal>
+                <SectionHeading eyebrow="Gallery" title="Every variant, mode and state — live." />
+                <div className="mt-8">
+                  <TabsGallery />
+                </div>
+              </div>
+            </div>
+          )}
+
           {/*
             Copilot earns one for the opposite reason to Tabs. Tabs needs a
             gallery because one strip cannot show that eleven skins share a
@@ -225,17 +266,6 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
                 />
                 <div className="mt-8">
                   <CopilotGallery />
-                </div>
-              </div>
-            </div>
-          )}
-
-          {component.name === "tabs" && (
-            <div className="mx-auto max-w-[92rem] px-5 pb-[clamp(2.75rem,5vw,4.5rem)] sm:px-8">
-              <div data-reveal>
-                <SectionHeading eyebrow="Gallery" title="Every variant, mode and state — live." />
-                <div className="mt-8">
-                  <TabsGallery />
                 </div>
               </div>
             </div>

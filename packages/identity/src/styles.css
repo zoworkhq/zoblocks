@@ -13,7 +13,7 @@
  *      window in which two states are simultaneously legible.
  */
 
-:where(.ox-banner, .ox-chip, .ox-avatar, .ox-verify, .ox-guard) {
+:where(.ox-banner, .ox-patient-chip, .ox-avatar, .ox-verify, .ox-guard) {
   /*
    * Three tiers, one reference rule.
    *
@@ -256,29 +256,71 @@
 /* PatientChip                                                            */
 /* --------------------------------------------------------------------- */
 
-.ox-chip {
+/*
+ * The box metrics are identical escalated and not. Escalation changes colour
+ * and reveals a rail; it never changes padding, border or size. The earlier
+ * version added `padding-inline` on escalation only, so running the pass
+ * nudged every collided row sideways — motion that says "something moved"
+ * on a component whose entire job is to say "look again at who this is".
+ *
+ * `padding-block` is sized to clear the avatar. Without it the avatar is the
+ * tallest thing in a box that only fits the text, and it hangs visibly outside
+ * the tint on exactly the rows the tint is trying to draw attention to.
+ */
+.ox-patient-chip {
+  --ox-patient-chip-rail: transparent;
+  position: relative;
   display: inline-flex;
   align-items: center;
   gap: 8px;
   max-inline-size: 100%;
+  padding-block: 4px;
+  padding-inline: 6px;
+  border-radius: var(--ox-identity-radius);
+  background: transparent;
   font-variant-numeric: tabular-nums;
+  transition:
+    background-color var(--ox-identity-dur-escalate) var(--ox-identity-ease),
+    box-shadow var(--ox-identity-dur-escalate) var(--ox-identity-ease);
 }
-.ox-chip__text {
+
+/*
+ * The rail is drawn as an inset box-shadow rather than a border or a
+ * pseudo-element, so it costs no layout: an escalated row and a calm row
+ * occupy the same rectangle to the pixel.
+ */
+.ox-patient-chip {
+  box-shadow: inset 2px 0 0 0 var(--ox-patient-chip-rail);
+}
+
+/* Full-width rows, for worklists. Inline chips hug their content, which is
+   right in a sentence and wrong in a column — a stack of content-width pills
+   is a staircase, and a reader scanning for a name has no left edge to follow. */
+.ox-patient-chip--block {
+  display: flex;
+  inline-size: 100%;
+}
+
+.ox-patient-chip__text {
   min-inline-size: 0;
 }
-.ox-chip__name {
+.ox-patient-chip__name {
   font-weight: 600;
   color: var(--ox-identity-fg);
 }
-.ox-chip__detail {
+.ox-patient-chip__detail {
   display: block;
   font-size: 12px;
   line-height: 1.35;
   color: var(--ox-identity-fg-subtle);
   /* Entering information animates; leaving does not. A graceful exit means the
      value is still readable while it leaves, and readable-but-stale is the
-     problem this component exists to prevent. */
-  animation: ox-enter var(--ox-identity-dur-escalate) var(--ox-identity-ease);
+     problem this component exists to prevent.
+     `--ox-row` is the row's index when a caller sets it, which staggers a
+     worklist so the eye follows the pass down the list instead of being
+     handed the whole result at once. Unset, it is 0 and nothing staggers. */
+  animation: ox-enter var(--ox-identity-dur-escalate) var(--ox-identity-ease) backwards;
+  animation-delay: calc(var(--ox-row, 0) * 40ms);
 }
 @keyframes ox-enter {
   from {
@@ -290,12 +332,12 @@
     transform: none;
   }
 }
-.ox-chip--escalated {
+.ox-patient-chip--escalated {
+  --ox-patient-chip-rail: var(--ox-identity-warn, #faad14);
   background: var(--ox-identity-warn-bg, #fffbe6);
-  border-radius: var(--ox-identity-radius);
-  padding-inline: 4px;
+  transition-delay: calc(var(--ox-row, 0) * 40ms);
 }
-.ox-chip__skeleton {
+.ox-patient-chip__skeleton {
   display: inline-block;
   inline-size: 110px;
   block-size: 14px;
@@ -701,7 +743,7 @@
 @media (prefers-reduced-motion: reduce) {
   /* Removed, not shortened. A fade at any duration is a window in which two
      states are simultaneously legible. */
-  :where(.ox-banner, .ox-chip, .ox-avatar, .ox-verify, .ox-guard) {
+  :where(.ox-banner, .ox-patient-chip, .ox-avatar, .ox-verify, .ox-guard) {
     --ox-dur-swap: 0ms;
     --ox-dur-reveal: 0ms;
     --ox-dur-escalate: 0ms;
@@ -709,7 +751,7 @@
   .ox-avatar--loading::after {
     animation: none;
   }
-  .ox-chip__detail {
+  .ox-patient-chip__detail {
     animation: none;
   }
 }
