@@ -15,7 +15,7 @@ trigger and an icon beside a label are the same size on the same strip. A caller
 who sets width and height on their own SVG still wins.
 
 **An unrecognised `as` is reported rather than crashed on.** Validation tested
-only for a *missing* mode. A value outside the four — `"tablist"` is the one
+only for a _missing_ mode. A value outside the four — `"tablist"` is the one
 everybody tries, since that is the ARIA role — passed the guard, resolved to no
 role spec, and threw `Cannot read properties of undefined (reading 'ownsPanels')`
 from inside the validator. The one function whose job is to explain a
