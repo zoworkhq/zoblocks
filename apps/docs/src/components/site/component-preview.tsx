@@ -133,6 +133,117 @@ function LiveSwitch({
 }
 
 /**
+ * A switch whose "on" has an end.
+ *
+ * `now` is a prop, never the wall clock — the component renders the window
+ * from what the caller supplies, so the output depends only on props and can
+ * be visually regression tested. The demo advances `now` itself, which is what
+ * a server pushing a fresher timestamp would do.
+ *
+ * The point to watch is what happens at the end: the switch does not turn
+ * itself off. It reports that the window lapsed and waits, because a client
+ * clock deciding to lift a clinical flag is a defect, not a feature.
+ */
+function TimeBoxedSwitch() {
+  const START = "2026-08-16T13:00:00.000Z";
+  const UNTIL = "2026-08-16T13:00:12.000Z";
+  const [now, setNow] = React.useState(START);
+  const [on, setOn] = React.useState(false);
+
+  React.useEffect(() => {
+    if (!on) return;
+    const id = setInterval(
+      () => setNow((current) => new Date(Date.parse(current) + 2000).toISOString()),
+      1000,
+    );
+    return () => clearInterval(id);
+  }, [on]);
+
+  return (
+    <div className="flex w-full max-w-md flex-col gap-4">
+      <Switch
+        label="Nil by mouth"
+        description="Set for theatre. Shows on the bed board, the diet list and the handover."
+        stateLabels="in-effect"
+        tone="caution"
+        size="large"
+        checked={on}
+        now={now}
+        until={UNTIL}
+        untilWarnMs={6000}
+        onCommit={(next) => {
+          setOn(next);
+          if (next) setNow(START);
+        }}
+        onExpire={() => {}}
+      />
+      <p className="text-xs text-graphite">
+        Turn it on and watch the window close. Nothing writes at the end — the application is told,
+        and a human decides.
+      </p>
+    </div>
+  );
+}
+
+/**
+ * The two states a shared record produces and a single-user demo never shows:
+ * a change that was never sent, and a change somebody else got in first with.
+ */
+function SharedRecordSwitches() {
+  const [online, setOnline] = React.useState(false);
+  const [offlineValue, setOfflineValue] = React.useState(false);
+  const [mine, setMine] = React.useState(true);
+  const [theirs, setTheirs] = React.useState<boolean | undefined>(undefined);
+
+  return (
+    <div className="flex w-full max-w-lg flex-col gap-8">
+      <div className="flex flex-col gap-3">
+        <button
+          type="button"
+          onClick={() => setOnline((v) => !v)}
+          className="self-start rounded-full border border-rule px-3 py-1 text-xs font-medium"
+        >
+          {online ? "Connected — tap to go offline" : "Offline — tap to reconnect"}
+        </button>
+        <Switch
+          label="Falls risk"
+          description="Adds the bed sensor to the round list."
+          stateLabels="in-effect"
+          size="large"
+          checked={offlineValue}
+          online={online}
+          onCommit={(next) => setOfflineValue(next)}
+        />
+      </div>
+
+      <div className="flex flex-col gap-3">
+        <button
+          type="button"
+          onClick={() => setTheirs(theirs === undefined ? !mine : undefined)}
+          className="self-start rounded-full border border-rule px-3 py-1 text-xs font-medium"
+        >
+          {theirs === undefined ? "Simulate: S. Mehta changes it too" : "Clear the conflict"}
+        </button>
+        <Switch
+          label="Contact precautions"
+          description="Gown and gloves on entry."
+          stateLabels="in-effect"
+          tone="caution"
+          size="large"
+          checked={mine}
+          serverValue={theirs}
+          onCommit={(next) => setMine(next)}
+          onResolveConflict={(keep) => {
+            if (keep === "theirs" && theirs !== undefined) setMine(theirs);
+            setTheirs(undefined);
+          }}
+        />
+      </div>
+    </div>
+  );
+}
+
+/**
  * Room around a composite demo, and deliberately no theme scope.
  *
  * `.instrument-demo` follows the page theme — globals.css states the rule
@@ -917,6 +1028,205 @@ const SCENARIOS: Record<string, Scenario[]> = {
               checked
             />
             <Switch label="Show archived encounters" tone="neutral" checked />
+          </div>
+        </Centered>
+      ),
+    },
+    {
+      id: "confirm",
+      label: "Friction matched to consequence",
+      note: "Three levels, chosen by what the toggle costs if nobody meant it. Hold is a timed input, so SC 2.2.1 applies — activate any of these from the keyboard and the dialog opens instead, because holding must never be the only path.",
+      render: () => (
+        <Centered>
+          <div className="flex w-full max-w-md flex-col gap-7">
+            <LiveSwitch
+              label="Suspend fall-risk alarm"
+              description="Hold the control, or press Enter for the dialog."
+              stateLabels="in-effect"
+              tone="critical"
+              size="large"
+              confirm="hold"
+            />
+            <LiveSwitch
+              label="Discharge to home"
+              description="Names the patient and the consequence — never “Are you sure?”."
+              stateLabels="active-inactive"
+              size="large"
+              confirm="dialog"
+              confirmCopy={{
+                subject: "Ada Lovelace",
+                consequence: "Closes the encounter and releases the bed. This cannot be undone.",
+              }}
+            />
+            <LiveSwitch
+              label="Bypass allergy check for this order"
+              description="The typed reason is the deliverable, not the friction."
+              stateLabels="allowed-blocked"
+              tone="critical"
+              size="large"
+              confirm="attest"
+            />
+            <LiveSwitch
+              label="Release restraint order"
+              description="A second qualified person, who cannot be the requester."
+              stateLabels="active-inactive"
+              tone="critical"
+              size="large"
+              confirm="countersign"
+              countersign={{
+                role: "registered-nurse",
+                notSameAs: "s.mehta",
+                requestedBy: "S. Mehta, RN",
+                verify: () =>
+                  new Promise<string>((resolve) => setTimeout(() => resolve("j.adeyemi"), 600)),
+              }}
+            />
+          </div>
+        </Centered>
+      ),
+    },
+    {
+      id: "until",
+      label: "An on that is not forever",
+      note: "Almost no clinical on-state is permanent. A switch with no expiry is how a patient stays nil-by-mouth for three days because the person who set it went home.",
+      render: () => (
+        <Centered>
+          <TimeBoxedSwitch />
+        </Centered>
+      ),
+    },
+    {
+      id: "shared",
+      label: "Offline, and overtaken",
+      note: "The two states a shared record produces that a single-user demo never shows. Queued is not pending: nothing has been sent, and you may still change your mind. A conflict offers both readings and pre-selects neither, because each clinician had a reason.",
+      render: () => (
+        <Centered>
+          <SharedRecordSwitches />
+        </Centered>
+      ),
+    },
+    {
+      id: "availability",
+      label: "Locked, and why",
+      note: "“Disabled” is the most over-used attribute in healthcare UI and almost always the wrong one — it takes the control out of the tab order, so a screen-reader user never learns it exists. Read-only keeps it reachable and says what is holding it.",
+      render: () => (
+        <Centered>
+          <div className="flex w-full max-w-md flex-col gap-6">
+            <Switch
+              label="Contact precautions"
+              stateLabels="in-effect"
+              checked
+              readOnly
+              lockedReason="Encounter signed 14:32 by Dr Okafor."
+            />
+            <Switch
+              label="Change diet order"
+              stateLabels="allowed-blocked"
+              checked={false}
+              readOnly
+              lockedReason="Your role cannot change this."
+            />
+            <Switch
+              label="Airborne precautions"
+              stateLabels="in-effect"
+              checked={false}
+              readOnly
+              lockedReason="Requires a negative-pressure room, and none is free on this unit."
+            />
+            <Switch
+              label="Notify by SMS"
+              stateLabels="enabled-disabled"
+              checked
+              disabled
+              description="Genuinely disabled: transient, and caused by something the user just did."
+            />
+          </div>
+        </Centered>
+      ),
+    },
+    {
+      id: "density",
+      label: "From a flowsheet row to a phone",
+      note: "The pill shrinks; the target does not. The micro switches below are 26×14px and still present a target at or above the 24px floor, because the hit area is a separate token that follows the density profile.",
+      render: () => (
+        <Centered>
+          <div className="flex w-full max-w-lg flex-col gap-8">
+            <div
+              data-ox-density="clinical"
+              className="overflow-hidden rounded-lg border border-rule"
+            >
+              <table className="w-full text-xs">
+                <thead>
+                  <tr className="border-b border-rule text-left">
+                    <th className="px-3 py-2 font-medium">Bed</th>
+                    <th className="px-3 py-2 font-medium">Patient</th>
+                    <th className="px-3 py-2 font-medium">NPO</th>
+                    <th className="px-3 py-2 font-medium">Falls</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {[
+                    { bed: "12", who: "A. Lovelace", npo: true, falls: false },
+                    { bed: "13", who: "G. Hopper", npo: false, falls: true },
+                  ].map((row) => (
+                    <tr key={row.bed} className="border-b border-rule/60 last:border-0">
+                      <td className="px-3 py-2">{row.bed}</td>
+                      <td className="px-3 py-2">{row.who}</td>
+                      <td className="px-3 py-2">
+                        <Switch
+                          size="micro"
+                          tone="caution"
+                          checked={row.npo}
+                          showState={false}
+                          aria-label={`Nil by mouth — ${row.who}`}
+                        />
+                      </td>
+                      <td className="px-3 py-2">
+                        <Switch
+                          size="micro"
+                          checked={row.falls}
+                          showState={false}
+                          aria-label={`Falls risk — ${row.who}`}
+                        />
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            <div data-ox-density="patient">
+              <Switch
+                label="Share my records with my GP"
+                description="Your GP surgery can see your hospital notes. You can change this at any time, and it will not affect your care."
+                appearance="row"
+                audience="patient"
+                checked
+              />
+            </div>
+          </div>
+        </Centered>
+      ),
+    },
+    {
+      id: "impact",
+      label: "The consequence, before the click",
+      note: "Every design system puts this in a confirmation dialog, which is after the decision. A switch whose consequences reach other people should carry them where they inform it — and say who last moved it, because in a shared record that is the first question anyone asks.",
+      render: () => (
+        <Centered>
+          <div className="w-full max-w-md">
+            <LiveSwitch
+              label="Add to the deteriorating-patient list"
+              stateLabels="in-effect"
+              tone="caution"
+              size="large"
+              impact={[
+                "page the outreach team on call now",
+                "add a banner to the bed board, visible to visitors",
+                "set hourly observations for 24 hours",
+              ]}
+              provenance={{ by: "J. Adeyemi", at: "2026-08-16T06:40:00.000Z", via: "ward round" }}
+            />
           </div>
         </Centered>
       ),

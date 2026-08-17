@@ -6,7 +6,14 @@
       "dependsOn": ["^build"],
       "outputs": ["dist/**", ".next/**", "!.next/cache/**"]
     },
+    // Builds workspace dependencies first, like every other task here. The docs
+    // app aliases the NodeNext packages (tabs, consult) to their `dist` — see
+    // apps/docs/next.config.ts — so without a build those specifiers resolve
+    // into `src`, hit a `./Tabs.js` import that only Node can follow, and the
+    // whole site 500s. The error names a file that exists on disk, which makes
+    // it read as a broken component rather than a missing build.
     "dev": {
+      "dependsOn": ["^build"],
       "cache": false,
       "persistent": true
     },
