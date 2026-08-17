@@ -18,7 +18,7 @@
  * standing up a second harness that could drift from what ships.
  */
 
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test, type Locator, type Page } from "@playwright/test";
 
 const PAGE = "/components/tabs";
 
@@ -34,13 +34,44 @@ async function openGallery(page: Page) {
   return gallery;
 }
 
+/**
+ * Click something in the gallery, out from under the site header.
+ *
+ * The docs header is sticky, and Playwright's own `scrollIntoViewIfNeeded`
+ * does the *minimum* scroll that puts an element inside the viewport — which
+ * leaves anything below the fold parked at the very top, underneath it.
+ * Playwright then reports the click landing on the header's search control and
+ * retries until it times out. It never reproduced locally because the failure
+ * depends on where the element happens to sit, and that moves with font
+ * metrics: the same test passed on macOS and failed on CI's Linux runners in
+ * two engines.
+ *
+ * Centring is not enough on its own. Near the end of the document there is no
+ * scroll left to give, so `block: "center"` silently leaves the element where
+ * it was — which is how this was first "fixed" without being fixed. So the
+ * overlap is measured against the header afterwards and corrected directly.
+ */
+async function clickClear(target: Locator) {
+  await target.evaluate((element) => {
+    element.scrollIntoView({ block: "center" });
+
+    const header = document.querySelector("header");
+    // A little more than the header, so the click lands on the control rather
+    // than on the boundary between the two.
+    const clearance = (header?.getBoundingClientRect().height ?? 0) + 12;
+    const top = element.getBoundingClientRect().top;
+    if (top < clearance) window.scrollBy(0, top - clearance);
+  });
+  await target.click();
+}
+
 async function chooseChapter(page: Page, label: string) {
-  await page.locator(".ox-gallery__chapters").getByRole("radio", { name: label }).click();
+  await clickClear(page.locator(".ox-gallery__chapters").getByRole("radio", { name: label }));
   await page.waitForTimeout(250);
 }
 
 async function setControl(page: Page, group: string, value: string) {
-  await page.getByRole("group", { name: group }).getByRole("button", { name: value }).click();
+  await clickClear(page.getByRole("group", { name: group }).getByRole("button", { name: value }));
   await page.waitForTimeout(200);
 }
 
@@ -67,7 +98,7 @@ test.describe("indicator geometry @a11y", () => {
   test("the thumb follows a click", async ({ page }) => {
     await openGallery(page);
     const demo = page.locator("#v01");
-    await demo.getByRole("tab", { name: "Shared" }).click();
+    await clickClear(demo.getByRole("tab", { name: "Shared" }));
     // Let the 180ms transition finish before measuring where it settled.
     await page.waitForTimeout(400);
 
@@ -146,9 +177,13 @@ test.describe("overflow @a11y", () => {
     await openGallery(page);
     await chooseChapter(page, "Overflow");
     const demo = page.locator("#o2");
-    const more = demo.getByRole("button", { name: /More/ });
-    if (await more.count()) {
-      await more.first().click();
+    // `visible`, not `count`: whether anything overflows depends on the width
+    // the fonts happen to produce, so a run where nothing is hidden is a real
+    // outcome rather than a failure — but a button that exists and cannot be
+    // clicked is not.
+    const more = demo.getByRole("button", { name: /More/ }).first();
+    if (await more.isVisible()) {
+      await clickClear(more);
       await expect(page.getByRole("menu")).toBeVisible();
       await page.keyboard.press("Escape");
     }
@@ -236,7 +271,7 @@ test.describe("reflow @reflow", () => {
     await page.setViewportSize({ width: 320, height: 720 });
     await openGallery(page);
     const demo = page.locator("#v01");
-    await demo.getByRole("tab", { name: "Shared" }).click();
+    await clickClear(demo.getByRole("tab", { name: "Shared" }));
     await expect(demo.getByRole("tab", { name: "Shared" })).toHaveAttribute(
       "aria-selected",
       "true",

@@ -170,6 +170,19 @@
 html {
   scroll-behavior: smooth;
   -webkit-text-size-adjust: 100%;
+
+  /*
+   * The site header is sticky, so "scrolled into view" and "visible" are not
+   * the same thing: anything the browser scrolls to lands at y=0, underneath
+   * it. Individual sections have carried `scroll-mt-*` classes to compensate,
+   * which works for the ones someone remembered and for nothing else —
+   * including every control inside a demo, and every `scrollIntoView` a script
+   * makes. This states it once, where the browser can apply it to all of them.
+   *
+   * The header is 52px; the rest is breathing room, so a heading does not sit
+   * flush against the chrome above it.
+   */
+  scroll-padding-top: 4.5rem;
 }
 
 body {
