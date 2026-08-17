@@ -61,12 +61,37 @@ const cardArt = recordKeys(cardSource, "const PREVIEW", "(");
  */
 const CUSTOM_DETAIL_PREVIEW = new Set(["signature"]);
 
+/**
+ * Components whose detail preview is a gallery the page mounts directly,
+ * rather than a scenario list inside `ComponentPreview`.
+ *
+ * A scenario switcher shows one state at a time, which suits a component whose
+ * states are alternatives. It is the wrong shape for one whose argument is that
+ * several axes are independent: those are a set, and a set shown one card at a
+ * time reads as unrelated screenshots. Switch's absence reasons only make their
+ * point side by side, where the word changes and the colour does not.
+ *
+ * Still asserted rather than exempted — the page has to actually mount the
+ * gallery, or this is a component with no preview at all.
+ */
+const PAGE_MOUNTED_GALLERY = new Map([["switch", "SwitchGallery"]]);
+
+const detailPageSource = read("apps/docs/src/app/components/[name]/page.tsx");
+
 describe("every catalog component is live on the docs site", () => {
   it.each(CATALOG.map((component) => component.name))("%s has a detail preview", (name) => {
     if (CUSTOM_DETAIL_PREVIEW.has(name)) {
       expect(previewSource).toContain(`name === "${name}"`);
       return;
     }
+
+    const gallery = PAGE_MOUNTED_GALLERY.get(name);
+    if (gallery) {
+      expect(detailPageSource).toContain(`component.name === "${name}"`);
+      expect(detailPageSource).toContain(`<${gallery} />`);
+      return;
+    }
+
     expect(scenarios).toContain(name);
   });
 

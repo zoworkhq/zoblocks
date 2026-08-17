@@ -176,10 +176,38 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
 
         {/* Preview ------------------------------------------------------ */}
         <section id="preview" className="scroll-mt-24 border-b border-rule bg-paper-sunk/40">
-          <div className="mx-auto max-w-6xl section-minor px-5 sm:px-8">
-            <SectionHeading eyebrow="Preview" title="Every state, switchable." />
+          {/*
+            Switch takes the whole width and shows everything at once rather
+            than one card behind a switcher.
+
+            The scenario switcher is the right shape for a component whose
+            states are alternatives — a loader is spinning or it is not. It is
+            the wrong shape for one whose argument is that three axes are
+            independent and seven commit phases are seven different recoveries:
+            those are a *set*, and a set shown one card at a time reads as a
+            list of unrelated screenshots. The absence reasons in particular
+            only make their point side by side, where the word changes and the
+            colour does not.
+          */}
+          <div
+            className={`mx-auto section-minor px-5 sm:px-8 ${
+              component.name === "switch" ? "max-w-[92rem]" : "max-w-6xl"
+            }`}
+          >
+            <SectionHeading
+              eyebrow="Preview"
+              title={
+                component.name === "switch"
+                  ? "Every state, phase and surface — live, on the page."
+                  : "Every state, switchable."
+              }
+            />
             <div className="mt-8" data-reveal>
-              <ComponentPreview name={component.name} />
+              {component.name === "switch" ? (
+                <SwitchGallery />
+              ) : (
+                <ComponentPreview name={component.name} />
+              )}
             </div>
 
             <div className="mt-6 flex flex-wrap gap-2" data-reveal>
@@ -207,30 +235,6 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
             clipped last label as if that were the design rather than the demo
             being too small to hold it.
           */}
-          {/*
-            Switch earns a gallery for the same reason Tabs does, and a
-            different one. Tabs has to show that eleven skins share one
-            accessibility tree; Switch has to show that three axes are
-            independent and that seven commit phases are seven different
-            recoveries — and a claim about a *set* cannot be made one card at a
-            time. The scenario switcher above shows one state; this shows them
-            beside each other, which is where the absence reasons stop looking
-            like four greys and the phases stop looking like one spinner.
-          */}
-          {component.name === "switch" && (
-            <div className="mx-auto max-w-[92rem] px-5 pb-[clamp(2.75rem,5vw,4.5rem)] sm:px-8">
-              <div data-reveal>
-                <SectionHeading
-                  eyebrow="Gallery"
-                  title="Every state, phase and surface — live, on the page."
-                />
-                <div className="mt-8">
-                  <SwitchGallery />
-                </div>
-              </div>
-            </div>
-          )}
-
           {component.name === "tabs" && (
             <div className="mx-auto max-w-[92rem] px-5 pb-[clamp(2.75rem,5vw,4.5rem)] sm:px-8">
               <div data-reveal>
