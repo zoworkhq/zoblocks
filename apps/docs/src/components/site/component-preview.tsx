@@ -43,6 +43,15 @@ import {
 } from "@oxygenui-design/copilot-core";
 import { InstrumentGlow } from "@/components/site/interactions";
 import { SignatureDemo } from "@/components/site/signature-demo";
+import {
+  IdentityAbsenceDemo,
+  IdentityBannerDemo,
+  IdentityDisclosureDemo,
+  IdentityGuardDemo,
+  IdentityStatesDemo,
+  IdentityVerifyDemo,
+  IdentityWorklistDemo,
+} from "@/components/site/identity-demo";
 import { cn } from "@/lib/utils";
 
 type Density = "patient" | "standard" | "clinical";
@@ -131,6 +140,117 @@ function LiveSwitch({
         setValue(next);
       }}
     />
+  );
+}
+
+/**
+ * A switch whose "on" has an end.
+ *
+ * `now` is a prop, never the wall clock — the component renders the window
+ * from what the caller supplies, so the output depends only on props and can
+ * be visually regression tested. The demo advances `now` itself, which is what
+ * a server pushing a fresher timestamp would do.
+ *
+ * The point to watch is what happens at the end: the switch does not turn
+ * itself off. It reports that the window lapsed and waits, because a client
+ * clock deciding to lift a clinical flag is a defect, not a feature.
+ */
+function TimeBoxedSwitch() {
+  const START = "2026-08-16T13:00:00.000Z";
+  const UNTIL = "2026-08-16T13:00:12.000Z";
+  const [now, setNow] = React.useState(START);
+  const [on, setOn] = React.useState(false);
+
+  React.useEffect(() => {
+    if (!on) return;
+    const id = setInterval(
+      () => setNow((current) => new Date(Date.parse(current) + 2000).toISOString()),
+      1000,
+    );
+    return () => clearInterval(id);
+  }, [on]);
+
+  return (
+    <div className="flex w-full max-w-md flex-col gap-4">
+      <Switch
+        label="Nil by mouth"
+        description="Set for theatre. Shows on the bed board, the diet list and the handover."
+        stateLabels="in-effect"
+        tone="caution"
+        size="large"
+        checked={on}
+        now={now}
+        until={UNTIL}
+        untilWarnMs={6000}
+        onCommit={(next) => {
+          setOn(next);
+          if (next) setNow(START);
+        }}
+        onExpire={() => {}}
+      />
+      <p className="text-xs text-graphite">
+        Turn it on and watch the window close. Nothing writes at the end — the application is told,
+        and a human decides.
+      </p>
+    </div>
+  );
+}
+
+/**
+ * The two states a shared record produces and a single-user demo never shows:
+ * a change that was never sent, and a change somebody else got in first with.
+ */
+function SharedRecordSwitches() {
+  const [online, setOnline] = React.useState(false);
+  const [offlineValue, setOfflineValue] = React.useState(false);
+  const [mine, setMine] = React.useState(true);
+  const [theirs, setTheirs] = React.useState<boolean | undefined>(undefined);
+
+  return (
+    <div className="flex w-full max-w-lg flex-col gap-8">
+      <div className="flex flex-col gap-3">
+        <button
+          type="button"
+          onClick={() => setOnline((v) => !v)}
+          className="self-start rounded-full border border-rule px-3 py-1 text-xs font-medium"
+        >
+          {online ? "Connected — tap to go offline" : "Offline — tap to reconnect"}
+        </button>
+        <Switch
+          label="Falls risk"
+          description="Adds the bed sensor to the round list."
+          stateLabels="in-effect"
+          size="large"
+          checked={offlineValue}
+          online={online}
+          onCommit={(next) => setOfflineValue(next)}
+        />
+      </div>
+
+      <div className="flex flex-col gap-3">
+        <button
+          type="button"
+          onClick={() => setTheirs(theirs === undefined ? !mine : undefined)}
+          className="self-start rounded-full border border-rule px-3 py-1 text-xs font-medium"
+        >
+          {theirs === undefined ? "Simulate: S. Mehta changes it too" : "Clear the conflict"}
+        </button>
+        <Switch
+          label="Contact precautions"
+          description="Gown and gloves on entry."
+          stateLabels="in-effect"
+          tone="caution"
+          size="large"
+          checked={mine}
+          serverValue={theirs}
+          onCommit={(next) => setMine(next)}
+          onResolveConflict={(keep) => {
+            if (keep === "theirs" && theirs !== undefined) setMine(theirs);
+            setTheirs(undefined);
+          }}
+        />
+      </div>
+    </div>
   );
 }
 
@@ -465,108 +585,79 @@ function completeNote() {
 }
 
 const SCENARIOS: Record<string, Scenario[]> = {
-  "clinical-note": [
+  identity: [
     {
-      id: "provenance",
-      label: "Who wrote every character",
-      note: "Turn on Origins. Orange is copied forward from a note about a different admission, green is a passage a model drafted that nobody has read, blue dotted is a lab value that was true eight hours ago. Every origin carries an underline style as well as a hue, so the distinction survives greyscale, colour-blindness, forced colours and the ward printer. The copy-forward percentage in the strip is measured from the marks, not estimated.",
+      id: "banner",
+      label: "The banner",
+      note: 'The last surface a clinician reads before they act. Two identifiers because `context="action"` requires them at the type level; `08 Mar 1985` because `08/03/1985` is 3 August in Delhi and 8 March in Denver; SPCU rather than a bare “F”, because administrative gender is not a dosing fact and `Patient.gender` is not a renderable field at all.',
       render: () => (
-        <ClinicalNote
-          subject={NOTE_SUBJECT}
-          author={{ display: "R. Menon, MD", role: "Resident", requiresCosign: true }}
-          noteType="progress"
-          now={NOTE_NOW}
-          value={noteWithMixedOrigins()}
-          attestation={NOTE_ATTESTATION}
-          timestampLine="Created 16 Aug 2026, 14:02 IST (UTC+05:30) · edited 14:38 IST"
-          saveState={{ kind: "saved", at: "14:38:02 IST" }}
-        />
+        <InstrumentStage>
+          <IdentityBannerDemo />
+        </InstrumentStage>
       ),
     },
     {
-      id: "gate",
-      label: "The signature it will not let you make",
-      note: "Press Sign & file. The assessment is empty and a model's paragraph is unread — both block, and the button says why rather than greying out silently. The copy-forward ratio and the stale potassium only warn: a gate that blocks on everything gets routed around within a week, and one that blocks on nothing is decoration.",
+      id: "worklist",
+      label: "Two patients, one name",
+      note: "The pass no other component library ships. It reads what is actually on screen and adds the minimum that separates each collided row — full given name, then date of birth, then identifier — stopping at the first rung that works. Toggle it off to see what a ward list looks like without it.",
       render: () => (
-        <ClinicalNote
-          subject={NOTE_SUBJECT}
-          author={{ display: "R. Menon, MD", role: "Resident", requiresCosign: true }}
-          noteType="progress"
-          now={NOTE_NOW}
-          value={noteWithMixedOrigins()}
-          gateOptions={{ maxPullAgeMs: 4 * 60 * 60 * 1000 }}
-          attestation={NOTE_ATTESTATION}
-          timestampLine="Created 16 Aug 2026, 14:02 IST (UTC+05:30)"
-        />
+        <InstrumentStage>
+          <IdentityWorklistDemo />
+        </InstrumentStage>
       ),
     },
     {
-      id: "clear",
-      label: "A note that is ready",
-      note: "Every required section has content, nothing is unread, nothing is copied beyond the threshold. The gate reports its passes as well as its failures — a list that only shows problems reads as an accusation, and clinicians dismiss those on reflex. The attestation still has to be ticked, because its wording is a legal decision the deployment makes.",
+      id: "states",
+      label: "Four states, not one pill",
+      note: "Deceased, inactive, merged and test come from four unrelated places in FHIR and mean four unrelated things. Collapsing them into one grey “Inactive” is how an automated appointment reminder reaches a bereaved family. The last row carries an NHS number that fails its check digit — a matching failure that has already happened, shown rather than hidden.",
       render: () => (
-        <ClinicalNote
-          subject={NOTE_SUBJECT}
-          author={{ display: "A. Iyer, MD", role: "Attending" }}
-          noteType="progress"
-          now={NOTE_NOW}
-          value={completeNote()}
-          attestation={NOTE_ATTESTATION}
-          timestampLine="Created 16 Aug 2026, 14:02 IST (UTC+05:30)"
-          saveState={{ kind: "saved", at: "14:41:07 IST" }}
-        />
+        <InstrumentStage>
+          <IdentityStatesDemo />
+        </InstrumentStage>
       ),
     },
     {
-      id: "offline",
-      label: "Interrupted, and offline",
-      note: "Four honest save states and never a silent spinner. A clinician pulled out of the room by a code needs to know whether the last twelve minutes exist anywhere — and a failed save announces assertively, because an unheard save failure is lost work rather than a cosmetic problem.",
+      id: "disclosure",
+      label: "Who is looking",
+      note: "One resource, four audiences. Sensitivity categories stay behind an audited reveal below full disclosure — and they are withheld from the accessible name too, because naming them there would hand a screen-reader user the thing the reveal exists to record.",
       render: () => (
-        <ClinicalNote
-          subject={NOTE_SUBJECT}
-          author={{ display: "R. Menon, MD", role: "Resident", requiresCosign: true }}
-          noteType="progress"
-          now={NOTE_NOW}
-          value={noteWithMixedOrigins()}
-          saveState={{ kind: "offline", pending: 42 }}
-          timestampLine="Created 16 Aug 2026, 14:02 IST (UTC+05:30)"
-        />
+        <InstrumentStage>
+          <IdentityDisclosureDemo />
+        </InstrumentStage>
       ),
     },
     {
-      id: "signed",
-      label: "Signed, countersigned, and superseded",
-      note: "The original is not shown as corrected — it is shown as superseded. Both statements stand, in order, with their own authors and times. That is the difference between a record and a document, and it is what a patient's right to amend under 45 CFR 164.526 actually requires. This path loads no editor at all: most people who open a note never edit one.",
+      id: "guard",
+      label: "Wrong patient",
+      note: "The coupling that makes a banner a control rather than a heading. The form knows which patient it was opened for, the banner knows which chart is displayed, and the component refuses to let those disagree — silently or otherwise. Switch the chart and watch the order form withdraw.",
       render: () => (
-        <ClinicalNoteReader
-          subject={NOTE_SUBJECT}
-          title="Progress note"
-          doc={completeNote()}
-          attestations={[
-            {
-              who: "Rohit Menon, MD",
-              role: "Resident, Internal Medicine",
-              when: "16 Aug 2026, 14:41:07 IST (UTC+05:30)",
-            },
-            {
-              who: "Anjali Iyer, MD",
-              role: "Attending, Internal Medicine",
-              when: "16 Aug 2026, 18:02:55 IST (UTC+05:30)",
-              statement:
-                "I have reviewed the note and the patient, and agree with the findings and plan.",
-            },
-          ]}
-          addenda={[
-            {
-              author: "Anjali Iyer, MD",
-              when: "19 Aug 2026, 09:14 IST",
-              text: "Bone marrow biopsy performed 18 Aug returned consistent with iron deficiency; the assessment of anaemia of chronic disease documented above is superseded. Iron studies and GI referral ordered.",
-            },
-          ]}
-        />
+        <InstrumentStage>
+          <IdentityGuardDemo />
+        </InstrumentStage>
+      ),
+    },
+    {
+      id: "verify",
+      label: "Confirm before ordering",
+      note: "Adelman et al., 901,776 ordering sessions: a dismissible alert cut wrong-patient orders with an odds ratio of 0.84, and making the clinician re-enter the initials cut them with an odds ratio of 0.60. Everyone builds the first. Type AO.",
+      render: () => (
+        <InstrumentStage>
+          <IdentityVerifyDemo />
+        </InstrumentStage>
+      ),
+    },
+    {
+      id: "absence",
+      label: "Five kinds of missing",
+      note: "Every design system collapses these into “show initials”. A photograph in the banner is associated with measurably fewer wrong-patient orders, so a silently missing one is a silently degraded safety control — and “no photo on record” and “we could not load the photo we have” are different facts.",
+      render: () => (
+        <InstrumentStage>
+          <IdentityAbsenceDemo />
+        </InstrumentStage>
       ),
     },
   ],
+
   copilot: [
     {
       id: "rest",
@@ -947,6 +1038,116 @@ const SCENARIOS: Record<string, Scenario[]> = {
     },
   ],
 
+  /**
+   * Five demos, each showing a fact no other editor can tell you.
+   *
+   * `now` is frozen so the stale-value demo says the same thing every day —
+   * and because the component takes the clock as a prop precisely so that a
+   * demo, a test and a ward workstation can each supply their own.
+   */
+  "clinical-note": [
+    {
+      id: "provenance",
+      label: "Who wrote every character",
+      note: "Turn on Origins. Orange is copied forward from a note about a different admission, green is a passage a model drafted that nobody has read, blue dotted is a lab value that was true eight hours ago. Every origin carries an underline style as well as a hue, so the distinction survives greyscale, colour-blindness, forced colours and the ward printer. The copy-forward percentage in the strip is measured from the marks, not estimated.",
+      render: () => (
+        <ClinicalNote
+          subject={NOTE_SUBJECT}
+          author={{ display: "R. Menon, MD", role: "Resident", requiresCosign: true }}
+          noteType="progress"
+          now={NOTE_NOW}
+          value={noteWithMixedOrigins()}
+          attestation={NOTE_ATTESTATION}
+          timestampLine="Created 16 Aug 2026, 14:02 IST (UTC+05:30) · edited 14:38 IST"
+          saveState={{ kind: "saved", at: "14:38:02 IST" }}
+        />
+      ),
+    },
+    {
+      id: "gate",
+      label: "The signature it will not let you make",
+      note: "Press Sign & file. The assessment is empty and a model's paragraph is unread — both block, and the button says why rather than greying out silently. The copy-forward ratio and the stale potassium only warn: a gate that blocks on everything gets routed around within a week, and one that blocks on nothing is decoration.",
+      render: () => (
+        <ClinicalNote
+          subject={NOTE_SUBJECT}
+          author={{ display: "R. Menon, MD", role: "Resident", requiresCosign: true }}
+          noteType="progress"
+          now={NOTE_NOW}
+          value={noteWithMixedOrigins()}
+          gateOptions={{ maxPullAgeMs: 4 * 60 * 60 * 1000 }}
+          attestation={NOTE_ATTESTATION}
+          timestampLine="Created 16 Aug 2026, 14:02 IST (UTC+05:30)"
+        />
+      ),
+    },
+    {
+      id: "clear",
+      label: "A note that is ready",
+      note: "Every required section has content, nothing is unread, nothing is copied beyond the threshold. The gate reports its passes as well as its failures — a list that only shows problems reads as an accusation, and clinicians dismiss those on reflex. The attestation still has to be ticked, because its wording is a legal decision the deployment makes.",
+      render: () => (
+        <ClinicalNote
+          subject={NOTE_SUBJECT}
+          author={{ display: "A. Iyer, MD", role: "Attending" }}
+          noteType="progress"
+          now={NOTE_NOW}
+          value={completeNote()}
+          attestation={NOTE_ATTESTATION}
+          timestampLine="Created 16 Aug 2026, 14:02 IST (UTC+05:30)"
+          saveState={{ kind: "saved", at: "14:41:07 IST" }}
+        />
+      ),
+    },
+    {
+      id: "offline",
+      label: "Interrupted, and offline",
+      note: "Four honest save states and never a silent spinner. A clinician pulled out of the room by a code needs to know whether the last twelve minutes exist anywhere — and a failed save announces assertively, because an unheard save failure is lost work rather than a cosmetic problem.",
+      render: () => (
+        <ClinicalNote
+          subject={NOTE_SUBJECT}
+          author={{ display: "R. Menon, MD", role: "Resident", requiresCosign: true }}
+          noteType="progress"
+          now={NOTE_NOW}
+          value={noteWithMixedOrigins()}
+          saveState={{ kind: "offline", pending: 42 }}
+          timestampLine="Created 16 Aug 2026, 14:02 IST (UTC+05:30)"
+        />
+      ),
+    },
+    {
+      id: "signed",
+      label: "Signed, countersigned, and superseded",
+      note: "The original is not shown as corrected — it is shown as superseded. Both statements stand, in order, with their own authors and times. That is the difference between a record and a document, and it is what a patient's right to amend under 45 CFR 164.526 actually requires. This path loads no editor at all: most people who open a note never edit one.",
+      render: () => (
+        <ClinicalNoteReader
+          subject={NOTE_SUBJECT}
+          title="Progress note"
+          doc={completeNote()}
+          attestations={[
+            {
+              who: "Rohit Menon, MD",
+              role: "Resident, Internal Medicine",
+              when: "16 Aug 2026, 14:41:07 IST (UTC+05:30)",
+            },
+            {
+              who: "Anjali Iyer, MD",
+              role: "Attending, Internal Medicine",
+              when: "16 Aug 2026, 18:02:55 IST (UTC+05:30)",
+              statement:
+                "I have reviewed the note and the patient, and agree with the findings and plan.",
+            },
+          ]}
+          addenda={[
+            {
+              author: "Anjali Iyer, MD",
+              when: "19 Aug 2026, 09:14 IST",
+              text: "Bone marrow biopsy performed 18 Aug returned consistent with iron deficiency; the assessment of anaemia of chronic disease documented above is superseded. Iron studies and GI referral ordered.",
+            },
+          ]}
+        />
+      ),
+    },
+  ],
+
   switch: [
     {
       id: "commit",
@@ -1108,6 +1309,205 @@ const SCENARIOS: Record<string, Scenario[]> = {
               checked
             />
             <Switch label="Show archived encounters" tone="neutral" checked />
+          </div>
+        </Centered>
+      ),
+    },
+    {
+      id: "confirm",
+      label: "Friction matched to consequence",
+      note: "Three levels, chosen by what the toggle costs if nobody meant it. Hold is a timed input, so SC 2.2.1 applies — activate any of these from the keyboard and the dialog opens instead, because holding must never be the only path.",
+      render: () => (
+        <Centered>
+          <div className="flex w-full max-w-md flex-col gap-7">
+            <LiveSwitch
+              label="Suspend fall-risk alarm"
+              description="Hold the control, or press Enter for the dialog."
+              stateLabels="in-effect"
+              tone="critical"
+              size="large"
+              confirm="hold"
+            />
+            <LiveSwitch
+              label="Discharge to home"
+              description="Names the patient and the consequence — never “Are you sure?”."
+              stateLabels="active-inactive"
+              size="large"
+              confirm="dialog"
+              confirmCopy={{
+                subject: "Ada Lovelace",
+                consequence: "Closes the encounter and releases the bed. This cannot be undone.",
+              }}
+            />
+            <LiveSwitch
+              label="Bypass allergy check for this order"
+              description="The typed reason is the deliverable, not the friction."
+              stateLabels="allowed-blocked"
+              tone="critical"
+              size="large"
+              confirm="attest"
+            />
+            <LiveSwitch
+              label="Release restraint order"
+              description="A second qualified person, who cannot be the requester."
+              stateLabels="active-inactive"
+              tone="critical"
+              size="large"
+              confirm="countersign"
+              countersign={{
+                role: "registered-nurse",
+                notSameAs: "s.mehta",
+                requestedBy: "S. Mehta, RN",
+                verify: () =>
+                  new Promise<string>((resolve) => setTimeout(() => resolve("j.adeyemi"), 600)),
+              }}
+            />
+          </div>
+        </Centered>
+      ),
+    },
+    {
+      id: "until",
+      label: "An on that is not forever",
+      note: "Almost no clinical on-state is permanent. A switch with no expiry is how a patient stays nil-by-mouth for three days because the person who set it went home.",
+      render: () => (
+        <Centered>
+          <TimeBoxedSwitch />
+        </Centered>
+      ),
+    },
+    {
+      id: "shared",
+      label: "Offline, and overtaken",
+      note: "The two states a shared record produces that a single-user demo never shows. Queued is not pending: nothing has been sent, and you may still change your mind. A conflict offers both readings and pre-selects neither, because each clinician had a reason.",
+      render: () => (
+        <Centered>
+          <SharedRecordSwitches />
+        </Centered>
+      ),
+    },
+    {
+      id: "availability",
+      label: "Locked, and why",
+      note: "“Disabled” is the most over-used attribute in healthcare UI and almost always the wrong one — it takes the control out of the tab order, so a screen-reader user never learns it exists. Read-only keeps it reachable and says what is holding it.",
+      render: () => (
+        <Centered>
+          <div className="flex w-full max-w-md flex-col gap-6">
+            <Switch
+              label="Contact precautions"
+              stateLabels="in-effect"
+              checked
+              readOnly
+              lockedReason="Encounter signed 14:32 by Dr Okafor."
+            />
+            <Switch
+              label="Change diet order"
+              stateLabels="allowed-blocked"
+              checked={false}
+              readOnly
+              lockedReason="Your role cannot change this."
+            />
+            <Switch
+              label="Airborne precautions"
+              stateLabels="in-effect"
+              checked={false}
+              readOnly
+              lockedReason="Requires a negative-pressure room, and none is free on this unit."
+            />
+            <Switch
+              label="Notify by SMS"
+              stateLabels="enabled-disabled"
+              checked
+              disabled
+              description="Genuinely disabled: transient, and caused by something the user just did."
+            />
+          </div>
+        </Centered>
+      ),
+    },
+    {
+      id: "density",
+      label: "From a flowsheet row to a phone",
+      note: "The pill shrinks; the target does not. The micro switches below are 26×14px and still present a target at or above the 24px floor, because the hit area is a separate token that follows the density profile.",
+      render: () => (
+        <Centered>
+          <div className="flex w-full max-w-lg flex-col gap-8">
+            <div
+              data-ox-density="clinical"
+              className="overflow-hidden rounded-lg border border-rule"
+            >
+              <table className="w-full text-xs">
+                <thead>
+                  <tr className="border-b border-rule text-left">
+                    <th className="px-3 py-2 font-medium">Bed</th>
+                    <th className="px-3 py-2 font-medium">Patient</th>
+                    <th className="px-3 py-2 font-medium">NPO</th>
+                    <th className="px-3 py-2 font-medium">Falls</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {[
+                    { bed: "12", who: "A. Lovelace", npo: true, falls: false },
+                    { bed: "13", who: "G. Hopper", npo: false, falls: true },
+                  ].map((row) => (
+                    <tr key={row.bed} className="border-b border-rule/60 last:border-0">
+                      <td className="px-3 py-2">{row.bed}</td>
+                      <td className="px-3 py-2">{row.who}</td>
+                      <td className="px-3 py-2">
+                        <Switch
+                          size="micro"
+                          tone="caution"
+                          checked={row.npo}
+                          showState={false}
+                          aria-label={`Nil by mouth — ${row.who}`}
+                        />
+                      </td>
+                      <td className="px-3 py-2">
+                        <Switch
+                          size="micro"
+                          checked={row.falls}
+                          showState={false}
+                          aria-label={`Falls risk — ${row.who}`}
+                        />
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            <div data-ox-density="patient">
+              <Switch
+                label="Share my records with my GP"
+                description="Your GP surgery can see your hospital notes. You can change this at any time, and it will not affect your care."
+                appearance="row"
+                audience="patient"
+                checked
+              />
+            </div>
+          </div>
+        </Centered>
+      ),
+    },
+    {
+      id: "impact",
+      label: "The consequence, before the click",
+      note: "Every design system puts this in a confirmation dialog, which is after the decision. A switch whose consequences reach other people should carry them where they inform it — and say who last moved it, because in a shared record that is the first question anyone asks.",
+      render: () => (
+        <Centered>
+          <div className="w-full max-w-md">
+            <LiveSwitch
+              label="Add to the deteriorating-patient list"
+              stateLabels="in-effect"
+              tone="caution"
+              size="large"
+              impact={[
+                "page the outreach team on call now",
+                "add a banner to the bed board, visible to visitors",
+                "set hourly observations for 24 hours",
+              ]}
+              provenance={{ by: "J. Adeyemi", at: "2026-08-16T06:40:00.000Z", via: "ward round" }}
+            />
           </div>
         </Centered>
       ),

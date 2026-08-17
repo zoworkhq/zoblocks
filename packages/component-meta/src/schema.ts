@@ -138,6 +138,17 @@ export const componentMetaSchema = z
     distribution: distributionSchema.default("registry"),
     /** npm package name. Required when `distribution` is `package`. */
     packageName: z.string().optional(),
+    /**
+     * File under `src/` to extract the prop table from, when it is not named
+     * after the title.
+     *
+     * The convention — `Signature` in `Signature.tsx` — assumes a package has
+     * one public component. A package whose surface is several of them has no
+     * file to name after itself, and contorting the catalog title into a
+     * filename would put the filename in front of the reader instead. Name the
+     * component whose props a consumer configures.
+     */
+    propsSource: z.string().optional(),
 
     /**
      * Three lengths for three surfaces. They are separate fields because each

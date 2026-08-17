@@ -483,7 +483,8 @@ export function SignGate({
             key={finding.id}
             className={cn(
               "grid grid-cols-[auto_1fr_auto] items-start gap-3 px-3 py-2.5 text-sm",
-              finding.severity === "block" && "bg-[var(--ox-status-critical-bg)]/30",
+              finding.severity === "block" &&
+                "bg-[color-mix(in_oklab,var(--ox-status-critical-bg)_30%,transparent)]",
             )}
           >
             <span

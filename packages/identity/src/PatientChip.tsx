@@ -6,7 +6,7 @@
  * truncated. Names and identifiers are never ellipsised here, at any width.
  */
 
-import { identityLabel, type Identity } from "@oxygenui-design/identity-core";
+import { identityLabel, shortName, type Identity } from "@oxygenui-design/identity-core";
 import type { Patient } from "@oxygenui-design/fhir";
 import { type ReactNode } from "react";
 import { IdentityAvatar, type AvatarSize } from "./IdentityAvatar.js";
@@ -65,7 +65,7 @@ export function PatientChip(props: PatientChipProps): ReactNode {
   const showIdentifier = add.includes("identifier");
   const forcePhoto = add.includes("photo");
 
-  const displayName = showGivenFull ? identity.name.text : shortName(identity);
+  const displayName = showGivenFull ? identity.name.text : shortName(identity.name);
 
   const detail: string[] = [];
   if (showDob && identity.birthDate) detail.push(identity.birthDate.text);
@@ -110,19 +110,4 @@ export function PatientChip(props: PatientChipProps): ReactNode {
       </span>
     </span>
   );
-}
-
-/**
- * The compact form: first given initial plus family name.
- *
- * This is what the reference design shows by default, and it is fine right up
- * until two of them appear on the same list — which is what the escalation
- * exists to notice.
- */
-function shortName(identity: Identity): string {
-  const first = identity.name.given[0];
-  const family = identity.name.family;
-  if (!family) return identity.name.text;
-  if (!first) return family;
-  return `${Array.from(first)[0]}. ${family}`;
 }

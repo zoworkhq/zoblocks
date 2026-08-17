@@ -131,6 +131,74 @@ describe("sending with the button", () => {
   });
 });
 
+describe("the controls the mockup asks for", () => {
+  /*
+   * All three of these shipped invisible rather than absent, which is why they
+   * get tests rather than trusting the story set. Every colour on this skin was
+   * written in Tailwind 3's `bg-[--token]` shorthand, which Tailwind 4 parses
+   * happily and emits as invalid CSS — so the dock rendered with transparent
+   * surfaces and no borders while every existing assertion about roles, names
+   * and behaviour kept passing.
+   *
+   * `test/registry-css-vars.test.ts` now guards the syntax across the whole
+   * registry. These cover the behaviour of the controls that were added at the
+   * same time, so a later refactor cannot quietly drop them again.
+   */
+
+  it("opens the shortcut menu from the square glyph, not only from the key", async () => {
+    // The "/" affordance has to be visible. A shortcut only a keyboard user who
+    // already knows about it can reach is not a feature for the ward.
+    renderCopilot({ shortcuts: [{ id: "s1", label: "Recent labs", question: "recent labs?" }] });
+
+    fireEvent.click(screen.getByRole("button", { name: "Shortcuts" }));
+
+    await waitFor(() => expect((field() as HTMLInputElement).value).toBe("/"));
+    await waitFor(() => expect(screen.getByRole("listbox", { name: "Shortcuts" })).toBeTruthy());
+  });
+
+  it("carries the mode's glyph on the chip, so the chip is scannable", () => {
+    renderCopilot();
+    const chip = screen.getByRole("button", { name: "Look up" });
+    expect(chip.querySelector("svg")).toBeTruthy();
+    // Paired with a real name on the button, so the glyph must stay silent.
+    expect(chip.querySelector("svg")).toHaveAttribute("aria-hidden", "true");
+  });
+
+  it("routes the scope strip's Change affordance to the mode tray", async () => {
+    /*
+     * Scope *is* the mode's `reads` contract, so Change opens the tray rather
+     * than editing scope on its own. A second control that set scope
+     * independently could disagree with the mode chip beside it, and the strip
+     * is precisely the thing a clinician is being asked to trust.
+     */
+    renderCopilot();
+
+    fireEvent.click(screen.getByRole("button", { name: "Change" }));
+
+    await waitFor(() => expect(screen.getByRole("group", { name: "Change mode" })).toBeTruthy());
+  });
+
+  it("routes the same affordance to the mode select once the panel has replaced the dock", async () => {
+    /*
+     * The panel carries its own mode control — a select rather than a tray,
+     * because the panel has no room for one — so Change has to land on that
+     * instead. Same promise, different control: the strip never points at
+     * something that is not on screen.
+     */
+    renderCopilot();
+    type("what is the dose?");
+    fireEvent.keyDown(field(), { key: "Enter" });
+
+    await waitFor(() => expect(screen.getByRole("region", { name: /conversation/i })).toBeTruthy());
+
+    fireEvent.click(screen.getByRole("button", { name: "Change" }));
+
+    await waitFor(() =>
+      expect(document.activeElement).toBe(screen.getByRole("combobox", { name: "Change mode" })),
+    );
+  });
+});
+
 describe("the scope line", () => {
   /*
    * The scope line only exists once a mode that reads data has actually run:

@@ -16,6 +16,7 @@
     "@oxygenui-design/copilot-react": "workspace:*",
     "@oxygenui-design/fhir": "workspace:*",
     "@oxygenui-design/fixtures": "workspace:*",
+    "@oxygenui-design/identity": "workspace:*",
     "@oxygenui-design/signature": "workspace:*",
     "@oxygenui-design/tabs": "workspace:*",
     "@oxygenui-design/tokens": "workspace:*",

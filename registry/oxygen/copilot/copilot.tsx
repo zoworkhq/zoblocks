@@ -37,8 +37,10 @@ import {
   CloseIcon,
   CopyIcon,
   InsertIcon,
+  LockIcon,
   MicIcon,
   NewChatIcon,
+  PersonIcon,
   SendIcon,
   ShortcutIcon,
   SparkIcon,
@@ -52,6 +54,7 @@ import {
   CopilotLiveRegion,
   CopilotRoot,
   citationLabel,
+  modeIcon,
   segmentAnswer,
   useCopilot,
   useShortcutMenu,
@@ -120,7 +123,7 @@ export function Copilot({
             type="button"
             aria-label="Reopen the assistant"
             onClick={() => api.setCollapsed(false)}
-            className="grid h-12 w-12 place-items-center rounded-full bg-[--ox-status-accent] text-[--ox-text-on-accent] shadow-lg"
+            className="grid h-12 w-12 place-items-center rounded-full bg-[var(--ox-accent)] text-[var(--ox-text-on-accent)] shadow-lg"
           >
             <SparkIcon />
           </button>
@@ -154,7 +157,7 @@ export function Copilot({
         ) : (
           <CopilotDockRegion className="flex w-full max-w-2xl flex-col gap-1.5">
             {trayOpen ? (
-              <div className="rounded-2xl border border-[--ox-rule] bg-[--ox-surface] p-3 shadow-lg">
+              <div className="rounded-2xl border border-[var(--ox-border)] bg-[var(--ox-surface)] p-3 shadow-lg">
                 <div role="group" aria-label="Change mode" className="mb-2 flex flex-wrap gap-1.5">
                   {api.modes.map((mode) => (
                     <button
@@ -165,8 +168,8 @@ export function Copilot({
                       className={cn(
                         "min-h-6 rounded-lg px-2.5 py-1 text-sm",
                         mode.id === api.mode.id
-                          ? "bg-[--ox-status-accent] text-[--ox-text-on-accent]"
-                          : "border border-[--ox-rule] text-[--ox-text]",
+                          ? "bg-[var(--ox-accent)] text-[var(--ox-text-on-accent)]"
+                          : "border border-[var(--ox-border)] text-[var(--ox-text)]",
                       )}
                     >
                       {mode.label}
@@ -177,7 +180,7 @@ export function Copilot({
                   {api.mode.suggestions.map((suggestion) => (
                     <li
                       key={suggestion.id}
-                      className="border-t border-[--ox-rule] first:border-t-0"
+                      className="border-t border-[var(--ox-border)] first:border-t-0"
                     >
                       <button
                         type="button"
@@ -187,10 +190,12 @@ export function Copilot({
                           setTrayOpen(false);
                         }}
                       >
-                        <span className="block text-sm text-[--ox-text]">{suggestion.label}</span>
+                        <span className="block text-sm text-[var(--ox-text)]">
+                          {suggestion.label}
+                        </span>
                         {/* The scope, shown at the point of choice. */}
                         {suggestion.reads ? (
-                          <span className="block text-xs text-[--ox-text-muted]">
+                          <span className="block text-xs text-[var(--ox-text-muted)]">
                             {suggestion.reads}
                           </span>
                         ) : null}
@@ -205,13 +210,13 @@ export function Copilot({
               <ul
                 {...menu.listProps}
                 aria-label="Shortcuts"
-                className="m-0 list-none rounded-2xl border border-[--ox-rule] bg-[--ox-surface] p-2 shadow-lg"
+                className="m-0 list-none rounded-2xl border border-[var(--ox-border)] bg-[var(--ox-surface)] p-2 shadow-lg"
               >
                 {menu.items.map((item, index) => (
                   <li
                     key={item.id}
                     {...menu.optionProps(index)}
-                    className="cursor-pointer rounded-lg px-2 py-1.5 text-sm aria-selected:bg-[--ox-status-accent]/12"
+                    className="cursor-pointer rounded-lg px-2 py-1.5 text-sm aria-selected:bg-[color-mix(in_oklab,var(--ox-accent)_12%,transparent)]"
                   >
                     {item.label}
                   </li>
@@ -219,9 +224,20 @@ export function Copilot({
               </ul>
             ) : null}
 
-            <ScopeStrip api={api} />
+            <ScopeStrip api={api} onChange={() => setTrayOpen(true)} />
 
-            <div className="flex items-center gap-1.5 rounded-2xl border border-[--ox-rule] bg-[--ox-surface] px-2.5 py-2 shadow-lg">
+            <div className="flex items-center gap-1.5 rounded-2xl border border-[var(--ox-border)] bg-[var(--ox-surface)] px-2 py-1.5 shadow-[0_1px_2px_rgb(0_0_0/0.05),0_12px_32px_-14px_rgb(0_0_0/0.22)]">
+              {/* The square glyph. Also the "/" affordance, so the shortcut
+                menu has a visible way in for anyone who never learns the key. */}
+              <button
+                type="button"
+                aria-label="Shortcuts"
+                onClick={() => api.setDraft(api.draft.startsWith("/") ? api.draft : "/")}
+                className="grid size-8 shrink-0 place-items-center rounded-[10px] border border-[var(--ox-border)] bg-[var(--ox-bg-subtle)] text-base text-[var(--ox-text-muted)]"
+              >
+                <ShortcutIcon />
+              </button>
+
               <input
                 ref={fieldRef}
                 value={api.draft}
@@ -244,24 +260,30 @@ export function Copilot({
                 {...(menu.inputProps["aria-activedescendant"]
                   ? { "aria-activedescendant": menu.inputProps["aria-activedescendant"] }
                   : {})}
-                className="min-w-0 flex-1 bg-transparent text-[--ox-text] outline-none"
+                className="min-w-0 flex-1 bg-transparent px-1 text-[var(--ox-text)] outline-none placeholder:text-[var(--ox-text-muted)]"
               />
 
-              <button
-                type="button"
-                aria-expanded={trayOpen}
-                onClick={() => setTrayOpen((open) => !open)}
-                className="min-h-6 rounded-lg border border-[--ox-rule] px-2 py-1 text-sm"
-              >
-                {api.mode.label}
-              </button>
+              {(() => {
+                const ModeGlyph = modeIcon(api.mode.id);
+                return (
+                  <button
+                    type="button"
+                    aria-expanded={trayOpen}
+                    onClick={() => setTrayOpen((open) => !open)}
+                    className="inline-flex min-h-8 shrink-0 items-center gap-1.5 rounded-[10px] border border-[var(--ox-border)] bg-[var(--ox-bg-subtle)] px-2.5 py-1 text-sm text-[var(--ox-text)]"
+                  >
+                    <ModeGlyph className="text-[var(--ox-text-muted)]" />
+                    {api.mode.label}
+                  </button>
+                );
+              })()}
 
               {api.dictation.active ? (
                 <button
                   type="button"
                   aria-label="Stop dictation"
                   onClick={() => api.dictation.stop()}
-                  className="min-h-6 min-w-6 rounded-lg px-2 text-[--ox-status-normal]"
+                  className="min-h-6 min-w-6 rounded-lg px-2 text-[var(--ox-status-normal)]"
                 >
                   <span className="inline-flex gap-[2px]" aria-hidden="true">
                     <i className="block h-3 w-[2px] animate-pulse rounded bg-current" />
@@ -277,7 +299,7 @@ export function Copilot({
                   type="button"
                   aria-label="Start dictation"
                   onClick={api.dictation.start}
-                  className="min-h-6 min-w-6 rounded-lg px-2"
+                  className="grid size-8 shrink-0 place-items-center rounded-[10px] text-base text-[var(--ox-text-muted)]"
                 >
                   <MicIcon />
                 </button>
@@ -287,7 +309,7 @@ export function Copilot({
                 <button
                   type="button"
                   onClick={api.stop}
-                  className="min-h-6 rounded-lg border border-[--ox-rule] px-2.5 py-1 text-sm"
+                  className="grid size-8 shrink-0 place-items-center rounded-[10px] border border-[var(--ox-border)] text-base"
                 >
                   <StopIcon />
                   <span className="sr-only">Stop</span>
@@ -297,7 +319,7 @@ export function Copilot({
                   type="button"
                   disabled={!api.canSubmit}
                   onClick={() => void api.submit()}
-                  className="min-h-6 rounded-lg bg-[--ox-status-accent] px-2.5 py-1 text-sm text-[--ox-text-on-accent] disabled:opacity-40"
+                  className="grid size-8 shrink-0 place-items-center rounded-[10px] bg-[var(--ox-accent)] text-base text-[var(--ox-text-on-accent)] disabled:opacity-40"
                 >
                   <SendIcon />
                   <span className="sr-only">Send</span>
@@ -306,7 +328,7 @@ export function Copilot({
             </div>
 
             {/* Never dismissible. */}
-            <p className="m-0 text-center text-xs text-[--ox-text-muted]">
+            <p className="m-0 text-center text-xs text-[var(--ox-text-muted)]">
               Medical knowledge only. Not for autonomous decision making. Check sources and use your
               clinical judgement.
             </p>
@@ -326,32 +348,63 @@ export function Copilot({
  * A summary that silently excludes a protected record has created a false
  * belief that would not exist if the tool did not exist.
  */
-function ScopeStrip({ api }: { api: ReturnType<typeof useCopilot> }) {
+function ScopeStrip({
+  api,
+  onChange,
+}: {
+  api: ReturnType<typeof useCopilot>;
+  onChange: () => void;
+}) {
   const { scope } = api;
+
+  // "Change" opens the mode tray rather than a scope picker of its own. Scope
+  // *is* the mode's `reads` contract, so a second control that edited it
+  // independently would let the two disagree — and the strip is the thing a
+  // clinician is being asked to trust.
+  const change = (
+    <button
+      type="button"
+      onClick={onChange}
+      className="rounded-full font-medium text-[var(--ox-accent)] underline underline-offset-2"
+    >
+      Change
+    </button>
+  );
+
+  // A pill that sizes to its own text, not a full-width bar. The strip is a
+  // statement about *this* answer, and a bar spanning the dock reads as chrome —
+  // which is exactly the thing people stop seeing.
+  const shell =
+    "m-0 mx-auto flex w-fit max-w-full flex-wrap items-center gap-x-2 gap-y-1 rounded-full border border-[var(--ox-border)] bg-[var(--ox-surface)] px-3 py-1 text-xs text-[var(--ox-text-muted)] shadow-[0_1px_2px_rgb(0_0_0/0.04)]";
 
   if (scope.categories.length === 0) {
     return (
-      <p className="m-0 rounded-lg border border-[--ox-rule] bg-[--ox-surface] px-3 py-1 text-xs text-[--ox-text-muted]">
+      <p className={shell}>
+        <LockIcon className="shrink-0" />
         No patient data is being used
+        {change}
       </p>
     );
   }
 
   return (
-    <p className="m-0 flex flex-wrap items-center gap-2 rounded-lg border border-[--ox-rule] bg-[--ox-surface] px-3 py-1 text-xs text-[--ox-text-muted]">
+    <p className={shell}>
+      <PersonIcon className="shrink-0" />
       <span>
         Reading{" "}
-        <strong className="text-[--ox-text]">
+        <strong className="font-semibold text-[var(--ox-text)]">
           {scope.subject?.display ?? scope.subject?.reference}
         </strong>
         {" · "}
         {scope.categories.join(", ")}
       </span>
       {scope.showWithheld ? (
-        <span className="rounded bg-[--ox-status-high]/20 px-1.5 text-[--ox-text]">
+        <span className="inline-flex items-center gap-1 rounded-full bg-[color-mix(in_oklab,var(--ox-status-high)_20%,transparent)] px-2 py-px text-[var(--ox-text)]">
+          <LockIcon className="shrink-0" />
           {scope.withheldCount} record{scope.withheldCount === 1 ? "" : "s"} withheld
         </span>
       ) : null}
+      {change}
     </p>
   );
 }
@@ -365,19 +418,21 @@ function CopilotPanel({
   onInsert?: (text: string) => void;
   onRiskProtocol?: () => void;
 }) {
+  const modeSelectRef = React.useRef<HTMLSelectElement>(null);
+
   return (
     <section
       aria-label="Assistant conversation"
-      className="flex max-h-[min(70vh,40rem)] w-full max-w-2xl flex-col overflow-hidden rounded-2xl border border-[--ox-rule] bg-[--ox-surface] shadow-lg"
+      className="flex max-h-[min(70vh,40rem)] w-full max-w-2xl flex-col overflow-hidden rounded-2xl border border-[var(--ox-border)] bg-[var(--ox-surface)] shadow-[0_1px_2px_rgb(0_0_0/0.05),0_16px_40px_-16px_rgb(0_0_0/0.28)]"
     >
-      <header className="flex items-center justify-between border-b border-[--ox-rule] px-3 py-2">
+      <header className="flex items-center justify-between border-b border-[var(--ox-border)] px-3 py-2">
         {api.threads.length > 1 ? (
           <label className="flex min-w-0 items-center gap-1">
             <span className="sr-only">Switch conversation</span>
             <select
               value={api.activeThreadId}
               onChange={(event) => api.switchThread(event.target.value)}
-              className="min-w-0 max-w-[18rem] truncate bg-transparent text-sm font-semibold text-[--ox-text] outline-none"
+              className="min-w-0 max-w-[18rem] truncate bg-transparent text-sm font-semibold text-[var(--ox-text)] outline-none"
             >
               {api.threads.map((thread) => (
                 <option key={thread.id} value={thread.id}>
@@ -388,14 +443,14 @@ function CopilotPanel({
             <ChevronDownIcon />
           </label>
         ) : (
-          <h2 className="m-0 truncate text-sm font-semibold text-[--ox-text]">
+          <h2 className="m-0 truncate text-sm font-semibold text-[var(--ox-text)]">
             {api.threads[0]?.title ?? api.mode.label}
           </h2>
         )}
         <button
           type="button"
           onClick={api.newThread}
-          className="min-h-6 rounded-lg border border-[--ox-rule] px-2 py-0.5 text-xs"
+          className="min-h-6 rounded-lg border border-[var(--ox-border)] px-2 py-0.5 text-xs"
         >
           <NewChatIcon />
           <span className="sr-only">New chat</span>
@@ -415,7 +470,7 @@ function CopilotPanel({
           message.role === "clinician" ? (
             <p
               key={message.id}
-              className="m-0 max-w-[80%] self-end rounded-xl bg-[--ox-status-accent]/12 px-3 py-1.5 text-sm text-[--ox-text]"
+              className="m-0 max-w-[80%] self-end rounded-xl bg-[color-mix(in_oklab,var(--ox-accent)_12%,transparent)] px-3 py-1.5 text-sm text-[var(--ox-text)]"
             >
               {message.text}
             </p>
@@ -424,11 +479,11 @@ function CopilotPanel({
               {/* Collapsed by design: a visible chain of thought reads as
                   evidence to a clinician, and it is not evidence. */}
               {message.answer?.reasoning ? (
-                <details className="text-xs text-[--ox-text-muted]">
+                <details className="text-xs text-[var(--ox-text-muted)]">
                   <summary className="flex cursor-pointer items-center gap-1 text-[0.65rem] uppercase tracking-wide [&::-webkit-details-marker]:hidden">
                     <ThoughtIcon /> Reasoning
                   </summary>
-                  <p className="m-0 mt-1 border-s-2 border-[--ox-rule] ps-2 leading-relaxed">
+                  <p className="m-0 mt-1 border-s-2 border-[var(--ox-border)] ps-2 leading-relaxed">
                     {message.answer.reasoning}
                   </p>
                 </details>
@@ -440,11 +495,11 @@ function CopilotPanel({
                   className={cn(
                     "self-start rounded px-1.5 py-0.5 text-[0.65rem] uppercase tracking-wide",
                     message.answer.register === "grounded" &&
-                      "bg-[--ox-status-normal]/15 text-[--ox-status-normal]",
+                      "bg-[color-mix(in_oklab,var(--ox-status-normal)_15%,transparent)] text-[var(--ox-status-normal)]",
                     message.answer.register === "general" &&
-                      "bg-[--ox-status-high]/15 text-[--ox-status-high]",
+                      "bg-[color-mix(in_oklab,var(--ox-status-high)_15%,transparent)] text-[var(--ox-status-high)]",
                     message.answer.register === "declined" &&
-                      "bg-[--ox-surface-2] text-[--ox-text-muted]",
+                      "bg-[var(--ox-bg-subtle)] text-[var(--ox-text-muted)]",
                   )}
                 >
                   {message.answer.register === "grounded"
@@ -459,9 +514,9 @@ function CopilotPanel({
                 <div
                   data-register={message.answer.register}
                   className={cn(
-                    "text-sm leading-relaxed text-[--ox-text]",
+                    "text-sm leading-relaxed text-[var(--ox-text)]",
                     message.answer.register === "general" &&
-                      "border-s-[3px] border-[--ox-status-high] ps-2.5",
+                      "border-s-[3px] border-[var(--ox-status-high)] ps-2.5",
                   )}
                 >
                   {segmentAnswer(message.answer).map((segment, index) => (
@@ -469,7 +524,7 @@ function CopilotPanel({
                       key={index}
                       className={cn(
                         segment.uncited &&
-                          "underline decoration-[--ox-status-high] decoration-wavy underline-offset-4",
+                          "underline decoration-[var(--ox-status-high)] decoration-wavy underline-offset-4",
                       )}
                       {...(segment.uncited
                         ? {
@@ -485,7 +540,7 @@ function CopilotPanel({
                           type="button"
                           onClick={api.openSources}
                           aria-label={citationLabel(marker, message.answer?.sources.get(marker))}
-                          className="ms-px align-super rounded bg-[--ox-status-accent]/15 px-1 text-[0.65em]"
+                          className="ms-px align-super rounded bg-[color-mix(in_oklab,var(--ox-accent)_15%,transparent)] px-1 text-[0.65em]"
                         >
                           {marker}
                         </button>
@@ -523,7 +578,7 @@ function CopilotPanel({
                 <button
                   type="button"
                   onClick={api.openSources}
-                  className="inline-flex min-h-6 items-center gap-1 rounded-lg border border-[--ox-rule] px-2 py-0.5"
+                  className="inline-flex min-h-6 items-center gap-1 rounded-lg border border-[var(--ox-border)] px-2 py-0.5"
                 >
                   <VerifyIcon />
                   Show sources
@@ -544,7 +599,7 @@ function CopilotPanel({
         )}
 
         {api.state.status === "streaming" && api.state.current ? (
-          <CopilotAnswerRegion busy className="text-sm leading-relaxed text-[--ox-text]">
+          <CopilotAnswerRegion busy className="text-sm leading-relaxed text-[var(--ox-text)]">
             {api.state.current.text}
           </CopilotAnswerRegion>
         ) : null}
@@ -552,12 +607,12 @@ function CopilotPanel({
         {api.state.status === "crisis" ? (
           <section
             role="alert"
-            className="rounded-xl border border-[--ox-status-critical]/45 border-s-[3px] border-s-[--ox-status-critical] bg-[--ox-status-critical]/6 p-3"
+            className="rounded-xl border border-[color-mix(in_oklab,var(--ox-status-critical)_45%,transparent)] border-s-[3px] border-s-[var(--ox-status-critical)] bg-[color-mix(in_oklab,var(--ox-status-critical)_6%,transparent)] p-3"
           >
-            <h3 className="m-0 mb-1 text-sm font-semibold text-[--ox-status-critical]">
+            <h3 className="m-0 mb-1 text-sm font-semibold text-[var(--ox-status-critical)]">
               This needs a person, not a model
             </h3>
-            <p className="m-0 mb-2 text-sm text-[--ox-text]">
+            <p className="m-0 mb-2 text-sm text-[var(--ox-text)]">
               {api.state.safety.crisis.audience === "user"
                 ? "This assistant is not able to help with this. Please reach a person now."
                 : "This assistant does not answer questions about a patient in immediate danger."}
@@ -567,7 +622,7 @@ function CopilotPanel({
                 <button
                   type="button"
                   onClick={onRiskProtocol}
-                  className="min-h-6 rounded-lg bg-[--ox-status-critical] px-2.5 py-1 text-sm text-[--ox-text-on-accent]"
+                  className="min-h-6 rounded-lg bg-[var(--ox-status-critical)] px-2.5 py-1 text-sm text-[var(--ox-text-on-accent)]"
                 >
                   Open risk protocol
                 </button>
@@ -579,12 +634,15 @@ function CopilotPanel({
                   <a
                     key={line.label}
                     href={`tel:${line.number}`}
-                    className="min-h-6 rounded-lg border border-[--ox-rule] px-2.5 py-1 text-sm"
+                    className="min-h-6 rounded-lg border border-[var(--ox-border)] px-2.5 py-1 text-sm"
                   >
                     {line.label} · {line.number}
                   </a>
                 ) : (
-                  <span key={line.label} className="px-2.5 py-1 text-sm text-[--ox-text-muted]">
+                  <span
+                    key={line.label}
+                    className="px-2.5 py-1 text-sm text-[var(--ox-text-muted)]"
+                  >
                     {line.label}
                   </span>
                 ),
@@ -594,21 +652,24 @@ function CopilotPanel({
         ) : null}
 
         {api.state.status === "refused" && api.state.error ? (
-          <div role="status" className="rounded-lg bg-[--ox-surface-2] p-2.5 text-sm">
-            <strong className="text-[--ox-text]">Outside what this assistant answers</strong>
-            <p className="m-0 text-[--ox-text-muted]">{api.state.error.message}</p>
+          <div role="status" className="rounded-lg bg-[var(--ox-bg-subtle)] p-2.5 text-sm">
+            <strong className="text-[var(--ox-text)]">Outside what this assistant answers</strong>
+            <p className="m-0 text-[var(--ox-text-muted)]">{api.state.error.message}</p>
           </div>
         ) : null}
 
         {api.state.status === "error" && api.state.error ? (
-          <div role="alert" className="rounded-lg bg-[--ox-status-critical]/8 p-2.5 text-sm">
-            <strong className="text-[--ox-text]">The assistant could not answer</strong>
-            <p className="m-0 text-[--ox-text-muted]">{api.state.error.message}</p>
+          <div
+            role="alert"
+            className="rounded-lg bg-[color-mix(in_oklab,var(--ox-status-critical)_8%,transparent)] p-2.5 text-sm"
+          >
+            <strong className="text-[var(--ox-text)]">The assistant could not answer</strong>
+            <p className="m-0 text-[var(--ox-text-muted)]">{api.state.error.message}</p>
             {api.state.error.retryable && api.canRetry ? (
               <button
                 type="button"
                 onClick={() => void api.retry()}
-                className="min-h-6 rounded-lg border border-[--ox-rule] px-2 py-0.5"
+                className="min-h-6 rounded-lg border border-[var(--ox-border)] px-2 py-0.5"
               >
                 Try again
               </button>
@@ -617,14 +678,14 @@ function CopilotPanel({
         ) : null}
       </div>
 
-      <ScopeStrip api={api} />
+      <ScopeStrip api={api} onChange={() => modeSelectRef.current?.focus()} />
 
       {/* The panel's own composer. Once the thread is open the dock is the wrong
           place to type: the answer being followed up on is up here, and making
           someone travel back down to ask about it is the kind of small friction
           that ends in a copy-paste into a chat window with none of this
           component's guarantees. */}
-      <div className="border-t border-[--ox-rule] px-3 py-2">
+      <div className="border-t border-[var(--ox-border)] px-3 py-2">
         <input
           value={api.draft}
           aria-label="Ask a follow-up…"
@@ -637,7 +698,7 @@ function CopilotPanel({
               void api.submit();
             }
           }}
-          className="w-full bg-transparent text-sm text-[--ox-text] outline-none"
+          className="w-full bg-transparent text-sm text-[var(--ox-text)] outline-none"
         />
         <div className="mt-1 flex items-center gap-1">
           <button
@@ -652,12 +713,13 @@ function CopilotPanel({
           {/* Mode has to survive the dock being hidden, or opening a thread
               would quietly remove the control that decides what the model may
               read — the one thing that must never be implicit. */}
-          <label className="inline-flex items-center gap-1 rounded-lg border border-[--ox-rule] px-2 py-0.5 text-xs">
+          <label className="inline-flex items-center gap-1 rounded-lg border border-[var(--ox-border)] px-2 py-0.5 text-xs">
             <span className="sr-only">Change mode</span>
             <select
+              ref={modeSelectRef}
               value={api.mode.id}
               onChange={(event) => api.setMode(event.target.value)}
-              className="bg-transparent text-xs text-[--ox-text] outline-none"
+              className="bg-transparent text-xs text-[var(--ox-text)] outline-none"
             >
               {api.modes.map((mode) => (
                 <option key={mode.id} value={mode.id}>
@@ -674,7 +736,7 @@ function CopilotPanel({
               type="button"
               aria-label="Stop dictation"
               onClick={() => api.dictation.stop()}
-              className="min-h-6 min-w-6 rounded-lg px-1 text-[--ox-status-normal]"
+              className="min-h-6 min-w-6 rounded-lg px-1 text-[var(--ox-status-normal)]"
             >
               <MicIcon />
               <span className="sr-only">Microphone is live</span>
@@ -695,7 +757,7 @@ function CopilotPanel({
               type="button"
               aria-label="Stop"
               onClick={api.stop}
-              className="min-h-6 min-w-6 rounded-lg border border-[--ox-rule] px-1"
+              className="min-h-6 min-w-6 rounded-lg border border-[var(--ox-border)] px-1"
             >
               <StopIcon />
             </button>
@@ -705,7 +767,7 @@ function CopilotPanel({
               aria-label="Send"
               disabled={!api.canSubmit}
               onClick={() => void api.submit()}
-              className="min-h-6 min-w-6 rounded-lg bg-[--ox-status-accent] px-1 text-[--ox-text-on-accent] disabled:opacity-40"
+              className="min-h-6 min-w-6 rounded-lg bg-[var(--ox-accent)] px-1 text-[var(--ox-text-on-accent)] disabled:opacity-40"
             >
               <SendIcon />
             </button>
@@ -718,10 +780,10 @@ function CopilotPanel({
       {api.sourcesOpen ? (
         <section
           aria-label="Basis of this answer"
-          className="max-h-72 overflow-y-auto border-t border-[--ox-rule] p-3"
+          className="max-h-72 overflow-y-auto border-t border-[var(--ox-border)] p-3"
         >
           <div className="mb-1 flex items-center justify-between">
-            <strong className="text-sm text-[--ox-text]">Basis of this answer</strong>
+            <strong className="text-sm text-[var(--ox-text)]">Basis of this answer</strong>
             <button
               type="button"
               aria-label="Close"
@@ -735,12 +797,12 @@ function CopilotPanel({
             {api.sources.map((source, index) => (
               <li
                 key={source.id}
-                className="border-t border-[--ox-rule] pt-2 first:border-t-0 first:pt-0"
+                className="border-t border-[var(--ox-border)] pt-2 first:border-t-0 first:pt-0"
               >
                 <div className="flex items-baseline gap-1.5 text-sm">
                   <span
                     aria-hidden="true"
-                    className="rounded bg-[--ox-status-accent]/15 px-1 text-xs"
+                    className="rounded bg-[color-mix(in_oklab,var(--ox-accent)_15%,transparent)] px-1 text-xs"
                   >
                     {index + 1}
                   </span>
@@ -749,18 +811,18 @@ function CopilotPanel({
                       href={source.url}
                       target="_blank"
                       rel="noreferrer noopener"
-                      className="text-[--ox-text]"
+                      className="text-[var(--ox-text)]"
                     >
                       {source.title}
                     </a>
                   ) : (
-                    <strong className="text-[--ox-text]">{source.title}</strong>
+                    <strong className="text-[var(--ox-text)]">{source.title}</strong>
                   )}
                 </div>
-                <blockquote className="m-0 mt-1 border-s-2 border-[--ox-rule] ps-2 text-xs text-[--ox-text-muted]">
+                <blockquote className="m-0 mt-1 border-s-2 border-[var(--ox-border)] ps-2 text-xs text-[var(--ox-text-muted)]">
                   {source.passage}
                 </blockquote>
-                <p className="m-0 mt-1 text-[0.7rem] tabular-nums text-[--ox-text-muted]">
+                <p className="m-0 mt-1 text-[0.7rem] tabular-nums text-[var(--ox-text-muted)]">
                   Retrieved {source.retrievedAt.slice(0, 10)}
                   {source.version ? ` · version ${source.version}` : ""} · {source.kind}
                 </p>
@@ -770,7 +832,7 @@ function CopilotPanel({
         </section>
       ) : null}
 
-      <p className="m-0 border-t border-[--ox-rule] px-3 py-2 text-center text-xs text-[--ox-text-muted]">
+      <p className="m-0 border-t border-[var(--ox-border)] px-3 py-2 text-center text-xs text-[var(--ox-text-muted)]">
         Medical knowledge only. Not for autonomous decision making. Check sources and use your
         clinical judgement.
       </p>

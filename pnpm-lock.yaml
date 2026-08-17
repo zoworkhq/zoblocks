@@ -186,6 +186,9 @@ importers:
       '@oxygenui-design/fixtures':
         specifier: workspace:*
         version: link:../../packages/fixtures
+      '@oxygenui-design/identity':
+        specifier: workspace:*
+        version: link:../../packages/identity
       '@oxygenui-design/signature':
         specifier: workspace:*
         version: link:../../packages/signature

@@ -11,10 +11,13 @@ import { codeableText } from "@oxygenui-design/fhir";
 import { precise, resolveAge } from "./dates.js";
 import { resolveIdentifiers, DEFAULT_IDENTIFIER_SYSTEMS } from "./identifiers.js";
 import { identityInitials, isFamilyFirstLocale } from "./initials.js";
+import { graphemes } from "./text.js";
 import { substituteForDemo } from "./demo.js";
 import { identitySwatch, DEFAULT_SWATCH_COUNT } from "./swatch.js";
 import type {
   CodedValue,
+  DisclosureAllowance,
+  DisclosureLevel,
   Identity,
   IdentityPolicy,
   IdentityState,
@@ -384,4 +387,65 @@ export class IdentityCache {
   clear(): void {
     this.map.clear();
   }
+}
+
+/**
+ * What each disclosure level permits.
+ *
+ * The public rung is the one worth arguing about: a waiting-room display exists
+ * so a named person can recognise themselves being called, and nothing beyond
+ * that is anybody else's business. A full name plus a date of birth on a screen
+ * a corridor can read is an identity handed to whoever is standing there.
+ */
+export function disclosureAllows(level: DisclosureLevel): DisclosureAllowance {
+  switch (level) {
+    case "public":
+      return {
+        name: "short",
+        birthDate: false,
+        age: false,
+        clinicalSex: false,
+        pronouns: false,
+        identifiers: false,
+      };
+    case "reception":
+      // Confirming an appointment, not reading a chart. The date of birth is
+      // the identifier a receptionist actually verifies against; the clinical
+      // sex parameter is a dosing fact and has no business here.
+      return {
+        name: "full",
+        birthDate: true,
+        age: false,
+        clinicalSex: false,
+        pronouns: true,
+        identifiers: true,
+      };
+    case "clinical":
+    case "full":
+    default:
+      return {
+        name: "full",
+        birthDate: true,
+        age: true,
+        clinicalSex: true,
+        pronouns: true,
+        identifiers: true,
+      };
+  }
+}
+
+/**
+ * An initial and a family name. Mononyms and unnamed records pass through.
+ *
+ * The initial is a grapheme cluster, not a code point: `Array.from("रामेश")[0]`
+ * is a bare consonant with its vowel sign left behind, which is a different
+ * letter rather than an abbreviation of one. Same rule as `identityInitials`,
+ * and it is shared rather than reimplemented for exactly that reason.
+ */
+export function shortName(name: ResolvedName): string {
+  const first = name.given[0];
+  const family = name.family;
+  if (!family) return name.text;
+  if (!first) return family;
+  return `${graphemes(first)[0] ?? first}. ${family}`;
 }
