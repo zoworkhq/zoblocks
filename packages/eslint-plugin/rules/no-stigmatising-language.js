@@ -9,7 +9,7 @@
  *
  * This rule covers Oxygen's own strings — message catalogues, labels, defaults.
  * The matching model output is checked at runtime by `runChecks` in
- * `@oxygenui-design/consult-core`, because the model was trained on decades of
+ * `@oxygenui-design/copilot-core`, because the model was trained on decades of
  * clinical text that used these terms freely and will reproduce them.
  *
  * Two deliberate limits:
@@ -25,11 +25,11 @@
  */
 
 /**
- * Kept in sync with STIGMA_TERMS in packages/consult-core/src/language.ts.
+ * Kept in sync with STIGMA_TERMS in packages/copilot-core/src/language.ts.
  * Duplicated rather than imported: this plugin is plain ESM with no build step
  * and no TypeScript, and a lint rule that needs a compiled workspace package to
  * load is a lint rule that breaks the moment someone runs eslint before build.
- * The consult-core test suite asserts the two lists agree.
+ * The copilot-core test suite asserts the two lists agree.
  */
 const TERMS = [
   ["addict", "person with a substance use disorder"],

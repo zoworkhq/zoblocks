@@ -1211,8 +1211,8 @@ export const CATALOG: ComponentDoc[] = [
     "install": "pnpm dlx shadcn@latest add https://oxygenui.design/r/chart-accordion.json"
   },
   {
-    "name": "consult",
-    "title": "Consult",
+    "name": "copilot",
+    "title": "Copilot",
     "tier": "free",
     "status": "experimental",
     "since": "0.3.0",
@@ -1258,13 +1258,13 @@ export const CATALOG: ComponentDoc[] = [
     "props": [
       {
         "name": "modes",
-        "type": "readonly ConsultMode[]",
+        "type": "readonly CopilotMode[]",
         "description": "",
         "required": true
       },
       {
         "name": "provider",
-        "type": "ConsultProvider",
+        "type": "CopilotProvider",
         "description": "",
         "required": true
       },
@@ -1301,7 +1301,7 @@ export const CATALOG: ComponentDoc[] = [
       },
       {
         "name": "context",
-        "type": "ConsultContextResolver",
+        "type": "CopilotContextResolver",
         "description": "",
         "required": false
       },
@@ -1367,7 +1367,7 @@ export const CATALOG: ComponentDoc[] = [
       },
       {
         "name": "shortcuts",
-        "type": "readonly ConsultShortcut[]",
+        "type": "readonly CopilotShortcut[]",
         "description": "",
         "required": false,
         "default": "[]"
@@ -1391,20 +1391,20 @@ export const CATALOG: ComponentDoc[] = [
         "required": false
       }
     ],
-    "extendsType": "UseConsultOptions",
+    "extendsType": "UseCopilotOptions",
     "exports": [
       {
-        "name": "Consult",
+        "name": "Copilot",
         "props": [
           {
             "name": "modes",
-            "type": "readonly ConsultMode[]",
+            "type": "readonly CopilotMode[]",
             "description": "",
             "required": true
           },
           {
             "name": "provider",
-            "type": "ConsultProvider",
+            "type": "CopilotProvider",
             "description": "",
             "required": true
           },
@@ -1441,7 +1441,7 @@ export const CATALOG: ComponentDoc[] = [
           },
           {
             "name": "context",
-            "type": "ConsultContextResolver",
+            "type": "CopilotContextResolver",
             "description": "",
             "required": false
           },
@@ -1507,7 +1507,7 @@ export const CATALOG: ComponentDoc[] = [
           },
           {
             "name": "shortcuts",
-            "type": "readonly ConsultShortcut[]",
+            "type": "readonly CopilotShortcut[]",
             "description": "",
             "required": false,
             "default": "[]"
@@ -1531,10 +1531,10 @@ export const CATALOG: ComponentDoc[] = [
             "required": false
           }
         ],
-        "extendsType": "UseConsultOptions"
+        "extendsType": "UseCopilotOptions"
       }
     ],
-    "usage": "import { Consult } from \"@/components/oxygen/consult\";\nimport { lookUp, prepare } from \"@oxygenui-design/consult-core\";\n\n// Safest first deployment: reference lookup, no patient data anywhere.\n<Consult provider={ourEndpoint} modes={[lookUp]} />\n\n// With the chart, once a resolver is wired.\n<Consult\n  provider={ourEndpoint}\n  modes={[lookUp, prepare]}\n  subject={{ reference: \"Patient/123\", display: \"Amara Okonkwo\" }}\n  context={resolver}\n  actor={{ display: \"Dr Okafor\", reference: \"Practitioner/7\" }}\n  onAudit={(event) => auditSink.write(event)}\n  // The most valuable prop in the API.\n  suppressed={isAdministeringMedication || isSigningOrders}\n/>",
+    "usage": "import { Copilot } from \"@/components/oxygen/copilot\";\nimport { lookUp, prepare } from \"@oxygenui-design/copilot-core\";\n\n// Safest first deployment: reference lookup, no patient data anywhere.\n<Copilot provider={ourEndpoint} modes={[lookUp]} />\n\n// With the chart, once a resolver is wired.\n<Copilot\n  provider={ourEndpoint}\n  modes={[lookUp, prepare]}\n  subject={{ reference: \"Patient/123\", display: \"Amara Okonkwo\" }}\n  context={resolver}\n  actor={{ display: \"Dr Okafor\", reference: \"Practitioner/7\" }}\n  onAudit={(event) => auditSink.write(event)}\n  // The most valuable prop in the API.\n  suppressed={isAdministeringMedication || isSigningOrders}\n/>",
     "guidance": {
       "use": [
         "Clinician-facing reference lookup, where no patient data reaches the model at all. This is the safest first deployment and needs no BAA covering PHI in the model call.",
@@ -1542,9 +1542,9 @@ export const CATALOG: ComponentDoc[] = [
         "Behavioral health measurement-based care — instrument trends restated from what was documented, which generates no clinical recommendation."
       ],
       "avoid": [
-        "Patient-facing surfaces. Consult throws rather than rendering: Illinois, Nevada and Utah each regulate AI in mental health differently and Nevada prohibits it outright. A patient-facing product is a separate product with a separate regulatory footing.",
+        "Patient-facing surfaces. Copilot throws rather than rendering: Illinois, Nevada and Utah each regulate AI in mental health differently and Nevada prohibits it outright. A patient-facing product is a separate product with a separate regulatory footing.",
         "Any moment the clinician is mid-procedure — administering medication, signing orders, in a documented timeout. Pass `suppressed` and the component removes itself entirely.",
-        "Autonomous action. Consult proposes; a human commits, and provenance attributes the act to the human. There is no configuration that changes this.",
+        "Autonomous action. Copilot proposes; a human commits, and provenance attributes the act to the human. There is no configuration that changes this.",
         "Differential generation before you have evaluated your own stack. Below roughly 70% reliability, automation makes performance worse than no automation."
       ]
     },
@@ -1578,17 +1578,17 @@ export const CATALOG: ComponentDoc[] = [
       "Not clinical decision support as any regulator defines it, and not a medical device. The obligations belong to the team that ships it.",
       "The crisis classifier is deterministic and rule-based. It is tuned so that clinical documentation ('denies SI', 'C-SSRS negative') does not escalate, which is what makes it usable in psychiatry — but it is a floor, not a substitute for a risk protocol.",
       "Built-in crisis lines are a development default. 988 is US-only; a host must supply its own for production.",
-      "Consult cannot secure a backend. It guarantees the shape of what it sends and the provenance of what it renders; it cannot stop a host wiring an agent with standing EHR write access behind it.",
-      "Requires @oxygenui-design/consult-react and @oxygenui-design/consult-core from npm. The engine is deliberately not inlined — a safety control nobody reads before pasting is not a safety control."
+      "Copilot cannot secure a backend. It guarantees the shape of what it sends and the provenance of what it renders; it cannot stop a host wiring an agent with standing EHR write access behind it.",
+      "Requires @oxygenui-design/copilot-react and @oxygenui-design/copilot-core from npm. The engine is deliberately not inlined — a safety control nobody reads before pasting is not a safety control."
     ],
     "related": [],
     "dependencies": [
       "clsx",
       "tailwind-merge",
-      "@oxygenui-design/consult-core",
-      "@oxygenui-design/consult-react"
+      "@oxygenui-design/copilot-core",
+      "@oxygenui-design/copilot-react"
     ],
-    "install": "pnpm dlx shadcn@latest add https://oxygenui.design/r/consult.json"
+    "install": "pnpm dlx shadcn@latest add https://oxygenui.design/r/copilot.json"
   },
   {
     "name": "helix-loader",

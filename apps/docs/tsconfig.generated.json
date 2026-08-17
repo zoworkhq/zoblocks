@@ -21,8 +21,8 @@
       "@/components/oxygen/chart-accordion": [
         "../../registry/oxygen/chart-accordion/chart-accordion.tsx"
       ],
-      "@/components/oxygen/consult": [
-        "../../registry/oxygen/consult/consult.tsx"
+      "@/components/oxygen/copilot": [
+        "../../registry/oxygen/copilot/copilot.tsx"
       ],
       "@/components/oxygen/helix-loader": [
         "../../registry/oxygen/helix-loader/helix-loader.tsx"

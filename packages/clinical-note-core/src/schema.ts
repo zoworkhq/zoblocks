@@ -127,7 +127,7 @@ export const NOTE_TYPES = {
   },
   consultation: {
     code: "11488-4",
-    title: "Consultation note",
+    title: "Copilotation note",
     sections: [
       SECTIONS.chiefComplaint,
       SECTIONS.hpi,

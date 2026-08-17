@@ -184,9 +184,9 @@
       ]
     },
     {
-      "name": "consult",
+      "name": "copilot",
       "type": "registry:component",
-      "title": "Consult",
+      "title": "Copilot",
       "description": "Model-agnostic clinical assistant with mode-level scope contracts, inline source attribution, a deterministic crisis interrupt, and FHIR audit output. The engine and the accessibility behaviour ship as npm packages; this item is the Tailwind skin over them.",
       "categories": [
         "patterns",
@@ -195,8 +195,8 @@
       "dependencies": [
         "clsx",
         "tailwind-merge",
-        "@oxygenui-design/consult-core",
-        "@oxygenui-design/consult-react"
+        "@oxygenui-design/copilot-core",
+        "@oxygenui-design/copilot-react"
       ],
       "registryDependencies": [
         "https://oxygenui.design/r/utils.json",
@@ -204,9 +204,9 @@
       ],
       "files": [
         {
-          "path": "registry/oxygen/consult/consult.tsx",
+          "path": "registry/oxygen/copilot/copilot.tsx",
           "type": "registry:component",
-          "target": "components/oxygen/consult.tsx"
+          "target": "components/oxygen/copilot.tsx"
         }
       ]
     },

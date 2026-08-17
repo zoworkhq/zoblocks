@@ -39,7 +39,7 @@ export default defineConfig({
     /*
      * 20s, against Vitest's 5s default.
      *
-     * Story play functions drive whole components through jsdom — the Consult
+     * Story play functions drive whole components through jsdom — the Copilot
      * walkthrough alone opens a mode tray, switches mode, picks a suggestion,
      * runs the shortcut menu, toggles dictation, asks a question and opens the
      * sources drawer. That is seconds of work without a layout engine, and a CI

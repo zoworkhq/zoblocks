@@ -11,7 +11,7 @@ const nextConfig: NextConfig = {
    * output is still valid Node ESM: a post-build pass adds the extensions to
    * `dist` only, which is why the source can stay bundler-friendly.)
    *
-   * The tab and consult packages are NodeNext ESM, so their relative imports
+   * The tab and copilot packages are NodeNext ESM, so their relative imports
    * carry `.js` extensions that resolve to `.ts`/`.tsx` on disk — correct for
    * Node, and unresolvable to Turbopack, which takes the specifier literally
    * and has no `extensionAlias`. They are aliased to `dist` instead, which is
@@ -24,7 +24,7 @@ const nextConfig: NextConfig = {
    * Every NodeNext workspace package the docs import needs an entry here. A
    * missing one is not a subtle failure — the module simply does not resolve,
    * and the page that imports it 500s — but it is only discovered by importing
-   * the package, which is how Consult reached this app without one.
+   * the package, which is how Copilot reached this app without one.
    */
   transpilePackages: [
     "@oxygenui-design/component-meta",
@@ -38,8 +38,8 @@ const nextConfig: NextConfig = {
     resolveAlias: {
       "@oxygenui-design/tabs": "../../packages/tabs/dist/index.js",
       "@oxygenui-design/tabs-core": "../../packages/tabs-core/dist/index.js",
-      "@oxygenui-design/consult-core": "../../packages/consult-core/dist/index.js",
-      "@oxygenui-design/consult-react": "../../packages/consult-react/dist/index.js",
+      "@oxygenui-design/copilot-core": "../../packages/copilot-core/dist/index.js",
+      "@oxygenui-design/copilot-react": "../../packages/copilot-react/dist/index.js",
     },
   },
 

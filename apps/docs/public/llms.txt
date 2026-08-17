@@ -68,8 +68,8 @@ Rules that matter when generating code with these components:
 
 ## Pattern
 
-- [Consult](https://oxygenui.design/components/consult): A floating clinical copilot: a dock above the chart that takes a question and opens into a sourced, auditable thread.
-  install: pnpm dlx shadcn@latest add https://oxygenui.design/r/consult.json
+- [Copilot](https://oxygenui.design/components/copilot): A floating clinical copilot: a dock above the chart that takes a question and opens into a sourced, auditable thread.
+  install: pnpm dlx shadcn@latest add https://oxygenui.design/r/copilot.json
   fhir: AuditEvent, Provenance, QuestionnaireResponse
   states: Rest, Mode tray, Shortcuts, Dictating, Streaming, Grounded answer, General-knowledge answer, Sources open, Refused, Crisis, Error, Suppressed
   status: experimental

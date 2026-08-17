@@ -41,8 +41,8 @@ import {
 import type { AccordionItem } from "@/registry/oxygen/lib/accordion-core";
 import { SafetyPlan } from "@/registry/oxygen/safety-plan/safety-plan";
 import { Tabs } from "@oxygenui-design/tabs";
-import { Consult } from "@/registry/oxygen/consult/consult";
-import { createStaticProvider, lookUp, minimalDisclosure } from "@oxygenui-design/consult-core";
+import { Copilot } from "@/registry/oxygen/copilot/copilot";
+import { createStaticProvider, lookUp, minimalDisclosure } from "@oxygenui-design/copilot-core";
 import { SignatureMark } from "@/components/site/signature-mark";
 import { STATUS_LABEL, type ComponentDoc } from "@/lib/catalog";
 import { cn } from "@/lib/utils";
@@ -192,14 +192,14 @@ const PREVIEW: Record<string, (featured: boolean) => React.ReactNode> = {
    * page instead of in the cell. The provider is scripted and never asked for
    * anything here — a card is not a place to start a model session.
    */
-  consult: (featured) => (
+  copilot: (featured) => (
     <div className="w-full" style={{ maxWidth: featured ? 340 : 280 }}>
-      <Consult provider={CARD_CONSULT_PROVIDER} modes={[lookUp]} anchor="inline" locale="en-GB" />
+      <Copilot provider={CARD_COPILOT_PROVIDER} modes={[lookUp]} anchor="inline" locale="en-GB" />
     </div>
   ),
 };
 
-const CARD_CONSULT_PROVIDER = createStaticProvider({
+const CARD_COPILOT_PROVIDER = createStaticProvider({
   events: [{ type: "done", finish: "stop" }],
   disclosure: minimalDisclosure("demo-model@1", {
     developer: "Zowork",

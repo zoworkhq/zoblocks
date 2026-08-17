@@ -35,12 +35,12 @@ importers:
       '@oxygenui-design/component-meta':
         specifier: workspace:*
         version: link:packages/component-meta
-      '@oxygenui-design/consult-core':
+      '@oxygenui-design/copilot-core':
         specifier: workspace:*
-        version: link:packages/consult-core
-      '@oxygenui-design/consult-react':
+        version: link:packages/copilot-core
+      '@oxygenui-design/copilot-react':
         specifier: workspace:*
-        version: link:packages/consult-react
+        version: link:packages/copilot-react
       '@oxygenui-design/eslint-plugin':
         specifier: workspace:^
         version: link:packages/eslint-plugin
@@ -152,12 +152,12 @@ importers:
       '@oxygenui-design/component-meta':
         specifier: workspace:*
         version: link:../../packages/component-meta
-      '@oxygenui-design/consult-core':
+      '@oxygenui-design/copilot-core':
         specifier: workspace:*
-        version: link:../../packages/consult-core
-      '@oxygenui-design/consult-react':
+        version: link:../../packages/copilot-core
+      '@oxygenui-design/copilot-react':
         specifier: workspace:*
-        version: link:../../packages/consult-react
+        version: link:../../packages/copilot-react
       '@oxygenui-design/fhir':
         specifier: workspace:*
         version: link:../../packages/fhir
@@ -429,14 +429,14 @@ importers:
         specifier: ^4.1.10
         version: 4.1.10(@types/node@22.20.1)(@vitest/coverage-v8@4.1.10)(jsdom@30.0.1)(vite@8.2.1(@types/node@22.20.1)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.12)(yaml@2.9.0))
 
-  packages/consult:
+  packages/copilot:
     dependencies:
-      '@oxygenui-design/consult-core':
+      '@oxygenui-design/copilot-core':
         specifier: workspace:*
-        version: link:../consult-core
-      '@oxygenui-design/consult-react':
+        version: link:../copilot-core
+      '@oxygenui-design/copilot-react':
         specifier: workspace:*
-        version: link:../consult-react
+        version: link:../copilot-react
     devDependencies:
       '@oxygenui-design/tsconfig':
         specifier: workspace:*
@@ -484,7 +484,7 @@ importers:
         specifier: ^4.1.10
         version: 4.1.10(@types/node@22.20.1)(@vitest/coverage-v8@4.1.10)(jsdom@30.0.1)(vite@8.2.1(@types/node@22.20.1)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.12)(yaml@2.9.0))
 
-  packages/consult-core:
+  packages/copilot-core:
     devDependencies:
       '@oxygenui-design/tsconfig':
         specifier: workspace:*
@@ -499,11 +499,11 @@ importers:
         specifier: ^4.1.10
         version: 4.1.10(@types/node@22.20.1)(@vitest/coverage-v8@4.1.10)(jsdom@30.0.1)(vite@8.2.1(@types/node@22.20.1)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.12)(yaml@2.9.0))
 
-  packages/consult-evals:
+  packages/copilot-evals:
     dependencies:
-      '@oxygenui-design/consult-core':
+      '@oxygenui-design/copilot-core':
         specifier: workspace:*
-        version: link:../consult-core
+        version: link:../copilot-core
     devDependencies:
       '@oxygenui-design/tsconfig':
         specifier: workspace:*
@@ -518,11 +518,11 @@ importers:
         specifier: ^4.1.10
         version: 4.1.10(@types/node@22.20.1)(@vitest/coverage-v8@4.1.10)(jsdom@30.0.1)(vite@8.2.1(@types/node@22.20.1)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.12)(yaml@2.9.0))
 
-  packages/consult-react:
+  packages/copilot-react:
     dependencies:
-      '@oxygenui-design/consult-core':
+      '@oxygenui-design/copilot-core':
         specifier: workspace:*
-        version: link:../consult-core
+        version: link:../copilot-core
     devDependencies:
       '@oxygenui-design/tsconfig':
         specifier: workspace:*
