@@ -83,6 +83,116 @@ function AppBehind({ children }: { children: React.ReactNode }) {
   );
 }
 
+/**
+ * A specification row — the code on the left, the thing it produces on the right.
+ *
+ * A gallery that shows five renderings without naming them is a picture.
+ * Naming the prop that produced each one makes it documentation.
+ */
+function SpecRow({
+  code,
+  note,
+  children,
+}: {
+  code: string;
+  note?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="grid gap-3 border-b border-rule/50 py-5 last:border-0 sm:grid-cols-[minmax(0,12rem)_minmax(0,1fr)] sm:gap-6">
+      <div className="min-w-0">
+        <code className="inline-block rounded bg-paper-sunk/70 px-1.5 py-0.5 font-mono text-[11px] text-oxygen-deep">
+          {code}
+        </code>
+        {note ? <p className="mt-1.5 text-xs leading-snug text-graphite">{note}</p> : null}
+      </div>
+      <div className="min-w-0">{children}</div>
+    </div>
+  );
+}
+
+/**
+ * A control with its rationale underneath, boxed.
+ *
+ * For the cases where the interesting thing is *why* this one looks the way it
+ * does — tone, availability — and the answer is a sentence, not a prop name.
+ */
+function AnnotatedRow({ note, children }: { note: string; children: React.ReactNode }) {
+  return (
+    <div className="rounded-lg border border-rule/70 px-4 py-3.5">
+      {children}
+      <p className="mt-2 font-mono text-[11px] leading-relaxed text-graphite">{note}</p>
+    </div>
+  );
+}
+
+/**
+ * The reference grid, rebuilt.
+ *
+ * Four availability rows against size and value — the specimen sheet this
+ * component started from. Kept because it is the one view that *shows* the
+ * axes are independent rather than asserting it.
+ */
+function AnatomyMatrix() {
+  const COLUMNS = [
+    { size: "large", checked: false },
+    { size: "large", checked: true },
+    { size: "default", checked: false },
+    { size: "default", checked: true },
+  ] as const;
+
+  const ROWS = [
+    { key: "plain", label: "plain", props: {} },
+    {
+      key: "labelled",
+      label: "labelled track",
+      props: { appearance: "labeled" as const, stateLabels: "active-inactive" as const },
+    },
+    { key: "readonly", label: "read-only", props: { readOnly: true } },
+    { key: "disabled", label: "disabled", props: { disabled: true } },
+  ];
+
+  return (
+    <div className="overflow-x-auto">
+      <table className="w-full min-w-[34rem] border-collapse">
+        <thead>
+          <tr>
+            <th className="w-24" />
+            {COLUMNS.map((c) => (
+              <th
+                key={`${c.size}-${String(c.checked)}`}
+                className="border-b border-rule px-3 pb-2 text-left font-mono text-[10px] font-normal uppercase tracking-[0.14em] text-graphite"
+              >
+                {c.size} · {c.checked ? "on" : "off"}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {ROWS.map((row) => (
+            <tr key={row.key}>
+              <th className="border-r border-rule py-4 pr-3 text-left align-middle font-mono text-[10px] font-normal uppercase tracking-[0.14em] text-graphite">
+                {row.label}
+              </th>
+              {COLUMNS.map((c) => (
+                <td key={`${row.key}-${c.size}-${String(c.checked)}`} className="px-3 py-4">
+                  <Switch
+                    label="Label"
+                    size={c.size}
+                    checked={c.checked}
+                    showState={false}
+                    {...row.props}
+                  />
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
 function Centered({ children }: { children: React.ReactNode }) {
   return <div className="flex min-h-[200px] items-center justify-center">{children}</div>;
 }
@@ -1017,6 +1127,29 @@ const SCENARIOS: Record<string, Scenario[]> = {
 
   switch: [
     {
+      id: "anatomy",
+      label: "Anatomy",
+      note: "The specimen sheet this component started from, rebuilt with Oxygen's real token values — then desaturated, because on-track and off-track sit within about 1.2:1 of each other in luminance. Position, glyph and word each carry the state alone.",
+      render: () => (
+        <div className="flex flex-col gap-8">
+          <AnatomyMatrix />
+          <div className="rounded-lg border border-rule/70 p-4">
+            <p className="axis-label mb-3">The same four states, desaturated</p>
+            <div className="flex flex-wrap items-center gap-x-8 gap-y-4 grayscale">
+              <Switch label="Off" checked={false} />
+              <Switch label="On" checked />
+              <Switch label="Advance directive" checked="unknown" absentReason="not-collected" />
+              <Switch label="Contact precautions" checked readOnly />
+            </div>
+            <p className="mt-3 font-mono text-[11px] leading-relaxed text-graphite">
+              A CSS greyscale filter, standing in for a monochrome ward printer and for
+              deuteranopia.
+            </p>
+          </div>
+        </div>
+      ),
+    },
+    {
       id: "commit",
       label: "The write, and the write that fails",
       note: "A switch is a request, not a change. The first control saves; the second fails every other attempt — watch it animate back to the value the record actually holds and say so, rather than snapping back while nobody is looking.",
@@ -1045,20 +1178,27 @@ const SCENARIOS: Record<string, Scenario[]> = {
       label: "Off, and never asked",
       note: "The clinical difference a two-state control cannot hold. Four switches in the same visual state saying four different things — and the word changes, not the colour.",
       render: () => (
-        <Centered>
-          <div className="grid gap-6 sm:grid-cols-2">
+        <div className="flex flex-col">
+          <SpecRow code={'absentReason="not-collected"'} note="nobody collected it">
             <Switch
               label="Advance directive"
               checked="unknown"
               absentReason="not-collected"
               stateLabels="yes-no"
             />
+          </SpecRow>
+          <SpecRow
+            code={'absentReason="declined"'}
+            note="the person refused — a recorded clinical act, not an absence"
+          >
             <Switch
               label="Interpreter needed"
               checked="unknown"
               absentReason="declined"
               stateLabels="yes-no"
             />
+          </SpecRow>
+          <SpecRow code={'absentReason="masked"'} note="policy withheld it from you">
             <Switch
               label="Substance use screen"
               checked="unknown"
@@ -1066,14 +1206,16 @@ const SCENARIOS: Record<string, Scenario[]> = {
               readOnly
               stateLabels="yes-no"
             />
+          </SpecRow>
+          <SpecRow code={'absentReason="pending"'} note="collected, result not back">
             <Switch
               label="MRSA screen"
               checked="unknown"
               absentReason="pending"
               stateLabels="yes-no"
             />
-          </div>
-        </Centered>
+          </SpecRow>
+        </div>
       ),
     },
     {
@@ -1123,27 +1265,44 @@ const SCENARIOS: Record<string, Scenario[]> = {
       label: "One value, five renderings",
       note: "The same state model behind every one. Segmented is the only appearance that changes the ARIA role — two labelled cells that both look pressable are a radiogroup, and calling them a switch would be a lie to a screen reader.",
       render: () => (
-        <Centered>
-          <div className="flex w-full max-w-md flex-col gap-6">
+        <div className="flex flex-col">
+          <SpecRow code={'appearance="switch"'} note="the default">
             <Switch label="Interpreter required" stateLabels="yes-no" checked />
+          </SpecRow>
+          <SpecRow code={'appearance="labeled"'} note="the word is inside the track">
             <Switch
               label="Interpreter required"
               appearance="labeled"
               stateLabels="active-inactive"
               checked
             />
-            <Switch
-              label="Latex allergy"
-              appearance="segmented"
-              stateLabels="yes-no"
-              checked="unknown"
-              absentReason="not-collected"
-            />
+          </SpecRow>
+          <SpecRow code={'appearance="segmented"'} note="both answers are visible choices">
+            <div className="flex flex-col gap-3">
+              <Switch
+                label="Interpreter required"
+                appearance="segmented"
+                stateLabels="yes-no"
+                checked
+              />
+              <Switch
+                label="Latex allergy"
+                appearance="segmented"
+                stateLabels="yes-no"
+                checked="unknown"
+                absentReason="not-collected"
+              />
+            </div>
+          </SpecRow>
+          <SpecRow code={'appearance="chip"'} note="a filter bar, eight at a time">
             <div className="flex flex-wrap gap-2">
               <Switch label="My patients" appearance="chip" checked />
-              <Switch label="Unacknowledged" appearance="chip" checked={false} />
+              <Switch label="Unacknowledged results" appearance="chip" checked={false} />
               <Switch label="Discharge today" appearance="chip" checked />
+              <Switch label="Isolation" appearance="chip" checked={false} />
             </div>
+          </SpecRow>
+          <SpecRow code={'appearance="row"'} note="the whole row is the target">
             <Switch
               label="Text me when my results are ready"
               description="To the mobile ending 4471. Standard rates apply."
@@ -1151,33 +1310,43 @@ const SCENARIOS: Record<string, Scenario[]> = {
               audience="patient"
               checked
             />
-          </div>
-        </Centered>
+          </SpecRow>
+        </div>
       ),
     },
     {
       id: "tone",
       label: "When on is the dangerous state",
-      note: "Half the switches in a clinical system are suppressions. All four here are on; only the middle two are situations anyone needs to know about — and the colour, the glyph and the word all say so.",
+      note: "Half the switches in a clinical system are suppressions. All four here are on; only the middle two are situations anyone needs to know about — and the colour, the glyph and the state word all say so.",
       render: () => (
-        <Centered>
-          <div className="flex flex-col gap-6">
+        <div className="flex flex-col gap-3">
+          <AnnotatedRow note={'tone="affirmative" — on is the safe direction, and the default.'}>
             <Switch label="Allergy interaction checking" stateLabels="enabled-disabled" checked />
+          </AnnotatedRow>
+          <AnnotatedRow note={'tone="caution" — on removes a safety net. Amber, with the word.'}>
             <Switch
               label="Suppress duplicate-therapy alerts"
               tone="caution"
               stateLabels="in-effect"
               checked
             />
+          </AnnotatedRow>
+          <AnnotatedRow
+            note={'tone="critical" + confirm="attest" — on requires a typed reason, recorded.'}
+          >
             <Switch
               label="Bypass allergy check for this order"
               tone="critical"
               stateLabels="allowed-blocked"
               checked
             />
+          </AnnotatedRow>
+          <AnnotatedRow
+            note={'tone="neutral" — a view preference with no clinical direction at all.'}
+          >
             <Switch label="Show archived encounters" tone="neutral" checked />
-          </div>
-        </Centered>
+          </AnnotatedRow>
+        </div>
       ),
     },
     {
@@ -1258,8 +1427,8 @@ const SCENARIOS: Record<string, Scenario[]> = {
       label: "Locked, and why",
       note: "“Disabled” is the most over-used attribute in healthcare UI and almost always the wrong one — it takes the control out of the tab order, so a screen-reader user never learns it exists. Read-only keeps it reachable and says what is holding it.",
       render: () => (
-        <Centered>
-          <div className="flex w-full max-w-md flex-col gap-6">
+        <div className="flex flex-col gap-3">
+          <AnnotatedRow note="readOnly — the record is signed. Still focusable, still named.">
             <Switch
               label="Contact precautions"
               stateLabels="in-effect"
@@ -1267,6 +1436,8 @@ const SCENARIOS: Record<string, Scenario[]> = {
               readOnly
               lockedReason="Encounter signed 14:32 by Dr Okafor."
             />
+          </AnnotatedRow>
+          <AnnotatedRow note="readOnly — policy, not record state. The row stays visible rather than vanishing.">
             <Switch
               label="Change diet order"
               stateLabels="allowed-blocked"
@@ -1274,6 +1445,8 @@ const SCENARIOS: Record<string, Scenario[]> = {
               readOnly
               lockedReason="Your role cannot change this."
             />
+          </AnnotatedRow>
+          <AnnotatedRow note="readOnly — a dependency, named, so the reader knows what would unlock it.">
             <Switch
               label="Airborne precautions"
               stateLabels="in-effect"
@@ -1281,15 +1454,11 @@ const SCENARIOS: Record<string, Scenario[]> = {
               readOnly
               lockedReason="Requires a negative-pressure room, and none is free on this unit."
             />
-            <Switch
-              label="Notify by SMS"
-              stateLabels="enabled-disabled"
-              checked
-              disabled
-              description="Genuinely disabled: transient, and caused by something the user just did."
-            />
-          </div>
-        </Centered>
+          </AnnotatedRow>
+          <AnnotatedRow note="disabled — correct here and only here: transient, and caused by something the user just did.">
+            <Switch label="Notify by SMS" stateLabels="enabled-disabled" checked disabled />
+          </AnnotatedRow>
+        </div>
       ),
     },
     {
