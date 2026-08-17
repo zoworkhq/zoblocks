@@ -3485,6 +3485,12 @@ export const CATALOG: ComponentDoc[] = [
         "default": "false"
       },
       {
+        "name": "error",
+        "type": "React.ReactNode",
+        "description": "Shown and announced on a controlled `reverted`, `blocked` or `stale`.",
+        "required": false
+      },
+      {
         "name": "holdMs",
         "type": "number",
         "description": "Hold duration in ms. 0 routes every activation to the dialog instead.",
@@ -3579,6 +3585,12 @@ export const CATALOG: ComponentDoc[] = [
         "required": false
       },
       {
+        "name": "phase",
+        "type": "CommitPhase",
+        "description": "The controlled alternative to `onCommit`, for a caller that already owns a state machine — a mutation library, a websocket, an offline queue — and needs this control to render its phases rather than run its own. Supplying it takes the machine out of the loop entirely: nothing here starts a timer, and `requested` decides what is drawn while in flight. Every rendering, announcement and availability rule is unchanged, which is the point — a host should not have to reimplement the revert animation to use its own transport.",
+        "required": false
+      },
+      {
         "name": "provenance",
         "type": "{ by: string; at: string; via?: string; }",
         "description": "",
@@ -3590,6 +3602,12 @@ export const CATALOG: ComponentDoc[] = [
         "description": "",
         "required": false,
         "default": "false"
+      },
+      {
+        "name": "requested",
+        "type": "boolean",
+        "description": "What to render while a controlled `phase` is `pending` or `queued`.",
+        "required": false
       },
       {
         "name": "serverValue",
@@ -3749,6 +3767,12 @@ export const CATALOG: ComponentDoc[] = [
             "default": "false"
           },
           {
+            "name": "error",
+            "type": "React.ReactNode",
+            "description": "Shown and announced on a controlled `reverted`, `blocked` or `stale`.",
+            "required": false
+          },
+          {
             "name": "holdMs",
             "type": "number",
             "description": "Hold duration in ms. 0 routes every activation to the dialog instead.",
@@ -3843,6 +3867,12 @@ export const CATALOG: ComponentDoc[] = [
             "required": false
           },
           {
+            "name": "phase",
+            "type": "CommitPhase",
+            "description": "The controlled alternative to `onCommit`, for a caller that already owns a state machine — a mutation library, a websocket, an offline queue — and needs this control to render its phases rather than run its own. Supplying it takes the machine out of the loop entirely: nothing here starts a timer, and `requested` decides what is drawn while in flight. Every rendering, announcement and availability rule is unchanged, which is the point — a host should not have to reimplement the revert animation to use its own transport.",
+            "required": false
+          },
+          {
             "name": "provenance",
             "type": "{ by: string; at: string; via?: string; }",
             "description": "",
@@ -3854,6 +3884,12 @@ export const CATALOG: ComponentDoc[] = [
             "description": "",
             "required": false,
             "default": "false"
+          },
+          {
+            "name": "requested",
+            "type": "boolean",
+            "description": "What to render while a controlled `phase` is `pending` or `queued`.",
+            "required": false
           },
           {
             "name": "serverValue",
@@ -4008,6 +4044,12 @@ export const CATALOG: ComponentDoc[] = [
             "required": false
           },
           {
+            "name": "error",
+            "type": "React.ReactNode",
+            "description": "Shown and announced on a controlled `reverted`, `blocked` or `stale`.",
+            "required": false
+          },
+          {
             "name": "holdMs",
             "type": "number",
             "description": "Hold duration in ms. 0 routes every activation to the dialog instead.",
@@ -4098,6 +4140,12 @@ export const CATALOG: ComponentDoc[] = [
             "required": false
           },
           {
+            "name": "phase",
+            "type": "CommitPhase",
+            "description": "The controlled alternative to `onCommit`, for a caller that already owns a state machine — a mutation library, a websocket, an offline queue — and needs this control to render its phases rather than run its own. Supplying it takes the machine out of the loop entirely: nothing here starts a timer, and `requested` decides what is drawn while in flight. Every rendering, announcement and availability rule is unchanged, which is the point — a host should not have to reimplement the revert animation to use its own transport.",
+            "required": false
+          },
+          {
             "name": "provenance",
             "type": "{ by: string; at: string; via?: string; }",
             "description": "",
@@ -4107,6 +4155,12 @@ export const CATALOG: ComponentDoc[] = [
             "name": "readOnly",
             "type": "boolean",
             "description": "",
+            "required": false
+          },
+          {
+            "name": "requested",
+            "type": "boolean",
+            "description": "What to render while a controlled `phase` is `pending` or `queued`.",
             "required": false
           },
           {

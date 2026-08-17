@@ -253,6 +253,72 @@ function SharedRecordSwitches() {
 }
 
 /**
+ * Every phase, driven by hand.
+ *
+ * The controlled escape hatch: a caller that already owns a state machine — a
+ * mutation library, a websocket, an offline queue — hands `phase` in and gets
+ * the same renderings, announcements and availability rules without running a
+ * second machine underneath.
+ */
+function PhaseGallery() {
+  const PHASES = [
+    { phase: "idle", note: "nothing in flight" },
+    { phase: "pending", note: "sent, awaiting the record — still focusable" },
+    { phase: "committed", note: "landed" },
+    { phase: "reverted", note: "we tried and it failed; retry is reasonable" },
+    { phase: "blocked", note: "refused before trying; retry fails identically" },
+    { phase: "queued", note: "never sent — offline, and cancellable" },
+    { phase: "stale", note: "somebody else's write landed" },
+  ] as const;
+
+  const [i, setI] = React.useState(0);
+  const active = PHASES[i]!;
+
+  return (
+    <div className="flex w-full max-w-md flex-col gap-5">
+      <div className="flex flex-wrap gap-1.5">
+        {PHASES.map((p, index) => (
+          <button
+            key={p.phase}
+            type="button"
+            onClick={() => setI(index)}
+            aria-pressed={index === i}
+            className={`rounded-full border px-2.5 py-1 font-mono text-[11px] ${
+              index === i ? "border-oxygen-deep text-oxygen-deep" : "border-rule text-graphite"
+            }`}
+          >
+            {p.phase}
+          </button>
+        ))}
+      </div>
+
+      <Switch
+        label="Contact precautions"
+        description="Gown and gloves on entry."
+        stateLabels="in-effect"
+        tone="caution"
+        size="large"
+        checked
+        phase={active.phase}
+        requested={active.phase === "queued" || active.phase === "pending" ? false : undefined}
+        serverValue={active.phase === "stale" ? false : undefined}
+        error={
+          active.phase === "reverted"
+            ? "Could not reach the record."
+            : active.phase === "blocked"
+              ? "Your role cannot change precautions on this unit."
+              : undefined
+        }
+      />
+
+      <p className="font-mono text-xs text-graphite">
+        {active.phase} — {active.note}
+      </p>
+    </div>
+  );
+}
+
+/**
  * Room around a composite demo, and deliberately no theme scope.
  *
  * `.instrument-demo` follows the page theme — globals.css states the rule
@@ -1309,6 +1375,137 @@ const SCENARIOS: Record<string, Scenario[]> = {
               ]}
               provenance={{ by: "J. Adeyemi", at: "2026-08-16T06:40:00.000Z", via: "ward round" }}
             />
+          </div>
+        </Centered>
+      ),
+    },
+    {
+      id: "phases",
+      label: "Every phase, by hand",
+      note: "The controlled escape hatch. A caller that already owns a state machine — a mutation library, a websocket, an offline queue — hands `phase` in and gets these renderings and announcements without a second machine running underneath. Step through all seven.",
+      render: () => (
+        <Centered>
+          <PhaseGallery />
+        </Centered>
+      ),
+    },
+    {
+      id: "deferred",
+      label: "A switch inside a form",
+      note: "A switch means applied now. When it is not — a form that commits on submit — it has to say so, or it lies about when it took effect. Toggle these and watch an unsaved marker rather than a write.",
+      render: () => (
+        <Centered>
+          <div className="flex w-full max-w-md flex-col gap-6">
+            <Switch
+              label="Text me when my results are ready"
+              description="Saved when you submit the form."
+              stateLabels="enabled-disabled"
+              commit="deferred"
+              defaultChecked={false}
+              size="large"
+            />
+            <Switch
+              label="Share my records with my GP"
+              description="Also saved on submit."
+              stateLabels="given-declined"
+              commit="deferred"
+              defaultChecked={false}
+              size="large"
+            />
+          </div>
+        </Centered>
+      ),
+    },
+    {
+      id: "antd",
+      label: "The antd surface, unchanged",
+      note: "Prop names, shapes and defaults match Ant Design's Switch, so an existing form migrates by changing an import. The one deliberate divergence is `loading`: it renders as pending and does not disable, because a spinner that removes the control loses focus and cannot be cancelled.",
+      render: () => (
+        <Centered>
+          <div className="flex w-full max-w-md flex-col gap-6">
+            <Switch
+              label="checkedChildren / unCheckedChildren"
+              checkedChildren="Active"
+              unCheckedChildren="Inactive"
+              defaultChecked
+              size="large"
+            />
+            <Switch
+              label="loading — still focusable, never disabled"
+              loading
+              checked
+              size="large"
+            />
+            <Switch label="disabled — antd's meaning, unchanged" disabled checked size="large" />
+            <Switch label="size=small" size="small" defaultChecked />
+          </div>
+        </Centered>
+      ),
+    },
+    {
+      id: "custom",
+      label: "Restyled without a fork",
+      note: "Three layers, in the order to reach for them: tokens first, props second, slots last. All three below are one component and one state model — only the --ox-switch-* values differ, so a brand restyles the control without editing the source it was shipped.",
+      render: () => (
+        <Centered>
+          <div className="flex w-full max-w-md flex-col gap-7">
+            <Switch label="Default tokens" stateLabels="in-effect" checked size="large" />
+            <div
+              style={
+                {
+                  "--ox-switch-radius": "0.25rem",
+                  "--ox-switch-track-on-bg": "#4338ca",
+                  "--ox-switch-track-w": "64px",
+                } as React.CSSProperties
+              }
+            >
+              <Switch
+                label="Squared, wider, another brand"
+                stateLabels="in-effect"
+                checked
+                size="large"
+              />
+            </div>
+            <Switch
+              label="A custom thumb, through slots"
+              stateLabels="in-effect"
+              checked
+              size="large"
+              slots={{
+                thumb: ({ value }) => (
+                  <span aria-hidden="true" style={{ fontSize: 11, lineHeight: 1 }}>
+                    {value === true ? "\u2713" : ""}
+                  </span>
+                ),
+              }}
+            />
+          </div>
+        </Centered>
+      ),
+    },
+    {
+      id: "rtl",
+      label: "Right to left",
+      note: "Logical properties throughout — the thumb travels on inset-inline-start, and labelPlacement is start/end rather than left/right. Nothing here is mirrored by hand, which is why it is correct rather than approximately correct.",
+      render: () => (
+        <Centered>
+          <div className="flex w-full max-w-md flex-col gap-7">
+            <Switch label="Label at the end (default)" stateLabels="yes-no" checked size="large" />
+            <Switch
+              label="Label at the start"
+              stateLabels="yes-no"
+              labelPlacement="start"
+              checked
+              size="large"
+            />
+            <div dir="rtl" className="rounded-lg border border-rule p-4">
+              <Switch
+                label="\u0645\u062a\u0631\u062c\u0645 \u0645\u0637\u0644\u0648\u0628"
+                stateLabels="yes-no"
+                checked
+                size="large"
+              />
+            </div>
           </div>
         </Centered>
       ),
