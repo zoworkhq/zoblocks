@@ -402,7 +402,24 @@ describe("scope summary", () => {
 
     await waitFor(() => expect(result.current.scope.showWithheld).toBe(true));
     expect(result.current.scope.withheldCount).toBe(2);
-    expect(result.current.scope.categories).toContain("Condition");
+
+    /*
+     * Two views of one fact, and the split is the point.
+     *
+     * `resourceTypes` is the contract — the closed FHIR union a compliance
+     * officer diffs and a typo cannot survive. `categories` is what the scope
+     * strip renders, and it has to be a sentence a clinician reads
+     * mid-consultation: "Condition, MedicationRequest, MedicationStatement,
+     * AllergyIntolerance, Observation, DiagnosticReport, Encounter" gets
+     * skipped, and a scope strip that gets skipped is the control defeated.
+     */
+    expect(result.current.scope.resourceTypes).toContain("Condition");
+    expect(result.current.scope.categories).toContain("problem list");
+    expect(result.current.scope.categories).not.toContain("Condition");
+
+    // MedicationRequest and MedicationStatement collapse: a clinician thinks
+    // "medications", and listing it twice reads as a rendering fault.
+    expect(result.current.scope.categories.filter((c) => c === "medications")).toHaveLength(1);
   });
 });
 

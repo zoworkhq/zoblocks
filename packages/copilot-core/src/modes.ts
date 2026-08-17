@@ -335,3 +335,52 @@ export function requireMode(modes: readonly CopilotMode[], id: string): CopilotM
   }
   return found;
 }
+
+/**
+ * What a category is called on screen.
+ *
+ * `reads` is a contract, so it is FHIR resource types: a closed union a
+ * compliance officer can diff and a typo cannot survive. That is exactly the
+ * wrong register for the scope strip, which is read mid-consultation by someone
+ * who has never heard of `MedicationStatement` and is being asked to decide
+ * whether the assistant saw enough to be trusted. "Reading Amara Okonkwo ·
+ * Condition, MedicationRequest, MedicationStatement, AllergyIntolerance,
+ * Observation, DiagnosticReport, Encounter" is a sentence that gets skipped,
+ * and a scope strip that gets skipped is the whole control defeated.
+ *
+ * So the contract stays in resource types and the *display* is translated here
+ * — once, beside the modes, rather than in each skin where the two could drift.
+ * Several types collapse deliberately: a clinician thinks "medications", not
+ * "MedicationRequest and MedicationStatement".
+ */
+const CATEGORY_LABELS: Record<string, string> = {
+  AllergyIntolerance: "allergies",
+  CarePlan: "care plan",
+  Condition: "problem list",
+  DiagnosticReport: "results",
+  DocumentReference: "notes",
+  Encounter: "encounters",
+  Immunization: "immunisations",
+  MedicationRequest: "medications",
+  MedicationStatement: "medications",
+  Observation: "results",
+  Patient: "demographics",
+  Procedure: "procedures",
+  QuestionnaireResponse: "questionnaires",
+  ServiceRequest: "orders",
+};
+
+/**
+ * Human-readable scope categories, de-duplicated and in the order given.
+ *
+ * Order is preserved rather than sorted, because a mode author lists what the
+ * mode is mostly about first and that ordering carries meaning.
+ */
+export function categoryLabels(reads: readonly string[]): readonly string[] {
+  const out: string[] = [];
+  for (const type of reads) {
+    const label = CATEGORY_LABELS[type] ?? type;
+    if (!out.includes(label)) out.push(label);
+  }
+  return out;
+}

@@ -17,6 +17,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   assertClinicianFacing,
+  categoryLabels,
   confirmProposal,
   disclosableWithheldCount,
   hasDisclosableWithholding,
@@ -71,7 +72,10 @@ export interface UseCopilotOptions {
 
 export interface ScopeSummary {
   readonly subject: Reference | undefined;
+  /** For display — clinical English, several resource types collapsed. */
   readonly categories: readonly string[];
+  /** The enforcement contract, unchanged, for anyone auditing what was read. */
+  readonly resourceTypes: readonly string[];
   readonly withheldCount: number;
   readonly showWithheld: boolean;
   readonly asOf: string | undefined;
@@ -504,7 +508,11 @@ export function useCopilot(options: UseCopilotOptions): CopilotApi {
   const scope: ScopeSummary = useMemo(
     () => ({
       subject,
-      categories: mode.reads,
+      // Clinical English, not FHIR. `mode.reads` stays the contract; this is
+      // the sentence a clinician actually reads mid-consultation, and one they
+      // skip is the scope control defeated.
+      categories: categoryLabels(mode.reads),
+      resourceTypes: mode.reads,
       withheldCount: state.context ? disclosableWithheldCount(state.context) : 0,
       showWithheld: state.context ? hasDisclosableWithholding(state.context) : false,
       asOf: state.context?.asOf,

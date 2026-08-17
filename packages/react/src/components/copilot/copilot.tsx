@@ -146,7 +146,13 @@ export function Copilot({
         data-ox-copilot=""
         data-ox-status={api.state.status}
         className={cn(
-          "z-[900] flex flex-col items-center gap-2",
+          "z-[900] flex flex-col gap-2",
+          // The dock centres; the thread docks to a side. A dock is a summons
+          // bar and belongs where the eye already is, but a thread is something
+          // you read *against* the record — centred, it sits on top of the
+          // chart being discussed, and the first thing anyone does is drag it
+          // out of the way.
+          threadOpen ? "items-start" : "items-center",
           anchor !== "inline" &&
             "fixed inset-x-0 bottom-0 px-4 pb-[max(1rem,env(safe-area-inset-bottom))]",
           anchor === "bottom-right" && "items-end",
@@ -383,7 +389,9 @@ function ScopeStrip({
   // statement about *this* answer, and a bar spanning the dock reads as chrome —
   // which is exactly the thing people stop seeing.
   const shell =
-    "m-0 mx-auto flex w-fit max-w-full flex-wrap items-center gap-x-2 gap-y-1 rounded-full border border-[var(--ox-border)] bg-[var(--ox-surface)] px-3 py-1 text-xs text-[var(--ox-text-muted)] shadow-[0_1px_2px_rgb(0_0_0/0.04)]";
+    // `rounded-2xl` rather than a full pill: the category list is host-supplied
+    // and a pill that wraps to three lines reads as a rendering fault.
+    "m-0 mx-auto flex w-fit max-w-full flex-wrap items-center justify-center gap-x-2 gap-y-1 rounded-2xl border border-[var(--ox-border)] bg-[var(--ox-surface)] px-3 py-1 text-xs text-[var(--ox-text-muted)] shadow-[0_1px_2px_rgb(0_0_0/0.04)]";
 
   if (scope.categories.length === 0) {
     return (
@@ -417,6 +425,42 @@ function ScopeStrip({
   );
 }
 
+/**
+ * A retrieved passage with the supporting clause marked.
+ *
+ * This is the difference between a citation and a verification. A source title
+ * tells a clinician where an answer came from; it does not tell them the model
+ * read that source correctly, and checking costs a tab, a search and a scan of
+ * a forty-page guideline. Nobody pays that during a consultation — which is the
+ * mechanism behind automation bias, an effort asymmetry rather than a character
+ * flaw.
+ *
+ * Marking the clause makes the check a glance. `<mark>` rather than a styled
+ * span because the semantics are exactly right and it survives forced-colours
+ * mode, where a background tint would vanish and take the meaning with it.
+ *
+ * Offsets are host-supplied and clamped rather than trusted: a provider that
+ * returns a stale range should mark the wrong words at worst, never throw away
+ * the passage.
+ */
+export function HighlightedPassage({ text, at }: { text: string; at?: readonly [number, number] }) {
+  if (!at) return <>{text}</>;
+
+  const start = Math.max(0, Math.min(at[0], text.length));
+  const end = Math.max(start, Math.min(at[1], text.length));
+  if (start === end) return <>{text}</>;
+
+  return (
+    <>
+      {text.slice(0, start)}
+      <mark className="rounded bg-[color-mix(in_oklab,var(--ox-status-high)_28%,transparent)] px-0.5 text-[var(--ox-text)]">
+        {text.slice(start, end)}
+      </mark>
+      {text.slice(end)}
+    </>
+  );
+}
+
 function CopilotPanel({
   api,
   onInsert,
@@ -431,7 +475,9 @@ function CopilotPanel({
   return (
     <section
       aria-label="Assistant conversation"
-      className="flex max-h-[min(70vh,40rem)] w-full max-w-2xl flex-col overflow-hidden rounded-2xl border border-[var(--ox-border)] bg-[var(--ox-surface)] shadow-[0_1px_2px_rgb(0_0_0/0.05),0_16px_40px_-16px_rgb(0_0_0/0.28)]"
+      // A column, not a banner. The record stays readable beside it, which is
+      // the whole reason a clinician opened a thread about that record.
+      className="flex max-h-[min(78vh,44rem)] w-full max-w-md flex-col overflow-hidden rounded-2xl border border-[var(--ox-border)] bg-[var(--ox-surface)] shadow-[0_1px_2px_rgb(0_0_0/0.05),0_16px_40px_-16px_rgb(0_0_0/0.28)]"
     >
       <header className="flex items-center justify-between border-b border-[var(--ox-border)] px-3 py-2">
         {api.threads.length > 1 ? (
@@ -686,6 +732,67 @@ function CopilotPanel({
         ) : null}
       </div>
 
+      {/* The verification surface. The passage itself, not a link — following a
+          link costs a tab and a search, and people accept rather than pay it. */}
+      {api.sourcesOpen ? (
+        <section
+          aria-label="Basis of this answer"
+          className="max-h-72 overflow-y-auto border-t border-[var(--ox-border)] p-3"
+        >
+          <div className="mb-1 flex items-center justify-between">
+            <strong className="text-sm text-[var(--ox-text)]">Basis of this answer</strong>
+            <button
+              type="button"
+              aria-label="Close"
+              onClick={api.closeSources}
+              className="min-h-6 px-1"
+            >
+              ✕
+            </button>
+          </div>
+          <ol className="m-0 list-none p-0">
+            {api.sources.map((source, index) => (
+              <li
+                key={source.id}
+                className="border-t border-[var(--ox-border)] pt-2 first:border-t-0 first:pt-0"
+              >
+                <div className="flex items-baseline gap-1.5 text-sm">
+                  <span
+                    aria-hidden="true"
+                    className="rounded bg-[color-mix(in_oklab,var(--ox-accent)_15%,transparent)] px-1 text-xs"
+                  >
+                    {index + 1}
+                  </span>
+                  {source.url ? (
+                    <a
+                      href={source.url}
+                      target="_blank"
+                      rel="noreferrer noopener"
+                      className="text-[var(--ox-text)]"
+                    >
+                      {source.title}
+                    </a>
+                  ) : (
+                    <strong className="text-[var(--ox-text)]">{source.title}</strong>
+                  )}
+                </div>
+                <blockquote className="m-0 mt-1 border-s-2 border-[var(--ox-border)] ps-2 text-xs text-[var(--ox-text-muted)]">
+                  <HighlightedPassage
+                    text={source.passage}
+                    {...(source.highlight ? { at: source.highlight } : {})}
+                  />
+                </blockquote>
+                <p className="m-0 mt-1 text-[0.7rem] tabular-nums text-[var(--ox-text-muted)]">
+                  Retrieved {source.retrievedAt.slice(0, 10)}
+                  {source.version ? ` · ${source.version}` : ""} · {source.kind}
+                  {typeof source.score === "number" ? ` · match ${source.score.toFixed(2)}` : ""}
+                </p>
+              </li>
+            ))}
+          </ol>
+        </section>
+      ) : null}
+
       <ScopeStrip api={api} onChange={() => modeSelectRef.current?.focus()} />
 
       {/* The panel's own composer. Once the thread is open the dock is the wrong
@@ -782,63 +889,6 @@ function CopilotPanel({
           )}
         </div>
       </div>
-
-      {/* The verification surface. The passage itself, not a link — following a
-          link costs a tab and a search, and people accept rather than pay it. */}
-      {api.sourcesOpen ? (
-        <section
-          aria-label="Basis of this answer"
-          className="max-h-72 overflow-y-auto border-t border-[var(--ox-border)] p-3"
-        >
-          <div className="mb-1 flex items-center justify-between">
-            <strong className="text-sm text-[var(--ox-text)]">Basis of this answer</strong>
-            <button
-              type="button"
-              aria-label="Close"
-              onClick={api.closeSources}
-              className="min-h-6 px-1"
-            >
-              ✕
-            </button>
-          </div>
-          <ol className="m-0 list-none p-0">
-            {api.sources.map((source, index) => (
-              <li
-                key={source.id}
-                className="border-t border-[var(--ox-border)] pt-2 first:border-t-0 first:pt-0"
-              >
-                <div className="flex items-baseline gap-1.5 text-sm">
-                  <span
-                    aria-hidden="true"
-                    className="rounded bg-[color-mix(in_oklab,var(--ox-accent)_15%,transparent)] px-1 text-xs"
-                  >
-                    {index + 1}
-                  </span>
-                  {source.url ? (
-                    <a
-                      href={source.url}
-                      target="_blank"
-                      rel="noreferrer noopener"
-                      className="text-[var(--ox-text)]"
-                    >
-                      {source.title}
-                    </a>
-                  ) : (
-                    <strong className="text-[var(--ox-text)]">{source.title}</strong>
-                  )}
-                </div>
-                <blockquote className="m-0 mt-1 border-s-2 border-[var(--ox-border)] ps-2 text-xs text-[var(--ox-text-muted)]">
-                  {source.passage}
-                </blockquote>
-                <p className="m-0 mt-1 text-[0.7rem] tabular-nums text-[var(--ox-text-muted)]">
-                  Retrieved {source.retrievedAt.slice(0, 10)}
-                  {source.version ? ` · version ${source.version}` : ""} · {source.kind}
-                </p>
-              </li>
-            ))}
-          </ol>
-        </section>
-      ) : null}
 
       <p className="m-0 border-t border-[var(--ox-border)] px-3 py-2 text-center text-xs text-[var(--ox-text-muted)]">
         Medical knowledge only. Not for autonomous decision making. Check sources and use your

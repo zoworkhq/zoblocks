@@ -413,8 +413,10 @@ describe("non-happy states", () => {
     // Thumbs-up records immediately: there is nothing to diagnose about an
     // answer that worked.
     await user.click(screen.getByRole("button", { name: DEFAULT_LOCALE.helpful }));
-    expect(onTelemetry).toHaveBeenCalledWith(
-      expect.objectContaining({ type: "feedback", rating: "up" }),
+    await waitFor(() =>
+      expect(onTelemetry).toHaveBeenCalledWith(
+        expect.objectContaining({ type: "feedback", rating: "up" }),
+      ),
     );
 
     // Thumbs-down asks why first. A bare down-vote records a signal nobody can
@@ -427,8 +429,12 @@ describe("non-happy states", () => {
     const reasons = await screen.findByRole("group", { name: DEFAULT_LOCALE.whyNotHelpful });
     await user.click(within(reasons).getByRole("button", { name: "No source" }));
 
-    expect(onTelemetry).toHaveBeenCalledWith(
-      expect.objectContaining({ type: "feedback", rating: "down", reason: "no-source" }),
+    // Asserted through `waitFor` for the same reason as the thumbs-up above:
+    // synchronous here passes locally and fails on a loaded CI runner.
+    await waitFor(() =>
+      expect(onTelemetry).toHaveBeenCalledWith(
+        expect.objectContaining({ type: "feedback", rating: "down", reason: "no-source" }),
+      ),
     );
   });
 

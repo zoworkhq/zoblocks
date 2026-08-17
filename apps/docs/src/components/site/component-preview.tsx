@@ -358,7 +358,7 @@ const GROUNDED_STREAM: CopilotEvent[] = [
     text: "Rate control is a reasonable initial approach for most patients without severe symptoms.",
   },
   { type: "citation", marker: 1, source: COPILOT_GUIDELINE },
-  { type: "claim", claim: { span: [0, 86], markers: [1] } },
+  { type: "claim", claim: { span: [0, 88], markers: [1] } },
   { type: "done", finish: "stop" },
 ];
 
@@ -393,7 +393,7 @@ const MULTI_SOURCE_STREAM: CopilotEvent[] = [
     text: "Rate control is a reasonable initial approach for most patients without severe symptoms.",
   },
   { type: "citation", marker: 1, source: COPILOT_GUIDELINE },
-  { type: "claim", claim: { span: [0, 86], markers: [1] } },
+  { type: "claim", claim: { span: [0, 88], markers: [1] } },
   { type: "delta", text: " Locally, bisoprolol is the preferred first-line agent." },
   { type: "citation", marker: 2, source: COPILOT_FORMULARY },
   { type: "claim", claim: { span: [86, 141], markers: [2] } },
@@ -432,6 +432,84 @@ const WITHHELD_CONTEXT: ResolvedContext = {
   withheld: [{ reason: "part2", count: 2, disclosable: true }],
   asOf: "2026-08-16T09:00:00.000Z",
 };
+
+/**
+ * The host application, washed out, with the component living inside it.
+ *
+ * Every other component in this library is the thing you look at, so a bare
+ * stage is the honest frame for it. Copilot is the opposite: it is an overlay
+ * that a customer embeds *into* their EHR, and almost every design decision in
+ * it — the scope strip, the suppression prop, the dock that collapses to a
+ * bubble, the panel that replaces the dock rather than stacking on it — is a
+ * decision about coexisting with a chart that is already on screen.
+ *
+ * Shown on an empty page none of that is legible; it reads as a chat box with
+ * unusual chrome. So the demo supplies the record it is meant to sit over,
+ * deliberately faded: the point is what the assistant occludes and what it
+ * leaves readable, which is not a judgement anyone can make without something
+ * behind it.
+ *
+ * The bars are skeletons rather than fake clinical text on purpose. Legible
+ * invented values in a demo get screenshotted, and a plausible potassium with
+ * no patient behind it is the kind of thing that ends up in a slide deck.
+ */
+function HostChart({ children, tall }: { children: React.ReactNode; tall?: boolean }) {
+  const bars = [
+    ["82%", "58%", "68%"],
+    ["90%", "50%"],
+    ["76%", "63%"],
+  ];
+
+  return (
+    <div className="overflow-hidden rounded-xl border border-[var(--ox-border)] bg-[var(--ox-bg)] shadow-[0_1px_2px_rgb(0_0_0/0.05),0_18px_44px_-20px_rgb(0_0_0/0.25)]">
+      {/* Host chrome. Decorative: the accessible content is the component. */}
+      <div
+        aria-hidden="true"
+        className="flex items-center gap-2 border-b border-[var(--ox-border)] bg-[var(--ox-bg-subtle)] px-3 py-2"
+      >
+        <span className="flex gap-1.5">
+          {[0, 1, 2].map((i) => (
+            <i key={i} className="block size-2.5 rounded-full bg-[var(--ox-border-strong)]" />
+          ))}
+        </span>
+        <span className="font-mono text-[0.65rem] tracking-[0.14em] text-[var(--ox-text-muted)]">
+          HOST APPLICATION · ENCOUNTER VIEW
+        </span>
+      </div>
+
+      <div className={cn("relative px-4 pb-4 pt-3", tall ? "min-h-[34rem]" : "min-h-[26rem]")}>
+        <div aria-hidden="true" className="pointer-events-none select-none opacity-45">
+          <p className="m-0 mb-3 text-sm font-semibold text-[var(--ox-text)]">
+            Amara Okonkwo{" "}
+            <span className="font-mono text-xs font-normal text-[var(--ox-text-muted)]">
+              F · 68y · MRN 0042-1187
+            </span>
+          </p>
+          {["PROBLEM LIST", "MEDICATIONS", "RECENT RESULTS"].map((label, section) => (
+            <section
+              key={label}
+              className="mb-2.5 rounded-lg border border-[var(--ox-border)] px-3 py-2.5"
+            >
+              <p className="m-0 mb-2 font-mono text-[0.6rem] tracking-[0.14em] text-[var(--ox-text-muted)]">
+                {label}
+              </p>
+              {(bars[section] ?? []).map((width, row) => (
+                <i
+                  key={row}
+                  style={{ width }}
+                  className="mb-1.5 block h-2 rounded-full bg-[var(--ox-bg-muted)] last:mb-0"
+                />
+              ))}
+            </section>
+          ))}
+        </div>
+
+        {/* The component, anchored the way a host would place it. */}
+        <div className="absolute inset-x-4 bottom-4">{children}</div>
+      </div>
+    </div>
+  );
+}
 
 function CopilotDemo({ events, delayMs = 90 }: { events: CopilotEvent[]; delayMs?: number }) {
   // Rebuilt per scenario so switching tabs restarts the stream rather than
@@ -664,9 +742,9 @@ const SCENARIOS: Record<string, Scenario[]> = {
       label: "At rest",
       note: "A dock, not a floating div: role=complementary with a name, so it is findable and skippable. The placeholder does not say \u201cAsk anything\u201d \u2014 a copilot that promises a scope it will refuse has already lied once before the first question. Type a question and press Enter.",
       render: () => (
-        <InstrumentStage>
+        <HostChart>
           <CopilotDemo events={GROUNDED_STREAM} />
-        </InstrumentStage>
+        </HostChart>
       ),
     },
     {
@@ -674,9 +752,9 @@ const SCENARIOS: Record<string, Scenario[]> = {
       label: "A sourced answer",
       note: "Every claim is spanned and tied to the passage that supports it, and the passage is shown with the supporting sentence highlighted. Citations resolve during the stream rather than after it, so Show sources opens from cache \u2014 the design goal is narrow and unusual: make checking the answer cheaper than accepting it.",
       render: () => (
-        <InstrumentStage>
+        <HostChart>
           <CopilotDemo events={GROUNDED_STREAM} delayMs={140} />
-        </InstrumentStage>
+        </HostChart>
       ),
     },
     {
@@ -684,9 +762,9 @@ const SCENARIOS: Record<string, Scenario[]> = {
       label: "Guideline and local policy",
       note: "The common real shape: a national guideline for the strategy, the trust\u2019s own formulary for the agent. Each sentence carries its own marker, so a clinician can accept one and check the other. Open the reasoning disclosure to see what the model said it was doing \u2014 collapsed by default, because a visible chain of thought reads as evidence and is not evidence.",
       render: () => (
-        <InstrumentStage>
+        <HostChart>
           <CopilotDemo events={MULTI_SOURCE_STREAM} delayMs={110} />
-        </InstrumentStage>
+        </HostChart>
       ),
     },
     {
@@ -694,9 +772,9 @@ const SCENARIOS: Record<string, Scenario[]> = {
       label: "Unsupported",
       note: "The same component, given an answer with no citation behind it. It is not hidden and not silently rendered as though it were sourced \u2014 the register drops to \u201cGeneral knowledge\u201d, the text is marked, and the badge says so. The failure this component exists to prevent is a confident sentence that nothing stands behind.",
       render: () => (
-        <InstrumentStage>
+        <HostChart>
           <CopilotDemo events={UNCITED_STREAM} delayMs={140} />
-        </InstrumentStage>
+        </HostChart>
       ),
     },
     {
@@ -704,9 +782,9 @@ const SCENARIOS: Record<string, Scenario[]> = {
       label: "A dose in the answer",
       note: "Any numeric dose is flagged for verification regardless of how well sourced it is, because a transcription error in a drug dose is the classic harm and one extra glance is cheap. In a mode that forbids dosing outright, the same answer is refused rather than flagged.",
       render: () => (
-        <InstrumentStage>
+        <HostChart>
           <CopilotDemo events={DOSING_STREAM} delayMs={110} />
-        </InstrumentStage>
+        </HostChart>
       ),
     },
     {
@@ -714,9 +792,9 @@ const SCENARIOS: Record<string, Scenario[]> = {
       label: "Reading the chart",
       note: "The scope strip is the highest-value element here and the one nobody ships. It says who the copilot is reading, which categories it was given, and \u2014 the part everyone omits \u2014 what was withheld and why. A summary that silently excludes a 42 CFR Part 2 record has created a false belief that would not exist if the tool did not exist.",
       render: () => (
-        <InstrumentStage>
+        <HostChart>
           <CopilotChartDemo events={GROUNDED_STREAM} context={WITHHELD_CONTEXT} delayMs={110} />
-        </InstrumentStage>
+        </HostChart>
       ),
     },
     {
@@ -724,9 +802,9 @@ const SCENARIOS: Record<string, Scenario[]> = {
       label: "Out of scope",
       note: "Ask it something the active mode does not read \u2014 \u201cwhat are this patient\u2019s current medications\u201d in a reference-only mode \u2014 and it redirects rather than guessing. Over-refusal is a real failure that is almost never measured, so the refusal names the mode that would have answered instead of leaving a dead end.",
       render: () => (
-        <InstrumentStage>
+        <HostChart>
           <CopilotDemo events={GROUNDED_STREAM} />
-        </InstrumentStage>
+        </HostChart>
       ),
     },
     {
@@ -734,9 +812,9 @@ const SCENARIOS: Record<string, Scenario[]> = {
       label: "Crisis",
       note: "Type something that discloses risk. A deterministic classifier runs before the model, reads the whole thread, and replaces the answer rather than annotating it \u2014 a hotline appended under a helpful answer is something people scroll past. The lines are resolved by locale: 988 works in the United States and nowhere else. It is tuned so clinical documentation \u2014 \u201cdenies SI\u201d, \u201cC-SSRS negative\u201d \u2014 does not escalate, which is what makes it usable in psychiatry at all.",
       render: () => (
-        <InstrumentStage>
+        <HostChart>
           <CopilotDemo events={GROUNDED_STREAM} />
-        </InstrumentStage>
+        </HostChart>
       ),
     },
     {
@@ -744,9 +822,9 @@ const SCENARIOS: Record<string, Scenario[]> = {
       label: "A hostile record",
       note: "The chart is not trusted input. This one contains an instruction aimed at the model rather than a clinician. Record content is fenced and never concatenated into the instruction channel, the instruction-shaped text is neutralised, and a record scoring as hostile blocks the exchange rather than being summarised.",
       render: () => (
-        <InstrumentStage>
+        <HostChart>
           <CopilotChartDemo events={GROUNDED_STREAM} context={HOSTILE_RECORD} delayMs={90} />
-        </InstrumentStage>
+        </HostChart>
       ),
     },
     {
@@ -754,14 +832,14 @@ const SCENARIOS: Record<string, Scenario[]> = {
       label: "Between visits",
       note: "The behavioral health pack, and deliberately the least ambitious thing here. Instrument trends restated from what was documented \u2014 PHQ-9, GAD-7 \u2014 with no recommendation attached. It is clinician-facing only: Illinois, Nevada and Utah each regulate AI in mental health differently and Nevada prohibits it outright, so the patient-facing configuration throws rather than rendering.",
       render: () => (
-        <InstrumentStage>
+        <HostChart>
           <CopilotChartDemo
             events={GROUNDED_STREAM}
             context={WITHHELD_CONTEXT}
             mode={betweenVisits}
             delayMs={110}
           />
-        </InstrumentStage>
+        </HostChart>
       ),
     },
     {
@@ -769,11 +847,11 @@ const SCENARIOS: Record<string, Scenario[]> = {
       label: "Suppressed",
       note: "The most valuable thing this component does is disappear. Passed `suppressed`, it renders nothing at all \u2014 no dock, no dictation indicator, no keyboard listener. Each interruption during medication administration is associated with a measurable rise in clinical errors, and the FDA moved time-critical use under the criterion about independent review for the same reason.",
       render: () => (
-        <InstrumentStage>
+        <HostChart>
           <div className="grid place-items-center py-10 text-sm text-[--ox-text-muted]">
             Nothing renders while the clinician is mid-procedure. That is the state.
           </div>
-        </InstrumentStage>
+        </HostChart>
       ),
     },
   ],

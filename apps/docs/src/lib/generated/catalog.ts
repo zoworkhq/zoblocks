@@ -1877,6 +1877,23 @@ export const CATALOG: ComponentDoc[] = [
           }
         ],
         "extendsType": "UseCopilotOptions"
+      },
+      {
+        "name": "HighlightedPassage",
+        "props": [
+          {
+            "name": "text",
+            "type": "string",
+            "description": "",
+            "required": true
+          },
+          {
+            "name": "at",
+            "type": "readonly [number, number]",
+            "description": "",
+            "required": false
+          }
+        ]
       }
     ],
     "usage": "import { Copilot } from \"@/components/oxygen/copilot\";\nimport { lookUp, prepare } from \"@oxygenui-design/copilot-core\";\n\n// Safest first deployment: reference lookup, no patient data anywhere.\n<Copilot provider={ourEndpoint} modes={[lookUp]} />\n\n// With the chart, once a resolver is wired.\n<Copilot\n  provider={ourEndpoint}\n  modes={[lookUp, prepare]}\n  subject={{ reference: \"Patient/123\", display: \"Amara Okonkwo\" }}\n  context={resolver}\n  actor={{ display: \"Dr Okafor\", reference: \"Practitioner/7\" }}\n  onAudit={(event) => auditSink.write(event)}\n  // The most valuable prop in the API.\n  suppressed={isAdministeringMedication || isSigningOrders}\n/>",

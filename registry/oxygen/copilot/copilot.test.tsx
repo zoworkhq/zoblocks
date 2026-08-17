@@ -27,7 +27,7 @@ import {
   type CopilotEvent,
   type Source,
 } from "@oxygenui-design/copilot-core";
-import { Copilot } from "./copilot";
+import { Copilot, HighlightedPassage } from "./copilot";
 
 const disclosure = minimalDisclosure("demo-model@1", {
   developer: "Zowork",
@@ -196,6 +196,116 @@ describe("the controls the mockup asks for", () => {
     await waitFor(() =>
       expect(document.activeElement).toBe(screen.getByRole("combobox", { name: "Change mode" })),
     );
+  });
+});
+
+describe("the basis drawer", () => {
+  /*
+   * The verification surface, and the reason the whole component exists. The
+   * skin rendered `source.passage` as flat text and dropped both `highlight`
+   * and `score` — the two fields that turn a citation into something a
+   * clinician can check at a glance rather than a link they will never follow.
+   */
+  const cited: CopilotEvent[] = [
+    { type: "delta", text: "Rate control is reasonable without severe symptoms." },
+    {
+      type: "citation",
+      marker: 1,
+      source: {
+        id: "g1",
+        title: "2023 AF Guideline",
+        passage: "Rate control is a reasonable initial approach for those without severe symptoms.",
+        highlight: [0, 45],
+        kind: "guideline",
+        version: "2023.1",
+        retrievedAt: "2026-08-16T09:00:00.000Z",
+        score: 0.91,
+      },
+    },
+    { type: "claim", claim: { span: [0, 51], markers: [1] } },
+    { type: "done", finish: "stop" },
+  ];
+
+  async function openSources() {
+    renderCopilot({ provider: createStaticProvider({ events: cited, disclosure, delayMs: 0 }) });
+    type("AF first line?");
+    fireEvent.keyDown(field(), { key: "Enter" });
+    const button = await screen.findByRole("button", { name: /show sources/i });
+    fireEvent.click(button);
+    return screen.findByRole("region", { name: "Basis of this answer" });
+  }
+
+  it("marks the clause that supports the claim", async () => {
+    const drawer = await openSources();
+    const mark = drawer.querySelector("mark");
+    expect(mark?.textContent).toBe("Rate control is a reasonable initial approach");
+    // The rest of the passage survives — a highlight that swallowed its
+    // context would be worse than none.
+    expect(drawer.textContent).toContain("for those without severe symptoms.");
+  });
+
+  it("shows the retrieval score, because a citation without one hides its own weakness", async () => {
+    const drawer = await openSources();
+    expect(drawer.textContent).toContain("match 0.91");
+    expect(drawer.textContent).toContain("2023.1");
+  });
+
+  it("survives a passage-range the provider got wrong", async () => {
+    /*
+     * Offsets are host-supplied. A stale range should mark the wrong words at
+     * worst — never throw away the passage, which is the only evidence on
+     * screen.
+     */
+    const { container } = render(<HighlightedPassage text="short" at={[2, 999]} />);
+    expect(container.textContent).toBe("short");
+    expect(container.querySelector("mark")?.textContent).toBe("ort");
+  });
+
+  it("renders the passage untouched when there is no highlight", () => {
+    const { container } = render(<HighlightedPassage text="no marks here" />);
+    expect(container.textContent).toBe("no marks here");
+    expect(container.querySelector("mark")).toBeNull();
+  });
+
+  it("renders the passage untouched when the range is empty", () => {
+    const { container } = render(<HighlightedPassage text="no marks here" at={[4, 4]} />);
+    expect(container.querySelector("mark")).toBeNull();
+  });
+
+  it("degrades to the plain passage when the endpoint offers no metadata", async () => {
+    /*
+     * `highlight`, `version` and `score` are all optional, and plenty of
+     * retrieval endpoints expose none of them. The drawer has to stay useful
+     * on that floor — the passage is the evidence, and the rest is garnish.
+     * Asserting it here also keeps the three negative arms exercised, which is
+     * where a null-guard regression would otherwise hide.
+     */
+    const bare: CopilotEvent[] = [
+      { type: "delta", text: "Bisoprolol is the local first-line agent." },
+      {
+        type: "citation",
+        marker: 1,
+        source: {
+          id: "f1",
+          title: "Local formulary",
+          passage: "Bisoprolol is preferred first-line for rate control.",
+          kind: "org-policy",
+          retrievedAt: "2026-08-16T09:00:00.000Z",
+        },
+      },
+      { type: "claim", claim: { span: [0, 41], markers: [1] } },
+      { type: "done", finish: "stop" },
+    ];
+
+    renderCopilot({ provider: createStaticProvider({ events: bare, disclosure, delayMs: 0 }) });
+    type("local first line?");
+    fireEvent.keyDown(field(), { key: "Enter" });
+    fireEvent.click(await screen.findByRole("button", { name: /show sources/i }));
+
+    const drawer = await screen.findByRole("region", { name: "Basis of this answer" });
+    expect(drawer.textContent).toContain("Bisoprolol is preferred first-line for rate control.");
+    expect(drawer.querySelector("mark")).toBeNull();
+    expect(drawer.textContent).not.toContain("match");
   });
 });
 

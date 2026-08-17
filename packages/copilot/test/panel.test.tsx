@@ -205,8 +205,14 @@ describe("feedback asks why", () => {
     const group = screen.getByRole("group", { name: DEFAULT_LOCALE.whyNotHelpful });
     await user.click(within(group).getByRole("button", { name: "Unsafe" }));
 
-    expect(onTelemetry).toHaveBeenCalledWith(
-      expect.objectContaining({ type: "feedback", rating: "down", reason: "unsafe" }),
+    // `waitFor` rather than a bare assertion: telemetry is dispatched from an
+    // effect, so the call lands a tick after the click settles. Asserting
+    // synchronously passes on a fast machine and fails on a loaded CI runner,
+    // which is exactly how this arrived — green locally, red in CI.
+    await waitFor(() =>
+      expect(onTelemetry).toHaveBeenCalledWith(
+        expect.objectContaining({ type: "feedback", rating: "down", reason: "unsafe" }),
+      ),
     );
   });
 

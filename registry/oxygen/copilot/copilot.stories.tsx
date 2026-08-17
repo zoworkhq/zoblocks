@@ -218,8 +218,20 @@ export const SourcesOpen: Story = {
     canvas.getByRole("button", { name: "Show sources" }).click();
 
     const panel = await waitFor(() => canvas.getByRole("region", { name: "Basis of this answer" }));
-    // The passage itself. A link would be a citation; this is a verification.
-    expect(within(panel).getByText(/rate control is a reasonable initial approach/i)).toBeTruthy();
+
+    /*
+     * Asserted on `textContent` rather than with `getByText`, because the
+     * passage is deliberately split across nodes: the clause that supports the
+     * claim is wrapped in `<mark>`, which is what turns a citation into a
+     * verification a clinician can make at a glance. A matcher that required
+     * one unbroken text node would fail precisely because the feature works.
+     */
+    expect(panel.textContent).toMatch(/rate control is a reasonable initial approach/i);
+
+    // And the mark is on the supporting clause, not the whole passage.
+    const mark = panel.querySelector("mark");
+    expect(mark?.textContent?.length).toBeGreaterThan(0);
+    expect(mark?.textContent?.length).toBeLessThan(panel.textContent?.length ?? 0);
   },
 };
 

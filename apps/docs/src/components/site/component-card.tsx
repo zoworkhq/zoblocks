@@ -203,9 +203,23 @@ const PREVIEW: Record<string, (featured: boolean) => React.ReactNode> = {
    * anything here — a card is not a place to start a model session.
    */
   copilot: (featured) => (
-    <div className="w-full" style={{ maxWidth: featured ? 340 : 280 }}>
-      <Copilot provider={CARD_COPILOT_PROVIDER} modes={[lookUp]} anchor="inline" locale="en-GB" />
-    </div>
+    /*
+     * Scaled rather than squeezed. The dock carries six controls — shortcut
+     * glyph, field, mode chip, mic, send, and the scope strip above it — and at
+     * a 280px card width they collide: the placeholder truncates mid-word and
+     * the chip sits on top of the field. That is a picture of a broken
+     * component, which is the one thing card art must never be.
+     *
+     * So it renders at the width it was designed for and scales down, the same
+     * trick the identity card uses. The card still shows the real component
+     * rather than an illustration of it, which is the point of driving these
+     * previews live at all.
+     */
+    <ScaledArt scale={featured ? 0.92 : 0.78}>
+      <div className="w-full" style={{ maxWidth: 420 }}>
+        <Copilot provider={CARD_COPILOT_PROVIDER} modes={[lookUp]} anchor="inline" locale="en-GB" />
+      </div>
+    </ScaledArt>
   ),
 };
 

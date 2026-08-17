@@ -131,6 +131,7 @@ export { findStigma, STIGMA_TERMS, type StigmaFinding, type StigmaTerm } from ".
 
 export {
   DEFAULT_EXCLUSIONS,
+  categoryLabels,
   defaultModes,
   defineMode,
   lookUp,
