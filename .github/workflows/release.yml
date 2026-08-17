@@ -130,6 +130,10 @@ jobs:
       # belonging to a person rather than to the run.
       - name: Version PR or publish
         id: changesets
+        # Allowed to fail so the fallback below can run. The fallback re-fails
+        # the job for anything that is not the PR-permission case, so a broken
+        # publish is still a broken build.
+        continue-on-error: true
         uses: changesets/action@v2
         with:
           version-script: pnpm changeset version
@@ -147,29 +151,64 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           NPM_CONFIG_PROVENANCE: "true"
 
-      # The refusal arrives as a bare HttpError linking to the REST docs, which
-      # describe the endpoint rather than the setting — so the first time it
-      # happened it cost a session to find a checkbox. Every step before it is
-      # green, which makes it read like a flake. Say what it is instead.
-      - name: Explain a refused Version PR
-        if: failure() && steps.changesets.outcome == 'failure'
+      # Opening the pull request is the one thing this job cannot do for
+      # itself. `pull-requests: write` above is declared and then overridden by
+      # a repository switch — Settings -> Actions -> General -> Workflow
+      # permissions -> "Allow GitHub Actions to create and approve pull
+      # requests" — so the run versions every package correctly and fails on
+      # the final API call.
+      #
+      # Pushing a branch needs only `contents: write`, which this job has. So
+      # the branch is pushed and the summary carries a one-click link to open
+      # the PR from it. The release model is unchanged: a human reviews the
+      # bumps, and merging is still the only thing that publishes. Enabling the
+      # switch, or adding a RELEASE_PAT, skips this entirely.
+      - name: Push the Version branch when Actions may not open the PR
+        if: steps.changesets.outcome == 'failure'
+        env:
+          BRANCH: changeset-release/main
         run: |
+          set -euo pipefail
+
+          # Only the PR-permission case is recoverable. With no changesets
+          # pending the action was trying to *publish*, and a publish that
+          # failed must stay failed rather than be dressed up as a link.
+          pending=$(find .changeset -maxdepth 1 -name '*.md' ! -iname 'README.md' | head -1)
+          if [ -z "$pending" ]; then
+            echo "::error::The release step failed with no changesets pending, so this is a publish failure rather than the PR-permission one. Read the log above."
+            exit 1
+          fi
+
+          # A clean slate. The action may have versioned and committed before
+          # it failed, and running `changeset version` over that would double
+          # every bump.
+          git reset --hard "$GITHUB_SHA"
+          git switch -C "$BRANCH"
+
+          pnpm changeset version
+
+          git add -A
+          git -c user.name="github-actions[bot]" \
+              -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
+              commit -m "Version packages"
+          git push --force origin "$BRANCH"
+
+          compare="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/compare/main...${BRANCH}?expand=1"
           {
-            echo "### The release could not open its Version PR"
+            echo "### The Version PR is ready to open"
             echo
-            echo "If the log ends in *GitHub Actions is not permitted to create or approve"
-            echo "pull requests*, the code is fine: \`changeset version\` ran and updated"
-            echo "every file. What failed is the call that opens the PR."
+            echo "GitHub Actions is not permitted to open pull requests in this"
+            echo "repository, so the versioned branch has been pushed instead."
             echo
-            echo "Either of these fixes it:"
+            echo "**[Open the Version PR](${compare})** — review the bumps and the"
+            echo "changelogs, then merge it. Merging is what publishes, exactly as before."
             echo
-            echo "1. **Settings -> Actions -> General -> Workflow permissions** — tick"
-            echo "   *Allow GitHub Actions to create and approve pull requests*. Nothing"
-            echo "   to store, and it is scoped to this repository."
-            echo "2. Add a **RELEASE_PAT** secret, a personal access token with \`repo\`"
-            echo "   scope. This workflow already prefers it when it is present."
+            echo "To have it opened automatically in future, either tick *Settings ->"
+            echo "Actions -> General -> Workflow permissions -> Allow GitHub Actions to"
+            echo "create and approve pull requests*, or add a \`RELEASE_PAT\` secret with"
+            echo "\`repo\` scope — this workflow already prefers the PAT when present."
             echo
-            echo "No package was published or half-published: merging the Version PR is"
-            echo "what publishes, and it was never opened."
+            echo "Nothing was published by this run."
           } >> "$GITHUB_STEP_SUMMARY"
-          echo "::error::Version PR refused — see the job summary for the two ways to fix it."
+
+          echo "::notice::Version branch pushed. Open the PR: ${compare}"
