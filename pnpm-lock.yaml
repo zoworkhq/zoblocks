@@ -149,6 +149,15 @@ importers:
 
   apps/docs:
     dependencies:
+      '@oxygenui-design/component-meta':
+        specifier: workspace:*
+        version: link:../../packages/component-meta
+      '@oxygenui-design/consult-core':
+        specifier: workspace:*
+        version: link:../../packages/consult-core
+      '@oxygenui-design/consult-react':
+        specifier: workspace:*
+        version: link:../../packages/consult-react
       '@oxygenui-design/fhir':
         specifier: workspace:*
         version: link:../../packages/fhir

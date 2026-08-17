@@ -3055,8 +3055,815 @@ export const CATALOG: ComponentDoc[] = [
       "Chip — a filter bar",
       "Row — the whole row is the target"
     ],
-    "props": [],
-    "exports": [],
+    "props": [
+      {
+        "name": "absentReason",
+        "type": "AbsentReason",
+        "description": "Why the value is `\"unknown\"`. Structurally the output of `resolveAbsentReason()` in `@oxygenui-design/fhir`.",
+        "required": false
+      },
+      {
+        "name": "appearance",
+        "type": "SwitchAppearance",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "audience",
+        "type": "SwitchAudience",
+        "description": "",
+        "required": false,
+        "default": "\"clinician\""
+      },
+      {
+        "name": "autoFocus",
+        "type": "boolean",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "checked",
+        "type": "SwitchValue",
+        "description": "`\"unknown\"` is Oxygen's widening. antd's `boolean` shape is unchanged.",
+        "required": false
+      },
+      {
+        "name": "checkedChildren",
+        "type": "React.ReactNode",
+        "description": "Supplying either implies `appearance=\"labeled\"`.",
+        "required": false
+      },
+      {
+        "name": "commit",
+        "type": "'instant' | 'deferred'",
+        "description": "A switch that does not take effect until Save must say so.",
+        "required": false,
+        "default": "\"instant\""
+      },
+      {
+        "name": "confirm",
+        "type": "false | 'countersign' | 'hold' | 'dialog' | 'attest'",
+        "description": "",
+        "required": false,
+        "default": "false"
+      },
+      {
+        "name": "confirmCopy",
+        "type": "{ title?: string; consequence: string; subject?: string; }",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "countersign",
+        "type": "CountersignRequirement",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "defaultChecked",
+        "type": "SwitchValue",
+        "description": "",
+        "required": false,
+        "default": "false"
+      },
+      {
+        "name": "description",
+        "type": "React.ReactNode",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "disabled",
+        "type": "boolean",
+        "description": "The last resort, and almost always the wrong prop. Correct only when the unavailability is transient and caused by something the user just did. Everything else — policy, permission, record state, dependency — is `readOnly` with a `lockedReason`.",
+        "required": false,
+        "default": "false"
+      },
+      {
+        "name": "holdMs",
+        "type": "number",
+        "description": "Hold duration in ms. 0 routes every activation to the dialog instead.",
+        "required": false,
+        "default": "600"
+      },
+      {
+        "name": "impact",
+        "type": "React.ReactNode[]",
+        "description": "The consequence, rendered before the click rather than after the decision.",
+        "required": false
+      },
+      {
+        "name": "label",
+        "type": "React.ReactNode",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "labelPlacement",
+        "type": "'start' | 'end'",
+        "description": "",
+        "required": false,
+        "default": "\"end\""
+      },
+      {
+        "name": "loading",
+        "type": "boolean",
+        "description": "Kept for drop-in compatibility, with the behaviour corrected: it maps to `phase=\"pending\"` and does **not** disable the control. A spinner that removes the control loses focus, cannot be cancelled, and turns a switch into a dead pixel for as long as the request takes.",
+        "required": false,
+        "default": "false"
+      },
+      {
+        "name": "lockedReason",
+        "type": "React.ReactNode",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "minPendingMs",
+        "type": "number",
+        "description": "Minimum time in `pending`, so a fast write is perceptible rather than a flash.",
+        "required": false
+      },
+      {
+        "name": "now",
+        "type": "string",
+        "description": "ISO 8601 from the server. Required alongside `onAuditEvent` and `until`.",
+        "required": false
+      },
+      {
+        "name": "onAuditEvent",
+        "type": "((event: SwitchAuditEvent) => void)",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "onChange",
+        "type": "((checked: boolean, event: React.SyntheticEvent) => void)",
+        "description": "antd's signature exactly. Fires optimistically, before the commit resolves.",
+        "required": false
+      },
+      {
+        "name": "onCommit",
+        "type": "((next: boolean, ctx: { from: SwitchValue; reason?: string; }) => void | Promise<void>)",
+        "description": "Return a promise and the component owns the phase machine: pending while in flight, committed on resolve, reverted on reject — with the rollback animated and announced. Reject with a `SwitchBlockedError` for `blocked`.",
+        "required": false
+      },
+      {
+        "name": "onExpire",
+        "type": "((at: string) => void)",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "online",
+        "type": "boolean",
+        "description": "`false` queues the commit rather than sending it.",
+        "required": false,
+        "default": "true"
+      },
+      {
+        "name": "onResolveConflict",
+        "type": "((keep: 'mine' | 'theirs') => void)",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "onSlow",
+        "type": "(() => void)",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "provenance",
+        "type": "{ by: string; at: string; via?: string; }",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "readOnly",
+        "type": "boolean",
+        "description": "",
+        "required": false,
+        "default": "false"
+      },
+      {
+        "name": "serverValue",
+        "type": "SwitchValue",
+        "description": "What the record now holds. Differing from `checked` puts the control in `stale`.",
+        "required": false
+      },
+      {
+        "name": "showState",
+        "type": "boolean",
+        "description": "The word beside the control.",
+        "required": false
+      },
+      {
+        "name": "size",
+        "type": "SwitchSize",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "slots",
+        "type": "SwitchSlots",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "slowAfter",
+        "type": "number",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "stateLabels",
+        "type": "'on-off' | 'yes-no' | 'active-inactive' | 'in-effect' | 'allowed-blocked' | 'given-declined' | 'enabled-disabled' | Partial<StateLabels>",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "tone",
+        "type": "SwitchTone",
+        "description": "",
+        "required": false,
+        "default": "\"affirmative\""
+      },
+      {
+        "name": "unCheckedChildren",
+        "type": "React.ReactNode",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "until",
+        "type": "string",
+        "description": "ISO 8601. Renders \"in effect until …\". The component never writes on expiry.",
+        "required": false
+      },
+      {
+        "name": "untilWarnMs",
+        "type": "number",
+        "description": "Warn this long before `until`.",
+        "required": false,
+        "default": "0"
+      },
+      {
+        "name": "value",
+        "type": "SwitchValue",
+        "description": "antd's alias for `checked`, accepted by `Form.Item`.",
+        "required": false
+      }
+    ],
+    "extendsType": "Omit< React.HTMLAttributes<HTMLSpanElement>, \"onChange\" | \"defaultChecked\" | \"children\" | \"onClick\" >",
+    "exports": [
+      {
+        "name": "Switch",
+        "props": [
+          {
+            "name": "absentReason",
+            "type": "AbsentReason",
+            "description": "Why the value is `\"unknown\"`. Structurally the output of `resolveAbsentReason()` in `@oxygenui-design/fhir`.",
+            "required": false
+          },
+          {
+            "name": "appearance",
+            "type": "SwitchAppearance",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "audience",
+            "type": "SwitchAudience",
+            "description": "",
+            "required": false,
+            "default": "\"clinician\""
+          },
+          {
+            "name": "autoFocus",
+            "type": "boolean",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "checked",
+            "type": "SwitchValue",
+            "description": "`\"unknown\"` is Oxygen's widening. antd's `boolean` shape is unchanged.",
+            "required": false
+          },
+          {
+            "name": "checkedChildren",
+            "type": "React.ReactNode",
+            "description": "Supplying either implies `appearance=\"labeled\"`.",
+            "required": false
+          },
+          {
+            "name": "commit",
+            "type": "'instant' | 'deferred'",
+            "description": "A switch that does not take effect until Save must say so.",
+            "required": false,
+            "default": "\"instant\""
+          },
+          {
+            "name": "confirm",
+            "type": "false | 'countersign' | 'hold' | 'dialog' | 'attest'",
+            "description": "",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "confirmCopy",
+            "type": "{ title?: string; consequence: string; subject?: string; }",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "countersign",
+            "type": "CountersignRequirement",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "defaultChecked",
+            "type": "SwitchValue",
+            "description": "",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "description",
+            "type": "React.ReactNode",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "disabled",
+            "type": "boolean",
+            "description": "The last resort, and almost always the wrong prop. Correct only when the unavailability is transient and caused by something the user just did. Everything else — policy, permission, record state, dependency — is `readOnly` with a `lockedReason`.",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "holdMs",
+            "type": "number",
+            "description": "Hold duration in ms. 0 routes every activation to the dialog instead.",
+            "required": false,
+            "default": "600"
+          },
+          {
+            "name": "impact",
+            "type": "React.ReactNode[]",
+            "description": "The consequence, rendered before the click rather than after the decision.",
+            "required": false
+          },
+          {
+            "name": "label",
+            "type": "React.ReactNode",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "labelPlacement",
+            "type": "'start' | 'end'",
+            "description": "",
+            "required": false,
+            "default": "\"end\""
+          },
+          {
+            "name": "loading",
+            "type": "boolean",
+            "description": "Kept for drop-in compatibility, with the behaviour corrected: it maps to `phase=\"pending\"` and does **not** disable the control. A spinner that removes the control loses focus, cannot be cancelled, and turns a switch into a dead pixel for as long as the request takes.",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "lockedReason",
+            "type": "React.ReactNode",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "minPendingMs",
+            "type": "number",
+            "description": "Minimum time in `pending`, so a fast write is perceptible rather than a flash.",
+            "required": false
+          },
+          {
+            "name": "now",
+            "type": "string",
+            "description": "ISO 8601 from the server. Required alongside `onAuditEvent` and `until`.",
+            "required": false
+          },
+          {
+            "name": "onAuditEvent",
+            "type": "((event: SwitchAuditEvent) => void)",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "onChange",
+            "type": "((checked: boolean, event: React.SyntheticEvent) => void)",
+            "description": "antd's signature exactly. Fires optimistically, before the commit resolves.",
+            "required": false
+          },
+          {
+            "name": "onCommit",
+            "type": "((next: boolean, ctx: { from: SwitchValue; reason?: string; }) => void | Promise<void>)",
+            "description": "Return a promise and the component owns the phase machine: pending while in flight, committed on resolve, reverted on reject — with the rollback animated and announced. Reject with a `SwitchBlockedError` for `blocked`.",
+            "required": false
+          },
+          {
+            "name": "onExpire",
+            "type": "((at: string) => void)",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "online",
+            "type": "boolean",
+            "description": "`false` queues the commit rather than sending it.",
+            "required": false,
+            "default": "true"
+          },
+          {
+            "name": "onResolveConflict",
+            "type": "((keep: 'mine' | 'theirs') => void)",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "onSlow",
+            "type": "(() => void)",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "provenance",
+            "type": "{ by: string; at: string; via?: string; }",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "readOnly",
+            "type": "boolean",
+            "description": "",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "serverValue",
+            "type": "SwitchValue",
+            "description": "What the record now holds. Differing from `checked` puts the control in `stale`.",
+            "required": false
+          },
+          {
+            "name": "showState",
+            "type": "boolean",
+            "description": "The word beside the control.",
+            "required": false
+          },
+          {
+            "name": "size",
+            "type": "SwitchSize",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "slots",
+            "type": "SwitchSlots",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "slowAfter",
+            "type": "number",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "stateLabels",
+            "type": "'on-off' | 'yes-no' | 'active-inactive' | 'in-effect' | 'allowed-blocked' | 'given-declined' | 'enabled-disabled' | Partial<StateLabels>",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "tone",
+            "type": "SwitchTone",
+            "description": "",
+            "required": false,
+            "default": "\"affirmative\""
+          },
+          {
+            "name": "unCheckedChildren",
+            "type": "React.ReactNode",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "until",
+            "type": "string",
+            "description": "ISO 8601. Renders \"in effect until …\". The component never writes on expiry.",
+            "required": false
+          },
+          {
+            "name": "untilWarnMs",
+            "type": "number",
+            "description": "Warn this long before `until`.",
+            "required": false,
+            "default": "0"
+          },
+          {
+            "name": "value",
+            "type": "SwitchValue",
+            "description": "antd's alias for `checked`, accepted by `Form.Item`.",
+            "required": false
+          }
+        ],
+        "extendsType": "Omit< React.HTMLAttributes<HTMLSpanElement>, \"onChange\" | \"defaultChecked\" | \"children\" | \"onClick\" >"
+      },
+      {
+        "name": "SwitchField",
+        "props": [
+          {
+            "name": "absentReason",
+            "type": "AbsentReason",
+            "description": "Why the value is `\"unknown\"`. Structurally the output of `resolveAbsentReason()` in `@oxygenui-design/fhir`.",
+            "required": false
+          },
+          {
+            "name": "appearance",
+            "type": "SwitchAppearance",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "audience",
+            "type": "SwitchAudience",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "autoFocus",
+            "type": "boolean",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "checked",
+            "type": "SwitchValue",
+            "description": "`\"unknown\"` is Oxygen's widening. antd's `boolean` shape is unchanged.",
+            "required": false
+          },
+          {
+            "name": "checkedChildren",
+            "type": "React.ReactNode",
+            "description": "Supplying either implies `appearance=\"labeled\"`.",
+            "required": false
+          },
+          {
+            "name": "commit",
+            "type": "'instant' | 'deferred'",
+            "description": "A switch that does not take effect until Save must say so.",
+            "required": false
+          },
+          {
+            "name": "confirm",
+            "type": "false | 'countersign' | 'hold' | 'dialog' | 'attest'",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "confirmCopy",
+            "type": "{ title?: string; consequence: string; subject?: string; }",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "countersign",
+            "type": "CountersignRequirement",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "defaultChecked",
+            "type": "SwitchValue",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "description",
+            "type": "React.ReactNode",
+            "description": "Rendered under the label, above the state word.",
+            "required": false
+          },
+          {
+            "name": "disabled",
+            "type": "boolean",
+            "description": "The last resort, and almost always the wrong prop. Correct only when the unavailability is transient and caused by something the user just did. Everything else — policy, permission, record state, dependency — is `readOnly` with a `lockedReason`.",
+            "required": false
+          },
+          {
+            "name": "holdMs",
+            "type": "number",
+            "description": "Hold duration in ms. 0 routes every activation to the dialog instead.",
+            "required": false
+          },
+          {
+            "name": "impact",
+            "type": "React.ReactNode[]",
+            "description": "The consequence, rendered before the click rather than after the decision.",
+            "required": false
+          },
+          {
+            "name": "label",
+            "type": "React.ReactNode",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "labelPlacement",
+            "type": "'start' | 'end'",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "loading",
+            "type": "boolean",
+            "description": "Kept for drop-in compatibility, with the behaviour corrected: it maps to `phase=\"pending\"` and does **not** disable the control. A spinner that removes the control loses focus, cannot be cancelled, and turns a switch into a dead pixel for as long as the request takes.",
+            "required": false
+          },
+          {
+            "name": "lockedReason",
+            "type": "React.ReactNode",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "minPendingMs",
+            "type": "number",
+            "description": "Minimum time in `pending`, so a fast write is perceptible rather than a flash.",
+            "required": false
+          },
+          {
+            "name": "now",
+            "type": "string",
+            "description": "ISO 8601 from the server. Required alongside `onAuditEvent` and `until`.",
+            "required": false
+          },
+          {
+            "name": "onAuditEvent",
+            "type": "((event: SwitchAuditEvent) => void)",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "onChange",
+            "type": "((checked: boolean, event: React.SyntheticEvent) => void)",
+            "description": "antd's signature exactly. Fires optimistically, before the commit resolves.",
+            "required": false
+          },
+          {
+            "name": "onCommit",
+            "type": "((next: boolean, ctx: { from: SwitchValue; reason?: string; }) => void | Promise<void>)",
+            "description": "Return a promise and the component owns the phase machine: pending while in flight, committed on resolve, reverted on reject — with the rollback animated and announced. Reject with a `SwitchBlockedError` for `blocked`.",
+            "required": false
+          },
+          {
+            "name": "onExpire",
+            "type": "((at: string) => void)",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "online",
+            "type": "boolean",
+            "description": "`false` queues the commit rather than sending it.",
+            "required": false
+          },
+          {
+            "name": "onResolveConflict",
+            "type": "((keep: 'mine' | 'theirs') => void)",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "onSlow",
+            "type": "(() => void)",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "provenance",
+            "type": "{ by: string; at: string; via?: string; }",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "readOnly",
+            "type": "boolean",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "serverValue",
+            "type": "SwitchValue",
+            "description": "What the record now holds. Differing from `checked` puts the control in `stale`.",
+            "required": false
+          },
+          {
+            "name": "showState",
+            "type": "boolean",
+            "description": "The word beside the control.",
+            "required": false
+          },
+          {
+            "name": "size",
+            "type": "SwitchSize",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "slots",
+            "type": "SwitchSlots",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "slowAfter",
+            "type": "number",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "stateLabels",
+            "type": "'on-off' | 'yes-no' | 'active-inactive' | 'in-effect' | 'allowed-blocked' | 'given-declined' | 'enabled-disabled' | Partial<StateLabels>",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "tone",
+            "type": "SwitchTone",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "unCheckedChildren",
+            "type": "React.ReactNode",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "until",
+            "type": "string",
+            "description": "ISO 8601. Renders \"in effect until …\". The component never writes on expiry.",
+            "required": false
+          },
+          {
+            "name": "untilWarnMs",
+            "type": "number",
+            "description": "Warn this long before `until`.",
+            "required": false
+          },
+          {
+            "name": "value",
+            "type": "SwitchValue",
+            "description": "antd's alias for `checked`, accepted by `Form.Item`.",
+            "required": false
+          }
+        ],
+        "extendsType": "SwitchProps"
+      },
+      {
+        "name": "SwitchList",
+        "props": [
+          {
+            "name": "children",
+            "type": "React.ReactNode",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "counts",
+            "type": "{ on: number; total: number; unknown?: number; }",
+            "description": "Counts for the summary line. `unknown` is reported separately and excluded from both numerator and denominator — a count that silently treats \"not asked\" as \"off\" is the whole failure this component exists to prevent, repeated at group scale.",
+            "required": false
+          },
+          {
+            "name": "provenance",
+            "type": "{ by: string; at: string; }",
+            "description": "Who last changed anything in this group. The first question anyone asks.",
+            "required": false
+          },
+          {
+            "name": "title",
+            "type": "React.ReactNode",
+            "description": "",
+            "required": false
+          }
+        ],
+        "extendsType": "Omit<React.HTMLAttributes<HTMLDivElement>, \"title\">"
+      }
+    ],
     "usage": "import { Switch, SwitchField, SwitchList } from \"@/components/oxygen/switch\";\n\n// The whole three-phase UX, including rollback and announcement.\n<Switch\n  label=\"Contact precautions\"\n  stateLabels=\"in-effect\"\n  tone=\"caution\"\n  checked={precautions}\n  onCommit={async (next) => {\n    await api.setPrecautions({ encounter, contact: next });\n    setPrecautions(next);\n  }}\n  now={serverTime}\n/>\n\n// An absence that says which kind it is.\n<Switch\n  label=\"Advance directive on file\"\n  checked=\"unknown\"\n  absentReason=\"not-collected\"\n  stateLabels=\"yes-no\"\n/>\n\n// A group, counting unknown separately from off.\n<SwitchList title=\"Isolation precautions\" counts={{ on: 2, total: 5, unknown: 1 }}>\n  <SwitchField label=\"Contact\" description=\"Gown and gloves on entry.\" checked />\n  <SwitchField label=\"Airborne\" readOnly lockedReason=\"No negative-pressure room on this unit.\" />\n</SwitchList>",
     "guidance": {
       "use": [
@@ -3516,8 +4323,374 @@ export const CATALOG: ComponentDoc[] = [
       "Collapsed to a native picker",
       "Awaiting an async guard"
     ],
-    "props": [],
+    "props": [
+      {
+        "name": "aria-label",
+        "type": "string",
+        "description": "Required: the accessible name of the strip.",
+        "required": true
+      },
+      {
+        "name": "as",
+        "type": "SemanticMode",
+        "description": "What this control *is*. Required, with no default — see `validateTabsConfig`. A view switch, a link list, a form value and a wizard share one silhouette and need four different accessibility trees.",
+        "required": true
+      },
+      {
+        "name": "items",
+        "type": "readonly TabsItemProps[]",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "activation",
+        "type": "Activation",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "defaultValue",
+        "type": "string",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "editable",
+        "type": "TabsEditable",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "fill",
+        "type": "FillMode",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "hotkeys",
+        "type": "boolean",
+        "description": "Ctrl/Cmd + 1…9 to jump to a tab. Off by default: on Windows and Linux those belong to the browser, and claiming them takes a shortcut the user already had for something else.",
+        "required": false
+      },
+      {
+        "name": "id",
+        "type": "string",
+        "description": "Supplied to make ids deterministic in snapshot tests.",
+        "required": false
+      },
+      {
+        "name": "indicator",
+        "type": "IndicatorKind",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "keepScroll",
+        "type": "boolean",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "listClassName",
+        "type": "string",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "locale",
+        "type": "Partial<TabsLocale>",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "mount",
+        "type": "MountStrategy",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "now",
+        "type": "(() => string)",
+        "description": "Supplies the ISO timestamp on audit events. Omit it and events carry no `at` — the component does not read the clock.",
+        "required": false
+      },
+      {
+        "name": "onAuditEvent",
+        "type": "((event: AuditEvent) => void)",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "onBeforeChange",
+        "type": "BeforeChange",
+        "description": "Return false — or a promise of false — to veto. Strip goes inert while a promise is pending.",
+        "required": false
+      },
+      {
+        "name": "onChange",
+        "type": "((value: string, meta: { via: ChangeSource; }) => void)",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "orientation",
+        "type": "Orientation",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "overflow",
+        "type": "OverflowStrategy",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "panelsClassName",
+        "type": "string",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "size",
+        "type": "TabSize",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "syncHistory",
+        "type": "'replace' | 'push'",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "syncKey",
+        "type": "string",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "syncTo",
+        "type": "SyncTarget",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "toolbar",
+        "type": "React.ReactNode",
+        "description": "Rendered between the strip and the panels — a toolbar, a filter row.",
+        "required": false
+      },
+      {
+        "name": "transition",
+        "type": "TransitionKind",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "value",
+        "type": "string",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "variant",
+        "type": "TabVariant",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "virtualise",
+        "type": "boolean",
+        "description": "Above ~40 triggers, observe the list rather than every trigger. Never removes a trigger from the DOM — a tablist whose children come and go reports \"n of m\" from whatever happens to be rendered.",
+        "required": false
+      }
+    ],
     "exports": [
+      {
+        "name": "Tabs",
+        "props": [
+          {
+            "name": "aria-label",
+            "type": "string",
+            "description": "Required: the accessible name of the strip.",
+            "required": true
+          },
+          {
+            "name": "as",
+            "type": "SemanticMode",
+            "description": "What this control *is*. Required, with no default — see `validateTabsConfig`. A view switch, a link list, a form value and a wizard share one silhouette and need four different accessibility trees.",
+            "required": true
+          },
+          {
+            "name": "items",
+            "type": "readonly TabsItemProps[]",
+            "description": "",
+            "required": true
+          },
+          {
+            "name": "activation",
+            "type": "Activation",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "defaultValue",
+            "type": "string",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "editable",
+            "type": "TabsEditable",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "fill",
+            "type": "FillMode",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "hotkeys",
+            "type": "boolean",
+            "description": "Ctrl/Cmd + 1…9 to jump to a tab. Off by default: on Windows and Linux those belong to the browser, and claiming them takes a shortcut the user already had for something else.",
+            "required": false
+          },
+          {
+            "name": "id",
+            "type": "string",
+            "description": "Supplied to make ids deterministic in snapshot tests.",
+            "required": false
+          },
+          {
+            "name": "indicator",
+            "type": "IndicatorKind",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "keepScroll",
+            "type": "boolean",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "listClassName",
+            "type": "string",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "locale",
+            "type": "Partial<TabsLocale>",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "mount",
+            "type": "MountStrategy",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "now",
+            "type": "(() => string)",
+            "description": "Supplies the ISO timestamp on audit events. Omit it and events carry no `at` — the component does not read the clock.",
+            "required": false
+          },
+          {
+            "name": "onAuditEvent",
+            "type": "((event: AuditEvent) => void)",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "onBeforeChange",
+            "type": "BeforeChange",
+            "description": "Return false — or a promise of false — to veto. Strip goes inert while a promise is pending.",
+            "required": false
+          },
+          {
+            "name": "onChange",
+            "type": "((value: string, meta: { via: ChangeSource; }) => void)",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "orientation",
+            "type": "Orientation",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "overflow",
+            "type": "OverflowStrategy",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "panelsClassName",
+            "type": "string",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "size",
+            "type": "TabSize",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "syncHistory",
+            "type": "'replace' | 'push'",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "syncKey",
+            "type": "string",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "syncTo",
+            "type": "SyncTarget",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "toolbar",
+            "type": "React.ReactNode",
+            "description": "Rendered between the strip and the panels — a toolbar, a filter row.",
+            "required": false
+          },
+          {
+            "name": "transition",
+            "type": "TransitionKind",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "value",
+            "type": "string",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "variant",
+            "type": "TabVariant",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "virtualise",
+            "type": "boolean",
+            "description": "Above ~40 triggers, observe the list rather than every trigger. Never removes a trigger from the DOM — a tablist whose children come and go reports \"n of m\" from whatever happens to be rendered.",
+            "required": false
+          }
+        ]
+      },
       {
         "name": "TabsAddButton",
         "props": []

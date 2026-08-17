@@ -30,6 +30,92 @@ describe("the mode is required", () => {
   it("accepts a well-formed configuration silently", () => {
     expect(validateTabsConfig({ mode: "tabs", items: ok })).toEqual([]);
   });
+
+  /*
+   * "tablist" is the ARIA role, so it is the wrong value a caller is most
+   * likely to reach for. It used to pass the missing-mode guard, resolve to no
+   * role spec, and throw `Cannot read properties of undefined (reading
+   * 'ownsPanels')` from inside the validator — a stack trace into library
+   * internals in place of the sentence that names the four valid modes.
+   */
+  it("reports an unrecognised mode rather than throwing on it", () => {
+    const input = { mode: "tablist" as never, items: ok, hasPanels: true };
+    expect(() => validateTabsConfig(input)).not.toThrow();
+    expect(codes(input)).toEqual(["missing-mode"]);
+    expect(formatProblems(validateTabsConfig(input))).toContain('"tablist"');
+  });
+
+  it("names the four modes whether the mode is absent or unrecognised", () => {
+    for (const mode of [undefined, "tablist" as never]) {
+      const message = formatProblems(validateTabsConfig({ mode, items: ok }));
+      for (const valid of ["tabs", "nav", "radiogroup", "steps"]) {
+        expect(message).toContain(`"${valid}"`);
+      }
+    }
+  });
+
+  /*
+   * The whole class, not just the one value.
+   *
+   * Every input below is one a JavaScript caller or a deserialised config can
+   * produce, and validation is the layer they arrive at. Whatever else it does,
+   * it must not be the thing that throws — a validator that crashes on invalid
+   * input has inverted its own job, and the stack trace points at library
+   * internals rather than at the prop the caller got wrong.
+   */
+  const BAD_MODES: Array<[string, unknown]> = [
+    ["the ARIA role", "tablist"],
+    ["a near miss", "tab"],
+    ["wrong case", "Tabs"],
+    ["padded", " tabs "],
+    ["empty", ""],
+    ["null", null],
+    ["a number", 3],
+    ["an object", {}],
+    ["an array", ["tabs"]],
+    ["a prototype key", "constructor"],
+    ["another prototype key", "toString"],
+  ];
+
+  it.each(BAD_MODES)("does not throw on %s", (_label, mode) => {
+    // Every downstream check turned on at once, so a crash in any of them
+    // would surface here rather than only in the arm that happened to run.
+    expect(() =>
+      validateTabsConfig({
+        mode: mode as never,
+        items: [{ value: "a", label: "A", href: "/a", closable: true }],
+        hasPanels: true,
+        hasCloseHandler: false,
+        overflow: "wrap",
+        orientation: "vertical",
+        value: "nope",
+        defaultValue: "also-nope",
+      }),
+    ).not.toThrow();
+  });
+
+  it.each(BAD_MODES)("reports exactly one problem for %s and stops there", (_label, mode) => {
+    // Everything below the guard depends on knowing the mode, so reporting a
+    // second problem would mean reporting a guess.
+    const problems = validateTabsConfig({
+      mode: mode as never,
+      items: [{ value: "", label: "A", href: "/a" }],
+      hasPanels: true,
+    });
+    expect(problems).toHaveLength(1);
+    expect(problems[0]!.code).toBe("missing-mode");
+  });
+
+  it("distinguishes an absent mode from a wrong one in the message", () => {
+    const absent = formatProblems(validateTabsConfig({ mode: undefined, items: ok }));
+    const wrong = formatProblems(validateTabsConfig({ mode: "tablist" as never, items: ok }));
+
+    expect(absent).toContain("requires `as`");
+    // The caller who typed something needs to see what they typed, not be told
+    // they omitted a prop they did not omit.
+    expect(wrong).not.toContain("requires `as`");
+    expect(wrong).toContain('"tablist"');
+  });
 });
 
 describe("links and modes", () => {

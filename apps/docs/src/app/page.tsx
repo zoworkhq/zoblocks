@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Activity, ArrowRight, Braces, ShieldCheck } from "lucide-react";
 import { CATALOG } from "@/lib/catalog";
 import { ComponentCard } from "@/components/site/component-card";
-import { ScrollRail, SiteFooter, SiteHeader } from "@/components/site/chrome";
+import { SiteFooter, SiteHeader } from "@/components/site/chrome";
 import { DemoPlaceholder } from "@/components/site/demo-placeholder";
 import { LoaderShowcase } from "@/components/site/loader-showcase";
 import { Counter, InstallCommand, RevealRoot } from "@/components/site/interactions";
@@ -21,7 +21,6 @@ export default function HomePage() {
         <ClosingCta />
       </main>
       <SiteFooter />
-      <ScrollRail />
     </RevealRoot>
   );
 }

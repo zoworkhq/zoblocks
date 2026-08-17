@@ -3,7 +3,7 @@ import Link from "next/link";
 import { ArrowRight, Check, Layers } from "lucide-react";
 import { getComponent } from "@/lib/catalog";
 import { FAQ, STATUS_COPY, TEMPLATES, TIERS } from "@/lib/offerings";
-import { ScrollRail, SiteFooter, SiteHeader } from "@/components/site/chrome";
+import { SiteFooter, SiteHeader } from "@/components/site/chrome";
 import { cn } from "@/lib/utils";
 import { RevealRoot } from "@/components/site/interactions";
 import { TelemetryTrace } from "@/components/site/telemetry-trace";
@@ -357,7 +357,6 @@ export default function ProPage() {
       </main>
 
       <SiteFooter />
-      <ScrollRail />
     </RevealRoot>
   );
 }

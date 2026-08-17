@@ -19,6 +19,14 @@
    the previews render the same file a customer installs, not a copy of it. */
 @import "../../../../registry/oxygen/lib/switch.css";
 
+/* Disclosure structure, severity rails and access states. Shipped as
+   styles/oxygen-accordion.css by the `accordion-core` registry item, and
+   carrying Accordion, ChartAccordion and SafetyPlan between them. Missing here
+   until now, which is the other half of why those three had no preview — the
+   import could not resolve, and had it resolved it would have rendered a
+   severity rail with no severity. */
+@import "../../../../registry/oxygen/lib/accordion.css";
+
 /* The tab system's own stylesheet, imported from the package rather than
    copied — so the docs demo the exact file a customer installs. Its tokens
    resolve through --ox-* to --ant-* to a literal, which is why it needs no
@@ -168,7 +176,26 @@
  * ------------------------------------------------------------------------ */
 
 html {
-  scroll-behavior: smooth;
+  /*
+   * No `scroll-behavior: smooth`.
+   *
+   * It was set here, and it applies to every programmatic and anchor-driven
+   * scroll on the site. On pages this long that is not a flourish, it is a
+   * wait: an 863px jump from the section rail measured at 947ms of animation,
+   * and the rail's own span is several times that. Every in-page navigation
+   * became a second of gliding before the reader could read anything, and
+   * `scrollIntoView` anywhere in a demo inherited the same delay.
+   *
+   * It also made a fault much harder to see than it should have been. The
+   * section rail used to call `scrollIntoView` on each active-section change;
+   * because the document scrolled *smoothly*, that landed as the page sliding
+   * out from under the pointer mid-gesture rather than as an obvious jump.
+   *
+   * Removing it leaves native scrolling: instant anchors, and a wheel or
+   * trackpad gesture that is the browser's own. `scroll-padding-top` below is
+   * what actually makes an anchor land clear of the sticky header, and it is
+   * unaffected.
+   */
   -webkit-text-size-adjust: 100%;
 
   /*
@@ -528,34 +555,6 @@ body {
 .rail-link[aria-current="true"]::before {
   background: var(--color-oxygen);
   width: 2px;
-}
-
-/* Scroll progress, rendered as a calibrated column rather than a bar. */
-.scroll-rail {
-  position: fixed;
-  top: 50%;
-  right: 1.25rem;
-  translate: 0 -50%;
-  z-index: 30;
-  width: 2px;
-  height: 8rem;
-  border-radius: 999px;
-  background: var(--color-rule);
-  overflow: hidden;
-}
-
-.scroll-rail i {
-  display: block;
-  width: 100%;
-  background: var(--color-oxygen);
-  height: var(--scroll-progress, 0%);
-  transition: height 120ms linear;
-}
-
-@media (max-width: 1279px) {
-  .scroll-rail {
-    display: none;
-  }
 }
 
 /* ---------------------------------------------------------------------------
@@ -1546,9 +1545,8 @@ html:not(.dark) .instrument-demo [class*="bg-panel"] {
  * ------------------------------------------------------------------------ */
 
 @media (prefers-reduced-motion: reduce) {
-  html {
-    scroll-behavior: auto;
-  }
+  /* `scroll-behavior: auto` used to be reset here, for the smooth scrolling the
+     base rule set. Nothing sets it now, so there is nothing to undo. */
 
   *,
   *::before,

@@ -20,6 +20,23 @@ import { BreathLoader } from "@/registry/oxygen/breath-loader/breath-loader";
 import { HelixLoader } from "@/registry/oxygen/helix-loader/helix-loader";
 import { InfusionLoader } from "@/registry/oxygen/infusion-loader/infusion-loader";
 import { Switch, SwitchField, SwitchList } from "@/registry/oxygen/switch/switch";
+import { Accordion } from "@/registry/oxygen/accordion/accordion";
+import {
+  ChartAccordion,
+  type ChartSection,
+} from "@/registry/oxygen/chart-accordion/chart-accordion";
+import { SafetyPlan } from "@/registry/oxygen/safety-plan/safety-plan";
+import type { AccordionItem } from "@/registry/oxygen/lib/accordion-core";
+import { Tabs } from "@oxygenui-design/tabs";
+import { Consult } from "@/registry/oxygen/consult/consult";
+import {
+  createStaticProvider,
+  lookUp,
+  minimalDisclosure,
+  prepare,
+  type ConsultEvent,
+  type Source,
+} from "@oxygenui-design/consult-core";
 import { InstrumentGlow } from "@/components/site/interactions";
 import { SignatureDemo } from "@/components/site/signature-demo";
 import { cn } from "@/lib/utils";
@@ -113,7 +130,435 @@ function LiveSwitch({
   );
 }
 
+/**
+ * Room around a composite demo, and deliberately no theme scope.
+ *
+ * `.instrument-demo` follows the page theme — globals.css states the rule
+ * outright: "live component previews should never look dark on a light page."
+ * The component tokens follow the same `.dark` class on the document, so the
+ * two already agree and anything declared here could only disagree with both.
+ * An earlier version of this pinned `[data-ox-theme="dark"]`, on the mistaken
+ * reading that the panel was dark under both themes; on a light page that put
+ * dark-theme tab colours — pale cyan on near-white — inside a white panel.
+ */
+function InstrumentStage({ children }: { children: React.ReactNode }) {
+  return <div className="rounded-xl">{children}</div>;
+}
+
+const CHART_ITEMS: AccordionItem[] = [
+  {
+    key: "risk",
+    label: "Risk & suicidality",
+    severity: "critical",
+    summary: "C-SSRS positive · 13 Aug",
+    children: <p>Ideation 3 — active thoughts, no plan, no intent, no preparatory behaviour.</p>,
+  },
+  {
+    key: "meds",
+    label: "Medications",
+    severity: "high",
+    summary: "Clozapine ANC due 18 Aug",
+    children: <p>Clozapine 300 mg nightly. Lithium carbonate 900 mg nightly.</p>,
+  },
+  {
+    key: "plan",
+    label: "Safety plan",
+    severity: "normal",
+    summary: "Current · revised 11 Aug",
+    children: <p>Six steps complete. Means restriction reviewed on 11 August.</p>,
+  },
+];
+
+const RECORD_SECTIONS: ChartSection[] = [
+  {
+    key: "risk",
+    label: "Risk & suicidality",
+    severity: "critical",
+    status: "C-SSRS positive",
+    updatedAt: "2026-08-13",
+    children: <p>Ideation 3 — active thoughts, no plan, no intent, no preparatory behaviour.</p>,
+  },
+  {
+    key: "assessments",
+    label: "Assessments",
+    severity: "high",
+    status: "PHQ-9 21 · severe",
+    updatedAt: "2026-08-03",
+    children: <p>PHQ-9 21 of 27. GAD-7 16 of 21. Item 9 endorsed.</p>,
+  },
+  {
+    key: "notes",
+    label: "Progress notes",
+    count: "142 encounters",
+    updatedAt: "2026-08-13",
+    children: <p>BIRP format.</p>,
+  },
+  {
+    key: "audit",
+    label: "AUDIT",
+    severity: "unknown",
+    status: "Not asked this visit",
+    updatedAt: "2026-02-02",
+    children: <p>Not administered on 3 August. Last score 14 on 2 February 2026.</p>,
+  },
+];
+
+/*
+ * Consult, driven by a scripted provider.
+ *
+ * `createStaticProvider` is exported by consult-core for exactly this — the
+ * states worth showing are the ones a live model gives you only by luck, and
+ * the two that matter most (an answer its sources support, and one they do not)
+ * are not worth waiting on a model to produce.
+ */
+const CONSULT_DISCLOSURE = minimalDisclosure("demo-model@1", {
+  developer: "Zowork",
+  knowledgeCutoff: "2025-10",
+});
+
+const CONSULT_GUIDELINE: Source = {
+  id: "acc-aha-af",
+  title: "2023 ACC/AHA/HRS AF Guideline",
+  passage:
+    "In patients with atrial fibrillation and rapid ventricular response, rate control is a reasonable initial approach for those without severe symptoms.",
+  highlight: [40, 106],
+  kind: "guideline",
+  version: "2023.1",
+  retrievedAt: "2026-08-16T09:00:00.000Z",
+  score: 0.91,
+};
+
+const GROUNDED_STREAM: ConsultEvent[] = [
+  {
+    type: "delta",
+    text: "Rate control is a reasonable initial approach for most patients without severe symptoms.",
+  },
+  { type: "citation", marker: 1, source: CONSULT_GUIDELINE },
+  { type: "claim", claim: { span: [0, 86], markers: [1] } },
+  { type: "done", finish: "stop" },
+];
+
+const UNCITED_STREAM: ConsultEvent[] = [
+  {
+    type: "delta",
+    text: "Rhythm control is often preferred in younger, more symptomatic patients.",
+  },
+  { type: "done", finish: "stop" },
+];
+
+function ConsultDemo({ events, delayMs = 90 }: { events: ConsultEvent[]; delayMs?: number }) {
+  // Rebuilt per scenario so switching tabs restarts the stream rather than
+  // replaying a session the previous scenario already finished.
+  const provider = React.useMemo(
+    () => createStaticProvider({ events, disclosure: CONSULT_DISCLOSURE, delayMs }),
+    [events, delayMs],
+  );
+
+  return (
+    <Consult
+      provider={provider}
+      modes={[lookUp, prepare]}
+      anchor="inline"
+      locale="en-GB"
+      actor={{ display: "Dr Amara Okafor", credential: "MD", reference: "Practitioner/7" }}
+    />
+  );
+}
+
 const SCENARIOS: Record<string, Scenario[]> = {
+  consult: [
+    {
+      id: "rest",
+      label: "At rest",
+      note: "A dock, not a floating div: role=complementary with a name, so it is findable and skippable. The placeholder does not say “Ask anything” — a copilot that promises a scope it will refuse has already lied once before the first question. Type a question and press Enter.",
+      render: () => (
+        <InstrumentStage>
+          <ConsultDemo events={GROUNDED_STREAM} />
+        </InstrumentStage>
+      ),
+    },
+    {
+      id: "sourced",
+      label: "A sourced answer",
+      note: "Every claim the model makes is spanned and tied to the passage that supports it, and the passage is shown with the supporting sentence highlighted. The design goal is narrow and unusual: make checking the answer cheaper than accepting it.",
+      render: () => (
+        <InstrumentStage>
+          <ConsultDemo events={GROUNDED_STREAM} delayMs={140} />
+        </InstrumentStage>
+      ),
+    },
+    {
+      id: "uncited",
+      label: "Unsupported",
+      note: "The same component, given an answer with no citation behind it. It is not hidden and not silently rendered as though it were sourced — an unsupported claim is marked as unsupported, because the failure this component exists to prevent is a confident sentence that nothing stands behind.",
+      render: () => (
+        <InstrumentStage>
+          <ConsultDemo events={UNCITED_STREAM} delayMs={140} />
+        </InstrumentStage>
+      ),
+    },
+  ],
+
+  accordion: [
+    {
+      id: "chart",
+      label: "A record",
+      note: "Severity is never colour alone: the rail is paired with a summary that says the same thing in words, so a closed section still reports what is inside it. Click a header, or focus one and press ↑ / ↓ — the roving tab stop and the heading level are the same in every configuration.",
+      render: () => (
+        <InstrumentStage>
+          <Accordion items={CHART_ITEMS} defaultActiveKey={["risk"]} headingLevel={3} />
+        </InstrumentStage>
+      ),
+    },
+    {
+      id: "consent",
+      label: "Consent gate",
+      note: "Expanding a section and disclosing its content are separate events. The panel opens to explain what governs it — 42 CFR Part 2, named in the header so a closed section says it too — and the content stays behind the gate until consent is confirmed. An expiry is stated before it lapses, not after.",
+      render: () => (
+        <InstrumentStage>
+          <Accordion
+            headingLevel={3}
+            defaultActiveKey={["sud"]}
+            onDisclose={() => true}
+            items={[
+              {
+                key: "sud",
+                label: "Substance use treatment",
+                summary: "42 CFR Part 2",
+                access: {
+                  kind: "consent",
+                  policy: "42 CFR Part 2",
+                  state: "granted",
+                  expiresAt: "2027-02-02",
+                },
+                children: <p>Intensive outpatient programme, three sessions weekly.</p>,
+              },
+              {
+                key: "notes",
+                label: "Progress notes",
+                summary: "142 encounters",
+                children: <p>BIRP format.</p>,
+              },
+            ]}
+          />
+        </InstrumentStage>
+      ),
+    },
+    {
+      id: "withheld",
+      label: "Withheld",
+      note: "Content this reader cannot obtain still gets a row. Deleting it would claim the record is complete, and a clinician reading a chart with a silent hole in it makes a decision on evidence they do not know is missing. The row states the reason and is not expandable.",
+      render: () => (
+        <InstrumentStage>
+          <Accordion
+            headingLevel={3}
+            items={[
+              {
+                key: "sealed",
+                label: "Adolescent visit, 2019",
+                access: {
+                  kind: "withheld",
+                  reason: "Sealed under state minor-consent law. Not releasable to this account.",
+                },
+              },
+              {
+                key: "meds",
+                label: "Medications",
+                severity: "high",
+                summary: "Clozapine ANC due 18 Aug",
+                children: <p>Clozapine 300 mg nightly.</p>,
+              },
+            ]}
+          />
+        </InstrumentStage>
+      ),
+    },
+  ],
+
+  "chart-accordion": [
+    {
+      id: "record",
+      label: "The whole record",
+      note: "The chart layer over Accordion: severity chips, counts and a last-updated time composed to the house rules, so a severity can never reach the screen without the words that explain it. Expand all and Collapse all are one control each, because the first thing anyone does with a record is open all of it.",
+      render: () => (
+        <InstrumentStage>
+          <ChartAccordion
+            sections={RECORD_SECTIONS}
+            defaultOpenKeys={["risk"]}
+            toolbarLabel="Okonkwo, A. · MRN 4471902"
+            headingLevel={3}
+          />
+        </InstrumentStage>
+      ),
+    },
+    {
+      id: "quiet",
+      label: "Without a toolbar",
+      note: "Embedded inside a page that already has its own chrome, the toolbar is a second set of controls competing with the first. Turning it off leaves the sections, the severity rails and the summaries — the part that carries the information.",
+      render: () => (
+        <InstrumentStage>
+          <ChartAccordion sections={RECORD_SECTIONS} toolbar={false} headingLevel={3} />
+        </InstrumentStage>
+      ),
+    },
+  ],
+
+  "safety-plan": [
+    {
+      id: "complete",
+      label: "Complete",
+      note: "The six steps of the Stanley-Brown Safety Planning Intervention, in order. The crisis step is pinned open and cannot be closed: a person in crisis should not have to find the part of their own plan that holds the phone numbers.",
+      render: () => (
+        <InstrumentStage>
+          <SafetyPlan
+            revisedAt="2026-08-11"
+            headingLevel={3}
+            steps={{
+              warningSigns: {
+                entries: ["Sleeping less than four hours", "Not answering messages for two days"],
+              },
+              internalCoping: {
+                entries: ["Walk to the end of the road and back", "Four in, six out, ten times"],
+              },
+              distractions: { entries: ["The cafe on Bell Street before 11am"] },
+              supportContacts: {
+                contacts: [{ name: "Priya", detail: "Sister", availability: "Any time" }],
+              },
+              professionals: {
+                contacts: [
+                  { name: "988", detail: "Suicide & Crisis Lifeline", availability: "24 hours" },
+                  { name: "County crisis team", detail: "555 0148", availability: "24 hours" },
+                ],
+              },
+              environment: { entries: ["Priya is holding the spare keys to the garage"] },
+            }}
+          />
+        </InstrumentStage>
+      ),
+    },
+    {
+      id: "unfinished",
+      label: "Unfinished",
+      note: "A half-written plan is the normal case — it is filled in over several appointments. Empty steps say they are not filled in yet and who fills them in, rather than rendering blank; a blank row reads as a plan that has nothing in it rather than one still being written.",
+      render: () => (
+        <InstrumentStage>
+          <SafetyPlan
+            revisedAt="2026-08-11"
+            headingLevel={3}
+            steps={{
+              warningSigns: { entries: ["Sleeping less than four hours"] },
+              professionals: {
+                contacts: [
+                  { name: "988", detail: "Suicide & Crisis Lifeline", availability: "24 hours" },
+                ],
+              },
+            }}
+          />
+        </InstrumentStage>
+      ),
+    },
+  ],
+
+  /*
+   * Tabs also has a full gallery further down this page. These four are here
+   * because the gallery is organised by skin, and the claim that actually
+   * matters is the one a skin cannot show: the same silhouette compiles to four
+   * different accessibility trees depending on what the tabs *are*.
+   */
+  tabs: [
+    {
+      id: "tablist",
+      label: "View switch",
+      note: 'as="tabs" — the default, and the only one of the four that owns panels. Arrow keys move selection, the panel follows, and the strip is a single tab stop. This is the one everybody builds; the other three are the ones everybody builds wrongly by reusing this.',
+      render: () => (
+        <InstrumentStage>
+          <Tabs
+            as="tabs"
+            aria-label="Encounter"
+            variant="underline"
+            defaultValue="summary"
+            items={[
+              { value: "summary", label: "Summary", children: <p>Order #4471, placed 12 Aug.</p> },
+              {
+                value: "items",
+                label: "Line items",
+                count: 24,
+                children: <p>24 items across 3 shipments.</p>,
+              },
+              { value: "shipping", label: "Shipping", children: <p>Collected 13 Aug.</p> },
+            ]}
+          />
+        </InstrumentStage>
+      ),
+    },
+    {
+      id: "radiogroup",
+      label: "Form value",
+      note: 'as="radiogroup" — a filter that belongs in a Form.Item. It has a value, not a panel, so it announces "checked, 1 of 4" rather than pretending to be a tablist. Wrapping a radio group in role=tablist is the single most common tab defect in an audit.',
+      render: () => (
+        <InstrumentStage>
+          <Tabs
+            as="radiogroup"
+            aria-label="Document type"
+            variant="pill"
+            defaultValue="all"
+            items={[
+              { value: "all", label: "Everything", count: 241 },
+              { value: "referrals", label: "Referrals", count: 38 },
+              { value: "labs", label: "Lab reports", count: 96 },
+              { value: "consent", label: "Consent forms", count: 14 },
+            ]}
+          />
+        </InstrumentStage>
+      ),
+    },
+    {
+      id: "nav",
+      label: "Link list",
+      note: 'as="nav" — a navigation menu, so every trigger is a real anchor with an href. Hijacking arrow keys here would destroy a keyboard user\'s focus the moment they pressed one, so it does not: Tab moves between links, exactly as it does everywhere else on the web.',
+      render: () => (
+        <InstrumentStage>
+          <Tabs
+            as="nav"
+            aria-label="Chart sections"
+            variant="ghost"
+            defaultValue="overview"
+            items={[
+              { value: "overview", label: "Overview", href: "#overview" },
+              { value: "meds", label: "Medications", href: "#meds" },
+              { value: "labs", label: "Labs", href: "#labs" },
+            ]}
+          />
+        </InstrumentStage>
+      ),
+    },
+    {
+      id: "steps",
+      label: "Wizard",
+      note: 'as="steps" — ordered and gated. Completed steps stay reachable, because locking them is the classic wizard mistake: it forces a restart to fix a typo. A step that is not yet earned is focusable and says why, rather than being invisible.',
+      render: () => (
+        <InstrumentStage>
+          <Tabs
+            as="steps"
+            aria-label="Referral"
+            variant="stepper"
+            defaultValue="details"
+            items={[
+              { value: "patient", label: "Patient", state: "done" },
+              { value: "details", label: "Details", state: "current" },
+              {
+                value: "review",
+                label: "Review",
+                state: "locked",
+                disabledReason: "Complete the details step first.",
+              },
+            ]}
+          />
+        </InstrumentStage>
+      ),
+    },
+  ],
+
   switch: [
     {
       id: "commit",

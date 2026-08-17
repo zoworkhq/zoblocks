@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { CATALOG } from "@/lib/catalog";
 import { ComponentCard } from "@/components/site/component-card";
-import { ScrollRail, SiteFooter, SiteHeader } from "@/components/site/chrome";
+import { SiteFooter, SiteHeader } from "@/components/site/chrome";
 import { RevealRoot } from "@/components/site/interactions";
 
 export const metadata: Metadata = {
@@ -118,7 +118,6 @@ export default function ComponentsPage() {
       </main>
 
       <SiteFooter />
-      <ScrollRail />
     </RevealRoot>
   );
 }

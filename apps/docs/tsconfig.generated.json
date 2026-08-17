@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "display": "Oxygen generated path mappings",
+  "_generated": [
+    "GENERATED FILE — DO NOT EDIT.",
+    "",
+    "Produced by `pnpm gen` from each component's *.meta.ts.",
+    "Edit the metadata, then re-run. CI fails if this file is stale.",
+    "",
+    "See content/decisions/0004-generated-component-metadata.md"
+  ],
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/components/oxygen/accordion": [
+        "../../registry/oxygen/accordion/accordion.tsx"
+      ],
+      "@/components/oxygen/breath-loader": [
+        "../../registry/oxygen/breath-loader/breath-loader.tsx"
+      ],
+      "@/components/oxygen/chart-accordion": [
+        "../../registry/oxygen/chart-accordion/chart-accordion.tsx"
+      ],
+      "@/components/oxygen/consult": [
+        "../../registry/oxygen/consult/consult.tsx"
+      ],
+      "@/components/oxygen/helix-loader": [
+        "../../registry/oxygen/helix-loader/helix-loader.tsx"
+      ],
+      "@/components/oxygen/infusion-loader": [
+        "../../registry/oxygen/infusion-loader/infusion-loader.tsx"
+      ],
+      "@/components/oxygen/pulse-loader": [
+        "../../registry/oxygen/pulse-loader/pulse-loader.tsx"
+      ],
+      "@/components/oxygen/rhythm-loader": [
+        "../../registry/oxygen/rhythm-loader/rhythm-loader.tsx"
+      ],
+      "@/components/oxygen/safety-plan": [
+        "../../registry/oxygen/safety-plan/safety-plan.tsx"
+      ],
+      "@/components/oxygen/switch": [
+        "../../registry/oxygen/switch/switch.tsx"
+      ],
+      "@/lib/oxygen-accordion": [
+        "../../registry/oxygen/lib/accordion-core.tsx"
+      ],
+      "@/lib/oxygen-loader": [
+        "../../registry/oxygen/lib/loader.tsx"
+      ],
+      "@/lib/oxygen-switch": [
+        "../../registry/oxygen/lib/switch.tsx"
+      ],
+      "@/lib/utils": [
+        "../../registry/oxygen/lib/utils.ts"
+      ],
+      "@oxygenui-design/component-meta": [
+        "../../packages/component-meta/src/index.ts"
+      ],
+      "@oxygenui-design/fhir": [
+        "../../packages/fhir/src/index.ts"
+      ],
+      "@oxygenui-design/fixtures": [
+        "../../packages/fixtures/src/index.ts"
+      ]
+    }
+  }
+}

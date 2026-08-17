@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <!--
+    The site mark — two bonded circles, O₂ — as the tab icon.
+
+    Picked up by Next's `icon` file convention (app/icon.svg), so no <link> tag
+    is written by hand.
+
+    Three deliberate differences from `OxygenMark` in chrome.tsx, all forced by
+    the size this renders at:
+
+      1. It carries its own dark ground rather than sitting transparent. A tab
+         icon has no control over what is behind it, and ink-on-transparent
+         vanishes against a dark browser chrome — which is where a large share
+         of readers will see it.
+      2. Colours are literal. `currentColor` and `var(--color-oxygen)` have
+         nothing to resolve against in a standalone file.
+      3. Strokes are proportionally heavier and the mark fills the square. At
+         16px a 2px stroke on a 28-wide viewBox lands under one device pixel and
+         greys out into a smudge.
+  -->
+  <rect width="32" height="32" rx="7" fill="#08110f" />
+  <!-- The bond is the brand colour and is drawn first, so the atoms sit on it. -->
+  <line x1="9" y1="16" x2="23" y2="16" stroke="#10b995" stroke-width="3.25" stroke-linecap="round" />
+  <circle cx="9" cy="16" r="5.75" fill="none" stroke="#f7f9f8" stroke-width="2.75" />
+  <circle cx="23" cy="16" r="5.75" fill="none" stroke="#f7f9f8" stroke-width="2.75" />
+</svg>

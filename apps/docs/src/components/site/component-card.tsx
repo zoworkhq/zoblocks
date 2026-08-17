@@ -32,6 +32,17 @@ import { InfusionLoader } from "@/registry/oxygen/infusion-loader/infusion-loade
 import { RhythmLoader } from "@/registry/oxygen/rhythm-loader/rhythm-loader";
 import { BreathLoader } from "@/registry/oxygen/breath-loader/breath-loader";
 import { HelixLoader } from "@/registry/oxygen/helix-loader/helix-loader";
+import { Switch } from "@/registry/oxygen/switch/switch";
+import { Accordion } from "@/registry/oxygen/accordion/accordion";
+import {
+  ChartAccordion,
+  type ChartSection,
+} from "@/registry/oxygen/chart-accordion/chart-accordion";
+import type { AccordionItem } from "@/registry/oxygen/lib/accordion-core";
+import { SafetyPlan } from "@/registry/oxygen/safety-plan/safety-plan";
+import { Tabs } from "@oxygenui-design/tabs";
+import { Consult } from "@/registry/oxygen/consult/consult";
+import { createStaticProvider, lookUp, minimalDisclosure } from "@oxygenui-design/consult-core";
 import { SignatureMark } from "@/components/site/signature-mark";
 import { STATUS_LABEL, type ComponentDoc } from "@/lib/catalog";
 import { cn } from "@/lib/utils";
@@ -68,23 +79,293 @@ const STATUS_STYLE: Record<string, string> = {
  * are twice as wide, and art scaled to a two-column cell overflows a one-column
  * one.
  */
+/**
+ * Step through a list on a timer, pausing when the tab is hidden.
+ *
+ * The loaders animate themselves, so a grid of them reads as alive while every
+ * composite component sat frozen next to them — the same cell, doing nothing.
+ * These components have no idle animation of their own and cannot be clicked
+ * here (the card is a link, and the art is `inert`), so the only way to show
+ * what they do is to drive them.
+ *
+ * `visibilitychange` matters at this count: a dozen cards each holding an
+ * interval keeps a backgrounded tab awake for no one's benefit.
+ */
+function useCycle<T>(values: readonly T[], everyMs: number): T {
+  const [index, setIndex] = React.useState(0);
+
+  React.useEffect(() => {
+    if (values.length < 2) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    let timer: ReturnType<typeof setInterval> | undefined;
+    const start = () => {
+      timer ??= setInterval(() => setIndex((i) => (i + 1) % values.length), everyMs);
+    };
+    const stop = () => {
+      if (timer) clearInterval(timer);
+      timer = undefined;
+    };
+
+    const onVisibility = () => (document.hidden ? stop() : start());
+    if (!document.hidden) start();
+    document.addEventListener("visibilitychange", onVisibility);
+    return () => {
+      stop();
+      document.removeEventListener("visibilitychange", onVisibility);
+    };
+  }, [values.length, everyMs]);
+
+  return values[index % values.length]!;
+}
+
+/**
+ * Scale a component down to fit the cell without reflowing it.
+ *
+ * SafetyPlan is the case this exists for: its six steps are fixed by the
+ * instrument, so it cannot be shortened, and clipping it cut labels through the
+ * middle of a word — which reads as a broken component rather than a thumbnail.
+ * A transform keeps every proportion the component actually has and simply
+ * shows less of it, which is what a thumbnail is.
+ */
+function ScaledArt({ scale, children }: { scale: number; children: React.ReactNode }) {
+  return (
+    <div className="w-full overflow-hidden">
+      <div
+        style={{
+          transform: `scale(${scale})`,
+          transformOrigin: "top left",
+          width: `${100 / scale}%`,
+        }}
+      >
+        {children}
+      </div>
+    </div>
+  );
+}
+
 const PREVIEW: Record<string, (featured: boolean) => React.ReactNode> = {
   "pulse-loader": (featured) => (
-    <PulseLoader size={featured ? 92 : 64} label="Loading your records" />
+    <PulseLoader size={featured ? 124 : 96} label="Loading your records" />
   ),
   "infusion-loader": (featured) => (
-    <InfusionLoader size={featured ? 150 : 116} progress={62} label="Importing records" />
+    <InfusionLoader size={featured ? 190 : 148} progress={62} label="Importing records" />
   ),
-  "rhythm-loader": (featured) => <RhythmLoader size={featured ? 92 : 68} label="Loading results" />,
+  "rhythm-loader": (featured) => (
+    <RhythmLoader size={featured ? 132 : 104} label="Loading results" />
+  ),
   "breath-loader": (featured) => (
-    <BreathLoader size={featured ? 92 : 64} label="Loading your information" />
+    <BreathLoader size={featured ? 124 : 96} label="Loading your information" />
   ),
-  "helix-loader": (featured) => <HelixLoader size={featured ? 92 : 64} label="Running the panel" />,
+  "helix-loader": (featured) => (
+    <HelixLoader size={featured ? 124 : 96} label="Running the panel" />
+  ),
   // Not the component itself: Signature wraps Ant Design, which the docs site
   // does not carry. This draws the same geometry from the same engine — see
   // signature-mark.tsx.
-  signature: (featured) => <SignatureMark size={featured ? 92 : 72} />,
+  signature: (featured) => <SignatureMark size={featured ? 120 : 96} />,
+
+  /*
+   * The composite components, at card scale.
+   *
+   * These are the real components with a card-sized slice of real data — two
+   * sections rather than seven, one switch rather than a group. A card is a
+   * thumbnail, and the honest thumbnail of a disclosure surface is a disclosure
+   * surface with fewer rows in it, not a picture of one.
+   *
+   * No theme scope on any of them. The card sits on the site's own surface and
+   * follows the site's own toggle, and the component tokens already resolve
+   * light or dark from the `.dark` class on the document — so a scope here
+   * could only be a second, disagreeing opinion. (The detail-page previews do
+   * carry one, because the instrument panel they sit in is dark under both site
+   * themes and is the exception rather than the rule.)
+   */
+  switch: () => <SwitchArt />,
+  tabs: (featured) => <TabsArt featured={featured} />,
+  accordion: (featured) => <AccordionArt featured={featured} />,
+  "chart-accordion": (featured) => <ChartAccordionArt featured={featured} />,
+  "safety-plan": (featured) => <SafetyPlanArt featured={featured} />,
+
+  /*
+   * The dock at rest, inline rather than floating: `anchor="bottom-center"` is
+   * fixed to the viewport, which inside a card would park the copilot over the
+   * page instead of in the cell. The provider is scripted and never asked for
+   * anything here — a card is not a place to start a model session.
+   */
+  consult: (featured) => (
+    <div className="w-full" style={{ maxWidth: featured ? 340 : 280 }}>
+      <Consult provider={CARD_CONSULT_PROVIDER} modes={[lookUp]} anchor="inline" locale="en-GB" />
+    </div>
+  ),
 };
+
+const CARD_CONSULT_PROVIDER = createStaticProvider({
+  events: [{ type: "done", finish: "stop" }],
+  disclosure: minimalDisclosure("demo-model@1", {
+    developer: "Zowork",
+    knowledgeCutoff: "2025-10",
+  }),
+});
+
+/* ------------------------------------------------------------------ */
+/* The driven previews                                                  */
+/* ------------------------------------------------------------------ */
+
+/** Three of the values a switch can hold, including the one nobody models. */
+const SWITCH_VALUES = [true, "unknown", false] as const;
+
+function SwitchArt() {
+  const checked = useCycle(SWITCH_VALUES, 2200);
+  return (
+    <div className="w-full max-w-[236px]">
+      <Switch
+        label="Contact precautions"
+        stateLabels="in-effect"
+        tone="caution"
+        checked={checked}
+        absentReason={checked === "unknown" ? "not-collected" : undefined}
+        readOnly
+      />
+    </div>
+  );
+}
+
+const TABS_VALUES = ["personal", "shared"] as const;
+
+function TabsArt({ featured }: { featured: boolean }) {
+  // The thumb interpolates position and width between these two, which is the
+  // one thing about this component a still image cannot show.
+  const value = useCycle(TABS_VALUES, 2000);
+  return (
+    <div className="w-full" style={{ maxWidth: featured ? 340 : 268 }}>
+      <Tabs
+        as="radiogroup"
+        aria-label="Documents"
+        variant="segmented"
+        fill="equal"
+        value={value}
+        onChange={() => {}}
+        items={[
+          { value: "personal", label: "Personal" },
+          { value: "shared", label: "Shared" },
+        ]}
+      />
+    </div>
+  );
+}
+
+const ACCORDION_ITEMS: AccordionItem[] = [
+  {
+    key: "risk",
+    label: "Risk & suicidality",
+    severity: "critical",
+    summary: "C-SSRS positive · 13 Aug",
+    children: <p>Ideation 3 — no plan, no intent.</p>,
+  },
+  {
+    key: "meds",
+    label: "Medications",
+    severity: "high",
+    summary: "Clozapine ANC due 18 Aug",
+    children: <p>Clozapine 300 mg nightly.</p>,
+  },
+  {
+    key: "plan",
+    label: "Safety plan",
+    severity: "normal",
+    summary: "Current · revised 11 Aug",
+    children: <p>Six steps complete.</p>,
+  },
+];
+
+const ACCORDION_KEYS = ["risk", "meds", "plan"] as const;
+
+function AccordionArt({ featured }: { featured: boolean }) {
+  const open = useCycle(ACCORDION_KEYS, 2600);
+  return (
+    <ScaledArt scale={featured ? 0.92 : 0.8}>
+      <Accordion
+        headingLevel={4}
+        density="clinical"
+        accordion
+        activeKey={open}
+        onChange={() => {}}
+        items={ACCORDION_ITEMS}
+      />
+    </ScaledArt>
+  );
+}
+
+const RECORD_SECTIONS: ChartSection[] = [
+  {
+    key: "risk",
+    label: "Risk & suicidality",
+    severity: "critical",
+    status: "C-SSRS positive",
+    children: <p>Ideation 3.</p>,
+  },
+  {
+    key: "assessments",
+    label: "Assessments",
+    severity: "high",
+    status: "PHQ-9 21 · severe",
+    children: <p>PHQ-9 21 of 27.</p>,
+  },
+  {
+    key: "audit",
+    label: "AUDIT",
+    severity: "unknown",
+    status: "Not asked this visit",
+    children: <p>Last score 14.</p>,
+  },
+];
+
+const SECTION_KEYS = ["risk", "assessments", "audit"] as const;
+
+function ChartAccordionArt({ featured }: { featured: boolean }) {
+  const open = useCycle(SECTION_KEYS, 2600);
+  return (
+    <ScaledArt scale={featured ? 0.92 : 0.8}>
+      <ChartAccordion
+        toolbar={false}
+        headingLevel={4}
+        density="clinical"
+        defaultOpenKeys={[open]}
+        key={open}
+        sections={RECORD_SECTIONS}
+      />
+    </ScaledArt>
+  );
+}
+
+/*
+ * The whole plan, scaled rather than cropped.
+ *
+ * SafetyPlan renders all six steps by design — the order is the instrument and
+ * the component will not let a caller drop one — so a card-height crop sliced
+ * labels through the middle of a word. Scaled down, the shape a reader
+ * recognises survives: six numbered steps with the crisis step held open.
+ */
+function SafetyPlanArt({ featured }: { featured: boolean }) {
+  return (
+    <ScaledArt scale={featured ? 0.62 : 0.5}>
+      <SafetyPlan
+        headingLevel={4}
+        density="clinical"
+        steps={{
+          warningSigns: { entries: ["Sleeping less than four hours"] },
+          internalCoping: { entries: ["Four in, six out, ten times"] },
+          supportContacts: { contacts: [{ name: "Priya", detail: "Sister" }] },
+          professionals: {
+            contacts: [
+              { name: "988", detail: "Suicide & Crisis Lifeline", availability: "24 hours" },
+            ],
+          },
+        }}
+      />
+    </ScaledArt>
+  );
+}
 
 export function ComponentCard({
   component,
@@ -163,8 +444,11 @@ export function ComponentCard({
             inert
             aria-hidden="true"
             className={cn(
+              // Raised from 120/92. The art was sized to the old floor and read
+              // as a stamp in the middle of a large empty frame — a rhythm strip
+              // at 68px in a 330px-wide cell is a hairline, not a component.
               "pointer-events-none flex w-full items-center justify-center",
-              featured ? "min-h-[120px]" : "min-h-[92px]",
+              featured ? "min-h-[184px]" : "min-h-[148px]",
             )}
           >
             {preview(featured)}

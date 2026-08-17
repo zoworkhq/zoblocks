@@ -208,6 +208,26 @@
   grid-area: 1 / 1;
 }
 
+/*
+ * An icon-only trigger passes its glyph as the label.
+ *
+ * That is the supported shape — it is why `textLabel` exists, and why the
+ * command variant documents itself as icon-only — but the label slot is sized
+ * by its content, and an inline `<svg>` carrying a `viewBox` and no width or
+ * height has no intrinsic size at all. It therefore took whatever the strip
+ * offered: on the command variant, four glyphs meant to be 14px rendered
+ * roughly eighty, one per cell, filling the bar.
+ *
+ * Matched to `.ox-tabs__icon` rather than invented: an icon is 1em wherever it
+ * appears in this component, so an icon-only trigger and an icon beside a label
+ * are the same size on the same strip. A caller who wants a larger glyph still
+ * sets width and height on their own SVG, which wins.
+ */
+.ox-tabs__label > svg {
+  inline-size: 1em;
+  block-size: 1em;
+}
+
 .ox-tabs__icon {
   flex: 0 0 auto;
   display: inline-grid;

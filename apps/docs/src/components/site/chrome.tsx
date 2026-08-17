@@ -34,11 +34,25 @@ export function SiteHeader() {
   const pathname = usePathname();
   const [scrolled, setScrolled] = React.useState(false);
 
+  // Coalesced to one read per frame, like the section rail. `scrollY` is cheap
+  // on its own, but the handler ran on every event and each one reached React —
+  // and React's bail-out still costs a scheduled render to decide on.
   React.useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 12);
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+    let frame = 0;
+    const read = () => {
+      frame = 0;
+      setScrolled(window.scrollY > 12);
+    };
+    const schedule = () => {
+      if (!frame) frame = requestAnimationFrame(read);
+    };
+
+    read();
+    window.addEventListener("scroll", schedule, { passive: true });
+    return () => {
+      cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", schedule);
+    };
   }, []);
 
   return (
@@ -113,37 +127,6 @@ export function SiteHeader() {
         </nav>
       </div>
     </header>
-  );
-}
-
-/** Scroll position as a calibrated column. Desktop only; hidden under 1280px. */
-export function ScrollRail() {
-  const ref = React.useRef<HTMLDivElement>(null);
-
-  React.useEffect(() => {
-    let frame = 0;
-    function update() {
-      cancelAnimationFrame(frame);
-      frame = requestAnimationFrame(() => {
-        const max = document.documentElement.scrollHeight - window.innerHeight;
-        const pct = max > 0 ? Math.min(window.scrollY / max, 1) * 100 : 0;
-        ref.current?.style.setProperty("--scroll-progress", `${pct}%`);
-      });
-    }
-    update();
-    window.addEventListener("scroll", update, { passive: true });
-    window.addEventListener("resize", update);
-    return () => {
-      window.removeEventListener("scroll", update);
-      window.removeEventListener("resize", update);
-      cancelAnimationFrame(frame);
-    };
-  }, []);
-
-  return (
-    <div ref={ref} className="scroll-rail" aria-hidden="true">
-      <i />
-    </div>
   );
 }
 

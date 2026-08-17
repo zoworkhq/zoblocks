@@ -44,6 +44,16 @@ export const paths = {
   registryJson: path.join(ROOT, "registry.json"),
   registryOut: path.join(ROOT, "apps", "docs", "public", "r"),
   tsconfigPaths: path.join(ROOT, "tsconfig.generated.json"),
+  /**
+   * The same mappings, rebased for the docs app.
+   *
+   * The docs app resolves from its own directory, so it cannot extend the root
+   * file. It used to carry a hand-written subset instead, and the subset went
+   * stale exactly as the root one had before it was generated: three of the ten
+   * component specifiers were mapped, so a preview importing any of the other
+   * seven could not be written at all.
+   */
+  docsTsconfigPaths: path.join(ROOT, "apps", "docs", "tsconfig.generated.json"),
   docsGenerated: path.join(ROOT, "apps", "docs", "src", "lib", "generated"),
   docsCatalog: path.join(ROOT, "apps", "docs", "src", "lib", "generated", "catalog.ts"),
   tailwindSources: path.join(ROOT, "apps", "docs", "src", "app", "generated-sources.css"),
