@@ -50,6 +50,10 @@ Rules that matter when generating code with these components:
   install: pnpm dlx shadcn@latest add https://oxygenui.design/r/switch.json
   states: On, Off, Unknown (absence, with a reason), Pending — the write is in flight, Committed, Reverted — the write failed, Blocked — refused before trying, Queued — offline, Stale — changed by someone else, Read-only, with a reason, Disabled, Time-boxed (until), Awaiting confirmation, Segmented — both answers visible, Chip — a filter bar, Row — the whole row is the target
   status: experimental
+- [Tabs](https://oxygenui.design/components/tabs): Tabs that know what they are: a view switch, a link list, a form value or a wizard — four accessibility trees behind one silhouette.
+  install: pnpm dlx shadcn@latest add https://oxygenui.design/r/tabs.json
+  states: Selected, Unselected, Disabled with a stated reason, Restricted (present, gated, explained), Stale — showing cached data, Unavailable offline, Unsaved changes pending, Locked step, Completed step, Overflowing into a menu, Collapsed to a native picker, Awaiting an async guard
+  status: beta
 
 ## Clinical
 

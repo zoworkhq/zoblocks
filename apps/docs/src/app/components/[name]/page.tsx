@@ -7,6 +7,7 @@ import { ArrowLeft, ArrowUpRight, Check, CircleAlert, X } from "lucide-react";
 import { CATALOG, STATUS_LABEL, getComponent } from "@/lib/catalog";
 import { ScrollRail, SiteFooter, SiteHeader } from "@/components/site/chrome";
 import { ComponentPreview } from "@/components/site/component-preview";
+import { TabsGallery } from "@/components/site/tabs-gallery";
 import { InstallCommand, RevealRoot } from "@/components/site/interactions";
 import { SectionRail, type RailSection } from "@/components/site/section-rail";
 
@@ -119,9 +120,15 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
                   command={`pnpm add ${component.packageName}`}
                   note={
                     <>
-                      This one ships on npm rather than as copied source, because it wraps Ant
-                      Design — copying a framework into your repository would be a fork, not a
-                      component. Import its stylesheet too:{" "}
+                      {/*
+                        The reason differs per package and stating the wrong one
+                        is worse than stating none: a reader who is told Tabs
+                        wraps Ant Design will add a dependency it does not need.
+                      */}
+                      {component.name === "signature"
+                        ? "This one ships on npm rather than as copied source, because it wraps Ant Design — copying a framework into your repository would be a fork, not a component."
+                        : "This one ships on npm rather than as copied source, because it carries a headless core you can take on its own. Ant Design is an optional peer: the component works without it."}{" "}
+                      Import its stylesheet too:{" "}
                       <code className="font-mono text-[0.6875rem] text-ink">
                         {`import "${component.packageName}/styles.css"`}
                       </code>
@@ -174,6 +181,21 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
                 </span>
               ))}
             </div>
+
+            {/*
+              Tabs earns a gallery rather than a single preview: the claim it
+              makes is that eleven skins and four semantic modes share one
+              keyboard model, and a claim about sameness cannot be shown with
+              one example.
+            */}
+            {component.name === "tabs" && (
+              <div className="mt-12" data-reveal>
+                <SectionHeading eyebrow="Gallery" title="Every variant, mode and state — live." />
+                <div className="mt-8">
+                  <TabsGallery />
+                </div>
+              </div>
+            )}
           </div>
         </section>
 

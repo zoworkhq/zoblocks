@@ -245,3 +245,31 @@ export function tabStopIndex(items: readonly TabItem[], selectedIndex: number): 
   if (selectedIndex >= 0 && selectedIndex < items.length) return selectedIndex;
   return items.length > 0 ? 0 : -1;
 }
+
+/**
+ * Ctrl/Cmd + 1…9 → a tab index.
+ *
+ * Off by default, and it has to be: on Windows and Linux the browser itself
+ * owns Ctrl+1…9 for switching *browser* tabs, so a page that claims them is
+ * taking a shortcut the user already had for something else. It exists because
+ * dense internal tools ask for it, and a host that knows its users are in an
+ * Electron shell or a kiosk can turn it on honestly.
+ *
+ * `9` is the last tab rather than the ninth — the convention every browser and
+ * editor already uses, so a host with twelve tabs still gets a way to reach
+ * the end.
+ */
+export function hotkeyIndex(
+  key: string,
+  modifiers: { ctrl: boolean; meta: boolean; alt: boolean; shift: boolean },
+  total: number,
+): number | null {
+  if (!(modifiers.ctrl || modifiers.meta)) return null;
+  if (modifiers.alt || modifiers.shift) return null;
+  if (total === 0) return null;
+  if (!/^[1-9]$/.test(key)) return null;
+
+  const n = Number(key);
+  if (n === 9) return total - 1;
+  return n <= total ? n - 1 : null;
+}

@@ -48,6 +48,7 @@ export interface TabsContextValue {
   fill: FillMode;
   mount: MountStrategy;
   keepScroll: boolean;
+  virtualise: boolean;
   locale: TabsLocale;
 
   value: string | undefined;

@@ -158,6 +158,9 @@ importers:
       '@oxygenui-design/signature':
         specifier: workspace:*
         version: link:../../packages/signature
+      '@oxygenui-design/tabs':
+        specifier: workspace:*
+        version: link:../../packages/tabs
       '@oxygenui-design/tokens':
         specifier: workspace:*
         version: link:../../packages/tokens
@@ -830,6 +833,12 @@ importers:
         specifier: workspace:*
         version: link:../tabs-core
     devDependencies:
+      '@oxygenui-design/component-meta':
+        specifier: workspace:*
+        version: link:../component-meta
+      '@oxygenui-design/tabs-testing':
+        specifier: workspace:*
+        version: link:../tabs-testing
       '@oxygenui-design/tsconfig':
         specifier: workspace:*
         version: link:../tsconfig
@@ -884,6 +893,24 @@ importers:
       '@vitest/coverage-v8':
         specifier: ^4.1.10
         version: 4.1.10(vitest@4.1.10)
+      typescript:
+        specifier: ^5.7.2
+        version: 5.9.3
+      vitest:
+        specifier: ^4.1.10
+        version: 4.1.10(@types/node@22.20.1)(@vitest/coverage-v8@4.1.10)(jsdom@30.0.1)(vite@8.2.1(@types/node@22.20.1)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.12)(yaml@2.9.0))
+
+  packages/tabs-testing:
+    devDependencies:
+      '@oxygenui-design/tsconfig':
+        specifier: workspace:*
+        version: link:../tsconfig
+      '@vitest/coverage-v8':
+        specifier: ^4.1.10
+        version: 4.1.10(vitest@4.1.10)
+      jsdom:
+        specifier: ^30
+        version: 30.0.1
       typescript:
         specifier: ^5.7.2
         version: 5.9.3

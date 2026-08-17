@@ -14,6 +14,7 @@ import * as React from "react";
 import {
   indexOfValue,
   interpolate,
+  observationWindow,
   resolveIndicator,
   textOf,
   type TabItem,
@@ -67,11 +68,18 @@ export const TabsList = React.forwardRef<HTMLDivElement, TabsListProps>(function
   );
 
   const indicatorKind = resolveIndicator(ctx.indicator, ctx.variant);
+  // A long strip pays for its per-trigger observers; past the threshold the
+  // list resize carries the load instead.
+  const { observeAll } = observationWindow(items.length, selectedIndex);
   const indicator = useIndicator({
     listRef,
     getSelected: () => elementAt(selectedIndex),
     enabled: indicatorKind !== "none",
-    deps: [selectedIndex, ctx.registryVersion, ctx.variant, ctx.orientation, ctx.size],
+    observeListOnly: ctx.virtualise || !observeAll,
+    // `rtl` is in here because flipping direction mirrors every offset while
+    // changing no element's size — so nothing else would ever tell the
+    // indicator to move.
+    deps: [selectedIndex, ctx.registryVersion, ctx.variant, ctx.orientation, ctx.size, rtl],
   });
 
   const overflow = useOverflow({

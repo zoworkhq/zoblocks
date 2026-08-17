@@ -2,5 +2,5 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": "nextjs",
   "installCommand": "pnpm install --frozen-lockfile",
-  "buildCommand": "pnpm -w run registry:build && next build"
+  "buildCommand": "pnpm -w run registry:build && pnpm -w exec turbo run build --filter='@oxygenui-design/docs^...' && next build"
 }
