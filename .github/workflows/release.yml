@@ -115,16 +115,30 @@ jobs:
       # pin to, so pinning a major is not the protection it looks like. A digest
       # pin would have held. Left as a tag to match every other action in this
       # repository — changing that is its own decision, not a drive-by.
+      #
+      # `RELEASE_PAT` is optional and exists for one reason: opening the
+      # "Version packages" PR needs a permission the workflow cannot grant
+      # itself. The `pull-requests: write` above is necessary and not
+      # sufficient — a repository switch, Settings -> Actions -> General ->
+      # Workflow permissions -> "Allow GitHub Actions to create and approve
+      # pull requests", overrides it. While that is off, the action versions
+      # every package correctly and then fails on the final call with
+      # "GitHub Actions is not permitted to create or approve pull requests".
+      #
+      # Enabling the switch is the simpler fix and stores no credential. The
+      # PAT is for a repository that keeps the switch off on purpose: a token
+      # belonging to a person rather than to the run.
       - name: Version PR or publish
+        id: changesets
         uses: changesets/action@v2
         with:
           version-script: pnpm changeset version
           publish-script: pnpm changeset publish
           commit-message: "Version packages"
           pr-title: "Version packages"
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.RELEASE_PAT || secrets.GITHUB_TOKEN }}
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.RELEASE_PAT || secrets.GITHUB_TOKEN }}
           # Optional. Preferred setup is npm trusted publishing (OIDC), which
           # needs no stored credential at all — configure it per package in the
           # npm UI and this can stay empty. Kept as a fallback because trusted
@@ -132,3 +146,30 @@ jobs:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           NPM_CONFIG_PROVENANCE: "true"
+
+      # The refusal arrives as a bare HttpError linking to the REST docs, which
+      # describe the endpoint rather than the setting — so the first time it
+      # happened it cost a session to find a checkbox. Every step before it is
+      # green, which makes it read like a flake. Say what it is instead.
+      - name: Explain a refused Version PR
+        if: failure() && steps.changesets.outcome == 'failure'
+        run: |
+          {
+            echo "### The release could not open its Version PR"
+            echo
+            echo "If the log ends in *GitHub Actions is not permitted to create or approve"
+            echo "pull requests*, the code is fine: \`changeset version\` ran and updated"
+            echo "every file. What failed is the call that opens the PR."
+            echo
+            echo "Either of these fixes it:"
+            echo
+            echo "1. **Settings -> Actions -> General -> Workflow permissions** — tick"
+            echo "   *Allow GitHub Actions to create and approve pull requests*. Nothing"
+            echo "   to store, and it is scoped to this repository."
+            echo "2. Add a **RELEASE_PAT** secret, a personal access token with \`repo\`"
+            echo "   scope. This workflow already prefers it when it is present."
+            echo
+            echo "No package was published or half-published: merging the Version PR is"
+            echo "what publishes, and it was never opened."
+          } >> "$GITHUB_STEP_SUMMARY"
+          echo "::error::Version PR refused — see the job summary for the two ways to fix it."
