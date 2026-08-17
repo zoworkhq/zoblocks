@@ -57,9 +57,23 @@ export interface IdentitySetProps {
    * patients — which safety teams genuinely want to know.
    */
   onDisambiguate?: (result: DisambiguationResult) => void;
+  /**
+   * Run the pass. Defaults to true.
+   *
+   * Turning it off here rather than unmounting the set is the difference
+   * between the rows changing and the rows being replaced: the members stay
+   * registered, so React keeps the same DOM and the escalation can transition
+   * out. It also gives an application one switch for the whole behaviour
+   * without restructuring its list.
+   */
+  enabled?: boolean;
 }
 
-export function IdentitySet({ children, onDisambiguate }: IdentitySetProps): ReactNode {
+export function IdentitySet({
+  children,
+  onDisambiguate,
+  enabled = true,
+}: IdentitySetProps): ReactNode {
   const [members, setMembers] = useState<ReadonlyMap<string, Identity>>(() => new Map());
 
   // Stable for the life of the provider. This is what the effect depends on.
@@ -86,7 +100,13 @@ export function IdentitySet({ children, onDisambiguate }: IdentitySetProps): Rea
     };
   }
 
-  const result = useMemo(() => disambiguate([...members.values()]), [members]);
+  // Disabled publishes the empty plan rather than skipping the hook: members
+  // stay registered, `useEscalation` keeps returning (now undefined), and the
+  // rows de-escalate in place instead of being torn down and rebuilt.
+  const result = useMemo(
+    () => (enabled ? disambiguate([...members.values()]) : EMPTY),
+    [members, enabled],
+  );
 
   useEffect(() => {
     onDisambiguate?.(result);

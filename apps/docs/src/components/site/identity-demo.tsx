@@ -252,27 +252,31 @@ export function IdentityWorklistDemo() {
         Run <code className="font-mono">disambiguate()</code>
       </label>
 
+      {/*
+        One tree, toggled with `enabled` — not two trees swapped by a ternary.
+        Swapping unmounts every row, so React rebuilds the DOM and the browser
+        has nothing to transition between: the pass appeared to snap because
+        the rows it acted on were, literally, different rows.
+
+        `--ox-row` is the index. The package reads it to stagger, so the eye
+        follows the pass down the list rather than being handed the result.
+      */}
       <IdentityProvider now={NOW} disclosure="clinical" photos="deny">
-        {on ? (
-          <IdentitySet>
-            <ul className="flex list-none flex-col gap-1.5 p-0">
-              {WORKLIST.map((p) => (
-                <li key={p.id}>
-                  <PatientChip patient={p} />
+        <IdentitySet enabled={on}>
+          {/* A ward list is a narrow column, not a full-bleed table. The notice
+              shares the constraint: a marker wider than the rows it marks reads
+              as page furniture rather than as something this list produced. */}
+          <div className="max-w-[26rem]">
+            <ul className="flex list-none flex-col gap-0.5 p-0">
+              {WORKLIST.map((p, i) => (
+                <li key={p.id} style={{ "--ox-row": i } as React.CSSProperties}>
+                  <PatientChip patient={p} block />
                 </li>
               ))}
             </ul>
             <IdentitySetNotice />
-          </IdentitySet>
-        ) : (
-          <ul className="flex list-none flex-col gap-1.5 p-0">
-            {WORKLIST.map((p) => (
-              <li key={p.id}>
-                <PatientChip patient={p} />
-              </li>
-            ))}
-          </ul>
-        )}
+          </div>
+        </IdentitySet>
       </IdentityProvider>
 
       <Aside>
