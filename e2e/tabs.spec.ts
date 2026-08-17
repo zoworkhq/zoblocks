@@ -131,13 +131,16 @@ test.describe("indicator geometry @a11y", () => {
     await openGallery(page);
     const demo = page.locator("#v01");
     await clickClear(demo.getByRole("tab", { name: "Shared" }));
-    // Let the 180ms transition finish before measuring where it settled.
-    await page.waitForTimeout(400);
 
-    const thumb = await demo.locator(".ox-tabs__thumb").boundingBox();
-    const selected = await demo.locator('[role="tab"][aria-selected="true"]').boundingBox();
-    expect(Math.abs(thumb!.x - selected!.x)).toBeLessThan(1.5);
-    expect(Math.abs(thumb!.width - selected!.width)).toBeLessThan(1.5);
+    // The indicator animates to its new home over 180ms. Polled rather than
+    // slept on: the assertion is where it *settles*, and how long settling
+    // takes belongs to the machine.
+    await expect(async () => {
+      const thumb = await demo.locator(".ox-tabs__thumb").boundingBox();
+      const selected = await demo.locator('[role="tab"][aria-selected="true"]').boundingBox();
+      expect(Math.abs(thumb!.x - selected!.x)).toBeLessThan(1.5);
+      expect(Math.abs(thumb!.width - selected!.width)).toBeLessThan(1.5);
+    }).toPass({ timeout: 8000 });
   });
 
   test("the underline sits on the rail, not floating above it", async ({ page }) => {
@@ -155,27 +158,39 @@ test.describe("indicator geometry @a11y", () => {
     const before = await demo.locator(".ox-tabs__thumb").boundingBox();
 
     await setControl(page, "Density", "patient");
-    await page.waitForTimeout(400);
 
-    const after = await demo.locator(".ox-tabs__thumb").boundingBox();
-    const selected = await demo.locator('[role="tab"][aria-selected="true"]').boundingBox();
-    // A density change resizes every trigger. If the indicator did not
-    // re-measure it would still be sized for the old one.
-    expect(after!.height).not.toBeCloseTo(before!.height, 0);
-    expect(Math.abs(after!.width - selected!.width)).toBeLessThan(1.5);
+    /*
+     * Polled, not slept on.
+     *
+     * A density change resizes every trigger and the indicator re-measures
+     * after; how long that takes is a property of the machine, not of the
+     * component. A fixed 400ms passed everywhere it was tried and then failed
+     * in WebKit on a contended CI runner, reading back the old height — which
+     * looks exactly like the bug this test exists to catch, and was not.
+     */
+    await expect(async () => {
+      const after = await demo.locator(".ox-tabs__thumb").boundingBox();
+      const selected = await demo.locator('[role="tab"][aria-selected="true"]').boundingBox();
+      // If the indicator had not re-measured it would still be sized for the
+      // trigger it was measured against.
+      expect(after!.height).not.toBeCloseTo(before!.height, 0);
+      // And it tracks the selected trigger rather than merely being different.
+      expect(Math.abs(after!.width - selected!.width)).toBeLessThan(1.5);
+    }).toPass({ timeout: 8000 });
   });
 
   test("the thumb is placed correctly in RTL", async ({ page }) => {
     await openGallery(page);
     await setControl(page, "Text direction", "rtl");
-    await page.waitForTimeout(400);
 
     const demo = page.locator("#v01");
-    const thumb = await demo.locator(".ox-tabs__thumb").boundingBox();
-    const selected = await demo.locator('[role="tab"][aria-selected="true"]').boundingBox();
-    // Physical offsets in a mirrored layout: the case a logical-property
-    // implementation gets exactly backwards.
-    expect(Math.abs(thumb!.x - selected!.x)).toBeLessThan(1.5);
+    await expect(async () => {
+      const thumb = await demo.locator(".ox-tabs__thumb").boundingBox();
+      const selected = await demo.locator('[role="tab"][aria-selected="true"]').boundingBox();
+      // Physical offsets in a mirrored layout: the case a logical-property
+      // implementation gets exactly backwards.
+      expect(Math.abs(thumb!.x - selected!.x)).toBeLessThan(1.5);
+    }).toPass({ timeout: 8000 });
   });
 });
 
