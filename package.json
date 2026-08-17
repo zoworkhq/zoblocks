@@ -54,6 +54,7 @@
     "@commitlint/config-conventional": "^21.2.2",
     "@eslint/js": "^10.0.1",
     "@next/eslint-plugin-next": "^16.3.0",
+    "@oxygenui-design/clinical-note-core": "workspace:*",
     "@oxygenui-design/component-meta": "workspace:*",
     "@oxygenui-design/copilot-core": "workspace:*",
     "@oxygenui-design/copilot-react": "workspace:*",
@@ -108,5 +109,13 @@
     "*.{json,md,mdx,css,yml,yaml}": [
       "prettier --write --ignore-unknown"
     ]
+  },
+  "dependencies": {
+    "prosemirror-commands": "^1.7.2",
+    "prosemirror-history": "^1.5.0",
+    "prosemirror-keymap": "^1.2.3",
+    "prosemirror-model": "^1.25.1",
+    "prosemirror-state": "^1.4.4",
+    "prosemirror-view": "^1.42.2"
   }
 }

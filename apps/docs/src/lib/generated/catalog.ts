@@ -1211,6 +1211,351 @@ export const CATALOG: ComponentDoc[] = [
     "install": "pnpm dlx shadcn@latest add https://oxygenui.design/r/chart-accordion.json"
   },
   {
+    "name": "clinical-note",
+    "title": "Clinical Note",
+    "tier": "free",
+    "status": "experimental",
+    "since": "0.4.0",
+    "layer": "clinical",
+    "distribution": "registry",
+    "summary": "A clinical note editor that records where every character came from, and refuses to let anyone sign what they have not read.",
+    "description": "LOINC-coded sections, per-range provenance across six origins, a composable sign gate with three severities, and deterministic FHIR, XHTML and plain-text output. The engine ships as an npm package with no DOM; this item is the Tailwind skin over it.",
+    "rationale": "A rich text editor is a solved problem and competes with a hundred free ones. The parts that are hard are knowing which passages were copied forward from a note about a different admission, proving a clinician actually read the text a model drafted before signing it, and producing bytes that hash the same way twice so a signature over them means something. A 2022 analysis of over 100 million notes found 50.1% of note text duplicated from prior documentation on the same patient; copy-and-paste has been implicated in roughly a third of errors in ambulatory patient-safety analyses; and CMS's July 2025 signature guidance treats an AI scribe exactly as it treats a human one, which makes the review gate the only thing standing between a clinician and words they never read. Note bloat, copy-paste error and AI attribution are one missing data structure seen three times. This component stores it.",
+    "categories": [
+      "Clinical",
+      "Documentation"
+    ],
+    "fhir": [
+      {
+        "name": "Composition",
+        "url": "https://hl7.org/fhir/R4/composition.html"
+      },
+      {
+        "name": "DocumentReference",
+        "url": "https://hl7.org/fhir/R4/documentreference.html"
+      },
+      {
+        "name": "Provenance",
+        "url": "https://hl7.org/fhir/R4/provenance.html"
+      },
+      {
+        "name": "Narrative",
+        "url": "https://hl7.org/fhir/R4/narrative.html"
+      }
+    ],
+    "resource": "Composition",
+    "resourceUrl": "https://hl7.org/fhir/R4/composition.html",
+    "states": [
+      "Empty draft",
+      "In progress",
+      "Origins ribbon",
+      "Unreviewed AI",
+      "Copied forward",
+      "Unfilled blanks",
+      "Stale pulled value",
+      "Gate blocking",
+      "Gate clear",
+      "Offline draft",
+      "Save failed",
+      "Signed",
+      "Signed with addendum",
+      "Awaiting countersignature"
+    ],
+    "props": [
+      {
+        "name": "author",
+        "type": "NoteAuthor",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "canSign",
+        "type": "boolean",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "findings",
+        "type": "readonly Finding[]",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "attestation",
+        "type": "string",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "onCancel",
+        "type": "(() => void)",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "onNavigate",
+        "type": "((finding: Finding) => void)",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "onSign",
+        "type": "((acknowledged: string[]) => void)",
+        "description": "",
+        "required": false
+      }
+    ],
+    "exports": [
+      {
+        "name": "SignGate",
+        "props": [
+          {
+            "name": "author",
+            "type": "NoteAuthor",
+            "description": "",
+            "required": true
+          },
+          {
+            "name": "canSign",
+            "type": "boolean",
+            "description": "",
+            "required": true
+          },
+          {
+            "name": "findings",
+            "type": "readonly Finding[]",
+            "description": "",
+            "required": true
+          },
+          {
+            "name": "attestation",
+            "type": "string",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "onCancel",
+            "type": "(() => void)",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "onNavigate",
+            "type": "((finding: Finding) => void)",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "onSign",
+            "type": "((acknowledged: string[]) => void)",
+            "description": "",
+            "required": false
+          }
+        ]
+      },
+      {
+        "name": "ClinicalNoteReader",
+        "props": [
+          {
+            "name": "doc",
+            "type": "PMNode",
+            "description": "",
+            "required": true
+          },
+          {
+            "name": "subject",
+            "type": "NoteSubject",
+            "description": "",
+            "required": true
+          },
+          {
+            "name": "title",
+            "type": "string",
+            "description": "",
+            "required": true
+          },
+          {
+            "name": "addenda",
+            "type": "readonly Addendum[]",
+            "description": "",
+            "required": false,
+            "default": "[]"
+          },
+          {
+            "name": "attestations",
+            "type": "readonly Attestation[]",
+            "description": "",
+            "required": false,
+            "default": "[]"
+          }
+        ]
+      },
+      {
+        "name": "ClinicalNote",
+        "props": [
+          {
+            "name": "author",
+            "type": "NoteAuthor",
+            "description": "",
+            "required": true
+          },
+          {
+            "name": "noteType",
+            "type": "NoteTypeDef | 'progress' | 'historyAndPhysical' | 'consultation' | 'dischargeSummary'",
+            "description": "Decides which sections exist and which of them block a signature.",
+            "required": true
+          },
+          {
+            "name": "now",
+            "type": "Date",
+            "description": "The instant the gate is evaluated against, from the host's clock. Required, and there is no default. A browser clock on a ward workstation is not evidence, and 42 CFR 482.24(c)(1) wants entries dated, timed and authenticated. Passing `new Date()` is a decision the host makes, not one this component makes silently on their behalf.",
+            "required": true
+          },
+          {
+            "name": "subject",
+            "type": "NoteSubject",
+            "description": "Who the note is about. Never optional — it is the wrong-patient mitigation.",
+            "required": true
+          },
+          {
+            "name": "attestation",
+            "type": "string",
+            "description": "The attestation sentence. Wording is a legal and organisational decision.",
+            "required": false
+          },
+          {
+            "name": "editorLabel",
+            "type": "string",
+            "description": "Accessible name for the editable region. Defaults to \"Note body\". User-visible text, so it is a prop: a deployment in another language needs to be able to change it.",
+            "required": false,
+            "default": "\"Note body\""
+          },
+          {
+            "name": "gateOptions",
+            "type": "Partial<Omit<GateContext, 'now' | 'noteType' | 'subject'>>",
+            "description": "Overrides for the default gate context — thresholds, mostly.",
+            "required": false
+          },
+          {
+            "name": "onChange",
+            "type": "((doc: PMNode) => void)",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "onCommit",
+            "type": "((kind: CommitKind, doc: PMNode, acknowledged: string[]) => void)",
+            "description": "Fired for each of the three commits. Three verbs with three legal meanings, never one blue Save: `draft` is reversible, `sign` is not, and `addend` is the only legal operation on a note that has already been signed.",
+            "required": false
+          },
+          {
+            "name": "phrases",
+            "type": "readonly Phrase[]",
+            "description": "Dot phrases. None ship in the package; a phrase library is yours.",
+            "required": false
+          },
+          {
+            "name": "readOnly",
+            "type": "boolean",
+            "description": "Renders the signed reader instead of the editor.",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "rules",
+            "type": "readonly GateRule[]",
+            "description": "Extra gate rules, appended to the defaults.",
+            "required": false
+          },
+          {
+            "name": "saveState",
+            "type": "SaveState",
+            "description": "Draft state, shown in the status strip. Never a silent spinner.",
+            "required": false
+          },
+          {
+            "name": "timestampLine",
+            "type": "string",
+            "description": "Absolute, with offset — the created/edited line under the document.",
+            "required": false
+          },
+          {
+            "name": "value",
+            "type": "PMNode",
+            "description": "The document. Defaults to an empty note of `noteType`.",
+            "required": false
+          }
+        ],
+        "extendsType": "Omit<React.HTMLAttributes<HTMLDivElement>, \"onChange\">"
+      }
+    ],
+    "usage": "import { ClinicalNote } from \"@/components/oxygen/clinical-note\";\n\n// The minimum. `now` has no default on purpose — the host owns the clock.\n<ClinicalNote\n  noteType=\"progress\"\n  subject={{\n    reference: \"Patient/4471902\",\n    display: \"RANDOL, Joshua\",\n    identifier: \"4471902\",\n    birthDate: \"12 Mar 1996\",\n    detail: \"30y M · Bed 4E-12\",\n  }}\n  author={{ display: \"R. Menon, MD\", role: \"Resident\", requiresCosign: true }}\n  now={await serverTime()}\n  onCommit={(kind, doc, acknowledgedWarnings) => save(kind, doc, acknowledgedWarnings)}\n/>\n\n// Reading a signed note loads no editor at all.\n<ClinicalNote.Reader\n  subject={subject}\n  title=\"Progress note\"\n  doc={signedDoc}\n  attestations={[{ who: \"R. Menon, MD\", when: \"16 Aug 2026, 14:41 IST (UTC+05:30)\" }]}\n  addenda={[{ author: \"A. Iyer, MD\", when: \"19 Aug 2026, 09:14 IST\", text: \"…\" }]}\n/>",
+    "guidance": {
+      "use": [
+        "Clinician-facing documentation where the note is the legal record — progress notes, H&Ps, consultations, discharge summaries. The gate and the addendum model are what make it a record rather than a document.",
+        "Anywhere an ambient scribe or a drafting model writes into the note. Generated text arrives marked unreviewed and cannot be signed in that state, which is the only mechanical protection the signer has.",
+        "Teaching settings with a resident-and-attending countersignature, where two signatures with two times and two authors have to survive into the export.",
+        "Deployments that need to measure copy-forward rather than estimate it. The ratio is computed from the marks and can be recorded on the signature."
+      ],
+      "avoid": [
+        "Patient-facing note composition. The gate's language, the do-not-use lint and the section model all assume a clinical author; a patient-authored narrative is a different surface with different rules.",
+        "Anything that must round-trip provenance through a third-party FHIR server. Per-range authorship is a custom extension and a conforming server may drop it — verify with the actual endpoint before promising the feature.",
+        "Free-form documents that are not clinical notes. The schema refuses prose outside a coded section, which is the point here and an obstruction anywhere else.",
+        "Signing workflows where the browser clock is the only clock. `now` is required precisely so that a deployment cannot accidentally attest to a time nobody can defend."
+      ]
+    },
+    "accessibility": [
+      {
+        "label": "The toolbar is one tab stop, not fifteen",
+        "detail": "role=toolbar with a roving tabindex: one Tab in, arrow keys within, one Tab out. Without it there are fifteen Tab presses between the document and the sign button, every time, for anyone who does not use a mouse."
+      },
+      {
+        "label": "Provenance is never colour alone",
+        "detail": "Each of the six origins carries a hue and a distinct underline style — wavy for dictated, dashed for template, dotted for pulled, solid for copied, double for AI. Under forced-colors the tints are dropped and the underline styles carry the whole distinction, which is also what survives a monochrome print."
+      },
+      {
+        "label": "The blocked sign button says why",
+        "detail": "aria-describedby points at a live count of what is blocking. A disabled control with no stated reason is the most common way a gate gets routed around."
+      },
+      {
+        "label": "Save state reaches assistive technology",
+        "detail": "The status strip is a live region: polite for ordinary transitions, assertive for a failed save. A silent spinner is a status change nobody hears, and an unheard save failure is lost work."
+      },
+      {
+        "label": "Sections are real landmarks",
+        "detail": "The rail is a nav with aria-current on the section holding the caret, and each section is a schema node rather than a bold paragraph — which is what makes both heading navigation and the required-section check possible at all."
+      },
+      {
+        "label": "Formatting is semantic",
+        "detail": "Bold and italic render as strong and em, not styled spans, so a screen reader can convey emphasis. Underline and strikethrough are deliberately absent: underline reads as a link, and strikethrough is silently dropped by some renderers, which applied to a retraction is a safety defect."
+      }
+    ],
+    "limitations": [
+      "No phrase library, terminology or attestation wording ships here. Those are jurisdictional, organisational and licensing decisions; the component provides the seams.",
+      "Per-range provenance is not standardised anywhere in FHIR. It travels as a custom Oxygen extension that a conforming server may legitimately ignore or strip.",
+      "There is no clock. `now` is a required prop, because a browser clock on a ward workstation is not evidence.",
+      "No speech recognizer, no collaboration server, no crypto. The component defines the channel, the integration and the seam; the implementations are the deployment's.",
+      "The LOINC section codes match published display names but must be confirmed — with their C-CDA cardinality — against the implementation guide a deployment conforms to.",
+      "Real-time collaboration, tables, live data islands and ink annotation are designed but not built. See the brief."
+    ],
+    "related": [
+      "copilot",
+      "switch"
+    ],
+    "dependencies": [
+      "clsx",
+      "tailwind-merge",
+      "@oxygenui-design/clinical-note-core",
+      "prosemirror-view",
+      "prosemirror-state",
+      "prosemirror-model",
+      "prosemirror-keymap",
+      "prosemirror-history",
+      "prosemirror-commands"
+    ],
+    "install": "pnpm dlx shadcn@latest add https://oxygenui.design/r/clinical-note.json"
+  },
+  {
     "name": "copilot",
     "title": "Copilot",
     "tier": "free",

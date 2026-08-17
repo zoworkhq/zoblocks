@@ -103,5 +103,12 @@
     "import": "{ Copilot }",
     "limit": "24 KB",
     "ignore": ["react", "react-dom"]
+  },
+  {
+    "name": "react — clinical note (subpath: pulls the ProseMirror view layer)",
+    "path": "packages/react/dist/components/clinical-note/clinical-note.js",
+    "import": "{ ClinicalNote }",
+    "limit": "75 KB",
+    "ignore": ["react", "react-dom"]
   }
 ]

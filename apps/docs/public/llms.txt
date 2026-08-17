@@ -61,6 +61,11 @@ Rules that matter when generating code with these components:
   install: pnpm dlx shadcn@latest add https://oxygenui.design/r/chart-accordion.json
   states: Closed, with summaries, Expanded, Severity across the scale, Consent gate, Withheld section, Section that failed to load, No sections
   status: beta
+- [Clinical Note](https://oxygenui.design/components/clinical-note): A clinical note editor that records where every character came from, and refuses to let anyone sign what they have not read.
+  install: pnpm dlx shadcn@latest add https://oxygenui.design/r/clinical-note.json
+  fhir: Composition, DocumentReference, Provenance, Narrative
+  states: Empty draft, In progress, Origins ribbon, Unreviewed AI, Copied forward, Unfilled blanks, Stale pulled value, Gate blocking, Gate clear, Offline draft, Save failed, Signed, Signed with addendum, Awaiting countersignature
+  status: experimental
 - [Signature](https://oxygenui.design/components/signature): Signature capture that records the times nobody signed — declined, unable, verbal, on paper — not just the times they did.
   install: pnpm dlx shadcn@latest add https://oxygenui.design/r/signature.json
   states: Signed, Declined to sign, Unable to sign (witnessed), Consented verbally (witnessed), Signed on paper, Awaiting countersignature, Consent withdrawn, Required and empty, Locked / read-only

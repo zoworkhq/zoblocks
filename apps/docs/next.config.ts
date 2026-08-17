@@ -40,6 +40,7 @@ const nextConfig: NextConfig = {
       "@oxygenui-design/tabs-core": "../../packages/tabs-core/dist/index.js",
       "@oxygenui-design/copilot-core": "../../packages/copilot-core/dist/index.js",
       "@oxygenui-design/copilot-react": "../../packages/copilot-react/dist/index.js",
+      "@oxygenui-design/clinical-note-core": "../../packages/clinical-note-core/dist/index.js",
     },
   },
 

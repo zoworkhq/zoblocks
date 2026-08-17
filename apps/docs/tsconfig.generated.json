@@ -21,6 +21,9 @@
       "@/components/oxygen/chart-accordion": [
         "../../registry/oxygen/chart-accordion/chart-accordion.tsx"
       ],
+      "@/components/oxygen/clinical-note": [
+        "../../registry/oxygen/clinical-note/clinical-note.tsx"
+      ],
       "@/components/oxygen/copilot": [
         "../../registry/oxygen/copilot/copilot.tsx"
       ],
@@ -44,6 +47,9 @@
       ],
       "@/lib/oxygen-accordion": [
         "../../registry/oxygen/lib/accordion-core.tsx"
+      ],
+      "@/lib/oxygen-clinical-note": [
+        "../../registry/oxygen/lib/clinical-note.tsx"
       ],
       "@/lib/oxygen-loader": [
         "../../registry/oxygen/lib/loader.tsx"
