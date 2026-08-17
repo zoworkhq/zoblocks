@@ -29,6 +29,8 @@
   "//exports": "styles.css is the documented entry point and carries everything. The per-concern sheets exist so an application that installs only loaders does not ship accordion CSS it never renders.",
   "exports": {
     ".": "./src/index.ts",
+    "./clinical-note": "./src/components/clinical-note/clinical-note.tsx",
+    "./styles/clinical-note.css": "./src/styles/clinical-note.css",
     "./styles.css": "./src/styles.css",
     "./styles/loader.css": "./src/styles/loader.css",
     "./styles/accordion.css": "./src/styles/accordion.css",

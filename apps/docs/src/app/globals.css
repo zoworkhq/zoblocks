@@ -27,6 +27,13 @@
    severity rail with no severity. */
 @import "../../../../registry/oxygen/lib/accordion.css";
 
+/* Shipped to a consumer as styles/oxygen-clinical-note.css by the
+   `clinical-note-core` registry item; imported here so the live previews
+   render the same file a customer receives. It carries the document surface
+   and the six provenance channels — each an underline style as well as a hue,
+   so the distinction survives greyscale, forced colours and print. */
+@import "../../../../registry/oxygen/lib/clinical-note.css";
+
 /* The tab system's own stylesheet, imported from the package rather than
    copied — so the docs demo the exact file a customer installs. Its tokens
    resolve through --ox-* to --ant-* to a literal, which is why it needs no

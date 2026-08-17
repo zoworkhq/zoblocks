@@ -35,6 +35,7 @@ export const SUPPORT_ITEM_NAMES: ReadonlySet<string> = new Set([
   "loader-core",
   "accordion-core",
   "switch-core",
+  "clinical-note-core",
 ]);
 
 /** Prefix the shadcn CLI writes component files under, inside the consumer's project. */

@@ -49,6 +49,8 @@ function rewriteImports(source: string, fromDepth: number): string {
       .replace(/(["'])@\/lib\/oxygen-accordion\1/g, `"${up}lib/accordion-core"`)
       // The switch core.
       .replace(/(["'])@\/lib\/oxygen-switch\1/g, `"${up}lib/switch"`)
+      // The clinical-note core: the ProseMirror binding.
+      .replace(/(["'])@\/lib\/oxygen-clinical-note\1/g, `"${up}lib/clinical-note"`)
       // A sibling component, by the path the CLI writes in a consumer's project.
       .replace(
         /(["'])@\/components\/oxygen\/([a-z0-9-]+)\1/g,
@@ -92,6 +94,7 @@ export async function emitReactPackage(
     ["lib/loader.tsx", "lib/loader.tsx", 1],
     ["lib/accordion-core.tsx", "lib/accordion-core.tsx", 1],
     ["lib/switch.tsx", "lib/switch.tsx", 1],
+    ["lib/clinical-note.tsx", "lib/clinical-note.tsx", 1],
   ] as const) {
     const source = await readFile(path.join(COMPONENTS_DIR, file), "utf8");
     await emitter.emit(
@@ -117,6 +120,7 @@ export async function emitReactPackage(
     ["lib/loader.css", "styles/loader.css"],
     ["lib/accordion.css", "styles/accordion.css"],
     ["lib/switch.css", "styles/switch.css"],
+    ["lib/clinical-note.css", "styles/clinical-note.css"],
   ] as const) {
     const css = await readFile(path.join(COMPONENTS_DIR, file), "utf8");
     await emitter.emit(path.join(PACKAGE_SRC, target), css);
@@ -144,7 +148,22 @@ export async function emitReactPackage(
   // Explicit re-exports rather than `export *`: a barrel that re-exports
   // everything makes every internal helper public API by accident, and
   // api-extractor cannot tell the difference.
+  /**
+   * Components kept out of the root barrel and shipped from a subpath instead.
+   *
+   * `clinical-note` pulls the whole ProseMirror view layer — model, state,
+   * view, keymap, history and commands. In the barrel that is roughly 60 kB
+   * every consumer pays to render a loader, because a re-export is a hard edge
+   * that no bundler can shake away. A subpath makes the cost opt-in, which is
+   * the honest shape for a dependency that large.
+   *
+   * Anything added here needs a `.size-limit.json` entry of its own, or it
+   * simply stops being measured.
+   */
+  const SUBPATH_ONLY = new Set(["clinical-note"]);
+
   const exports = components
+    .filter((c) => !SUBPATH_ONLY.has(c.meta.name))
     .map((c) => `export * from "./components/${c.meta.name}/${c.meta.name}";`)
     .join("\n");
 

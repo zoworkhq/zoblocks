@@ -1,45 +1,45 @@
 [
   {
-    "name": "elements \u2014 one loader (pulse + its deps)",
+    "name": "elements — one loader (pulse + its deps)",
     "path": "packages/loaders/dist/pulse.js",
     "import": "*",
     "limit": "9 KB"
   },
   {
-    "name": "elements \u2014 all five",
+    "name": "elements — all five",
     "path": "packages/loaders/dist/index.js",
     "import": "*",
     "limit": "11 KB"
   },
   {
-    "name": "elements \u2014 <ox-switch>",
+    "name": "elements — <ox-switch>",
     "path": "packages/elements/dist/switch.js",
     "import": "*",
     "limit": "8 KB"
   },
   {
-    "name": "react \u2014 one loader (includes loader-core and the rhythm delegate)",
+    "name": "react — one loader (includes loader-core and the rhythm delegate)",
     "path": "packages/react/dist/components/pulse-loader/pulse-loader.js",
     "import": "{ PulseLoader }",
     "limit": "8.5 KB",
     "ignore": ["react", "react-dom"]
   },
   {
-    "name": "react \u2014 the whole barrel",
+    "name": "react — the whole barrel",
     "path": "packages/react/dist/index.js",
     "import": "*",
     "limit": "38 KB",
     "ignore": ["react", "react-dom"]
   },
   {
-    "name": "react \u2014 Switch alone (includes switch-core)",
+    "name": "react — Switch alone (includes switch-core)",
     "path": "packages/react/dist/components/switch/switch.js",
     "import": "{ Switch }",
     "limit": "13 KB",
     "ignore": ["react", "react-dom"]
   },
   {
-    "name": "tokens \u2014 the stylesheet every consumer loads",
+    "name": "tokens — the stylesheet every consumer loads",
     "path": "packages/tokens/src/oxygen-tokens.css",
     "limit": "5 KB"
   },
@@ -49,14 +49,14 @@
     "limit": "4 KB"
   },
   {
-    "name": "react \u2014 the headless behaviour layer, alone",
+    "name": "react — the headless behaviour layer, alone",
     "path": "packages/react/dist/lib/accordion-core.js",
     "import": "{ useAccordion }",
     "limit": "2.5 KB",
     "ignore": ["react", "react-dom"]
   },
   {
-    "name": "react \u2014 accordion (includes accordion-core)",
+    "name": "react — accordion (includes accordion-core)",
     "path": "packages/react/dist/components/accordion/accordion.js",
     "import": "{ Accordion }",
     "limit": "10 KB",
@@ -73,20 +73,20 @@
     "limit": "12 KB"
   },
   {
-    "name": "identity-core \u2014 the whole engine (includes Jaro\u2013Winkler and Metaphone)",
+    "name": "identity-core — the whole engine (includes Jaro–Winkler and Metaphone)",
     "path": "packages/identity-core/dist/index.js",
     "import": "*",
     "limit": "9 KB"
   },
   {
-    "name": "identity \u2014 the avatar alone",
+    "name": "identity — the avatar alone",
     "path": "packages/identity/dist/IdentityAvatar.js",
     "import": "{ IdentityAvatar }",
     "limit": "3 KB",
     "ignore": ["react", "react-dom", "antd"]
   },
   {
-    "name": "identity \u2014 the whole barrel",
+    "name": "identity — the whole barrel",
     "path": "packages/identity/dist/index.js",
     "import": "*",
     "limit": "16 KB",
@@ -98,10 +98,17 @@
     "limit": "6 KB"
   },
   {
-    "name": "react \u2014 consult alone (pattern layer: pulls consult-core and consult-react)",
+    "name": "react — consult alone (pattern layer: pulls consult-core and consult-react)",
     "path": "packages/react/dist/components/consult/consult.js",
     "import": "{ Consult }",
     "limit": "22 KB",
+    "ignore": ["react", "react-dom"]
+  },
+  {
+    "name": "react — clinical note (subpath: pulls the ProseMirror view layer)",
+    "path": "packages/react/dist/components/clinical-note/clinical-note.js",
+    "import": "{ ClinicalNote }",
+    "limit": "75 KB",
     "ignore": ["react", "react-dom"]
   }
 ]
