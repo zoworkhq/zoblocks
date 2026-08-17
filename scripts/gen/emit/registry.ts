@@ -103,6 +103,35 @@ const SUPPORT_ITEMS: BuildableItem[] = [
     ],
   },
   {
+    name: "clinical-note-core",
+    type: "registry:lib",
+    title: "Clinical note core",
+    description:
+      "The ProseMirror binding behind Clinical Note: the editor view, the provenance decorations, the toolbar commands, and the document builders. The clinical engine itself is the npm package; this is the part that needs a DOM. Installed automatically with Clinical Note.",
+    dependencies: [
+      "@oxygenui-design/clinical-note-core",
+      "prosemirror-view",
+      "prosemirror-state",
+      "prosemirror-model",
+      "prosemirror-keymap",
+      "prosemirror-history",
+      "prosemirror-commands",
+    ],
+    registryDependencies: ["utils"],
+    files: [
+      {
+        path: "registry/oxygen/lib/clinical-note.tsx",
+        type: "registry:hook",
+        target: "lib/oxygen-clinical-note.tsx",
+      },
+      {
+        path: "registry/oxygen/lib/clinical-note.css",
+        type: "registry:file",
+        target: "styles/oxygen-clinical-note.css",
+      },
+    ],
+  },
+  {
     name: "tokens",
     type: "registry:style",
     title: "Oxygen tokens",
