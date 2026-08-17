@@ -202,17 +202,28 @@ describe("feedback asks why", () => {
       expect.objectContaining({ type: "feedback", rating: "down" }),
     );
 
-    const group = screen.getByRole("group", { name: DEFAULT_LOCALE.whyNotHelpful });
+    /*
+     * `findByRole`, not `getByRole`. The reason group appears from a state
+     * update, and jsdom has no layout engine — the antd overlays these suites
+     * drive settle in seconds rather than milliseconds, and a loaded CI runner
+     * is slower again. A synchronous get here passes on a quiet machine and
+     * fails in CI, which is exactly how this test arrived.
+     */
+    const group = await screen.findByRole(
+      "group",
+      { name: DEFAULT_LOCALE.whyNotHelpful },
+      { timeout: 8000 },
+    );
     await user.click(within(group).getByRole("button", { name: "Unsafe" }));
 
-    // `waitFor` rather than a bare assertion: telemetry is dispatched from an
-    // effect, so the call lands a tick after the click settles. Asserting
-    // synchronously passes on a fast machine and fails on a loaded CI runner,
-    // which is exactly how this arrived — green locally, red in CI.
-    await waitFor(() =>
-      expect(onTelemetry).toHaveBeenCalledWith(
-        expect.objectContaining({ type: "feedback", rating: "down", reason: "unsafe" }),
-      ),
+    // Same reason on the way out: telemetry is dispatched from an effect, so
+    // the call lands a tick after the click settles.
+    await waitFor(
+      () =>
+        expect(onTelemetry).toHaveBeenCalledWith(
+          expect.objectContaining({ type: "feedback", rating: "down", reason: "unsafe" }),
+        ),
+      { timeout: 8000 },
     );
   });
 

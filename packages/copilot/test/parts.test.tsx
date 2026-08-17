@@ -89,7 +89,7 @@ describe("AnswerBody", () => {
 
   it("calls back with the marker when a citation is activated", async () => {
     const onCite = vi.fn();
-    const user = userEvent.setup();
+    const user = userEvent.setup({ pointerEventsCheck: 0 });
     render(<AnswerBody answer={answer()} onCite={onCite} />);
     await user.click(screen.getByRole("button", { name: /Source 1/ }));
     expect(onCite).toHaveBeenCalledWith(1);
@@ -176,7 +176,7 @@ describe("SourcesPanel", () => {
 
   it("closes", async () => {
     const onClose = vi.fn();
-    const user = userEvent.setup();
+    const user = userEvent.setup({ pointerEventsCheck: 0 });
     render(<SourcesPanel sources={[source]} onClose={onClose} />);
     await user.click(screen.getByRole("button", { name: DEFAULT_LOCALE.close }));
     expect(onClose).toHaveBeenCalled();
@@ -204,7 +204,7 @@ describe("ScopeStrip", () => {
 
   it("offers a change control only when the host supplies a handler", async () => {
     const onChange = vi.fn();
-    const user = userEvent.setup();
+    const user = userEvent.setup({ pointerEventsCheck: 0 });
     const { rerender } = render(<ScopeStrip scope={scope} />);
     expect(screen.queryByRole("button", { name: DEFAULT_LOCALE.changeScope })).toBeNull();
 
@@ -228,7 +228,7 @@ describe("CrisisNotice", () => {
   it("offers the escalation hooks the host supplied", async () => {
     const onProtocol = vi.fn();
     const onPage = vi.fn();
-    const user = userEvent.setup();
+    const user = userEvent.setup({ pointerEventsCheck: 0 });
     render(<CrisisNotice audience="user" lines={[]} onProtocol={onProtocol} onPage={onPage} />);
 
     await user.click(screen.getByRole("button", { name: DEFAULT_LOCALE.crisisProtocol }));
@@ -307,7 +307,7 @@ describe("ProposalCard", () => {
   it("wires both controls", async () => {
     const confirm = vi.fn();
     const dismissProposal = vi.fn();
-    const user = userEvent.setup();
+    const user = userEvent.setup({ pointerEventsCheck: 0 });
     render(<ProposalCard api={api({ confirm, dismissProposal })} />);
 
     await user.click(screen.getByRole("button", { name: DEFAULT_LOCALE.proposalConfirm }));
@@ -323,7 +323,7 @@ describe("ProposalCard", () => {
 
 let ids = 0;
 const renderCopilot = (over: Record<string, unknown> = {}) => {
-  const user = userEvent.setup();
+  const user = userEvent.setup({ pointerEventsCheck: 0 });
   const view = render(
     <Copilot
       provider={createStaticProvider({ events: [{ type: "done", finish: "stop" }], disclosure })}
@@ -426,7 +426,17 @@ describe("non-happy states", () => {
       expect.objectContaining({ type: "feedback", rating: "down" }),
     );
 
-    const reasons = await screen.findByRole("group", { name: DEFAULT_LOCALE.whyNotHelpful });
+    /*
+     * `findByRole` with room to breathe. jsdom has no layout engine, so the
+     * antd overlays these suites drive settle in seconds rather than
+     * milliseconds, and a loaded CI runner is slower again — the default 1s
+     * window is why this passed locally and failed in CI.
+     */
+    const reasons = await screen.findByRole(
+      "group",
+      { name: DEFAULT_LOCALE.whyNotHelpful },
+      { timeout: 8000 },
+    );
     await user.click(within(reasons).getByRole("button", { name: "No source" }));
 
     // Asserted through `waitFor` for the same reason as the thumbs-up above:
