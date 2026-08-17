@@ -67,6 +67,9 @@ export {
   STATE_LABEL_PRESETS,
   useCommitPhase,
   isUnknown,
+  isPending,
+  isCommitted,
+  isUnresolved,
   type AbsentReason,
   type CommitPhase,
   type SwitchValue,
@@ -286,6 +289,22 @@ export interface SwitchProps extends Omit<
    * animated and announced. Reject with a `SwitchBlockedError` for `blocked`.
    */
   onCommit?: (next: boolean, ctx: { from: SwitchValue; reason?: string }) => void | Promise<void>;
+  /**
+   * The controlled alternative to `onCommit`, for a caller that already owns a
+   * state machine — a mutation library, a websocket, an offline queue — and
+   * needs this control to render its phases rather than run its own.
+   *
+   * Supplying it takes the machine out of the loop entirely: nothing here
+   * starts a timer, and `requested` decides what is drawn while in flight.
+   * Every rendering, announcement and availability rule is unchanged, which is
+   * the point — a host should not have to reimplement the revert animation to
+   * use its own transport.
+   */
+  phase?: CommitPhase;
+  /** What to render while a controlled `phase` is `pending` or `queued`. */
+  requested?: boolean;
+  /** Shown and announced on a controlled `reverted`, `blocked` or `stale`. */
+  error?: React.ReactNode;
   /** Minimum time in `pending`, so a fast write is perceptible rather than a flash. */
   minPendingMs?: number;
   slowAfter?: number;
@@ -370,6 +389,9 @@ export const Switch = React.forwardRef<HTMLSpanElement, SwitchProps>(function Sw
     slowAfter,
     onSlow,
     commit = "instant",
+    phase: phaseProp,
+    requested: requestedProp,
+    error: errorProp,
     serverValue,
     onResolveConflict,
     online = true,
@@ -440,9 +462,40 @@ export const Switch = React.forwardRef<HTMLSpanElement, SwitchProps>(function Sw
     onAuditEvent,
   });
 
-  // `loading` is antd's prop. It renders as pending and never disables.
-  const phase: CommitPhase = loading && machine.phase === "idle" ? "pending" : machine.phase;
-  const shown = machine.shown;
+  /**
+   * A controlled `phase` wins outright.
+   *
+   * The internal machine still runs — it is what `request` drives, and taking
+   * it out would mean two code paths for activation — but nothing it computes
+   * reaches the screen. That keeps the controlled and uncontrolled renderings
+   * identical by construction rather than by two implementations agreeing.
+   *
+   * `loading` is antd's prop, and it sits underneath both: it renders as
+   * pending and never disables.
+   */
+  const phaseControlled = phaseProp !== undefined;
+  const phase: CommitPhase = phaseControlled
+    ? phaseProp
+    : loading && machine.phase === "idle"
+      ? "pending"
+      : machine.phase;
+
+  const shown: SwitchValue = phaseControlled
+    ? (phase === "pending" || phase === "queued" || phase === "committed") &&
+      requestedProp !== undefined
+      ? requestedProp
+      : current
+    : machine.shown;
+
+  const conflicting = phaseControlled
+    ? phase === "stale" && serverValue !== undefined && serverValue !== current
+      ? serverValue
+      : undefined
+    : machine.conflicting;
+
+  const slow = phaseControlled ? false : machine.slow;
+  /** The caller's message when controlled, the machine's otherwise. */
+  const error: React.ReactNode = phaseControlled ? errorProp : machine.error;
 
   /* ---- until -------------------------------------------------- */
 
@@ -482,10 +535,13 @@ export const Switch = React.forwardRef<HTMLSpanElement, SwitchProps>(function Sw
       setAttestation("");
       setCountersignError(undefined);
       setCurrent(next);
-      if (commit !== "deferred") machine.request(next, reason);
+      // Deferred commits are applied by the form, and a controlled `phase`
+      // means the caller's own machine owns the write. Running ours as well
+      // would produce a second set of announcements racing the caller's.
+      if (commit !== "deferred" && !phaseControlled) machine.request(next, reason);
       if (event) onChange?.(next, event);
     },
-    [commit, machine, onChange, setCurrent],
+    [commit, machine, onChange, phaseControlled, setCurrent],
   );
 
   const attempt = React.useCallback(
@@ -572,9 +628,9 @@ export const Switch = React.forwardRef<HTMLSpanElement, SwitchProps>(function Sw
     phase,
     plainLabel,
     shown,
-    wordFor(machine.conflicting ?? current, labels),
+    wordFor(conflicting ?? current, labels),
     labels,
-    machine.error,
+    typeof error === "string" ? error : undefined,
   );
 
   /* ---- classes and data attributes ------------------------------ */
@@ -591,7 +647,7 @@ export const Switch = React.forwardRef<HTMLSpanElement, SwitchProps>(function Sw
   const describedBy =
     [
       description ? `${controlId}-desc` : undefined,
-      lockedReason || machine.error || machine.slow ? noteId : undefined,
+      lockedReason || error || slow ? noteId : undefined,
       showStateWord ? stateId : undefined,
       typeof rest["aria-describedby"] === "string" ? rest["aria-describedby"] : undefined,
     ]
@@ -675,10 +731,10 @@ export const Switch = React.forwardRef<HTMLSpanElement, SwitchProps>(function Sw
 
   const notes: React.ReactNode[] = [];
 
-  if (machine.error) {
+  if (error) {
     notes.push(
       <span key="error" className="ox-switch__note ox-switch__note--error">
-        {machine.error}
+        {error}
         {phase === "reverted" || phase === "blocked" ? (
           <>
             {" "}
@@ -702,7 +758,7 @@ export const Switch = React.forwardRef<HTMLSpanElement, SwitchProps>(function Sw
     );
   }
 
-  if (machine.slow && phase === "pending") {
+  if (slow && phase === "pending") {
     notes.push(
       <span key="slow" className="ox-switch__note ox-switch__note--pending">
         Still saving. The change has not been confirmed yet.
@@ -765,8 +821,8 @@ export const Switch = React.forwardRef<HTMLSpanElement, SwitchProps>(function Sw
     );
   }
 
-  if (phase === "stale" && machine.conflicting !== undefined) {
-    const theirs = wordFor(machine.conflicting, labels);
+  if (phase === "stale" && conflicting !== undefined) {
+    const theirs = wordFor(conflicting, labels);
     const mine = wordFor(current, labels);
     notes.push(
       <span
@@ -793,7 +849,7 @@ export const Switch = React.forwardRef<HTMLSpanElement, SwitchProps>(function Sw
             className="ox-switch__action"
             onClick={() => {
               machine.resolveConflict("theirs");
-              if (machine.conflicting !== undefined) setCurrent(machine.conflicting);
+              if (conflicting !== undefined) setCurrent(conflicting);
               onResolveConflict?.("theirs");
             }}
           >

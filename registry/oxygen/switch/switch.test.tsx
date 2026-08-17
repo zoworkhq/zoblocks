@@ -17,7 +17,10 @@ import {
   SWITCH_SIZE,
   SwitchBlockedError,
   announcementFor,
+  isCommitted,
+  isPending,
   isUnknown,
+  isUnresolved,
   nextValueFor,
   resolveStateLabels,
   useCommitPhase,
@@ -2248,5 +2251,154 @@ describe("partial composition", () => {
     // failure this component exists to prevent.
     expect(view.container.textContent).toMatch(/2 of 5 in effect/);
     expect(view.container.textContent).toMatch(/1 not asked/);
+  });
+});
+
+/* =================================================================== */
+/* The controlled phase                                                */
+/*                                                                     */
+/* The escape hatch for a caller that already owns a state machine — a  */
+/* mutation library, a websocket, an offline queue. It must render      */
+/* every phase identically to the internal machine, and must not run    */
+/* a second one underneath.                                            */
+/* =================================================================== */
+
+describe("controlled phase", () => {
+  it("renders the caller's phase rather than its own", () => {
+    const view = render(
+      <Switch label="Contact precautions" checked={false} phase="pending" requested />,
+    );
+    expect(root(view.container)).toHaveAttribute("data-ox-phase", "pending");
+    // The requested value is what is drawn while in flight, never the record's.
+    expect(control()).toHaveAttribute("aria-checked", "true");
+    expect(control()).toHaveAttribute("aria-busy", "true");
+  });
+
+  it("falls back to the record's value when no request is declared", () => {
+    render(<Switch label="Contact precautions" checked phase="pending" />);
+    expect(control()).toHaveAttribute("aria-checked", "true");
+  });
+
+  it("shows and announces a caller-supplied error", async () => {
+    const view = render(
+      <Switch
+        label="Contact precautions"
+        stateLabels="in-effect"
+        checked
+        phase="reverted"
+        error="The ward system is not responding."
+      />,
+    );
+    expect(view.container.textContent).toMatch(/ward system is not responding/i);
+    const alert = view.container.querySelector('[role="alert"]');
+    // Assertive, and it still says what the value now is — the question the
+    // listener was actually asking.
+    expect(alert?.textContent).toMatch(/not changed/i);
+    expect(alert?.textContent).toMatch(/still in effect/i);
+  });
+
+  it("renders a controlled conflict from serverValue", () => {
+    const view = render(
+      <Switch
+        label="Contact precautions"
+        stateLabels="in-effect"
+        checked
+        phase="stale"
+        serverValue={false}
+      />,
+    );
+    expect(root(view.container)).toHaveAttribute("data-ox-phase", "stale");
+    expect(screen.getByRole("button", { name: /use theirs/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /change it back/i })).toBeInTheDocument();
+  });
+
+  it("does not start its own write when the caller owns the machine", async () => {
+    // Two machines would produce two sets of announcements racing each other.
+    const user = userEvent.setup();
+    const onCommit = vi.fn();
+    const onChange = vi.fn();
+    const view = render(
+      <Switch
+        label="Contact precautions"
+        checked={false}
+        phase="idle"
+        onCommit={onCommit}
+        onChange={onChange}
+      />,
+    );
+    await user.click(control());
+    expect(onChange).toHaveBeenCalledWith(true, expect.anything());
+    expect(onCommit).not.toHaveBeenCalled();
+    // And the phase stays exactly where the caller put it.
+    expect(root(view.container)).toHaveAttribute("data-ox-phase", "idle");
+  });
+
+  it("renders a controlled queued state with no cancel of its own", () => {
+    const view = render(<Switch label="Falls risk" checked={false} phase="queued" requested />);
+    expect(root(view.container)).toHaveAttribute("data-ox-phase", "queued");
+    expect(control()).toHaveAttribute("aria-checked", "true");
+  });
+
+  it("covers every phase without throwing", () => {
+    const phases: CommitPhase[] = [
+      "idle",
+      "pending",
+      "committed",
+      "reverted",
+      "blocked",
+      "queued",
+      "stale",
+    ];
+    for (const phase of phases) {
+      const view = render(
+        <Switch
+          label="Contact precautions"
+          checked
+          phase={phase}
+          serverValue={phase === "stale" ? false : undefined}
+          error={phase === "reverted" || phase === "blocked" ? "Nope." : undefined}
+        />,
+      );
+      expect(root(view.container)).toHaveAttribute("data-ox-phase", phase);
+      expectNoLeakedValues(view);
+      view.unmount();
+    }
+  });
+});
+
+/* =================================================================== */
+/* Phase guards                                                        */
+/* =================================================================== */
+
+describe("phase guards", () => {
+  it("classifies every phase exactly once across the three guards", () => {
+    const phases: CommitPhase[] = [
+      "idle",
+      "pending",
+      "committed",
+      "reverted",
+      "blocked",
+      "queued",
+      "stale",
+    ];
+    const table = phases.map((p) => ({
+      phase: p,
+      pending: isPending(p),
+      committed: isCommitted(p),
+      unresolved: isUnresolved(p),
+    }));
+
+    expect(table.filter((r) => r.pending).map((r) => r.phase)).toEqual(["pending", "queued"]);
+    expect(table.filter((r) => r.committed).map((r) => r.phase)).toEqual(["committed"]);
+    expect(table.filter((r) => r.unresolved).map((r) => r.phase)).toEqual([
+      "reverted",
+      "blocked",
+      "stale",
+    ]);
+
+    // `idle` is the only phase none of them claim, which is what makes these
+    // three a partition rather than three overlapping opinions.
+    const unclaimed = table.filter((r) => !r.pending && !r.committed && !r.unresolved);
+    expect(unclaimed.map((r) => r.phase)).toEqual(["idle"]);
   });
 });
