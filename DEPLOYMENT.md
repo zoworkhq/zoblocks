@@ -65,6 +65,12 @@ hq is a **separate Vercel project** on the same repository:
 Both projects must have their Root Directory set explicitly. With two apps in
 one repository, a project that defaults to the root builds the wrong app.
 
+hq's `vercel.json` pins its functions to `bom1`, next to the Atlas cluster in
+`ap-south-1`. That is load-bearing, not a preference — on the default region the
+functions ran in Virginia and every query crossed the Atlantic twice. See
+[apps/hq/README.md](apps/hq/README.md#why-verceljson-pins-the-region-to-bom1).
+The docs site is unaffected: it is static and served from the edge cache.
+
 ### The database user hq should hold
 
 hq currently shares the marketing site's Atlas credential. That credential can
