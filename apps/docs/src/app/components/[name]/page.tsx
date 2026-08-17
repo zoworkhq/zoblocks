@@ -5,7 +5,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, ArrowUpRight, Check, CircleAlert, X } from "lucide-react";
 import { CATALOG, STATUS_LABEL, getComponent } from "@/lib/catalog";
-import { ScrollRail, SiteFooter, SiteHeader } from "@/components/site/chrome";
+import { SiteFooter, SiteHeader } from "@/components/site/chrome";
 import { ComponentPreview } from "@/components/site/component-preview";
 import { TabsGallery } from "@/components/site/tabs-gallery";
 import { InstallCommand, RevealRoot } from "@/components/site/interactions";
@@ -57,15 +57,25 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
   if (!component) notFound();
 
   const source = await readRegistrySource(name);
+  const related = component.related.map(getComponent).filter(Boolean);
+
+  /*
+   * Every entry here is conditional on the section it points at, `related`
+   * included — it used to be unconditional while the section it links to only
+   * renders when there is something to put in it. A component with no related
+   * entries (Tabs, today) therefore showed a "Related" tab in its in-page nav
+   * whose href pointed at an id that was not on the page: clicking it did
+   * nothing, and it could never be marked current, so the rail's last entry was
+   * permanently dead.
+   */
   const railSections: RailSection[] = [
     { id: "preview", label: "Preview" },
     ...(component.usage ? [{ id: "usage", label: "Usage & props" }] : []),
     ...(component.guidance.use.length ? [{ id: "guidance", label: "Guidance" }] : []),
     ...(component.accessibility.length ? [{ id: "quality", label: "Quality" }] : []),
     ...(source ? [{ id: "source", label: "Source" }] : []),
-    { id: "related", label: "Related" },
+    ...(related.length ? [{ id: "related", label: "Related" }] : []),
   ];
-  const related = component.related.map(getComponent).filter(Boolean);
 
   return (
     <RevealRoot>
@@ -181,22 +191,31 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
                 </span>
               ))}
             </div>
+          </div>
 
-            {/*
-              Tabs earns a gallery rather than a single preview: the claim it
-              makes is that eleven skins and four semantic modes share one
-              keyboard model, and a claim about sameness cannot be shown with
-              one example.
-            */}
-            {component.name === "tabs" && (
-              <div className="mt-12" data-reveal>
+          {/*
+            Tabs earns a gallery rather than a single preview: the claim it
+            makes is that eleven skins and four semantic modes share one
+            keyboard model, and a claim about sameness cannot be shown with
+            one example.
+
+            It also earns its own container. The prose column is 6xl, and a tab
+            strip is not prose: at that width the grid gives each demo ~340px,
+            which is narrower than the strips themselves — so the workhorse
+            variants rendered permanently overflowed, showing nudge arrows and a
+            clipped last label as if that were the design rather than the demo
+            being too small to hold it.
+          */}
+          {component.name === "tabs" && (
+            <div className="mx-auto max-w-[92rem] px-5 pb-[clamp(2.75rem,5vw,4.5rem)] sm:px-8">
+              <div data-reveal>
                 <SectionHeading eyebrow="Gallery" title="Every variant, mode and state — live." />
                 <div className="mt-8">
                   <TabsGallery />
                 </div>
               </div>
-            )}
-          </div>
+            </div>
+          )}
         </section>
 
         {/* Usage & props ------------------------------------------------ */}
@@ -441,7 +460,6 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
       </main>
 
       <SiteFooter />
-      <ScrollRail />
     </RevealRoot>
   );
 }

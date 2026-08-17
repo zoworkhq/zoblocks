@@ -180,7 +180,18 @@ export function ChartAccordion({
       sections.map((section) => {
         const summary = summaryFor(section);
         const base = {
-          key: section.key,
+          /*
+           * Typed from the target rather than inferred from the source.
+           *
+           * Both sides declare `React.Key`, but React 19 leaves that alias open
+           * for a host to extend, and Next does extend it. Compiled under this
+           * repository's config the two agree; compiled under the docs app's,
+           * the inferred literal picked up the widened alias and the declared
+           * one did not, so building the items failed to typecheck in the only
+           * project that renders them. Reading the type off `AccordionItem`
+           * makes them the same type by construction, under any host.
+           */
+          key: section.key as AccordionItem["key"],
           label: section.label,
           ...(summary === undefined ? {} : { summary }),
           ...(section.severity ? { severity: section.severity } : {}),

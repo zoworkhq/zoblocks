@@ -256,6 +256,43 @@ function extendsTypeOf(type: ts.Type, ownFile: string): string | undefined {
   return heritage.types.map((t) => t.getText().replace(/\s+/g, " ").trim()).join(", ");
 }
 
+/**
+ * The render function inside a wrapped component.
+ *
+ * `export const Switch = React.forwardRef<HTMLSpanElement, SwitchProps>(...)` is
+ * a variable statement, not a function declaration, so a reader that only walks
+ * function and class declarations sees no export at all — and emits an empty
+ * prop table rather than failing. That is how Switch and Tabs, two of the
+ * largest APIs in the library, came to document zero props on their own pages
+ * while `pnpm gen` reported success.
+ *
+ * Unwrapping the call rather than reading the type arguments keeps one code
+ * path for every component shape: whatever comes back is a function whose first
+ * parameter is the props, which is exactly what the declaration branches
+ * already hand to `propsFromType` and `defaultsFromParameter`. Nesting is
+ * unwrapped too, so `memo(forwardRef(...))` reads the same as either alone.
+ */
+const COMPONENT_WRAPPERS = new Set(["forwardRef", "memo"]);
+
+function unwrapComponent(node: ts.Expression): ts.SignatureDeclaration | undefined {
+  if (ts.isFunctionExpression(node) || ts.isArrowFunction(node)) return node;
+
+  if (ts.isCallExpression(node)) {
+    const callee = node.expression;
+    const name = ts.isPropertyAccessExpression(callee)
+      ? callee.name.text
+      : ts.isIdentifier(callee)
+        ? callee.text
+        : undefined;
+    if (!name || !COMPONENT_WRAPPERS.has(name)) return undefined;
+
+    const first = node.arguments[0];
+    return first ? unwrapComponent(first) : undefined;
+  }
+
+  return undefined;
+}
+
 /** The props type of a class component, read from `extends React.Component<Props>`. */
 function classPropsType(checker: ts.TypeChecker, node: ts.ClassDeclaration): ts.Type | undefined {
   for (const clause of node.heritageClauses ?? []) {
@@ -326,6 +363,40 @@ export function extractProps(components: LoadedComponent[]): Map<string, Extract
             ? propsFromType(checker, propsType, statement, component.sourceFile, new Map())
             : [],
         });
+        continue;
+      }
+
+      // `export const Foo = forwardRef(...)` / `memo(...)` / `(props) => ...`.
+      if (ts.isVariableStatement(statement)) {
+        for (const declaration of statement.declarationList.declarations) {
+          if (!ts.isIdentifier(declaration.name)) continue;
+          const name = declaration.name.text;
+          if (!isComponentName(name)) continue;
+
+          const fn = declaration.initializer ? unwrapComponent(declaration.initializer) : undefined;
+          if (!fn) continue;
+
+          const parameter = fn.parameters[0];
+          if (!parameter) {
+            exports.push({ exportName: name, props: [] });
+            continue;
+          }
+
+          const propsType = checker.getTypeAtLocation(parameter);
+          const extendsType = extendsTypeOf(propsType, component.sourceFile);
+
+          exports.push({
+            exportName: name,
+            props: propsFromType(
+              checker,
+              propsType,
+              parameter,
+              component.sourceFile,
+              defaultsFromParameter(parameter),
+            ),
+            ...(extendsType ? { extendsType } : {}),
+          });
+        }
       }
     }
 

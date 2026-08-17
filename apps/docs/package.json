@@ -11,6 +11,9 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@oxygenui-design/component-meta": "workspace:*",
+    "@oxygenui-design/consult-core": "workspace:*",
+    "@oxygenui-design/consult-react": "workspace:*",
     "@oxygenui-design/fhir": "workspace:*",
     "@oxygenui-design/fixtures": "workspace:*",
     "@oxygenui-design/signature": "workspace:*",

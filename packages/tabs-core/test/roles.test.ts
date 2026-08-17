@@ -7,7 +7,7 @@
  */
 
 import { describe, expect, it } from "vitest";
-import { ariaOrientation, disabledProps, rolesFor } from "../src/index.js";
+import { ariaOrientation, disabledProps, isSemanticMode, rolesFor } from "../src/index.js";
 
 describe("rolesFor", () => {
   it('as="tabs" is a tablist of buttons that owns panels', () => {
@@ -106,4 +106,61 @@ describe("disabledProps", () => {
       "aria-describedby": "reason-1",
     });
   });
+});
+
+/**
+ * The guard in front of `rolesFor`.
+ *
+ * `rolesFor` indexes a record by the mode and returns `undefined` for anything
+ * that is not one of the four. Inside the type system that cannot happen; at
+ * the edges — a prop read from a URL, a config file, a JavaScript caller — it
+ * happens routinely, and it used to reach `spec.ownsPanels` and throw from
+ * inside the validator. This is the check that keeps that at the boundary.
+ */
+describe("isSemanticMode", () => {
+  it.each(["tabs", "nav", "radiogroup", "steps"])("accepts %s", (mode) => {
+    expect(isSemanticMode(mode)).toBe(true);
+    // And the acceptance is worth something: every accepted value resolves.
+    expect(rolesFor(mode as Parameters<typeof rolesFor>[0])).toBeDefined();
+  });
+
+  it.each([
+    // The ARIA role, and by far the most likely wrong answer — the component is
+    // a tablist, so "tablist" is what a caller reaches for.
+    "tablist",
+    "tab",
+    "tabpanel",
+    "menu",
+    "list",
+    "Tabs",
+    "TABS",
+    " tabs",
+    "tabs ",
+    "",
+  ])("rejects %o", (mode) => {
+    expect(isSemanticMode(mode)).toBe(false);
+  });
+
+  it.each([
+    ["undefined", undefined],
+    ["null", null],
+    ["a number", 0],
+    ["an object", {}],
+    ["an array", ["tabs"]],
+    ["a boolean", true],
+  ])("rejects %s", (_label, mode) => {
+    expect(isSemanticMode(mode)).toBe(false);
+  });
+
+  /*
+   * `Object.hasOwn`, not `in`: `"toString" in SPECS` is true through the
+   * prototype chain, and a mode called "constructor" would otherwise resolve to
+   * a function and fail somewhere much further downstream.
+   */
+  it.each(["toString", "constructor", "hasOwnProperty", "__proto__", "valueOf"])(
+    "rejects %s, which the prototype chain would otherwise answer for",
+    (mode) => {
+      expect(isSemanticMode(mode)).toBe(false);
+    },
+  );
 });

@@ -57,8 +57,7 @@ export async function emitTsconfigPaths(
     Object.entries(mappings).sort(([a], [b]) => a.localeCompare(b)),
   );
 
-  await emitter.emit(
-    paths.tsconfigPaths,
+  const document = (rebase: (target: string) => string) =>
     `${JSON.stringify(
       {
         $schema: "https://json.schemastore.org/tsconfig",
@@ -68,11 +67,26 @@ export async function emitTsconfigPaths(
           .map((l) => l.replace(/^\/\/ ?/, "")),
         compilerOptions: {
           baseUrl: ".",
-          paths: ordered,
+          paths: Object.fromEntries(
+            Object.entries(ordered).map(([specifier, targets]) => [specifier, targets.map(rebase)]),
+          ),
         },
       },
       null,
       2,
-    )}`,
+    )}`;
+
+  await emitter.emit(
+    paths.tsconfigPaths,
+    document((target) => target),
+  );
+
+  // The docs app sits two levels down, so every root-relative target is the
+  // same path with the hops prepended. Emitted rather than hand-kept: the
+  // previews import registry source directly, and a specifier the app cannot
+  // resolve is a preview nobody can write.
+  await emitter.emit(
+    paths.docsTsconfigPaths,
+    document((target) => target.replace(/^\.\//, "../../")),
   );
 }

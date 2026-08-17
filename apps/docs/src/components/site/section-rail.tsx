@@ -37,6 +37,22 @@ export function SectionRail({ sections }: { sections: RailSection[] }) {
         const el = document.getElementById(section.id);
         if (el && el.getBoundingClientRect().top <= line) current = section.id;
       }
+
+      /*
+       * At the end of the document, the last section wins outright.
+       *
+       * A section shorter than 60% of the viewport can be entirely on screen
+       * and still start below the 40% line, so it never became current at all
+       * — scrolled fully to the bottom, with Related filling the screen, the
+       * rail went on claiming the reader was in Quality. There is nowhere
+       * further to scroll to fix that, which makes it the one case the line
+       * cannot answer.
+       */
+      const documentEnd =
+        window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2;
+      const last = sections.at(-1);
+      if (documentEnd && last && document.getElementById(last.id)) current = last.id;
+
       setActive(current);
     }
 
@@ -49,11 +65,32 @@ export function SectionRail({ sections }: { sections: RailSection[] }) {
     };
   }, [sections]);
 
-  // Keep the active tab visible when the bar scrolls horizontally on narrow screens.
+  /*
+   * Keep the active tab visible when the bar scrolls horizontally on narrow
+   * screens — by moving this list, and nothing else.
+   *
+   * This used to call `scrollIntoView`, which is the wrong tool twice over.
+   * It walks *every* scrollable ancestor up to the document, and `html` carries
+   * `scroll-behavior: smooth`, so each call started an animated document scroll.
+   * The active section changes while the reader is scrolling, so that fired
+   * mid-gesture, repeatedly, competing with their own momentum — the page
+   * stuttering and yanking under the pointer with nothing on screen to explain
+   * it. Adjusting `scrollLeft` by the measured overhang cannot reach the
+   * document at all.
+   */
   React.useEffect(() => {
-    listRef.current
-      ?.querySelector(`[data-id="${active}"]`)
-      ?.scrollIntoView({ block: "nearest", inline: "nearest" });
+    const list = listRef.current;
+    const item = list?.querySelector(`[data-id="${active}"]`);
+    if (!list || !item) return;
+
+    const listBox = list.getBoundingClientRect();
+    const itemBox = item.getBoundingClientRect();
+
+    if (itemBox.left < listBox.left) {
+      list.scrollLeft -= listBox.left - itemBox.left;
+    } else if (itemBox.right > listBox.right) {
+      list.scrollLeft += itemBox.right - listBox.right;
+    }
   }, [active]);
 
   return (

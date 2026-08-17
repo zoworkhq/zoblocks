@@ -105,9 +105,17 @@
 .ox-gallery__grid {
   display: grid;
   gap: 1.25rem;
-  /* `min()` in the floor is load-bearing: a bare minmax(340px, 1fr) cannot
-     shrink below its floor and overflows the page on a phone. */
-  grid-template-columns: repeat(auto-fit, minmax(min(340px, 100%), 1fr));
+  /* `min()` in the floor is load-bearing: a bare minmax(30rem, 1fr) cannot
+     shrink below its floor and overflows the page on a phone.
+
+     The floor is 30rem rather than the 340px it started at. A tab strip is not
+     a card of prose: at 340px the underline and enclosed demos were narrower
+     than their own content, so every one of them rendered scrolled — nudge
+     arrows lit, last label sliced in half — and the gallery ended up
+     demonstrating the overflow behaviour in the chapter about variants. The
+     floor now clears the widest strip, which costs a column and buys demos
+     that show what they claim to. */
+  grid-template-columns: repeat(auto-fit, minmax(min(30rem, 100%), 1fr));
 }
 /* A demo that needs the room takes the whole row rather than being squeezed
    into a column where its own content would wrap into nonsense. */

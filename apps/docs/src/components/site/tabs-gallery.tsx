@@ -769,9 +769,24 @@ function longItems(tone = true) {
   }));
 }
 
+/*
+ * The container is narrow on purpose, at every strategy.
+ *
+ * This chapter's premise is "eleven tabs, and five ways to survive a narrow
+ * container", and the container used to be narrow by accident — the gallery
+ * column happened to be about 340px, so eleven tabs happened not to fit. When
+ * the grid was widened so the *variant* demos would stop rendering permanently
+ * scrolled, this chapter inherited the room and stopped overflowing at all:
+ * five strategies, all shown doing nothing, on a page explaining what they do.
+ *
+ * Stating the width here makes the demo independent of the page it sits on,
+ * which is what it should always have been. `collapse` keeps its tighter
+ * bound: it is the strategy for the narrowest case, and it needs to be past the
+ * point where a menu would still have fitted.
+ */
 function OverflowDemo({ strategy }: { strategy: "scroll" | "menu" | "collapse" }) {
   return (
-    <div className={cn("w-full", strategy === "collapse" && "mx-auto max-w-[320px]")}>
+    <div className={cn("w-full", strategy === "collapse" ? "max-w-[320px]" : "max-w-[26rem]")}>
       <Tabs
         as="tabs"
         variant="underline"
@@ -1001,6 +1016,35 @@ export function TabsGallery() {
   const [rtl, setRtl] = React.useState(false);
   const [motion, setMotion] = React.useState(true);
 
+  /*
+   * The demo theme starts at whatever the site is showing, and keeps following
+   * it until the reader picks one here.
+   *
+   * It used to be hardcoded to "light". The demo scopes set their own literal
+   * `--ox-*` values — that is the point of them, and why the matrix can show
+   * three themes at once — so on the dark site every stage rendered as a white
+   * slab. Nothing was broken, but a page whose argument is "the tokens carry
+   * the theme" opening on eleven light-mode panels in a dark page argues the
+   * opposite.
+   *
+   * `hc` is only ever a deliberate choice, so it is never selected here — the
+   * site has no high-contrast mode to follow.
+   */
+  const [themePinned, setThemePinned] = React.useState(false);
+
+  React.useEffect(() => {
+    if (themePinned) return;
+    const root = document.documentElement;
+    const sync = () => setTheme(root.classList.contains("dark") ? "dark" : "light");
+    sync();
+    // The site theme is a class on <html>, written by the toggle and by the
+    // pre-paint script. Observing it covers both, and the OS-level flip that
+    // reaches neither.
+    const observer = new MutationObserver(sync);
+    observer.observe(root, { attributes: true, attributeFilter: ["class"] });
+    return () => observer.disconnect();
+  }, [themePinned]);
+
   const active = CHAPTERS.find((item) => item.id === chapter) ?? CHAPTERS[0]!;
 
   return (
@@ -1014,7 +1058,10 @@ export function TabsGallery() {
               key={option}
               type="button"
               aria-pressed={theme === option}
-              onClick={() => setTheme(option)}
+              onClick={() => {
+                setThemePinned(true);
+                setTheme(option);
+              }}
               className="ox-gallery__switch"
             >
               {option}
@@ -1126,6 +1173,10 @@ export function TabsGallery() {
               api='variant="underline"'
               tags={["6+ items"]}
               note="The workhorse: more than four items, labels of unequal length, panels that are whole screens. The rail is an inset shadow rather than a border, so the 2 px indicator can sit at bottom:0 and overlap it exactly at any zoom."
+              // Six labels of unequal length need a row of their own. In a
+              // column they render permanently scrolled, which demonstrates the
+              // overflow behaviour in the chapter about variants.
+              wide
             >
               <Underline />
             </Demo>
@@ -1146,6 +1197,10 @@ export function TabsGallery() {
               api="editable={{ onClose, onAdd }}"
               tags={["closable", "addable"]}
               note="The × is aria-hidden and the keyboard path is Delete on the tab, because an interactive control inside role=tab is invalid ARIA. After a close, focus moves to the neighbour deterministically — never to <body>."
+              // Each tab carries an icon, a dirty dot and a close control, so a
+              // strip of them is wider than its labels suggest — and a demo
+              // about closing tabs has to show more than one.
+              wide
             >
               <Editable />
             </Demo>

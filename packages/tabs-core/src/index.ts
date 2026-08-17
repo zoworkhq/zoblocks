@@ -31,7 +31,13 @@ export type {
   TransitionKind,
 } from "./types.js";
 
-export { ariaOrientation, disabledProps, rolesFor, type RoleSpec } from "./roles.js";
+export {
+  ariaOrientation,
+  disabledProps,
+  isSemanticMode,
+  rolesFor,
+  type RoleSpec,
+} from "./roles.js";
 
 export {
   focusAfterClose,

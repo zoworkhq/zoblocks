@@ -3,7 +3,7 @@ import Link from "next/link";
 import { ArrowRight, FlaskConical } from "lucide-react";
 import { getComponent } from "@/lib/catalog";
 import { SHOWCASE } from "@/lib/offerings";
-import { ScrollRail, SiteFooter, SiteHeader } from "@/components/site/chrome";
+import { SiteFooter, SiteHeader } from "@/components/site/chrome";
 import { RevealRoot } from "@/components/site/interactions";
 import { ShowcasePreview } from "@/components/site/showcase-preview";
 import { cn } from "@/lib/utils";
@@ -177,7 +177,6 @@ export default function ShowcasePage() {
       </main>
 
       <SiteFooter />
-      <ScrollRail />
     </RevealRoot>
   );
 }

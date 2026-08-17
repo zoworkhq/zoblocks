@@ -18,9 +18,32 @@
       // Registry components import each other, and their shared library, by the
       // paths the shadcn CLI writes in a consumer's project. Mapped back to the
       // registry source so the previews render the real files, unedited.
+      //
+      // The per-component entries are generated — see tsconfig.generated.json,
+      // spread below. They were hand-kept until three of ten were mapped and
+      // the rest were simply unimportable, which is why several components had
+      // no live preview: not a decision, a missing line in this file.
       "@/lib/oxygen-loader": ["../../registry/oxygen/lib/loader.tsx"],
       "@/lib/oxygen-switch": ["../../registry/oxygen/lib/switch.tsx"],
-      "@/components/oxygen/rhythm-loader": ["../../registry/oxygen/rhythm-loader/rhythm-loader.tsx"]
+      "@/lib/oxygen-accordion": ["../../registry/oxygen/lib/accordion-core.tsx"],
+      "@/components/oxygen/accordion": ["../../registry/oxygen/accordion/accordion.tsx"],
+      "@/components/oxygen/breath-loader": [
+        "../../registry/oxygen/breath-loader/breath-loader.tsx"
+      ],
+      "@/components/oxygen/chart-accordion": [
+        "../../registry/oxygen/chart-accordion/chart-accordion.tsx"
+      ],
+      "@/components/oxygen/consult": ["../../registry/oxygen/consult/consult.tsx"],
+      "@/components/oxygen/helix-loader": ["../../registry/oxygen/helix-loader/helix-loader.tsx"],
+      "@/components/oxygen/infusion-loader": [
+        "../../registry/oxygen/infusion-loader/infusion-loader.tsx"
+      ],
+      "@/components/oxygen/pulse-loader": ["../../registry/oxygen/pulse-loader/pulse-loader.tsx"],
+      "@/components/oxygen/rhythm-loader": [
+        "../../registry/oxygen/rhythm-loader/rhythm-loader.tsx"
+      ],
+      "@/components/oxygen/safety-plan": ["../../registry/oxygen/safety-plan/safety-plan.tsx"],
+      "@/components/oxygen/switch": ["../../registry/oxygen/switch/switch.tsx"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],

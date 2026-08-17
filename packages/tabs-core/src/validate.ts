@@ -13,7 +13,7 @@
  * time, before the code ever runs.
  */
 
-import { rolesFor } from "./roles.js";
+import { isSemanticMode, rolesFor } from "./roles.js";
 import type { OverflowStrategy, SemanticMode, TabItem } from "./types.js";
 
 export type ProblemCode =
@@ -51,11 +51,25 @@ export function validateTabsConfig(input: ValidateInput): Problem[] {
   const problems: Problem[] = [];
   const { items, overflow, orientation = "horizontal", value, defaultValue } = input;
 
-  if (!input.mode) {
+  /*
+   * An unrecognised mode is reported, not crashed on.
+   *
+   * This used to test only for absence. A mode outside the four — "tablist" is
+   * the one everybody reaches for, since that is the ARIA role — passed the
+   * guard, resolved to no role spec, and threw `Cannot read properties of
+   * undefined (reading 'ownsPanels')` from inside the validator a few lines
+   * down. The one function whose job is to explain a misconfiguration was the
+   * one that failed to, and it did it with a stack trace pointing at library
+   * internals rather than at the caller's prop.
+   */
+  if (!isSemanticMode(input.mode)) {
     problems.push({
       code: "missing-mode",
-      message:
-        'Tabs requires `as`. There is no safe default: a view switch, a link list, a form value and a wizard share this silhouette and need four different accessibility trees. Pick "tabs", "nav", "radiogroup" or "steps".',
+      message: `${
+        input.mode === undefined
+          ? "Tabs requires `as`."
+          : `Tabs does not have a mode called "${String(input.mode)}".`
+      } There is no safe default: a view switch, a link list, a form value and a wizard share this silhouette and need four different accessibility trees. Pick "tabs", "nav", "radiogroup" or "steps".`,
     });
     return problems; // Everything below depends on knowing the mode.
   }

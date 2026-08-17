@@ -116,37 +116,6 @@ export function SiteHeader() {
   );
 }
 
-/** Scroll position as a calibrated column. Desktop only; hidden under 1280px. */
-export function ScrollRail() {
-  const ref = React.useRef<HTMLDivElement>(null);
-
-  React.useEffect(() => {
-    let frame = 0;
-    function update() {
-      cancelAnimationFrame(frame);
-      frame = requestAnimationFrame(() => {
-        const max = document.documentElement.scrollHeight - window.innerHeight;
-        const pct = max > 0 ? Math.min(window.scrollY / max, 1) * 100 : 0;
-        ref.current?.style.setProperty("--scroll-progress", `${pct}%`);
-      });
-    }
-    update();
-    window.addEventListener("scroll", update, { passive: true });
-    window.addEventListener("resize", update);
-    return () => {
-      window.removeEventListener("scroll", update);
-      window.removeEventListener("resize", update);
-      cancelAnimationFrame(frame);
-    };
-  }, []);
-
-  return (
-    <div ref={ref} className="scroll-rail" aria-hidden="true">
-      <i />
-    </div>
-  );
-}
-
 const FOOTER_LINKS = [
   {
     title: "Library",

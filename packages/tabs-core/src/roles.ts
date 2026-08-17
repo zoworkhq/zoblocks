@@ -95,6 +95,18 @@ export function rolesFor(mode: SemanticMode): RoleSpec {
 }
 
 /**
+ * Is this a mode the library actually has a role spec for?
+ *
+ * The type says it must be, and JavaScript callers, `as` read from a prop that
+ * came over the wire, and anyone who guessed "tablist" are all outside the type
+ * system. Validation is precisely where those arrive, so it cannot assume the
+ * mode is one of the four — see the crash it used to cause in `validateTabsConfig`.
+ */
+export function isSemanticMode(mode: unknown): mode is SemanticMode {
+  return typeof mode === "string" && Object.hasOwn(SPECS, mode);
+}
+
+/**
  * `aria-orientation` is only meaningful where arrow keys exist, and setting it
  * without also swapping the key axis is a lie to the screen reader — the
  * single most common vertical-tabs bug. Both come from here so they cannot
