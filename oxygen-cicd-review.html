@@ -1,0 +1,1797 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>CI/CD and build-system review · Oxygen UI</title>
+    <style>
+      :root {
+        --paper: #f7f9f8;
+        --paper-sunk: #eef3f1;
+        --surface: #ffffff;
+        --ink: #08110f;
+        --muted: #5a6b67;
+        --faint: #8397924d;
+        --rule: #dde5e2;
+        --rule-strong: #c6d3cf;
+        --accent: #059478;
+        --accent-deep: #045b4b;
+        --accent-wash: #e8f6f1;
+        --panel: #08110f;
+        --panel-fg: #dff3ec;
+        --panel-muted: #7d968f;
+        --panel-rule: #1a2b28;
+        --panel-accent: #4fd6c0;
+        --critical: #b91c1c;
+        --critical-bg: #fdeaea;
+        --high: #b45309;
+        --high-bg: #fdf3e3;
+        --medium: #1d4ed8;
+        --medium-bg: #eaf0fe;
+        --low: #4b5563;
+        --low-bg: #f1f3f4;
+
+        --font-display: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+        --font-body:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+      }
+
+      @media (prefers-color-scheme: dark) {
+        :root:not([data-theme="light"]) {
+          --paper: #0a1211;
+          --paper-sunk: #060d0c;
+          --surface: #101a18;
+          --ink: #e6f2ef;
+          --muted: #93a7a2;
+          --faint: #6b807b4d;
+          --rule: #1e2c29;
+          --rule-strong: #2a3b37;
+          --accent: #4fd6c0;
+          --accent-deep: #7fe8d6;
+          --accent-wash: #0f2320;
+          --panel: #060d0c;
+          --panel-fg: #dff3ec;
+          --panel-muted: #7d968f;
+          --panel-rule: #1a2b28;
+          --critical: #f87171;
+          --critical-bg: #2a1416;
+          --high: #fbbf24;
+          --high-bg: #2a2113;
+          --medium: #93b4fd;
+          --medium-bg: #141d2f;
+          --low: #9ca3af;
+          --low-bg: #161c1b;
+        }
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: var(--paper);
+        color: var(--ink);
+        font-family: var(--font-body);
+        font-size: 16.5px;
+        line-height: 1.65;
+        -webkit-font-smoothing: antialiased;
+      }
+      .wrap {
+        max-width: 1080px;
+        margin: 0 auto;
+        padding: 0 28px 120px;
+      }
+
+      header.masthead {
+        border-bottom: 1px solid var(--rule);
+        padding: 72px 0 40px;
+        margin-bottom: 8px;
+      }
+      .eyebrow {
+        font-family: var(--font-mono);
+        font-size: 11px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--accent-deep);
+        margin: 0 0 18px;
+      }
+      h1 {
+        font-family: var(--font-display);
+        font-size: clamp(34px, 5vw, 52px);
+        line-height: 1.08;
+        letter-spacing: -0.02em;
+        margin: 0 0 18px;
+        text-wrap: balance;
+      }
+      .standfirst {
+        font-size: 19px;
+        color: var(--muted);
+        max-width: 62ch;
+        margin: 0;
+      }
+      .meta {
+        margin-top: 28px;
+        font-family: var(--font-mono);
+        font-size: 12px;
+        color: var(--muted);
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px 22px;
+      }
+
+      section.block {
+        padding: 52px 0 8px;
+        border-top: 1px solid var(--rule);
+        margin-top: 44px;
+      }
+      section.block:first-of-type {
+        border-top: 0;
+      }
+      h2 {
+        font-family: var(--font-display);
+        font-size: clamp(25px, 3.2vw, 33px);
+        line-height: 1.18;
+        letter-spacing: -0.015em;
+        margin: 0 0 10px;
+      }
+      h3 {
+        font-size: 17px;
+        letter-spacing: -0.005em;
+        margin: 34px 0 10px;
+      }
+      h4 {
+        font-family: var(--font-mono);
+        font-size: 12px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--muted);
+        margin: 26px 0 8px;
+      }
+      p {
+        max-width: 74ch;
+      }
+      .lede {
+        font-size: 17.5px;
+        color: var(--muted);
+        max-width: 70ch;
+      }
+      a {
+        color: var(--accent-deep);
+      }
+      code {
+        font-family: var(--font-mono);
+        font-size: 0.87em;
+        background: var(--paper-sunk);
+        border: 1px solid var(--rule);
+        border-radius: 4px;
+        padding: 0.1em 0.36em;
+      }
+      pre {
+        background: var(--panel);
+        color: var(--panel-fg);
+        border-radius: 12px;
+        padding: 18px 20px;
+        overflow-x: auto;
+        font-family: var(--font-mono);
+        font-size: 12.5px;
+        line-height: 1.6;
+        border: 1px solid var(--panel-rule);
+      }
+      pre code {
+        background: none;
+        border: 0;
+        padding: 0;
+        font-size: inherit;
+        color: inherit;
+      }
+      pre .c {
+        color: var(--panel-muted);
+      }
+      pre .g {
+        color: var(--panel-accent);
+      }
+      pre .r {
+        color: #ff9a9a;
+      }
+
+      .tablewrap {
+        overflow-x: auto;
+        border: 1px solid var(--rule);
+        border-radius: 12px;
+        background: var(--surface);
+        margin: 22px 0;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 14.5px;
+      }
+      th,
+      td {
+        text-align: left;
+        padding: 12px 14px;
+        border-bottom: 1px solid var(--rule);
+        vertical-align: top;
+      }
+      th {
+        background: var(--paper-sunk);
+        font-size: 11.5px;
+        letter-spacing: 0.09em;
+        text-transform: uppercase;
+        color: var(--muted);
+        font-weight: 600;
+        white-space: nowrap;
+      }
+      tbody tr:last-child td {
+        border-bottom: 0;
+      }
+      td.num {
+        font-family: var(--font-mono);
+        font-variant-numeric: tabular-nums;
+        white-space: nowrap;
+      }
+
+      .sev {
+        font-family: var(--font-mono);
+        font-size: 10.5px;
+        letter-spacing: 0.07em;
+        text-transform: uppercase;
+        padding: 3px 8px;
+        border-radius: 999px;
+        white-space: nowrap;
+        font-weight: 600;
+      }
+      .sev-critical {
+        background: var(--critical-bg);
+        color: var(--critical);
+      }
+      .sev-high {
+        background: var(--high-bg);
+        color: var(--high);
+      }
+      .sev-medium {
+        background: var(--medium-bg);
+        color: var(--medium);
+      }
+      .sev-low {
+        background: var(--low-bg);
+        color: var(--low);
+      }
+
+      .callout {
+        border: 1px solid var(--rule-strong);
+        border-left: 3px solid var(--accent);
+        background: var(--surface);
+        border-radius: 10px;
+        padding: 18px 22px;
+        margin: 24px 0;
+      }
+      .callout.crit {
+        border-left-color: var(--critical);
+        background: var(--critical-bg);
+      }
+      .callout h4 {
+        margin-top: 0;
+        color: inherit;
+      }
+      .callout p:last-child {
+        margin-bottom: 0;
+      }
+
+      .finding {
+        border: 1px solid var(--rule);
+        border-radius: 12px;
+        background: var(--surface);
+        padding: 22px 24px;
+        margin: 20px 0;
+      }
+      .finding > h3 {
+        margin-top: 0;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+      .finding dl {
+        display: grid;
+        grid-template-columns: 140px 1fr;
+        gap: 8px 18px;
+        margin: 14px 0 0;
+        font-size: 14.5px;
+      }
+      .finding dt {
+        font-family: var(--font-mono);
+        font-size: 11px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--muted);
+        padding-top: 3px;
+      }
+      .finding dd {
+        margin: 0;
+      }
+      @media (max-width: 640px) {
+        .finding dl {
+          grid-template-columns: 1fr;
+          gap: 2px;
+        }
+        .finding dt {
+          margin-top: 10px;
+        }
+      }
+
+      .flow {
+        background: var(--surface);
+        border: 1px solid var(--rule);
+        border-radius: 12px;
+        padding: 8px 4px;
+        margin: 24px 0;
+        overflow-x: auto;
+      }
+      .bars {
+        margin: 22px 0;
+      }
+      .bar {
+        display: grid;
+        grid-template-columns: 210px 1fr 62px;
+        gap: 12px;
+        align-items: center;
+        padding: 5px 0;
+        font-size: 14px;
+      }
+      .bar .track {
+        background: var(--paper-sunk);
+        border-radius: 4px;
+        height: 15px;
+        overflow: hidden;
+      }
+      .bar .fill {
+        /* block, because a span ignores width and height while inline — the
+           track blockifies as a grid item, the fill inside it does not. */
+        display: block;
+        height: 100%;
+        background: var(--accent);
+        border-radius: 4px;
+      }
+      .bar .fill.dup {
+        background: var(--high);
+      }
+      .bar .fill.cold {
+        background: var(--medium);
+      }
+      .bar .t {
+        font-family: var(--font-mono);
+        font-variant-numeric: tabular-nums;
+        text-align: right;
+        color: var(--muted);
+        font-size: 12.5px;
+      }
+      .legend {
+        display: flex;
+        gap: 20px;
+        flex-wrap: wrap;
+        font-size: 13px;
+        color: var(--muted);
+        margin-top: 10px;
+      }
+      .legend span::before {
+        content: "";
+        display: inline-block;
+        width: 10px;
+        height: 10px;
+        border-radius: 2px;
+        margin-right: 7px;
+        vertical-align: baseline;
+      }
+      .legend .l-keep::before {
+        background: var(--accent);
+      }
+      .legend .l-dup::before {
+        background: var(--high);
+      }
+      .legend .l-cold::before {
+        background: var(--medium);
+      }
+
+      ul,
+      ol {
+        max-width: 74ch;
+        padding-left: 22px;
+      }
+      li {
+        margin: 6px 0;
+      }
+      .tight li {
+        margin: 3px 0;
+      }
+
+      .phase {
+        border-left: 2px solid var(--rule-strong);
+        padding-left: 22px;
+        margin: 28px 0;
+      }
+      .phase h3 {
+        margin-top: 0;
+      }
+      .tag {
+        display: inline-block;
+        font-family: var(--font-mono);
+        font-size: 10.5px;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--muted);
+        border: 1px solid var(--rule-strong);
+        border-radius: 999px;
+        padding: 2px 9px;
+        margin-left: 6px;
+        vertical-align: middle;
+      }
+      .confirmed {
+        color: var(--accent-deep);
+        border-color: var(--accent);
+      }
+      .inferred {
+        color: var(--high);
+        border-color: var(--high);
+      }
+
+      footer {
+        border-top: 1px solid var(--rule);
+        margin-top: 60px;
+        padding-top: 24px;
+        color: var(--muted);
+        font-size: 13.5px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <header class="masthead">
+        <p class="eyebrow">Platform engineering · Assessment</p>
+        <h1>The pipeline is thorough, slow, and green about one thing it never does</h1>
+        <p class="standfirst">
+          A review of Oxygen UI's CI/CD system and local build workflow, against the actual workflow
+          files and real run telemetry. The quality gates here are unusually strong. The problems
+          are that one deployment job has never run, roughly 40% of every build is duplicated work,
+          and the local pre-push check is missing four of the gates CI enforces.
+        </p>
+        <div class="meta">
+          <span>17 August 2026</span>
+          <span>zoworkhq/oxygenui</span>
+          <span>main @ a2eb9ad</span>
+          <span>Evidence: run 32013169805, job 95323329767</span>
+        </div>
+      </header>
+
+      <!-- ============================================================ -->
+      <section class="block">
+        <h2>Executive summary</h2>
+
+        <p class="lede">
+          This is a well-governed repository. The gate set is broader than most teams ship —
+          generated-artifact drift, an executable architecture rule, bundle budgets, a WCAG audit
+          across sixteen pages in two themes, cross-framework smoke tests in three browser engines,
+          and a synthetic-data scan. Almost every workflow step carries a comment explaining the
+          incident that produced it. That is rare and worth preserving.
+        </p>
+
+        <p>
+          The findings below are therefore not about missing rigour. They are about three things:
+          one gate that silently does nothing, an execution model that has outgrown its single job,
+          and a local workflow that has drifted from CI in exactly the places that produced this
+          week's red builds.
+        </p>
+
+        <div class="callout crit">
+          <h4>The finding that matters most</h4>
+          <p>
+            <strong
+              >The <code>Deploy hq (production)</code> job has never deployed anything, and reports
+              success every time.</strong
+            >
+            Five of its six steps are gated on <code>steps.gate.outputs.skip == 'false'</code>, but
+            no step in the job declares <code>id: gate</code>. The expression evaluates against an
+            empty string, every gated step is skipped, and a job whose steps all skip is a job that
+            passes. The repository variable it checks for, <code>VERCEL_PROJECT_ID_HQ</code>,
+            <em>is</em> set — so this is not a deliberate skip. hq has not been deployed by this
+            pipeline at all.
+          </p>
+        </div>
+
+        <h3>What the numbers say</h3>
+        <p>
+          The most recent full run took <strong>17m53s</strong> in a single job. Of that,
+          <strong>435s (41%)</strong> is spent running the test suites twice — once as
+          <code>Test</code>, once as <code>Coverage thresholds</code> — and roughly
+          <strong>630s</strong> is spent on work Turbo could cache but currently cannot, because no
+          Turbo cache is carried between runs.
+        </p>
+        <p>
+          A conservative rework — deduplicate the suites, cache the Turbo graph and the Playwright
+          browsers, and split the job so independent gates run concurrently — should put PR feedback
+          at <strong>6–8 minutes wall clock</strong> without removing or weakening a single check.
+        </p>
+
+        <h3>Priority summary</h3>
+        <div class="tablewrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Severity</th>
+                <th>Count</th>
+                <th>Theme</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="sev sev-critical">Critical</span></td>
+                <td class="num">1</td>
+                <td>A deployment job that reports success and deploys nothing</td>
+              </tr>
+              <tr>
+                <td><span class="sev sev-high">High</span></td>
+                <td class="num">5</td>
+                <td>
+                  Release blocked on a repository setting; no build cache; duplicated test
+                  execution; local/CI gate drift; mutable action pins
+                </td>
+              </tr>
+              <tr>
+                <td><span class="sev sev-medium">Medium</span></td>
+                <td class="num">6</td>
+                <td>
+                  No job parallelism; uncached browsers; duplicated Node pin; rebuild-on-deploy; VRT
+                  unenforced; audit threshold mismatch
+                </td>
+              </tr>
+              <tr>
+                <td><span class="sev sev-low">Low</span></td>
+                <td class="num">3</td>
+                <td>Flake visibility, dependency update automation, deploy tool refetching</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ============================================================ -->
+      <section class="block">
+        <h2>Current state</h2>
+
+        <h3>Repository shape</h3>
+        <p>
+          A pnpm workspace driven by Turborepo: 20+ packages under <code>packages/</code>, two
+          Next.js applications (<code>apps/docs</code>, <code>apps/hq</code>), six framework smoke
+          apps, and a shadcn-style component registry under <code>registry/oxygen</code>. Node is
+          pinned at 22 in <code>.nvmrc</code>. There is no <code>.npmrc</code> and no Dockerfile;
+          builds run directly on GitHub-hosted <code>ubuntu-latest</code> runners, and deployment is
+          to Vercel via the CLI.
+        </p>
+
+        <h3>Workflows</h3>
+        <div class="tablewrap">
+          <table>
+            <thead>
+              <tr>
+                <th>File</th>
+                <th class="num">Lines</th>
+                <th>Trigger</th>
+                <th>Purpose</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>ci.yml</code></td>
+                <td class="num">513</td>
+                <td>push main, PR</td>
+                <td>verify · no-phi · deploy-docs · deploy-hq · deploy-preview</td>
+              </tr>
+              <tr>
+                <td><code>release.yml</code></td>
+                <td class="num">214</td>
+                <td>push main, dispatch</td>
+                <td>Changesets version PR, then publish on merge</td>
+              </tr>
+              <tr>
+                <td><code>codeql.yml</code></td>
+                <td class="num">81</td>
+                <td>push, PR, weekly</td>
+                <td>Static analysis; self-skips on a private repo without opt-in</td>
+              </tr>
+              <tr>
+                <td><code>sbom.yml</code></td>
+                <td class="num">62</td>
+                <td>release published</td>
+                <td>CycloneDX SBOM attached to the release</td>
+              </tr>
+              <tr>
+                <td><code>hq-indexes.yml</code></td>
+                <td class="num">73</td>
+                <td>manual only</td>
+                <td>One-off MongoDB index creation</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>Flow</h3>
+        <div class="flow">
+          <pre><code><span class="c">                      ┌──────────────────────────────────────────┐</span>
+  push / PR  ────────▶│ <span class="g">verify</span>  (single job, 25 min budget)      │
+                      │  install → gen → lint → format → types   │
+                      │  → test → coverage → build → a11y → e2e  │
+                      │  → size → deps                           │
+                      └──────────────────────────────────────────┘
+                      ┌──────────────────────────────────────────┐
+             ────────▶│ <span class="g">no-phi</span>  (synthetic data scan, 5 min)      │
+                      └──────────────────────────────────────────┘
+                                        │ needs: [verify, no-phi]
+                        ┌───────────────┼────────────────┐
+                        ▼               ▼                ▼
+                 <span class="g">deploy-docs</span>      <span class="r">deploy-hq</span>        <span class="g">deploy-preview</span>
+                 (push→main)      <span class="r">(push→main)</span>       (pull_request)
+                 vercel prod      <span class="r">ALL STEPS SKIP</span>    vercel preview
+                 + registry       <span class="r">reports success</span>
+                   verified       <span class="r">deploys nothing</span>
+
+  push main ─────────▶ <span class="g">release.yml</span> ── changeset version ──▶ Version PR ──▶ publish</code></pre>
+        </div>
+
+        <h3>Where the 17m53s goes</h3>
+        <p>
+          Measured from job <code>95336917945</code> (run 32013169805). Amber marks work that is
+          executed twice; blue marks work a warm Turbo cache would largely eliminate.
+        </p>
+        <div class="bars">
+          <div class="bar">
+            <span>Browser e2e (3 engines)</span
+            ><span class="track"><span class="fill" style="width: 100%"></span></span
+            ><span class="t">232s</span>
+          </div>
+          <div class="bar">
+            <span>Test</span
+            ><span class="track"><span class="fill cold" style="width: 97.8%"></span></span
+            ><span class="t">227s</span>
+          </div>
+          <div class="bar">
+            <span>Coverage thresholds</span
+            ><span class="track"><span class="fill dup" style="width: 89.7%"></span></span
+            ><span class="t">208s</span>
+          </div>
+          <div class="bar">
+            <span>Typecheck</span
+            ><span class="track"><span class="fill cold" style="width: 53%"></span></span
+            ><span class="t">123s</span>
+          </div>
+          <div class="bar">
+            <span>Build</span
+            ><span class="track"><span class="fill cold" style="width: 31.9%"></span></span
+            ><span class="t">74s</span>
+          </div>
+          <div class="bar">
+            <span>Install Playwright browsers</span
+            ><span class="track"><span class="fill dup" style="width: 30.6%"></span></span
+            ><span class="t">71s</span>
+          </div>
+          <div class="bar">
+            <span>Accessibility audit</span
+            ><span class="track"><span class="fill" style="width: 25.4%"></span></span
+            ><span class="t">59s</span>
+          </div>
+          <div class="bar">
+            <span>Format</span
+            ><span class="track"><span class="fill" style="width: 7.8%"></span></span
+            ><span class="t">18s</span>
+          </div>
+          <div class="bar">
+            <span>setup-node</span
+            ><span class="track"><span class="fill" style="width: 6%"></span></span
+            ><span class="t">14s</span>
+          </div>
+          <div class="bar">
+            <span>Lint</span
+            ><span class="track"><span class="fill" style="width: 5.6%"></span></span
+            ><span class="t">13s</span>
+          </div>
+          <div class="bar">
+            <span>gen · deps · size · install</span
+            ><span class="track"><span class="fill" style="width: 7.3%"></span></span
+            ><span class="t">17s</span>
+          </div>
+        </div>
+        <div class="legend">
+          <span class="l-keep">Irreducible work</span>
+          <span class="l-dup">Duplicated or re-fetched every run</span>
+          <span class="l-cold">Recomputed from cold; cacheable</span>
+        </div>
+        <p>
+          <code>Install</code> takes 6s, so the pnpm store cache is working correctly. Nothing else
+          is cached between runs.
+        </p>
+      </section>
+
+      <!-- ============================================================ -->
+      <section class="block">
+        <h2>Findings</h2>
+        <p class="lede">
+          Each finding is marked <span class="tag confirmed">confirmed</span> where it was
+          reproduced against the repository or a real run, and
+          <span class="tag inferred">inferred</span> where the mechanism is clear but the
+          consequence has not been directly observed.
+        </p>
+
+        <div class="tablewrap">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Severity</th>
+                <th>Finding</th>
+                <th>Location</th>
+                <th>Effort</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="num">F1</td>
+                <td><span class="sev sev-critical">Critical</span></td>
+                <td>hq deploy job skips every step and reports success</td>
+                <td><code>ci.yml</code> · deploy-hq</td>
+                <td class="num">15 min</td>
+              </tr>
+              <tr>
+                <td class="num">F2</td>
+                <td><span class="sev sev-high">High</span></td>
+                <td>Release cannot open its Version PR; publishing is blocked</td>
+                <td>repo setting · <code>release.yml</code></td>
+                <td class="num">1 min</td>
+              </tr>
+              <tr>
+                <td class="num">F3</td>
+                <td><span class="sev sev-high">High</span></td>
+                <td>No Turbo cache between runs; every task recomputed from cold</td>
+                <td><code>ci.yml</code> · <code>turbo.json</code></td>
+                <td class="num">2 h</td>
+              </tr>
+              <tr>
+                <td class="num">F4</td>
+                <td><span class="sev sev-high">High</span></td>
+                <td>Test suites run twice — 435s, 41% of the build</td>
+                <td><code>ci.yml</code> · Test + Coverage</td>
+                <td class="num">3 h</td>
+              </tr>
+              <tr>
+                <td class="num">F5</td>
+                <td><span class="sev sev-high">High</span></td>
+                <td>Local <code>verify</code> omits four gates CI enforces</td>
+                <td><code>scripts/verify.sh</code></td>
+                <td class="num">3 h</td>
+              </tr>
+              <tr>
+                <td class="num">F6</td>
+                <td><span class="sev sev-high">High</span></td>
+                <td>All 9 actions pinned to mutable tags, not digests</td>
+                <td>all workflows</td>
+                <td class="num">1 h</td>
+              </tr>
+              <tr>
+                <td class="num">F7</td>
+                <td><span class="sev sev-medium">Medium</span></td>
+                <td>Single monolithic job; no parallelism, one shared timeout</td>
+                <td><code>ci.yml</code> · verify</td>
+                <td class="num">4 h</td>
+              </tr>
+              <tr>
+                <td class="num">F8</td>
+                <td><span class="sev sev-medium">Medium</span></td>
+                <td>Playwright browsers reinstalled every run (71s)</td>
+                <td><code>ci.yml</code></td>
+                <td class="num">20 min</td>
+              </tr>
+              <tr>
+                <td class="num">F9</td>
+                <td><span class="sev sev-medium">Medium</span></td>
+                <td>Node version pinned in two places that can drift</td>
+                <td><code>.nvmrc</code> · 7 workflow steps</td>
+                <td class="num">15 min</td>
+              </tr>
+              <tr>
+                <td class="num">F10</td>
+                <td><span class="sev sev-medium">Medium</span></td>
+                <td>Deploy jobs rebuild what verify already built</td>
+                <td><code>ci.yml</code> · deploy-*</td>
+                <td class="num">3 h</td>
+              </tr>
+              <tr>
+                <td class="num">F11</td>
+                <td><span class="sev sev-medium">Medium</span></td>
+                <td>Visual regression never enforced in CI (darwin-only baselines)</td>
+                <td><code>ci.yml</code> · <code>playwright.config.ts</code></td>
+                <td class="num">4 h</td>
+              </tr>
+              <tr>
+                <td class="num">F12</td>
+                <td><span class="sev sev-medium">Medium</span></td>
+                <td>Branch protection not confirmed; gates may be advisory</td>
+                <td>repo settings</td>
+                <td class="num">15 min</td>
+              </tr>
+              <tr>
+                <td class="num">F13</td>
+                <td><span class="sev sev-low">Low</span></td>
+                <td>No flaky-test detection or failure notification</td>
+                <td>process</td>
+                <td class="num">3 h</td>
+              </tr>
+              <tr>
+                <td class="num">F14</td>
+                <td><span class="sev sev-low">Low</span></td>
+                <td>No automated dependency updates</td>
+                <td><code>.github/</code></td>
+                <td class="num">30 min</td>
+              </tr>
+              <tr>
+                <td class="num">F15</td>
+                <td><span class="sev sev-low">Low</span></td>
+                <td>Audit comment says "critical", flag enforces "high"</td>
+                <td><code>ci.yml</code> line 118</td>
+                <td class="num">2 min</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- ---------------------------------------------------------- -->
+        <h3>F1 · The hq deployment has never run</h3>
+        <div class="finding">
+          <h3>
+            <span class="sev sev-critical">Critical</span> Deploy job green, deploys nothing
+            <span class="tag confirmed">confirmed</span>
+          </h3>
+
+          <p>
+            <code>deploy-hq</code> opens with a step named <em>Check the project exists</em> that
+            writes <code>skip=true|false</code> to <code>$GITHUB_OUTPUT</code>. Every subsequent
+            step is guarded by <code>if: steps.gate.outputs.skip == 'false'</code>. No step in the
+            job declares <code>id: gate</code>.
+          </p>
+          <p>
+            An unresolvable step reference yields an empty string, so the guard is always
+            <code>'' == 'false'</code> — false. Checkout, setup, deploy and the post-deploy
+            verification are all skipped. GitHub reports a job whose steps all skipped as
+            <strong>successful</strong>.
+          </p>
+
+          <h4>Evidence — job 95323329767, a run marked green on main</h4>
+          <pre><code>job conclusion: <span class="g">success</span>
+  success  Set up job
+  success  Check the project exists
+  <span class="r">skipped   Run actions/checkout@v7</span>
+  <span class="r">skipped   Run pnpm/action-setup@v4</span>
+  <span class="r">skipped   Run actions/setup-node@v7</span>
+  <span class="r">skipped   Deploy</span>
+  <span class="r">skipped   Verify hq is serving hq</span>
+  success  Complete job</code></pre>
+
+          <p>
+            The variable the gate looks for is present —
+            <code>gh api repos/zoworkhq/oxygenui/actions/variables</code> returns
+            <code>VERCEL_PROJECT_ID_HQ</code> — so this is not the intentional self-skip the comment
+            describes. It is an unintentional total skip that would persist even after the project
+            was created, which is precisely the case the author was trying to handle.
+          </p>
+
+          <dl>
+            <dt>Root cause</dt>
+            <dd>
+              A step <code>id</code> was never added when the guard was written. Nothing validates
+              step references: GitHub does not warn on an unresolvable <code>steps.*</code> lookup,
+              and the failure mode of the mistake is silence.
+            </dd>
+            <dt>Impact</dt>
+            <dd>
+              hq production receives no deployments from CI. Worse than an outage, the pipeline
+              asserts the opposite — a green <em>Deploy hq (production)</em> next to a real docs
+              deploy is actively misleading, and the post-deploy assertion (<em
+                >Verify hq is serving hq</em
+              >) is skipped with it, so nothing notices.
+            </dd>
+            <dt>Fix</dt>
+            <dd>
+              Add <code>id: gate</code> to the check step. Then make the skip <em>visible</em>: a
+              skipped deployment should not look identical to a successful one.
+              <pre><code>- name: Check the project exists
+  <span class="g">id: gate</span>
+  env:
+    PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID_HQ }}
+  run: |
+    if [ -z "${PROJECT_ID:-}" ]; then
+      echo "skip=true" &gt;&gt; "$GITHUB_OUTPUT"
+      echo "::warning::VERCEL_PROJECT_ID_HQ unset — hq was NOT deployed."
+    else
+      echo "skip=false" &gt;&gt; "$GITHUB_OUTPUT"
+    fi</code></pre>
+            </dd>
+            <dt>Alternative</dt>
+            <dd>
+              Move the condition to the job level (<code>if: vars.VERCEL_PROJECT_ID_HQ != ''</code
+              >). GitHub then reports the job as <em>skipped</em> rather than <em>successful</em>,
+              which is honest by construction and removes the per-step guards entirely. This is the
+              stronger option; the only cost is losing the explanatory summary line.
+            </dd>
+            <dt>Prevention</dt>
+            <dd>
+              Add <a href="https://github.com/rhysd/actionlint">actionlint</a> to the lint gate. It
+              detects unresolvable <code>steps.*</code> references statically and would have caught
+              this the day it was written.
+            </dd>
+            <dt>Effort · Priority</dt>
+            <dd>15 minutes · do first. No dependencies.</dd>
+          </dl>
+        </div>
+
+        <!-- ---------------------------------------------------------- -->
+        <h3>F2 · Publishing is blocked on a repository setting</h3>
+        <div class="finding">
+          <h3>
+            <span class="sev sev-high">High</span> Version PR refused
+            <span class="tag confirmed">confirmed</span>
+          </h3>
+          <p>
+            <code>release.yml</code> declares <code>permissions: pull-requests: write</code>. That
+            is necessary and not sufficient: the repository switch
+            <em
+              >Settings → Actions → General → Workflow permissions → "Allow GitHub Actions to create
+              and approve pull requests"</em
+            >
+            overrides it. While it is off, <code>changeset version</code> runs correctly and the
+            final API call fails:
+          </p>
+          <pre><code>All files have been updated. Review them and commit at your leisure
+creating pull request
+<span class="r">Error: HttpError: GitHub Actions is not permitted to create or approve pull requests.</span></code></pre>
+          <p>
+            Nineteen packages are versioned and waiting. Five consecutive release runs have failed
+            on this call.
+          </p>
+          <dl>
+            <dt>Impact</dt>
+            <dd>
+              No npm release since the switch was last off. Nothing is half-published — merging the
+              Version PR is what publishes, and it was never opened — so this is a stalled release
+              train, not a corrupted one.
+            </dd>
+            <dt>Fix</dt>
+            <dd>
+              Tick the switch. It is scoped to this repository and stores no credential. A
+              <code>RELEASE_PAT</code> secret is the alternative for organisations that keep the
+              switch off by policy; the workflow already prefers it when present.
+            </dd>
+            <dt>Status</dt>
+            <dd>
+              Partially mitigated. The workflow now falls back to pushing
+              <code>changeset-release/main</code> and emitting a one-click "open the PR" link, so
+              the release is no longer fully blocked — but the switch remains the correct fix.
+            </dd>
+            <dt>Effort · Priority</dt>
+            <dd>1 minute · do first. Requires repository admin.</dd>
+          </dl>
+        </div>
+
+        <!-- ---------------------------------------------------------- -->
+        <h3>F3 · No build cache between runs</h3>
+        <div class="finding">
+          <h3>
+            <span class="sev sev-high">High</span> Turbo recomputes everything, every run
+            <span class="tag confirmed">confirmed</span>
+          </h3>
+          <p>
+            <code>turbo.json</code> declares correct <code>outputs</code> for <code>build</code>,
+            <code>test</code> and <code>test:coverage</code>, so the task graph is cacheable. But
+            <code>ci.yml</code> caches only the pnpm store (via <code>setup-node</code>) and the
+            mongod binary. The two occurrences of the string "turbo" in the workflow are both inside
+            comments. No <code>.turbo</code> directory is persisted and no remote cache is
+            configured.
+          </p>
+          <p>
+            Every run therefore recomputes typecheck (123s), test (227s), coverage (208s) and build
+            (74s) from cold, including for a pull request that changed one markdown file.
+          </p>
+          <dl>
+            <dt>Impact</dt>
+            <dd>
+              Roughly 630s per run of avoidable compute, on every push and every PR. This is the
+              single largest lever available.
+            </dd>
+            <dt>Fix — preferred</dt>
+            <dd>
+              Turbo remote caching. Self-hosted options exist, or Vercel's — the account is already
+              in use for deployment. Set <code>TURBO_TOKEN</code> and <code>TURBO_TEAM</code> and
+              the cache is shared across runs, branches and developer machines, which also speeds up
+              local <code>pnpm verify</code>.
+            </dd>
+            <dt>Fix — no new dependency</dt>
+            <dd>
+              <code>actions/cache</code> on <code>.turbo</code>, keyed on the lockfile and the
+              commit with a restore-key prefix:
+              <pre><code>- uses: actions/cache@v4
+  with:
+    path: .turbo
+    key: turbo-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}-${{ github.sha }}
+    restore-keys: |
+      turbo-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}-
+      turbo-${{ runner.os }}-</code></pre>
+              Turbo hashes task inputs itself, so a restored cache cannot produce a stale result — a
+              changed input is a changed hash is a miss. This is safe for pull requests from forks
+              because GitHub scopes caches by branch and forks cannot write to the base branch's
+              cache.
+            </dd>
+            <dt>Cache-poisoning note</dt>
+            <dd>
+              Do not key a Turbo cache on the branch name alone. Key on lockfile content plus commit
+              SHA with prefix restore-keys, so a poisoned or partial entry can never be a
+              content-address match for different inputs.
+            </dd>
+            <dt>Effort · Priority</dt>
+            <dd>2 hours · immediately after F1. No dependencies.</dd>
+          </dl>
+        </div>
+
+        <!-- ---------------------------------------------------------- -->
+        <h3>F4 · The test suites run twice</h3>
+        <div class="finding">
+          <h3>
+            <span class="sev sev-high">High</span> 435s spent, ~208s of it duplicated
+            <span class="tag confirmed">confirmed</span>
+          </h3>
+          <p>
+            <code>Test</code> runs <code>turbo run test &amp;&amp; pnpm test:registry</code> (227s).
+            <code>Coverage thresholds</code> then runs
+            <code>turbo run test:coverage &amp;&amp; vitest run --coverage</code> (208s), executing
+            substantially the same suites again with instrumentation.
+          </p>
+          <p>
+            The obvious fix — delete the <code>Test</code> step — is wrong, and the workflow comment
+            already says so. Eight packages define <code>test</code> without
+            <code>test:coverage</code>:
+          </p>
+          <pre><code>component-meta   elements   eslint-plugin   fhir
+intl             loaders    react           hq</code></pre>
+          <p>Dropping <code>Test</code> would silently stop running all eight.</p>
+          <dl>
+            <dt>Root cause</dt>
+            <dd>
+              Coverage was added per-package as each package earned a threshold, rather than as a
+              workspace-wide convention. The gap was papered over by running both commands.
+            </dd>
+            <dt>Fix</dt>
+            <dd>
+              Add <code>test:coverage</code> to the eight packages that lack it — for packages
+              without a threshold it can simply alias <code>vitest run --coverage</code> with no
+              <code>thresholds</code> block. Then delete the <code>Test</code> step. Verify the
+              suite count is unchanged before and after; that is the acceptance criterion.
+            </dd>
+            <dt>Alternative</dt>
+            <dd>
+              Keep both steps but let Turbo cache absorb the second (F3). Cheaper to implement,
+              though it leaves two sources of truth for "did the tests run".
+            </dd>
+            <dt>Impact</dt>
+            <dd>−208s per run, and one unambiguous answer to whether tests passed.</dd>
+            <dt>Effort · Priority</dt>
+            <dd>
+              3 hours · near-term. Best done after F3 so the saving is measurable in isolation.
+            </dd>
+          </dl>
+        </div>
+
+        <!-- ---------------------------------------------------------- -->
+        <h3>F5 · Local verification is missing four CI gates</h3>
+        <div class="finding">
+          <h3>
+            <span class="sev sev-high">High</span> The parity gap that produced this week's red
+            builds <span class="tag confirmed">confirmed</span>
+          </h3>
+          <p>
+            <code>scripts/verify.sh</code> is a genuinely good idea — one command that mirrors CI,
+            wired into <code>pre-push</code> via husky. Its header even says "If you add a step to
+            ci.yml, add it here too." But it has drifted:
+          </p>
+          <div class="tablewrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Gate</th>
+                  <th>CI</th>
+                  <th><code>verify</code></th>
+                  <th><code>verify --fast</code> (pre-push)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>generated artifacts, lint, format, typecheck, deps</td>
+                  <td>yes</td>
+                  <td>yes</td>
+                  <td>yes</td>
+                </tr>
+                <tr>
+                  <td>tests, coverage, build, bundle budgets</td>
+                  <td>yes</td>
+                  <td>yes</td>
+                  <td><strong>no</strong></td>
+                </tr>
+                <tr>
+                  <td><code>pnpm audit</code></td>
+                  <td>yes</td>
+                  <td><strong>no</strong></td>
+                  <td><strong>no</strong></td>
+                </tr>
+                <tr>
+                  <td>synthetic-data (PHI) scan</td>
+                  <td>yes</td>
+                  <td><strong>no</strong></td>
+                  <td><strong>no</strong></td>
+                </tr>
+                <tr>
+                  <td>accessibility audit</td>
+                  <td>yes</td>
+                  <td><strong>no</strong></td>
+                  <td><strong>no</strong></td>
+                </tr>
+                <tr>
+                  <td>browser e2e (3 engines)</td>
+                  <td>yes</td>
+                  <td><strong>no</strong></td>
+                  <td><strong>no</strong></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p>
+            The e2e gap is not hypothetical. Three separate CI failures this week were reproducible
+            only under a full parallel browser run, and each cost a push-wait-read cycle of roughly
+            fifteen minutes to observe. The bundle-budget gap produced a fourth, and has since been
+            closed.
+          </p>
+          <dl>
+            <dt>Root cause</dt>
+            <dd>
+              Nothing enforces the parity the script's own header asks for. The two lists are
+              maintained by hand in different files.
+            </dd>
+            <dt>Fix — mechanical parity</dt>
+            <dd>
+              Make the gate list data, not duplication. Define the gates once (a small JSON or the
+              <code>package.json</code> scripts themselves), have <code>verify.sh</code> iterate it,
+              and have CI call <code>pnpm verify</code> rather than restating each step. A test can
+              then assert that every CI step name maps to a known gate.
+            </dd>
+            <dt>Fix — tiered local workflow</dt>
+            <dd>
+              See the <a href="#local">local development</a> section: a three-tier model that keeps
+              pre-push under a minute while making the full CI-equivalent one command.
+            </dd>
+            <dt>Effort · Priority</dt>
+            <dd>3 hours · near-term. Highest developer-experience return of any item here.</dd>
+          </dl>
+        </div>
+
+        <!-- ---------------------------------------------------------- -->
+        <h3>F6 · Actions are pinned to mutable tags</h3>
+        <div class="finding">
+          <h3>
+            <span class="sev sev-high">High</span> Supply chain
+            <span class="tag confirmed">confirmed</span>
+          </h3>
+          <p>All nine third-party action references use a tag:</p>
+          <pre><code>9 × actions/checkout@v7        7 × pnpm/action-setup@v4
+7 × actions/setup-node@v7      2 × actions/upload-artifact@v7
+2 × github/codeql-action/*@v3  1 × changesets/action@v2
+1 × actions/cache@v4</code></pre>
+          <p>
+            A tag is mutable. The repository has already been bitten by this and documented it —
+            <code>release.yml</code> carries a comment explaining that changesets/action renamed
+            four inputs <em>inside</em> the <code>v2</code> tag, breaking every push to main, and
+            concluding: "pinning a major is not the protection it looks like. A digest pin would
+            have held."
+          </p>
+          <dl>
+            <dt>Impact</dt>
+            <dd>
+              A compromised or merely careless upstream release executes with
+              <code>contents: write</code> and, in the release workflow, with
+              <code>id-token: write</code> and the npm token in scope. This is the highest-severity
+              security exposure in the pipeline.
+            </dd>
+            <dt>Fix</dt>
+            <dd>
+              Pin every action to a full commit SHA with the human-readable version in a trailing
+              comment, and let Dependabot (F14) propose digest bumps:
+              <pre><code>- uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 <span class="c"># v7.0.0</span></code></pre>
+            </dd>
+            <dt>Trade-off</dt>
+            <dd>
+              Digest pins do not auto-receive upstream security patches. That is the point — they
+              arrive as a reviewable PR instead. Pair with Dependabot so the review actually
+              happens.
+            </dd>
+            <dt>Effort · Priority</dt>
+            <dd>1 hour · near-term, and higher if this repository ever handles customer data.</dd>
+          </dl>
+        </div>
+
+        <!-- ---------------------------------------------------------- -->
+        <h3>F7–F12 · Structural and operational</h3>
+
+        <div class="finding">
+          <h3>
+            <span class="sev sev-medium">Medium</span> F7 · One job does everything
+            <span class="tag confirmed">confirmed</span>
+          </h3>
+          <p>
+            <code>verify</code> runs eleven gates sequentially under one 25-minute budget. A lint
+            error is reported seventeen minutes into the run, after the tests and the build have
+            already been paid for. A single slow gate pushes the whole job toward its timeout —
+            which is exactly what happened at 15m16s before the budget was raised.
+          </p>
+          <p>
+            <strong>Fix.</strong> Split into <code>static</code> (gen · lint · format · typecheck ·
+            deps · audit — under 3 min), <code>unit</code> (tests + coverage), and
+            <code>browser</code> (build · a11y · e2e), running concurrently. Fast feedback arrives
+            in about three minutes instead of seventeen. The cost is per-job install overhead (~20s
+            each), which the pnpm store cache already makes cheap. <strong>Effort:</strong> 4 h.
+          </p>
+        </div>
+
+        <div class="finding">
+          <h3>
+            <span class="sev sev-medium">Medium</span> F8 · Playwright browsers re-downloaded every
+            run <span class="tag confirmed">confirmed</span>
+          </h3>
+          <p>
+            <code>playwright install --with-deps chromium firefox webkit</code> costs 71s on every
+            run and is not cached. Cache <code>~/.cache/ms-playwright</code> keyed on the Playwright
+            version from the lockfile; keep <code>--with-deps</code> as a separate, cheap step since
+            OS packages are not cacheable. <strong>Saving:</strong> ~60s.
+            <strong>Effort:</strong> 20 min.
+          </p>
+        </div>
+
+        <div class="finding">
+          <h3>
+            <span class="sev sev-medium">Medium</span> F9 · Node version pinned twice
+            <span class="tag confirmed">confirmed</span>
+          </h3>
+          <p>
+            <code>.nvmrc</code> says 22; seven workflow steps hardcode
+            <code>node-version: 22</code>. They agree today. Replace all seven with
+            <code>node-version-file: .nvmrc</code> so they cannot disagree tomorrow — a CI/local
+            Node mismatch produces exactly the "works locally" class of failure this review is
+            about. <strong>Effort:</strong> 15 min.
+          </p>
+        </div>
+
+        <div class="finding">
+          <h3>
+            <span class="sev sev-medium">Medium</span> F10 · Deploy rebuilds what verify already
+            built <span class="tag confirmed">confirmed</span>
+          </h3>
+          <p>
+            <code>verify</code> runs <code>pnpm build</code> (74s). Each deploy job then runs
+            <code>vercel build</code>, compiling the app again — three occurrences across the three
+            deploy jobs. Beyond the duplicated minutes, the artifact that ships is not the artifact
+            that was tested, only one built from the same commit. Uploading the build output from
+            <code>verify</code> and having deploys consume it would make the tested artifact and the
+            shipped artifact identical.
+          </p>
+          <p>
+            <strong>Trade-off.</strong> Vercel's <code>--prebuilt</code> flow expects
+            <code>.vercel/output</code>, produced by <code>vercel build</code> rather than
+            <code>next build</code>, so this is not a drop-in swap. Treat as a deliberate piece of
+            work, not a quick win. <strong>Effort:</strong> 3 h.
+          </p>
+        </div>
+
+        <div class="finding">
+          <h3>
+            <span class="sev sev-medium">Medium</span> F11 · Visual regression never runs in CI
+            <span class="tag confirmed">confirmed</span>
+          </h3>
+          <p>
+            <code>e2e:ci</code> excludes the <code>@vrt</code> tag because the committed baselines
+            are darwin and font rasterisation differs on linux. The reasoning is documented and
+            correct as far as it goes — but the consequence is that 24 visual baselines are enforced
+            only on whichever developer remembers to run them. The workflow comment already contains
+            the remedy: generate linux baselines once inside
+            <code>mcr.microsoft.com/playwright:v1.56.0-jammy</code> and commit them. Doing so also
+            removes the darwin/linux split that makes local VRT results non-transferable.
+            <strong>Effort:</strong> 4 h.
+          </p>
+        </div>
+
+        <div class="finding">
+          <h3>
+            <span class="sev sev-medium">Medium</span> F12 · Branch protection unconfirmed
+            <span class="tag inferred">inferred</span>
+          </h3>
+          <p>
+            <code>GET /repos/zoworkhq/oxygenui/branches/main/protection</code> returns 404. That is
+            ambiguous: GitHub returns 404 both when no protection exists and when the caller lacks
+            admin scope, and the token used here has neither. <strong>Assumption:</strong> required
+            status checks may not be enforced, in which case a red CI run does not prevent a merge
+            and every gate in this report is advisory. <strong>Verify by</strong> opening
+            <em>Settings → Branches</em> and confirming that <em>Typecheck, test, build</em> and
+            <em>Synthetic data check</em> are required. <strong>Effort:</strong> 15 min.
+          </p>
+        </div>
+
+        <!-- ---------------------------------------------------------- -->
+        <h3>F13–F15 · Observability and hygiene</h3>
+        <div class="finding">
+          <h3><span class="sev sev-low">Low</span> Three smaller items</h3>
+          <ul>
+            <li>
+              <strong>F13 · No flake detection.</strong> Playwright retries once in CI, so an
+              intermittent test can pass on retry and leave no signal anyone reads. Three genuinely
+              flaky behaviours were found and fixed this week only because someone was watching.
+              Have CI surface retried-but-passed tests in the job summary, and post failures on
+              <code>main</code> to a channel someone owns.
+            </li>
+            <li>
+              <strong>F14 · No dependency automation.</strong> No <code>dependabot.yml</code> and no
+              Renovate config. <code>pnpm audit --audit-level=high</code> reports vulnerabilities
+              but nothing proposes the upgrade. This pairs with F6: digest pinning without automated
+              bumps produces stale actions.
+            </li>
+            <li>
+              <strong>F15 · Comment contradicts behaviour.</strong> <code>ci.yml</code> line 117
+              describes failing on "a critical advisory"; line 119 runs
+              <code>--audit-level=high</code>. The behaviour is stricter than the comment, so this
+              is documentation drift rather than a gap — but in a file this heavily commented, the
+              comments are load-bearing.
+            </li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- ============================================================ -->
+      <section class="block">
+        <h2>Build time and reliability</h2>
+
+        <h3>Where the time goes, and where it could go</h3>
+        <div class="tablewrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Change</th>
+                <th class="num">Saving</th>
+                <th>Mechanism</th>
+                <th>Risk</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Turbo cache (F3)</td>
+                <td class="num">~250–500s</td>
+                <td>Warm cache on unchanged packages; varies with the diff</td>
+                <td>None — Turbo hashes inputs; a change is a miss</td>
+              </tr>
+              <tr>
+                <td>Deduplicate test runs (F4)</td>
+                <td class="num">208s</td>
+                <td>One instrumented run instead of two</td>
+                <td>Must add <code>test:coverage</code> to 8 packages first</td>
+              </tr>
+              <tr>
+                <td>Cache Playwright browsers (F8)</td>
+                <td class="num">~60s</td>
+                <td><code>~/.cache/ms-playwright</code>, keyed on version</td>
+                <td>None</td>
+              </tr>
+              <tr>
+                <td>Parallel jobs (F7)</td>
+                <td class="num">wall clock</td>
+                <td>Static gates report in ~3 min instead of ~17</td>
+                <td>Adds ~20s install per job</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p>
+          Sequential total today is <strong>1073s</strong>. With F3, F4 and F8 the same work should
+          land near <strong>450–600s</strong>; with F7 the
+          <em>time to first meaningful failure</em> drops to about <strong>3 minutes</strong>, which
+          is the number developers actually feel. None of this removes a check.
+        </p>
+
+        <div class="callout">
+          <h4>What not to do</h4>
+          <p>
+            Do not shard the browser suite across matrix jobs yet. At 232s it is not the bottleneck,
+            and the three engines share a webServer whose startup would be paid three times over.
+            Revisit if it passes ~400s.
+          </p>
+        </div>
+
+        <h3>Reliability</h3>
+        <p>
+          Three flaky behaviours were diagnosed this week, and all three had the same shape: a test
+          interacting with the page after a <em>fixed timeout</em> rather than after a
+          <em>condition</em>. They failed only under three-engine parallel load, and each wore a
+          different disguise — a click landing on a neighbouring element, a measurement read back
+          stale, an element that had not appeared yet.
+        </p>
+        <p>
+          The durable lesson is worth encoding as a review rule:
+          <strong>a fixed <code>waitForTimeout</code> before an assertion is a defect</strong>. It
+          asserts the speed of the machine as much as the behaviour of the code, and when the
+          machine is slower the failure is indistinguishable from the bug the test exists to catch.
+          Prefer <code>expect(...).toPass()</code>, auto-retrying assertions, or an explicit signal
+          from the component such as a <code>data-*</code> attribute set when it has settled.
+        </p>
+      </section>
+
+      <!-- ============================================================ -->
+      <section class="block" id="local">
+        <h2>Local development and validation</h2>
+
+        <h3>What exists, and it is good</h3>
+        <p>
+          Husky is wired with three hooks: <code>pre-commit</code> runs <code>lint-staged</code>,
+          <code>commit-msg</code> runs commitlint, and <code>pre-push</code> runs
+          <code>pnpm verify --fast</code>. The <code>verify.sh</code> script prints a gate list with
+          a suggested fix command per failure. This is better than most repositories have.
+        </p>
+
+        <h3>The gap</h3>
+        <p>
+          <code>--fast</code> covers generated artifacts, lint, format, typecheck and dependency
+          rules — everything cheap. It excludes tests, build, bundle budgets, and everything
+          browser-based. So the checks most likely to fail in CI are the ones a developer cannot
+          conveniently run, and the feedback loop for them is a fifteen-minute push-and-wait.
+        </p>
+
+        <h3>Recommended: three tiers, one command each</h3>
+        <div class="tablewrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Tier</th>
+                <th>Command</th>
+                <th>Budget</th>
+                <th>Covers</th>
+                <th>When</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Staged</strong></td>
+                <td><code>lint-staged</code></td>
+                <td class="num">&lt; 5s</td>
+                <td>Format and lint the touched files</td>
+                <td>pre-commit (already)</td>
+              </tr>
+              <tr>
+                <td><strong>Fast</strong></td>
+                <td><code>pnpm verify --fast</code></td>
+                <td class="num">&lt; 60s</td>
+                <td>
+                  + types, generated drift, deps, <strong>audit</strong>, <strong>PHI scan</strong>
+                </td>
+                <td>pre-push (already)</td>
+              </tr>
+              <tr>
+                <td><strong>Full</strong></td>
+                <td><code>pnpm verify --ci</code></td>
+                <td class="num">~6 min warm</td>
+                <td>Everything CI runs, including <strong>a11y and e2e</strong></td>
+                <td>Before opening a PR; on request</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          The two additions to <code>--fast</code> are nearly free: <code>pnpm audit</code> took 1s
+          in CI and the PHI scan is a pair of greps. Both currently exist only in CI, and both can
+          fail a build for reasons a developer would rather learn in one second than in fifteen
+          minutes.
+        </p>
+        <p>
+          The new <code>--ci</code> tier is the important one. It should run the a11y audit and
+          <code>e2e:ci</code>, and it becomes practical precisely because of F3: with a warm Turbo
+          cache, the build and test portions are near-instant on an unchanged tree, so the marginal
+          cost is the browser suite alone.
+        </p>
+
+        <h3>Environment validation</h3>
+        <p>
+          There is a real trap in the current setup, discovered while working in this repository:
+          running <code>next build</code> in <code>apps/docs</code> without first building the
+          workspace packages fails with nine unresolved modules, because
+          <code>next.config.ts</code> aliases two packages to their <code>dist</code>. That is a
+          build-only failure invisible to typecheck and tests. It has been fixed in
+          <code>vercel.json</code>, but the class remains: <strong>add a preflight</strong> that
+          checks Node matches <code>.nvmrc</code>, pnpm is the expected major, and required
+          <code>dist</code> directories exist — run from <code>verify.sh</code> and from
+          <code>predev</code>.
+        </p>
+
+        <div class="callout">
+          <h4>Parity, enforced rather than intended</h4>
+          <p>
+            The single highest-leverage change in this section is to stop maintaining the gate list
+            twice. Have CI invoke <code>pnpm verify</code>, and reduce the workflow to environment
+            setup plus that one call. Then local and CI cannot drift, because they are the same list
+            — and the four gates in F5 could never have gone missing.
+          </p>
+        </div>
+      </section>
+
+      <!-- ============================================================ -->
+      <section class="block">
+        <h2>Target state</h2>
+        <div class="flow">
+          <pre><code>  push / PR
+      │
+      ├──▶ <span class="g">static</span>      ~3 min   gen · lint · format · typecheck · deps · audit · PHI
+      │                       <span class="c">(fails fast; most PRs fail here or nowhere)</span>
+      │
+      ├──▶ <span class="g">unit</span>        ~4 min   test:coverage across the workspace <span class="c">(single run)</span>
+      │                       <span class="c">warm Turbo cache; near-zero on an unchanged package</span>
+      │
+      └──▶ <span class="g">browser</span>     ~6 min   build → a11y (16 pages × 2 themes) → e2e (3 engines) → VRT
+                              <span class="c">cached browsers; linux baselines committed</span>
+                    │
+                    ▼  all three green
+             ┌──────────────┐
+             │  <span class="g">deploy</span>      │  docs (prod) │ hq (prod, <span class="g">now actually runs</span>) │ preview (PR)
+             │              │  consuming the artifact <span class="g">verify</span> built
+             └──────────────┘
+                    │
+                    ▼  push to main only
+             <span class="g">release.yml</span> ── changeset version ──▶ Version PR ──▶ merge ──▶ publish + SBOM
+
+  local:  lint-staged (pre-commit) → verify --fast (pre-push) → verify --ci (pre-PR)
+          <span class="c">the same gate list CI runs, invoked the same way</span></code></pre>
+        </div>
+        <ul class="tight">
+          <li>
+            Three concurrent jobs replace one sequential job; slowest path sets the wall clock.
+          </li>
+          <li>Turbo remote cache shared between CI and developer machines.</li>
+          <li>Every action pinned by digest, bumped by Dependabot.</li>
+          <li>CI calls <code>pnpm verify</code>; the gate list exists once.</li>
+          <li>Deployment jobs consume a built artifact rather than rebuilding.</li>
+        </ul>
+      </section>
+
+      <!-- ============================================================ -->
+      <section class="block">
+        <h2>Roadmap</h2>
+
+        <div class="phase">
+          <h3>Phase 0 · Immediate <span class="tag">this week · ~2 h</span></h3>
+          <ol class="tight">
+            <li>
+              <strong>F1</strong> — add <code>id: gate</code>, or move the condition to job level.
+              <em>Then confirm hq actually deploys.</em> Nothing else in this list matters if
+              production is not being updated.
+            </li>
+            <li>
+              <strong>F2</strong> — tick the workflow-permissions switch; confirm a Version PR
+              opens.
+            </li>
+            <li><strong>F12</strong> — confirm branch protection requires both check jobs.</li>
+            <li><strong>F15</strong> — correct the audit comment.</li>
+            <li>Add <strong>actionlint</strong> to the lint gate, so F1's class cannot recur.</li>
+          </ol>
+          <p>
+            <strong>Owner:</strong> whoever holds repository admin. <strong>Rollback:</strong> each
+            is a one-line revert. <strong>Risk:</strong> F1 will cause hq to deploy for the first
+            time in some while — review what is on <code>main</code> before merging it.
+          </p>
+        </div>
+
+        <div class="phase">
+          <h3>Phase 1 · Near-term <span class="tag">2–3 weeks · ~10 h</span></h3>
+          <ol class="tight">
+            <li>
+              <strong>F3</strong> — Turbo caching. Largest single win; do it first and measure.
+            </li>
+            <li><strong>F8</strong> — cache Playwright browsers.</li>
+            <li><strong>F9</strong> — <code>node-version-file: .nvmrc</code> everywhere.</li>
+            <li>
+              <strong>F4</strong> — add <code>test:coverage</code> to eight packages, drop the
+              duplicate step.
+            </li>
+            <li>
+              <strong>F5</strong> — audit and PHI scan into <code>--fast</code>; add
+              <code>--ci</code>.
+            </li>
+            <li>
+              <strong>F6</strong> — digest-pin all actions; <strong>F14</strong> — enable
+              Dependabot.
+            </li>
+          </ol>
+          <p>
+            <strong>Sequencing:</strong> F3 before F4, so the saving from deduplication is
+            measurable rather than confounded. F6 with F14, or the pins go stale.
+            <strong>Risk:</strong> F4 is the one that can silently reduce coverage — assert the
+            total test count before and after.
+          </p>
+        </div>
+
+        <div class="phase">
+          <h3>Phase 2 · Structural <span class="tag">1–2 months · ~15 h</span></h3>
+          <ol class="tight">
+            <li><strong>F7</strong> — split into static / unit / browser jobs.</li>
+            <li>
+              <strong>F5 (part two)</strong> — CI calls <code>pnpm verify</code>; one gate list.
+            </li>
+            <li><strong>F11</strong> — linux VRT baselines; make visual regression blocking.</li>
+            <li><strong>F10</strong> — deploy from a built artifact.</li>
+            <li><strong>F13</strong> — flake surfacing and failure notification.</li>
+          </ol>
+          <p>
+            <strong>Migration risk:</strong> F7 and F10 change job topology, so
+            <em>required status check names change</em> — update branch protection in the same
+            change or merges will block on checks that no longer exist. Run the split workflow on a
+            branch for a week alongside the existing one before switching.
+          </p>
+        </div>
+      </section>
+
+      <!-- ============================================================ -->
+      <section class="block">
+        <h2>Acceptance criteria</h2>
+        <div class="tablewrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Measure</th>
+                <th>Today</th>
+                <th>Target</th>
+                <th>How to verify</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>hq production deploys</td>
+                <td><strong>0</strong> ever</td>
+                <td>every merge to main</td>
+                <td>Deploy step not skipped; <em>Verify hq is serving hq</em> passes</td>
+              </tr>
+              <tr>
+                <td>PR wall clock</td>
+                <td class="num">17m53s</td>
+                <td class="num">&lt; 8 min</td>
+                <td>Median over 20 runs, <code>gh run list</code></td>
+              </tr>
+              <tr>
+                <td>Time to first failure</td>
+                <td class="num">up to 17 min</td>
+                <td class="num">&lt; 3 min</td>
+                <td>Static job duration</td>
+              </tr>
+              <tr>
+                <td>Turbo cache hit rate</td>
+                <td class="num">0%</td>
+                <td class="num">&gt; 70% on PRs</td>
+                <td><code>turbo run --summarize</code>, cached vs total</td>
+              </tr>
+              <tr>
+                <td>Local/CI gate parity</td>
+                <td class="num">7 of 11</td>
+                <td class="num">11 of 11</td>
+                <td>A test asserting every CI gate appears in <code>verify.sh</code></td>
+              </tr>
+              <tr>
+                <td>CI-only failures per week</td>
+                <td class="num">4 observed</td>
+                <td class="num">&lt; 1</td>
+                <td>Red runs whose cause reproduces locally after the fact</td>
+              </tr>
+              <tr>
+                <td>Actions pinned by digest</td>
+                <td class="num">0 of 9</td>
+                <td class="num">9 of 9</td>
+                <td><code>grep -c '@[0-9a-f]\{40\}'</code></td>
+              </tr>
+              <tr>
+                <td>Releases published</td>
+                <td class="num">blocked</td>
+                <td>on demand</td>
+                <td>A Version PR opens and merges cleanly</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ============================================================ -->
+      <section class="block">
+        <h2>Assumptions, open questions and risks</h2>
+
+        <h4>Assumptions stated, and how to check them</h4>
+        <ul>
+          <li>
+            <strong>Branch protection may not be enforced.</strong> The API returned 404, which is
+            ambiguous between "no protection" and "insufficient scope". Verify in
+            <em>Settings → Branches</em>. If unprotected, every finding here is advisory and F12
+            becomes the highest priority item in the document.
+          </li>
+          <li>
+            <strong>hq has been deployed by some other means.</strong> The pipeline has never done
+            it, but a manual <code>vercel --prod</code> may have. Check the Vercel dashboard's
+            deployment history and its source before assuming production is stale.
+          </li>
+          <li>
+            <strong>Turbo remote caching is available on the current plan.</strong> Not verified. If
+            not, the <code>actions/cache</code> fallback in F3 delivers most of the benefit within
+            CI, losing only the CI↔local sharing.
+          </li>
+          <li>
+            <strong>The 17m53s run is representative.</strong> It is one measurement on a cold cache
+            with all gates executing. Take a median over ten runs before and after Phase 1.
+          </li>
+        </ul>
+
+        <h4>Open questions</h4>
+        <ul>
+          <li>
+            Is the workflow-permissions switch off deliberately? If it is organisational policy, the
+            <code>RELEASE_PAT</code> path should be adopted properly rather than left as a fallback.
+          </li>
+          <li>
+            Should <code>apps/hq</code> gate deployment on its own tests rather than the whole
+            monorepo's? It currently waits for the docs e2e suite, which cannot fail for a reason
+            that affects hq.
+          </li>
+          <li>
+            Is the darwin-only VRT baseline a deliberate long-term choice, or an unpaid debt? It
+            determines whether F11 is worth 4 hours.
+          </li>
+        </ul>
+
+        <h4>Risks of acting</h4>
+        <ul>
+          <li>
+            <strong>F1 will deploy hq for the first time.</strong> Whatever is on <code>main</code>
+            goes to production. Review it, and have a rollback deployment identified, before
+            merging.
+          </li>
+          <li>
+            <strong>Caching can mask a real failure if keyed wrongly.</strong> Key on lockfile
+            content plus commit SHA with prefix restore-keys, never on branch name alone. Turbo's
+            own input hashing is the safety net; do not defeat it with a hand-rolled key.
+          </li>
+          <li>
+            <strong>Job splitting changes required check names.</strong> Update branch protection in
+            the same change, or merges block on checks that no longer exist.
+          </li>
+        </ul>
+
+        <h4>Risks of not acting</h4>
+        <p>
+          The ordering here is deliberate. F1 means a production system is not receiving deployments
+          while the pipeline reports that it is — that is a correctness problem, not a performance
+          one, and it is the only finding in this document that could already have caused harm.
+          Everything else costs time and patience.
+        </p>
+      </section>
+
+      <footer>
+        <p>
+          Prepared against <code>main</code> at <code>a2eb9ad</code>, 17 August 2026. Timings from
+          run <code>32013169805</code>; the skipped-deploy evidence from job
+          <code>95323329767</code>. Findings marked
+          <span class="tag confirmed">confirmed</span> were reproduced against the repository or a
+          real run; those marked <span class="tag inferred">inferred</span> have a clear mechanism
+          whose consequence was not directly observed, and each states how to verify it.
+        </p>
+      </footer>
+    </div>
+  </body>
+</html>
