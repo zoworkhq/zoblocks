@@ -67,7 +67,7 @@ importers:
         version: 16.3.2(@testing-library/dom@10.4.1)(@types/react-dom@19.2.4(@types/react@19.2.18))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       '@testing-library/user-event':
         specifier: ^14
-        version: 14.6.3(@testing-library/dom@10.4.1)
+        version: 14.6.4(@testing-library/dom@10.4.1)
       '@types/node':
         specifier: ^22.10.2
         version: 22.20.1
@@ -443,7 +443,7 @@ importers:
         version: 16.3.2(@testing-library/dom@10.4.1)(@types/react-dom@19.2.4(@types/react@19.2.18))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       '@testing-library/user-event':
         specifier: ^14
-        version: 14.6.3(@testing-library/dom@10.4.1)
+        version: 14.6.4(@testing-library/dom@10.4.1)
       '@types/react':
         specifier: ^19.0.2
         version: 19.2.18
@@ -529,7 +529,7 @@ importers:
         version: 16.3.2(@testing-library/dom@10.4.1)(@types/react-dom@19.2.4(@types/react@19.2.18))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       '@testing-library/user-event':
         specifier: ^14
-        version: 14.6.3(@testing-library/dom@10.4.1)
+        version: 14.6.4(@testing-library/dom@10.4.1)
       '@types/react':
         specifier: ^19.0.2
         version: 19.2.18
@@ -627,7 +627,7 @@ importers:
         version: 16.3.2(@testing-library/dom@10.4.1)(@types/react-dom@19.2.4(@types/react@19.2.18))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       '@testing-library/user-event':
         specifier: ^14
-        version: 14.6.3(@testing-library/dom@10.4.1)
+        version: 14.6.4(@testing-library/dom@10.4.1)
       '@types/react':
         specifier: ^19.0.2
         version: 19.2.18
@@ -780,7 +780,7 @@ importers:
         version: 16.3.2(@testing-library/dom@10.4.1)(@types/react-dom@19.2.4(@types/react@19.2.18))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       '@testing-library/user-event':
         specifier: ^14
-        version: 14.6.3(@testing-library/dom@10.4.1)
+        version: 14.6.4(@testing-library/dom@10.4.1)
       '@types/react':
         specifier: ^19.0.2
         version: 19.2.18
@@ -853,7 +853,7 @@ importers:
         version: 16.3.2(@testing-library/dom@10.4.1)(@types/react-dom@19.2.4(@types/react@19.2.18))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       '@testing-library/user-event':
         specifier: ^14
-        version: 14.6.3(@testing-library/dom@10.4.1)
+        version: 14.6.4(@testing-library/dom@10.4.1)
       '@types/react':
         specifier: ^19.0.2
         version: 19.2.18
@@ -2394,8 +2394,8 @@ packages:
       '@types/react-dom':
         optional: true
 
-  '@testing-library/user-event@14.6.3':
-    resolution: {integrity: sha512-6dBq67jT8lE+JTE8Exm02Kt6ze43hz1jdiSpSJwtTZiT1xQQ6b7nZYTTQ9njdArdU8XklOwaDp/AbT/eYSKF4g==}
+  '@testing-library/user-event@14.6.4':
+    resolution: {integrity: sha512-QCGwP6QrjypBLwyj5cuyfVamkaIEy/XGY+1VDehbtbQqOggYmTFpFOdWR5mPz14vX8vXLMVjDHlRNBcClyO9ew==}
     engines: {node: '>=12', npm: '>=6'}
     peerDependencies:
       '@testing-library/dom': '>=7.21.4'
@@ -6309,7 +6309,7 @@ snapshots:
       '@types/react': 19.2.18
       '@types/react-dom': 19.2.4(@types/react@19.2.18)
 
-  '@testing-library/user-event@14.6.3(@testing-library/dom@10.4.1)':
+  '@testing-library/user-event@14.6.4(@testing-library/dom@10.4.1)':
     dependencies:
       '@testing-library/dom': 10.4.1
 
