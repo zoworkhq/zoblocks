@@ -23,14 +23,61 @@ import { expect, test, type Locator, type Page } from "@playwright/test";
 const PAGE = "/components/tabs";
 
 /** Jump to the gallery and settle the site's scroll-reveal animation. */
+/**
+ * Wait for every visible strip to have measured itself.
+ *
+ * A tab list sets `data-ox-measured` once its indicator geometry is known.
+ * Before that the fit is still being decided, the strip is moving, and both
+ * clicking and measuring it give answers about a transient state — which on a
+ * contended runner is most of the reason a geometry test fails.
+ *
+ * The three failures this suite hit on CI were all this: a click landing on a
+ * neighbouring tab, an indicator read back at its old height, a picker that
+ * had not appeared yet. Each looked like a different bug.
+ */
+async function awaitMeasured(page: Page) {
+  const strips = page.locator(".ox-gallery [data-ox-list]");
+  const count = await strips.count();
+  for (let i = 0; i < count; i++) {
+    await strips.nth(i).evaluate((element) => {
+      if (element.hasAttribute("hidden")) return;
+      if (element.hasAttribute("data-ox-measured")) return;
+
+      // Only a strip that draws an indicator ever sets the attribute. Waiting
+      // on one that does not is a guaranteed two-second stall per strip, per
+      // call — which turned a 1.2-minute suite into three minutes before this
+      // check was added.
+      if (!element.querySelector(".ox-tabs__thumb, .ox-tabs__line")) return;
+
+      return new Promise<void>((resolve) => {
+        const observer = new MutationObserver(() => {
+          if (element.hasAttribute("data-ox-measured")) {
+            observer.disconnect();
+            resolve();
+          }
+        });
+        observer.observe(element, { attributes: true, attributeFilter: ["data-ox-measured"] });
+        // Bounded, so a strip that never measures fails on its own assertion
+        // rather than by timing out here with nothing to say.
+        setTimeout(() => {
+          observer.disconnect();
+          resolve();
+        }, 2000);
+      });
+    });
+  }
+}
+
 async function openGallery(page: Page) {
   await page.goto(PAGE);
   const gallery = page.locator(".ox-gallery");
   await gallery.scrollIntoViewIfNeeded();
-  // The reveal is an IntersectionObserver fade; without waiting, a screenshot
-  // captures a half-faded panel and every run differs.
-  await page.waitForTimeout(400);
   await expect(gallery).toBeVisible();
+
+  // The reveal is an IntersectionObserver fade; a screenshot taken through it
+  // differs every run.
+  await page.waitForTimeout(400);
+  await awaitMeasured(page);
   return gallery;
 }
 
@@ -68,43 +115,13 @@ async function clickClear(target: Locator) {
 async function chooseChapter(page: Page, label: string) {
   await clickClear(page.locator(".ox-gallery__chapters").getByRole("radio", { name: label }));
   await page.waitForTimeout(250);
-
-  /*
-   * Wait for the strips to have measured themselves.
-   *
-   * A tab list sets `data-ox-measured` once the indicator geometry is known;
-   * before that the fit is still being decided and the whole strip is moving.
-   * Interacting during that window is what produced clicks landing on the
-   * wrong element on CI — a fixed timeout is a guess at how long a slower,
-   * more contended runner needs, and it was the wrong guess.
-   */
-  const strips = page.locator(".ox-gallery [data-ox-list]");
-  const count = await strips.count();
-  for (let i = 0; i < count; i++) {
-    await strips.nth(i).evaluate((element) => {
-      if (element.hasAttribute("hidden")) return;
-      return new Promise<void>((resolve) => {
-        if (element.hasAttribute("data-ox-measured")) return resolve();
-        const observer = new MutationObserver(() => {
-          if (element.hasAttribute("data-ox-measured")) {
-            observer.disconnect();
-            resolve();
-          }
-        });
-        observer.observe(element, { attributes: true, attributeFilter: ["data-ox-measured"] });
-        // A strip with no indicator never sets it, and that is not a failure.
-        setTimeout(() => {
-          observer.disconnect();
-          resolve();
-        }, 2000);
-      });
-    });
-  }
+  await awaitMeasured(page);
 }
 
 async function setControl(page: Page, group: string, value: string) {
   await clickClear(page.getByRole("group", { name: group }).getByRole("button", { name: value }));
   await page.waitForTimeout(200);
+  await awaitMeasured(page);
 }
 
 /* ==================================================================== */
