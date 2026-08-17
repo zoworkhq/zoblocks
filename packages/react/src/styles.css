@@ -1978,3 +1978,211 @@
     color: HighlightText !important;
   }
 }
+
+/* ---- registry/oxygen/lib/clinical-note.css ---- */
+/**
+ * ClinicalNote — the document surface and the provenance channels.
+ *
+ * The rule that shapes this whole file: **colour is never the only channel.**
+ * Each of the six origins carries a hue *and* a distinct underline style, so
+ * the set stays separable in greyscale, under any colour-vision deficiency, in
+ * Windows High Contrast, and on the monochrome ward printer a reviewer will
+ * eventually read the chart on. A tinted background alone fails all four at
+ * once, and this is precisely the surface where a missed distinction has
+ * consequences — copied text read as freshly written is the mechanism behind a
+ * documented third of ambulatory documentation errors.
+ *
+ * `text-decoration` rather than `box-shadow` because it is the only thing that
+ * wraps correctly across line boxes, and clinical paragraphs wrap constantly.
+ */
+
+.ox-note-doc {
+  color: var(--ox-text);
+  font-size: 0.925rem;
+  line-height: 1.65;
+}
+
+.ox-note-doc:focus-visible {
+  outline: 2px solid var(--ox-focus-ring);
+  outline-offset: 4px;
+  border-radius: 4px;
+}
+
+/* A section is a coded node, not a styled heading. The rule after the title is
+   the only decoration; the code itself lives in the DOM and the export. */
+.ox-note-doc section {
+  margin-block: 1.25rem;
+}
+.ox-note-doc section:first-child {
+  margin-block-start: 0;
+}
+
+.ox-note-doc section::before {
+  content: attr(data-ox-title);
+  display: block;
+  margin-block-end: 0.4rem;
+  padding-block-end: 0.3rem;
+  border-block-end: 1px solid var(--ox-border);
+  color: var(--ox-text-muted);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.ox-note-doc p {
+  margin-block: 0 0.6rem;
+}
+.ox-note-doc p:last-child {
+  margin-block-end: 0;
+}
+
+.ox-note-doc ul,
+.ox-note-doc ol {
+  margin-block: 0 0.6rem;
+  padding-inline-start: 1.4rem;
+}
+.ox-note-doc ul {
+  list-style: disc;
+}
+.ox-note-doc ol {
+  list-style: decimal;
+}
+
+.ox-note-doc strong {
+  font-weight: 600;
+}
+.ox-note-doc em {
+  font-style: italic;
+}
+
+/* An unfilled blank. A real node, so it cannot be half-deleted into an
+   invisible fragment that ships inside a signed note. */
+.ox-note-doc [data-ox-wildcard] {
+  border-radius: 3px;
+  background: var(--ox-status-high-bg);
+  box-shadow: inset 0 0 0 1px var(--ox-status-high);
+  padding-inline: 0.25rem;
+  color: var(--ox-status-high);
+  font-family: var(--ox-font-mono, ui-monospace, monospace);
+  font-size: 0.85em;
+}
+
+/* The read-only rendering used by the Reader, which loads no editor at all. */
+.ox-note-read h3 {
+  margin-block: 1.25rem 0.4rem;
+  padding-block-end: 0.3rem;
+  border-block-end: 1px solid var(--ox-border);
+  color: var(--ox-text-muted);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+.ox-note-read section:first-child h3 {
+  margin-block-start: 0;
+}
+.ox-note-read p {
+  margin-block: 0 0.6rem;
+  color: var(--ox-text);
+}
+
+/* ------------------------------------------------------------------ */
+/* Provenance                                                          */
+/* ------------------------------------------------------------------ */
+
+.ox-note-pv {
+  border-radius: 2px;
+  text-decoration-line: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+  text-decoration-skip-ink: none;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+
+/* Wavy — a recognizer that was unsure looks unsure. `status-unknown` rather
+   than `status-low` so that dictated and pulled stay distinguishable on the
+   stacked bar, which has no underline to fall back on. */
+.ox-note-pv-dictated {
+  background: color-mix(in srgb, var(--ox-status-unknown) 9%, transparent);
+  text-decoration-style: wavy;
+  text-decoration-thickness: 1.5px;
+  text-decoration-color: var(--ox-status-unknown);
+}
+
+/* Dashed — boilerplate the author chose but did not write. */
+.ox-note-pv-template {
+  background: color-mix(in srgb, var(--ox-accent) 6%, transparent);
+  text-decoration-style: dashed;
+  text-decoration-color: var(--ox-accent);
+}
+
+/* Dotted — a fact that was true at a stated instant and may not be now. */
+.ox-note-pv-pulled {
+  background: color-mix(in srgb, var(--ox-status-low) 6%, transparent);
+  text-decoration-style: dotted;
+  text-decoration-thickness: 2.5px;
+  text-decoration-color: var(--ox-status-low);
+}
+
+/* Solid and warmest — the one the copy-forward ratio is measured from. */
+.ox-note-pv-copied {
+  background: color-mix(in srgb, var(--ox-status-high) 9%, transparent);
+  text-decoration-style: solid;
+  text-decoration-color: var(--ox-status-high);
+}
+
+/* Double, plus a ring while unreviewed — the state that blocks signing. */
+.ox-note-pv-ai {
+  background: color-mix(in srgb, var(--ox-status-normal) 7%, transparent);
+  text-decoration-style: double;
+  text-underline-offset: 3px;
+  text-decoration-color: var(--ox-status-normal);
+}
+.ox-note-pv-ai[title$="not yet reviewed"] {
+  background: color-mix(in srgb, var(--ox-status-normal) 12%, transparent);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--ox-status-normal) 45%, transparent);
+}
+
+/* The stacked composition bar and its legend swatches share these, so the
+   ribbon and the summary can never drift apart. */
+.ox-note-bar[data-origin="typed"] {
+  background: repeating-linear-gradient(45deg, var(--ox-border) 0 2px, transparent 2px 4px);
+  box-shadow: inset 0 0 0 1px var(--ox-border);
+}
+.ox-note-bar[data-origin="dictated"] {
+  background: var(--ox-status-unknown);
+}
+.ox-note-bar[data-origin="template"] {
+  background: var(--ox-accent);
+}
+.ox-note-bar[data-origin="pulled"] {
+  background: var(--ox-status-low);
+}
+.ox-note-bar[data-origin="copied"] {
+  background: var(--ox-status-high);
+}
+.ox-note-bar[data-origin="ai"] {
+  background: var(--ox-status-normal);
+}
+
+/* Forced colours strip every hue we chose. The underline styles are what is
+   left, and they are enough — which is the reason they exist. */
+@media (forced-colors: active) {
+  .ox-note-pv {
+    background: none;
+    text-decoration-color: currentColor;
+  }
+  .ox-note-bar {
+    forced-color-adjust: none;
+  }
+}
+
+/* The document is the one thing that must survive print, because the printed
+   artifact is what gets subpoenaed. Tints go; the underlines stay. */
+@media print {
+  .ox-note-pv {
+    background: none;
+  }
+}

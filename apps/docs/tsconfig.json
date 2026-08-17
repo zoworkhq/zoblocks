@@ -26,6 +26,10 @@
       "@/lib/oxygen-loader": ["../../registry/oxygen/lib/loader.tsx"],
       "@/lib/oxygen-switch": ["../../registry/oxygen/lib/switch.tsx"],
       "@/lib/oxygen-accordion": ["../../registry/oxygen/lib/accordion-core.tsx"],
+      "@/lib/oxygen-clinical-note": ["../../registry/oxygen/lib/clinical-note.tsx"],
+      "@/components/oxygen/clinical-note": [
+        "../../registry/oxygen/clinical-note/clinical-note.tsx"
+      ],
       "@/components/oxygen/accordion": ["../../registry/oxygen/accordion/accordion.tsx"],
       "@/components/oxygen/breath-loader": [
         "../../registry/oxygen/breath-loader/breath-loader.tsx"

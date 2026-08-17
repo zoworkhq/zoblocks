@@ -182,6 +182,7 @@ const PREVIEW: Record<string, (featured: boolean) => React.ReactNode> = {
    * themes and is the exception rather than the rule.)
    */
   switch: () => <SwitchArt />,
+  "clinical-note": () => <ClinicalNoteArt />,
   tabs: (featured) => <TabsArt featured={featured} />,
   accordion: (featured) => <AccordionArt featured={featured} />,
   "chart-accordion": (featured) => <ChartAccordionArt featured={featured} />,
@@ -265,6 +266,33 @@ const CARD_CONSULT_PROVIDER = createStaticProvider({
 
 /** Three of the values a switch can hold, including the one nobody models. */
 const SWITCH_VALUES = [true, "unknown", false] as const;
+
+/**
+ * The card shows the one thing a still image of an editor cannot: that the same
+ * sentence carries different origins, and that the difference is a line style
+ * as well as a colour. Mounting the real editor here would load ProseMirror
+ * into every catalogue page for a 236px thumbnail.
+ */
+function ClinicalNoteArt() {
+  return (
+    <div className="ox-note-doc w-full max-w-[248px] text-[13px] leading-relaxed">
+      <p className="mb-2">
+        <span className="ox-note-pv ox-note-pv-copied">Six weeks of progressive fatigue</span>{" "}
+        <span>and dyspnea.</span>
+      </p>
+      <p className="mb-2">
+        <span className="ox-note-pv ox-note-pv-ai">He denies overt bleeding.</span>{" "}
+        <span className="ox-note-pv ox-note-pv-pulled">Hgb 7.1 g/dL</span>
+      </p>
+      <div className="mt-3 flex h-2 overflow-hidden rounded-full ring-1 ring-inset ring-[var(--ox-border)]">
+        <span data-origin="typed" className="ox-note-bar block h-full" style={{ width: "24%" }} />
+        <span data-origin="copied" className="ox-note-bar block h-full" style={{ width: "44%" }} />
+        <span data-origin="ai" className="ox-note-bar block h-full" style={{ width: "20%" }} />
+        <span data-origin="pulled" className="ox-note-bar block h-full" style={{ width: "12%" }} />
+      </div>
+    </div>
+  );
+}
 
 function SwitchArt() {
   const checked = useCycle(SWITCH_VALUES, 2200);
