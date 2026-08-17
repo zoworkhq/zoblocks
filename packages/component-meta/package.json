@@ -14,7 +14,8 @@
   "scripts": {
     "build": "echo \"[component-meta] consumed as source by the generator\"",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test": "vitest run --passWithNoTests"
+    "test": "vitest run --passWithNoTests",
+    "test:coverage": "vitest run --passWithNoTests --coverage"
   },
   "dependencies": {
     "zod": "^3.24.1"

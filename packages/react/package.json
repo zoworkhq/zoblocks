@@ -77,6 +77,7 @@
     "build": "tsc -p tsconfig.build.json && node scripts/fix-esm-extensions.mjs && node scripts/copy-css.mjs",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
     "check-tarball": "node scripts/check-tarball.mjs"
   },
   "devDependencies": {

@@ -15,23 +15,41 @@
 # Every one of those is invisible to `lint-staged` and fatal in CI. This script
 # closes that gap, and `.husky/pre-push` runs it so nobody has to remember.
 #
-#   pnpm verify          run everything CI runs
-#   pnpm verify --fast   the quick pass: generated, lint, format, types, deps
+# Three tiers, because one budget cannot serve both a pre-push hook and a
+# pre-merge check:
 #
-# Full gates, in CI's order: generated artifacts · lint · format · typecheck ·
-# dependency rules · tests · coverage thresholds · build.
+#   pnpm verify --fast   under a minute. Everything static: generated
+#                        artifacts, lint (including the workflows), format,
+#                        types, dependency rules, the audit, and the synthetic
+#                        data scan. This is what `pre-push` runs.
+#   pnpm verify          the above, plus tests, coverage, build and bundle
+#                        budgets. What you run before opening a pull request.
+#   pnpm verify --ci     everything CI runs, including the accessibility audit
+#                        and the browser suite in three engines.
 #
-# Turbo caches typecheck, test and build, so a second run costs seconds.
+# The audit and the PHI scan moved into `--fast` because they are nearly free —
+# `pnpm audit` took one second in CI and the scan is a pair of greps — and both
+# can fail a build for a reason worth learning in one second rather than in
+# fifteen minutes.
+#
+# `--ci` exists because the gap it closes was expensive. Three separate red
+# builds in one week came from the browser suite, none reproducible except
+# under a full parallel run, and each cost a push-and-wait cycle to observe.
+# With Turbo's cache warm, the build and test portions are near-instant on an
+# unchanged tree, so the marginal cost of `--ci` is the browser suite alone.
 #
 # If you add a step to .github/workflows/ci.yml, add it here too. A gate that
-# only exists in CI is a gate you find out about from a red pull request.
+# only exists in CI is a gate you find out about from a red pull request —
+# `test/gate-parity.test.ts` fails when the two lists disagree.
 
 set -uo pipefail
 
 FAST=0
+FULL_CI=0
 for arg in "$@"; do
   case "$arg" in
     --fast) FAST=1 ;;
+    --ci) FULL_CI=1 ;;
     *) echo "verify: unknown argument '$arg'" >&2; exit 2 ;;
   esac
 done
@@ -69,14 +87,18 @@ step "lint"                 "pnpm lint:fix"               pnpm lint
 step "format"               "pnpm format"                 pnpm format:check
 step "typecheck"            "fix the type errors"         pnpm typecheck
 step "dependency rules"     "see ARCHITECTURE.md"         pnpm deps
+# Both of these are CI gates that lived only in CI. A high advisory and a real
+# identifier in a fixture are each worth one second here rather than fifteen
+# minutes of pipeline.
+step "dependency audit"     "pnpm audit --fix, or pin"    pnpm audit --audit-level=high
+step "synthetic data"       "use example.org fixtures"    bash scripts/no-phi.sh
 
 if [ "$FAST" -eq 0 ]; then
-  step "tests"              "fix the failing tests"       pnpm test
-  # A separate gate from `tests`, and it has to be: coverage thresholds are
-  # declared per package and a suite can pass while its package drops below
-  # the bar for its stability tier. CI runs this as its own step; leaving it
-  # out here was the second thing that reached a red PR.
-  step "coverage"           "raise coverage, or justify"  pnpm test:coverage
+  # One instrumented run, not two. `test:coverage` is a strict superset of
+  # `test` now that every package defines both — verified by comparing
+  # per-package suite counts, which matched at 20 packages and 2768 tests. CI
+  # dropped its separate `Test` step for the same reason.
+  step "tests and coverage" "fix the tests, or coverage"  pnpm test:coverage
   step "build"              "fix the build"               pnpm build
   # After build, because it measures dist. CI has always run this and this
   # script never did, so a blown budget could only be discovered from a red
@@ -84,11 +106,24 @@ if [ "$FAST" -eq 0 ]; then
   step "bundle budgets"     "trim it, or raise the budget"  pnpm size
 fi
 
+# The browser tier. Only under --ci, because it needs a production build and a
+# running server, and the three engines take a few minutes between them.
+#
+# It is here at all because its absence was expensive: three red builds in one
+# week came from this suite, none reproducible except under a full parallel
+# run. Fifteen minutes to learn that, each time, from a pipeline.
+if [ "$FULL_CI" -eq 1 ]; then
+  step "accessibility"      "fix the axe violations"      bash scripts/verify-a11y.sh
+  step "browser suite"      "see playwright-report/"      pnpm e2e:ci
+fi
+
 if [ ${#FAILED[@]} -eq 0 ]; then
   if [ "$FAST" -eq 1 ]; then
-    printf "\n%s✓ fast gates pass%s %s(tests skipped — CI still runs them)%s\n\n" "$GREEN" "$OFF" "$DIM" "$OFF"
-  else
+    printf "\n%s✓ fast gates pass%s %s(tests and browsers skipped — run \`pnpm verify\` or \`--ci\`)%s\n\n" "$GREEN" "$OFF" "$DIM" "$OFF"
+  elif [ "$FULL_CI" -eq 1 ]; then
     printf "\n%s✓ everything CI checks passes locally%s\n\n" "$GREEN" "$OFF"
+  else
+    printf "\n%s✓ all gates pass%s %s(browsers skipped — run \`pnpm verify --ci\` for those)%s\n\n" "$GREEN" "$OFF" "$DIM" "$OFF"
   fi
   exit 0
 fi

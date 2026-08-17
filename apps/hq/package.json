@@ -10,7 +10,8 @@
     "typecheck": "tsc --noEmit",
     "lint": "next lint",
     "db:indexes": "node scripts/ensure-indexes.mjs",
-    "test": "vitest run"
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
     "@oxygenui-design/tokens": "workspace:*",

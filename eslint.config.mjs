@@ -131,6 +131,9 @@ export default tseslint.config(
   {
     files: [
       "scripts/**/*.ts",
+      // Root-level node scripts had no entry here at all, so `flaky.mjs`
+      // linted against browser globals and failed on `process`.
+      "scripts/**/*.mjs",
       "*.config.{mjs,ts}",
       ".dependency-cruiser.cjs",
       "packages/eslint-plugin/**/*.js",

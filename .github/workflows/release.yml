@@ -33,15 +33,15 @@ jobs:
     timeout-minutes: 20
 
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
 
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4
 
-      - uses: actions/setup-node@v7
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
-          node-version: 22
+          node-version-file: .nvmrc
           cache: pnpm
           registry-url: https://registry.npmjs.org
 
@@ -134,7 +134,7 @@ jobs:
         # the job for anything that is not the PR-permission case, so a broken
         # publish is still a broken build.
         continue-on-error: true
-        uses: changesets/action@v2
+        uses: changesets/action@198f833dd7d863100ea6e28967bc9a9fdefadb0a # v2 branch head
         with:
           version-script: pnpm changeset version
           publish-script: pnpm changeset publish
@@ -170,12 +170,24 @@ jobs:
         run: |
           set -euo pipefail
 
-          # Only the PR-permission case is recoverable. With no changesets
-          # pending the action was trying to *publish*, and a publish that
-          # failed must stay failed rather than be dressed up as a link.
-          pending=$(find .changeset -maxdepth 1 -name '*.md' ! -iname 'README.md' | head -1)
+          # Only the PR-permission case is recoverable. A commit carrying no
+          # changesets means the action was trying to *publish*, and a publish
+          # that failed must stay failed rather than be dressed up as a link.
+          #
+          # Read from the commit, never from the working tree. `changeset
+          # version` deletes each changeset as it consumes it, and it does that
+          # *before* the call that opens the pull request — so by the time this
+          # step runs the directory is empty whether or not there was anything
+          # to release. Checking the tree reported "no changesets pending" on a
+          # run with sixteen of them, and turned a recoverable state into a red
+          # build carrying a message that pointed at the wrong thing entirely.
+          #
+          # `git ls-tree` reads the immutable commit, so nothing the previous
+          # step did can change the answer.
+          pending=$(git ls-tree -r --name-only "$GITHUB_SHA" -- .changeset \
+            | grep -viE 'config\.json|README\.md' | head -1)
           if [ -z "$pending" ]; then
-            echo "::error::The release step failed with no changesets pending, so this is a publish failure rather than the PR-permission one. Read the log above."
+            echo "::error::The release step failed and this commit carries no changesets, so it was publishing rather than versioning. Read the log above."
             exit 1
           fi
 

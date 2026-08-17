@@ -118,9 +118,28 @@ async function chooseChapter(page: Page, label: string) {
   await awaitMeasured(page);
 }
 
+/**
+ * Set a gallery control, and confirm it actually took.
+ *
+ * A `.click()` that passes its actionability checks has only been *delivered*;
+ * nothing guarantees the handler ran. When a density click was lost, the strip
+ * never re-laid-out, and the geometry assertion that followed timed out looking
+ * like the indicator had failed to re-measure — which is exactly the bug that
+ * test exists to catch, arriving for the wrong reason. It reproduced in WebKit
+ * under a full parallel run and never in isolation.
+ *
+ * These controls report `aria-pressed`, so the click is re-sent until the
+ * control says it is selected. Idempotent: a control that is already pressed is
+ * never clicked again.
+ */
 async function setControl(page: Page, group: string, value: string) {
-  await clickClear(page.getByRole("group", { name: group }).getByRole("button", { name: value }));
-  await page.waitForTimeout(200);
+  const control = page.getByRole("group", { name: group }).getByRole("button", { name: value });
+
+  await expect(async () => {
+    if ((await control.getAttribute("aria-pressed")) !== "true") await clickClear(control);
+    await expect(control).toHaveAttribute("aria-pressed", "true", { timeout: 2_000 });
+  }).toPass({ timeout: 20_000 });
+
   await awaitMeasured(page);
 }
 

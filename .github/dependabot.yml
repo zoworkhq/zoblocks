@@ -1,0 +1,104 @@
+# Dependency updates, as reviewable pull requests.
+#
+# This exists because of the digest pins. Every action is pinned to a commit
+# SHA, which stops a compromised or merely careless upstream release executing
+# with `contents: write` and, in the release workflow, an npm token in scope.
+# The cost of that is real: a pinned action never receives an upstream security
+# patch on its own. Dependabot is what turns "never updates" into "updates when
+# someone has looked at it" — and it understands SHA pins, so it bumps the
+# digest and the trailing version comment together.
+#
+# The npm ecosystem is included with a narrower remit. `pnpm audit
+# --audit-level=high` already fails CI on a vulnerable dependency, but it only
+# reports; nothing proposed the upgrade, so a finding sat until a human noticed
+# the red build and did it by hand.
+
+version: 2
+
+updates:
+  # ---------------------------------------------------------------------------
+  # GitHub Actions — the supply chain with the most privilege and the least
+  # visibility. Weekly, and never grouped: an action bump is a change to code
+  # that runs with repository write access, and each one deserves its own diff.
+  # ---------------------------------------------------------------------------
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "06:00"
+      timezone: Etc/UTC
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "ci"
+    labels:
+      - dependencies
+      - github-actions
+
+  # ---------------------------------------------------------------------------
+  # npm, at the workspace root. pnpm workspaces are resolved from the root
+  # lockfile, so one entry covers every package.
+  #
+  # Grouped deliberately, and the grouping is the whole design here. Ungrouped,
+  # a monorepo this size produces a dozen PRs a week, each needing a full CI run
+  # — which is both expensive and the reason nobody reviews any of them.
+  # Security updates stay ungrouped so they arrive alone and obviously.
+  # ---------------------------------------------------------------------------
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "06:00"
+      timezone: Etc/UTC
+    open-pull-requests-limit: 8
+    versioning-strategy: increase
+    commit-message:
+      prefix: "chore"
+      prefix-development: "chore"
+    labels:
+      - dependencies
+    groups:
+      # The toolchain moves together or not at all. A Vitest bump that lands
+      # without its coverage provider is a broken suite, and this repository has
+      # already had one Vitest major arrive and re-baseline every threshold.
+      test-tooling:
+        patterns:
+          - "vitest"
+          - "@vitest/*"
+          - "@testing-library/*"
+          - "jsdom"
+          - "@playwright/test"
+          - "playwright"
+      linting:
+        patterns:
+          - "eslint"
+          - "eslint-*"
+          - "@typescript-eslint/*"
+          - "prettier"
+          - "prettier-*"
+      types:
+        patterns:
+          - "@types/*"
+      build-tooling:
+        patterns:
+          - "turbo"
+          - "typescript"
+          - "tsx"
+          - "size-limit"
+          - "@size-limit/*"
+    ignore:
+      # React and Next are deliberate upgrades, not routine ones: this library
+      # publishes a React peer range, and moving it is a decision about which
+      # consumers can install the next version. Majors arrive by hand.
+      - dependency-name: react
+        update-types: [version-update:semver-major]
+      - dependency-name: react-dom
+        update-types: [version-update:semver-major]
+      - dependency-name: next
+        update-types: [version-update:semver-major]
+      # antd is a peer dependency of the signature and identity packages. A
+      # major is a breaking change for every consumer of those packages and
+      # belongs in a changeset written by a person.
+      - dependency-name: antd
+        update-types: [version-update:semver-major]

@@ -23,7 +23,26 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,
   workers: process.env.CI ? 2 : undefined,
-  reporter: process.env.CI ? [["github"], ["html", { open: "never" }]] : [["list"]],
+  /*
+   * The JSON reporter is there so a flake can be *seen*.
+   *
+   * CI retries once, which is right — a genuinely intermittent failure should
+   * not block a merge on its own. But a test that fails and then passes leaves
+   * no signal anyone reads: the job is green and the retry is buried in the
+   * log. Three real flakes were found in one week only because somebody
+   * happened to be watching the output.
+   *
+   * `scripts/flaky.mjs` reads this file after the run and writes any
+   * retried-but-passed test into the job summary, where it is visible without
+   * opening the run.
+   */
+  reporter: process.env.CI
+    ? [
+        ["github"],
+        ["html", { open: "never" }],
+        ["json", { outputFile: "playwright-report/results.json" }],
+      ]
+    : [["list"]],
 
   use: {
     baseURL: process.env.OXYGEN_BASE_URL ?? "http://localhost:6001",
