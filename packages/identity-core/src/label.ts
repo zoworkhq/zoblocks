@@ -13,6 +13,7 @@
  * the order a human would say it.
  */
 
+import { disclosureAllows, shortName } from "./resolve.js";
 import type { Identity, IdentityPolicy } from "./types.js";
 import { SENSITIVITY_LABEL } from "./types.js";
 
@@ -105,18 +106,31 @@ export function identityLabel(
   options: LabelOptions = {},
 ): string {
   const noun = options.noun ?? "Patient";
-  const parts: string[] = [`${noun}: ${identity.name.text}`];
 
-  if (identity.pronouns) parts.push(identity.pronouns);
-  if (identity.birthDate) parts.push(`born ${identity.birthDate.spoken}`);
-  if (identity.age) {
+  /*
+   * The same allowance the renderer consults.
+   *
+   * Reducing the pixels and leaving the label intact would put every withheld
+   * fact into the accessible name — a screen-reader user hearing the date of
+   * birth a waiting-room screen was built not to show. This function exists so
+   * the two cannot disagree, and that only holds if it reads the same rule.
+   */
+  const allow = disclosureAllows(p.disclosure);
+  const displayName = allow.name === "short" ? shortName(identity.name) : identity.name.text;
+  const parts: string[] = [`${noun}: ${displayName}`];
+
+  if (allow.pronouns && identity.pronouns) parts.push(identity.pronouns);
+  if (allow.birthDate && identity.birthDate) parts.push(`born ${identity.birthDate.spoken}`);
+  if (allow.age && identity.age) {
     parts.push(
       identity.age.atDeath ? `aged ${identity.age.text} at death` : `age ${identity.age.text}`,
     );
   }
-  if (identity.spcu) parts.push(`sex parameter for clinical use, ${identity.spcu.label}`);
+  if (allow.clinicalSex && identity.spcu) {
+    parts.push(`sex parameter for clinical use, ${identity.spcu.label}`);
+  }
 
-  if (options.identifiers !== false) {
+  if (allow.identifiers && options.identifiers !== false) {
     for (const id of identity.identifiers) {
       const assigner = id.assigner ? `, ${id.assigner}` : "";
       const masked = id.masked ? ", partially hidden" : "";

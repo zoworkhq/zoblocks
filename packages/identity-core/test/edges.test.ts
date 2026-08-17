@@ -17,7 +17,13 @@ import { substituteForDemo } from "../src/demo.js";
 import { resolveIdentifiers, DEFAULT_IDENTIFIER_SYSTEMS } from "../src/identifiers.js";
 import { identityInitials, initialsFromText } from "../src/initials.js";
 import { identityLabel } from "../src/label.js";
-import { policy, resolveIdentity, resolvePhoto } from "../src/resolve.js";
+import {
+  disclosureAllows,
+  policy,
+  resolveIdentity,
+  resolvePhoto,
+  shortName,
+} from "../src/resolve.js";
 import { metaphone } from "../src/similarity.js";
 import { graphemes } from "../src/text.js";
 import type { Identity, ResolvedName } from "../src/types.js";
@@ -375,5 +381,74 @@ describe("no console output from the engine", () => {
       expect(s).not.toHaveBeenCalled();
       s.mockRestore();
     }
+  });
+});
+
+describe("identityLabel honours the disclosure allowance", () => {
+  it("says only what a waiting-room screen shows", () => {
+    const pub = policy({ now: F.NOW, disclosure: "public" });
+    const label = identityLabel(resolveIdentity(F.patient(), pub), pub);
+    expect(label).toContain("A. Okonkwo");
+    expect(label).not.toContain("Amara Chinelo");
+    expect(label).not.toContain("8 March 1985");
+    expect(label).not.toContain("M R N");
+  });
+
+  it("gives reception the date of birth and the identifier, not the clinical sex", () => {
+    const rec = policy({ now: F.NOW, disclosure: "reception" });
+    const label = identityLabel(resolveIdentity(F.withSpcu, rec), rec);
+    expect(label).toContain("born");
+    expect(label).toContain("M R N");
+    expect(label).not.toContain("sex parameter");
+    expect(label).not.toContain("age ");
+  });
+
+  it("gives a clinician everything", () => {
+    const label = identityLabel(resolveIdentity(F.withSpcu, P), P);
+    expect(label).toContain("sex parameter for clinical use");
+    expect(label).toContain("age ");
+  });
+});
+
+describe("disclosureAllows", () => {
+  it("is progressively more permissive", () => {
+    const pub = disclosureAllows("public");
+    const rec = disclosureAllows("reception");
+    const clin = disclosureAllows("clinical");
+
+    expect(pub).toMatchObject({ name: "short", birthDate: false, identifiers: false });
+    expect(rec).toMatchObject({ name: "full", birthDate: true, clinicalSex: false });
+    expect(clin).toMatchObject({ name: "full", birthDate: true, clinicalSex: true, age: true });
+    expect(disclosureAllows("full")).toEqual(clin);
+  });
+
+  it("never widens as the level narrows", () => {
+    const order = ["public", "reception", "clinical", "full"] as const;
+    const flags = ["birthDate", "age", "clinicalSex", "pronouns", "identifiers"] as const;
+    for (let i = 1; i < order.length; i++) {
+      const prev = disclosureAllows(order[i - 1]!);
+      const next = disclosureAllows(order[i]!);
+      for (const f of flags) {
+        // A narrower level must never permit something a wider one withholds.
+        expect(prev[f] && !next[f]).toBe(false);
+      }
+    }
+  });
+});
+
+describe("shortName", () => {
+  it("is an initial and a family name", () => {
+    expect(shortName(resolveIdentity(F.patient(), P).name)).toBe("A. Okonkwo");
+  });
+  it("leaves a mononym whole", () => {
+    expect(shortName(resolveIdentity(F.mononym, P).name)).toBe("Suryanto");
+  });
+  it("leaves a family-only record whole", () => {
+    const p = F.patient({ name: [{ use: "official", family: "Okonkwo" }] });
+    expect(shortName(resolveIdentity(p, P).name)).toBe("Okonkwo");
+  });
+  it("takes the first grapheme, not the first code unit", () => {
+    const p = F.patient({ name: [{ use: "official", given: ["रामेश"], family: "Kulkarni" }] });
+    expect(shortName(resolveIdentity(p, P).name).startsWith("रा")).toBe(true);
   });
 });

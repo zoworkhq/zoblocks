@@ -19,7 +19,9 @@
 
 import {
   SENSITIVITY_LABEL,
+  disclosureAllows,
   identityLabel,
+  shortName,
   switchAnnouncement,
   type Identity,
 } from "@oxygenui-design/identity-core";
@@ -205,16 +207,29 @@ export function PatientBanner(props: PatientBannerProps): ReactNode {
     return true;
   };
 
+  /*
+   * Disclosure reduces the field set, not only the identifiers.
+   *
+   * It used to reach `resolveIdentifiers` and nothing else, so a waiting-room
+   * screen masked the medical record number and then printed the patient's full
+   * name, date of birth and sex parameter for clinical use beside it. That
+   * removed the one field nobody reads across a room and kept every field they
+   * do.
+   */
+  const allow = disclosureAllows(policy.disclosure);
+
   const showPhoto = push("photo");
   push("name");
-  const showPronouns = push("pronouns") && !!identity.pronouns;
-  const showDob = push("dob") && !!identity.birthDate;
-  const showAge = push("age") && !!identity.age;
-  const showSpcu = push("spcu") && !!identity.spcu;
-  const showGi = push("gender-identity") && !!identity.genderIdentity;
-  const showRsg = push("recorded-sex-or-gender") && !!identity.recordedSexOrGender;
-  const showIdentifiers = push("identifier") && identity.identifiers.length > 0;
-  const showWard = push("ward") && !!ward;
+  const showPronouns = allow.pronouns && push("pronouns") && !!identity.pronouns;
+  const showDob = allow.birthDate && push("dob") && !!identity.birthDate;
+  const showAge = allow.age && push("age") && !!identity.age;
+  const showSpcu = allow.clinicalSex && push("spcu") && !!identity.spcu;
+  const showGi = allow.clinicalSex && push("gender-identity") && !!identity.genderIdentity;
+  const showRsg =
+    allow.clinicalSex && push("recorded-sex-or-gender") && !!identity.recordedSexOrGender;
+  const showIdentifiers =
+    allow.identifiers && push("identifier") && identity.identifiers.length > 0;
+  const showWard = allow.identifiers && push("ward") && !!ward;
 
   const selected = selectIdentifiers(identity, identifiers);
   const label = identityLabel(identity, policy);
@@ -270,7 +285,9 @@ export function PatientBanner(props: PatientBannerProps): ReactNode {
         )}
         <div className="ox-banner__block">
           <div className="ox-banner__line1">
-            <span className="ox-banner__name">{identity.name.text}</span>
+            <span className="ox-banner__name">
+              {allow.name === "short" ? shortName(identity.name) : identity.name.text}
+            </span>
             {showPronouns && (
               <span className="ox-banner__pronouns ox-drop-2">{identity.pronouns}</span>
             )}

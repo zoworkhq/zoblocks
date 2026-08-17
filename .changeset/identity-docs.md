@@ -1,6 +1,5 @@
 ---
 "@oxygenui-design/identity": minor
-"@oxygenui-design/component-meta": minor
 ---
 
 Put Patient identity in the catalog, and make its stylesheet actually themeable.
@@ -24,7 +23,7 @@ Two real defects surfaced while wiring it up:
   `src/` references it, so a non-antd consumer was being asked to install it
   for nothing. Removed.
 
-`@oxygenui-design/component-meta` gains an optional `propsSource`. The
-convention — extract props from `src/<Title>.tsx` — assumes a package has one
+`component-meta` gains an optional `propsSource` — unversioned here because it
+is private and never publishes. The convention — extract props from `src/<Title>.tsx` — assumes a package has one
 public component; identity's surface is three, and contorting the catalog title
 into a filename would put the filename in front of the reader.
