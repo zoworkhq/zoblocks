@@ -64,11 +64,20 @@ test.describe("scrolling @a11y", () => {
 
     expect(positions.length, "no scrolling happened at all").toBeGreaterThan(5);
 
-    // A downward gesture produces a monotonic sequence. Momentum and rounding
-    // give a pixel or two; a hijack gives hundreds.
+    /*
+     * A downward gesture produces a monotonic sequence.
+     *
+     * The threshold is 24px rather than a couple of pixels: WebKit's momentum
+     * and rubber-banding settle backwards by single digits at the end of a
+     * fling, which is the engine behaving normally and not something this test
+     * is about. The regression it exists for moved the page by hundreds — a
+     * competing animated scroll started mid-gesture — so the gap between
+     * "engine noise" and "hijack" is two orders of magnitude wide and there is
+     * no need to sit close to the noise.
+     */
     const reversals = positions
       .map((y, i) => (i === 0 ? 0 : positions[i - 1]! - y))
-      .filter((delta) => delta > 4);
+      .filter((delta) => delta > 24);
 
     expect(reversals, `the page scrolled back up by ${reversals.join(", ")}px`).toEqual([]);
     expect(final).toBeGreaterThan(600);

@@ -34,11 +34,25 @@ export function SiteHeader() {
   const pathname = usePathname();
   const [scrolled, setScrolled] = React.useState(false);
 
+  // Coalesced to one read per frame, like the section rail. `scrollY` is cheap
+  // on its own, but the handler ran on every event and each one reached React —
+  // and React's bail-out still costs a scheduled render to decide on.
   React.useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 12);
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+    let frame = 0;
+    const read = () => {
+      frame = 0;
+      setScrolled(window.scrollY > 12);
+    };
+    const schedule = () => {
+      if (!frame) frame = requestAnimationFrame(read);
+    };
+
+    read();
+    window.addEventListener("scroll", schedule, { passive: true });
+    return () => {
+      cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", schedule);
+    };
   }, []);
 
   return (
