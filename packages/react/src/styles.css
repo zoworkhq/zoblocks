@@ -1,3 +1,13 @@
+/*
+ * GENERATED FILE — DO NOT EDIT.
+ *
+ * Produced by `pnpm gen` from each component's *.meta.ts.
+ * Edit the metadata, then re-run. CI fails if this file is stale.
+ *
+ * See content/decisions/0004-generated-component-metadata.md
+ */
+
+/* ---- registry/oxygen/lib/loader.css ---- */
 /**
  * Oxygen loaders — structure and motion.
  *
@@ -477,6 +487,667 @@
   }
 }
 
+/* ---- registry/oxygen/lib/accordion.css ---- */
+/**
+ * Oxygen accordion — structure, motion, and the three states that are not decoration.
+ *
+ * Install target: styles/oxygen-accordion.css. Import it once, next to the
+ * token stylesheet:
+ *
+ *   @import "./styles/oxygen-tokens.css";
+ *   @import "./styles/oxygen-accordion.css";
+ *
+ * Two deliberate choices, matching the loaders:
+ *
+ *   1. No Tailwind utilities. The open/close transition needs a property
+ *      Tailwind cannot express, and a component whose layout depends on the
+ *      host's Tailwind config renders unstyled in someone else's build.
+ *   2. Every colour is a semantic or component token, never a palette value, so
+ *      a brand override reaches this file without editing it.
+ *
+ * The one piece of real cleverness is the hiding strategy, and it is worth
+ * reading before changing anything below.
+ *
+ *   A closed panel carries `hidden="until-found"`, so find-in-page and fragment
+ *   navigation can reveal it. That attribute is specified as
+ *   `content-visibility: hidden` rather than `display: none`, which means the
+ *   element still generates a box — and a box can be transitioned.
+ *
+ *   But this file also sets `display: grid` on the panel, and an author
+ *   declaration beats the UA's `[hidden] { display: none }`. In a browser
+ *   without `until-found` support that would leave the panel *visible*. So the
+ *   hiding is re-asserted explicitly for `[hidden]` in any form. The result is
+ *   the same in both: hidden from sight, hidden from the accessibility tree,
+ *   and not findable by Ctrl+F when hiding is what we meant.
+ */
+
+.ox-accordion {
+  --ox-accordion-rail: transparent;
+
+  display: block;
+  border: 1px solid var(--ox-accordion-border);
+  border-radius: var(--ox-accordion-radius);
+  background: var(--ox-accordion-header-bg-open);
+  color: var(--ox-accordion-header-fg);
+  font-family: var(--ox-font-sans);
+  font-size: var(--ox-accordion-font);
+  /* Clip the first and last header into the rounded corners without needing a
+     per-item radius that would have to know its own position. */
+  overflow: hidden;
+}
+
+/* ------------------------------------------------------------------ */
+/* Variants                                                            */
+/* ------------------------------------------------------------------ */
+
+.ox-accordion[data-variant="separate"] {
+  border: 0;
+  background: none;
+  overflow: visible;
+  display: grid;
+  gap: calc(var(--ox-accordion-gap) / 2);
+}
+
+.ox-accordion[data-variant="separate"] .ox-accordion__item {
+  border: 1px solid var(--ox-accordion-border);
+  border-radius: var(--ox-accordion-radius);
+  overflow: hidden;
+}
+
+.ox-accordion[data-variant="ghost"] {
+  border: 0;
+  background: none;
+  overflow: visible;
+}
+
+.ox-accordion[data-variant="ghost"] .ox-accordion__trigger {
+  background: none;
+}
+
+.ox-accordion[data-variant="ghost"] .ox-accordion__item + .ox-accordion__item {
+  border-block-start: 1px solid var(--ox-accordion-divider);
+}
+
+/* ------------------------------------------------------------------ */
+/* Item and header                                                     */
+/* ------------------------------------------------------------------ */
+
+.ox-accordion__item {
+  position: relative;
+}
+
+.ox-accordion[data-variant="bordered"] .ox-accordion__item + .ox-accordion__item {
+  border-block-start: 1px solid var(--ox-accordion-border);
+}
+
+/**
+ * The heading element carries no visual weight of its own.
+ *
+ * It exists so the trigger sits inside a real h1–h6 — which is what puts the
+ * section in a screen reader's heading list, and the heading list is the entire
+ * navigation model for a long chart. Resetting it here means the level can
+ * change without the design changing with it.
+ */
+.ox-accordion__heading {
+  margin: 0;
+  font-size: inherit;
+  font-weight: inherit;
+  font-family: inherit;
+  line-height: inherit;
+}
+
+.ox-accordion__trigger {
+  display: flex;
+  align-items: center;
+  gap: var(--ox-accordion-gap);
+  inline-size: 100%;
+  /* Never below the WCAG 2.2 AA floor, whatever the density profile says.
+     Dense means tighter rows, not smaller buttons. */
+  min-block-size: max(var(--ox-accordion-target), var(--ox-density-target-floor));
+  padding-block: var(--ox-accordion-pad-y);
+  padding-inline: var(--ox-accordion-pad-x);
+  margin: 0;
+  border: 0;
+  background: var(--ox-accordion-header-bg);
+  color: inherit;
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+  box-shadow: inset var(--ox-accordion-rail-width) 0 0 var(--ox-accordion-rail);
+  transition: background var(--ox-accordion-duration) var(--ox-ease);
+}
+
+.ox-accordion__trigger:hover {
+  background: var(--ox-accordion-header-bg-hover);
+}
+
+.ox-accordion__trigger:focus-visible {
+  outline: var(--ox-focus-ring);
+  /* Inset, because an outward ring on a full-bleed header is clipped by the
+     container's own overflow and disappears on the first and last rows. */
+  outline-offset: calc(var(--ox-focus-ring-offset) * -1);
+}
+
+.ox-accordion__item[data-open="true"] > .ox-accordion__heading > .ox-accordion__trigger {
+  background: var(--ox-accordion-header-bg-open);
+}
+
+.ox-accordion__trigger[aria-disabled="true"] {
+  cursor: default;
+}
+
+.ox-accordion__icon {
+  flex: none;
+  inline-size: 0.875em;
+  block-size: 0.875em;
+  color: var(--ox-accordion-icon-fg);
+  transition: transform var(--ox-accordion-duration) var(--ox-ease);
+}
+
+.ox-accordion__item[data-open="true"] > .ox-accordion__heading .ox-accordion__icon {
+  transform: rotate(180deg);
+}
+
+/* The chevron points along the reading direction when placed at the end. */
+.ox-accordion[data-icon-placement="end"] .ox-accordion__icon {
+  order: 2;
+}
+
+.ox-accordion__label {
+  flex: none;
+  font-weight: 600;
+}
+
+.ox-accordion__spacer {
+  flex: 1 1 auto;
+  min-inline-size: var(--ox-accordion-gap);
+}
+
+.ox-accordion__summary {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--ox-accordion-gap) / 1.5);
+  flex: none;
+  color: var(--ox-accordion-summary-fg);
+  font-size: var(--ox-text-sm);
+}
+
+.ox-accordion__extra {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: calc(var(--ox-accordion-gap) / 2);
+  padding-inline-end: var(--ox-accordion-pad-x);
+}
+
+/* ------------------------------------------------------------------ */
+/* Severity rail                                                       */
+/* ------------------------------------------------------------------ */
+
+/**
+ * The rail is never the only carrier of state.
+ *
+ * Forced-colors mode discards it, monochrome printing discards the hue, and
+ * roughly one in twelve men cannot separate red from green. A lint rule
+ * (@oxygenui/require-accordion-summary) makes the paired text mandatory rather
+ * than conventional.
+ */
+.ox-accordion__item[data-severity="critical"] {
+  --ox-accordion-rail: var(--ox-accordion-rail-critical);
+}
+.ox-accordion__item[data-severity="high"] {
+  --ox-accordion-rail: var(--ox-accordion-rail-high);
+}
+.ox-accordion__item[data-severity="low"] {
+  --ox-accordion-rail: var(--ox-accordion-rail-low);
+}
+.ox-accordion__item[data-severity="normal"] {
+  --ox-accordion-rail: var(--ox-accordion-rail-normal);
+}
+.ox-accordion__item[data-severity="unknown"] {
+  --ox-accordion-rail: var(--ox-accordion-rail-unknown);
+}
+
+/* Restricted describes the record, not a measurement, so it sits outside the
+   status scale — the same distinction PatientBanner already makes. */
+.ox-accordion__item[data-access="consent"],
+.ox-accordion__item[data-access="reason"],
+.ox-accordion__item[data-access="withheld"] {
+  --ox-accordion-rail: var(--ox-accordion-rail-restricted);
+}
+
+.ox-accordion__item[data-access="withheld"] .ox-accordion__trigger {
+  cursor: not-allowed;
+}
+
+.ox-accordion__item[data-access="withheld"] .ox-accordion__summary {
+  color: var(--ox-accordion-withheld-fg);
+}
+
+/* ------------------------------------------------------------------ */
+/* Panel                                                               */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Height animation with no measurement.
+ *
+ * `0fr → 1fr` on a single grid row transitions to the content's intrinsic
+ * height without JavaScript reading `scrollHeight`, without a ResizeObserver,
+ * and without a forced reflow in the toggle path. Every accordion that animates
+ * by measuring gets slower as its sections get longer, which is exactly where a
+ * 142-encounter note list lands.
+ */
+.ox-accordion__panel {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows var(--ox-accordion-duration) var(--ox-ease);
+}
+
+/**
+ * Re-assert hiding, because `display: grid` above beats `[hidden]`.
+ *
+ * `content-visibility: hidden` rather than `display: none` on purpose: it keeps
+ * the box for the transition, and it still removes the subtree from the
+ * accessibility tree and from find-in-page. In a browser that supports
+ * `hidden="until-found"` this matches what the UA stylesheet already does; in
+ * one that does not, it is what makes the plain `hidden` attribute behave.
+ */
+.ox-accordion__panel[hidden] {
+  content-visibility: hidden;
+}
+
+.ox-accordion__item[data-open="true"] > .ox-accordion__panel {
+  grid-template-rows: 1fr;
+}
+
+.ox-accordion__body {
+  overflow: hidden;
+  min-block-size: 0;
+}
+
+.ox-accordion__inner {
+  padding-block: var(--ox-accordion-pad-y) calc(var(--ox-accordion-pad-y) + 0.25rem);
+  padding-inline: var(--ox-accordion-pad-x);
+  border-block-start: 1px solid var(--ox-accordion-divider);
+  color: var(--ox-accordion-body-fg);
+}
+
+/**
+ * Long charts stop paying layout for sections nobody opened.
+ *
+ * `auto` rather than `hidden`: an open panel must lay out normally, and the
+ * intrinsic-size hint keeps the scrollbar from jumping as sections render.
+ */
+.ox-accordion[data-virtualise-hint="true"] .ox-accordion__panel {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 0 var(--ox-accordion-intrinsic, 4rem);
+}
+
+/* ------------------------------------------------------------------ */
+/* Gates                                                               */
+/* ------------------------------------------------------------------ */
+
+.ox-accordion__gate {
+  border: 1px solid var(--ox-accordion-gate-border);
+  border-radius: var(--ox-radius);
+  background: var(--ox-accordion-gate-bg);
+  padding-block: var(--ox-accordion-pad-y);
+  padding-inline: var(--ox-accordion-pad-x);
+  color: var(--ox-text);
+}
+
+.ox-accordion__gate[data-kind="consent"] {
+  border-color: var(--ox-accordion-rail-restricted);
+  background: var(--ox-accordion-restricted-bg);
+}
+
+.ox-accordion__gate-title {
+  margin: 0 0 0.25rem;
+  font-size: inherit;
+  font-weight: 600;
+}
+
+.ox-accordion__gate-note {
+  margin: 0 0 0.5rem;
+  color: var(--ox-text-muted);
+  font-size: var(--ox-text-sm);
+}
+
+.ox-accordion__gate-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: calc(var(--ox-accordion-gap) / 2);
+}
+
+.ox-accordion__gate-reasons {
+  display: block;
+  margin-block-end: 0.5rem;
+  font-size: var(--ox-text-sm);
+  color: var(--ox-text-muted);
+}
+
+.ox-accordion__gate-select {
+  font: inherit;
+  color: var(--ox-field-fg);
+  background: var(--ox-field-bg);
+  border: 1px solid var(--ox-field-border);
+  border-radius: var(--ox-field-radius);
+  padding-block: calc(var(--ox-field-pad-y) / 1.5);
+  padding-inline: var(--ox-field-pad-x);
+  margin-block-end: 0.5rem;
+  min-block-size: var(--ox-density-target-floor);
+}
+
+.ox-accordion__gate-select:focus-visible {
+  outline: var(--ox-focus-ring);
+  outline-offset: var(--ox-focus-ring-offset);
+}
+
+.ox-accordion__gate-confirm {
+  font: inherit;
+  cursor: pointer;
+  color: var(--ox-text-on-accent);
+  background: var(--ox-accent);
+  border: 1px solid var(--ox-accent-border);
+  border-radius: var(--ox-radius);
+  padding-block: calc(var(--ox-accordion-pad-y) / 1.5);
+  padding-inline: var(--ox-accordion-pad-x);
+  min-block-size: max(var(--ox-accordion-target), var(--ox-density-target-floor));
+}
+
+.ox-accordion__gate-confirm:hover:not(:disabled) {
+  background: var(--ox-accent-hover);
+}
+
+.ox-accordion__gate-confirm:disabled {
+  cursor: progress;
+}
+
+.ox-accordion__gate-confirm:focus-visible {
+  outline: var(--ox-focus-ring);
+  outline-offset: var(--ox-focus-ring-offset);
+}
+
+/* A refusal names what did not happen and what is still usable — CONTENT.md §5. */
+.ox-accordion__gate-refused {
+  margin: 0.5rem 0 0;
+  color: var(--ox-status-critical);
+  font-size: var(--ox-text-sm);
+}
+
+/**
+ * Withheld reads as a statement, never as a disabled control.
+ *
+ * CONTENT.md §1 separates five kinds of absence, and this is the *masked* one:
+ * policy withheld it from this reader. Greying it would say "unavailable",
+ * which is a different claim and the wrong one.
+ */
+.ox-accordion__withheld-reason {
+  margin: 0;
+  color: var(--ox-accordion-withheld-fg);
+}
+
+/* ------------------------------------------------------------------ */
+/* Severity chip                                                       */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Lives here rather than in chart-accordion so the whole family installs one
+ * stylesheet. It uses `--ox-badge-*` deliberately: when StatusBadge ships, this
+ * becomes a refactor rather than a re-design, and critical already reads
+ * identically on a section header and on a lab result.
+ */
+.ox-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding-block: 0.05rem;
+  padding-inline: 0.45rem;
+  border: 1px solid var(--ox-badge-unknown-border);
+  border-radius: var(--ox-badge-radius);
+  background: var(--ox-badge-unknown-bg);
+  color: var(--ox-badge-unknown-fg);
+  font-size: var(--ox-text-sm);
+  white-space: nowrap;
+}
+
+.ox-chip--critical {
+  border-color: var(--ox-badge-critical-border);
+  background: var(--ox-badge-critical-bg);
+  color: var(--ox-badge-critical-fg);
+  font-weight: 600;
+}
+.ox-chip--high {
+  border-color: var(--ox-badge-high-border);
+  background: var(--ox-badge-high-bg);
+  color: var(--ox-badge-high-fg);
+}
+.ox-chip--low {
+  border-color: var(--ox-badge-low-border);
+  background: var(--ox-badge-low-bg);
+  color: var(--ox-badge-low-fg);
+}
+.ox-chip--normal {
+  border-color: var(--ox-badge-normal-border);
+  background: var(--ox-badge-normal-bg);
+  color: var(--ox-badge-normal-fg);
+}
+.ox-chip--unknown {
+  border-color: var(--ox-badge-unknown-border);
+  background: var(--ox-badge-unknown-bg);
+  color: var(--ox-badge-unknown-fg);
+}
+
+/* ------------------------------------------------------------------ */
+/* ChartAccordion                                                      */
+/* ------------------------------------------------------------------ */
+
+.ox-chart-accordion__toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ox-accordion-gap);
+  margin-block-end: calc(var(--ox-accordion-gap) / 1.5);
+}
+
+.ox-chart-accordion__toolbar-label {
+  font-weight: 600;
+  color: var(--ox-text);
+}
+
+.ox-chart-accordion__toolbar-actions {
+  display: flex;
+  gap: calc(var(--ox-accordion-gap) / 2);
+}
+
+.ox-chart-accordion__action {
+  font: inherit;
+  font-size: var(--ox-text-sm);
+  color: var(--ox-accent);
+  background: none;
+  border: 1px solid transparent;
+  border-radius: var(--ox-radius-sm);
+  cursor: pointer;
+  padding-block: 0.15rem;
+  padding-inline: 0.4rem;
+  min-block-size: var(--ox-density-target-floor);
+}
+
+.ox-chart-accordion__action:hover {
+  background: var(--ox-accent-subtle);
+}
+
+.ox-chart-accordion__action:focus-visible {
+  outline: var(--ox-focus-ring);
+  outline-offset: var(--ox-focus-ring-offset);
+}
+
+.ox-chart-accordion__count,
+.ox-chart-accordion__time {
+  color: var(--ox-text-subtle);
+  font-size: var(--ox-text-sm);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ------------------------------------------------------------------ */
+/* SafetyPlan                                                          */
+/* ------------------------------------------------------------------ */
+
+.ox-safety-plan__revised {
+  margin: 0 0 var(--ox-accordion-gap);
+  color: var(--ox-text-muted);
+  font-size: var(--ox-text-sm);
+}
+
+.ox-safety-plan__entries {
+  margin: 0;
+  padding-inline-start: 1.15rem;
+  color: var(--ox-text);
+}
+
+.ox-safety-plan__entries li {
+  margin-block-end: 0.35rem;
+}
+
+.ox-safety-plan__contacts {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 0.3rem 1rem;
+  margin: 0;
+  color: var(--ox-text);
+}
+
+.ox-safety-plan__contacts dt {
+  font-weight: 600;
+}
+
+.ox-safety-plan__contacts dd {
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.15rem 0.6rem;
+}
+
+.ox-safety-plan__availability {
+  color: var(--ox-text-muted);
+}
+
+/**
+ * The crisis step is drawn as its own surface.
+ *
+ * Not for emphasis — because a person arriving here is not reading, they are
+ * looking. The tint is paired with the "Always open" text in the header, so
+ * nothing depends on the colour surviving.
+ */
+.ox-safety-plan .ox-accordion__item[data-pinned="true"] .ox-accordion__inner {
+  background: var(--ox-status-critical-bg);
+  border-block-start-color: var(--ox-status-critical-border);
+}
+
+.ox-safety-plan__explanation {
+  margin: 0.6rem 0 0;
+  color: var(--ox-text-muted);
+  font-size: var(--ox-text-sm);
+}
+
+.ox-safety-plan__empty {
+  margin: 0;
+  color: var(--ox-absent-fg);
+}
+
+/* ------------------------------------------------------------------ */
+/* Motion                                                              */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Reduced motion is a designed state, not a paused one.
+ *
+ * The panel still opens and closes; it simply stops travelling. Anything that
+ * carried meaning through movement carries it through text instead, which it
+ * already did.
+ */
+@media (prefers-reduced-motion: reduce) {
+  .ox-accordion__panel,
+  .ox-accordion__icon,
+  .ox-accordion__trigger {
+    transition-duration: 1ms;
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Forced colors                                                       */
+/* ------------------------------------------------------------------ */
+
+/**
+ * The OS discards our palette here, including the severity rail. That is the
+ * reason the rail was never allowed to be the only signal: what survives is the
+ * text in the summary, which is always present.
+ */
+@media (forced-colors: active) {
+  .ox-accordion,
+  .ox-accordion[data-variant="separate"] .ox-accordion__item {
+    border-color: CanvasText;
+  }
+
+  .ox-accordion__trigger {
+    background: Canvas;
+    color: CanvasText;
+  }
+
+  .ox-accordion__trigger:focus-visible {
+    outline: 2px solid Highlight;
+  }
+
+  .ox-accordion__icon {
+    color: CanvasText;
+  }
+
+  .ox-accordion__gate {
+    border-color: CanvasText;
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Print                                                               */
+/* ------------------------------------------------------------------ */
+
+/**
+ * A printed chart must be a chart, not a table of contents.
+ *
+ * The component removes `hidden` from every permitted panel before printing —
+ * `content-visibility` cannot be overridden into visibility for a subtree the
+ * UA has skipped — and this rule finishes the job by giving those panels their
+ * height back. Withheld sections are never expanded: there is nothing behind
+ * them, and printing an empty one would suggest otherwise.
+ */
+@media print {
+  .ox-accordion,
+  .ox-accordion[data-variant="separate"] .ox-accordion__item {
+    border-color: #999;
+  }
+
+  .ox-accordion__panel {
+    transition: none;
+  }
+
+  .ox-accordion__item[data-open="true"] > .ox-accordion__panel,
+  .ox-accordion__item[data-print-expanded="true"] > .ox-accordion__panel {
+    grid-template-rows: 1fr;
+    content-visibility: visible;
+  }
+
+  .ox-accordion__trigger {
+    background: none;
+  }
+
+  .ox-accordion__icon {
+    display: none;
+  }
+}
+
+/* ---- registry/oxygen/lib/switch.css ---- */
 /**
  * Oxygen Switch — the stylesheet.
  *

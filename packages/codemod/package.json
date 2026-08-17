@@ -1,0 +1,66 @@
+{
+  "name": "@oxygenui-design/codemod",
+  "version": "0.1.0",
+  "description": "Migration codemods for Oxygen UI. Rewrites what it can prove and reports what it cannot, rather than guessing.",
+  "license": "MIT",
+  "homepage": "https://oxygenui.design",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zoworkhq/oxygenui.git",
+    "directory": "packages/codemod"
+  },
+  "keywords": [
+    "codemod",
+    "migration",
+    "antd",
+    "ant-design",
+    "accordion",
+    "collapse",
+    "healthcare"
+  ],
+  "type": "module",
+  "sideEffects": false,
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "bin": {
+    "oxygen-codemod": "./bin/oxygen-codemod.mjs"
+  },
+  "exports": {
+    ".": "./src/index.ts",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "src",
+    "bin",
+    "!src/**/*.test.ts"
+  ],
+  "engines": {
+    "node": ">=20.11.0"
+  },
+  "//dependencies": "None, on purpose. A full AST transform would pull jscodeshift and a Babel toolchain in to do work that is textual, and ARCHITECTURE.md makes every runtime dependency an architectural decision. The trade is stated in the source rather than hidden.",
+  "publishConfig": {
+    "access": "public",
+    "main": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "exports": {
+      ".": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "./package.json": "./package.json"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage"
+  },
+  "devDependencies": {
+    "@oxygenui-design/tsconfig": "workspace:*",
+    "@vitest/coverage-v8": "^4.1.10",
+    "typescript": "^5.7.2",
+    "vitest": "^4.1.10"
+  }
+}

@@ -10,7 +10,12 @@
       "pad-x": { "$type": "dimension", "$value": "1.125rem" },
       "pad-y": { "$type": "dimension", "$value": "0.875rem" },
       "font": { "$type": "dimension", "$value": "{ref.size.md}" },
-      "target": { "$type": "dimension", "$value": "3rem" }
+      "target": { "$type": "dimension", "$value": "3rem" },
+      "duration": {
+        "$type": "duration",
+        "$value": "{ref.duration.slow}",
+        "$description": "Unhurried. A patient reading their own care plan should not feel rushed through it."
+      }
     },
 
     "standard": {
@@ -19,7 +24,8 @@
       "pad-x": { "$type": "dimension", "$value": "0.875rem" },
       "pad-y": { "$type": "dimension", "$value": "0.625rem" },
       "font": { "$type": "dimension", "$value": "{ref.size.base}" },
-      "target": { "$type": "dimension", "$value": "2.75rem" }
+      "target": { "$type": "dimension", "$value": "2.75rem" },
+      "duration": { "$type": "duration", "$value": "{ref.duration.base}" }
     },
 
     "clinical": {
@@ -32,6 +38,11 @@
         "$type": "dimension",
         "$value": "1.5rem",
         "$description": "Holds at 24px even in dense mode — the WCAG 2.2 AA target-size floor. Below this, mis-taps become clinically consequential. Dense means tighter rows, not smaller buttons."
+      },
+      "duration": {
+        "$type": "duration",
+        "$value": "{ref.duration.fast}",
+        "$description": "A dense worklist must not feel slow. Motion duration belongs to density for the same reason spacing does: the same component serves a nurse scanning ninety rows and a patient reading one screen, and the difference between them is pace."
       }
     }
   },

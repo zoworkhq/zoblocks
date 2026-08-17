@@ -61,6 +61,27 @@ const SUPPORT_ITEMS: BuildableItem[] = [
     ],
   },
   {
+    name: "accordion-core",
+    type: "registry:lib",
+    title: "Accordion core",
+    description:
+      "Headless disclosure behaviour and stylesheet behind Accordion and Disclosure: the open-set policies, the ARIA wiring, the access model, and find-in-page support. Installed automatically with either.",
+    dependencies: [] as string[],
+    registryDependencies: ["utils"],
+    files: [
+      {
+        path: "registry/oxygen/lib/accordion-core.tsx",
+        type: "registry:hook",
+        target: "lib/oxygen-accordion.tsx",
+      },
+      {
+        path: "registry/oxygen/lib/accordion.css",
+        type: "registry:file",
+        target: "styles/oxygen-accordion.css",
+      },
+    ],
+  },
+  {
     name: "switch-core",
     type: "registry:lib",
     title: "Switch core",

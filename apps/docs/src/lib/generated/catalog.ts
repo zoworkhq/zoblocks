@@ -9,6 +9,552 @@ import type { ComponentDoc } from "@oxygenui-design/component-meta";
 
 export const CATALOG: ComponentDoc[] = [
   {
+    "name": "accordion",
+    "title": "Accordion",
+    "tier": "free",
+    "status": "beta",
+    "since": "0.3.0",
+    "layer": "primitive",
+    "distribution": "registry",
+    "summary": "A disclosure widget whose headers can be read while closed, with a per-section access model for content a reader may not simply be shown.",
+    "description": "Collapsible sections with a summary slot in the header, clinical severity on the leading edge, sections that cannot be closed, and four kinds of gate between a reader and content that is governed rather than merely hidden. Ant Design's Collapse API, with the accordion mode's accessibility defects fixed.",
+    "rationale": "Every accordion assumes hidden means unneeded. In a behavioral health record it does not: what is collapsed may be a suicide-risk item, a safety plan someone needs in ninety seconds, a note the patient has a legal right to read but may not be ready to, or a substance-use record governed by a different federal rule than the chart around it. Three consequences follow, and together they are the component. Collapsed is not absent, so the header carries a summary and a severity rail. Disclosure is an event rather than a state change, so opening a governed section can require a consent, a reason code, or nothing but the reader's own choice. And content this reader cannot obtain still gets a row that says so, because deleting it claims the record is complete — which is CONTENT.md's governing rule applied to the one component whose entire job is omitting facts on purpose.",
+    "categories": [
+      "Disclosure",
+      "Layout"
+    ],
+    "fhir": [],
+    "states": [
+      "Closed",
+      "Open",
+      "Summary in the header",
+      "Severity on the leading edge",
+      "Pinned — cannot be closed",
+      "Advisory gate",
+      "Reason gate",
+      "Consent gate",
+      "Consent refused",
+      "Withheld",
+      "Single open at a time",
+      "Nested, with heading levels"
+    ],
+    "props": [
+      {
+        "name": "items",
+        "type": "readonly AccordionItem[]",
+        "description": "The sections. Extends Ant Design's `ItemType` with `summary`, `severity`, `pinned` and `access`.",
+        "required": true
+      },
+      {
+        "name": "accordion",
+        "type": "boolean",
+        "description": "One section open at a time. Ant Design's name, kept for familiarity. Unlike antd it changes only the state policy; the roles, heading and region wiring are identical either way.",
+        "required": false,
+        "default": "false"
+      },
+      {
+        "name": "activeKey",
+        "type": "React.Key | readonly React.Key[]",
+        "description": "Open sections, controlled.",
+        "required": false
+      },
+      {
+        "name": "bordered",
+        "type": "boolean",
+        "description": "Draw the container border.",
+        "required": false,
+        "default": "true"
+      },
+      {
+        "name": "classNames",
+        "type": "Partial<Record<AccordionSlot, string>>",
+        "description": "Per-slot class names, matching Ant Design v6's semantic DOM.",
+        "required": false
+      },
+      {
+        "name": "collapsible",
+        "type": "'header' | 'icon' | 'disabled'",
+        "description": "Which part of the header activates the section.",
+        "required": false
+      },
+      {
+        "name": "defaultActiveKey",
+        "type": "React.Key | readonly React.Key[]",
+        "description": "Open sections on first render, uncontrolled.",
+        "required": false
+      },
+      {
+        "name": "density",
+        "type": "AccordionDensity",
+        "description": "Overrides any inherited `data-ox-density`.",
+        "required": false
+      },
+      {
+        "name": "destroyOnHidden",
+        "type": "boolean",
+        "description": "Unmount a section's content when it closes. Ant Design v6 naming.",
+        "required": false,
+        "default": "false"
+      },
+      {
+        "name": "expandIcon",
+        "type": "((props: { item: AccordionItem; isOpen: boolean; }) => React.ReactNode)",
+        "description": "Replace the chevron. Receives the item and whether it is open.",
+        "required": false
+      },
+      {
+        "name": "expandIconPlacement",
+        "type": "'start' | 'end'",
+        "description": "Ant Design v6 naming — `expandIconPosition` was renamed in v6.",
+        "required": false,
+        "default": "\"start\""
+      },
+      {
+        "name": "findable",
+        "type": "boolean",
+        "description": "Make collapsed content reachable by find-in-page and fragment navigation. On by default. Turning it off is a decision to make Ctrl+F miss content the record contains.",
+        "required": false,
+        "default": "true"
+      },
+      {
+        "name": "ghost",
+        "type": "boolean",
+        "description": "Transparent, borderless, no header fill.",
+        "required": false,
+        "default": "false"
+      },
+      {
+        "name": "headingLevel",
+        "type": "AccordionHeadingLevel",
+        "description": "Heading level for every trigger. Required at a nesting boundary and not knowable by the component. For a screen-reader user the heading list is the chart's table of contents, and a nested accordion that hardcodes its level flattens it silently.",
+        "required": false,
+        "default": "3"
+      },
+      {
+        "name": "locale",
+        "type": "Partial<AccordionLocale>",
+        "description": "Replaces the built-in wording. Patient and clinician catalogs are separate.",
+        "required": false
+      },
+      {
+        "name": "now",
+        "type": "(() => string)",
+        "description": "Injectable clock for the disclosure timestamp. Defaults to now, ISO 8601.",
+        "required": false
+      },
+      {
+        "name": "onChange",
+        "type": "((keys: React.Key[]) => void)",
+        "description": "Fires with every open key, always as an array — including in single mode.",
+        "required": false
+      },
+      {
+        "name": "onDisclose",
+        "type": "((event: DisclosureEvent) => boolean | Promise<boolean>)",
+        "description": "Called when a reader asks to see gated content. Resolve false to refuse.",
+        "required": false
+      },
+      {
+        "name": "panelRole",
+        "type": "AccordionPanelRole",
+        "description": "`region` landmarks on panels. `auto` follows APG: the landmark up to six simultaneously-openable sections, omitted above that, where a landmark list stops being navigation.",
+        "required": false,
+        "default": "\"auto\""
+      },
+      {
+        "name": "printExpanded",
+        "type": "boolean",
+        "description": "Expand every permitted section for printing. Never a withheld one.",
+        "required": false,
+        "default": "true"
+      },
+      {
+        "name": "size",
+        "type": "AccordionSize",
+        "description": "Ant Design v6 naming — `middle` was renamed in v6.",
+        "required": false,
+        "default": "\"medium\""
+      },
+      {
+        "name": "styles",
+        "type": "Partial<Record<AccordionSlot, React.CSSProperties>>",
+        "description": "Per-slot inline styles, matching Ant Design v6's semantic DOM.",
+        "required": false
+      },
+      {
+        "name": "variant",
+        "type": "AccordionVariant",
+        "description": "Container shape. `separate` gives each section its own card.",
+        "required": false
+      }
+    ],
+    "extendsType": "Omit< React.HTMLAttributes<HTMLDivElement>, \"onChange\" | \"children\" | \"defaultValue\" >",
+    "exports": [
+      {
+        "name": "Accordion",
+        "props": [
+          {
+            "name": "items",
+            "type": "readonly AccordionItem[]",
+            "description": "The sections. Extends Ant Design's `ItemType` with `summary`, `severity`, `pinned` and `access`.",
+            "required": true
+          },
+          {
+            "name": "accordion",
+            "type": "boolean",
+            "description": "One section open at a time. Ant Design's name, kept for familiarity. Unlike antd it changes only the state policy; the roles, heading and region wiring are identical either way.",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "activeKey",
+            "type": "React.Key | readonly React.Key[]",
+            "description": "Open sections, controlled.",
+            "required": false
+          },
+          {
+            "name": "bordered",
+            "type": "boolean",
+            "description": "Draw the container border.",
+            "required": false,
+            "default": "true"
+          },
+          {
+            "name": "classNames",
+            "type": "Partial<Record<AccordionSlot, string>>",
+            "description": "Per-slot class names, matching Ant Design v6's semantic DOM.",
+            "required": false
+          },
+          {
+            "name": "collapsible",
+            "type": "'header' | 'icon' | 'disabled'",
+            "description": "Which part of the header activates the section.",
+            "required": false
+          },
+          {
+            "name": "defaultActiveKey",
+            "type": "React.Key | readonly React.Key[]",
+            "description": "Open sections on first render, uncontrolled.",
+            "required": false
+          },
+          {
+            "name": "density",
+            "type": "AccordionDensity",
+            "description": "Overrides any inherited `data-ox-density`.",
+            "required": false
+          },
+          {
+            "name": "destroyOnHidden",
+            "type": "boolean",
+            "description": "Unmount a section's content when it closes. Ant Design v6 naming.",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "expandIcon",
+            "type": "((props: { item: AccordionItem; isOpen: boolean; }) => React.ReactNode)",
+            "description": "Replace the chevron. Receives the item and whether it is open.",
+            "required": false
+          },
+          {
+            "name": "expandIconPlacement",
+            "type": "'start' | 'end'",
+            "description": "Ant Design v6 naming — `expandIconPosition` was renamed in v6.",
+            "required": false,
+            "default": "\"start\""
+          },
+          {
+            "name": "findable",
+            "type": "boolean",
+            "description": "Make collapsed content reachable by find-in-page and fragment navigation. On by default. Turning it off is a decision to make Ctrl+F miss content the record contains.",
+            "required": false,
+            "default": "true"
+          },
+          {
+            "name": "ghost",
+            "type": "boolean",
+            "description": "Transparent, borderless, no header fill.",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "headingLevel",
+            "type": "AccordionHeadingLevel",
+            "description": "Heading level for every trigger. Required at a nesting boundary and not knowable by the component. For a screen-reader user the heading list is the chart's table of contents, and a nested accordion that hardcodes its level flattens it silently.",
+            "required": false,
+            "default": "3"
+          },
+          {
+            "name": "locale",
+            "type": "Partial<AccordionLocale>",
+            "description": "Replaces the built-in wording. Patient and clinician catalogs are separate.",
+            "required": false
+          },
+          {
+            "name": "now",
+            "type": "(() => string)",
+            "description": "Injectable clock for the disclosure timestamp. Defaults to now, ISO 8601.",
+            "required": false
+          },
+          {
+            "name": "onChange",
+            "type": "((keys: React.Key[]) => void)",
+            "description": "Fires with every open key, always as an array — including in single mode.",
+            "required": false
+          },
+          {
+            "name": "onDisclose",
+            "type": "((event: DisclosureEvent) => boolean | Promise<boolean>)",
+            "description": "Called when a reader asks to see gated content. Resolve false to refuse.",
+            "required": false
+          },
+          {
+            "name": "panelRole",
+            "type": "AccordionPanelRole",
+            "description": "`region` landmarks on panels. `auto` follows APG: the landmark up to six simultaneously-openable sections, omitted above that, where a landmark list stops being navigation.",
+            "required": false,
+            "default": "\"auto\""
+          },
+          {
+            "name": "printExpanded",
+            "type": "boolean",
+            "description": "Expand every permitted section for printing. Never a withheld one.",
+            "required": false,
+            "default": "true"
+          },
+          {
+            "name": "size",
+            "type": "AccordionSize",
+            "description": "Ant Design v6 naming — `middle` was renamed in v6.",
+            "required": false,
+            "default": "\"medium\""
+          },
+          {
+            "name": "styles",
+            "type": "Partial<Record<AccordionSlot, React.CSSProperties>>",
+            "description": "Per-slot inline styles, matching Ant Design v6's semantic DOM.",
+            "required": false
+          },
+          {
+            "name": "variant",
+            "type": "AccordionVariant",
+            "description": "Container shape. `separate` gives each section its own card.",
+            "required": false
+          }
+        ],
+        "extendsType": "Omit< React.HTMLAttributes<HTMLDivElement>, \"onChange\" | \"children\" | \"defaultValue\" >"
+      },
+      {
+        "name": "Disclosure",
+        "props": [
+          {
+            "name": "item",
+            "type": "AccordionItem",
+            "description": "The section. Same shape as an accordion item.",
+            "required": true
+          },
+          {
+            "name": "activeKey",
+            "type": "React.Key | readonly React.Key[]",
+            "description": "Open sections, controlled.",
+            "required": false
+          },
+          {
+            "name": "bordered",
+            "type": "boolean",
+            "description": "Draw the container border.",
+            "required": false
+          },
+          {
+            "name": "classNames",
+            "type": "Partial<Record<AccordionSlot, string>>",
+            "description": "Per-slot class names, matching Ant Design v6's semantic DOM.",
+            "required": false
+          },
+          {
+            "name": "collapsible",
+            "type": "'header' | 'icon' | 'disabled'",
+            "description": "Which part of the header activates the section.",
+            "required": false
+          },
+          {
+            "name": "defaultActiveKey",
+            "type": "React.Key | readonly React.Key[]",
+            "description": "Open sections on first render, uncontrolled.",
+            "required": false
+          },
+          {
+            "name": "defaultOpen",
+            "type": "boolean",
+            "description": "Open on first render, uncontrolled.",
+            "required": false
+          },
+          {
+            "name": "density",
+            "type": "AccordionDensity",
+            "description": "Overrides any inherited `data-ox-density`.",
+            "required": false
+          },
+          {
+            "name": "destroyOnHidden",
+            "type": "boolean",
+            "description": "Unmount a section's content when it closes. Ant Design v6 naming.",
+            "required": false
+          },
+          {
+            "name": "expandIcon",
+            "type": "((props: { item: AccordionItem; isOpen: boolean; }) => React.ReactNode)",
+            "description": "Replace the chevron. Receives the item and whether it is open.",
+            "required": false
+          },
+          {
+            "name": "expandIconPlacement",
+            "type": "'start' | 'end'",
+            "description": "Ant Design v6 naming — `expandIconPosition` was renamed in v6.",
+            "required": false
+          },
+          {
+            "name": "findable",
+            "type": "boolean",
+            "description": "Make collapsed content reachable by find-in-page and fragment navigation. On by default. Turning it off is a decision to make Ctrl+F miss content the record contains.",
+            "required": false
+          },
+          {
+            "name": "ghost",
+            "type": "boolean",
+            "description": "Transparent, borderless, no header fill.",
+            "required": false
+          },
+          {
+            "name": "headingLevel",
+            "type": "AccordionHeadingLevel",
+            "description": "Heading level for every trigger. Required at a nesting boundary and not knowable by the component. For a screen-reader user the heading list is the chart's table of contents, and a nested accordion that hardcodes its level flattens it silently.",
+            "required": false
+          },
+          {
+            "name": "locale",
+            "type": "Partial<AccordionLocale>",
+            "description": "Replaces the built-in wording. Patient and clinician catalogs are separate.",
+            "required": false
+          },
+          {
+            "name": "now",
+            "type": "(() => string)",
+            "description": "Injectable clock for the disclosure timestamp. Defaults to now, ISO 8601.",
+            "required": false
+          },
+          {
+            "name": "onDisclose",
+            "type": "((event: DisclosureEvent) => boolean | Promise<boolean>)",
+            "description": "Called when a reader asks to see gated content. Resolve false to refuse.",
+            "required": false
+          },
+          {
+            "name": "onOpenChange",
+            "type": "((open: boolean) => void)",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "open",
+            "type": "boolean",
+            "description": "Open, controlled.",
+            "required": false
+          },
+          {
+            "name": "panelRole",
+            "type": "AccordionPanelRole",
+            "description": "`region` landmarks on panels. `auto` follows APG: the landmark up to six simultaneously-openable sections, omitted above that, where a landmark list stops being navigation.",
+            "required": false
+          },
+          {
+            "name": "printExpanded",
+            "type": "boolean",
+            "description": "Expand every permitted section for printing. Never a withheld one.",
+            "required": false
+          },
+          {
+            "name": "size",
+            "type": "AccordionSize",
+            "description": "Ant Design v6 naming — `middle` was renamed in v6.",
+            "required": false
+          },
+          {
+            "name": "styles",
+            "type": "Partial<Record<AccordionSlot, React.CSSProperties>>",
+            "description": "Per-slot inline styles, matching Ant Design v6's semantic DOM.",
+            "required": false
+          },
+          {
+            "name": "variant",
+            "type": "AccordionVariant",
+            "description": "Container shape. `separate` gives each section its own card.",
+            "required": false
+          }
+        ],
+        "extendsType": "Omit<AccordionProps, \"items\" | \"accordion\" | \"onChange\">"
+      }
+    ],
+    "usage": "import { Accordion } from \"@/components/oxygen/accordion\";\n\n<Accordion\n  headingLevel={2}\n  density=\"clinical\"\n  onDisclose={async (event) => {\n    await audit.record({ section: event.key, reason: event.reasonCode, at: event.at });\n    return true;\n  }}\n  items={[\n    {\n      key: \"risk\",\n      label: \"Risk & suicidality\",\n      severity: \"critical\",\n      summary: \"C-SSRS positive · 13 Aug\",\n      children: <RiskPanel {...risk} />,\n    },\n    {\n      key: \"sud\",\n      label: \"Substance use treatment\",\n      access: { kind: \"consent\", policy: \"42 CFR Part 2\", state: \"granted\" },\n      children: <SudPanel {...sud} />,\n    },\n    {\n      key: \"psychotherapy\",\n      label: \"Psychotherapy notes\",\n      access: { kind: \"withheld\", reason: \"Kept separately by the author\" },\n    },\n  ]}\n/>",
+    "guidance": {
+      "use": [
+        "Long records where most sections are not needed on most visits — charts, treatment plans, note histories.",
+        "Anywhere a section is governed differently from the rest of the screen: 42 CFR Part 2, a Cures Act exception, a break-the-glass access.",
+        "Patient-facing surfaces where the reader should choose when to see something, rather than meeting it on arrival.",
+        "Ordered procedures with one step that must stay visible — a safety plan's crisis contacts."
+      ],
+      "avoid": [
+        "Alternative views of the same region. That is a tab set, and the two patterns announce themselves differently.",
+        "Content that is short enough to show in full. An accordion over four lines costs an interaction and saves nothing.",
+        "Hiding a fact to save a row. Density is spacing, never which clinical facts appear.",
+        "As an access control. The gate is an interface affordance for a policy the application owns and enforces elsewhere."
+      ]
+    },
+    "accessibility": [
+      {
+        "label": "Every trigger is a real button inside a real heading",
+        "detail": "The trigger is a <button> wrapped in an h1–h6 chosen by headingLevel, so Enter and Space both activate it and every section appears in a screen reader's heading list. Ant Design renders a div with role=button that handles Enter only — which means Space scrolls the page instead of opening the section — and no heading element at all, so a fourteen-section chart offers no outline."
+      },
+      {
+        "label": "One pattern in every configuration",
+        "detail": "The accordion prop changes the state policy and nothing else. There is no role=tablist, tab, or tabpanel in any configuration, and aria-controls, the panel id, and aria-labelledby are wired identically whether one section opens at a time or several."
+      },
+      {
+        "label": "Region landmarks, but only up to six",
+        "detail": "panelRole=auto follows APG: role=region with aria-labelledby up to six simultaneously-openable sections, omitted above that, where a landmark list stops being navigation and becomes noise. A withheld panel is never a region — an empty landmark is a dead end in the rotor."
+      },
+      {
+        "label": "Collapsed content is still findable",
+        "detail": "Closed panels carry hidden=\"until-found\", so Ctrl+F and fragment navigation reveal them. A clinician searching a chart for a drug name and getting no match concludes the record does not mention it."
+      },
+      {
+        "label": "Disabled triggers still take focus",
+        "detail": "Pinned and withheld sections set aria-disabled rather than disabled, so a keyboard user lands on them and hears the label instead of tabbing past a row that appears not to exist."
+      },
+      {
+        "label": "Arrow keys navigate, and never activate",
+        "detail": "Up, Down, Home and End move focus between headers and wrap. They never toggle a section, so a keyboard user cannot open a governed one by scrolling through the list."
+      }
+    ],
+    "limitations": [
+      "Not an access control. onDisclose reports that a reader asked; refusing to render is not the same as refusing to serve, and the application still owns authorisation and audit.",
+      "Severity is supplied, never derived. The component will not score an instrument or decide what is urgent — that would make it clinical decision support.",
+      "React cannot express hidden=\"until-found\": React 19 serialises it as hidden=\"\", so the attribute is upgraded after commit. Between commit and effect a closed panel is hidden but not yet findable.",
+      "Requires styles/oxygen-accordion.css, installed with accordion-core.",
+      "Above roughly 200 sections, render your own windowed list over useAccordion. Virtualising breaks find-in-page, so the component does not do it silently.",
+      "persistKey is not implemented. Remembering which sections a reader opened is per-product storage, and storing it for a gated section would defeat the gate."
+    ],
+    "related": [
+      "chart-accordion",
+      "safety-plan"
+    ],
+    "dependencies": [
+      "clsx",
+      "tailwind-merge"
+    ],
+    "install": "pnpm dlx shadcn@latest add https://oxygenui.design/r/accordion.json"
+  },
+  {
     "name": "breath-loader",
     "title": "Breath Loader",
     "tier": "free",
@@ -304,6 +850,367 @@ export const CATALOG: ComponentDoc[] = [
     "install": "pnpm dlx shadcn@latest add https://oxygenui.design/r/breath-loader.json"
   },
   {
+    "name": "chart-accordion",
+    "title": "Chart Accordion",
+    "tier": "free",
+    "status": "beta",
+    "since": "0.3.0",
+    "layer": "clinical",
+    "distribution": "registry",
+    "summary": "A record's sections with their headers composed to the house rules, so a severity can never reach the screen without the words that explain it.",
+    "description": "Accordion with a clinical summary vocabulary: a status paired with its severity, a count, and a timestamp at the precision the record holds. Adds an expand-all control that never opens a section the reader may not have.",
+    "rationale": "Accordion will happily let a product build a header that says nothing, and at fourteen sections that produces a chart nobody reads. This component closes that gap by composing the summary itself from a small, closed vocabulary. The type does the enforcing: passing severity without status is a build error, because a coloured rail with no words beside it is a signal that forced-colors mode discards, monochrome printing discards, and roughly one in twelve men cannot resolve. The expand-all control is here rather than on the primitive because expanding a whole record is a chart-shaped action — it is what makes the record searchable and printable in one press — and it has to know not to touch a withheld section.",
+    "categories": [
+      "Disclosure",
+      "Clinical"
+    ],
+    "fhir": [],
+    "states": [
+      "Closed, with summaries",
+      "Expanded",
+      "Severity across the scale",
+      "Consent gate",
+      "Withheld section",
+      "Section that failed to load",
+      "No sections"
+    ],
+    "props": [
+      {
+        "name": "sections",
+        "type": "readonly ChartSection[]",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "bordered",
+        "type": "boolean",
+        "description": "Draw the container border.",
+        "required": false
+      },
+      {
+        "name": "classNames",
+        "type": "Partial<Record<AccordionSlot, string>>",
+        "description": "Per-slot class names, matching Ant Design v6's semantic DOM.",
+        "required": false
+      },
+      {
+        "name": "collapsible",
+        "type": "'header' | 'icon' | 'disabled'",
+        "description": "Which part of the header activates the section.",
+        "required": false
+      },
+      {
+        "name": "defaultOpenKeys",
+        "type": "readonly React.Key[]",
+        "description": "Open on first render.",
+        "required": false
+      },
+      {
+        "name": "density",
+        "type": "AccordionDensity",
+        "description": "Overrides any inherited `data-ox-density`.",
+        "required": false,
+        "default": "\"clinical\""
+      },
+      {
+        "name": "destroyOnHidden",
+        "type": "boolean",
+        "description": "Unmount a section's content when it closes. Ant Design v6 naming.",
+        "required": false
+      },
+      {
+        "name": "expandIcon",
+        "type": "((props: { item: AccordionItem; isOpen: boolean; }) => React.ReactNode)",
+        "description": "Replace the chevron. Receives the item and whether it is open.",
+        "required": false
+      },
+      {
+        "name": "expandIconPlacement",
+        "type": "'start' | 'end'",
+        "description": "Ant Design v6 naming — `expandIconPosition` was renamed in v6.",
+        "required": false
+      },
+      {
+        "name": "findable",
+        "type": "boolean",
+        "description": "Make collapsed content reachable by find-in-page and fragment navigation. On by default. Turning it off is a decision to make Ctrl+F miss content the record contains.",
+        "required": false
+      },
+      {
+        "name": "ghost",
+        "type": "boolean",
+        "description": "Transparent, borderless, no header fill.",
+        "required": false
+      },
+      {
+        "name": "headingLevel",
+        "type": "AccordionHeadingLevel",
+        "description": "Heading level for every trigger. Required at a nesting boundary and not knowable by the component. For a screen-reader user the heading list is the chart's table of contents, and a nested accordion that hardcodes its level flattens it silently.",
+        "required": false,
+        "default": "3"
+      },
+      {
+        "name": "locale",
+        "type": "Partial<AccordionLocale>",
+        "description": "Replaces the built-in wording. Patient and clinician catalogs are separate.",
+        "required": false
+      },
+      {
+        "name": "now",
+        "type": "(() => string)",
+        "description": "Injectable clock for the disclosure timestamp. Defaults to now, ISO 8601.",
+        "required": false
+      },
+      {
+        "name": "onChange",
+        "type": "((keys: React.Key[]) => void)",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "onDisclose",
+        "type": "((event: DisclosureEvent) => boolean | Promise<boolean>)",
+        "description": "Called when a reader asks to see gated content. Resolve false to refuse.",
+        "required": false
+      },
+      {
+        "name": "panelRole",
+        "type": "AccordionPanelRole",
+        "description": "`region` landmarks on panels. `auto` follows APG: the landmark up to six simultaneously-openable sections, omitted above that, where a landmark list stops being navigation.",
+        "required": false
+      },
+      {
+        "name": "printExpanded",
+        "type": "boolean",
+        "description": "Expand every permitted section for printing. Never a withheld one.",
+        "required": false
+      },
+      {
+        "name": "size",
+        "type": "AccordionSize",
+        "description": "Ant Design v6 naming — `middle` was renamed in v6.",
+        "required": false
+      },
+      {
+        "name": "styles",
+        "type": "Partial<Record<AccordionSlot, React.CSSProperties>>",
+        "description": "Per-slot inline styles, matching Ant Design v6's semantic DOM.",
+        "required": false
+      },
+      {
+        "name": "toolbar",
+        "type": "boolean",
+        "description": "Show \"Expand all\" and \"Collapse all\". On by default.",
+        "required": false,
+        "default": "true"
+      },
+      {
+        "name": "toolbarLabel",
+        "type": "React.ReactNode",
+        "description": "Leading content in the toolbar — usually who the record belongs to.",
+        "required": false
+      },
+      {
+        "name": "variant",
+        "type": "AccordionVariant",
+        "description": "Container shape. `separate` gives each section its own card.",
+        "required": false
+      }
+    ],
+    "extendsType": "Omit< AccordionProps, \"items\" | \"activeKey\" | \"defaultActiveKey\" | \"accordion\" | \"onChange\" >",
+    "exports": [
+      {
+        "name": "ChartAccordion",
+        "props": [
+          {
+            "name": "sections",
+            "type": "readonly ChartSection[]",
+            "description": "",
+            "required": true
+          },
+          {
+            "name": "bordered",
+            "type": "boolean",
+            "description": "Draw the container border.",
+            "required": false
+          },
+          {
+            "name": "classNames",
+            "type": "Partial<Record<AccordionSlot, string>>",
+            "description": "Per-slot class names, matching Ant Design v6's semantic DOM.",
+            "required": false
+          },
+          {
+            "name": "collapsible",
+            "type": "'header' | 'icon' | 'disabled'",
+            "description": "Which part of the header activates the section.",
+            "required": false
+          },
+          {
+            "name": "defaultOpenKeys",
+            "type": "readonly React.Key[]",
+            "description": "Open on first render.",
+            "required": false
+          },
+          {
+            "name": "density",
+            "type": "AccordionDensity",
+            "description": "Overrides any inherited `data-ox-density`.",
+            "required": false,
+            "default": "\"clinical\""
+          },
+          {
+            "name": "destroyOnHidden",
+            "type": "boolean",
+            "description": "Unmount a section's content when it closes. Ant Design v6 naming.",
+            "required": false
+          },
+          {
+            "name": "expandIcon",
+            "type": "((props: { item: AccordionItem; isOpen: boolean; }) => React.ReactNode)",
+            "description": "Replace the chevron. Receives the item and whether it is open.",
+            "required": false
+          },
+          {
+            "name": "expandIconPlacement",
+            "type": "'start' | 'end'",
+            "description": "Ant Design v6 naming — `expandIconPosition` was renamed in v6.",
+            "required": false
+          },
+          {
+            "name": "findable",
+            "type": "boolean",
+            "description": "Make collapsed content reachable by find-in-page and fragment navigation. On by default. Turning it off is a decision to make Ctrl+F miss content the record contains.",
+            "required": false
+          },
+          {
+            "name": "ghost",
+            "type": "boolean",
+            "description": "Transparent, borderless, no header fill.",
+            "required": false
+          },
+          {
+            "name": "headingLevel",
+            "type": "AccordionHeadingLevel",
+            "description": "Heading level for every trigger. Required at a nesting boundary and not knowable by the component. For a screen-reader user the heading list is the chart's table of contents, and a nested accordion that hardcodes its level flattens it silently.",
+            "required": false,
+            "default": "3"
+          },
+          {
+            "name": "locale",
+            "type": "Partial<AccordionLocale>",
+            "description": "Replaces the built-in wording. Patient and clinician catalogs are separate.",
+            "required": false
+          },
+          {
+            "name": "now",
+            "type": "(() => string)",
+            "description": "Injectable clock for the disclosure timestamp. Defaults to now, ISO 8601.",
+            "required": false
+          },
+          {
+            "name": "onChange",
+            "type": "((keys: React.Key[]) => void)",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "onDisclose",
+            "type": "((event: DisclosureEvent) => boolean | Promise<boolean>)",
+            "description": "Called when a reader asks to see gated content. Resolve false to refuse.",
+            "required": false
+          },
+          {
+            "name": "panelRole",
+            "type": "AccordionPanelRole",
+            "description": "`region` landmarks on panels. `auto` follows APG: the landmark up to six simultaneously-openable sections, omitted above that, where a landmark list stops being navigation.",
+            "required": false
+          },
+          {
+            "name": "printExpanded",
+            "type": "boolean",
+            "description": "Expand every permitted section for printing. Never a withheld one.",
+            "required": false
+          },
+          {
+            "name": "size",
+            "type": "AccordionSize",
+            "description": "Ant Design v6 naming — `middle` was renamed in v6.",
+            "required": false
+          },
+          {
+            "name": "styles",
+            "type": "Partial<Record<AccordionSlot, React.CSSProperties>>",
+            "description": "Per-slot inline styles, matching Ant Design v6's semantic DOM.",
+            "required": false
+          },
+          {
+            "name": "toolbar",
+            "type": "boolean",
+            "description": "Show \"Expand all\" and \"Collapse all\". On by default.",
+            "required": false,
+            "default": "true"
+          },
+          {
+            "name": "toolbarLabel",
+            "type": "React.ReactNode",
+            "description": "Leading content in the toolbar — usually who the record belongs to.",
+            "required": false
+          },
+          {
+            "name": "variant",
+            "type": "AccordionVariant",
+            "description": "Container shape. `separate` gives each section its own card.",
+            "required": false
+          }
+        ],
+        "extendsType": "Omit< AccordionProps, \"items\" | \"activeKey\" | \"defaultActiveKey\" | \"accordion\" | \"onChange\" >"
+      }
+    ],
+    "usage": "import { ChartAccordion } from \"@/components/oxygen/chart-accordion\";\n\n<ChartAccordion\n  toolbarLabel=\"Ada Lovelace · 38 · MRN 4471902\"\n  headingLevel={2}\n  onDisclose={async (event) => audit.record(event)}\n  sections={[\n    {\n      key: \"risk\",\n      label: \"Risk & suicidality\",\n      severity: \"critical\",\n      status: \"C-SSRS positive\",\n      updatedAt: \"2026-08-13T09:12:00+05:30\",\n      children: <RiskPanel {...risk} />,\n    },\n    {\n      key: \"meds\",\n      label: \"Medications\",\n      severity: \"high\",\n      status: \"Clozapine ANC due 18 Aug\",\n      count: \"4 active\",\n      children: <MedicationList {...meds} />,\n    },\n    {\n      key: \"psychotherapy\",\n      label: \"Psychotherapy notes\",\n      access: { kind: \"withheld\", reason: \"Kept separately by the author\" },\n    },\n  ]}\n/>",
+    "guidance": {
+      "use": [
+        "The main record view, where sections are read closed more often than open.",
+        "Any list of sections where at least one can carry a severity.",
+        "Surfaces that need to be printable in one action."
+      ],
+      "avoid": [
+        "Patient-facing surfaces — this is clinician density and clinician vocabulary. Compose Accordion directly.",
+        "Two or three sections. The toolbar and the summary vocabulary are overhead at that size.",
+        "As a layout for content with no state to summarise. Use Accordion."
+      ]
+    },
+    "accessibility": [
+      {
+        "label": "Severity is never alone",
+        "detail": "The type requires a status alongside a severity, so the rail always has words beside it. The chip renders text plus colour plus a token-driven border, and the text is what survives forced-colors mode and a monochrome print."
+      },
+      {
+        "label": "Expand all is a real control, not a link",
+        "detail": "Both toolbar controls are buttons with a 24px minimum target, focusable in order, and they change the accordion's controlled state rather than reaching into the DOM."
+      },
+      {
+        "label": "Timestamps carry their precision",
+        "detail": "updatedAt renders inside a <time datetime> using the exact string the record holds, so a FHIR 2026-08 stays August rather than being widened to the first of the month."
+      }
+    ],
+    "limitations": [
+      "The chip is local to this component until StatusBadge ships. It already uses the --ox-badge-* tokens, so adopting StatusBadge is a refactor rather than a re-design.",
+      "The timestamp is rendered verbatim, not localised. Formatting and time-zone rendering belong to @oxygenui-design/intl, and inventing a second formatter here would guarantee they disagree.",
+      "Expand all opens gated sections to their gate, not to their content — one press cannot consent on the reader's behalf.",
+      "Sections are rendered in the order given. It does not sort by severity, because a record's order is usually clinical rather than alphabetical."
+    ],
+    "related": [
+      "accordion",
+      "safety-plan"
+    ],
+    "dependencies": [
+      "clsx",
+      "tailwind-merge"
+    ],
+    "install": "pnpm dlx shadcn@latest add https://oxygenui.design/r/chart-accordion.json"
+  },
+  {
     "name": "consult",
     "title": "Consult",
     "tier": "free",
@@ -479,7 +1386,7 @@ export const CATALOG: ComponentDoc[] = [
       },
       {
         "name": "surface",
-        "type": "'clinician' | 'patient'",
+        "type": "'patient' | 'clinician'",
         "description": "Which surface this is. `patient` throws for every built-in mode.",
         "required": false
       }
@@ -619,7 +1526,7 @@ export const CATALOG: ComponentDoc[] = [
           },
           {
             "name": "surface",
-            "type": "'clinician' | 'patient'",
+            "type": "'patient' | 'clinician'",
             "description": "Which surface this is. `patient` throws for every built-in mode.",
             "required": false
           }
@@ -1953,6 +2860,166 @@ export const CATALOG: ComponentDoc[] = [
       "tailwind-merge"
     ],
     "install": "pnpm dlx shadcn@latest add https://oxygenui.design/r/rhythm-loader.json"
+  },
+  {
+    "name": "safety-plan",
+    "title": "Safety Plan",
+    "tier": "free",
+    "status": "beta",
+    "since": "0.3.0",
+    "layer": "block",
+    "distribution": "registry",
+    "summary": "The six steps of the Stanley-Brown Safety Planning Intervention, in order, with the crisis step rendered open and uncloseable.",
+    "description": "A patient-facing safety plan: warning signs, coping, distraction, people to ask, professionals and agencies, and means restriction. The crisis step cannot be collapsed, empty steps say they are unfinished rather than disappearing, and the wording is a patient catalog throughout.",
+    "rationale": "A safety plan is written collaboratively in a room and read alone, often on a phone, often at the worst hour of someone's week. That reading context is the whole design. The crisis step holds the phone numbers, so it renders open and its trigger reports itself disabled — a person in crisis does not scroll, does not scan, and should not have to make a correct decision about a chevron to reach a number. The step order is the intervention rather than a layout: the escalation from what someone can do alone to who they call is the clinical content, so nothing here sorts or filters. And a step nobody has filled in says so instead of vanishing, because a five-step plan numbered one to five claims the sixth was never part of the instrument.",
+    "categories": [
+      "Disclosure",
+      "Clinical"
+    ],
+    "fhir": [],
+    "states": [
+      "Complete plan",
+      "Crisis step pinned open",
+      "Unfinished step",
+      "Empty plan",
+      "Clinician editing view, nothing pinned"
+    ],
+    "props": [
+      {
+        "name": "steps",
+        "type": "Partial<Record<SafetyPlanStepKey, SafetyPlanStepContent>>",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "density",
+        "type": "AccordionDensity",
+        "description": "",
+        "required": false,
+        "default": "\"patient\""
+      },
+      {
+        "name": "headingLevel",
+        "type": "AccordionHeadingLevel",
+        "description": "",
+        "required": false,
+        "default": "3"
+      },
+      {
+        "name": "labels",
+        "type": "Partial<SafetyPlanLabels>",
+        "description": "Replaces the built-in patient-facing wording.",
+        "required": false
+      },
+      {
+        "name": "pinCrisisStep",
+        "type": "boolean",
+        "description": "Keep the crisis step open and uncloseable. Defaults to true and should stay true on any surface a person in crisis might open. Turning it off is for a clinician's editing view, where every step is being worked on and none of them is the emergency.",
+        "required": false,
+        "default": "true"
+      },
+      {
+        "name": "revisedAt",
+        "type": "string",
+        "description": "ISO 8601. Shown so a reader knows how current the plan is.",
+        "required": false
+      }
+    ],
+    "extendsType": "Omit< React.HTMLAttributes<HTMLDivElement>, \"children\" | \"onChange\" >",
+    "exports": [
+      {
+        "name": "SafetyPlan",
+        "props": [
+          {
+            "name": "steps",
+            "type": "Partial<Record<SafetyPlanStepKey, SafetyPlanStepContent>>",
+            "description": "",
+            "required": true
+          },
+          {
+            "name": "density",
+            "type": "AccordionDensity",
+            "description": "",
+            "required": false,
+            "default": "\"patient\""
+          },
+          {
+            "name": "headingLevel",
+            "type": "AccordionHeadingLevel",
+            "description": "",
+            "required": false,
+            "default": "3"
+          },
+          {
+            "name": "labels",
+            "type": "Partial<SafetyPlanLabels>",
+            "description": "Replaces the built-in patient-facing wording.",
+            "required": false
+          },
+          {
+            "name": "pinCrisisStep",
+            "type": "boolean",
+            "description": "Keep the crisis step open and uncloseable. Defaults to true and should stay true on any surface a person in crisis might open. Turning it off is for a clinician's editing view, where every step is being worked on and none of them is the emergency.",
+            "required": false,
+            "default": "true"
+          },
+          {
+            "name": "revisedAt",
+            "type": "string",
+            "description": "ISO 8601. Shown so a reader knows how current the plan is.",
+            "required": false
+          }
+        ],
+        "extendsType": "Omit< React.HTMLAttributes<HTMLDivElement>, \"children\" | \"onChange\" >"
+      }
+    ],
+    "usage": "import { SafetyPlan } from \"@/components/oxygen/safety-plan\";\n\n<SafetyPlan\n  revisedAt=\"2026-08-11\"\n  headingLevel={2}\n  steps={{\n    warningSigns: { entries: [\"Sleeping less than four hours\", \"Not answering messages for two days\"] },\n    internalCoping: { entries: [\"Walk to the end of the road and back\", \"Four in, six out, ten times\"] },\n    distractions: { entries: [\"The cafe on Bell Street before 11am\"] },\n    supportContacts: { contacts: [{ name: \"Priya\", detail: \"Sister\", availability: \"Any time\" }] },\n    professionals: {\n      contacts: [\n        { name: \"988\", detail: \"Suicide & Crisis Lifeline\", availability: \"24 hours\" },\n        { name: \"County crisis team\", detail: \"555 0148\", availability: \"24 hours\" },\n      ],\n    },\n    environment: { entries: [\"Priya is holding the spare keys to the garage\"] },\n  }}\n/>",
+    "guidance": {
+      "use": [
+        "Patient-facing portals and apps, which is what the default patient density and second-person wording are for.",
+        "A clinician's read-only view of a plan someone else wrote.",
+        "Printed copies — the crisis step prints expanded whatever else is closed."
+      ],
+      "avoid": [
+        "As the editor. This renders a plan; writing one is a form, with its own validation and consent.",
+        "With pinCrisisStep off on any surface a person in crisis might open. That switch is for an editing view.",
+        "As a substitute for a risk assessment. A plan is an intervention someone agreed to, not a score."
+      ]
+    },
+    "accessibility": [
+      {
+        "label": "The crisis step is reachable without an interaction",
+        "detail": "It renders expanded and its trigger carries aria-disabled=true, which is the case APG defines: the panel is visible and the accordion prevents collapsing it. The trigger stays focusable, so a keyboard or screen-reader user lands on it and hears the label rather than tabbing past it."
+      },
+      {
+        "label": "Pinning is stated in words",
+        "detail": "The header shows an \"Always open\" summary and the panel repeats the reason in a sentence, so the behaviour reads as intentional rather than as a stuck control — including in forced-colors mode, where the tint on the crisis panel is discarded."
+      },
+      {
+        "label": "Steps keep their numbers in text",
+        "detail": "The step number is part of the heading string rather than a separate element, so it survives being announced, copied, and printed."
+      },
+      {
+        "label": "Contacts are a description list",
+        "detail": "Names and how to reach them are marked up as dt/dd pairs, so a screen reader can navigate them as pairs instead of a run of text."
+      }
+    ],
+    "limitations": [
+      "Renders a plan; it does not create or edit one.",
+      "The six steps are fixed. Labels are replaceable, order is not — reordering would change the instrument.",
+      "Not a crisis-service integration. Numbers are rendered as the plan records them; the component does not dial, verify, or geolocate.",
+      "Default wording is English and patient-facing. A clinician-facing surface needs its own catalog, not a tone change.",
+      "No expiry logic. Whether a plan is stale is a clinical judgement, so revisedAt is displayed rather than interpreted."
+    ],
+    "related": [
+      "accordion",
+      "chart-accordion"
+    ],
+    "dependencies": [
+      "clsx",
+      "tailwind-merge"
+    ],
+    "install": "pnpm dlx shadcn@latest add https://oxygenui.design/r/safety-plan.json"
   },
   {
     "name": "switch",
