@@ -51,7 +51,8 @@
     "prepublishOnly": "node scripts/require-pnpm.mjs",
     "build": "tsc -p tsconfig.build.json && node scripts/fix-esm-extensions.mjs",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test": "vitest run"
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage"
   },
   "devDependencies": {
     "@oxygenui-design/tsconfig": "workspace:*",

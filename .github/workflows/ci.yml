@@ -31,6 +31,19 @@ env:
   # fixed path is also the only thing actions/cache can be pointed at.
   MONGOMS_DOWNLOAD_DIR: ${{ github.workspace }}/.cache/mongodb-binaries
 
+  # Turbo's cache location, pinned so there is a single directory to restore.
+  #
+  # This is load-bearing and easy to get wrong: by default Turbo does NOT keep
+  # a central cache. It writes per-package `.turbo/` directories, and for a task
+  # with no declared `outputs` it keeps only the task log. Caching the root
+  # `.turbo` therefore captures run summaries and nothing else — a cache step
+  # that is green, fast, and does nothing at all.
+  #
+  # Verified rather than assumed: with this set, `turbo run build` writes
+  # `<hash>.tar.zst` artifacts here, and deleting `dist` then re-running
+  # restores it and reports FULL TURBO.
+  TURBO_CACHE_DIR: ${{ github.workspace }}/.turbo/cache
+
 jobs:
   verify:
     name: Typecheck, test, build
@@ -50,23 +63,49 @@ jobs:
     timeout-minutes: 25
 
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4
 
-      - uses: actions/setup-node@v7
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
-          node-version: 22
+          node-version-file: .nvmrc
           cache: pnpm
 
       # hq's tests run against a real mongod, fetched by mongodb-memory-server's
       # postinstall. Restored before install so the postinstall finds it, and so
       # a bad day at the download host cannot fail an otherwise-green build.
       - name: Cache mongod binary
-        uses: actions/cache@v4
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
         with:
           path: ${{ github.workspace }}/.cache/mongodb-binaries
           key: mongod-${{ runner.os }}-7.0.24
+
+      # Turbo's local cache, carried between runs.
+      #
+      # `turbo.json` has declared correct `outputs` for build, test and
+      # test:coverage all along, so the task graph was always cacheable — there
+      # was simply nothing persisting it, and every run recomputed typecheck
+      # (123s), test (227s), coverage (208s) and build (74s) from cold,
+      # including for a pull request that changed one markdown file.
+      #
+      # The key is content, not branch. Turbo hashes each task's own inputs, so
+      # a restored cache cannot produce a stale result: changed input, changed
+      # hash, cache miss. The lockfile is in the key because a dependency change
+      # invalidates everything downstream of it, and the SHA makes each run
+      # write a fresh entry rather than fight another run for one. The prefixes
+      # are what actually deliver the hits.
+      #
+      # Deliberately not keyed on branch name alone — that is how a cache entry
+      # for one set of inputs gets served for another.
+      - name: Cache Turbo
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
+        with:
+          path: ${{ github.workspace }}/.turbo/cache
+          key: turbo-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}-${{ github.sha }}
+          restore-keys: |
+            turbo-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}-
+            turbo-${{ runner.os }}-
 
       - name: Install
         run: pnpm install --frozen-lockfile
@@ -113,8 +152,10 @@ jobs:
       # The number may go down. It may not go up: a new warning fails the build,
       # so adding one means fixing it, or fixing another to make room. When it
       # reaches zero, both rules become errors and the flag goes away.
-      # C5: a critical advisory in the toolchain is a critical advisory. This
-      # fails the build rather than waiting for a procurement reviewer to run it.
+      # A high-or-worse advisory in the toolchain fails the build rather than
+      # waiting for a procurement reviewer to run it. (The threshold is `high`,
+      # not `critical` — the comment used to say critical, which understated
+      # what this actually enforces.)
       - name: Audit dependencies
         run: pnpm audit --audit-level=high
 
@@ -136,16 +177,29 @@ jobs:
       - name: Typecheck
         run: pnpm typecheck
 
-      # Two layers, both required to pass:
+      # One instrumented run, not two.
       #
-      #   `turbo run test`   — the workspace packages (FHIR helpers) and hq's
-      #                        auth, permissions, and server actions, the last
-      #                        against a real mongod rather than a mocked driver:
-      #                        the guarantees there (a unique index deciding a
+      # This was `Test` (227s) followed by `Coverage thresholds` (208s), which
+      # executed substantially the same suites twice — 41% of the whole build.
+      # The obvious fix was wrong for a long time and the workflow said so:
+      # eight packages defined `test` without `test:coverage`, so dropping the
+      # first step would have silently stopped running them.
+      #
+      # Those eight now define both, so `test:coverage` is a strict superset.
+      # Verified by comparing per-package suite counts across the two commands
+      # before the step was removed: 20 packages and 2768 tests under each,
+      # with no package present in one and absent from the other.
+      #
+      # Two layers still run, and both must pass:
+      #
+      #   `turbo run test:coverage` — the workspace packages and hq's auth,
+      #                        permissions and server actions, the last against
+      #                        a real mongod rather than a mocked driver: the
+      #                        guarantees there (a unique index deciding a
       #                        duplicate signup, an atomic claim deciding who is
       #                        the first admin) live in the database, so a mock
       #                        would assert the code calls what it calls.
-      #   `pnpm test:registry` — the 29 registry components, rendered in jsdom
+      #   `vitest run --coverage` — the registry components, rendered in jsdom
       #                        against the source a customer actually receives.
       #
       # Every component asserts the safety claim it exists to make: an
@@ -153,16 +207,9 @@ jobs:
       # unknown code status never defaults to full code, a restricted record
       # fails closed. Those are the failures that look fine in review.
       #
-      # The registry half needs no build — the workspace packages resolve to
-      # their TypeScript sources — so it is safe to run here, ahead of Build.
-      - name: Test
-        run: pnpm test
-
       # Coverage is a gate, not a report. The readiness audit's tier bar puts
-      # `beta` at 90% lines / 85% branches, and the packages that declare
-      # thresholds fail their own run when they slip below — so this step goes
-      # red on a regression rather than quietly publishing a number nobody
-      # reads.
+      # `beta` at 90% lines / 85% branches, and a package that declares
+      # thresholds fails its own run when it slips below.
       - name: Coverage thresholds
         run: pnpm test:coverage
 
@@ -174,30 +221,44 @@ jobs:
       # Its first run found four real violations, including a contrast failure
       # on the footer's own legal limitation statement and three in the
       # clinical status tokens.
-      - name: Install Playwright browsers
-        # Firefox and WebKit as well as Chromium: the library publishes a WCAG
-        # 2.2 AA claim, and a focus ring or a forced-colours fallback that works
-        # in one engine and not another is exactly the defect that claim hides.
-        run: pnpm exec playwright install --with-deps chromium firefox webkit
-
-      - name: Accessibility (WCAG 2.2 AA, both themes)
+      # Browser binaries are ~300MB and took 71s to fetch on every single run.
+      # Keyed on the resolved Playwright version rather than the lockfile hash,
+      # so an unrelated dependency bump does not throw the browsers away.
+      - name: Resolve the Playwright version
+        id: pw
         run: |
-          # The filter is checked before starting, because `pnpm --filter` on a
-          # name that matches nothing prints a notice and exits quietly.
-          # Backgrounded, that surfaces 60s later as "timed out waiting for
-          # localhost:6001", which points at the server rather than at the
-          # renamed package that actually broke it.
-          # `pnpm --filter <unmatched> exec` still exits 0, so the exit code
-          # cannot be used. `ls --json` prints nothing at all when no package
-          # matches, which can.
-          if [ -z "$(pnpm --filter @oxygenui-design/docs ls --depth -1 --json 2>/dev/null)" ]; then
-            echo "::error::No package matched @oxygenui-design/docs — check the name in apps/docs/package.json."
-            exit 1
-          fi
+          version=$(node -p "require('@playwright/test/package.json').version")
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "Playwright $version"
 
-          pnpm --filter @oxygenui-design/docs start &
-          npx wait-on http://localhost:6001 -t 60000
-          pnpm a11y http://localhost:6001
+      - name: Cache Playwright browsers
+        id: pw-cache
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ steps.pw.outputs.version }}
+
+      # Firefox and WebKit as well as Chromium: the library publishes a WCAG
+      # 2.2 AA claim, and a focus ring or a forced-colours fallback that works
+      # in one engine and not another is exactly the defect that claim hides.
+      #
+      # Two steps, because only one half is cacheable. The browsers live in the
+      # cached directory; `--with-deps` installs OS packages system-wide, which
+      # a cache cannot hold, and which are cheap.
+      - name: Install Playwright browsers
+        if: steps.pw-cache.outputs.cache-hit != 'true'
+        run: pnpm exec playwright install chromium firefox webkit
+
+      - name: Install Playwright system dependencies
+        run: pnpm exec playwright install-deps chromium firefox webkit
+
+      # The server plumbing lives in scripts/verify-a11y.sh so this and
+      # `pnpm verify --ci` run the same code. The site publishes a WCAG 2.2 AA
+      # conformance claim; this is what makes it checkable rather than
+      # aspirational, and its first run found four real violations including a
+      # contrast failure on the footer's own legal limitation statement.
+      - name: Accessibility (WCAG 2.2 AA, both themes)
+        run: bash scripts/verify-a11y.sh
 
       # Visual regression, plus the accessibility checks that need a real layout
       # engine: 320px reflow, 200% zoom, forced colours, the focus indicator,
@@ -229,9 +290,16 @@ jobs:
           OXYGEN_BASE_URL: http://localhost:6001
         run: pnpm e2e:ci
 
+      # A retried-but-passed test leaves no signal anyone reads: the job is
+      # green and the retry is buried in the log. `always()` because a flake is
+      # most worth reporting on the run where something else also failed.
+      - name: Report flaky tests
+        if: always()
+        run: node scripts/flaky.mjs
+
       - name: Upload the Playwright report on failure
         if: failure()
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: playwright-report
           path: playwright-report/
@@ -252,7 +320,7 @@ jobs:
     timeout-minutes: 5
 
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       # Fixtures must stay synthetic. This catches the obvious mistakes — a real
       # identifier system, a production hostname — not every possible one. It is
@@ -263,36 +331,12 @@ jobs:
       # homepage, in component documentation — so the job was red on every
       # commit and told us nothing. A check that always fails is a check nobody
       # reads. Patterns here must match DATA, never discussion of data.
+      # The patterns live in scripts/no-phi.sh so this and `pnpm verify` run
+      # identical code. Inline here, it was a CI-only gate — a developer could
+      # not run it without copying shell out of a YAML file, so nobody did, and
+      # it could only ever fail after a push.
       - name: Scan for non-synthetic identifiers
-        run: |
-          set -euo pipefail
-          fail=0
-
-          # Real terminology systems, vendor hostnames, and SSN-shaped literals.
-          # Plain -E only: portable, and testable on a developer's machine.
-          patterns='hl7\.org/fhir/sid/us-ssn|hl7\.org/fhir/sid/us-mbi'
-          patterns="$patterns"'|epic\.com|cerner\.com|athenahealth|allscripts\.com'
-          patterns="$patterns"'|[0-9]{3}-[0-9]{2}-[0-9]{4}'
-          if grep -rInE "$patterns" packages/fixtures registry apps/docs/src; then
-            echo "::error::Real identifier system, vendor hostname, or SSN-shaped literal found above."
-            fail=1
-          fi
-
-          # Email addresses outside the reserved example domains. Two passes
-          # rather than a PCRE lookahead, so the same command runs locally.
-          #
-          # zowork.com is allowed: our own contact address on the marketing
-          # pages is not patient data. The point of this pass is a real
-          # person's address reaching a fixture or a component default.
-          if grep -rInE '[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}' \
-               packages/fixtures registry apps/docs/src \
-             | grep -vE '@(example\.(org|com)|zowork\.com)'; then
-            echo "::error::Email address outside example.org / example.com / zowork.com found above."
-            fail=1
-          fi
-
-          if [ "$fail" -ne 0 ]; then exit 1; fi
-          echo "No non-synthetic identifiers found."
+        run: bash scripts/no-phi.sh
 
   # ---------------------------------------------------------------------------
   # Deployment
@@ -319,13 +363,13 @@ jobs:
       url: https://oxygenui.design
 
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4
 
-      - uses: actions/setup-node@v7
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
-          node-version: 22
+          node-version-file: .nvmrc
           cache: pnpm
 
       - name: Deploy
@@ -361,7 +405,9 @@ jobs:
           echo "Expecting: $expected"
 
           url="https://oxygenui.design/r/index.json?ci=${GITHUB_SHA}"
-          for i in $(seq 1 10); do
+          # `_` rather than `i`: the counter bounds the loop and is never
+          # read, and shellcheck is right to say so.
+          for _ in $(seq 1 10); do
             body=$(curl -fsS --max-time 20 "$url" || true)
             if [ -n "$body" ]; then break; fi
             sleep 6
@@ -387,10 +433,26 @@ jobs:
   # hq is a separate Vercel project. The job self-skips until VERCEL_PROJECT_ID_HQ
   # exists as a repository variable, so this workflow is committable before the
   # project is created rather than red until someone gets to it.
+  #
+  # The skip is a JOB condition, not a per-step one.
+  #
+  # It used to be five steps each guarded by `steps.gate.outputs.skip`, and no
+  # step declared `id: gate` — so the expression read an empty string, every
+  # guarded step skipped, and GitHub reported the job as *successful* because a
+  # job whose steps all skip is a job that passed. hq was never deployed and
+  # the pipeline said it was, including the post-deploy assertion that would
+  # have noticed.
+  #
+  # At job level GitHub reports the job as *skipped*, which is honest by
+  # construction and cannot be misread as a deploy. `actionlint` in the lint
+  # gate now catches the original mistake — an unresolvable `steps.*` reference
+  # is a static error, and it flagged all five the first time it ran.
   deploy-hq:
     name: Deploy hq (production)
     needs: [verify, no-phi]
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: >-
+      github.event_name == 'push' && github.ref == 'refs/heads/main' &&
+      vars.VERCEL_PROJECT_ID_HQ != ''
     runs-on: ubuntu-latest
     timeout-minutes: 15
     environment:
@@ -398,35 +460,16 @@ jobs:
       url: https://hq.oxygenui.design
 
     steps:
-      - name: Check the project exists
-        env:
-          # Through the environment, never interpolated into the script body.
-          # `${{ vars.X }}` is expanded before the shell parses the line, so a
-          # value containing shell syntax executes.
-          PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID_HQ }}
-        run: |
-          if [ -z "${PROJECT_ID:-}" ]; then
-            echo "skip=true" >> "$GITHUB_OUTPUT"
-            echo "VERCEL_PROJECT_ID_HQ is not set — skipping. Create the Vercel project, then add the variable." \
-              >> "$GITHUB_STEP_SUMMARY"
-          else
-            echo "skip=false" >> "$GITHUB_OUTPUT"
-          fi
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      - uses: actions/checkout@v7
-        if: steps.gate.outputs.skip == 'false'
+      - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4
 
-      - uses: pnpm/action-setup@v4
-        if: steps.gate.outputs.skip == 'false'
-
-      - uses: actions/setup-node@v7
-        if: steps.gate.outputs.skip == 'false'
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
-          node-version: 22
+          node-version-file: .nvmrc
           cache: pnpm
 
       - name: Deploy
-        if: steps.gate.outputs.skip == 'false'
         env:
           VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID_HQ }}
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
@@ -452,7 +495,6 @@ jobs:
       # fails for a reason outside what it is checking teaches people to ignore
       # it.
       - name: Verify hq is serving hq
-        if: steps.gate.outputs.skip == 'false'
         run: |
           set -uo pipefail
           host=hq.oxygenui.design
@@ -483,13 +525,13 @@ jobs:
     timeout-minutes: 15
 
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4
 
-      - uses: actions/setup-node@v7
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
-          node-version: 22
+          node-version-file: .nvmrc
           cache: pnpm
 
       - name: Deploy preview

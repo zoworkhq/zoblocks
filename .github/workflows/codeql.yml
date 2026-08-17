@@ -67,15 +67,19 @@ jobs:
         language: [javascript-typescript]
 
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      - uses: github/codeql-action/init@v3
+      - uses: github/codeql-action/init@f3712979fa5f215279b101dd0a2e3bdfb4353324 # v3
         with:
-          language: ${{ matrix.language }}
+          # `languages`, plural. The singular is not an input this action has;
+          # it was accepted without complaint and ignored, so the matrix value
+          # selected nothing and CodeQL fell back to autodetecting. actionlint
+          # reports it as an unknown input, which is how it was found.
+          languages: ${{ matrix.language }}
           # security-extended adds the queries that matter for a library:
           # injection sinks, unsafe deserialisation, prototype pollution.
           queries: security-extended
 
-      - uses: github/codeql-action/analyze@v3
+      - uses: github/codeql-action/analyze@f3712979fa5f215279b101dd0a2e3bdfb4353324 # v3
         with:
           category: "/language:${{ matrix.language }}"

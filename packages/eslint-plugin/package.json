@@ -12,7 +12,8 @@
   "scripts": {
     "build": "echo \"[eslint-plugin] plain ESM, no build\"",
     "typecheck": "echo \"[eslint-plugin] plain ESM, no typecheck\"",
-    "test": "vitest run --passWithNoTests"
+    "test": "vitest run --passWithNoTests",
+    "test:coverage": "vitest run --passWithNoTests --coverage"
   },
   "devDependencies": {
     "vitest": "^4.1.10"
