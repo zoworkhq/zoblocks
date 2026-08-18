@@ -274,11 +274,68 @@ function extendsTypeOf(type: ts.Type, ownFile: string): string | undefined {
  */
 const COMPONENT_WRAPPERS = new Set(["forwardRef", "memo"]);
 
-function unwrapComponent(node: ts.Expression): ts.SignatureDeclaration | undefined {
-  if (ts.isFunctionExpression(node) || ts.isArrowFunction(node)) return node;
+/**
+ * `Object.assign(Root, { Item })` — the compound-component shape.
+ *
+ * Ant Design's own components are written this way and any primitive that
+ * matches their API inherits it: `Timeline.Item`, `Tabs.TabPane`. The first
+ * argument is a plain identifier pointing at a function declared above, so
+ * unwrapping it needs one more hop than `forwardRef(...)` does — and without
+ * that hop the component documents zero props while `pnpm gen` reports
+ * success, which is exactly the failure this file was written to end.
+ */
+function isObjectAssign(callee: ts.Expression): boolean {
+  return (
+    ts.isPropertyAccessExpression(callee) &&
+    ts.isIdentifier(callee.expression) &&
+    callee.expression.text === "Object" &&
+    callee.name.text === "assign"
+  );
+}
+
+/** The declaration an identifier refers to, resolved within its own file. */
+function resolveInFile(
+  name: string,
+  sourceFile: ts.SourceFile,
+): ts.Expression | ts.SignatureDeclaration | undefined {
+  for (const statement of sourceFile.statements) {
+    if (ts.isFunctionDeclaration(statement) && statement.name?.text === name) return statement;
+    if (ts.isVariableStatement(statement)) {
+      for (const declaration of statement.declarationList.declarations) {
+        if (ts.isIdentifier(declaration.name) && declaration.name.text === name) {
+          return declaration.initializer;
+        }
+      }
+    }
+  }
+  return undefined;
+}
+
+function unwrapComponent(
+  node: ts.Expression | ts.SignatureDeclaration,
+  sourceFile: ts.SourceFile,
+  depth = 0,
+): ts.SignatureDeclaration | undefined {
+  // A cycle would be a component assigned to itself; bounded rather than
+  // tracked, because the bound is also a readable limit on how wrapped a
+  // component may be before it stops being documentable.
+  if (depth > 6) return undefined;
+  if (ts.isFunctionDeclaration(node) || ts.isFunctionExpression(node) || ts.isArrowFunction(node)) {
+    return node;
+  }
+
+  if (ts.isIdentifier(node)) {
+    const resolved = resolveInFile(node.text, sourceFile);
+    return resolved ? unwrapComponent(resolved, sourceFile, depth + 1) : undefined;
+  }
 
   if (ts.isCallExpression(node)) {
     const callee = node.expression;
+    const first = node.arguments[0];
+    if (!first) return undefined;
+
+    if (isObjectAssign(callee)) return unwrapComponent(first, sourceFile, depth + 1);
+
     const name = ts.isPropertyAccessExpression(callee)
       ? callee.name.text
       : ts.isIdentifier(callee)
@@ -286,8 +343,7 @@ function unwrapComponent(node: ts.Expression): ts.SignatureDeclaration | undefin
         : undefined;
     if (!name || !COMPONENT_WRAPPERS.has(name)) return undefined;
 
-    const first = node.arguments[0];
-    return first ? unwrapComponent(first) : undefined;
+    return unwrapComponent(first, sourceFile, depth + 1);
   }
 
   return undefined;
@@ -373,7 +429,9 @@ export function extractProps(components: LoadedComponent[]): Map<string, Extract
           const name = declaration.name.text;
           if (!isComponentName(name)) continue;
 
-          const fn = declaration.initializer ? unwrapComponent(declaration.initializer) : undefined;
+          const fn = declaration.initializer
+            ? unwrapComponent(declaration.initializer, sourceFile)
+            : undefined;
           if (!fn) continue;
 
           const parameter = fn.parameters[0];
