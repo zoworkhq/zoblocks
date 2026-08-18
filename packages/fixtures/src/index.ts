@@ -14,11 +14,18 @@
 import type {
   AllergyIntolerance,
   Appointment,
+  Bundle,
+  Communication,
   Condition,
   Coverage,
+  DocumentReference,
+  Encounter,
+  Immunization,
   MedicationRequest,
   Observation,
   Patient,
+  Provenance,
+  QuestionnaireResponse,
 } from "@oxygenui-design/fhir";
 
 export const MRN_SYSTEM = "http://example.org/fhir/sid/mrn";
@@ -815,4 +822,134 @@ export const observations = {
   absentSet: observationAbsentSet,
   corrected: observationCorrected,
   panel: observationPanel,
+};
+
+// ---------------------------------------------------------------------------
+// Timeline — the states a chronology has to survive
+//
+// Chosen so that the events nobody demos outnumber the ordinary ones: an
+// appointment that was booked and never attended, a call that did not connect,
+// an encounter recorded against the wrong patient, a form sent and never
+// returned, and a note written six days after the visit it describes.
+// ---------------------------------------------------------------------------
+
+/** An ordinary visit, with a participant and a period. */
+export const encounterRoutine: Encounter = {
+  resourceType: "Encounter",
+  id: "syn-enc-routine",
+  status: "finished",
+  class: { system: "http://terminology.hl7.org/CodeSystem/v3-ActCode", code: "AMB" },
+  type: [{ text: "Diabetes review clinic" }],
+  subject: { reference: "Patient/syn-patient-routine" },
+  participant: [{ individual: { reference: "Practitioner/syn-pr-1", display: "Dr Wade Warren" } }],
+  period: { start: "2026-08-12T10:05:00+05:30", end: "2026-08-12T10:35:00+05:30" },
+};
+
+/**
+ * Created against the wrong patient and retained.
+ *
+ * The state every implementation filters out of the query, and the one the
+ * record's own rules say must be kept and marked.
+ */
+export const encounterInError: Encounter = {
+  resourceType: "Encounter",
+  id: "syn-enc-error",
+  status: "entered-in-error",
+  class: { code: "EMER" },
+  type: [{ text: "Emergency department attendance" }],
+  subject: { reference: "Patient/syn-patient-routine" },
+  period: { start: "2026-07-30T22:10:00+05:30" },
+};
+
+/** Booked, in the past, with no encounter referring to it. Derives to lapsed. */
+export const appointmentLapsed: Appointment = {
+  resourceType: "Appointment",
+  id: "syn-appt-lapsed",
+  status: "booked",
+  appointmentType: { text: "Diabetic retinal screening" },
+  start: "2026-08-05T11:00:00+05:30",
+  end: "2026-08-05T11:20:00+05:30",
+  participant: [{ actor: { reference: "Patient/syn-patient-routine", display: "Amara Okonkwo" } }],
+};
+
+/** An attempt that did not connect. Not a contact, and not a cancellation. */
+export const communicationNotDone: Communication = {
+  resourceType: "Communication",
+  id: "syn-comm-notdone",
+  status: "not-done",
+  statusReason: { text: "No answer" },
+  medium: [{ text: "Telephone" }],
+  topic: { text: "Follow-up call" },
+  subject: { reference: "Patient/syn-patient-routine" },
+  sent: "2026-07-22T15:10:00+05:30",
+  sender: { reference: "Practitioner/syn-pr-2", display: "Priya Menon" },
+  recipient: [{ reference: "Patient/syn-patient-routine", display: "Amara Okonkwo" }],
+  payload: [{ contentString: "To confirm the visit and update insurance." }],
+};
+
+/** Sent and never returned. Renders as an open step, not a completed form. */
+export const questionnaireUnreturned: QuestionnaireResponse = {
+  resourceType: "QuestionnaireResponse",
+  id: "syn-qr-open",
+  status: "in-progress",
+  questionnaire: "Pre-visit medical history",
+  subject: { reference: "Patient/syn-patient-routine" },
+  authored: "2026-08-11T09:00:00+05:30",
+};
+
+/** A dose refused. `not-done` is a real answer, not a missing record. */
+export const immunizationRefused: Immunization = {
+  resourceType: "Immunization",
+  id: "syn-imm-refused",
+  status: "not-done",
+  statusReason: { text: "Patient declined" },
+  vaccineCode: { text: "Influenza, seasonal" },
+  patient: { reference: "Patient/syn-patient-routine" },
+  occurrenceDateTime: "2025-11-04",
+  recorded: "2025-11-04",
+};
+
+/** A note written six days after the visit it describes. */
+export const documentLateEntry: DocumentReference = {
+  resourceType: "DocumentReference",
+  id: "syn-doc-late",
+  status: "current",
+  docStatus: "final",
+  type: { text: "Progress note" },
+  subject: { reference: "Patient/syn-patient-routine" },
+  date: "2026-08-12T10:05:00+05:30",
+  author: [{ reference: "Practitioner/syn-pr-1", display: "Dr Wade Warren" }],
+};
+
+/** The provenance that makes the late entry visible as one. */
+export const provenanceLateEntry: Provenance = {
+  resourceType: "Provenance",
+  id: "syn-prov-late",
+  target: [{ reference: "DocumentReference/syn-doc-late" }],
+  recorded: "2026-08-18T09:40:00+05:30",
+  agent: [{ who: { reference: "Practitioner/syn-pr-1", display: "Dr Wade Warren" } }],
+};
+
+/**
+ * A bundle shaped like a `Patient/$everything` response, including one
+ * resource type no timeline adapter understands.
+ *
+ * The unmapped `CarePlan` is deliberate: an adapter that drops it quietly has
+ * told the same lie the timeline exists to prevent, one layer further down.
+ */
+export const timelineBundle: Bundle = {
+  resourceType: "Bundle",
+  type: "searchset",
+  total: 9,
+  entry: [
+    { resource: encounterRoutine },
+    { resource: encounterInError },
+    { resource: appointmentLapsed },
+    { resource: communicationNotDone },
+    { resource: questionnaireUnreturned },
+    { resource: immunizationRefused },
+    { resource: documentLateEntry },
+    { resource: observationPotassiumCritical },
+    { resource: { resourceType: "CarePlan", id: "syn-careplan-1" } as never },
+  ],
 };

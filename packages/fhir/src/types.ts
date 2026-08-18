@@ -559,6 +559,159 @@ export interface DocumentReference extends Resource {
   content?: Array<{ attachment?: Attachment }>;
 }
 
+/** https://hl7.org/fhir/R4/encounter.html */
+export interface Encounter extends Resource {
+  resourceType?: "Encounter";
+  /**
+   * `entered-in-error` is why this union is written out rather than typed as
+   * a string. A record created by mistake is retained and marked, never
+   * deleted, so a renderer that cannot name the state will filter it instead.
+   */
+  status?:
+    | "planned"
+    | "arrived"
+    | "triaged"
+    | "in-progress"
+    | "onleave"
+    | "finished"
+    | "cancelled"
+    | "entered-in-error"
+    | "unknown";
+  class?: Coding;
+  type?: CodeableConcept[];
+  subject?: Reference;
+  participant?: Array<{ type?: CodeableConcept[]; individual?: Reference; period?: Period }>;
+  /** Encounter records what actually happened; Appointment records what was planned. */
+  period?: Period;
+  reasonCode?: CodeableConcept[];
+  serviceProvider?: Reference;
+  appointment?: Reference[];
+}
+
+/** https://hl7.org/fhir/R4/communication.html */
+export interface Communication extends Resource {
+  resourceType?: "Communication";
+  /** `not-done` is an attempt that did not connect, which is not a contact. */
+  status?:
+    | "preparation"
+    | "in-progress"
+    | "not-done"
+    | "on-hold"
+    | "stopped"
+    | "completed"
+    | "entered-in-error"
+    | "unknown";
+  statusReason?: CodeableConcept;
+  category?: CodeableConcept[];
+  medium?: CodeableConcept[];
+  subject?: Reference;
+  topic?: CodeableConcept;
+  sent?: string;
+  received?: string;
+  recipient?: Reference[];
+  sender?: Reference;
+  payload?: Array<{ contentString?: string; contentAttachment?: Attachment }>;
+}
+
+/** https://hl7.org/fhir/R4/diagnosticreport.html */
+export interface DiagnosticReport extends Resource {
+  resourceType?: "DiagnosticReport";
+  status?:
+    | "registered"
+    | "partial"
+    | "preliminary"
+    | "final"
+    | "amended"
+    | "corrected"
+    | "appended"
+    | "cancelled"
+    | "entered-in-error"
+    | "unknown";
+  category?: CodeableConcept[];
+  code?: CodeableConcept;
+  subject?: Reference;
+  effectiveDateTime?: string;
+  effectivePeriod?: Period;
+  issued?: string;
+  performer?: Reference[];
+  conclusion?: string;
+  result?: Reference[];
+}
+
+/** https://hl7.org/fhir/R4/procedure.html */
+export interface Procedure extends Resource {
+  resourceType?: "Procedure";
+  status?:
+    | "preparation"
+    | "in-progress"
+    | "not-done"
+    | "on-hold"
+    | "stopped"
+    | "completed"
+    | "entered-in-error"
+    | "unknown";
+  statusReason?: CodeableConcept;
+  code?: CodeableConcept;
+  subject?: Reference;
+  performedDateTime?: string;
+  performedPeriod?: Period;
+  performer?: Array<{ function?: CodeableConcept; actor?: Reference }>;
+  reasonCode?: CodeableConcept[];
+}
+
+/** https://hl7.org/fhir/R4/immunization.html */
+export interface Immunization extends Resource {
+  resourceType?: "Immunization";
+  /** `not-done` is a real answer here — a dose refused is not a dose missing. */
+  status?: "completed" | "entered-in-error" | "not-done";
+  statusReason?: CodeableConcept;
+  vaccineCode?: CodeableConcept;
+  patient?: Reference;
+  occurrenceDateTime?: string;
+  occurrenceString?: string;
+  recorded?: string;
+  primarySource?: boolean;
+  performer?: Array<{ function?: CodeableConcept; actor?: Reference }>;
+}
+
+/** https://hl7.org/fhir/R4/questionnaireresponse.html */
+export interface QuestionnaireResponse extends Resource {
+  resourceType?: "QuestionnaireResponse";
+  /** `in-progress` is the form that was sent and never came back. */
+  status?: "in-progress" | "completed" | "amended" | "entered-in-error" | "stopped";
+  questionnaire?: string;
+  subject?: Reference;
+  authored?: string;
+  author?: Reference;
+  source?: Reference;
+}
+
+/** https://hl7.org/fhir/R4/task.html */
+export interface Task extends Resource {
+  resourceType?: "Task";
+  status?:
+    | "draft"
+    | "requested"
+    | "received"
+    | "accepted"
+    | "rejected"
+    | "ready"
+    | "cancelled"
+    | "in-progress"
+    | "on-hold"
+    | "failed"
+    | "completed"
+    | "entered-in-error";
+  intent?: string;
+  code?: CodeableConcept;
+  description?: string;
+  for?: Reference;
+  authoredOn?: string;
+  lastModified?: string;
+  requester?: Reference;
+  owner?: Reference;
+}
+
 /** https://hl7.org/fhir/R4/operationoutcome.html */
 export interface OperationOutcome extends Resource {
   resourceType?: "OperationOutcome";
