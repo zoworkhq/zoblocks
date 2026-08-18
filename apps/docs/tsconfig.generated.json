@@ -18,6 +18,9 @@
       "@/components/oxygen/breath-loader": [
         "../../registry/oxygen/breath-loader/breath-loader.tsx"
       ],
+      "@/components/oxygen/care-timeline": [
+        "../../registry/oxygen/care-timeline/care-timeline.tsx"
+      ],
       "@/components/oxygen/chart-accordion": [
         "../../registry/oxygen/chart-accordion/chart-accordion.tsx"
       ],
@@ -45,6 +48,9 @@
       "@/components/oxygen/switch": [
         "../../registry/oxygen/switch/switch.tsx"
       ],
+      "@/components/oxygen/timeline": [
+        "../../registry/oxygen/timeline/timeline.tsx"
+      ],
       "@/lib/oxygen-accordion": [
         "../../registry/oxygen/lib/accordion-core.tsx"
       ],
@@ -56,6 +62,12 @@
       ],
       "@/lib/oxygen-switch": [
         "../../registry/oxygen/lib/switch.tsx"
+      ],
+      "@/lib/timeline-core": [
+        "../../registry/oxygen/lib/timeline-core.ts"
+      ],
+      "@/lib/timeline-fhir": [
+        "../../registry/oxygen/lib/timeline-fhir.ts"
       ],
       "@/lib/utils": [
         "../../registry/oxygen/lib/utils.ts"

@@ -51,6 +51,9 @@ function rewriteImports(source: string, fromDepth: number): string {
       .replace(/(["'])@\/lib\/oxygen-switch\1/g, `"${up}lib/switch"`)
       // The clinical-note core: the ProseMirror binding.
       .replace(/(["'])@\/lib\/oxygen-clinical-note\1/g, `"${up}lib/clinical-note"`)
+      // The chronology engine and its FHIR adapters.
+      .replace(/(["'])@\/lib\/timeline-core\1/g, `"${up}lib/timeline-core"`)
+      .replace(/(["'])@\/lib\/timeline-fhir\1/g, `"${up}lib/timeline-fhir"`)
       // A sibling component, by the path the CLI writes in a consumer's project.
       .replace(
         /(["'])@\/components\/oxygen\/([a-z0-9-]+)\1/g,
@@ -95,6 +98,8 @@ export async function emitReactPackage(
     ["lib/accordion-core.tsx", "lib/accordion-core.tsx", 1],
     ["lib/switch.tsx", "lib/switch.tsx", 1],
     ["lib/clinical-note.tsx", "lib/clinical-note.tsx", 1],
+    ["lib/timeline-core.ts", "lib/timeline-core.ts", 1],
+    ["lib/timeline-fhir.ts", "lib/timeline-fhir.ts", 1],
   ] as const) {
     const source = await readFile(path.join(COMPONENTS_DIR, file), "utf8");
     await emitter.emit(
@@ -121,6 +126,7 @@ export async function emitReactPackage(
     ["lib/accordion.css", "styles/accordion.css"],
     ["lib/switch.css", "styles/switch.css"],
     ["lib/clinical-note.css", "styles/clinical-note.css"],
+    ["lib/timeline.css", "styles/timeline.css"],
   ] as const) {
     const css = await readFile(path.join(COMPONENTS_DIR, file), "utf8");
     await emitter.emit(path.join(PACKAGE_SRC, target), css);

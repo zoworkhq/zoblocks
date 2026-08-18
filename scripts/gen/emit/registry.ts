@@ -103,6 +103,43 @@ const SUPPORT_ITEMS: BuildableItem[] = [
     ],
   },
   {
+    name: "timeline-core",
+    type: "registry:lib",
+    title: "Timeline core",
+    description:
+      "The chronology engine behind Timeline and CareTimeline: precision-preserving time, the stable comparator, grouping, clustering with critical promotion, the coverage claim and its sentence. Installed automatically with either.",
+    dependencies: [] as string[],
+    registryDependencies: ["utils", "accordion-core"],
+    files: [
+      {
+        path: "registry/oxygen/lib/timeline-core.ts",
+        type: "registry:lib",
+        target: "lib/timeline-core.ts",
+      },
+      {
+        path: "registry/oxygen/lib/timeline.css",
+        type: "registry:file",
+        target: "styles/oxygen-timeline.css",
+      },
+    ],
+  },
+  {
+    name: "timeline-fhir",
+    type: "registry:lib",
+    title: "Timeline FHIR adapters",
+    description:
+      "Thirteen FHIR R4 resource types read into timeline events, plus an honest report of everything that could not be mapped. Pure functions — no fetching. Installed automatically with CareTimeline.",
+    dependencies: ["@oxygenui-design/fhir"],
+    registryDependencies: ["utils", "timeline-core"],
+    files: [
+      {
+        path: "registry/oxygen/lib/timeline-fhir.ts",
+        type: "registry:lib",
+        target: "lib/timeline-fhir.ts",
+      },
+    ],
+  },
+  {
     name: "clinical-note-core",
     type: "registry:lib",
     title: "Clinical note core",

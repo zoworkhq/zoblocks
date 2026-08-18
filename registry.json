@@ -92,6 +92,48 @@
       ]
     },
     {
+      "name": "timeline-core",
+      "type": "registry:lib",
+      "title": "Timeline core",
+      "description": "The chronology engine behind Timeline and CareTimeline: precision-preserving time, the stable comparator, grouping, clustering with critical promotion, the coverage claim and its sentence. Installed automatically with either.",
+      "registryDependencies": [
+        "https://oxygenui.design/r/utils.json",
+        "https://oxygenui.design/r/accordion-core.json"
+      ],
+      "files": [
+        {
+          "path": "registry/oxygen/lib/timeline-core.ts",
+          "type": "registry:lib",
+          "target": "lib/timeline-core.ts"
+        },
+        {
+          "path": "registry/oxygen/lib/timeline.css",
+          "type": "registry:file",
+          "target": "styles/oxygen-timeline.css"
+        }
+      ]
+    },
+    {
+      "name": "timeline-fhir",
+      "type": "registry:lib",
+      "title": "Timeline FHIR adapters",
+      "description": "Thirteen FHIR R4 resource types read into timeline events, plus an honest report of everything that could not be mapped. Pure functions — no fetching. Installed automatically with CareTimeline.",
+      "dependencies": [
+        "@oxygenui-design/fhir"
+      ],
+      "registryDependencies": [
+        "https://oxygenui.design/r/utils.json",
+        "https://oxygenui.design/r/timeline-core.json"
+      ],
+      "files": [
+        {
+          "path": "registry/oxygen/lib/timeline-fhir.ts",
+          "type": "registry:lib",
+          "target": "lib/timeline-fhir.ts"
+        }
+      ]
+    },
+    {
       "name": "clinical-note-core",
       "type": "registry:lib",
       "title": "Clinical note core",
@@ -183,6 +225,34 @@
           "path": "registry/oxygen/breath-loader/breath-loader.tsx",
           "type": "registry:component",
           "target": "components/oxygen/breath-loader.tsx"
+        }
+      ]
+    },
+    {
+      "name": "care-timeline",
+      "type": "registry:component",
+      "title": "Care Timeline",
+      "description": "A timeline over clinical, administrative, communication and patient-reported events, with coverage as a required prop. Separates planned from happened, keeps an entry recorded in error visible and marked, and refuses to collapse anything a reader would act on.",
+      "categories": [
+        "clinical",
+        "data-display"
+      ],
+      "dependencies": [
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "https://oxygenui.design/r/utils.json",
+        "https://oxygenui.design/r/tokens.json",
+        "https://oxygenui.design/r/timeline-core.json",
+        "https://oxygenui.design/r/timeline-fhir.json",
+        "https://oxygenui.design/r/timeline.json"
+      ],
+      "files": [
+        {
+          "path": "registry/oxygen/care-timeline/care-timeline.tsx",
+          "type": "registry:component",
+          "target": "components/oxygen/care-timeline.tsx"
         }
       ]
     },
@@ -427,6 +497,32 @@
           "path": "registry/oxygen/switch/switch.tsx",
           "type": "registry:component",
           "target": "components/oxygen/switch.tsx"
+        }
+      ]
+    },
+    {
+      "name": "timeline",
+      "type": "registry:component",
+      "title": "Timeline",
+      "description": "An ordered list with a rail. The API matches Ant Design v6 exactly, including the v5 names it still accepts, and takes no dependency on it. Adds a required accessible name and drops the current-step behaviour a chronology has no use for.",
+      "categories": [
+        "data-display",
+        "primitives"
+      ],
+      "dependencies": [
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "https://oxygenui.design/r/utils.json",
+        "https://oxygenui.design/r/tokens.json",
+        "https://oxygenui.design/r/timeline-core.json"
+      ],
+      "files": [
+        {
+          "path": "registry/oxygen/timeline/timeline.tsx",
+          "type": "registry:component",
+          "target": "components/oxygen/timeline.tsx"
         }
       ]
     }

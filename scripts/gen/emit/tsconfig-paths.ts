@@ -42,6 +42,8 @@ export const WORKSPACE_ALIASES: Record<string, string[]> = {
   "@/lib/oxygen-accordion": ["./registry/oxygen/lib/accordion-core.tsx"],
   "@/lib/oxygen-switch": ["./registry/oxygen/lib/switch.tsx"],
   "@/lib/oxygen-clinical-note": ["./registry/oxygen/lib/clinical-note.tsx"],
+  "@/lib/timeline-core": ["./registry/oxygen/lib/timeline-core.ts"],
+  "@/lib/timeline-fhir": ["./registry/oxygen/lib/timeline-fhir.ts"],
 };
 
 export async function emitTsconfigPaths(

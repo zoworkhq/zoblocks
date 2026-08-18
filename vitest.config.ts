@@ -68,7 +68,16 @@ export default defineConfig({
       // them. Counting them measured how thoroughly the suite exercises its own
       // scaffolding, which is not the question — and it let a genuinely
       // uncovered branch in a component hide behind a well-covered story file.
-      exclude: ["**/*.test.tsx", "**/*.stories.tsx", "**/*.meta.ts"],
+      exclude: [
+        "**/*.test.tsx",
+        "**/*.stories.tsx",
+        "**/*.meta.ts",
+        // Fixtures join stories for the same reason: a chart shared between a
+        // story and a test is scaffolding, never in a registry item, and never
+        // run by a customer. Counting it measures how thoroughly the suite
+        // exercises its own data.
+        "**/*.fixtures.tsx",
+      ],
       reporter: ["text-summary", "json-summary"],
       // A coverage report nothing enforces is a number in a log. These are set
       // at the level the current suite already clears, so they ratchet rather

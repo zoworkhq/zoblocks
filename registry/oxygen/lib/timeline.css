@@ -1,0 +1,804 @@
+/**
+ * Oxygen timeline — the rail, the nodes, and the states that are not decoration.
+ *
+ * Install target: styles/oxygen-timeline.css. Import it once, next to the
+ * token stylesheet:
+ *
+ *   @import "./styles/oxygen-tokens.css";
+ *   @import "./styles/oxygen-timeline.css";
+ *
+ * Three choices worth reading before changing anything below.
+ *
+ *   1. **The rail is a grid column, not an absolutely positioned line.** A
+ *      32px column with a 1px child that stretches. It survives a four-line
+ *      title, 200% zoom, a 320px viewport and RTL without a single physical
+ *      offset. Every timeline that positions its rail absolutely breaks on the
+ *      first long title, and the break is invisible until real data arrives.
+ *
+ *   2. **Two dashes, two meanings, neither load-bearing.** A dashed *node*
+ *      border is a planned event; a dashed *rail* segment is a stated gap in
+ *      coverage. Both are redundant with words that are always rendered — a
+ *      status chip and a gap sentence — so forced-colors mode, a monochrome
+ *      print and a red-green deficiency all keep the meaning.
+ *
+ *   3. **No Tailwind utilities.** Same reasoning as the accordion: a component
+ *      whose layout depends on the host's Tailwind config renders unstyled in
+ *      someone else's build, and every colour here resolves through a semantic
+ *      token so a brand override reaches this file without editing it.
+ */
+
+.ox-timeline {
+  --ox-timeline-rail: var(--ox-border);
+  --ox-timeline-rail-width: 1px;
+  --ox-timeline-node-size: 2rem;
+  --ox-timeline-node-bg: var(--ox-surface);
+  --ox-timeline-node-border: var(--ox-border);
+  --ox-timeline-node-fg: var(--ox-text-muted);
+  --ox-timeline-gap: 0.75rem;
+  --ox-timeline-row-gap: 1.125rem;
+  --ox-timeline-font: var(--ox-density-font, var(--ox-text-sm));
+
+  display: block;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-family: var(--ox-font-sans);
+  font-size: var(--ox-timeline-font);
+  color: var(--ox-text);
+}
+
+.ox-timeline__item {
+  display: grid;
+  grid-template-columns: var(--ox-timeline-node-size) 1fr;
+  gap: 0 var(--ox-timeline-gap);
+  margin: 0;
+}
+
+.ox-timeline__rail {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  justify-items: center;
+}
+
+.ox-timeline__node {
+  inline-size: var(--ox-timeline-node-size);
+  block-size: var(--ox-timeline-node-size);
+  border-radius: var(--ox-radius-full);
+  display: grid;
+  place-items: center;
+  background: var(--ox-timeline-node-bg);
+  border: 1px solid var(--ox-timeline-node-border);
+  color: var(--ox-timeline-node-fg);
+}
+
+.ox-timeline__line {
+  inline-size: var(--ox-timeline-rail-width);
+  background: var(--ox-timeline-rail);
+  margin-block-start: 0.375rem;
+  align-self: stretch;
+  min-block-size: 0.5rem;
+}
+
+.ox-timeline__item:last-child .ox-timeline__line {
+  display: none;
+}
+
+.ox-timeline__body {
+  min-inline-size: 0;
+  padding-block-end: var(--ox-timeline-row-gap);
+}
+
+.ox-timeline__item:last-child .ox-timeline__body {
+  padding-block-end: 0;
+}
+
+/* Horizontal orientation, matching Ant Design v6's `orientation` prop. */
+.ox-timeline--horizontal {
+  display: flex;
+  gap: var(--ox-timeline-gap);
+  overflow-x: auto;
+}
+
+.ox-timeline--horizontal .ox-timeline__item {
+  grid-template-columns: 1fr;
+  grid-template-rows: var(--ox-timeline-node-size) 1fr;
+  flex: 1 0 12rem;
+}
+
+.ox-timeline--horizontal .ox-timeline__rail {
+  grid-template-rows: none;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  justify-items: start;
+}
+
+.ox-timeline--horizontal .ox-timeline__line {
+  inline-size: auto;
+  block-size: var(--ox-timeline-rail-width);
+  min-inline-size: 0.5rem;
+  margin-block-start: 0;
+  margin-inline-start: 0.375rem;
+  align-self: center;
+  justify-self: stretch;
+}
+
+.ox-timeline--horizontal .ox-timeline__body {
+  padding-block-end: 0;
+  padding-block-start: 0.5rem;
+}
+
+/* Ant Design's `variant`. `filled` paints the node, `outlined` rings it. */
+.ox-timeline--filled .ox-timeline__node {
+  background: var(--ox-bg-muted);
+}
+
+/* `mode="alternate"`: items alternate sides above the reflow breakpoint. */
+@media (min-width: 48rem) {
+  .ox-timeline--alternate .ox-timeline__item {
+    grid-template-columns: 1fr var(--ox-timeline-node-size) 1fr;
+  }
+
+  .ox-timeline--alternate .ox-timeline__rail {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .ox-timeline--alternate .ox-timeline__body {
+    grid-column: 3;
+    grid-row: 1;
+  }
+
+  .ox-timeline--alternate .ox-timeline__item--start .ox-timeline__body {
+    grid-column: 1;
+    text-align: end;
+  }
+}
+
+.ox-timeline__title {
+  font-weight: 600;
+  line-height: 1.45;
+  color: var(--ox-text);
+}
+
+.ox-timeline__content {
+  color: var(--ox-text-muted);
+  margin-block-start: 0.1875rem;
+}
+
+/* ------------------------------------------------------------------ */
+/* CareTimeline                                                        */
+/* ------------------------------------------------------------------ */
+
+.ox-care-timeline {
+  --ox-care-timeline-divider: var(--ox-border);
+  --ox-care-timeline-meta: var(--ox-text-subtle);
+
+  display: block;
+  font-family: var(--ox-font-sans);
+  font-size: var(--ox-density-font, var(--ox-text-sm));
+  color: var(--ox-text);
+}
+
+.ox-care-timeline__toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin-block-end: 0.75rem;
+}
+
+.ox-care-timeline__filter {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  min-block-size: var(--ox-density-target, 2.75rem);
+  padding-inline: 0.625rem;
+  border-radius: var(--ox-radius);
+  border: 1px solid var(--ox-border);
+  background: var(--ox-surface);
+  color: var(--ox-text-muted);
+  font: inherit;
+  cursor: pointer;
+}
+
+.ox-care-timeline__filter[aria-pressed="true"] {
+  border-color: var(--ox-accent-border);
+  background: var(--ox-accent-subtle);
+  color: var(--ox-accent);
+}
+
+.ox-care-timeline__filter:focus-visible,
+.ox-care-timeline__action:focus-visible,
+.ox-care-timeline__cluster:focus-visible {
+  outline: 2px solid var(--ox-focus-ring);
+  outline-offset: var(--ox-focus-ring-offset, 2px);
+}
+
+/* The banner a failed source escalates to. Never a grey footnote. */
+.ox-care-timeline__banner {
+  display: flex;
+  gap: 0.5rem;
+  align-items: flex-start;
+  padding: 0.625rem 0.75rem;
+  border-radius: var(--ox-radius);
+  border: 1px solid var(--ox-status-critical-border);
+  background: var(--ox-status-critical-bg);
+  color: var(--ox-text);
+  margin-block-end: 0.75rem;
+}
+
+.ox-care-timeline__group {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  padding-block: 0.625rem 0.5rem;
+  font-size: var(--ox-text-xs);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: var(--ox-text-subtle);
+  background: var(--ox-surface);
+  position: sticky;
+  inset-block-start: 0;
+  z-index: 1;
+}
+
+.ox-care-timeline__group-rule {
+  flex: 1 1 auto;
+  block-size: 1px;
+  background: var(--ox-care-timeline-divider);
+}
+
+.ox-care-timeline__group-count {
+  text-transform: none;
+  letter-spacing: 0;
+  font-weight: 400;
+  font-variant-numeric: tabular-nums;
+  color: var(--ox-text-subtle);
+}
+
+.ox-care-timeline__divider {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  padding-block: 0.375rem 0.75rem;
+  font-size: var(--ox-text-xs);
+  font-weight: 600;
+  color: var(--ox-accent);
+}
+
+.ox-care-timeline__divider--now {
+  color: var(--ox-status-high);
+}
+
+.ox-care-timeline__divider-rule {
+  flex: 1 1 auto;
+  block-size: 1px;
+  background: currentColor;
+  opacity: 0.35;
+}
+
+.ox-care-timeline__kind {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  flex-wrap: wrap;
+  font-size: var(--ox-text-2xs);
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: var(--ox-text-subtle);
+  margin-block-end: 0.125rem;
+}
+
+.ox-care-timeline__who,
+.ox-care-timeline__when {
+  font-size: var(--ox-text-xs);
+  color: var(--ox-text-muted);
+  margin-block-start: 0.25rem;
+}
+
+.ox-care-timeline__when {
+  color: var(--ox-care-timeline-meta);
+  font-variant-numeric: tabular-nums;
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.ox-care-timeline__link {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: var(--ox-border-strong);
+}
+
+.ox-care-timeline__link:hover {
+  text-decoration-color: currentColor;
+}
+
+.ox-care-timeline__link:focus-visible {
+  outline: 2px solid var(--ox-focus-ring);
+  outline-offset: var(--ox-focus-ring-offset, 2px);
+}
+
+/* An entry recorded in error is struck and kept. Removing it is the one
+   behaviour the record's own rules forbid — so the strike lands on the claim
+   and never on the correction that explains it. Scoped to the title text and
+   the detail rather than the whole item: `text-decoration` propagates to
+   in-flow descendants and cannot be removed by them, so striking the content
+   wrapper would strike the revision note too. */
+.ox-care-timeline__item--in-error .ox-timeline__title-text,
+.ox-care-timeline__item--in-error .ox-care-timeline__detail {
+  text-decoration: line-through;
+  text-decoration-thickness: 1px;
+  color: var(--ox-text-subtle);
+}
+
+.ox-care-timeline__note {
+  margin-block-start: 0.5rem;
+  border: 1px solid var(--ox-border);
+  border-radius: var(--ox-radius);
+  padding: 0.5rem 0.6875rem;
+  font-size: var(--ox-text-xs);
+  color: var(--ox-text-muted);
+  background: var(--ox-bg-subtle);
+  text-decoration: none;
+}
+
+.ox-care-timeline__note--critical {
+  border-color: var(--ox-status-critical-border);
+  background: var(--ox-status-critical-bg);
+}
+
+.ox-care-timeline__note--caution {
+  border-color: var(--ox-status-high-border);
+  background: var(--ox-status-high-bg);
+}
+
+.ox-care-timeline__steps {
+  margin: 0.4375rem 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.3125rem;
+}
+
+.ox-care-timeline__step {
+  display: grid;
+  grid-template-columns: 0.875rem 1fr auto;
+  gap: 0.5rem;
+  align-items: baseline;
+  font-size: var(--ox-text-xs);
+  color: var(--ox-text-muted);
+}
+
+.ox-care-timeline__step-dot {
+  inline-size: 0.375rem;
+  block-size: 0.375rem;
+  border-radius: var(--ox-radius-full);
+  background: var(--ox-border-strong);
+  align-self: center;
+}
+
+.ox-care-timeline__step--done .ox-care-timeline__step-dot {
+  background: var(--ox-status-normal);
+}
+
+.ox-care-timeline__step--open .ox-care-timeline__step-dot {
+  background: transparent;
+  box-shadow: inset 0 0 0 1.5px var(--ox-status-high);
+}
+
+.ox-care-timeline__step-time {
+  color: var(--ox-text-subtle);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.ox-care-timeline__cluster {
+  display: flex;
+  align-items: center;
+  gap: 0.5625rem;
+  inline-size: 100%;
+  text-align: start;
+  font: inherit;
+  font-size: var(--ox-text-xs);
+  color: var(--ox-text-muted);
+  border: 1px dashed var(--ox-border-strong);
+  border-radius: var(--ox-radius);
+  padding: 0.4375rem 0.6875rem;
+  background: var(--ox-bg-subtle);
+  cursor: pointer;
+}
+
+.ox-care-timeline__cluster-count {
+  font-weight: 600;
+  color: var(--ox-text);
+}
+
+/* A dotted rail segment says records may be missing between these two events.
+   The affordance Ant Design spends on "the last item you rendered". */
+.ox-care-timeline__gap {
+  display: grid;
+  grid-template-columns: var(--ox-timeline-node-size) 1fr;
+  gap: 0 var(--ox-timeline-gap, 0.75rem);
+  padding-block-end: var(--ox-timeline-row-gap, 1.125rem);
+  color: var(--ox-status-high);
+  font-size: var(--ox-text-xs);
+}
+
+.ox-care-timeline__gap-rail {
+  justify-self: center;
+  inline-size: 0;
+  border-inline-start: 1px dashed currentColor;
+  min-block-size: 1.5rem;
+}
+
+.ox-care-timeline__coverage {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.625rem;
+  margin-block-start: 0.75rem;
+  padding-block-start: 0.6875rem;
+  border-block-start: 1px solid var(--ox-care-timeline-divider);
+  font-size: var(--ox-text-xs);
+  color: var(--ox-text-muted);
+}
+
+.ox-care-timeline__coverage-lead {
+  font-weight: 600;
+  color: var(--ox-text);
+}
+
+.ox-care-timeline__sources {
+  display: flex;
+  gap: 0.375rem;
+  flex-wrap: wrap;
+  margin-block-start: 0.375rem;
+  padding: 0;
+  list-style: none;
+}
+
+.ox-care-timeline__source {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3125rem;
+  min-block-size: 1.375rem;
+  padding-inline: 0.5rem;
+  border-radius: var(--ox-radius-full);
+  box-shadow: inset 0 0 0 1px var(--ox-border);
+  color: var(--ox-text-muted);
+  margin: 0;
+}
+
+.ox-care-timeline__source-dot {
+  inline-size: 0.4375rem;
+  block-size: 0.4375rem;
+  border-radius: var(--ox-radius-full);
+  background: var(--ox-status-normal);
+}
+
+.ox-care-timeline__source--partial .ox-care-timeline__source-dot {
+  background: var(--ox-status-high);
+}
+
+.ox-care-timeline__source--unavailable {
+  box-shadow: inset 0 0 0 1px var(--ox-status-critical-border);
+  background: var(--ox-status-critical-bg);
+  color: var(--ox-status-critical);
+}
+
+.ox-care-timeline__source--unavailable .ox-care-timeline__source-dot {
+  background: var(--ox-status-critical);
+}
+
+.ox-care-timeline__source--excluded {
+  color: var(--ox-text-subtle);
+}
+
+.ox-care-timeline__source--excluded .ox-care-timeline__source-dot {
+  background: var(--ox-text-subtle);
+}
+
+.ox-care-timeline__empty {
+  padding: 1rem;
+  border: 1px solid var(--ox-border);
+  border-radius: var(--ox-radius);
+  background: var(--ox-bg-subtle);
+  color: var(--ox-text-muted);
+}
+
+.ox-care-timeline__action {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  min-block-size: var(--ox-density-target, 2.75rem);
+  padding-inline: 0.75rem;
+  border-radius: var(--ox-radius);
+  border: 1px solid var(--ox-border);
+  background: var(--ox-surface);
+  color: var(--ox-text);
+  font: inherit;
+  cursor: pointer;
+}
+
+/* Register accents. Redundant with the kind label, which is always rendered as
+   text — so this is emphasis, never the signal. */
+.ox-care-timeline__item--clinical .ox-timeline__node {
+  border-color: var(--ox-accent-border);
+  background: var(--ox-accent-subtle);
+  color: var(--ox-accent);
+}
+
+.ox-care-timeline__item--communication .ox-timeline__node {
+  border-color: var(--ox-swatch-3-border);
+  background: var(--ox-swatch-3-bg);
+  color: var(--ox-swatch-3);
+}
+
+.ox-care-timeline__item--patient-reported .ox-timeline__node {
+  border-color: var(--ox-swatch-5-border);
+  background: var(--ox-swatch-5-bg);
+  color: var(--ox-swatch-5);
+}
+
+.ox-care-timeline__item--critical .ox-timeline__node {
+  border-color: var(--ox-status-critical-border);
+  background: var(--ox-status-critical-bg);
+  color: var(--ox-status-critical);
+}
+
+.ox-care-timeline__item--planned .ox-timeline__node {
+  border-style: dashed;
+  background: transparent;
+  color: var(--ox-text-subtle);
+}
+
+/* Register layout: which side an event is on IS its register, so this is the
+   one alternating timeline that alternates on a fact. Below the breakpoint it
+   collapses to one column and the register survives as the kind label, because
+   a two-column chronology on a phone is not a design. */
+.ox-care-timeline__columns {
+  display: grid;
+  gap: 0 1.25rem;
+}
+
+.ox-care-timeline__column {
+  min-inline-size: 0;
+}
+
+.ox-care-timeline__column-head {
+  margin: 0 0 0.5rem;
+  font-size: var(--ox-text-2xs);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: var(--ox-text-subtle);
+}
+
+@media (min-width: 48rem) {
+  .ox-care-timeline--register .ox-care-timeline__columns {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  /* A rule between the columns, so the split reads as one instrument rather
+     than two lists that happen to be side by side. */
+  .ox-care-timeline--register .ox-care-timeline__column + .ox-care-timeline__column {
+    border-inline-start: 1px solid var(--ox-care-timeline-divider);
+    padding-inline-start: 1.25rem;
+  }
+}
+
+/* Jump to a period. It moves the reader; it never changes what is shown. */
+.ox-care-timeline__jump-label {
+  font-size: var(--ox-text-xs);
+  color: var(--ox-text-muted);
+}
+
+.ox-care-timeline__jump {
+  min-block-size: var(--ox-density-target, 2.75rem);
+  padding-inline: 0.5rem;
+  border-radius: var(--ox-radius);
+  border: 1px solid var(--ox-border);
+  background: var(--ox-surface);
+  color: var(--ox-text);
+  font: inherit;
+  font-size: var(--ox-text-sm);
+}
+
+.ox-care-timeline__jump:focus-visible {
+  outline: 2px solid var(--ox-focus-ring);
+  outline-offset: var(--ox-focus-ring-offset, 2px);
+}
+
+.ox-care-timeline__hint {
+  font-size: var(--ox-text-xs);
+  color: var(--ox-text-subtle);
+}
+
+/* The group heading is a jump target, so it takes focus — without drawing a
+   ring nobody asked for when the reader arrived by scrolling. */
+.ox-care-timeline__group:focus-visible {
+  outline: 2px solid var(--ox-focus-ring);
+  outline-offset: var(--ox-focus-ring-offset, 2px);
+}
+
+.ox-care-timeline__provenance {
+  color: var(--ox-text-subtle);
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+/* Arrivals are announced as content. The region is always rendered and empty
+   until something lands: an empty live region announces nothing, and one that
+   appears only when needed is one the screen reader was never watching. */
+.ox-care-timeline__announce {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Compact density: 22px nodes, one line per event, kind label retained. */
+.ox-care-timeline--compact .ox-timeline {
+  --ox-timeline-node-size: 1.375rem;
+  --ox-timeline-row-gap: 0.5625rem;
+  --ox-timeline-gap: 0.5625rem;
+}
+
+.ox-care-timeline--compact .ox-timeline__title {
+  font-weight: 500;
+}
+
+.ox-care-timeline--compact .ox-care-timeline__kind {
+  margin-block-end: 0;
+}
+
+.ox-care-timeline--compact .ox-care-timeline__when {
+  margin-block-start: 0.0625rem;
+}
+
+/* Parts CareTimeline adds to the primitive's tree. */
+.ox-timeline__title-text {
+  display: block;
+}
+
+.ox-care-timeline__detail {
+  margin: 0.1875rem 0 0;
+  color: var(--ox-text-muted);
+  font-weight: 400;
+}
+
+.ox-care-timeline__chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  min-block-size: 1.25rem;
+  padding-inline: 0.375rem;
+  border-radius: var(--ox-radius-sm);
+  border: 1px solid var(--ox-border);
+  background: var(--ox-bg-subtle);
+  color: var(--ox-text-muted);
+  font-size: var(--ox-text-2xs);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: none;
+  white-space: nowrap;
+}
+
+.ox-care-timeline__chip--caution {
+  border-color: var(--ox-status-high-border);
+  background: var(--ox-status-high-bg);
+  color: var(--ox-status-high);
+}
+
+.ox-care-timeline__chip--critical {
+  border-color: var(--ox-status-critical-border);
+  background: var(--ox-status-critical-bg);
+  color: var(--ox-status-critical);
+}
+
+.ox-care-timeline__chip--info {
+  border-color: var(--ox-accent-border);
+  background: var(--ox-accent-subtle);
+  color: var(--ox-accent);
+}
+
+.ox-care-timeline__ago {
+  color: var(--ox-text-subtle);
+}
+
+.ox-care-timeline__banner-mark {
+  flex: 0 0 auto;
+  color: var(--ox-status-critical);
+  margin-block-start: 0.125rem;
+}
+
+.ox-care-timeline__problems {
+  margin: 0.375rem 0 0;
+  padding-inline-start: 1.1rem;
+  color: var(--ox-status-critical);
+}
+
+.ox-care-timeline__gap-notice {
+  margin: 0;
+  color: var(--ox-status-high);
+}
+
+.ox-care-timeline__cluster-note {
+  margin-inline-start: auto;
+  color: var(--ox-text-subtle);
+}
+
+/* The dotted rail. Its meaning is "records may be missing between these two
+   events" — the affordance Ant Design spends on whichever item rendered last. */
+.ox-care-timeline__item--gap .ox-timeline__line {
+  background: none;
+  inline-size: 0;
+  border-inline-start: 1px dashed var(--ox-status-high);
+}
+
+.ox-care-timeline__item--gap .ox-timeline__node {
+  border-style: dashed;
+  border-color: var(--ox-status-high-border);
+  color: var(--ox-status-high);
+  background: var(--ox-status-high-bg);
+}
+
+/* A cluster expanding and a new event arriving are the only motion here.
+   A fade that has finished is a state the reader never saw, so under reduced
+   motion the arrival highlight becomes persistent rather than instant. */
+@media (prefers-reduced-motion: reduce) {
+  .ox-care-timeline *,
+  .ox-timeline * {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}
+
+@media (forced-colors: active) {
+  .ox-timeline__node,
+  .ox-care-timeline__source,
+  .ox-care-timeline__cluster {
+    forced-color-adjust: none;
+    border: 1px solid CanvasText;
+    background: Canvas;
+    color: CanvasText;
+  }
+
+  .ox-timeline__line,
+  .ox-care-timeline__group-rule,
+  .ox-care-timeline__divider-rule {
+    background: CanvasText;
+  }
+}
+
+/* Print is where "See all" stops existing, so it is where the coverage
+   sentence matters most. It is never the thing that gets dropped to fit. */
+@media print {
+  .ox-care-timeline__filter,
+  .ox-care-timeline__action {
+    display: none;
+  }
+
+  .ox-care-timeline__coverage,
+  .ox-care-timeline__banner,
+  .ox-care-timeline__sources {
+    display: flex !important;
+    break-inside: avoid;
+  }
+
+  .ox-timeline__item {
+    break-inside: avoid;
+  }
+}

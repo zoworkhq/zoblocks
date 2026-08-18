@@ -850,6 +850,455 @@ export const CATALOG: ComponentDoc[] = [
     "install": "pnpm dlx shadcn@latest add https://oxygenui.design/r/breath-loader.json"
   },
   {
+    "name": "care-timeline",
+    "title": "Care Timeline",
+    "tier": "free",
+    "status": "experimental",
+    "since": "0.4.0",
+    "layer": "clinical",
+    "distribution": "registry",
+    "summary": "A patient's chronology that cannot be rendered without saying what it is a view of — the window, the sources, the filters and the order.",
+    "description": "A timeline over clinical, administrative, communication and patient-reported events, with coverage as a required prop. Separates planned from happened, keeps an entry recorded in error visible and marked, and refuses to collapse anything a reader would act on.",
+    "rationale": "A table is read as rows and a chart as a shape, but a timeline is read as an account — and an account is understood to be continuous, so a gap in it becomes a fact. Meanwhile the timeline on screen is nearly always a slice: paginated to five, filtered to one register, assembled from sources that fail independently. Every one of those renders as the same tidy, confident, continuous list. A clinician reads a timeline with no imaging on it and orders a CT; the study was done eleven weeks ago at another hospital and the exchange query timed out four seconds earlier. Nothing was wrong on screen. So coverage is required in the type, with no default, because every plausible default is a claim the caller did not make — and the sentence it produces is rendered in a fixed place and printed. Two consequences follow: planned is not happened, so a future event sits above a now marker and a planned event whose time has passed with nothing against it is lapsed rather than silent; and clinical events are not administrative ones, so registers are typed rather than mixed at one weight.",
+    "categories": [
+      "Clinical",
+      "Data display"
+    ],
+    "fhir": [
+      {
+        "name": "Encounter",
+        "url": "https://hl7.org/fhir/R4/encounter.html"
+      },
+      {
+        "name": "Appointment",
+        "url": "https://hl7.org/fhir/R4/appointment.html"
+      },
+      {
+        "name": "Communication",
+        "url": "https://hl7.org/fhir/R4/communication.html"
+      },
+      {
+        "name": "Observation",
+        "url": "https://hl7.org/fhir/R4/observation.html"
+      },
+      {
+        "name": "DiagnosticReport",
+        "url": "https://hl7.org/fhir/R4/diagnosticreport.html"
+      },
+      {
+        "name": "Procedure",
+        "url": "https://hl7.org/fhir/R4/procedure.html"
+      },
+      {
+        "name": "MedicationRequest",
+        "url": "https://hl7.org/fhir/R4/medicationrequest.html"
+      },
+      {
+        "name": "Immunization",
+        "url": "https://hl7.org/fhir/R4/immunization.html"
+      },
+      {
+        "name": "DocumentReference",
+        "url": "https://hl7.org/fhir/R4/documentreference.html"
+      },
+      {
+        "name": "QuestionnaireResponse",
+        "url": "https://hl7.org/fhir/R4/questionnaireresponse.html"
+      },
+      {
+        "name": "Consent",
+        "url": "https://hl7.org/fhir/R4/consent.html"
+      },
+      {
+        "name": "Provenance",
+        "url": "https://hl7.org/fhir/R4/provenance.html"
+      }
+    ],
+    "resource": "Encounter",
+    "resourceUrl": "https://hl7.org/fhir/R4/encounter.html",
+    "states": [
+      "Newest first, grouped by month",
+      "Planned, above the now marker",
+      "Lapsed — planned, and nothing recorded against it",
+      "Cancelled",
+      "Attempted and did not connect",
+      "Amended, with what changed",
+      "Entered in error, retained and struck",
+      "Restricted — it exists and you may not read it",
+      "Consent-gated",
+      "A thread with its own steps",
+      "A cluster, and a critical event promoted out of one",
+      "A stated gap in coverage",
+      "A source that could not be reached",
+      "Filtered, with the hidden count stated",
+      "New since last reviewed",
+      "An imprecise date, kept imprecise",
+      "No record · none in this window · none you may see",
+      "Patient-facing, with a result not yet reviewed"
+    ],
+    "props": [
+      {
+        "name": "coverage",
+        "type": "TimelineCoverage",
+        "description": "What this timeline is a view of. Required, with no default. The one prop that makes the component worth using. Four honest lines is the floor: `{ sources: [{ id, label, status: \"ok\" }], order }`.",
+        "required": true
+      },
+      {
+        "name": "events",
+        "type": "readonly TypedTimelineEvent[]",
+        "description": "The events. `TypedTimelineEvent` rather than `TimelineEvent`: `kind: \"other\"` requires a `typeLabel`, so an unlabelled unknown is a build error at the call site instead of a blank chip in a chart.",
+        "required": true
+      },
+      {
+        "name": "now",
+        "type": "string",
+        "description": "Now, supplied by the caller. Reading the clock here would make the `now` marker, the lapsed state and every relative time undoable by a visual-regression baseline, and this repository lints against it for that reason.",
+        "required": true
+      },
+      {
+        "name": "audience",
+        "type": "CareTimelineAudience",
+        "description": "Selects the string catalog. Different words, not a softer tone.",
+        "required": false,
+        "default": "\"clinician\""
+      },
+      {
+        "name": "cluster",
+        "type": "false | ClusterOptions",
+        "description": "",
+        "required": false,
+        "default": "false"
+      },
+      {
+        "name": "defaultRegisters",
+        "type": "readonly TimelineRegister[]",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "filters",
+        "type": "boolean",
+        "description": "Show the register filter. Off for `layout=\"card\"`, which has no room.",
+        "required": false,
+        "default": "layout !== \"card\""
+      },
+      {
+        "name": "group",
+        "type": "GroupBy",
+        "description": "",
+        "required": false,
+        "default": "\"auto\""
+      },
+      {
+        "name": "headingLevel",
+        "type": "CareTimelineHeadingLevel",
+        "description": "Heading level for the group headers. Omitted by default. A timeline nested in a tab panel inside a chart page can sit four levels deep, and a component that hardcodes its level produces an outline worse than no headings at all — so with no level given the groups are labelled regions rather than headings.",
+        "required": false
+      },
+      {
+        "name": "icons",
+        "type": "Partial<Record<string, React.ReactNode>>",
+        "description": "Per-kind node marks. Decoration: the kind is always rendered as text too.",
+        "required": false
+      },
+      {
+        "name": "jump",
+        "type": "boolean",
+        "description": "Show the jump control. Moves the reader to a period and announces where it landed; it never changes what is rendered, because a control that filtered and navigated at once would make the coverage sentence ambiguous.",
+        "required": false,
+        "default": "false"
+      },
+      {
+        "name": "kinds",
+        "type": "readonly TimelineKind[]",
+        "description": "Kinds to show, controlled. No built-in UI: twenty-one toggles is not a filter bar, it is a form. The cost still reaches the coverage sentence.",
+        "required": false
+      },
+      {
+        "name": "lateEntryAfter",
+        "type": "string",
+        "description": "ISO 8601. A recording gap at least this long is stated on the event.",
+        "required": false
+      },
+      {
+        "name": "layout",
+        "type": "CareTimelineLayout",
+        "description": "",
+        "required": false,
+        "default": "\"default\""
+      },
+      {
+        "name": "limit",
+        "type": "number",
+        "description": "Render at most this many events. The remainder is reported, never dropped.",
+        "required": false
+      },
+      {
+        "name": "locale",
+        "type": "Partial<TimelineLocale>",
+        "description": "Replace individual strings. Merged over the audience's catalog.",
+        "required": false
+      },
+      {
+        "name": "localeTag",
+        "type": "string",
+        "description": "BCP 47. Passed to `Intl` for dates.",
+        "required": false
+      },
+      {
+        "name": "onLoadOlder",
+        "type": "(() => void)",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "onRead",
+        "type": "((coverage: TimelineCoverage) => void)",
+        "description": "Fires once per rendered coverage claim. For the host's audit record. The component does not write one itself — a component that writes audit records is infrastructure.",
+        "required": false
+      },
+      {
+        "name": "onRegistersChange",
+        "type": "((registers: TimelineRegister[]) => void)",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "onSelect",
+        "type": "((event: TimelineEvent) => void)",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "ref",
+        "type": "React.Ref<HTMLElement>",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "registers",
+        "type": "readonly TimelineRegister[]",
+        "description": "Registers to show, controlled. Hidden events are counted in the sentence.",
+        "required": false
+      },
+      {
+        "name": "seenThrough",
+        "type": "string",
+        "description": "What the reader had already seen. Never computed here.",
+        "required": false
+      }
+    ],
+    "exports": [
+      {
+        "name": "CareTimeline",
+        "props": [
+          {
+            "name": "coverage",
+            "type": "TimelineCoverage",
+            "description": "What this timeline is a view of. Required, with no default. The one prop that makes the component worth using. Four honest lines is the floor: `{ sources: [{ id, label, status: \"ok\" }], order }`.",
+            "required": true
+          },
+          {
+            "name": "events",
+            "type": "readonly TypedTimelineEvent[]",
+            "description": "The events. `TypedTimelineEvent` rather than `TimelineEvent`: `kind: \"other\"` requires a `typeLabel`, so an unlabelled unknown is a build error at the call site instead of a blank chip in a chart.",
+            "required": true
+          },
+          {
+            "name": "now",
+            "type": "string",
+            "description": "Now, supplied by the caller. Reading the clock here would make the `now` marker, the lapsed state and every relative time undoable by a visual-regression baseline, and this repository lints against it for that reason.",
+            "required": true
+          },
+          {
+            "name": "audience",
+            "type": "CareTimelineAudience",
+            "description": "Selects the string catalog. Different words, not a softer tone.",
+            "required": false,
+            "default": "\"clinician\""
+          },
+          {
+            "name": "cluster",
+            "type": "false | ClusterOptions",
+            "description": "",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "defaultRegisters",
+            "type": "readonly TimelineRegister[]",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "filters",
+            "type": "boolean",
+            "description": "Show the register filter. Off for `layout=\"card\"`, which has no room.",
+            "required": false,
+            "default": "layout !== \"card\""
+          },
+          {
+            "name": "group",
+            "type": "GroupBy",
+            "description": "",
+            "required": false,
+            "default": "\"auto\""
+          },
+          {
+            "name": "headingLevel",
+            "type": "CareTimelineHeadingLevel",
+            "description": "Heading level for the group headers. Omitted by default. A timeline nested in a tab panel inside a chart page can sit four levels deep, and a component that hardcodes its level produces an outline worse than no headings at all — so with no level given the groups are labelled regions rather than headings.",
+            "required": false
+          },
+          {
+            "name": "icons",
+            "type": "Partial<Record<string, React.ReactNode>>",
+            "description": "Per-kind node marks. Decoration: the kind is always rendered as text too.",
+            "required": false
+          },
+          {
+            "name": "jump",
+            "type": "boolean",
+            "description": "Show the jump control. Moves the reader to a period and announces where it landed; it never changes what is rendered, because a control that filtered and navigated at once would make the coverage sentence ambiguous.",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "kinds",
+            "type": "readonly TimelineKind[]",
+            "description": "Kinds to show, controlled. No built-in UI: twenty-one toggles is not a filter bar, it is a form. The cost still reaches the coverage sentence.",
+            "required": false
+          },
+          {
+            "name": "lateEntryAfter",
+            "type": "string",
+            "description": "ISO 8601. A recording gap at least this long is stated on the event.",
+            "required": false
+          },
+          {
+            "name": "layout",
+            "type": "CareTimelineLayout",
+            "description": "",
+            "required": false,
+            "default": "\"default\""
+          },
+          {
+            "name": "limit",
+            "type": "number",
+            "description": "Render at most this many events. The remainder is reported, never dropped.",
+            "required": false
+          },
+          {
+            "name": "locale",
+            "type": "Partial<TimelineLocale>",
+            "description": "Replace individual strings. Merged over the audience's catalog.",
+            "required": false
+          },
+          {
+            "name": "localeTag",
+            "type": "string",
+            "description": "BCP 47. Passed to `Intl` for dates.",
+            "required": false
+          },
+          {
+            "name": "onLoadOlder",
+            "type": "(() => void)",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "onRead",
+            "type": "((coverage: TimelineCoverage) => void)",
+            "description": "Fires once per rendered coverage claim. For the host's audit record. The component does not write one itself — a component that writes audit records is infrastructure.",
+            "required": false
+          },
+          {
+            "name": "onRegistersChange",
+            "type": "((registers: TimelineRegister[]) => void)",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "onSelect",
+            "type": "((event: TimelineEvent) => void)",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "ref",
+            "type": "React.Ref<HTMLElement>",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "registers",
+            "type": "readonly TimelineRegister[]",
+            "description": "Registers to show, controlled. Hidden events are counted in the sentence.",
+            "required": false
+          },
+          {
+            "name": "seenThrough",
+            "type": "string",
+            "description": "What the reader had already seen. Never computed here.",
+            "required": false
+          }
+        ]
+      }
+    ],
+    "usage": "import { CareTimeline } from \"@/components/oxygen/care-timeline\";\n\n<CareTimeline\n  aria-label=\"Care timeline for Ada Lovelace\"\n  events={events}\n  now={serverTime}\n  coverage={{\n    window: { from: \"2025-07-01\" },\n    order: \"newest-first\",\n    total: 43,\n    hidden: [{ reason: \"access\", count: 2 }],\n    sources: [\n      { id: \"ehr\", label: \"Northside EHR\", status: \"ok\" },\n      {\n        id: \"hie\",\n        label: \"Northside Regional Exchange\",\n        status: \"unavailable\",\n        detail: \"Timed out after 8s.\",\n      },\n    ],\n  }}\n  group=\"auto\"\n  cluster={{ kinds: [\"observation\"], within: \"P3D\", min: 3 }}\n  seenThrough=\"2026-08-12T14:02:00+05:30\"\n  lateEntryAfter=\"P2D\"\n  onLoadOlder={() => fetchOlder()}\n/>",
+    "guidance": {
+      "use": [
+        "The chart's own timeline view, where a clinician is asking what has been happening to this person.",
+        "Any surface where not finding an event is itself an answer — 'has she had this before' is the read this component exists for.",
+        "A dashboard card, with layout=\"card\" and limit, where the compressed coverage sentence still fits.",
+        "A patient portal, with audience=\"patient\", where a result may arrive before anyone has called."
+      ],
+      "avoid": [
+        "As the only view of a record. It is a chronology, not an index — a reader who needs the current medication list should not have to scroll a year of events to build one.",
+        "For one resource's own version history. That is a version list and it wants a different component.",
+        "Anywhere the coverage genuinely cannot be described. If you do not know what you searched, the honest render is an error state, not a timeline."
+      ]
+    },
+    "accessibility": [
+      {
+        "label": "Each group is its own named list",
+        "detail": "One <ol role=\"list\"> per group, each with an accessible name built from the timeline's own label and the group heading, so a rotor can move between periods. The since-you-last-looked divider splits a group into two named lists rather than floating a rule inside one."
+      },
+      {
+        "label": "The relative time is never the only time",
+        "detail": "Every event renders an absolute time inside <time datetime> at the record's precision. The relative form beside it is aria-hidden: spoken aloud it doubles the length of every item and adds nothing the date has not said."
+      },
+      {
+        "label": "Every state carries words, not only a shape",
+        "detail": "Planned is a dashed node and a Planned chip; a coverage gap is a dashed rail and a sentence; entered-in-error is a strike, a chip and a paragraph. Forced-colors mode, a monochrome print and a red-green deficiency each keep the meaning."
+      },
+      {
+        "label": "A failed source interrupts",
+        "detail": "An unavailable source renders a role=\"alert\" banner above the list rather than a grey footnote, because the reader is about to convert an absence into a clinical fact."
+      }
+    ],
+    "limitations": [
+      "coverage reports what this query reached, not what exists. A source that answers with an incomplete record is reported as reached, and that limit is the reason the component is not a completeness guarantee.",
+      "Coverage gaps are declared by the caller, never inferred. A component that turned eleven quiet weeks into 'records may be missing' would be inventing a claim; the application is what knows a source timed out.",
+      "No swimlane layout. One lane per source is the right answer for a medico-legal chronology and it needs horizontal scroll, its own keyboard model and a legend.",
+      "Duration events render at their start. A period is not a point, and bands are not in this version.",
+      "role=\"feed\" is not used. It is the APG's own pattern for an infinitely scrolling list and its example carries a note that it has not reached task-force consensus; load-older is a real button instead.",
+      "Dates are formatted by Intl at the record's precision, and a stamp with an offset renders in the record's zone rather than the reader's. Pass localeTag to control the language; there is no per-field format override yet.",
+      "The commonest way to defeat the coverage claim is upstream: catching a source's failure in the data layer and returning a shorter array. See content/guides/populating-coverage.md — the component cannot detect what never reached it."
+    ],
+    "related": [
+      "timeline",
+      "chart-accordion",
+      "clinical-note",
+      "accordion"
+    ],
+    "dependencies": [
+      "clsx",
+      "tailwind-merge"
+    ],
+    "install": "pnpm dlx shadcn@latest add https://oxygenui.design/r/care-timeline.json"
+  },
+  {
     "name": "chart-accordion",
     "title": "Chart Accordion",
     "tier": "free",
@@ -4349,6 +4798,279 @@ export const CATALOG: ComponentDoc[] = [
       "tailwind-merge"
     ],
     "install": "pnpm dlx shadcn@latest add https://oxygenui.design/r/switch.json"
+  },
+  {
+    "name": "timeline",
+    "title": "Timeline",
+    "tier": "free",
+    "status": "experimental",
+    "since": "0.4.0",
+    "layer": "primitive",
+    "distribution": "registry",
+    "summary": "Ant Design v6's Timeline, prop for prop, with the accessible name and the ordered-list semantics it does not ship.",
+    "description": "An ordered list with a rail. The API matches Ant Design v6 exactly, including the v5 names it still accepts, and takes no dependency on it. Adds a required accessible name and drops the current-step behaviour a chronology has no use for.",
+    "rationale": "antd's Timeline is a thin adapter over Steps, and it inherits two things a chronology should not have. It hardcodes current to the last item, which marks that item process — and antd's own stylesheet gives that state a dotted rail. On a wizard that reads as 'the step you are on, and it continues'. On a history it is a mark of incompleteness applied to whichever event happened to be last, and because reverse reverses the array first, on a newest-first clinical timeline it lands on the oldest event in the chart. It also inherits rc-steps' accessibility, which is none: no role, no aria-current, no way to name the list, so a page with a care timeline and an access-history timeline gives a screen-reader user two unnamed lists. Matching the API rather than wrapping it means an existing antd call site migrates by changing one import, and no consumer of a primitive inherits antd.",
+    "categories": [
+      "Data display",
+      "Primitives"
+    ],
+    "fhir": [],
+    "states": [
+      "Vertical, the default",
+      "Alternate, items on both sides",
+      "Horizontal",
+      "Filled and outlined variants",
+      "Custom node icons",
+      "Preset and custom node colours",
+      "A loading node",
+      "Reversed",
+      "Ant Design v5 prop names, still accepted"
+    ],
+    "props": [
+      {
+        "name": "children",
+        "type": "React.ReactNode",
+        "description": "`<Timeline.Item>` children, as antd v5 wrote them. Accepted for parity.",
+        "required": false
+      },
+      {
+        "name": "className",
+        "type": "string",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "classNames",
+        "type": "Partial<Record<TimelineSlot, string>>",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "items",
+        "type": "readonly TimelineItemType[]",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "mode",
+        "type": "TimelineMode",
+        "description": "Ant Design v6 resolves an unset value to `start`. So does this.",
+        "required": false
+      },
+      {
+        "name": "orientation",
+        "type": "TimelineOrientation",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "pending",
+        "type": "React.ReactNode",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "pendingDot",
+        "type": "React.ReactNode",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "prefixCls",
+        "type": "string",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "ref",
+        "type": "React.Ref<HTMLOListElement>",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "reverse",
+        "type": "boolean",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "rootClassName",
+        "type": "string",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "style",
+        "type": "React.CSSProperties",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "styles",
+        "type": "Partial<Record<TimelineSlot, React.CSSProperties>>",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "titleSpan",
+        "type": "string | number",
+        "description": "Distance to the centre of the node. A number is a ratio; a string is a length.",
+        "required": false
+      },
+      {
+        "name": "variant",
+        "type": "TimelineVariant",
+        "description": "",
+        "required": false
+      }
+    ],
+    "exports": [
+      {
+        "name": "Timeline",
+        "props": [
+          {
+            "name": "children",
+            "type": "React.ReactNode",
+            "description": "`<Timeline.Item>` children, as antd v5 wrote them. Accepted for parity.",
+            "required": false
+          },
+          {
+            "name": "className",
+            "type": "string",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "classNames",
+            "type": "Partial<Record<TimelineSlot, string>>",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "items",
+            "type": "readonly TimelineItemType[]",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "mode",
+            "type": "TimelineMode",
+            "description": "Ant Design v6 resolves an unset value to `start`. So does this.",
+            "required": false
+          },
+          {
+            "name": "orientation",
+            "type": "TimelineOrientation",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "pending",
+            "type": "React.ReactNode",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "pendingDot",
+            "type": "React.ReactNode",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "prefixCls",
+            "type": "string",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "ref",
+            "type": "React.Ref<HTMLOListElement>",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "reverse",
+            "type": "boolean",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "rootClassName",
+            "type": "string",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "style",
+            "type": "React.CSSProperties",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "styles",
+            "type": "Partial<Record<TimelineSlot, React.CSSProperties>>",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "titleSpan",
+            "type": "string | number",
+            "description": "Distance to the centre of the node. A number is a ratio; a string is a length.",
+            "required": false
+          },
+          {
+            "name": "variant",
+            "type": "TimelineVariant",
+            "description": "",
+            "required": false
+          }
+        ]
+      }
+    ],
+    "usage": "import { Timeline } from \"@/components/oxygen/timeline\";\n\n<Timeline\n  aria-label=\"Release history\"\n  mode=\"start\"\n  items={[\n    { key: \"1\", title: \"0.3.0\", content: \"Switch, Tabs, ChartAccordion.\" },\n    { key: \"2\", title: \"0.2.0\", content: \"Signature and Identity.\" },\n    { key: \"3\", title: \"0.1.0\", content: \"Five loaders.\" },\n  ]}\n/>",
+    "guidance": {
+      "use": [
+        "Any ordered sequence of moments: a release history, an order's progress, an audit trail.",
+        "Migrating an existing Ant Design Timeline without adding antd to a copy-source project.",
+        "As the rail underneath a component that owns a clinical concept — CareTimeline is built on this."
+      ],
+      "avoid": [
+        "A patient's chronology. Use CareTimeline, which states what it is a view of.",
+        "A list whose order does not carry meaning. That is a list, and <ul> says so honestly.",
+        "Carrying meaning in the node colour. The colour prop exists for API parity; a reader in forced-colors mode does not receive it."
+      ]
+    },
+    "accessibility": [
+      {
+        "label": "An accessible name is required, in the type",
+        "detail": "TimelineProps is intersected with a union requiring aria-label or aria-labelledby, so a list with no name does not compile. An unnamed list is invisible in review and in a rendering test, and obvious to exactly one group of readers."
+      },
+      {
+        "label": "An ordered list, with role=\"list\" stated",
+        "detail": "A chronology is ordered, so the element is <ol> of <li>. The redundant role=\"list\" is present because Safari drops list semantics from any list with list-style: none, and VoiceOver then announces neither the list nor its item count."
+      },
+      {
+        "label": "A structure, not a widget",
+        "detail": "No roving tabindex and no arrow-key handling. Screen-reader users read a list with the arrow keys in browse mode, and claiming them would make the list less navigable rather than more. Only the caller's own controls inside an item are focusable."
+      }
+    ],
+    "limitations": [
+      "No current or activeIndex. antd hardcodes current to the last item and its stylesheet dots that item's rail; a history has no current step, so the prop does not exist here and the dotted rail is free to mean something.",
+      "color accepts antd's four presets and any CSS colour, and nothing enforces a text equivalent beside it. That enforcement belongs on the clinical layer, where the vocabulary is closed.",
+      "titleSpan sets --ox-timeline-title-span rather than reproducing antd's internal head-span calculation. The rendered geometry is close, not identical.",
+      "The Ant Design documentation site and the 6.6.0 source disagree on mode's default — the table says end, the source falls back to start. This follows the source, and the parity test asserts against the installed version.",
+      "Migrating an existing antd call site is one import plus an accessible name. The three deliberate divergences, and the dotted rail antd draws that this one does not, are written up in content/guides/migrating-from-antd-timeline.md."
+    ],
+    "related": [
+      "care-timeline",
+      "accordion",
+      "chart-accordion"
+    ],
+    "dependencies": [
+      "clsx",
+      "tailwind-merge"
+    ],
+    "install": "pnpm dlx shadcn@latest add https://oxygenui.design/r/timeline.json"
   },
   {
     "name": "identity",
