@@ -19,8 +19,7 @@ module.exports = {
     {
       name: "no-circular",
       severity: "error",
-      comment:
-        "A cycle means neither module can be understood, tested, or replaced on its own.",
+      comment: "A cycle means neither module can be understood, tested, or replaced on its own.",
       from: {},
       to: { circular: true },
     },
@@ -75,13 +74,28 @@ module.exports = {
         path: "^registry/",
         pathNot: "\\.(meta|test|stories)\\.(ts|tsx)$",
       },
-      to: { path: "^packages/", dependencyTypes: ["local"] },
+      to: {
+        path: "^packages/",
+        // `@oxygenui-design/fhir` is the one exception, and it is a resolution
+        // artefact rather than a real coupling: the package is published, and
+        // every registry item that imports it declares it in `dependencies`, so
+        // the shadcn CLI installs it and the specifier resolves from npm in the
+        // customer's project. It only appears here as a workspace path because
+        // the package's `main` points at `src` for this repository's benefit,
+        // where every other published package points at `dist`.
+        pathNot: "^packages/fhir/src",
+        dependencyTypes: ["local"],
+      },
     },
     {
       name: "no-dev-dep-in-shipped-source",
       severity: "error",
-      comment: "A devDependency imported by shipped source is a runtime failure in a consumer's build.",
-      from: { path: "^(packages/(react|loaders|tokens|fhir|intl)/src|registry)/", pathNot: "\\.(test|stories)\\.(ts|tsx)$" },
+      comment:
+        "A devDependency imported by shipped source is a runtime failure in a consumer's build.",
+      from: {
+        path: "^(packages/(react|loaders|tokens|fhir|intl)/src|registry)/",
+        pathNot: "\\.(test|stories)\\.(ts|tsx)$",
+      },
       to: { dependencyTypes: ["npm-dev"] },
     },
     {

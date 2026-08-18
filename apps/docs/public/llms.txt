@@ -50,6 +50,10 @@ Rules that matter when generating code with these components:
   install: pnpm dlx shadcn@latest add https://oxygenui.design/r/switch.json
   states: On, Off, Unknown (absence, with a reason), Pending — the write is in flight, Committed, Reverted — the write failed, Blocked — refused before trying, Queued — offline, Stale — changed by someone else, Read-only, with a reason, Disabled, Time-boxed (until), Awaiting confirmation, Segmented — both answers visible, Chip — a filter bar, Row — the whole row is the target
   status: experimental
+- [Timeline](https://oxygenui.design/components/timeline): Ant Design v6's Timeline, prop for prop, with the accessible name and the ordered-list semantics it does not ship.
+  install: pnpm dlx shadcn@latest add https://oxygenui.design/r/timeline.json
+  states: Vertical, the default, Alternate, items on both sides, Horizontal, Filled and outlined variants, Custom node icons, Preset and custom node colours, A loading node, Reversed, Ant Design v5 prop names, still accepted
+  status: experimental
 - [Tabs](https://oxygenui.design/components/tabs): Tabs that know what they are: a view switch, a link list, a form value or a wizard — four accessibility trees behind one silhouette.
   install: pnpm dlx shadcn@latest add https://oxygenui.design/r/tabs.json
   states: Selected, Unselected, Disabled with a stated reason, Restricted (present, gated, explained), Stale — showing cached data, Unavailable offline, Unsaved changes pending, Locked step, Completed step, Overflowing into a menu, Collapsed to a native picker, Awaiting an async guard
@@ -57,6 +61,11 @@ Rules that matter when generating code with these components:
 
 ## Clinical
 
+- [Care Timeline](https://oxygenui.design/components/care-timeline): A patient's chronology that cannot be rendered without saying what it is a view of — the window, the sources, the filters and the order.
+  install: pnpm dlx shadcn@latest add https://oxygenui.design/r/care-timeline.json
+  fhir: Encounter, Appointment, Communication, Observation, DiagnosticReport, Procedure, MedicationRequest, Immunization, DocumentReference, QuestionnaireResponse, Consent, Provenance
+  states: Newest first, grouped by month, Planned, above the now marker, Lapsed — planned, and nothing recorded against it, Cancelled, Attempted and did not connect, Amended, with what changed, Entered in error, retained and struck, Restricted — it exists and you may not read it, Consent-gated, A thread with its own steps, A cluster, and a critical event promoted out of one, A stated gap in coverage, A source that could not be reached, Filtered, with the hidden count stated, New since last reviewed, An imprecise date, kept imprecise, No record · none in this window · none you may see, Patient-facing, with a result not yet reviewed
+  status: experimental
 - [Chart Accordion](https://oxygenui.design/components/chart-accordion): A record's sections with their headers composed to the house rules, so a severity can never reach the screen without the words that explain it.
   install: pnpm dlx shadcn@latest add https://oxygenui.design/r/chart-accordion.json
   states: Closed, with summaries, Expanded, Severity across the scale, Consent gate, Withheld section, Section that failed to load, No sections

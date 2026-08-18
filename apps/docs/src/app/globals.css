@@ -34,6 +34,17 @@
    so the distinction survives greyscale, forced colours and print. */
 @import "../../../../registry/oxygen/lib/clinical-note.css";
 
+/* The rail, the coverage footer and the two-column register split. Shipped as
+   styles/oxygen-timeline.css by the `timeline-core` registry item, carrying
+   Timeline and CareTimeline between them.
+
+   Missing here for a whole session after both components landed, and nothing
+   caught it: axe does not check styling, and the unit tests run in jsdom,
+   which applies no CSS at all. Both pages rendered a chronology with no rail,
+   no dashed gap and no column split — perfectly accessible, perfectly
+   functional, and invisible. `test/docs-stylesheets.test.ts` is the guard. */
+@import "../../../../registry/oxygen/lib/timeline.css";
+
 /* The tab system's own stylesheet, imported from the package rather than
    copied — so the docs demo the exact file a customer installs. Its tokens
    resolve through --ox-* to --ant-* to a literal, which is why it needs no

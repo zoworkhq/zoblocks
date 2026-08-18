@@ -1,0 +1,3324 @@
+<meta charset="utf-8" />
+<title>Oxygen CareTimeline</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<style>
+  /* ------------------------------------------------------------------ */
+  /* Document tokens — Oxygen's own identity, shared with the other      */
+  /* component briefs so the set reads as one series.                    */
+  /* The mockups further down deliberately do NOT use these: they use    */
+  /* Ant Design v6's real token values, so what you are judging is antd, */
+  /* not a teal impression of it.                                        */
+  /* ------------------------------------------------------------------ */
+  :root {
+    --paper: #f6faf8;
+    --surface: #ffffff;
+    --surface-2: #eef4f2;
+    --ink: #0e1c19;
+    --ink-2: #33473f;
+    --muted: #5d716b;
+    --rule: #d8e4df;
+    --rule-2: #c3d3cd;
+    --accent: #059478;
+    --accent-2: #0bb08f;
+    --accent-soft: #e6f7f1;
+    --accent-ink: #045b4b;
+    --stage: #0b1716;
+    --stage-rule: #1c3230;
+    --warn: #b7791f;
+    --warn-soft: #fbf3e0;
+    --warn-rule: #e4c98a;
+    --bad: #b4423a;
+    --bad-soft: #fbeceb;
+    --bad-rule: #e8b5b0;
+    --ok: #1f8f5f;
+    --ok-soft: #e6f6ee;
+    --ok-rule: #a9dcc3;
+    --code-bg: #0f1e1c;
+    --code-fg: #d9ece6;
+    --code-k: #7ee0cd;
+    --code-s: #f2c98a;
+    --code-c: #7f9c94;
+    --shadow: 0 1px 2px rgb(14 28 25 / 0.06), 0 8px 24px -12px rgb(14 28 25 / 0.18);
+    --font-display: "Avenir Next", "Segoe UI Variable Display", "Helvetica Neue", ui-sans-serif, system-ui, sans-serif;
+    --font-body: -apple-system, BlinkMacSystemFont, "Segoe UI Variable Text", "Segoe UI", ui-sans-serif, system-ui, sans-serif;
+    --font-mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper: #0b1514;
+      --surface: #101d1b;
+      --surface-2: #142522;
+      --ink: #e7f2ee;
+      --ink-2: #c3d6d0;
+      --muted: #93aca5;
+      --rule: #1f312e;
+      --rule-2: #2c423e;
+      --accent: #5fe0c9;
+      --accent-2: #8aeedd;
+      --accent-soft: #10302b;
+      --accent-ink: #b8f3e7;
+      --stage: #070f0e;
+      --stage-rule: #1a2d2b;
+      --warn: #e2b04a;
+      --warn-soft: #2a2410;
+      --warn-rule: #4d4020;
+      --bad: #f0928a;
+      --bad-soft: #2c1614;
+      --bad-rule: #552a26;
+      --ok: #5fd39a;
+      --ok-soft: #10281d;
+      --ok-rule: #23503a;
+      --code-bg: #0a1413;
+      --code-fg: #d9ece6;
+      --shadow: 0 1px 2px rgb(0 0 0 / 0.4), 0 10px 30px -14px rgb(0 0 0 / 0.6);
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper: #0b1514;
+    --surface: #101d1b;
+    --surface-2: #142522;
+    --ink: #e7f2ee;
+    --ink-2: #c3d6d0;
+    --muted: #93aca5;
+    --rule: #1f312e;
+    --rule-2: #2c423e;
+    --accent: #5fe0c9;
+    --accent-2: #8aeedd;
+    --accent-soft: #10302b;
+    --accent-ink: #b8f3e7;
+    --stage: #070f0e;
+    --stage-rule: #1a2d2b;
+    --warn: #e2b04a;
+    --warn-soft: #2a2410;
+    --warn-rule: #4d4020;
+    --bad: #f0928a;
+    --bad-soft: #2c1614;
+    --bad-rule: #552a26;
+    --ok: #5fd39a;
+    --ok-soft: #10281d;
+    --ok-rule: #23503a;
+    --code-bg: #0a1413;
+    --code-fg: #d9ece6;
+    --shadow: 0 1px 2px rgb(0 0 0 / 0.4), 0 10px 30px -14px rgb(0 0 0 / 0.6);
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+  a { color: var(--accent-ink); text-decoration-color: color-mix(in oklab, var(--accent) 50%, transparent); text-underline-offset: 3px; }
+  a:hover { text-decoration-color: var(--accent); }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+  h1, h2, h3, h4 { font-family: var(--font-display); letter-spacing: -0.015em; text-wrap: balance; margin: 0; }
+  h1 { font-size: clamp(2.2rem, 4.5vw, 3.4rem); line-height: 1.05; font-weight: 600; }
+  h2 { font-size: 1.75rem; line-height: 1.2; font-weight: 600; }
+  h3 { font-size: 1.2rem; line-height: 1.3; font-weight: 600; margin-top: 2rem; }
+  h4 { font-size: 1rem; line-height: 1.35; font-weight: 600; }
+  p { margin: 0 0 1rem; }
+  ul, ol { margin: 0 0 1rem; padding-inline-start: 1.35rem; }
+  li { margin-bottom: 0.4rem; }
+  li::marker { color: var(--accent); }
+  strong { font-weight: 600; color: var(--ink); }
+  code { font-family: var(--font-mono); font-size: 0.86em; background: var(--surface-2); padding: 0.1em 0.35em; border-radius: 4px; }
+
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 0 clamp(1rem, 4vw, 2.5rem); }
+  .prose { max-width: 68ch; }
+
+  header.hero {
+    padding: clamp(3rem, 9vw, 6.5rem) 0 clamp(2rem, 5vw, 3.5rem);
+    border-bottom: 1px solid var(--rule);
+    background:
+      radial-gradient(1100px 420px at 12% -12%, color-mix(in oklab, var(--accent) 11%, transparent), transparent 62%),
+      var(--paper);
+  }
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--accent-ink);
+    margin-bottom: 1.1rem;
+  }
+  .hero .lede { font-size: clamp(1.05rem, 2vw, 1.3rem); color: var(--ink-2); max-width: 62ch; margin-top: 1.25rem; }
+  .hero-meta { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: 2rem; }
+  .pill {
+    font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.05em;
+    padding: 0.35rem 0.7rem; border-radius: 999px;
+    border: 1px solid var(--rule-2); background: var(--surface); color: var(--muted);
+  }
+  .pill.on { border-color: color-mix(in oklab, var(--accent) 45%, transparent); background: var(--accent-soft); color: var(--accent-ink); }
+
+  nav.toc { border-bottom: 1px solid var(--rule); background: var(--surface); position: sticky; top: 0; z-index: 40; }
+  nav.toc .wrap { display: flex; gap: 0.25rem; overflow-x: auto; padding-block: 0.5rem; scrollbar-width: thin; }
+  nav.toc a {
+    flex: 0 0 auto; font-size: 0.8rem; padding: 0.35rem 0.65rem; border-radius: 6px;
+    color: var(--muted); text-decoration: none; white-space: nowrap;
+  }
+  nav.toc a:hover { background: var(--surface-2); color: var(--ink); }
+
+  section { padding: clamp(2.75rem, 6vw, 4.5rem) 0; border-bottom: 1px solid var(--rule); scroll-margin-top: 3.5rem; }
+  section > .wrap > .sec-head { margin-bottom: 2rem; }
+  .sec-num {
+    font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.14em;
+    color: var(--accent); text-transform: uppercase; display: block; margin-bottom: 0.5rem;
+  }
+  .sec-head p { color: var(--ink-2); max-width: 66ch; margin-top: 0.75rem; }
+
+  .grid { display: grid; gap: 1rem; }
+  .g2 { grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
+  .g3 { grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); }
+  .g4 { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
+
+  .card {
+    background: var(--surface); border: 1px solid var(--rule);
+    border-radius: 12px; padding: 1.25rem 1.35rem; box-shadow: var(--shadow);
+  }
+  .card h4 { margin-bottom: 0.5rem; }
+  .card p:last-child, .card ul:last-child { margin-bottom: 0; }
+  .card .k { font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); display: block; margin-bottom: 0.4rem; }
+
+  .note {
+    border-inline-start: 3px solid var(--accent);
+    background: var(--accent-soft); color: var(--accent-ink);
+    padding: 1rem 1.15rem; border-radius: 0 10px 10px 0; margin: 1.5rem 0;
+  }
+  .note.warn { border-color: var(--warn); background: var(--warn-soft); color: var(--ink); }
+  .note.bad { border-color: var(--bad); background: var(--bad-soft); color: var(--ink); }
+  .note.ok { border-color: var(--ok); background: var(--ok-soft); color: var(--ink); }
+  .note p:last-child { margin-bottom: 0; }
+  .note .lbl { font-family: var(--font-mono); font-size: 0.68rem; letter-spacing: 0.12em; text-transform: uppercase; display: block; margin-bottom: 0.4rem; opacity: 0.85; }
+
+  .tw { overflow-x: auto; border: 1px solid var(--rule); border-radius: 12px; background: var(--surface); margin: 1.5rem 0; }
+  table { border-collapse: collapse; width: 100%; font-size: 0.88rem; min-width: 560px; }
+  th, td { text-align: start; padding: 0.7rem 0.9rem; border-bottom: 1px solid var(--rule); vertical-align: top; }
+  th { font-family: var(--font-mono); font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); background: var(--surface-2); position: sticky; top: 0; }
+  tr:last-child td { border-bottom: 0; }
+  td code { white-space: nowrap; }
+  .num { font-variant-numeric: tabular-nums; }
+  .yes { color: var(--ok); font-weight: 600; }
+  .no { color: var(--bad); font-weight: 600; }
+  .meh { color: var(--warn); font-weight: 600; }
+
+  pre {
+    background: var(--code-bg); color: var(--code-fg); border-radius: 12px;
+    padding: 1.1rem 1.25rem; overflow-x: auto; font-family: var(--font-mono);
+    font-size: 0.8rem; line-height: 1.65; margin: 1.25rem 0; border: 1px solid var(--stage-rule);
+  }
+  pre code { background: none; padding: 0; font-size: inherit; color: inherit; }
+  .c-k { color: var(--code-k); }
+  .c-s { color: var(--code-s); }
+  .c-c { color: var(--code-c); font-style: italic; }
+
+  figure { margin: 1.75rem 0; }
+  figcaption {
+    font-size: 0.82rem; color: var(--muted); margin-top: 0.75rem;
+    padding-inline-start: 0.9rem; border-inline-start: 2px solid var(--rule-2);
+  }
+  figcaption b { color: var(--ink-2); font-weight: 600; }
+  .stage {
+    background: linear-gradient(var(--surface-2) 0 0) padding-box, var(--surface);
+    border: 1px solid var(--rule); border-radius: 14px;
+    padding: clamp(1rem, 3vw, 2rem); overflow-x: auto;
+  }
+
+  /* ------------------------------------------------------------------ */
+  /* ANT DESIGN mockup primitives — real antd v6 default token values.   */
+  /* Kept in their own namespace so the document's teal never leaks in.  */
+  /* ------------------------------------------------------------------ */
+  .antd {
+    --a-primary: #1677ff;
+    --a-primary-bg: #e6f4ff;
+    --a-primary-border: #91caff;
+    --a-success: #52c41a;
+    --a-success-bg: #f6ffed;
+    --a-success-border: #b7eb8f;
+    --a-warning: #faad14;
+    --a-warning-bg: #fffbe6;
+    --a-warning-border: #ffe58f;
+    --a-error: #ff4d4f;
+    --a-error-bg: #fff2f0;
+    --a-error-border: #ffccc7;
+    --a-purple: #722ed1;
+    --a-purple-bg: #f9f0ff;
+    --a-purple-border: #d3adf7;
+    --a-cyan: #13c2c2;
+    --a-cyan-bg: #e6fffb;
+    --a-cyan-border: #87e8de;
+    --a-magenta: #eb2f96;
+    --a-magenta-bg: #fff0f6;
+    --a-magenta-border: #ffadd2;
+    --a-text: rgba(0, 0, 0, 0.88);
+    --a-text-2: rgba(0, 0, 0, 0.65);
+    --a-text-3: rgba(0, 0, 0, 0.45);
+    --a-text-4: rgba(0, 0, 0, 0.25);
+    --a-border: #d9d9d9;
+    --a-border-2: #f0f0f0;
+    --a-bg: #ffffff;
+    --a-bg-layout: #f5f5f5;
+    --a-fill-3: rgba(0, 0, 0, 0.04);
+    --a-fill-2: rgba(0, 0, 0, 0.06);
+    --a-radius: 6px;
+    --a-radius-lg: 8px;
+    --a-radius-sm: 4px;
+    --a-h: 32px;
+    --a-h-sm: 24px;
+    --a-shadow: 0 6px 16px 0 rgb(0 0 0 / 0.08), 0 3px 6px -4px rgb(0 0 0 / 0.12), 0 9px 28px 8px rgb(0 0 0 / 0.05);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+    font-size: 14px;
+    line-height: 1.5714;
+    color: var(--a-text);
+  }
+  .antd code {
+    background: var(--a-fill-3); color: var(--a-text);
+    border: 1px solid var(--a-border-2); border-radius: var(--a-radius-sm);
+    padding: 1px 5px; font-size: 12px;
+  }
+  .a-card {
+    background: var(--a-bg); border-radius: var(--a-radius-lg);
+    box-shadow: var(--a-shadow); width: 100%; max-width: 560px; margin: 0 auto;
+  }
+  .a-card.wide { max-width: 860px; }
+  .a-card.xwide { max-width: 1040px; }
+  .a-card.pins { overflow: visible; }
+  .a-card-head {
+    display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem;
+    padding: 16px 20px; border-bottom: 1px solid var(--a-border-2);
+  }
+  .a-card-title { font-size: 16px; font-weight: 600; line-height: 1.5; color: var(--a-text); }
+  .a-card-sub { font-size: 12px; color: var(--a-text-3); margin-top: 2px; }
+  .a-card-body { padding: 16px 20px; }
+  .a-card-body.flush { padding: 0; }
+  .a-card-foot {
+    display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap;
+    padding: 11px 20px; border-top: 1px solid var(--a-border-2);
+    font-size: 12px; color: var(--a-text-3);
+  }
+  .a-btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+    height: var(--a-h); padding: 0 15px; border-radius: var(--a-radius);
+    border: 1px solid var(--a-border); background: var(--a-bg); color: var(--a-text);
+    font-size: 14px; font-weight: 400; white-space: nowrap;
+  }
+  .a-btn.primary { background: var(--a-primary); border-color: var(--a-primary); color: #fff; }
+  .a-btn.text { border-color: transparent; background: transparent; color: var(--a-text-2); }
+  .a-btn.link { border-color: transparent; background: transparent; color: var(--a-primary); padding: 0; height: auto; }
+  .a-btn.sm { height: var(--a-h-sm); padding: 0 9px; font-size: 12px; }
+  .a-btn.on { color: var(--a-primary); border-color: var(--a-primary); background: var(--a-primary-bg); }
+  .a-alert {
+    display: flex; gap: 8px; align-items: flex-start;
+    padding: 9px 12px; border-radius: var(--a-radius); font-size: 13px;
+    border: 1px solid var(--a-primary-border); background: var(--a-primary-bg); color: var(--a-text);
+  }
+  .a-alert.warning { border-color: var(--a-warning-border); background: var(--a-warning-bg); }
+  .a-alert.error { border-color: var(--a-error-border); background: var(--a-error-bg); }
+  .a-alert .ic { flex: 0 0 auto; margin-top: 2px; }
+  .a-alert b { font-weight: 600; }
+  .a-tag {
+    display: inline-flex; align-items: center; gap: 4px; height: 20px; padding: 0 6px;
+    font-size: 11px; line-height: 18px; border-radius: var(--a-radius-sm);
+    border: 1px solid var(--a-border); background: var(--a-fill-3); color: var(--a-text-2);
+    white-space: nowrap;
+  }
+  .a-tag.blue { border-color: var(--a-primary-border); background: var(--a-primary-bg); color: var(--a-primary); }
+  .a-tag.green { border-color: var(--a-success-border); background: var(--a-success-bg); color: #389e0d; }
+  .a-tag.gold { border-color: var(--a-warning-border); background: var(--a-warning-bg); color: #d48806; }
+  .a-tag.red { border-color: var(--a-error-border); background: var(--a-error-bg); color: var(--a-error); }
+  .a-tag.purple { border-color: var(--a-purple-border); background: var(--a-purple-bg); color: var(--a-purple); }
+  .a-tag.cyan { border-color: var(--a-cyan-border); background: var(--a-cyan-bg); color: #08979c; }
+  .a-tag.magenta { border-color: var(--a-magenta-border); background: var(--a-magenta-bg); color: #c41d7f; }
+  .a-tag.plain { border-color: var(--a-border-2); background: transparent; color: var(--a-text-3); }
+
+  /* ------------------------------------------------------------------ */
+  /* Icons — Lucide geometry: 24px grid, 2px stroke, round caps.         */
+  /* ------------------------------------------------------------------ */
+  .i {
+    width: 16px; height: 16px; flex: 0 0 auto; display: block;
+    fill: none; stroke: currentColor; stroke-width: 2;
+    stroke-linecap: round; stroke-linejoin: round;
+    vector-effect: non-scaling-stroke;
+  }
+  .i-14 { width: 14px; height: 14px; stroke-width: 2.15; }
+  .i-18 { width: 18px; height: 18px; stroke-width: 1.9; }
+  .i-20 { width: 20px; height: 20px; stroke-width: 1.85; }
+
+  /* ------------------------------------------------------------------ */
+  /* Timeline mockup primitives.                                         */
+  /* The rail is a real grid column, not an absolutely positioned line —  */
+  /* so it survives reflow, zoom and a long title wrapping to 4 lines.   */
+  /* ------------------------------------------------------------------ */
+  .tl { list-style: none; margin: 0; padding: 0; }
+  .tl > li { display: grid; grid-template-columns: 32px 1fr; gap: 12px; position: relative; }
+  .tl > li > .rail { display: grid; grid-template-rows: auto 1fr; justify-items: center; }
+  .antd .node {
+    width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center;
+    background: var(--a-bg); border: 1px solid var(--a-border); color: var(--a-text-2); flex: 0 0 auto;
+  }
+  .antd .node.clinical { border-color: var(--a-primary-border); background: var(--a-primary-bg); color: var(--a-primary); }
+  .antd .node.admin { border-color: var(--a-border); background: var(--a-fill-3); color: var(--a-text-2); }
+  .antd .node.comms { border-color: var(--a-cyan-border); background: var(--a-cyan-bg); color: #08979c; }
+  .antd .node.reported { border-color: var(--a-magenta-border); background: var(--a-magenta-bg); color: #c41d7f; }
+  .antd .node.critical { border-color: var(--a-error-border); background: var(--a-error-bg); color: var(--a-error); }
+  .antd .node.planned { border-style: dashed; border-color: var(--a-border); background: transparent; color: var(--a-text-3); }
+  .tl .line { width: 1px; background: var(--a-border-2); margin: 6px 0 0; min-height: 8px; align-self: stretch; }
+  /* A DOTTED rail segment is not decoration: it means records may be
+     missing between the two events it joins. Paired with a worded label. */
+  .tl .line.gap { background: none; border-inline-start: 1px dashed var(--a-warning); width: 0; }
+  .tl > li:last-child .line { display: none; }
+  .tl .body { padding-bottom: 18px; min-width: 0; }
+  .tl > li:last-child .body { padding-bottom: 0; }
+  .antd .kind {
+    font-size: 10.5px; letter-spacing: 0.07em; text-transform: uppercase;
+    color: var(--a-text-3); font-weight: 600; margin-bottom: 2px;
+    display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+  }
+  .antd .ttl { font-size: 14px; font-weight: 600; color: var(--a-text); line-height: 1.45; }
+  .antd .ttl a { color: var(--a-text); text-decoration: none; border-bottom: 1px solid var(--a-border); }
+  .antd .det { font-size: 13px; color: var(--a-text-2); margin-top: 3px; line-height: 1.5; }
+  .antd .who { font-size: 12.5px; color: var(--a-text-2); margin-top: 4px; display: flex; align-items: center; gap: 5px; flex-wrap: wrap; }
+  .antd .when {
+    font-size: 12px; color: var(--a-text-3); margin-top: 5px;
+    font-variant-numeric: tabular-nums; display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap;
+  }
+  .antd .when .ago { color: var(--a-text-4); }
+  .antd .when .src { color: var(--a-text-4); }
+  .antd .struck .ttl, .antd .struck .det { text-decoration: line-through; text-decoration-thickness: 1px; color: var(--a-text-3); }
+  .antd .box {
+    margin-top: 8px; border: 1px solid var(--a-border-2); border-radius: var(--a-radius);
+    padding: 8px 11px; font-size: 12.5px; color: var(--a-text-2); background: var(--a-fill-3);
+  }
+  .antd .box.err { border-color: var(--a-error-border); background: var(--a-error-bg); }
+  .antd .box.warnb { border-color: var(--a-warning-border); background: var(--a-warning-bg); }
+  .antd .steps { margin: 7px 0 0; padding: 0; list-style: none; display: grid; gap: 5px; }
+  .antd .steps li {
+    display: grid; grid-template-columns: 14px 1fr auto; gap: 8px; align-items: baseline;
+    font-size: 12.5px; color: var(--a-text-2); margin: 0;
+  }
+  .antd .steps .t { color: var(--a-text-4); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .antd .steps .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--a-border); margin-top: 6px; }
+  .antd .steps .dot.done { background: var(--a-success); }
+  .antd .steps .dot.open { background: transparent; box-shadow: inset 0 0 0 1.5px var(--a-warning); }
+
+  /* Month / group header, sticky inside a scrolling chart pane */
+  .tl-grp {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--a-text-3); font-weight: 600; padding: 10px 0 8px;
+    background: var(--a-bg);
+  }
+  .tl-grp .rule { flex: 1 1 auto; height: 1px; background: var(--a-border-2); }
+  .tl-grp .n { color: var(--a-text-4); font-weight: 400; letter-spacing: 0; text-transform: none; font-variant-numeric: tabular-nums; }
+
+  /* The divider that answers "what is new since I last looked" */
+  .tl-since {
+    display: flex; align-items: center; gap: 10px; padding: 6px 0 12px;
+    font-size: 11.5px; color: var(--a-primary); font-weight: 600;
+  }
+  .tl-since .rule { flex: 1 1 auto; height: 1px; background: var(--a-primary-border); }
+  .tl-now { color: #d48806; }
+  .tl-now .rule { background: var(--a-warning-border); }
+
+  /* The coverage statement. Always rendered, always printed. */
+  .cov {
+    display: flex; align-items: flex-start; gap: 8px; flex-wrap: wrap;
+    font-size: 12px; color: var(--a-text-2); line-height: 1.55;
+  }
+  .cov .lead { font-weight: 600; color: var(--a-text); }
+  .cov-srcs { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px; }
+  .srcpill {
+    display: inline-flex; align-items: center; gap: 5px; height: 22px; padding: 0 8px;
+    border-radius: 999px; font-size: 11.5px; color: var(--a-text-2);
+    box-shadow: inset 0 0 0 1px var(--a-border-2); background: var(--a-bg);
+  }
+  .srcpill .d { width: 7px; height: 7px; border-radius: 50%; background: var(--a-success); flex: 0 0 auto; }
+  .srcpill.partial .d { background: var(--a-warning); }
+  .srcpill.down { box-shadow: inset 0 0 0 1px var(--a-error-border); background: var(--a-error-bg); color: var(--a-error); }
+  .srcpill.down .d { background: var(--a-error); }
+  .srcpill.excluded { color: var(--a-text-4); }
+  .srcpill.excluded .d { background: var(--a-text-4); }
+
+  /* Two-column register mode */
+  .tl-reg { display: grid; grid-template-columns: 1fr 33px 1fr; gap: 0 12px; }
+  .tl-reg .col-h {
+    font-size: 10.5px; letter-spacing: 0.08em; text-transform: uppercase; font-weight: 600;
+    color: var(--a-text-3); padding-bottom: 8px;
+  }
+  .tl-reg .col-h.r { text-align: end; }
+  .tl-reg .spine { grid-column: 2; border-inline-start: 1px solid var(--a-border-2); margin-inline-start: 16px; }
+  .tl-reg .ev { padding: 0 0 16px; }
+  .tl-reg .ev.r { grid-column: 3; }
+  .tl-reg .ev.l { grid-column: 1; text-align: end; }
+  .tl-reg .mid { grid-column: 2; display: grid; place-items: center; position: relative; }
+  /* the rail, drawn behind the node rather than as a sibling element */
+  .tl-reg .mid::before {
+    content: ""; position: absolute; top: 0; bottom: -16px;
+    inset-inline-start: 50%; width: 1px; background: var(--a-border-2); transform: translateX(-50%);
+  }
+  .tl-reg .mid.last::before { bottom: 50%; }
+  .tl-reg .mid > .node { position: relative; z-index: 1; }
+
+  /* Compact density */
+  .tl.compact > li { grid-template-columns: 22px 1fr; gap: 9px; }
+  .tl.compact .node { width: 22px; height: 22px; }
+  .tl.compact .body { padding-bottom: 9px; }
+  .tl.compact .ttl { font-size: 13px; font-weight: 500; }
+  .tl.compact .kind { margin-bottom: 0; }
+  .tl.compact .when { margin-top: 1px; }
+
+  .cluster {
+    display: flex; align-items: center; gap: 9px; font-size: 12.5px; color: var(--a-text-2);
+    border: 1px dashed var(--a-border); border-radius: var(--a-radius); padding: 7px 11px;
+    background: var(--a-fill-3);
+  }
+  .cluster b { font-weight: 600; color: var(--a-text); }
+
+  /* ------------------------------------------------------------------ */
+  /* Annotation pins — anchored to the element they describe.            */
+  /* ------------------------------------------------------------------ */
+  .rel { position: relative; }
+  .pin {
+    position: absolute; z-index: 6;
+    width: 20px; height: 20px; border-radius: 50%;
+    background: var(--accent); color: #fff;
+    font-family: var(--font-mono); font-size: 10px; font-weight: 700;
+    display: grid; place-items: center; line-height: 1;
+    box-shadow: 0 0 0 2px var(--a-bg), 0 0 0 3.5px color-mix(in oklab, var(--accent) 40%, transparent);
+  }
+  .pin.bad { background: var(--bad); box-shadow: 0 0 0 2px var(--a-bg), 0 0 0 3.5px color-mix(in oklab, var(--bad) 40%, transparent); }
+  .pin-tl { top: -10px; inset-inline-start: -10px; }
+  .pin-tr { top: -10px; inset-inline-end: -10px; }
+  .pin-bl { bottom: -10px; inset-inline-start: -10px; }
+  .pin-br { bottom: -10px; inset-inline-end: -10px; }
+  .pin-l  { top: 50%; inset-inline-start: -10px; transform: translateY(-50%); }
+  .pin-r  { top: 50%; inset-inline-end: -10px; transform: translateY(-50%); }
+
+  .anno-key { margin-top: 1.5rem; display: grid; gap: 0.6rem; padding: 0; }
+  .anno-key li { display: flex; gap: 0.65rem; align-items: flex-start; font-size: 0.88rem; color: var(--ink-2); list-style: none; margin: 0; }
+  .anno-key .n {
+    flex: 0 0 auto; width: 20px; height: 20px; border-radius: 50%;
+    background: var(--accent); color: #fff; font-family: var(--font-mono);
+    font-size: 10px; font-weight: 700; display: grid; place-items: center; margin-top: 2px;
+  }
+  .anno-key .n.bad { background: var(--bad); }
+
+  .feat { display: grid; gap: 0; border: 1px solid var(--rule); border-radius: 12px; overflow: hidden; background: var(--surface); margin: 1.5rem 0; }
+  .feat > div { display: grid; grid-template-columns: 2.5rem 1fr; gap: 0.9rem; padding: 0.85rem 1.1rem; border-bottom: 1px solid var(--rule); }
+  .feat > div:last-child { border-bottom: 0; }
+  .feat .n { font-family: var(--font-mono); font-size: 0.75rem; color: var(--muted); padding-top: 0.15rem; }
+  .feat .t { font-weight: 600; margin-bottom: 0.15rem; }
+  .feat .d { font-size: 0.9rem; color: var(--ink-2); }
+  .badge { font-family: var(--font-mono); font-size: 0.62rem; letter-spacing: 0.08em; text-transform: uppercase; padding: 0.1rem 0.4rem; border-radius: 4px; margin-inline-start: 0.5rem; vertical-align: 0.1em; white-space: nowrap; }
+  .badge.v1 { background: var(--accent-soft); color: var(--accent-ink); border: 1px solid color-mix(in oklab, var(--accent) 35%, transparent); }
+  .badge.v2 { background: var(--surface-2); color: var(--muted); border: 1px solid var(--rule-2); }
+  .badge.host { background: var(--warn-soft); color: var(--warn); border: 1px solid var(--warn-rule); }
+  .badge.never { background: var(--bad-soft); color: var(--bad); border: 1px solid var(--bad-rule); }
+  .grp-h { font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); margin: 2rem 0 0.5rem; }
+
+  .phases { display: grid; gap: 1rem; }
+  .phase { display: grid; grid-template-columns: auto 1fr; gap: 1.1rem; }
+  .phase .prail { display: grid; grid-template-rows: auto 1fr; justify-items: center; }
+  .phase .dot { width: 30px; height: 30px; border-radius: 50%; background: var(--accent-soft); border: 2px solid var(--accent); color: var(--accent-ink); font-family: var(--font-mono); font-size: 0.72rem; font-weight: 700; display: grid; place-items: center; }
+  .phase .pline { width: 2px; background: var(--rule); margin-top: 4px; min-height: 1rem; }
+  .phase:last-child .pline { display: none; }
+  .phase .body { padding-bottom: 1.25rem; }
+  .phase .body h4 { margin-bottom: 0.3rem; }
+  .phase .meta { font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.5rem; }
+
+  .layers { display: grid; gap: 0; border: 1px solid var(--rule); border-radius: 12px; overflow: hidden; font-family: var(--font-mono); font-size: 0.8rem; }
+  .layers > div { padding: 0.85rem 1.1rem; border-bottom: 1px solid var(--rule); background: var(--surface); display: grid; grid-template-columns: 5.5rem 1fr; gap: 1rem; align-items: baseline; }
+  .layers > div:last-child { border-bottom: 0; }
+  .layers .l { color: var(--accent); font-weight: 700; }
+  .layers .d { color: var(--ink-2); font-family: var(--font-body); font-size: 0.88rem; }
+
+  footer { padding: 3rem 0 4rem; color: var(--muted); font-size: 0.85rem; }
+  footer .wrap > div + div { margin-top: 0.5rem; }
+
+  @media (max-width: 760px) {
+    .tl-reg { grid-template-columns: 1fr; }
+    .tl-reg .spine, .tl-reg .mid, .tl-reg .col-h.r { display: none; }
+    .tl-reg .ev, .tl-reg .ev.l, .tl-reg .ev.r { grid-column: 1; text-align: start; }
+  }
+  @media print {
+    nav.toc { display: none; }
+    section { break-inside: avoid; }
+  }
+</style>
+
+<svg width="0" height="0" style="position: absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <symbol id="i-stethoscope" viewBox="0 0 24 24"><path d="M11 2v2"/><path d="M5 2v2"/><path d="M5 3H4a2 2 0 0 0-2 2v4a6 6 0 0 0 12 0V5a2 2 0 0 0-2-2h-1"/><path d="M8 15a6 6 0 0 0 12 0v-3"/><circle cx="20" cy="10" r="2"/></symbol>
+    <symbol id="i-history" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></symbol>
+    <symbol id="i-calendar" viewBox="0 0 24 24"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/><path d="m9 16 2 2 4-4"/></symbol>
+    <symbol id="i-mail" viewBox="0 0 24 24"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></symbol>
+    <symbol id="i-phone" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92"/></symbol>
+    <symbol id="i-flask" viewBox="0 0 24 24"><path d="M10 2v7.31"/><path d="M14 9.3V1.99"/><path d="M8.5 2h7"/><path d="M14 9.3a6.5 6.5 0 1 1-4 0"/><path d="M5.58 16.5h12.85"/></symbol>
+    <symbol id="i-pill" viewBox="0 0 24 24"><path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7"/><path d="m8.5 8.5 7 7"/></symbol>
+    <symbol id="i-file-text" viewBox="0 0 24 24"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></symbol>
+    <symbol id="i-clipboard" viewBox="0 0 24 24"><rect width="8" height="4" x="8" y="2" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 11h4"/><path d="M12 16h4"/><path d="M8 11h.01"/><path d="M8 16h.01"/></symbol>
+    <symbol id="i-x-circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></symbol>
+    <symbol id="i-alert-tri" viewBox="0 0 24 24"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></symbol>
+    <symbol id="i-user" viewBox="0 0 24 24"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></symbol>
+    <symbol id="i-database" viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14a9 3 0 0 0 18 0V5"/><path d="M3 12a9 3 0 0 0 18 0"/></symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24"><rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></symbol>
+    <symbol id="i-eye-off" viewBox="0 0 24 24"><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.5 13.5 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><path d="M14.084 14.158a3 3 0 0 1-4.242-4.242"/><path d="m2 2 20 20"/></symbol>
+    <symbol id="i-wifi-off" viewBox="0 0 24 24"><path d="M12 20h.01"/><path d="M8.5 16.429a5 5 0 0 1 7 0"/><path d="M5 12.859a10 10 0 0 1 5.17-2.69"/><path d="M19 12.859a10 10 0 0 0-2.007-1.523"/><path d="M2 8.82a15 15 0 0 1 4.177-2.643"/><path d="M22 8.82a15 15 0 0 0-11.288-3.764"/><path d="m2 2 20 20"/></symbol>
+    <symbol id="i-filter" viewBox="0 0 24 24"><path d="M3 4h18l-7 8v6l-4 2v-8Z"/></symbol>
+    <symbol id="i-chevron-down" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+    <symbol id="i-arrow-down" viewBox="0 0 24 24"><path d="M12 5v14"/><path d="m19 12-7 7-7-7"/></symbol>
+    <symbol id="i-activity" viewBox="0 0 24 24"><path d="M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.49 12H2"/></symbol>
+  </defs>
+</svg>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="eyebrow">Oxygen UI · Component brief · 18 August 2026</div>
+    <h1>CareTimeline</h1>
+    <p class="lede">
+      A timeline renders the events you hand it. What makes it dangerous is the events you
+      didn't — because a reader turns a gap into a fact. This component cannot be rendered
+      without saying what it covers.
+    </p>
+    <div class="hero-meta">
+      <span class="pill on">Built · 18 Aug 2026</span>
+      <span class="pill on">2 components · 1 engine · 13 FHIR adapters</span>
+      <span class="pill on">18 declared states, 18 stories</span>
+      <span class="pill">antd v6 parity, asserted against the installed package</span>
+      <span class="pill">68 component tests · 1,887 in the suite</span>
+      <span class="pill">Registry · free tier</span>
+    </div>
+  </div>
+</header>
+
+<nav class="toc" aria-label="Sections">
+  <div class="wrap">
+    <a href="#thesis">1 · Thesis</a>
+    <a href="#reading">2 · The supplied design</a>
+    <a href="#scenarios">3 · Six real reads</a>
+    <a href="#antd">4 · antd v6, measured</a>
+    <a href="#ideas">5 · Sixty-one ideas</a>
+    <a href="#design">6 · The design</a>
+    <a href="#variations">7 · Variations</a>
+    <a href="#model">8 · The event model</a>
+    <a href="#a11y">9 · Accessibility</a>
+    <a href="#api">10 · The API</a>
+    <a href="#law">11 · Rules that bind</a>
+    <a href="#arch">12 · Architecture</a>
+    <a href="#tests">13 · Testing</a>
+    <a href="#plan">14 · The plan</a>
+    <a href="#docs">15 · Docs &amp; demo</a>
+    <a href="#decide">16 · Decide</a>
+    <a href="#sources">Sources</a>
+  </div>
+</nav>
+
+<section id="thesis">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="sec-num">01 — Thesis</span>
+      <h2>A timeline is a claim about completeness, and almost every one on screen is false.</h2>
+      <p>
+        Everything else in this brief follows from one observation about how people read
+        chronological lists.
+      </p>
+    </div>
+
+    <div class="prose">
+      <p>
+        A table is read as a set of rows. A chart is read as a shape. A <em>timeline</em> is read as
+        an <strong>account</strong> — and an account is understood to be continuous. Nothing between
+        two entries means nothing happened between them. Nothing before the last entry means the
+        history starts there. This is not a mistake readers make carelessly; it is what the form
+        promises.
+      </p>
+      <p>
+        Which is a problem, because the timeline on screen is nearly always a slice. It is paginated
+        to five. It is filtered to one department. It is assembled from three source systems, one of
+        which timed out four seconds ago and returned nothing. Every one of those produces the same
+        rendering: a clean, confident, continuous list.
+      </p>
+
+      <div class="note bad">
+        <span class="lbl">The failure this component exists to prevent</span>
+        <p>
+          A clinician opens a chart, reads a timeline with no imaging on it, and orders a CT. The
+          study was done eleven weeks ago at another hospital. The regional exchange query failed and
+          the component rendered the events it had. Nothing was wrong on screen. The patient got a
+          second dose of contrast and radiation for a scan that already existed.
+        </p>
+      </div>
+
+      <p>
+        This is not hypothetical framing. Missing information is a measured, routine feature of
+        clinical work: about <strong>13.6%</strong> of primary-care consultations proceed with clinical
+        information missing, adversely affecting care in roughly half of them, and one emergency
+        study found records missing or incomplete on admission for <strong>27%</strong> of patients,
+        with unnecessary procedures — including lumbar punctures — performed on 5% as a consequence.
+        The literature's own term for the deeper problem is <em>informative missingness</em>: a NULL
+        that gets read as a negative.
+      </p>
+
+      <h3>Three rules, each enforced by something that fails</h3>
+
+      <div class="feat">
+        <div>
+          <div class="n">01</div>
+          <div>
+            <div class="t">The timeline states its own boundaries, or it does not compile.</div>
+            <div class="d">
+              <code>coverage</code> is a <strong>required prop</strong>. It names the window, the
+              sources and their health, the applied filters, the sort direction, and how many events
+              exist versus how many are shown. It renders as a sentence in a fixed place, it is never
+              collapsed behind a tooltip, and it is one of the few things that <strong>always
+              prints</strong>. A timeline whose boundaries you cannot describe is a timeline you may
+              not render.
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="n">02</div>
+          <div>
+            <div class="t">Planned is not happened.</div>
+            <div class="d">
+              FHIR already draws this line — <code>Appointment</code> records a planned activity,
+              <code>Encounter</code> records an actual one — and every timeline in the field erases it
+              by putting both in one stream. A future event renders on the other side of a
+              <em>now</em> marker derived from a caller-supplied <code>now</code>, never the wall
+              clock. And a planned event whose time has passed with nothing recorded against it is
+              its own state: <strong>lapsed</strong>. That state is how a no-show becomes visible
+              instead of becoming silence.
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="n">03</div>
+          <div>
+            <div class="t">Two registers, never one weight.</div>
+            <div class="d">
+              An SMS reminder and a creatinine of 3.2 are not the same kind of fact. Every event
+              carries a <code>register</code> — clinical, administrative, communication,
+              patient-reported, system — and the component ranks, groups or splits by it. Undifferentiated
+              is the one layout it will not produce, because that is the layout in which sixty
+              automated reminders bury one encounter note.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <p>
+        Two secondary rules inherit from decisions this repository has already made, and are restated
+        here only because a timeline is where they bite hardest. <strong>A time is rendered at the
+        precision the record holds it</strong> — a FHIR <code>2019</code> stays 2019 and is never
+        widened to 1 January. And <strong>a relative time never appears alone</strong>: "3 hours ago"
+        beside a dose is not a clinical timestamp.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section id="reading">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="sec-num">02 — The supplied design</span>
+      <h2>Five things it gets right, and eighteen it cannot survive</h2>
+      <p>
+        Redrawn below in real Ant Design v6 token values so the judgement is about the structure and
+        not about a screenshot's colour profile. The pins mark findings that are visually locatable;
+        the rest are structural and listed after.
+      </p>
+    </div>
+
+    <figure>
+      <div class="stage">
+        <div class="antd">
+          <div class="a-card pins rel" style="max-width: 460px">
+            <div class="a-card-head rel">
+              <div>
+                <div class="a-card-title">Patient Timeline</div>
+              </div>
+              <span class="a-btn link">See All</span>
+              <span class="pin bad pin-tr">1</span>
+            </div>
+            <div class="a-card-body">
+              <ol class="tl">
+                <li>
+                  <div class="rail"><span class="node clinical rel"><svg class="i i-14"><use href="#i-stethoscope"/></svg><span class="pin bad pin-l" style="inset-inline-start:-24px">2</span></span><span class="line"></span></div>
+                  <div class="body rel">
+                    <div class="ttl">Routine Checkup: <span style="font-weight:400;color:var(--a-text-2)">Dr. Wade warren</span></div>
+                    <div class="when">26 Mar, 2025 <span class="pin bad pin-r" style="inset-inline-end:-18px">4</span></div>
+                  </div>
+                </li>
+                <li>
+                  <div class="rail"><span class="node admin"><svg class="i i-14"><use href="#i-history"/></svg></span><span class="line"></span></div>
+                  <div class="body rel">
+                    <div class="ttl">Medical History: <span style="font-weight:400;color:var(--a-text-2)">form sent and response received and reviewed by Dr. Wade warren</span></div>
+                    <div class="when">25 Mar, 2025</div>
+                    <span class="pin bad pin-tr" style="top:-6px;inset-inline-end:-10px">5</span>
+                  </div>
+                </li>
+                <li>
+                  <div class="rail"><span class="node admin"><svg class="i i-14"><use href="#i-calendar"/></svg></span><span class="line"></span></div>
+                  <div class="body">
+                    <div class="ttl">Appointment: <span style="font-weight:400;color:var(--a-text-2)">scheduled with Dr. Wade warren</span></div>
+                    <div class="when">24 Mar, 2025</div>
+                  </div>
+                </li>
+                <li>
+                  <div class="rail"><span class="node comms"><svg class="i i-14"><use href="#i-mail"/></svg></span><span class="line"></span></div>
+                  <div class="body rel">
+                    <div class="ttl">Follow-up Call</div>
+                    <div class="det">Purpose: Confirm visit, update insurance</div>
+                    <div class="when">22 Mar, 2025</div>
+                    <span class="pin bad pin-r" style="inset-inline-end:-18px">6</span>
+                  </div>
+                </li>
+                <li>
+                  <div class="rail"><span class="node comms"><svg class="i i-14"><use href="#i-mail"/></svg></span><span class="line"></span></div>
+                  <div class="body rel" style="opacity:0.35">
+                    <div class="ttl">Reminder Email to Dr. Wade warren</div>
+                    <span class="pin bad pin-br" style="inset-inline-end:auto;inset-inline-start:120px">3</span>
+                  </div>
+                </li>
+              </ol>
+            </div>
+            <span class="pin bad pin-bl">7</span>
+          </div>
+        </div>
+      </div>
+      <figcaption>
+        <b>As supplied.</b> The card is 460 px wide at antd's default 14 px base, matching the density
+        of the reference. Everything below is about what this structure can and cannot express — not
+        about its visual craft, which is fine.
+      </figcaption>
+    </figure>
+
+    <h3>What it gets right, and should be kept</h3>
+    <div class="grid g3" style="margin-bottom: 2rem">
+      <div class="card">
+        <span class="k">Keep</span>
+        <h4>One rail, one column</h4>
+        <p style="font-size:0.9rem;color:var(--ink-2)">
+          No alternation. Alternating timelines double the horizontal scan distance, and they are the
+          first thing to break at 320 px. This is the correct default and antd's own default
+          (<code>mode</code> resolving to <code>start</code>) agrees.
+        </p>
+      </div>
+      <div class="card">
+        <span class="k">Keep</span>
+        <h4>The type has its own place</h4>
+        <p style="font-size:0.9rem;color:var(--ink-2)">
+          A 32 px ringed icon node gives the event's kind somewhere to live that is not the title.
+          That is exactly the slot a text kind-label needs, which is the fix for finding 8.
+        </p>
+      </div>
+      <div class="card">
+        <span class="k">Keep</span>
+        <h4>What, then when</h4>
+        <p style="font-size:0.9rem;color:var(--ink-2)">
+          Title first, timestamp subordinate underneath. Most clinical timelines lead with the date,
+          which optimises for a scan nobody performs — you look for the <em>event</em>, then check
+          when.
+        </p>
+      </div>
+      <div class="card">
+        <span class="k">Keep</span>
+        <h4>The card admits it is a window</h4>
+        <p style="font-size:0.9rem;color:var(--ink-2)">
+          "See All" concedes that more exists. Most designs do not concede even that much. It is the
+          right instinct expressed in the wrong grammar — see finding 1.
+        </p>
+      </div>
+      <div class="card">
+        <span class="k">Keep</span>
+        <h4>The rail runs off the edge</h4>
+        <p style="font-size:0.9rem;color:var(--ink-2)">
+          The clipped fifth entry and the continuing line are an honest gesture toward continuation.
+          Worth keeping deliberately rather than as a side-effect of a fixed card height.
+        </p>
+      </div>
+    </div>
+
+    <h3>The eighteen</h3>
+    <p class="prose">
+      Findings 1–7 are pinned on the mockup. The rest are absences — things the structure has no slot
+      for, which is why they are invisible until the day they matter.
+    </p>
+
+    <div class="feat">
+      <div>
+        <div class="n">01</div>
+        <div>
+          <div class="t">"See All" is a link where a sentence is needed</div>
+          <div class="d">
+            Five of how many? Of twelve, this card is a summary. Of fourteen hundred, it is a
+            rounding error presented as a history. And the reader cannot tell which, so they assume
+            the first. Fix: <code>Showing 5 of 43 · newest first</code> stated in words, with
+            "See all 43" as the control beside it.
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="n">02</div>
+        <div>
+          <div class="t">Type is carried by an icon and a hue, and nothing else</div>
+          <div class="d">
+            The stethoscope ring is the only thing separating a clinical encounter from an email.
+            Forced-colors mode flattens the ring, a monochrome print flattens it, and the icon has no
+            text equivalent anywhere in the accessibility tree. This is the library's oldest rule —
+            never colour alone — failing on the most repeated element on the screen.
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="n">03</div>
+        <div>
+          <div class="t">"Reminder Email to Dr. Wade warren"</div>
+          <div class="d">
+            The reminder went to the doctor? Every line in this design names the same person, in a
+            different role each time — performer, reviewer, recipient — and the structure has one slot
+            for all three. Fix: <code>actor</code>, <code>recipient</code> and <code>subject</code> as
+            separate fields, with the component composing the sentence. Also: <em>warren</em>,
+            lowercase. A name assembled by concatenation rather than rendered from the record's own
+            parts. <code>formatHumanName()</code> already exists in <code>@oxygenui-design/fhir</code>.
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="n">04</div>
+        <div>
+          <div class="t">A date with no time, no zone, and no precision</div>
+          <div class="d">
+            Three problems wearing one hat. <strong>No time</strong>: two calls on 22 March are
+            indistinguishable and their order is unverifiable. <strong>No zone</strong>: a transfer, a
+            traveller or a teleconsult renders in the reader's zone, not the record's.
+            <strong>No precision</strong>: a checkup known to the day and a history item known only as
+            "2019" would format identically, so the component has to invent a day for the second one.
+            Every one of these is a fact the record did not assert.
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="n">05</div>
+        <div>
+          <div class="t">Three events compressed into one sentence</div>
+          <div class="d">
+            "form sent and response received and reviewed" is three things that happened on three
+            days, flattened into prose dated to one of them. The reader cannot ask how long the
+            patient took to respond, or how long the form sat unreviewed — which is the only question
+            anyone actually asks of an intake form. Fix: a <strong>thread</strong> — one node that
+            carries its own ordered steps, each with its own time and its own open/closed state.
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="n">06</div>
+        <div>
+          <div class="t">Nothing here can have failed</div>
+          <div class="d">
+            A call that went to voicemail, an appointment that was cancelled, a form sent and never
+            returned, an email that bounced — all four render identically to a call that connected.
+            The design has states for things that happened and no state for things that were attempted.
+            In a practice-management timeline that is most of the content.
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="n">07</div>
+        <div>
+          <div class="t">The card ends, and the reader does not know why</div>
+          <div class="d">
+            Because the height ran out? Because the list did? Because a filter is applied elsewhere on
+            the page? A rail running off the bottom edge is an honest gesture only when a sentence
+            underneath says what it means.
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="n">08</div>
+        <div>
+          <div class="t">Two registers at one weight</div>
+          <div class="d">
+            Four of the five entries are administrative. One is clinical. At five entries that reads
+            as a rich account of a practice's attentiveness; at two hundred, sixty automated
+            reminders bury the encounter note, and the clinician stops reading the timeline entirely
+            — which is the actual observed failure mode of this pattern in the field.
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="n">09</div>
+        <div>
+          <div class="t">The event type is fused into the title prose</div>
+          <div class="d">
+            "Routine Checkup: Dr. Wade warren" is a sentence a template built, not a record. It cannot
+            be filtered, cannot be counted, cannot be translated without re-authoring, and cannot be
+            read by anything but a human. <code>kind</code> + <code>title</code> + <code>detail</code>
+            as three fields, composed by the component, gives all four back.
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="n">10</div>
+        <div>
+          <div class="t">Nothing states the sort direction</div>
+          <div class="d">
+            It is newest-first. Reverse it and the identical component tells a completely different
+            story with no visible difference except the numbers. Direction is not a preference to be
+            inferred from two dates the reader happens to compare; it is part of the claim.
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="n">11</div>
+        <div>
+          <div class="t">Planned and past share one stream</div>
+          <div class="d">
+            "Appointment: scheduled with…" is dated 24 March and sits between two things that
+            happened. Was it scheduled on the 24th, or scheduled <em>for</em> the 24th? The structure
+            cannot say, and there is no <em>now</em> anywhere on the surface to anchor against.
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="n">12</div>
+        <div>
+          <div class="t">Nothing can be entered in error</div>
+          <div class="d">
+            FHIR is explicit: an erroneous record is retained and marked, not deleted — the
+            <code>entered-in-error</code> state exists precisely so the correction is itself part of
+            the record. This design has no way to draw a struck entry, so an implementer will filter
+            it out, which is the one behaviour the standard forbids. The same gap covers
+            <code>amended</code> and <code>corrected</code>.
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="n">13</div>
+        <div>
+          <div class="t">No source, so a failed source is invisible</div>
+          <div class="d">
+            Records from this practice and records from a regional exchange look identical, and a
+            source that returned nothing looks like a source with nothing to return. This is the
+            failure in the box at the top of this document, and it is the single most consequential
+            absence in the list.
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="n">14</div>
+        <div>
+          <div class="t">No access model, so restricted events vanish</div>
+          <div class="d">
+            A psychotherapy note, a sealed adolescent record, a break-glass-only entry. With no way to
+            render "this exists and you may not read it", the implementation filters them, and the
+            timeline silently misrepresents the record to a clinician who has no way to know they are
+            reading a redacted version. <code>ChartAccordion</code> already solved this shape; the
+            <code>AccessDescriptor</code> type is reusable as-is.
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="n">15</div>
+        <div>
+          <div class="t">Occurred and recorded are the same field</div>
+          <div class="d">
+            A note written six days after the visit it describes is a different document, evidentially,
+            from one written that afternoon — and every retrospective chart review turns on that gap.
+            One date field cannot hold it.
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="n">16</div>
+        <div>
+          <div class="t">One empty state where there are at least three</div>
+          <div class="d">
+            No record at all; no events <em>in this window</em>; and no events <em>you may see</em>.
+            Rendering all three as an empty card is the exact ambiguity "absence is a state" exists to
+            prevent, and it is the one that produces a repeat CT.
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="n">17</div>
+        <div>
+          <div class="t">It does not survive its own success</div>
+          <div class="d">
+            At forty events there is no grouping, so "what happened in June" is a manual scan. At four
+            hundred — one year of a diabetic patient's observations — it is a scroll with no bottom.
+            Grouping, clustering and a jump control are not enhancements here; they are the difference
+            between the component working at demo scale and at chart scale.
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="n">18</div>
+        <div>
+          <div class="t">The rail carries a meaning nobody authored</div>
+          <div class="d">
+            Not yet, in this drawing — but it will the moment it is built on Ant Design's own
+            <code>Timeline</code>, which attaches a dotted rail segment to the last rendered item for
+            reasons that have nothing to do with the data. Section 4 measures that from the source.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="note">
+      <span class="lbl">The shape of the fix</span>
+      <p>
+        Fourteen of these eighteen are the same finding wearing different clothes: <strong>the model
+        is a rendering, not a record.</strong> A title string, an icon, and a date is what you build
+        when the events arrive pre-formatted from a template. Give each event a typed
+        <code>kind</code>, a <code>register</code>, a <code>status</code>, an <code>actor</code>, a
+        <code>source</code>, and two separate times, and eleven of the eighteen close without any
+        visual change at all.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section id="scenarios">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="sec-num">03 — Six real reads</span>
+      <h2>What people are actually doing when they look at one of these</h2>
+      <p>
+        Nobody reads a timeline. They interrogate it, with a specific question, under time pressure.
+        Six questions, and what each one demands of the component.
+      </p>
+    </div>
+
+    <div class="grid g2">
+      <div class="card">
+        <span class="k">Read 1 · 90 seconds</span>
+        <h4>"What has been happening to this person?"</h4>
+        <p style="font-size:0.92rem;color:var(--ink-2)">
+          A covering clinician picking up an unfamiliar chart before walking into the room. They read
+          the top eight entries and stop.
+        </p>
+        <p style="font-size:0.92rem;color:var(--ink-2)"><strong>Demands:</strong> newest-first;
+        clinical register legible above administrative noise; the coverage sentence visible without
+        scrolling, because those eight entries are about to become their whole mental model.</p>
+      </div>
+      <div class="card">
+        <span class="k">Read 2 · the dangerous one</span>
+        <h4>"Has she had this before?"</h4>
+        <p style="font-size:0.92rem;color:var(--ink-2)">
+          Looking for a specific prior event — an imaging study, an allergy reaction, a previous
+          admission — possibly years back.
+        </p>
+        <p style="font-size:0.92rem;color:var(--ink-2)"><strong>Demands:</strong> filter by kind, jump
+        to date, and above all an unambiguous account of what was searched. This is the read where
+        <em>not finding it</em> is a clinical answer, and the component must never let "absent from
+        this view" pass as "absent from the record".</p>
+      </div>
+      <div class="card">
+        <span class="k">Read 3 · the back office</span>
+        <h4>"Did anyone actually call her?"</h4>
+        <p style="font-size:0.92rem;color:var(--ink-2)">
+          A practice manager auditing outreach after a missed appointment. This is what the supplied
+          design is genuinely for, and it is a real job.
+        </p>
+        <p style="font-size:0.92rem;color:var(--ink-2)"><strong>Demands:</strong> the administrative
+        and communication registers promoted, not buried; attempts distinguishable from contacts;
+        threads that show a form sent on the 12th and still unreturned on the 25th as one open item
+        rather than one closed sentence.</p>
+      </div>
+      <div class="card">
+        <span class="k">Read 4 · adversarial</span>
+        <h4>"Reconstruct what was known, and when."</h4>
+        <p style="font-size:0.92rem;color:var(--ink-2)">
+          A clinical reviewer, a complaint, a claim. The artefact they are building is literally
+          called a chronology.
+        </p>
+        <p style="font-size:0.92rem;color:var(--ink-2)"><strong>Demands:</strong> occurred and recorded
+        as separate, both visible; entries entered in error retained and struck rather than removed;
+        amendments showing what changed; source attribution per event; and a print that carries all of
+        it, because this read ends as a PDF in a bundle.</p>
+      </div>
+      <div class="card">
+        <span class="k">Read 5 · the other audience</span>
+        <h4>"What did my results say?"</h4>
+        <p style="font-size:0.92rem;color:var(--ink-2)">
+          The patient, in their own portal, at 11pm. Since April 2021 the information-blocking rule
+          means results reach them at the same moment as the ordering clinician — frequently before
+          anyone has called.
+        </p>
+        <p style="font-size:0.92rem;color:var(--ink-2)"><strong>Demands:</strong> a separate string
+        catalog, not a softened tone; a result that has not yet been reviewed saying exactly that; and
+        no clinician shorthand anywhere on the surface.</p>
+      </div>
+      <div class="card">
+        <span class="k">Read 6 · moving target</span>
+        <h4>"…and one more just arrived."</h4>
+        <p style="font-size:0.92rem;color:var(--ink-2)">
+          A result lands while the timeline is open, on a screen someone is mid-scroll through.
+        </p>
+        <p style="font-size:0.92rem;color:var(--ink-2)"><strong>Demands:</strong> new items announced
+        as content rather than as a count; nothing reordering under the reader's cursor; and a
+        "new since you opened this" divider that survives a re-render, so the reader can tell what
+        moved.</p>
+      </div>
+    </div>
+
+    <div class="note warn">
+      <span class="lbl">What reads 2 and 4 have in common</span>
+      <p>
+        Both are reads where the <em>absence</em> of an entry is the finding. Those two reads are the
+        entire justification for making <code>coverage</code> a required prop rather than an optional
+        nicety, and they are why the coverage sentence prints. Reads 1, 3, 5 and 6 would be adequately
+        served by a good-looking list.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section id="antd">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="sec-num">04 — antd v6, measured</span>
+      <h2>Ant Design ships a Timeline. I read it rather than assuming.</h2>
+      <p>
+        Measured against <code>antd@6.6.0</code> and <code>@rc-component/steps@1.2.2</code> as
+        installed in this workspace — the source, not the documentation site, because the two
+        disagree in at least one place.
+      </p>
+    </div>
+
+    <div class="prose">
+      <h3>What it actually is</h3>
+      <p>
+        <code>antd/es/timeline/Timeline.js</code> is a thin adapter over <strong>Steps</strong>. It
+        imports <code>Steps</code>, renders it with <code>type="dot"</code>, and swaps the element
+        names through an internal context:
+      </p>
+    </div>
+
+<pre><code><span class="c-c">// antd/es/timeline/Timeline.js — the whole mechanism, condensed</span>
+<span class="c-k">const</span> stepInternalContext = { rootComponent: <span class="c-s">'ol'</span>, itemComponent: <span class="c-s">'li'</span> };
+
+&lt;InternalContext.Provider value={stepInternalContext}&gt;
+  &lt;UnstableContext.Provider value={{ railFollowPrevStatus: reverse }}&gt;
+    &lt;Steps
+      type=<span class="c-s">"dot"</span>
+      items={mergedItems}
+      current={mergedItems.length - <span class="c-s">1</span>}   <span class="c-c">// ← hardcoded</span>
+      variant={variant}
+      orientation={orientation}
+    /&gt;
+  &lt;/UnstableContext.Provider&gt;
+&lt;/InternalContext.Provider&gt;</code></pre>
+
+    <div class="prose">
+      <h4>Finding A — it is an <code>&lt;ol&gt;</code> of <code>&lt;li&gt;</code>, which is good news</h4>
+      <p>
+        Ordered list, correct element, and the documentation site's summary that it renders a
+        <code>&lt;ul&gt;</code> is wrong. A chronology <em>is</em> ordered; <code>ol</code> is the
+        right call and we should keep it.
+      </p>
+
+      <h4>Finding B — <code>current</code> is hardcoded to the last item, and it has a visual consequence</h4>
+      <p>
+        Steps derives a status per item from <code>current</code>: index below it is
+        <code>finish</code>, index equal to it is <code>process</code>, above is <code>wait</code>.
+        With <code>current = items.length - 1</code>, <strong>every timeline's last rendered item is
+        permanently in the "process" state</strong> — and antd's timeline stylesheet contains exactly
+        one rule keyed on it:
+      </p>
+    </div>
+
+<pre><code><span class="c-c">// antd/es/timeline/style/index.js</span>
+[varName(<span class="c-s">'item-process-rail-line-style'</span>)]: <span class="c-s">'dotted'</span></code></pre>
+
+    <div class="prose">
+      <p>
+        So the last item's rail segment is dotted. On a wizard, "the step you are on, and it continues"
+        is exactly right. On a chronology it is a mark of incompleteness applied to whichever event
+        happens to be last — and because <code>reverse</code> reverses the array <em>before</em>
+        <code>current</code> is computed, on a newest-first clinical timeline the dotted segment lands
+        on the <strong>oldest event in the chart</strong>. Nobody authored that sentence and it is
+        being said on every screen.
+      </p>
+
+      <div class="note bad">
+        <span class="lbl">Why this one matters beyond antd</span>
+        <p>
+          It is the cleanest example of the argument for this whole component: a dotted line in a
+          clinical chronology is <em>read</em>. A reader who has learned that dotted means "gap in
+          the record" — a reading we are about to make true, deliberately, in section 6 — will read
+          antd's decorative artefact as a data claim. Inheriting a visual language you did not author
+          is how a component library injects meaning into a chart.
+        </p>
+      </div>
+
+      <h4>Finding C — zero accessibility, and no seam to add it</h4>
+      <p>
+        <code>@rc-component/steps@1.2.2</code> emits no <code>role</code>, no
+        <code>aria-current</code>, no <code>aria-label</code> — a grep for <code>aria</code> across
+        its ES build returns nothing. There is no prop to name the list, so a page with a patient
+        timeline and an audit timeline gives a screen-reader user two unnamed lists. This is
+        consistent with what we already recorded about antd's stance on WCAG, and it is not a defect
+        we can file around: naming the list is not a feature antd exposes.
+      </p>
+
+      <h4>Finding D — v6 renamed most of the item API</h4>
+      <p>
+        Anyone arriving from antd v5 has already been through this, and our parity table has to
+        encode the v6 spelling, not the familiar one.
+      </p>
+    </div>
+
+    <div class="tw">
+      <table>
+        <thead>
+          <tr><th>v5 spelling</th><th>v6 spelling</th><th>Status in 6.6.0</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>items[].label</code></td><td><code>items[].title</code></td><td>deprecated, warns</td></tr>
+          <tr><td><code>items[].children</code></td><td><code>items[].content</code></td><td>deprecated, warns</td></tr>
+          <tr><td><code>items[].dot</code></td><td><code>items[].icon</code></td><td>deprecated, warns</td></tr>
+          <tr><td><code>items[].position</code></td><td><code>items[].placement</code></td><td>deprecated, warns</td></tr>
+          <tr><td><code>mode="left" | "right"</code></td><td><code>mode="start" | "end"</code></td><td>deprecated, warns</td></tr>
+          <tr><td><code>pending</code>, <code>pendingDot</code></td><td><code>items[].loading</code>, <code>items[].icon</code></td><td>deprecated, warns</td></tr>
+          <tr><td><code>&lt;Timeline.Item&gt;</code></td><td><code>items</code></td><td>deprecated; <code>Timeline.Item</code> is a no-op function</td></tr>
+          <tr><td>—</td><td><code>orientation="horizontal"</code></td><td>new in v6</td></tr>
+          <tr><td>—</td><td><code>variant="filled" | "outlined"</code></td><td>new in v6</td></tr>
+          <tr><td>—</td><td><code>titleSpan</code></td><td>new in v6</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="note warn">
+      <span class="lbl">A discrepancy to pin down before we claim parity</span>
+      <p>
+        The documentation table gives <code>mode</code> a default of <code>end</code>. The 6.6.0
+        source resolves an unset <code>mode</code> to <code>'start'</code> — the fallback branch of
+        <code>modeList.includes(mode) ? mode : 'start'</code>. One of the two is wrong. Our parity
+        test must assert against the installed version's behaviour and record the finding, not copy
+        the documentation table.
+      </p>
+    </div>
+
+    <div class="prose">
+      <h3>The decision under ADR 0010</h3>
+      <p>
+        The reviewer test is <em>does it own a clinical concept, or is it a control?</em> This
+        component splits cleanly across that line, which is why it is two components and not one.
+      </p>
+    </div>
+
+    <div class="tw">
+      <table>
+        <thead>
+          <tr><th>Question</th><th><code>Timeline</code></th><th><code>CareTimeline</code></th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Control, or clinical concept?</td>
+            <td>Control. A rail, dots, and a list.</td>
+            <td>Concept. A chronology with a coverage claim.</td>
+          </tr>
+          <tr>
+            <td>Under ADR 0010</td>
+            <td><strong>Match antd's API exactly, take no dependency.</strong></td>
+            <td>Organism. Built on our <code>Timeline</code>, not antd's.</td>
+          </tr>
+          <tr>
+            <td>Is the extension expressible as a wrapper?</td>
+            <td class="no">No — we must not set <code>current</code>, and antd offers no way not to.</td>
+            <td class="no">No — nothing in it is antd.</td>
+          </tr>
+          <tr>
+            <td>Anything expensive to inherit?</td>
+            <td class="no">No. An <code>&lt;ol&gt;</code>, a rail, and a dot.</td>
+            <td class="no">No.</td>
+          </tr>
+          <tr>
+            <td>Would wrapping cost the copy-source channel?</td>
+            <td class="yes">Yes — antd in every consumer of a primitive.</td>
+            <td class="yes">Yes, transitively.</td>
+          </tr>
+          <tr>
+            <td>Parity table in the test suite?</td>
+            <td class="yes">Required, per ADR 0010.</td>
+            <td>n/a</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="prose">
+      <p>
+        So: <strong>an antd-compatible <code>Timeline</code> primitive that an existing antd form
+        adopts by changing one import</strong>, and a <code>CareTimeline</code> organism above it.
+        This is the same pairing the repository already ships as <code>Accordion</code> and
+        <code>ChartAccordion</code>, for the same reason, and the precedent is worth following
+        exactly.
+      </p>
+      <h4>Three declared divergences from antd</h4>
+      <ol>
+        <li>
+          <strong>We do not set <code>current</code>, and we expose no equivalent.</strong> A history
+          has no current step. This frees the dotted rail, and section 6 reassigns it to a meaning
+          worth having.
+        </li>
+        <li>
+          <strong>An accessible name is required, not optional.</strong> <code>aria-label</code> or
+          <code>aria-labelledby</code>, enforced by the contract suite. antd cannot do this; we can,
+          and a page with two timelines needs it.
+        </li>
+        <li>
+          <strong><code>reverse</code> exists on the primitive for parity, and is not the mechanism
+          on <code>CareTimeline</code></strong>, which takes <code>order</code> and states the
+          direction in words. <code>reverse</code> is a rendering trick; direction is part of the
+          claim.
+        </li>
+      </ol>
+      <p>
+        Each of the three goes in the component's <code>limitations</code>, which is where this
+        repository records deliberate divergence — the same place the Switch records
+        <code>loading</code> not disabling the control.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section id="ideas">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="sec-num">05 — Sixty-one ideas</span>
+      <h2>Everything it could do, and the nineteen that make v1</h2>
+      <p>
+        Badged <span class="badge v1">v1</span> for the beta surface,
+        <span class="badge v2">later</span> for designed-but-deferred,
+        <span class="badge host">host</span> for things the consuming application owns and we must not
+        take, and <span class="badge never">no</span> for ideas that are attractive and wrong.
+      </p>
+    </div>
+
+    <div class="grp-h">A · Structure and layout</div>
+    <div class="feat">
+      <div><div class="n">01</div><div><div class="t">Single rail, newest first <span class="badge v1">v1</span></div><div class="d">The default, and the only layout that holds at 320 px.</div></div></div>
+      <div><div class="n">02</div><div><div class="t">Group headers by month, quarter or year <span class="badge v1">v1</span></div><div class="d">Chosen by span, not hardcoded: a fourteen-month history groups by month, a fourteen-year one by year.</div></div></div>
+      <div><div class="n">03</div><div><div class="t">Sticky group header inside a scrolling pane <span class="badge v1">v1</span></div><div class="d">You should never scroll past the point where you no longer know what month you are in.</div></div></div>
+      <div><div class="n">04</div><div><div class="t">Group by encounter or episode instead of by date <span class="badge v2">later</span></div><div class="d">"Everything that belonged to the March admission." The correct primary grouping for inpatient; needs an episode model first.</div></div></div>
+      <div><div class="n">05</div><div><div class="t"><code>mode="register"</code> — clinical one side, everything else the other <span class="badge v1">v1</span></div><div class="d">antd's <code>alternate</code> alternates for decoration. Ours alternates on a fact, and collapses to one column with kind labels under 760 px.</div></div></div>
+      <div><div class="n">06</div><div><div class="t">Swimlanes — one lane per source or per register <span class="badge v2">later</span></div><div class="d">The medico-legal reviewer's view. Genuinely useful, genuinely a different component's worth of layout code.</div></div></div>
+      <div><div class="n">07</div><div><div class="t">Horizontal band for a single episode or medication course <span class="badge v2">later</span></div><div class="d">antd v6 added <code>orientation="horizontal"</code>; our primitive matches it, <code>CareTimeline</code> stays vertical in v1.</div></div></div>
+      <div><div class="n">08</div><div><div class="t">Compact density <span class="badge v1">v1</span></div><div class="d">22 px nodes, one line per event, kind label retained. Three densities already exist in the token pipeline.</div></div></div>
+      <div><div class="n">09</div><div><div class="t">Card variant with a stated limit <span class="badge v1">v1</span></div><div class="d">The supplied design, done honestly. <code>limit={5}</code> plus a coverage line and a real "See all 43".</div></div></div>
+      <div><div class="n">10</div><div><div class="t">Minimap / density strip beside a long history <span class="badge v2">later</span></div><div class="d">A 4 px column showing where the events cluster across ten years. Beautiful, and it needs the scroll container to be ours.</div></div></div>
+
+    </div>
+
+    <div class="grp-h">B · Time</div>
+    <div class="feat">
+      <div><div class="n">11</div><div><div class="t">Precision-preserving dates <span class="badge v1">v1</span></div><div class="d">FHIR <code>2019</code>, <code>2019-04</code> and <code>2019-04-02T09:15:00+05:30</code> render as what they are. Never widened.</div></div></div>
+      <div><div class="n">12</div><div><div class="t">Occurred and recorded as separate fields <span class="badge v1">v1</span></div><div class="d">Two dates, one event. The gap between them is evidence.</div></div></div>
+      <div><div class="n">13</div><div><div class="t">Late-entry marker when the gap exceeds a threshold <span class="badge v1">v1</span></div><div class="d">"Recorded 6 days later." Caller sets the threshold; the default is stated, not hidden.</div></div></div>
+      <div><div class="n">14</div><div><div class="t">Zone rendered from the record, not the reader <span class="badge v1">v1</span></div><div class="d">And a marker when an event's zone differs from the timeline's, because that is a transfer or a traveller.</div></div></div>
+      <div><div class="n">15</div><div><div class="t">Relative time, never alone <span class="badge v1">v1</span></div><div class="d">"2 days ago" is a convenience beside an absolute time and a lie in place of one.</div></div></div>
+      <div><div class="n">16</div><div><div class="t">A <em>now</em> marker from a caller-supplied <code>now</code> <span class="badge v1">v1</span></div><div class="d">Deterministic, so the component is visually regression-testable. Reading the wall clock is a lint error in this repo.</div></div></div>
+      <div><div class="n">17</div><div><div class="t">"New since you last reviewed this" divider <span class="badge v1">v1</span></div><div class="d">Takes <code>seenThrough</code> as a prop, never computes it. The single most requested affordance in every EHR usability study I have read, and roughly nine lines of code.</div></div></div>
+      <div><div class="n">18</div><div><div class="t">Stable ordering for identical timestamps <span class="badge v1">v1</span></div><div class="d">Bulk-imported records share an instant to the second. Ties break on a documented key so two renders never disagree.</div></div></div>
+      <div><div class="n">19</div><div><div class="t">Duration events — a course, an admission, an infusion <span class="badge v2">later</span></div><div class="d">A period is not a point. It wants a band, not a dot, and that is layout work.</div></div></div>
+      <div><div class="n">20</div><div><div class="t">Elapsed-between annotation <span class="badge v2">later</span></div><div class="d">"11 weeks" printed on the rail between two events. Excellent for a chronology, noisy everywhere else.</div></div></div>
+      <div><div class="n">21</div><div><div class="t">Age-at-event beside the date <span class="badge v2">later</span></div><div class="d">"aged 62". Paediatrics wants it in months. <code>calculateAge()</code> already exists.</div></div></div>
+    </div>
+
+    <div class="grp-h">C · Completeness and safety — the reason this component exists</div>
+    <div class="feat">
+      <div><div class="n">22</div><div><div class="t"><code>coverage</code> as a required prop <span class="badge v1">v1</span></div><div class="d">The window, the sources, the filters, the order, the counts. Omitting it is a type error.</div></div></div>
+      <div><div class="n">23</div><div><div class="t">The coverage sentence, in a fixed place, always <span class="badge v1">v1</span></div><div class="d">Never a tooltip, never an icon, never behind a disclosure. Composed from the data, not written by the caller.</div></div></div>
+      <div><div class="n">24</div><div><div class="t">Per-source health, named <span class="badge v1">v1</span></div><div class="d">"Regional exchange — could not be reached." A source that failed is a fact about the timeline, not a toast that has already gone.</div></div></div>
+      <div><div class="n">25</div><div><div class="t">A failed source escalates to a blocking banner <span class="badge v1">v1</span></div><div class="d">Not a grey footnote. This is the CT case, and it is worth interrupting for.</div></div></div>
+      <div><div class="n">26</div><div><div class="t">Dotted rail means "records may be missing here" <span class="badge v1">v1</span></div><div class="d">The affordance antd wastes on the last item. Paired with a worded label on the rail, because a dotted line alone is colour-by-another-name.</div></div></div>
+      <div><div class="n">27</div><div><div class="t">Three distinct empty states <span class="badge v1">v1</span></div><div class="d">No record · none in this window · none you may see. Three sentences, never one shrug.</div></div></div>
+      <div><div class="n">28</div><div><div class="t">Filters state themselves and their cost <span class="badge v1">v1</span></div><div class="d">"2 hidden by filter" beside the filter, not only in the filter's own UI, which is usually off screen.</div></div></div>
+      <div><div class="n">29</div><div><div class="t">Entered-in-error retained and struck <span class="badge v1">v1</span></div><div class="d">The standard says retain and mark. Removing it is the one thing a compliant renderer may not do.</div></div></div>
+      <div><div class="n">30</div><div><div class="t">Amendments show what changed <span class="badge v1">v1</span></div><div class="d">"Amended 14 Aug — result value corrected." An amendment with no statement of what moved is a rumour.</div></div></div>
+      <div><div class="n">31</div><div><div class="t">A cluster may never swallow a critical event <span class="badge v1">v1</span></div><div class="d">Collapsing 40 vitals into one node is necessary; collapsing the one critical potassium into it is the defect that collapsing invents. Promotion out of a cluster is an invariant with a test.</div></div></div>
+    </div>
+
+    <div class="grp-h">D · Clinical intelligence</div>
+    <div class="feat">
+      <div><div class="n">32</div><div><div class="t">Five registers, typed <span class="badge v1">v1</span></div><div class="d">clinical · administrative · communication · patient-reported · system.</div></div></div>
+      <div><div class="n">33</div><div><div class="t">A closed <code>kind</code> vocabulary, with an escape that costs something <span class="badge v1">v1</span></div><div class="d">Twenty kinds; <code>kind: "other"</code> requires a <code>typeLabel</code>, so an unlabelled unknown is a build error rather than a blank chip.</div></div></div>
+      <div><div class="n">34</div><div><div class="t">Threads — one node, several steps, each with its own time <span class="badge v1">v1</span></div><div class="d">Form sent → returned → reviewed. This is the fix for finding 5, and it is what the supplied design was reaching for with prose.</div></div></div>
+      <div><div class="n">35</div><div><div class="t">Lapsed — planned, the time passed, nothing recorded <span class="badge v1">v1</span></div><div class="d">The state that makes a no-show visible. Derived from <code>now</code>, never written back.</div></div></div>
+      <div><div class="n">36</div><div><div class="t">Actor, recipient and subject as separate fields <span class="badge v1">v1</span></div><div class="d">The component composes the sentence, so "Reminder email to Dr Warren" cannot be authored by accident.</div></div></div>
+      <div><div class="n">37</div><div><div class="t">Severity paired with a status word, or neither <span class="badge v1">v1</span></div><div class="d">Lifted wholesale from <code>ChartAccordion</code>, where the type already enforces it.</div></div></div>
+      <div><div class="n">38</div><div><div class="t">Access states — withheld, consent-gated, break-glass <span class="badge v1">v1</span></div><div class="d">Reuses <code>AccessDescriptor</code>. Says that something exists without saying what it is.</div></div></div>
+      <div><div class="n">39</div><div><div class="t">Provenance chip — patient-reported vs clinician-recorded <span class="badge v1">v1</span></div><div class="d">"Patient reported" beside a symptom onset is not a hedge, it is the correct attribution.</div></div></div>
+      <div><div class="n">40</div><div><div class="t">Result values inline on the node <span class="badge v2">later</span></div><div class="d">Wants <code>ResultValue</code>, which is not built. The interpretation rules live there and must not be re-implemented here.</div></div></div>
+      <div><div class="n">41</div><div><div class="t">Any automatic summarisation of the history <span class="badge never">no</span></div><div class="d">A component that decides which events matter is clinical decision support wearing a list's clothing. Ranking by declared register is as far as this goes.</div></div></div>
+    </div>
+
+    <div class="grp-h">E · Interaction</div>
+    <div class="feat">
+      <div><div class="n">42</div><div><div class="t">Filter by register and by kind <span class="badge v1">v1</span></div><div class="d">Controlled, with the applied filter visible in the coverage sentence.</div></div></div>
+      <div><div class="n">43</div><div><div class="t">"Load older records" as a real button <span class="badge v1">v1</span></div><div class="d">Not infinite scroll. A chronology with no bottom cannot be printed, cannot be finished, and cannot be reasoned about.</div></div></div>
+      <div><div class="n">44</div><div><div class="t">Jump to date <span class="badge v1">v1</span></div><div class="d">Read 2's affordance. Scrolls to the nearest group and announces where it landed.</div></div></div>
+      <div><div class="n">45</div><div><div class="t">Expand a cluster in place <span class="badge v1">v1</span></div><div class="d">Disclosure, not navigation. The reader keeps their position.</div></div></div>
+      <div><div class="n">46</div><div><div class="t">Each event links into the record <span class="badge v1">v1</span></div><div class="d">An <code>href</code> or an <code>onSelect</code>, never both silently. The title is the link target — the whole row being clickable steals every text selection.</div></div></div>
+      <div><div class="n">47</div><div><div class="t">Keyboard: it is a structure, not a widget <span class="badge v1">v1</span></div><div class="d">Tab reaches controls, arrows do not hijack reading. Browse mode is how screen-reader users read a list, and a roving tabindex would take it away.</div></div></div>
+      <div><div class="n">48</div><div><div class="t"><code>role="feed"</code> for the infinite case <span class="badge v2">later</span></div><div class="d">The APG's own pattern for this, and its example carries a note that it has not reached task-force consensus. Opt-in behind a prop, after a screen-reader matrix, never the default.</div></div></div>
+      <div><div class="n">49</div><div><div class="t">New arrivals announced as content <span class="badge v1">v1</span></div><div class="d">A polite live region containing the event's own words. An empty live region announces nothing, which is the classic way this is got wrong.</div></div></div>
+      <div><div class="n">50</div><div><div class="t">Never reorder under the reader <span class="badge v1">v1</span></div><div class="d">Arriving events queue behind a "3 new" control unless the reader is at the top.</div></div></div>
+      <div><div class="n">51</div><div><div class="t">Select a range to build a chronology <span class="badge v2">later</span></div><div class="d">Read 4's real workflow, and a whole feature. Worth doing; not worth doing badly in v1.</div></div></div>
+    </div>
+
+    <div class="grp-h">F · Data, integration and output</div>
+    <div class="feat">
+      <div><div class="n">52</div><div><div class="t">FHIR adapters for eleven resource types <span class="badge v1">v1</span></div><div class="d">Encounter, Appointment, Communication, DocumentReference, QuestionnaireResponse, Observation, Procedure, MedicationRequest, Immunization, Consent, Task. Pure functions, no fetching.</div></div></div>
+      <div><div class="n">53</div><div><div class="t">A Bundle in, a timeline out <span class="badge v1">v1</span></div><div class="d"><code>toTimelineEvents(bundle)</code> over a <code>Patient/$everything</code> response, with unmapped types surfaced as a count rather than dropped.</div></div></div>
+      <div><div class="n">54</div><div><div class="t">Unmapped resources are reported, not discarded <span class="badge v1">v1</span></div><div class="d">"6 resources of 2 types not shown." A silent drop in an adapter is a coverage lie one layer down.</div></div></div>
+      <div><div class="n">55</div><div><div class="t">Any network access, polling or subscription <span class="badge never">no</span></div><div class="d">Same rule Consult holds. The component takes data; the application fetches it.</div></div></div>
+      <div><div class="n">56</div><div><div class="t">Print stylesheet that keeps the coverage statement <span class="badge v1">v1</span></div><div class="d">Print is where "See all" stops existing, so it is where the sentence matters most.</div></div></div>
+      <div><div class="n">57</div><div><div class="t">Export the visible chronology as CSV or PDF <span class="badge host">host</span></div><div class="d">Ours to make possible, the application's to own — it has the audit trail and the letterhead.</div></div></div>
+      <div><div class="n">58</div><div><div class="t">Patient-facing string catalog <span class="badge v1">v1</span></div><div class="d">A separate <code>@oxygenui-design/intl</code> catalog, per the house rule. Not a softened tone: different words.</div></div></div>
+      <div><div class="n">59</div><div><div class="t">"Not yet reviewed by your care team" on a patient-facing result <span class="badge v1">v1</span></div><div class="d">The honest rendering of the immediate-release rule. It is a fact about the record, and it is the difference between a portal that informs and one that ambushes.</div></div></div>
+      <div><div class="n">60</div><div><div class="t">Emit an AuditEvent when the timeline is read <span class="badge host">host</span></div><div class="d">An <code>onRead</code> callback with the coverage it rendered; the application writes it. A component that writes audit records is infrastructure.</div></div></div>
+      <div><div class="n">61</div><div><div class="t">Custom-element channel <span class="badge v2">later</span></div><div class="d">The loaders and the Switch ship one. This has too much layout to be cheap in a shadow root, and no demand yet.</div></div></div>
+    </div>
+
+    <div class="note ok">
+      <span class="lbl">The cut</span>
+      <p>
+        Nineteen features carry the beta: the required <code>coverage</code> with its sentence, banner
+        and three empty states; register and kind typing; threads; the planned / now / lapsed axis;
+        entered-in-error and amendments; access states; grouping with sticky headers; clustering with
+        the critical-promotion invariant; precision-preserving time with occurred/recorded; the
+        since-last-review divider; card, default, compact and register layouts; filter, jump, load
+        older; the FHIR adapters; print; and the patient catalog. Everything badged
+        <span class="badge v2">later</span> is designed enough to be sure it fits, and deliberately
+        not built.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section id="design">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="sec-num">06 — The design</span>
+      <h2>The default read, in real Ant Design v6 tokens</h2>
+      <p>
+        One synthetic patient — Ada Lovelace, 38, fourteen months of records across two source
+        systems, one of which is down. Rendered at antd's default density with
+        <code>now = 18 Aug 2026 10:40 +05:30</code> supplied by the caller.
+      </p>
+    </div>
+
+    <figure>
+      <div class="stage">
+        <div class="antd">
+          <div class="a-card wide">
+            <div class="a-card-head">
+              <div>
+                <div class="a-card-title">Care timeline</div>
+                <div class="a-card-sub">Ada Lovelace · 38 · MRN 4471902</div>
+              </div>
+              <div style="display:flex;gap:8px;align-items:center">
+                <span class="a-btn sm on"><svg class="i i-14"><use href="#i-filter"/></svg> Clinical</span>
+                <span class="a-btn sm">All registers</span>
+                <span class="a-btn sm"><svg class="i i-14"><use href="#i-clock"/></svg> Jump to date</span>
+              </div>
+            </div>
+
+            <div style="padding:12px 20px 0">
+              <div class="a-alert error">
+                <span class="ic"><svg class="i i-18"><use href="#i-wifi-off"/></svg></span>
+                <div>
+                  <b>One source could not be reached.</b> Records held by Northside Regional Exchange
+                  are not in this timeline. This is not a statement that none exist.
+                  <span style="display:block;margin-top:4px"><span class="a-btn link">Retry</span></span>
+                </div>
+              </div>
+            </div>
+
+            <div class="a-card-body">
+              <div class="tl-grp">Planned <span class="rule"></span> <span class="n">2 events</span></div>
+              <ol class="tl">
+                <li>
+                  <div class="rail"><span class="node planned"><svg class="i i-14"><use href="#i-calendar"/></svg></span><span class="line"></span></div>
+                  <div class="body">
+                    <div class="kind">Appointment <span class="a-tag plain">Planned</span></div>
+                    <div class="ttl">Endocrinology review</div>
+                    <div class="who"><svg class="i i-14"><use href="#i-user"/></svg> With Dr Wade Warren · Endocrinology</div>
+                    <div class="when"><time datetime="2026-09-02T09:30:00+05:30">2 Sep 2026, 09:30 IST</time> <span class="ago">in 15 days</span></div>
+                  </div>
+                </li>
+                <li>
+                  <div class="rail"><span class="node planned"><svg class="i i-14"><use href="#i-calendar"/></svg></span><span class="line"></span></div>
+                  <div class="body">
+                    <div class="kind">Appointment <span class="a-tag gold">Lapsed</span></div>
+                    <div class="ttl">Diabetic retinal screening</div>
+                    <div class="when"><time datetime="2026-08-05T11:00:00+05:30">5 Aug 2026, 11:00 IST</time></div>
+                    <div class="box warnb">
+                      Scheduled, and no encounter has been recorded against it. Nothing here says the
+                      patient did not attend — only that this record has nothing.
+                    </div>
+                  </div>
+                </li>
+              </ol>
+
+              <div class="tl-since tl-now"><svg class="i i-14"><use href="#i-clock"/></svg> Now — 18 Aug 2026, 10:40 IST <span class="rule"></span></div>
+
+              <div class="tl-grp">August 2026 <span class="rule"></span> <span class="n">9 events · 4 shown</span></div>
+              <ol class="tl">
+                <li>
+                  <div class="rail"><span class="node clinical"><svg class="i i-14"><use href="#i-flask"/></svg></span><span class="line"></span></div>
+                  <div class="body">
+                    <div class="kind">Laboratory <span class="a-tag blue">Amended</span></div>
+                    <div class="ttl">HbA1c — 8.9%</div>
+                    <div class="who"><svg class="i i-14"><use href="#i-user"/></svg> Reported by Northside Pathology</div>
+                    <div class="when"><time datetime="2026-08-14T08:12:00+05:30">14 Aug 2026, 08:12 IST</time> <span class="src">· Northside EHR</span></div>
+                    <div class="box">
+                      <b>Amended 15 Aug, 16:20</b> — result value corrected from 9.4%. The original
+                      value remains in the record.
+                    </div>
+                  </div>
+                </li>
+                <li>
+                  <div class="rail"><span class="node clinical"><svg class="i i-14"><use href="#i-file-text"/></svg></span><span class="line"></span></div>
+                  <div class="body">
+                    <div class="kind">Clinical note</div>
+                    <div class="ttl">Diabetes review — progress note</div>
+                    <div class="who"><svg class="i i-14"><use href="#i-user"/></svg> Signed by Dr Wade Warren</div>
+                    <div class="when"><time datetime="2026-08-13T17:40:00+05:30">13 Aug 2026, 17:40 IST</time> <span class="ago">recorded 1 day after the visit</span></div>
+                  </div>
+                </li>
+              </ol>
+
+              <div class="tl-since"><svg class="i i-14"><use href="#i-arrow-down"/></svg> New since you last reviewed this chart — 12 Aug 2026, 14:02 IST <span class="rule"></span></div>
+
+              <ol class="tl">
+                <li>
+                  <div class="rail"><span class="node clinical"><svg class="i i-14"><use href="#i-stethoscope"/></svg></span><span class="line"></span></div>
+                  <div class="body">
+                    <div class="kind">Encounter <span class="a-tag gold">Elevated · HbA1c 8.9%</span></div>
+                    <div class="ttl">Diabetes review clinic</div>
+                    <div class="who"><svg class="i i-14"><use href="#i-user"/></svg> Dr Wade Warren · Endocrinology · Northside Clinic</div>
+                    <div class="when"><time datetime="2026-08-12T10:05:00+05:30">12 Aug 2026, 10:05 IST</time> <span class="src">· Northside EHR</span></div>
+                  </div>
+                </li>
+                <li>
+                  <div class="rail"><span class="node reported"><svg class="i i-14"><use href="#i-clipboard"/></svg></span><span class="line"></span></div>
+                  <div class="body">
+                    <div class="kind">Questionnaire · patient reported</div>
+                    <div class="ttl">Pre-visit medical history</div>
+                    <ol class="steps">
+                      <li><span class="dot done"></span><span>Sent to the patient</span><span class="t">11 Aug, 09:00</span></li>
+                      <li><span class="dot done"></span><span>Returned by the patient</span><span class="t">11 Aug, 21:34</span></li>
+                      <li><span class="dot open"></span><span>Not yet reviewed <span class="a-tag gold">Open 7 days</span></span><span class="t">—</span></li>
+                    </ol>
+                  </div>
+                </li>
+                <li>
+                  <div class="rail"><span class="node admin"><svg class="i i-14"><use href="#i-activity"/></svg></span><span class="line gap"></span></div>
+                  <div class="body">
+                    <div class="kind">Observations</div>
+                    <div class="cluster">
+                      <svg class="i i-14"><use href="#i-chevron-down"/></svg>
+                      <span><b>14 observations</b> — vitals and point-of-care glucose, 9–11 Aug</span>
+                      <span style="margin-inline-start:auto" class="a-tag plain">None critical</span>
+                    </div>
+                  </div>
+                </li>
+              </ol>
+
+              <div style="display:flex;align-items:center;gap:10px;padding:2px 0 12px;font-size:12px;color:#d48806">
+                <span style="width:32px;display:grid;place-items:center"><svg class="i i-14"><use href="#i-alert-tri"/></svg></span>
+                <span>Records may be missing between 22 Jun and 9 Aug — one source was not reached.</span>
+              </div>
+
+              <div class="tl-grp">June 2026 <span class="rule"></span> <span class="n">1 shown</span></div>
+              <ol class="tl">
+                <li>
+                  <div class="rail"><span class="node clinical"><svg class="i i-14"><use href="#i-lock"/></svg></span></div>
+                  <div class="body">
+                    <div class="kind">Document <span class="a-tag purple">Restricted</span></div>
+                    <div class="ttl">A document exists on this date and you do not have access to it</div>
+                    <div class="det">Kept separately by its author. Ask the care team if you need it.</div>
+                    <div class="when"><time datetime="2026-06-22">22 Jun 2026</time> <span class="src">· Northside EHR</span></div>
+                  </div>
+                </li>
+              </ol>
+            </div>
+
+            <div class="a-card-foot">
+              <div class="cov">
+                <div>
+                  <span class="lead">Showing 8 of 43 events</span>, newest first, from 1 Jul 2025 to now.
+                  35 not shown: 28 beyond this page, 5 hidden by the “Clinical” filter, 2 you do not
+                  have access to.
+                  <div class="cov-srcs">
+                    <span class="srcpill"><span class="d"></span> Northside EHR · 43 events</span>
+                    <span class="srcpill down"><span class="d"></span> Northside Regional Exchange · could not be reached</span>
+                    <span class="srcpill excluded"><span class="d"></span> Patient-entered records · excluded by filter</span>
+                  </div>
+                </div>
+              </div>
+              <span class="a-btn sm">Load older records</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <figcaption>
+        <b>The default read.</b> Nothing in this frame is decoration. The dashed nodes are planned, the
+        dashed rail segment is a stated gap in coverage, the amber divider is <em>now</em>, the blue
+        divider is what arrived since this reader last looked, and the footer is the sentence that
+        makes the whole thing honest. The red banner is the CT case, caught.
+      </figcaption>
+    </figure>
+
+    <h3>Seven decisions inside that frame</h3>
+    <div class="feat">
+      <div><div class="n">01</div><div><div class="t">The rail is a grid column, not an absolutely positioned line</div><div class="d">A 32 px column with a 1 px child that stretches. It survives a four-line title, 200% zoom, and RTL without a single physical offset. Every timeline that positions its rail absolutely breaks on the first long title.</div></div></div>
+      <div><div class="n">02</div><div><div class="t">Dashed border = planned. Dashed rail = gap. Both carry words.</div><div class="d">Two different dashes, two different meanings, and neither is load-bearing on its own: "Planned" is a chip, and the gap has a sentence on the rail. Forced-colors keeps both.</div></div></div>
+      <div><div class="n">03</div><div><div class="t">The kind label sits above the title, in text</div><div class="d">The slot the reference design left for the icon, filled with something a screen reader and a monochrome printer can both use. The icon becomes what it should have been: redundant.</div></div></div>
+      <div><div class="n">04</div><div><div class="t">Lapsed says what it does not know</div><div class="d">"Scheduled, and no encounter has been recorded against it" — not "missed", not "no-show". The record cannot support either word, and the component may not invent them.</div></div></div>
+      <div><div class="n">05</div><div><div class="t">The amendment states the previous value</div><div class="d">9.4% → 8.9%. An amendment chip with no delta tells the reader something changed and denies them the one thing they need.</div></div></div>
+      <div><div class="n">06</div><div><div class="t">The cluster carries its own safety claim</div><div class="d">"None critical" is not reassurance copy; it is the invariant, rendered. A cluster containing a critical value cannot render that chip, because the critical event is promoted out of the cluster before it forms.</div></div></div>
+      <div><div class="n">07</div><div><div class="t">The restricted event is a sentence, not a redaction bar</div><div class="d">Black boxes read as a design flourish. A line of text reads as a fact, and it is the fact that matters: something is here, and this reader is not seeing it.</div></div></div>
+    </div>
+
+    <h3>The states, one node each</h3>
+    <figure>
+      <div class="stage">
+        <div class="antd">
+          <div class="a-card xwide">
+            <div class="a-card-body">
+              <div class="grid g2" style="gap:0 28px">
+                <ol class="tl">
+                  <li>
+                    <div class="rail"><span class="node critical"><svg class="i i-14"><use href="#i-alert-tri"/></svg></span><span class="line"></span></div>
+                    <div class="body">
+                      <div class="kind">Laboratory <span class="a-tag red">Critical · Potassium 6.8 mmol/L</span></div>
+                      <div class="ttl">Urea and electrolytes</div>
+                      <div class="when"><time datetime="2026-08-16T02:14:00+05:30">16 Aug 2026, 02:14 IST</time></div>
+                      <div class="box err">Promoted out of the 9–11 Aug cluster. A critical result is never collapsed.</div>
+                    </div>
+                  </li>
+                  <li>
+                    <div class="rail"><span class="node admin"><svg class="i i-14"><use href="#i-x-circle"/></svg></span><span class="line"></span></div>
+                    <div class="body struck">
+                      <div class="kind">Encounter <span class="a-tag red">Entered in error</span></div>
+                      <div class="ttl">Emergency department attendance</div>
+                      <div class="when"><time datetime="2026-07-30">30 Jul 2026</time></div>
+                      <div class="box err" style="text-decoration:none">
+                        Recorded against this patient in error and retained. Marked
+                        <code>entered-in-error</code> on 31 Jul by Dr A Rahman.
+                      </div>
+                    </div>
+                  </li>
+                  <li>
+                    <div class="rail"><span class="node comms"><svg class="i i-14"><use href="#i-phone"/></svg></span><span class="line"></span></div>
+                    <div class="body">
+                      <div class="kind">Telephone <span class="a-tag plain">No answer</span></div>
+                      <div class="ttl">Follow-up call</div>
+                      <div class="det">To confirm the visit and update insurance.</div>
+                      <div class="who"><svg class="i i-14"><use href="#i-user"/></svg> By Priya Menon · Front desk · to the patient</div>
+                      <div class="when"><time datetime="2026-07-22T15:10:00+05:30">22 Jul 2026, 15:10 IST</time></div>
+                    </div>
+                  </li>
+                  <li>
+                    <div class="rail"><span class="node reported"><svg class="i i-14"><use href="#i-user"/></svg></span></div>
+                    <div class="body">
+                      <div class="kind">Condition · patient reported</div>
+                      <div class="ttl">Gestational diabetes</div>
+                      <div class="when"><time datetime="2019">2019</time> <span class="ago">year only — the record holds no month</span></div>
+                    </div>
+                  </li>
+                </ol>
+                <ol class="tl">
+                  <li>
+                    <div class="rail"><span class="node admin"><svg class="i i-14"><use href="#i-eye-off"/></svg></span><span class="line"></span></div>
+                    <div class="body">
+                      <div class="kind">Note <span class="a-tag purple">Consent required</span></div>
+                      <div class="ttl">A note exists on this date</div>
+                      <div class="det">Reading it is recorded against your name.</div>
+                      <div class="when"><time datetime="2026-07-14">14 Jul 2026</time></div>
+                      <div style="margin-top:8px"><span class="a-btn sm">Record a reason and open</span></div>
+                    </div>
+                  </li>
+                  <li>
+                    <div class="rail"><span class="node clinical"><svg class="i i-14"><use href="#i-pill"/></svg></span><span class="line"></span></div>
+                    <div class="body">
+                      <div class="kind">Medication <span class="a-tag cyan">Northside Regional Exchange</span></div>
+                      <div class="ttl">Metformin 1 g · twice daily</div>
+                      <div class="who"><svg class="i i-14"><use href="#i-database"/></svg> From another organisation's record</div>
+                      <div class="when"><time datetime="2026-04-02T00:00:00-04:00">2 Apr 2026 · 09:30 EDT</time> <span class="ago">recorded in a different time zone</span></div>
+                    </div>
+                  </li>
+                  <li>
+                    <div class="rail"><span class="node clinical"><svg class="i i-14"><use href="#i-flask"/></svg></span><span class="line"></span></div>
+                    <div class="body">
+                      <div class="kind">Laboratory <span class="a-tag blue">Not yet reviewed</span></div>
+                      <div class="ttl">Thyroid function</div>
+                      <div class="det">Released to you at the same time as your care team. Nobody has looked at it yet.</div>
+                      <div class="when"><time datetime="2026-08-17T22:41:00+05:30">17 Aug 2026, 22:41 IST</time></div>
+                      <div class="box">Patient-facing catalog. The clinician catalog says <em>"Released to patient, unreviewed"</em>.</div>
+                    </div>
+                  </li>
+                  <li>
+                    <div class="rail"><span class="node admin"><svg class="i i-14"><use href="#i-alert-tri"/></svg></span></div>
+                    <div class="body">
+                      <div class="kind">Nothing here</div>
+                      <div class="ttl">No events between 1 Jul 2025 and 21 Jun 2026</div>
+                      <div class="det">
+                        This window was searched and returned nothing. It is not a statement that
+                        nothing happened — one source could not be reached.
+                      </div>
+                    </div>
+                  </li>
+                </ol>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <figcaption>
+        <b>Eight of the eighteen declared states.</b> Each is a story in <code>meta.ts</code>, each is a
+        test, and each is a screenshot in the docs. The bottom-right node is the second of the three
+        empty states — the one that is most often rendered as a shrug.
+      </figcaption>
+    </figure>
+  </div>
+</section>
+
+<section id="variations">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="sec-num">07 — Variations</span>
+      <h2>Four layouts in v1, and what each one is for</h2>
+      <p>
+        One component, one event model, four <code>layout</code> values. Adding a layout must never
+        add a way to say something the model cannot express.
+      </p>
+    </div>
+
+    <figure>
+      <div class="stage">
+        <div class="grid g2" style="gap: 1.75rem; align-items: start">
+          <div class="antd">
+            <div class="a-card" style="max-width:none">
+              <div class="a-card-head">
+                <div><div class="a-card-title">Patient timeline</div></div>
+                <span class="a-btn link">See all 43</span>
+              </div>
+              <div class="a-card-body">
+                <ol class="tl compact">
+                  <li>
+                    <div class="rail"><span class="node clinical"><svg class="i i-14"><use href="#i-stethoscope"/></svg></span><span class="line"></span></div>
+                    <div class="body">
+                      <div class="kind">Encounter</div>
+                      <div class="ttl">Diabetes review clinic</div>
+                      <div class="when">12 Aug 2026, 10:05 · Dr Wade Warren</div>
+                    </div>
+                  </li>
+                  <li>
+                    <div class="rail"><span class="node reported"><svg class="i i-14"><use href="#i-clipboard"/></svg></span><span class="line"></span></div>
+                    <div class="body">
+                      <div class="kind">Questionnaire <span class="a-tag gold">Awaiting review</span></div>
+                      <div class="ttl">Pre-visit medical history</div>
+                      <div class="when">Returned 11 Aug 2026, 21:34</div>
+                    </div>
+                  </li>
+                  <li>
+                    <div class="rail"><span class="node admin"><svg class="i i-14"><use href="#i-calendar"/></svg></span><span class="line"></span></div>
+                    <div class="body">
+                      <div class="kind">Appointment</div>
+                      <div class="ttl">Scheduled with Dr Wade Warren</div>
+                      <div class="when">Booked 24 Jul 2026 · for 12 Aug 2026</div>
+                    </div>
+                  </li>
+                  <li>
+                    <div class="rail"><span class="node comms"><svg class="i i-14"><use href="#i-phone"/></svg></span><span class="line"></span></div>
+                    <div class="body">
+                      <div class="kind">Telephone <span class="a-tag plain">No answer</span></div>
+                      <div class="ttl">Follow-up call to the patient</div>
+                      <div class="when">22 Jul 2026, 15:10 · Priya Menon</div>
+                    </div>
+                  </li>
+                  <li>
+                    <div class="rail"><span class="node comms"><svg class="i i-14"><use href="#i-mail"/></svg></span></div>
+                    <div class="body">
+                      <div class="kind">Email</div>
+                      <div class="ttl">Appointment reminder to the patient</div>
+                      <div class="when">20 Jul 2026, 08:00 · Automated</div>
+                    </div>
+                  </li>
+                </ol>
+              </div>
+              <div class="a-card-foot">
+                <div class="cov">
+                  <span class="lead">5 of 43</span>&nbsp;· newest first · 1 Jul 2025 to now · 1 of 2 sources reached
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <h4 style="margin-bottom:0.6rem"><code>layout="card"</code> — the supplied design, kept</h4>
+            <p style="font-size:0.92rem;color:var(--ink-2)">
+              Same width, same density, same five entries, same rail. Four things changed and none of
+              them cost a pixel of height:
+            </p>
+            <ul style="font-size:0.92rem;color:var(--ink-2)">
+              <li>the kind is a text label above the title, not a hue;</li>
+              <li>the actor's role is stated and the recipient is no longer the doctor;</li>
+              <li>the appointment says both when it was booked and what it was booked for;</li>
+              <li>the footer is one sentence long and it is the reason the card can be trusted.</li>
+            </ul>
+            <p style="font-size:0.92rem;color:var(--ink-2)">
+              <strong>"1 of 2 sources reached"</strong> is the compressed form of the coverage
+              sentence, used when the card is too narrow for the full one. It never compresses to
+              nothing.
+            </p>
+            <div class="note" style="margin-top:1rem">
+              <p style="font-size:0.92rem">
+                This is the variant to build first. It is the one the reference design asked for, it
+                is the one that demos, and it is the smallest surface on which the whole argument can
+                be made.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <figcaption><b><code>layout="card"</code></b> at 420 px, compact density, <code>limit={5}</code>.</figcaption>
+    </figure>
+
+    <figure>
+      <div class="stage">
+        <div class="antd">
+          <div class="a-card wide">
+            <div class="a-card-head">
+              <div>
+                <div class="a-card-title">Care timeline</div>
+                <div class="a-card-sub"><code>layout="register"</code> · 12 Aug 2026</div>
+              </div>
+            </div>
+            <div class="a-card-body">
+              <div class="tl-reg">
+                <div class="col-h">Clinical</div>
+                <div></div>
+                <div class="col-h" style="text-align:start">Administrative &amp; contact</div>
+
+                <div class="ev l">
+                  <div class="kind" style="justify-content:flex-end">Encounter</div>
+                  <div class="ttl">Diabetes review clinic</div>
+                  <div class="when" style="justify-content:flex-end">12 Aug, 10:05 IST</div>
+                </div>
+                <div class="mid"><span class="node clinical"><svg class="i i-14"><use href="#i-stethoscope"/></svg></span></div>
+                <div class="ev r"></div>
+
+                <div class="ev l"></div>
+                <div class="mid"><span class="node reported"><svg class="i i-14"><use href="#i-clipboard"/></svg></span></div>
+                <div class="ev r">
+                  <div class="kind">Questionnaire · patient reported</div>
+                  <div class="ttl">Pre-visit medical history returned</div>
+                  <div class="when">11 Aug, 21:34 IST</div>
+                </div>
+
+                <div class="ev l">
+                  <div class="kind" style="justify-content:flex-end">Laboratory</div>
+                  <div class="ttl">HbA1c — 8.9%</div>
+                  <div class="when" style="justify-content:flex-end">14 Aug, 08:12 IST</div>
+                </div>
+                <div class="mid"><span class="node clinical"><svg class="i i-14"><use href="#i-flask"/></svg></span></div>
+                <div class="ev r"></div>
+
+                <div class="ev l"></div>
+                <div class="mid last"><span class="node comms"><svg class="i i-14"><use href="#i-mail"/></svg></span></div>
+                <div class="ev r">
+                  <div class="kind">Email</div>
+                  <div class="ttl">Results-ready notice to the patient</div>
+                  <div class="when">14 Aug, 08:15 IST</div>
+                </div>
+              </div>
+            </div>
+            <div class="a-card-foot">
+              <div class="cov"><span class="lead">4 of 43</span>&nbsp;· split by register · newest first</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <figcaption>
+        <b><code>layout="register"</code>.</b> antd's <code>mode="alternate"</code> alternates sides to
+        fill space. This alternates on a fact — which side an event is on <em>is</em> its register —
+        and it is the one layout where the reader can see that an email went out three minutes after a
+        result landed. Under 760 px it collapses to a single column and the register survives as the
+        kind label, because a two-column timeline on a phone is not a design, it is a bug.
+      </figcaption>
+    </figure>
+
+    <div class="tw">
+      <table>
+        <thead>
+          <tr><th>layout</th><th>For</th><th>Density</th><th>Notes</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>"default"</code></td>
+            <td>The chart's own timeline tab. Reads 1, 2 and 4.</td>
+            <td>comfortable</td>
+            <td>Groups, clusters, threads, gap rails, both dividers.</td>
+          </tr>
+          <tr>
+            <td><code>"card"</code></td>
+            <td>A dashboard panel beside other cards. Read 1 and read 3.</td>
+            <td>compact</td>
+            <td>Requires <code>limit</code>. Compressed coverage sentence. No grouping.</td>
+          </tr>
+          <tr>
+            <td><code>"compact"</code></td>
+            <td>Four hundred events. Chart review at speed.</td>
+            <td>compact</td>
+            <td>22 px nodes, one line per event, group headers retained.</td>
+          </tr>
+          <tr>
+            <td><code>"register"</code></td>
+            <td>Seeing clinical and administrative activity against each other. Read 3.</td>
+            <td>comfortable</td>
+            <td>Two columns above 760 px, one below. Never more than two.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="note warn">
+      <span class="lbl">The layout we are not shipping, and why it is tempting</span>
+      <p>
+        A swimlane view — one lane per source, so the reader sees at a glance that the outside
+        organisation contributed nothing after April — is the correct answer to read 4 and it is the
+        best idea in this brief that is not in v1. It is out because it needs horizontal scroll, its
+        own keyboard model, and a legend, and shipping it badly would be worse than not shipping it.
+        It goes in <code>limitations</code> with a named successor so nobody has to re-derive it.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section id="model">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="sec-num">08 — The event model</span>
+      <h2>Fourteen fields, and three of them are the whole product</h2>
+      <p>
+        <code>register</code>, <code>status</code> and <code>coverage</code>. Everything else in this
+        type exists in some form in every timeline component ever written.
+      </p>
+    </div>
+
+<pre><code><span class="c-c">/**
+ * One thing that happened, or was planned, or was attempted.
+ *
+ * Times are strings, not Dates. A FHIR `2019` means 2019 — parsing it into a
+ * Date invents a January, a first, a midnight, and a time zone, none of which
+ * anybody recorded.
+ */</span>
+<span class="c-k">export interface</span> TimelineEvent {
+  id: <span class="c-k">string</span>;
+
+  <span class="c-c">/** What sort of thing it is. Closed vocabulary — see KINDS below. */</span>
+  kind: TimelineKind;
+  <span class="c-c">/** Required when kind is "other". An unlabelled unknown is a build error. */</span>
+  typeLabel?: <span class="c-k">string</span>;
+
+  <span class="c-c">/** Which stream it belongs to. Drives ranking, grouping and layout="register". */</span>
+  register: <span class="c-s">"clinical"</span> | <span class="c-s">"administrative"</span> | <span class="c-s">"communication"</span>
+          | <span class="c-s">"patient-reported"</span> | <span class="c-s">"system"</span>;
+
+  <span class="c-c">/** When it happened, at the precision the record holds. */</span>
+  occurred: FhirDateTime;
+  <span class="c-c">/** When it entered the record, if that is a different fact. */</span>
+  recorded?: FhirDateTime;
+
+  <span class="c-c">/** What happened. A noun phrase — never a sentence with the actor in it. */</span>
+  title: React.ReactNode;
+  <span class="c-c">/** One more line, when the title alone would be cryptic. */</span>
+  detail?: React.ReactNode;
+
+  status: TimelineStatus;
+  <span class="c-c">/** Present only for amended | corrected | in-error. Says what moved. */</span>
+  revision?: { at: FhirDateTime; by?: Party; was?: <span class="c-k">string</span>; reason?: <span class="c-k">string</span> };
+
+  <span class="c-c">/** Who did it, who it was to, whose record it is. Three roles, three fields. */</span>
+  actor?: Party;
+  recipient?: Party;
+  subject?: Party;
+
+  <span class="c-c">/** Which system this came from. Renders, and feeds the coverage statement. */</span>
+  source?: <span class="c-k">string</span>;
+
+  <span class="c-c">/** Exists, and you may not read it. Same shape ChartAccordion already uses. */</span>
+  access?: AccessDescriptor;
+
+  <span class="c-c">/** A workflow with its own internal times. The fix for "sent and received and reviewed". */</span>
+  steps?: readonly TimelineStep[];
+
+  <span class="c-c">/** Where this event lives in the record. */</span>
+  href?: <span class="c-k">string</span>;
+}
+
+<span class="c-c">/**
+ * Severity travels with a status word or not at all — lifted from ChartAccordion,
+ * where a coloured rail with nothing beside it is already a type error.
+ */</span>
+<span class="c-k">export type</span> TimelineEventProps =
+  | (TimelineEvent &amp; { severity: Severity; severityStatus: React.ReactNode })
+  | (TimelineEvent &amp; { severity?: <span class="c-k">undefined</span> });</code></pre>
+
+    <div class="prose">
+      <h3>The two closed vocabularies</h3>
+    </div>
+
+    <div class="tw">
+      <table>
+        <thead>
+          <tr><th><code>status</code></th><th>Means</th><th>Renders as</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>occurred</code></td><td>It happened.</td><td>Plain. The default, and the only one with no chip.</td></tr>
+          <tr><td><code>in-progress</code></td><td>Started, not finished.</td><td>Chip, and the rail below it is solid — it is not a gap.</td></tr>
+          <tr><td><code>planned</code></td><td>Scheduled, still in the future relative to <code>now</code>.</td><td>Dashed node, above the <em>now</em> divider.</td></tr>
+          <tr><td><code>lapsed</code></td><td>Planned, the time has passed, nothing recorded against it.</td><td>Amber chip plus a sentence saying what is <em>not</em> known.</td></tr>
+          <tr><td><code>cancelled</code></td><td>Called off before it happened. Someone decided.</td><td>Chip, muted, with the actor who cancelled it if known.</td></tr>
+          <tr><td><code>not-done</code></td><td>Attempted and did not connect — no answer, bounced, undelivered.</td><td>Chip. Distinct from cancelled, because nobody decided.</td></tr>
+          <tr><td><code>amended</code></td><td>Changed, in a way that did not alter the value.</td><td>Blue chip plus the revision box.</td></tr>
+          <tr><td><code>corrected</code></td><td>Changed, and the value moved.</td><td>Blue chip plus the revision box, with <code>was</code> shown.</td></tr>
+          <tr><td><code>in-error</code></td><td>Should never have been recorded. Retained.</td><td>Struck, red chip, revision box unstruck beneath.</td></tr>
+          <tr><td><code>unknown</code></td><td>The source did not say.</td><td>Stated in words. Never silently treated as <code>occurred</code>.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="prose">
+      <p>
+        Twenty <code>kind</code> values, grouped by register:
+        <strong>clinical</strong> — <code>encounter</code>, <code>observation</code>,
+        <code>laboratory</code>, <code>imaging</code>, <code>procedure</code>,
+        <code>medication</code>, <code>immunization</code>, <code>condition</code>,
+        <code>allergy</code>, <code>note</code>, <code>document</code>, <code>care-plan</code>;
+        <strong>administrative</strong> — <code>appointment</code>, <code>referral</code>,
+        <code>task</code>, <code>coverage</code>, <code>consent</code>;
+        <strong>communication</strong> — <code>message</code>, <code>call</code>;
+        <strong>system</strong> — <code>access</code>. Plus <code>other</code>, which costs a
+        <code>typeLabel</code>.
+      </p>
+
+      <h3>Coverage — the type that makes the claim</h3>
+    </div>
+
+<pre><code><span class="c-c">/**
+ * What this timeline is a view of. Required. There is no default, because
+ * every plausible default is a claim the caller did not make.
+ */</span>
+<span class="c-k">export interface</span> TimelineCoverage {
+  <span class="c-c">/** The period searched. Omitted `from` means "everything held". */</span>
+  window?: { from?: FhirDateTime; to?: FhirDateTime };
+
+  <span class="c-c">/** Every system asked, and how it answered. An empty array is a type error. */</span>
+  sources: readonly [TimelineSource, ...TimelineSource[]];
+
+  <span class="c-c">/** How many events match the query, if the server said. */</span>
+  total?: <span class="c-k">number</span>;
+  <span class="c-c">/** What is hidden, and why. Rendered beside the count, not inside a filter panel. */</span>
+  hidden?: readonly { reason: <span class="c-s">"filter"</span> | <span class="c-s">"page"</span> | <span class="c-s">"access"</span> | <span class="c-s">"unmapped"</span>; count: <span class="c-k">number</span>; label?: <span class="c-k">string</span> }[];
+
+  order: <span class="c-s">"newest-first"</span> | <span class="c-s">"oldest-first"</span>;
+}
+
+<span class="c-k">export interface</span> TimelineSource {
+  id: <span class="c-k">string</span>;
+  label: <span class="c-k">string</span>;
+  <span class="c-c">/** "unavailable" is the state this whole component was built for. */</span>
+  status: <span class="c-s">"ok"</span> | <span class="c-s">"partial"</span> | <span class="c-s">"unavailable"</span> | <span class="c-s">"excluded"</span>;
+  <span class="c-c">/** Required when status is not "ok" — a failure with no reason is a shrug. */</span>
+  detail?: <span class="c-k">string</span>;
+  <span class="c-c">/** How far back this source was able to answer for. */</span>
+  window?: { from?: FhirDateTime; to?: FhirDateTime };
+}</code></pre>
+
+    <div class="note">
+      <span class="lbl">Why <code>sources</code> is a non-empty tuple</span>
+      <p>
+        <code>readonly [T, ...T[]]</code> rather than <code>readonly T[]</code>. An empty array would
+        let a caller satisfy the type while claiming nothing, which is exactly the state the prop
+        exists to forbid. A timeline assembled from one system says so; that is one line, and it is
+        true.
+      </p>
+    </div>
+
+    <div class="prose">
+      <h3>FHIR, and where the adapters stop</h3>
+      <p>
+        Eleven resource types map cleanly. The adapters are pure functions over resources the caller
+        already has — no fetching, no <code>$everything</code> call, no assumptions about a server.
+      </p>
+    </div>
+
+    <div class="tw">
+      <table>
+        <thead>
+          <tr><th>Resource</th><th>kind · register</th><th>occurred</th><th>Status derived from</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>Encounter</code></td><td>encounter · clinical</td><td><code>period.start</code></td><td><code>status</code>; <code>entered-in-error</code> maps straight through</td></tr>
+          <tr><td><code>Appointment</code></td><td>appointment · administrative</td><td><code>start</code></td><td><code>status</code>; <code>booked</code> + past <code>now</code> + no Encounter → <strong>lapsed</strong></td></tr>
+          <tr><td><code>Communication</code></td><td>message / call · communication</td><td><code>sent</code> ?? <code>received</code></td><td><code>status</code>; <code>not-done</code> preserved</td></tr>
+          <tr><td><code>Observation</code></td><td>observation / laboratory · clinical</td><td><code>effectiveDateTime</code></td><td><code>status</code>; <code>preliminary</code>, <code>amended</code>, <code>corrected</code> all distinct</td></tr>
+          <tr><td><code>DiagnosticReport</code></td><td>laboratory / imaging · clinical</td><td><code>effectiveDateTime</code></td><td><code>status</code></td></tr>
+          <tr><td><code>Procedure</code></td><td>procedure · clinical</td><td><code>performedDateTime</code></td><td><code>status</code></td></tr>
+          <tr><td><code>MedicationRequest</code></td><td>medication · clinical</td><td><code>authoredOn</code></td><td><code>status</code></td></tr>
+          <tr><td><code>Immunization</code></td><td>immunization · clinical</td><td><code>occurrenceDateTime</code></td><td><code>status</code>; <code>not-done</code> is a real answer</td></tr>
+          <tr><td><code>DocumentReference</code></td><td>document / note · clinical</td><td><code>date</code></td><td><code>docStatus</code> and <code>status</code></td></tr>
+          <tr><td><code>QuestionnaireResponse</code></td><td>questionnaire · patient-reported</td><td><code>authored</code></td><td><code>status</code>; <code>in-progress</code> is the unreturned form</td></tr>
+          <tr><td><code>Consent</code></td><td>consent · administrative</td><td><code>dateTime</code></td><td><code>status</code></td></tr>
+          <tr><td><code>Provenance</code></td><td>—</td><td>—</td><td>Not an event. Read for <code>recorded</code> and <code>actor</code> on the events it points at.</td></tr>
+          <tr><td><code>AuditEvent</code></td><td>access · system</td><td><code>recorded</code></td><td>Off by default. Turning on "who read this chart" is a deliberate act.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="note bad">
+      <span class="lbl">The adapter's own coverage obligation</span>
+      <p>
+        <code>toTimelineEvents()</code> returns <code>{ events, unmapped }</code>, and
+        <code>unmapped</code> is a count by resource type that flows into
+        <code>coverage.hidden</code>. An adapter that silently drops six resources it does not
+        understand has told the same lie the component exists to prevent — one layer further down,
+        where nobody will look for it.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section id="a11y">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="sec-num">09 — Accessibility</span>
+      <h2>A structure, not a widget — which is the harder discipline</h2>
+      <p>
+        The temptation with a long list is to make it operable. Every arrow key you claim is a reading
+        key you take away, and a screen-reader user reads a list in browse mode.
+      </p>
+    </div>
+
+    <div class="prose">
+      <h3>Elements and roles</h3>
+      <ul>
+        <li>
+          <strong><code>&lt;ol&gt;</code> of <code>&lt;li&gt;</code></strong>, one list per group. A
+          chronology is ordered and the order carries meaning; <code>ul</code> would be a lie the
+          markup tells. antd v6 already gets this right and we keep it.
+        </li>
+        <li>
+          <strong><code>role="list"</code> stated explicitly.</strong> Safari drops list semantics
+          from any list with <code>list-style: none</code>, and VoiceOver then announces neither the
+          list nor its item count. The redundant role is the accepted fix and the HTML validator's
+          complaint about it is wrong here. It goes in with a comment naming the bug, so nobody
+          "cleans it up".
+        </li>
+        <li>
+          <strong>An accessible name is required.</strong> <code>aria-label</code> or
+          <code>aria-labelledby</code>, enforced by a test, because a chart with a care timeline and
+          an access-history timeline otherwise presents two unnamed lists.
+        </li>
+        <li>
+          <strong>Each group is a <code>&lt;section&gt;</code> labelled by its heading</strong>, so
+          the month headers are landmarks a rotor can jump between. This is what replaces the arrow
+          keys we are not claiming.
+        </li>
+        <li>
+          <strong>No <code>role="feed"</code> in v1.</strong> It is the APG's pattern for exactly this
+          and its own example carries a note that it has not reached task-force consensus; support is
+          uneven. It stays behind a prop, after a screen-reader matrix, and never as the default.
+        </li>
+      </ul>
+
+      <h3>What each event announces</h3>
+      <p>
+        In order, and nothing that is only visual: <em>kind</em>, then any status word, then the
+        title, then the detail, then who, then the absolute time. The relative time is
+        <code>aria-hidden</code> — "two days ago" adds nothing to a spoken absolute date and doubles
+        the length of every item.
+      </p>
+    </div>
+
+<pre><code><span class="c-c">&lt;!-- One event, as it reaches the accessibility tree --&gt;</span>
+&lt;li&gt;
+  &lt;span class=<span class="c-s">"kind"</span>&gt;Laboratory&lt;/span&gt;
+  &lt;span class=<span class="c-s">"a-tag"</span>&gt;Amended&lt;/span&gt;
+  &lt;h4&gt;&lt;a href=<span class="c-s">"/chart/obs/9f2"</span>&gt;HbA1c — 8.9%&lt;/a&gt;&lt;/h4&gt;
+  &lt;p&gt;Reported by Northside Pathology&lt;/p&gt;
+  &lt;time datetime=<span class="c-s">"2026-08-14T08:12:00+05:30"</span>&gt;14 Aug 2026, 08:12 IST&lt;/time&gt;
+  &lt;span aria-hidden=<span class="c-s">"true"</span>&gt;4 days ago&lt;/span&gt;
+  &lt;p&gt;Amended 15 Aug, 16:20 — result value corrected from 9.4%.&lt;/p&gt;
+&lt;/li&gt;
+
+<span class="c-c">// "Laboratory, amended, link, HbA1c 8.9 percent, reported by Northside
+//  Pathology, 14 August 2026 08:12 IST, amended 15 August 16:20 — result
+//  value corrected from 9.4 percent."</span></code></pre>
+
+    <div class="tw">
+      <table>
+        <thead>
+          <tr><th>Key</th><th>Does</th><th>Why not something else</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><kbd>Tab</kbd></td><td>Moves through controls: filters, jump, each event link, cluster toggles, "Load older".</td><td>The reading order is the DOM order. Nothing is pulled out of it.</td></tr>
+          <tr><td><kbd>Enter</kbd></td><td>Follows an event link; toggles a cluster.</td><td>—</td></tr>
+          <tr><td><kbd>Space</kbd></td><td>Toggles a cluster. Never follows a link.</td><td>Clusters are buttons; links are links.</td></tr>
+          <tr><td>Arrow keys</td><td><strong>Nothing.</strong></td><td>Browse mode uses them to read. A roving tabindex here would make the list less navigable, not more.</td></tr>
+          <tr><td><kbd>Esc</kbd></td><td>Closes the jump-to-date popover, returning focus to its trigger.</td><td>—</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="grid g2">
+      <div class="card">
+        <span class="k">Forced colours</span>
+        <h4>Every state survives the palette being taken away</h4>
+        <p style="font-size:0.92rem;color:var(--ink-2)">
+          Because no state is carried by colour in the first place: planned is a dashed border
+          <em>and</em> a chip that says Planned; a gap is a dashed rail <em>and</em> a sentence;
+          entered-in-error is a strike-through <em>and</em> a chip <em>and</em> a paragraph. Tested in
+          three engines, as with every other component here.
+        </p>
+      </div>
+      <div class="card">
+        <span class="k">Reduced motion</span>
+        <h4>A designed still state, not a paused one</h4>
+        <p style="font-size:0.92rem;color:var(--ink-2)">
+          The only motion in the component is a cluster expanding and a new event arriving. Under
+          <code>prefers-reduced-motion</code> both are instant, and the new-arrival highlight becomes
+          a persistent left border rather than a fade — a fade that has finished is a state the reader
+          never saw.
+        </p>
+      </div>
+      <div class="card">
+        <span class="k">320 px and 200%</span>
+        <h4>The rail is a grid column, so it just narrows</h4>
+        <p style="font-size:0.92rem;color:var(--ink-2)">
+          <code>layout="register"</code> collapses to one column under 760 px. Group headers stay
+          sticky. Nothing scrolls horizontally except a cluster's own contents, in its own container.
+        </p>
+      </div>
+      <div class="card">
+        <span class="k">Live regions</span>
+        <h4>Announce the event, not the number</h4>
+        <p style="font-size:0.92rem;color:var(--ink-2)">
+          A polite region containing the arriving event's kind, title and time. "3 new items" is a
+          notification; the point of a live region here is that a critical result announces itself
+          without the reader going to look.
+        </p>
+      </div>
+    </div>
+
+    <div class="note warn">
+      <span class="lbl">The one I am least sure of</span>
+      <p>
+        Whether the group headings should be <code>h3</code> or a <code>role="heading"</code> at a
+        caller-supplied level. <code>ChartAccordion</code> takes <code>headingLevel</code> and that is
+        the right precedent, but a timeline nested inside a tab panel inside a chart page can end up
+        four levels deep, and getting it wrong produces a heading outline that is worse than no
+        headings. It takes the prop, it defaults to nothing, and it renders a labelled section rather
+        than a heading when no level is given.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section id="api">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="sec-num">10 — The API</span>
+      <h2>Two components, one hook, three helpers</h2>
+      <p>
+        The primitive matches Ant Design exactly. Everything Oxygen-specific is on the organism, so an
+        antd migration is an import change and nothing else.
+      </p>
+    </div>
+
+<pre><code><span class="c-c">// The primitive. Every prop below is antd v6's, spelled antd's way.</span>
+<span class="c-k">import</span> { Timeline } <span class="c-k">from</span> <span class="c-s">"@/components/oxygen/timeline"</span>;
+
+&lt;Timeline
+  aria-label=<span class="c-s">"Release history"</span>          <span class="c-c">// ← ours. Required.</span>
+  mode=<span class="c-s">"start"</span>                         <span class="c-c">// start | end | alternate</span>
+  orientation=<span class="c-s">"vertical"</span>
+  variant=<span class="c-s">"outlined"</span>
+  reverse={<span class="c-k">false</span>}
+  items={[{ title, content, icon, color, placement, loading, key }]}
+/&gt;</code></pre>
+
+<pre><code><span class="c-c">// The organism.</span>
+<span class="c-k">import</span> { CareTimeline } <span class="c-k">from</span> <span class="c-s">"@/components/oxygen/care-timeline"</span>;
+
+&lt;CareTimeline
+  aria-label=<span class="c-s">"Care timeline for Ada Lovelace"</span>
+  events={events}
+  now={serverTime}                       <span class="c-c">// never Date.now()</span>
+  coverage={{
+    window: { from: <span class="c-s">"2025-07-01"</span> },
+    order: <span class="c-s">"newest-first"</span>,
+    total: <span class="c-s">43</span>,
+    hidden: [{ reason: <span class="c-s">"filter"</span>, count: <span class="c-s">5</span>, label: <span class="c-s">"Clinical only"</span> },
+             { reason: <span class="c-s">"access"</span>, count: <span class="c-s">2</span> }],
+    sources: [
+      { id: <span class="c-s">"ehr"</span>, label: <span class="c-s">"Northside EHR"</span>, status: <span class="c-s">"ok"</span> },
+      { id: <span class="c-s">"hie"</span>, label: <span class="c-s">"Northside Regional Exchange"</span>,
+        status: <span class="c-s">"unavailable"</span>, detail: <span class="c-s">"Timed out after 8s"</span> },
+    ],
+  }}
+  layout=<span class="c-s">"default"</span>                      <span class="c-c">// default | card | compact | register</span>
+  group=<span class="c-s">"auto"</span>                          <span class="c-c">// auto | month | quarter | year | none</span>
+  cluster={{ kinds: [<span class="c-s">"observation"</span>], within: <span class="c-s">"P3D"</span>, min: <span class="c-s">5</span> }}
+  seenThrough=<span class="c-s">"2026-08-12T14:02:00+05:30"</span>
+  lateEntryAfter=<span class="c-s">"P2D"</span>                   <span class="c-c">// gap that earns "recorded N later"</span>
+  audience=<span class="c-s">"clinician"</span>                   <span class="c-c">// clinician | patient — picks the intl catalog</span>
+  onSelect={(event) =&gt; open(event.href)}
+  onLoadOlder={() =&gt; fetchOlder()}
+  onRead={(coverage) =&gt; audit.record(coverage)}
+/&gt;</code></pre>
+
+    <div class="tw">
+      <table>
+        <thead><tr><th>Export</th><th>Is</th><th>Notes</th></tr></thead>
+        <tbody>
+          <tr><td><code>Timeline</code></td><td>antd-compatible primitive</td><td>No dependency on antd. Parity table in the test suite.</td></tr>
+          <tr><td><code>CareTimeline</code></td><td>The clinical organism</td><td><code>coverage</code> required; <code>now</code> required.</td></tr>
+          <tr><td><code>CareTimelineEvent</code></td><td>One node, exported</td><td>For a product that owns its own scrolling container.</td></tr>
+          <tr><td><code>useTimeline()</code></td><td>Headless: sort, group, cluster, coverage prose</td><td>Returns what the component renders. Lets a product build its own skin without re-deriving the safety rules.</td></tr>
+          <tr><td><code>toTimelineEvents(bundle, opts)</code></td><td>FHIR Bundle → events + unmapped</td><td>Pure. No network.</td></tr>
+          <tr><td><code>describeCoverage(coverage, locale)</code></td><td>Coverage → the sentence</td><td>Exported because the sentence belongs in exports, print headers and audit records too.</td></tr>
+          <tr><td><code>compareByTime(a, b)</code></td><td>Precision-aware, stable</td><td>The comparator, exported so a caller sorting server-side sorts the same way.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="prose">
+      <h4>Four props that do not exist, deliberately</h4>
+      <ul>
+        <li><strong><code>fetchEvents</code> / <code>url</code> / <code>subscription</code></strong> — the component takes data. Same rule Consult holds.</li>
+        <li><strong><code>summarise</code></strong> — a component that decides which events matter is decision support in a list's clothing.</li>
+        <li><strong><code>hideEmpty</code></strong> — there is no state in which rendering nothing is the correct answer. Three empty states exist precisely so this prop is never needed.</li>
+        <li><strong><code>reverse</code></strong> on the organism — direction is stated in <code>coverage.order</code>, because it is part of the claim rather than a rendering flag.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section id="law">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="sec-num">11 — Rules that bind</span>
+      <h2>Three that change the design, and one claim we do not make</h2>
+      <p>
+        Not a compliance section. These are the places where an external rule decides a rendering
+        question that would otherwise be taste.
+      </p>
+    </div>
+
+    <div class="feat">
+      <div>
+        <div class="n">01</div>
+        <div>
+          <div class="t">An erroneous record is retained and marked, never removed</div>
+          <div class="d">
+            FHIR's own lifecycle guidance is explicit: once an erroneous record exists, in clinical
+            settings it must be retained and flagged as created in error, because the correction is
+            itself part of the record. The common implementation — filter
+            <code>entered-in-error</code> out of the query — is the reading that fails read 4 in
+            section 3, and it fails it silently. <strong>Consequence for the design:</strong>
+            <code>in-error</code> is a rendered state with a strike, a chip and a revision box, and
+            the component has no prop that hides it.
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="n">02</div>
+        <div>
+          <div class="t">Results reach the patient at the same moment they reach the clinician</div>
+          <div class="d">
+            The ONC information-blocking rule has applied to providers since 5 April 2021, and the
+            practical effect is that a patient can read a result in a portal before the ordering
+            clinician has opened it. The design question this settles: a patient-facing timeline must
+            be able to say <em>"released to you, not yet reviewed by your care team"</em> — because
+            the alternative is a portal that shows a number with no context and no indication that
+            anyone is coming. <strong>Consequence:</strong> <code>audience="patient"</code> is a v1
+            feature, not a v2 nicety, and it selects a different string catalog rather than a softer
+            tone.
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="n">03</div>
+        <div>
+          <div class="t">Planned and actual are different resources, and the difference is normative</div>
+          <div class="d">
+            <code>Appointment</code> records a planned activity; <code>Encounter</code> records what
+            actually occurred. A timeline that renders both as "things on the record" erases a
+            distinction the data model went to trouble to make.
+            <strong>Consequence:</strong> the <em>now</em> divider, the <code>lapsed</code> state, and
+            the rule that a lapsed appointment says what is <em>not</em> known rather than asserting a
+            no-show.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="note bad">
+      <span class="lbl">The claim we do not make</span>
+      <p>
+        Rendering a complete-looking timeline is not a statement that the record is complete, and
+        <code>coverage</code> is not a completeness guarantee — it is an accurate report of what
+        <em>this query</em> reached. If the source system itself is missing records, the component
+        will faithfully report that it reached a source which returned nothing to report. That
+        limitation is stated in <code>meta.limitations</code> in those words, because a safety control
+        that is trusted beyond its actual guarantee is worse than none.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section id="arch">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="sec-num">12 — Architecture</span>
+      <h2>One engine, two components, no new packages</h2>
+      <p>
+        The whole thing fits inside the registry channel, which keeps it installable as source and
+        keeps antd out of every consumer.
+      </p>
+    </div>
+
+    <div class="layers">
+      <div><span class="l">layer 0</span><span class="d"><code>registry/oxygen/lib/timeline-core.ts</code> — precision-aware time compare, stable sort, grouping, clustering with the critical-promotion rule, coverage prose, the closed vocabularies. No React, no DOM, no dependencies. This is where every rule in section 1 actually lives.</span></div>
+      <div><span class="l">layer 1</span><span class="d"><code>registry/oxygen/timeline/</code> — the antd-compatible primitive. <code>&lt;ol&gt;</code>, rail, dots, <code>mode</code>, <code>orientation</code>, <code>variant</code>. Knows nothing clinical.</span></div>
+      <div><span class="l">layer 2</span><span class="d"><code>registry/oxygen/care-timeline/</code> — the organism. Composes the primitive, consumes the engine, owns the coverage surface, the dividers, the states.</span></div>
+      <div><span class="l">layer 3</span><span class="d"><code>registry/oxygen/lib/timeline-fhir.ts</code> — the eleven adapters. Imports <code>@oxygenui-design/fhir</code> types and its existing read helpers. Never imports layers 1 or 2.</span></div>
+    </div>
+
+<pre><code>registry/oxygen/
+├── lib/
+│   ├── timeline-core.ts          <span class="c-c">// the engine — no React</span>
+│   ├── timeline-fhir.ts          <span class="c-c">// eleven adapters, pure</span>
+│   └── timeline.css              <span class="c-c">// shared rail geometry</span>
+├── timeline/
+│   ├── timeline.tsx
+│   ├── timeline.meta.ts
+│   ├── timeline.stories.tsx
+│   └── timeline.test.tsx
+└── care-timeline/
+    ├── care-timeline.tsx
+    ├── care-timeline.meta.ts
+    ├── care-timeline.stories.tsx
+    └── care-timeline.test.tsx
+
+test/
+├── timeline-parity.test.ts       <span class="c-c">// antd v6 props parity — ADR 0010</span>
+└── timeline-invariants.test.ts   <span class="c-c">// coverage, clustering, ordering</span></code></pre>
+
+    <div class="prose">
+      <p>
+        Two registry items, both <code>tier: "free"</code>, both <code>distribution: "registry"</code>,
+        both <code>status: "experimental"</code> at first merge — nothing starts at stable. They pick
+        up <code>@oxygenui-design/react</code> automatically through the generated barrel, so the npm
+        channel comes free without a new package.
+      </p>
+      <h4>Why no <code>timeline-core</code> npm package, when <code>tabs-core</code> exists</h4>
+      <p>
+        Because nothing outside React wants it yet. <code>tabs-core</code> and
+        <code>signature-core</code> earned their packages by having a second consumer — a custom
+        element, a testing package. This engine has one consumer today. It lives in
+        <code>lib/</code>, shaped so extraction is a file move rather than a redesign, and it gets its
+        own package the day something else imports it. Shipping a package with one consumer is
+        shipping a public API you have not tested against a second opinion.
+      </p>
+    </div>
+
+    <div class="tw">
+      <table>
+        <thead><tr><th>Budget</th><th>Limit</th><th>Reasoning</th></tr></thead>
+        <tbody>
+          <tr><td><code>timeline-core</code></td><td class="num">4.5 KB gz</td><td>Comparator, grouper, clusterer and two vocabularies. Mostly tables.</td></tr>
+          <tr><td><code>Timeline</code> primitive</td><td class="num">6 KB gz</td><td>An <code>&lt;ol&gt;</code> with a rail. If it grows past this, something clinical has leaked down a layer.</td></tr>
+          <tr><td><code>CareTimeline</code> incl. engine</td><td class="num">15 KB gz</td><td>Between Switch (13 KB) and the copilot. Four layouts and eighteen states.</td></tr>
+          <tr><td><code>timeline-fhir</code></td><td class="num">5 KB gz</td><td>Eleven adapters, tree-shakeable individually.</td></tr>
+          <tr><td>CSS</td><td class="num">2.5 KB gz</td><td>The repository's standing per-component limit. The grid-column rail is what makes it achievable.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="note warn">
+      <span class="lbl">A budget question this raises, again</span>
+      <p>
+        The <code>@oxygenui-design/react</code> barrel is already at a 38 KB limit and this adds two
+        more components to it. The argument in <code>.size-limit.md</code> — that a single barrel
+        number has stopped modelling what a small consumer ships, and should be split per layer or
+        dropped in favour of the per-component entries — gets stronger with every component. Worth
+        settling before this lands rather than after.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section id="tests">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="sec-num">13 — Testing</span>
+      <h2>Assert the safety claim, not the render</h2>
+      <p>
+        Every failure in section 2 looks fine on screen. A suite that checks the component renders
+        would pass on all eighteen.
+      </p>
+    </div>
+
+    <div class="prose">
+      <h3>The eleven that are the point</h3>
+    </div>
+
+<pre><code><span class="c-c">// 1 — the claim the whole component exists to make</span>
+it(<span class="c-s">"names a source that could not be reached, above the fold"</span>, ...);
+it(<span class="c-s">"never renders an empty timeline without saying which kind of empty"</span>, ...);
+it(<span class="c-s">"states the applied filter and the count it hides"</span>, ...);
+it(<span class="c-s">"prints the coverage sentence"</span>, ...);        <span class="c-c">// asserted on the print stylesheet</span>
+
+<span class="c-c">// 2 — the record's own rules</span>
+it(<span class="c-s">"renders an entered-in-error event, struck and marked, and never removes it"</span>, ...);
+it(<span class="c-s">"shows what an amendment changed, not only that it changed"</span>, ...);
+it(<span class="c-s">"says an event exists that the reader may not open, without saying what it is"</span>, ...);
+
+<span class="c-c">// 3 — the invariants that clustering and sorting can break silently</span>
+it(<span class="c-s">"promotes a critical event out of a cluster"</span>, ...);
+it(<span class="c-s">"loses no event across sort, group and cluster"</span>, ...);   <span class="c-c">// property test</span>
+it(<span class="c-s">"orders identical timestamps identically on every render"</span>, ...);
+it(<span class="c-s">"keeps a year-only date a year"</span>, ...);</code></pre>
+
+    <div class="grid g2">
+      <div class="card">
+        <span class="k">Property tests</span>
+        <h4>The pipeline may not lose an event</h4>
+        <p style="font-size:0.92rem;color:var(--ink-2)">
+          Generate n events with mixed precisions, statuses and sources; assert that
+          <em>rendered + clustered + hidden = n</em> for every combination of layout, group and
+          filter. Sort-then-group-then-cluster is three transformations and this is the one thing all
+          three can break without a visible symptom.
+        </p>
+      </div>
+      <div class="card">
+        <span class="k">Parity</span>
+        <h4>An antd rename fails our build, not a customer's</h4>
+        <p style="font-size:0.92rem;color:var(--ink-2)">
+          <code>timeline-parity.test.ts</code> reads antd's own <code>TimelineProps</code> and
+          <code>TimelineItemType</code> from the installed package and asserts our surface matches,
+          deprecations included. Modelled on the existing <code>switch-parity.test.ts</code>. It also
+          pins the <code>mode</code> default discrepancy from section 4 to whichever value the
+          installed version actually produces.
+        </p>
+      </div>
+      <div class="card">
+        <span class="k">Determinism</span>
+        <h4>Nothing reads the wall clock</h4>
+        <p style="font-size:0.92rem;color:var(--ink-2)">
+          <code>now</code> is a prop and a lint rule already forbids the alternative. That is what
+          makes the <em>now</em> divider, the lapsed state and the relative times visually
+          regression-testable at all — every VRT baseline is taken at a frozen instant.
+        </p>
+      </div>
+      <div class="card">
+        <span class="k">Story-derived</span>
+        <h4>Eighteen states, eighteen stories, no exceptions</h4>
+        <p style="font-size:0.92rem;color:var(--ink-2)">
+          <code>pnpm gen --strict</code> fails a beta component whose declared state has no story, and
+          axe runs per story × themes × densities. The declared-state list in
+          <code>meta.ts</code> is therefore a test manifest, not documentation.
+        </p>
+      </div>
+    </div>
+
+    <div class="note">
+      <span class="lbl">The test I would write first</span>
+      <p>
+        <code>it("never lets a hidden event become an invisible one")</code>: render with a filter, a
+        page limit, an access restriction and a failed source all at once — the realistic case, and
+        the one no demo shows — and assert that the rendered text accounts for every one of the
+        43 events in words. It is the single assertion that, if it holds, means the component has
+        done its job.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section id="plan">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="sec-num">14 — The plan</span>
+      <h2>Seven phases, roughly six weeks to beta</h2>
+      <p>
+        Each phase ends green on the full gate — <code>pnpm verify</code> runs every CI check locally
+        in CI order — and each is a reviewable pull request on its own.
+      </p>
+    </div>
+
+    <div class="phases">
+      <div class="phase">
+        <div class="prail"><div class="dot">1</div><div class="pline"></div></div>
+        <div class="body">
+          <div class="meta">~4 days · no UI</div>
+          <h4>The engine</h4>
+          <p style="color:var(--ink-2)">
+            <code>lib/timeline-core.ts</code>: precision-aware comparison and formatting, stable
+            sort, auto grouping, clustering with critical promotion, the coverage prose generator, the
+            two closed vocabularies. Property tests and unit tests only. <strong>Exit:</strong> the
+            pipeline provably loses no event, and <code>describeCoverage()</code> produces a correct
+            sentence for all sixteen combinations of window, sources, filters and order.
+          </p>
+        </div>
+      </div>
+      <div class="phase">
+        <div class="prail"><div class="dot">2</div><div class="pline"></div></div>
+        <div class="body">
+          <div class="meta">~3 days</div>
+          <h4>The primitive and its parity table</h4>
+          <p style="color:var(--ink-2)">
+            <code>Timeline</code> with antd v6's exact surface, plus the required accessible name.
+            <code>timeline-parity.test.ts</code>. Migration note covering the six v5→v6 renames and
+            our three declared divergences. <strong>Exit:</strong> an antd <code>Timeline</code> call
+            site compiles unchanged against ours, and the parity test fails if antd renames anything.
+          </p>
+        </div>
+      </div>
+      <div class="phase">
+        <div class="prail"><div class="dot">3</div><div class="pline"></div></div>
+        <div class="body">
+          <div class="meta">~5 days</div>
+          <h4>CareTimeline, ordinary states</h4>
+          <p style="color:var(--ink-2)">
+            Default layout, the event node, registers, kinds, grouping, sticky headers, the
+            <em>now</em> divider, the coverage footer and its three empty states.
+            <strong>Exit:</strong> the top mockup in section 6 renders from real props, minus the
+            hard states.
+          </p>
+        </div>
+      </div>
+      <div class="phase">
+        <div class="prail"><div class="dot">4</div><div class="pline"></div></div>
+        <div class="body">
+          <div class="meta">~5 days · the actual product</div>
+          <h4>The hard states</h4>
+          <p style="color:var(--ink-2)">
+            Lapsed, cancelled, not-done, amended, corrected, entered-in-error, access states, the
+            failed-source banner, the gap rail, threads, clusters with promotion, the
+            since-last-review divider, late-entry marking. <strong>Exit:</strong> all eleven tests in
+            section 13 pass, and every declared state has a story.
+          </p>
+        </div>
+      </div>
+      <div class="phase">
+        <div class="prail"><div class="dot">5</div><div class="pline"></div></div>
+        <div class="body">
+          <div class="meta">~4 days</div>
+          <h4>FHIR adapters and fixtures</h4>
+          <p style="color:var(--ink-2)">
+            Eleven adapters with the <code>unmapped</code> report. Fixtures in
+            <code>@oxygenui-design/fixtures</code> that over-represent the hard states, as the
+            existing ones do: a lapsed appointment, an amended observation, an entered-in-error
+            encounter, a restricted document, a year-only condition, a cross-zone medication.
+            <strong>Exit:</strong> a <code>$everything</code>-shaped Bundle renders a correct
+            timeline, and nothing is silently dropped.
+          </p>
+        </div>
+      </div>
+      <div class="phase">
+        <div class="prail"><div class="dot">6</div><div class="pline"></div></div>
+        <div class="body">
+          <div class="meta">~5 days</div>
+          <h4>Layouts, a11y, i18n, print</h4>
+          <p style="color:var(--ink-2)">
+            Card, compact and register layouts. Both intl catalogs. RTL with logical properties.
+            Forced-colors, 320 px reflow, 200% zoom, reduced motion, the print stylesheet. VRT
+            baselines at a frozen <code>now</code>. <strong>Exit:</strong> axe clean across themes and
+            densities in three engines; the coverage sentence appears in the print snapshot.
+          </p>
+        </div>
+      </div>
+      <div class="phase">
+        <div class="prail"><div class="dot">7</div><div class="pline"></div></div>
+        <div class="body">
+          <div class="meta">~3 days</div>
+          <h4>Documentation, demo, release</h4>
+          <p style="color:var(--ink-2)">
+            Everything in section 15, plus the ADR, changesets, and size-limit entries.
+            <strong>Exit:</strong> <code>pnpm gen --strict</code> green, both components at
+            <code>beta</code>, docs page live with every state previewed.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="note ok">
+      <span class="lbl">Sequencing note</span>
+      <p>
+        Phases 1 and 2 are independent and could run in parallel. Phase 4 is where the value is and it
+        is the phase most likely to overrun — if something has to be cut to hold six weeks, cut the
+        <code>register</code> layout from phase 6, not a state from phase 4. A missing layout is a
+        gap; a missing state is a component that renders something false.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section id="docs">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="sec-num">15 — Documentation &amp; demo</span>
+      <h2>What ships alongside the code, and who writes each piece</h2>
+      <p>
+        Most of the documentation is generated. The parts that are not are the parts carrying the
+        argument — and those are the ones a prop table can never contain.
+      </p>
+    </div>
+
+    <h3>Generated, from <code>meta.ts</code> and the types</h3>
+    <p class="prose">
+      Editing a <code>*.meta.ts</code> and running <code>pnpm gen</code> is the whole mechanism: the
+      registry manifest, the docs catalog and its prop tables, path mappings, the Tailwind source
+      list, and the agent manifest all fall out of it. Prop documentation is extracted from the
+      TypeScript types and must never be written by hand.
+    </p>
+
+<pre><code><span class="c-c">// registry/oxygen/care-timeline/care-timeline.meta.ts — the fields that carry judgement</span>
+<span class="c-k">export default</span> defineComponentMeta({
+  name: <span class="c-s">"care-timeline"</span>,
+  title: <span class="c-s">"Care Timeline"</span>,
+  tier: <span class="c-s">"free"</span>,
+  status: <span class="c-s">"experimental"</span>,
+  layer: <span class="c-s">"clinical"</span>,
+  categories: [<span class="c-s">"Clinical"</span>, <span class="c-s">"Data display"</span>],
+  fhir: [<span class="c-s">"Encounter"</span>, <span class="c-s">"Appointment"</span>, <span class="c-s">"Communication"</span>, <span class="c-s">"Observation"</span>,
+         <span class="c-s">"DocumentReference"</span>, <span class="c-s">"QuestionnaireResponse"</span>, <span class="c-s">"Procedure"</span>,
+         <span class="c-s">"MedicationRequest"</span>, <span class="c-s">"Immunization"</span>, <span class="c-s">"Consent"</span>, <span class="c-s">"Provenance"</span>],
+
+  <span class="c-c">// 18 declared states. Each one is a story, a test and a screenshot.</span>
+  states: [
+    <span class="c-s">"Newest first, grouped by month"</span>,
+    <span class="c-s">"Planned, above the now marker"</span>,
+    <span class="c-s">"Lapsed — planned, and nothing recorded against it"</span>,
+    <span class="c-s">"Cancelled"</span>,
+    <span class="c-s">"Attempted and did not connect"</span>,
+    <span class="c-s">"Amended, with what changed"</span>,
+    <span class="c-s">"Entered in error, retained and struck"</span>,
+    <span class="c-s">"Restricted — it exists and you may not read it"</span>,
+    <span class="c-s">"Consent-gated"</span>,
+    <span class="c-s">"A thread with its own steps"</span>,
+    <span class="c-s">"A cluster, and a critical event promoted out of one"</span>,
+    <span class="c-s">"A stated gap in coverage"</span>,
+    <span class="c-s">"A source that could not be reached"</span>,
+    <span class="c-s">"Filtered, with the hidden count stated"</span>,
+    <span class="c-s">"New since last reviewed"</span>,
+    <span class="c-s">"An imprecise date, kept imprecise"</span>,
+    <span class="c-s">"No record · none in this window · none you may see"</span>,
+    <span class="c-s">"Patient-facing, with a result not yet reviewed"</span>,
+  ],
+
+  guidance: {
+    use: [<span class="c-c">/* … */</span>],
+    avoid: [
+      <span class="c-s">"As the only view of a record. It is a chronology, not an index — a reader looking for the current medication list should not have to scroll a year of events to build one."</span>,
+      <span class="c-s">"For a single resource's own history. That is a version list, and it wants a different component."</span>,
+      <span class="c-s">"Anywhere the coverage genuinely cannot be described. If you do not know what you searched, the honest render is an error state, not a timeline."</span>,
+    ],
+  },
+
+  limitations: [
+    <span class="c-s">"coverage reports what this query reached, not what exists. A source that answers with an incomplete record is reported as reached."</span>,
+    <span class="c-s">"No swimlane layout. Designed and deferred — see the brief."</span>,
+    <span class="c-s">"Duration events render at their start. A period is not a point, and bands are not in v1."</span>,
+    <span class="c-s">"Dates are rendered by @oxygenui-design/intl at the record's precision; a second formatter here would guarantee the two disagree."</span>,
+    <span class="c-s">"role=\"feed\" is opt-in and unverified against a screen-reader matrix."</span>,
+  ],
+  related: [<span class="c-s">"timeline"</span>, <span class="c-s">"chart-accordion"</span>, <span class="c-s">"clinical-note"</span>, <span class="c-s">"patient-banner"</span>],
+});</code></pre>
+
+    <h3>Hand-written, because it cannot be derived</h3>
+    <div class="feat">
+      <div>
+        <div class="n">01</div>
+        <div>
+          <div class="t">ADR 0011 — a component that summarises a set declares the set's boundaries</div>
+          <div class="d">
+            This is an architecture decision, not a component one: the same rule will bind the
+            worklist, the results list, and the medication list when they are built. Writing it as an
+            ADR now means the next component inherits the argument instead of re-deriving it — and it
+            is the record of why a required prop was worth annoying people over.
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="n">02</div>
+        <div>
+          <div class="t">A migration note for antd <code>Timeline</code> users</div>
+          <div class="d">
+            The six v5→v6 renames, our three declared divergences, and — stated plainly — that we do
+            not reproduce the dotted last-item rail, with the reason. Someone will notice the visual
+            difference and file it as a bug; this note is the answer.
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="n">03</div>
+        <div>
+          <div class="t">A page on reading a timeline safely</div>
+          <div class="d">
+            Under <code>content/</code>, addressed to the implementer rather than the clinician:
+            what <code>coverage</code> can and cannot promise, how to populate it from a real
+            multi-source query, and why a timed-out source has to reach the component rather than
+            being swallowed by the data layer. The most common way to defeat this component is to
+            catch the error upstream.
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="n">04</div>
+        <div>
+          <div class="t">A <code>CONTENT.md</code> addition — the coverage sentence's grammar</div>
+          <div class="d">
+            The sentence is composed, not authored, so its templates are clinical copy and belong
+            under the existing content rules: absence is stated rather than punctuated, and both
+            catalogs — clinician and patient — get their own phrasings rather than one tone-shifted
+            string.
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="n">05</div>
+        <div>
+          <div class="t">Prop tables — none, written by hand</div>
+          <div class="d">
+            Extracted from the types. A prop table is read as a contract and one that has silently
+            drifted is worse than none. Listed here only so it is explicit that the omission is
+            policy.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <h3>The demo</h3>
+    <p class="prose">
+      Three artefacts, each aimed at a different reader. The stories are the gate; the showcase is the
+      argument; the comparison is the pitch.
+    </p>
+
+    <div class="grid g3">
+      <div class="card">
+        <span class="k">Demo 1 · the gate</span>
+        <h4>Eighteen stories, one per declared state</h4>
+        <p style="font-size:0.92rem;color:var(--ink-2)">
+          Written once and reused as docs preview, VRT baseline, axe fixture and interaction test —
+          the repository's story-derived testing decision. Each story is a chart a clinician would
+          actually meet, and the fixtures over-represent the hard states rather than the happy path.
+        </p>
+      </div>
+      <div class="card">
+        <span class="k">Demo 2 · the argument</span>
+        <h4>Ada Lovelace, fourteen months, two sources, live controls</h4>
+        <p style="font-size:0.92rem;color:var(--ink-2)">
+          A showcase page with 43 events and real controls: layout, density, group, register filter,
+          audience, order — and one toggle marked <strong>"break the exchange"</strong> that flips the
+          second source to <code>unavailable</code>. Watching the footer sentence and the banner change
+          in front of you is the entire product demonstrated in four seconds, and it needs no
+          narration.
+        </p>
+      </div>
+      <div class="card">
+        <span class="k">Demo 3 · the pitch</span>
+        <h4>The same five events, both ways</h4>
+        <p style="font-size:0.92rem;color:var(--ink-2)">
+          The reference card beside <code>layout="card"</code>, identical width, identical density,
+          identical data — with the four differences called out. It answers "why not just build the
+          nice-looking one" faster than any paragraph, and it is the screenshot that goes on the docs
+          index.
+        </p>
+      </div>
+    </div>
+
+    <div class="tw">
+      <table>
+        <thead><tr><th>Also shipping</th><th>Where</th><th>Gate</th></tr></thead>
+        <tbody>
+          <tr><td>Install command, source link, related components</td><td>Docs page</td><td>Generated from meta</td></tr>
+          <tr><td>Keyboard map</td><td>Docs page</td><td>Required for an interactive component</td></tr>
+          <tr><td>i18n notes — two catalogs, RTL, precision</td><td>Docs page</td><td>Required</td></tr>
+          <tr><td>Screenshots in both themes</td><td>PR + docs</td><td>Reviewed VRT baselines</td></tr>
+          <tr><td>Changesets for every published package touched</td><td><code>.changeset/</code></td><td>Tested by <code>changesets.test.ts</code></td></tr>
+          <tr><td>Size-limit entries for both components</td><td><code>.size-limit.json</code></td><td>Blocking</td></tr>
+          <tr><td>e2e: 320 px reflow, forced colours, print</td><td><code>e2e/</code></td><td>Three engines</td></tr>
+          <tr><td><code>api.md</code></td><td>Component dir</td><td>Only at <code>stable</code> — not in this scope</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section id="decide">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="sec-num">16 — Decide</span>
+      <h2>Five decisions, and one thing I would argue about</h2>
+      <p>
+        Recommendations attached. If you say nothing, I will build the recommendation and record it
+        here, as with the previous components.
+      </p>
+    </div>
+
+    <div class="feat">
+      <div>
+        <div class="n">01</div>
+        <div>
+          <div class="t">The name — <code>CareTimeline</code></div>
+          <div class="d">
+            <strong>Recommended.</strong> "Care" spans the registers the component actually carries;
+            two of the five are not chart material at all. Runners-up and why they lost:
+            <code>ChartTimeline</code> pairs beautifully with <code>ChartAccordion</code> but claims
+            the events are all in the chart, which is the exact conflation finding 8 is about;
+            <code>PatientTimeline</code> matches the reference label and reads as though it belongs to
+            the identity family, which owns the <code>Patient*</code> prefix for a different purpose;
+            <code>Chronology</code> is the real medico-legal instrument and is opaque to everyone who
+            has not built one. The primitive is <code>Timeline</code>, which is not negotiable — it
+            has to match antd's name to be a drop-in.
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="n">02</div>
+        <div>
+          <div class="t">Is <code>coverage</code> genuinely required?</div>
+          <div class="d">
+            <strong>Recommended: yes.</strong> This is the decision that makes the component worth
+            building, and it is the one that will generate complaints — every other timeline in the
+            world takes an array and renders it. The escape hatch is honest and cheap:
+            <code>coverage={{ sources: [{ id: "app", label: "This application", status: "ok" }], order: "newest-first" }}</code>
+            is four lines and it is <em>true</em>. If you would rather it were optional with a warning,
+            say so now, because half the design follows from this answer.
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="n">03</div>
+        <div>
+          <div class="t">Free, or Pro?</div>
+          <div class="d">
+            <strong>Recommended: free, both items.</strong> Consistent with the calls already made —
+            <code>tier: "pro"</code> keeps an item out of the public registry entirely, and the
+            registry is the adoption engine. If anything here ever becomes Pro it should be the
+            swimlane chronology view, which is a specialist workflow with a specialist buyer, not the
+            timeline itself.
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="n">04</div>
+        <div>
+          <div class="t">Do the FHIR adapters ship in v1?</div>
+          <div class="d">
+            <strong>Recommended: yes, phase 5.</strong> They are the reason to choose this over a
+            styled list, and without them every evaluator writes their own mapping and gets
+            <code>entered-in-error</code> wrong. The cost is four days and a real maintenance surface
+            as FHIR resources evolve. The alternative — ship the event model in v1, adapters in v2 —
+            is defensible and I do not prefer it.
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="n">05</div>
+        <div>
+          <div class="t">Does <code>audience="patient"</code> belong on this component?</div>
+          <div class="d">
+            <strong>Recommended: yes, as a catalog switch.</strong> The repository's rule is that
+            patient-facing and clinician-facing strings are different catalogs, not different tones,
+            and a prop that selects the catalog honours that. The counter-argument is Consult's
+            precedent, where a patient-facing product was ruled a separate package with a different
+            name — but that was about a different <em>surface</em> and a different risk model. Here it
+            is the same list of the same events with different words, and splitting the package would
+            duplicate eighteen states to change a string table.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <h3>Ten things the build changed about this brief</h3>
+    <p class="prose">
+      Written after the fact, because a design document that quietly matches the code it produced is
+      a document nobody re-read. Each of these was decided at the keyboard.
+    </p>
+
+    <div class="tw">
+      <table>
+        <thead><tr><th>The brief said</th><th>The code does</th><th>Why</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>Coverage gaps are drawn where a source failed.</td>
+            <td><code>coverage.gaps</code> — declared by the caller, placed by the engine.</td>
+            <td>Inferring "records may be missing" from eleven quiet weeks is the component inventing a claim. Placement runs over the whole ordered list rather than inside a group, because the interesting gaps are exactly the ones that span a month boundary.</td>
+          </tr>
+          <tr>
+            <td>Filtering is the host's job.</td>
+            <td><code>registers</code> / <code>defaultRegisters</code> / <code>onRegistersChange</code>, and the component folds the filter's cost into the sentence.</td>
+            <td>A filter that hides five events and says so only inside its own popover — usually off screen — has not said so. Owning the filter is the only way to own that number.</td>
+          </tr>
+          <tr>
+            <td>Eleven FHIR adapters.</td>
+            <td>Thirteen, in their own registry item (<code>timeline-fhir</code>).</td>
+            <td><code>Task</code> and <code>Condition</code> were already typed and cost four lines each. Separating the item keeps the FHIR dependency off anyone installing only the primitive.</td>
+          </tr>
+          <tr>
+            <td>The adapters read <code>@oxygenui-design/fhir</code>.</td>
+            <td>They do — after seven resource interfaces were added to it.</td>
+            <td><code>Encounter</code>, <code>Communication</code>, <code>DiagnosticReport</code>, <code>Procedure</code>, <code>Immunization</code>, <code>QuestionnaireResponse</code> and <code>Task</code> did not exist. Each union is written out rather than typed as <code>string</code>, so <code>entered-in-error</code> is nameable.</td>
+          </tr>
+          <tr>
+            <td>Dates are formatted by <code>@oxygenui-design/intl</code>.</td>
+            <td><code>formatFhirDateTime</code> lives in the engine; the two catalogs are objects, like the accordion's.</td>
+            <td>The intl package has no catalog yet, and inventing one for this component is the point at which changing a word becomes a breaking change. The limitation is restated honestly in <code>meta</code>.</td>
+          </tr>
+          <tr>
+            <td>"recorded 6 days after it happened".</td>
+            <td>"recorded 18 Aug 2026".</td>
+            <td>A date is a fact the record holds. A humanised duration needs a unit vocabulary in every catalog, and it is an adjective the record did not write.</td>
+          </tr>
+          <tr>
+            <td>—</td>
+            <td>The props extractor learned <code>Object.assign(Root, { Item })</code>.</td>
+            <td><code>Timeline</code> documented zero props on merge — the same failure the extractor was written to end, in the compound-component shape antd uses. Fixed there rather than by contorting the export.</td>
+          </tr>
+          <tr>
+            <td>Primitive ≤ 6 KB; barrel unmentioned.</td>
+            <td>Primitive 8 KB; barrel raised 38 → 45 KB.</td>
+            <td><code>Timeline</code> measures 7.17 KB and six of those are <code>tailwind-merge</code> reached through <code>cn</code> — the accordion's finding, again. The barrel raise is the third; <code>.size-limit.md</code> now says plainly that the number has stopped modelling anything.</td>
+          </tr>
+          <tr>
+            <td><code>role="feed"</code> opt-in behind a prop.</td>
+            <td>Not shipped in any form.</td>
+            <td>A prop nobody can safely turn on is an API surface with no behaviour behind it. It goes in when the screen-reader matrix exists, and <code>limitations</code> says so.</td>
+          </tr>
+          <tr>
+            <td>—</td>
+            <td>Four entries added to the docs app's hand-kept <code>paths</code>.</td>
+            <td>The exact drift its own comment warns about, caught by <code>typecheck</code> rather than by a reader noticing a preview was missing.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>What the review pass found</h3>
+    <p class="prose">
+      Every gate was green and the component was wrong in six places. Recorded here rather than
+      quietly fixed, because the pattern in the first three is the same one and it is worth naming:
+      <strong>a test that asserts a class name passes while the class does nothing.</strong>
+    </p>
+
+    <div class="feat">
+      <div>
+        <div class="n">01</div>
+        <div>
+          <div class="t"><code>layout="register"</code> rendered a class and nothing else</div>
+          <div class="d">
+            The stylesheet targeted <code>.ox-care-timeline__columns</code>; the component never
+            rendered one. So the promised two-column split was a no-op — and the test passed,
+            because it asserted <code>[data-ox-layout="register"]</code> and the presence of the
+            coverage sentence, both of which were true. The replacement asserts that an encounter is
+            in the clinical column and a phone call is not, and that the split loses no rows.
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="n">02</div>
+        <div>
+          <div class="t">The stylesheet was never imported by the docs site</div>
+          <div class="d">
+            Written, wired into the registry item, concatenated into the published package — and
+            missing one <code>@import</code> in <code>globals.css</code>. Both pages shipped a
+            chronology with no rail, no dashed gap and no column split. Nothing caught it: axe does
+            not check styling and jsdom applies no CSS at all. Found by looking at the page.
+            <code>test/docs-stylesheets.test.ts</code> now fails when a registry stylesheet is not
+            loaded by the docs, not emitted into the React package, or has no owner in the
+            class-namespace check — and adding that third assertion revealed that
+            <code>loader.css</code> and <code>switch.css</code> had no owner either.
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="n">03</div>
+        <div>
+          <div class="t">Two browser tests skipped on every run</div>
+          <div class="d">
+            Both guarded with <code>test.skip</code> when their fixture was absent, and the fixture
+            was always absent because the docs page shows one scenario at a time. Playwright reports
+            a skip as not-a-failure. This repository's own config carries a paragraph about exactly
+            this. They now select the scenario; there is nothing to skip.
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="n">04</div>
+        <div>
+          <div class="t">A year-only date was headed "January 2019"</div>
+          <div class="d">
+            The group key came from the value's lower bound, so a FHIR <code>2019</code> landed in a
+            month bucket — inventing a January in exactly the place the component refuses to invent
+            one on the event itself. A bucket may now never be finer than the record's own
+            precision.
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="n">05</div>
+        <div>
+          <div class="t">An ungrouped card was headed "All"</div>
+          <div class="d">
+            A heading that says nothing is still a heading in the outline a screen-reader user
+            navigates by. Sections now carry <code>titled</code>, and the one produced by
+            <code>group="none"</code> is not.
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="n">06</div>
+        <div>
+          <div class="t">Four v1 features from §5 were simply not built</div>
+          <div class="d">
+            Jump-to-date (44), the arrivals live region (49), the kind filter (42), and the
+            provenance attribution on patient-reported events (39). All four are in now, with tests.
+            The live region announces the event's own words rather than a count, because "3 new
+            items" is a notification and the point of a live region on a chart is that a result
+            announces itself.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="note warn">
+      <span class="lbl">One thing still not fixed</span>
+      <p>
+        <code>e2e/signature.spec.ts</code>'s keyboard test flakes in Firefox under parallel load —
+        it failed once in a full <code>e2e:ci</code> run and passed three times out of three in
+        isolation. It is untouched by this work and pre-dates it, so it is reported rather than
+        chased.
+      </p>
+    </div>
+
+    <div class="note bad">
+      <span class="lbl">And one thing I would push back on, if you disagree</span>
+      <p>
+        If the ask is to ship the reference card as drawn — five entries, "See All", no coverage line
+        — I would build everything else and still refuse that one. Not because the card is bad; it is
+        the right shape and <code>layout="card"</code> exists to serve it. But a five-item window onto
+        an unstated whole, on a clinical surface, is the single defect this library was founded to
+        make unwritable, and the fix costs one line of text at the bottom of a card. Every other
+        recommendation in this document is negotiable. That one I would want to lose an argument
+        about rather than concede quietly.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section id="sources">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="sec-num">Appendix — Sources</span>
+      <h2>Where the external claims came from</h2>
+      <p>
+        Everything about antd was measured from the installed package rather than read. Everything
+        else is cited below so a reviewer can disagree with the source rather than with me.
+      </p>
+    </div>
+    <div class="tw">
+      <table>
+        <thead><tr><th>Claim</th><th>Section</th><th>Source</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>13.6% of primary-care consultations proceed with clinical information missing, adversely affecting care in about half</td>
+            <td>1</td>
+            <td><a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3118108/">Missing clinical information in NHS hospital outpatient clinics — prevalence, causes and effects on patient care</a></td>
+          </tr>
+          <tr>
+            <td>Records missing or incomplete for 27% of patients on admission; unnecessary procedures in 5%</td>
+            <td>1</td>
+            <td><a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC11546321/">Missing medical data in neurological emergency care compromise patient safety and healthcare resources</a></td>
+          </tr>
+          <tr>
+            <td>"Informative missingness" — a NULL read as a negative</td>
+            <td>1</td>
+            <td><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC4371484/">Strategies for handling missing data in EHR-derived data</a> · <a href="https://www.sciencedirect.com/science/article/pii/S1532046423000278">Informative missingness in the EHR</a></td>
+          </tr>
+          <tr>
+            <td>An erroneous record is retained and marked, never deleted</td>
+            <td>2, 11</td>
+            <td><a href="https://www.hl7.org/fhir/lifecycle.html">FHIR — Resource lifecycle and status management</a></td>
+          </tr>
+          <tr>
+            <td>Appointment records planned activity; Encounter records what occurred</td>
+            <td>1, 11</td>
+            <td><a href="https://www.hl7.org/fhir/encounter.html">FHIR R4 — Encounter</a> · <a href="https://hl7.org/fhir/R4/patient.html">Patient, and the resources that reference it</a></td>
+          </tr>
+          <tr>
+            <td>Information-blocking rules applicable to providers from 5 April 2021; results reach patients in parallel with the ordering clinician</td>
+            <td>3, 11</td>
+            <td><a href="https://www.opennotes.org/onc-federal-rule/">OpenNotes — the ONC federal rule</a> · <a href="https://pubmed.ncbi.nlm.nih.gov/37403329/">Patient-before-clinician review of immediately released results</a></td>
+          </tr>
+          <tr>
+            <td>Safari drops list semantics when <code>list-style: none</code> is applied; <code>role="list"</code> is the accepted fix</td>
+            <td>9</td>
+            <td><a href="https://www.scottohara.me/blog/2019/01/12/lists-and-safari.html">Scott O'Hara — "Fixing" lists</a> · <a href="https://www.matuzo.at/blog/2023/removing-list-styles-without-affecting-semantics">Matuzović — removing list styles without affecting semantics</a></td>
+          </tr>
+          <tr>
+            <td>The feed pattern is a structure rather than a widget, and its example has not reached task-force consensus</td>
+            <td>5, 9</td>
+            <td><a href="https://www.w3.org/WAI/ARIA/apg/patterns/feed/examples/feed/">WAI-ARIA APG — infinite scrolling feed example</a> · <a href="https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Reference/Roles/feed_role">MDN — the feed role</a></td>
+          </tr>
+          <tr>
+            <td>Timeline is an adapter over Steps; <code>current</code> hardcoded; dotted process rail; no ARIA; six v5→v6 renames</td>
+            <td>4</td>
+            <td>Measured from <code>antd@6.6.0</code> (<code>es/timeline/Timeline.js</code>, <code>es/timeline/Timeline.d.ts</code>, <code>es/timeline/style/index.js</code>) and <code>@rc-component/steps@1.2.2</code> (<code>es/Steps.js</code>), as installed in this workspace. Cross-read against <a href="https://ant.design/components/timeline">ant.design/components/timeline</a>, which disagrees on the <code>mode</code> default and on the rendered element.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div>
+      <strong>Oxygen UI — CareTimeline brief.</strong> Drafted 18 August 2026, and built the same
+      day. This document is the argument; the code is in the worktree, uncommitted, with every CI
+      gate green. Where the two disagree, the code is the record — the notable divergences are
+      listed in §16.
+    </div>
+    <div>
+      antd findings measured against <code>antd@6.6.0</code> and
+      <code>@rc-component/steps@1.2.2</code> as installed in this workspace, from source rather than
+      from the documentation site, which disagrees with it in at least one place noted in section 4.
+    </div>
+    <div>
+      All data on this page is synthetic. Names, identifiers, dates and results are invented and no
+      patient information of any kind appears in this repository.
+    </div>
+  </div>
+</footer>

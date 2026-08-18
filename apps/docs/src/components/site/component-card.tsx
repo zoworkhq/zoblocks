@@ -40,6 +40,12 @@ import {
 } from "@/registry/oxygen/chart-accordion/chart-accordion";
 import type { AccordionItem } from "@/registry/oxygen/lib/accordion-core";
 import { SafetyPlan } from "@/registry/oxygen/safety-plan/safety-plan";
+import { Timeline } from "@/registry/oxygen/timeline/timeline";
+import { CareTimeline } from "@/registry/oxygen/care-timeline/care-timeline";
+import {
+  EVENTS as TIMELINE_EVENTS,
+  NOW as TIMELINE_NOW,
+} from "@/registry/oxygen/care-timeline/care-timeline.fixtures";
 import { Tabs } from "@oxygenui-design/tabs";
 import { Copilot } from "@/registry/oxygen/copilot/copilot";
 import { createStaticProvider, lookUp, minimalDisclosure } from "@oxygenui-design/copilot-core";
@@ -187,6 +193,8 @@ const PREVIEW: Record<string, (featured: boolean) => React.ReactNode> = {
   accordion: (featured) => <AccordionArt featured={featured} />,
   "chart-accordion": (featured) => <ChartAccordionArt featured={featured} />,
   "safety-plan": (featured) => <SafetyPlanArt featured={featured} />,
+  timeline: (featured) => <TimelineArt featured={featured} />,
+  "care-timeline": (featured) => <CareTimelineArt featured={featured} />,
 
   /*
    * Two rows rather than seven, and the two that carry the argument: the same
@@ -222,6 +230,66 @@ const PREVIEW: Record<string, (featured: boolean) => React.ReactNode> = {
     </ScaledArt>
   ),
 };
+
+/**
+ * The rail, at card scale.
+ *
+ * Three nodes rather than ten. The honest thumbnail of a timeline is a shorter
+ * timeline, not a picture of one.
+ */
+function TimelineArt({ featured }: { featured: boolean }) {
+  return (
+    <ScaledArt scale={featured ? 0.95 : 0.84}>
+      <div className="w-full" style={{ maxWidth: 260 }}>
+        <Timeline
+          aria-label="Release history"
+          items={[
+            { key: "a", title: "0.4.0", content: "Timeline." },
+            { key: "b", title: "0.3.0", content: "Switch, Tabs." },
+            { key: "c", title: "0.2.0", content: "Signature." },
+          ]}
+        />
+      </div>
+    </ScaledArt>
+  );
+}
+
+/**
+ * Three events and the sentence.
+ *
+ * The card deliberately shows the degraded state rather than the healthy one:
+ * a timeline that renders cleanly is what every library ships, and the argument
+ * for this one is the line at the bottom saying which source did not answer.
+ */
+function CareTimelineArt({ featured }: { featured: boolean }) {
+  return (
+    <ScaledArt scale={featured ? 0.88 : 0.74}>
+      <div className="w-full" style={{ maxWidth: 320 }}>
+        <CareTimeline
+          aria-label="Patient timeline"
+          events={TIMELINE_EVENTS.slice(2, 6)}
+          now={TIMELINE_NOW}
+          layout="card"
+          limit={3}
+          localeTag="en-GB"
+          coverage={{
+            order: "newest-first",
+            total: 43,
+            sources: [
+              { id: "ehr", label: "Northside EHR", status: "ok" },
+              {
+                id: "hie",
+                label: "Regional exchange",
+                status: "unavailable",
+                detail: "Timed out.",
+              },
+            ],
+          }}
+        />
+      </div>
+    </ScaledArt>
+  );
+}
 
 /**
  * A fixed clock.

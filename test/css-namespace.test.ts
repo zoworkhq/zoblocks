@@ -39,8 +39,11 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const SHEETS: ReadonlyArray<{ owner: string; file: string }> = [
   { owner: "identity", file: "packages/identity/src/styles.css" },
   { owner: "tabs", file: "packages/tabs/src/styles.css" },
+  { owner: "react/loader", file: "packages/react/src/styles/loader.css" },
+  { owner: "react/switch", file: "packages/react/src/styles/switch.css" },
   { owner: "react/accordion", file: "packages/react/src/styles/accordion.css" },
   { owner: "react/clinical-note", file: "packages/react/src/styles/clinical-note.css" },
+  { owner: "react/timeline", file: "packages/react/src/styles/timeline.css" },
 ];
 
 /**

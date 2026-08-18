@@ -14,6 +14,7 @@ export { cn } from "./lib/utils";
 
 export * from "./components/accordion/accordion";
 export * from "./components/breath-loader/breath-loader";
+export * from "./components/care-timeline/care-timeline";
 export * from "./components/chart-accordion/chart-accordion";
 export * from "./components/copilot/copilot";
 export * from "./components/helix-loader/helix-loader";
@@ -22,3 +23,4 @@ export * from "./components/pulse-loader/pulse-loader";
 export * from "./components/rhythm-loader/rhythm-loader";
 export * from "./components/safety-plan/safety-plan";
 export * from "./components/switch/switch";
+export * from "./components/timeline/timeline";
