@@ -24,8 +24,8 @@
       "@/components/oxygen/clinical-note": [
         "./registry/oxygen/clinical-note/clinical-note.tsx"
       ],
-      "@/components/oxygen/consult": [
-        "./registry/oxygen/consult/consult.tsx"
+      "@/components/oxygen/copilot": [
+        "./registry/oxygen/copilot/copilot.tsx"
       ],
       "@/components/oxygen/helix-loader": [
         "./registry/oxygen/helix-loader/helix-loader.tsx"

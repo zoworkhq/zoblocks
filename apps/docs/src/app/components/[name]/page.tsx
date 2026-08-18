@@ -8,6 +8,7 @@ import { CATALOG, STATUS_LABEL, getComponent } from "@/lib/catalog";
 import { SiteFooter, SiteHeader } from "@/components/site/chrome";
 import { ComponentPreview } from "@/components/site/component-preview";
 import { TabsGallery } from "@/components/site/tabs-gallery";
+import { CopilotGallery } from "@/components/site/copilot-gallery";
 import { SwitchGallery } from "@/components/site/switch-gallery";
 import { InstallCommand, RevealRoot } from "@/components/site/interactions";
 import { SectionRail, type RailSection } from "@/components/site/section-rail";
@@ -235,12 +236,36 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
             clipped last label as if that were the design rather than the demo
             being too small to hold it.
           */}
+
           {component.name === "tabs" && (
             <div className="mx-auto max-w-[92rem] px-5 pb-[clamp(2.75rem,5vw,4.5rem)] sm:px-8">
               <div data-reveal>
                 <SectionHeading eyebrow="Gallery" title="Every variant, mode and state — live." />
                 <div className="mt-8">
                   <TabsGallery />
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/*
+            Copilot earns one for the opposite reason to Tabs. Tabs needs a
+            gallery because one strip cannot show that eleven skins share a
+            keyboard model. Copilot needs one because the scenario switcher
+            above shows a chat surface, and a chat surface is the least
+            interesting thing in the package — the mode contract, the pipeline
+            order, the fence and the crisis classifier are the product, and
+            none of them is visible in a screenshot of a text field.
+          */}
+          {component.name === "copilot" && (
+            <div className="mx-auto max-w-[92rem] px-5 pb-[clamp(2.75rem,5vw,4.5rem)] sm:px-8">
+              <div data-reveal>
+                <SectionHeading
+                  eyebrow="Under the surface"
+                  title="The part that is not a chat box."
+                />
+                <div className="mt-8">
+                  <CopilotGallery />
                 </div>
               </div>
             </div>

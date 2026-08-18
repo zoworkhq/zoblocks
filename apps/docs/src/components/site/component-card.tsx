@@ -41,8 +41,8 @@ import {
 import type { AccordionItem } from "@/registry/oxygen/lib/accordion-core";
 import { SafetyPlan } from "@/registry/oxygen/safety-plan/safety-plan";
 import { Tabs } from "@oxygenui-design/tabs";
-import { Consult } from "@/registry/oxygen/consult/consult";
-import { createStaticProvider, lookUp, minimalDisclosure } from "@oxygenui-design/consult-core";
+import { Copilot } from "@/registry/oxygen/copilot/copilot";
+import { createStaticProvider, lookUp, minimalDisclosure } from "@oxygenui-design/copilot-core";
 import { SignatureMark } from "@/components/site/signature-mark";
 import { IdentityProvider, PatientChip, IdentitySet } from "@oxygenui-design/identity";
 import { STATUS_LABEL, type ComponentDoc } from "@/lib/catalog";
@@ -202,10 +202,24 @@ const PREVIEW: Record<string, (featured: boolean) => React.ReactNode> = {
    * page instead of in the cell. The provider is scripted and never asked for
    * anything here — a card is not a place to start a model session.
    */
-  consult: (featured) => (
-    <div className="w-full" style={{ maxWidth: featured ? 340 : 280 }}>
-      <Consult provider={CARD_CONSULT_PROVIDER} modes={[lookUp]} anchor="inline" locale="en-GB" />
-    </div>
+  copilot: (featured) => (
+    /*
+     * Scaled rather than squeezed. The dock carries six controls — shortcut
+     * glyph, field, mode chip, mic, send, and the scope strip above it — and at
+     * a 280px card width they collide: the placeholder truncates mid-word and
+     * the chip sits on top of the field. That is a picture of a broken
+     * component, which is the one thing card art must never be.
+     *
+     * So it renders at the width it was designed for and scales down, the same
+     * trick the identity card uses. The card still shows the real component
+     * rather than an illustration of it, which is the point of driving these
+     * previews live at all.
+     */
+    <ScaledArt scale={featured ? 0.92 : 0.78}>
+      <div className="w-full" style={{ maxWidth: 420 }}>
+        <Copilot provider={CARD_COPILOT_PROVIDER} modes={[lookUp]} anchor="inline" locale="en-GB" />
+      </div>
+    </ScaledArt>
   ),
 };
 
@@ -252,7 +266,7 @@ function IdentityArt({ featured }: { featured: boolean }) {
   );
 }
 
-const CARD_CONSULT_PROVIDER = createStaticProvider({
+const CARD_COPILOT_PROVIDER = createStaticProvider({
   events: [{ type: "done", finish: "stop" }],
   disclosure: minimalDisclosure("demo-model@1", {
     developer: "Zowork",

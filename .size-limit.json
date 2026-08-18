@@ -98,10 +98,17 @@
     "limit": "6 KB"
   },
   {
-    "name": "react — consult alone (pattern layer: pulls consult-core and consult-react)",
-    "path": "packages/react/dist/components/consult/consult.js",
-    "import": "{ Consult }",
-    "limit": "22 KB",
+    "name": "react — copilot alone (pattern layer: pulls copilot-core and copilot-react)",
+    "path": "packages/react/dist/components/copilot/copilot.js",
+    "import": "{ Copilot }",
+    "limit": "24 KB",
+    "ignore": ["react", "react-dom"]
+  },
+  {
+    "name": "react — clinical note (subpath: pulls the ProseMirror view layer)",
+    "path": "packages/react/dist/components/clinical-note/clinical-note.js",
+    "import": "{ ClinicalNote }",
+    "limit": "75 KB",
     "ignore": ["react", "react-dom"]
   },
   {

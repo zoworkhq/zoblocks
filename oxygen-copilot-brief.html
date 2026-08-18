@@ -1,0 +1,2827 @@
+<meta charset="utf-8" />
+<title>Oxygen Copilot</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<style>
+  /* ================================================================== */
+  /* Document tokens — Oxygen's own identity, matching the Signature     */
+  /* and Page Loader briefs so the set reads as one series.              */
+  /*                                                                     */
+  /* The mockups in §5 deliberately do NOT use these. They reproduce the */
+  /* cream-and-plum palette from Rahul's screenshots, so what is being   */
+  /* judged is the actual design, not a teal impression of it.           */
+  /* ================================================================== */
+  :root {
+    --paper: #f6faf8;
+    --surface: #ffffff;
+    --surface-2: #eef4f2;
+    --surface-3: #e5eeeb;
+    --ink: #0e1c19;
+    --ink-2: #33473f;
+    --muted: #5d716b;
+    --rule: #d8e4df;
+    --rule-2: #c3d3cd;
+    --accent: #059478;
+    --accent-2: #0bb08f;
+    --accent-soft: #e6f7f1;
+    --accent-ink: #045b4b;
+    --stage: #0b1716;
+    --stage-2: #10201e;
+    --stage-fg: #dff3ec;
+    --stage-muted: #7f9c94;
+    --stage-rule: #1c3230;
+    --warn: #b7791f;
+    --warn-soft: #fbf3e0;
+    --warn-rule: #e4c98a;
+    --bad: #b4423a;
+    --bad-soft: #fbeceb;
+    --bad-rule: #e8b5b0;
+    --ok: #1f8f5f;
+    --ok-soft: #e6f6ee;
+    --ok-rule: #a9dcc3;
+    /* The machine register. Used only where the document marks something as
+       model-generated, so "human" and "machine" never share a colour. */
+    --machine: #4a5a8c;
+    --machine-soft: #eceffa;
+    --machine-rule: #b9c3e2;
+    --code-bg: #0f1e1c;
+    --code-fg: #d9ece6;
+    --code-k: #7ee0cd;
+    --code-s: #f2c98a;
+    --code-c: #7f9c94;
+    --code-n: #a5b4fc;
+    --shadow: 0 1px 2px rgb(14 28 25 / 0.06), 0 8px 24px -12px rgb(14 28 25 / 0.18);
+    --shadow-lg: 0 2px 4px rgb(14 28 25 / 0.05), 0 24px 60px -28px rgb(14 28 25 / 0.3);
+    --font-display: "Avenir Next", "Segoe UI Variable Display", "Helvetica Neue", ui-sans-serif, system-ui, sans-serif;
+    --font-body: -apple-system, BlinkMacSystemFont, "Segoe UI Variable Text", "Segoe UI", ui-sans-serif, system-ui, sans-serif;
+    --font-mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper: #0b1514;
+      --surface: #101d1b;
+      --surface-2: #142522;
+      --surface-3: #1a2f2b;
+      --ink: #e7f2ee;
+      --ink-2: #c3d6d0;
+      --muted: #93aca5;
+      --rule: #1f312e;
+      --rule-2: #2c423e;
+      --accent: #5fe0c9;
+      --accent-2: #8aeedd;
+      --accent-soft: #10302b;
+      --accent-ink: #b8f3e7;
+      --warn: #e2b04a;
+      --warn-soft: #2a2410;
+      --warn-rule: #4d4020;
+      --bad: #f0928a;
+      --bad-soft: #2c1614;
+      --bad-rule: #552a26;
+      --ok: #5fd39a;
+      --ok-soft: #10281d;
+      --ok-rule: #23503a;
+      --machine: #a9b6e4;
+      --machine-soft: #171d33;
+      --machine-rule: #303c66;
+      --code-bg: #0a1413;
+      --code-fg: #d9ece6;
+      --shadow: 0 1px 2px rgb(0 0 0 / 0.4), 0 10px 30px -14px rgb(0 0 0 / 0.6);
+      --shadow-lg: 0 2px 6px rgb(0 0 0 / 0.5), 0 28px 70px -30px rgb(0 0 0 / 0.75);
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper: #0b1514;
+    --surface: #101d1b;
+    --surface-2: #142522;
+    --surface-3: #1a2f2b;
+    --ink: #e7f2ee;
+    --ink-2: #c3d6d0;
+    --muted: #93aca5;
+    --rule: #1f312e;
+    --rule-2: #2c423e;
+    --accent: #5fe0c9;
+    --accent-2: #8aeedd;
+    --accent-soft: #10302b;
+    --accent-ink: #b8f3e7;
+    --warn: #e2b04a;
+    --warn-soft: #2a2410;
+    --warn-rule: #4d4020;
+    --bad: #f0928a;
+    --bad-soft: #2c1614;
+    --bad-rule: #552a26;
+    --ok: #5fd39a;
+    --ok-soft: #10281d;
+    --ok-rule: #23503a;
+    --machine: #a9b6e4;
+    --machine-soft: #171d33;
+    --machine-rule: #303c66;
+    --code-bg: #0a1413;
+    --code-fg: #d9ece6;
+    --shadow: 0 1px 2px rgb(0 0 0 / 0.4), 0 10px 30px -14px rgb(0 0 0 / 0.6);
+    --shadow-lg: 0 2px 6px rgb(0 0 0 / 0.5), 0 28px 70px -30px rgb(0 0 0 / 0.75);
+    color-scheme: dark;
+  }
+
+  /* ------------------------------------------------------------------ */
+  /* Base                                                                */
+  /* ------------------------------------------------------------------ */
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; }
+  }
+  a { color: var(--accent-ink); text-decoration-color: color-mix(in oklab, var(--accent) 50%, transparent); text-underline-offset: 3px; }
+  a:hover { text-decoration-color: var(--accent); }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+  h1, h2, h3, h4 { font-family: var(--font-display); letter-spacing: -0.015em; text-wrap: balance; margin: 0; }
+  h1 { font-size: clamp(2.2rem, 4.5vw, 3.4rem); line-height: 1.05; font-weight: 600; }
+  h2 { font-size: 1.75rem; line-height: 1.2; font-weight: 600; }
+  h3 { font-size: 1.2rem; line-height: 1.3; font-weight: 600; margin-top: 2.25rem; }
+  h4 { font-size: 1rem; line-height: 1.35; font-weight: 600; }
+  p { margin: 0 0 1rem; }
+  ul, ol { margin: 0 0 1rem; padding-inline-start: 1.35rem; }
+  li { margin-bottom: 0.4rem; }
+  li::marker { color: var(--accent); }
+  strong { font-weight: 600; color: var(--ink); }
+  code { font-family: var(--font-mono); font-size: 0.86em; background: var(--surface-2); padding: 0.1em 0.35em; border-radius: 4px; }
+  hr { border: 0; border-top: 1px solid var(--rule); margin: 2.5rem 0; }
+
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 0 clamp(1rem, 4vw, 2.5rem); }
+  .prose { max-width: 68ch; }
+  .prose-wide { max-width: 82ch; }
+
+  /* ------------------------------------------------------------------ */
+  /* Header                                                              */
+  /* ------------------------------------------------------------------ */
+  header.hero {
+    padding: clamp(3rem, 9vw, 6.5rem) 0 clamp(2rem, 5vw, 3.5rem);
+    border-bottom: 1px solid var(--rule);
+    background:
+      radial-gradient(1100px 420px at 12% -12%, color-mix(in oklab, var(--accent) 11%, transparent), transparent 62%),
+      var(--paper);
+  }
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--accent-ink);
+    margin-bottom: 1.1rem;
+  }
+  .hero .lede { font-size: clamp(1.05rem, 2vw, 1.3rem); color: var(--ink-2); max-width: 64ch; margin-top: 1.25rem; }
+  .hero-meta { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: 2rem; }
+  .pill {
+    font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.05em;
+    padding: 0.35rem 0.7rem; border-radius: 999px;
+    border: 1px solid var(--rule-2); background: var(--surface); color: var(--muted);
+  }
+  .pill.on { border-color: color-mix(in oklab, var(--accent) 45%, transparent); background: var(--accent-soft); color: var(--accent-ink); }
+
+  /* ------------------------------------------------------------------ */
+  /* Table of contents                                                   */
+  /* ------------------------------------------------------------------ */
+  nav.toc { border-bottom: 1px solid var(--rule); background: var(--surface); position: sticky; top: 0; z-index: 40; }
+  nav.toc .wrap { display: flex; gap: 0.25rem; overflow-x: auto; padding-block: 0.5rem; scrollbar-width: thin; }
+  nav.toc a {
+    flex: 0 0 auto; font-size: 0.8rem; padding: 0.35rem 0.65rem; border-radius: 6px;
+    color: var(--muted); text-decoration: none; white-space: nowrap;
+  }
+  nav.toc a:hover { background: var(--surface-2); color: var(--ink); }
+
+  /* ------------------------------------------------------------------ */
+  /* Sections                                                            */
+  /* ------------------------------------------------------------------ */
+  section { padding: clamp(2.75rem, 6vw, 4.5rem) 0; border-bottom: 1px solid var(--rule); scroll-margin-top: 3.5rem; }
+  section > .wrap > .sec-head { margin-bottom: 2rem; }
+  .sec-num {
+    font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.14em;
+    color: var(--accent); text-transform: uppercase; display: block; margin-bottom: 0.5rem;
+  }
+  .sec-head p { color: var(--ink-2); max-width: 66ch; margin-top: 0.75rem; }
+
+  /* ------------------------------------------------------------------ */
+  /* Cards, callouts, grids                                              */
+  /* ------------------------------------------------------------------ */
+  .grid { display: grid; gap: 1rem; }
+  .g2 { grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
+  .g3 { grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+  .g4 { grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); }
+
+  .card {
+    background: var(--surface); border: 1px solid var(--rule); border-radius: 10px;
+    padding: 1.25rem 1.35rem; box-shadow: var(--shadow);
+  }
+  .card h4 { margin-bottom: 0.5rem; }
+  .card p:last-child, .card ul:last-child { margin-bottom: 0; }
+  .card .k { font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); display: block; margin-bottom: 0.6rem; }
+
+  .note {
+    border-left: 3px solid var(--accent); background: var(--accent-soft);
+    padding: 1rem 1.25rem; border-radius: 0 8px 8px 0; margin: 1.5rem 0;
+  }
+  .note.warn { border-left-color: var(--warn); background: var(--warn-soft); }
+  .note.bad { border-left-color: var(--bad); background: var(--bad-soft); }
+  .note.ok { border-left-color: var(--ok); background: var(--ok-soft); }
+  .note.machine { border-left-color: var(--machine); background: var(--machine-soft); }
+  .note p:last-child { margin-bottom: 0; }
+  .note .lbl { font-family: var(--font-mono); font-size: 0.68rem; letter-spacing: 0.14em; text-transform: uppercase; display: block; margin-bottom: 0.4rem; color: var(--ink-2); }
+
+  .stat { display: flex; flex-direction: column; gap: 0.25rem; }
+  .stat .n { font-family: var(--font-display); font-size: 2rem; font-weight: 600; line-height: 1; color: var(--accent-ink); font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
+  .stat .n.bad { color: var(--bad); }
+  .stat .n.warn { color: var(--warn); }
+  .stat .l { font-size: 0.85rem; color: var(--ink-2); line-height: 1.4; }
+  .stat .src { font-family: var(--font-mono); font-size: 0.66rem; color: var(--muted); letter-spacing: 0.04em; }
+
+  /* ------------------------------------------------------------------ */
+  /* Tables                                                              */
+  /* ------------------------------------------------------------------ */
+  .tbl-scroll { overflow-x: auto; border: 1px solid var(--rule); border-radius: 10px; background: var(--surface); }
+  table { border-collapse: collapse; width: 100%; font-size: 0.88rem; min-width: 620px; }
+  th, td { text-align: left; padding: 0.7rem 0.9rem; border-bottom: 1px solid var(--rule); vertical-align: top; }
+  thead th {
+    font-family: var(--font-mono); font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--muted); background: var(--surface-2); border-bottom: 1px solid var(--rule-2); position: sticky; top: 0;
+  }
+  tbody tr:last-child td { border-bottom: 0; }
+  td code { font-size: 0.82em; }
+  .num { font-variant-numeric: tabular-nums; }
+
+  .tag {
+    display: inline-block; font-family: var(--font-mono); font-size: 0.64rem; letter-spacing: 0.08em;
+    text-transform: uppercase; padding: 0.16rem 0.45rem; border-radius: 4px; white-space: nowrap;
+    border: 1px solid var(--rule-2); background: var(--surface-2); color: var(--muted);
+  }
+  .tag.p0 { background: var(--bad-soft); border-color: var(--bad-rule); color: var(--bad); }
+  .tag.p1 { background: var(--warn-soft); border-color: var(--warn-rule); color: var(--warn); }
+  .tag.p2 { background: var(--accent-soft); border-color: color-mix(in oklab, var(--accent) 40%, transparent); color: var(--accent-ink); }
+  .tag.p3 { background: var(--surface-2); border-color: var(--rule-2); color: var(--muted); }
+  .tag.risk-hi { background: var(--bad-soft); border-color: var(--bad-rule); color: var(--bad); }
+  .tag.risk-md { background: var(--warn-soft); border-color: var(--warn-rule); color: var(--warn); }
+  .tag.risk-lo { background: var(--ok-soft); border-color: var(--ok-rule); color: var(--ok); }
+
+  /* ------------------------------------------------------------------ */
+  /* Code                                                                */
+  /* ------------------------------------------------------------------ */
+  pre {
+    background: var(--code-bg); color: var(--code-fg); border-radius: 10px;
+    padding: 1.15rem 1.3rem; overflow-x: auto; font-family: var(--font-mono);
+    font-size: 0.8rem; line-height: 1.65; margin: 1.25rem 0; border: 1px solid var(--stage-rule);
+  }
+  pre code { background: none; padding: 0; font-size: inherit; color: inherit; }
+  .c-k { color: var(--code-k); }
+  .c-s { color: var(--code-s); }
+  .c-c { color: var(--code-c); font-style: italic; }
+  .c-n { color: var(--code-n); }
+  .filename {
+    font-family: var(--font-mono); font-size: 0.7rem; color: var(--muted);
+    letter-spacing: 0.06em; margin: 1.25rem 0 -0.75rem; display: block;
+  }
+
+  /* ------------------------------------------------------------------ */
+  /* MOCKUP STAGE                                                        */
+  /* A fake clinical app window. Committed to the light palette from the */
+  /* source screenshots regardless of document theme, so it reads as a   */
+  /* device showing a design rather than a themed part of the page.      */
+  /* Every colour below is an explicit literal for that reason.          */
+  /* ------------------------------------------------------------------ */
+  .stage-shell { margin: 1.5rem 0 0; }
+  .app {
+    --a-ground: #fdfaf8;
+    --a-card: #fffefd;
+    --a-rule: #f1e5df;
+    --a-rule-2: #e6d5cd;
+    --a-ink: #191414;
+    --a-ink-2: #4a3b38;
+    --a-muted: #8d726c;
+    --a-placeholder: #9b7d77;
+    --a-active: #f6e7dd;
+    --a-active-ink: #2c1a15;
+    --a-send: #3d2529;
+    --a-send-fg: #fdf6f3;
+    --a-live: #17915a;
+    --a-shadow: 0 1px 2px rgb(61 37 41 / 0.05), 0 12px 32px -14px rgb(61 37 41 / 0.22);
+    background: var(--a-ground);
+    border: 1px solid var(--rule-2);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: var(--shadow-lg);
+    color: var(--a-ink);
+    font-family: var(--font-body);
+  }
+  .app-chrome {
+    display: flex; align-items: center; gap: 0.5rem;
+    padding: 0.55rem 0.85rem; background: #f4eae5; border-bottom: 1px solid var(--a-rule);
+  }
+  .app-dot { width: 10px; height: 10px; border-radius: 50%; background: #dcc7be; }
+  .app-title {
+    font-family: var(--font-mono); font-size: 0.68rem; letter-spacing: 0.1em;
+    text-transform: uppercase; color: #8d726c; margin-left: 0.5rem;
+  }
+  .app-body { position: relative; min-height: 430px; padding: 1.25rem; display: flex; gap: 1.1rem; }
+
+  /* Fake EHR behind the dock — deliberately low-contrast wallpaper. */
+  .ehr { flex: 1; min-width: 0; opacity: 0.5; user-select: none; pointer-events: none; }
+  .ehr-h { display: flex; align-items: baseline; gap: 0.6rem; margin-bottom: 0.9rem; }
+  .ehr-name { font-family: var(--font-display); font-size: 1.05rem; font-weight: 600; color: #2c1a15; }
+  .ehr-sub { font-family: var(--font-mono); font-size: 0.68rem; color: #8d726c; letter-spacing: 0.04em; }
+  .ehr-row { height: 9px; border-radius: 4px; background: #efe0d9; margin-bottom: 0.55rem; }
+  .ehr-card { background: #fffefd; border: 1px solid #f1e5df; border-radius: 8px; padding: 0.8rem 0.9rem; margin-bottom: 0.7rem; }
+  .ehr-lbl { font-family: var(--font-mono); font-size: 0.6rem; letter-spacing: 0.12em; text-transform: uppercase; color: #a68b84; margin-bottom: 0.5rem; }
+
+  /* The dock itself */
+  .dock-layer {
+    position: absolute; inset: auto 0 0 0; padding: 0 1.25rem 1.25rem;
+    display: flex; flex-direction: column; align-items: center; gap: 0.55rem;
+  }
+  .dock {
+    width: 100%; max-width: 620px; background: var(--a-card);
+    border: 1px solid var(--a-rule); border-radius: 16px;
+    box-shadow: var(--a-shadow);
+    display: flex; align-items: center; gap: 0.6rem;
+    padding: 0.7rem 0.85rem;
+  }
+  .dock-ph { flex: 1; color: var(--a-placeholder); font-size: 0.95rem; }
+  .dock-ph.typed { color: var(--a-ink); font-family: var(--font-mono); font-size: 0.9rem; }
+  .ico {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 30px; height: 30px; border-radius: 7px; color: var(--a-ink-2);
+    background: none; border: 0; cursor: default; flex: 0 0 auto;
+  }
+  .ico.lit { background: var(--a-active); color: var(--a-active-ink); }
+  .ico svg { width: 17px; height: 17px; }
+  .chip {
+    display: inline-flex; align-items: center; gap: 0.4rem;
+    border: 1px solid var(--a-rule-2); background: var(--a-card); color: var(--a-ink);
+    border-radius: 9px; padding: 0.35rem 0.7rem; font-size: 0.86rem; white-space: nowrap;
+  }
+  .chip svg { width: 15px; height: 15px; flex: 0 0 auto; }
+  .chip.on { background: var(--a-active); border-color: transparent; color: var(--a-active-ink); font-weight: 500; }
+  .send {
+    width: 32px; height: 32px; border-radius: 9px; background: var(--a-send); color: var(--a-send-fg);
+    display: inline-flex; align-items: center; justify-content: center; flex: 0 0 auto;
+  }
+  .send svg { width: 16px; height: 16px; }
+  .send.off { background: #e9d8d0; color: #b39b94; }
+
+  /* Mode tray */
+  .tray {
+    width: 100%; max-width: 620px; background: var(--a-card);
+    border: 1px solid var(--a-rule); border-radius: 16px; box-shadow: var(--a-shadow);
+    padding: 0.85rem 0.95rem 0.4rem;
+  }
+  .tray-top { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.9rem; }
+  .tray-top .sp { flex: 1; }
+  .tray-item {
+    padding: 0.6rem 0.3rem; border-top: 1px solid var(--a-rule); font-size: 0.95rem; color: var(--a-ink);
+  }
+  .tray-item:first-of-type { border-top: 0; }
+  .tray-item .hint { display: block; font-size: 0.76rem; color: var(--a-muted); margin-top: 0.15rem; }
+
+  /* Slash menu */
+  .slash {
+    position: absolute; left: 1.25rem; bottom: 5.4rem; z-index: 3;
+    background: var(--a-card); border: 1px solid var(--a-rule); border-radius: 14px;
+    box-shadow: var(--a-shadow); padding: 0.5rem; min-width: 250px;
+  }
+  .slash-item { display: flex; align-items: center; gap: 0.6rem; padding: 0.5rem 0.6rem; border-radius: 8px; font-size: 0.92rem; }
+  .slash-item svg { width: 16px; height: 16px; color: var(--a-ink-2); flex: 0 0 auto; }
+  .slash-item.sel { background: var(--a-active); }
+  .slash-sep { height: 1px; background: var(--a-rule); margin: 0.35rem 0.25rem; }
+
+  /* Waveform */
+  .wave { display: inline-flex; align-items: center; gap: 2px; height: 18px; padding: 0 0.4rem; }
+  .wave i { display: block; width: 2.5px; border-radius: 2px; background: var(--a-live); height: 5px; animation: wv 1.05s ease-in-out infinite; }
+  .wave i:nth-child(2) { animation-delay: 0.12s; }
+  .wave i:nth-child(3) { animation-delay: 0.24s; }
+  .wave i:nth-child(4) { animation-delay: 0.36s; }
+  .wave i:nth-child(5) { animation-delay: 0.48s; }
+  @keyframes wv { 0%, 100% { height: 4px; } 50% { height: 16px; } }
+  @media (prefers-reduced-motion: reduce) { .wave i { height: 10px; } }
+
+  /* Panel (expanded thread) */
+  .panel {
+    width: 372px; flex: 0 0 372px; background: var(--a-card); border: 1px solid var(--a-rule);
+    border-radius: 12px; box-shadow: var(--a-shadow); display: flex; flex-direction: column; overflow: hidden;
+  }
+  .panel-head { display: flex; align-items: center; gap: 0.45rem; padding: 0.7rem 0.8rem; border-bottom: 1px solid var(--a-rule); }
+  .panel-title {
+    font-size: 0.93rem; font-weight: 600; display: flex; align-items: center; gap: 0.3rem;
+    min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .panel-title svg { width: 14px; height: 14px; color: var(--a-muted); flex: 0 0 auto; }
+  .panel-head .sp { flex: 1; min-width: 0.25rem; }
+  .panel-act { display: inline-flex; align-items: center; gap: 0.3rem; font-size: 0.8rem; color: var(--a-ink-2); white-space: nowrap; }
+  .panel-act svg { width: 14px; height: 14px; }
+  .thread { flex: 1; padding: 0.9rem 0.8rem; display: flex; flex-direction: column; gap: 0.75rem; overflow-y: auto; }
+  .msg-user { align-self: flex-end; background: var(--a-active); color: var(--a-active-ink); border-radius: 12px; padding: 0.4rem 0.75rem; font-size: 0.88rem; max-width: 78%; }
+  .msg-ai { font-size: 0.88rem; line-height: 1.55; }
+  .thought { font-size: 0.74rem; color: var(--a-muted); font-family: var(--font-mono); letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 0.4rem; display: flex; align-items: center; gap: 0.3rem; }
+  .thought svg { width: 12px; height: 12px; }
+  .cite { font-size: 0.64rem; vertical-align: super; color: #7a5b73; font-family: var(--font-mono); background: #f7ecf3; border-radius: 3px; padding: 0 0.2rem; }
+  .msg-acts { display: flex; align-items: center; gap: 0.5rem; margin-top: 0.6rem; color: var(--a-ink-2); }
+  .msg-acts svg { width: 14px; height: 14px; }
+  .msg-acts .sp { flex: 1; }
+  .msg-acts .verify { display: inline-flex; align-items: center; gap: 0.3rem; font-size: 0.76rem; border: 1px solid var(--a-rule-2); border-radius: 7px; padding: 0.2rem 0.45rem; }
+  .composer { border-top: 1px solid var(--a-rule); padding: 0.7rem 0.8rem; }
+  .composer-ph { color: var(--a-placeholder); font-size: 0.88rem; margin-bottom: 0.6rem; }
+  .composer-row { display: flex; align-items: center; gap: 0.4rem; }
+  .composer-row .sp { flex: 1; }
+  .disclaim { font-size: 0.66rem; color: var(--a-muted); text-align: center; padding: 0.5rem 0.8rem 0.7rem; line-height: 1.45; border-top: 1px solid var(--a-rule); }
+
+  /* Scope banner — the "reading from" strip */
+  .scope {
+    display: flex; align-items: center; gap: 0.45rem; width: 100%; max-width: 620px;
+    font-size: 0.74rem; color: #4a3b38; background: #f4ece7; border: 1px solid var(--a-rule-2);
+    border-radius: 9px; padding: 0.35rem 0.6rem;
+  }
+  .scope svg { width: 13px; height: 13px; flex: 0 0 auto; color: #8d726c; }
+  .scope .sp { flex: 1; }
+  .scope b { font-weight: 600; }
+  .scope .edit { font-size: 0.72rem; text-decoration: underline; color: #6b4d47; }
+
+  /* Crisis interstitial */
+  .crisis {
+    width: 100%; max-width: 620px; background: #fff8f6; border: 1px solid #e8bdb3;
+    border-left: 3px solid #b4423a; border-radius: 12px; padding: 0.85rem 1rem; box-shadow: var(--a-shadow);
+  }
+  .crisis-h { display: flex; align-items: center; gap: 0.45rem; font-weight: 600; font-size: 0.9rem; color: #8a2f28; margin-bottom: 0.4rem; }
+  .crisis-h svg { width: 16px; height: 16px; }
+  .crisis p { font-size: 0.85rem; color: #4a3b38; margin: 0 0 0.6rem; }
+  .crisis-row { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+  .crisis-btn { font-size: 0.82rem; border-radius: 8px; padding: 0.35rem 0.7rem; border: 1px solid #e8bdb3; background: #fff; color: #8a2f28; }
+  .crisis-btn.primary { background: #8a2f28; border-color: #8a2f28; color: #fff; }
+
+  /* [hidden] must beat the display values set by .dock, .panel, .scope etc. */
+  [hidden] { display: none !important; }
+
+  /* Sources drawer — the criterion-4 control */
+  .src-drawer { border: 1px solid var(--a-rule-2); border-radius: 10px; background: #fdf7f4; overflow: hidden; margin-top: 0.5rem; }
+  .src-drawer-h {
+    display: flex; align-items: center; gap: 0.4rem; padding: 0.45rem 0.6rem;
+    background: #f6ebe5; border-bottom: 1px solid var(--a-rule-2);
+    font-family: var(--font-mono); font-size: 0.64rem; letter-spacing: 0.1em; text-transform: uppercase; color: #6b4d47;
+  }
+  .src-drawer-h svg { width: 13px; height: 13px; }
+  .src-drawer-h .sp { flex: 1; }
+  .src-item { padding: 0.55rem 0.6rem; border-bottom: 1px solid var(--a-rule); }
+  .src-item:last-child { border-bottom: 0; }
+  .src-cite { font-size: 0.72rem; font-weight: 600; color: #2c1a15; display: flex; align-items: baseline; gap: 0.35rem; }
+  .src-cite .mk { font-family: var(--font-mono); font-size: 0.6rem; background: #f7ecf3; color: #7a5b73; border-radius: 3px; padding: 0 0.2rem; }
+  .src-quote { font-size: 0.75rem; color: #4a3b38; line-height: 1.5; margin: 0.3rem 0 0; border-left: 2px solid #d9c3ba; padding-left: 0.5rem; }
+  .src-quote mark { background: #fbe9c9; color: inherit; padding: 0 0.1em; border-radius: 2px; }
+  .src-meta { font-family: var(--font-mono); font-size: 0.62rem; color: #8d726c; margin-top: 0.3rem; letter-spacing: 0.03em; }
+
+  /* Answer confidence register — Law 3 */
+  .ans-badge {
+    display: inline-flex; align-items: center; gap: 0.3rem; font-family: var(--font-mono);
+    font-size: 0.6rem; letter-spacing: 0.1em; text-transform: uppercase;
+    border-radius: 4px; padding: 0.12rem 0.35rem; margin-bottom: 0.45rem;
+  }
+  .ans-badge svg { width: 11px; height: 11px; }
+  .ans-badge.grounded { background: #e4f2ea; color: #1c6b46; }
+  .ans-badge.general { background: #f4eee3; color: #7a5c22; }
+  .msg-ai.general { border-left: 2px solid #d9c08a; padding-left: 0.6rem; }
+
+  /* State switcher */
+  .switcher { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 1rem; }
+  .switcher button {
+    font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.04em;
+    padding: 0.4rem 0.7rem; border-radius: 7px; cursor: pointer;
+    border: 1px solid var(--rule-2); background: var(--surface); color: var(--muted);
+    transition: background 0.12s ease, color 0.12s ease, border-color 0.12s ease;
+  }
+  .switcher button:hover { color: var(--ink); border-color: var(--accent); }
+  .switcher button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--paper); }
+  .caption { font-size: 0.85rem; color: var(--muted); margin-top: 0.85rem; max-width: 70ch; }
+  .caption b { color: var(--ink-2); font-weight: 600; }
+
+  /* Anatomy callout list */
+  .anat { list-style: none; padding: 0; margin: 0; display: grid; gap: 0.6rem; }
+  .anat li { display: grid; grid-template-columns: 1.6rem 1fr; gap: 0.7rem; margin: 0; font-size: 0.9rem; }
+  .anat .n {
+    font-family: var(--font-mono); font-size: 0.66rem; font-weight: 600;
+    width: 1.6rem; height: 1.6rem; border-radius: 5px; display: inline-flex;
+    align-items: center; justify-content: center; background: var(--accent-soft);
+    color: var(--accent-ink); border: 1px solid color-mix(in oklab, var(--accent) 30%, transparent);
+  }
+  .anat b { display: block; }
+  .anat span.d { color: var(--muted); }
+
+  /* Phase rail */
+  .phase { border-left: 2px solid var(--rule-2); padding-left: 1.35rem; margin-left: 0.4rem; display: grid; gap: 1.75rem; }
+  .phase > li { list-style: none; position: relative; margin: 0; }
+  .phase > li::before {
+    content: ""; position: absolute; left: calc(-1.35rem - 6px); top: 0.45rem;
+    width: 10px; height: 10px; border-radius: 50%; background: var(--accent);
+    border: 2px solid var(--paper); box-sizing: content-box;
+  }
+  .phase h4 { display: flex; align-items: baseline; gap: 0.6rem; flex-wrap: wrap; }
+  .phase h4 .when { font-family: var(--font-mono); font-size: 0.7rem; color: var(--muted); letter-spacing: 0.06em; font-weight: 400; }
+  .phase ul { margin-top: 0.55rem; margin-bottom: 0; }
+
+  footer.end { padding: 3rem 0 4rem; color: var(--muted); font-size: 0.85rem; }
+  footer.end .wrap > p { max-width: 70ch; }
+
+  @media (max-width: 760px) {
+    .app-body { flex-direction: column; min-height: 0; }
+    .panel { width: 100%; flex: 1 1 auto; }
+    .dock-layer { position: static; padding: 0; }
+    .slash { position: static; margin-bottom: 0.6rem; }
+    .ehr { display: none; }
+  }
+</style>
+
+<header class="hero">
+  <div class="wrap">
+    <p class="eyebrow">Oxygen UI · Component brief · 16 August 2026</p>
+    <h1>Copilot</h1>
+    <p class="lede">
+      A floating clinical copilot: a dock that sits above the chart, takes a question in
+      typing or speech, and opens into a working thread. Model-agnostic by construction.
+      Designed so that checking the answer is cheaper than accepting it — which is the only
+      version of this component that is safe to put in front of a clinician.
+    </p>
+    <div class="hero-meta">
+      <span class="pill on">layer: pattern</span>
+      <span class="pill on">stability: proposed</span>
+      <span class="pill">tier: pro</span>
+      <span class="pill">core is React-free</span>
+      <span class="pill">antd skin + registry skin</span>
+      <span class="pill">WCAG 2.2 AA target</span>
+    </div>
+  </div>
+</header>
+
+<nav class="toc" aria-label="Contents">
+  <div class="wrap">
+    <a href="#thesis">1 · Thesis</a>
+    <a href="#name">2 · Name</a>
+    <a href="#anatomy">3 · Anatomy</a>
+    <a href="#behaviour">4 · Behavioural case</a>
+    <a href="#mockups">5 · Mockups</a>
+    <a href="#features">6 · Features</a>
+    <a href="#modes">7 · Modes</a>
+    <a href="#context">8 · Context</a>
+    <a href="#actions">9 · Actions</a>
+    <a href="#bh">10 · Behavioral health</a>
+    <a href="#regulatory">11 · Regulatory</a>
+    <a href="#security">12 · Security</a>
+    <a href="#a11y">13 · Accessibility</a>
+    <a href="#architecture">14 · Architecture</a>
+    <a href="#api">15 · API</a>
+    <a href="#plan">16 · Plan</a>
+    <a href="#evals">17 · Evals</a>
+    <a href="#risks">18 · Risks</a>
+    <a href="#sources">Sources</a>
+  </div>
+</nav>
+
+<section id="thesis">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="sec-num">Section 01</span>
+      <h2>The idea, sharpened</h2>
+      <p>
+        What you sketched is a good component. It is also, in its default form, the single
+        most dangerous thing Oxygen could ship. Both of those are worth saying up front,
+        because the second one is what makes the first one valuable.
+      </p>
+    </div>
+
+    <div class="prose">
+      <p>
+        The screenshots describe a floating dock with three task modes, slash shortcuts,
+        dictation, and an expanding thread panel. That is a complete and coherent product
+        idea, and your instinct about distribution is right: every clinical application
+        being built in 2026 wants this surface, almost nobody wants to build it, and the
+        parts that are hard to build are not the parts that look hard.
+      </p>
+      <p>
+        The parts that look hard are the floating positioning, the streaming text, the
+        waveform. Those are two weeks of work. The parts that are actually hard are:
+        deciding what the model is allowed to see, proving where an answer came from,
+        keeping chart text from being read as instructions, and knowing — with evidence —
+        whether the thing is making clinicians better or worse. Those are the parts a
+        digital-health team cannot build in a sprint and will pay for.
+      </p>
+
+      <div class="note">
+        <span class="lbl">The product thesis</span>
+        <p>
+          Copilot is not an AI chat component. It is <b>the accountability layer around a
+          model</b>, delivered as a chat component. The chat is the part customers recognise;
+          the provenance, scoping, audit and safety machinery is the part they are buying,
+          whether or not they know it yet.
+        </p>
+      </div>
+
+      <p>
+        This reframing has a commercial consequence that matters more than the design one.
+        An AI chat widget competes with a hundred free ones and with whatever the customer's
+        frontend lead can assemble from Vercel's AI SDK in a fortnight. A component that
+        arrives with a defensible answer to "how does your clinician independently review
+        the basis for this recommendation?" competes with nothing, because that question has
+        a regulatory shape (§11) and the free widgets do not answer it.
+      </p>
+      <p>
+        It also fits the buyer already identified in Oxygen's strategy — digital health
+        startups, health-tech vendors, and their agencies. They have a model. They have an
+        API key. What they do not have is six months of clinical-safety design, and they are
+        the ones whose customers will ask.
+      </p>
+
+      <h3>What Copilot must never be</h3>
+      <p>
+        Three constraints are load-bearing on every decision downstream. They are not
+        hedges; they are the shape of the component.
+      </p>
+      <ul>
+        <li>
+          <b>Never autonomous.</b> Copilot proposes; a human commits. Every write to the
+          record is attributed to the clinician who confirmed it, never to the model. This
+          is a hard architectural rule in §9, not a policy statement.
+        </li>
+        <li>
+          <b>Never unsourced.</b> A clinical claim with no inspectable basis does not render
+          as a clinical claim. It renders as an unsupported statement, visibly marked. §8.
+        </li>
+        <li>
+          <b>Never the therapist.</b> In behavioral health, three US states have already
+          legislated on this and the answer is not subtle. §10.
+        </li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section id="name">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="sec-num">Section 02</span>
+      <h2>What to call it</h2>
+      <p>
+        Named <b>Copilot</b> by Rahul, after three rounds of alternatives. This section
+        records what that choice costs and how the rest of the design pays for it, because
+        the objection is real and the mitigation has to be deliberate rather than assumed.
+      </p>
+    </div>
+
+    <div class="prose">
+      <div class="note ok">
+        <span class="lbl">Decided</span>
+        <p>
+          <b>Copilot.</b> Registry item <code>copilot</code>, npm
+          <code>@oxygenui-design/copilot</code>, component <code>&lt;Copilot /&gt;</code>,
+          engine <code>@oxygenui-design/copilot-core</code>.
+        </p>
+      </div>
+
+      <p>
+        The case for it is discoverability, and it is a strong case. "Copilot" is the term
+        health tech already uses for this surface: it needs no explaining to a buyer, it is
+        what a developer types into a search box, and a component library that has to teach
+        its own vocabulary before it can be found has made itself harder to adopt for a
+        reason nobody outside the team can see.
+      </p>
+
+      <h3>The objection, and what we do about it</h3>
+      <p>
+        The word is aviation-derived, and a copilot has <em>shared control of the aircraft</em>.
+        That is precisely the claim §1 forbids and §9 engineers against — this component
+        proposes and a human commits, always. A name that implies joint authority sits at odds
+        with a design whose entire argument is that authority stays with the clinician.
+      </p>
+      <p>
+        Names are not neutral here. §4 is a section about automation bias: a tool that reads
+        as a co-equal is a tool people defer to. So the name is a small force pushing the
+        wrong way, and the design has to push back harder than it otherwise would.
+      </p>
+
+      <div class="note warn">
+        <span class="lbl">What that means concretely</span>
+        <p>
+          Three things carry the weight the name gives up, and none of them is optional now:
+          the standing disclosure line is <b>never dismissible</b>; the confirm step in §9
+          defaults focus to <b>Discard</b> rather than Confirm; and the answer register in §4
+          Law 3 is <b>derived, never asserted</b> — a provider cannot call its own answer
+          grounded. If any of those is relaxed later, the name stops being a small tension
+          and becomes a misdescription.
+        </p>
+      </div>
+
+      <h3>Names considered</h3>
+      <div class="tbl-scroll">
+        <table>
+          <thead>
+            <tr><th>Candidate</th><th>For</th><th>Against</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>copilot</code> <span class="tag p2">chosen</span></td>
+              <td>The category term. Instantly understood, best discoverability, nothing to
+                  explain to a buyer or a developer.</td>
+              <td>Implies shared control. Microsoft ships a Copilot — low risk for a component
+                  inside a namespaced scope, not zero.</td>
+            </tr>
+            <tr>
+              <td><code>consult</code></td>
+              <td>The curbside consult: informal, advisory, and the asking clinician stays
+                  responsible — near-verbatim the FDA's fourth non-device criterion.</td>
+              <td>Rejected on review. Reads as a scheduled specialist referral to anyone who
+                  does not already know the idiom, and FHIR uses
+                  <code>ServiceRequest.intent = "consult"</code> for exactly that.</td>
+            </tr>
+            <tr>
+              <td><code>touchstone</code></td>
+              <td>The stone you rub gold against to test it. Encodes the thesis — make the
+                  check cheaper than the acceptance.</td>
+              <td>Needs a sentence of explanation, and nobody searches for it.</td>
+            </tr>
+            <tr>
+              <td><code>aperture</code></td>
+              <td>Names the scope contract — how much of the patient the model can see.</td>
+              <td>Describes one subsystem rather than the component.</td>
+            </tr>
+            <tr>
+              <td><code>ask</code> / <code>assist</code></td>
+              <td>Short, neutral.</td>
+              <td>Carries no register at all, clinical or otherwise.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p style="margin-top:1.25rem">
+        Sub-components follow the part names, not invented ones:
+        <code>CopilotDock</code>, <code>CopilotPanel</code>, <code>CopilotThread</code>,
+        <code>CopilotComposer</code>, <code>CopilotModes</code>, <code>CopilotShortcuts</code>,
+        <code>CopilotSources</code>, <code>CopilotScope</code>, <code>CopilotDisclosure</code>.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section id="anatomy">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="sec-num">Section 03</span>
+      <h2>Anatomy</h2>
+      <p>
+        Your six screenshots are six states of two surfaces. Naming them precisely now is
+        what keeps the API from growing a prop per screenshot later.
+      </p>
+    </div>
+
+    <div class="grid g2">
+      <div class="card">
+        <span class="k">Surface A — the dock</span>
+        <p style="font-size:0.9rem;color:var(--ink-2)">
+          Persistent, floating, always reachable. Its job is to accept a question in under
+          two seconds and get out of the way. It has one collapsed form and three expansions.
+        </p>
+        <ul class="anat" style="margin-top:0.9rem">
+          <li><span class="n">1</span><span><b>Shortcut affordance</b><span class="d">The square glyph. Opens the slash menu; also the drop target for "/".</span></span></li>
+          <li><span class="n">2</span><span><b>Question field</b><span class="d">Single line, grows to four. "Ask anything…" is the wrong placeholder — see below.</span></span></li>
+          <li><span class="n">3</span><span><b>Active mode chip</b><span class="d">Shows the current mode. Opens the mode tray. Absent when no mode is set.</span></span></li>
+          <li><span class="n">4</span><span><b>Dictation control</b><span class="d">Mic ⇄ live waveform. Two distinct states, never ambiguous.</span></span></li>
+          <li><span class="n">5</span><span><b>Submit</b><span class="d">Appears only when the field has content. Dark, high-contrast, unmistakable.</span></span></li>
+          <li><span class="n">6</span><span><b>Scope strip</b><span class="d">New. Not in your screenshots. The most important element on the surface — §8.</span></span></li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <span class="k">Surface B — the panel</span>
+        <p style="font-size:0.9rem;color:var(--ink-2)">
+          Opens on first send. Your instinct to give it real estate on the left is right: the
+          thread is a working document, not a notification.
+        </p>
+        <ul class="anat" style="margin-top:0.9rem">
+          <li><span class="n">7</span><span><b>Thread switcher</b><span class="d">Title plus chevron. Threads are named from the question, editable, and persist.</span></span></li>
+          <li><span class="n">8</span><span><b>Reasoning disclosure</b><span class="d">Your "Thought" label. Collapsed by default, and never confused with the answer.</span></span></li>
+          <li><span class="n">9</span><span><b>Answer body</b><span class="d">Streamed. Inline citation markers, not a bibliography at the end.</span></span></li>
+          <li><span class="n">10</span><span><b>Verify row</b><span class="d">Your "Check other sources". Rename it. It is the criterion-4 control — §11.</span></span></li>
+          <li><span class="n">11</span><span><b>Carry-out actions</b><span class="d">Copy, insert into note, share. Each one is a provenance event.</span></span></li>
+          <li><span class="n">12</span><span><b>Standing disclosure</b><span class="d">Your footer line. Keep it. Make it locale-aware and never scroll it away.</span></span></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="prose" style="margin-top:2rem">
+      <h3>Three notes on what you already drew</h3>
+      <p>
+        <b>"Ask anything…" is the one thing I would change on sight.</b> It is a consumer
+        chatbot's placeholder, and it makes a promise the component must not keep — that any
+        question is in scope, including ones it should refuse. It also wastes the highest-value
+        pixels on the surface. Replace it with the mode's actual affordance: "Ask about this
+        patient…", "Search the evidence…", "What are you working through?" The placeholder
+        should tell the clinician what this thing is for, and by implication what it is not for.
+      </p>
+      <p>
+        <b>"Check other sources" is doing something more important than it sounds.</b> Read
+        literally it suggests the answer might be wrong and you should go look elsewhere — a
+        vague nudge that people learn to ignore. Read as a product feature it is the control
+        that lets a clinician inspect the basis of the recommendation, which is a regulatory
+        requirement with a specific shape. Rename to <b>"Show sources"</b> and make it open a
+        drawer containing the retrieved passages themselves, not a list of links. The
+        difference between a link and the quoted passage is the difference between a
+        citation and a verification.
+      </p>
+      <p>
+        <b>Multi-select modes (your screenshot 4) is a subtle trap.</b> Prepare + Work up
+        active together reads as "more capable", but each mode is a scope contract — what
+        data it may read, which tools it may call, what it may say (§7). Two modes at once
+        means the union of two permission sets, and the union of two system prompts, which is
+        a configuration nobody reviewed. Keep the modes single-select and let a shortcut span
+        them if a real workflow needs it.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section id="behaviour">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="sec-num">Section 04</span>
+      <h2>The behavioural case, and the six laws it produces</h2>
+      <p>
+        This is the section that should determine the design, so it comes before the mockups
+        rather than after them. Four findings from the human-factors literature bound what a
+        floating clinical assistant is allowed to do.
+      </p>
+    </div>
+
+    <div class="grid g4">
+      <div class="card stat">
+        <span class="n bad">+12.7%</span>
+        <span class="l">clinical errors per interruption during medication administration; major-error risk doubles from 2.3% to 4.7% at four interruptions</span>
+        <span class="src">Westbrook et&nbsp;al., Arch Intern Med 2010 — 98 nurses, 4,271 administrations</span>
+      </div>
+      <div class="card stat">
+        <span class="n bad">&gt;90%</span>
+        <span class="l">override rate for drug–drug interaction alerts in contemporary EHRs; one study found 88.2% of <em>very severe</em> alerts overridden</span>
+        <span class="src">Meta-analysis, Health Informatics J 2024</span>
+      </div>
+      <div class="card stat">
+        <span class="n bad">+56.9%</span>
+        <span class="l">commission errors when clinicians are shown <em>incorrect</em> decision support, versus no support at all</span>
+        <span class="src">Automation-bias prescribing studies, BMC Med Inform Decis Mak 2017</span>
+      </div>
+      <div class="card stat">
+        <span class="n warn">70%</span>
+        <span class="l">the reliability floor below which automation makes performance <em>worse</em> than no automation</span>
+        <span class="src">Human-factors literature on automation reliance</span>
+      </div>
+    </div>
+
+    <div class="prose" style="margin-top:2rem">
+      <p>
+        Read together these say something uncomfortable about the component you have drawn.
+        A floating assistant is, by construction, an interruption generator sitting on top of
+        a workflow where interruptions cost measurable patient harm. Its predecessors in this
+        exact position — pop-up CDS alerts — were ignored by clinicians more than nine times
+        out of ten. And when a decision-support tool is wrong, clinicians do not merely fail
+        to catch it; they make <em>more</em> errors than they would have made with no tool at all.
+      </p>
+      <p>
+        None of that is an argument against building it. It is an argument about which
+        version to build, and it produces six laws that the rest of this document obeys.
+      </p>
+
+      <h3>Law 1 — Pull, not push</h3>
+      <p>
+        Copilot speaks when spoken to. The dock is always visible and never proactive: no
+        unsolicited suggestions, no badge counts, no "I noticed something about this patient".
+        The override-rate data is the entire history of push-based clinical software, and it
+        ends the same way every time. If a future release must push, it earns that through
+        §17's telemetry — a proactive prompt ships only after its acceptance rate is measured
+        above a threshold in shadow mode, never on a product manager's confidence.
+      </p>
+
+      <h3>Law 2 — Verification must be cheaper than acceptance</h3>
+      <p>
+        This is the load-bearing one. Automation bias is not a character flaw; it is a
+        rational response to effort asymmetry. If accepting an answer costs one click and
+        checking it costs four clicks and a new tab, people will accept. The design job is to
+        invert that: the source passage is <em>already on screen</em>, one keystroke away,
+        pre-scrolled to the relevant sentence. Every millisecond removed from the verification
+        path is a direct reduction in commission errors.
+      </p>
+      <div class="note machine">
+        <span class="lbl">Design consequence</span>
+        <p>
+          The "Show sources" drawer must open in under 150&nbsp;ms from cache, not fetch on
+          click. Which means citations are resolved during streaming, not after. Which
+          means the provider contract has to carry citation events inline (§15). One
+          behavioural finding just constrained the network protocol — that is what it looks
+          like when the behavioural work is done before the architecture rather than after.
+        </p>
+      </div>
+
+      <h3>Law 3 — Confidence must be visible and must vary</h3>
+      <p>
+        A model that answers everything in the same assured register teaches clinicians to
+        trust everything equally, which is the definition of miscalibrated trust. Copilot
+        renders three distinct answer states — <b>grounded</b> (claims tied to retrieved
+        sources), <b>general</b> (model knowledge, no retrieval, visibly marked), and
+        <b>declined</b> (out of scope) — with different typography, not just different words.
+        A clinician should be able to tell which of the three they are looking at from across
+        the room.
+      </p>
+
+      <h3>Law 4 — The 70% floor is a release gate, not a metric</h3>
+      <p>
+        If the assembled stack — model plus retrieval plus prompt — cannot clear the
+        reliability threshold on your own clinical eval set, shipping it makes your users
+        worse than shipping nothing. This belongs in CI as a failing test, not on a dashboard
+        as a number someone might look at. §17 specifies it.
+      </p>
+
+      <h3>Law 5 — Never interrupt a procedure</h3>
+      <p>
+        The Westbrook finding is specifically about interruption <em>during</em> a task.
+        Copilot must therefore know when the clinician is mid-procedure — medication
+        administration, an active order signature, a documented timeout — and suppress
+        itself entirely: no dock, no dictation indicator, no motion. The host application
+        signals this through a single prop, and the honest framing for customers is that
+        <b>the most valuable thing this component does is disappear.</b>
+      </p>
+
+      <h3>Law 6 — Design for the fiftieth use, not the first</h3>
+      <p>
+        Demos optimise for the first interaction; clinical software lives or dies on the
+        fiftieth. Two consequences. The delightful things — the waveform, the streaming
+        cursor, the reasoning reveal — must all be silenceable, because what reads as
+        polished on Monday reads as latency on Friday. And the fast path must be
+        keyboard-complete: summon, mode, shortcut, dictate, send, cite, insert, close, all
+        without a mouse. The clinician who uses this thirty times a shift is the one whose
+        opinion determines renewal.
+      </p>
+    </div>
+  </div>
+</section>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <g id="ic-base"></g>
+  </defs>
+  <symbol id="i-shortcut" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="17" height="17" rx="4.5"/><path d="M8.5 15.5 15.5 8.5"/></symbol>
+  <symbol id="i-prepare" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 6.5l2 2 3-3.5"/><path d="M2.5 15.5l2 2 3-3.5"/><path d="M11 7h10M11 16h10"/></symbol>
+  <symbol id="i-lookup" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M20 20l-4.7-4.7"/></symbol>
+  <symbol id="i-workup" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 3v5.5a4.5 4.5 0 0 0 9 0V3"/><path d="M4.5 3H3M13.5 3H15"/><path d="M9 13v2.5a4.5 4.5 0 0 0 9 0V14"/><circle cx="18" cy="11.5" r="2.4"/></symbol>
+  <symbol id="i-mic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="9.2" y="2.5" width="5.6" height="10.5" rx="2.8"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v3.2"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/></symbol>
+  <symbol id="i-send" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19.5V5M5.5 11.5 12 5l6.5 6.5"/></symbol>
+  <symbol id="i-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9.5l6 6 6-6"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5.5v13M5.5 12h13"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 7v5.3l3.2 2"/></symbol>
+  <symbol id="i-panel" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="4.5" width="17" height="15" rx="3"/><path d="M14.5 4.5v15"/></symbol>
+  <symbol id="i-up" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M7 21.5V10.5l4.6-7.4a2.3 2.3 0 0 1 2.2 3l-1 3.9h5.3a1.9 1.9 0 0 1 1.9 2.3l-1.5 6.5a1.9 1.9 0 0 1-1.9 1.5H7z"/><path d="M7 10.5H3v11h4"/></symbol>
+  <symbol id="i-down" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><g transform="rotate(180 12 12)"><path d="M7 21.5V10.5l4.6-7.4a2.3 2.3 0 0 1 2.2 3l-1 3.9h5.3a1.9 1.9 0 0 1 1.9 2.3l-1.5 6.5a1.9 1.9 0 0 1-1.9 1.5H7z"/><path d="M7 10.5H3v11h4"/></g></symbol>
+  <symbol id="i-copy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11.5" height="11.5" rx="2.5"/><path d="M5.5 15V5.5a2 2 0 0 1 2-2H16"/></symbol>
+  <symbol id="i-insert" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 6.5h13M3.5 12h9M3.5 17.5h7"/><path d="M17.5 13.5v7M14 17h7"/></symbol>
+  <symbol id="i-dots" viewBox="0 0 24 24" fill="currentColor" stroke="none"><circle cx="5.5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="18.5" cy="12" r="1.5"/></symbol>
+  <symbol id="i-verify" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.6 20 6v6c0 4.8-3.3 8.2-8 9.4C7.3 20.2 4 16.8 4 12V6z"/><path d="M9 12.2l2.2 2.2 4-4.4"/></symbol>
+  <symbol id="i-zap" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M13.2 2.5 4.5 14h6.6l-1.3 7.5L19.5 10h-6.6z"/></symbol>
+  <symbol id="i-grid" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="7" height="7" rx="1.8"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.8"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.8"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.8"/></symbol>
+  <symbol id="i-expand" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 3.5h-6v6M14.5 20.5h6v-6M3.5 3.5l6.5 6.5M20.5 20.5 14 14"/></symbol>
+  <symbol id="i-newchat" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5H5.5a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h13a2 2 0 0 0 2-2V12"/><path d="M18.2 2.8a2 2 0 0 1 2.9 2.9L12 14.8l-3.8 1 1-3.8z"/></symbol>
+  <symbol id="i-person" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.8"/><path d="M4.5 20.5a7.5 7.5 0 0 1 15 0"/></symbol>
+  <symbol id="i-alert" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5 2.8 20h18.4z"/><path d="M12 9.5v4.5M12 17.2v.05"/></symbol>
+  <symbol id="i-lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="4.5" y="10" width="15" height="10.5" rx="2.5"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></symbol>
+  <symbol id="i-book" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4.5h5.5a3 3 0 0 1 3 3v12a2.4 2.4 0 0 0-2.4-2.4H3z"/><path d="M21 4.5h-5.5a3 3 0 0 0-3 3v12a2.4 2.4 0 0 1 2.4-2.4H21z"/></symbol>
+  <symbol id="i-stop" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><rect x="9.2" y="9.2" width="5.6" height="5.6" rx="1.2"/></symbol>
+</svg>
+
+<section id="mockups">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="sec-num">Section 05</span>
+      <h2>Mockups</h2>
+      <p>
+        All six states from your screenshots, reproduced live, plus the two this design
+        needs that the screenshots do not yet have. The palette is deliberately yours, not
+        Oxygen's teal — you should be judging your design, not a recolour of it. The chart
+        behind the dock is deliberately washed out; it is wallpaper, not a proposal.
+      </p>
+    </div>
+
+    <div class="stage-shell">
+      <div class="switcher" role="group" aria-label="Choose a component state">
+        <button type="button" data-go="rest" aria-pressed="true">01 · Rest</button>
+        <button type="button" data-go="modes" aria-pressed="false">02 · Modes</button>
+        <button type="button" data-go="slash" aria-pressed="false">03 · Shortcuts</button>
+        <button type="button" data-go="workup" aria-pressed="false">04 · Work up</button>
+        <button type="button" data-go="dictating" aria-pressed="false">05 · Dictation</button>
+        <button type="button" data-go="thread" aria-pressed="false">06 · Thread</button>
+        <button type="button" data-go="sources" aria-pressed="false">07 · Sources ✦</button>
+        <button type="button" data-go="crisis" aria-pressed="false">08 · Crisis ✦</button>
+      </div>
+
+      <div class="app" id="stage" data-state="rest">
+        <div class="app-chrome">
+          <span class="app-dot"></span><span class="app-dot"></span><span class="app-dot"></span>
+          <span class="app-title">Host application · encounter view</span>
+        </div>
+
+        <div class="app-body">
+          <!-- ============ PANEL (states: thread, sources) ============ -->
+          <div class="panel" data-only="thread sources" hidden>
+            <div class="panel-head">
+              <span class="panel-title">First-line treatments <svg><use href="#i-chev"/></svg></span>
+              <span class="sp"></span>
+              <span class="panel-act"><svg><use href="#i-newchat"/></svg> New chat</span>
+              <span class="ico"><svg><use href="#i-expand"/></svg></span>
+              <span class="ico"><svg><use href="#i-x"/></svg></span>
+            </div>
+
+            <div class="thread">
+              <div class="msg-user">First-line options for new-onset AF, rate vs rhythm?</div>
+
+              <div>
+                <div class="thought"><svg><use href="#i-chev"/></svg> Reasoning · 4 steps</div>
+                <span class="ans-badge grounded"><svg><use href="#i-verify"/></svg> Grounded · 3 sources</span>
+                <div class="msg-ai">
+                  For haemodynamically stable new-onset AF, rate control is a reasonable
+                  first strategy in most patients over 65 with minimal symptoms<span class="cite">1</span>.
+                  Early rhythm control within 12 months of diagnosis reduced cardiovascular
+                  outcomes in EAST-AFNET&nbsp;4<span class="cite">2</span>. Anticoagulation is
+                  decided separately from the rate/rhythm choice and follows
+                  CHA₂DS₂-VASc<span class="cite">3</span>.
+                </div>
+                <div class="msg-acts">
+                  <svg><use href="#i-up"/></svg>
+                  <svg><use href="#i-down"/></svg>
+                  <span class="verify" id="verify-btn"><svg><use href="#i-verify"/></svg> Show sources</span>
+                  <span class="sp"></span>
+                  <svg><use href="#i-copy"/></svg>
+                  <svg><use href="#i-insert"/></svg>
+                  <svg><use href="#i-dots"/></svg>
+                </div>
+
+                <!-- the criterion-4 drawer -->
+                <div class="src-drawer" data-only="sources" hidden>
+                  <div class="src-drawer-h">
+                    <svg><use href="#i-book"/></svg> Basis of this answer <span class="sp"></span> <svg><use href="#i-x"/></svg>
+                  </div>
+                  <div class="src-item">
+                    <div class="src-cite"><span class="mk">1</span> 2023 ACC/AHA/HRS AF Guideline — §7.1 Rate control</div>
+                    <p class="src-quote">"In patients with AF and rapid ventricular response,
+                      <mark>rate control is a reasonable initial approach</mark> for those
+                      without severe symptoms…"</p>
+                    <p class="src-meta">Retrieved 2026-08-14 · guideline v2023.1 · match 0.91</p>
+                  </div>
+                  <div class="src-item">
+                    <div class="src-cite"><span class="mk">2</span> EAST-AFNET 4 — NEJM 2020;383:1305</div>
+                    <p class="src-quote">"<mark>Early rhythm-control therapy was associated with a
+                      lower risk of adverse cardiovascular outcomes</mark> than usual care among
+                      patients with early atrial fibrillation…"</p>
+                    <p class="src-meta">Retrieved 2026-08-14 · RCT, n=2789 · match 0.88</p>
+                  </div>
+                  <div class="src-item">
+                    <div class="src-cite"><span class="mk">3</span> Local formulary — Anticoagulation in AF</div>
+                    <p class="src-quote">"Stroke-risk assessment using <mark>CHA₂DS₂-VASc is
+                      independent of the rate or rhythm strategy chosen</mark>."</p>
+                    <p class="src-meta">Retrieved 2026-08-14 · org policy, rev. Apr 2026 · match 0.84</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="composer">
+              <div class="composer-ph">Ask a follow-up…</div>
+              <div class="composer-row">
+                <span class="ico"><svg><use href="#i-plus"/></svg></span>
+                <span class="ico"><svg><use href="#i-shortcut"/></svg></span>
+                <span class="chip"><svg><use href="#i-zap"/></svg><svg><use href="#i-workup"/></svg> Sources</span>
+                <span class="sp"></span>
+                <span class="ico"><svg><use href="#i-mic"/></svg></span>
+                <span class="send off"><svg><use href="#i-send"/></svg></span>
+              </div>
+            </div>
+            <p class="disclaim">
+              Medical knowledge only. Not for autonomous decision making.
+              Check sources and use your clinical judgement.
+            </p>
+          </div>
+
+          <!-- ============ FAKE CHART ============ -->
+          <div class="ehr" aria-hidden="true">
+            <div class="ehr-h">
+              <span class="ehr-name">Amara Okonkwo</span>
+              <span class="ehr-sub">F · 68y · MRN 0042-1187</span>
+            </div>
+            <div class="ehr-card">
+              <div class="ehr-lbl">Problem list</div>
+              <div class="ehr-row" style="width:72%"></div>
+              <div class="ehr-row" style="width:54%"></div>
+              <div class="ehr-row" style="width:63%"></div>
+            </div>
+            <div class="ehr-card">
+              <div class="ehr-lbl">Medications</div>
+              <div class="ehr-row" style="width:81%"></div>
+              <div class="ehr-row" style="width:46%"></div>
+            </div>
+            <div class="ehr-card">
+              <div class="ehr-lbl">Recent results</div>
+              <div class="ehr-row" style="width:68%"></div>
+              <div class="ehr-row" style="width:59%"></div>
+            </div>
+          </div>
+
+          <!-- ============ DOCK LAYER ============ -->
+          <div class="dock-layer" data-only="rest modes slash workup dictating crisis">
+
+            <!-- slash menu -->
+            <div class="slash" data-only="slash" hidden>
+              <div class="slash-item sel"><svg><use href="#i-shortcut"/></svg> Prep</div>
+              <div class="slash-item"><svg><use href="#i-shortcut"/></svg> Questions</div>
+              <div class="slash-sep"></div>
+              <div class="slash-item"><svg><use href="#i-grid"/></svg> See all shortcuts</div>
+            </div>
+
+            <!-- crisis interstitial -->
+            <div class="crisis" data-only="crisis" hidden>
+              <div class="crisis-h"><svg><use href="#i-alert"/></svg> This needs a person, not a model</div>
+              <p>
+                Copilot does not answer questions about a patient in immediate danger. Your
+                organisation's escalation path is one tap away, and this exchange has been
+                flagged to the on-call clinician.
+              </p>
+              <div class="crisis-row">
+                <span class="crisis-btn primary">Open risk protocol</span>
+                <span class="crisis-btn">Call 988 · Suicide &amp; Crisis Lifeline</span>
+                <span class="crisis-btn">Page on-call</span>
+              </div>
+            </div>
+
+            <!-- mode tray -->
+            <div class="tray" data-only="modes workup" hidden>
+              <div class="tray-top">
+                <span class="chip" id="chip-prep"><svg><use href="#i-prepare"/></svg> Prepare</span>
+                <span class="chip"><svg><use href="#i-lookup"/></svg> Look up</span>
+                <span class="chip" id="chip-work"><svg><use href="#i-workup"/></svg> Work up</span>
+                <span class="sp"></span>
+                <span class="ico"><svg><use href="#i-x"/></svg></span>
+              </div>
+              <div id="tray-list-prepare">
+                <div class="tray-item">Patient history <span class="hint">Reads: encounters, problem list, notes · last 24 months</span></div>
+                <div class="tray-item">Current medications <span class="hint">Reads: active MedicationRequest, allergies</span></div>
+                <div class="tray-item">Outstanding results <span class="hint">Reads: unacknowledged Observation, DiagnosticReport</span></div>
+              </div>
+              <div id="tray-list-workup" hidden>
+                <div class="tray-item">Differentials <span class="hint">Ranked by presentation, not by likelihood of being right</span></div>
+                <div class="tray-item">Investigations to consider <span class="hint">Guideline-linked · never auto-ordered</span></div>
+                <div class="tray-item">Referral threshold <span class="hint">Local pathway, org formulary</span></div>
+              </div>
+            </div>
+
+            <!-- scope strip -->
+            <div class="scope" data-only="rest modes slash workup dictating">
+              <svg><use href="#i-person"/></svg>
+              <span>Reading <b>Amara Okonkwo</b> · problem list, medications, results</span>
+              <span class="sp"></span>
+              <svg><use href="#i-lock"/></svg>
+              <span>2 records withheld</span>
+              <span class="edit">Change</span>
+            </div>
+
+            <!-- the dock -->
+            <div class="dock">
+              <span class="ico" id="dock-shortcut"><svg><use href="#i-shortcut"/></svg></span>
+
+              <span class="dock-ph" data-only="rest modes workup dictating" id="dock-ph">Ask about this patient…</span>
+              <span class="dock-ph typed" data-only="slash" hidden>/</span>
+              <span class="dock-ph" data-only="crisis" hidden style="font-style:italic">Input paused — use the escalation path above</span>
+
+              <span class="chip" data-only="rest dictating" id="dock-mode"><svg><use href="#i-prepare"/></svg> Prepare</span>
+
+              <span class="ico" data-only="slash" hidden><svg><use href="#i-clock"/></svg></span>
+              <span class="ico" data-only="slash" hidden><svg><use href="#i-panel"/></svg></span>
+
+              <span class="ico" data-only="rest modes workup"><svg><use href="#i-mic"/></svg></span>
+              <span class="wave" data-only="dictating" hidden aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>
+              <span class="send" data-only="slash" hidden><svg><use href="#i-send"/></svg></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <p class="caption" id="stage-caption">
+        <b>Rest.</b> Your screenshot 1, with the scope strip added above it. The dock asks a
+        specific question — "Ask about this patient…" — rather than promising to answer
+        anything, and the clinician can see what it is reading before they type a word.
+      </p>
+    </div>
+
+    <div class="prose" style="margin-top:2.5rem">
+      <h3>What states 07 and 08 add, and why they are not optional</h3>
+      <p>
+        <b>07 · Sources</b> is the drawer behind "Show sources". Notice what it contains: the
+        actual retrieved sentence with the relevant clause highlighted, the retrieval date,
+        the guideline version, and the match score. A clinician can confirm or reject the
+        claim without leaving the panel. That is Law 2 made concrete, and it is the difference
+        between a component that satisfies the FDA's fourth criterion and one that gestures at it.
+      </p>
+      <p>
+        <b>08 · Crisis</b> is the deterministic interrupt. In behavioral health the model does
+        not get to decide whether a message indicates risk — a classifier running before the
+        model decides, and on a positive it replaces the answer entirely rather than prefixing
+        it with a hotline number (§10). The layout matters: the model's response is not
+        rendered at all, because a crisis message with a helpful answer attached underneath is
+        a crisis message the user will scroll past.
+      </p>
+    </div>
+  </div>
+</section>
+
+<script>
+  (function () {
+    var stage = document.getElementById("stage");
+    if (!stage) return;
+    var buttons = Array.prototype.slice.call(document.querySelectorAll(".switcher [data-go]"));
+    var scoped = Array.prototype.slice.call(stage.querySelectorAll("[data-only]"));
+    var caption = document.getElementById("stage-caption");
+
+    var captions = {
+      rest: "<b>Rest.</b> Your screenshot 1, with the scope strip added above it. The dock asks a specific question — “Ask about this patient…” — rather than promising to answer anything, and the clinician can see what it is reading before they type a word.",
+      modes: "<b>Modes.</b> Your screenshot 2. Each suggestion now carries the data it will read, in small type. A mode is a permission scope (§7), so showing the scope at the point of choice is both honest and cheap.",
+      slash: "<b>Shortcuts.</b> Your screenshot 3. A shortcut is a named, versioned prompt template with a fixed tool set — the unit a clinical safety officer signs off on, and the reason this is worth building properly rather than as a text macro.",
+      workup: "<b>Work up.</b> Your screenshot 4, single-select rather than multi. This is the highest-risk mode in the product: a differential list anchors the clinician, and order of presentation changes diagnosis. It ships last and behind a flag.",
+      dictating: "<b>Dictation.</b> Your screenshot 5. The waveform must be unmistakably distinct from the idle mic — a clinician needs to know at a glance whether a microphone in a consulting room is live. Reduced-motion users get a static bar, never a silent one.",
+      thread: "<b>Thread.</b> Your screenshot 6, left-docked as you described. Note the confidence badge above the answer, the inline citation markers, and “Check other sources” renamed to “Show sources”.",
+      sources: "<b>Sources.</b> The drawer open. Retrieved passage, highlighted clause, retrieval date, guideline version, match score. Opens from cache in under 150 ms because citations resolve during streaming, not on click.",
+      crisis: "<b>Crisis.</b> A deterministic classifier, not the model, decides this. The answer is replaced rather than annotated. The hotline is locale-resolved — 988 is US-only, and hardcoding it is a real bug that ships in real products."
+    };
+
+    function apply(state) {
+      stage.setAttribute("data-state", state);
+      scoped.forEach(function (el) {
+        var allowed = el.getAttribute("data-only").split(/\s+/);
+        el.hidden = allowed.indexOf(state) === -1;
+      });
+
+      // Mode chips reflect the selected mode.
+      var prep = document.getElementById("chip-prep");
+      var work = document.getElementById("chip-work");
+      if (prep) prep.classList.toggle("on", state === "modes");
+      if (work) work.classList.toggle("on", state === "workup");
+
+      // Tray suggestion list follows the mode.
+      var lp = document.getElementById("tray-list-prepare");
+      var lw = document.getElementById("tray-list-workup");
+      if (lp) lp.hidden = state === "workup";
+      if (lw) lw.hidden = state !== "workup";
+
+      // The shortcut glyph lights up while the slash menu is open.
+      var sc = document.getElementById("dock-shortcut");
+      if (sc) sc.classList.toggle("lit", state === "slash");
+
+      // Placeholder copy follows the mode.
+      var ph = document.getElementById("dock-ph");
+      if (ph) ph.textContent = state === "workup" ? "What are you working through?" : "Ask about this patient…";
+
+      var dm = document.getElementById("dock-mode");
+      if (dm) dm.classList.toggle("on", state === "dictating");
+
+      if (caption && captions[state]) caption.innerHTML = captions[state];
+
+      buttons.forEach(function (b) {
+        b.setAttribute("aria-pressed", String(b.getAttribute("data-go") === state));
+      });
+    }
+
+    buttons.forEach(function (b) {
+      b.addEventListener("click", function () { apply(b.getAttribute("data-go")); });
+    });
+
+    // "Show sources" in the thread jumps to the sources state.
+    var vb = document.getElementById("verify-btn");
+    if (vb) {
+      vb.style.cursor = "pointer";
+      vb.addEventListener("click", function () { apply("sources"); });
+    }
+
+    apply("rest");
+  })();
+</script>
+
+<section id="features">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="sec-num">Section 06</span>
+      <h2>Feature inventory</h2>
+      <p>
+        Everything the component could do, with a release tier attached. The tiers are
+        opinions and they are the useful part — a list without them is a wish, and this one
+        is meant to be argued with.
+      </p>
+    </div>
+
+    <div class="grid g4" style="margin-bottom:1.5rem">
+      <div class="card"><span class="k">Tier</span><p style="margin:0;font-size:0.87rem"><span class="tag p0">v1</span> Ships in the first release. Without it the component is not honest.</p></div>
+      <div class="card"><span class="k">Tier</span><p style="margin:0;font-size:0.87rem"><span class="tag p1">v1.1</span> Fast follow. Needed for a real deployment, not for a design partner.</p></div>
+      <div class="card"><span class="k">Tier</span><p style="margin:0;font-size:0.87rem"><span class="tag p2">later</span> Real value, no urgency, or blocked on evidence from §17.</p></div>
+      <div class="card"><span class="k">Tier</span><p style="margin:0;font-size:0.87rem"><span class="tag p3">no</span> Deliberately excluded. The reason is the useful bit.</p></div>
+    </div>
+
+    <div class="tbl-scroll">
+      <table>
+        <thead>
+          <tr><th style="width:30%">Feature</th><th style="width:9%">Tier</th><th>Notes</th></tr>
+        </thead>
+        <tbody>
+          <tr><td colspan="3" style="background:var(--surface-2);font-family:var(--font-mono);font-size:0.68rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted)">A · Dock &amp; summoning</td></tr>
+          <tr><td>Floating dock, bottom-centre default</td><td><span class="tag p0">v1</span></td><td>Anchor configurable: <code>bottom-center</code>, <code>bottom-right</code>, <code>inline</code>. Position persists per user.</td></tr>
+          <tr><td>Keyboard summon</td><td><span class="tag p0">v1</span></td><td><kbd>⌘K</kbd> / <kbd>Ctrl K</kbd>, host-overridable. Focus lands in the field, not on the container.</td></tr>
+          <tr><td>Collapse to bubble</td><td><span class="tag p0">v1</span></td><td>A clinician who wants it gone must be able to make it gone in one action, and it must stay gone.</td></tr>
+          <tr><td>Occlusion avoidance</td><td><span class="tag p0">v1</span></td><td>Auto-shift when a host modal, toast, or sticky footer would collide. Respects <code>env(safe-area-inset-*)</code>.</td></tr>
+          <tr><td><b>Procedure suppression</b></td><td><span class="tag p0">v1</span></td><td>Law 5. <code>suppressed</code> prop removes the dock entirely — no motion, no indicator, no listener. The most valuable prop in the API.</td></tr>
+          <tr><td>Drag to reposition</td><td><span class="tag p1">v1.1</span></td><td>Pointer + keyboard reposition. Snap to anchors rather than free float.</td></tr>
+          <tr><td>Multi-monitor / detached window</td><td><span class="tag p2">later</span></td><td>Real demand in radiology and ICU. Needs the panel to survive a portal into a second window.</td></tr>
+
+          <tr><td colspan="3" style="background:var(--surface-2);font-family:var(--font-mono);font-size:0.68rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted)">B · Modes &amp; shortcuts</td></tr>
+          <tr><td>Mode registry (Prepare / Look up / Work up)</td><td><span class="tag p0">v1</span></td><td>Modes are data, not code. Host supplies the array; §7 defines the contract.</td></tr>
+          <tr><td>Per-mode suggestion list</td><td><span class="tag p0">v1</span></td><td>Your screenshots 2 and 4. Each suggestion declares the data it reads.</td></tr>
+          <tr><td>Slash shortcuts + palette</td><td><span class="tag p0">v1</span></td><td>Your screenshot 3. A shortcut is a versioned prompt template with a fixed tool set.</td></tr>
+          <tr><td>Org-authored shortcuts, role-scoped</td><td><span class="tag p1">v1.1</span></td><td>The feature that makes this sticky. A nurse and an attending see different menus.</td></tr>
+          <tr><td>Multi-select modes</td><td><span class="tag p3">no</span></td><td>§3. Union of two permission sets is a configuration nobody reviewed.</td></tr>
+
+          <tr><td colspan="3" style="background:var(--surface-2);font-family:var(--font-mono);font-size:0.68rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted)">C · Dictation</td></tr>
+          <tr><td>Push-to-talk and toggle dictation</td><td><span class="tag p0">v1</span></td><td>Waveform state visually unmistakable from idle. Recording indicator survives collapse.</td></tr>
+          <tr><td>Partial transcript, editable before send</td><td><span class="tag p0">v1</span></td><td>Never auto-send on silence. Speech recognition errors in drug names are the classic harm.</td></tr>
+          <tr><td>Pluggable ASR provider</td><td><span class="tag p1">v1.1</span></td><td>Same adapter shape as the model provider. Browser <code>SpeechRecognition</code> ships as the default and is explicitly labelled non-clinical-grade.</td></tr>
+          <tr><td>Ambient / always-on listening</td><td><span class="tag p3">no</span></td><td>Different product, different consent model, different regulator. Oxygen should not blur into the scribe category.</td></tr>
+
+          <tr><td colspan="3" style="background:var(--surface-2);font-family:var(--font-mono);font-size:0.68rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted)">D · Thread &amp; answers</td></tr>
+          <tr><td>Left-docked resizable panel, expand to full</td><td><span class="tag p0">v1</span></td><td>Your screenshot 6.</td></tr>
+          <tr><td>Streaming with stop</td><td><span class="tag p0">v1</span></td><td>Stop must abort the request, not just hide the text. Partial answers are marked partial.</td></tr>
+          <tr><td>Three answer registers</td><td><span class="tag p0">v1</span></td><td>Law 3: grounded / general / declined, distinguished typographically.</td></tr>
+          <tr><td>Reasoning disclosure, collapsed</td><td><span class="tag p0">v1</span></td><td>Your "Thought". Must never be mistakable for the answer — different colour, different weight, explicit label.</td></tr>
+          <tr><td>Thread persistence &amp; switcher</td><td><span class="tag p1">v1.1</span></td><td>Storage adapter, host-supplied. Oxygen never picks the database.</td></tr>
+          <tr><td>Structured feedback on 👎</td><td><span class="tag p1">v1.1</span></td><td>Free-text thumbs are worthless. Offer: wrong, outdated, not relevant, unsafe, missing source.</td></tr>
+          <tr><td>Empty / error / offline / denied / restricted states</td><td><span class="tag p0">v1</span></td><td>Required by Oxygen's own <code>DESIGN.md</code> contract. Each one designed, not defaulted.</td></tr>
+
+          <tr><td colspan="3" style="background:var(--surface-2);font-family:var(--font-mono);font-size:0.68rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted)">E · Provenance &amp; verification</td></tr>
+          <tr><td>Inline citation markers</td><td><span class="tag p0">v1</span></td><td>Per claim, not per answer.</td></tr>
+          <tr><td>Sources drawer with retrieved passage</td><td><span class="tag p0">v1</span></td><td>Mockup state 07. Cached during streaming so it opens instantly (Law 2).</td></tr>
+          <tr><td>Uncited-claim marking</td><td><span class="tag p0">v1</span></td><td>A sentence with no source renders in the "general" register. Silence about provenance is the failure mode.</td></tr>
+          <tr><td>Model disclosure sheet</td><td><span class="tag p0">v1</span></td><td>Model, version, knowledge cut-off, intended use, populations, known limitations. Maps to HTI-1 source attributes — §11.</td></tr>
+          <tr><td>Source freshness &amp; guideline version</td><td><span class="tag p1">v1.1</span></td><td>"Retrieved today from the 2023 guideline" and "retrieved today from a 2019 guideline" are different clinical facts.</td></tr>
+
+          <tr><td colspan="3" style="background:var(--surface-2);font-family:var(--font-mono);font-size:0.68rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted)">F · Context &amp; consent</td></tr>
+          <tr><td>Scope strip ("reading from…")</td><td><span class="tag p0">v1</span></td><td>§8. Always visible when patient context is attached.</td></tr>
+          <tr><td>Explicit context opt-in</td><td><span class="tag p0">v1</span></td><td>Default is <em>no</em> patient context. Evidence lookup needs none, and that is the safest first release.</td></tr>
+          <tr><td>Withheld-record disclosure</td><td><span class="tag p0">v1</span></td><td>"2 records withheld" with a reason. A silent omission is worse than a refusal — the clinician assumes completeness.</td></tr>
+          <tr><td>Break-the-glass integration</td><td><span class="tag p1">v1.1</span></td><td>Copilot never grants access. It renders the host's existing decision and records it.</td></tr>
+          <tr><td>De-identification pass before egress</td><td><span class="tag p1">v1.1</span></td><td>Optional, host-configured. Off by default because a half-working de-identifier is more dangerous than none.</td></tr>
+
+          <tr><td colspan="3" style="background:var(--surface-2);font-family:var(--font-mono);font-size:0.68rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted)">G · Actions</td></tr>
+          <tr><td>Copy / insert into note</td><td><span class="tag p0">v1</span></td><td>Insert carries an attribution block the host can render or strip. §9.</td></tr>
+          <tr><td>Propose → confirm → attributed write</td><td><span class="tag p1">v1.1</span></td><td>The only write pattern. No silent tool execution, ever. §9.</td></tr>
+          <tr><td>Tool allowlist per mode</td><td><span class="tag p1">v1.1</span></td><td>Enforced in core, not in the prompt. A prompt is not a permission system.</td></tr>
+          <tr><td>Autonomous ordering / messaging</td><td><span class="tag p3">no</span></td><td>Crosses into device territory and breaks §1. Not a roadmap item; a boundary.</td></tr>
+
+          <tr><td colspan="3" style="background:var(--surface-2);font-family:var(--font-mono);font-size:0.68rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted)">H · Safety</td></tr>
+          <tr><td>Pre-model safety classifiers</td><td><span class="tag p0">v1</span></td><td>Crisis, scope, injection. Deterministic gate before the model call. §10, §12.</td></tr>
+          <tr><td>Crisis interstitial with locale-resolved lines</td><td><span class="tag p0">v1</span></td><td>Mockup state 08. 988 is US-only; the resolver is a required prop in non-US locales.</td></tr>
+          <tr><td>Injection containment</td><td><span class="tag p0">v1</span></td><td>Chart content is fenced as data and never concatenated into the instruction channel. §12.</td></tr>
+          <tr><td>Dose &amp; units post-check</td><td><span class="tag p1">v1.1</span></td><td>Any numeric dose in the output is flagged for verification regardless of confidence.</td></tr>
+          <tr><td>Report-a-problem path</td><td><span class="tag p1">v1.1</span></td><td>One click, captures full transcript, sources and model version. Feeds §17.</td></tr>
+
+          <tr><td colspan="3" style="background:var(--surface-2);font-family:var(--font-mono);font-size:0.68rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted)">I · Governance &amp; ops</td></tr>
+          <tr><td>Audit event per exchange</td><td><span class="tag p0">v1</span></td><td>FHIR <code>AuditEvent</code> emitted through a host sink. Copilot stores nothing itself.</td></tr>
+          <tr><td>Telemetry hooks</td><td><span class="tag p0">v1</span></td><td>Acceptance, verification, abandonment, latency, refusal. §17.</td></tr>
+          <tr><td>Per-org model routing &amp; flags</td><td><span class="tag p1">v1.1</span></td><td>Different tenants, different BAAs, different models. Routing is host-side; the component just carries the id.</td></tr>
+          <tr><td>Eval harness in CI</td><td><span class="tag p1">v1.1</span></td><td>Ships as a package, not a doc. §17.</td></tr>
+
+          <tr><td colspan="3" style="background:var(--surface-2);font-family:var(--font-mono);font-size:0.68rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted)">J · Accessibility &amp; i18n</td></tr>
+          <tr><td>Streaming announcement strategy</td><td><span class="tag p0">v1</span></td><td>Not token-by-token. §13 specifies exactly what is announced and when.</td></tr>
+          <tr><td>Full keyboard path</td><td><span class="tag p0">v1</span></td><td>Summon → mode → shortcut → dictate → send → cite → insert → close.</td></tr>
+          <tr><td>Reduced motion</td><td><span class="tag p0">v1</span></td><td>Waveform becomes a static level meter that still proves the mic is live.</td></tr>
+          <tr><td>Clinician vs patient register</td><td><span class="tag p0">v1</span></td><td>Two catalogs, already the pattern in <code>@oxygenui-design/intl</code>.</td></tr>
+          <tr><td>RTL</td><td><span class="tag p1">v1.1</span></td><td>Dock anchors, panel side, and the slash menu all mirror.</td></tr>
+          <tr><td>400% zoom / 320px reflow</td><td><span class="tag p0">v1</span></td><td>WCAG 2.2 1.4.10. A floating dock at 400% zoom is where these components normally fail.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section id="modes">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="sec-num">Section 07</span>
+      <h2>Modes are scope contracts, not prompt presets</h2>
+      <p>
+        This is the single most important architectural idea in the brief, and it is worth
+        more than the rest of the UI combined.
+      </p>
+    </div>
+
+    <div class="prose">
+      <p>
+        The obvious implementation of your three chips is that each one swaps a system
+        prompt. That is how almost everyone builds it, and it is wrong in a way that only
+        shows up in the security review, eighteen months in, when someone asks which data a
+        given mode can reach and the answer is "whatever the prompt happened to say".
+      </p>
+      <p>
+        A mode should instead be a declarative contract with four parts, enforced in code:
+        <b>what it may read</b>, <b>what tools it may call</b>, <b>what it may output</b>,
+        and <b>what risk class it carries</b>. The prompt is a fifth, subordinate field. With
+        that shape, "can Look up see the problem list?" has an answer you can read off a
+        config file and hand to a compliance officer, rather than one you have to infer from
+        English.
+      </p>
+
+      <span class="filename">modes.config.ts</span>
+      <pre><code><span class="c-k">export const</span> <span class="c-n">workUp</span>: <span class="c-n">CopilotMode</span> = {
+  id: <span class="c-s">"work-up"</span>,
+  label: <span class="c-s">"Work up"</span>,
+  <span class="c-c">// What the model may be shown. Enforced by the context assembler,</span>
+  <span class="c-c">// not by asking the model nicely.</span>
+  reads: [<span class="c-s">"Condition"</span>, <span class="c-s">"Observation"</span>, <span class="c-s">"MedicationRequest"</span>, <span class="c-s">"AllergyIntolerance"</span>],
+  excludes: [<span class="c-s">"part2"</span>, <span class="c-s">"psychotherapy-notes"</span>, <span class="c-s">"genetic"</span>],
+  <span class="c-c">// Empty by default. A mode with no tools cannot act on the world.</span>
+  tools: [],
+  <span class="c-c">// The output contract. Violations are caught post-stream and downgraded</span>
+  <span class="c-c">// to the "general" register rather than rendered as clinical claims.</span>
+  output: { requireCitations: <span class="c-k">true</span>, maxClaims: <span class="c-n">6</span>, forbidDosing: <span class="c-k">true</span> },
+  <span class="c-c">// Drives the confirmation UI, the audit detail level, and whether the</span>
+  <span class="c-c">// mode is available at all under a given org policy.</span>
+  risk: <span class="c-s">"clinical"</span>,
+  prompt: { ref: <span class="c-s">"work-up@3"</span> },
+};</code></pre>
+
+      <h3>The three modes, ranked by how much they can hurt someone</h3>
+      <div class="tbl-scroll">
+        <table>
+          <thead><tr><th>Mode</th><th>Risk</th><th>What it really is</th><th>Ship</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><b>Look up</b></td>
+              <td><span class="tag risk-lo">low</span></td>
+              <td>Retrieval over an evidence corpus with no patient context at all. The model
+                  summarises sources it was given. Nearly all the demonstrable value, almost
+                  none of the risk.</td>
+              <td>First</td>
+            </tr>
+            <tr>
+              <td><b>Prepare</b></td>
+              <td><span class="tag risk-md">medium</span></td>
+              <td>Summarisation of the record for a clinician about to walk into a room.
+                  Reads PHI, but produces no recommendation — it restates what is already
+                  documented. Failure mode is omission, which is real but bounded.</td>
+              <td>Second</td>
+            </tr>
+            <tr>
+              <td><b>Work up</b></td>
+              <td><span class="tag risk-hi">high</span></td>
+              <td>Differentials, investigations, referral thresholds. This is the one that
+                  generates novel clinical recommendations, and the one where a wrong answer
+                  produces the +56.9% commission-error effect from §4.</td>
+              <td>Last, flagged, after evals</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="note warn">
+        <span class="lbl">On differential lists specifically</span>
+        <p>
+          Order is not neutral. A ranked differential anchors the clinician on the first item
+          and measurably narrows what they consider afterwards. If Work up ships, present the
+          list <b>unranked and alphabetical</b>, or ranked with the ranking basis stated —
+          and consider surfacing "what would change my mind" rather than "what is most
+          likely". The second framing is the one that survives contact with a diagnostician.
+        </p>
+      </div>
+
+      <p>
+        Shipping in risk order is also the commercial path of least resistance. Look up needs
+        no BAA covering patient data in the model call, no chart integration, and no
+        institutional review to pilot. A design partner can have it running in an afternoon.
+        Prepare needs the chart. Work up needs a clinical governance conversation. Building
+        them in that order means revenue arrives before the hard conversations do.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section id="context">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="sec-num">Section 08</span>
+      <h2>Context, provenance, and the scope strip</h2>
+      <p>
+        The element I added to your dock is a thin grey strip nobody would put in a pitch
+        deck. It is the highest-value pixel in the component.
+      </p>
+    </div>
+
+    <div class="prose">
+      <p>
+        A clinician looking at a floating assistant has one question they cannot currently
+        answer: <em>what does this thing know about my patient right now?</em> Without an
+        answer they must assume either too much (and trust a summary built from partial data)
+        or too little (and stop using it). Neither is recoverable through better answers.
+      </p>
+      <p>
+        The scope strip answers it continuously, in three parts: <b>who</b> the context is
+        about, <b>what</b> categories are included, and <b>what is missing and why</b>. That
+        third part is the one everyone omits and the one that matters most.
+      </p>
+
+      <div class="note bad">
+        <span class="lbl">The silent-omission failure</span>
+        <p>
+          A patient has an SUD treatment episode under 42 CFR Part 2, and the copilot is not
+          permitted to see it. If Copilot summarises the record without saying so, the
+          clinician reads a summary that appears complete and is not. The system has now
+          actively created a false belief that would not have existed if the tool did not
+          exist. <b>"2 records withheld" is not a privacy nicety; it is the difference
+          between a redaction and a lie.</b>
+        </p>
+      </div>
+
+      <h3>Context assembly is a core concern, not an app concern</h3>
+      <p>
+        The host supplies a context <em>resolver</em>, not a context blob. Copilot asks for
+        exactly the categories the active mode declares, the host returns what policy allows
+        plus an explicit list of what it withheld and why, and core assembles the prompt from
+        that. The important property: <b>the component cannot accidentally send data the mode
+        did not ask for</b>, because it never holds it.
+      </p>
+
+      <span class="filename">context.ts</span>
+      <pre><code><span class="c-k">interface</span> <span class="c-n">CopilotContextResolver</span> {
+  resolve(request: {
+    subject: <span class="c-n">Reference</span>;              <span class="c-c">// Patient/123</span>
+    categories: <span class="c-n">ResourceType</span>[];      <span class="c-c">// from mode.reads</span>
+    purpose: <span class="c-s">"treatment"</span>;            <span class="c-c">// recorded in the AuditEvent</span>
+  }): <span class="c-n">Promise</span>&lt;{
+    resources: <span class="c-n">FhirResource</span>[];
+    <span class="c-c">// Required, not optional. An empty array is a claim of completeness</span>
+    <span class="c-c">// and must be made deliberately.</span>
+    withheld: <span class="c-n">Array</span>&lt;{
+      reason: <span class="c-s">"part2"</span> | <span class="c-s">"psychotherapy-notes"</span> | <span class="c-s">"break-glass-required"</span>
+            | <span class="c-s">"minor-confidential"</span> | <span class="c-s">"patient-restriction"</span> | <span class="c-s">"policy"</span>;
+      count: <span class="c-n">number</span>;
+      <span class="c-c">// Never the content, never enough to infer it.</span>
+      disclosable: <span class="c-k">boolean</span>;
+    }&gt;;
+    asOf: <span class="c-n">string</span>;                     <span class="c-c">// staleness is a clinical fact</span>
+  }&gt;;
+}</code></pre>
+
+      <div class="note machine">
+        <span class="lbl">Note the <code>disclosable</code> flag</span>
+        <p>
+          In some jurisdictions the <em>existence</em> of a withheld record is itself
+          protected — knowing a patient has a sealed record can be as revealing as reading
+          it. So the resolver decides whether the strip says "2 records withheld" or says
+          nothing at all, and Copilot renders whichever it is told. That judgement belongs to
+          the deploying organisation's counsel, not to a component author, and the API shape
+          says so.
+        </p>
+      </div>
+
+      <h3>What comes back out</h3>
+      <p>
+        Every exchange produces a provenance record whether or not anyone looks at it. Oxygen
+        already has the FHIR helpers to shape this, and Signature already established the
+        pattern of mapping a component's value into FHIR resources rather than inventing a
+        format:
+      </p>
+      <ul>
+        <li><code>AuditEvent</code> — who asked, what mode, what was read, what was withheld,
+            which model and version, when.</li>
+        <li><code>Provenance</code> — attached to anything inserted into the record, with
+            <code>agent.who</code> set to the <em>clinician</em> and the model recorded as
+            <code>agent.onBehalfOf</code>. Never the reverse.</li>
+        <li><code>DocumentReference</code> — optional, for organisations that retain
+            transcripts. Worth telling customers plainly that a retained transcript is
+            discoverable in litigation, because most of them have not thought about it.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section id="actions">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="sec-num">Section 09</span>
+      <h2>Actions: propose, confirm, attribute</h2>
+      <p>
+        The moment Copilot can do something rather than say something, it becomes a different
+        product with a different risk profile. One pattern makes that safe, and it has no
+        exceptions.
+      </p>
+    </div>
+
+    <div class="prose">
+      <p>
+        Every action follows three steps that cannot be collapsed. The model emits a
+        <b>proposal</b> — a structured object, never free text. The UI renders it as a
+        reviewable diff with the reasoning and sources attached. A human <b>confirms</b>, and
+        the confirmation is a deliberate act distinguishable from dismissing a dialog. The
+        host then <b>executes</b> and writes provenance attributing the act to the human.
+      </p>
+      <p>
+        The temptation to collapse this is enormous and always framed as saving clicks. It is
+        worth naming the specific failure it prevents: an agent with standing write access to
+        an EHR, reading a patient-portal message containing a hidden instruction, executing
+        it before any human sees the message. That is not hypothetical — it is the documented
+        indirect-injection pattern in §12, and the propose/confirm boundary is the control
+        that makes it survivable.
+      </p>
+
+      <div class="grid g3" style="margin-top:1.5rem">
+        <div class="card">
+          <span class="k">Safe to propose</span>
+          <ul style="font-size:0.88rem;margin:0;padding-inline-start:1.1rem">
+            <li>Draft note text for review</li>
+            <li>Suggested problem-list additions</li>
+            <li>Candidate order sets, unsigned</li>
+            <li>Patient-education material</li>
+            <li>Referral letter drafts</li>
+          </ul>
+        </div>
+        <div class="card">
+          <span class="k">Confirm with friction</span>
+          <ul style="font-size:0.88rem;margin:0;padding-inline-start:1.1rem">
+            <li>Anything with a dose or a route</li>
+            <li>Anything that leaves the organisation</li>
+            <li>Anything a patient will read</li>
+            <li>Anything touching a Part 2 record</li>
+          </ul>
+        </div>
+        <div class="card">
+          <span class="k">Never</span>
+          <ul style="font-size:0.88rem;margin:0;padding-inline-start:1.1rem">
+            <li>Signing an order</li>
+            <li>Sending a message as the clinician</li>
+            <li>Modifying an existing note</li>
+            <li>Any write with no human in the loop</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="note warn" style="margin-top:1.75rem">
+        <span class="lbl">Design the confirmation, not just the button</span>
+        <p>
+          A confirm step that people click through reflexively is worse than none, because it
+          launders the model's output as human judgement while adding no scrutiny. Two things
+          make it real: the diff must show <em>what changes</em>, not restate what was
+          proposed; and the default focus must not be on the confirm control. If the
+          telemetry in §17 shows a median confirm time under two seconds, that step is
+          theatre and should be reported as such.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="bh">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="sec-num">Section 10</span>
+      <h2>Behavioral health</h2>
+      <p>
+        You asked specifically how this lands in behavioral health. The honest answer is that
+        it is the domain where this component has the most to offer and the least room for
+        error, and where a design that works fine in cardiology becomes unlawful.
+      </p>
+    </div>
+
+    <div class="prose">
+      <h3>Three structural differences that break the general design</h3>
+      <p>
+        <b>The record is part of the treatment.</b> In most of medicine, notes describe care
+        that happened elsewhere. In psychotherapy the note frequently <em>is</em> the clinical
+        material, which is why HIPAA gives psychotherapy notes their own heightened protection
+        and why 42 CFR Part 2 now defines SUD counselling notes as a separate category
+        requiring specific consent rather than a broad treatment authorisation. A summariser
+        pointed at a behavioral health chart is not doing the same thing it does in a
+        medical chart.
+      </p>
+      <p>
+        <b>The patient may be the user.</b> Everywhere else in this brief the user is a
+        clinician. Behavioral health is the one domain where product teams routinely put the
+        assistant in front of the patient — between sessions, at 2am, when the therapist is
+        unreachable. That single change moves the component across a legal line that three US
+        states have now drawn explicitly.
+      </p>
+      <p>
+        <b>Risk is acute, and the window is minutes.</b> A wrong answer about hypertension
+        plays out over months and is recoverable. A wrong response to someone disclosing
+        suicidal intent is not. Everything in this section follows from that asymmetry.
+      </p>
+
+      <h3>The legal wall, as of August 2026</h3>
+      <p>
+        Three states have legislated, they do not agree with each other, and the trajectory
+        is toward more rather than fewer. Any behavioral health deployment of Copilot has to
+        be configurable across all three postures.
+      </p>
+
+      <div class="tbl-scroll">
+        <table>
+          <thead><tr><th style="width:22%">Law</th><th style="width:38%">What it does</th><th>What it means for Copilot</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><b>Illinois WOPR Act</b><br><span class="tag">PA 104-0054 · Aug 2025</span></td>
+              <td>Bars AI from independently performing therapy. No independent therapeutic
+                  decisions, no direct therapeutic communication with clients, no treatment
+                  recommendations without licensed review, <b>and no detecting emotions or
+                  mental state.</b> Penalties to $10,000.</td>
+              <td>Kills the patient-facing configuration outright in Illinois. Also kills any
+                  "sentiment" or "affect" feature — a common and seemingly harmless addition
+                  that is specifically enumerated.</td>
+            </tr>
+            <tr>
+              <td><b>Nevada AB 406</b><br><span class="tag">eff. Jul 2025</span></td>
+              <td>Bars AI from providing professional mental or behavioral healthcare
+                  outright. Penalties to $15,000. Marketing terms like "AI therapy" or
+                  "chatbot counselor" are unlawful without clinician supervision.</td>
+              <td>The strictest posture. Copilot must be able to run clinician-facing-only
+                  with the patient surface not merely hidden but absent from the bundle.</td>
+            </tr>
+            <tr>
+              <td><b>Utah HB 452</b><br><span class="tag">eff. May 2025</span></td>
+              <td>Does not ban — requires honesty. Mental health chatbots must disclose they
+                  are software, may not sell user health data, and face limits on in-chat
+                  advertising.</td>
+              <td>The disclosure model. This is the posture the EU AI Act's Article 50 also
+                  takes (§11), so building to Utah gets you most of the way to Europe.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="note bad" style="margin-top:1.5rem">
+        <span class="lbl">The design conclusion</span>
+        <p>
+          <b>Copilot ships behavioral health as clinician-facing only.</b> The patient-facing
+          configuration is not a v2 feature to be sequenced later; it is a different product
+          with a different regulatory footing, and putting both behind one flag invites a
+          customer to flip it in a state where that is a five-figure penalty. If Oxygen ever
+          builds the patient-facing version it should carry a different name and a different
+          package.
+        </p>
+      </div>
+
+      <h3>The crisis interrupt</h3>
+      <p>
+        Mockup state 08. The design rules here are narrow and each one exists because
+        products have failed at it in ways that made the news.
+      </p>
+      <ul>
+        <li>
+          <b>The classifier runs before the model, not after.</b> If the model generates the
+          answer and a filter inspects it, the crisis path depends on the model having
+          behaved. It must not.
+        </li>
+        <li>
+          <b>The answer is replaced, not annotated.</b> Appending a hotline number to a
+          helpful answer produces something people scroll past. Recent evaluations found
+          safety banners disappearing entirely when unrelated clinical content was added to
+          the same message — the failure mode is dilution, and replacement is the only
+          reliable defence against it.
+        </li>
+        <li>
+          <b>Guardrails must not decay across a long conversation.</b> Measured degradation
+          over extended sessions is well documented; medical disclaimers in one longitudinal
+          analysis fell from 26% of responses in 2022 to under 1% by 2025. The classifier
+          therefore evaluates every turn against the whole thread, not the latest message.
+        </li>
+        <li>
+          <b>The hotline is resolved by locale, never hardcoded.</b> 988 works in the United
+          States and nowhere else. A component that ships 988 as a constant is shipping a bug
+          to every other market, and it is the kind of bug that gets discovered by the person
+          least able to absorb it.
+        </li>
+        <li>
+          <b>Escalation is to a human, and the component says so plainly.</b> The interstitial
+          copy should not be warm. Warmth here reads as the machine continuing to play a role
+          it must exit.
+        </li>
+      </ul>
+
+      <div class="note ok">
+        <span class="lbl">Test it against something real</span>
+        <p>
+          <b>VERA-MH</b> — Validation of Ethical and Responsible AI in Mental Health, released
+          by Spring Health with an expert council — is an open-source, clinically grounded
+          evaluation for exactly this. Its human-validation study reported an LLM judge
+          aligned with clinical consensus at 0.81 chance-corrected agreement, against 0.77
+          between the clinicians themselves. That makes it usable as an automated CI gate
+          rather than a report someone reads once. Wire it into §17's harness and the crisis
+          path has evidence behind it instead of a design intention.
+        </p>
+      </div>
+
+      <h3>Where the real value is: measurement-based care</h3>
+      <p>
+        The high-value behavioral health use for this component is not therapy and not
+        diagnosis. It is the thing every behavioral health organisation says it wants and
+        under a fifth actually do consistently — <b>measurement-based care</b>. PHQ-9, GAD-7,
+        AUDIT-C, PCL-5, C-SSRS, WHODAS, collected on schedule and actually looked at before
+        the session.
+      </p>
+      <p>
+        A Prepare-mode shortcut that opens with "PHQ-9 down 14→8 over three visits, GAD-7
+        flat at 12, last completed 6 days ago, two items unanswered" is genuinely useful, is
+        purely a restatement of documented data, generates no clinical recommendation, sits
+        outside every one of the three state laws above, and takes a week to build. It is
+        also the kind of thing a psychiatrist notices on day one and misses when it is gone.
+      </p>
+      <p>
+        The behavioral health mode pack that follows from this is deliberately unambitious:
+      </p>
+      <div class="grid g3">
+        <div class="card">
+          <span class="k">Mode · low risk</span>
+          <h4>Between visits</h4>
+          <p style="font-size:0.88rem;margin:0">Instrument trends, missed appointments,
+             adherence signals, outstanding measures. Reads only what was documented;
+             recommends nothing.</p>
+        </div>
+        <div class="card">
+          <span class="k">Mode · low risk</span>
+          <h4>Look up</h4>
+          <p style="font-size:0.88rem;margin:0">Formulary, interactions, guideline text,
+             titration schedules. No patient context. The safest surface in the product,
+             and the one clinicians ask for most.</p>
+        </div>
+        <div class="card">
+          <span class="k">Mode · high risk</span>
+          <h4>Formulate</h4>
+          <p style="font-size:0.88rem;margin:0">Case formulation support. Genuinely valuable,
+             genuinely dangerous, and the closest thing to what Illinois prohibits. Behind a
+             flag, clinician-facing, evals first.</p>
+        </div>
+      </div>
+
+      <h3>Two smaller things that signal you have done this before</h3>
+      <p>
+        <b>Language.</b> Behavioral health has a specific vocabulary problem: "addict",
+        "clean", "committed suicide", "non-compliant", "manipulative" — each carries clinical
+        judgement that changes how the next clinician reads the patient. Oxygen already ships
+        an <code>eslint-plugin</code> package, which makes a <code>no-stigmatising-language</code>
+        rule over the message catalog a genuinely cheap and unusually credible addition. The
+        same list belongs in the output post-check, flagging the model's language, not just
+        the component's own strings.
+      </p>
+      <p>
+        <b>Silence during the session.</b> Therapeutic alliance is the strongest single
+        predictor of outcome in psychotherapy, and it is built through attention. A dock that
+        pulses, streams, or animates during a session is competing with the thing that
+        actually works. Law 5's <code>suppressed</code> prop is not an edge case here — for a
+        therapy product it is the default state, and the component should be visible in the
+        ten minutes before and the ten minutes after, not the fifty in between.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section id="regulatory">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="sec-num">Section 11</span>
+      <h2>The regulatory surface</h2>
+      <p>
+        Four regimes touch this component. None of them regulate Oxygen — they regulate the
+        customer. That distinction is the entire commercial argument: the component's job is
+        to make the customer's compliance work cheap, and to never be the reason they fail it.
+      </p>
+    </div>
+
+    <div class="prose">
+      <h3>FDA — Clinical Decision Support software</h3>
+      <p>
+        The FDA revised its CDS guidance twice in January 2026, most recently on 29 January.
+        Software escapes device regulation only if it meets all four non-device criteria, and
+        the fourth is the one this component lives or dies on: the software must enable the
+        healthcare professional to <b>independently review the basis for the
+        recommendations</b>, so that they do not rely primarily on it to make a diagnosis or
+        treatment decision.
+      </p>
+      <p>
+        Four things in the 2026 revision matter for the design:
+      </p>
+      <ol>
+        <li>
+          <b>Single recommendations are now workable.</b> The 2022 guidance effectively
+          pushed developers to output lists; FDA now intends enforcement discretion where
+          only one option is clinically appropriate. Copilot does not need to manufacture
+          fake alternatives to stay non-device.
+        </li>
+        <li>
+          <b>Time-critical use moved into criterion 4.</b> The reasoning is explicit and it is
+          a design instruction: a clinician under time pressure cannot independently review
+          anything. Copilot must therefore know when it is in a time-critical context and
+          withdraw — which is the same <code>suppressed</code> prop as Law 5, now doing
+          regulatory work as well as human-factors work.
+        </li>
+        <li>
+          <b>Sources must be well understood and accepted.</b> Established guidelines and
+          peer-reviewed literature — not novel data sources, not proprietary derived signals.
+          This constrains what a customer may put in the retrieval corpus, and Copilot should
+          make corpus provenance visible enough that they notice when they have crossed it.
+        </li>
+        <li>
+          <b>Avoid information overload.</b> The guidance now explicitly asks that
+          decision-relevant details be prioritised. An answer that buries the clinically
+          relevant sentence under five paragraphs is not merely bad UX; it works against the
+          criterion the whole design depends on.
+        </li>
+      </ol>
+      <div class="note warn">
+        <span class="lbl">The gap worth telling customers about</span>
+        <p>
+          Despite being framed as an AI-focused update, the 2026 guidance is <b>silent on
+          generative AI</b>, and it declines to address consumer-facing decision support
+          entirely. So there is no safe harbour for an LLM-based clinical assistant and no
+          policy at all for a patient-facing one. Customers who assume the guidance blesses
+          their chatbot have misread it, and saying so early is worth more to them than
+          agreeing.
+        </p>
+      </div>
+
+      <h3>ONC / ASTP — HTI-1 Decision Support Interventions</h3>
+      <p>
+        If a customer's product is certified health IT, the DSI criterion at
+        §&nbsp;170.315(b)(11) applies. It requires <b>31 source attributes</b> for predictive
+        DSIs — the "model card" set: development details, validation, fairness, performance,
+        maintenance — plus intervention risk management practices covering risk analysis,
+        mitigation and governance along the lines of the NIST AI Risk Management Framework.
+        Certified developers had to meet this by 31 December 2024 and maintain it from 1
+        January 2025.
+      </p>
+      <div class="note ok">
+        <span class="lbl">This is a product opportunity, not a burden</span>
+        <p>
+          Copilot's disclosure sheet should be <b>structured to the 31 attributes</b>, shipped
+          as a typed object the customer fills in, rendered by the component, and exportable.
+          A customer pursuing certification then gets most of a compliance artifact from a
+          component they installed for the UI. That is the kind of thing that turns a
+          component purchase into a platform decision — and no free chat widget will do it.
+        </p>
+      </div>
+
+      <h3>EU AI Act</h3>
+      <p>
+        Article 50's transparency obligations came into force on <b>2 August 2026</b> —
+        two weeks ago — and were explicitly <em>not</em> deferred by the Digital Omnibus
+        package that pushed stand-alone high-risk Annex III obligations back to 2 December
+        2027. So the chatbot-disclosure duty is live now while the heavier high-risk regime
+        is not.
+      </p>
+      <p>
+        Practically: a user must know they are interacting with an AI system, and
+        AI-generated content carries marking obligations (with a grace period to 2 December
+        2026 for systems already on the market before August). Copilot's standing disclosure
+        line — the one already in your screenshot 6 — is the right primitive. It needs to be
+        non-dismissible, locale-aware, and present on the patient-facing surface if one ever
+        exists.
+      </p>
+
+      <h3>HIPAA, 42 CFR Part 2, and the BAA question</h3>
+      <ul>
+        <li>
+          <b>The model provider needs a BAA</b> if PHI reaches it. This is the first question
+          a customer's security team asks and Copilot should make the answer structural:
+          the provider adapter carries a <code>phiPermitted</code> flag, and core refuses to
+          attach patient context to a provider not marked as covered. A configuration error
+          becomes a thrown exception rather than a breach.
+        </li>
+        <li>
+          <b>Part 2 enforcement began 16 February 2026.</b> OCR announced its civil
+          enforcement program on 13 February and began accepting complaints three days later.
+          The rule states that segregating Part 2 records is not required — which means
+          customers may hold them commingled, which means <b>Copilot cannot assume the host's
+          data is already filtered</b>. The <code>excludes</code> list in §7 and the
+          <code>withheld</code> array in §8 exist for exactly this.
+        </li>
+        <li>
+          <b>Never put the API key in the browser.</b> Obvious, and still worth an explicit
+          line in the README, because the single most common integration mistake with any
+          model SDK is a client-side key. The adapter targets the customer's own endpoint;
+          Copilot has no network configuration that could reach a model vendor directly.
+        </li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section id="security">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="sec-num">Section 12</span>
+      <h2>Security: the chart is hostile input</h2>
+      <p>
+        This is the failure mode most likely to produce a headline, and the one most teams
+        building this component have not thought about at all.
+      </p>
+    </div>
+
+    <div class="prose">
+      <p>
+        Indirect prompt injection is the attack where instructions are hidden inside content
+        the model retrieves rather than in what the user types. In healthcare the retrieval
+        corpus is the chart, the patient-portal message queue, uploaded PDFs, and referral
+        letters — all of which contain text written by people outside the organisation. One
+        2025 simulation study reported commercial medical LLMs following injected instructions
+        in <b>94.4%</b> of simulated patient encounters, including recommendations that would
+        have been life-threatening.
+      </p>
+      <p>
+        The reason generic defences fail here is worth stating precisely: the dangerous
+        requests in a clinical setting are <em>fluent and legitimate-looking</em>. "Export
+        this patient's chart to the covering physician" carries no jailbreak signal. An
+        injection classifier scores it benign because, as a sentence, it is benign. What makes
+        it an attack is that nobody authorised it.
+      </p>
+
+      <div class="grid g2" style="margin:1.75rem 0">
+        <div class="card">
+          <span class="k">The containment rules</span>
+          <ul style="font-size:0.89rem;margin:0;padding-inline-start:1.1rem">
+            <li><b>Two channels, never merged.</b> Instructions come from the mode's prompt
+                template and the user's typed question. Chart content enters as fenced,
+                labelled data with an explicit "this is a record, not an instruction" frame.
+                They are concatenated in core, in one place, that has a test.</li>
+            <li><b>Retrieved content is never rendered as markup.</b> A note containing HTML
+                or a link renders as text. Injection via the display layer is the same bug in
+                a different coat.</li>
+            <li><b>Tools are allowlisted per mode and empty by default.</b> §7. An agent that
+                cannot call anything cannot be made to exfiltrate anything.</li>
+            <li><b>Egress is host-mediated.</b> Copilot makes no outbound request except to
+                the adapter endpoint the host configured. There is no second network path to
+                subvert.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <span class="k">What Copilot does not solve</span>
+          <p style="font-size:0.89rem">
+            A component cannot secure a backend. Copilot can guarantee the shape of what it
+            sends and the provenance of what it renders; it cannot stop a customer wiring an
+            agent with standing EHR write access behind it. The documentation should say this
+            in the same plain register as Oxygen's existing "not a compliance boundary" line —
+            and §9's propose/confirm pattern is the mitigation Oxygen <em>can</em> ship.
+          </p>
+          <p style="font-size:0.89rem;margin-bottom:0">
+            Worth tracking rather than adopting: healthcare-specific work on positive-security
+            prompt firewalls and the MPIB medical injection benchmark, both 2026. Neither is
+            mature enough to depend on, and both are the right shape for a later
+            <code>copilot-guard</code> package.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="a11y">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="sec-num">Section 13</span>
+      <h2>Accessibility</h2>
+      <p>
+        Oxygen's differentiator is that its components are accessible where Ant Design's are
+        not. A streaming chat surface is where that claim gets tested hardest, because the
+        naive implementation is genuinely unusable with a screen reader.
+      </p>
+    </div>
+
+    <div class="prose">
+      <h3>The streaming problem, and the actual answer</h3>
+      <p>
+        Putting <code>aria-live="polite"</code> on a streaming response container produces a
+        screen reader that either reads every partial token — an unusable stutter — or
+        silently coalesces and reads nothing useful. Both are common in shipped products.
+        The working pattern has four parts:
+      </p>
+      <ol>
+        <li>The streaming region is <code>aria-live="off"</code> and <code>aria-busy="true"</code>
+            while text arrives. Nothing is announced during the stream.</li>
+        <li>A separate visually-hidden status region announces <b>state transitions only</b>:
+            "Answering…", then on completion "Answer complete. 240 words, 3 sources."</li>
+        <li>On completion, <code>aria-busy</code> flips to false and focus management offers
+            the answer — the user moves to it deliberately rather than being dragged.</li>
+        <li>A <b>preference for progressive announcement</b> exists for users who want it,
+            announcing at sentence boundaries rather than tokens. Off by default, because the
+            majority preference is the summary.</li>
+      </ol>
+
+      <h3>The rest of the surface</h3>
+      <div class="tbl-scroll">
+        <table>
+          <thead><tr><th style="width:26%">Concern</th><th>Requirement</th></tr></thead>
+          <tbody>
+            <tr><td>Dock semantics</td><td>The dock is a <code>complementary</code> landmark with an accessible name, not a bare floating div. It must be reachable in the tab order at a predictable point and escapable from.</td></tr>
+            <tr><td>Panel focus</td><td>On open, focus moves to the panel heading; on close it returns to the element that opened it. The panel is not a dialog and must not trap focus — a clinician has to be able to keep working in the chart with it open.</td></tr>
+            <tr><td>Slash menu</td><td>Combobox pattern with <code>aria-activedescendant</code>. Arrow keys move, Enter selects, Escape closes and returns to the field with the "/" intact.</td></tr>
+            <tr><td>Dictation state</td><td>Recording is announced once on start and once on stop, and exposed as a persistent status — never conveyed by the waveform alone. This is a WCAG 1.4.1 failure waiting to happen, and it is also a privacy issue.</td></tr>
+            <tr><td>Citation markers</td><td>Superscript numbers need accessible text: "source 1, ACC AHA atrial fibrillation guideline" — not "one". Each is a button, not a link, since it opens a local drawer.</td></tr>
+            <tr><td>Reduced motion</td><td>Waveform becomes a static level meter that still updates amplitude. Streaming cursor stops blinking. Panel opens without transition. None of these may remove information.</td></tr>
+            <tr><td>Zoom &amp; reflow</td><td>WCAG 2.2 1.4.10 at 320 CSS px and 400% zoom. The dock docks to the bottom edge full-width and the panel becomes a sheet. This is where floating assistants normally fail, and it is worth a Playwright VRT case in the existing e2e suite.</td></tr>
+            <tr><td>Target size</td><td>WCAG 2.2 2.5.8 — 24×24 minimum. Your icon row in the dock is close to the limit at current sizes; worth measuring rather than assuming.</td></tr>
+            <tr><td>Dictation as access</td><td>Speech input is an accessibility feature for clinicians with motor impairment or RSI, not only a convenience. It should not be gated behind a premium tier for that reason.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="note">
+        <span class="lbl">Reuse what Signature already learned</span>
+        <p>
+          The antd gaps documented during Signature apply directly: Modal has no accessible
+          name without <code>title</code>, initial focus lands on an invisible sentinel, Tabs
+          drop <code>aria-controls</code> without an <code>id</code>, and the close button's
+          <code>aria-label</code> is hardcoded English outside the locale system. Copilot uses
+          Drawer, Dropdown and Tooltip, so the same audit needs repeating against those three
+          before the antd skin ships.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="architecture">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="sec-num">Section 14</span>
+      <h2>Architecture</h2>
+      <p>
+        Copilot also happens to settle the open question Signature left behind — whether
+        Oxygen wraps Ant Design, matches it, or migrates. The answer this component forces is
+        better than any of the three.
+      </p>
+    </div>
+
+    <div class="prose">
+      <h3>Resolving the registry-versus-antd tension</h3>
+      <p>
+        Signature took a dependency on antd because antd's Modal focus trap and Tabs ARIA
+        were worth more than reimplementing them. That was the right call there and it is the
+        wrong call here, for a simple reason: <b>almost none of Copilot is an antd component.</b>
+        A floating dock, a streaming thread, a citation drawer, a waveform, a slash palette —
+        antd has none of these. The antd surface Copilot would actually consume is Drawer,
+        Dropdown, Tooltip and Button, which is a rounding error against the bespoke work.
+      </p>
+      <p>
+        So Copilot should ship <b>headless</b>, with skins on top. This is not a compromise
+        between wrap and match; it is the structure that makes the question stop mattering.
+      </p>
+
+      <div class="grid g2" style="margin:1.5rem 0">
+        <div class="card">
+          <span class="k">Four packages</span>
+          <ul style="font-size:0.88rem;margin:0;padding-inline-start:1.1rem">
+            <li><code>copilot-core</code> — engine. No React, no DOM, no dependencies. Exactly the
+                <code>signature-core</code> precedent, and for the same reason: the expensive
+                half of the work stays portable.</li>
+            <li><code>copilot-react</code> — headless React. Hooks and unstyled primitives that
+                own state, keyboard, focus and ARIA. Peer dependency on React only.</li>
+            <li><code>copilot</code> — the antd skin. Peer dependency on antd, thin.</li>
+            <li>registry <code>copilot</code> — the Tailwind/registry skin, copy-as-source,
+                depending on <code>copilot-react</code> from npm.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <span class="k">Why this is worth the extra package</span>
+          <p style="font-size:0.88rem">
+            The accessibility work in §13 — the streaming announcement strategy, focus
+            handling, the combobox — is the hardest part of the component and is
+            design-system-agnostic. Putting it in <code>copilot-react</code> means it is
+            written once and correct in both channels, instead of written twice and correct
+            in neither.
+          </p>
+          <p style="font-size:0.88rem;margin-bottom:0">
+            It also means the copy-as-source registry channel <em>survives</em>, which the
+            wrap option would have ended. That matters for adoption: developers try the
+            registry, and buy the packages.
+          </p>
+        </div>
+      </div>
+
+      <h3>The engine</h3>
+      <p>
+        <code>copilot-core</code> is a reducer plus a middleware pipeline. It has no timers it
+        does not own, no globals, and no I/O it did not receive as an argument, which is what
+        makes it testable without a browser.
+      </p>
+
+      <span class="filename">copilot-core/src/session.ts — the state chart</span>
+      <pre><code>idle
+ └─ compose ──────────────┬─► dictating ──► compose
+                          │
+                          └─► submitting
+                               ├─► <span class="c-n">refused</span>     <span class="c-c">// scope classifier said no</span>
+                               ├─► <span class="c-n">crisis</span>      <span class="c-c">// crisis classifier fired — terminal</span>
+                               └─► streaming
+                                    ├─► stopped   <span class="c-c">// user aborted; partial, marked</span>
+                                    ├─► error     <span class="c-c">// transport or provider</span>
+                                    └─► complete
+                                         ├─► compose      <span class="c-c">// follow-up</span>
+                                         └─► proposing ──► confirming ──► committed</code></pre>
+
+      <p>
+        Two properties of this chart are load-bearing. <code>crisis</code> is <b>terminal</b> —
+        there is no edge back to streaming, so no code path exists in which a crisis
+        classification is followed by a model answer. And <code>committed</code> is reachable
+        only through <code>confirming</code>, so §9's rule is enforced by the type system
+        rather than by developer discipline.
+      </p>
+
+      <h3>The pipeline</h3>
+      <p>
+        Every exchange runs the same ordered chain. Each stage is pluggable, each stage's
+        decision is recorded, and the order is not configurable — that is the point.
+      </p>
+      <div class="tbl-scroll">
+        <table>
+          <thead><tr><th style="width:20%">Stage</th><th>Does</th><th style="width:22%">Failure behaviour</th></tr></thead>
+          <tbody>
+            <tr><td><code>crisis</code></td><td>Deterministic risk classification over the whole thread.</td><td>Terminal. Replace with interstitial. §10.</td></tr>
+            <tr><td><code>scope</code></td><td>Is this question in the mode's declared remit?</td><td>Refuse, explain, offer the right mode.</td></tr>
+            <tr><td><code>resolve</code></td><td>Ask the host's context resolver for the mode's declared categories.</td><td>Render as degraded, name what is missing.</td></tr>
+            <tr><td><code>redact</code></td><td>Optional de-identification before egress.</td><td>Fail closed — no context sent rather than partially redacted.</td></tr>
+            <tr><td><code>assemble</code></td><td>Build the request. The one place instruction and data channels meet. §12.</td><td>Throws if a provider lacks <code>phiPermitted</code>.</td></tr>
+            <tr><td><code>stream</code></td><td>Call the adapter, normalise events, resolve citations inline.</td><td>Partial marked partial, never silently truncated.</td></tr>
+            <tr><td><code>check</code></td><td>Citation coverage, dose guard, language, output contract.</td><td>Downgrade to "general" register; never silently rewrite.</td></tr>
+            <tr><td><code>audit</code></td><td>Emit <code>AuditEvent</code> through the host sink.</td><td>Best-effort, buffered, never blocks the UI.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Where the model lives</h3>
+      <div class="note">
+        <span class="lbl">The rule that makes "configurable with any model" true</span>
+        <p>
+          Copilot never talks to a model vendor. The adapter targets <b>an endpoint the
+          customer operates</b>, and that endpoint holds the key, applies the BAA-covered
+          routing, and enforces rate limits and tenancy. This is what makes the component
+          genuinely model-agnostic — swapping providers is a change on the customer's server,
+          not a change to the component — and it removes the single most common integration
+          vulnerability at the same time. Oxygen ships a reference endpoint as an example,
+          never as a service.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="api">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="sec-num">Section 15</span>
+      <h2>API surface</h2>
+      <p>
+        Enough of the real shape to argue with. Written the way Oxygen writes types — narrow,
+        structural, no transitive dependencies inflicted on a customer who copied a file.
+      </p>
+    </div>
+
+    <div class="prose-wide">
+      <span class="filename">copilot-core/src/provider.ts</span>
+      <pre><code><span class="c-c">/**
+ * The adapter. Implemented by the host against its OWN endpoint —
+ * never against a model vendor's API from the browser.
+ */</span>
+<span class="c-k">export interface</span> <span class="c-n">CopilotProvider</span> {
+  id: <span class="c-n">string</span>;
+
+  <span class="c-c">/** Core refuses to attach patient context unless this is true. */</span>
+  phiPermitted: <span class="c-k">boolean</span>;
+
+  capabilities: {
+    streaming: <span class="c-k">boolean</span>;
+    citations: <span class="c-k">boolean</span>;   <span class="c-c">// false ⇒ every answer is "general" register</span>
+    reasoning: <span class="c-k">boolean</span>;
+    tools: <span class="c-k">boolean</span>;
+    attachments: <span class="c-k">boolean</span>;
+  };
+
+  <span class="c-c">/** Rendered by CopilotDisclosure; structured to the HTI-1 attributes. §11 */</span>
+  disclosure: <span class="c-n">ModelDisclosure</span>;
+
+  send(
+    request: <span class="c-n">CopilotRequest</span>,
+    signal: <span class="c-n">AbortSignal</span>,
+  ): <span class="c-n">AsyncIterable</span>&lt;<span class="c-n">CopilotEvent</span>&gt;;
+}
+
+<span class="c-c">/**
+ * The wire protocol, normalised. Whatever an endpoint emits — SSE, NDJSON,
+ * a vendor SDK's own stream — the adapter maps it onto these.
+ */</span>
+<span class="c-k">export type</span> <span class="c-n">CopilotEvent</span> =
+  | { type: <span class="c-s">"delta"</span>; text: <span class="c-n">string</span> }
+  | { type: <span class="c-s">"reasoning"</span>; text: <span class="c-n">string</span> }
+  <span class="c-c">// Emitted DURING the stream, not after — Law 2 depends on it. §4</span>
+  | { type: <span class="c-s">"citation"</span>; marker: <span class="c-n">number</span>; source: <span class="c-n">Source</span> }
+  | { type: <span class="c-s">"claim"</span>; span: [<span class="c-n">number</span>, <span class="c-n">number</span>]; markers: <span class="c-n">number</span>[] }
+  | { type: <span class="c-s">"tool-call"</span>; call: <span class="c-n">ToolCall</span> }
+  | { type: <span class="c-s">"proposal"</span>; proposal: <span class="c-n">ActionProposal</span> }   <span class="c-c">// §9</span>
+  | { type: <span class="c-s">"safety"</span>; verdict: <span class="c-n">SafetyVerdict</span> }
+  | { type: <span class="c-s">"usage"</span>; input: <span class="c-n">number</span>; output: <span class="c-n">number</span> }
+  | { type: <span class="c-s">"error"</span>; error: <span class="c-n">CopilotError</span> }
+  | { type: <span class="c-s">"done"</span>; finish: <span class="c-s">"stop"</span> | <span class="c-s">"length"</span> | <span class="c-s">"aborted"</span> | <span class="c-s">"refused"</span> };
+
+<span class="c-k">export interface</span> <span class="c-n">Source</span> {
+  id: <span class="c-n">string</span>;
+  title: <span class="c-n">string</span>;
+  <span class="c-c">/** The retrieved passage itself. A URL alone is a citation, not a verification. */</span>
+  passage: <span class="c-n">string</span>;
+  highlight?: [<span class="c-n">number</span>, <span class="c-n">number</span>];
+  url?: <span class="c-n">string</span>;
+  kind: <span class="c-s">"guideline"</span> | <span class="c-s">"literature"</span> | <span class="c-s">"formulary"</span> | <span class="c-s">"org-policy"</span> | <span class="c-s">"record"</span>;
+  version?: <span class="c-n">string</span>;
+  retrievedAt: <span class="c-n">string</span>;
+  score?: <span class="c-n">number</span>;
+}</code></pre>
+
+      <span class="filename">copilot-react/src/index.ts — the headless surface</span>
+      <pre><code><span class="c-k">const</span> copilot = <span class="c-n">useCopilot</span>({
+  provider,
+  modes,
+  shortcuts,
+  context: contextResolver,       <span class="c-c">// §8</span>
+  safety: { crisis, scope, injection },
+  onAudit: (event) =&gt; sink.write(event),
+  locale,
+});
+
+copilot.state       <span class="c-c">// "idle" | "composing" | … | "crisis"</span>
+copilot.messages    <span class="c-c">// ReadonlyArray&lt;CopilotMessage&gt;</span>
+copilot.sources     <span class="c-c">// Map&lt;marker, Source&gt; — populated during streaming</span>
+copilot.scope       <span class="c-c">// { subject, categories, withheld[] } — drives the strip</span>
+copilot.submit(text)
+copilot.stop()
+copilot.confirm(proposalId)</code></pre>
+
+      <span class="filename">copilot/src/index.ts — the antd skin, as a customer sees it</span>
+      <pre><code><span class="c-k">import</span> { Copilot } <span class="c-k">from</span> <span class="c-s">"@oxygenui-design/copilot"</span>;
+<span class="c-k">import</span> <span class="c-s">"@oxygenui-design/copilot/styles.css"</span>;
+
+&lt;<span class="c-n">Copilot</span>
+  provider={ourEndpoint}
+  modes={[lookUp, prepare]}          <span class="c-c">// workUp deliberately absent — §7</span>
+  subject={{ reference: <span class="c-s">"Patient/123"</span> }}
+  context={resolver}
+  <span class="c-c">// Law 5, and FDA criterion 4's time-critical clause. §11</span>
+  suppressed={isAdministeringMedication || isSigningOrders}
+  anchor=<span class="c-s">"bottom-center"</span>
+  onAudit={sink.write}
+  onInsert={(text, provenance) =&gt; note.append(text, provenance)}
+/&gt;</code></pre>
+
+      <div class="note machine">
+        <span class="lbl">Read the props back as an argument</span>
+        <p>
+          There is no <code>apiKey</code>, no <code>model</code>, no <code>systemPrompt</code>,
+          and no <code>onToolCall</code>. Those absences are the design. A customer cannot
+          misconfigure this component into calling a vendor directly, cannot smuggle a
+          permission grant through a prompt string, and cannot wire an unattended tool
+          execution — because the surface to do it does not exist.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="plan">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="sec-num">Section 16</span>
+      <h2>Implementation plan</h2>
+      <p>
+        Sequenced by risk, not by visibility. Every phase ends with something a design partner
+        can run, which is the only sequencing that survives contact with a real customer.
+        Estimates assume one strong engineer; the clinical review in phases 4 and 6 is not
+        engineering time and cannot be compressed by adding engineers.
+      </p>
+    </div>
+
+    <ol class="phase">
+      <li>
+        <h4>Phase 0 · Decide and spike <span class="when">~1 week</span></h4>
+        <p style="color:var(--ink-2);font-size:0.92rem;margin-bottom:0.5rem">
+          Nothing in this brief is worth building until §18's four decisions are answered.
+          The spike exists to make one of them cheap to answer.
+        </p>
+        <ul>
+          <li>Build the dock and a streaming thread twice — once headless, once on antd — and
+              time both. This settles the §14 recommendation with evidence rather than
+              argument.</li>
+          <li>Write <code>copilot.meta.ts</code> against the existing schema and run
+              <code>pnpm gen</code>. If the metadata does not express a mode registry, the
+              schema needs a field before code is written, not after.</li>
+          <li>Draft the <code>ModelDisclosure</code> type against the 31 HTI-1 attributes. This
+              is a research task with a typed artifact at the end of it, and it is the piece
+              most likely to be underestimated.</li>
+        </ul>
+      </li>
+
+      <li>
+        <h4>Phase 1 · Core engine and the dock <span class="when">~3 weeks</span></h4>
+        <p style="color:var(--ink-2);font-size:0.92rem;margin-bottom:0.5rem">
+          <b>Look up mode only. No patient context anywhere in the codebase.</b> The lowest-risk
+          slice, and the one a design partner can pilot without an institutional review.
+        </p>
+        <ul>
+          <li><code>copilot-core</code>: session reducer, provider contract, event normaliser,
+              mode registry, pipeline skeleton with <code>scope</code> and <code>stream</code>
+              stages live and the rest as pass-throughs.</li>
+          <li><code>copilot-react</code>: <code>useCopilot</code>, dock primitives, slash
+              combobox, dictation via browser <code>SpeechRecognition</code> behind the same
+              adapter shape the real ASR will use.</li>
+          <li>Reference endpoint as an example app under <code>apps/</code>, wired to an
+              OpenAI-compatible shape so it works against most vendors unchanged.</li>
+          <li>Tests: reducer transitions exhaustively, event normaliser against three malformed
+              stream fixtures, axe on every dock state.</li>
+        </ul>
+      </li>
+
+      <li>
+        <h4>Phase 2 · Panel, citations, disclosure <span class="when">~3 weeks</span></h4>
+        <ul>
+          <li>Panel, thread, streaming render with the §13 announcement strategy — budget real
+              time for this; it is the hardest accessibility work in the component.</li>
+          <li>Inline citation markers, sources drawer, claim-to-marker mapping, the "general"
+              register for uncited spans.</li>
+          <li><code>CopilotDisclosure</code> rendering the HTI-1 attribute set, exportable.</li>
+          <li>The five required non-happy states from Oxygen's <code>DESIGN.md</code>, designed
+              rather than defaulted.</li>
+          <li>Playwright VRT at 320px and 400% zoom, added to the existing <code>@vrt</code> tag.</li>
+        </ul>
+      </li>
+
+      <li>
+        <h4>Phase 3 · Patient context <span class="when">~3 weeks</span></h4>
+        <p style="color:var(--ink-2);font-size:0.92rem;margin-bottom:0.5rem">
+          Unlocks Prepare mode. This is where the component starts touching PHI and where the
+          security conversation with customers begins.
+        </p>
+        <ul>
+          <li>Context resolver contract, assembler, the <code>withheld</code> path end to end
+              including the <code>disclosable</code> distinction.</li>
+          <li>Scope strip. Injection containment in <code>assemble</code>, with the
+              instruction/data fence covered by a test that fails loudly if the two channels
+              are ever concatenated elsewhere.</li>
+          <li><code>AuditEvent</code> and <code>Provenance</code> mapping via
+              <code>@oxygenui-design/fhir</code>.</li>
+          <li>The <code>phiPermitted</code> guard, with a test asserting it throws rather than
+              degrades.</li>
+        </ul>
+      </li>
+
+      <li>
+        <h4>Phase 4 · Behavioral health pack <span class="when">~2 weeks + clinical review</span></h4>
+        <ul>
+          <li>Crisis classifier interface, interstitial, locale-resolved crisis lines, terminal
+              state enforcement.</li>
+          <li>Part 2 exclusion category wired through modes and the resolver.</li>
+          <li>"Between visits" mode with instrument trend rendering — PHQ-9, GAD-7, C-SSRS.</li>
+          <li><code>no-stigmatising-language</code> ESLint rule in the existing
+              <code>eslint-plugin</code>, plus the same list as an output post-check.</li>
+          <li>VERA-MH wired into CI. <b>Clinical review gate before merge, not after.</b></li>
+        </ul>
+      </li>
+
+      <li>
+        <h4>Phase 5 · Actions <span class="when">~3 weeks</span></h4>
+        <ul>
+          <li>Proposal type, diff rendering, confirm step with anti-reflex defaults, attributed
+              commit, undo window.</li>
+          <li>Per-mode tool allowlist enforced in core.</li>
+          <li>Confirm-dwell telemetry from day one, so §9's theatre check has data.</li>
+        </ul>
+      </li>
+
+      <li>
+        <h4>Phase 6 · Work up <span class="when">only after §17 passes</span></h4>
+        <ul>
+          <li>Behind a flag, off by default, clinician-facing only, unranked differentials.</li>
+          <li>Ships when the eval gate clears, not when the sprint ends. If that is never,
+              that is an acceptable outcome and the product is still good.</li>
+        </ul>
+      </li>
+    </ol>
+
+    <div class="prose" style="margin-top:2.25rem">
+      <p>
+        <b>Roughly fourteen to sixteen weeks to a defensible v1</b> covering phases 0–4, with
+        5 and 6 following on evidence. Phases 2 and 3 partially parallelise across two
+        engineers; phase 4 does not, because it is gated on a clinician's calendar rather
+        than on code.
+      </p>
+      <div class="note warn">
+        <span class="lbl">The estimate most likely to be wrong</span>
+        <p>
+          The HTI-1 disclosure work in phase 0/2 looks like typing a type. It is actually
+          gathering 31 pieces of information about a model, some of which the customer's
+          vendor will not readily supply. Budget it as research, expect it to surface
+          uncomfortable questions, and treat those questions as the product working.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="evals">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="sec-num">Section 17</span>
+      <h2>Evals and telemetry</h2>
+      <p>
+        The part that separates a component someone bought from a component someone trusts.
+        Both halves belong in the repository, not in a dashboard.
+      </p>
+    </div>
+
+    <div class="prose">
+      <h3>The release gate</h3>
+      <div class="note bad">
+        <span class="lbl">Law 4, as a failing test</span>
+        <p>
+          Below roughly <b>70% reliability</b>, automation makes human performance worse than
+          no automation at all. So the assembled stack must clear that on the customer's own
+          eval set before a mode is enabled — and Copilot should ship the harness that measures
+          it, with the gate wired into CI as a test that fails the build. A number on a
+          dashboard is a number nobody blocks a release on.
+        </p>
+      </div>
+
+      <p>
+        Five eval suites, shipped as <code>@oxygenui-design/copilot-evals</code> with fixtures
+        the customer replaces with their own:
+      </p>
+      <div class="tbl-scroll">
+        <table>
+          <thead><tr><th style="width:24%">Suite</th><th>Measures</th><th style="width:20%">Gate</th></tr></thead>
+          <tbody>
+            <tr><td><b>Citation faithfulness</b></td><td>Does each cited claim actually appear in the cited passage? The single highest-yield eval, because it catches the failure that looks most like success.</td><td>Blocking</td></tr>
+            <tr><td><b>Retrieval accuracy</b></td><td>Does the right source surface for a known question set?</td><td>Blocking</td></tr>
+            <tr><td><b>Refusal correctness</b></td><td>Out-of-scope questions refused; in-scope questions <em>not</em> refused. Over-refusal is a real failure and usually unmeasured.</td><td>Blocking</td></tr>
+            <tr><td><b>Crisis response</b></td><td>VERA-MH, plus long-conversation variants that test guardrail decay. §10.</td><td>Blocking, behavioral health</td></tr>
+            <tr><td><b>Injection resistance</b></td><td>Adversarial content in retrieved records; MPIB-shaped. §12.</td><td>Blocking</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Telemetry, and the metric that must not be the north star</h3>
+      <div class="note warn">
+        <span class="lbl">Engagement is the wrong goal here</span>
+        <p>
+          For a consumer chat product, more messages is better. For this component it is
+          ambiguous at best: a clinician sending forty messages a shift may be getting
+          enormous value, or may have been pulled into a tool that is now the work rather
+          than helping with it. <b>Optimise for task completion time and verification rate.
+          Track engagement as a diagnostic, never as a success metric</b> — and say so
+          out loud when a customer's growth team asks for the opposite.
+        </p>
+      </div>
+
+      <div class="grid g2">
+        <div class="card">
+          <span class="k">Signals worth acting on</span>
+          <ul style="font-size:0.88rem;margin:0;padding-inline-start:1.1rem">
+            <li><b>Verification rate</b> — proportion of answers where the sources drawer was
+                opened. Falling over time is the automation-bias early warning, and it is the
+                single most important number in the product.</li>
+            <li><b>Time to verify</b> — Law 2 made measurable. If it climbs, the drawer has
+                regressed.</li>
+            <li><b>Refusal rate, split by correct and incorrect</b> — over-refusal drives
+                abandonment silently.</li>
+            <li><b>Confirm dwell time</b> — median under two seconds means §9's confirm step
+                has become theatre.</li>
+            <li><b>Abandonment after first token</b> — the answer started badly.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <span class="k">Shipped as hooks, not a service</span>
+          <p style="font-size:0.88rem">
+            Copilot emits typed telemetry events and stores nothing. The customer routes them
+            wherever their analytics already live. Oxygen never becomes a processor of clinical
+            interaction data — that is a liability position, a procurement obstacle, and a
+            data-residency conversation nobody in a component library wants to have.
+          </p>
+          <p style="font-size:0.88rem;margin-bottom:0">
+            The same reasoning applies to transcripts, threads and audit events. Every one of
+            them goes out through a host sink.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="risks">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="sec-num">Section 18</span>
+      <h2>Risks, open decisions, and what I would cut</h2>
+    </div>
+
+    <div class="prose">
+      <h3>Four decisions that need your answer before code</h3>
+      <ol>
+        <li>
+          <b>The four-package headless split (§14) — yes or no?</b> This is the Signature
+          question coming back. My recommendation is yes, and Copilot is the right component
+          to settle it on because so little of it is antd. Saying no means the registry
+          channel ends for anything sophisticated, which is a strategy decision, not a
+          packaging one.
+        </li>
+        <li>
+          <b>Where is the free/pro line?</b> My suggestion: the dock, the thread, and Look up
+          mode are free and in the registry — that is the adoption engine. Context resolution,
+          audit mapping, the disclosure sheet, the eval harness, and the behavioral health
+          pack are pro. The free tier must be genuinely useful or it does no work; the pro
+          tier must be the compliance machinery, because that is what has a budget attached.
+        </li>
+        <li>
+          <b>Does Oxygen ship a reference backend?</b> An example app is safe and clearly
+          scoped. A supported package edges Oxygen toward being infrastructure, which is a
+          different company. I would ship the example and resist the package for at least a
+          year, but it is a strategy call, not a technical one.
+        </li>
+        <li>
+          <b>Is behavioral health a mode pack or a separate product?</b> §10 argues that the
+          patient-facing configuration must be a different package with a different name. The
+          clinician-facing behavioral health pack can live inside Copilot. Confirm you agree,
+          because the answer changes the package layout in phase 0.
+        </li>
+      </ol>
+
+      <h3>Risks worth naming now</h3>
+      <div class="grid g2">
+        <div class="card">
+          <span class="k">Scope drift into the scribe category</span>
+          <p style="font-size:0.89rem;margin:0">Dictation is one small step from ambient
+             recording, and a customer will ask. That market has Abridge, Microsoft DAX and
+             Nabla in it with hundreds of millions in funding and deep Epic integration —
+             together they hold the large majority of ambient deployments in Epic hospitals.
+             Oxygen cannot win it and should not try. Say no early and in writing.</p>
+        </div>
+        <div class="card">
+          <span class="k">Liability positioning</span>
+          <p style="font-size:0.89rem;margin:0">Shipping safety machinery invites the reading
+             that Oxygen is warranting safety. The existing "not a compliance boundary"
+             language needs a Copilot-specific extension, reviewed by someone qualified,
+             before the first sale rather than after the first incident.</p>
+        </div>
+        <div class="card">
+          <span class="k">The regulatory content ages</span>
+          <p style="font-size:0.89rem;margin:0">§11 moved twice in January 2026 alone, and
+             Part 2 enforcement began in February. Documentation that states the law will be
+             wrong within a year. Write it as "what this component does" with the regulation
+             as rationale, so a change in the rule does not invalidate the docs.</p>
+        </div>
+        <div class="card">
+          <span class="k">Name collision, again</span>
+          <p style="font-size:0.89rem;margin:0">"Copilot" is common in health IT. It is
+             defensible as a component name inside a namespaced library and it is not a
+             product brand, so this is a lower risk than the Oxygen name itself already
+             carries — but check npm and the trademark register in phase 0 rather than at
+             launch.</p>
+        </div>
+      </div>
+
+      <h3>What I would cut from your sketch</h3>
+      <ul>
+        <li><b>Multi-select modes.</b> §3. An unreviewed permission union.</li>
+        <li><b>"Ask anything…".</b> §3. Promises a scope the component must refuse.</li>
+        <li><b>Work up, from v1.</b> §7. Highest harm, lowest confidence, and the mode most
+            likely to be demoed before it is evaluated.</li>
+        <li><b>The reasoning panel as a default-open surface.</b> Keep it collapsed. Visible
+            chain-of-thought reads as evidence to a clinician, and it is not evidence — it is
+            a narrative the model produced alongside the answer.</li>
+      </ul>
+
+      <h3>What I would add that you did not ask for</h3>
+      <ul>
+        <li><b>The scope strip.</b> §8. The highest-value element in the component.</li>
+        <li><b>The <code>suppressed</code> prop.</b> §4 Law 5 and §11's time-critical clause,
+            one prop serving both.</li>
+        <li><b>Sources as passages, not links.</b> §5 state 07. The difference between
+            satisfying criterion 4 and gesturing at it.</li>
+        <li><b>The eval harness as a shipped package.</b> §17. Nobody else selling a
+            component does this, and it is what makes the whole argument credible.</li>
+      </ul>
+
+      <div class="note ok" style="margin-top:2rem">
+        <span class="lbl">The bottom line</span>
+        <p>
+          Your instinct is right — this is the surface every clinical application is about to
+          need, and being early with a good one is worth a great deal. But the version worth
+          building is not the version that demos best. It is the one that makes a clinician
+          faster at checking, that can prove where an answer came from, that knows when to
+          disappear, and that treats behavioral health as its own domain rather than a theme.
+          That component is roughly four months of work and it has no real competitor.
+          The one that demos best is three weeks and has a hundred.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="sources">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="sec-num">Appendix</span>
+      <h2>Sources</h2>
+      <p>
+        Everything factual in this brief, with somewhere to check it. The regulatory items
+        moved recently enough that dates matter more than usual.
+      </p>
+    </div>
+
+    <div class="grid g2">
+      <div class="card">
+        <span class="k">Regulatory</span>
+        <ul style="font-size:0.85rem;margin:0;padding-inline-start:1.1rem">
+          <li><a href="https://www.fda.gov/regulatory-information/search-fda-guidance-documents/clinical-decision-support-software">FDA — Clinical Decision Support Software guidance</a>, revised 29 January 2026</li>
+          <li><a href="https://www.cov.com/news-and-insights/insights/2026/01/5-key-takeaways-from-fdas-revised-clinical-decision-support-cds-software-guidance">Covington — 5 key takeaways from the revised CDS guidance</a></li>
+          <li><a href="https://healthit.gov/test-method/decision-support-interventions/">ONC — §170.315(b)(11) Decision Support Interventions</a> and the <a href="https://healthit.gov/wp-content/uploads/2023/12/HTI-1_DSI_fact-sheet_508.pdf">HTI-1 DSI fact sheet</a> (31 predictive source attributes)</li>
+          <li><a href="https://artificialintelligenceact.eu/article/50/">EU AI Act Article 50</a>; <a href="https://www.goodwinlaw.com/en/insights/publications/2026/08/alerts-technology-dpc-eu-ai-act-transparency-obligations-now-in-force">Goodwin — transparency obligations in force 2 Aug 2026</a>; <a href="https://www.gibsondunn.com/eu-ai-act-omnibus-agreement-postponed-high-risk-deadlines-and-other-key-changes/">Gibson Dunn — Omnibus high-risk deferral to Dec 2027</a></li>
+          <li><a href="https://www.hipaajournal.com/february-16-2026-compliance-deadline-part-2-final-rule/">42 CFR Part 2 — 16 February 2026 compliance and OCR enforcement</a></li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <span class="k">Behavioral health law &amp; safety</span>
+        <ul style="font-size:0.85rem;margin:0;padding-inline-start:1.1rem">
+          <li><a href="https://www.wsgr.com/en/insights/legal-framework-for-ai-in-mental-healthcare.html">Wilson Sonsini — legal framework for AI in mental healthcare</a> (Illinois WOPR, Nevada AB 406, Utah HB 452)</li>
+          <li><a href="https://stateline.org/2026/01/15/ai-therapy-chatbots-draw-new-oversight-as-suicides-raise-alarm/">Stateline — AI therapy chatbots draw new oversight</a>, January 2026</li>
+          <li><a href="https://www.springhealth.com/news/spring-health-expert-council-vera-mh-first-open-source-evaluation-ai-mental-health">VERA-MH</a> and its <a href="https://arxiv.org/abs/2602.05088">human validation study</a> (IRR 0.81 vs 0.77 clinician baseline)</li>
+          <li><a href="https://apn.com/research/zero-of-29-ai-chatbots-provided-adequate-suicide-crisis-responses/">Evaluation of 29 chatbots against C-SSRS-based crisis scenarios</a></li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <span class="k">Human factors</span>
+        <ul style="font-size:0.85rem;margin:0;padding-inline-start:1.1rem">
+          <li><a href="https://psnet.ahrq.gov/node/39523/psn-pdf">Westbrook et al. — interruptions and medication administration errors</a>, Arch Intern Med 2010 (+12.1% procedural failures, +12.7% clinical errors per interruption; major-error risk 2.3%→4.7% at four)</li>
+          <li><a href="https://journals.sagepub.com/doi/10.1177/14604582241263242">Override rates for drug–drug interaction alerts — systematic review and meta-analysis</a></li>
+          <li><a href="https://link.springer.com/article/10.1186/s12911-017-0425-5">Automation bias in electronic prescribing</a> (+56.9% commission errors with incorrect CDS)</li>
+          <li><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC6353646/">Reduced verification of medication alerts increases prescribing errors</a></li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <span class="k">Security &amp; market</span>
+        <ul style="font-size:0.85rem;margin:0;padding-inline-start:1.1rem">
+          <li><a href="https://arxiv.org/html/2602.06268">MPIB — a benchmark for medical prompt injection attacks</a>, 2026</li>
+          <li><a href="https://www.medrxiv.org/content/10.64898/2026.06.04.26354950v2.full">Positive-security prompt firewall for healthcare agents</a>, medRxiv 2026</li>
+          <li><a href="https://www.aptible.com/hipaa-ai-security/prompt-injection">Aptible — prompt injection in healthcare AI</a> (summarising the 94.4% instruction-following figure)</li>
+          <li><a href="https://www.techtarget.com/searchhealthit/news/366638553/Two-thirds-of-Epic-hospitals-have-adopted-ambient-AI-tools">Two-thirds of Epic hospitals have adopted ambient AI tools</a></li>
+          <li><a href="https://www.healthcare.digital/single-post/openevidence-chatgpt-for-doctors-2026-plans-and-strategic-outlook">OpenEvidence 2026 outlook</a> — $250M Series D, Epic-embedded evidence search</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="note warn" style="margin-top:1.5rem">
+      <span class="lbl">On the numbers</span>
+      <p>
+        The 94.4% instruction-following figure is reported second-hand from a 2025 simulation
+        study and should be verified against the primary source before it appears in anything
+        customer-facing. Every other figure here comes from the linked publication directly.
+        None of this is legal advice, and the three state laws in §10 are summarised, not
+        quoted.
+      </p>
+    </div>
+  </div>
+</section>
+
+
+<footer class="end">
+  <div class="wrap">
+    <p>
+      Oxygen UI · Copilot brief · drafted 16 August 2026. Nothing here is committed to the
+      repository yet. Section 18 lists the four decisions that need Rahul's answer before any
+      code is written.
+    </p>
+    <p>
+      Oxygen UI is not a compliance boundary. Copilot does not make an application HIPAA,
+      GDPR, or DPDP compliant, is not a medical device, and is not clinical decision support
+      as defined by any regulator. It is a user interface with safety machinery attached,
+      and the obligations in §11 belong to the team that ships it.
+    </p>
+  </div>
+</footer>

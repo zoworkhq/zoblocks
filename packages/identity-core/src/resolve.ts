@@ -255,7 +255,7 @@ export function resolvePhoto(patient: Patient, p: IdentityPolicy): PhotoState {
    * which made the value indistinguishable from `"allow"` — a policy setting
    * that reads as a safeguard and does nothing is worse than not having it.
    *
-   * There is no consent record in `Patient.photo` to consult, so the honest
+   * There is no consent record in `Patient.photo` to copilot, so the honest
    * contract is: the application asserts consent by switching this to
    * `"allow"`, and until it does the photograph stays behind the same withheld
    * state a site-wide denial produces.

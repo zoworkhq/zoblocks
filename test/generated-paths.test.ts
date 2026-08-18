@@ -162,7 +162,7 @@ describe("workspace packages the docs app bundles", () => {
    * which takes the specifier literally. They are aliased to `dist` in
    * next.config.ts instead. A package imported without an alias does not fail
    * subtly: the page 500s. It is still worth a test, because it is discovered
-   * only by importing the package, which is how Consult reached the app without
+   * only by importing the package, which is how Copilot reached the app without
    * one.
    */
   const nextConfig = readFileSync(path.join(DOCS, "next.config.ts"), "utf8");

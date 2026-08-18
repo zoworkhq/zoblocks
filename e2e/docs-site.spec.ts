@@ -161,7 +161,7 @@ test.describe("scrolling @a11y", () => {
    * is that the entries differ per component.
    */
   test("every rail entry points at a section that exists", async ({ page }) => {
-    for (const name of ["tabs", "switch", "accordion", "consult", "pulse-loader"]) {
+    for (const name of ["tabs", "switch", "accordion", "copilot", "pulse-loader"]) {
       await page.goto(`/components/${name}`);
 
       const missing = await page.evaluate(() =>
