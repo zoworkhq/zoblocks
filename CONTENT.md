@@ -174,6 +174,50 @@ on screen is complete.
 
 ---
 
+## 6a. Coverage — saying what a view is a view of
+
+A component that shows _some_ of a set has to say so, in words, in a fixed
+place. The sentence is **composed by the component from typed data**, never
+written by the caller — a hand-written "showing recent results" drifts from the
+query the moment either changes, and a claim that has drifted is worse than no
+claim. See [ADR 0011](content/decisions/0011-summaries-declare-their-boundaries.md).
+
+The grammar, in order, because a reader takes the first clause and stops:
+
+1. **The count.** `Showing 8 of 43 events` — or `Showing all 12 events` when
+   there is no remainder. Never "showing recent", never "top results".
+2. **The order.** `newest first`. A list that silently reverses tells a
+   different story with no visible difference.
+3. **The window.** `from 1 July 2025 to now`, at the precision the caller gave.
+4. **What is missing, and why.** One clause per reason, each with a number:
+   `33 beyond this page`, `5 hidden by the "Clinical" filter`, `2 you do not
+have access to`, `6 of a type this view cannot render`.
+5. **The sources, and their health.** A source that did not answer is named.
+
+✅ **Do**
+
+- Say what was _searched_, not what exists. "1 of 2 sources reached" is true;
+  "complete record" is a claim the query cannot support.
+- Escalate a source that failed from a footnote to an interruption. The reader
+  is about to convert an absence into a clinical fact.
+- Add the sentence that says an absence is not a finding: _"This is not a
+  statement that no such records exist."_
+- Keep the claim in print. Print is where "See all" stops existing.
+
+❌ **Don't**
+
+- Punctuate the remainder. "…" and "+35 more" are not counts.
+- Hide the count behind the control that caused it. A filter that says how much
+  it hid only inside its own popover — usually off screen — has not said it.
+- Let a failure render as an emptiness. Three different empty states —
+  _no record_, _none in this window_, _none you may see_ — are three different
+  facts with three different next actions, and one shrug for all three is the
+  defect this guide exists to prevent.
+- Write the sentence by hand. Call `describeCoverage()`, which is exported so
+  the print header, the export and the audit record all say the same thing.
+
+---
+
 ## 7. Register — who is reading
 
 Patient-facing and clinician-facing strings are **different catalogs, not

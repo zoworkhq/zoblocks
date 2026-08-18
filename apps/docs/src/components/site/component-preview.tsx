@@ -25,6 +25,15 @@ import {
   type ChartSection,
 } from "@/registry/oxygen/chart-accordion/chart-accordion";
 import { SafetyPlan } from "@/registry/oxygen/safety-plan/safety-plan";
+import { Timeline } from "@/registry/oxygen/timeline/timeline";
+import { CareTimeline } from "@/registry/oxygen/care-timeline/care-timeline";
+import {
+  COVERAGE as TIMELINE_COVERAGE,
+  EVENTS as TIMELINE_EVENTS,
+  HEALTHY_COVERAGE as TIMELINE_HEALTHY_COVERAGE,
+  NOW as TIMELINE_NOW,
+  SEEN_THROUGH as TIMELINE_SEEN_THROUGH,
+} from "@/registry/oxygen/care-timeline/care-timeline.fixtures";
 import type { AccordionItem } from "@/registry/oxygen/lib/accordion-core";
 import { Tabs } from "@oxygenui-design/tabs";
 import { Copilot } from "@/registry/oxygen/copilot/copilot";
@@ -517,6 +526,54 @@ function completeNote() {
   );
 }
 
+/**
+ * The shape a patient timeline usually ships as.
+ *
+ * Deliberately not a strawman — the craft is fine and the structure is the one
+ * the reference design used. What it cannot express is the point: the event
+ * type is fused into the title prose, the actor's role is missing, the date
+ * carries no time or zone, and "See All" concedes that more exists without
+ * saying how much. It is here so the comparison beside it is against a real
+ * rendering rather than an argument about one.
+ */
+function NaiveTimeline() {
+  const rows = [
+    ["Routine Checkup: Dr. Wade warren", "26 Mar, 2025"],
+    [
+      "Medical History: form sent and response received and reviewed by Dr. Wade warren",
+      "25 Mar, 2025",
+    ],
+    ["Appointment: scheduled with Dr. Wade warren", "24 Mar, 2025"],
+    ["Follow-up Call", "22 Mar, 2025"],
+    ["Reminder Email to Dr. Wade warren", "20 Mar, 2025"],
+  ];
+
+  return (
+    <div className="rounded-lg border border-[var(--ox-border)] bg-[var(--ox-surface)] p-5">
+      <div className="mb-4 flex items-baseline justify-between">
+        <span className="text-base font-semibold text-[var(--ox-text)]">Patient Timeline</span>
+        <span className="text-sm text-[var(--ox-text-muted)]">See All</span>
+      </div>
+      <ol className="m-0 list-none p-0">
+        {rows.map(([title, date], index) => (
+          <li key={title} className="grid grid-cols-[2rem_1fr] gap-3">
+            <span className="grid justify-items-center">
+              <span className="size-8 rounded-full border border-[var(--ox-border)]" />
+              {index < rows.length - 1 ? (
+                <span className="mt-1.5 w-px flex-1 self-stretch bg-[var(--ox-border)]" />
+              ) : null}
+            </span>
+            <span className="pb-4">
+              <span className="block text-sm font-semibold text-[var(--ox-text)]">{title}</span>
+              <span className="block text-xs text-[var(--ox-text-subtle)]">{date}</span>
+            </span>
+          </li>
+        ))}
+      </ol>
+    </div>
+  );
+}
+
 const SCENARIOS: Record<string, Scenario[]> = {
   identity: [
     {
@@ -810,6 +867,174 @@ const SCENARIOS: Record<string, Scenario[]> = {
       render: () => (
         <InstrumentStage>
           <ChartAccordion sections={RECORD_SECTIONS} toolbar={false} headingLevel={3} />
+        </InstrumentStage>
+      ),
+    },
+  ],
+
+  timeline: [
+    {
+      id: "vertical",
+      label: "The rail",
+      note: "Ant Design v6's Timeline, prop for prop, with no dependency on antd. Two things are different and both are deliberate: the list has a name, which antd exposes no way to give it, and there is no current step — antd hardcodes one and its stylesheet dots that item's rail, which on a reversed chronology lands a mark of incompleteness under the oldest event in the chart.",
+      render: () => (
+        <InstrumentStage>
+          <Timeline
+            aria-label="Release history"
+            items={[
+              { key: "0.4.0", title: "0.4.0", content: "Timeline and CareTimeline." },
+              { key: "0.3.0", title: "0.3.0", content: "Switch, Tabs, ChartAccordion." },
+              { key: "0.2.0", title: "0.2.0", content: "Signature and Identity." },
+              { key: "0.1.0", title: "0.1.0", content: "Five loaders." },
+            ]}
+          />
+        </InstrumentStage>
+      ),
+    },
+    {
+      id: "legacy",
+      label: "An Ant Design v5 call site",
+      note: 'The same component, written the way an existing antd codebase writes it — label, children, dot, and mode="left". v6 renamed all four and kept them working; so does this, which is what makes the migration an import change rather than a rewrite.',
+      render: () => (
+        <InstrumentStage>
+          <Timeline
+            aria-label="Release history, written for v5"
+            mode="left"
+            items={[
+              { key: "a", label: "0.4.0", children: "label and children, as v5 spelled them." },
+              {
+                key: "b",
+                label: "0.3.0",
+                children: "dot instead of icon.",
+                dot: <span aria-hidden="true">◆</span>,
+              },
+            ]}
+          />
+        </InstrumentStage>
+      ),
+    },
+  ],
+
+  "care-timeline": [
+    {
+      id: "chart",
+      label: "The whole chart",
+      note: "Fourteen months, two source systems, one of them down. Read the footer first: it is the only thing on screen that tells you what the list above it is a view of — the window, the order, the counts, and which sources answered. It is a required prop, and it prints.",
+      render: () => (
+        <InstrumentStage>
+          <CareTimeline
+            aria-label="Care timeline for Ada Lovelace"
+            events={TIMELINE_EVENTS}
+            now={TIMELINE_NOW}
+            coverage={TIMELINE_COVERAGE}
+            seenThrough={TIMELINE_SEEN_THROUGH}
+            localeTag="en-GB"
+            filters={false}
+          />
+        </InstrumentStage>
+      ),
+    },
+    {
+      id: "degraded",
+      label: "A source that could not be reached",
+      note: "The failure this component exists to prevent. A clinician reads a timeline with no imaging on it and orders a CT; the study was done eleven weeks ago at another hospital and the exchange query timed out four seconds earlier. Nothing was wrong on screen. So the banner interrupts, the rail goes dashed where the records would have been, and the sentence at the foot says which source did not answer.",
+      render: () => (
+        <InstrumentStage>
+          <CareTimeline
+            aria-label="Care timeline with a failed source"
+            events={TIMELINE_EVENTS.slice(2, 8)}
+            now={TIMELINE_NOW}
+            coverage={TIMELINE_COVERAGE}
+            localeTag="en-GB"
+            filters={false}
+          />
+        </InstrumentStage>
+      ),
+    },
+    {
+      id: "card",
+      label: "The dashboard card",
+      note: "Five entries beside three other cards — the shape most patient timelines actually ship as. The difference is one line: “5 of 43, newest first, 1 of 2 sources reached”. Without it, five of forty-three reads as a complete account of a life in care.",
+      render: () => (
+        <InstrumentStage>
+          <CareTimeline
+            aria-label="Patient timeline"
+            events={TIMELINE_EVENTS}
+            now={TIMELINE_NOW}
+            coverage={TIMELINE_HEALTHY_COVERAGE}
+            layout="card"
+            limit={5}
+            localeTag="en-GB"
+          />
+        </InstrumentStage>
+      ),
+    },
+    {
+      id: "register",
+      label: "Clinical on one side, everything else on the other",
+      note: "Ant Design's alternate mode alternates sides to fill space, which carries no information and doubles the horizontal scan distance. This alternates on a fact — which side an event is on IS its register — and it is the one layout where you can see that a results-ready email went out three minutes after the result landed. Under 768px it collapses to one column and the register survives as the kind label, because a two-column chronology on a phone is not a design. The Jump control moves the reader between periods; it never changes what is shown.",
+      render: () => (
+        <InstrumentStage>
+          <CareTimeline
+            aria-label="Care timeline by register"
+            events={TIMELINE_EVENTS}
+            now={TIMELINE_NOW}
+            coverage={TIMELINE_HEALTHY_COVERAGE}
+            layout="register"
+            group="month"
+            jump
+            localeTag="en-GB"
+            filters={false}
+          />
+        </InstrumentStage>
+      ),
+    },
+    {
+      id: "comparison",
+      label: "The same five events, both ways",
+      note: "Left: the shape a patient timeline usually ships as — five entries, a “See All”, and a rail that runs off the bottom edge. Right: identical width, identical density, identical data. Four things changed and none of them cost a pixel of height. The one that matters is the last line: five of forty-three reads as a complete account of a life in care until something says otherwise.",
+      render: () => (
+        <InstrumentStage>
+          <div className="grid w-full gap-6 lg:grid-cols-2">
+            <figure className="m-0">
+              <figcaption className="mb-2 text-xs uppercase tracking-wider text-[var(--ox-text-subtle)]">
+                As usually shipped
+              </figcaption>
+              <NaiveTimeline />
+            </figure>
+            <figure className="m-0">
+              <figcaption className="mb-2 text-xs uppercase tracking-wider text-[var(--ox-text-subtle)]">
+                CareTimeline, layout=&quot;card&quot;
+              </figcaption>
+              <CareTimeline
+                aria-label="Patient timeline"
+                events={TIMELINE_EVENTS}
+                now={TIMELINE_NOW}
+                coverage={TIMELINE_HEALTHY_COVERAGE}
+                layout="card"
+                limit={5}
+                localeTag="en-GB"
+              />
+            </figure>
+          </div>
+        </InstrumentStage>
+      ),
+    },
+    {
+      id: "patient",
+      label: "The same chart, for the patient",
+      note: "A different catalog, not a softer tone. “Visit” and “Test result” are what a person recognises; “Encounter” and “Laboratory” are what a chart says. Since April 2021 a result reaches the patient when it reaches the ordering clinician, so a portal has to be able to say that nobody has looked at it yet.",
+      render: () => (
+        <InstrumentStage>
+          <CareTimeline
+            aria-label="Your care timeline"
+            events={TIMELINE_EVENTS.slice(2, 8)}
+            now={TIMELINE_NOW}
+            coverage={TIMELINE_HEALTHY_COVERAGE}
+            audience="patient"
+            localeTag="en-GB"
+            filters={false}
+          />
         </InstrumentStage>
       ),
     },

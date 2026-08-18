@@ -19,6 +19,8 @@ Format: **Context** (the forces, stated honestly) → **Decision** (what we do)
 | [0007](0007-story-derived-testing.md)                        | Tests derive from stories; quality is gated at the catalog level          | proposed |
 | [0008](0008-internationalisation-before-fifty-components.md) | Internationalisation lands before the catalog reaches ~50 components      | proposed |
 | [0009](0009-supply-chain-and-component-constraints.md)       | Component capability is constrained by lint; the supply chain is attested | proposed |
+| [0010](0010-antd-compatible-primitives.md)                   | Primitives match Ant Design's API and take no dependency on it            | accepted |
+| [0011](0011-summaries-declare-their-boundaries.md)           | A component that summarises a set declares the set's boundaries           | accepted |
 
 See [ARCHITECTURE.md](../../ARCHITECTURE.md) for how these fit together.
 
