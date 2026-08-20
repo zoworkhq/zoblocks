@@ -6,15 +6,16 @@
  */
 
 import { describe, expect, it } from "vitest";
-import { contrastBetween, parseHex } from "@oxygenui-design/tokens/validate";
 import {
   ANCHOR_STEP,
   RAMP_STEPS,
+  contrastBetween,
   generateRamp,
   hslToHex,
   nearestPassing,
+  parseHex,
   rgbToHsl,
-} from "../src/index";
+} from "../src/validate";
 
 describe("generateRamp", () => {
   it("produces every step", () => {

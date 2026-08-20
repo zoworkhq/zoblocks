@@ -35,27 +35,28 @@ export { diffPlan, type PlanDiff, type SnapshotVariable, type VariableSnapshot }
 export { fromVariables, type ImportOptions, type ImportReport } from "./import";
 
 export {
+  ANCHOR_STEP,
+  RAMP_STEPS,
   contrastBetween,
+  contrastRatio,
+  floorForPair,
+  generateRamp,
   measureContrast,
+  nearestPassing,
   parseHex,
   validateTokens,
+  CONTRAST_PAIRS,
+  STATUS_PAIRS,
 } from "@oxygenui-design/tokens/validate";
 
 /*
- * `nearestPassing` is deliberately *not* re-exported, and that is a finding
- * rather than an omission.
+ * One import, not two — the plan's own requirement, and the reason `theme` is
+ * absent from this package's dependencies.
  *
- * The plan assumed it sat with the rest of the colour maths in
- * `@oxygenui-design/tokens/validate`. It does not — it lives in
- * `@oxygenui-design/theme/src/ramp.ts`, whose only import is that validator, so
- * it is pure and could move. But `theme` also carries the document schema, zod
- * and both framework bridges, and making a plugin sandbox depend on all of that
- * to offer one suggestion is the wrong trade.
- *
- * Phase 2 needs it, because the panel offers a nearest passing colour exactly
- * as the token editor does. The choice there is to move `ramp.ts` into the
- * validator package — where `generateRamp` and `ANCHOR_STEP` arguably belong
- * too — or to duplicate four lines of binary search. The first is right and is
- * a refactor with one call site outside its own tests, which is why it is
- * called out here rather than done quietly as part of something else.
+ * `nearestPassing` used to live in `@oxygenui-design/theme/src/ramp.ts`. It was
+ * pure, but `theme` also carries the document schema, zod and both framework
+ * bridges, and making a plugin sandbox depend on all of that to offer one
+ * suggestion is the wrong trade. `ramp.ts` now sits in the validator beside the
+ * colour maths it was already importing; `theme` re-exports it, so nothing that
+ * used it had to change.
  */

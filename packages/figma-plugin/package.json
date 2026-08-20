@@ -1,0 +1,29 @@
+{
+  "name": "@oxygenui-design/figma-plugin",
+  "version": "0.1.0",
+  "type": "module",
+  "private": true,
+  "description": "Oxygen's accessibility gate, inside Figma. Reads the open file's variables; no network, no account, no sync.",
+  "exports": {
+    ".": "./src/gate.ts",
+    "./package.json": "./package.json"
+  },
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage"
+  },
+  "dependencies": {
+    "@oxygenui-design/figma-core": "workspace:*",
+    "@oxygenui-design/tokens": "workspace:*"
+  },
+  "devDependencies": {
+    "@oxygenui-design/tsconfig": "workspace:*",
+    "@vitest/coverage-v8": "^4.1.10",
+    "esbuild": "^0.28.2",
+    "jsdom": "^30",
+    "typescript": "^5.7.2",
+    "vitest": "^4.1.10"
+  }
+}

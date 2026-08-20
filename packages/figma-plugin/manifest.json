@@ -1,0 +1,14 @@
+{
+  "name": "Oxygen — contrast",
+  "id": "oxygen-contrast",
+  "api": "1.0.0",
+  "main": "dist/code.js",
+  "ui": "dist/ui.html",
+  "editorType": ["figma", "figjam", "dev"],
+  "documentAccess": "dynamic-page",
+  "networkAccess": {
+    "allowedDomains": ["none"],
+    "reasoning": "This plugin reads the variables already in the open file and measures them locally. It has no account, no sync, and nothing to send."
+  },
+  "permissions": []
+}

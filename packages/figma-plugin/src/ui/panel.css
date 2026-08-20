@@ -1,0 +1,303 @@
+/*
+ * The panel.
+ *
+ * Sized in rem throughout so a designer at 200% zoom gets a bigger panel rather
+ * than a clipped one — this runs inside somebody else's application, which is a
+ * reason to be economical with space and not a reason to drop the standard.
+ *
+ * Two themes, because Figma has two and a plugin that ignores the dark one
+ * renders a white rectangle in the middle of a dark canvas. The tokens are
+ * defined on :root and only redefined under prefers-color-scheme, so nothing
+ * has its single definition inside a media query.
+ *
+ * `--rule-strong` is the border of every control here, which makes it an SC
+ * 1.4.11 surface and not a decoration. The first values chosen for it were
+ * 1.63:1 and 2.01:1 — caught by measuring this panel with the thing the panel
+ * measures. Both are now above 3:1 against the page and against the fill they
+ * sit on. An accessibility tool whose own controls fail is not an argument
+ * anyone has to refute.
+ */
+
+:root {
+  --ink: #14181a;
+  --ink-soft: #5c6a72;
+  --paper: #ffffff;
+  --sunk: #f3f5f6;
+  --rule: #e1e6e8;
+  --rule-strong: #7a8f99;
+  --focus: #1a6fd4;
+  --pass: #146c43;
+  --pass-wash: #e6f4ec;
+  --fail: #9b2226;
+  --fail-wash: #fbecec;
+
+  --mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
+  --sans: "Inter", ui-sans-serif, -apple-system, system-ui, sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ink: #e8edef;
+    --ink-soft: #9aa8af;
+    --paper: #1e2223;
+    --sunk: #272c2e;
+    --rule: #363c3f;
+    --rule-strong: #6b777b;
+    --focus: #7db3f2;
+    --pass: #6ed09a;
+    --pass-wash: #16301f;
+    --fail: #f28b8b;
+    --fail-wash: #331819;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0.75rem;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 0.75rem;
+  line-height: 1.5;
+}
+
+:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+  border-radius: 3px;
+}
+
+code {
+  font-family: var(--mono);
+  font-size: 0.9em;
+}
+
+/* Controls */
+
+#controls {
+  display: grid;
+  gap: 0.5rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--rule);
+}
+
+.field {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.field > label,
+.field > legend {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--ink-soft);
+}
+
+select {
+  width: 100%;
+  padding: 0.35rem 0.4rem;
+  font: inherit;
+  color: inherit;
+  background: var(--sunk);
+  border: 1px solid var(--rule-strong);
+  border-radius: 4px;
+}
+
+fieldset.kinds {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.radio {
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+  padding: 0.15rem 0;
+}
+
+.radio small {
+  color: var(--ink-soft);
+  font-family: var(--mono);
+  font-size: 0.625rem;
+}
+
+/* Summary */
+
+.summary {
+  padding: 0.75rem 0 0.5rem;
+}
+
+.summary .count {
+  margin: 0;
+  font-size: 0.9375rem;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+}
+
+.summary[data-state="fail"] .count {
+  color: var(--fail);
+}
+
+.summary[data-state="pass"] .count {
+  color: var(--pass);
+}
+
+.summary .where,
+.summary .how {
+  margin: 0.15rem 0 0;
+  color: var(--ink-soft);
+}
+
+/* Groups and tables */
+
+.group {
+  margin-top: 0.75rem;
+}
+
+.group > h2,
+.group > summary {
+  margin: 0 0 0.35rem;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  cursor: default;
+}
+
+details.group > summary {
+  cursor: pointer;
+}
+
+.group ul {
+  margin: 0.25rem 0 0;
+  padding-left: 1rem;
+  color: var(--ink-soft);
+}
+
+.scroll {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+}
+
+th,
+td {
+  text-align: left;
+  padding: 0.4rem 0.5rem 0.4rem 0;
+  border-bottom: 1px solid var(--rule);
+  vertical-align: top;
+}
+
+thead th {
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  white-space: nowrap;
+}
+
+tbody tr[data-state="fail"] .num:first-of-type {
+  color: var(--fail);
+  font-weight: 650;
+}
+
+.pair {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-weight: 400;
+}
+
+.names {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.15rem;
+}
+
+.on {
+  color: var(--ink-soft);
+}
+
+.swatch {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  width: 1.75rem;
+  height: 1.5rem;
+  border: 1px solid var(--rule-strong);
+  border-radius: 3px;
+  font-size: 0.6875rem;
+  font-weight: 600;
+}
+
+td.num {
+  white-space: nowrap;
+  font-family: var(--mono);
+}
+
+td.criterion {
+  color: var(--ink-soft);
+}
+
+/* The suggestion */
+
+button.copy {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.2rem 0.4rem;
+  font: inherit;
+  color: inherit;
+  background: var(--sunk);
+  border: 1px solid var(--rule-strong);
+  border-radius: 4px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+button.copy:hover {
+  border-color: var(--focus);
+}
+
+button.copy .chip {
+  width: 0.75rem;
+  height: 0.75rem;
+  border: 1px solid var(--rule-strong);
+  border-radius: 2px;
+}
+
+button.copy .copied {
+  display: none;
+  color: var(--pass);
+  font-weight: 600;
+}
+
+button.copy[data-state="copied"] .copied {
+  display: inline;
+}
+
+.note,
+.finding,
+.muted {
+  color: var(--ink-soft);
+}
+
+.finding {
+  padding: 0.5rem 0.6rem;
+  margin: 0.75rem 0 0;
+  color: var(--fail);
+  background: var(--fail-wash);
+  border-radius: 4px;
+}

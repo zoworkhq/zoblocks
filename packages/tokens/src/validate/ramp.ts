@@ -15,7 +15,7 @@
  * regardless.
  */
 
-import { contrastRatio, parseHex, type Rgb } from "@oxygenui-design/tokens/validate";
+import { contrastRatio, parseHex, type Rgb } from "./color";
 
 /** The steps a brand ramp defines, matching the primitive palette's shape. */
 export const RAMP_STEPS = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950] as const;

@@ -80,6 +80,16 @@ export {
 } from "./resolve";
 
 export {
+  ANCHOR_STEP,
+  RAMP_STEPS,
+  generateRamp,
+  hslToHex,
+  nearestPassing,
+  rgbToHsl,
+  type RampStep,
+} from "./ramp";
+
+export {
   validateTokens,
   checkStatusContrast,
   checkTextContrast,

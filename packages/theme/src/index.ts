@@ -62,6 +62,13 @@ export {
   type VisionKind,
 } from "./vision";
 
+/**
+ * The ramp moved to `@oxygenui-design/tokens/validate` so a Figma plugin
+ * sandbox can offer "nearest passing" without pulling in zod and both
+ * framework bridges. Re-exported here because it has been part of this
+ * package's public surface since the console was written, and a move is not a
+ * reason to break a caller.
+ */
 export {
   ANCHOR_STEP,
   RAMP_STEPS,
@@ -70,7 +77,7 @@ export {
   nearestPassing,
   rgbToHsl,
   type RampStep,
-} from "./ramp";
+} from "@oxygenui-design/tokens/validate";
 
 export {
   UnsafeTokenValueError,
