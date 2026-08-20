@@ -99,6 +99,26 @@ export interface ColorPickerProps {
 }
 
 export function ColorPicker({ value, onChange, ramp, against, onClose }: ColorPickerProps) {
+  /*
+   * The hex field holds its own draft, and it has to.
+   *
+   * Bound straight to `value` it was unusable: an incomplete hex is not emitted
+   * upstream — correctly, `#18` is not a colour — so the parent's state never
+   * moved and React restored the old text on the very next render. Every
+   * keystroke vanished as it was typed. The same pattern is in `ColorField` for
+   * the same reason and did not get carried across when this was written.
+   *
+   * The draft yields when the value changes from outside — picking a ramp step,
+   * dragging the square — because otherwise the field would keep showing what
+   * somebody half-typed while the swatch beside it moved on.
+   */
+  const [draft, setDraft] = React.useState(value);
+  const [lastValue, setLastValue] = React.useState(value);
+  if (value !== lastValue) {
+    setLastValue(value);
+    setDraft(value);
+  }
+
   const rgb = hexToRgb(value) ?? { r: 0, g: 0, b: 0 };
   const hsv = rgbToHsv(rgb.r, rgb.g, rgb.b);
   const areaRef = React.useRef<HTMLDivElement>(null);
@@ -237,12 +257,16 @@ export function ColorPicker({ value, onChange, ramp, against, onClose }: ColorPi
         <label className="min-w-0 flex-1">
           <span className="sr-only">Hex value</span>
           <input
-            value={value.toUpperCase()}
+            value={draft.toUpperCase()}
             onChange={(event) => {
-              const next = event.target.value.trim();
-              if (/^#?[0-9a-f]{6}$/i.test(next)) {
-                onChange(next.startsWith("#") ? next.toLowerCase() : `#${next.toLowerCase()}`);
-              }
+              const typed = event.target.value.trim();
+              setDraft(typed);
+
+              // Only a complete colour goes upstream. A partial one is a legal
+              // thing to be in the middle of typing and not a value anything
+              // else should paint with.
+              const normalised = typed.startsWith("#") ? typed : `#${typed}`;
+              if (/^#[0-9a-f]{6}$/i.test(normalised)) onChange(normalised.toLowerCase());
             }}
             spellCheck={false}
             className="w-full rounded-lg border border-rule-strong bg-paper px-2.5 py-1.5 font-mono text-[0.8125rem] uppercase focus:border-oxygen-deep focus:outline-none focus:ring-[3px] focus:ring-oxygen/20"

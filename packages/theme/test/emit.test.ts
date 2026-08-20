@@ -244,6 +244,34 @@ describe("emitThemeCss", () => {
   });
 
   /**
+   * A replaced glyph reaches the stylesheet a customer's application fetches.
+   *
+   * The whole mechanism is one `var()` fallback — `mask-image: var(--ox-icon-send,
+   * <built-in>)` — so the only thing this end has to do is declare the property.
+   * If it does not, every part of the feature still works: the upload succeeds,
+   * the file is stored, the console grid shows the new glyph, and the customer's
+   * toolbar never changes.
+   */
+  it("declares a replaced glyph, so the override actually reaches a host", () => {
+    const theme = publishedTheme();
+    theme.assets.icons = [
+      {
+        slot: "send",
+        sha256: "d".repeat(64),
+        src: `/f/northwind/${"d".repeat(64)}.svg`,
+        uploadedAt: "2026-08-20T00:00:00.000Z",
+      },
+    ] as typeof theme.assets.icons;
+
+    const css = emitThemeCss(theme);
+    expect(css).toContain(`--ox-icon-send: url("/f/northwind/${"d".repeat(64)}.svg")`);
+
+    // At the root and once: a glyph is a shape, and a shape does not change
+    // between light and dark — only the colour does, and that is currentColor.
+    expect(css.match(/--ox-icon-send:/g)).toHaveLength(1);
+  });
+
+  /**
    * An illustration is declared once and never overridden per theme.
    *
    * There is no second file to switch to — that is the whole reason the console

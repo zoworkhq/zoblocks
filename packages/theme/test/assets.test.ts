@@ -65,9 +65,73 @@ describe("reading a size out of the file itself", () => {
     expect(imageSize(b, "jpeg")).toMatchObject({ width: 1200, height: 630 });
   });
 
+  /**
+   * WebP states its size three different ways, and only one of them is common.
+   *
+   * A design tool emits VP8L for lossless and VP8X whenever there is an alpha
+   * channel — which a logo always has. Reading only the lossy VP8 header would
+   * work on whatever file happened to be tested and silently return nothing for
+   * the ones a customer actually exports.
+   */
+  it("reads a lossy VP8 header", () => {
+    const b = new Uint8Array(32);
+    b.set([0x52, 0x49, 0x46, 0x46]); // "RIFF"
+    b.set([0x57, 0x45, 0x42, 0x50], 8); // "WEBP"
+    b.set([0x56, 0x50, 0x38, 0x20], 12); // "VP8 "
+    b[26] = 320 & 0xff;
+    b[27] = (320 >> 8) & 0x3f;
+    b[28] = 80 & 0xff;
+    b[29] = (80 >> 8) & 0x3f;
+    expect(imageSize(b, "webp")).toMatchObject({ width: 320, height: 80 });
+  });
+
+  it("reads an extended VP8X header, which is what a logo with alpha becomes", () => {
+    const b = new Uint8Array(40);
+    b.set([0x52, 0x49, 0x46, 0x46]);
+    b.set([0x57, 0x45, 0x42, 0x50], 8);
+    b.set([0x56, 0x50, 0x38, 0x58], 12); // "VP8X"
+    // Both dimensions are stored minus one, little-endian, over three bytes.
+    const le24 = (n: number, at: number) => {
+      b[at] = n & 0xff;
+      b[at + 1] = (n >> 8) & 0xff;
+      b[at + 2] = (n >> 16) & 0xff;
+    };
+    le24(1199, 24);
+    le24(629, 27);
+    expect(imageSize(b, "webp")).toMatchObject({ width: 1200, height: 630 });
+  });
+
+  it("reads a lossless VP8L header", () => {
+    const b = new Uint8Array(32);
+    b.set([0x52, 0x49, 0x46, 0x46]);
+    b.set([0x57, 0x45, 0x42, 0x50], 8);
+    b.set([0x56, 0x50, 0x38, 0x4c], 12); // "VP8L"
+    // 14 bits of width-1, then 14 bits of height-1, little-endian.
+    const bits = (32 - 1) | ((32 - 1) << 14);
+    b[21] = bits & 0xff;
+    b[22] = (bits >> 8) & 0xff;
+    b[23] = (bits >> 16) & 0xff;
+    b[24] = (bits >> 24) & 0xff;
+    expect(imageSize(b, "webp")).toMatchObject({ width: 32, height: 32 });
+  });
+
+  it("returns nothing for a WebP container it does not recognise", () => {
+    const b = new Uint8Array(32);
+    b.set([0x52, 0x49, 0x46, 0x46]);
+    b.set([0x57, 0x45, 0x42, 0x50], 8);
+    b.set([0x58, 0x58, 0x58, 0x58], 12);
+    expect(imageSize(b, "webp")).toBeUndefined();
+  });
+
+  it("returns nothing for a format it was never taught", () => {
+    expect(imageSize(png(10, 10), "avif")).toBeUndefined();
+  });
+
   it("does not run off the end of a truncated file", () => {
     expect(() => imageSize(new Uint8Array([0xff, 0xd8, 0xff]), "jpeg")).not.toThrow();
     expect(() => imageSize(new Uint8Array(4), "png")).not.toThrow();
+    expect(() => imageSize(new Uint8Array(6), "webp")).not.toThrow();
+    expect(imageSize(new Uint8Array(0), "png")).toBeUndefined();
   });
 });
 

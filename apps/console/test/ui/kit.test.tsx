@@ -11,7 +11,7 @@
 
 import * as React from "react";
 import { describe, expect, it, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import {
   Button,
@@ -531,6 +531,153 @@ describe("AxisGroup", () => {
     await userEvent.click(screen.getByRole("radio", { name: "MUI" }));
     expect(onChange).not.toHaveBeenCalled();
     expect(screen.getByRole("radio", { name: "MUI" })).toHaveAttribute("aria-disabled", "true");
+  });
+
+  /**
+   * The radios are inside a group that names them.
+   *
+   * `role="radio"` outside a `radiogroup` is not a set of alternatives to a
+   * screen reader — it is loose radios with nothing saying what they choose
+   * between. The bar these sit in used to carry the role instead, which was
+   * worse: three or four axes became one group of a dozen radios, so theme,
+   * density and vision were announced as alternatives to each other.
+   */
+  it("wraps its options in a group named by the label", () => {
+    render(
+      <AxisGroup
+        label="Density"
+        value="standard"
+        onChange={() => {}}
+        options={[
+          { value: "patient", label: "Patient" },
+          { value: "standard", label: "Standard" },
+        ]}
+      />,
+    );
+
+    const group = screen.getByRole("radiogroup", { name: "Density" });
+    expect(within(group).getAllByRole("radio")).toHaveLength(2);
+  });
+
+  /**
+   * One tab stop for the whole axis, not one per option.
+   *
+   * A radio group that is a row of independent tab stops makes a keyboard user
+   * step through every option to get past it — the playground has four axes, so
+   * that is a dozen stops before the content. The roving tabindex is what makes
+   * the role honest rather than decorative.
+   */
+  it("is a single tab stop, on the selected option", () => {
+    render(
+      <AxisGroup
+        label="Theme"
+        value="dark"
+        onChange={() => {}}
+        options={[
+          { value: "light", label: "Light" },
+          { value: "dark", label: "Dark" },
+          { value: "high-contrast", label: "High contrast" },
+        ]}
+      />,
+    );
+
+    expect(screen.getByRole("radio", { name: "Dark" })).toHaveAttribute("tabindex", "0");
+    for (const name of ["Light", "High contrast"]) {
+      expect(screen.getByRole("radio", { name })).toHaveAttribute("tabindex", "-1");
+    }
+  });
+
+  /**
+   * Driven through a stateful wrapper, because the component is controlled.
+   *
+   * Asserting on `onChange` alone with a frozen `value` tests one keypress and
+   * then lies: the second press starts from wherever the *unchanged* prop still
+   * says, so a run of arrows walks a different path than a user would. This is
+   * how it is actually mounted.
+   */
+  it("moves the selection with the arrow keys, in both directions", async () => {
+    function Controlled() {
+      const [value, setValue] = React.useState("light");
+      return (
+        <AxisGroup
+          label="Theme"
+          value={value}
+          onChange={setValue}
+          options={[
+            { value: "light", label: "Light" },
+            { value: "dark", label: "Dark" },
+            { value: "high-contrast", label: "High contrast" },
+          ]}
+        />
+      );
+    }
+    render(<Controlled />);
+
+    screen.getByRole("radio", { name: "Light" }).focus();
+    await userEvent.keyboard("{ArrowRight}");
+    expect(screen.getByRole("radio", { name: "Dark" })).toHaveAttribute("aria-checked", "true");
+
+    // Down is the same axis as right: these are read as a set rather than as a
+    // horizontal strip, so both directions advance.
+    await userEvent.keyboard("{ArrowDown}");
+    expect(screen.getByRole("radio", { name: "High contrast" })).toHaveAttribute(
+      "aria-checked",
+      "true",
+    );
+
+    await userEvent.keyboard("{ArrowLeft}");
+    expect(screen.getByRole("radio", { name: "Dark" })).toHaveAttribute("aria-checked", "true");
+
+    // And focus follows the selection, or the next arrow starts from the wrong
+    // place and the group stops being operable at all.
+    expect(screen.getByRole("radio", { name: "Dark" })).toHaveFocus();
+  });
+
+  it("wraps at the ends rather than stopping", async () => {
+    const onChange = vi.fn();
+    render(
+      <AxisGroup
+        label="Theme"
+        value="light"
+        onChange={onChange}
+        options={[
+          { value: "light", label: "Light" },
+          { value: "dark", label: "Dark" },
+        ]}
+      />,
+    );
+
+    screen.getByRole("radio", { name: "Light" }).focus();
+    // Backwards from the first lands on the last, which is what a set does.
+    await userEvent.keyboard("{ArrowLeft}");
+    expect(onChange).toHaveBeenLastCalledWith("dark");
+  });
+
+  /**
+   * A disabled option is stepped over, not landed on.
+   *
+   * Arrowing onto something that cannot be chosen strands the focus: the next
+   * arrow press has to guess which way the user was going, and the selection
+   * has silently not moved.
+   */
+  it("skips a disabled option when arrowing", async () => {
+    const onChange = vi.fn();
+    render(
+      <AxisGroup
+        label="Bridge"
+        value="none"
+        onChange={onChange}
+        options={[
+          { value: "none", label: "None" },
+          { value: "mui", label: "MUI", disabled: true, reason: "Not enabled." },
+          { value: "antd", label: "Ant Design" },
+        ]}
+      />,
+    );
+
+    screen.getByRole("radio", { name: "None" }).focus();
+    await userEvent.keyboard("{ArrowRight}");
+    expect(onChange).toHaveBeenLastCalledWith("antd");
   });
 });
 
