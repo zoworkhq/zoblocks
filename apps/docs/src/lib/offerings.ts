@@ -194,6 +194,19 @@ export const TIERS: Tier[] = [
 
 export const FAQ: Array<{ q: string; a: string }> = [
   {
+    /*
+     * Asked here because a reader who sees both pages will ask it, and the
+     * honest answer is not "they are the same thing at two prices".
+     *
+     * The overlap between a $199 bundle and a $290 pack is real and unresolved
+     * — see the note at the top of this file. What this answer must not do is
+     * invent an inclusion promise nobody has made, so it states the two
+     * properties that are actually true and leaves the choice with the reader.
+     */
+    q: "How does the marketplace relate to these tiers?",
+    a: "The marketplace sells one thing at a time — an icon set, an empty-state system, a theme pack, a component — licensed to your whole organisation and perpetual. These tiers bundle work that is still being built. If you need a specific pack today, buy that one; if you want the starter kits as they land, the tiers are the way in. Nothing bought in the marketplace stops working when a subscription does.",
+  },
+  {
     q: "Is any of this a compliance boundary?",
     a: "No. Installing Oxygen does not make an application HIPAA, GDPR, or DPDP compliant, and nothing here is a medical device or clinical decision support. Access control, audit, data residency, and clinical validation remain yours. We would rather lose a sale than imply otherwise.",
   },

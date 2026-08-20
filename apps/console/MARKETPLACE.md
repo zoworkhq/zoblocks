@@ -128,6 +128,28 @@ Tokens are minted under **Access tokens**, shown once, and stored only as a
 SHA-256 — the same reasoning as the session cookie. They are labelled, expire
 after 90 days, are revocable, and are capped at ten live per organisation.
 
+## The public shelf
+
+The catalogue is also rendered on `oxygenui.design/marketplace`, because a
+storefront reachable only after sign-up has no top of funnel — the console has
+no anonymous traffic and the docs site does. The console keeps checkout,
+entitlement and delivery; the docs site keeps discovery.
+
+It reads `GET /c/catalog.json` — public, cached, and carrying the shelf only.
+No entitlement, no order, no organisation, and not the Stripe price id.
+
+```
+# apps/docs
+NEXT_PUBLIC_CONSOLE_URL="https://console.oxygenui.design"
+```
+
+**The docs site must never read this database.** A public marketing page that
+500s because a private console's MongoDB is restarting is a worse property than
+one showing yesterday's catalogue, so the endpoint is
+`stale-while-revalidate` for a day and every failure on the docs side renders an
+empty shelf that says so. That is why a CI build with no console reachable
+produces a page that is correct and empty rather than a build failure.
+
 ## Things worth not undoing
 
 **`/m/…` is the one route here that is not public.** `/t/` and `/f/` are public

@@ -22,6 +22,7 @@ export function OxygenMark({ className = "h-4 w-7" }: { className?: string }) {
 const NAV = [
   { href: "/components", label: "Components" },
   { href: "/showcase", label: "Showcase" },
+  { href: "/marketplace", label: "Marketplace" },
   { href: "/pro", label: "Pro" },
 ];
 
@@ -136,6 +137,7 @@ const FOOTER_LINKS = [
     links: [
       { href: "/components", label: "Components" },
       { href: "/showcase", label: "Showcase" },
+      { href: "/marketplace", label: "Marketplace" },
       { href: "/pro", label: "Pro" },
     ],
   },

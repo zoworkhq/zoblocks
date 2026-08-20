@@ -111,7 +111,7 @@ test.describe("scrolling @a11y", () => {
   });
 
   test("the removed progress rail is gone from every page", async ({ page }) => {
-    for (const url of [CATALOG, TABS, "/", "/showcase", "/pro"]) {
+    for (const url of [CATALOG, TABS, "/", "/showcase", "/marketplace", "/pro"]) {
       await page.goto(url);
       await expect(page.locator(".scroll-rail")).toHaveCount(0);
     }
@@ -438,5 +438,68 @@ test.describe("site chrome @a11y", () => {
       // AA for body text. The bug this replaces measured about 1.2:1.
       expect(contrast!, `${scheme} preview contrast`).toBeGreaterThan(4.5);
     }
+  });
+});
+
+test.describe("the public marketplace @a11y", () => {
+  /**
+   * The catalogue is rendered here and bought in the console.
+   *
+   * A storefront reachable only after sign-up has no top of funnel: the console
+   * has no anonymous traffic and this site does. So the shelf lives here, where
+   * it can be linked to and indexed, and the console keeps the parts that need
+   * to know who you are.
+   *
+   * These assertions are deliberately tolerant of an empty catalogue. The data
+   * comes from a separate service over HTTP, and the page is built to read
+   * perfectly well without it — a marketing page that fails because a private
+   * console is restarting is a worse property than one showing yesterday's
+   * shelf.
+   */
+  test("is reachable from the site chrome", async ({ page }) => {
+    await page.goto("/");
+    await page.getByRole("navigation").first().getByRole("link", { name: "Marketplace" }).click();
+
+    await expect(page).toHaveURL(/\/marketplace$/);
+    await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+  });
+
+  test("lists what the console publishes, or says it is loading", async ({ page }) => {
+    await page.goto("/marketplace");
+
+    const cards = page.getByRole("main").getByRole("listitem");
+    const count = await cards.count();
+
+    if (count === 0) {
+      // The fallback is a state, not an error. It must never read as a broken
+      // page to somebody who arrived from a search result.
+      await expect(page.getByText("The catalogue is loading")).toBeVisible();
+      return;
+    }
+
+    // Every card is a link into a detail page, priced.
+    await expect(cards.first().getByRole("link")).toHaveAttribute("href", /\/marketplace\//);
+    await expect(cards.first()).toContainText(/\$|By arrangement/);
+  });
+
+  test("an item states what was checked and where it is bought", async ({ page }) => {
+    await page.goto("/marketplace");
+
+    const first = page.getByRole("main").getByRole("listitem").first();
+    if ((await page.getByRole("main").getByRole("listitem").count()) === 0) test.skip();
+    await first.getByRole("link").click();
+
+    await expect(page.getByRole("heading", { name: "What was checked" })).toBeVisible();
+    await expect(page.getByText(/contrast pairs at or above/)).toBeVisible();
+
+    /*
+     * Buying leaves for the console, because a purchase belongs to an
+     * organisation and this site does not know about organisations.
+     */
+    const buy = page.getByRole("link", { name: /Buy in the console/ });
+    await expect(buy).toHaveAttribute("href", /\/market\//);
+
+    // And the licence is stated before anybody spends anything.
+    await expect(page.getByRole("heading", { name: "Licence" })).toBeVisible();
   });
 });
