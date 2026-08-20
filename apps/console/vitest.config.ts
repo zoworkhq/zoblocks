@@ -88,8 +88,13 @@ export default defineConfig({
        * Branches sits lower than the rest and the gap is honest: `auth.ts` came
        * from hq with its own reset and throttling paths, and this suite drives
        * sign-in rather than every branch of password recovery.
+       *
+       * Ratcheted from 90/90/80/90 once the asset store, the marketplace and
+       * the webhook route were covered. Doing that is the whole point of the
+       * rule above — a floor left at what the suite cleared two features ago
+       * stops being a floor and becomes a decoration.
        */
-      thresholds: { lines: 90, functions: 90, branches: 80, statements: 90 },
+      thresholds: { lines: 96, functions: 95, branches: 87, statements: 94 },
     },
     /*
      * jsdom, not node.
