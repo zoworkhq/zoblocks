@@ -27,6 +27,30 @@ const BRAND: OxygenTokens = {
 };
 
 describe("toMuiTheme", () => {
+  /**
+   * The shades are meaningless without the colour they are shades of.
+   *
+   * `createTheme` runs `augmentColor` over any `primary` it receives and throws
+   * if `main` is absent, so an object carrying only `dark` is not a partial
+   * theme — it is one that takes the host's application down at import. A theme
+   * with a hover accent and no accent is unusual and entirely reachable: it is
+   * one override away.
+   */
+  it("omits primary entirely rather than emitting shades with no main", () => {
+    const options = toMuiTheme({
+      "--ox-accent-hover": "#1a53a8",
+      "--ox-accent-subtle": "#eef4fd",
+    });
+    expect(options.palette?.primary).toBeUndefined();
+  });
+
+  it("keeps the rest of the palette when the accent is missing", () => {
+    // The absence of one entry must not take the others with it.
+    const options = toMuiTheme({ "--ox-text": "#16181d", "--ox-bg": "#ffffff" });
+    expect(options.palette?.text?.primary).toBe("#16181d");
+    expect(options.palette?.background?.default).toBe("#ffffff");
+  });
+
   it("puts the Oxygen accent on MUI's primary", () => {
     const options = toMuiTheme(BRAND);
     expect(options.palette?.primary?.main).toBe("#1d63c9");

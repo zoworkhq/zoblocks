@@ -16,7 +16,16 @@ import { toPx, type OxygenTokens } from "@oxygenui-design/bridge-core";
 /** The shape `createTheme` takes. Structural, so MUI stays a peer. */
 export interface MuiThemeOptions {
   palette?: {
-    primary?: { main?: string; dark?: string; light?: string; contrastText?: string };
+    /*
+     * `main` is required, and that is MUI's rule rather than a preference.
+     *
+     * `createTheme` runs `augmentColor` over any `primary` it is given and
+     * throws — "the color provided to augmentColor is invalid" — if `main` is
+     * missing. So a theme that had defined `--ox-accent-hover` but not
+     * `--ox-accent` used to produce an object that looked fine, typechecked
+     * against this interface, and took the host's application down at import.
+     */
+    primary?: { main: string; dark?: string; light?: string; contrastText?: string };
     text?: { primary?: string; secondary?: string; disabled?: string };
     background?: { default?: string; paper?: string };
     divider?: string;
@@ -28,12 +37,19 @@ export interface MuiThemeOptions {
 export function toMuiTheme(tokens: OxygenTokens): MuiThemeOptions {
   const options: MuiThemeOptions = {};
 
-  const primary = clean({
-    main: tokens["--ox-accent"],
-    dark: tokens["--ox-accent-hover"],
-    light: tokens["--ox-accent-subtle"],
-    contrastText: tokens["--ox-text-on-accent"],
-  });
+  /*
+   * No accent, no palette entry. The shades are meaningless without the colour
+   * they are shades *of*, and MUI refuses the object rather than ignoring it.
+   */
+  const main = tokens["--ox-accent"];
+  const primary = main
+    ? (clean({
+        main,
+        dark: tokens["--ox-accent-hover"],
+        light: tokens["--ox-accent-subtle"],
+        contrastText: tokens["--ox-text-on-accent"],
+      }) as { main: string; dark?: string; light?: string; contrastText?: string })
+    : undefined;
 
   const text = clean({
     primary: tokens["--ox-text"],

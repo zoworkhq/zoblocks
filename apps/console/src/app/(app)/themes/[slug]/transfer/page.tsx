@@ -1,4 +1,7 @@
 import Link from "next/link";
+import { baseTokens } from "@/lib/base-tokens";
+import { buildEditorModel } from "@/lib/token-editor";
+import { FrameworkSpecimen } from "./FrameworkSpecimen";
 import { notFound } from "next/navigation";
 import { AlertTriangle } from "lucide-react";
 import { currentMember } from "@/lib/auth";
@@ -113,6 +116,17 @@ export default async function TransferPage({ params }: { params: Promise<{ slug:
       )
     : [];
 
+  /*
+   * The same resolved tokens the framework exports were built from.
+   *
+   * Computed once here rather than per card, and deliberately the same value —
+   * a specimen drawn from a second resolution could disagree with the file
+   * beside it, which is the whole failure this screen now exists to rule out.
+   */
+  const resolved = canExport
+    ? buildEditorModel(await baseTokens(), theme.slug, theme.tokens, "light").resolved
+    : {};
+
   return (
     <>
       <PageHeader
@@ -154,7 +168,7 @@ export default async function TransferPage({ params }: { params: Promise<{ slug:
           )}
 
           <ul className="grid gap-3 sm:grid-cols-2">
-            {exports.map(({ id, name, body, result }) => (
+            {exports.map(({ id, name, body, result, framework }) => (
               <li key={id}>
                 <Panel
                   title={name}
@@ -176,6 +190,24 @@ export default async function TransferPage({ params }: { params: Promise<{ slug:
                   <p className="tabular font-mono text-[0.6875rem] text-graphite-soft">
                     {result.filename}
                   </p>
+
+                  {/*
+                    The file, rendered — in the framework's own components.
+                    
+                    A download is a claim that a brand survived translation into
+                    somebody else's vocabulary, and the only way to settle that
+                    is to look at their Button rather than at a hex in a JSON
+                    file.
+                  */}
+                  {framework && (
+                    <div className="mt-3">
+                      <p className="eyebrow mb-1.5 text-[0.5625rem] text-graphite-soft">
+                        {framework === "antd" ? "Ant Design" : "Material UI"} components, under this
+                        file
+                      </p>
+                      <FrameworkSpecimen framework={framework} resolved={resolved} />
+                    </div>
+                  )}
 
                   {result.caveat && (
                     <p className="mt-2 flex gap-1.5 text-[0.75rem] leading-relaxed text-warn">

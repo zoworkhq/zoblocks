@@ -20,6 +20,9 @@
     "stripe:sync": "tsx scripts/stripe-sync.mjs"
   },
   "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.0",
+    "@mui/material": "^9.3.1",
     "@oxygenui-design/bridge-antd": "workspace:*",
     "@oxygenui-design/bridge-core": "workspace:*",
     "@oxygenui-design/bridge-mui": "workspace:*",
@@ -27,6 +30,7 @@
     "@oxygenui-design/react": "workspace:*",
     "@oxygenui-design/theme": "workspace:*",
     "@oxygenui-design/tokens": "workspace:*",
+    "antd": "^6.6.0",
     "bcryptjs": "^3.0.2",
     "clsx": "^2.1.1",
     "lucide-react": "^0.468.0",

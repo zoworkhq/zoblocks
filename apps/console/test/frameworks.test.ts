@@ -135,21 +135,65 @@ describe("the console never resolves a UI framework", () => {
     expect(barrelImports, "import from `/definition` instead").toBe("");
   });
 
-  it("declares neither antd nor @mui/material anywhere in its manifest", async () => {
+  /**
+   * The rule this replaces, and why it changed.
+   *
+   * It used to be "the console declares neither antd nor MUI anywhere in its
+   * manifest". That was a proxy for the claim that matters — Oxygen's
+   * components do not need a UI framework — and it held until the console had a
+   * legitimate reason to render one: showing a customer the antd theme they are
+   * about to download, in antd's own components, because a theme file is a
+   * claim that only a rendered Button can settle.
+   *
+   * A proxy that now blocks correct work is worth replacing with the thing it
+   * was standing in for, not deleting. So the guarantee is asserted twice, more
+   * directly than the manifest check managed:
+   *
+   *   1. The component packages declare no framework dependency at all.
+   *   2. Inside the console, antd and MUI are reachable from exactly one file —
+   *      the export specimen — and never from its own interface.
+   *
+   * If somebody imports antd into a screen, (2) fails by name. If a component
+   * package grows a framework dependency, (1) fails. Neither was covered by
+   * reading the console's manifest.
+   */
+  it("keeps the component packages free of any UI framework", async () => {
     const { readFile } = await import("node:fs/promises");
     const path = await import("node:path");
-    const manifest = JSON.parse(
-      await readFile(path.resolve(__dirname, "..", "package.json"), "utf8"),
-    ) as Record<string, Record<string, string> | undefined>;
+    const root = path.resolve(__dirname, "..", "..", "..", "packages");
 
-    const declared = Object.keys({
-      ...manifest.dependencies,
-      ...manifest.devDependencies,
-      ...manifest.peerDependencies,
-    });
+    for (const pkg of ["react", "tokens", "theme", "bridge-core"]) {
+      const manifest = JSON.parse(
+        await readFile(path.join(root, pkg, "package.json"), "utf8"),
+      ) as Record<string, Record<string, string> | undefined>;
 
-    expect(declared).not.toContain("antd");
-    expect(declared).not.toContain("@mui/material");
+      const declared = Object.keys({
+        ...manifest.dependencies,
+        ...manifest.peerDependencies,
+      });
+
+      expect(declared, `${pkg} must not require antd`).not.toContain("antd");
+      expect(declared, `${pkg} must not require MUI`).not.toContain("@mui/material");
+    }
+  });
+
+  it("reaches a UI framework from the export specimen and nowhere else", async () => {
+    const { execSync } = await import("node:child_process");
+    const path = await import("node:path");
+    const src = path.resolve(__dirname, "..", "src");
+
+    const importers = execSync(`grep -rlE 'from "(antd|@mui/)' ${JSON.stringify(src)} || true`, {
+      encoding: "utf8",
+    })
+      .trim()
+      .split("\n")
+      .filter(Boolean)
+      .map((file) => path.relative(src, file));
+
+    // One file, named. The console's own interface is Tailwind and its own kit;
+    // a framework appearing in a screen would mean the admin tool had started
+    // depending on the thing the bridges exist to avoid depending on.
+    expect(importers).toEqual(["app/(app)/themes/[slug]/transfer/FrameworkSpecimenImpl.tsx"]);
   });
 });
 

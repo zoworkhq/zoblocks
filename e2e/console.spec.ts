@@ -270,7 +270,32 @@ test.describe("@console the glyphs", () => {
   });
 });
 
-test.describe("@console the frameworks setting", () => {
+/*
+ * Serial, because these two mutate the same organisation-level setting.
+ *
+ * `org.frameworks` is one row shared by every spec in this file, so running
+ * these in parallel had one test enabling both frameworks while the other
+ * asserted that exactly one was offered. That is not flakiness to retry around
+ * — it is two tests describing incompatible worlds and taking turns winning.
+ */
+test.describe.serial("@console the frameworks setting", () => {
+  /*
+   * And both are put back afterwards, so a spec that merely *reads* this screen
+   * finds the state the seed produced rather than whatever ran last.
+   */
+  test.afterAll(async ({ browser }) => {
+    const page = await browser.newPage();
+    await signIn(page);
+    await page.goto(`${BASE}/frameworks`);
+    for (const name of [/Ant Design/, /Material UI/]) {
+      const box = page.getByRole("checkbox", { name });
+      if (!(await box.isChecked())) await box.click();
+    }
+    await page.getByRole("button", { name: "Save selection" }).click();
+    await page.waitForTimeout(400);
+    await page.close();
+  });
+
   /**
    * The setting that used to do nothing.
    *
@@ -318,6 +343,37 @@ test.describe("@console the frameworks setting", () => {
    * the generated file can be read. A browser test could only click Copy and
    * believe it — which is a test that passes whatever the file says.
    */
+
+  /**
+   * The download, rendered in the framework's own components.
+   *
+   * A theme file is a claim that a brand survived translation into somebody
+   * else's vocabulary, and the only way to settle it is to look at *their*
+   * Button. So this reads the painted colour off a real antd primary button and
+   * checks it against the accent Oxygen resolves — if the mapping table drifts,
+   * or the specimen quietly renders unthemed, the pixel disagrees.
+   */
+  test("draws the export in the framework's own components", async ({ page }) => {
+    await signIn(page);
+
+    await page.goto(`${BASE}/frameworks`);
+    const antd = page.getByRole("checkbox", { name: /Ant Design/ });
+    if (!(await antd.isChecked())) await antd.click();
+    await page.getByRole("button", { name: "Save selection" }).click();
+
+    await page.goto(`${BASE}/themes/${THEME}/transfer`);
+
+    // Loaded with `ssr: false`, so it arrives after hydration rather than in
+    // the first HTML — antd and MUI must not be evaluated in the request path.
+    const admit = page.getByRole("button", { name: "Admit" }).first();
+    await expect(admit).toBeVisible({ timeout: 25000 });
+
+    const painted = await admit.evaluate((el) => getComputedStyle(el).backgroundColor);
+
+    // #1851a5 — the ramp's 700, which is what `--ox-accent` resolves to. The
+    // 600 the customer picked would be rgb(29, 99, 201).
+    expect(painted).toBe("rgb(24, 81, 165)");
+  });
 });
 
 test.describe("@console what no role may do", () => {
