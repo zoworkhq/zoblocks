@@ -103,9 +103,21 @@ const accessibility = (pairs) => ({
   nonColourChannel: "shape and label",
 });
 
+/*
+ * Deliberately not a plausible name or a plausible registration number.
+ *
+ * This is the one field on the whole product whose purpose is being checkable,
+ * and a seeded "Dr A. Reid, GMC 7412995" is indistinguishable from a real
+ * review the moment a screenshot leaves a laptop. Seed data that cannot be
+ * mistaken for the real thing costs nothing; seed data that can is a
+ * credibility event waiting for a demo.
+ *
+ * The shape is still exercised — the item page renders this block, and the
+ * "does not claim" list is the part worth looking at anyway.
+ */
 const clinical = (scope) => ({
-  reviewedBy: "Dr A. Reid",
-  registration: "GMC 7412995",
+  reviewedBy: "SEED DATA — nobody has reviewed this",
+  registration: "not a registration",
   reviewedAt: new Date("2026-08-11T00:00:00Z"),
   scope,
   doesNotClaim: [

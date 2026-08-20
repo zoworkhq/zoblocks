@@ -29,8 +29,13 @@
  */
 
 import { NextResponse } from "next/server";
-import { fulfilSession, markExpired, revokeForCharge } from "@/lib/market/fulfil";
-import { SignatureError, constructEvent, type CheckoutSession } from "@/lib/market/stripe";
+import { fulfilInvoice, fulfilSession, markExpired, revokeForCharge } from "@/lib/market/fulfil";
+import {
+  SignatureError,
+  constructEvent,
+  type CheckoutSession,
+  type StripeInvoice,
+} from "@/lib/market/stripe";
 
 export async function POST(request: Request) {
   const secret = process.env.STRIPE_WEBHOOK_SECRET;
@@ -62,6 +67,33 @@ export async function POST(request: Request) {
     case "checkout.session.async_payment_succeeded": {
       const result = await fulfilSession(event.data.object as unknown as CheckoutSession);
       return NextResponse.json({ received: true, outcome: result.reason });
+    }
+
+    /*
+     * The enterprise route. An invoice paid on terms, days or weeks after
+     * anybody clicked anything.
+     *
+     * It grants through the same claim a checkout does, so an invoice paid
+     * twice — or a webhook delivered twice — produces one entitlement. What it
+     * needs from whoever raised the invoice is `metadata.orgId` and
+     * `metadata.items`; without them the payment cannot be attributed and the
+     * outcome says `unresolvable` rather than guessing from the customer.
+     */
+    case "invoice.paid": {
+      const result = await fulfilInvoice(event.data.object as unknown as StripeInvoice);
+      return NextResponse.json({ received: true, outcome: result.reason });
+    }
+
+    /*
+     * Deliberately not a revocation.
+     *
+     * A failed invoice payment is a retry, a card that expired, or a finance
+     * department that has not run its payment batch yet — none of which are
+     * reasons to take away something already delivered. Stripe retries on its
+     * own schedule and `invoice.paid` still arrives when it succeeds.
+     */
+    case "invoice.payment_failed": {
+      return NextResponse.json({ received: true, outcome: "awaiting-payment" });
     }
 
     case "checkout.session.expired": {

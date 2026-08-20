@@ -19,7 +19,12 @@ import { ObjectId } from "mongodb";
 import { scoped } from "@/db/scope";
 import { itemBySlug, itemsByIds } from "./catalogue";
 import { grant, revoke } from "./entitlements";
-import { stripeGateway, type CheckoutSession, type PaymentGateway } from "./stripe";
+import {
+  stripeGateway,
+  type CheckoutSession,
+  type PaymentGateway,
+  type StripeInvoice,
+} from "./stripe";
 
 export type FulfilmentReason =
   /** Entitlements were written by this call. */
@@ -65,10 +70,73 @@ export async function fulfilSession(session: CheckoutSession): Promise<Fulfilmen
     return { reason: "unpaid", granted: [] };
   }
 
-  const orgId = readObjectId(session.metadata?.orgId ?? session.client_reference_id);
-  const slugs = (session.metadata?.items ?? "")
+  return deliver({
+    id: session.id,
+    orgId: session.metadata?.orgId ?? session.client_reference_id,
+    items: session.metadata?.items,
+    memberId: session.metadata?.memberId,
+    amountMinor: session.amount_total,
+    currency: session.currency,
+    ...(session.payment_intent ? { paymentIntent: session.payment_intent } : {}),
+  });
+}
+
+/**
+ * The enterprise route: an invoice, paid on terms, days or weeks later.
+ *
+ * The half of the money model that a card cannot serve. Plenty of health-tech
+ * buyers cannot put four figures on a company card at all — procurement raises
+ * a purchase order, finance pays an invoice, and if that path does not exist
+ * the marketplace only serves the tier that cannot fund the business.
+ *
+ * Mechanically it is the same delivery as a checkout, and deliberately so: the
+ * entitlement, the audit row and the idempotent claim do not care which
+ * instrument paid. What differs is only where the fields are read from — and
+ * that the invoice must carry `metadata.orgId` and `metadata.items`, which is
+ * whoever raises it doing the one thing this path depends on.
+ */
+export async function fulfilInvoice(invoice: StripeInvoice): Promise<Fulfilment> {
+  // `paid` is the only status that delivers. `open` is an invoice awaiting
+  // payment, and `void`/`uncollectible` are ones that never will be.
+  if (invoice.status !== "paid") {
+    return { reason: "unpaid", granted: [] };
+  }
+
+  return deliver({
+    id: invoice.id,
+    orgId: invoice.metadata?.orgId,
+    items: invoice.metadata?.items,
+    memberId: invoice.metadata?.memberId,
+    amountMinor: invoice.amount_paid,
+    currency: invoice.currency,
+  });
+}
+
+interface Delivery {
+  /** Stripe's id for the thing that was paid. Becomes the order `_id`. */
+  id: string;
+  orgId: string | null | undefined;
+  /** Comma-separated catalogue slugs, as resolved server-side. */
+  items: string | undefined;
+  memberId: string | undefined;
+  amountMinor: number | null;
+  currency: string | null;
+  paymentIntent?: string;
+}
+
+/**
+ * Claim the order exactly once, then grant.
+ *
+ * Shared by both routes rather than written twice. The duplication would not
+ * have been the cost — the drift would: an idempotency claim that is subtly
+ * different on the invoice path is a bug nobody finds until an enterprise
+ * customer is charged for something they already own.
+ */
+async function deliver(input: Delivery): Promise<Fulfilment> {
+  const orgId = readObjectId(input.orgId);
+  const slugs = (input.items ?? "")
     .split(",")
-    .map((s) => s.trim())
+    .map((slug) => slug.trim())
     .filter(Boolean);
   if (!orgId || slugs.length === 0) {
     return { reason: "unresolvable", granted: [] };
@@ -90,41 +158,40 @@ export async function fulfilSession(session: CheckoutSession): Promise<Fulfilmen
    * the order is recorded, and a person decides.
    */
   const expected = resolved.reduce((total, item) => total + (item.priceMinor ?? 0), 0);
-  if (session.amount_total !== null && session.amount_total < expected) {
+  if (input.amountMinor !== null && input.amountMinor < expected) {
     await scoped(orgId).orders.updateOne(
-      { _id: session.id },
-      { $set: { status: "open", amountMinor: session.amount_total } },
+      { _id: input.id },
+      { $set: { status: "open", amountMinor: input.amountMinor } },
     );
-    return { reason: "underpaid", granted: [], orderId: session.id };
+    return { reason: "underpaid", granted: [], orderId: input.id };
   }
 
   /*
    * The claim.
    *
-   * `_id` is the Stripe session id and `fulfilledAt: null` is in the filter, so
-   * exactly one caller can transition it. `returnDocument: "before"` is what
-   * makes the winner distinguishable: the winner sees `null` (or no document
-   * at all, on the upsert), the loser sees a date.
+   * `_id` is Stripe's id and `fulfilledAt: null` is in the filter, so exactly
+   * one caller can transition it. `returnDocument: "before"` is what makes the
+   * winner distinguishable: the winner sees `null`, the loser sees a date.
    *
-   * The upsert matters for the case where the order row is missing entirely —
-   * a session created before this deployment, or a customer who paid through a
-   * Payment Link. Fulfilment must not depend on our own bookkeeping having run
-   * first.
+   * The upsert matters where the order row is missing entirely — a session
+   * created before this deployment, a Payment Link, or an invoice raised in the
+   * Stripe dashboard. Fulfilment must not depend on our own bookkeeping having
+   * run first.
    */
   let before;
   try {
     before = await scoped(orgId).orders.findOneAndUpdate(
-      { _id: session.id, fulfilledAt: null },
+      { _id: input.id, fulfilledAt: null },
       {
         $set: {
           status: "paid" as const,
           fulfilledAt: new Date(),
-          amountMinor: session.amount_total,
-          currency: session.currency,
-          ...(session.payment_intent ? { paymentIntent: session.payment_intent } : {}),
+          amountMinor: input.amountMinor,
+          currency: input.currency,
+          ...(input.paymentIntent ? { paymentIntent: input.paymentIntent } : {}),
         },
         $setOnInsert: {
-          memberId: readObjectId(session.metadata?.memberId),
+          memberId: readObjectId(input.memberId),
           items: slugs,
           createdAt: new Date(),
         },
@@ -148,35 +215,35 @@ export async function fulfilSession(session: CheckoutSession): Promise<Fulfilmen
      * retry, which would raise it again.
      */
     if ((error as { code?: number }).code !== 11000) throw error;
-    const existing = await scoped(orgId).orders.findOne({ _id: session.id });
-    return { reason: "already", granted: existing?.items ?? slugs, orderId: session.id };
+    const existing = await scoped(orgId).orders.findOne({ _id: input.id });
+    return { reason: "already", granted: existing?.items ?? slugs, orderId: input.id };
   }
 
   if (before?.fulfilledAt) {
-    return { reason: "already", granted: before.items, orderId: session.id };
+    return { reason: "already", granted: before.items, orderId: input.id };
   }
 
   for (const item of resolved) {
     await grant(orgId, item._id, {
-      via: session.id,
-      by: readObjectId(session.metadata?.memberId),
+      via: input.id,
+      by: readObjectId(input.memberId),
       versionLine: item.liveVersion,
     });
   }
 
   await scoped(orgId).audit.insertOne({
     _id: new ObjectId(),
-    // A webhook has no member. `actorId` is the buyer when the session named
+    // A webhook has no member. `actorId` is the buyer when the payload named
     // one, and a zero id when it did not — an audit row with a fabricated
     // actor would be worse than one that admits the actor is unknown.
-    actorId: readObjectId(session.metadata?.memberId) ?? new ObjectId("000000000000000000000000"),
+    actorId: readObjectId(input.memberId) ?? new ObjectId("000000000000000000000000"),
     action: "market.purchased",
     subject: slugs.join(", "),
-    detail: `order ${session.id}`,
+    detail: `order ${input.id}`,
     at: new Date(),
   });
 
-  return { reason: "granted", granted: slugs, orderId: session.id };
+  return { reason: "granted", granted: slugs, orderId: input.id };
 }
 
 /**

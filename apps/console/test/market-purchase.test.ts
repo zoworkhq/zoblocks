@@ -21,6 +21,7 @@ import { createCheckout } from "@/lib/market/checkout";
 import { grant, isEntitled } from "@/lib/market/entitlements";
 import {
   fulfil,
+  fulfilInvoice,
   fulfilSession,
   markExpired,
   orderItems,
@@ -390,5 +391,105 @@ describe("the paths a webhook reaches and a happy path does not", () => {
       metadata: { orgId: northwind.toHexString(), items: "ghost-pack" },
     });
     expect(result.revoked).toEqual([]);
+  });
+});
+
+describe("the enterprise route: an invoice", () => {
+  const invoice = (
+    orgId: import("mongodb").ObjectId,
+    slugs: string[],
+    overrides: Partial<import("@/lib/market/stripe").StripeInvoice> = {},
+  ): import("@/lib/market/stripe").StripeInvoice => ({
+    id: "in_test_1",
+    status: "paid",
+    amount_paid: 29000,
+    currency: "usd",
+    customer: "cus_test",
+    metadata: { orgId: orgId.toHexString(), items: slugs.join(",") },
+    ...overrides,
+  });
+
+  it("grants against a paid invoice", async () => {
+    const { northwind } = await twoOrgs();
+    const item = await seedItem();
+
+    const result = await fulfilInvoice(invoice(northwind, [item.slug]));
+
+    expect(result.reason).toBe("granted");
+    expect(await isEntitled(northwind, item._id)).toBe(true);
+    // The order is keyed on the invoice id, exactly as a checkout is keyed on
+    // its session — one claim, whichever instrument paid.
+    expect(await scoped(northwind).orders.findOne({ _id: "in_test_1" })).toMatchObject({
+      status: "paid",
+    });
+  });
+
+  it("delivers once however many times the webhook arrives", async () => {
+    const { northwind } = await twoOrgs();
+    const item = await seedItem();
+    const paid = invoice(northwind, [item.slug]);
+
+    const outcomes = await Promise.all(Array.from({ length: 4 }, () => fulfilInvoice(paid)));
+    await fulfilInvoice(paid);
+
+    expect(outcomes.filter((o) => o.reason === "granted")).toHaveLength(1);
+    expect(await scoped(northwind).entitlements.countDocuments()).toBe(1);
+    expect(await scoped(northwind).orders.countDocuments()).toBe(1);
+  });
+
+  it("waits rather than delivering while the invoice is open", async () => {
+    const { northwind } = await twoOrgs();
+    const item = await seedItem();
+
+    for (const status of ["draft", "open", "void", "uncollectible"] as const) {
+      const result = await fulfilInvoice(invoice(northwind, [item.slug], { status }));
+      expect(result.reason, status).toBe("unpaid");
+    }
+    expect(await isEntitled(northwind, item._id)).toBe(false);
+  });
+
+  it("refuses an invoice that names no organisation", async () => {
+    const { northwind } = await twoOrgs();
+    const item = await seedItem();
+
+    // Whoever raises the invoice has to carry the metadata. Guessing from the
+    // Stripe customer would attribute a payment to an organisation on the
+    // strength of an email address.
+    const result = await fulfilInvoice(
+      invoice(northwind, [item.slug], { metadata: { items: item.slug } }),
+    );
+    expect(result.reason).toBe("unresolvable");
+  });
+
+  it("holds an invoice paid below the catalogue price", async () => {
+    const { northwind } = await twoOrgs();
+    const item = await seedItem({ priceMinor: 29000 });
+
+    const result = await fulfilInvoice(invoice(northwind, [item.slug], { amount_paid: 500 }));
+    expect(result.reason).toBe("underpaid");
+    expect(await isEntitled(northwind, item._id)).toBe(false);
+  });
+
+  it("delivers several items on one invoice", async () => {
+    const { northwind } = await twoOrgs();
+    const a = await seedItem({ slug: "pack-a", priceMinor: 10000 });
+    const b = await seedItem({ slug: "pack-b", priceMinor: 15000 });
+
+    const result = await fulfilInvoice(
+      invoice(northwind, ["pack-a", "pack-b"], { amount_paid: 25000 }),
+    );
+
+    expect(result.reason).toBe("granted");
+    expect(await isEntitled(northwind, a._id)).toBe(true);
+    expect(await isEntitled(northwind, b._id)).toBe(true);
+  });
+
+  it("keeps an invoice-granted entitlement out of the other organisation", async () => {
+    const { northwind, southmere } = await twoOrgs();
+    const item = await seedItem();
+    await fulfilInvoice(invoice(northwind, [item.slug]));
+
+    expect(await isEntitled(southmere, item._id)).toBe(false);
+    expect(await scoped(southmere).orders.countDocuments()).toBe(0);
   });
 });

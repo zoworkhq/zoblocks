@@ -124,7 +124,16 @@ export default async function MarketItemPage({ params }: { params: Promise<{ slu
         </Panel>
 
         <Panel title="What was checked">
-          <dl className="space-y-2 text-[0.8125rem]">
+          {/*
+            A list, not a definition list.
+            
+            This was a `<dl>`, and axe was right to refuse it: a `<dl>` promises
+            term/definition pairs and this has none — every row is a single
+            statement about what was checked. The promise was structural rather
+            than cosmetic, so a screen reader announced a definition list with
+            nothing in it.
+          */}
+          <ul className="space-y-2 text-[0.8125rem]">
             <Fact tone="pass">
               {accessibility.contrastPairs.passed}/{accessibility.contrastPairs.total} contrast
               pairs at or above {accessibility.contrastPairs.floor} · checker v
@@ -156,7 +165,7 @@ export default async function MarketItemPage({ params }: { params: Promise<{ slu
                 Maps {fhir.maps.join(", ")} ({fhir.release})
               </Fact>
             )}
-          </dl>
+          </ul>
 
           <p className="eyebrow mt-4 mb-1.5 text-[0.5625rem] text-graphite-soft">Licence</p>
           <p className="body-sm text-graphite">
@@ -272,11 +281,11 @@ function Fact({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex items-baseline gap-2">
+    <li className="flex items-baseline gap-2">
       <StatusChip tone={tone === "neutral" ? "neutral" : tone}>
         {tone === "pass" ? "Pass" : tone === "warn" ? "Note" : "Info"}
       </StatusChip>
       <span className="text-graphite">{children}</span>
-    </div>
+    </li>
   );
 }

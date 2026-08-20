@@ -92,6 +92,23 @@ export interface CheckoutSession {
   payment_intent?: string | null;
 }
 
+/**
+ * The enterprise instrument.
+ *
+ * Only the fields fulfilment reads. `metadata` is the one that makes this path
+ * work at all: an invoice raised without `orgId` and `items` is a payment we
+ * cannot attribute, and it is deliberately left as a hard requirement rather
+ * than guessed at from the customer record.
+ */
+export interface StripeInvoice {
+  id: string;
+  status: "draft" | "open" | "paid" | "void" | "uncollectible";
+  amount_paid: number | null;
+  currency: string | null;
+  customer?: string | null;
+  metadata: Record<string, string> | null;
+}
+
 export interface StripeEvent {
   id: string;
   type: string;

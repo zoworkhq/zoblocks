@@ -202,7 +202,7 @@ export const BRAND_ASSETS: readonly BrandAssetSpec[] = [
   {
     role: "watermark-draft",
     label: "Draft watermark",
-    note: "Laid across any note that has not been countersigned. The one asset here with a patient-safety argument: an unsigned note that prints clean gets filed and read as final.",
+    note: "Laid across any note that has not been countersigned. The one asset here with a patient-safety argument: an unsigned note that prints without the watermark gets filed and read as final.",
     formats: ["svg", "png"],
     ground: "light",
     shape: { width: 600, height: 600, ratio: 1 },

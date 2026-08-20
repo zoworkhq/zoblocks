@@ -29,6 +29,13 @@ const env = {
   // The fixture the specs assert against. Absolute, because `fontFaceSchema`
   // validates `src` as a URL and a relative path is not one.
   CONSOLE_ASSET_ORIGIN: "http://localhost:6003",
+  /*
+   * Obviously fake, and present so the webhook route reaches its signature
+   * check at all. Without a secret it answers 500 "not configured", which
+   * would let a suite assert a refusal it never actually tested.
+   */
+  STRIPE_SECRET_KEY: "sk_test_e2e_not_a_real_key",
+  STRIPE_WEBHOOK_SECRET: "whsec_e2e_not_a_real_secret",
 };
 
 /** Run one command to completion, inheriting stdio so failures are visible. */
