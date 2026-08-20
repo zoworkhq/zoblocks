@@ -23,3 +23,4 @@ packages/tokens/src/tailwind.css
 packages/tokens/src/tokens.ts
 packages/tokens/src/tokens.json
 packages/tokens/src/contrast.json
+packages/tokens/src/surface.ts

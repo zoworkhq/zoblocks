@@ -9,7 +9,15 @@
  * Produced by scripts/gen/emit/catalog.ts. Never written by hand.
  */
 
-import type { A11yNote, Distribution, FhirResource, Layer, Stability, Tier } from "./schema";
+import type {
+  A11yNote,
+  Distribution,
+  FhirResource,
+  FrameworkRelation,
+  Layer,
+  Stability,
+  Tier,
+} from "./schema";
 
 export interface PropDoc {
   name: string;
@@ -43,6 +51,14 @@ export interface ComponentDoc {
   distribution: Distribution;
   /** npm package name. Present only for `package` components. */
   packageName?: string;
+  /**
+   * Relationship to each UI framework, keyed by npm package name. Present only
+   * when the component has one — most do not, and that is the house default.
+   *
+   * The docs page renders this as the answer to the question a buyer on antd
+   * actually asks: does adopting this component mean adopting a framework?
+   */
+  frameworks?: Record<string, FrameworkRelation>;
   deprecation?: {
     deprecatedIn: string;
     removeIn: string;

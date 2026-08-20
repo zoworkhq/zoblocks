@@ -149,6 +149,42 @@ export default defineConfig({
       grep: /@framework/,
       use: { ...devices["Desktop Safari"] },
     },
+    {
+      /*
+       * The UI-framework hosts: one application source under antd, MUI and
+       * neither, asserting the accessibility trees match.
+       *
+       * Chromium only, deliberately. This suite compares three renders of the
+       * same page against *each other* rather than against a fixed
+       * expectation, so a second engine would re-run the same comparison and
+       * find the same answer — it tests our architecture, not the browser's
+       * DOM. The cross-engine coverage that earns its keep is `@a11y`, which
+       * checks things engines genuinely differ on.
+       *
+       * It needs a project at all because every project here carries a `grep`:
+       * a tag with no project matches nothing, and Playwright reports the run
+       * green while silently collecting none of it. That is how `@motion` went
+       * unrun; `playwright test --list` is what surfaces it.
+       */
+      name: "bridge-chromium",
+      grep: /@bridge/,
+      use: { ...devices["Desktop Chrome"], colorScheme: "light" },
+    },
+    {
+      /*
+       * The console's own lifecycle, in one engine.
+       *
+       * Chromium only, on the same reasoning as `@bridge`: this suite asserts
+       * that a sequence of *our* screens is reachable and that our gate refuses
+       * what it should. None of that differs by engine. The console's
+       * cross-engine coverage is `@a11y`, which checks the things engines do
+       * genuinely disagree about — focus rings, forced colours, name
+       * computation.
+       */
+      name: "console-chromium",
+      grep: /@console/,
+      use: { ...devices["Desktop Chrome"], colorScheme: "light" },
+    },
   ],
 
   // Three hosts, because the smoke apps cannot share one: React 18 and React 19
@@ -162,6 +198,27 @@ export default defineConfig({
   // deployed URL also silently stopped the smoke apps from starting, and the
   // framework suite failed on connection refused rather than on anything real.
   webServer: [
+    /*
+     * The console, with a throwaway MongoDB of its own.
+     *
+     * One command rather than three, because the steps are ordered and
+     * Playwright's `webServer` owns exactly one: the database has to exist
+     * before the seed, and the seed has to finish before a request assumes a
+     * member exists. Three entries would race and the failure would look like a
+     * flaky login. `scripts/e2e-server.mjs` does all three and tears the
+     * database down with the process.
+     */
+    ...(process.env.OXYGEN_CONSOLE_URL
+      ? []
+      : [
+          {
+            command:
+              "pnpm --filter @oxygenui-design/console build && pnpm --filter @oxygenui-design/console e2e:server",
+            url: "http://localhost:6003/login",
+            reuseExistingServer: !process.env.CI,
+            timeout: 180_000,
+          },
+        ]),
     ...(process.env.OXYGEN_BASE_URL
       ? []
       : [
@@ -190,6 +247,32 @@ export default defineConfig({
             command:
               "pnpm --filter @oxygenui-design/smoke-react18 build && pnpm --filter @oxygenui-design/smoke-react18 preview",
             url: "http://localhost:6011",
+            reuseExistingServer: !process.env.CI,
+            timeout: 120_000,
+          },
+        ]),
+    // The three UI-framework hosts. `bridge-hosts.spec.ts` renders one
+    // application source under antd, MUI and neither, and asserts the
+    // accessibility trees match — the check that fails if framework coupling
+    // ever leaks into a component.
+    ...(process.env.OXYGEN_HOSTS_URL
+      ? []
+      : [
+          {
+            command:
+              "pnpm --filter @oxygenui-design/smoke-hosts build && pnpm --filter @oxygenui-design/smoke-hosts preview",
+            /*
+             * `/none/`, not `/`.
+             *
+             * This app has three entry points and no root document — its Vite
+             * input is `antd/`, `mui/` and `none/`, so `/` is a 404 by
+             * construction. Polling it meant the server came up healthy, never
+             * satisfied the check, and every run that started this server
+             * failed after two minutes with "Timed out waiting for
+             * config.webServer" — a message that points at the server rather
+             * than at the URL, which is why it survived.
+             */
+            url: "http://localhost:6012/none/",
             reuseExistingServer: !process.env.CI,
             timeout: 120_000,
           },

@@ -13,6 +13,11 @@
  * than one bespoke test each: hidden from the tree, unreachable by tab, sized
  * in `em` so they scale with their label, and inheriting colour so a skin never
  * has to restate it.
+ *
+ * The glyphs are masked spans rather than inline SVG, so that a customer can
+ * replace one from CSS. The contract above is unchanged by that and the
+ * assertions deliberately do not name an element — the day a glyph goes back to
+ * being an `<svg>`, or becomes something else again, these should still hold.
  */
 
 import { describe, expect, it } from "vitest";
@@ -39,45 +44,52 @@ describe("the icon set", () => {
     expect(ICONS.length).toBeGreaterThanOrEqual(20);
   });
 
+  const glyphOf = (container: HTMLElement) => container.firstElementChild;
+
   it.each(ICONS)("%s is hidden from assistive technology", (_name, Glyph) => {
     const { container } = render(<Glyph />);
-    const svg = container.querySelector("svg");
-    expect(svg).toHaveAttribute("aria-hidden", "true");
-    expect(svg).toHaveAttribute("focusable", "false");
+    expect(glyphOf(container)).toHaveAttribute("aria-hidden", "true");
   });
 
-  it.each(ICONS)("%s scales with its label rather than a fixed pixel size", (_name, Glyph) => {
+  it.each(ICONS)("%s is not reachable by tab", (_name, Glyph) => {
     const { container } = render(<Glyph />);
-    const svg = container.querySelector("svg");
-    expect(svg).toHaveAttribute("width", "1em");
-    expect(svg).toHaveAttribute("height", "1em");
+    // No tabindex and not a natively focusable element: an icon inside a button
+    // that could be focused separately would be a second stop for one control.
+    expect(glyphOf(container)).not.toHaveAttribute("tabindex");
+    expect(glyphOf(container)?.tagName).not.toBe("BUTTON");
   });
 
-  it.each(ICONS)("%s inherits colour so a skin never restates it", (_name, Glyph) => {
+  /**
+   * Size and colour now come from `icons.css` rather than from attributes, so
+   * what this asserts is the hook that stylesheet needs: the class and the slot
+   * it is keyed to. Without either, the mask has nothing to attach to and the
+   * glyph is a blank square — which is also exactly how a customer override
+   * goes missing.
+   */
+  it.each(ICONS)("%s carries the slot its mask is keyed to", (_name, Glyph) => {
     const { container } = render(<Glyph />);
-    const svg = container.querySelector("svg");
-    expect(
-      svg?.getAttribute("stroke") === "currentColor" ||
-        svg?.getAttribute("fill") === "currentColor",
-    ).toBe(true);
-  });
-
-  it.each(ICONS)("%s draws something", (_name, Glyph) => {
-    const { container } = render(<Glyph />);
-    expect(container.querySelector("svg")?.innerHTML.trim()).not.toBe("");
+    const el = glyphOf(container);
+    expect(el).toHaveClass("ox-icon");
+    expect(el?.getAttribute("data-icon")).toMatch(/^[a-z0-9-]+$/);
   });
 
   it("passes props through, so a skin can add a class without a wrapper", () => {
     const { container } = render(<icons.SendIcon className="my-class" data-testid="send" />);
-    const svg = container.querySelector("svg");
-    expect(svg).toHaveClass("my-class");
-    expect(svg).toHaveAttribute("data-testid", "send");
+    const el = glyphOf(container);
+    expect(el).toHaveClass("my-class");
+    // And keeps its own, because dropping either would drop the glyph.
+    expect(el).toHaveClass("ox-icon");
+    expect(el).toHaveAttribute("data-icon", "send");
+    expect(el).toHaveAttribute("data-testid", "send");
   });
 
-  it("lets a caller override the stroke weight", () => {
-    const { container } = render(<icons.SendIcon strokeWidth={3} />);
-    expect(container.querySelector("svg")).toHaveAttribute("stroke-width", "3");
-  });
+  /*
+   * That every glyph matches a slot in the theme package's registry is checked
+   * at the repository root instead, in `test/icon-slots.test.ts`. A component
+   * package must not depend on the theme package to find out what it draws —
+   * that is the dependency pointing the wrong way — and a cross-package
+   * invariant belongs where both sides are already in scope.
+   */
 });
 
 describe("modeIcon", () => {
@@ -97,6 +109,6 @@ describe("modeIcon", () => {
     const Glyph = modeIcon("our-own-triage-mode");
     expect(Glyph).toBe(icons.SparkIcon);
     const { container } = render(<Glyph />);
-    expect(container.querySelector("svg")).toBeTruthy();
+    expect(container.firstElementChild).toHaveAttribute("data-icon", "spark");
   });
 });

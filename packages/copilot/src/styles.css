@@ -1,3 +1,11 @@
+/*
+ * The glyphs, which are masks rather than inline SVG so a customer can replace
+ * them. Imported rather than inlined here: a block of twenty-nine data URIs in
+ * the middle of this file would bury everything around it, and a change to one
+ * glyph should be a diff somebody can read.
+ */
+@import "@oxygenui-design/copilot-react/icons.css";
+
 /**
  * Oxygen Copilot — antd skin.
  *
@@ -16,10 +24,10 @@
 .ox-copilot {
   --ox-copilot-radius: var(--ox-radius-lg, 16px);
   --ox-copilot-surface: var(--ox-surface, var(--ant-color-bg-container, #fff));
-  --ox-copilot-rule: var(--ox-rule, var(--ant-color-border-secondary, #f0f0f0));
+  --ox-copilot-rule: var(--ox-border, var(--ant-color-border-secondary, #f0f0f0));
   --ox-copilot-ink: var(--ox-text, var(--ant-color-text, rgb(0 0 0 / 0.88)));
   --ox-copilot-muted: var(--ox-text-muted, var(--ant-color-text-secondary, rgb(0 0 0 / 0.65)));
-  --ox-copilot-accent: var(--ox-status-accent, var(--ant-color-primary, #1677ff));
+  --ox-copilot-accent: var(--ox-accent, var(--ant-color-primary, #1677ff));
   --ox-copilot-warn: var(--ox-status-high, var(--ant-color-warning, #faad14));
   --ox-copilot-bad: var(--ox-status-critical, var(--ant-color-error, #ff4d4f));
   --ox-copilot-ok: var(--ox-status-normal, var(--ant-color-success, #52c41a));

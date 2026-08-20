@@ -24,6 +24,13 @@ import { buildCatalog, emitCatalog } from "./emit/catalog";
 import { buildCoverage, emitCoverage } from "./emit/coverage";
 import { emitReactPackage, ensureReactPackageDirs } from "./emit/react-package";
 import { emitRegistry } from "./emit/registry";
+import {
+  buildSurface,
+  danglingReferences,
+  emitSurface,
+  missingFallbacks,
+  staleFallbackExemptions,
+} from "./emit/surface";
 import { emitTailwindSources } from "./emit/tailwind-sources";
 import { emitTsconfigPaths } from "./emit/tsconfig-paths";
 import { MetaError, loadComponents } from "./load";
@@ -61,6 +68,11 @@ async function main() {
     process.exit(1);
   }
   await emitTokens(tokenSource, emitter);
+
+  // The component token surface, read back out of the stylesheets. It sits
+  // here because it describes the same layer the token build just wrote, and
+  // because a bridge or a customer theme is only as trustworthy as the list of
+  // properties it is allowed to touch.
 
   /*
    * Two audiences from here on.
@@ -106,6 +118,57 @@ async function main() {
   // runs this way.
   await ensureReactPackageDirs();
   await emitReactPackage(registryComponents, emitter);
+
+  /*
+   * The token surface is read back out of the component stylesheets, so it has
+   * to be built *after* the react package emits them. Building it earlier made
+   * `pnpm gen` non-idempotent: a stylesheet edit produced a surface describing
+   * the previous run's CSS, and only a second run agreed with itself. The
+   * fallback gate caught it, which is the argument for having the gate.
+   */
+  const surface = await buildSurface(tokenSource);
+
+  // A component token whose `--ox-*` fallback names nothing renders correctly
+  // and silently ignores every brand. Nothing else in the build can see it:
+  // the CSS is valid, the pixels are fine, and the component simply never
+  // participates in the theming system it appears to be part of.
+  const dangling = danglingReferences(surface, tokenSource);
+  if (dangling.length) {
+    report(
+      `${dangling.length} component token(s) reference a token that does not exist`,
+      dangling.map((d) => `${d.token} → ${d.missing} is not defined  (${d.source})`),
+    );
+    process.exit(1);
+  }
+
+  // A chain that does not reach a literal renders as nothing on a page without
+  // the token stylesheet. The seven that predate this check are exempted by
+  // name in the emitter; an eighth is a build failure.
+  const unterminated = missingFallbacks(surface);
+  if (unterminated.length) {
+    report(
+      `${unterminated.length} component token(s) do not fall back to a literal`,
+      unterminated.map(
+        (u) =>
+          `${u.token} → ${u.chainsTo ?? "(nothing)"} with no literal at the end  (${u.source})`,
+      ),
+    );
+    process.exit(1);
+  }
+
+  const stale = staleFallbackExemptions(surface);
+  if (stale.length) {
+    report(
+      `${stale.length} token(s) are exempted from the fallback rule but no longer need to be`,
+      [
+        ...stale.map((t) => `${t} now terminates in a literal`),
+        "Remove them from KNOWN_WITHOUT_FALLBACK in scripts/gen/emit/surface.ts.",
+      ],
+    );
+    process.exit(1);
+  }
+
+  await emitSurface(surface, tokenSource, emitter);
 
   await emitCatalog(buildCatalog(components, props), emitter);
   await emitTailwindSources(registryComponents, emitter);

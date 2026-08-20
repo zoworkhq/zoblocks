@@ -13,10 +13,10 @@
  */
 
 import * as React from "react";
-import { Monitor, Moon, Sun } from "lucide-react";
+import { Contrast, Monitor, Moon, Sun } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-type Theme = "light" | "dark" | "system";
+type Theme = "light" | "dark" | "high-contrast" | "system";
 
 const OPTIONS: Array<{
   value: Theme;
@@ -25,14 +25,27 @@ const OPTIONS: Array<{
 }> = [
   { value: "light", label: "Light", icon: Sun },
   { value: "dark", label: "Dark", icon: Moon },
+  { value: "high-contrast", label: "High contrast", icon: Contrast },
   { value: "system", label: "System", icon: Monitor },
 ];
 
 export function applyTheme(theme: Theme) {
+  const root = document.documentElement;
+
+  // High contrast is a third theme, not a modifier on the other two: the token
+  // build emits it as its own value set held to 7:1, and layering it over dark
+  // would give a reader two half-applied palettes.
+  if (theme === "high-contrast") {
+    root.classList.remove("dark");
+    root.setAttribute("data-ox-theme", "high-contrast");
+    return;
+  }
+
+  root.removeAttribute("data-ox-theme");
   const dark =
     theme === "dark" ||
     (theme === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
-  document.documentElement.classList.toggle("dark", dark);
+  root.classList.toggle("dark", dark);
 }
 
 export function ThemeToggle() {
@@ -42,7 +55,14 @@ export function ThemeToggle() {
   React.useEffect(() => {
     setMounted(true);
     const stored = localStorage.getItem("oxygen-theme") as Theme | null;
-    if (stored === "light" || stored === "dark" || stored === "system") setTheme(stored);
+    if (
+      stored === "light" ||
+      stored === "dark" ||
+      stored === "high-contrast" ||
+      stored === "system"
+    ) {
+      setTheme(stored);
+    }
   }, []);
 
   // Follow the OS while the preference is "system".

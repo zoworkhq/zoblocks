@@ -17,6 +17,15 @@ export default defineComponentMeta({
   status: "beta",
   since: "0.1.0",
   layer: "primitive",
+  frameworks: {
+    antd: {
+      policy: "compatible",
+      bridge: true,
+      divergences: [
+        "`as` is required. antd's Tabs infers nothing, so a strip that navigates and a strip that switches views are the same component with the same accessibility tree; here they are not.",
+      ],
+    },
+  },
 
   distribution: "package",
   packageName: "@oxygenui-design/tabs",

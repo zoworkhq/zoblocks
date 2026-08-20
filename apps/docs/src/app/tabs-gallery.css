@@ -76,9 +76,9 @@
   --ox-bg-muted: var(--color-paper-sunk);
   --ox-surface: var(--color-paper);
   --ox-surface-raised: var(--color-paper);
-  --ox-fg: var(--color-ink);
-  --ox-fg-muted: var(--color-graphite);
-  --ox-fg-subtle: var(--color-graphite-soft);
+  --ox-text: var(--color-ink);
+  --ox-text-muted: var(--color-graphite);
+  --ox-text-subtle: var(--color-graphite-soft);
   --ox-border: var(--color-rule);
   --ox-border-strong: var(--color-rule-strong);
   --ox-accent: var(--color-oxygen);
@@ -200,11 +200,11 @@
   border-radius: 0.75rem;
   padding: 0.85rem 1rem;
   font-size: 0.8125rem;
-  color: var(--ox-fg-muted);
+  color: var(--ox-text-muted);
   background: var(--ox-bg-subtle);
 }
 .ox-demo-panel b {
-  color: var(--ox-fg);
+  color: var(--ox-text);
 }
 
 .ox-demo-btn {
@@ -216,7 +216,7 @@
   border-radius: 0.5rem;
   border: 1px solid var(--ox-border);
   background: var(--ox-surface);
-  color: var(--ox-fg);
+  color: var(--ox-text);
   cursor: pointer;
 }
 .ox-demo-btn--primary {
@@ -235,7 +235,7 @@
   line-height: 1.5;
   border: 1px solid var(--ox-status-critical-border);
   background: var(--ox-status-critical-bg);
-  color: var(--ox-fg);
+  color: var(--ox-text);
 }
 
 .ox-log {
@@ -247,12 +247,12 @@
   background: var(--ox-bg-subtle);
   font-family: var(--font-mono);
   font-size: 0.6875rem;
-  color: var(--ox-fg-muted);
+  color: var(--ox-text-muted);
   display: grid;
   gap: 0.2rem;
 }
 .ox-log li:first-child {
-  color: var(--ox-fg);
+  color: var(--ox-text);
 }
 
 .ox-sheet {
@@ -267,12 +267,12 @@
   margin: 0 0 0.3rem;
   font-size: 0.9rem;
   font-weight: 600;
-  color: var(--ox-fg);
+  color: var(--ox-text);
 }
 .ox-sheet p {
   margin: 0 0 0.75rem;
   font-size: 0.8125rem;
-  color: var(--ox-fg-muted);
+  color: var(--ox-text-muted);
 }
 .ox-sheet__actions {
   display: flex;
@@ -298,12 +298,12 @@
 .ox-chart__name {
   font-size: 1.05rem;
   font-weight: 600;
-  color: var(--ox-fg);
+  color: var(--ox-text);
 }
 .ox-chart__mrn {
   font-family: var(--font-mono);
   font-size: 0.75rem;
-  color: var(--ox-fg-muted);
+  color: var(--ox-text-muted);
 }
 .ox-chart__actions {
   display: flex;
@@ -319,13 +319,13 @@
 .ox-card__title {
   font-weight: 600;
   font-size: 0.9rem;
-  color: var(--ox-fg);
+  color: var(--ox-text);
 }
 .ox-card__body {
   font-size: 0.8rem;
   font-weight: 400;
   line-height: 1.45;
-  color: var(--ox-fg-muted);
+  color: var(--ox-text-muted);
   white-space: normal;
 }
 
@@ -338,14 +338,14 @@
 .ox-stat__key {
   font-size: 0.75rem;
   font-weight: 500;
-  color: var(--ox-fg-muted);
+  color: var(--ox-text-muted);
 }
 .ox-stat__value {
   font-family: var(--font-mono);
   font-size: 1.4rem;
   font-weight: 600;
   line-height: 1.1;
-  color: var(--ox-fg);
+  color: var(--ox-text);
   font-variant-numeric: tabular-nums;
 }
 .ox-stat__delta {
@@ -399,7 +399,7 @@
 .ox-variants__row > code {
   font-family: var(--font-mono);
   font-size: 0.6875rem;
-  color: var(--ox-fg-muted);
+  color: var(--ox-text-muted);
 }
 
 /* ---- the nine-cell matrix ----------------------------------------- */
@@ -445,9 +445,9 @@
   --ox-bg-muted: #f1f5f9;
   --ox-surface: #ffffff;
   --ox-surface-raised: #ffffff;
-  --ox-fg: #0f172a;
-  --ox-fg-muted: #475569;
-  --ox-fg-subtle: #94a3b8;
+  --ox-text: #0f172a;
+  --ox-text-muted: #475569;
+  --ox-text-subtle: #94a3b8;
   --ox-border: #e2e8f0;
   --ox-border-strong: #cbd5e1;
   --ox-accent: #059478;
@@ -474,9 +474,9 @@
   --ox-bg-muted: #1e293b;
   --ox-surface: #0f172a;
   --ox-surface-raised: #27334a;
-  --ox-fg: #e2e8f0;
-  --ox-fg-muted: #94a3b8;
-  --ox-fg-subtle: #64748b;
+  --ox-text: #e2e8f0;
+  --ox-text-muted: #94a3b8;
+  --ox-text-subtle: #64748b;
   --ox-border: #1e293b;
   --ox-border-strong: #334155;
   --ox-accent: #2dd4b0;
@@ -503,9 +503,9 @@
   --ox-bg-muted: #ffffff;
   --ox-surface: #ffffff;
   --ox-surface-raised: #ffffff;
-  --ox-fg: #000000;
-  --ox-fg-muted: #1a1a1a;
-  --ox-fg-subtle: #404040;
+  --ox-text: #000000;
+  --ox-text-muted: #1a1a1a;
+  --ox-text-subtle: #404040;
   --ox-border: #000000;
   --ox-border-strong: #000000;
   --ox-accent: #005c47;

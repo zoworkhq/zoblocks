@@ -1,0 +1,32 @@
+{
+  "name": "@oxygenui-design/smoke-hosts",
+  "version": "0.0.0",
+  "private": true,
+  "description": "The same Oxygen application source rendered under three UI-framework hosts, so the claim that application code is framework-independent can be executed rather than asserted.",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview --port 6012 --strictPort",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.0",
+    "@mui/material": "^9.3.1",
+    "@oxygenui-design/bridge-antd": "workspace:*",
+    "@oxygenui-design/bridge-mui": "workspace:*",
+    "@oxygenui-design/react": "workspace:*",
+    "@oxygenui-design/tokens": "workspace:*",
+    "antd": "^6.6.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.2",
+    "@types/react-dom": "^19.0.2",
+    "@vitejs/plugin-react": "^4.3.4",
+    "typescript": "^5.7.2",
+    "vite": "^8.0.0"
+  }
+}

@@ -28,15 +28,15 @@
  */
 
 .ox-timeline {
-  --ox-timeline-rail: var(--ox-border);
+  --ox-timeline-rail: var(--ox-border, #e2e8f0);
   --ox-timeline-rail-width: 1px;
   --ox-timeline-node-size: 2rem;
-  --ox-timeline-node-bg: var(--ox-surface);
-  --ox-timeline-node-border: var(--ox-border);
-  --ox-timeline-node-fg: var(--ox-text-muted);
+  --ox-timeline-node-bg: var(--ox-surface, #ffffff);
+  --ox-timeline-node-border: var(--ox-border, #e2e8f0);
+  --ox-timeline-node-fg: var(--ox-text-muted, #475569);
   --ox-timeline-gap: 0.75rem;
   --ox-timeline-row-gap: 1.125rem;
-  --ox-timeline-font: var(--ox-density-font, var(--ox-text-sm));
+  --ox-timeline-font: var(--ox-density-font, var(--ox-text-sm, 0.8125rem));
 
   display: block;
   margin: 0;
@@ -170,8 +170,8 @@
 /* ------------------------------------------------------------------ */
 
 .ox-care-timeline {
-  --ox-care-timeline-divider: var(--ox-border);
-  --ox-care-timeline-meta: var(--ox-text-subtle);
+  --ox-care-timeline-divider: var(--ox-border, #e2e8f0);
+  --ox-care-timeline-meta: var(--ox-text-subtle, #64748b);
 
   display: block;
   font-family: var(--ox-font-sans);

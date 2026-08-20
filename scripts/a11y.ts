@@ -48,7 +48,10 @@ async function main() {
 
   let failures = 0;
 
-  for (const theme of ["light", "dark"] as const) {
+  // Three, not two. `high-contrast` was emitted by the token build and audited
+  // by nothing, which is the worst combination: a mode we advertise, hold to a
+  // 7:1 floor, and had no evidence for.
+  for (const theme of ["light", "dark", "high-contrast"] as const) {
     for (const path of PAGES) {
       // Set the preference BEFORE navigating so the no-flash head script applies
       // it during first paint. Toggling after load leaves translucent surfaces
@@ -101,7 +104,7 @@ async function main() {
     console.error(`\n✗ ${failures} accessibility violation(s)`);
     process.exit(1);
   }
-  console.log(`\n✓ no WCAG 2.2 AA violations across ${PAGES.length} pages × 2 themes`);
+  console.log(`\n✓ no WCAG 2.2 AA violations across ${PAGES.length} pages × 3 themes`);
 }
 
 main().catch((error) => {

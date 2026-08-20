@@ -47,10 +47,13 @@ export default defineConfig({
     /*
      * 20s, against Vitest's 5s default.
      *
-     * These suites drive real antd overlays through jsdom, which has no layout
+     * These suites drive real overlays through jsdom, which has no layout
      * engine — the longest interaction chains sit seconds rather than
-     * milliseconds, and a CI runner is slower again. Two signature tests failed
-     * on exactly this. Browser timing is asserted in the Playwright suite.
+     * milliseconds, and a CI runner is slower again. Browser timing is
+     * asserted in the Playwright suite.
+     *
+     * (This package takes no antd dependency; the note this was copied from
+     * belongs to signature, which does.)
      */
     testTimeout: 20_000,
     globals: true,

@@ -195,6 +195,53 @@
   color-scheme: dark;
 }
 
+/* -----------------------------------------------------------------------
+ * High contrast — the theme that was emitted and never reachable.
+ *
+ * `packages/tokens` has shipped 59 high-contrast tokens at a 7:1 floor since
+ * the pipeline landed, selected by `[data-ox-theme="high-contrast"]` — an
+ * attribute nothing in this repository ever set. So the components had a
+ * high-contrast mode, no page could turn it on, and `scripts/a11y.ts` audited
+ * two themes, which meant it was never checked either.
+ *
+ * The site chrome needs its own palette or the page fights the components:
+ * high-contrast components on the ordinary paper ground is a mismatch, not a
+ * mode. Every pair below clears the AAA floor the tokens are held to — 7:1 for
+ * text, 4.5:1 for interface components — and the axe run now covers it.
+ *
+ * Deliberately not driven by `prefers-contrast: more`. That query says the
+ * reader wants more contrast than the current theme gives, and honouring it by
+ * jumping to AAA would take the choice away from someone who had already
+ * chosen dark. It is an option in the toggle, like the other three.
+ * -------------------------------------------------------------------- */
+[data-ox-theme="high-contrast"] {
+  --site-paper: #ffffff;
+  --site-paper-sunk: #f2f2f2;
+  --site-rule: #595959;
+  --site-rule-strong: #333333;
+
+  --site-ink: #000000;
+  --site-graphite: #2b2b2b;
+  --site-graphite-soft: #333333;
+
+  --site-oxygen: #00594a;
+  --site-accent-text: #00443a;
+  --site-electric: #003d52;
+  --site-critical: #8c0000;
+
+  --site-cta: #000000;
+
+  --site-panel: #000000;
+  --site-panel-raised: #141414;
+  --site-panel-rule: #7a7a7a;
+  --site-panel-fg: #ffffff;
+  --site-panel-muted: #d6d6d6;
+  --site-trace: #7ef0e0;
+  --site-critical-lum: #ff9aa8;
+
+  color-scheme: light;
+}
+
 /* ---------------------------------------------------------------------------
  * Base
  * ------------------------------------------------------------------------ */

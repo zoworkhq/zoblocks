@@ -4,9 +4,14 @@
     {
       "name": "docs",
       "runtimeExecutable": "pnpm",
-      "runtimeArgs": ["dev", "--filter", "@oxygenui-design/docs"],
-      "port": 6001,
-      "autoPort": true
+      "runtimeArgs": ["--filter", "@oxygenui-design/docs", "dev"],
+      "port": 6001
+    },
+    {
+      "name": "console",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["--filter", "@oxygenui-design/console", "dev"],
+      "port": 6003
     }
   ]
 }

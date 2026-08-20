@@ -1,0 +1,62 @@
+/**
+ * A throwaway MongoDB for local development.
+ *
+ * The console needs a database and most machines do not have `mongod`
+ * installed. `mongodb-memory-server` is already a devDependency because the
+ * test suite runs against a real mongod rather than a mocked driver — this
+ * reuses the same binary so `pnpm dev` works on a clean checkout without
+ * anyone provisioning a cluster.
+ *
+ *     pnpm --filter @oxygenui-design/console db:dev     # leave running
+ *     pnpm --filter @oxygenui-design/console db:seed
+ *     pnpm --filter @oxygenui-design/console dev
+ *
+ * **The data is gone when this process stops.** That is the point: a
+ * development database that survives is a development database people start
+ * treating as real, and this one has seeded passwords in it.
+ */
+
+import { MongoMemoryServer } from "mongodb-memory-server";
+
+/**
+ * A fixed port, not whichever one happened to be free.
+ *
+ * This used to print a fresh random port on every start and ask the reader to
+ * copy it into `.env.local`. That makes the instruction correct exactly once:
+ * restart the database — after a reboot, after a test run, after a laptop
+ * sleeps — and the file points at a port nothing is listening on. The failure
+ * surfaces much later, as `MongoTopologyClosedError` on the first sign-in,
+ * which reads like an application bug rather than a stale line in a dotfile.
+ *
+ * Pinning it means `.env.local` is written once and stays true. If something
+ * else holds the port the failure is immediate and says so, which is a better
+ * trade than a URL that looks right and fails at the far end of a request.
+ */
+const PORT = 59789;
+
+const server = await MongoMemoryServer.create({
+  instance: { port: PORT, dbName: "oxygen_console" },
+});
+const uri = server.getUri();
+
+console.log("");
+console.log("  Ephemeral MongoDB running on a fixed port.");
+console.log("");
+console.log(`    DATABASE_URL=${uri}`);
+console.log("    CONSOLE_DB_NAME=oxygen_console");
+console.log("");
+console.log("  That URL is stable across restarts, so apps/console/.env.local only");
+console.log("  ever needs writing once.");
+console.log("");
+console.log("  Ctrl-C to stop. Everything in it disappears with the process.");
+console.log("");
+
+const stop = async () => {
+  await server.stop();
+  process.exit(0);
+};
+process.on("SIGINT", stop);
+process.on("SIGTERM", stop);
+
+// Hold the process open; the server runs in a child.
+await new Promise(() => {});

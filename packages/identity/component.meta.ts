@@ -22,6 +22,15 @@ export default defineComponentMeta({
   status: "beta",
   since: "0.1.0",
   layer: "clinical",
+  frameworks: {
+    antd: {
+      // No dependency at all. The styles are its own custom properties and
+      // they inherit from antd's tokens when a host supplies them — the
+      // fallback chain doing the work rather than an import.
+      policy: "neutral",
+      bridge: false,
+    },
+  },
 
   distribution: "package",
   packageName: "@oxygenui-design/identity",

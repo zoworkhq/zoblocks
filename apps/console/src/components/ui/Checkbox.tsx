@@ -1,0 +1,69 @@
+import { cn } from "@/lib/utils";
+
+/**
+ * A checkbox that belongs to this product.
+ *
+ * The one it replaces was a bare `<input type="checkbox">` with an
+ * `accent-color`. That tints the browser's own control but leaves everything
+ * else the browser's: on macOS Chrome it draws heavier and larger than the
+ * 16px it is given, with its own corner radius and its own tick, so the only
+ * hand-drawn control on the screen sat next to a card built entirely out of
+ * this kit's parts. It looked borrowed, because it was.
+ *
+ * `appearance-none` takes the drawing back. The box is then an ordinary styled
+ * element and the tick is an SVG revealed by `peer-checked`, which means the
+ * whole thing is still one real `<input>` — same keyboard behaviour, same form
+ * participation, same announcement. Nothing here is a `<div>` pretending.
+ *
+ * The fill is `oxygen-deep` rather than `oxygen`: the tick is white, and white
+ * on the lighter accent measures about 2.2:1 — below the 3:1 that SC 1.4.11
+ * asks of a control's own parts. A checkbox whose tick is hard to see is a
+ * checkbox that has to be clicked twice to be believed.
+ *
+ * Round rather than square, which is a deliberate departure worth naming: a
+ * circle usually signals a radio, and radios are one-of-many. This is
+ * many-of-many, and the shape says otherwise. It stays round because the
+ * element it marks is a card that is *on* or *off* rather than an item in a
+ * list of alternatives, and at that size a filled disc with a tick reads as a
+ * state at a glance where a small square reads as a form field. The semantics
+ * are unaffected — it is a real `<input type="checkbox">`, so it is still
+ * announced as a checkbox and still toggles independently.
+ */
+export function Checkbox({
+  className,
+  ...props
+}: Omit<React.InputHTMLAttributes<HTMLInputElement>, "type">) {
+  return (
+    <span className={cn("relative inline-flex shrink-0", className)}>
+      <input
+        {...props}
+        type="checkbox"
+        className={cn(
+          "peer size-[1.125rem] appearance-none rounded-full border border-rule-strong bg-paper",
+          "transition-[background-color,border-color,box-shadow] duration-150",
+          "checked:border-accent-solid checked:bg-accent-solid",
+          "disabled:cursor-not-allowed disabled:border-rule disabled:bg-paper-sunk",
+          "disabled:checked:border-graphite-soft disabled:checked:bg-graphite-soft",
+        )}
+      />
+      {/*
+        Decorative: the input beside it already carries the state. Drawn rather
+        than a glyph so it scales with the box and keeps its stroke weight.
+      */}
+      <svg
+        aria-hidden="true"
+        viewBox="0 0 16 16"
+        className="pointer-events-none absolute inset-0 size-[1.125rem] text-accent-on opacity-0 transition-opacity duration-150 peer-checked:opacity-100"
+      >
+        <path
+          d="M4.2 8.3 6.9 11 11.8 5.6"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2.1"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </svg>
+    </span>
+  );
+}

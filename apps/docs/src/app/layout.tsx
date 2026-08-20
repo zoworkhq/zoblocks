@@ -71,7 +71,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         */}
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{var t=localStorage.getItem("oxygen-theme")||"system";var d=t==="dark"||(t==="system"&&matchMedia("(prefers-color-scheme: dark)").matches);document.documentElement.classList.toggle("dark",d)}catch(e){}})()`,
+            __html: `(function(){try{var e=document.documentElement,t=localStorage.getItem("oxygen-theme")||"system";if(t==="high-contrast"){e.setAttribute("data-ox-theme","high-contrast");return}var d=t==="dark"||(t==="system"&&matchMedia("(prefers-color-scheme: dark)").matches);e.classList.toggle("dark",d)}catch(e){}})()`,
           }}
         />
       </head>

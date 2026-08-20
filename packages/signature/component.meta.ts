@@ -15,6 +15,17 @@ export default defineComponentMeta({
   status: "beta",
   since: "0.1.0",
   layer: "clinical",
+  frameworks: {
+    antd: {
+      policy: "wrapping",
+      inherits: [
+        "Modal's focus trap and restore — a capture surface that loses focus on open is unusable by keyboard, and rebuilding it badly would undermine the component whose whole argument is accessibility.",
+        "Form.Item's control contract, so `signatureRequired()` composes with the host's own validation rather than sitting beside it.",
+        "Upload's file handling, including drag targets and the accept filter.",
+      ],
+      bridge: false,
+    },
+  },
 
   distribution: "package",
   packageName: "@oxygenui-design/signature",
@@ -68,6 +79,11 @@ export default defineComponentMeta({
         "The ink is currentColor on real SVG elements rather than a script-painted canvas bitmap, so it is recoloured with everything else instead of vanishing against a forced background.",
     },
     {
+      label: "An unsigned document does not look signed",
+      detail:
+        "SignatureBlock renders declined, unable, verbal, on-paper, pending and revoked as a bordered notice with the words 'Not signed', never as a rule with a name beneath it. A reader skimming a letter must not come away believing an attestation exists; status is carried in text rather than by colour, so it survives monochrome print and forced colors.",
+    },
+    {
       label: "Targets meet the 24px floor",
       detail:
         "SC 2.5.8 exempts the canvas — a spatially-selected area counts as one target — so it is entirely a toolbar concern. Undo, redo and clear are all at least 24 by 24.",
@@ -80,11 +96,13 @@ export default defineComponentMeta({
       "Clinician attestation and countersignature, where the record must say who is accountable and in what capacity.",
       "Signing on behalf of someone — a parent for a minor, a proxy for an incapacitated adult — which the capacity field captures explicitly.",
       "Inside an Ant Design form: it satisfies the custom-control contract, so `Form.Item` wiring and validation status work with no adapter.",
+      "SignatureBlock at the foot of a discharge summary, referral letter or policy approval, where the reader needs the signer's role and register — not the full audit record — to decide whether to act on it.",
     ],
     avoid: [
       "Controlled-substance prescribing. DEA EPCS is a separate and far stricter regime — identity proofing, two-factor, a certified application — and this does not satisfy it.",
       "Anywhere you need cryptographic non-repudiation from the component alone. A PNG of a mark carries no integrity guarantee; pair it with a detached JWS.",
       "As an identity check. It records the identity the host asserts and cannot verify it; 21 CFR 11.200's two-component rule lives in your auth layer.",
+      "Storing a signature as a theme asset. A signature is credential data attached to a person, not brand data attached to an organisation, and a theme versions, publishes, rolls back and is served from a public URL — none of which a signature should do.",
       'Draw-only configurations. `methods={["draw"]}` is a WCAG Level A failure that renders perfectly and passes every other test.',
     ],
   },

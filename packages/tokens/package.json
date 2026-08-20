@@ -24,6 +24,8 @@
     "./tokens.json": "./src/tokens.json",
     "./contrast.json": "./src/contrast.json",
     ".": "./src/tokens.ts",
+    "./validate": "./src/validate/index.ts",
+    "./surface": "./src/surface.ts",
     "./package.json": "./package.json"
   },
   "files": [
@@ -41,6 +43,14 @@
         "types": "./dist/tokens.d.ts",
         "default": "./dist/tokens.js"
       },
+      "./validate": {
+        "types": "./dist/validate/index.d.ts",
+        "default": "./dist/validate/index.js"
+      },
+      "./surface": {
+        "types": "./dist/surface.d.ts",
+        "default": "./dist/surface.js"
+      },
       "./oxygen-tokens.css": "./src/oxygen-tokens.css",
       "./tailwind.css": "./src/tailwind.css",
       "./tokens.json": "./src/tokens.json",
@@ -52,14 +62,18 @@
     "prepublishOnly": "node scripts/require-pnpm.mjs",
     "build": "tsc -p tsconfig.build.json && node scripts/fix-esm-extensions.mjs",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "check-tarball": "node scripts/check-tarball.mjs"
+    "check-tarball": "node scripts/check-tarball.mjs",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage"
   },
   "type": "module",
   "main": "./src/tokens.ts",
   "types": "./src/tokens.ts",
-  "//publishConfig": "main/types/exports are rewritten to ./dist at publish time. That rewrite is a pnpm feature — publishing with npm ships raw TypeScript, which is exactly what 0.1.0 did.",
+  "//publishConfig": "main/types/exports are rewritten to ./dist at publish time. That rewrite is a pnpm feature \u2014 publishing with npm ships raw TypeScript, which is exactly what 0.1.0 did.",
   "devDependencies": {
     "@oxygenui-design/tsconfig": "workspace:*",
-    "typescript": "^5.7.2"
+    "@vitest/coverage-v8": "^4.1.10",
+    "typescript": "^5.7.2",
+    "vitest": "^4.1.10"
   }
 }

@@ -36,8 +36,25 @@ is generalised rather than replaced.
 
 Supporting decisions:
 
-1. **A brand overrides semantic tokens only**, and may replace the primitive
-   palette wholesale. It never introduces new semantic keys.
+1. **A brand overrides primitive tokens only.** It replaces steps of the
+   palette; the semantic tier resolves through them, so one brand file reaches
+   every component. It never introduces new semantic keys, and it may not
+   redefine a semantic one — letting it would let a brand redefine what
+   _critical_ means, which is the one thing a clinical design system does not
+   delegate.
+
+   > **Corrected 19 August 2026.** This clause originally read "overrides
+   > semantic tokens only", which is the opposite of what was built and of what
+   > `packages/tokens/tokens/brands/README.md` has always said. The
+   > implementation — `themeTokensSchema`, the emitted `[data-ox-brand]` blocks,
+   > and the brand key-space check — has only ever accepted primitives. The
+   > wording is fixed here rather than in a new ADR because nothing was decided
+   > differently; the record was simply wrong.
+   >
+   > A **customer theme** may additionally override non-clinical _semantic_ and
+   > _component_ tokens, per ADR 0014. That is a wider surface than a built-in
+   > brand has, and it is guarded by the generated clinical refusal rather than
+   > by this tier rule.
 
 2. **A missing semantic key in any brand is a build error.** Silent fallback to
    a default is unacceptable when the token means "critical" — a brand that

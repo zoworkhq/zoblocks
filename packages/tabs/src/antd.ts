@@ -1,18 +1,35 @@
 "use client";
 
 /**
- * The Ant Design bridge — a separate entry point on purpose.
+ * Deprecated. Use `@oxygenui-design/bridge-antd`.
  *
- *     import { AntdTabsBridge } from "@oxygenui-design/tabs/antd";
+ *     - import { AntdTabsBridge } from "@oxygenui-design/tabs/antd";
+ *     + import { AntdBridge }     from "@oxygenui-design/bridge-antd";
  *
- * `styles.css` already falls back to `--ant-*` custom properties, so a host
- * running `ConfigProvider` with `cssVar` enabled gets a matching strip with no
- * JavaScript at all. This module is for the other case: a host on antd's
- * default (non-cssVar) theme, where the tokens exist only in JavaScript.
+ * This subpath bridged one component. Doing it per package meant every
+ * component wanting a host's theme grew its own copy of the same mapping, and
+ * a host running three of them mounted three wrappers that each called
+ * `theme.useToken()` and each decided separately what `colorTextSecondary`
+ * meant. The bridge is now one package writing the *semantic* tier, so mapping
+ * `colorPrimary` once reaches every Oxygen component rather than only tabs.
  *
- * It lives behind `./antd` rather than in the main entry so that a host with
- * no antd never pays for the import — `antd` is an optional peer, and the
- * package is fully usable without it.
+ * **This file is frozen.** It is a compatibility shim, deliberately holding
+ * its original behaviour rather than delegating to the new bridge: the two
+ * write different token tiers and a different marker attribute, so delegating
+ * would make a deprecation into a breaking change. Duplication in code
+ * scheduled for deletion is the cheaper mistake.
+ *
+ * Kept for two minors, per the deprecation sequence in ADR 0006. The notice
+ * is the `@deprecated` tag below — which every editor surfaces at the call
+ * site — plus the changeset and the migration guide. Deliberately not a
+ * runtime `console.warn`: writing to a customer's console from source they
+ * copied is forbidden repo-wide, and `packages/tabs/src/internal.ts` records
+ * why a warning is the wrong volume regardless. Removed in 0.3.0.
+ *
+ * One behaviour is *not* carried over: this shim still maps antd's
+ * `colorError` and `colorWarning` onto the tab strip's clinical tokens, which
+ * the new bridge refuses. That refusal is the point of ADR 0012, and changing
+ * it here would alter what existing consumers already render.
  */
 
 import * as React from "react";
@@ -30,6 +47,7 @@ export interface AntdTabsTokens extends React.CSSProperties {
  * pair, `colorPrimary` becomes the indicator. Anything without an honest
  * counterpart is left alone so the stylesheet's own fallback chain wins.
  */
+/** @deprecated Use `useAntdTokens` from `@oxygenui-design/bridge-antd`. */
 export function useAntdTabsTokens(): AntdTabsTokens {
   const { token } = theme.useToken();
 
@@ -84,6 +102,7 @@ export interface AntdTabsBridgeProps {
  * Wrap a subtree to give every Oxygen tab strip inside it the host's antd
  * theme. One element, no context, no re-render beyond the token change itself.
  */
+/** @deprecated Use `AntdBridge` from `@oxygenui-design/bridge-antd`. */
 export function AntdTabsBridge({ children, className }: AntdTabsBridgeProps) {
   const style = useAntdTabsTokens();
   return React.createElement("div", { className, style, "data-ox-antd-bridge": "" }, children);

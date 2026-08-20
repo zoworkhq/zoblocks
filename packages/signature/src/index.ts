@@ -25,6 +25,7 @@ export {
 export { SignaturePad, type SignaturePadProps } from "./SignaturePad";
 export { SignatureModal, type SignatureModalProps } from "./SignatureModal";
 export { SignatureManifest, type SignatureManifestProps } from "./SignatureManifest";
+export { SignatureBlock, type SignatureBlockProps } from "./SignatureBlock";
 export { SignatureInk, type SignatureInkProps } from "./SignatureInk";
 export { OutcomeSheet, type OutcomeSheetProps } from "./OutcomeSheet";
 export {

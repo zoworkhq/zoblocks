@@ -1,7 +1,7 @@
 {
   "name": "@oxygenui-design/copilot-react",
   "version": "0.1.0",
-  "description": "Headless React for Oxygen Copilot. Hooks and unstyled primitives that own state, keyboard, focus and ARIA — no design system, no styles.",
+  "description": "Headless React for Oxygen Copilot. Hooks and unstyled primitives that own state, keyboard, focus and ARIA \u2014 no design system, no styles.",
   "license": "MIT",
   "homepage": "https://oxygenui.design/components/copilot",
   "repository": {
@@ -24,7 +24,8 @@
   "types": "./src/index.ts",
   "exports": {
     ".": "./src/index.ts",
-    "./package.json": "./package.json"
+    "./package.json": "./package.json",
+    "./icons.css": "./src/icons.css"
   },
   "files": [
     "dist",
@@ -43,11 +44,12 @@
         "types": "./dist/index.d.ts",
         "default": "./dist/index.js"
       },
-      "./package.json": "./package.json"
+      "./package.json": "./package.json",
+      "./icons.css": "./dist/icons.css"
     }
   },
   "scripts": {
-    "build": "tsc -p tsconfig.json",
+    "build": "tsc -p tsconfig.json && cp src/icons.css dist/icons.css",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage"

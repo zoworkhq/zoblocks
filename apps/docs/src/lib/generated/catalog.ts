@@ -2012,6 +2012,13 @@ export const CATALOG: ComponentDoc[] = [
     "since": "0.3.0",
     "layer": "pattern",
     "distribution": "registry",
+    "frameworks": {
+      "antd": {
+        "policy": "neutral",
+        "bridge": false,
+        "divergences": []
+      }
+    },
     "summary": "A floating clinical copilot: a dock above the chart that takes a question and opens into a sourced, auditable thread.",
     "description": "Model-agnostic clinical assistant with mode-level scope contracts, inline source attribution, a deterministic crisis interrupt, and FHIR audit output. The engine and the accessibility behaviour ship as npm packages; this item is the Tailwind skin over them.",
     "rationale": "The floating dock and the streaming text are two weeks of work and compete with a hundred free widgets. The parts that are hard are deciding what the model may see, proving where an answer came from, keeping chart text from being read as instructions, and knowing whether the thing makes clinicians better or worse. Those are what a digital-health team cannot build in a sprint, and they are what this component is. The design target is not a better answer — it is verification that costs less than acceptance, because automation bias is an effort asymmetry rather than a character flaw, and incorrect decision support has been measured making clinicians worse than no decision support at all.",
@@ -5081,6 +5088,13 @@ export const CATALOG: ComponentDoc[] = [
     "layer": "clinical",
     "distribution": "package",
     "packageName": "@oxygenui-design/identity",
+    "frameworks": {
+      "antd": {
+        "policy": "neutral",
+        "bridge": false,
+        "divergences": []
+      }
+    },
     "summary": "An avatar, a chip and a patient banner — with the pass that keeps two patients who share a name apart on the same worklist.",
     "description": "The banner is the last surface a clinician reads before they act, so it is built as a control rather than a heading: two person-specific identifiers before a care action are a compile error, `Patient.gender` is not a renderable field, and a form can refuse to submit when the chart on screen is not the chart it was opened for.",
     "rationale": "A patient banner is the most PHI-dense component in a healthcare product and the one nobody designs. It is pinned to the top of every screen, read hundreds of times a shift, and it is the last thing standing between a clinician and someone else's chart. Adelman et al. (JAMIA 2013, 901,776 ordering sessions) found a dismissible 'check the patient' alert cut wrong-patient orders with an odds ratio of 0.84, while making the clinician re-enter the patient's initials cut them with an odds ratio of 0.60 — so a banner that is only read is worth a sixth of one that is answered, and both require the header to know what action is about to happen. Everything else follows from treating identity as a resolved value rather than a bag of booleans: absence of a photograph is five different facts, 'Inactive' is four unrelated ones, and two patients sharing a surname on a ward list is a problem a component can see and an application never will.",
@@ -5341,6 +5355,18 @@ export const CATALOG: ComponentDoc[] = [
     "layer": "clinical",
     "distribution": "package",
     "packageName": "@oxygenui-design/signature",
+    "frameworks": {
+      "antd": {
+        "policy": "wrapping",
+        "inherits": [
+          "Modal's focus trap and restore — a capture surface that loses focus on open is unusable by keyboard, and rebuilding it badly would undermine the component whose whole argument is accessibility.",
+          "Form.Item's control contract, so `signatureRequired()` composes with the host's own validation rather than sitting beside it.",
+          "Upload's file handling, including drag targets and the accept filter."
+        ],
+        "bridge": false,
+        "divergences": []
+      }
+    },
     "summary": "Signature capture that records the times nobody signed — declined, unable, verbal, on paper — not just the times they did.",
     "description": "Draw, type or upload a signature inside an Ant Design form, and record the outcomes a signature pad has no answer for. The value is a discriminated union over seven outcomes rather than a base64 string, so a refusal is a fact the record can hold.",
     "rationale": "Almost every signature component solves one problem: get ink from a pointer onto a canvas and hand back a PNG. That is about fifteen percent of what a healthcare product needs. The rest is everything the PNG does not say — who signed, in what capacity, what they were agreeing to, and, most often of all, what to record when nobody signed at all. A patient who refused and a form nobody opened are different facts with different consequences, and a component whose only states are empty and signed makes the difference unrecordable. That is the same argument AbsentValue makes one tier down, at a much higher stake.",
@@ -5641,12 +5667,14 @@ export const CATALOG: ComponentDoc[] = [
         "Consent forms, treatment authorisations, and anywhere a refusal must be recordable rather than left blank.",
         "Clinician attestation and countersignature, where the record must say who is accountable and in what capacity.",
         "Signing on behalf of someone — a parent for a minor, a proxy for an incapacitated adult — which the capacity field captures explicitly.",
-        "Inside an Ant Design form: it satisfies the custom-control contract, so `Form.Item` wiring and validation status work with no adapter."
+        "Inside an Ant Design form: it satisfies the custom-control contract, so `Form.Item` wiring and validation status work with no adapter.",
+        "SignatureBlock at the foot of a discharge summary, referral letter or policy approval, where the reader needs the signer's role and register — not the full audit record — to decide whether to act on it."
       ],
       "avoid": [
         "Controlled-substance prescribing. DEA EPCS is a separate and far stricter regime — identity proofing, two-factor, a certified application — and this does not satisfy it.",
         "Anywhere you need cryptographic non-repudiation from the component alone. A PNG of a mark carries no integrity guarantee; pair it with a detached JWS.",
         "As an identity check. It records the identity the host asserts and cannot verify it; 21 CFR 11.200's two-component rule lives in your auth layer.",
+        "Storing a signature as a theme asset. A signature is credential data attached to a person, not brand data attached to an organisation, and a theme versions, publishes, rolls back and is served from a public URL — none of which a signature should do.",
         "Draw-only configurations. `methods={[\"draw\"]}` is a WCAG Level A failure that renders perfectly and passes every other test."
       ]
     },
@@ -5670,6 +5698,10 @@ export const CATALOG: ComponentDoc[] = [
       {
         "label": "Legible under forced colors",
         "detail": "The ink is currentColor on real SVG elements rather than a script-painted canvas bitmap, so it is recoloured with everything else instead of vanishing against a forced background."
+      },
+      {
+        "label": "An unsigned document does not look signed",
+        "detail": "SignatureBlock renders declined, unable, verbal, on-paper, pending and revoked as a bordered notice with the words 'Not signed', never as a rule with a name beneath it. A reader skimming a letter must not come away believing an attestation exists; status is carried in text rather than by colour, so it survives monochrome print and forced colors."
       },
       {
         "label": "Targets meet the 24px floor",
@@ -5699,6 +5731,15 @@ export const CATALOG: ComponentDoc[] = [
     "layer": "primitive",
     "distribution": "package",
     "packageName": "@oxygenui-design/tabs",
+    "frameworks": {
+      "antd": {
+        "policy": "compatible",
+        "bridge": true,
+        "divergences": [
+          "`as` is required. antd's Tabs infers nothing, so a strip that navigates and a strip that switches views are the same component with the same accessibility tree; here they are not."
+        ]
+      }
+    },
     "summary": "Tabs that know what they are: a view switch, a link list, a form value or a wizard — four accessibility trees behind one silhouette.",
     "description": "Four semantic modes across eleven visual variants, with the WAI-ARIA keyboard model, five overflow strategies, and the states a clinical surface actually reaches — restricted, stale, unsaved. `as` is required and has no default, because the mode is the accessibility tree and the variant is only CSS.",
     "rationale": "Almost every tab component solves the easy half: show one panel, hide the others, move an underline. The hard half is that “tabs” is four different components sharing a shape. A view switch owns panels and answers to arrow keys. A navigation menu is a list of links, and hijacking arrows on it destroys a keyboard user's focus the moment they press one. A segmented filter is a form value that belongs in a Form.Item. A wizard is ordered and gated. Shipping one of them and using it as all four is the most-reported tab defect in every design system audit, and it is invisible: a role=tablist wrapped around anchors spells every attribute correctly, so axe passes it. Making `as` required is the whole design — everything else follows from having said out loud what the control is.",

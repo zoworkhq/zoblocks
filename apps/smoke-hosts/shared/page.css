@@ -1,0 +1,22 @@
+/*
+ * Nothing but layout. Colour, radius, type and motion come from whichever
+ * bridge the page mounts — putting any of it here would hide the thing the
+ * pages exist to demonstrate.
+ */
+body {
+  margin: 0;
+  padding: 1.5rem;
+  font-family: var(--ox-font-sans, system-ui, sans-serif);
+  background: var(--ox-bg, #ffffff);
+  color: var(--ox-text, #0f172a);
+}
+main {
+  max-width: 40rem;
+}
+section {
+  margin-block: 1.5rem;
+}
+#host {
+  font-family: ui-monospace, monospace;
+  font-size: 0.75rem;
+}

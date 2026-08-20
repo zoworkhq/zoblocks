@@ -56,6 +56,10 @@ export function buildCatalog(
       // and a `"packageName": null` on every loader is noise in a generated
       // file people read.
       ...(meta.packageName ? { packageName: meta.packageName } : {}),
+      // Only when there is something to say. Most components have no
+      // relationship with any UI framework, and a `"frameworks": {}` on every
+      // loader is noise in a file people read.
+      ...(Object.keys(meta.frameworks).length ? { frameworks: meta.frameworks } : {}),
       ...(meta.deprecation ? { deprecation: meta.deprecation } : {}),
 
       summary: meta.summary,

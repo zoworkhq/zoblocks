@@ -170,22 +170,54 @@ alias you can rename. The npm packages it pulls in are published under
 
 ## Packages
 
-| Package                           | What it is                                                            |
-| --------------------------------- | --------------------------------------------------------------------- |
-| `@oxygenui-design/loaders`        | The five loaders as custom elements. Zero dependencies, SSR-safe.     |
-| `@oxygenui-design/signature`      | Signature capture for Ant Design. antd is a peer dependency.          |
-| `@oxygenui-design/signature-core` | The capture engine. No React, no antd, no DOM, no dependencies.       |
-| `@oxygenui-design/identity`       | Patient avatar, chip and banner for Ant Design. antd is a peer.       |
-| `@oxygenui-design/identity-core`  | The identity engine. No React, no antd, no DOM.                       |
-| `@oxygenui-design/tabs`           | Tabs that know what they are. Four semantic modes, eleven skins.      |
-| `@oxygenui-design/tabs-core`      | The selection engine. No React, no DOM, no dependencies.              |
-| `@oxygenui-design/tabs-testing`   | Assertions that read a tab strip's accessibility tree.                |
-| `@oxygenui-design/react`          | Generated React package — same source as the registry, one build.     |
-| `@oxygenui-design/fhir`           | FHIR R4 types and pure read helpers.                                  |
-| `@oxygenui-design/tokens`         | Semantic clinical tokens: 3 themes × 3 densities × a brand axis.      |
-| `@oxygenui-design/intl`           | Terminology that requires both a clinician and a patient phrasing.    |
-| `@oxygenui-design/eslint-plugin`  | Eighteen rules enforcing the invariants above.                        |
-| `@oxygenui-design/fixtures`       | Synthetic, non-PHI FHIR fixtures that over-represent the hard states. |
+| Package                           | What it is                                                                |
+| --------------------------------- | ------------------------------------------------------------------------- |
+| `@oxygenui-design/loaders`        | The five loaders as custom elements. Zero dependencies, SSR-safe.         |
+| `@oxygenui-design/signature`      | Signature capture for Ant Design. antd is a peer dependency.              |
+| `@oxygenui-design/signature-core` | The capture engine. No React, no antd, no DOM, no dependencies.           |
+| `@oxygenui-design/identity`       | Patient avatar, chip and banner. No antd dependency; inherits its tokens. |
+| `@oxygenui-design/identity-core`  | The identity engine. No React, no antd, no DOM.                           |
+| `@oxygenui-design/tabs`           | Tabs that know what they are. Four semantic modes, eleven skins.          |
+| `@oxygenui-design/tabs-core`      | The selection engine. No React, no DOM, no dependencies.                  |
+| `@oxygenui-design/tabs-testing`   | Assertions that read a tab strip's accessibility tree.                    |
+| `@oxygenui-design/react`          | Generated React package — same source as the registry, one build.         |
+| `@oxygenui-design/fhir`           | FHIR R4 types and pure read helpers.                                      |
+| `@oxygenui-design/tokens`         | Semantic clinical tokens: 3 themes × 3 densities × a brand axis.          |
+| `@oxygenui-design/theme`          | Customer themes: the document model, ramp generator, validation and CSS.  |
+| `@oxygenui-design/bridge-core`    | The theme-bridge contract. No framework, no React, no DOM.                |
+| `@oxygenui-design/bridge-antd`    | Ant Design ↔ Oxygen, both directions. antd is an optional peer.           |
+| `@oxygenui-design/bridge-mui`     | Material UI ↔ Oxygen, both directions. MUI is an optional peer.           |
+| `@oxygenui-design/intl`           | Terminology that requires both a clinician and a patient phrasing.        |
+| `@oxygenui-design/eslint-plugin`  | Eighteen rules enforcing the invariants above.                            |
+| `@oxygenui-design/fixtures`       | Synthetic, non-PHI FHIR fixtures that over-represent the hard states.     |
+
+### Theme bridges
+
+A bridge is the only sanctioned way a UI framework reaches an Oxygen component.
+It reads that framework's resolved theme and writes Oxygen's token surface —
+nothing else crosses the boundary, so no component is swapped and no capability
+is reduced to what two frameworks happen to share.
+
+```tsx
+// Oxygen components in your antd app's design language
+<ConfigProvider theme={brand}>
+  <AntdBridge>{app}</AntdBridge>
+</ConfigProvider>
+
+// ...and the inverse: your own antd components in your Oxygen brand
+<OxygenAntdProvider>{app}</OxygenAntdProvider>
+```
+
+Switching framework changes the wrapper and nothing inside it —
+`e2e/bridge-hosts.spec.ts` renders one application under antd, MUI and neither
+and asserts the accessibility trees are identical.
+
+**Clinical status is never bridged, in either direction.** Ours carries a
+validated contrast floor and 60° of hue separation so the direction of an
+abnormal result survives colour-vision deficiency; a framework's `colorError` has
+neither, and going the other way a framework would apply ours to a form
+validation message. See
+[ADR 0012](content/decisions/0012-token-surface-is-a-contract.md).
 
 ---
 

@@ -1,0 +1,28 @@
+{
+  "extends": "@oxygenui-design/tsconfig/base.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "declaration": false,
+    "declarationMap": false,
+    "allowJs": true,
+    "incremental": true,
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "jsx": "preserve",
+    "plugins": [{ "name": "next" }],
+    "baseUrl": ".",
+    "paths": {
+      // Oxygen components are consumed by the same specifier the shadcn CLI
+      // writes into a customer's project (`@/components/oxygen/app-shell`).
+      // While the registry is being rebuilt those files live under
+      // src/components/oxygen/ — exactly a customer's install layout — and
+      // resolve through the plain `@/*` alias. When the new registry lands,
+      // map each specifier back to `../../registry/...` here so a broken
+      // component breaks our own daily tool first.
+      "@/*": ["./src/*"],
+      "@/lib/utils": ["./src/lib/utils.ts"]
+    }
+  },
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "exclude": ["node_modules"]
+}

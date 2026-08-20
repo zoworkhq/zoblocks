@@ -61,6 +61,8 @@
     "@oxygenui-design/eslint-plugin": "workspace:^",
     "@oxygenui-design/fhir": "workspace:*",
     "@oxygenui-design/fixtures": "workspace:*",
+    "@oxygenui-design/theme": "workspace:*",
+    "@oxygenui-design/tokens": "workspace:*",
     "@playwright/test": "^1.62.1",
     "@size-limit/preset-small-lib": "^13.0.3",
     "@testing-library/dom": "^10",
@@ -95,13 +97,13 @@
     "zod": "^3.24.1"
   },
   "pnpm": {
-    "//overrides": "Transitive advisories we cannot reach through a direct dependency. Each entry is the patched floor from the advisory, not a pin — remove it once the parent package ships the fix itself. `pnpm audit --audit-level=high` in CI is what tells us when that has happened.",
+    "//overrides": "Transitive advisories we cannot reach through a direct dependency. Each entry is the patched floor from the advisory, not a pin \u2014 remove it once the parent package ships the fix itself. `pnpm audit --audit-level=high` in CI is what tells us when that has happened.",
     "overrides": {
       "nanoid@<3.3.18": ">=3.3.18"
     }
   },
   "lint-staged": {
-    "//": "--no-warn-ignored because lint-staged passes every staged file matching the glob, including generated artifacts that .eslintignore excludes. ESLint then warns 'File ignored because of a matching ignore pattern', and --max-warnings 0 turns that warning into a failed commit — so staging a regenerated catalog.ts or next-env.d.ts blocked the commit for a file nobody is meant to lint.",
+    "//": "--no-warn-ignored because lint-staged passes every staged file matching the glob, including generated artifacts that .eslintignore excludes. ESLint then warns 'File ignored because of a matching ignore pattern', and --max-warnings 0 turns that warning into a failed commit \u2014 so staging a regenerated catalog.ts or next-env.d.ts blocked the commit for a file nobody is meant to lint.",
     "*.{ts,tsx,js,jsx,mjs,cjs}": [
       "eslint --fix --max-warnings 0 --no-warn-ignored",
       "prettier --write --ignore-unknown"

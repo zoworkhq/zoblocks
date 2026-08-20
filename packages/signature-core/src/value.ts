@@ -61,6 +61,24 @@ export interface Signer {
   reference?: string;
   /** NPI, licence number, or another identifier the host wants recorded. */
   identifier?: string;
+  /**
+   * Which register the identifier belongs to — "GMC", "NMC", "HCPC", "NPI".
+   *
+   * Optional for compatibility and load-bearing when present: a bare number is
+   * not a verifiable credential, because the reader cannot tell which body to
+   * check it against. "7412589" identifies nobody; "GMC 7412589" is a lookup.
+   * Kept beside the identifier rather than folded into it so the two can be
+   * rendered, sorted and checked separately.
+   */
+  register?: string;
+  /**
+   * Job title at the time of signing — "Consultant Cardiologist".
+   *
+   * Distinct from `credential`, which is a qualification somebody keeps for
+   * life. The role is what gave them the standing to sign *this*, and it is
+   * the line a reader actually uses to judge whether the right person signed.
+   */
+  role?: string;
 }
 
 /** Who the signature is *about*, which is not always who signed it. */

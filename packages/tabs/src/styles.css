@@ -28,10 +28,10 @@
   --ox-tabs-min-h: var(--ox-density-target, 2.75rem);
 
   /* ---- colour ------------------------------------------------------ */
-  --ox-tabs-fg: var(--ox-fg-muted, var(--ant-color-text-secondary, #475569));
-  --ox-tabs-fg-hover: var(--ox-fg, var(--ant-color-text, #0f172a));
-  --ox-tabs-fg-selected: var(--ox-fg, var(--ant-color-text, #0f172a));
-  --ox-tabs-fg-disabled: var(--ox-fg-subtle, var(--ant-color-text-disabled, #94a3b8));
+  --ox-tabs-fg: var(--ox-text-muted, var(--ant-color-text-secondary, #475569));
+  --ox-tabs-fg-hover: var(--ox-text, var(--ant-color-text, #0f172a));
+  --ox-tabs-fg-selected: var(--ox-text, var(--ant-color-text, #0f172a));
+  --ox-tabs-fg-disabled: var(--ox-text-subtle, var(--ant-color-text-disabled, #94a3b8));
   --ox-tabs-bg-hover: color-mix(in oklab, currentcolor 6%, transparent);
 
   --ox-tabs-track-bg: var(--ox-bg-muted, var(--ant-color-fill-tertiary, #f1f5f9));
@@ -58,7 +58,7 @@
   --ox-tabs-surface-subtle: var(--ox-bg-subtle, var(--ant-color-fill-quaternary, #f8fafc));
 
   --ox-tabs-badge-bg: var(--ox-bg-muted, var(--ant-color-fill-tertiary, #f1f5f9));
-  --ox-tabs-badge-fg: var(--ox-fg-muted, var(--ant-color-text-secondary, #475569));
+  --ox-tabs-badge-fg: var(--ox-text-muted, var(--ant-color-text-secondary, #475569));
   --ox-tabs-badge-bg-selected: var(--ox-tabs-accent-subtle);
   --ox-tabs-badge-fg-selected: var(--ox-tabs-accent-fg);
 

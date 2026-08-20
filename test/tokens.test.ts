@@ -17,6 +17,7 @@ import { describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { TOKEN_SURFACE } from "@oxygenui-design/tokens/surface";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const read = (p: string) => JSON.parse(readFileSync(path.join(ROOT, p), "utf8"));
@@ -400,5 +401,131 @@ describe("density-linked component tokens", () => {
       linked,
       "these component tokens reference density but are declared only on :root, so they freeze at the root profile",
     ).toEqual([]);
+  });
+});
+
+/* ------------------------------------------------------------------ */
+/* The extraction, held to the output it replaced                      */
+/* ------------------------------------------------------------------ */
+
+/**
+ * The gate moved out of `scripts/gen/tokens/validate.ts` and into
+ * `@oxygenui-design/tokens/validate` so the theme console can run the same
+ * rules the build runs. A refactor of the one module that decides whether a
+ * clinical colour is readable deserves more than "the build still passed".
+ *
+ * These read the real DTCG source through the generator's loader and put the
+ * *package's* validator over it, then compare against the committed evidence.
+ * A drift in either direction fails here rather than in a palette review.
+ */
+describe("the extracted validator agrees with the shipped evidence", () => {
+  it("reports no problem on the source that ships", async () => {
+    const { loadTokenSource } = await import("../scripts/gen/tokens/load");
+    const { validateTokens } = await import("@oxygenui-design/tokens/validate");
+
+    const problems = validateTokens(await loadTokenSource());
+    expect(problems.map((p) => p.message)).toEqual([]);
+  });
+
+  it("reproduces contrast.json exactly, reading and measuring independently", async () => {
+    const { loadTokenSource } = await import("../scripts/gen/tokens/load");
+    const { measureContrast } = await import("@oxygenui-design/tokens/validate");
+
+    const measured = measureContrast(await loadTokenSource());
+    const committed = read("packages/tokens/src/contrast.json");
+
+    // Order included: the emitter writes readings in iteration order, so a
+    // reordering is a diff in the published table and should be deliberate.
+    expect(measured).toEqual(committed);
+  });
+
+  it("still holds every brand to the base palette's bar", async () => {
+    const { loadTokenSource } = await import("../scripts/gen/tokens/load");
+    const { validateTokens } = await import("@oxygenui-design/tokens/validate");
+
+    const source = await loadTokenSource();
+    expect(
+      source.brands.length,
+      "northwind is the fixture the brand gate runs against",
+    ).toBeGreaterThan(0);
+
+    // Push the brand's accent ramp somewhere unreadable and confirm the gate
+    // notices — the failure a customer would otherwise ship, because the base
+    // build was green.
+    const brand = source.brands[0]!;
+    for (const key of ["ref.brand.600", "ref.brand.700", "ref.brand.800"]) {
+      brand.primitive.set(key, { path: key, value: "#cfeee6", file: "test" });
+    }
+
+    const messages = validateTokens(source).map((p) => p.message);
+    expect(messages.some((m) => m.startsWith(`brand "${brand.name}":`))).toBe(true);
+  });
+});
+
+/**
+ * The surface manifest says what kind of value each token holds, and consumers
+ * act on it: a bridge writing an antd theme, an editor rendering a colour
+ * picker, a validator deciding what a customer may type into a field. A token
+ * labelled `color` that actually holds a timing function is not a cosmetic
+ * error — it is a swatch picker rendered on a cubic-bezier, which is exactly
+ * what the console showed before this was fixed.
+ *
+ * Both defects behind those tests were ordering problems rather than missing
+ * rules, and both reported green for as long as nobody looked:
+ *
+ *   - `kindOf` tested colour before shadow, and a shadow *contains* a colour.
+ *   - A DTCG group `$type` is flattened onto every token beneath it, so
+ *     `switch.ease` — an alias to a cubic-bezier — inherited `color` from the
+ *     fifty-odd switch tokens that genuinely are colours.
+ */
+describe("every token is labelled with the kind of value it holds", () => {
+  // The committed manifest, imported the way a consumer imports it — not a
+  // recomputation, which would test this file's copy of the rules.
+  const surface = TOKEN_SURFACE as readonly {
+    name: string;
+    kind: string;
+    initial?: string;
+  }[];
+
+  it("covers the whole surface", () => {
+    expect(surface.length).toBeGreaterThan(250);
+  });
+
+  it("never calls a shadow a colour", () => {
+    const wrong = surface.filter(
+      (t) => t.kind === "color" && /\d+px\s+[\d.-]+px/.test(t.initial ?? ""),
+    );
+    expect(wrong.map((t) => t.name)).toEqual([]);
+  });
+
+  it("never calls a timing function a colour", () => {
+    const wrong = surface.filter(
+      (t) => t.kind === "color" && /cubic-bezier|\b(ease|steps)\b/.test(t.initial ?? ""),
+    );
+    expect(wrong.map((t) => t.name)).toEqual([]);
+  });
+
+  it("never calls a duration a colour", () => {
+    const wrong = surface.filter(
+      (t) => t.kind === "color" && /^\s*[\d.]+m?s\s*$/.test(t.initial ?? ""),
+    );
+    expect(wrong.map((t) => t.name)).toEqual([]);
+  });
+
+  /**
+   * The other direction, which is the one a narrowed rule would break: every
+   * token the manifest *does* call a colour has to look like one, so a future
+   * fix cannot make the tests above pass by labelling everything `dimension`.
+   */
+  it("only calls something a colour when it looks like one", () => {
+    const wrong = surface.filter(
+      (t) =>
+        t.kind === "color" &&
+        t.initial !== undefined &&
+        !/#[0-9a-f]{3,8}\b|\b(rgb|hsl|oklch|color-mix)\(|\bvar\(|transparent|currentColor|none|inherit/i.test(
+          t.initial,
+        ),
+    );
+    expect(wrong.map((t) => `${t.name} = ${t.initial}`)).toEqual([]);
   });
 });

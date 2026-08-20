@@ -62,6 +62,41 @@ export const distributionSchema = z.enum(["registry", "package"]);
 
 const nonEmpty = (label: string) => z.string().min(1, `${label} must not be empty`);
 
+/**
+ * A component's relationship to a UI framework, per ADR 0010.
+ *
+ * The ADR draws the line in prose — "primitives match Ant Design's public API
+ * exactly and take no dependency on it; compound clinical organisms may wrap
+ * antd, and each one must name the expensive behaviour it is inheriting". This
+ * is that rule as data, so the answer is machine-readable rather than a matter
+ * of reading imports, and so the docs can state it per component without
+ * anybody remembering to.
+ */
+export const frameworkPolicySchema = z.enum([
+  /** Matches the framework's public API and imports nothing from it. */
+  "compatible",
+  /** Wraps it for behaviour worth inheriting. `inherits` must say what. */
+  "wrapping",
+  /** No relationship. Themed only through the component token surface. */
+  "neutral",
+]);
+
+export const frameworkRelationSchema = z.object({
+  policy: frameworkPolicySchema,
+  /**
+   * The specific behaviour being inherited, required when wrapping.
+   *
+   * ADR 0010 is explicit that "it is consistent" is not a reason and
+   * "Modal's focus trap and Tabs' `aria-controls` wiring" is. Making it a
+   * required field is what stops the first kind of answer being written.
+   */
+  inherits: z.array(nonEmpty("inherits item")).optional(),
+  /** Whether a theme bridge exists for this framework. */
+  bridge: z.boolean().default(false),
+  /** Divergences from the framework's API, each one deliberate. */
+  divergences: z.array(nonEmpty("divergence")).default([]),
+});
+
 export const fhirResourceSchema = z.object({
   /** Resource type as spelled in the FHIR specification, e.g. "Observation". */
   name: nonEmpty("fhir resource name"),
@@ -135,6 +170,13 @@ export const componentMetaSchema = z
      * registry item, and shows an `npm install` command rather than a
      * `shadcn add` one. Its `packageName` is what a consumer installs.
      */
+    /**
+     * Per-framework relationship, keyed by npm package name — `antd`,
+     * `@mui/material`. Absent means the component has no relationship with any
+     * UI framework, which is the common case and the house default.
+     */
+    frameworks: z.record(z.string(), frameworkRelationSchema).default({}),
+
     distribution: distributionSchema.default("registry"),
     /** npm package name. Required when `distribution` is `package`. */
     packageName: z.string().optional(),
@@ -216,6 +258,25 @@ export const componentMetaSchema = z
     // A package component that does not say what to install is undocumentable:
     // the docs page has no install command to render and the reader is told the
     // component exists with no way to get it.
+    for (const [framework, relation] of Object.entries(meta.frameworks)) {
+      if (relation.policy === "wrapping" && !relation.inherits?.length) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["frameworks", framework, "inherits"],
+          message:
+            `policy is "wrapping" for ${framework}, so inherits must name the behaviour being inherited. ` +
+            'ADR 0010: "It is consistent" is not that reason; "Modal\'s focus trap and Tabs\' aria-controls wiring" is.',
+        });
+      }
+      if (relation.policy !== "wrapping" && relation.inherits?.length) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["frameworks", framework, "policy"],
+          message: `inherits is set for ${framework} but the policy is "${relation.policy}". Only a wrapping component inherits behaviour.`,
+        });
+      }
+    }
+
     if (meta.distribution === "package" && !meta.packageName?.trim()) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
@@ -292,6 +353,8 @@ export type Stability = z.infer<typeof stabilitySchema>;
 export type Tier = z.infer<typeof tierSchema>;
 export type Layer = z.infer<typeof layerSchema>;
 export type Distribution = z.infer<typeof distributionSchema>;
+export type FrameworkPolicy = z.infer<typeof frameworkPolicySchema>;
+export type FrameworkRelation = z.infer<typeof frameworkRelationSchema>;
 export type A11yNote = z.infer<typeof a11yNoteSchema>;
 export type FhirResource = z.infer<typeof fhirResourceSchema>;
 

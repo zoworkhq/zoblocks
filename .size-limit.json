@@ -136,5 +136,40 @@
     "name": "timeline stylesheet",
     "path": "registry/oxygen/lib/timeline.css",
     "limit": "3 KB"
+  },
+  {
+    "name": "bridge-core \u2014 the contract and the guard",
+    "path": "packages/bridge-core/dist/index.js",
+    "limit": "9 KB",
+    "ignore": ["react"]
+  },
+  {
+    "name": "bridge-antd \u2014 the bridge, excluding the framework it reads",
+    "path": "packages/bridge-antd/dist/index.js",
+    "limit": "7 KB",
+    "ignore": ["react", "react-dom", "antd"]
+  },
+  {
+    "name": "bridge-mui \u2014 the bridge, excluding the framework it reads",
+    "path": "packages/bridge-mui/dist/index.js",
+    "limit": "7 KB",
+    "ignore": ["react", "react-dom", "@mui/material", "@emotion/react", "@emotion/styled"]
+  },
+  {
+    "name": "theme \u2014 the document model, ramp, validation and CSS emitter",
+    "path": "packages/theme/dist/index.js",
+    "limit": "21 KB"
+  },
+  {
+    "name": "theme \u2014 the inline provider alone",
+    "path": "packages/theme/dist/react.js",
+    "limit": "1 KB",
+    "ignore": ["react"]
+  },
+  {
+    "name": "react \u2014 the barrel must contain no UI framework",
+    "path": "packages/react/dist/index.js",
+    "limit": "46 KB",
+    "ignore": ["react", "react-dom"]
   }
 ]

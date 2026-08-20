@@ -12,6 +12,16 @@ export default defineComponentMeta({
   status: "experimental",
   since: "0.3.0",
   layer: "pattern",
+  frameworks: {
+    antd: {
+      // The registry copilot imports no antd — it is the copy-source skin, and
+      // a component that copied antd's Modal and Input into someone's
+      // repository would be a fork of a framework rather than source they own.
+      // `@oxygenui-design/copilot` is the separate npm skin that does wrap it.
+      policy: "neutral",
+      bridge: false,
+    },
+  },
 
   summary:
     "A floating clinical copilot: a dock above the chart that takes a question and opens into a sourced, auditable thread.",

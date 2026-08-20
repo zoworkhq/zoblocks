@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, ArrowUpRight, Check, CircleAlert, X } from "lucide-react";
+import type { ComponentDoc, FrameworkRelation } from "@oxygenui-design/component-meta";
 import { CATALOG, STATUS_LABEL, getComponent } from "@/lib/catalog";
 import { SiteFooter, SiteHeader } from "@/components/site/chrome";
 import { ComponentPreview } from "@/components/site/component-preview";
@@ -51,6 +52,36 @@ async function readRegistrySource(name: string): Promise<string | undefined> {
   } catch {
     return undefined;
   }
+}
+
+/**
+ * Why this component ships on npm, in its own words.
+ *
+ * ADR 0010 classifies every component against each UI framework —
+ * `compatible` (matches the API, imports nothing), `wrapping` (inherits
+ * behaviour worth having, and must name it), or `neutral`. The schema refuses a
+ * wrapping component that does not say what it inherits, so the sentence below
+ * can be built from data instead of from a conditional that goes stale.
+ */
+function frameworkNote(component: ComponentDoc): string {
+  const wrapping = Object.entries(component.frameworks ?? {}).find(
+    ([, relation]) => (relation as FrameworkRelation).policy === "wrapping",
+  ) as [string, FrameworkRelation] | undefined;
+
+  if (wrapping) {
+    const [framework, relation] = wrapping;
+    const inherits = relation.inherits?.[0]?.replace(/\s+—.*$/, "").replace(/\.$/, "");
+    return (
+      `This one ships on npm rather than as copied source, because it wraps ${framework} — ` +
+      `copying a framework into your repository would be a fork, not a component.` +
+      (inherits ? ` What it inherits: ${inherits.toLowerCase()}.` : "")
+    );
+  }
+
+  return (
+    "This one ships on npm rather than as copied source, because it carries a headless core " +
+    "you can take on its own. Ant Design is an optional peer: the component works without it."
+  );
 }
 
 export default async function ComponentPage({ params }: { params: Promise<{ name: string }> }) {
@@ -133,14 +164,14 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
                   note={
                     <>
                       {/*
-                        The reason differs per package and stating the wrong one
-                        is worse than stating none: a reader who is told Tabs
-                        wraps Ant Design will add a dependency it does not need.
+                        Read from the component's own metadata rather than a
+                        conditional on its name. The reason differs per package
+                        and stating the wrong one is worse than stating none —
+                        a reader told Tabs wraps Ant Design adds a dependency it
+                        does not need. A hardcoded `name === "signature"` was
+                        right for exactly as long as there were two of these.
                       */}
-                      {component.name === "signature"
-                        ? "This one ships on npm rather than as copied source, because it wraps Ant Design — copying a framework into your repository would be a fork, not a component."
-                        : "This one ships on npm rather than as copied source, because it carries a headless core you can take on its own. Ant Design is an optional peer: the component works without it."}{" "}
-                      Import its stylesheet too:{" "}
+                      {frameworkNote(component)} Import its stylesheet too:{" "}
                       <code className="font-mono text-[0.6875rem] text-ink">
                         {`import "${component.packageName}/styles.css"`}
                       </code>

@@ -411,6 +411,119 @@
  * A signature record ends up on paper more often than anything else in a
  * clinical chart. The toolbar is not part of the record; the manifest is.
  */
+/* -------------------------------------------------------------------------
+   SignatureBlock — the attestation at the foot of a document.
+
+   Sized in ems against the document it sits in rather than in fixed pixels,
+   because this block is dropped into a letter template whose type scale is
+   not ours to decide. Every colour goes through a token with a literal
+   fallback, so the block still renders in a host that has not loaded Oxygen's
+   stylesheet — which is the common case for a print or email template.
+   ------------------------------------------------------------------------- */
+
+.ox-signature-block {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15em;
+  max-width: 26em;
+  /* An attestation must not be split across a page. */
+  break-inside: avoid;
+  page-break-inside: avoid;
+  color: var(--ox-text, #16181d);
+}
+
+.ox-signature-block__caption {
+  margin: 0 0 0.4em;
+  font-size: 0.8125em;
+  color: var(--ox-text-muted, #5c6773);
+}
+
+.ox-signature-block__ink {
+  /* Sat on the rule, not floating above it, which is what a pen does. */
+  display: block;
+  margin-bottom: -0.1em;
+  color: var(--ox-text, #16181d);
+}
+
+.ox-signature-block__rule {
+  width: 100%;
+  margin: 0 0 0.4em;
+  border: 0;
+  border-top: 1px solid var(--ox-border-strong, #16181d);
+}
+
+.ox-signature-block__signer {
+  display: flex;
+  flex-direction: column;
+  gap: 0.05em;
+}
+
+.ox-signature-block__name {
+  margin: 0;
+  font-weight: 600;
+}
+
+.ox-signature-block__credential {
+  font-weight: 400;
+}
+
+.ox-signature-block__role,
+.ox-signature-block__org {
+  margin: 0;
+  font-size: 0.875em;
+}
+
+/* Tabular figures: a registration number is checked digit by digit against a
+   register, and proportional digits make that harder than it needs to be. */
+.ox-signature-block__registration {
+  margin: 0;
+  font-size: 0.875em;
+  font-variant-numeric: tabular-nums;
+}
+
+.ox-signature-block__when,
+.ox-signature-block__meaning {
+  margin: 0;
+  font-size: 0.8125em;
+  color: var(--ox-text-muted, #5c6773);
+}
+
+.ox-signature-block__when {
+  margin-top: 0.35em;
+  font-variant-numeric: tabular-nums;
+}
+
+.ox-signature-block__integrity {
+  margin: 0.35em 0 0;
+  font-size: 0.8125em;
+  color: var(--ox-status-normal, #0f6b5f);
+}
+
+.ox-signature-block__integrity--failed {
+  color: var(--ox-status-critical, #a52834);
+  font-weight: 600;
+}
+
+/* The unsigned states deliberately do not look like a signature. A decline
+   drawn as a rule with a name under it is how a reader skims a letter and
+   comes away believing it was signed. */
+.ox-signature-block--unsigned {
+  gap: 0.25em;
+  padding: 0.75em 0.9em;
+  border: 1px solid var(--ox-status-high, #9a5108);
+  border-radius: 6px;
+}
+
+.ox-signature-block__notice {
+  margin: 0;
+}
+
+.ox-signature-block__detail {
+  margin: 0;
+  font-size: 0.875em;
+  color: var(--ox-text-muted, #5c6773);
+}
+
 @media print {
   .ox-signature__toolbar,
   .ox-signature__placeholder {
@@ -424,5 +537,29 @@
 
   .ox-signature-manifest__row dt {
     background: none;
+  }
+
+  /*
+   * On paper this block is the thing being read, so it stops depending on
+   * anything a printer drops. Backgrounds are not printed by default, and a
+   * token that resolves to a mid grey on screen resolves to something too
+   * light to read once it is toner.
+   */
+  .ox-signature-block,
+  .ox-signature-block__when,
+  .ox-signature-block__meaning,
+  .ox-signature-block__caption,
+  .ox-signature-block__detail,
+  .ox-signature-block__integrity {
+    color: #000;
+  }
+
+  .ox-signature-block__rule {
+    border-top-color: #000;
+  }
+
+  .ox-signature-block--unsigned {
+    border-color: #000;
+    border-width: 2px;
   }
 }

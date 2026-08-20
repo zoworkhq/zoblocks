@@ -159,9 +159,12 @@ describe("the controls the mockup asks for", () => {
   it("carries the mode's glyph on the chip, so the chip is scannable", () => {
     renderCopilot();
     const chip = screen.getByRole("button", { name: "Look up" });
-    expect(chip.querySelector("svg")).toBeTruthy();
+    // Located by the class its mask is keyed to rather than by element: glyphs
+    // are masked spans now, so that a customer can replace one from CSS.
+    const glyph = chip.querySelector(".ox-icon");
+    expect(glyph).toBeTruthy();
     // Paired with a real name on the button, so the glyph must stay silent.
-    expect(chip.querySelector("svg")).toHaveAttribute("aria-hidden", "true");
+    expect(glyph).toHaveAttribute("aria-hidden", "true");
   });
 
   it("routes the scope strip's Change affordance to the mode tray", async () => {
