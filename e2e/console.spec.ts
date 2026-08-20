@@ -279,6 +279,35 @@ test.describe("@console the glyphs", () => {
  * — it is two tests describing incompatible worlds and taking turns winning.
  */
 test.describe.serial("@console the frameworks setting", () => {
+  /**
+   * Save, and wait for the server to say it saved.
+   *
+   * Clicking Save and navigating immediately is a race the test loses roughly
+   * one run in four: the action is still in flight when the next page renders,
+   * so the export list is built from the *previous* selection. The count beside
+   * the button — "1 of 2 enabled" — is client state that updates on click and
+   * is therefore not a signal that anything reached the database.
+   *
+   * The action's own confirmation is, because it is returned by the server
+   * after the write.
+   */
+  const save = async (page: Page) => {
+    await page.getByRole("button", { name: "Save selection" }).click();
+    await expect(
+      /*
+        Any of the three things the server can say, unanchored.
+
+        "No change." is a real outcome here rather than a failure: the checkbox
+        clicks are guarded, so a run that finds the state already correct saves
+        nothing — and a wait that only accepted the success wording hung for
+        five seconds and then failed on a save that had worked perfectly.
+      */
+      // `.first()`, because the outcome is deliberately in two places: the
+      // inline result beside the button, and the live region that announces it.
+      page.getByText(/console now offers|No change|No framework selected/).first(),
+    ).toBeVisible();
+  };
+
   /*
    * And both are put back afterwards, so a spec that merely *reads* this screen
    * finds the state the seed produced rather than whatever ran last.
@@ -291,8 +320,7 @@ test.describe.serial("@console the frameworks setting", () => {
       const box = page.getByRole("checkbox", { name });
       if (!(await box.isChecked())) await box.click();
     }
-    await page.getByRole("button", { name: "Save selection" }).click();
-    await page.waitForTimeout(400);
+    await save(page);
     await page.close();
   });
 
@@ -317,8 +345,7 @@ test.describe.serial("@console the frameworks setting", () => {
     if (await mui.isChecked()) await mui.click();
     const antd = page.getByRole("checkbox", { name: /Ant Design/ });
     if (!(await antd.isChecked())) await antd.click();
-    await page.getByRole("button", { name: "Save selection" }).click();
-    await expect(page.getByText(/Saved|enabled/).first()).toBeVisible();
+    await save(page);
 
     await page.goto(`${BASE}/themes/${THEME}/transfer`);
     await expect(page.getByRole("heading", { name: "antd ConfigProvider" })).toBeVisible();
@@ -331,7 +358,7 @@ test.describe.serial("@console the frameworks setting", () => {
     // And the reverse, so this cannot pass by hiding everything.
     await page.goto(`${BASE}/frameworks`);
     await page.getByRole("checkbox", { name: /Material UI/ }).click();
-    await page.getByRole("button", { name: "Save selection" }).click();
+    await save(page);
 
     await page.goto(`${BASE}/themes/${THEME}/transfer`);
     await expect(page.getByRole("heading", { name: "MUI createTheme" })).toBeVisible();
@@ -359,7 +386,7 @@ test.describe.serial("@console the frameworks setting", () => {
     await page.goto(`${BASE}/frameworks`);
     const antd = page.getByRole("checkbox", { name: /Ant Design/ });
     if (!(await antd.isChecked())) await antd.click();
-    await page.getByRole("button", { name: "Save selection" }).click();
+    await save(page);
 
     await page.goto(`${BASE}/themes/${THEME}/transfer`);
 

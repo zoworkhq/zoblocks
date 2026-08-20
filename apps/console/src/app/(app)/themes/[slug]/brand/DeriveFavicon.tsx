@@ -6,6 +6,7 @@ import type { BrandAssetFile } from "@oxygenui-design/theme";
 import { uploadBrandAssetAction } from "@/lib/actions";
 import { Button, Callout, Field, Panel, Select, SubmitButton } from "@/components/ui";
 import { ActionForm } from "@/components/action-form";
+import { cropGeometry, type Crop } from "@/lib/crop";
 
 /**
  * Cut a favicon out of the wordmark.
@@ -26,8 +27,6 @@ import { ActionForm } from "@/components/action-form";
  * rasteriser; the browser already is one, and shipping an image decoder to the
  * server to avoid running one in the browser would be the wrong trade.
  */
-
-type Crop = "leading" | "centre" | "whole";
 
 const CROPS: readonly { value: Crop; label: string; note: string }[] = [
   {
@@ -68,21 +67,27 @@ function cut(image: HTMLImageElement, crop: Crop, size: number): HTMLCanvasEleme
   context.imageSmoothingEnabled = true;
   context.imageSmoothingQuality = "high";
 
-  const w = image.naturalWidth || image.width;
-  const h = image.naturalHeight || image.height;
+  const { source, dest } = cropGeometry(
+    image.naturalWidth || image.width,
+    image.naturalHeight || image.height,
+    crop,
+    size,
+  );
 
-  if (crop === "whole") {
-    const scale = Math.min(size / w, size / h);
-    const dw = w * scale;
-    const dh = h * scale;
-    context.drawImage(image, (size - dw) / 2, (size - dh) / 2, dw, dh);
-    return canvas;
-  }
+  // Nothing to draw from — an SVG that states no size at all, which is legal.
+  if (source.width === 0) return canvas;
 
-  const side = Math.min(w, h);
-  const sx = crop === "leading" ? 0 : (w - side) / 2;
-  const sy = (h - side) / 2;
-  context.drawImage(image, sx, sy, side, side, 0, 0, size, size);
+  context.drawImage(
+    image,
+    source.x,
+    source.y,
+    source.width,
+    source.height,
+    dest.x,
+    dest.y,
+    dest.width,
+    dest.height,
+  );
   return canvas;
 }
 

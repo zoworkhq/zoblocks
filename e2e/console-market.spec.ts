@@ -112,7 +112,21 @@ test.describe("@console the catalogue", () => {
   });
 });
 
-test.describe("@console owning something", () => {
+/*
+ * Serial, because two of these grant the same item.
+ *
+ * `grant()` is check-then-act — load the page, see it is not owned, submit the
+ * form — and the whole file shares one seeded organisation. Run in parallel,
+ * both tests read "not owned", both submit, and the first grant revalidates the
+ * page out from under the second: its Buy panel is replaced by the Install
+ * panel mid-interaction and the click times out against a form that correct
+ * behaviour has just removed.
+ *
+ * The helper's idempotence guard cannot close that, because the gap is between
+ * its check and its click rather than inside either. Two tests owning one
+ * entitlement are ordered, so this says so.
+ */
+test.describe.serial("@console owning something", () => {
   test("grants without charging, and the item says so afterwards", async ({ page }) => {
     await signIn(page);
     await grant(page, EMPTY_STATES);
