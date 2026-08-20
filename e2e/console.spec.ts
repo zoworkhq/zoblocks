@@ -270,6 +270,56 @@ test.describe("@console the glyphs", () => {
   });
 });
 
+test.describe("@console the frameworks setting", () => {
+  /**
+   * The setting that used to do nothing.
+   *
+   * It was written to the organisation and read by the badge counter beside
+   * "Frameworks" in the rail — and nowhere else — while the screen's own
+   * callout claimed it selected which bridge the preview rendered through and
+   * which imports were accepted. Neither was wired. This asserts the one thing
+   * it now genuinely decides, in both directions, because a preference that
+   * only ever adds is a preference nobody can tell is working.
+   */
+  test("decides which framework exports are offered, and says what it withheld", async ({
+    page,
+  }) => {
+    await signIn(page);
+
+    // Enable only Ant Design.
+    await page.goto(`${BASE}/frameworks`);
+    const mui = page.getByRole("checkbox", { name: /Material UI/ });
+    if (await mui.isChecked()) await mui.click();
+    const antd = page.getByRole("checkbox", { name: /Ant Design/ });
+    if (!(await antd.isChecked())) await antd.click();
+    await page.getByRole("button", { name: "Save selection" }).click();
+    await expect(page.getByText(/Saved|enabled/).first()).toBeVisible();
+
+    await page.goto(`${BASE}/themes/${THEME}/transfer`);
+    await expect(page.getByRole("heading", { name: "antd ConfigProvider" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "MUI createTheme" })).toHaveCount(0);
+
+    // Withheld, not silently absent — a format that vanishes reads as a
+    // product that lost a feature.
+    await expect(page.getByText(/MUI createTheme is hidden because/)).toBeVisible();
+
+    // And the reverse, so this cannot pass by hiding everything.
+    await page.goto(`${BASE}/frameworks`);
+    await page.getByRole("checkbox", { name: /Material UI/ }).click();
+    await page.getByRole("button", { name: "Save selection" }).click();
+
+    await page.goto(`${BASE}/themes/${THEME}/transfer`);
+    await expect(page.getByRole("heading", { name: "MUI createTheme" })).toBeVisible();
+  });
+
+  /*
+   * That the export carries the *resolved* accent rather than the swatch the
+   * customer typed is asserted in `apps/console/test/transfer.test.ts`, where
+   * the generated file can be read. A browser test could only click Copy and
+   * believe it — which is a test that passes whatever the file says.
+   */
+});
+
 test.describe("@console what no role may do", () => {
   /**
    * The negative path, which is the one worth automating.

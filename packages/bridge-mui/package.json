@@ -25,6 +25,7 @@
   "exports": {
     ".": "./src/index.ts",
     "./definition": "./src/map.ts",
+    "./inverse": "./src/inverse.ts",
     "./package.json": "./package.json"
   },
   "files": [
@@ -49,7 +50,8 @@
         "types": "./dist/map.d.ts",
         "default": "./dist/map.js"
       },
-      "./package.json": "./package.json"
+      "./package.json": "./package.json",
+      "./inverse": "./dist/inverse.js"
     }
   },
   "scripts": {

@@ -46,12 +46,45 @@ describe("export", () => {
     expect(result.body).toContain("#1d63c9");
   });
 
-  it("writes the brand in antd's vocabulary", async () => {
+  /**
+   * `colorPrimary` is the accent Oxygen *renders*, not the swatch the customer
+   * typed.
+   *
+   * This assertion used to expect the ramp's 600 — the brand colour as picked —
+   * because the export read `ref.brand` directly. Oxygen's `--ox-accent`
+   * resolves to step 700, so an antd application themed from that file sat a
+   * shade away from the Oxygen components beside it, and the two looked subtly
+   * unrelated. The export now goes through `bridge-antd`'s own table, which is
+   * the same one the runtime bridge uses, so the file and the bridge cannot
+   * disagree.
+   */
+  it("writes the accent Oxygen renders, in antd's vocabulary", async () => {
     const auth = await actingAs(await seedOrg("Northwind", "northwind"));
     const { id } = await createTheme(auth, { name: "Clinical", brandColour: "#1d63c9" });
     const result = await exportThemeAs(auth, id, "antd");
-    expect(result.body).toContain('"colorPrimary": "#1d63c9"');
+
+    // 700, derived from the 600 the customer chose.
+    expect(result.body).toContain('"colorPrimary": "#1851a5"');
+    // And far more than the four tokens the private copy knew.
+    expect(result.body).toContain('"colorText"');
+    expect(result.body).toContain('"borderRadius"');
+    expect(result.body).toContain('"fontFamily"');
     expect(result.caveat).toContain("Clinical status");
+  });
+
+  it("never writes a clinical colour into a framework theme", async () => {
+    const auth = await actingAs(await seedOrg("Northwind", "northwind"));
+    const { id } = await createTheme(auth, { name: "Clinical", brandColour: "#1d63c9" });
+
+    for (const format of ["antd", "mui"] as const) {
+      const { body } = await exportThemeAs(auth, id, format);
+      // Severity is carried by hue separation and a validated floor; neither
+      // framework has anywhere to record either, so a mapped status colour
+      // would be a colour stripped of the thing that made it safe.
+      expect(body.toLowerCase(), format).not.toContain("colorerror");
+      expect(body.toLowerCase(), format).not.toContain("colorwarning");
+      expect(body, format).not.toContain("palette.error");
+    }
   });
 
   it("refuses another organisation's theme", async () => {

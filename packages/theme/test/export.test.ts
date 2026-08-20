@@ -52,14 +52,35 @@ describe("CSS and Tailwind", () => {
 });
 
 describe("the framework exports", () => {
+  /**
+   * A resolved theme, the way the console supplies one.
+   *
+   * These two formats are the bridges' tables read backwards, and a bridge
+   * maps *semantic* tokens — `--ox-accent`, not `ref.brand.600`. Passing a
+   * document alone used to produce a four-token file that looked like it had
+   * worked; the signature now asks for the thing the mapping actually needs.
+   */
+  const RESOLVED = {
+    "--ox-accent": "#1d63c9",
+    "--ox-accent-hover": "#1851a5",
+    "--ox-accent-subtle": "#f2f6fd",
+    "--ox-accent-border": "#c1d6f6",
+    "--ox-text": "#16181d",
+    "--ox-bg": "#ffffff",
+    "--ox-surface": "#ffffff",
+    "--ox-border": "#dfe3e8",
+    "--ox-radius": "0.5rem",
+    "--ox-font-sans": "Instrument Sans, system-ui, sans-serif",
+  };
+
   it("writes the customer's brand in antd's vocabulary", () => {
-    const { body } = exportTheme(publishedTheme(), "antd");
+    const { body } = exportTheme(publishedTheme(), "antd", RESOLVED);
     expect(body).toContain('"colorPrimary": "#1d63c9"');
     expect(body).toContain("northwindClinicalTheme");
   });
 
   it("writes it in MUI's", () => {
-    const { body } = exportTheme(publishedTheme(), "mui");
+    const { body } = exportTheme(publishedTheme(), "mui", RESOLVED);
     expect(body).toContain('"main": "#1d63c9"');
     expect(body).toContain("createTheme");
   });
@@ -69,7 +90,7 @@ describe("the framework exports", () => {
    * would claim a correspondence the runtime does not honour.
    */
   it("writes only tokens the matching bridge treats as counterparts", () => {
-    const antd = exportTheme(publishedTheme(), "antd").body;
+    const antd = exportTheme(publishedTheme(), "antd", RESOLVED).body;
     for (const unmapped of antdBridge.unmapped) {
       // The bridge's unmapped list is in `--ox-*` terms; what matters is that
       // nothing clinical appears in the export at all.
@@ -77,7 +98,7 @@ describe("the framework exports", () => {
       expect(antd.toLowerCase()).not.toContain("colorerror");
       expect(antd.toLowerCase()).not.toContain("colorwarning");
     }
-    const mui = exportTheme(publishedTheme(), "mui").body;
+    const mui = exportTheme(publishedTheme(), "mui", RESOLVED).body;
     expect(mui).not.toContain("error");
     expect(muiBridge.unmapped).toContain("--ox-status-critical");
   });
@@ -88,7 +109,7 @@ describe("the framework exports", () => {
   });
 
   it("explains in the file itself why status is absent", () => {
-    const { body } = exportTheme(publishedTheme(), "antd");
+    const { body } = exportTheme(publishedTheme(), "antd", RESOLVED);
     expect(body).toContain("hue separation");
     expect(body).toContain("colour-vision deficiency");
   });

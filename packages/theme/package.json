@@ -58,6 +58,9 @@
     "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
+    "@oxygenui-design/bridge-antd": "workspace:*",
+    "@oxygenui-design/bridge-core": "workspace:*",
+    "@oxygenui-design/bridge-mui": "workspace:*",
     "@oxygenui-design/tokens": "workspace:*",
     "zod": "^3.24.1"
   },

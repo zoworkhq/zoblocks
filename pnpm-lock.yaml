@@ -1217,6 +1217,15 @@ importers:
 
   packages/theme:
     dependencies:
+      '@oxygenui-design/bridge-antd':
+        specifier: workspace:*
+        version: link:../bridge-antd
+      '@oxygenui-design/bridge-core':
+        specifier: workspace:*
+        version: link:../bridge-core
+      '@oxygenui-design/bridge-mui':
+        specifier: workspace:*
+        version: link:../bridge-mui
       '@oxygenui-design/tokens':
         specifier: workspace:*
         version: link:../tokens
@@ -1224,12 +1233,6 @@ importers:
         specifier: ^3.24.1
         version: 3.25.76
     devDependencies:
-      '@oxygenui-design/bridge-antd':
-        specifier: workspace:*
-        version: link:../bridge-antd
-      '@oxygenui-design/bridge-mui':
-        specifier: workspace:*
-        version: link:../bridge-mui
       '@oxygenui-design/tsconfig':
         specifier: workspace:*
         version: link:../tsconfig

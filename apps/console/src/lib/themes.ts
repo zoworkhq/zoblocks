@@ -46,6 +46,8 @@ import {
 import type { TokenSource } from "@oxygenui-design/tokens/validate";
 import type { ThemeDoc, ThemeVersionDoc } from "@/db/collections";
 import type { Authorized } from "./authorize";
+import { baseTokens } from "./base-tokens";
+import { buildEditorModel } from "./token-editor";
 
 export class ThemeError extends Error {
   constructor(
@@ -574,6 +576,16 @@ export async function exportThemeAs(
     ? await auth.data.versions.findOne({ themeId, version: theme.liveVersion })
     : null;
 
+  /*
+   * The light theme's tokens, resolved, for the two framework exports.
+   *
+   * Light rather than a choice: `ConfigProvider` and `createTheme` each hold
+   * one palette, and a host that runs both schemes switches them itself. Handing
+   * over the dark set would be picking the wrong one silently.
+   */
+  const tokens = published?.tokens ?? withTierDefaults(theme.tokens);
+  const resolved = buildEditorModel(await baseTokens(), theme.slug, tokens, "light").resolved;
+
   return exportTheme(
     {
       id: themeId.toHexString(),
@@ -600,6 +612,7 @@ export async function exportThemeAs(
       },
     },
     format,
+    resolved,
   );
 }
 

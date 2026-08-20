@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { AlertTriangle } from "lucide-react";
 import { currentMember } from "@/lib/auth";
@@ -32,8 +33,23 @@ const FORMATS = [
     id: "antd" as const,
     name: "antd ConfigProvider",
     body: "Theme your own antd components with this brand — not only Oxygen's.",
+    /*
+      Offered only to an organisation that runs it.
+      
+      Handing somebody a theme file for a library they do not use is not a
+      harmless extra: it is five downloads where three are relevant, and it
+      quietly suggests the product knows less about them than it does. The
+      Frameworks screen is where that is declared, and until now nothing read
+      it.
+    */
+    framework: "antd" as const,
   },
-  { id: "mui" as const, name: "MUI createTheme", body: "The same, for Material UI." },
+  {
+    id: "mui" as const,
+    name: "MUI createTheme",
+    body: "The same, for Material UI.",
+    framework: "mui" as const,
+  },
 ];
 
 /**
@@ -82,9 +98,15 @@ export default async function TransferPage({ params }: { params: Promise<{ slug:
    */
   const canExport = can(member.role, "theme.export");
   const auth = { member, data };
+
+  const org = await data.organisation.get();
+  const enabled = org?.frameworks ?? [];
+  const offered = FORMATS.filter((f) => !f.framework || enabled.includes(f.framework));
+  const withheld = FORMATS.filter((f) => f.framework && !enabled.includes(f.framework));
+
   const exports = canExport
     ? await Promise.all(
-        FORMATS.map(async (format) => ({
+        offered.map(async (format) => ({
           ...format,
           result: await exportThemeAs(auth, theme._id, format.id),
         })),
@@ -97,7 +119,7 @@ export default async function TransferPage({ params }: { params: Promise<{ slug:
         eyebrowHref={`/themes/${slug}`}
         eyebrow={`${theme.name}${theme.liveVersion ? ` · v${theme.liveVersion}` : " · draft"}`}
         title="Import and export"
-        lede="Five ways out, one way in."
+        lede="Every way out this organisation can use, and one way in."
       />
 
       <div className="space-y-6">
@@ -111,6 +133,26 @@ export default async function TransferPage({ params }: { params: Promise<{ slug:
                 "Exporting needs a developer, a designer or an admin."}
             </Callout>
           )}
+          {/*
+            What is missing, and why — rather than a shorter list.
+            
+            A format that silently disappears reads as a product that lost a
+            feature. Naming the setting that removed it makes the Frameworks
+            screen legible from the place its effect is felt, which is the only
+            place anybody would look for it.
+          */}
+          {canExport && withheld.length > 0 && (
+            <Callout tone="info" title="Two more formats are available" className="mb-3">
+              {withheld.map((f) => f.name).join(" and ")} {withheld.length === 1 ? "is" : "are"}{" "}
+              hidden because this organisation does not list{" "}
+              {withheld.length === 1 ? "that framework" : "those frameworks"} on the{" "}
+              <Link href="/frameworks" className="link">
+                frameworks screen
+              </Link>
+              .
+            </Callout>
+          )}
+
           <ul className="grid gap-3 sm:grid-cols-2">
             {exports.map(({ id, name, body, result }) => (
               <li key={id}>

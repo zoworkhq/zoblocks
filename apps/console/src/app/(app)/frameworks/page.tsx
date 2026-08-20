@@ -40,11 +40,22 @@ export default async function FrameworksPage() {
           reason={whyNot(member.role, "org.configure")}
         />
 
+        {/*
+          Rewritten to describe what it does rather than what it was going to do.
+          
+          The previous copy claimed this selected which bridge the preview
+          rendered through and which host-theme imports were accepted. Neither
+          was wired: the setting was written to the organisation and read by the
+          badge counter beside "Frameworks" in the rail, and nowhere else. The
+          last sentence was always true and is the important one, so it stays.
+        */}
         <Callout tone="info" title="What this setting does">
-          It decides what this console offers you — which bridges the preview can render a theme
-          through, and which host-theme exports the import screen accepts. It changes nothing in a
-          running application: a bridge is a package you install and mount yourself, so switching
-          here and switching there are two separate acts.
+          It decides which theme exports this console offers you. An organisation that runs Ant
+          Design is offered an antd{" "}
+          <code className="font-mono text-[0.8125rem]">ConfigProvider</code> file on the import and
+          export screen; one that does not is told the format exists and why it is hidden. It
+          changes nothing in a running application: a bridge is a package you install and mount
+          yourself, so switching here and switching there are two separate acts.
         </Callout>
 
         <Panel
