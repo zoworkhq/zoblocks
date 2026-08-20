@@ -86,7 +86,14 @@ export default function ComponentsPage() {
               </p>
             )}
 
-            <div className="grid auto-rows-fr gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {/* No `auto-rows-fr`. It sizes every row in the grid to the
+                tallest row, so one preview taller than the rest — Care
+                Timeline, which carries a banner, its events and the coverage
+                sentence — set the height of all sixteen cards and left a
+                column of empty frame in the other fifteen. Default `auto`
+                rows still stretch the cards within a row to match each
+                other, which is the part that was actually wanted. */}
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {ordered.map((component, index) => (
                 <ComponentCard
                   key={component!.name}

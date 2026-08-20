@@ -358,7 +358,9 @@ function Catalog() {
         </div>
 
         {CATALOG.length > 0 ? (
-          <div className="mt-12 grid auto-rows-fr gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          // Rows size to their own content — see the note on the catalog grid
+          // for why `auto-rows-fr` cannot be used here.
+          <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {CATALOG.map((component, index) => (
               <ComponentCard
                 key={component.name}

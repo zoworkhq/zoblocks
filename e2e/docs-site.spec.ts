@@ -226,6 +226,106 @@ test.describe("the catalog @a11y", () => {
   });
 
   /*
+   * The vertical half of the check above, which is the half that broke.
+   *
+   * `ScaledArt` paints through a transform, and a transform reserves the
+   * untransformed box: a preview drawn at 0.74 still booked 100% of its height.
+   * The grid was `auto-rows-fr`, which sizes every row to the tallest row — so
+   * the single densest preview set the height of all sixteen cards, and the
+   * catalog rendered as a column of near-empty frames roughly twice as tall as
+   * the components in them.
+   *
+   * Both halves are asserted, because either alone passes while the bug is
+   * live: the reserved box is the right width, and every card is the same
+   * height as every other. What is wrong is the size of the gap between the art
+   * and the frame around it.
+   */
+  test("no card reserves more height than its art paints", async ({ page }) => {
+    await page.goto(CATALOG);
+    await settle(page);
+
+    const slack = await page.evaluate(() =>
+      [...document.querySelectorAll<HTMLElement>("a[href^='/components/']")]
+        .map((card) => {
+          const frame = card.querySelector<HTMLElement>(".component-preview-frame");
+          const band = frame?.firstElementChild as HTMLElement | undefined;
+          if (!frame || !band) return null;
+
+          // What the art actually paints, including anything a descendant puts
+          // outside its own border box.
+          let top = Infinity;
+          let bottom = -Infinity;
+          for (const node of band.querySelectorAll("*")) {
+            const box = node.getBoundingClientRect();
+            if (!box.height || !box.width) continue;
+            top = Math.min(top, box.top);
+            bottom = Math.max(bottom, box.bottom);
+          }
+          if (bottom < top) return null;
+
+          const reserved = band.getBoundingClientRect();
+          return {
+            name: card.getAttribute("href")!.split("/").pop()!,
+            // Positive: the band holds more height than the art needs.
+            unused: Math.round(reserved.height - (bottom - top)),
+            // Positive: the art paints outside the band it was given.
+            spill: Math.max(Math.round(reserved.top - top), Math.round(bottom - reserved.bottom)),
+          };
+        })
+        .filter((entry): entry is NonNullable<typeof entry> => entry !== null),
+    );
+
+    expect(slack.length).toBeGreaterThanOrEqual(12);
+
+    // The band is deliberately taller than the smallest loaders — a rhythm
+    // strip is 35px and would read as a hairline centred in a 330px cell. What
+    // it must never be is a multiple of the art, which is what the reserved-box
+    // bug produced.
+    expect(
+      slack.filter((entry) => entry.unused > 160),
+      "a card is reserving more than a band of empty height above and below its art",
+    ).toEqual([]);
+
+    expect(
+      slack.filter((entry) => entry.spill > 0),
+      "a card's art paints outside the band, so the frame clips it",
+    ).toEqual([]);
+  });
+
+  /*
+   * `auto-rows-fr` sizes every row to the tallest row in the whole grid, so one
+   * dense preview is enough to inflate a catalog that is otherwise uniform. The
+   * rows are meant to differ — a featured cell is taller — but by their own
+   * content, not by the worst case anywhere on the page.
+   */
+  test("a row is not sized by a card in some other row", async ({ page }) => {
+    await page.goto(CATALOG);
+    await settle(page);
+
+    const rows = await page.evaluate(() => {
+      // Derived from a card rather than by class: `main div.grid` is the hero's
+      // two-column header, which is also a grid and also matches.
+      const card = document.querySelector<HTMLElement>("a[href^='/components/']");
+      const grid = card?.parentElement;
+      if (!grid || getComputedStyle(grid).display !== "grid") return null;
+      return getComputedStyle(grid)
+        .gridTemplateRows.split(" ")
+        .map((value) => Math.round(parseFloat(value)))
+        .filter((value) => Number.isFinite(value) && value > 0);
+    });
+
+    expect(rows, "the catalog grid was not found").not.toBeNull();
+    expect(rows!.length).toBeGreaterThan(2);
+
+    // Every row identical is the signature of `auto-rows-fr`: a grid whose
+    // cards carry different amounts of prose cannot honestly produce it.
+    expect(
+      new Set(rows!).size,
+      `every row is ${rows![0]}px — the rows are being equalised`,
+    ).toBeGreaterThan(1);
+  });
+
+  /*
    * The loaders animate themselves, so a frozen composite next to them reads as
    * a broken cell rather than a still. These are driven on a timer, which is
    * the only motion available: the card is a link and its art is `inert`.

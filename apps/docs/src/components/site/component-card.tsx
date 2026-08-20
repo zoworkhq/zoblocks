@@ -134,15 +134,65 @@ function useCycle<T>(values: readonly T[], everyMs: number): T {
  * middle of a word — which reads as a broken component rather than a thumbnail.
  * A transform keeps every proportion the component actually has and simply
  * shows less of it, which is what a thumbnail is.
+ *
+ * The wrapper has to be measured, because `transform` paints small and reserves
+ * large: it does not participate in layout, so a component scaled to 0.74 still
+ * booked every pixel of its natural height. Care Timeline claimed 605px of card
+ * for the 448px it painted, SafetyPlan 285 for 143, and under `auto-rows-fr`
+ * that surplus was copied into every other row in the grid. So the outer box is
+ * pinned to the scaled size and the surplus stops existing.
+ *
+ * `fit` is the guard rather than the mechanism. A preview should be authored to
+ * sit inside the art band and most are; `fit` only keeps a component that
+ * outgrows it — because its content changed, or because a new one was added —
+ * from setting the height of the row it lands in. It shrinks the paint, never
+ * the layout the child sees: the inner width is pinned in pixels, so clamping
+ * the scale cannot reflow the child and re-trigger the clamp.
  */
-function ScaledArt({ scale, children }: { scale: number; children: React.ReactNode }) {
+function ScaledArt({
+  scale,
+  fit,
+  children,
+}: {
+  scale: number;
+  fit?: number;
+  children: React.ReactNode;
+}) {
+  const inner = React.useRef<HTMLDivElement>(null);
+  const [natural, setNatural] = React.useState<{ w: number; h: number } | null>(null);
+
+  React.useLayoutEffect(() => {
+    const el = inner.current;
+    if (!el) return;
+    const read = () => setNatural({ w: el.offsetWidth, h: el.offsetHeight });
+    read();
+    const observer = new ResizeObserver(read);
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  const applied = natural && fit && natural.h > 0 ? Math.min(scale, fit / natural.h) : scale;
+
   return (
-    <div className="w-full overflow-hidden">
+    // No `overflow-hidden`. It was here to clip an inner box deliberately made
+    // wider than its parent; the inner box is now pinned to the measured width,
+    // so the only thing left to clip was the few pixels a shadow or a rule
+    // paints past its own border box — which showed up as a severed row at the
+    // bottom of the Accordion and SafetyPlan cards.
+    <div
+      style={
+        natural ? { width: natural.w * applied, height: natural.h * applied } : { width: "100%" }
+      }
+    >
       <div
+        ref={inner}
         style={{
-          transform: `scale(${scale})`,
+          transform: `scale(${applied})`,
           transformOrigin: "top left",
-          width: `${100 / scale}%`,
+          // Percentage until measured, pixels after. A percentage of a box that
+          // is itself derived from this element's width is a feedback loop the
+          // moment `applied` differs from `scale`.
+          width: natural ? natural.w : `${100 / scale}%`,
         }}
       >
         {children}
@@ -150,6 +200,22 @@ function ScaledArt({ scale, children }: { scale: number; children: React.ReactNo
     </div>
   );
 }
+
+/**
+ * The art band, in pixels.
+ *
+ * Raised from 120/92 once already: art sized to the old floor read as a stamp
+ * in the middle of a large empty frame — a rhythm strip at 68px in a 330px-wide
+ * cell is a hairline, not a component. Every preview is authored to sit inside
+ * these, and `ScaledArt`'s `fit` holds any that stops doing so.
+ *
+ * The standard band carries a few pixels over what any preview measures.
+ * `fit` sizes to the border box, and a component whose rule or shadow paints
+ * past its own border box — SafetyPlan's last step does, by 6px — would
+ * otherwise sit those pixels outside the band.
+ */
+const STANDARD_ART = 156;
+const FEATURED_ART = 184;
 
 const PREVIEW: Record<string, (featured: boolean) => React.ReactNode> = {
   "pulse-loader": (featured) => (
@@ -223,7 +289,7 @@ const PREVIEW: Record<string, (featured: boolean) => React.ReactNode> = {
      * rather than an illustration of it, which is the point of driving these
      * previews live at all.
      */
-    <ScaledArt scale={featured ? 0.92 : 0.78}>
+    <ScaledArt scale={featured ? 0.92 : 0.78} fit={featured ? FEATURED_ART : STANDARD_ART}>
       <div className="w-full" style={{ maxWidth: 420 }}>
         <Copilot provider={CARD_COPILOT_PROVIDER} modes={[lookUp]} anchor="inline" locale="en-GB" />
       </div>
@@ -239,7 +305,7 @@ const PREVIEW: Record<string, (featured: boolean) => React.ReactNode> = {
  */
 function TimelineArt({ featured }: { featured: boolean }) {
   return (
-    <ScaledArt scale={featured ? 0.95 : 0.84}>
+    <ScaledArt scale={featured ? 0.95 : 0.84} fit={featured ? FEATURED_ART : STANDARD_ART}>
       <div className="w-full" style={{ maxWidth: 260 }}>
         <Timeline
           aria-label="Release history"
@@ -255,22 +321,31 @@ function TimelineArt({ featured }: { featured: boolean }) {
 }
 
 /**
- * Three events and the sentence.
+ * One event, between the two halves of the claim.
  *
  * The card deliberately shows the degraded state rather than the healthy one:
  * a timeline that renders cleanly is what every library ships, and the argument
- * for this one is the line at the bottom saying which source did not answer.
+ * for this one is the banner naming the source that did not answer and the
+ * sentence at the bottom saying what the reader is therefore looking at.
+ *
+ * Both of those are prose, and prose is what makes this the densest preview in
+ * the catalog. It used to render three events between them, which came to 605px
+ * of component asked to sit in a 148px band — `fit` held it to the band by
+ * scaling it to a quarter size, which is a smudge, not a thumbnail. So the part
+ * that can be cut is cut: `limit={1}` keeps the newest event and both halves of
+ * the claim, and the wider `maxWidth` buys the reduction back out of line wraps
+ * rather than out of type size.
  */
 function CareTimelineArt({ featured }: { featured: boolean }) {
   return (
-    <ScaledArt scale={featured ? 0.88 : 0.74}>
-      <div className="w-full" style={{ maxWidth: 320 }}>
+    <ScaledArt scale={featured ? 0.72 : 0.58} fit={featured ? FEATURED_ART : STANDARD_ART}>
+      <div className="w-full" style={{ maxWidth: 400 }}>
         <CareTimeline
           aria-label="Patient timeline"
           events={TIMELINE_EVENTS.slice(2, 6)}
           now={TIMELINE_NOW}
           layout="card"
-          limit={3}
+          limit={1}
           localeTag="en-GB"
           coverage={{
             order: "newest-first",
@@ -320,7 +395,7 @@ const IDENTITY_ROWS = [
 
 function IdentityArt({ featured }: { featured: boolean }) {
   return (
-    <ScaledArt scale={featured ? 0.95 : 0.86}>
+    <ScaledArt scale={featured ? 0.95 : 0.86} fit={featured ? FEATURED_ART : STANDARD_ART}>
       <IdentityProvider now={IDENTITY_NOW} disclosure="clinical" photos="deny">
         <IdentitySet>
           <div className="flex w-full max-w-[280px] flex-col gap-1">
@@ -445,7 +520,7 @@ const ACCORDION_KEYS = ["risk", "meds", "plan"] as const;
 function AccordionArt({ featured }: { featured: boolean }) {
   const open = useCycle(ACCORDION_KEYS, 2600);
   return (
-    <ScaledArt scale={featured ? 0.92 : 0.8}>
+    <ScaledArt scale={featured ? 0.92 : 0.8} fit={featured ? FEATURED_ART : STANDARD_ART}>
       <Accordion
         headingLevel={4}
         density="clinical"
@@ -487,7 +562,7 @@ const SECTION_KEYS = ["risk", "assessments", "audit"] as const;
 function ChartAccordionArt({ featured }: { featured: boolean }) {
   const open = useCycle(SECTION_KEYS, 2600);
   return (
-    <ScaledArt scale={featured ? 0.92 : 0.8}>
+    <ScaledArt scale={featured ? 0.92 : 0.8} fit={featured ? FEATURED_ART : STANDARD_ART}>
       <ChartAccordion
         toolbar={false}
         headingLevel={4}
@@ -510,7 +585,7 @@ function ChartAccordionArt({ featured }: { featured: boolean }) {
  */
 function SafetyPlanArt({ featured }: { featured: boolean }) {
   return (
-    <ScaledArt scale={featured ? 0.62 : 0.5}>
+    <ScaledArt scale={featured ? 0.62 : 0.5} fit={featured ? FEATURED_ART : STANDARD_ART}>
       <SafetyPlan
         headingLevel={4}
         density="clinical"
@@ -584,11 +659,12 @@ export function ComponentCard({
         <p className="numeric mt-2 text-xs text-oxygen-deep">{component.resource}</p>
       ) : null}
 
+      {/* Not `flex-1`. The summary used to absorb a stretched row's slack and
+          open a band of white between the prose and the art; the frame below
+          takes it now, which is where the design wanted it — the preview grows
+          and the component stays centred in it. */}
       <p
-        className={cn(
-          "mt-3 leading-relaxed text-graphite",
-          featured ? "body max-w-lg" : "flex-1 text-sm",
-        )}
+        className={cn("mt-3 leading-relaxed text-graphite", featured ? "body max-w-lg" : "text-sm")}
       >
         {component.summary}
       </p>
@@ -596,7 +672,14 @@ export function ComponentCard({
       {preview ? (
         <div
           data-ox-density="standard"
-          className="component-preview-frame relative mt-5 flex flex-1 items-center justify-center overflow-hidden rounded-xl p-3"
+          // `flex-[1_0_auto]`, not `flex-1`. `flex-1` is `1 1 0%`: the frame
+          // contributes nothing to the card's intrinsic height and shrinks
+          // freely — and `overflow-hidden` zeroes the automatic minimum size
+          // that would otherwise stop it, so the frame silently squeezed below
+          // the art band and cut the top line off the densest previews. It
+          // still takes whatever slack a stretched row hands it; it just
+          // cannot give back what the band needs.
+          className="component-preview-frame relative mt-5 flex flex-[1_0_auto] items-center justify-center overflow-hidden rounded-xl p-3"
         >
           {/* Decorative inside the card. aria-hidden alone is a violation here:
               the panel contains a focusable scroll region, and hiding a
@@ -605,13 +688,13 @@ export function ComponentCard({
           <div
             inert
             aria-hidden="true"
-            className={cn(
-              // Raised from 120/92. The art was sized to the old floor and read
-              // as a stamp in the middle of a large empty frame — a rhythm strip
-              // at 68px in a 330px-wide cell is a hairline, not a component.
-              "pointer-events-none flex w-full items-center justify-center",
-              featured ? "min-h-[184px]" : "min-h-[148px]",
-            )}
+            // A fixed band, not a floor. These were `min-h` and nothing set the
+            // ceiling, so a preview taller than the band simply made its card
+            // taller — and the card set its row, and the row set the grid. The
+            // band is what makes a catalog scannable: sixteen previews read as
+            // one set of components only if they are drawn at one size.
+            style={{ height: featured ? FEATURED_ART : STANDARD_ART }}
+            className="pointer-events-none flex w-full items-center justify-center"
           >
             {preview(featured)}
           </div>
