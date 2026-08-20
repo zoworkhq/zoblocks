@@ -94,6 +94,33 @@ async function tabTo(page: Page, target: ReturnType<Page["locator"]>, limit = 40
   throw new Error(`never reached ${await target.textContent()} with ${limit} Tab presses`);
 }
 
+/**
+ * Press an arrow until focus lands, rather than once and hope.
+ *
+ * antd's tablist uses manual activation, so an arrow moves focus along it — and
+ * a synthetic key press can be dropped when Firefox is contending with six
+ * other workers. The existing mitigation in this file waits for focus before
+ * `Enter` for exactly that reason; the arrow that precedes it had the same gap
+ * and failed roughly one full run in ten.
+ *
+ * This keeps the claim intact — focus must reach the target *by arrow key* —
+ * while tolerating a lost event. A product that stopped responding to arrows
+ * still fails, because no number of presses would move focus.
+ */
+async function arrowTo(
+  page: Page,
+  key: "ArrowRight" | "ArrowLeft",
+  target: ReturnType<Page["locator"]>,
+  limit = 5,
+) {
+  for (let i = 0; i < limit; i++) {
+    await page.keyboard.press(key);
+    if (await target.evaluate((el) => el === document.activeElement).catch(() => false)) return;
+    await page.waitForTimeout(50);
+  }
+  throw new Error(`focus never reached ${await target.textContent()} with ${limit} ${key} presses`);
+}
+
 test.describe("the live demo", () => {
   test("@framework mounts with its real dependency", async ({ page }) => {
     const failures: string[] = [];
@@ -242,13 +269,15 @@ test.describe("accessibility in a real layout engine", () => {
      * position prefix, so these match on a substring rather than exactly.
      */
     await tabTo(page, dialog.getByRole("tab", { name: /Draw/ }));
-    await page.keyboard.press("ArrowRight");
 
     // Focus has to land before Enter can activate it. Sending both keys back
     // to back made this fail in Firefox roughly one run in six, because Enter
     // arrived while focus was still on Draw and re-selected the tab that was
-    // already selected.
+    // already selected. The arrow itself had the same gap — a dropped synthetic
+    // key left focus on Draw and the wait below then timed out — so it is now
+    // pressed until focus moves rather than once.
     const typeTab = dialog.getByRole("tab", { name: /Type/ });
+    await arrowTo(page, "ArrowRight", typeTab);
     await expect(typeTab).toBeFocused();
     await page.keyboard.press("Enter");
     await expect(typeTab).toHaveAttribute("aria-selected", "true");
