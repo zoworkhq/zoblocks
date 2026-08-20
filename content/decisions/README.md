@@ -24,6 +24,7 @@ Format: **Context** (the forces, stated honestly) → **Decision** (what we do)
 | [0012](0012-token-surface-is-a-contract.md)                  | The component token surface is a public contract                                 | accepted |
 | [0013](0013-open-questions-for-product.md)                   | Four questions the engineering work cannot answer                                | proposed |
 | [0014](0014-customer-themes-may-override-two-more-tiers.md)  | A customer theme may override semantic and component tokens, never clinical ones | accepted |
+| [0015](0015-the-direction-of-truth-for-design-tool-sync.md)  | The direction of truth for design-tool sync                                      | proposed |
 
 See [ARCHITECTURE.md](../../ARCHITECTURE.md) for how these fit together.
 

@@ -1,0 +1,32 @@
+{
+  "name": "@oxygenui-design/figma-core",
+  "version": "0.1.0",
+  "type": "module",
+  "private": false,
+  "description": "Oxygen themes as Figma variable plans. Pure — no figma.*, no DOM, no network.",
+  "exports": {
+    ".": "./src/index.ts",
+    "./package.json": "./package.json"
+  },
+  "publishConfig": {
+    "exports": {
+      ".": "./dist/index.js",
+      "./package.json": "./package.json"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json && node ../tokens/scripts/fix-esm-extensions.mjs",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage"
+  },
+  "dependencies": {
+    "@oxygenui-design/tokens": "workspace:*"
+  },
+  "devDependencies": {
+    "@oxygenui-design/tsconfig": "workspace:*",
+    "@vitest/coverage-v8": "^4.1.10",
+    "typescript": "^5.7.2",
+    "vitest": "^4.1.10"
+  }
+}
