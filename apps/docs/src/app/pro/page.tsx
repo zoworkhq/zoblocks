@@ -68,9 +68,10 @@ export default function ProPage() {
                 className="mt-8 max-w-2xl rounded-xl border border-rule bg-paper-sunk px-4 py-3 text-sm leading-relaxed text-graphite"
                 data-reveal
               >
-                <strong className="text-ink">Pre-launch.</strong> The catalog is eight components
-                and the first starter kit is still in build. The waitlist is free and nothing is
-                charged until a kit actually ships.
+                <strong className="text-ink">The kits are pre-launch.</strong> The catalog is eight
+                components and the first starter kit is still in build, so nothing bills for a kit
+                until one ships. The marketplace is not pre-launch — those packs exist, and buying
+                one charges you today.
               </p>
             </div>
 
@@ -195,7 +196,10 @@ export default function ProPage() {
               decision. Free and Enterprise are the two real ends of this
               ladder — one is where everyone starts, one is where the revenue
               is — so they anchor, and the paid middle sits between them at
-              standard weight with Pro carried on border, not scale.
+              standard weight, with the marketplace carried on border rather
+              than on scale. It is the only one of the four somebody can buy
+              from without talking to us, which is the whole reason it is
+              marked at all.
             */}
             <div className="mt-12 grid gap-4 md:grid-cols-2 lg:grid-cols-12">
               {TIERS.map((tier, index) => {

@@ -1,11 +1,12 @@
 /**
  * Commercial offerings and showcase entries.
  *
- * Pricing here mirrors the figures in the strategy report. It is deliberately
- * kept in one place because it is still an open business decision — the
- * volume-priced individual tier is anchored on a comparable with a far larger
- * addressable market, and the weight may need to shift toward team, enterprise,
- * and services.
+ * Kept in one place because it moves. The volume-priced individual tier that
+ * used to sit here was anchored on a comparable with a far larger addressable
+ * market, which is the reservation this comment carried for months before
+ * anything was done about it — it has now been retired in favour of the
+ * marketplace, where the unit is a pack rather than a promise, and the weight
+ * sits on team, enterprise and services.
  */
 
 export interface Template {
@@ -18,7 +19,6 @@ export interface Template {
   /** Registry items the kit composes. */
   uses: string[];
   status: "available" | "building" | "planned";
-  tier: "pro" | "team";
 }
 
 export const TEMPLATES: Template[] = [
@@ -45,7 +45,6 @@ export const TEMPLATES: Template[] = [
       "coverage-card",
     ],
     status: "building",
-    tier: "pro",
   },
   {
     slug: "provider-workspace",
@@ -56,7 +55,6 @@ export const TEMPLATES: Template[] = [
     screens: ["Today", "Patient list", "Chart summary", "Results inbox", "Orders", "Handoff"],
     uses: ["patient-banner", "vitals-panel", "condition-list", "allergy-list", "medication-card"],
     status: "building",
-    tier: "pro",
   },
   {
     slug: "clinic-operations",
@@ -67,7 +65,6 @@ export const TEMPLATES: Template[] = [
     screens: ["Command centre", "Schedule", "Queues", "Referrals", "Roster", "Reports"],
     uses: ["appointment-card", "coverage-card", "patient-banner", "status-badge"],
     status: "planned",
-    tier: "pro",
   },
   {
     slug: "telehealth",
@@ -78,7 +75,6 @@ export const TEMPLATES: Template[] = [
     screens: ["Check-in", "Device test", "Waiting room", "Consent", "In call", "Follow-up"],
     uses: ["appointment-card", "patient-banner", "condition-list"],
     status: "planned",
-    tier: "pro",
   },
   {
     slug: "health-tech-saas",
@@ -89,7 +85,6 @@ export const TEMPLATES: Template[] = [
     screens: ["Marketing", "Dashboard", "Organisation", "Members", "Audit log", "API keys"],
     uses: ["status-badge", "patient-banner", "vitals-panel"],
     status: "planned",
-    tier: "team",
   },
   {
     slug: "medication-reconciliation",
@@ -100,7 +95,6 @@ export const TEMPLATES: Template[] = [
     screens: ["Compare", "Resolve", "Allergies", "Sign-off", "History"],
     uses: ["medication-card", "allergy-list", "patient-banner", "status-badge"],
     status: "planned",
-    tier: "team",
   },
 ];
 
@@ -142,31 +136,45 @@ export const TIERS: Tier[] = [
     href: "/components",
   },
   {
-    name: "Pro",
-    price: "$199",
-    cadence: "one-time",
-    summary: "Workflow blocks and starter kits for one developer.",
+    /*
+     * This slot used to be "Pro, $199 one-time", and retiring it is the point
+     * of this table's current shape.
+     *
+     * That price was anchored on a comparable — a general-purpose React
+     * component library — whose addressable market is two orders of magnitude
+     * larger than healthcare-FHIR frontend work. The note at the top of this
+     * file said as much from the day it was written, and the tier never left a
+     * waitlist, so nobody has paid it and nothing has to be refunded.
+     *
+     * What replaces it is the thing that can actually be bought today: packs,
+     * priced individually, delivered by the console. A tier that bundles work
+     * still in build is a promise; a pack is a file.
+     */
+    name: "Marketplace",
+    price: "From $120",
+    cadence: "per pack",
+    summary: "Icon sets, illustration systems, theme packs and components — bought one at a time.",
     features: [
       "Everything in Core",
-      "Premium workflow blocks",
-      "Starter kits as they ship",
-      "Figma library",
-      "12 months of updates",
-      "Unlimited personal and client projects",
+      "Licensed to the whole organisation",
+      "Perpetual — it does not expire",
+      "Every item states what was checked",
+      "Installs into a theme draft",
+      "Components install with the shadcn CLI",
     ],
-    cta: "Join the waitlist",
-    href: "#waitlist",
+    cta: "Browse the marketplace",
+    href: "/marketplace",
     featured: true,
-    note: "Pre-launch. Nothing is charged until the first kit ships.",
+    note: "Bought in the console, because a purchase belongs to an organisation rather than a person.",
   },
   {
     name: "Team",
     price: "$799",
     cadence: "per year",
-    summary: "Five seats, shared design assets, and priority support.",
+    summary: "Starter kits, shared design assets, and priority support.",
     features: [
-      "Everything in Pro",
-      "5 seats, add more anytime",
+      "Everything in Core and the marketplace",
+      "Starter kits as they ship",
       "Shared Figma library",
       "Design token export",
       "Priority support",
@@ -194,17 +202,8 @@ export const TIERS: Tier[] = [
 
 export const FAQ: Array<{ q: string; a: string }> = [
   {
-    /*
-     * Asked here because a reader who sees both pages will ask it, and the
-     * honest answer is not "they are the same thing at two prices".
-     *
-     * The overlap between a $199 bundle and a $290 pack is real and unresolved
-     * — see the note at the top of this file. What this answer must not do is
-     * invent an inclusion promise nobody has made, so it states the two
-     * properties that are actually true and leaves the choice with the reader.
-     */
     q: "How does the marketplace relate to these tiers?",
-    a: "The marketplace sells one thing at a time — an icon set, an empty-state system, a theme pack, a component — licensed to your whole organisation and perpetual. These tiers bundle work that is still being built. If you need a specific pack today, buy that one; if you want the starter kits as they land, the tiers are the way in. Nothing bought in the marketplace stops working when a subscription does.",
+    a: "The marketplace is the paid tier that exists today. You buy one thing — an icon set, an empty-state system, a theme pack, a component — licensed to your whole organisation and perpetual, and it does not stop working when anything lapses. Team and Enterprise add the starter kits, the shared design assets and the support around them. There used to be a $199 bundle in between; it was priced against a far larger market than this one and never left its waitlist, so it is gone rather than quietly still on the page.",
   },
   {
     q: "Is any of this a compliance boundary?",
@@ -231,8 +230,8 @@ export const FAQ: Array<{ q: string; a: string }> = [
     a: "React 19 with Tailwind CSS v4 today, verified against Next.js App Router. The output is plain React with no framework-specific APIs, so Vite and Remix work; we simply have not added them to the tested matrix yet.",
   },
   {
-    q: "Why is the pricing marked pre-launch?",
-    a: "Because it is. The catalog is 8 components and the first starter kit is still in build. Charging before a kit ships would be charging for a promise, so the waitlist is free and nothing bills until there is something to bill for.",
+    q: "Is any of this actually buyable yet?",
+    a: "The marketplace is. Those packs exist, they are delivered by the console, and buying one charges you today. The starter kits are not — the first is still in build, and charging before a kit ships would be charging for a promise, so that half stays a free waitlist until there is something to bill for.",
   },
 ];
 

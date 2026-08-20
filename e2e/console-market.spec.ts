@@ -53,13 +53,8 @@ async function grant(page: Page, slug: string, reason = "E2E-2026-01") {
    * Making the helper idempotent matches what it models: granting something an
    * organisation already owns is a no-op in the product too.
    */
-  if (
-    await page
-      .getByText("Owned", { exact: true })
-      .isVisible()
-      .catch(() => false)
-  )
-    return;
+  const owned = page.getByText("Owned", { exact: true });
+  if (await owned.isVisible().catch(() => false)) return;
 
   await page.getByRole("group").filter({ hasText: "Granted with a contract" }).click();
   await page.getByLabel("Reason", { exact: true }).fill(reason);
