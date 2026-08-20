@@ -44,6 +44,16 @@ function run(command, args) {
 
 await run("pnpm", ["exec", "tsx", "scripts/seed-dev.mjs"]);
 
+/*
+ * The catalogue as well, and it is not optional decoration.
+ *
+ * Without it every marketplace screen renders its empty state — which passes an
+ * accessibility sweep and a "does it 404" check while covering none of the
+ * things those screens are actually made of: the card grid, the evidence
+ * panel, the licence, the install controls.
+ */
+await run("pnpm", ["exec", "tsx", "scripts/seed-market.mjs"]);
+
 const server = spawn("pnpm", ["exec", "next", "start", "--port", "6003"], {
   cwd: app,
   env,

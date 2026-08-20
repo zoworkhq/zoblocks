@@ -37,6 +37,12 @@ const THEME = "northwind-clinical";
  * failing, but by passing over less of it each release. `/reset` is included
  * with a token that cannot resolve, because the refusal screen is the one a
  * stranger with a stale link actually sees.
+ *
+ * The four marketplace screens are here for the same reason, added with them
+ * rather than after them. `/market/empty-state-system` stands for the item
+ * page, which is the densest of the four: an evidence list where every state
+ * has to carry a word beside its colour, and a licence somebody has to be able
+ * to read before they spend money.
  */
 const PAGES = [
   "/login",
@@ -50,6 +56,10 @@ const PAGES = [
   "/members",
   "/settings",
   "/playground",
+  "/market",
+  "/market/empty-state-system",
+  "/market/purchases",
+  "/market/tokens",
   `/themes/${THEME}`,
   `/themes/${THEME}/brand`,
   `/themes/${THEME}/tokens`,
