@@ -15,7 +15,8 @@
     "db:seed": "tsx scripts/seed-dev.mjs",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
-    "e2e:server": "tsx scripts/e2e-server.mjs"
+    "e2e:server": "tsx scripts/e2e-server.mjs",
+    "db:seed:market": "tsx scripts/seed-market.mjs"
   },
   "dependencies": {
     "@oxygenui-design/bridge-antd": "workspace:*",

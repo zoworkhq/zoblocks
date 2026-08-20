@@ -3,7 +3,18 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Blocks, LayoutGrid, Menu, Users, Palette, PlayCircle, Settings } from "lucide-react";
+import {
+  Blocks,
+  KeyRound,
+  LayoutGrid,
+  Menu,
+  Receipt,
+  ShoppingBag,
+  Users,
+  Palette,
+  PlayCircle,
+  Settings,
+} from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { themeScreenHref, themeScreens } from "@/lib/theme-screens";
 import { cn } from "@/lib/utils";
@@ -61,6 +72,18 @@ export interface RailProps {
   /** Frameworks enabled for this organisation, for the count beside the item. */
   frameworkCount: number;
   memberCount: number;
+  /** Live entitlements, for the count beside Purchases. */
+  purchaseCount: number;
+  /**
+   * Whether this member may mint a CLI token.
+   *
+   * Passed rather than derived from a role here, because the rail is a client
+   * component and the capability table is the server's answer. A route that
+   * would refuse the reader is worse than an absent one — the whole reason
+   * this rail was rewritten is that it linked to `/frameworks` before that
+   * page existed.
+   */
+  canMintTokens: boolean;
 }
 
 interface Item {
@@ -71,7 +94,13 @@ interface Item {
   count?: number;
 }
 
-export function Rail({ themes, frameworkCount, memberCount }: RailProps) {
+export function Rail({
+  themes,
+  frameworkCount,
+  memberCount,
+  purchaseCount,
+  canMintTokens,
+}: RailProps) {
   const pathname = usePathname();
 
   /*
@@ -177,6 +206,22 @@ export function Rail({ themes, frameworkCount, memberCount }: RailProps) {
   // item in this group the shared table does not own.
   const playground: Item = { href: "/playground", label: "Playground", Icon: PlayCircle };
   const tools: Item[] = [playground, ...forTheme("tools")];
+
+  /*
+   * Three items rather than one, because they have three audiences.
+   *
+   * Catalogue is where an admin spends money, Purchases is where the whole
+   * organisation sees what it owns and what it paid, and Access tokens is
+   * where a developer mints the credential the CLI needs. Folding them into a
+   * single "Marketplace" destination would make two of the three a tab nobody
+   * finds — and the token screen in particular is looked for by somebody who
+   * has never opened the catalogue.
+   */
+  const marketplace: Item[] = [
+    { href: "/market", label: "Catalogue", Icon: ShoppingBag },
+    { href: "/market/purchases", label: "Purchases", Icon: Receipt, count: purchaseCount },
+    ...(canMintTokens ? [{ href: "/market/tokens", label: "Access tokens", Icon: KeyRound }] : []),
+  ];
 
   const organisation: Item[] = [
     { href: "/frameworks", label: "Frameworks", Icon: Blocks, count: frameworkCount },
@@ -284,6 +329,8 @@ export function Rail({ themes, frameworkCount, memberCount }: RailProps) {
           </Group>
 
           {tools.length > 0 && <Group label="Tools" items={tools} pathname={pathname} />}
+
+          <Group label="Marketplace" items={marketplace} pathname={pathname} />
 
           <Group label="Organisation" items={organisation} pathname={pathname} />
         </nav>

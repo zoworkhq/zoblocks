@@ -22,7 +22,11 @@ export type Capability =
   | "theme.archive"
   | "theme.export"
   | "member.manage"
-  | "org.configure";
+  | "org.configure"
+  | "market.browse"
+  | "market.purchase"
+  | "market.install"
+  | "market.token";
 
 const GRANTS: Record<MemberRole, readonly Capability[]> = {
   admin: [
@@ -34,11 +38,55 @@ const GRANTS: Record<MemberRole, readonly Capability[]> = {
     "theme.export",
     "member.manage",
     "org.configure",
+    "market.browse",
+    "market.purchase",
+    "market.install",
+    "market.token",
   ],
-  designer: ["theme.read", "theme.write", "theme.export"],
-  developer: ["theme.read", "theme.export"],
-  viewer: ["theme.read"],
+  designer: [
+    "theme.read",
+    "theme.write",
+    "theme.export",
+    "market.browse",
+    "market.install",
+    "market.token",
+  ],
+  developer: ["theme.read", "theme.export", "market.browse", "market.token"],
+  viewer: ["theme.read", "market.browse"],
 };
+
+/**
+ * Why the marketplace grants split the way they do.
+ *
+ * **`market.purchase` is admin-only, and it is the same argument as
+ * `theme.publish`.** Publishing is separated from editing because it reaches a
+ * customer's production application — the action whose consequences land
+ * outside the console gets the narrower grant. Spending the organisation's
+ * money is that action with a currency symbol on it. A designer asks; an admin
+ * answers by buying, which is a one-click approval rather than a workflow.
+ *
+ * **`market.install` follows `theme.write`**, because installing a pack edits
+ * a theme draft and nothing more. It cannot publish, so a purchase is never a
+ * back door around the designer/admin split.
+ *
+ * **`market.token` starts at developer**, who needs a CLI credential every time
+ * they set up a machine and should not have to book an admin for it. That is
+ * only safe because a token is labelled, expiring, revocable and audited —
+ * without those four it would be a permanent bearer credential handed to the
+ * role with the least reason to think about credentials.
+ *
+ * A designer holds it too, and not because a designer wants one: **this table
+ * nests**, and `test/roles.test.ts` asserts it. Every capability a junior role
+ * has, the senior role has as well. A first draft gave `market.token` to
+ * developers and withheld it from designers on the reasoning that a designer
+ * has no CLI — which reads sensibly and quietly makes the grants a lattice
+ * rather than a ladder, so "more senior" stops meaning "can do more". The
+ * invariant is worth more than the distinction.
+ *
+ * **`market.browse` is universal.** Seeing the shelf costs nothing and a
+ * viewer who spots a pack tells the admin, which is the only marketing channel
+ * inside the product.
+ */
 
 /**
  * One sentence per role, in the words a member reads.
@@ -92,6 +140,19 @@ export function whyNot(role: MemberRole, capability: Capability): string | undef
     holders.length === 1
       ? `an ${holders[0]}`
       : `${holders.slice(0, -1).join(", ")} or ${holders.at(-1)}`;
+
+  /*
+   * A separate sentence for the marketplace, and the theme wording left alone.
+   *
+   * "Your role can edit and preview themes. This needs an admin." is right in
+   * front of a publish button and a non-sequitur in front of a Buy button —
+   * but rewriting it for both would change a message that is deliberate where
+   * it already appears. So the marketplace gets its own clause and the
+   * existing one is untouched.
+   */
+  if (capability.startsWith("market.")) {
+    return `Your role cannot do this in the marketplace. It needs ${list}.`;
+  }
 
   return `Your role can ${capabilitiesFor(role).includes("theme.write") ? "edit and preview themes" : "view themes"}. This needs ${list}.`;
 }

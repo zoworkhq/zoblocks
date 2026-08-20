@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { ObjectId } from "mongodb";
 import { z } from "zod";
@@ -27,6 +28,12 @@ import { removeBrandAsset, uploadBrandAsset } from "./brand-assets";
 import { MAX_ICON_BYTES, removeIcon, uploadIcons } from "./icons";
 import { MemberError, approveMember, changeRole, setMemberStatus } from "./members";
 import { OrganisationError, setFrameworks, updateOrganisation } from "./organisation";
+import { MarketError } from "./market/entitlements";
+import { createCheckout } from "./market/checkout";
+import { install } from "./market/install";
+import { grant } from "./market/entitlements";
+import { itemBySlug } from "./market/catalogue";
+import { mintToken, revokeToken } from "./market/tokens";
 import {
   ThemeError,
   applyImport,
@@ -73,6 +80,9 @@ async function run(fn: () => Promise<void | string>): Promise<ActionResult> {
       return { ok: false, message: error.message, problems: error.problems };
     }
     if (error instanceof MemberError) {
+      return { ok: false, message: error.message, problems: error.problems };
+    }
+    if (error instanceof MarketError) {
       return { ok: false, message: error.message, problems: error.problems };
     }
     if (error instanceof Error && error.name.startsWith("Not")) {
@@ -825,4 +835,133 @@ export async function removeIconAction(form: FormData): Promise<ActionResult> {
 export async function signOutAction(): Promise<void> {
   await destroySession();
   redirect("/login");
+}
+
+/* ==========================================================================
+ * Marketplace
+ * ======================================================================== */
+
+/**
+ * The origin this request arrived on, for Stripe's return URLs.
+ *
+ * Taken from the request rather than from configuration, for the reason the
+ * theme manifest route already gives: a console reachable on a vanity domain
+ * and on the hostname the platform assigns must not send a customer back to
+ * the other one, and the caller has already proved which one resolves for them
+ * by reaching this line.
+ */
+async function requestOrigin(): Promise<string> {
+  const h = await headers();
+  const host = h.get("x-forwarded-host") ?? h.get("host") ?? "localhost:6003";
+  const proto = h.get("x-forwarded-proto") ?? (host.startsWith("localhost") ? "http" : "https");
+  return `${proto}://${host}`;
+}
+
+/**
+ * Start a purchase.
+ *
+ * The only thing this accepts from the browser is a catalogue slug. Price,
+ * currency and the Stripe Price id are read from `catalogItems` inside
+ * `createCheckout` — an action that took a price would sell a $450 component
+ * for whatever the form said, with a valid receipt to show for it.
+ */
+export async function buyAction(form: FormData): Promise<ActionResult> {
+  const slug = String(form.get("slug") ?? "");
+
+  let url: string | undefined;
+  const result = await run(async () => {
+    const auth = await authorize("market.purchase");
+    ({ url } = await createCheckout(auth, slug, await requestOrigin()));
+  });
+
+  // Outside `run`, because `redirect` works by throwing and the catch above
+  // would treat Next's control flow as a failed action.
+  if (result.ok && url) redirect(url);
+  return result;
+}
+
+export async function installAction(form: FormData): Promise<ActionResult> {
+  const slug = String(form.get("slug") ?? "");
+  const themeId = String(form.get("themeId") ?? "");
+
+  return run(async () => {
+    const auth = await authorize("market.install");
+    const { message } = await install(
+      auth,
+      slug,
+      ObjectId.isValid(themeId) ? new ObjectId(themeId) : undefined,
+    );
+    revalidatePath("/market");
+    revalidatePath("/themes");
+    return message;
+  });
+}
+
+/**
+ * Grant an item without a payment.
+ *
+ * The fourth way money arrives, and the reason the entitlement model exists
+ * separately from Stripe: a pack included in an engagement is delivered by the
+ * same machinery as a card purchase, with a reason and an actor on the record
+ * rather than an email and a zip file.
+ */
+export async function grantAction(form: FormData): Promise<ActionResult> {
+  const slug = String(form.get("slug") ?? "");
+  const reason = String(form.get("reason") ?? "").trim();
+
+  return run(async () => {
+    const auth = await authorize("market.purchase");
+    if (!reason)
+      throw new MarketError("Say why this is being granted.", [
+        "It goes on the entitlement and into the audit trail, and it is what a later reader has to work from.",
+      ]);
+
+    const item = await itemBySlug(slug);
+    await grant(auth.member.orgId, item._id, {
+      via: `contract:${reason}`,
+      by: new ObjectId(auth.member.id),
+      versionLine: item.liveVersion,
+    });
+
+    await auth.data.audit.insertOne({
+      _id: new ObjectId(),
+      actorId: new ObjectId(auth.member.id),
+      action: "market.granted",
+      subject: item.slug,
+      detail: reason,
+      at: new Date(),
+    });
+
+    revalidatePath("/market");
+    return `${item.title} is now available to this organisation.`;
+  });
+}
+
+/**
+ * Mint a CLI token.
+ *
+ * The value is returned in the result message because this is the only moment
+ * it exists outside the customer's machine — the database holds its SHA-256
+ * and nothing else, so there is no screen that can ever show it again.
+ */
+export async function mintTokenAction(form: FormData): Promise<ActionResult> {
+  const label = String(form.get("label") ?? "");
+
+  return run(async () => {
+    const auth = await authorize("market.token");
+    const { token, expiresAt } = await mintToken(auth, label);
+    revalidatePath("/market/tokens");
+    return `${token} — copy it now. It expires ${expiresAt.toISOString().slice(0, 10)} and cannot be shown again.`;
+  });
+}
+
+export async function revokeTokenAction(form: FormData): Promise<ActionResult> {
+  const hash = String(form.get("hash") ?? "");
+
+  return run(async () => {
+    const auth = await authorize("market.token");
+    await revokeToken(auth, hash);
+    revalidatePath("/market/tokens");
+    return "Revoked. Any machine using it will stop installing on its next request.";
+  });
 }

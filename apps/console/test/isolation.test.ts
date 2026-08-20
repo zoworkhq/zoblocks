@@ -280,3 +280,137 @@ describe("every accessor on the scoped view is scoped", () => {
     expect(northwind).toBeDefined();
   });
 });
+
+describe("the marketplace accessors are scoped too", () => {
+  /**
+   * The catalogue is global on purpose — every organisation sees the same
+   * shelf. Everything expressing *who paid* is not, and this is where that
+   * line is held.
+   *
+   * Driven accessor by accessor for the reason the block above gives: the
+   * guarantee is not "the ones we happened to call are scoped", it is that
+   * none of them can express an unscoped query. An accessor nobody called is
+   * exactly where an unscoped one would survive review.
+   */
+  it("covers orders, entitlements and registry tokens across two organisations", async () => {
+    const { northwind, asNorthwind, asSouthmere } = await twoOrgs();
+    const nw = await asNorthwind();
+    const sm = await asSouthmere();
+
+    const itemId = new ObjectId();
+
+    /* orders ------------------------------------------------------------ */
+    await nw.data.orders.findOneAndUpdate(
+      { _id: "cs_isolation" },
+      {
+        $setOnInsert: {
+          memberId: null,
+          items: ["a-pack"],
+          amountMinor: 1000,
+          currency: "usd",
+          status: "open" as const,
+          fulfilledAt: null,
+          createdAt: new Date(),
+        },
+      },
+      { upsert: true },
+    );
+
+    expect(await nw.data.orders.countDocuments()).toBe(1);
+    expect(await sm.data.orders.countDocuments()).toBe(0);
+    expect(await sm.data.orders.find().toArray()).toHaveLength(0);
+    // The id is known and correct, and it still returns nothing.
+    expect(await sm.data.orders.findOne({ _id: "cs_isolation" })).toBeNull();
+
+    const stolen = await sm.data.orders.updateOne(
+      { _id: "cs_isolation" },
+      { $set: { status: "refunded" as const } },
+    );
+    expect(stolen.matchedCount, "cannot refund another org's order").toBe(0);
+    expect((await nw.data.orders.findOne({}))?.status).toBe("open");
+
+    /*
+     * The upsert an outsider aims at somebody else's order id creates *their
+     * own* row rather than touching it — the scope lands on the insert, so the
+     * worst case is a stray document in the caller's own organisation.
+     */
+    await expect(
+      sm.data.orders.findOneAndUpdate(
+        { _id: "cs_isolation", fulfilledAt: null },
+        { $set: { status: "paid" as const } },
+        { upsert: true },
+      ),
+    ).rejects.toThrow();
+
+    /* entitlements ------------------------------------------------------ */
+    await nw.data.entitlements.insertOne({
+      _id: new ObjectId(),
+      itemId,
+      versionLine: 1,
+      grantedAt: new Date(),
+      grantedBy: null,
+      grantedVia: "cs_isolation",
+      revokedAt: null,
+      revokedReason: null,
+    });
+
+    expect(await nw.data.entitlements.countDocuments()).toBe(1);
+    expect(await sm.data.entitlements.countDocuments()).toBe(0);
+    expect(await sm.data.entitlements.findOne({ itemId })).toBeNull();
+    expect(await sm.data.entitlements.find().toArray()).toHaveLength(0);
+
+    const revoked = await sm.data.entitlements.updateOne(
+      { itemId },
+      { $set: { revokedAt: new Date() } },
+    );
+    expect(revoked.matchedCount, "cannot revoke another org's entitlement").toBe(0);
+    expect((await nw.data.entitlements.findOne({ itemId }))?.revokedAt).toBeNull();
+
+    // And the same item granted to both is two rows, not a shared one.
+    await sm.data.entitlements.updateOne(
+      { itemId },
+      {
+        $set: {
+          versionLine: 1,
+          grantedAt: new Date(),
+          grantedBy: null,
+          grantedVia: "cs_other",
+          revokedAt: null,
+          revokedReason: null,
+        },
+        $setOnInsert: { _id: new ObjectId(), itemId },
+      },
+      { upsert: true },
+    );
+    expect(await nw.data.entitlements.countDocuments()).toBe(1);
+    expect(await sm.data.entitlements.countDocuments()).toBe(1);
+
+    /* registry tokens --------------------------------------------------- */
+    await nw.data.registryTokens.insertOne({
+      _id: "a".repeat(64),
+      label: "Ada's laptop",
+      createdBy: new ObjectId(nw.member.id),
+      createdAt: new Date(),
+      lastUsedAt: null,
+      expiresAt: new Date(Date.now() + 60_000),
+      revokedAt: null,
+    });
+
+    expect(await nw.data.registryTokens.countDocuments()).toBe(1);
+    expect(await sm.data.registryTokens.countDocuments()).toBe(0);
+    expect(await sm.data.registryTokens.find().toArray()).toHaveLength(0);
+    // Knowing the digest is not enough — which is the whole point, because a
+    // digest is the one part of a token an attacker might obtain.
+    expect(await sm.data.registryTokens.findOne({ _id: "a".repeat(64) })).toBeNull();
+
+    const hijacked = await sm.data.registryTokens.updateOne(
+      { _id: "a".repeat(64) },
+      { $set: { revokedAt: null, lastUsedAt: new Date() } },
+    );
+    expect(hijacked.matchedCount, "cannot touch another org's token").toBe(0);
+
+    /* every insert carries the caller's own organisation ------------------ */
+    const raw = await scoped(northwind).entitlements.findOne({ itemId });
+    expect(raw?.orgId.toHexString()).toBe(northwind.toHexString());
+  });
+});

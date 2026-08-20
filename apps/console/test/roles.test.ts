@@ -40,7 +40,15 @@ describe("the grant table", () => {
   });
 
   it("gives a viewer nothing but reading", () => {
-    expect(capabilitiesFor("viewer")).toEqual(["theme.read"]);
+    /*
+     * `market.browse` joined this list when the marketplace shipped, and it
+     * belongs here rather than being an exception to the sentence above:
+     * browsing a catalogue *is* reading. Nothing behind it spends money,
+     * changes a theme or mints a credential — and a viewer who spots a pack
+     * and tells an admin is the only marketing channel that exists inside the
+     * product.
+     */
+    expect(capabilitiesFor("viewer")).toEqual(["theme.read", "market.browse"]);
   });
 
   it("reserves member and organisation management for an admin", () => {

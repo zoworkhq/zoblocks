@@ -31,8 +31,14 @@ import { MongoMemoryServer } from "mongodb-memory-server";
  * Pinning it means `.env.local` is written once and stays true. If something
  * else holds the port the failure is immediate and says so, which is a better
  * trade than a URL that looks right and fails at the far end of a request.
+ *
+ * `CONSOLE_DEV_DB_PORT` overrides it, for the one case the fixed port cannot
+ * serve: a second git worktree. Two checkouts of this repo both run
+ * `db:dev` and the second dies with "Port 59789 already in use" — correct, and
+ * unhelpful, because the answer is a different port rather than stopping the
+ * other one and losing its data.
  */
-const PORT = 59789;
+const PORT = Number(process.env.CONSOLE_DEV_DB_PORT || 59789);
 
 const server = await MongoMemoryServer.create({
   instance: { port: PORT, dbName: "oxygen_console" },

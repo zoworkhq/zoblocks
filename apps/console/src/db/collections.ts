@@ -188,7 +188,13 @@ export interface AuditDoc {
     | "org.frameworks-changed"
     | "org.renamed"
     | "theme.font-uploaded"
-    | "theme.logo-uploaded";
+    | "theme.logo-uploaded"
+    | "market.purchased"
+    | "market.granted"
+    | "market.installed"
+    | "market.revoked"
+    | "market.token-minted"
+    | "market.token-revoked";
   subject: string;
   detail?: string;
   at: Date;
@@ -230,6 +236,241 @@ export interface LoginAttemptDoc {
   createdAt: Date;
 }
 
+/* ==========================================================================
+ * Marketplace
+ *
+ * Five collections, and the first documents in this app that are deliberately
+ * **not** org-scoped. That needs saying loudly, because every scoping mistake
+ * in a multi-tenant database looks like an ordinary query in review.
+ *
+ * The split is: the *catalogue* is the same for every customer — one Empty
+ * State System, one price, one set of bytes — while everything expressing
+ * **who paid for what** carries `orgId` and goes through `scoped()` like the
+ * rest of the app. So `catalogItems`, `catalogVersions` and `marketAssets` are
+ * global and reached only through the `unscopedCatalog*` helpers in `scope.ts`,
+ * beside the sign-in and public-stylesheet exceptions; `orders`,
+ * `entitlements` and `registryTokens` are scoped and reached no differently
+ * from themes.
+ *
+ * Two conventions carried over from themes because they are the same problem:
+ *
+ *   - **Catalogue versions are immutable.** One document per publish, never
+ *     updated. An organisation is entitled to a *version line*, so "which
+ *     version did they buy and which have they installed" stays answerable
+ *     after we ship an update — and a refund argument is settled by reading a
+ *     row rather than by remembering.
+ *   - **Nothing referenced is deleted.** An entitlement is revoked, not
+ *     removed. A revoked row is the evidence that access was withdrawn and
+ *     when; a deleted one is indistinguishable from one that never existed.
+ * ======================================================================== */
+
+/** What a catalogue item is, which decides how it is delivered. */
+export type CatalogKind = "icons" | "illustration" | "theme" | "component" | "fixtures";
+
+/**
+ * What was checked, stored beside the thing it was checked on.
+ *
+ * The console already refuses to serve a theme version validated by an older
+ * validator, because tightening a rule must not leave older palettes live.
+ * This is the same idea pointed at purchased content: the item page renders
+ * *this* record rather than an adjective, so "accessible" is a fact a customer
+ * can hand to their own procurement rather than a word we chose.
+ *
+ * `doesNotClaim` is not defensive boilerplate. It is the difference between
+ * artwork and a medical claim, and it is the sentence a hospital's clinical
+ * safety officer reads first.
+ */
+export interface Provenance {
+  accessibility: {
+    checkedAt: Date;
+    /** Bumped when the check tightens, exactly like `validatorVersion`. */
+    checkerVersion: number;
+    contrastPairs: { passed: number; total: number; floor: string };
+    forcedColors: "verified" | "not-applicable";
+    /** How meaning survives when colour does not. */
+    nonColourChannel: string;
+  };
+  /** Absent for items with no clinical content at all — decorative artwork. */
+  clinical?: {
+    reviewedBy: string;
+    registration: string;
+    reviewedAt: Date;
+    scope: string;
+    doesNotClaim: readonly string[];
+  };
+  authorship: {
+    /** Disclosed rather than implied. Procurement asks, and being caught is worse than being boring. */
+    method: "hand-drawn" | "ai-assisted, human-finished" | "generated from tokens";
+    thirdPartyContent: readonly string[];
+  };
+  licence: {
+    id: string;
+    grant: string;
+    derivatives: string;
+    resale: string;
+  };
+  /** Which FHIR resources the item speaks about, if any. */
+  fhir?: { maps: readonly string[]; release: string };
+}
+
+/**
+ * One purchasable thing. Global — every organisation sees the same row.
+ *
+ * `priceMinor` and `stripePriceId` live here and **nowhere else** that a
+ * browser can reach. Checkout is created from a slug the client sends and a
+ * price this document holds, which is the whole defence against the standard
+ * marketplace defect: an endpoint that accepts `{ priceId }` sells a $450
+ * component for whatever the caller says it costs.
+ */
+export interface CatalogItemDoc {
+  _id: ObjectId;
+  /** In the URL, so immutable once listed. */
+  slug: string;
+  kind: CatalogKind;
+  title: string;
+  blurb: string;
+  /** Minor units. `null` for an item that is only ever granted by contract. */
+  priceMinor: number | null;
+  currency: string;
+  stripePriceId: string | null;
+  /** Highest published catalogue version. */
+  liveVersion: number;
+  /** `null` means framework-agnostic; otherwise the bridges it is drawn for. */
+  frameworks: FrameworkId[] | null;
+  provenance: Provenance;
+  /** `null` while unlisted — drafted, or withdrawn without being deleted. */
+  listedAt: Date | null;
+}
+
+/** A file inside a catalogue version. Bytes live once, in `marketAssets`. */
+export interface CatalogFile {
+  /** Path inside the pack, e.g. `icons/route-iv.svg`. */
+  path: string;
+  /** Lowercase hex SHA-256 — the `_id` of the bytes. */
+  sha256: string;
+  contentType: string;
+  size: number;
+  /**
+   * Which icon slot this file replaces, for `kind: "icons"`.
+   *
+   * Here rather than parsed out of the filename, because a filename is a
+   * label and a slot is a contract: renaming the file must not silently stop
+   * an install from filling a slot.
+   */
+  slot?: string;
+}
+
+/** Immutable. One document per publish, never updated after it is written. */
+export interface CatalogVersionDoc {
+  _id: ObjectId;
+  itemId: ObjectId;
+  version: number;
+  files: CatalogFile[];
+  /** For `kind: "theme"`, the token document imported on install. */
+  tokens?: ThemeTokensInput;
+  /** For `kind: "component"`, the registry item served to the shadcn CLI. */
+  registry?: Record<string, unknown>;
+  notes: string;
+  publishedAt: Date;
+}
+
+/**
+ * Purchased bytes, stored the way fonts are: content-addressed and global.
+ *
+ * Keyed by digest rather than by name, so shipping the same glyph in two packs
+ * stores it once and "are these the bytes we published" is answerable by
+ * recomputing rather than by trusting a path. Global rather than copied per
+ * organisation because the bytes are ours; what is per-organisation is the
+ * entitlement to fetch them.
+ */
+export interface MarketAssetDoc {
+  /** Lowercase hex SHA-256 of the bytes. */
+  _id: string;
+  bytes: Binary;
+  contentType: string;
+  size: number;
+  uploadedAt: Date;
+}
+
+/**
+ * One purchase attempt.
+ *
+ * `_id` is the Stripe Checkout Session id, and that is the idempotency
+ * mechanism rather than a convenience: fulfilment can be called twice — once
+ * by the webhook, once by the customer landing on the success page, possibly
+ * at the same moment — and the unique key is what makes the second call a
+ * no-op instead of a second entitlement. It is the same reasoning that keys a
+ * font by its digest and claims the first admin with one atomic write.
+ */
+export interface OrderDoc {
+  _id: string;
+  orgId: ObjectId;
+  /** `null` when the order was reconstructed by a webhook after a session expired. */
+  memberId: ObjectId | null;
+  /** Catalogue slugs, as resolved server-side when checkout was created. */
+  items: string[];
+  amountMinor: number | null;
+  currency: string | null;
+  status: "open" | "paid" | "refunded" | "expired";
+  /** Set exactly once, by whichever caller wins the claim. */
+  fulfilledAt: Date | null;
+  createdAt: Date;
+  refundedAt?: Date;
+  /**
+   * Set at fulfilment, so a refund can find its way back here.
+   *
+   * `charge.refunded` arrives with a charge and no session, and the webhook has
+   * no organisation to scope by until something tells it one. The charge
+   * carries the metadata we put on the PaymentIntent, which is what actually
+   * resolves the org — this field is the second, checkable route to the same
+   * answer rather than the only one.
+   */
+  paymentIntent?: string;
+}
+
+/**
+ * What an organisation may fetch, and why.
+ *
+ * Attached to the organisation, never to the member who bought it: a designer
+ * who leaves does not take the icon pack with them, and the receipt does not
+ * live in one person's inbox.
+ */
+export interface EntitlementDoc {
+  _id: ObjectId;
+  orgId: ObjectId;
+  itemId: ObjectId;
+  /** The version line bought into. Updates inside the line are included. */
+  versionLine: number;
+  grantedAt: Date;
+  /** `null` when a webhook granted it — there is no member on that request. */
+  grantedBy: ObjectId | null;
+  /** An order `_id`, or `contract:<reason>` for a bundle inside an engagement. */
+  grantedVia: string;
+  revokedAt: Date | null;
+  revokedReason: string | null;
+}
+
+/**
+ * A credential the shadcn CLI sends to install a paid component.
+ *
+ * Only the SHA-256 is stored — the token itself is shown once at mint time and
+ * never again — so a dump of this collection yields nothing usable. Exactly
+ * the reasoning behind `sessions` and `password_resets`, and for the same
+ * reason: the thing being protected is reachable by anyone holding the string.
+ */
+export interface RegistryTokenDoc {
+  /** SHA-256 of the token value. */
+  _id: string;
+  orgId: ObjectId;
+  label: string;
+  createdBy: ObjectId;
+  createdAt: Date;
+  lastUsedAt: Date | null;
+  /** TTL, so an abandoned token expires without anybody remembering to revoke it. */
+  expiresAt: Date;
+  revokedAt: Date | null;
+}
+
 export interface Collections {
   organisations: Collection<OrganisationDoc>;
   members: Collection<MemberDoc>;
@@ -240,6 +481,12 @@ export interface Collections {
   sessions: Collection<SessionDoc>;
   passwordResets: Collection<PasswordResetDoc>;
   loginAttempts: Collection<LoginAttemptDoc>;
+  catalogItems: Collection<CatalogItemDoc>;
+  catalogVersions: Collection<CatalogVersionDoc>;
+  marketAssets: Collection<MarketAssetDoc>;
+  orders: Collection<OrderDoc>;
+  entitlements: Collection<EntitlementDoc>;
+  registryTokens: Collection<RegistryTokenDoc>;
 }
 
 export function collections(db: Db): Collections {
@@ -253,6 +500,12 @@ export function collections(db: Db): Collections {
     sessions: db.collection<SessionDoc>("sessions"),
     passwordResets: db.collection<PasswordResetDoc>("password_resets"),
     loginAttempts: db.collection<LoginAttemptDoc>("login_attempts"),
+    catalogItems: db.collection<CatalogItemDoc>("catalog_items"),
+    catalogVersions: db.collection<CatalogVersionDoc>("catalog_versions"),
+    marketAssets: db.collection<MarketAssetDoc>("market_assets"),
+    orders: db.collection<OrderDoc>("orders"),
+    entitlements: db.collection<EntitlementDoc>("entitlements"),
+    registryTokens: db.collection<RegistryTokenDoc>("registry_tokens"),
   };
 }
 
@@ -290,4 +543,26 @@ export async function ensureIndexes(db: Db): Promise<void> {
   await c.passwordResets.createIndex({ expiresAt: 1 }, { expireAfterSeconds: 0 });
   await c.loginAttempts.createIndex({ key: 1, createdAt: -1 });
   await c.loginAttempts.createIndex({ createdAt: 1 }, { expireAfterSeconds: 3600 });
+
+  /* Marketplace -------------------------------------------------------- */
+
+  // Global, not per organisation: the catalogue is the same for everybody, so
+  // the slug in `/market/empty-state-system` means one item worldwide.
+  await c.catalogItems.createIndex({ slug: 1 }, { unique: true });
+  await c.catalogItems.createIndex({ listedAt: -1 });
+
+  // The uniqueness that makes a double publish impossible rather than unlikely
+  // — the same index `themeVersions` carries, for the same reason.
+  await c.catalogVersions.createIndex({ itemId: 1, version: -1 }, { unique: true });
+
+  await c.orders.createIndex({ orgId: 1, createdAt: -1 });
+
+  // One live entitlement per organisation per item. Without this, a webhook
+  // delivered twice in a way the claim did not catch leaves two rows, and
+  // revoking one of them silently leaves access in place.
+  await c.entitlements.createIndex({ orgId: 1, itemId: 1 }, { unique: true });
+  await c.entitlements.createIndex({ orgId: 1, grantedAt: -1 });
+
+  await c.registryTokens.createIndex({ orgId: 1, createdAt: -1 });
+  await c.registryTokens.createIndex({ expiresAt: 1 }, { expireAfterSeconds: 0 });
 }

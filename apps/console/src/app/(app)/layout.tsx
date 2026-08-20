@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { currentMember } from "@/lib/auth";
 import { scoped } from "@/db/scope";
+import { can } from "@/lib/roles";
 import { Rail } from "@/components/Rail";
 import { AccountMenu } from "@/components/AccountMenu";
 import { ToastProvider } from "@/components/ui";
@@ -29,6 +30,11 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   const org = await data.organisation.get();
 
   const memberCount = await data.members.countDocuments();
+
+  // Live entitlements only. A revoked purchase still has a row — it is what
+  // proves access was withdrawn and when — but counting it in the rail would
+  // tell a customer they own something they cannot download.
+  const purchaseCount = await data.entitlements.countDocuments({ revokedAt: null });
 
   // Projected rather than passed whole: the rail needs three fields, and a
   // theme document carries a full token set. Sending the rest to the client on
@@ -69,6 +75,8 @@ export default async function AppLayout({ children }: { children: React.ReactNod
             themes={themes}
             frameworkCount={org?.frameworks.length ?? 0}
             memberCount={memberCount}
+            purchaseCount={purchaseCount}
+            canMintTokens={can(member.role, "market.token")}
           />
         </div>
 

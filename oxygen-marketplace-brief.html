@@ -1,0 +1,3852 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Oxygen Marketplace</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      /* ------------------------------------------------------------------ */
+      /* Document tokens — Oxygen's own identity, shared with the other      */
+      /* briefs so the set reads as one series. The console mockups further  */
+      /* down deliberately do NOT use these: they use console.oxygenui's     */
+      /* real --site-* values, so what you are judging is the console, not a */
+      /* teal impression of it.                                              */
+      /* ------------------------------------------------------------------ */
+      :root {
+        --paper: #f6faf8;
+        --surface: #ffffff;
+        --surface-2: #eef4f2;
+        --ink: #0e1c19;
+        --ink-2: #33473f;
+        --muted: #5d716b;
+        --rule: #d8e4df;
+        --rule-2: #c3d3cd;
+        --accent: #059478;
+        --accent-2: #0bb08f;
+        --accent-soft: #e6f7f1;
+        --accent-ink: #045b4b;
+        --stage: #0b1716;
+        --stage-rule: #1c3230;
+        --warn: #b7791f;
+        --warn-soft: #fbf3e0;
+        --warn-rule: #e4c98a;
+        --bad: #b4423a;
+        --bad-soft: #fbeceb;
+        --bad-rule: #e8b5b0;
+        --ok: #1f8f5f;
+        --ok-soft: #e6f6ee;
+        --ok-rule: #a9dcc3;
+        --code-bg: #0f1e1c;
+        --code-fg: #d9ece6;
+        --code-k: #7ee0cd;
+        --code-s: #f2c98a;
+        --code-c: #7f9c94;
+        --shadow: 0 1px 2px rgb(14 28 25 / 0.06), 0 8px 24px -12px rgb(14 28 25 / 0.18);
+        --font-display:
+          "Avenir Next", "Segoe UI Variable Display", "Helvetica Neue", ui-sans-serif, system-ui,
+          sans-serif;
+        --font-body:
+          -apple-system, BlinkMacSystemFont, "Segoe UI Variable Text", "Segoe UI", ui-sans-serif,
+          system-ui, sans-serif;
+        --font-mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
+        color-scheme: light;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root:not([data-theme="light"]) {
+          --paper: #0b1514;
+          --surface: #101d1b;
+          --surface-2: #142522;
+          --ink: #e7f2ee;
+          --ink-2: #c3d6d0;
+          --muted: #93aca5;
+          --rule: #1f312e;
+          --rule-2: #2c423e;
+          --accent: #5fe0c9;
+          --accent-2: #8aeedd;
+          --accent-soft: #10302b;
+          --accent-ink: #b8f3e7;
+          --stage: #070f0e;
+          --stage-rule: #1a2d2b;
+          --warn: #e2b04a;
+          --warn-soft: #2a2410;
+          --warn-rule: #4d4020;
+          --bad: #f0928a;
+          --bad-soft: #2c1614;
+          --bad-rule: #552a26;
+          --ok: #5fd39a;
+          --ok-soft: #10281d;
+          --ok-rule: #23503a;
+          --code-bg: #0a1413;
+          --code-fg: #d9ece6;
+          --shadow: 0 1px 2px rgb(0 0 0 / 0.4), 0 10px 30px -14px rgb(0 0 0 / 0.6);
+          color-scheme: dark;
+        }
+      }
+      :root[data-theme="dark"] {
+        --paper: #0b1514;
+        --surface: #101d1b;
+        --surface-2: #142522;
+        --ink: #e7f2ee;
+        --ink-2: #c3d6d0;
+        --muted: #93aca5;
+        --rule: #1f312e;
+        --rule-2: #2c423e;
+        --accent: #5fe0c9;
+        --accent-2: #8aeedd;
+        --accent-soft: #10302b;
+        --accent-ink: #b8f3e7;
+        --stage: #070f0e;
+        --stage-rule: #1a2d2b;
+        --warn: #e2b04a;
+        --warn-soft: #2a2410;
+        --warn-rule: #4d4020;
+        --bad: #f0928a;
+        --bad-soft: #2c1614;
+        --bad-rule: #552a26;
+        --ok: #5fd39a;
+        --ok-soft: #10281d;
+        --ok-rule: #23503a;
+        --code-bg: #0a1413;
+        --code-fg: #d9ece6;
+        --shadow: 0 1px 2px rgb(0 0 0 / 0.4), 0 10px 30px -14px rgb(0 0 0 / 0.6);
+        color-scheme: dark;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      body {
+        margin: 0;
+        background: var(--paper);
+        color: var(--ink);
+        font-family: var(--font-body);
+        font-size: 16px;
+        line-height: 1.6;
+        -webkit-font-smoothing: antialiased;
+      }
+      @media (prefers-reduced-motion: reduce) {
+        html {
+          scroll-behavior: auto;
+        }
+      }
+      a {
+        color: var(--accent-ink);
+        text-decoration-color: color-mix(in oklab, var(--accent) 50%, transparent);
+        text-underline-offset: 3px;
+      }
+      a:hover {
+        text-decoration-color: var(--accent);
+      }
+      :focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: 2px;
+        border-radius: 4px;
+      }
+      h1,
+      h2,
+      h3,
+      h4 {
+        font-family: var(--font-display);
+        letter-spacing: -0.015em;
+        text-wrap: balance;
+        margin: 0;
+      }
+      h1 {
+        font-size: clamp(2.2rem, 4.5vw, 3.4rem);
+        line-height: 1.05;
+        font-weight: 600;
+      }
+      h2 {
+        font-size: 1.75rem;
+        line-height: 1.2;
+        font-weight: 600;
+      }
+      h3 {
+        font-size: 1.2rem;
+        line-height: 1.3;
+        font-weight: 600;
+        margin-top: 2rem;
+      }
+      h4 {
+        font-size: 1rem;
+        line-height: 1.35;
+        font-weight: 600;
+      }
+      p {
+        margin: 0 0 1rem;
+      }
+      ul,
+      ol {
+        margin: 0 0 1rem;
+        padding-inline-start: 1.35rem;
+      }
+      li {
+        margin-bottom: 0.4rem;
+      }
+      li::marker {
+        color: var(--accent);
+      }
+      strong {
+        font-weight: 600;
+        color: var(--ink);
+      }
+      code {
+        font-family: var(--font-mono);
+        font-size: 0.86em;
+        background: var(--surface-2);
+        padding: 0.1em 0.35em;
+        border-radius: 4px;
+      }
+
+      .wrap {
+        max-width: 1180px;
+        margin: 0 auto;
+        padding: 0 clamp(1rem, 4vw, 2.5rem);
+      }
+      .prose {
+        max-width: 68ch;
+      }
+
+      header.hero {
+        padding: clamp(3rem, 9vw, 6.5rem) 0 clamp(2rem, 5vw, 3.5rem);
+        border-bottom: 1px solid var(--rule);
+        background:
+          radial-gradient(
+            1100px 420px at 12% -12%,
+            color-mix(in oklab, var(--accent) 11%, transparent),
+            transparent 62%
+          ),
+          var(--paper);
+      }
+      .eyebrow {
+        font-family: var(--font-mono);
+        font-size: 0.72rem;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--accent-ink);
+        margin-bottom: 1.1rem;
+      }
+      .hero .lede {
+        font-size: clamp(1.05rem, 2vw, 1.3rem);
+        color: var(--ink-2);
+        max-width: 62ch;
+        margin-top: 1.25rem;
+      }
+      .hero-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.6rem;
+        margin-top: 2rem;
+      }
+      .pill {
+        font-family: var(--font-mono);
+        font-size: 0.72rem;
+        letter-spacing: 0.05em;
+        padding: 0.35rem 0.7rem;
+        border-radius: 999px;
+        border: 1px solid var(--rule-2);
+        background: var(--surface);
+        color: var(--muted);
+      }
+      .pill.on {
+        border-color: color-mix(in oklab, var(--accent) 45%, transparent);
+        background: var(--accent-soft);
+        color: var(--accent-ink);
+      }
+
+      nav.toc {
+        border-bottom: 1px solid var(--rule);
+        background: var(--surface);
+        position: sticky;
+        top: 0;
+        z-index: 20;
+      }
+      nav.toc ol {
+        list-style: none;
+        display: flex;
+        gap: 0.15rem;
+        overflow-x: auto;
+        margin: 0;
+        padding: 0.5rem 0;
+        scrollbar-width: thin;
+      }
+      nav.toc li {
+        margin: 0;
+      }
+      nav.toc a {
+        display: block;
+        white-space: nowrap;
+        font-family: var(--font-mono);
+        font-size: 0.72rem;
+        padding: 0.35rem 0.6rem;
+        border-radius: 6px;
+        color: var(--muted);
+        text-decoration: none;
+      }
+      nav.toc a:hover {
+        background: var(--surface-2);
+        color: var(--ink);
+      }
+
+      section {
+        padding: clamp(2.6rem, 6vw, 4.6rem) 0;
+        border-bottom: 1px solid var(--rule);
+      }
+      .sec-head {
+        display: flex;
+        gap: 1rem;
+        align-items: baseline;
+        margin-bottom: 1.6rem;
+      }
+      .sec-num {
+        font-family: var(--font-mono);
+        font-size: 0.78rem;
+        color: var(--accent);
+        padding-top: 0.35rem;
+        flex: none;
+      }
+
+      .card {
+        background: var(--surface);
+        border: 1px solid var(--rule);
+        border-radius: 12px;
+        padding: 1.2rem 1.35rem;
+        box-shadow: var(--shadow);
+      }
+      .grid {
+        display: grid;
+        gap: 1rem;
+      }
+      .g2 {
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      }
+      .g3 {
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      }
+      .g4 {
+        grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+      }
+
+      .note {
+        border-left: 3px solid var(--accent);
+        background: var(--accent-soft);
+        padding: 0.9rem 1.1rem;
+        border-radius: 0 8px 8px 0;
+        margin: 1.4rem 0;
+      }
+      .note.warn {
+        border-left-color: var(--warn);
+        background: var(--warn-soft);
+      }
+      .note.bad {
+        border-left-color: var(--bad);
+        background: var(--bad-soft);
+      }
+      .note.ok {
+        border-left-color: var(--ok);
+        background: var(--ok-soft);
+      }
+      .note p:last-child {
+        margin-bottom: 0;
+      }
+      .note .lbl {
+        font-family: var(--font-mono);
+        font-size: 0.68rem;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        display: block;
+        margin-bottom: 0.4rem;
+        color: var(--accent-ink);
+      }
+      .note.warn .lbl {
+        color: var(--warn);
+      }
+      .note.bad .lbl {
+        color: var(--bad);
+      }
+      .note.ok .lbl {
+        color: var(--ok);
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.9rem;
+        margin: 1.2rem 0;
+      }
+      th,
+      td {
+        text-align: left;
+        padding: 0.6rem 0.7rem;
+        border-bottom: 1px solid var(--rule);
+        vertical-align: top;
+      }
+      th {
+        font-family: var(--font-mono);
+        font-size: 0.7rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--muted);
+        font-weight: 500;
+      }
+      tbody tr:hover {
+        background: var(--surface-2);
+      }
+      .tw {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      .badge {
+        font-family: var(--font-mono);
+        font-size: 0.64rem;
+        letter-spacing: 0.06em;
+        padding: 0.12rem 0.4rem;
+        border-radius: 4px;
+        border: 1px solid var(--rule-2);
+        color: var(--muted);
+        white-space: nowrap;
+      }
+      .badge.v1 {
+        background: var(--accent-soft);
+        border-color: color-mix(in oklab, var(--accent) 40%, transparent);
+        color: var(--accent-ink);
+      }
+      .badge.v2 {
+        background: var(--surface-2);
+      }
+      .badge.no {
+        background: var(--bad-soft);
+        border-color: var(--bad-rule);
+        color: var(--bad);
+      }
+
+      pre {
+        background: var(--code-bg);
+        color: var(--code-fg);
+        border-radius: 10px;
+        padding: 1rem 1.1rem;
+        overflow-x: auto;
+        font-family: var(--font-mono);
+        font-size: 0.8rem;
+        line-height: 1.65;
+        margin: 1.2rem 0;
+        border: 1px solid var(--stage-rule);
+      }
+      pre code {
+        background: none;
+        padding: 0;
+        font-size: inherit;
+        color: inherit;
+      }
+      .k {
+        color: var(--code-k);
+      }
+      .s {
+        color: var(--code-s);
+      }
+      .c {
+        color: var(--code-c);
+        font-style: italic;
+      }
+
+      figure {
+        margin: 1.6rem 0;
+      }
+      figcaption {
+        font-size: 0.83rem;
+        color: var(--muted);
+        margin-top: 0.7rem;
+        max-width: 70ch;
+      }
+      figcaption strong {
+        color: var(--ink-2);
+      }
+
+      /* ---- console mockup chrome: the console's REAL palette ---- */
+      .console {
+        --site-paper: #f7f9f8;
+        --site-paper-sunk: #eef3f1;
+        --site-rule: #dde5e2;
+        --site-rule-strong: #c3d0cc;
+        --site-ink: #08110f;
+        --site-graphite: #5a6b67;
+        --site-graphite-soft: #5c6d68;
+        --site-oxygen: #10b995;
+        --site-accent-text: #067662;
+        --site-electric: #0b7285;
+        --site-critical: #dc2626;
+        --site-cta: #08110f;
+        --site-panel: #08110f;
+        --site-panel-raised: #0d1a18;
+        --site-panel-rule: #1d302d;
+        --site-panel-fg: #e8f4f1;
+        --site-panel-muted: #8b9c98;
+        --site-trace: #2dd4b0;
+        --site-pass: #15803d;
+        --site-warn: #a16207;
+        background: var(--site-paper);
+        color: var(--site-ink);
+        border: 1px solid var(--rule-2);
+        border-radius: 12px;
+        overflow: hidden;
+        font-family: var(--font-body);
+        box-shadow: var(--shadow);
+      }
+      .console-top {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        padding: 0.55rem 0.9rem;
+        border-bottom: 1px solid var(--site-rule);
+        background: #fff;
+      }
+      .dot {
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+        background: var(--site-rule-strong);
+      }
+      .url {
+        font-family: var(--font-mono);
+        font-size: 0.7rem;
+        color: var(--site-graphite);
+        margin-left: 0.4rem;
+      }
+      .console-body {
+        display: grid;
+        grid-template-columns: 168px 1fr;
+        min-height: 300px;
+      }
+      .rail {
+        border-right: 1px solid var(--site-rule);
+        background: #fff;
+        padding: 0.8rem 0.6rem;
+      }
+      .rail .brand {
+        display: flex;
+        align-items: center;
+        gap: 0.45rem;
+        font-size: 0.82rem;
+        font-weight: 600;
+        padding: 0 0.4rem 0.9rem;
+        color: var(--site-ink);
+      }
+      .rail .grp {
+        font-family: var(--font-mono);
+        font-size: 0.6rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--site-graphite);
+        padding: 0.7rem 0.45rem 0.3rem;
+      }
+      .rail a {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.4rem;
+        font-size: 0.78rem;
+        color: var(--site-graphite);
+        padding: 0.3rem 0.45rem;
+        border-radius: 6px;
+        text-decoration: none;
+      }
+      .rail a .n {
+        font-family: var(--font-mono);
+        font-size: 0.64rem;
+        color: var(--site-graphite-soft);
+      }
+      .rail a.on {
+        background: var(--site-paper-sunk);
+        color: var(--site-ink);
+        font-weight: 600;
+      }
+      .rail a.on::before {
+        content: "";
+        width: 3px;
+        height: 14px;
+        background: var(--site-oxygen);
+        border-radius: 2px;
+        margin-left: -0.45rem;
+        margin-right: 0.3rem;
+      }
+      .pane {
+        padding: 1rem 1.2rem 1.4rem;
+      }
+      .ph {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 1rem;
+        padding-bottom: 0.9rem;
+        border-bottom: 1px solid var(--site-rule);
+        margin-bottom: 1rem;
+      }
+      .ph h4 {
+        font-size: 1.05rem;
+        color: var(--site-ink);
+      }
+      .ph .sub {
+        font-size: 0.76rem;
+        color: var(--site-graphite);
+        margin-top: 0.15rem;
+      }
+      .btn {
+        font-size: 0.74rem;
+        font-weight: 600;
+        padding: 0.34rem 0.7rem;
+        border-radius: 6px;
+        background: var(--site-cta);
+        color: var(--site-paper);
+        border: 0;
+        white-space: nowrap;
+      }
+      .btn.ghost {
+        background: transparent;
+        color: var(--site-ink);
+        border: 1px solid var(--site-rule-strong);
+      }
+      .chip {
+        font-family: var(--font-mono);
+        font-size: 0.6rem;
+        letter-spacing: 0.05em;
+        padding: 0.12rem 0.4rem;
+        border-radius: 999px;
+        border: 1px solid var(--site-rule-strong);
+        color: var(--site-graphite);
+        background: #fff;
+      }
+      .chip.own {
+        border-color: var(--site-pass);
+        color: var(--site-pass);
+        background: #f0fdf4;
+      }
+      .chip.new {
+        border-color: var(--site-oxygen);
+        color: var(--site-accent-text);
+        background: #ecfdf7;
+      }
+
+      /* the preview area is a dark panel: "the instrument is the lit object" */
+      .stage {
+        background: var(--site-panel);
+        border: 1px solid var(--site-panel-rule);
+        border-radius: 8px;
+        color: var(--site-panel-fg);
+      }
+
+      .mcard {
+        background: #fff;
+        border: 1px solid var(--site-rule);
+        border-radius: 10px;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+      }
+      .mcard .prev {
+        height: 92px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        background: var(--site-panel);
+        border-bottom: 1px solid var(--site-panel-rule);
+      }
+      .mcard .meta {
+        padding: 0.6rem 0.7rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.3rem;
+        flex: 1;
+      }
+      .mcard .ttl {
+        font-size: 0.82rem;
+        font-weight: 600;
+        color: var(--site-ink);
+        line-height: 1.25;
+      }
+      .mcard .dsc {
+        font-size: 0.7rem;
+        color: var(--site-graphite);
+        line-height: 1.4;
+      }
+      .mcard .foot {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-top: auto;
+        padding-top: 0.4rem;
+      }
+      .mcard .price {
+        font-family: var(--font-mono);
+        font-size: 0.78rem;
+        font-weight: 600;
+        color: var(--site-ink);
+      }
+
+      .flow {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 0.5rem;
+      }
+      .step {
+        background: var(--surface);
+        border: 1px solid var(--rule);
+        border-radius: 8px;
+        padding: 0.7rem 0.8rem;
+        position: relative;
+      }
+      .step .n {
+        font-family: var(--font-mono);
+        font-size: 0.62rem;
+        color: var(--accent);
+      }
+      .step .t {
+        font-size: 0.82rem;
+        font-weight: 600;
+        margin: 0.2rem 0 0.25rem;
+      }
+      .step .d {
+        font-size: 0.72rem;
+        color: var(--muted);
+        line-height: 1.45;
+      }
+
+      .lane {
+        display: grid;
+        grid-template-columns: 108px 1fr;
+        gap: 0 0.9rem;
+        align-items: start;
+        font-size: 0.85rem;
+      }
+      .lane .who {
+        font-family: var(--font-mono);
+        font-size: 0.66rem;
+        color: var(--muted);
+        text-align: right;
+        padding-top: 0.55rem;
+      }
+      .lane .msg {
+        border-left: 2px solid var(--rule-2);
+        padding: 0.5rem 0 0.5rem 0.9rem;
+        position: relative;
+      }
+      .lane .msg::before {
+        content: "";
+        position: absolute;
+        left: -5px;
+        top: 0.85rem;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--accent);
+      }
+      .lane .msg.q::before {
+        background: var(--warn);
+      }
+      .lane .msg code {
+        font-size: 0.78rem;
+      }
+
+      .kv {
+        display: grid;
+        grid-template-columns: max-content 1fr;
+        gap: 0.3rem 0.9rem;
+        font-size: 0.85rem;
+      }
+      .kv dt {
+        font-family: var(--font-mono);
+        font-size: 0.7rem;
+        color: var(--muted);
+        padding-top: 0.16rem;
+      }
+      .kv dd {
+        margin: 0;
+      }
+
+      .phase {
+        display: grid;
+        grid-template-columns: 46px 1fr;
+        gap: 0.9rem;
+        padding: 0.85rem 0;
+        border-bottom: 1px dashed var(--rule);
+      }
+      .phase:last-child {
+        border-bottom: 0;
+      }
+      .phase .pn {
+        font-family: var(--font-mono);
+        font-size: 0.72rem;
+        color: var(--accent);
+        padding-top: 0.15rem;
+      }
+      .phase h4 {
+        margin-bottom: 0.25rem;
+      }
+      .phase p {
+        font-size: 0.87rem;
+        color: var(--ink-2);
+        margin: 0;
+      }
+
+      footer {
+        padding: 3rem 0 4rem;
+        color: var(--muted);
+        font-size: 0.85rem;
+      }
+      .split {
+        display: grid;
+        grid-template-columns: 1.35fr 1fr;
+        gap: 1.1rem;
+      }
+      @media (max-width: 860px) {
+        .split {
+          grid-template-columns: 1fr;
+        }
+      }
+      @media (max-width: 720px) {
+        .console-body {
+          grid-template-columns: 1fr;
+        }
+        .rail {
+          display: none;
+        }
+        .lane {
+          grid-template-columns: 1fr;
+        }
+        .lane .who {
+          text-align: left;
+          padding-top: 0.6rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="hero">
+      <div class="wrap">
+        <div class="eyebrow">Console · Marketplace · Brief — 20 August 2026</div>
+        <h1>
+          A marketplace is not a shop.<br />It is the entitlement spine the console already needs.
+        </h1>
+        <p class="lede">
+          Selling illustrations, icons, components and screens from inside
+          <code>console.oxygenui.design</code> — designed so the same machinery that delivers a $180
+          icon pack on a card also delivers a $30,000 private component library on a purchase order,
+          and so every item carries a checkable claim rather than a screenshot.
+        </p>
+        <div class="hero-meta">
+          <span class="pill on">6 families, 26 SKUs brainstormed</span>
+          <span class="pill on">4 ship in v1</span>
+          <span class="pill">Stripe Checkout + Invoicing</span>
+          <span class="pill">5 new collections</span>
+          <span class="pill">4 new capabilities</span>
+          <span class="pill on">P1–P4 built</span>
+        </div>
+      </div>
+    </header>
+
+    <nav class="toc" aria-label="Contents">
+      <div class="wrap">
+        <ol>
+          <li><a href="#s1">1 · Why</a></li>
+          <li><a href="#s2">2 · Everything sellable</a></li>
+          <li><a href="#s3">3 · The empty-state system</a></li>
+          <li><a href="#s4">4 · What we refuse to sell</a></li>
+          <li><a href="#s5">5 · The claim on the receipt</a></li>
+          <li><a href="#s6">6 · The storefront</a></li>
+          <li><a href="#s7">7 · The item page</a></li>
+          <li><a href="#s8">8 · Buying in thirty seconds</a></li>
+          <li><a href="#s9">9 · Money model</a></li>
+          <li><a href="#s10">10 · Stripe, concretely</a></li>
+          <li><a href="#s11">11 · Data model</a></li>
+          <li><a href="#s12">12 · Capabilities</a></li>
+          <li><a href="#s13">13 · Delivery</a></li>
+          <li><a href="#s14">14 · What breaks</a></li>
+          <li><a href="#s15">15 · Phases</a></li>
+          <li><a href="#s16">16 · Decisions</a></li>
+          <li><a href="#s17">17 · Sources</a></li>
+        </ol>
+      </div>
+    </nav>
+
+    <main>
+      <section id="s1">
+        <div class="wrap">
+          <div class="sec-head">
+            <span class="sec-num">01</span>
+            <h2>
+              The console is the only screen Oxygen owns where a customer is already signed in — and
+              already spending.
+            </h2>
+          </div>
+          <div class="prose">
+            <p>
+              The console today does one job: an organisation authors a design language, validates
+              it against the same gate the build uses, and publishes it as an immutable stylesheet
+              at
+              <code>/t/{org}/{theme}@{version}.css</code>. Themes, fonts, icon slots, brand artwork,
+              four roles, an append-only audit log, and org scoping enforced by construction rather
+              than by convention.
+            </p>
+            <p>
+              Every one of those pieces is <em>already</em> half of a marketplace. The icon slots
+              are a delivery target. The content-addressed asset store is a CDN. The immutable
+              version pointer is a licence boundary. The audit log is a receipt. What is missing is
+              the part that says
+              <em>this organisation is entitled to this thing, because it paid for it.</em>
+            </p>
+
+            <h3>The honest objection, first</h3>
+            <p>
+              The feasibility review already threw out one revenue model on TAM grounds: a $199
+              lifetime tier priced against Magic UI, whose comparable converts against every React
+              developer alive, while the healthcare-FHIR frontend population is two orders of
+              magnitude smaller.
+              <strong>A marketplace of $12 icon packs fails that same arithmetic harder</strong>
+              — smaller unit, same audience, plus a content-production cost the component library
+              does not have.
+            </p>
+            <p>
+              So the marketplace has to earn its place on something other than unit sales. It does,
+              on four counts:
+            </p>
+            <ol>
+              <li>
+                <strong>It is a delivery mechanism the enterprise motion already needs.</strong>
+                When a $25k contract includes a private component pack, something has to hand the
+                customer the bytes, prove they are entitled to them, and revoke them when the
+                contract ends. Today that is an email with a zip. That is the actual gap.
+              </li>
+              <li>
+                <strong>It converts a designer into a lead without procurement.</strong>
+                A design lead can put $290 on a card. They cannot put $25,000 on one. The card
+                purchase is the qualification event: we now know the org, the stack, the framework,
+                and that somebody there has budget authority.
+              </li>
+              <li>
+                <strong>It gives the free MIT core somewhere to point.</strong> A library with no
+                paid surface has to convert readers into contract conversations in one leap. A $180
+                pack is the intermediate step.
+              </li>
+              <li>
+                <strong>The top SKUs are already contract-sized.</strong> An app starter at $4,000
+                and a commissioned component at $12,000 are not marketplace impulse buys; they are
+                the bottom of the services ladder with a checkout button on them, which shortens a
+                six-week sales cycle to a form.
+              </li>
+            </ol>
+
+            <div class="note">
+              <span class="lbl">The frame this brief argues for</span>
+              <p>
+                Build <strong>entitlements and delivery first, storefront second.</strong>
+                The storefront is the cheap part and the part that can be rebuilt. The entitlement
+                record, the licence boundary, the revocation path and the audit trail are the parts
+                that are painful to retrofit once real money has moved through them.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="s2">
+        <div class="wrap">
+          <div class="sec-head">
+            <span class="sec-num">02</span>
+            <h2>
+              Everything worth selling — twenty-six SKUs across six families, and only four of them
+              are icons
+            </h2>
+          </div>
+          <div class="prose">
+            <p>
+              The brief asked for a brainstorm, so this is the wide version before the cut. The
+              organising question for every row is
+              <strong
+                >what does a health-tech team currently fake, buy badly, or spend six weeks in
+                review over?</strong
+              >
+              — because that, not "nice artwork", is what has a price.
+            </p>
+          </div>
+
+          <h3>A · Illustration</h3>
+          <div class="tw">
+            <table>
+              <thead>
+                <tr>
+                  <th>SKU</th>
+                  <th>What it actually is</th>
+                  <th>Why nobody else sells it</th>
+                  <th>Band</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Empty-state system</strong></td>
+                  <td>
+                    24 empty states, each drawn in <em>three meanings</em>: not asked, asked and
+                    none found, withheld. Plus the copy for each.
+                  </td>
+                  <td>
+                    Stock art treats "empty" as one state. In a clinical record it is three, and
+                    confusing them is a patient-safety defect. See §3.
+                  </td>
+                  <td>$290</td>
+                  <td><span class="badge v1">v1</span></td>
+                </tr>
+                <tr>
+                  <td><strong>Failure &amp; degradation states</strong></td>
+                  <td>
+                    Offline, session expired, record locked by another clinician, the HL7/FHIR feed
+                    is behind, break-glass denied, partial result set.
+                  </td>
+                  <td>
+                    Generic sets have "500 error". They have nothing for "the data you can see is
+                    nine minutes stale".
+                  </td>
+                  <td>$240</td>
+                  <td><span class="badge v1">v1</span></td>
+                </tr>
+                <tr>
+                  <td><strong>Care-setting scenes</strong></td>
+                  <td>
+                    40 scenes: telehealth, ward round, home visit, pharmacy counter, ambulance
+                    handover, MDT meeting. Six skin tones, wheelchair users, hijab, prosthetics,
+                    carers, older adults as a default rather than a variant.
+                  </td>
+                  <td>
+                    The diverse-illustration packs are not clinical; the clinical packs are 2014-era
+                    stethoscope clip art.
+                  </td>
+                  <td>$390</td>
+                  <td><span class="badge v2">v2</span></td>
+                </tr>
+                <tr>
+                  <td><strong>Body maps &amp; anatomy</strong></td>
+                  <td>
+                    Pain-location selectors, wound and lesion mapping, dermatome maps, dental charts
+                    in both FDI and Universal numbering, paediatric and adult body outlines,
+                    Fitzpatrick I–VI.
+                  </td>
+                  <td>
+                    Interactive body maps are always rebuilt from scratch by every team. Selling the
+                    SVG <em>with region ids that map to SNOMED body-site codes</em> is a component,
+                    not a picture.
+                  </td>
+                  <td>$450</td>
+                  <td><span class="badge v2">v2</span></td>
+                </tr>
+                <tr>
+                  <td><strong>Patient-facing explainers</strong></td>
+                  <td>
+                    Inhaler technique, injection sites, pre-op fasting, wound care, medication
+                    timing.
+                  </td>
+                  <td>
+                    Because it is genuinely risky — this is patient education, and it carries a duty
+                    of accuracy. See §4.
+                  </td>
+                  <td>—</td>
+                  <td><span class="badge no">deferred</span></td>
+                </tr>
+                <tr>
+                  <td><strong>Spot &amp; decorative</strong></td>
+                  <td>Dashboard headers, marketing pages, print. No clinical claim at all.</td>
+                  <td>
+                    Nobody can't. This is the commodity row, and it is here to be honest about which
+                    rows are commodity.
+                  </td>
+                  <td>$120</td>
+                  <td><span class="badge v2">v2</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3>B · Icons</h3>
+          <div class="tw">
+            <table>
+              <thead>
+                <tr>
+                  <th>SKU</th>
+                  <th>What it actually is</th>
+                  <th>Why nobody else sells it</th>
+                  <th>Band</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Clinical icon set</strong></td>
+                  <td>
+                    ~320 glyphs: specialties, body systems, <em>routes of administration</em> (PO,
+                    IV, IM, SC, PR, inhaled, topical, transdermal), devices (ventilator, infusion
+                    pump, dialysis, pacemaker), sample containers by cap colour, care settings.
+                  </td>
+                  <td>
+                    Route of administration is a controlled vocabulary a nurse reads at speed.
+                    Generic sets draw one syringe and call it done.
+                  </td>
+                  <td>$180</td>
+                  <td><span class="badge v1">v1</span></td>
+                </tr>
+                <tr>
+                  <td><strong>Status &amp; severity glyphs</strong></td>
+                  <td>
+                    The FHIR <code>Observation.status</code> vocabulary drawn honestly — registered,
+                    preliminary, final, amended, corrected, cancelled, entered-in-error — plus
+                    severity shapes that survive forced-colors mode.
+                  </td>
+                  <td>
+                    It is the same discipline as the library: severity carried by colour alone
+                    disappears. These glyphs <em>are</em> the non-colour channel.
+                  </td>
+                  <td>$140</td>
+                  <td><span class="badge v1">v1</span></td>
+                </tr>
+                <tr>
+                  <td><strong>Console slot packs</strong></td>
+                  <td>
+                    A glyph for every replaceable slot the console already exposes, in three
+                    weights.
+                  </td>
+                  <td>
+                    Because the console already has the slots. Buy, click Apply, publish — the
+                    shortest path from money to a changed pixel in production.
+                  </td>
+                  <td>$90</td>
+                  <td><span class="badge v1">v1</span></td>
+                </tr>
+                <tr>
+                  <td><strong>Wayfinding / signage</strong></td>
+                  <td>
+                    Department signs that match the on-screen set, for print and physical estate.
+                  </td>
+                  <td>
+                    Niche, but it is the row an NHS trust's comms team asks for the moment they see
+                    the digital set.
+                  </td>
+                  <td>$260</td>
+                  <td><span class="badge v2">v3</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3>C · Components, blocks and starters</h3>
+          <div class="tw">
+            <table>
+              <thead>
+                <tr>
+                  <th>SKU</th>
+                  <th>What it actually is</th>
+                  <th>Why nobody else sells it</th>
+                  <th>Band</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Pro components</strong></td>
+                  <td>
+                    Individually: Questionnaire renderer, MAR grid, vitals flowsheet, growth charts
+                    on WHO/CDC percentiles, lab trend with reference-range band, allergy list with
+                    criticality, triage selector, referral tracker, immunisation schedule.
+                  </td>
+                  <td>
+                    These are the ones with a domain model underneath. A growth chart is not a line
+                    chart; it is a line chart plus percentile curves plus a correction for
+                    gestational age.
+                  </td>
+                  <td>$250–900</td>
+                  <td><span class="badge v1">v1</span></td>
+                </tr>
+                <tr>
+                  <td><strong>Blocks (assembled screens)</strong></td>
+                  <td>
+                    Patient summary, encounter note, admissions board, booking flow, clinician
+                    worklist, SBAR handover, patient-portal shell.
+                  </td>
+                  <td>
+                    A block is a week of a senior engineer's time with the states already thought
+                    through. That is what it is priced against.
+                  </td>
+                  <td>$600–1,500</td>
+                  <td><span class="badge v2">v2</span></td>
+                </tr>
+                <tr>
+                  <td><strong>App starters</strong></td>
+                  <td>
+                    Next.js + Oxygen + a FHIR client, auth, audit, and the boring compliance
+                    scaffolding. Telehealth, patient portal, clinic admin.
+                  </td>
+                  <td>Contract-sized, and the natural upsell target of every other row.</td>
+                  <td>$2,500–6,000</td>
+                  <td><span class="badge v2">v3</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3>D · Design-system content</h3>
+          <div class="tw">
+            <table>
+              <thead>
+                <tr>
+                  <th>SKU</th>
+                  <th>What it actually is</th>
+                  <th>Why nobody else sells it</th>
+                  <th>Band</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Theme packs</strong></td>
+                  <td>
+                    Complete token sets that pass the console's own validator:
+                    colour-vision-deficiency-safe severity ramps, forced-colors verified, AAA
+                    contrast inside critical alerts.
+                  </td>
+                  <td>
+                    The console already imports themes. A theme pack is a file the existing transfer
+                    path swallows whole.
+                  </td>
+                  <td>$120</td>
+                  <td><span class="badge v1">v1</span></td>
+                </tr>
+                <tr>
+                  <td><strong>Figma libraries</strong></td>
+                  <td>
+                    A Figma file whose variables are generated from the same token document the
+                    console publishes, so the file and the stylesheet cannot drift.
+                  </td>
+                  <td>
+                    The drift between Figma and code is the single most-complained-about thing in
+                    design systems. Selling the <em>generator</em>, not the file, is the product.
+                  </td>
+                  <td>$340</td>
+                  <td><span class="badge v2">v2</span></td>
+                </tr>
+                <tr>
+                  <td><strong>Motion &amp; loader packs</strong></td>
+                  <td>
+                    More of what the five existing loaders started: skeleton systems, transitions
+                    with reduced-motion equivalents that are not simply "off".
+                  </td>
+                  <td>Reduced-motion done as a real design, not a disabled feature.</td>
+                  <td>$110</td>
+                  <td><span class="badge v2">v2</span></td>
+                </tr>
+                <tr>
+                  <td><strong>Typography configurations</strong></td>
+                  <td>
+                    Pairings, scales and tabular-numeral setups over <em>openly licensed</em> faces
+                    — the console already checks a font for tabular numerals on upload.
+                  </td>
+                  <td>Configuration, never redistributed licences. See §4.</td>
+                  <td>$80</td>
+                  <td><span class="badge v2">v2</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3>E · Data and content — the rows nobody expects and everybody needs</h3>
+          <div class="tw">
+            <table>
+              <thead>
+                <tr>
+                  <th>SKU</th>
+                  <th>What it actually is</th>
+                  <th>Why nobody else sells it</th>
+                  <th>Band</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Synthetic patient fixtures</strong></td>
+                  <td>
+                    PHI-free FHIR bundles that are deliberately <em>messy</em>: partial records,
+                    conflicting allergy entries, mmol/L against mg/dL, a patient on 47 medications,
+                    a result amended twice, a name with a diacritic and a name with no surname.
+                  </td>
+                  <td>
+                    Every team fakes demo data, and fakes it clean — which is why every demo works
+                    and every pilot doesn't. This is the highest-value/lowest-cost row on the page.
+                  </td>
+                  <td>$350</td>
+                  <td><span class="badge v1">v1</span></td>
+                </tr>
+                <tr>
+                  <td><strong>Clinically-reviewed microcopy</strong></td>
+                  <td>
+                    The strings that get stuck in review for a month: consent, results disclosure,
+                    safety-netting advice, refusal, restriction notices. Localised, with the
+                    reasoning for each wording.
+                  </td>
+                  <td>
+                    Because it needs a clinician and a lawyer, which is exactly why it is worth four
+                    figures to somebody who has neither.
+                  </td>
+                  <td>$700</td>
+                  <td><span class="badge v2">v2</span></td>
+                </tr>
+                <tr>
+                  <td><strong>Accessibility evidence pack</strong></td>
+                  <td>
+                    A VPAT/ACR for the components the customer actually installed, WCAG 2.2 AA test
+                    records, forced-colors evidence, screen-reader transcripts.
+                  </td>
+                  <td>
+                    Procurement buys this. It is generated from tests that already run in CI, which
+                    makes the margin absurd.
+                  </td>
+                  <td>$900</td>
+                  <td><span class="badge v2">v2</span></td>
+                </tr>
+                <tr>
+                  <td><strong>Clinical-safety artefact pack</strong></td>
+                  <td>
+                    DCB0129/DCB0160 hazard log templates, clinical safety case structure, IEC 62304
+                    scaffolding, DPIA template — pre-populated for a UI layer.
+                  </td>
+                  <td>
+                    An England-market startup cannot ship into the NHS without these and usually
+                    discovers that late. Four figures, and the buyer is relieved rather than
+                    price-sensitive.
+                  </td>
+                  <td>$1,500–4,000</td>
+                  <td><span class="badge v2">v3</span></td>
+                </tr>
+                <tr>
+                  <td><strong>Terminology display packs</strong></td>
+                  <td>Human-readable display mappings and groupings over LOINC/RxNorm.</td>
+                  <td>
+                    Licensing. See §4 — SNOMED CT cannot be redistributed, and this row is a trap
+                    dressed as a product.
+                  </td>
+                  <td>—</td>
+                  <td><span class="badge no">deferred</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3>F · Services with a price tag instead of a proposal</h3>
+          <div class="tw">
+            <table>
+              <thead>
+                <tr>
+                  <th>SKU</th>
+                  <th>What it actually is</th>
+                  <th>Band</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Commissioned component</strong></td>
+                  <td>
+                    Built to spec, delivered into the customer's own private registry namespace,
+                    theirs perpetually, ours to generalise later unless they buy exclusivity.
+                  </td>
+                  <td>$4,000–12,000</td>
+                  <td><span class="badge v2">v2</span></td>
+                </tr>
+                <tr>
+                  <td><strong>Accessibility audit</strong></td>
+                  <td>Their application, our test harness, a report that survives procurement.</td>
+                  <td>$6,000</td>
+                  <td><span class="badge v2">v2</span></td>
+                </tr>
+                <tr>
+                  <td><strong>Theme migration</strong></td>
+                  <td>
+                    Their existing design language into the console, validated, published, with the
+                    rollback story.
+                  </td>
+                  <td>$8,000</td>
+                  <td><span class="badge v2">v2</span></td>
+                </tr>
+                <tr>
+                  <td><strong>Clinical safety review</strong></td>
+                  <td>
+                    A clinician reads their UI and writes the hazard log. Sold as a fixed-price
+                    engagement.
+                  </td>
+                  <td>$5,000</td>
+                  <td><span class="badge v2">v3</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="note ok">
+            <span class="lbl">The v1 cut</span>
+            <p>
+              <strong>Four kinds ship first</strong> — icons, illustrations, theme packs and pro
+              components — because each reuses machinery the console already has: icon slots, the
+              content-addressed asset store, the theme import path, and the shadcn registry.
+              Fixtures are the fifth if the content is cheaper than expected, because
+              <code>packages/fixtures</code>
+              already exists.
+            </p>
+            <p>
+              And <strong>depth beats breadth at launch.</strong> Six categories with one pack each
+              reads as abandoned. One category with six packs reads as a product line.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section id="s3">
+        <div class="wrap">
+          <div class="sec-head">
+            <span class="sec-num">03</span>
+            <h2>
+              The flagship is an empty state, because "empty" is three different facts and every
+              stock illustration says the wrong one
+            </h2>
+          </div>
+          <div class="prose">
+            <p>
+              This is the row worth building the marketplace around, and the argument for it is the
+              library's own founding argument. From the README:
+              <em>a blank cell is indistinguishable from a rendering bug.</em>
+            </p>
+            <p>
+              Take one screen region: the allergy list. It is empty. There are at least three
+              reasons, and they demand three different clinical behaviours:
+            </p>
+          </div>
+
+          <figure>
+            <div class="grid g3">
+              <div class="card">
+                <div
+                  class="stage console"
+                  style="
+                    padding: 1rem;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    height: 132px;
+                  "
+                >
+                  <svg
+                    viewBox="0 0 120 90"
+                    width="118"
+                    height="88"
+                    role="img"
+                    aria-label="A clipboard with an unfilled field and a question mark"
+                  >
+                    <rect
+                      x="24"
+                      y="10"
+                      width="72"
+                      height="72"
+                      rx="6"
+                      fill="none"
+                      stroke="#8b9c98"
+                      stroke-width="2.5"
+                    />
+                    <rect
+                      x="46"
+                      y="4"
+                      width="28"
+                      height="12"
+                      rx="3"
+                      fill="#08110f"
+                      stroke="#8b9c98"
+                      stroke-width="2.5"
+                    />
+                    <line
+                      x1="38"
+                      y1="34"
+                      x2="82"
+                      y2="34"
+                      stroke="#2dd4b0"
+                      stroke-width="2.5"
+                      stroke-linecap="round"
+                      stroke-dasharray="6 6"
+                    />
+                    <line
+                      x1="38"
+                      y1="48"
+                      x2="70"
+                      y2="48"
+                      stroke="#8b9c98"
+                      stroke-width="2.5"
+                      stroke-linecap="round"
+                      stroke-dasharray="6 6"
+                    />
+                    <path
+                      d="M55 62c0-4 6-4 6-8 0-3-2.5-4.5-5-4.5"
+                      fill="none"
+                      stroke="#2dd4b0"
+                      stroke-width="2.5"
+                      stroke-linecap="round"
+                      transform="translate(0,4)"
+                    />
+                    <circle cx="58.5" cy="72" r="1.8" fill="#2dd4b0" />
+                  </svg>
+                </div>
+                <h4 style="margin-top: 0.9rem">Not asked</h4>
+                <p style="font-size: 0.86rem; color: var(--ink-2); margin: 0.35rem 0 0.6rem">
+                  Nobody has taken an allergy history. The absence is about
+                  <em>us</em>, not the patient.
+                </p>
+                <p style="font-size: 0.8rem; color: var(--muted); margin: 0">
+                  <strong>Action offered:</strong> take a history. <strong>Never say:</strong> "no
+                  allergies".
+                </p>
+              </div>
+
+              <div class="card">
+                <div
+                  class="stage console"
+                  style="
+                    padding: 1rem;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    height: 132px;
+                  "
+                >
+                  <svg
+                    viewBox="0 0 120 90"
+                    width="118"
+                    height="88"
+                    role="img"
+                    aria-label="A clipboard with a completed check and a signature line"
+                  >
+                    <rect
+                      x="24"
+                      y="10"
+                      width="72"
+                      height="72"
+                      rx="6"
+                      fill="none"
+                      stroke="#8b9c98"
+                      stroke-width="2.5"
+                    />
+                    <rect
+                      x="46"
+                      y="4"
+                      width="28"
+                      height="12"
+                      rx="3"
+                      fill="#08110f"
+                      stroke="#8b9c98"
+                      stroke-width="2.5"
+                    />
+                    <path
+                      d="M38 40l8 8 16-18"
+                      fill="none"
+                      stroke="#2dd4b0"
+                      stroke-width="3"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                    <line
+                      x1="38"
+                      y1="60"
+                      x2="82"
+                      y2="60"
+                      stroke="#8b9c98"
+                      stroke-width="2.5"
+                      stroke-linecap="round"
+                    />
+                    <line
+                      x1="38"
+                      y1="70"
+                      x2="66"
+                      y2="70"
+                      stroke="#8b9c98"
+                      stroke-width="2.5"
+                      stroke-linecap="round"
+                    />
+                  </svg>
+                </div>
+                <h4 style="margin-top: 0.9rem">Asked, none found</h4>
+                <p style="font-size: 0.86rem; color: var(--ink-2); margin: 0.35rem 0 0.6rem">
+                  A clinician asked and recorded "no known allergies". That is a positive finding,
+                  with an author and a timestamp.
+                </p>
+                <p style="font-size: 0.8rem; color: var(--muted); margin: 0">
+                  <strong>Must show:</strong> who recorded it and when. An assertion with no author
+                  is a rumour.
+                </p>
+              </div>
+
+              <div class="card">
+                <div
+                  class="stage console"
+                  style="
+                    padding: 1rem;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    height: 132px;
+                  "
+                >
+                  <svg
+                    viewBox="0 0 120 90"
+                    width="118"
+                    height="88"
+                    role="img"
+                    aria-label="A clipboard behind a closed padlock"
+                  >
+                    <rect
+                      x="24"
+                      y="10"
+                      width="72"
+                      height="72"
+                      rx="6"
+                      fill="none"
+                      stroke="#8b9c98"
+                      stroke-width="2.5"
+                    />
+                    <rect
+                      x="46"
+                      y="4"
+                      width="28"
+                      height="12"
+                      rx="3"
+                      fill="#08110f"
+                      stroke="#8b9c98"
+                      stroke-width="2.5"
+                    />
+                    <rect
+                      x="44"
+                      y="46"
+                      width="32"
+                      height="24"
+                      rx="4"
+                      fill="#08110f"
+                      stroke="#2dd4b0"
+                      stroke-width="2.5"
+                    />
+                    <path
+                      d="M50 46v-7a10 10 0 0 1 20 0v7"
+                      fill="none"
+                      stroke="#2dd4b0"
+                      stroke-width="2.5"
+                      stroke-linecap="round"
+                    />
+                    <circle cx="60" cy="57" r="2.6" fill="#2dd4b0" />
+                    <line
+                      x1="38"
+                      y1="32"
+                      x2="82"
+                      y2="32"
+                      stroke="#8b9c98"
+                      stroke-width="2.5"
+                      stroke-linecap="round"
+                    />
+                  </svg>
+                </div>
+                <h4 style="margin-top: 0.9rem">Withheld</h4>
+                <p style="font-size: 0.86rem; color: var(--ink-2); margin: 0.35rem 0 0.6rem">
+                  The record exists and this viewer may not see it — a restricted record, a sealed
+                  envelope, a break-glass boundary.
+                </p>
+                <p style="font-size: 0.8rem; color: var(--muted); margin: 0">
+                  <strong>Must say so.</strong> Rendering a restriction as emptiness is the worst of
+                  the three.
+                </p>
+              </div>
+            </div>
+            <figcaption>
+              <strong>One region, three states, three different clinical consequences.</strong>
+              Drawn in the console's dark preview panel, which is where an instrument renders
+              something in this design language.
+            </figcaption>
+          </figure>
+
+          <div class="prose">
+            <p>And here is what every marketplace on the internet will sell you for that region:</p>
+          </div>
+
+          <figure>
+            <div class="card" style="border-color: var(--bad-rule); background: var(--bad-soft)">
+              <div style="display: flex; gap: 1.4rem; align-items: center; flex-wrap: wrap">
+                <svg
+                  viewBox="0 0 120 90"
+                  width="110"
+                  height="82"
+                  role="img"
+                  aria-label="An open box with a smiling face and confetti"
+                >
+                  <path d="M26 40h68v38H26z" fill="none" stroke="#b4423a" stroke-width="2.5" />
+                  <path
+                    d="M26 40l10-14h48l10 14"
+                    fill="none"
+                    stroke="#b4423a"
+                    stroke-width="2.5"
+                    stroke-linejoin="round"
+                  />
+                  <circle cx="50" cy="58" r="2.4" fill="#b4423a" />
+                  <circle cx="70" cy="58" r="2.4" fill="#b4423a" />
+                  <path
+                    d="M50 66c4 4 16 4 20 0"
+                    fill="none"
+                    stroke="#b4423a"
+                    stroke-width="2.5"
+                    stroke-linecap="round"
+                  />
+                  <path
+                    d="M18 22l4 6M102 22l-4 6M60 14v7"
+                    stroke="#b4423a"
+                    stroke-width="2.5"
+                    stroke-linecap="round"
+                  />
+                </svg>
+                <div style="flex: 1; min-width: 260px">
+                  <h4 style="color: var(--bad)">"All clear! Nothing to see here 🎉"</h4>
+                  <p style="margin: 0.4rem 0 0; color: var(--ink-2); font-size: 0.92rem">
+                    Cheerful, well drawn, on sale for $9, and it makes a
+                    <strong>clinical assertion the software has no basis for</strong>. It says "this
+                    patient has no allergies" when the truth may be "no one has asked" or "you are
+                    not allowed to know". A nurse who believes it prescribes into an unknown.
+                  </p>
+                </div>
+              </div>
+            </div>
+            <figcaption>
+              This is the entire commercial argument in one picture. The competition is not drawing
+              worse pictures than us — it is drawing pictures that cannot be safely used, and
+              charging so little that somebody uses them anyway.
+            </figcaption>
+          </figure>
+
+          <div class="prose">
+            <h3>What the pack contains, so it is a product and not a mood</h3>
+            <ul>
+              <li>
+                <strong>24 regions</strong> × <strong>3 meanings</strong> = 72 illustrations, plus a
+                "not applicable" variant where clinically real (menstrual history for a male patient
+                recorded as not-applicable rather than empty).
+              </li>
+              <li>
+                <strong>The copy for each</strong>, written to be truthful rather than cheerful,
+                with the reasoning recorded beside it.
+              </li>
+              <li>
+                <strong>A React component per meaning</strong>, not just SVG files — because the
+                point is that the developer picks a <em>meaning</em>, and the artwork follows.
+                <code>&lt;EmptyState reason="not-asked" /&gt;</code> makes the wrong version harder
+                to ship than the right one.
+              </li>
+              <li>
+                <strong>Forced-colors and reduced-motion behaviour</strong> already resolved, since
+                a line illustration that vanishes in high-contrast mode is a blank region again.
+              </li>
+              <li>
+                <strong>A mapping table</strong> from FHIR <code>dataAbsentReason</code> codes
+                (<code>asked-unknown</code>, <code>not-asked</code>, <code>masked</code>,
+                <code>not-applicable</code>) to the state to render, so the choice can be made from
+                data rather than by hand.
+              </li>
+            </ul>
+            <div class="note">
+              <span class="lbl">Why this is the flagship rather than the icon set</span>
+              <p>
+                The icon set is better than the competition. The empty-state system
+                <em>has no competition</em>, because selling it requires a point of view about
+                clinical data that an illustration marketplace has no reason to hold. It is also the
+                cheapest possible demonstration of what the whole library claims, which makes it the
+                best top-of-funnel asset Oxygen could put on a pricing page.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="s4">
+        <div class="wrap">
+          <div class="sec-head">
+            <span class="sec-num">04</span>
+            <h2>Five things not to sell, decided now rather than after a letter arrives</h2>
+          </div>
+          <div class="prose">
+            <p>
+              A marketplace makes it trivially easy to list something. These are listed here so that
+              "we could add it later" is a decision somebody reverses deliberately.
+            </p>
+          </div>
+          <div class="grid g2">
+            <div class="card">
+              <h4>1 · SNOMED CT content</h4>
+              <p style="font-size: 0.9rem; color: var(--ink-2)">
+                SNOMED CT requires an affiliate licence and its terms are country-dependent;
+                redistributing descriptions inside a $350 pack is not a grey area.
+                <strong
+                  >Sell the mapping layer we author, never the terminology we do not own.</strong
+                >
+                LOINC and RxNorm are more permissive but still carry attribution requirements —
+                which is exactly the kind of detail that belongs on the item's licence record rather
+                than in somebody's memory.
+              </p>
+            </div>
+            <div class="card">
+              <h4>2 · Redistributed font licences</h4>
+              <p style="font-size: 0.9rem; color: var(--ink-2)">
+                The console stores uploaded font <em>bytes</em>, which is fine for a customer's own
+                licensed face. Selling a bundle that includes a commercial face means becoming a
+                font reseller, with per-seat web-licence accounting attached.
+                <strong>Sell typography configurations over openly licensed families.</strong>
+              </p>
+            </div>
+            <div class="card">
+              <h4>3 · Clinical alarm tones</h4>
+              <p style="font-size: 0.9rem; color: var(--ink-2)">
+                Audible alarms in medical electrical equipment are the subject of
+                <strong>IEC 60601-1-8</strong>. A "clinical alert sound pack" invites a customer to
+                use it somewhere the standard applies, and the moment they do, our artwork is inside
+                their conformity assessment. Say no, and say why on the page.
+              </p>
+            </div>
+            <div class="card">
+              <h4>4 · Patient-education artwork, for now</h4>
+              <p style="font-size: 0.9rem; color: var(--ink-2)">
+                An inhaler-technique diagram is instructions to a patient. If it is wrong, the harm
+                is direct, and "it was decorative" is not a defence. This can ship later with a
+                named clinical reviewer and an explicit scope, but it must not ship in the first
+                release alongside decorative spot art under one licence.
+              </p>
+            </div>
+            <div class="card">
+              <h4>5 · Anything that computes a clinical recommendation</h4>
+              <p style="font-size: 0.9rem; color: var(--ink-2)">
+                A vitals flowsheet renders values. A component that says
+                <em>"score 7 — escalate"</em> is clinical decision support, and depending on
+                jurisdiction and claim, that can be a regulated medical device. The line for the
+                marketplace:
+                <strong
+                  >we render, compute arithmetic that the user configured, and never advise.</strong
+                >
+                The NEWS2-style scores get a fixture pack and a renderer, not a built-in escalation
+                rule.
+              </p>
+            </div>
+            <div class="card" style="border-color: var(--warn-rule); background: var(--warn-soft)">
+              <h4>Also: disclose AI-assisted artwork</h4>
+              <p style="font-size: 0.9rem; color: var(--ink-2)">
+                Procurement questionnaires increasingly ask. A disclosed "AI-assisted,
+                human-finished, reviewed by X" is a fact a buyer can accept. An undisclosed one that
+                gets noticed is a credibility event for a company whose entire pitch is
+                <em>the claims are checkable</em>. Put the provenance on the item record — §5.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="s5">
+        <div class="wrap">
+          <div class="sec-head">
+            <span class="sec-num">05</span>
+            <h2>
+              Every item carries a record of what was checked — the same move the theme validator
+              already makes
+            </h2>
+          </div>
+          <div class="prose">
+            <p>
+              A published theme version carries a <code>ValidationRecord</code> and a
+              <code>validatorVersion</code>, and the delivery route refuses to serve a version whose
+              validator has since been tightened. That is an unusual and good idea, and it
+              generalises:
+              <strong
+                >a marketplace item should carry the evidence for its claims, and the storefront
+                should render the evidence rather than an adjective.</strong
+              >
+            </p>
+            <p>
+              "Accessible" is marketing. "17 of 17 foreground/background pairs at or above 4.5:1,
+              forced-colors verified 14 Aug 2026 against the current checker" is a fact, and it is
+              one the customer can hand to their own procurement team. Which means the record is not
+              overhead — it is a second product hiding inside the first.
+            </p>
+          </div>
+
+          <pre><code><span class="c">// catalogItems[n].provenance — rendered on the item page, in the</span>
+<span class="c">// receipt, and in the JSON a customer can export for their audit file.</span>
+{
+  <span class="k">"accessibility"</span>: {
+    <span class="k">"checkedAt"</span>: <span class="s">"2026-08-14T09:12:03Z"</span>,
+    <span class="k">"checkerVersion"</span>: <span class="s">"3"</span>,           <span class="c">// same discipline as validatorVersion</span>
+    <span class="k">"contrastPairs"</span>: { <span class="k">"passed"</span>: 17, <span class="k">"total"</span>: 17, <span class="k">"floor"</span>: <span class="s">"4.5:1"</span> },
+    <span class="k">"forcedColors"</span>: <span class="s">"verified"</span>,       <span class="c">// artwork survives high-contrast mode</span>
+    <span class="k">"nonColourChannel"</span>: <span class="s">"shape+label"</span>, <span class="c">// severity never colour-only</span>
+    <span class="k">"reducedMotion"</span>: <span class="s">"designed"</span>        <span class="c">// not merely "animation disabled"</span>
+  },
+  <span class="k">"clinical"</span>: {
+    <span class="k">"reviewedBy"</span>: { <span class="k">"name"</span>: <span class="s">"…"</span>, <span class="k">"registration"</span>: <span class="s">"GMC …"</span>, <span class="k">"at"</span>: <span class="s">"2026-08-11"</span> },
+    <span class="k">"scope"</span>: <span class="s">"Vocabulary and state semantics. NOT dosing, NOT diagnosis."</span>,
+    <span class="k">"doesNotClaim"</span>: [
+      <span class="s">"Not medical advice"</span>,
+      <span class="s">"Not a medical device or clinical decision support"</span>,
+      <span class="s">"Not validated for use in diagnosis or treatment selection"</span>
+    ]
+  },
+  <span class="k">"authorship"</span>: {
+    <span class="k">"method"</span>: <span class="s">"hand-drawn"</span>,            <span class="c">// | "ai-assisted, human-finished"</span>
+    <span class="k">"sources"</span>: [<span class="s">"original"</span>],
+    <span class="k">"thirdPartyContent"</span>: []           <span class="c">// LOINC/RxNorm attributions land here</span>
+  },
+  <span class="k">"licence"</span>: {
+    <span class="k">"id"</span>: <span class="s">"oxygen-pack-1.0"</span>,
+    <span class="k">"grant"</span>: <span class="s">"per-organisation, perpetual, non-exclusive, no redistribution"</span>,
+    <span class="k">"derivatives"</span>: <span class="s">"permitted for the licensee's own products"</span>,
+    <span class="k">"resale"</span>: <span class="s">"prohibited, including as part of a template or theme"</span>
+  },
+  <span class="k">"fhir"</span>: { <span class="k">"maps"</span>: [<span class="s">"AllergyIntolerance"</span>, <span class="s">"Observation.dataAbsentReason"</span>], <span class="k">"release"</span>: <span class="s">"R4"</span> }
+}</code></pre>
+
+          <div class="note ok">
+            <span class="lbl">Why this is worth the effort</span>
+            <p>
+              It makes the marketplace <strong>hard to copy and easy to price</strong>. Anybody can
+              draw 320 glyphs. Producing 320 glyphs with a named clinician's review scope, a
+              contrast record and an explicit list of things they do not claim requires a company
+              that already thinks this way — which is the only durable advantage a small library has
+              over a large one.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section id="s6">
+        <div class="wrap">
+          <div class="sec-head">
+            <span class="sec-num">06</span>
+            <h2>
+              The storefront, in the console's own chrome — one new rail item, not a second product
+            </h2>
+          </div>
+          <div class="prose">
+            <p>
+              The console's design rules are already written down and they constrain this screen
+              more than a blank page would: <em>the instrument is the lit object</em> (anything
+              rendering something sits in a dark panel), <em>red only ever means critical</em> (so a
+              "Sale" badge cannot be red), and
+              <em>where a customer's own colours are on screen, the chrome goes achromatic</em>. A
+              marketplace card previewing a customer-themable icon pack is exactly that case.
+            </p>
+          </div>
+
+          <figure>
+            <div class="console">
+              <div class="console-top">
+                <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+                <span class="url">console.oxygenui.design/market</span>
+              </div>
+              <div class="console-body">
+                <div class="rail">
+                  <div class="brand">
+                    <svg viewBox="0 0 28 16" width="26" height="15" aria-hidden="true">
+                      <line x1="8" y1="8" x2="20" y2="8" stroke="#10b995" stroke-width="2.5" />
+                      <circle
+                        cx="8"
+                        cy="8"
+                        r="5.5"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                      />
+                      <circle
+                        cx="20"
+                        cy="8"
+                        r="5.5"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                      />
+                    </svg>
+                    Northwind
+                  </div>
+                  <div class="grp">Design</div>
+                  <a href="#s6">Themes <span class="n">3</span></a>
+                  <a href="#s6">Frameworks <span class="n">2</span></a>
+                  <a href="#s6">Playground</a>
+                  <div class="grp">Marketplace</div>
+                  <a href="#s6" class="on">Catalogue</a>
+                  <a href="#s6">Purchases <span class="n">4</span></a>
+                  <a href="#s6">Access tokens <span class="n">1</span></a>
+                  <div class="grp">Organisation</div>
+                  <a href="#s6">Members <span class="n">9</span></a>
+                  <a href="#s6">Settings</a>
+                </div>
+                <div class="pane">
+                  <div class="ph">
+                    <div>
+                      <h4>Catalogue</h4>
+                      <div class="sub">
+                        Packs, components and themes for this organisation. Purchases are perpetual
+                        and belong to Northwind, not to you.
+                      </div>
+                    </div>
+                    <div style="display: flex; gap: 0.4rem; align-items: center">
+                      <span class="chip">All kinds</span>
+                      <span class="chip">antd</span>
+                      <button class="btn ghost">Request an invoice</button>
+                    </div>
+                  </div>
+
+                  <div class="grid g3" style="gap: 0.7rem">
+                    <div class="mcard">
+                      <div class="prev">
+                        <svg
+                          viewBox="0 0 24 24"
+                          width="26"
+                          height="26"
+                          fill="none"
+                          stroke="#2dd4b0"
+                          stroke-width="1.6"
+                          aria-hidden="true"
+                        >
+                          <path d="M4 7h16M4 12h10M4 17h13" />
+                        </svg>
+                        <svg
+                          viewBox="0 0 24 24"
+                          width="26"
+                          height="26"
+                          fill="none"
+                          stroke="#e8f4f1"
+                          stroke-width="1.6"
+                          aria-hidden="true"
+                        >
+                          <circle cx="12" cy="12" r="8" />
+                          <path d="M12 8v5l3 2" />
+                        </svg>
+                        <svg
+                          viewBox="0 0 24 24"
+                          width="26"
+                          height="26"
+                          fill="none"
+                          stroke="#e8f4f1"
+                          stroke-width="1.6"
+                          aria-hidden="true"
+                        >
+                          <path d="M6 4h9l4 4v12H6z" />
+                          <path d="M15 4v4h4" />
+                        </svg>
+                        <svg
+                          viewBox="0 0 24 24"
+                          width="26"
+                          height="26"
+                          fill="none"
+                          stroke="#e8f4f1"
+                          stroke-width="1.6"
+                          aria-hidden="true"
+                        >
+                          <path d="M12 3v18M5 8l7-5 7 5" />
+                        </svg>
+                      </div>
+                      <div class="meta">
+                        <div class="ttl">Clinical icon set <span class="chip new">new</span></div>
+                        <div class="dsc">
+                          320 glyphs. Routes of administration, devices, sample containers,
+                          specialties. Three weights.
+                        </div>
+                        <div class="foot">
+                          <span class="price">$180</span><button class="btn">Buy</button>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="mcard">
+                      <div class="prev">
+                        <svg viewBox="0 0 120 60" width="120" height="54" aria-hidden="true">
+                          <rect
+                            x="10"
+                            y="8"
+                            width="30"
+                            height="44"
+                            rx="4"
+                            fill="none"
+                            stroke="#8b9c98"
+                            stroke-width="2"
+                          />
+                          <line
+                            x1="16"
+                            y1="22"
+                            x2="34"
+                            y2="22"
+                            stroke="#2dd4b0"
+                            stroke-width="2"
+                            stroke-dasharray="4 4"
+                            stroke-linecap="round"
+                          />
+                          <rect
+                            x="45"
+                            y="8"
+                            width="30"
+                            height="44"
+                            rx="4"
+                            fill="none"
+                            stroke="#8b9c98"
+                            stroke-width="2"
+                          />
+                          <path
+                            d="M52 26l5 5 9-10"
+                            fill="none"
+                            stroke="#2dd4b0"
+                            stroke-width="2.4"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          />
+                          <rect
+                            x="80"
+                            y="8"
+                            width="30"
+                            height="44"
+                            rx="4"
+                            fill="none"
+                            stroke="#8b9c98"
+                            stroke-width="2"
+                          />
+                          <rect
+                            x="88"
+                            y="28"
+                            width="14"
+                            height="11"
+                            rx="2"
+                            fill="none"
+                            stroke="#2dd4b0"
+                            stroke-width="2"
+                          />
+                          <path
+                            d="M91 28v-3a4 4 0 0 1 8 0v3"
+                            fill="none"
+                            stroke="#2dd4b0"
+                            stroke-width="2"
+                          />
+                        </svg>
+                      </div>
+                      <div class="meta">
+                        <div class="ttl">Empty-state system</div>
+                        <div class="dsc">
+                          24 regions × 3 meanings: not asked, asked and none found, withheld.
+                          Components, not just SVG.
+                        </div>
+                        <div class="foot">
+                          <span class="price">$290</span><button class="btn">Buy</button>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="mcard">
+                      <div class="prev">
+                        <svg viewBox="0 0 120 60" width="120" height="54" aria-hidden="true">
+                          <rect x="12" y="16" width="18" height="28" rx="3" fill="#0f766e" />
+                          <rect x="34" y="16" width="18" height="28" rx="3" fill="#2dd4b0" />
+                          <rect x="56" y="16" width="18" height="28" rx="3" fill="#a16207" />
+                          <rect x="78" y="16" width="18" height="28" rx="3" fill="#dc2626" />
+                          <rect x="100" y="16" width="8" height="28" rx="3" fill="#e8f4f1" />
+                        </svg>
+                      </div>
+                      <div class="meta">
+                        <div class="ttl">Severity ramp — CVD-safe</div>
+                        <div class="dsc">
+                          A theme pack that passes the console validator, verified for deuteranopia
+                          and forced-colors.
+                        </div>
+                        <div class="foot">
+                          <span class="price">$120</span><button class="btn">Buy</button>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="mcard">
+                      <div class="prev">
+                        <svg viewBox="0 0 120 60" width="120" height="54" aria-hidden="true">
+                          <path
+                            d="M10 46 L30 30 L46 36 L64 18 L82 26 L110 12"
+                            fill="none"
+                            stroke="#2dd4b0"
+                            stroke-width="2.4"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          />
+                          <rect
+                            x="10"
+                            y="20"
+                            width="100"
+                            height="14"
+                            fill="#134e4a"
+                            opacity="0.5"
+                          />
+                          <circle cx="64" cy="18" r="3" fill="#2dd4b0" />
+                        </svg>
+                      </div>
+                      <div class="meta">
+                        <div class="ttl">Lab trend + reference band</div>
+                        <div class="dsc">
+                          A trend that renders the reference range as a band, and says so when the
+                          range is missing.
+                        </div>
+                        <div class="foot">
+                          <span class="price">$450</span><button class="btn">Buy</button>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="mcard">
+                      <div class="prev">
+                        <svg viewBox="0 0 120 60" width="120" height="54" aria-hidden="true">
+                          <rect
+                            x="14"
+                            y="10"
+                            width="92"
+                            height="40"
+                            rx="4"
+                            fill="none"
+                            stroke="#8b9c98"
+                            stroke-width="2"
+                          />
+                          <line
+                            x1="14"
+                            y1="22"
+                            x2="106"
+                            y2="22"
+                            stroke="#8b9c98"
+                            stroke-width="2"
+                          />
+                          <line x1="44" y1="22" x2="44" y2="50" stroke="#1d302d" stroke-width="2" />
+                          <line x1="74" y1="22" x2="74" y2="50" stroke="#1d302d" stroke-width="2" />
+                          <circle cx="30" cy="32" r="3" fill="#2dd4b0" />
+                          <circle cx="59" cy="32" r="3" fill="#2dd4b0" />
+                          <circle cx="30" cy="42" r="3" fill="#8b9c98" />
+                          <circle cx="89" cy="42" r="3" fill="#a16207" />
+                        </svg>
+                      </div>
+                      <div class="meta">
+                        <div class="ttl">
+                          Synthetic patient fixtures <span class="chip own">owned</span>
+                        </div>
+                        <div class="dsc">
+                          200 PHI-free FHIR bundles, deliberately messy. Units that disagree,
+                          results amended twice.
+                        </div>
+                        <div class="foot">
+                          <span class="price" style="color: var(--site-graphite)">Owned · v3</span
+                          ><button class="btn ghost">Download</button>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="mcard">
+                      <div class="prev">
+                        <svg viewBox="0 0 120 60" width="120" height="54" aria-hidden="true">
+                          <circle
+                            cx="34"
+                            cy="22"
+                            r="9"
+                            fill="none"
+                            stroke="#8b9c98"
+                            stroke-width="2"
+                          />
+                          <path
+                            d="M20 46c0-8 6-12 14-12s14 4 14 12"
+                            fill="none"
+                            stroke="#8b9c98"
+                            stroke-width="2"
+                          />
+                          <circle
+                            cx="76"
+                            cy="22"
+                            r="9"
+                            fill="none"
+                            stroke="#2dd4b0"
+                            stroke-width="2"
+                          />
+                          <path
+                            d="M62 46c0-8 6-12 14-12s14 4 14 12"
+                            fill="none"
+                            stroke="#2dd4b0"
+                            stroke-width="2"
+                          />
+                          <path
+                            d="M96 30h10M101 25v10"
+                            stroke="#e8f4f1"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                          />
+                        </svg>
+                      </div>
+                      <div class="meta">
+                        <div class="ttl">Care-setting scenes</div>
+                        <div class="dsc">
+                          40 scenes, six skin tones, wheelchair users and carers as defaults rather
+                          than variants.
+                        </div>
+                        <div class="foot">
+                          <span class="price">$390</span><button class="btn">Buy</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <figcaption>
+              <strong>Three rail items, not a tab bar.</strong> Catalogue is where money is spent;
+              Purchases is where the org sees what it owns and what it paid; Access tokens is where
+              a developer mints the credential the CLI needs. Splitting them matters because they
+              have three different audiences and — per §12 — three different capabilities.
+            </figcaption>
+          </figure>
+        </div>
+      </section>
+
+      <section id="s7">
+        <div class="wrap">
+          <div class="sec-head">
+            <span class="sec-num">07</span>
+            <h2>The item page sells the evidence, not the adjective</h2>
+          </div>
+
+          <figure>
+            <div class="console">
+              <div class="console-top">
+                <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+                <span class="url">console.oxygenui.design/market/empty-state-system</span>
+              </div>
+              <div style="padding: 1.1rem 1.3rem 1.5rem">
+                <div class="ph">
+                  <div>
+                    <h4>
+                      Empty-state system <span class="chip">illustration</span>
+                      <span class="chip">v2 · 14 Aug 2026</span>
+                    </h4>
+                    <div class="sub">
+                      Twenty-four regions, each drawn and written in three meanings. React
+                      components, SVG source, and the FHIR mapping.
+                    </div>
+                  </div>
+                  <div style="text-align: right">
+                    <div style="font-family: var(--font-mono); font-size: 1.3rem; font-weight: 600">
+                      $290
+                    </div>
+                    <div
+                      style="font-size: 0.68rem; color: var(--site-graphite); margin-bottom: 0.4rem"
+                    >
+                      one-time · whole organisation
+                    </div>
+                    <button class="btn">Buy for Northwind</button>
+                  </div>
+                </div>
+
+                <div class="split">
+                  <div
+                    class="stage"
+                    style="
+                      padding: 1rem;
+                      display: flex;
+                      align-items: center;
+                      justify-content: center;
+                      min-height: 180px;
+                    "
+                  >
+                    <svg
+                      viewBox="0 0 260 120"
+                      width="100%"
+                      height="150"
+                      role="img"
+                      aria-label="Three empty-state illustrations side by side"
+                    >
+                      <g transform="translate(14,18)">
+                        <rect
+                          x="0"
+                          y="0"
+                          width="60"
+                          height="76"
+                          rx="5"
+                          fill="none"
+                          stroke="#8b9c98"
+                          stroke-width="2"
+                        />
+                        <line
+                          x1="12"
+                          y1="24"
+                          x2="48"
+                          y2="24"
+                          stroke="#2dd4b0"
+                          stroke-width="2"
+                          stroke-dasharray="5 5"
+                          stroke-linecap="round"
+                        />
+                        <line
+                          x1="12"
+                          y1="36"
+                          x2="38"
+                          y2="36"
+                          stroke="#8b9c98"
+                          stroke-width="2"
+                          stroke-dasharray="5 5"
+                          stroke-linecap="round"
+                        />
+                        <text
+                          x="30"
+                          y="94"
+                          font-size="8"
+                          fill="#8b9c98"
+                          text-anchor="middle"
+                          font-family="monospace"
+                        >
+                          not-asked
+                        </text>
+                      </g>
+                      <g transform="translate(98,18)">
+                        <rect
+                          x="0"
+                          y="0"
+                          width="60"
+                          height="76"
+                          rx="5"
+                          fill="none"
+                          stroke="#8b9c98"
+                          stroke-width="2"
+                        />
+                        <path
+                          d="M14 30l7 7 14-15"
+                          fill="none"
+                          stroke="#2dd4b0"
+                          stroke-width="2.6"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        />
+                        <line
+                          x1="12"
+                          y1="52"
+                          x2="48"
+                          y2="52"
+                          stroke="#8b9c98"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                        />
+                        <text
+                          x="30"
+                          y="94"
+                          font-size="8"
+                          fill="#8b9c98"
+                          text-anchor="middle"
+                          font-family="monospace"
+                        >
+                          none-found
+                        </text>
+                      </g>
+                      <g transform="translate(182,18)">
+                        <rect
+                          x="0"
+                          y="0"
+                          width="60"
+                          height="76"
+                          rx="5"
+                          fill="none"
+                          stroke="#8b9c98"
+                          stroke-width="2"
+                        />
+                        <rect
+                          x="20"
+                          y="36"
+                          width="22"
+                          height="17"
+                          rx="3"
+                          fill="#08110f"
+                          stroke="#2dd4b0"
+                          stroke-width="2"
+                        />
+                        <path
+                          d="M25 36v-5a6 6 0 0 1 12 0v5"
+                          fill="none"
+                          stroke="#2dd4b0"
+                          stroke-width="2"
+                        />
+                        <text
+                          x="30"
+                          y="94"
+                          font-size="8"
+                          fill="#8b9c98"
+                          text-anchor="middle"
+                          font-family="monospace"
+                        >
+                          masked
+                        </text>
+                      </g>
+                    </svg>
+                  </div>
+
+                  <div>
+                    <div
+                      style="
+                        font-family: var(--font-mono);
+                        font-size: 0.62rem;
+                        letter-spacing: 0.1em;
+                        text-transform: uppercase;
+                        color: var(--site-graphite);
+                        margin-bottom: 0.5rem;
+                      "
+                    >
+                      What was checked
+                    </div>
+                    <div
+                      style="display: flex; flex-direction: column; gap: 0.4rem; font-size: 0.78rem"
+                    >
+                      <div style="display: flex; gap: 0.5rem; align-items: baseline">
+                        <span style="color: var(--site-pass); font-weight: 700">✓</span
+                        ><span
+                          >17/17 contrast pairs ≥ 4.5:1
+                          <span style="color: var(--site-graphite)"
+                            >· checker v3, 14 Aug</span
+                          ></span
+                        >
+                      </div>
+                      <div style="display: flex; gap: 0.5rem; align-items: baseline">
+                        <span style="color: var(--site-pass); font-weight: 700">✓</span
+                        ><span
+                          >Forced-colors verified — every state readable with artwork
+                          suppressed</span
+                        >
+                      </div>
+                      <div style="display: flex; gap: 0.5rem; align-items: baseline">
+                        <span style="color: var(--site-pass); font-weight: 700">✓</span
+                        ><span>Meaning carried by shape and label, never colour alone</span>
+                      </div>
+                      <div style="display: flex; gap: 0.5rem; align-items: baseline">
+                        <span style="color: var(--site-pass); font-weight: 700">✓</span
+                        ><span
+                          >Clinically reviewed 11 Aug —
+                          <em>vocabulary and state semantics</em></span
+                        >
+                      </div>
+                      <div style="display: flex; gap: 0.5rem; align-items: baseline">
+                        <span style="color: var(--site-warn); font-weight: 700">!</span
+                        ><span
+                          >Does <strong>not</strong> claim: medical advice · device · diagnostic
+                          validation</span
+                        >
+                      </div>
+                      <div style="display: flex; gap: 0.5rem; align-items: baseline">
+                        <span style="color: var(--site-graphite); font-weight: 700">·</span
+                        ><span>Hand-drawn, original. No third-party content.</span>
+                      </div>
+                    </div>
+
+                    <div
+                      style="
+                        font-family: var(--font-mono);
+                        font-size: 0.62rem;
+                        letter-spacing: 0.1em;
+                        text-transform: uppercase;
+                        color: var(--site-graphite);
+                        margin: 1rem 0 0.5rem;
+                      "
+                    >
+                      Licence
+                    </div>
+                    <div style="font-size: 0.78rem; line-height: 1.5; color: var(--site-graphite)">
+                      Perpetual, for
+                      <strong style="color: var(--site-ink)">every member of Northwind</strong> and
+                      every product Northwind ships. Derivatives allowed. Resale and redistribution
+                      — including inside a template — are not.
+                    </div>
+
+                    <div
+                      style="
+                        font-family: var(--font-mono);
+                        font-size: 0.62rem;
+                        letter-spacing: 0.1em;
+                        text-transform: uppercase;
+                        color: var(--site-graphite);
+                        margin: 1rem 0 0.5rem;
+                      "
+                    >
+                      On purchase
+                    </div>
+                    <div style="font-size: 0.78rem; line-height: 1.5; color: var(--site-graphite)">
+                      Installed into any theme in one click, downloadable as SVG + React source, and
+                      available to
+                      <code style="font-size: 0.72rem">shadcn add @oxygen-pro/empty-state</code>
+                      with an org access token.
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <figcaption>
+              <strong>The right-hand column is the product.</strong> It is generated from the item's
+              provenance record (§5) rather than written by hand, so it cannot drift from what was
+              actually tested — and a customer can export it into their own accessibility evidence
+              file, which is a thing they are separately being asked for.
+            </figcaption>
+          </figure>
+        </div>
+      </section>
+
+      <section id="s8">
+        <div class="wrap">
+          <div class="sec-head">
+            <span class="sec-num">08</span>
+            <h2>Six steps from wanting it to using it, and only one of them is a payment</h2>
+          </div>
+          <div class="flow">
+            <div class="step">
+              <div class="n">01</div>
+              <div class="t">Catalogue</div>
+              <div class="d">
+                Signed in, org known, framework known. No cart in v1 — one item, one purchase.
+              </div>
+            </div>
+            <div class="step">
+              <div class="n">02</div>
+              <div class="t">Item page</div>
+              <div class="d">
+                Evidence, licence, what you get. The licence is shown, not linked.
+              </div>
+            </div>
+            <div class="step">
+              <div class="n">03</div>
+              <div class="t">Stripe Checkout</div>
+              <div class="d">
+                Hosted. Card, wallets, and the customer's billing address for tax. We never see a
+                card number.
+              </div>
+            </div>
+            <div class="step">
+              <div class="n">04</div>
+              <div class="t">Return</div>
+              <div class="d">
+                Success page runs the same idempotent fulfilment the webhook runs. The webhook is
+                what guarantees it.
+              </div>
+            </div>
+            <div class="step">
+              <div class="n">05</div>
+              <div class="t">Purchases</div>
+              <div class="d">
+                Entitlement visible, receipt and invoice downloadable, licence re-readable.
+              </div>
+            </div>
+            <div class="step">
+              <div class="n">06</div>
+              <div class="t">Install</div>
+              <div class="d">
+                Into a theme as a draft, as a download, or via the CLI with a token. Never
+                auto-published.
+              </div>
+            </div>
+          </div>
+
+          <div class="prose">
+            <h3>The two rules that shape this flow</h3>
+            <p>
+              <strong>Nothing purchased ever reaches production by itself.</strong> An icon pack
+              applied to a theme creates a draft; a human with <code>theme.publish</code> still has
+              to publish it. The console already separates designer from admin precisely because
+              publishing reaches a customer's production application, and a purchase must not become
+              a back door around that split.
+            </p>
+            <p>
+              <strong>The purchase belongs to the organisation, not the buyer.</strong>
+              A designer who leaves does not take the icon pack with them, and the entitlement is
+              not attached to their member document. This is also why the receipt and the invoice
+              live on the Purchases page rather than in one person's email.
+            </p>
+            <div class="note warn">
+              <span class="lbl">The discovery problem, stated plainly</span>
+              <p>
+                A storefront visible only after sign-up has no top of funnel. The catalogue's
+                <em>public</em> pages should live on <code>oxygenui.design</code>, where the docs
+                already rank, with the console owning checkout, entitlement and delivery. Same
+                catalogue documents, two renderings. Building the storefront console-only would be
+                building a shop inside a locked building.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="s9">
+        <div class="wrap">
+          <div class="sec-head">
+            <span class="sec-num">09</span>
+            <h2>
+              One-time, per organisation, perpetual — and an invoice for the half of this market
+              that cannot use a card
+            </h2>
+          </div>
+          <div class="prose">
+            <h3>Why not per seat</h3>
+            <p>
+              Seat-counting artwork is unenforceable and insulting in equal measure. The customer
+              would have to tell us how many designers opened an SVG, and we would have to pretend
+              to check. Per-organisation is honest, it is what the console's data model already
+              expresses, and it removes the entire class of "does the contractor count" support
+              conversation.
+            </p>
+
+            <h3>Why not a subscription, yet</h3>
+            <p>
+              An all-access subscription is the obvious second move and the wrong first one.
+              Subscriptions to a small audience produce churn management work before they produce
+              revenue, and they force a content cadence — a promise of new packs every month — that
+              a two-person content operation cannot keep.
+              <strong
+                >Ship one-time purchases; add "Oxygen Plus" only when the attach rate shows more
+                than one purchase per org.</strong
+              >
+              Stripe's own Entitlements API is subscription-only, which is another reason our
+              entitlement records have to be ours regardless.
+            </p>
+
+            <h3>The four ways money arrives</h3>
+            <div class="tw">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Route</th>
+                    <th>Stripe object</th>
+                    <th>Fits</th>
+                    <th>Grants on</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Card, self-serve</strong></td>
+                    <td>Checkout Session, <code>mode: payment</code></td>
+                    <td>
+                      $80–$900. A design lead with a company card and no procurement patience.
+                    </td>
+                    <td><code>checkout.session.completed</code></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Bank transfer / delayed methods</strong></td>
+                    <td>Checkout Session with a delayed payment method</td>
+                    <td>Larger amounts, European buyers.</td>
+                    <td>
+                      <code>checkout.session.async_payment_succeeded</code> — <em>not</em> the
+                      completed event
+                    </td>
+                  </tr>
+                  <tr>
+                    <td><strong>Invoice, net-30, with a PO number</strong></td>
+                    <td>Stripe Invoicing</td>
+                    <td>
+                      $1,500+. Health systems, funded startups with a finance function, anybody
+                      whose supplier onboarding takes six weeks.
+                    </td>
+                    <td><code>invoice.paid</code></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Contract bundle</strong></td>
+                    <td>None — granted by hand, recorded the same way</td>
+                    <td>
+                      A pack included in a $25k engagement. It still becomes an entitlement document
+                      with a reason and an actor.
+                    </td>
+                    <td>An admin action, audited</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="note">
+              <span class="lbl">The point of the fourth row</span>
+              <p>
+                It is the reason to build this at all. Once entitlements exist as records rather
+                than as emails, delivering the contract-sized work becomes the same operation as
+                delivering a $180 pack — including revocation when a trial ends, which today has no
+                mechanism whatsoever.
+              </p>
+            </div>
+
+            <h3>Tax, currency and the boring parts that bite later</h3>
+            <ul>
+              <li>
+                <strong>Stripe Tax on</strong>, because digital goods are taxed where the customer
+                is, and the thresholds arrive before the revenue does. Checkout collects the billing
+                address that the calculation needs.
+              </li>
+              <li>
+                <strong>Prices in USD</strong> with Stripe handling presentment. One currency of
+                record keeps reconciliation trivial while volume is low.
+              </li>
+              <li>
+                <strong>Business-customer field</strong> — VAT/GST number captured at checkout,
+                because a B2B buyer who cannot enter theirs will open a support ticket instead of
+                paying.
+              </li>
+              <li>
+                <strong>EU digital-content withdrawal right</strong> — for consumer-classified
+                buyers, immediate access requires an explicit acknowledgement that the 14-day
+                withdrawal right is waived on download. Collected at checkout, recorded on the
+                order.
+              </li>
+              <li>
+                <strong>Refunds</strong> — a stated window (14 days, no questions, one per org per
+                item), executed as an entitlement revocation plus a Stripe refund. §14 covers what
+                revocation cannot undo.
+              </li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section id="s10">
+        <div class="wrap">
+          <div class="sec-head">
+            <span class="sec-num">10</span>
+            <h2>
+              Stripe, concretely — and the one line that keeps a double-delivered webhook from
+              double-granting
+            </h2>
+          </div>
+
+          <div class="prose">
+            <p>
+              Stripe's own guidance is unambiguous on two points, and both of them are design
+              constraints rather than implementation details:
+              <strong>webhooks are required</strong> — a customer can pay and lose their connection
+              before the success page loads — and the fulfilment function
+              <strong
+                >must survive being called several times, possibly concurrently, for the same
+                session</strong
+              >.
+            </p>
+          </div>
+
+          <figure>
+            <div class="card">
+              <div class="lane">
+                <div class="who">member</div>
+                <div class="msg">
+                  Presses <strong>Buy</strong> on the item page. A server action, so the price is
+                  never in the browser's hands.
+                </div>
+
+                <div class="who">console</div>
+                <div class="msg">
+                  <code>authorize("market.purchase")</code> → resolves the org, looks the item up
+                  <strong>by slug in our own catalogue</strong>, reads its
+                  <code>stripePriceId</code>, creates a Checkout Session with
+                  <code>client_reference_id: orgId</code> and
+                  <code>metadata: { orgId, itemId, itemVersion, memberId }</code>.
+                </div>
+
+                <div class="who">stripe</div>
+                <div class="msg">
+                  Hosts the payment page. Collects address and tax. We never touch card data, which
+                  is the entire reason to use hosted Checkout rather than Elements here.
+                </div>
+
+                <div class="who">stripe → us</div>
+                <div class="msg">
+                  <code>POST /api/stripe/webhook</code> with
+                  <code>checkout.session.completed</code>. Raw body, signature verified with
+                  <code>constructEvent</code>. Anything unverified is a 400 and nothing else.
+                </div>
+
+                <div class="who">console</div>
+                <div class="msg">
+                  <code>fulfil(sessionId)</code> — re-reads the session from Stripe with
+                  <code>line_items</code> expanded, checks <code>payment_status !== "unpaid"</code>,
+                  then <strong>claims the order atomically</strong> before granting.
+                </div>
+
+                <div class="who">member</div>
+                <div class="msg q">
+                  Meanwhile lands on <code>/market/success?session_id=…</code>, which calls the
+                  <em>same</em> <code>fulfil()</code>. One of the two wins the claim; the other
+                  returns the already-granted entitlement. The member never waits on a webhook.
+                </div>
+
+                <div class="who">console</div>
+                <div class="msg">
+                  Writes <code>entitlements</code>, appends <code>market.purchased</code> to the
+                  audit log, and renders the install options.
+                </div>
+              </div>
+            </div>
+            <figcaption>
+              Fulfilling from <strong>both</strong> the webhook and the landing page is Stripe's
+              recommended shape: the webhook guarantees it happens, the landing page makes it
+              immediate. That is only safe because the claim below is atomic.
+            </figcaption>
+          </figure>
+
+          <h3>The atomic claim — the same trick the codebase already uses for the first admin</h3>
+          <div class="prose">
+            <p>
+              <code>claimFirstAdmin</code> in hq makes "is this the first account" a single atomic
+              write rather than a read followed by an act, because a count is a read and several
+              simultaneous signups all read zero. Order fulfilment is exactly the same shape: two
+              concurrent calls both read "not yet fulfilled" and both grant. So it is written the
+              same way — and the order document's <code>_id</code> <em>is</em> the Stripe session
+              id, which is the same reason the font store keys documents by their digest.
+            </p>
+          </div>
+
+          <pre><code><span class="c">// src/lib/market/fulfil.ts — safe to call many times, concurrently,</span>
+<span class="c">// from the webhook and from the success page, for the same session.</span>
+<span class="k">export async function</span> fulfil(sessionId: <span class="k">string</span>): Promise&lt;Fulfilment&gt; {
+  <span class="k">const</span> session = <span class="k">await</span> stripe.checkout.sessions.retrieve(sessionId, {
+    expand: [<span class="s">"line_items"</span>],
+  });
+  <span class="k">if</span> (session.payment_status === <span class="s">"unpaid"</span>) <span class="k">return</span> { granted: [], reason: <span class="s">"unpaid"</span> };
+
+  <span class="c">// The claim. `_id` is the session id, so the upsert is the lock:</span>
+  <span class="c">// exactly one caller sees `fulfilledAt` transition from null.</span>
+  <span class="k">const</span> claim = <span class="k">await</span> orders().findOneAndUpdate(
+    { _id: sessionId, fulfilledAt: <span class="k">null</span> },
+    {
+      $setOnInsert: { orgId, memberId, items, amountTotal, currency, createdAt: now },
+      $set: { fulfilledAt: now },
+    },
+    { upsert: <span class="k">true</span>, returnDocument: <span class="s">"before"</span> },
+  );
+
+  <span class="c">// A document came back with fulfilledAt already set → somebody else won.</span>
+  <span class="c">// Not an error: return what they granted.</span>
+  <span class="k">if</span> (claim?.fulfilledAt) <span class="k">return</span> { granted: claim.granted, reason: <span class="s">"already"</span> };
+
+  <span class="k">const</span> granted = <span class="k">await</span> grantEntitlements(orgId, items, { via: sessionId });
+  <span class="k">await</span> audit(<span class="s">"market.purchased"</span>, { orgId, actorId: memberId, subject: items.join() });
+  <span class="k">return</span> { granted, reason: <span class="s">"granted"</span> };
+}</code></pre>
+
+          <div class="note bad">
+            <span class="lbl">The vulnerability this shape closes, and one it does not</span>
+            <p>
+              <strong>Never accept a price, amount or line item from the client.</strong>
+              The browser sends an item <em>slug</em>; the server looks up the price. A checkout
+              endpoint that takes <code>{ priceId }</code> or, worse, <code>{ amount }</code> is a
+              marketplace that sells $450 components for one cent, and it is the single most common
+              integration mistake in this category.
+            </p>
+            <p style="margin-top: 0.6rem">
+              And what it does <em>not</em> close: the webhook endpoint must be exempt from any
+              CSRF/session middleware, must read the <strong>raw</strong> body before any JSON
+              parsing, and must return 2xx quickly — Checkout waits up to ten seconds on
+              <code>checkout.session.completed</code>
+              before redirecting the customer, so slow fulfilment is a visible stall.
+            </p>
+          </div>
+
+          <h3>Events to handle, and what each one means</h3>
+          <div class="tw">
+            <table>
+              <thead>
+                <tr>
+                  <th>Event</th>
+                  <th>Do</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>checkout.session.completed</code></td>
+                  <td>Fulfil. The common path.</td>
+                </tr>
+                <tr>
+                  <td><code>checkout.session.async_payment_succeeded</code></td>
+                  <td>
+                    Fulfil. Bank debits land here, sometimes days later. Skipping it means silently
+                    never delivering to the customers who paid the most.
+                  </td>
+                </tr>
+                <tr>
+                  <td><code>checkout.session.async_payment_failed</code></td>
+                  <td>Email the buyer. Do not grant.</td>
+                </tr>
+                <tr>
+                  <td><code>checkout.session.expired</code></td>
+                  <td>
+                    Mark the order abandoned. Useful signal: a spike here is a pricing or
+                    tax-surprise problem, not a bug.
+                  </td>
+                </tr>
+                <tr>
+                  <td><code>invoice.paid</code></td>
+                  <td>Grant for the enterprise path.</td>
+                </tr>
+                <tr>
+                  <td><code>charge.refunded</code></td>
+                  <td>
+                    Revoke the entitlement, revoke registry tokens' access to that item, audit it.
+                  </td>
+                </tr>
+                <tr>
+                  <td><code>charge.dispute.created</code></td>
+                  <td>
+                    Revoke and alert a human. A dispute on a digital good is usually either fraud or
+                    a very unhappy customer, and both need a person.
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="prose">
+            <p>
+              Local development uses
+              <code>stripe listen --forward-to localhost:6003/api/stripe/webhook</code>. Two
+              environment variables join the console's existing
+              <code>scripts/env.mjs</code> convention — <code>STRIPE_SECRET_KEY</code> and
+              <code>STRIPE_WEBHOOK_SECRET</code> — and the app must refuse to boot in production
+              with test-mode keys, which is one line and prevents an embarrassing week.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section id="s11">
+        <div class="wrap">
+          <div class="sec-head">
+            <span class="sec-num">11</span>
+            <h2>
+              Five collections, and the first document in this codebase that is deliberately not
+              org-scoped
+            </h2>
+          </div>
+          <div class="prose">
+            <p>
+              The console's central invariant is that everything belonging to a customer carries
+              <code>orgId</code>, nothing reads a collection directly, and
+              <code>scoped()</code> returns an object that <em>cannot express</em> an unscoped
+              query. There are two documented exceptions today, both named <code>unscoped*</code>:
+              sign-in, and the public stylesheet route.
+            </p>
+            <p>
+              The catalogue is the third, and it is a different kind: it is not customer data at
+              all. Every organisation sees the same items. That has to be stated loudly, because a
+              reviewer skimming
+              <code>catalogItems.find({})</code> should be able to tell in one second whether they
+              are looking at the deliberate exception or the bug the whole scoping design exists to
+              prevent — and the isolation test that asserts nothing under <code>src/</code> imports
+              <code>db()</code>
+              directly will need an explicit, narrow allowance.
+            </p>
+          </div>
+
+          <div class="tw">
+            <table>
+              <thead>
+                <tr>
+                  <th>Collection</th>
+                  <th>Scoped?</th>
+                  <th>Key shape</th>
+                  <th>Notes</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>catalogItems</code></td>
+                  <td><span class="badge no">global</span></td>
+                  <td><code>slug</code> unique</td>
+                  <td>
+                    kind, title, blurb, <code>stripePriceId</code>, current version, provenance
+                    (§5), preview assets, framework compatibility. Read through
+                    <code>unscopedCatalogue()</code>.
+                  </td>
+                </tr>
+                <tr>
+                  <td><code>catalogVersions</code></td>
+                  <td><span class="badge no">global</span></td>
+                  <td><code>{ itemId, version }</code> unique</td>
+                  <td>
+                    <strong>Immutable</strong>, exactly like <code>themeVersions</code>. A purchase
+                    entitles an org to a version line; an update writes a new document. "Which
+                    version did they buy, and which have they installed" stays answerable.
+                  </td>
+                </tr>
+                <tr>
+                  <td><code>orders</code></td>
+                  <td><span class="badge v1">orgId</span></td>
+                  <td><code>_id</code> = Stripe session or invoice id</td>
+                  <td>
+                    The id choice <em>is</em> the idempotency mechanism. Amount, currency, tax,
+                    buyer, line items, <code>fulfilledAt</code>, refund state.
+                  </td>
+                </tr>
+                <tr>
+                  <td><code>entitlements</code></td>
+                  <td><span class="badge v1">orgId</span></td>
+                  <td><code>{ orgId, itemId }</code> unique</td>
+                  <td>
+                    grantedAt, grantedVia (order id, or <code>contract:…</code> with a reason and an
+                    actor), versionLine, revokedAt + revokedReason. Never deleted — the console does
+                    not delete referenced things.
+                  </td>
+                </tr>
+                <tr>
+                  <td><code>registryTokens</code></td>
+                  <td><span class="badge v1">orgId</span></td>
+                  <td><code>_id</code> = SHA-256 of the token</td>
+                  <td>
+                    Only the hash is stored, exactly like sessions and password resets. Label,
+                    createdBy, lastUsedAt, expiresAt (TTL index), revokedAt. Shown once at mint time
+                    and never again.
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="prose">
+            <p>
+              Marketplace <strong>bytes</strong> reuse the content-addressed pattern the font store
+              already established — SHA-256 as <code>_id</code>, so a re-upload is idempotent and
+              "are these the bytes we shipped" is answerable by recomputing rather than by trusting
+              a filename. They are global rather than copied per organisation; what is
+              per-organisation is the <em>entitlement to fetch them</em>.
+            </p>
+            <p>
+              Three audit actions join the existing union:
+              <code>market.purchased</code>, <code>market.installed</code>,
+              <code>market.revoked</code>. The audit log is append-only and already indexed by
+              <code>{ orgId, at: -1 }</code>, so the Purchases page's history view is a query rather
+              than a feature.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section id="s12">
+        <div class="wrap">
+          <div class="sec-head">
+            <span class="sec-num">12</span>
+            <h2>
+              Four capabilities, and spending the organisation's money is admin-only for the same
+              reason publishing is
+            </h2>
+          </div>
+          <div class="prose">
+            <p>
+              The console checks capabilities, not roles —
+              <code>can(role, "theme.publish")</code> survives a fifth role;
+              <code>role === "admin" || role === "owner"</code> scattered across twenty actions does
+              not. Four capabilities join the union.
+            </p>
+          </div>
+          <div class="tw">
+            <table>
+              <thead>
+                <tr>
+                  <th>Capability</th>
+                  <th>admin</th>
+                  <th>designer</th>
+                  <th>developer</th>
+                  <th>viewer</th>
+                  <th>Reasoning</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>market.browse</code></td>
+                  <td>✓</td>
+                  <td>✓</td>
+                  <td>✓</td>
+                  <td>✓</td>
+                  <td>
+                    Seeing what exists costs nothing and creates demand. A viewer who spots a pack
+                    tells the admin.
+                  </td>
+                </tr>
+                <tr>
+                  <td><code>market.purchase</code></td>
+                  <td>✓</td>
+                  <td>—</td>
+                  <td>—</td>
+                  <td>—</td>
+                  <td>
+                    <strong>Admin only.</strong> Same argument as publishing: it is the action with
+                    consequences outside the console. A designer requests; an admin approves by
+                    buying. Anything else means a contractor can spend a hospital's money on a
+                    Tuesday.
+                  </td>
+                </tr>
+                <tr>
+                  <td><code>market.install</code></td>
+                  <td>✓</td>
+                  <td>✓</td>
+                  <td>—</td>
+                  <td>—</td>
+                  <td>
+                    Installing a pack edits a theme draft, so it is really
+                    <code>theme.write</code> wearing a different hat — and it stops at the draft,
+                    because publishing stays separate.
+                  </td>
+                </tr>
+                <tr>
+                  <td><code>market.token</code></td>
+                  <td>✓</td>
+                  <td>—</td>
+                  <td>✓</td>
+                  <td>—</td>
+                  <td>
+                    A developer needs a CLI credential and should not have to ask an admin every
+                    sprint. Tokens are labelled, expiring, revocable and audited, which is what
+                    makes that safe.
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="note">
+            <span class="lbl">One deliberate asymmetry</span>
+            <p>
+              A designer can spend an admin's money indirectly by asking, but cannot do it directly
+              — while a developer can mint a credential that downloads everything the org owns. That
+              is the right split: the first is a financial control, the second is a delivery
+              convenience, and conflating them produces either a console nobody can use or a card
+              nobody controls.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section id="s13">
+        <div class="wrap">
+          <div class="sec-head">
+            <span class="sec-num">13</span>
+            <h2>
+              Delivery is different for every kind — and the existing public asset route is the one
+              thing that must not be reused
+            </h2>
+          </div>
+          <div class="prose">
+            <p>
+              The console serves <code>/t/{org}/{theme}@{v}.css</code> and
+              <code>/f/{org}/{sha}.{ext}</code> <strong>publicly and without credentials</strong>,
+              deliberately, because a browser fetches a stylesheet and a font with no session. That
+              property is correct there and fatal here: a paid pack served from an unauthenticated
+              URL is a paid pack that is one shared link away from being free.
+            </p>
+            <p>
+              So marketplace bytes get their own route,
+              <code>/m/{item}@{v}/{file}</code>, which resolves an entitlement before it resolves a
+              file — and a miss is a flat 404 either way, because "that item exists and you have not
+              bought it" is not a fact this route needs to volunteer.
+            </p>
+          </div>
+
+          <div class="tw">
+            <table>
+              <thead>
+                <tr>
+                  <th>Kind</th>
+                  <th>Lands as</th>
+                  <th>Reuses</th>
+                  <th>Watch for</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Icons</strong></td>
+                  <td>Written straight into the theme's replaceable icon slots, as a draft.</td>
+                  <td>
+                    <code>uploadIcons()</code> — same slot model, same size ceiling, same SVG-only
+                    rule.
+                  </td>
+                  <td>
+                    Run <code>checkLogo()</code> on <em>our own</em> artwork too. "We drew it" is
+                    exactly the assumption that ships an SVG with a script in it.
+                  </td>
+                </tr>
+                <tr>
+                  <td><strong>Illustrations</strong></td>
+                  <td>
+                    A zip download, plus an optional copy into the org's asset store so they get a
+                    stable <code>/f/{org}/{sha}</code> URL for use in the customer's own app.
+                  </td>
+                  <td>The content-addressed store, the digest-as-id trick.</td>
+                  <td>
+                    The copy is a deliberate duplication: once it is in the customer's store it is
+                    theirs and survives a refund. That is a licence question, not a technical one.
+                  </td>
+                </tr>
+                <tr>
+                  <td><strong>Components</strong></td>
+                  <td>A private shadcn registry namespace the CLI installs from.</td>
+                  <td>The registry the public library already ships.</td>
+                  <td>Token handling — see below.</td>
+                </tr>
+                <tr>
+                  <td><strong>Themes</strong></td>
+                  <td>A <strong>draft</strong> theme in the org's list, never published.</td>
+                  <td>The existing import/transfer path and its validator.</td>
+                  <td>
+                    A purchased theme that fails the current validator must be rejected at import
+                    with the reason, not stored broken.
+                  </td>
+                </tr>
+                <tr>
+                  <td><strong>Fixtures / data</strong></td>
+                  <td>
+                    Download, and a registry item so it can be installed into a test directory.
+                  </td>
+                  <td><code>packages/fixtures</code>.</td>
+                  <td>
+                    Nothing derived from a real patient. Ever, for any reason, including "it was
+                    anonymised".
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3>Components: shadcn already solved the hard half</h3>
+          <div class="prose">
+            <p>
+              The shadcn CLI supports namespaced registries with per-registry authentication
+              configured in <code>components.json</code>, expanding <code>${VAR}</code> from the
+              environment. So the customer's install experience for a paid component is one line,
+              and no token is ever committed:
+            </p>
+          </div>
+
+          <pre><code><span class="c">// the customer's components.json</span>
+{
+  <span class="k">"registries"</span>: {
+    <span class="k">"@oxygen"</span>: <span class="s">"https://oxygenui.design/r/{name}.json"</span>,
+    <span class="k">"@oxygen-pro"</span>: {
+      <span class="k">"url"</span>: <span class="s">"https://console.oxygenui.design/r/pro/{name}.json"</span>,
+      <span class="k">"headers"</span>: { <span class="k">"Authorization"</span>: <span class="s">"Bearer ${OXYGEN_TOKEN}"</span> }
+    }
+  }
+}</code></pre>
+
+          <pre><code><span class="c"># .env.local, never committed. Minted in the console, shown once.</span>
+OXYGEN_TOKEN=oxy_live_…
+
+npx shadcn@latest add @oxygen-pro/vitals-flowsheet</code></pre>
+
+          <div class="prose">
+            <p>
+              On our side, <code>/r/pro/{name}.json</code> does four things in order and refuses at
+              the first failure:
+            </p>
+            <ol>
+              <li>
+                <strong>Hash the bearer token</strong> and look it up. Only the SHA-256 is stored,
+                so a database dump yields nothing usable — the same reasoning as the session cookie.
+              </li>
+              <li>
+                <strong>Resolve the organisation</strong> from the token, never from a parameter.
+              </li>
+              <li>
+                <strong>Check the entitlement</strong> for this item, and that it is not revoked.
+              </li>
+              <li>
+                <strong>Serve the registry JSON</strong> with the file contents inlined, stamp
+                <code>lastUsedAt</code>, and rate-limit per token.
+              </li>
+            </ol>
+            <p>
+              Everything else is a 404. A 403 would confirm the item's existence to somebody
+              guessing names, and there is no reason to help.
+            </p>
+
+            <div class="note warn">
+              <span class="lbl">An SVG is a document, and this origin has privileges</span>
+              <p>
+                The console already knows this — <code>checkLogo</code> refuses executable artwork
+                for exactly this reason. Marketplace files are bigger, more numerous and authored
+                under deadline, so the same rule needs teeth at the route:
+                <code>Content-Disposition: attachment</code> on downloads,
+                <code>X-Content-Type-Options: nosniff</code>, a restrictive CSP on any inline
+                preview, and — best of all — serve the bytes from a
+                <strong>separate origin</strong> so a hostile SVG cannot reach a console session
+                even if one gets through review.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="s14">
+        <div class="wrap">
+          <div class="sec-head">
+            <span class="sec-num">14</span>
+            <h2>Nine ways this goes wrong, and what each one is worth doing about</h2>
+          </div>
+          <div class="grid g2">
+            <div class="card">
+              <h4>1 · The TAM arithmetic, again</h4>
+              <p style="font-size: 0.88rem; color: var(--ink-2)">
+                $180 packs into a niche audience will not fund the company.
+                <strong>Answer:</strong> judge the marketplace on entitlement-delivery for contracts
+                and on qualified leads produced, not on pack revenue. If after two quarters it has
+                not produced a single contract conversation, it is a hobby and should be frozen
+                rather than expanded.
+              </p>
+            </div>
+            <div class="card">
+              <h4>2 · Content production is the real cost</h4>
+              <p style="font-size: 0.88rem; color: var(--ink-2)">
+                320 glyphs and 72 illustrations is months of skilled work, and the code is the cheap
+                half. <strong>Answer:</strong> cost the content <em>before</em> building the
+                storefront. Launch one category with depth. A catalogue of four lonely items reads
+                as abandoned and damages the library it is meant to sell.
+              </p>
+            </div>
+            <div class="card">
+              <h4>3 · Clinical review is recurring, not one-off</h4>
+              <p style="font-size: 0.88rem; color: var(--ink-2)">
+                The review record is the differentiator, so it must be budgeted per item and re-run
+                when an item changes. <strong>Answer:</strong> a named reviewer with a rate, a scope
+                template, and a rule that an item whose review is older than its current version
+                cannot be listed — the same relationship <code>validatorVersion</code> already
+                enforces for themes.
+              </p>
+            </div>
+            <div class="card">
+              <h4>4 · The catalogue is the first global collection</h4>
+              <p style="font-size: 0.88rem; color: var(--ink-2)">
+                Every scoping mistake in this codebase would look like a normal query.
+                <strong>Answer:</strong> <code>unscopedCatalogue()</code> named like the two
+                existing exceptions, a narrowly-scoped allowance in the isolation test, and a test
+                that asserts two organisations' entitlement queries never return each other's rows.
+              </p>
+            </div>
+            <div class="card">
+              <h4>5 · Refunds cannot un-download bytes</h4>
+              <p style="font-size: 0.88rem; color: var(--ink-2)">
+                Revocation stops future fetches; it does not reach a zip on a laptop.
+                <strong>Answer:</strong> say so in the licence in plain words, keep the refund
+                window short, limit one refund per org per item, and treat a pattern of
+                buy-download-refund as fraud rather than as a policy gap.
+              </p>
+            </div>
+            <div class="card">
+              <h4>6 · Licence contamination</h4>
+              <p style="font-size: 0.88rem; color: var(--ink-2)">
+                The core is MIT. A marketplace next to it invites "will the free parts get worse?"
+                and, worse, invites a paid asset to leak into an MIT package.
+                <strong>Answer:</strong> publish the boundary —
+                <em>nothing already MIT is ever withdrawn</em> — and add a build check that no
+                registry item under the MIT licence references a marketplace asset path.
+              </p>
+            </div>
+            <div class="card">
+              <h4>7 · Payment-integration classics</h4>
+              <p style="font-size: 0.88rem; color: var(--ink-2)">
+                Client-supplied prices, unverified webhook signatures, non-idempotent fulfilment,
+                ignoring async payment events. <strong>Answer:</strong> §10, plus tests that replay
+                the same webhook twice and assert one entitlement, and a test that posts an unsigned
+                body and asserts a 400.
+              </p>
+            </div>
+            <div class="card">
+              <h4>8 · Tax registration sneaks up</h4>
+              <p style="font-size: 0.88rem; color: var(--ink-2)">
+                Digital goods are taxed at the customer's location and thresholds are low in several
+                places. <strong>Answer:</strong> Stripe Tax from the first sale, not the hundredth,
+                and an accountant conversation before the first non-domestic invoice rather than
+                after.
+              </p>
+            </div>
+            <div class="card">
+              <h4>9 · The console is not on <code>main</code></h4>
+              <p style="font-size: 0.88rem; color: var(--ink-2)">
+                The whole app arrived in <code>8809f44</code> on
+                <strong><code>staging</code></strong> — not on
+                <code>claude/multi-framework-ui-theming-52a8a8</code>, which is stale at
+                <code>main</code> — and is not an ancestor of <code>main</code>.
+                <strong>Answer taken:</strong> the marketplace was built on top of
+                <code>staging</code>, which was a clean fast-forward from <code>main</code>. Landing
+                <code>staging</code> on <code>main</code> remains a prerequisite for release.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="s15">
+        <div class="wrap">
+          <div class="sec-head">
+            <span class="sec-num">15</span>
+            <h2>Six phases, and money does not appear until the third</h2>
+          </div>
+          <div class="card">
+            <div class="phase">
+              <div class="pn">P0</div>
+              <div>
+                <h4>Merge the console</h4>
+                <p>
+                  <strong>Done.</strong> The console lives on
+                  <code>staging</code> (<code>8809f44</code>), which is <code>main</code> plus one
+                  commit — so this was a fast-forward rather than a merge. The marketplace is built
+                  on top of it. Landing <code>staging</code> on <code>main</code> is still the
+                  release prerequisite, with the lockfile care that has twice turned
+                  <code>main</code> red.
+                </p>
+              </div>
+            </div>
+            <div class="phase">
+              <div class="pn">P1</div>
+              <div>
+                <h4>The spine, with no payment in it</h4>
+                <p>
+                  <code>catalogItems</code>, <code>catalogVersions</code>,
+                  <code>entitlements</code>, the <code>/m/</code> delivery route, the four
+                  capabilities, the three audit actions, and a <strong>free</strong> pack that goes
+                  end to end: browse → grant → install into a theme draft. Proves delivery before
+                  proving billing, and is independently useful for contract bundles.
+                </p>
+              </div>
+            </div>
+            <div class="phase">
+              <div class="pn">P2</div>
+              <div>
+                <h4>Stripe</h4>
+                <p>
+                  <code>orders</code>, Checkout Session creation from a server-resolved price, the
+                  webhook with signature verification, the atomic <code>fulfil()</code>, the success
+                  page calling the same function, receipts, and the refund path. One paid item.
+                  Tests: replayed webhook, unsigned body, async payment succeeded, refund revokes.
+                </p>
+              </div>
+            </div>
+            <div class="phase">
+              <div class="pn">P3</div>
+              <div>
+                <h4>The storefront</h4>
+                <p>
+                  Catalogue, item page rendering the provenance record, Purchases, install actions.
+                  Public catalogue pages mirrored onto <code>oxygenui.design</code> for discovery,
+                  because a shop inside a locked building has no customers.
+                </p>
+              </div>
+            </div>
+            <div class="phase">
+              <div class="pn">P4</div>
+              <div>
+                <h4>Registry entitlement</h4>
+                <p>
+                  <code>registryTokens</code>, minting UI, <code>/r/pro/{name}.json</code> gated on
+                  token → org → entitlement, rate limiting, and the
+                  <code>components.json</code> documentation. This is what makes paid
+                  <em>components</em> possible rather than only paid assets.
+                </p>
+              </div>
+            </div>
+            <div class="phase">
+              <div class="pn">P5</div>
+              <div>
+                <h4>Enterprise and depth</h4>
+                <p>
+                  Stripe Invoicing with PO numbers, multi-item purchase, contract-granted
+                  entitlements with a reason and an actor, and — in parallel and on a longer clock
+                  than all of the above — the content production line that gives the catalogue
+                  something worth browsing.
+                </p>
+              </div>
+            </div>
+          </div>
+          <div class="prose">
+            <div class="note">
+              <span class="lbl">Sequencing claim worth arguing with</span>
+              <p>
+                P1 before P2 is the load-bearing choice. It is tempting to put a Checkout button on
+                a page in an afternoon and call it a marketplace, but then entitlements get invented
+                under deadline in a webhook handler, and the record that has to survive refunds,
+                contracts, audits and revocation is the one nobody designed.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="s16">
+        <div class="wrap">
+          <div class="sec-head">
+            <span class="sec-num">16</span>
+            <h2>Ten calls I made writing this, and seven that are yours</h2>
+          </div>
+
+          <h3>Made, with the reasoning above</h3>
+          <div class="tw">
+            <table>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Decision</th>
+                  <th>Because</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>1</td>
+                  <td>Entitlements and delivery before storefront and payment</td>
+                  <td>
+                    The retrofit cost is asymmetric, and contracts need it regardless of whether
+                    anyone buys a pack.
+                  </td>
+                </tr>
+                <tr>
+                  <td>2</td>
+                  <td>Per-organisation, perpetual, one-time</td>
+                  <td>
+                    Seat counting on artwork is unenforceable; subscriptions impose a content
+                    cadence we cannot yet keep.
+                  </td>
+                </tr>
+                <tr>
+                  <td>3</td>
+                  <td><code>market.purchase</code> is admin-only</td>
+                  <td>
+                    Same argument the console already makes for publishing: the action with
+                    consequences outside the console gets the narrower grant.
+                  </td>
+                </tr>
+                <tr>
+                  <td>4</td>
+                  <td>Purchases never auto-publish</td>
+                  <td>A purchase must not be a back door around the designer/admin split.</td>
+                </tr>
+                <tr>
+                  <td>5</td>
+                  <td>A separate <code>/m/</code> route rather than reusing <code>/f/</code></td>
+                  <td>
+                    <code>/f/</code> is public by design and correct; paid bytes need an entitlement
+                    check before a file lookup.
+                  </td>
+                </tr>
+                <tr>
+                  <td>6</td>
+                  <td>Order <code>_id</code> = Stripe session id</td>
+                  <td>
+                    Makes idempotent fulfilment structural rather than remembered — the codebase's
+                    existing idiom for digests and atomic claims.
+                  </td>
+                </tr>
+                <tr>
+                  <td>7</td>
+                  <td>The empty-state system is the flagship</td>
+                  <td>
+                    It is the only item on the list with no substitute, and it demonstrates the
+                    library's whole thesis for $290.
+                  </td>
+                </tr>
+                <tr>
+                  <td>8</td>
+                  <td>Provenance record on every item, rendered on the page</td>
+                  <td>
+                    Turns "accessible" into a fact a customer can hand to their own procurement, and
+                    is hard for a bigger marketplace to copy.
+                  </td>
+                </tr>
+                <tr>
+                  <td>9</td>
+                  <td>Five categories deferred outright</td>
+                  <td>
+                    SNOMED, font licences, alarm tones, patient education, anything computing a
+                    recommendation. Each is a legal or regulatory exposure disproportionate to its
+                    revenue.
+                  </td>
+                </tr>
+                <tr>
+                  <td>10</td>
+                  <td>Public catalogue pages on the docs site</td>
+                  <td>
+                    A storefront behind sign-up has no top of funnel; the docs site is where the
+                    traffic and the SEO already are.
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3>Yours — each one changes what gets built</h3>
+          <div class="tw">
+            <table>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Question</th>
+                  <th>My lean</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>1</td>
+                  <td>Is this a revenue line or a delivery mechanism for the services motion?</td>
+                  <td>
+                    <strong>Delivery mechanism</strong>, with self-serve as lead qualification. It
+                    changes what "success" means in three months.
+                  </td>
+                </tr>
+                <tr>
+                  <td>2</td>
+                  <td>
+                    Who does clinical review, at what rate, and how fast can they turn an item
+                    around?
+                  </td>
+                  <td>
+                    Unresolved and blocking: the differentiator does not exist without a named
+                    person. Worth answering before P1.
+                  </td>
+                </tr>
+                <tr>
+                  <td>3</td>
+                  <td>What is the content budget, and who draws?</td>
+                  <td>Commission one category to depth rather than six to one item each.</td>
+                </tr>
+                <tr>
+                  <td>4</td>
+                  <td>Do we disclose AI-assisted artwork on the item record?</td>
+                  <td>
+                    <strong>Yes.</strong> The cost of disclosure is a line of JSON; the cost of
+                    being caught is the company's only real asset.
+                  </td>
+                </tr>
+                <tr>
+                  <td>5</td>
+                  <td>Refund window and policy?</td>
+                  <td>
+                    14 days, one per org per item, revocation plus a Stripe refund, stated on the
+                    item page.
+                  </td>
+                </tr>
+                <tr>
+                  <td>6</td>
+                  <td>Does the MIT boundary get written down publicly?</td>
+                  <td>
+                    <strong>Yes</strong> — "nothing already MIT is ever withdrawn" — because the
+                    question will be asked the day the catalogue ships.
+                  </td>
+                </tr>
+                <tr>
+                  <td>7</td>
+                  <td>Console-only, or public catalogue plus console delivery?</td>
+                  <td>
+                    Public catalogue. But it doubles the surface, so it is a real cost and your
+                    call.
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section id="s17">
+        <div class="wrap">
+          <div class="sec-head">
+            <span class="sec-num">17</span>
+            <h2>Where the claims came from</h2>
+          </div>
+          <div class="prose">
+            <h3>From this repository</h3>
+            <ul>
+              <li>
+                <code>apps/console/</code> at <code>8809f44</code> — 151 files on
+                <code>staging</code>, not an ancestor of <code>main</code>. (An earlier draft of
+                this brief named the wrong branch:
+                <code>claude/multi-framework-ui-theming-52a8a8</code> points at
+                <code>main</code> and carries none of this.) Org scoping
+                (<code>src/db/scope.ts</code>), capabilities (<code>src/lib/roles.ts</code>), the
+                authorisation boundary (<code>src/lib/authorize.ts</code>), collections and indexes
+                (<code>src/db/collections.ts</code>), the public delivery routes
+                (<code>src/app/t/…</code>, <code>src/app/f/…</code>), icon slots
+                (<code>src/lib/icons.ts</code>) and brand assets
+                (<code>src/lib/brand-assets.ts</code>).
+              </li>
+              <li>
+                <code>apps/hq/README.md</code> and <code>claimFirstAdmin</code> — the atomic-claim
+                idiom reused for order fulfilment.
+              </li>
+              <li>
+                <code>registry.json</code> — 21 items, shadcn registry distribution,
+                <code>https://oxygenui.design/r/{name}.json</code>.
+              </li>
+              <li>
+                <code>README.md</code> — "a blank cell is indistinguishable from a rendering bug",
+                which is the whole argument of §3.
+              </li>
+              <li>
+                <code>apps/console/src/app/globals.css</code> — the three design rules the mockups
+                obey.
+              </li>
+            </ul>
+
+            <h3>External</h3>
+            <ul>
+              <li>
+                <a href="https://docs.stripe.com/checkout/fulfillment">Stripe — Fulfil orders</a>:
+                webhooks are required because customers are not guaranteed to reach the landing
+                page; <code>fulfill_checkout</code> must handle being called multiple times,
+                possibly concurrently, for the same session; retrieve the session with
+                <code>line_items</code> expanded and check <code>payment_status</code>; Checkout
+                waits up to ten seconds for a <code>checkout.session.completed</code> response
+                before redirecting.
+              </li>
+              <li>
+                <a href="https://docs.stripe.com/mobile/digital-goods/checkout"
+                  >Stripe — digital goods with Checkout</a
+                >
+                and <a href="https://stripe.com/billing/features">Stripe Billing</a>: the
+                Entitlements API determines feature access from pricing, and is a subscription
+                construct — which is why one-time packs need our own entitlement records.
+              </li>
+              <li>
+                <a href="https://ui.shadcn.com/docs/registry/authentication"
+                  >shadcn/ui — registry authentication</a
+                >
+                and <a href="https://ui.shadcn.com/docs/registry/namespace">namespaces</a>:
+                per-registry <code>headers</code> in <code>components.json</code> with
+                <code>${VAR}</code> expansion; bearer, basic, API-key and query-param auth; the
+                docs' own guidance to use HTTPS, never commit tokens, rate-limit, rotate and log.
+              </li>
+              <li>
+                <a href="https://ui.shadcn.com/docs/changelog/2025-08-cli-3-mcp"
+                  >shadcn CLI 3.0 changelog</a
+                >: namespaced registries and the <code>@registry/name</code> install syntax.
+              </li>
+              <li>
+                IEC 60601-1-8 (audible alarm signals in medical electrical equipment) and
+                DCB0129/DCB0160 (clinical risk management for health IT in England) are cited as
+                reasons to defer or to price, not as compliance advice.
+              </li>
+            </ul>
+
+            <div class="note warn">
+              <span class="lbl">Not legal or tax advice</span>
+              <p>
+                The licensing, tax, consumer-withdrawal and regulatory notes here are the shape of
+                the questions, not the answers. Each of §4, §9 and §14 contains at least one item
+                that needs a professional before money moves.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div class="wrap">
+        <p>
+          Oxygen Marketplace — brief, 20 August 2026. Written against
+          <code>apps/console</code> at <code>8809f44</code> on <code>staging</code>.
+        </p>
+        <p>
+          <strong>Phases P1–P4 are now built</strong> — the entitlement spine, the Stripe
+          integration with idempotent fulfilment, the four console screens, and the token-gated
+          private registry. Phase P5 (Stripe Invoicing, multi-item carts) and the content production
+          line are not.
+        </p>
+      </div>
+    </footer>
+  </body>
+</html>

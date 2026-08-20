@@ -19,9 +19,18 @@
  * known, and the public stylesheet route, which resolves an org from its slug.
  */
 
-import { ObjectId, type Filter } from "mongodb";
+import { ObjectId, type Filter, type FindOneAndUpdateOptions, type UpdateFilter } from "mongodb";
 import { db } from "./client";
-import type { AuditDoc, FontAssetDoc, MemberDoc, ThemeDoc, ThemeVersionDoc } from "./collections";
+import type {
+  AuditDoc,
+  EntitlementDoc,
+  FontAssetDoc,
+  MemberDoc,
+  OrderDoc,
+  RegistryTokenDoc,
+  ThemeDoc,
+  ThemeVersionDoc,
+} from "./collections";
 
 /** Anything belonging to a customer carries this. */
 interface OrgOwned {
@@ -119,6 +128,67 @@ export function scoped(orgId: ObjectId) {
       ) => cols.members.updateOne(within(filter), update),
       countDocuments: (filter: Filter<MemberDoc> = {}) =>
         cols.members.countDocuments(within(filter)),
+    },
+
+    /**
+     * Purchases. Scoped like everything else, even though the `_id` is a
+     * Stripe session id nobody could guess: the guess is not the threat, a
+     * mistyped query is.
+     */
+    orders: {
+      find: (filter: Filter<OrderDoc> = {}) => cols.orders.find(within(filter)),
+      findOne: (filter: Filter<OrderDoc> = {}) => cols.orders.findOne(within(filter)),
+      /*
+       * The atomic claim behind idempotent fulfilment.
+       *
+       * Exposed as `findOneAndUpdate` rather than a read followed by a write
+       * because the two callers — the Stripe webhook and the customer landing
+       * on the success page — can arrive at the same instant. A
+       * check-then-act grants twice; this grants once and tells the loser.
+       *
+       * With `upsert`, Mongo seeds the new document from the filter's equality
+       * fields, so the `orgId` merged in by `within()` lands on the insert
+       * without the caller passing it — which is the property that makes an
+       * unscoped order impossible to create through this path.
+       */
+      findOneAndUpdate: (
+        filter: Filter<OrderDoc>,
+        update: UpdateFilter<OrderDoc>,
+        options?: FindOneAndUpdateOptions,
+      ) => cols.orders.findOneAndUpdate(within(filter), update, options ?? {}),
+      updateOne: (filter: Filter<OrderDoc>, update: Parameters<typeof cols.orders.updateOne>[1]) =>
+        cols.orders.updateOne(within(filter), update),
+      countDocuments: (filter: Filter<OrderDoc> = {}) => cols.orders.countDocuments(within(filter)),
+    },
+
+    /** What this organisation may fetch. Revoked, never deleted. */
+    entitlements: {
+      find: (filter: Filter<EntitlementDoc> = {}) => cols.entitlements.find(within(filter)),
+      findOne: (filter: Filter<EntitlementDoc> = {}) => cols.entitlements.findOne(within(filter)),
+      updateOne: (
+        filter: Filter<EntitlementDoc>,
+        update: Parameters<typeof cols.entitlements.updateOne>[1],
+        options?: Parameters<typeof cols.entitlements.updateOne>[2],
+      ) => cols.entitlements.updateOne(within(filter), update, options ?? {}),
+      insertOne: (doc: Omit<EntitlementDoc, "orgId">) =>
+        cols.entitlements.insertOne({ ...doc, orgId } as EntitlementDoc),
+      countDocuments: (filter: Filter<EntitlementDoc> = {}) =>
+        cols.entitlements.countDocuments(within(filter)),
+    },
+
+    /** CLI credentials. Only their digests are ever stored. */
+    registryTokens: {
+      find: (filter: Filter<RegistryTokenDoc> = {}) => cols.registryTokens.find(within(filter)),
+      findOne: (filter: Filter<RegistryTokenDoc> = {}) =>
+        cols.registryTokens.findOne(within(filter)),
+      insertOne: (doc: Omit<RegistryTokenDoc, "orgId">) =>
+        cols.registryTokens.insertOne({ ...doc, orgId } as RegistryTokenDoc),
+      updateOne: (
+        filter: Filter<RegistryTokenDoc>,
+        update: Parameters<typeof cols.registryTokens.updateOne>[1],
+      ) => cols.registryTokens.updateOne(within(filter), update),
+      countDocuments: (filter: Filter<RegistryTokenDoc> = {}) =>
+        cols.registryTokens.countDocuments(within(filter)),
     },
 
     /** Append-only: there is deliberately no update or delete. */
@@ -236,4 +306,73 @@ export async function unscopedPublishedVersion(orgSlug: string, slug: string, ve
   if (!published) return undefined;
 
   return { organisation, theme, version: published };
+}
+
+/* ==========================================================================
+ * The catalogue: global by nature, and the fourth documented exception.
+ *
+ * The three exceptions above are all "there is no session yet, or none is
+ * possible". This one is different in kind and worth reading as such: there
+ * *is* a session, and the data still is not scoped — because the catalogue is
+ * not customer data. Every organisation sees the same Empty State System at
+ * the same price.
+ *
+ * The line these helpers must never cross is returning anything that says who
+ * *bought* something. Entitlements, orders and tokens all carry `orgId` and go
+ * through `scoped()` exactly like themes; only the shelf is shared.
+ * ======================================================================== */
+
+/** Everything listed, newest first. */
+export function unscopedCatalogListed() {
+  return db()
+    .catalogItems.find({ listedAt: { $ne: null } })
+    .sort({ listedAt: -1 });
+}
+
+/** One item by the slug in its URL. Unlisted items are still resolvable by id. */
+export function unscopedCatalogItem(slug: string) {
+  return db().catalogItems.findOne({ slug });
+}
+
+export function unscopedCatalogItemById(id: ObjectId) {
+  return db().catalogItems.findOne({ _id: id });
+}
+
+export function unscopedCatalogItemsByIds(ids: readonly ObjectId[]) {
+  return db().catalogItems.find({ _id: { $in: [...ids] } });
+}
+
+/** A published catalogue version. Immutable once written. */
+export function unscopedCatalogVersion(itemId: ObjectId, version: number) {
+  return db().catalogVersions.findOne({ itemId, version });
+}
+
+/** Purchased bytes, by digest. The entitlement is checked before this is called. */
+export function unscopedMarketAsset(sha256: string) {
+  return db().marketAssets.findOne({ _id: sha256 });
+}
+
+/**
+ * Resolve an organisation from a registry token.
+ *
+ * The shadcn CLI sends `Authorization: Bearer …` and no cookie, so there is no
+ * session to scope by — the token *is* the identity. Safe because the lookup
+ * is by digest, the caller never names an organisation, and everything the
+ * route does afterwards goes through `scoped(token.orgId)`.
+ *
+ * Expiry is enforced here rather than left to the TTL index: a TTL monitor
+ * runs about once a minute, so a token is briefly readable after it expires,
+ * and "briefly" is not a word that belongs in an authorisation check.
+ */
+export async function unscopedRegistryToken(hash: string) {
+  const token = await db().registryTokens.findOne({ _id: hash });
+  if (!token) return undefined;
+  if (token.revokedAt) return undefined;
+  if (token.expiresAt.getTime() <= Date.now()) return undefined;
+  return token;
+}
+
+/** Stamp last use. Failure here must never fail the request it is recording. */
+export async function unscopedTouchRegistryToken(hash: string) {
+  await db().registryTokens.updateOne({ _id: hash }, { $set: { lastUsedAt: new Date() } });
 }
