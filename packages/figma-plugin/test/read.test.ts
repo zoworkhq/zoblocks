@@ -232,3 +232,23 @@ describe("readFile", () => {
     ]);
   });
 });
+
+describe("values that are not colours", () => {
+  it("keeps a string and a number, because a collection may hold either", async () => {
+    const figma = fakeFigma(
+      [BRAND],
+      [
+        { id: "v1", name: "family", collection: "c1", values: { m1: "Inter" } },
+        { id: "v2", name: "radius", collection: "c1", values: { m1: 8 } },
+        { id: "v3", name: "bold", collection: "c1", values: { m1: true } },
+      ],
+    );
+
+    const { snapshot } = await readFile(figma);
+    expect(snapshot.variables[0]!.values.default).toEqual({ kind: "string", value: "Inter" });
+    expect(snapshot.variables[1]!.values.default).toEqual({ kind: "number", value: 8 });
+    // A boolean is a Figma variable type this plugin has no reading for, and
+    // inventing one would put it in a contrast table.
+    expect(snapshot.variables[2]!.values.default).toBeUndefined();
+  });
+});

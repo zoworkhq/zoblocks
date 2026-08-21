@@ -211,6 +211,71 @@ describe("what the panel refuses to hide", () => {
   });
 });
 
+describe("the rows with nothing to offer", () => {
+  it("says so when no shade of a colour can clear the floor", () => {
+    // White on white: every shade of white is white, and lightness is the only
+    // axis `nearestPassing` moves along, so there is genuinely nothing to
+    // suggest. Saying nothing would read as "no fix needed".
+    const report: GateReport = {
+      mode: "oxygen",
+      collection: "Oxygen / Semantic",
+      figmaMode: "light",
+      theme: "light",
+      findings: [],
+      missing: [],
+      unstamped: [],
+      readings: [
+        {
+          fg: "text",
+          bg: "bg",
+          fgValue: "#ffffff",
+          bgValue: "#ffffff",
+          kind: "text",
+          criterion: "SC 1.4.3 (text)",
+          ratio: 1,
+          floor: 4.5,
+          passes: false,
+        },
+      ],
+    };
+
+    renderReport(root, report);
+    expect(text()).toContain("No shade of this colour clears the floor");
+    expect(root.querySelector("button[data-copy]")).toBeNull();
+  });
+
+  it("lists the unstamped variables it left alone", () => {
+    renderReport(
+      root,
+      runGate(
+        snapshot([
+          ...oxygenFile().variables,
+          colour("Scratch pink", "#ff00ff", { collection: OXYGEN }),
+        ]),
+        { collection: OXYGEN, figmaMode: "light" },
+      ),
+    );
+    expect(text()).toContain("Not Oxygen tokens (1)");
+    expect(text()).toContain("They are left alone");
+  });
+
+  it("does not repeat the swatch list in a palette reading", () => {
+    // In palette mode every colour is unstamped by definition, so the same
+    // block would restate the collection the designer just picked.
+    renderReport(
+      root,
+      runGate(
+        snapshot([
+          colour("Paper", "#ffffff", { collection: "Swatches" }),
+          colour("Mist", "#c9d1d9", { collection: "Swatches" }),
+        ]),
+        { collection: "Swatches", figmaMode: "light" },
+      ),
+    );
+    expect(text()).not.toContain("Not Oxygen tokens");
+  });
+});
+
 describe("readable without sight", () => {
   it("gives every table a header row with scoped columns", () => {
     renderReport(root, failing());
@@ -227,5 +292,31 @@ describe("readable without sight", () => {
     const header = row.querySelector("th")!;
     expect(header.getAttribute("scope")).toBe("row");
     expect(header.textContent).toContain(" on ");
+  });
+});
+
+describe("copying, at the edges", () => {
+  it("ignores a click that is not on a suggestion", () => {
+    renderReport(root, failing());
+    wireCopy(root);
+    // No throw, and nothing marked copied.
+    root.querySelector("table")!.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+    expect(root.querySelector("[data-state='copied']")).toBeNull();
+  });
+
+  it("does nothing when there is no clipboard and no value to select", async () => {
+    Object.defineProperty(navigator, "clipboard", { configurable: true, value: undefined });
+
+    const button = document.createElement("button");
+    button.dataset.copy = "#123456";
+    root.append(button);
+    wireCopy(root);
+
+    // A button with no `<code>` inside it: the fallback has nothing to select,
+    // and must fail quietly rather than throwing inside an event handler.
+    button.click();
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(button.dataset.state).toBeUndefined();
   });
 });

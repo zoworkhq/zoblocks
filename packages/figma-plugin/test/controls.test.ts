@@ -138,3 +138,36 @@ describe("nothing to measure", () => {
     expect(select.value).toBe(SWATCHES.name);
   });
 });
+
+describe("the ground picker with nothing to pick from", () => {
+  it("renders empty rather than throwing when the report has not arrived", () => {
+    // The first paint after choosing a palette collection: the panel knows the
+    // collection has no Oxygen stamps but has not been told its colour names
+    // yet, so the list is briefly empty.
+    draw([SWATCHES], paletteChoice, []);
+    const ground = root.querySelector<HTMLSelectElement>("#ground")!;
+    expect(ground.options).toHaveLength(0);
+    expect(ground.value).toBe("");
+  });
+
+  it("keeps the ground the caller chose over the first in the list", () => {
+    draw([SWATCHES], { ...paletteChoice, ground: "Ink" }, ["Paper", "Ink"]);
+    expect(root.querySelector<HTMLSelectElement>("#ground")!.value).toBe("Ink");
+  });
+
+  it("reports the chosen ground", () => {
+    draw([SWATCHES], paletteChoice, ["Paper", "Ink"]);
+    const ground = root.querySelector<HTMLSelectElement>("#ground")!;
+    ground.value = "Ink";
+    ground.dispatchEvent(new Event("change"));
+    expect(changes).toEqual([{ ...paletteChoice, ground: "Ink" }]);
+  });
+
+  it("reports a mode change", () => {
+    draw([OXYGEN], oxygenChoice);
+    const mode = root.querySelector<HTMLSelectElement>("#mode")!;
+    mode.value = "dark";
+    mode.dispatchEvent(new Event("change"));
+    expect(changes).toEqual([{ ...oxygenChoice, mode: "dark" }]);
+  });
+});

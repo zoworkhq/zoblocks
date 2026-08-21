@@ -216,6 +216,68 @@ describe("the palette reading", () => {
   });
 });
 
+describe("what a reading skips", () => {
+  it("does not measure an alias, which holds no value of its own", () => {
+    const file = snapshot([
+      colour("text", "#16181d", { token: "--ox-text", collection: OXYGEN }),
+      {
+        token: "--ox-bg",
+        name: "bg",
+        collection: OXYGEN,
+        // Points at the brand tier. Following it would report a ratio for a
+        // colour this variable does not hold, and would measure the same
+        // colour twice under two names.
+        values: { light: { kind: "alias", token: "--ox-ref-brand-50" } },
+      },
+    ]);
+
+    const report = runGate(file, { collection: OXYGEN, figmaMode: "light" });
+    expect(report.missing).toContain("text on bg");
+  });
+
+  it("names the unstamped variables it left alone", () => {
+    const file = snapshot([
+      ...oxygenFile().variables,
+      colour("Scratch pink", "#ff00ff", { collection: OXYGEN }),
+    ]);
+
+    const report = runGate(file, { collection: OXYGEN, figmaMode: "light" });
+    expect(report.unstamped).toEqual(["Scratch pink"]);
+    // Listed, not measured: a swatch with no Oxygen identity is somebody's own.
+    expect(report.readings.some((r) => r.fg === "Scratch pink")).toBe(false);
+  });
+
+  it("reads the mode asked for, not whichever came first", () => {
+    const file = snapshot([
+      {
+        token: "--ox-text",
+        name: "text",
+        collection: OXYGEN,
+        values: {
+          light: { kind: "color", hex: "#16181d", rgb: { r: 0.086, g: 0.094, b: 0.114 } },
+          dark: { kind: "color", hex: "#e8ecf1", rgb: { r: 0.91, g: 0.925, b: 0.945 } },
+        },
+      },
+      {
+        token: "--ox-bg",
+        name: "bg",
+        collection: OXYGEN,
+        values: {
+          light: { kind: "color", hex: "#ffffff", rgb: { r: 1, g: 1, b: 1 } },
+          dark: { kind: "color", hex: "#0e1116", rgb: { r: 0.055, g: 0.067, b: 0.086 } },
+        },
+      },
+    ]);
+
+    const dark = runGate(file, { collection: OXYGEN, figmaMode: "dark" });
+    const reading = dark.readings.find((r) => r.fg === "text" && r.bg === "bg")!;
+    // Measuring light's values under dark's floors is the quiet way a theme
+    // passes a check it never took.
+    expect(reading.fgValue).toBe("#e8ecf1");
+    expect(reading.bgValue).toBe("#0e1116");
+  });
+});
+
 describe("themeFromModeName", () => {
   it("reads the modes this plugin creates", () => {
     expect(themeFromModeName("light")).toBe("light");
