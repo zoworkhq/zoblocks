@@ -717,6 +717,68 @@ test.describe("@console when there is nothing there", () => {
   });
 });
 
+/**
+ * Arriving at an authenticated page with no session.
+ *
+ * Every one of these pages used to open with `const member = (await
+ * currentMember())!`. The assertion was wrong and the pages worked anyway: the
+ * layout's redirect won the race, so the reader landed on `/login` while the
+ * server logged `Cannot read properties of null (reading 'orgId')` behind them
+ * — 38 times in one run of this suite.
+ *
+ * **These would not have caught that, and it is worth knowing why.** Run
+ * against the old code they still pass, five for five — while the server logs
+ * exactly five dereferences, one per request. The bug was never visible from
+ * the browser, so no assertion made through one can reach it; `requireMember`'s
+ * unit tests are what guard it, and this file cannot.
+ *
+ * What this file does cover is a path that had none. Nothing anywhere drove an
+ * authenticated route without a cookie, which is how twenty pages could carry a
+ * broken guard while every suite stayed green. A redirect nobody exercises is
+ * indistinguishable from a redirect that works.
+ *
+ * Four routes rather than all twenty, because four is what the rewrite actually
+ * varied: a plain page, a settings page, one nested under a dynamic segment,
+ * and one under `/market`.
+ */
+test.describe("@console the door, when you have no key", () => {
+  for (const path of ["/themes", "/settings", "/themes/northwind-clinical/tokens", "/market"]) {
+    test(`${path} sends you to sign in rather than failing`, async ({ page }) => {
+      // No `signIn` above this line, deliberately — the whole point is the
+      // request that arrives without one.
+      const response = await page.goto(`${BASE}${path}`);
+
+      await expect(page).toHaveURL(/\/login$/);
+
+      /*
+       * The status matters as much as the URL. A page that threw and a page
+       * that redirected both end up here — the first through an error boundary
+       * — and only the status tells them apart. This is the assertion the old
+       * code would have had to earn rather than inherit.
+       */
+      expect(response?.status()).toBe(200);
+      await expect(page.getByRole("button", { name: "Sign in", exact: true })).toBeVisible();
+    });
+  }
+
+  /**
+   * The way back in still works from there. A redirect that lands on a broken
+   * form is not a fix, and the sign-in page is reached by a route the previous
+   * tests never exercise: as a redirect target rather than a direct visit.
+   */
+  test("and signing in from there reaches the console", async ({ page }) => {
+    await page.goto(`${BASE}/settings`);
+    await expect(page).toHaveURL(/\/login$/);
+
+    await page.getByLabel("Email", { exact: true }).fill(ADMIN.email);
+    await page.getByLabel("Password", { exact: true }).fill(ADMIN.password);
+    await page.getByRole("button", { name: "Sign in", exact: true }).click();
+
+    await expect(page).toHaveURL(/\/themes$/);
+    await expect(page.getByRole("navigation", { name: "Console" })).toBeVisible();
+  });
+});
+
 test.describe("@console brand artwork", () => {
   /**
    * The upload is a security boundary, so it is tested through the boundary.

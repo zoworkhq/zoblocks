@@ -16,6 +16,33 @@ import { defineConfig, devices } from "@playwright/test";
  *
  * The docs site is the fixture host: it already renders every component in
  * every state, so VRT reuses it rather than standing up a second harness.
+ *
+ * ## `Error: The destination stream closed early.`
+ *
+ * A clean run prints this ~60 times against the console server. It is benign,
+ * it is not the console's, and it has been chased once already — so the
+ * measurements are here rather than in someone's terminal history.
+ *
+ * Every aborted request carries `?_rsc=`: they are `next/link` prefetches of
+ * the rail's destinations, cancelled when a page is torn down before the
+ * response finishes. React's Flight server logs a cancelled stream as an error
+ * because it usually is one. Here it is a browser closing a tab.
+ *
+ * What the numbers said, on `e2e/console.spec.ts` alone:
+ *
+ *   - `--workers=1` → 0 errors. `--workers=2` → 4. `--workers=4` → 27.
+ *   - a prefetch stops at `(app)/loading.tsx` and completes in ~7ms
+ *
+ * So it scales with how many pages are being closed at once, not with anything
+ * being slow or wrong. Nothing here is worth `prefetch={false}` on the rail:
+ * that would trade instant navigation for a quieter log, and the log is only
+ * loud because the harness closes pages faster than any person does.
+ *
+ * The reason it is written down at all: it sits next to an error that *was*
+ * real. Twenty pages once logged `Cannot read properties of null (reading
+ * 'orgId')` in the same stream, from a null-assertion that survived precisely
+ * because it looked like more of this. Knowing which lines are furniture is
+ * what makes a new one visible.
  */
 export default defineConfig({
   testDir: "./e2e",
