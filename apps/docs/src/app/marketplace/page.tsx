@@ -3,7 +3,7 @@ import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { SiteFooter, SiteHeader } from "@/components/site/chrome";
 import { RevealRoot } from "@/components/site/interactions";
-import { KIND_LABEL, catalogue, priceLabel, CONSOLE } from "@/lib/marketplace";
+import { KIND_LABEL, catalogue, priceLabel, APP } from "@/lib/marketplace";
 
 export const metadata: Metadata = {
   title: "Marketplace — clinically-reviewed packs for healthcare interfaces",
@@ -16,9 +16,9 @@ export const metadata: Metadata = {
  * The public shelf.
  *
  * It exists because a storefront reachable only after sign-up has no top of
- * funnel: the console has no anonymous traffic, and this site does. So the
+ * funnel: the app has no anonymous traffic, and this site does. So the
  * catalogue is rendered here, where it can be linked to and indexed, and the
- * console keeps checkout, entitlement and delivery — the parts that need to
+ * app keeps checkout, entitlement and delivery — the parts that need to
  * know who you are.
  *
  * What is worth indexing is not the price. It is the evidence: nobody else
@@ -62,7 +62,7 @@ export default async function MarketplacePage() {
           <div className="mx-auto max-w-6xl section-major px-5 sm:px-8">
             {items.length === 0 ? (
               /*
-               * Not an error state. The catalogue lives in the console and this
+               * Not an error state. The catalogue lives in the app and this
                * page is deliberately readable without it — a marketing page
                * that 500s because a private service is restarting is a worse
                * property than one that says come back shortly.
@@ -70,10 +70,10 @@ export default async function MarketplacePage() {
               <div className="surface px-6 py-16 text-center">
                 <p className="font-display text-lg font-semibold">The catalogue is loading</p>
                 <p className="body-sm mx-auto mt-2 max-w-[46ch] text-graphite">
-                  It is published from the console and refreshes here every few minutes. If this
+                  It is published from the app and refreshes here every few minutes. If this
                   persists, the packs are all reachable directly at{" "}
-                  <a href={`${CONSOLE}/market`} className="underline">
-                    console.oxygenui.design
+                  <a href={`${APP}/market`} className="underline">
+                    app.oxygenui.design
                   </a>
                   .
                 </p>
@@ -113,7 +113,7 @@ export default async function MarketplacePage() {
             <div className="surface flex flex-wrap items-center justify-between gap-6 px-7 py-7">
               <div className="max-w-xl">
                 <h2 className="font-display text-xl font-semibold tracking-[-0.015em]">
-                  Buying happens in the console
+                  Buying happens in the app
                 </h2>
                 <p className="body-sm mt-2 text-graphite">
                   A purchase belongs to an organisation rather than to the person who paid, so it
@@ -122,10 +122,10 @@ export default async function MarketplacePage() {
                 </p>
               </div>
               <a
-                href={`${CONSOLE}/market`}
+                href={`${APP}/market`}
                 className="group inline-flex items-center gap-2 rounded-xl bg-cta px-5 py-3.5 text-sm font-medium text-paper transition-all duration-300 ease-[var(--ease-out-expo)] hover:-translate-y-0.5 hover:bg-cta-hover"
               >
-                Open the console
+                Open the app
                 <ArrowUpRight
                   aria-hidden="true"
                   className="size-4 transition-transform duration-300 ease-[var(--ease-out-expo)] group-hover:translate-x-0.5"

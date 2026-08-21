@@ -102,7 +102,7 @@ describe("clinical tokens arrive locked", () => {
    * framework bridges treat the same tokens. Hiding them would make the refusal
    * invisible and the palette look incomplete.
    */
-  it("carries the reason, in the words the console uses", () => {
+  it("carries the reason, in the words the app uses", () => {
     const plan = toVariablePlan(theme());
     const critical = find(plan, "--ox-status-critical")!;
 

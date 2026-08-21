@@ -149,7 +149,7 @@ describe("the guard on serve", () => {
  * A customer may move any token whose meaning is theirs to decide. They may not
  * move one that carries a clinical signal — and neither may a theme bridge, by
  * the same generated rule, so a colour cannot arrive through the framework door
- * that was refused at the console door.
+ * that was refused at the app door.
  */
 describe("semantic overrides", () => {
   const withSemantic = (light: Record<string, string>) => ({

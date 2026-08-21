@@ -410,7 +410,7 @@ describe("density-linked component tokens", () => {
 
 /**
  * The gate moved out of `scripts/gen/tokens/validate.ts` and into
- * `@oxygenui-design/tokens/validate` so the theme console can run the same
+ * `@oxygenui-design/tokens/validate` so the theme app can run the same
  * rules the build runs. A refactor of the one module that decides whether a
  * clinical colour is readable deserves more than "the build still passed".
  *
@@ -468,7 +468,7 @@ describe("the extracted validator agrees with the shipped evidence", () => {
  * picker, a validator deciding what a customer may type into a field. A token
  * labelled `color` that actually holds a timing function is not a cosmetic
  * error — it is a swatch picker rendered on a cubic-bezier, which is exactly
- * what the console showed before this was fixed.
+ * what the app showed before this was fixed.
  *
  * Both defects behind those tests were ordering problems rather than missing
  * rules, and both reported green for as long as nobody looked:

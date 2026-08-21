@@ -7,7 +7,7 @@ import { defineConfig } from "vitest/config";
  * Nothing here needs a DOM — and running it without one is what proves the
  * claim that makes this package worth extracting: the same module runs in the
  * build, in a server action, and in a browser. A file that quietly reached for
- * `window` or `node:fs` would fail on import here rather than in the console.
+ * `window` or `node:fs` would fail on import here rather than in the app.
  */
 export default defineConfig({
   test: {

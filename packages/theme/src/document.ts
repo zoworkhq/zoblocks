@@ -8,9 +8,9 @@
  * it is, and what the validator said when it was published.
  *
  * Keeping the `tokens` body byte-compatible is what makes the two channels one
- * system: a theme authored in the console can be exported and committed as a
- * built-in brand, and a built-in brand can be imported into the console. If the
- * console had invented its own format, "bring your own design system" would
+ * system: a theme authored in the app can be exported and committed as a
+ * built-in brand, and a built-in brand can be imported into the app. If the
+ * app had invented its own format, "bring your own design system" would
  * have meant two formats to support and one of them would rot.
  *
  * See content/decisions/0012-token-surface-is-a-contract.md.
@@ -103,9 +103,9 @@ const componentValueSchema = z.string().min(1).max(120);
  * `ref` is unchanged and still byte-compatible with a built-in brand file — a
  * ramp-only theme exports as something that can be committed to
  * `packages/tokens/tokens/brands/` verbatim, which is the property that keeps
- * the console and the build one system rather than two.
+ * the app and the build one system rather than two.
  *
- * `semantic` and `component` are the extension. Without them the console can
+ * `semantic` and `component` are the extension. Without them the app can
  * only offer a brand ramp, and "customise the badge without forking the
  * component" — the reason the 282-token surface is published as a contract at
  * all — has no way to be expressed. The clinical refusal is what makes it safe
@@ -213,7 +213,7 @@ export const brandAssetSchema = z.object({
    * Where the artwork is fetched from, for the same reason a font carries one.
    *
    * A digest identifies bytes; it does not locate them. Without this, an
-   * exported theme is a document that names artwork nobody outside this console
+   * exported theme is a document that names artwork nobody outside this app
    * can resolve — and "the theme is portable" stops being true at exactly the
    * point somebody tries to use it. Written by the server on upload.
    *

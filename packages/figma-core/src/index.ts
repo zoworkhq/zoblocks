@@ -9,7 +9,7 @@
  * has no conditionals worth a test.
  *
  * The validator is re-exported so a plugin has one import rather than two, and
- * so the answer it gives is provably the answer the console and the publish
+ * so the answer it gives is provably the answer the app and the publish
  * gate give. Three implementations of one contrast rule is the failure this
  * whole package layout exists to avoid.
  */

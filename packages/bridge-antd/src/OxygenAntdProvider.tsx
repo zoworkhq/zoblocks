@@ -9,7 +9,7 @@
  *       <YourAntdApp />       // your Button, your Table, your Modal
  *     </OxygenAntdProvider>
  *
- * A customer configures their brand once in the console and their whole
+ * A customer configures their brand once in the app and their whole
  * application follows — not only the Oxygen components in it. That is the
  * difference between a component library with theming and a design system.
  *

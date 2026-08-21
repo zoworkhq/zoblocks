@@ -27,7 +27,7 @@
 
 /*
  * Declared at the root rather than on the component, so anything that draws a
- * glyph gets the built-ins — including the console's icon screen, which renders
+ * glyph gets the built-ins — including the app's icon screen, which renders
  * the same spans to show a customer what they are replacing.
  */
 :root {

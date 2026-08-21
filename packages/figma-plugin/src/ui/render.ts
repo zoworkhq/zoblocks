@@ -6,7 +6,7 @@
  * gets tested, since the real panel lives in an iframe inside somebody else's
  * canvas.
  *
- * The vocabulary is the console's, deliberately: the measured ratio, the floor
+ * The vocabulary is the app's, deliberately: the measured ratio, the floor
  * it is held to, and the criterion that imposes the floor. A tick and a cross
  * would be smaller and would teach a designer nothing about why, or about what
  * would fix it.

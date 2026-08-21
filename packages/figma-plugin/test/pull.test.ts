@@ -21,7 +21,7 @@ import {
   summarise,
   versionMove,
 } from "../src/pull";
-import type { ResolvedPayload } from "../src/console";
+import type { ResolvedPayload } from "../src/app";
 import { snapshot } from "./fixture";
 
 const CLINICAL = "Clinical. Carries a validated contrast floor and 60° of hue separation.";
@@ -133,7 +133,7 @@ describe("a designer's edits", () => {
   });
 
   it("names a clinical variable it is putting back, with the reason", () => {
-    // A colour a customer cannot change in the console, changed here.
+    // A colour a customer cannot change in the app, changed here.
     const file = snapshot([inFile("--ox-status-critical", "status/critical", "#ff00ff")]);
     const preview = previewPull(payload(), file);
 
@@ -230,7 +230,7 @@ describe("the one pair measured in the panel", () => {
      * The bug this test exists for. `generateRamp` pins the seed at 600 and
      * derives the rest at fixed lightnesses, so a seed darker than 600's
      * nominal lightness produces a *lighter* 700. Measuring the anchor reported
-     * 5.47:1 for #0f766e where the console reports 2.98:1 — confidently wrong,
+     * 5.47:1 for #0f766e where the app reports 2.98:1 — confidently wrong,
      * in the direction that says pass where the gate says fail.
      */
     const reading = readAnchorLocally(real, "#0f766e")!;
@@ -248,7 +248,7 @@ describe("the one pair measured in the panel", () => {
 
   it("says nothing rather than guessing when the accent is not a ramp step", () => {
     // A customer who overrode `accent` to a literal. No number beats a wrong
-    // one, and the console is still authoritative.
+    // one, and the app is still authoritative.
     const overridden = payload({
       semantic: {
         light: { "--ox-accent": "#123456", "--ox-text-on-accent": "#ffffff" },

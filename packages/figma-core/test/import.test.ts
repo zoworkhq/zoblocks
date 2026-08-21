@@ -10,7 +10,7 @@
  *
  * So the refusal is named rather than silent, in the same report shape
  * `importDtcg` already returns — because a designer meeting this should meet
- * the words a console user meets.
+ * the words an app user meets.
  */
 
 import { describe, expect, it } from "vitest";

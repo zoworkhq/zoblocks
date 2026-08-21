@@ -12,7 +12,7 @@
  */
 
 import type { GateReport, PairKindName } from "./gate";
-import type { Credential, ResolvedPayload } from "./console";
+import type { Credential, ResolvedPayload } from "./app";
 import type { PullPreview } from "./pull";
 
 /** A collection, as the picker needs to show it. */

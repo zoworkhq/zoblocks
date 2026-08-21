@@ -15,10 +15,10 @@
  *   - A form's patient must equal the displayed patient.
  *
  * **Neither throws, and neither logs.** An earlier draft threw in development
- * and wrote to `console` in production, which is the React-ecosystem habit —
+ * and wrote to `app` in production, which is the React-ecosystem habit —
  * and which this repo has explicitly decided against: `process.env` does not
  * exist in a copy-source consumer's build, and a component that writes to the
- * console writes PHI onward to whatever error reporter the customer installed.
+ * app writes PHI onward to whatever error reporter the customer installed.
  * See `@oxygenui/no-forbidden-capability` and ADR 0009.
  *
  * A violation does two things instead, both of which are better: it renders a

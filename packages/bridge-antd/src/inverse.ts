@@ -3,7 +3,7 @@
  *
  * `AntdBridge` answers "make Oxygen's components look like our antd app".
  * This answers the question customers actually ask second, and care about
- * more: *"we configured our brand in your console — why do our **own** buttons
+ * more: *"we configured our brand in your app — why do our **own** buttons
  * still look like Ant Design's default blue?"*
  *
  * Same correspondence as `map.ts`, read the other way. That is deliberate and

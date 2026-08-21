@@ -2,7 +2,7 @@
  * The panel half. DOM and `fetch`, and no `figma` API.
  *
  * Everything with a rule in it lives elsewhere — `gate.ts` decides what a
- * reading is, `pull.ts` decides what a sync would change, `console.ts` decides
+ * reading is, `pull.ts` decides what a sync would change, `app.ts` decides
  * what a refusal means. What is left here is state and wiring across two
  * boundaries that cannot be unit-tested: `postMessage` to the sandbox, and the
  * network. Keeping it thin is the point.
@@ -11,13 +11,13 @@
 import type { CollectionSummary, FromUi, Standing } from "../protocol";
 import { readUiMessage } from "../protocol";
 import {
-  consoleApi,
+  appApi,
   readOrigin,
   readToken,
-  type ConsoleApi,
+  type AppApi,
   type ResolvedPayload,
   type ThemeSummary,
-} from "../console";
+} from "../app";
 import { readAnchorLocally, type PullPreview } from "../pull";
 import { renderControls, type Choice } from "./controls";
 import { renderReport } from "./render";
@@ -60,9 +60,9 @@ function send(message: FromUi): void {
   parent.postMessage({ pluginMessage: message }, "*");
 }
 
-function api(): ConsoleApi | undefined {
+function api(): AppApi | undefined {
   const credential = state.standing.credential;
-  return credential ? consoleApi((url, init) => fetch(url, init), credential) : undefined;
+  return credential ? appApi((url, init) => fetch(url, init), credential) : undefined;
 }
 
 /* ------------------------------------------------------------------ paint */
@@ -189,9 +189,9 @@ function connectTo(rawOrigin: string, rawToken: string): void {
 
   // Checked before a round trip, so a typo is a correction rather than a 404.
   state.invalid = !origin
-    ? "That is not a console address. It should look like https://console.oxygenui.design."
+    ? "That is not an app address. It should look like https://app.oxygenui.design."
     : !token
-      ? "That is not a Figma key. They start oxy_live_ and are minted in the console."
+      ? "That is not a Figma key. They start oxy_live_ and are minted in the app."
       : undefined;
 
   if (state.invalid || !origin || !token) {

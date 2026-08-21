@@ -283,7 +283,7 @@ describe("the typed path", () => {
   });
 
   it("still renders when the typed path is removed, so the lint rule is the guard", () => {
-    // A component that writes to a customer's console is forbidden here, and
+    // A component that writes to a customer's app is forbidden here, and
     // the mistake is invisible at runtime anyway — it renders and passes every
     // other test. `@oxygenui/signature-requires-typed-path` is what catches it,
     // with its own tests in the eslint plugin.

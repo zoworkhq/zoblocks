@@ -27,7 +27,7 @@ looked:
 
 Consumers act on `kind`: a bridge writing an antd theme, an editor rendering a
 colour picker, a validator deciding what a customer may type. A timing function
-labelled `color` is a swatch picker on a cubic-bezier, which is what the console
+labelled `color` is a swatch picker on a cubic-bezier, which is what the app
 was showing. Five tests now hold the manifest to it in both directions, so a
 future fix cannot pass by labelling everything `dimension`.
 

@@ -1,5 +1,5 @@
 /**
- * The glyphs the components draw, against the slots the console offers.
+ * The glyphs the components draw, against the slots the app offers.
  *
  * These two lists live in different packages on purpose. `ICON_SLOTS` in the
  * theme package is what a customer is offered and what the schema will accept;
@@ -8,7 +8,7 @@
  * package what it may render would be the dependency pointing the wrong way —
  * so nothing but this file would notice them drifting apart.
  *
- * The failure it catches is quiet and total: a slot the console offers with no
+ * The failure it catches is quiet and total: a slot the app offers with no
  * class behind it accepts an upload, stores it, serves it, and changes nothing
  * on screen. Everything reports success and the glyph never moves.
  */
@@ -81,7 +81,7 @@ describe("the locked marks are not offered", () => {
   /**
    * The switch's `unknown` mark is that component's entire clinical
    * contribution: a binary control cannot tell "no" from "nobody asked". These
-   * appear in the registry so the console can show them refused with a reason
+   * appear in the registry so the app can show them refused with a reason
    * — showing nothing would make the list look arbitrary — but they must never
    * reach the schema's accepted set.
    */

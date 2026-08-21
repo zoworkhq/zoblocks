@@ -16,7 +16,7 @@ illustration is one file that has to survive both, nobody ships two, and a
 drawing with a baked white background looks perfect on the light preview and is
 a white rectangle in the dark theme.
 
-The console also now offers to cut a favicon out of the light mark. Nothing
+The app also now offers to cut a favicon out of the light mark. Nothing
 else here derives one asset from another, and the argument against it is weaker
 in exactly this one place: the alternative is not "somebody drew it" but "the
 tab shows a blank page icon". Three crops, previewed at 16, 32 and 64 pixels on
@@ -24,7 +24,7 @@ both grounds, because sixteen is the size that decides and the person choosing
 should see that rather than be told. The cutting happens in a canvas in the
 browser — a favicon needs a rasteriser and the browser already is one — and the
 result is decoded server-side and put through `checkBrandAsset` like any
-uploaded file. A picture this console generated is not a picture it trusts.
+uploaded file. A picture this app generated is not a picture it trusts.
 
 The role list also stopped being written down twice: `brandAssetSchema` now
 takes its enum from `BRAND_ASSET_ROLES` rather than restating it, which it had

@@ -1,7 +1,7 @@
 /**
  * One colour in, eleven steps out.
  *
- * The console asks for a brand colour, not a ramp, because most of what the
+ * The app asks for a brand colour, not a ramp, because most of what the
  * contrast gate catches is a hand-picked step rather than the chosen colour.
  */
 
@@ -91,7 +91,7 @@ describe("hslToHex", () => {
 
 describe("nearestPassing", () => {
   /**
-   * The console's "apply nearest passing". Customers reliably accept a shade
+   * The app's "apply nearest passing". Customers reliably accept a shade
    * they did not choose; they do not reliably accept a rejection, and a
    * rejection with no route out is how a gate becomes something a team works
    * around rather than with.

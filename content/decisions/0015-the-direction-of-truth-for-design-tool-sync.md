@@ -5,7 +5,7 @@
 ## Context
 
 A brand reaches production today by a person retyping hex values into the
-console. The designer who owns that brand works in Figma and never opens it.
+app. The designer who owns that brand works in Figma and never opens it.
 Closing that loop means two systems can write the same values — and two systems
 that can both write one token, with no written rule about which wins, is how a
 sync feature becomes a permanent source of "why did my colour change back".
@@ -19,18 +19,18 @@ should be a document rather than a per-ticket argument.
 Each tier has one owner. The other side may display it and may propose, never
 write.
 
-| Tier                        | Owner   | Direction                  | Why                                                                                                                  |
-| --------------------------- | ------- | -------------------------- | -------------------------------------------------------------------------------------------------------------------- |
-| Brand anchor (the 600 step) | Figma   | Figma → console            | A brand decision, held by the designer. One swatch, not eleven.                                                      |
-| Ramp steps (50–950)         | Console | Console → Figma            | Derived by `generateRamp` and validated. A per-step override is a proposal; the console decides whether it ships.    |
-| Semantic                    | Console | Console → Figma            | The tier the gate measures. If Figma could write it, a palette could reach a file without ever having passed.        |
-| Component                   | Console | Console → Figma, opt-in    | Large enough to make a variable panel unusable. Off by default.                                                      |
-| Clinical                    | Neither | Console → Figma, read-only | Pushed so a designer can see them, refused on the way back — exactly as the framework bridges treat the same tokens. |
+| Tier                        | Owner   | Direction              | Why                                                                                                                  |
+| --------------------------- | ------- | ---------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| Brand anchor (the 600 step) | Figma   | Figma → app            | A brand decision, held by the designer. One swatch, not eleven.                                                      |
+| Ramp steps (50–950)         | App     | App → Figma            | Derived by `generateRamp` and validated. A per-step override is a proposal; the app decides whether it ships.        |
+| Semantic                    | App     | App → Figma            | The tier the gate measures. If Figma could write it, a palette could reach a file without ever having passed.        |
+| Component                   | App     | App → Figma, opt-in    | Large enough to make a variable panel unusable. Off by default.                                                      |
+| Clinical                    | Neither | App → Figma, read-only | Pushed so a designer can see them, refused on the way back — exactly as the framework bridges treat the same tokens. |
 
 Three consequences worth stating explicitly:
 
 - **Push is one anchor, not a palette.** The plugin sends a proposed brand
-  colour and receives a console URL. It cannot publish, and it cannot write
+  colour and receives an app URL. It cannot publish, and it cannot write
   anything the gate has not measured.
 - **Aliases, not flattened hex.** A semantic token that resolves to a ramp step
   is written as a Figma alias to that step. Flattening it renders identically
@@ -56,14 +56,14 @@ reachable only for customers already on Enterprise.** Automation is therefore a
 feature for a subset, and should be sold as one.
 
 **Distribution: private to our own organisation first, Community when the
-console is customer-facing.** Private publishing skips Figma's review entirely;
+app is customer-facing.** Private publishing skips Figma's review entirely;
 Community takes up to two weeks. But the fact that decides this is a different
 one: _private_ means private to the **publisher's** organisation, so a privately
 published plugin does not reach a customer's designers at all. It reaches ours.
 
 That makes distribution a consequence of
 [0013](0013-open-questions-for-product.md) question 3 rather than an independent
-choice. The console is customer-facing _staged_, run internally first with our
+choice. The app is customer-facing _staged_, run internally first with our
 own team authoring real themes on customers' behalf — and the plugin belongs in
 exactly the same stage. Private now costs nothing, because the plugin's audience
 during that stage is us. Community publishing arrives with the login page.

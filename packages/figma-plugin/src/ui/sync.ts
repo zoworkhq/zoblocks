@@ -2,13 +2,13 @@
  * Connecting, pulling and proposing — the three screens that talk to a server.
  *
  * Rendering only. Every decision they present was made somewhere else:
- * `previewPull` decided what would change, the console decided whether a colour
+ * `previewPull` decided what would change, the app decided whether a colour
  * passes. What is here is the part a designer reads before agreeing, and the
  * words matter as much as the counts — "18 created, 4 updated, 2 no longer in
  * this theme" is a sentence somebody can act on; "sync 24 changes" is not.
  */
 
-import type { Credential, ThemeSummary } from "../console";
+import type { Credential, ThemeSummary } from "../app";
 import type { PullPreview } from "../pull";
 import { summarise, versionMove } from "../pull";
 
@@ -49,7 +49,7 @@ export function renderConnect(root: HTMLElement, options: ConnectOptions): void 
 
   const form = el("form", "connect");
   form.append(
-    field("origin", "Console address", "https://console.oxygenui.design", "url"),
+    field("origin", "App address", "https://app.oxygenui.design", "url"),
     field("token", "Figma key", "oxy_live_…", "password"),
   );
 
@@ -64,7 +64,7 @@ export function renderConnect(root: HTMLElement, options: ConnectOptions): void 
     el(
       "p",
       "note",
-      "Mint one in the console at Market → Tokens, with the scope set to Figma. It reads your themes and proposes a brand colour; it cannot publish.",
+      "Mint one in the app at Market → Tokens, with the scope set to Figma. It reads your themes and proposes a brand colour; it cannot publish.",
     ),
   );
 
@@ -284,7 +284,7 @@ export function renderPush(root: HTMLElement, options: PushOptions): void {
     el(
       "p",
       "note",
-      "Propose a brand colour. The console derives the other ten steps, measures them, and opens a draft — it cannot publish, and neither can this.",
+      "Propose a brand colour. The app derives the other ten steps, measures them, and opens a draft — it cannot publish, and neither can this.",
     ),
   );
 
@@ -323,14 +323,14 @@ export function renderPush(root: HTMLElement, options: PushOptions): void {
      *
      * This is one pair — the label colour on the step the accent comes from —
      * and it is the pair that fails most often, so seeing it while choosing is
-     * worth a lot. It is not the gate: the console measures twenty-odd pairs
+     * worth a lot. It is not the gate: the app measures twenty-odd pairs
      * across three themes and is the only thing that can refuse. Saying which
      * is which is the difference between a helpful number and a false pass.
      */
     const line = el(
       "p",
       options.local.passes ? "note" : "finding",
-      `${options.local.against} on this colour measures ${options.local.ratio.toFixed(2)}:1 against a ${options.local.floor}:1 floor. One pair, measured here — the console checks the rest.`,
+      `${options.local.against} on this colour measures ${options.local.ratio.toFixed(2)}:1 against a ${options.local.floor}:1 floor. One pair, measured here — the app checks the rest.`,
     );
     root.append(line);
   }
@@ -348,7 +348,7 @@ export function renderPush(root: HTMLElement, options: PushOptions): void {
       el(
         "p",
         "note",
-        "Somebody with the role for it reviews and publishes in the console. Nothing is live yet.",
+        "Somebody with the role for it reviews and publishes in the app. Nothing is live yet.",
       ),
     );
     const link = el("a", undefined, options.outcome.url);

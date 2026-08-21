@@ -7,7 +7,7 @@
  * in three places, and three implementations would be three answers.
  *
  *   1. `pnpm gen`         — the build, over the DTCG source on disk
- *   2. the theme console  — live, in a browser, as a customer types a colour
+ *   2. the theme app  — live, in a browser, as a customer types a colour
  *   3. the publish gate   — server-side and authoritative, before a theme ships
  *
  * A customer whose palette passed in the browser and failed in CI has been

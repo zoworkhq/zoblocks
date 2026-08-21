@@ -3,7 +3,7 @@
  *
  * One property carries this file, and it is the reason the public shelf is an
  * HTTP read rather than a database one: **the marketing site must survive the
- * console being unreachable.** A page somebody arrived at from a search result
+ * app being unreachable.** A page somebody arrived at from a search result
  * cannot 500 because a private service is restarting, and a CI build cannot
  * fail because one was.
  *
@@ -15,7 +15,7 @@
 
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
-  CONSOLE,
+  APP,
   KIND_LABEL,
   buyHref,
   catalogue,
@@ -61,26 +61,26 @@ const respondWith = (body: unknown, ok = true) =>
 afterEach(() => vi.unstubAllGlobals());
 
 describe("reading the catalogue", () => {
-  it("returns what the console published", async () => {
+  it("returns what the app published", async () => {
     respondWith({ items: [ITEM] });
     await expect(catalogue()).resolves.toEqual([ITEM]);
   });
 
-  it("asks the console, and lets Next cache the answer", async () => {
+  it("asks the app, and lets Next cache the answer", async () => {
     const fetchMock = vi.fn(async () => ({ ok: true, json: async () => ({ items: [] }) }));
     vi.stubGlobal("fetch", fetchMock);
 
     await catalogue();
 
     const [url, init] = fetchMock.mock.calls[0] as unknown as [string, RequestInit];
-    expect(url).toBe(`${CONSOLE}/c/catalog.json`);
+    expect(url).toBe(`${APP}/c/catalog.json`);
     // Ten minutes. A catalogue changes when somebody publishes a pack, which is
-    // rare; hammering the console on every request is not free.
+    // rare; hammering the app on every request is not free.
     expect((init as { next?: { revalidate?: number } }).next?.revalidate).toBe(600);
   });
 });
 
-describe("what happens when the console is not there", () => {
+describe("what happens when the app is not there", () => {
   it("returns nothing when the request is refused", async () => {
     respondWith({ error: "nope" }, false);
     await expect(catalogue()).resolves.toEqual([]);
@@ -157,20 +157,20 @@ describe("presenting a price", () => {
   });
 });
 
-describe("sending a buyer to the console", () => {
+describe("sending a buyer to the app", () => {
   it("links at the item, not the catalogue", () => {
     // Buying needs an organisation, which this site knows nothing about.
-    expect(buyHref("empty-state-system")).toBe(`${CONSOLE}/market/empty-state-system`);
+    expect(buyHref("empty-state-system")).toBe(`${APP}/market/empty-state-system`);
   });
 
-  it("defaults to the deployed console rather than localhost", () => {
-    expect(CONSOLE).toMatch(/^https?:\/\//);
+  it("defaults to the deployed app rather than localhost", () => {
+    expect(APP).toMatch(/^https?:\/\//);
   });
 });
 
 describe("naming a kind", () => {
-  it("has a word for every kind the console can publish", () => {
-    // Kept in step with `KIND_LABEL` in the console by this assertion — a kind
+  it("has a word for every kind the app can publish", () => {
+    // Kept in step with `KIND_LABEL` in the app by this assertion — a kind
     // added there and forgotten here renders as `undefined` on a public page.
     expect(Object.keys(KIND_LABEL).sort()).toEqual([
       "component",

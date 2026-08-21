@@ -1,5 +1,5 @@
 /**
- * The console key, held where a document cannot carry it.
+ * The app key, held where a document cannot carry it.
  *
  * `figma.clientStorage` is per-user and per-plugin on one machine. That is the
  * whole reason it is used rather than the file's plugin data, which would be
@@ -14,7 +14,7 @@
  * `localStorage` on a Figma-owned origin shared with every other plugin.
  */
 
-import { readOrigin, readToken, type Credential } from "../console";
+import { readOrigin, readToken, type Credential } from "../app";
 import type { FigmaClientStorage } from "./api";
 
 const KEY = "ox.credential";
@@ -27,7 +27,7 @@ export async function loadCredential(storage: FigmaClientStorage): Promise<Crede
    * Re-validated on the way out, not trusted because we wrote it.
    *
    * The stored shape can predate a change to what is accepted, and a token that
-   * no longer matches the prefix is one the console will refuse anyway — better
+   * no longer matches the prefix is one the app will refuse anyway — better
    * to ask for it again than to send it and report a 404.
    */
   const { origin, token } = raw as { origin?: unknown; token?: unknown };

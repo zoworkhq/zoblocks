@@ -125,7 +125,7 @@ test.describe("the live demo", () => {
   test("@framework mounts with its real dependency", async ({ page }) => {
     const failures: string[] = [];
     page.on("pageerror", (error) => failures.push(error.message));
-    page.on("console", (message) => {
+    page.on("app", (message) => {
       if (message.type() === "error") failures.push(message.text());
     });
 
@@ -145,7 +145,7 @@ test.describe("the live demo", () => {
       await expect(page.getByRole("tab", { name: label })).toBeVisible();
     }
 
-    expect(failures, `console errors on ${PAGE}:\n${failures.join("\n")}`).toEqual([]);
+    expect(failures, `app errors on ${PAGE}:\n${failures.join("\n")}`).toEqual([]);
   });
 
   test("@framework the modal offers all three capture methods", async ({ page }) => {

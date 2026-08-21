@@ -12,7 +12,7 @@ export type Pane = "check" | "pull" | "push";
 
 export interface TabsOptions {
   active: Pane;
-  /** Pull and push need a console; check does not, and says so when disabled. */
+  /** Pull and push need an app; check does not, and says so when disabled. */
   connected: boolean;
   onSelect(pane: Pane): void;
 }
@@ -33,8 +33,8 @@ export function renderTabs(root: HTMLElement, options: TabsOptions): void {
   const buttons: HTMLButtonElement[] = [];
 
   for (const pane of ORDER) {
-    const needsConsole = pane !== "check";
-    const disabled = needsConsole && !options.connected;
+    const needsApp = pane !== "check";
+    const disabled = needsApp && !options.connected;
 
     const button = document.createElement("button");
     button.type = "button";
@@ -48,7 +48,7 @@ export function renderTabs(root: HTMLElement, options: TabsOptions): void {
     if (disabled) {
       button.disabled = true;
       // Said rather than left to be inferred from a grey button.
-      button.title = "Connect to the console first.";
+      button.title = "Connect to the app first.";
     }
 
     button.addEventListener("click", () => options.onSelect(pane));

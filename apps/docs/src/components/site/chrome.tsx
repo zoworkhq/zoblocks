@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import { ArrowUpRight, Github } from "lucide-react";
 import { CommandMenu } from "@/components/site/command-menu";
 import { ThemeToggle } from "@/components/site/theme-toggle";
-import { signInHref, signUpHref } from "@/lib/console";
+import { signInHref, signUpHref } from "@/lib/app";
 import { cn } from "@/lib/utils";
 
 export function OxygenMark({ className = "h-4 w-7" }: { className?: string }) {
@@ -117,7 +117,7 @@ export function SiteHeader() {
 
           {/* GitHub and the theme picker stand down on a phone.
 
-              The header was at exactly its width before the console links were
+              The header was at exactly its width before the app links were
               added: 375px of content in a 375px viewport, with the wordmark
               already wrapping to two lines. Two more controls do not fit, and
               the ones to sacrifice are the ones that are reachable elsewhere —
@@ -139,14 +139,14 @@ export function SiteHeader() {
             <ThemeToggle />
           </div>
 
-          {/* The way into the console.
+          {/* The way into the app.
 
               A rule rather than a gap separates these from the utilities to
               their left. GitHub and the theme toggle are things you do *to*
               this page; these two leave it for another application entirely,
               and a plain gap reads as one more icon in the same row.
 
-              Plain `<a>`, not `<Link>`: the console is a different origin, and
+              Plain `<a>`, not `<Link>`: the app is a different origin, and
               a client-side navigation cannot cross one. `Link` would prefetch
               an address it can never render. */}
           <span aria-hidden="true" className="mx-2 hidden h-4 w-px bg-rule sm:block" />
@@ -197,11 +197,11 @@ const FOOTER_LINKS = [
    * Not redundancy for its own sake: the header hides Sign in below `sm` to
    * keep six controls off a phone-width bar, and a returning reader on a phone
    * needs somewhere to go that is not the sign-up form. `external` marks them
-   * because they leave for the console's origin, which is what the arrow on
+   * because they leave for the app's origin, which is what the arrow on
    * hover is telling the reader.
    */
   {
-    title: "Console",
+    title: "App",
     links: [
       { href: signInHref, label: "Sign in", external: true },
       { href: signUpHref, label: "Sign up", external: true },
@@ -240,7 +240,7 @@ export function SiteFooter() {
           </div>
 
           {/* Three columns now, so two-up on a phone and three-up once there is
-              room — `grid-cols-2` alone left Console stranded on its own row. */}
+              room — `grid-cols-2` alone left App stranded on its own row. */}
           <div className="grid grid-cols-2 gap-10 sm:grid-cols-3 sm:gap-16">
             {FOOTER_LINKS.map((column) => (
               <div key={column.title}>

@@ -132,7 +132,7 @@ export default tseslint.config(
   // them is actively wrong here: `no-forbidden-capability` refuses network
   // calls because data fetching belongs to the application rather than to a
   // component (ARCHITECTURE.md §14). This *is* the application — a plugin whose
-  // whole iframe exists to talk to the console — so the rule would be arguing
+  // whole iframe exists to talk to the app — so the rule would be arguing
   // with the architecture rather than enforcing it.
   //
   // Turned off by name rather than by ignoring the package, so the rest stay

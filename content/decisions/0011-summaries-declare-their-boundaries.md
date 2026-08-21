@@ -111,7 +111,7 @@ being made deliberately: the sentence is the component's safety claim, and a
 component that lets you turn its safety claim off does not have one.
 
 **Rejected: optional with a development warning.** The repository's own rules
-forbid `console` in component source, and `process.env` does not exist in a
+forbid `app` in component source, and `process.env` does not exist in a
 copy-source consumer's build — so the warning would either not fire or not be
 seen. A required prop fires in the one place that always works: the type
 checker.

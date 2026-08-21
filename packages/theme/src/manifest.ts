@@ -13,7 +13,7 @@
  *     link-preview card by `<meta>`. Emitting those as custom properties would
  *     put two permanently unusable declarations in every customer's stylesheet.
  *   - **Absolute URLs.** A relative `/f/…` path resolves against the host's own
- *     origin, which is not where the artwork lives. Fine inside the console;
+ *     origin, which is not where the artwork lives. Fine inside the app;
  *     useless in an email that Outlook renders three days later.
  *   - **The size on record**, so a host can set width and height and stop the
  *     page reflowing when the mark loads.
@@ -52,9 +52,9 @@ export interface ThemeManifest {
 /**
  * The manifest for one published theme.
  *
- * `origin` is where this console serves from. It is a parameter rather than
+ * `origin` is where this app serves from. It is a parameter rather than
  * read from configuration because the value that matters is the one in the
- * request that produced this response — a console reachable on two hostnames
+ * request that produced this response — an app reachable on two hostnames
  * must not hand out the other one's URLs.
  */
 export function brandManifest(

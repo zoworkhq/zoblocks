@@ -13,7 +13,7 @@ between them (accepted formats, required shape, where it is delivered) is data.
 Three things this changes that are worth knowing about:
 
 - **Uploads are checked, not sanitised.** An SVG is a document, not a picture:
-  served from the console's origin it runs with the console's privileges. Any
+  served from the app's origin it runs with the app's privileges. Any
   script, event handler, embedded document, remote `<use>` or entity
   declaration is refused, and the refusal names what was found — "invalid file"
   sends a designer back to the export settings that produced it. Raster formats
@@ -36,9 +36,9 @@ writes `background-image: var(--ox-logo)` and nothing else.
 `variant`. `emptyAssets()` is exported, because the empty literal it replaces
 was written out in six places.
 
-In the console, the Brand screen now manages all seven, grouped by what renders
+In the app, the Brand screen now manages all seven, grouped by what renders
 them. Two bugs surfaced while wiring it: `/f/{org}/{file}` only ever served
 fonts, so uploaded artwork 404ed behind a broken image, and the previews
-followed the console's own theme — meaning "Mark, on light" previewed on black
+followed the app's own theme — meaning "Mark, on light" previewed on black
 for anybody working in dark mode, which is precisely the failure a per-ground
 preview exists to catch.

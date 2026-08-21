@@ -201,7 +201,7 @@ export function fontHeaders(format: FontFormat): Record<string, string> {
     "Cache-Control": "public, max-age=31536000, immutable",
     "X-Content-Type-Options": "nosniff",
     // Served from an isolated origin, so a customer's bytes never execute in
-    // the console's own origin.
+    // the app's own origin.
     "Cross-Origin-Resource-Policy": "cross-origin",
   };
 }

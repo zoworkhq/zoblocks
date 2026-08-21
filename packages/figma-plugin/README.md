@@ -6,7 +6,7 @@ Oxygen's design system, inside Figma. Three things:
   with the same code the build and the publish gate run. Needs no account.
 - **Pull** — a published theme becomes variables, previewed before anything is
   written.
-- **Propose** — one brand colour goes to the console as a draft.
+- **Propose** — one brand colour goes to the app as a draft.
 
 `manifest.json` allows exactly one origin in production and no wildcard. The
 sandbox has no `fetch` at all; the iframe has the network. The key lives in
@@ -30,15 +30,15 @@ Then in Figma: **Plugins → Development → Import plugin from manifest**, and
 choose `packages/figma-plugin/manifest.json`. The manifest points at `dist/`,
 which is not committed, so the build has to run first.
 
-Against a local console, the address is `http://localhost:6003` — allowed by
+Against a local app, the address is `http://localhost:6003` — allowed by
 `devAllowedDomains`, which is deliberately not `allowedDomains`. A published
 plugin that may talk to whatever is listening on a designer's own machine is a
 different product.
 
 ## Connecting
 
-Mint a key in the console at **Market → Tokens** with the scope set to _Themes,
-for the Figma plugin_, then paste it with the console address. `apps/console/
+Mint a key in the app at **Market → Tokens** with the scope set to _Themes,
+for the Figma plugin_, then paste it with the app address. `apps/app/
 PLUGIN-API.md` covers what the key can reach; the short version is that it reads
 themes and proposes a brand anchor, cannot install purchased components, and
 never exceeds the role of the person who minted it.

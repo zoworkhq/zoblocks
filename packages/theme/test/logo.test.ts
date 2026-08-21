@@ -2,8 +2,8 @@
  * Brand artwork, and the reason it is checked at all.
  *
  * Almost every assertion here is about one thing: an SVG is a document, not a
- * picture. Hosting a customer's SVG on the console's own origin means whatever
- * that file contains runs with the console's privileges — so a logo upload is
+ * picture. Hosting a customer's SVG on the app's own origin means whatever
+ * that file contains runs with the app's privileges — so a logo upload is
  * a stored-XSS vector wearing a file picker, and the refusals below are the
  * only thing between the two.
  *

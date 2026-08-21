@@ -3,7 +3,7 @@
  *
  * The bridges so far run one way: a host framework's theme in, Oxygen's tokens
  * out. This is the other direction, and it is the one a customer actually asks
- * for — *"we configured our brand in your console; why do our own buttons still
+ * for — *"we configured our brand in your app; why do our own buttons still
  * look like Ant Design's default blue?"*
  *
  * Answering it means knowing what `--ox-accent` currently resolves to, and the

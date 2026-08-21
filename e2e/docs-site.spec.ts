@@ -501,15 +501,15 @@ test.describe("the tab gallery @a11y", () => {
 /* ==================================================================== */
 
 /* ==================================================================== */
-/* The way into the console                                             */
+/* The way into the app                                             */
 /* ==================================================================== */
 
-test.describe("the console doors @a11y", () => {
+test.describe("the app doors @a11y", () => {
   /**
    * Sign in and Sign up leave for another application.
    *
    * Asserted on the pathname and on *having* an origin rather than on the
-   * origin itself, because that address is configuration: `NEXT_PUBLIC_CONSOLE_URL`
+   * origin itself, because that address is configuration: `NEXT_PUBLIC_APP_URL`
    * in a deployment, localhost on a laptop. Pinning the host here would make
    * the test pass only on the machine it was written on.
    */
@@ -517,7 +517,7 @@ test.describe("the console doors @a11y", () => {
     ["Sign in", "/login"],
     ["Sign up", "/signup"],
   ] as const) {
-    test(`${label} points at the console's ${path}`, async ({ page }) => {
+    test(`${label} points at the app's ${path}`, async ({ page }) => {
       await page.goto("/");
 
       const link = page.locator("header").getByRole("link", { name: label, exact: true });
@@ -641,17 +641,17 @@ test.describe("site chrome @a11y", () => {
 
 test.describe("the public marketplace @a11y", () => {
   /**
-   * The catalogue is rendered here and bought in the console.
+   * The catalogue is rendered here and bought in the app.
    *
-   * A storefront reachable only after sign-up has no top of funnel: the console
+   * A storefront reachable only after sign-up has no top of funnel: the app
    * has no anonymous traffic and this site does. So the shelf lives here, where
-   * it can be linked to and indexed, and the console keeps the parts that need
+   * it can be linked to and indexed, and the app keeps the parts that need
    * to know who you are.
    *
    * These assertions are deliberately tolerant of an empty catalogue. The data
    * comes from a separate service over HTTP, and the page is built to read
    * perfectly well without it — a marketing page that fails because a private
-   * console is restarting is a worse property than one showing yesterday's
+   * app is restarting is a worse property than one showing yesterday's
    * shelf.
    */
   test("is reachable from the site chrome", async ({ page }) => {
@@ -662,7 +662,7 @@ test.describe("the public marketplace @a11y", () => {
     await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
   });
 
-  test("lists what the console publishes, or says it is loading", async ({ page }) => {
+  test("lists what the app publishes, or says it is loading", async ({ page }) => {
     await page.goto("/marketplace");
 
     const cards = page.getByRole("main").getByRole("listitem");
@@ -691,10 +691,10 @@ test.describe("the public marketplace @a11y", () => {
     await expect(page.getByText(/contrast pairs at or above/)).toBeVisible();
 
     /*
-     * Buying leaves for the console, because a purchase belongs to an
+     * Buying leaves for the app, because a purchase belongs to an
      * organisation and this site does not know about organisations.
      */
-    const buy = page.getByRole("link", { name: /Buy in the console/ });
+    const buy = page.getByRole("link", { name: /Buy in the app/ });
     await expect(buy).toHaveAttribute("href", /\/market\//);
 
     // And the licence is stated before anybody spends anything.

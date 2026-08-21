@@ -420,7 +420,7 @@ export async function emitSurface(
    * `NOT_BRIDGEABLE` lists *component* tokens, so a clinical semantic token no
    * component references yet is absent from it — `--ox-flag-provisional` was
    * exactly that. A consumer deriving the rule from that list therefore
-   * misclassifies it, which is how the theme console came to describe an
+   * misclassifies it, which is how the theme app came to describe an
    * identity flag as an ordinary gap in Ant Design's palette. Publishing the
    * rule as data is the fix; re-deriving it downstream is the bug.
    */

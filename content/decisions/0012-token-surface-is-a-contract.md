@@ -88,7 +88,7 @@ Concretely:
 
 6. **The gate is a module, not a build script.** The rules moved from
    `scripts/gen/tokens/validate.ts` to `@oxygenui-design/tokens/validate`:
-   pure functions, no `node:*`, no DOM. The build, a theme console's live
+   pure functions, no `node:*`, no DOM. The build, a theme app's live
    preview, and a server-side publish gate run identical code. A customer whose
    palette passed in the browser and failed in CI has been told two different
    things about the same colour.

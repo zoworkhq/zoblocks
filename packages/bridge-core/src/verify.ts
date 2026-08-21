@@ -145,7 +145,7 @@ export function verifyPatch(patch: TokenPatch): {
  * Host *contrast* is deliberately not covered here. That depends on a colour
  * the customer chose, it is not a defect in the bridge, and failing someone's
  * application over their palette would be the wrong place to enforce it. It is
- * returned by `verifyPatch` instead, for the theme console to surface at the
+ * returned by `verifyPatch` instead, for the theme app to surface at the
  * point where a person can actually change the colour.
  */
 export function assertBridgeOutput(bridgeId: string, patch: TokenPatch): void {

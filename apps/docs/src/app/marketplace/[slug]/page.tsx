@@ -95,7 +95,7 @@ export default async function MarketplaceItemPage({
                 href={buyHref(item.slug)}
                 className="group inline-flex items-center gap-2 rounded-xl bg-cta px-5 py-3.5 text-sm font-medium text-paper transition-all duration-300 ease-[var(--ease-out-expo)] hover:-translate-y-0.5 hover:bg-cta-hover"
               >
-                Buy in the console
+                Buy in the app
                 <ArrowUpRight
                   aria-hidden="true"
                   className="size-4 transition-transform duration-300 ease-[var(--ease-out-expo)] group-hover:translate-x-0.5"

@@ -34,7 +34,7 @@ See [ARCHITECTURE.md](../../ARCHITECTURE.md) for how these fit together.
 - Anything that changes a public API's shape, a package boundary, or a
   distribution channel.
 - Anything that adds a way for a component to reach the network, the
-  environment, or the console.
+  environment, or the app.
 - A new axis in the token system.
 
 Everything else is a pull request.

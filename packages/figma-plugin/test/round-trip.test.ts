@@ -19,7 +19,7 @@ import { applyPull } from "../src/sandbox/apply";
 import { readFile } from "../src/sandbox/read";
 import { previewPull } from "../src/pull";
 import { colourAt } from "../src/snapshot";
-import type { ResolvedPayload } from "../src/console";
+import type { ResolvedPayload } from "../src/app";
 import { FakeFigma } from "./fake-figma";
 
 const THEMES = ["light", "dark", "high-contrast"] as const;

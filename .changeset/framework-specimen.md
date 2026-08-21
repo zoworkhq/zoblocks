@@ -16,4 +16,4 @@ of this cannot compile. The rest of the palette is unaffected — the absence of
 one entry must not take the others with it.
 
 Found by pointing MUI's own `createTheme` at the output for the first time,
-which is what the console's new export preview does.
+which is what the app's new export preview does.

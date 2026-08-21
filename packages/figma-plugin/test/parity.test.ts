@@ -8,7 +8,7 @@
  * in the message the publish gate would print, and the number the conformance
  * table publishes, for the same colours.
  *
- * A designer told 4.62:1 in Figma and 3.98:1 in the console will believe
+ * A designer told 4.62:1 in Figma and 3.98:1 in the app will believe
  * whichever is more convenient, and they will be right to, because one of them
  * is wrong.
  */

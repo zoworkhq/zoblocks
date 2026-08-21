@@ -12,7 +12,7 @@ import { renderConnect, renderPull, renderPush } from "../src/ui/sync";
 import { renderControls } from "../src/ui/controls";
 import { renderTabs } from "../src/ui/tabs";
 import { previewPull } from "../src/pull";
-import type { ResolvedPayload, ThemeSummary } from "../src/console";
+import type { ResolvedPayload, ThemeSummary } from "../src/app";
 import { snapshot } from "./fixture";
 
 const payload: ResolvedPayload = {
@@ -75,11 +75,11 @@ describe("connecting", () => {
 
   it("raises a refusal to a screen reader rather than only showing it", () => {
     renderConnect(root, {
-      invalid: "That is not a console address.",
+      invalid: "That is not an app address.",
       onConnect: noop,
       onDisconnect: noop,
     });
-    expect(root.querySelector("[role=alert]")?.textContent).toContain("not a console address");
+    expect(root.querySelector("[role=alert]")?.textContent).toContain("not an app address");
   });
 
   it("offers to disconnect once connected, and never shows the key again", () => {
@@ -255,10 +255,10 @@ describe("the propose screen", () => {
     // Claiming more than one pair here would be a false pass, which is worse
     // than no number at all.
     expect(text()).toContain("One pair, measured here");
-    expect(text()).toContain("the console checks the rest");
+    expect(text()).toContain("the app checks the rest");
   });
 
-  it("shows the console's measured refusal in full", () => {
+  it("shows the app's measured refusal in full", () => {
     renderPush(root, {
       ...base,
       outcome: {
@@ -315,7 +315,7 @@ describe("the tab strip", () => {
     expect(tabs.find((t) => t.tabIndex === 0)!.dataset.pane).toBe("pull");
   });
 
-  it("disables what needs a console, and says why", () => {
+  it("disables what needs an app, and says why", () => {
     renderTabs(root, { active: "check", connected: false, onSelect: noop });
     const disabled = [...root.querySelectorAll<HTMLButtonElement>("button")].filter(
       (b) => b.disabled,

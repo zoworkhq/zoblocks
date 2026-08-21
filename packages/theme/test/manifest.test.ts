@@ -12,7 +12,7 @@ import { describe, expect, it } from "vitest";
 import { brandManifest } from "../src/manifest";
 import { publishedTheme } from "./fixture";
 
-const WHERE = { origin: "https://console.oxygenui.design", orgSlug: "northwind" };
+const WHERE = { origin: "https://app.oxygenui.design", orgSlug: "northwind" };
 
 const asset = (role: string, over: Record<string, unknown> = {}) => ({
   role,
@@ -34,7 +34,7 @@ describe("what a host is given", () => {
   it("names the stylesheet it belongs with, at the same version", () => {
     const manifest = brandManifest(publishedTheme(), WHERE);
     expect(manifest.stylesheet).toBe(
-      `https://console.oxygenui.design/t/northwind/northwind-clinical@${manifest.version}.css`,
+      `https://app.oxygenui.design/t/northwind/northwind-clinical@${manifest.version}.css`,
     );
   });
 
@@ -42,21 +42,21 @@ describe("what a host is given", () => {
    * Absolute, always.
    *
    * A relative `/f/…` resolves against the *host's* origin, which is not where
-   * the artwork lives. It is fine inside the console and useless in an email
+   * the artwork lives. It is fine inside the app and useless in an email
    * that Outlook renders three days later — and the failure is a broken image
    * where a hospital's name should be.
    */
   it("makes every URL absolute", () => {
     const manifest = brandManifest(withAssets([asset("mark-light")]), WHERE);
     expect(manifest.assets[0]?.href).toBe(
-      `https://console.oxygenui.design/f/northwind/${"a".repeat(64)}.svg`,
+      `https://app.oxygenui.design/f/northwind/${"a".repeat(64)}.svg`,
     );
   });
 
   it("does not double the slash when the origin carries one", () => {
     const manifest = brandManifest(withAssets([asset("mark-light")]), {
       ...WHERE,
-      origin: "https://console.oxygenui.design/",
+      origin: "https://app.oxygenui.design/",
     });
     expect(manifest.assets[0]?.href).not.toContain("//f/");
   });

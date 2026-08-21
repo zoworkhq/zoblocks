@@ -53,7 +53,7 @@ describe("CSS and Tailwind", () => {
 
 describe("the framework exports", () => {
   /**
-   * A resolved theme, the way the console supplies one.
+   * A resolved theme, the way the app supplies one.
    *
    * These two formats are the bridges' tables read backwards, and a bridge
    * maps *semantic* tokens — `--ox-accent`, not `ref.brand.600`. Passing a

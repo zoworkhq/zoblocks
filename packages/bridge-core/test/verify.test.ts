@@ -174,7 +174,7 @@ describe("assertBridgeOutput", () => {
   /**
    * Host contrast is not the bridge's defect and does not throw. It belongs to
    * whoever chose the colour, which is why `verifyPatch` returns it for the
-   * theme console to surface where a person can change it.
+   * theme app to surface where a person can change it.
    */
   it("does not throw over the host's own contrast choices", () => {
     expect(() =>

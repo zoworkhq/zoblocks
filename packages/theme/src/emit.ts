@@ -150,7 +150,7 @@ function logoDeclarations(assets: readonly BrandAssetFile[]): {
        *
        * Unlike the mark there is no per-theme variant to switch to: an
        * illustration is a single file that has to work on both grounds, which
-       * is exactly why the console previews it on both. Emitting a dark
+       * is exactly why the app previews it on both. Emitting a dark
        * override here would invent a second file nobody uploaded.
        */
       base.push(`  --ox-${asset.role}: ${url};`);

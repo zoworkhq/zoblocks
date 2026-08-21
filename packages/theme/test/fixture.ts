@@ -1,8 +1,8 @@
 /**
- * A published theme, in the shape the console stores.
+ * A published theme, in the shape the app stores.
  *
  * `northwind` deliberately, matching the worked brand the token gate already
- * runs against — so the console's fixture and the build's fixture are the same
+ * runs against — so the app's fixture and the build's fixture are the same
  * customer, and a divergence between the two channels shows up as a difference
  * in one palette rather than two unrelated ones.
  */
@@ -34,7 +34,7 @@ export function publishedTheme(overrides: Partial<ThemeDocument> = {}): ThemeDoc
         },
       },
       // Empty rather than absent: this fixture stands for a theme authored
-      // through the current console, which always writes all three tiers.
+      // through the current app, which always writes all three tiers.
       // `emit.test.ts` covers the pre-migration `{ ref: … }` shape explicitly.
       semantic: { light: {}, dark: {}, "high-contrast": {} },
       component: { light: {}, dark: {}, "high-contrast": {} },

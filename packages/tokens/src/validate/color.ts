@@ -1,7 +1,7 @@
 /**
  * Colour maths for the accessibility gate.
  *
- * Exported rather than private because the theme console needs the same
+ * Exported rather than private because the theme app needs the same
  * numbers the build uses: a customer editing a palette must be told the
  * measured ratio at the moment they pick a colour, and a second implementation
  * of WCAG relative luminance is a second set of answers.
@@ -92,7 +92,7 @@ export function hueDistance(a: number, b: number): number {
  * The contrast ratio between two hex strings, or `undefined` if either is not
  * a ratio we can honestly compute.
  *
- * The convenience form the console reaches for; the build uses the `Rgb` pair
+ * The convenience form the app reaches for; the build uses the `Rgb` pair
  * directly because it has already parsed both sides.
  */
 export function contrastBetween(fg: string, bg: string): number | undefined {

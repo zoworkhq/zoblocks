@@ -1,7 +1,7 @@
 /**
  * One colour in, eleven steps out.
  *
- * The console asks a customer for their brand colour, not for a ramp. Asking
+ * The app asks a customer for their brand colour, not for a ramp. Asking
  * for eleven values would be asking them to do the part that has a right
  * answer, and most of the failures the contrast gate catches come from a
  * hand-picked step rather than from the chosen colour.
@@ -114,7 +114,7 @@ export function generateRamp(seed: string): Record<RampStep, string> | undefined
 /**
  * The nearest shade of the same colour that clears a floor.
  *
- * The console's "apply nearest passing" action. Customers reliably accept a
+ * The app's "apply nearest passing" action. Customers reliably accept a
  * shade they did not choose; they do not reliably accept a rejection, and a
  * rejection with no route out is how an accessibility gate becomes something a
  * team works around rather than with.

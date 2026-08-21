@@ -1,13 +1,13 @@
 /**
- * The catalogue, fetched from the console.
+ * The catalogue, fetched from the app.
  *
- * The console owns what is for sale — it is where a pack is published, priced
+ * The app owns what is for sale — it is where a pack is published, priced
  * and delivered — so this site reads it rather than keeping a second copy that
- * drifts. What it deliberately does not do is read the console's database:
+ * drifts. What it deliberately does not do is read the app's database:
  *
- *   **A public marketing page must not fall over when a private console's
+ *   **A public marketing page must not fall over when a private app's
  *   MongoDB does.** `/c/catalog.json` is cached hard and marked
- *   `stale-while-revalidate` for a day, so a console outage shows up here as
+ *   `stale-while-revalidate` for a day, so an app outage shows up here as
  *   yesterday's catalogue rather than as a 500 on a page somebody arrived at
  *   from a search result.
  *
@@ -50,14 +50,14 @@ export interface MarketItem {
   publishedAt: string | null;
 }
 
-// Re-exported rather than redefined: `lib/console.ts` owns the address, and two
+// Re-exported rather than redefined: `lib/app.ts` owns the address, and two
 // copies of it drift the moment one deployment moves.
-import { CONSOLE } from "./console";
+import { APP } from "./app";
 
-export { CONSOLE };
+export { APP };
 
 /** Where a reader goes to actually buy one. Buying needs an organisation. */
-export const buyHref = (slug: string) => `${CONSOLE}/market/${slug}`;
+export const buyHref = (slug: string) => `${APP}/market/${slug}`;
 
 /**
  * `RequestInit` plus the field Next adds to it.
@@ -78,10 +78,10 @@ export async function catalogue(): Promise<MarketItem[]> {
     const init: NextFetchInit = {
       // Ten minutes. The catalogue changes when somebody publishes a pack,
       // which is rare; the cost of being ten minutes late is nothing and the
-      // cost of hammering the console on every request is not.
+      // cost of hammering the app on every request is not.
       next: { revalidate: 600 },
     };
-    const response = await fetch(`${CONSOLE}/c/catalog.json`, init);
+    const response = await fetch(`${APP}/c/catalog.json`, init);
     if (!response.ok) return [];
     const body = (await response.json()) as { items?: MarketItem[] };
     return body.items ?? [];

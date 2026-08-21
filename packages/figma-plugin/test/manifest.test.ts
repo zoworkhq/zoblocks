@@ -48,10 +48,10 @@ function code(path: string): string {
 const files = sources(join(root, "src"));
 
 describe("the manifest", () => {
-  it("reaches one origin in production, and it is the console", () => {
+  it("reaches one origin in production, and it is the app", () => {
     // A wildcard would be the easy thing to write and the thing a reviewer
     // cannot check. One exact origin is a claim they can hold us to.
-    expect(manifest.networkAccess.allowedDomains).toEqual(["https://console.oxygenui.design"]);
+    expect(manifest.networkAccess.allowedDomains).toEqual(["https://app.oxygenui.design"]);
     expect(manifest.networkAccess.allowedDomains.every((d) => !d.includes("*"))).toBe(true);
   });
 
@@ -118,9 +118,9 @@ describe("the code behind the declaration", () => {
     }
   });
 
-  it("cannot ask the console to publish either", () => {
+  it("cannot ask the app to publish either", () => {
     /*
-     * The client is the only thing that can address the console, and every
+     * The client is the only thing that can address the app, and every
      * address it can build is written literally in one file. A fourth endpoint
      * would have to be added here to be reachable at all.
      *
@@ -128,7 +128,7 @@ describe("the code behind the declaration", () => {
      * `status: "published" | "draft"` field, which is a thing being *read*, and
      * a grep that cannot tell those apart is a grep somebody will delete.
      */
-    const client = code(join(root, "src/console.ts"));
+    const client = code(join(root, "src/app.ts"));
     const paths = [...client.matchAll(/\/api\/v1\/[^`"'\s]*/g)].map((m) => m[0]);
 
     expect(paths).toHaveLength(3);

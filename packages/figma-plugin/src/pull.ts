@@ -1,7 +1,7 @@
 /**
  * A published theme, as a set of changes somebody can look at before agreeing.
  *
- * Pure, and deliberately the whole of the pull decision: what the console sent
+ * Pure, and deliberately the whole of the pull decision: what the app sent
  * becomes a plan, the plan is compared against the file, and what comes out is
  * a preview. The sandbox's job is to apply a diff it did not compute.
  *
@@ -25,7 +25,7 @@ import {
 
 import { contrastBetween, generateRamp } from "@oxygenui-design/tokens/validate";
 
-import type { ResolvedPayload } from "./console";
+import type { ResolvedPayload } from "./app";
 
 /** Plugin data on the collection, so a file knows what it is pinned to. */
 export const PIN = { theme: "ox.theme", version: "ox.version" } as const;
@@ -99,7 +99,7 @@ export function previewPull(
  *   - **a renamed label** — the label is theirs, and restoring it is not
  *     restoring a clinical signal;
  *   - **a value in a mode the file holds, and it differs** — a customer cannot
- *     change a clinical value in the console, so this one came from an edit
+ *     change a clinical value in the app, so this one came from an edit
  *     here. This is the only case worth saying out loud.
  *
  * Crying wolf on the other two is how a warning that matters gets skimmed.
@@ -174,13 +174,13 @@ export function applyOrder(variables: PlannedVariable[]): PlannedVariable[] {
  * What the accent would measure if the brand anchor moved.
  *
  * The pair a designer needs while choosing: the label colour on the step the
- * accent actually comes from. One pair, not the gate — the console measures
+ * accent actually comes from. One pair, not the gate — the app measures
  * twenty-odd across three themes and is the only thing that can refuse.
  *
  * **Which step that is comes from the data, not from a constant here.** The
  * semantic tier defines `accent` as `{ref.brand.700}`, and the first version of
  * this measured the anchor itself. For `#0f766e` it reported 5.47:1 where the
- * console reported 2.98:1 — because `generateRamp` pins the seed at 600 and
+ * app reported 2.98:1 — because `generateRamp` pins the seed at 600 and
  * derives the others at fixed lightnesses, so a seed darker than 600's nominal
  * lightness produces a *lighter* 700. Confidently wrong, in the one direction
  * that matters: it said pass where the gate says fail.

@@ -9,7 +9,7 @@
  * stylesheet — version-pinned, CDN-cacheable, no JavaScript, and it survives
  * this component not rendering. This is for the two cases a stylesheet cannot
  * serve: a multi-tenant page rendering two customers' branding at once, where
- * a root-scoped payload would let the last one loaded win; and the console's
+ * a root-scoped payload would let the last one loaded win; and the app's
  * own preview, which has to show an unpublished draft.
  *
  * Structurally identical to a theme bridge, and deliberately so: both write

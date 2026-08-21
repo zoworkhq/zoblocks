@@ -8,7 +8,7 @@ A built-in brand is primitive overrides only (ADR 0005). That is the right rule
 for a brand: one palette file, compiled at build time, reaching every component
 through the semantic tier without any component knowing a brand exists.
 
-It is not a sufficient rule for a **customer theme**. The console exists so an
+It is not a sufficient rule for a **customer theme**. The app exists so an
 enterprise customer can put Oxygen's components into their own design language,
 and two things they reliably want are outside a ramp:
 
@@ -22,7 +22,7 @@ and two things they reliably want are outside a ramp:
   which is the failure the 282-token published surface (ADR 0012) exists to
   prevent.
 
-Both were specified in the console mockups and neither was expressible:
+Both were specified in the app mockups and neither was expressible:
 `themeTokensSchema` accepted `{ ref }` and nothing else.
 
 ## Decision
@@ -32,7 +32,7 @@ Both were specified in the console mockups and neither was expressible:
 1. **`ref` is unchanged and stays byte-compatible with a built-in brand file.**
    A ramp-only theme still exports as something that can be committed to
    `packages/tokens/tokens/brands/` verbatim. That property is what keeps the
-   console and the build one system rather than two.
+   app and the build one system rather than two.
 
 2. **`semantic` and `component` are keyed per theme** — light, dark,
    high-contrast. Not a convenience: one literal cannot clear 4.5:1 against both
@@ -45,7 +45,7 @@ Both were specified in the console mockups and neither was expressible:
    `CLINICAL_SEMANTIC` (every `status.*` and `flag.*`) and `NOT_BRIDGEABLE` (the
    component tokens that fall through to one) come out of `pnpm gen`. A theme
    bridge is refused by the same two constants, so a colour cannot arrive
-   through the framework door that was refused at the console door.
+   through the framework door that was refused at the app door.
 
 4. **Overrides are validated as a set, at save, by the same gate the build
    uses.** `sourceWithOverrides` lays them over the shipped palette and re-runs
@@ -60,7 +60,7 @@ Both were specified in the console mockups and neither was expressible:
 
 ## Consequences
 
-**Good.** The console can offer what its mockups promised. "Customise the badge
+**Good.** The app can offer what its mockups promised. "Customise the badge
 without forking the component" becomes true. The clinical guarantee is stated
 once, generated, and enforced at four separate points — schema, validator,
 emitter, and bridge — rather than remembered.
@@ -84,7 +84,7 @@ computed at the root.
 Publishing is unaffected: `emitThemeCss` writes to `:root`, where the component
 declarations are. But it means two things are true and worth writing down:
 
-- The console's preview applies the dependent component tokens itself, from the
+- The app's preview applies the dependent component tokens itself, from the
   manifest's `semantic` field.
 - **`EmitOptions.scope` was not sufficient for its documented multi-tenant use
   case.** Emitting a customer's tokens under `[data-ox-brand="x"]` on a subtree

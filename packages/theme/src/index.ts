@@ -4,8 +4,8 @@
  * A customer theme is a built-in brand with an envelope: the same primitive
  * overrides, held to the same gate, delivered as an immutable version-pinned
  * stylesheet instead of compiled into the build. That equivalence is the point
- * — a theme authored in the console can be committed as a brand, and a brand
- * can be imported into the console, because there is one format.
+ * — a theme authored in the app can be committed as a brand, and a brand
+ * can be imported into the app, because there is one format.
  *
  * The React provider lives at `@oxygenui-design/theme/react` so a server that
  * only validates and serves never resolves React.
@@ -73,7 +73,7 @@ export {
  * The ramp moved to `@oxygenui-design/tokens/validate` so a Figma plugin
  * sandbox can offer "nearest passing" without pulling in zod and both
  * framework bridges. Re-exported here because it has been part of this
- * package's public surface since the console was written, and a move is not a
+ * package's public surface since the app was written, and a move is not a
  * reason to break a caller.
  */
 export {

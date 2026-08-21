@@ -2,7 +2,7 @@
  * Reads the DTCG token source off disk.
  *
  * The *model* — types, constants, reference helpers, and the DTCG flattener —
- * now lives in `@oxygenui-design/tokens/validate`, because the theme console
+ * now lives in `@oxygenui-design/tokens/validate`, because the theme app
  * has to build a `TokenSource` from a payload a customer typed rather than
  * from files. This module is the filesystem half of that split and nothing
  * more.

@@ -1,0 +1,297 @@
+"use client";
+
+import { useLayoutEffect, useState } from "react";
+import { Accordion, Switch, Timeline } from "@oxygenui-design/react";
+import {
+  VISION_KINDS,
+  VISION_LABELS,
+  simulateVision,
+  type VisionKind,
+} from "@oxygenui-design/theme";
+import {
+  AxisGroup,
+  Callout,
+  CopyButton,
+  Panel,
+  Preview,
+  StatusChip,
+  Toolbar,
+} from "@/components/ui";
+import type { ThemeName } from "@/lib/token-editor";
+
+type Density = "patient" | "standard" | "clinical";
+
+export interface PlaygroundTheme {
+  slug: string;
+  name: string;
+  liveVersion: number | null;
+  /** Resolved semantic tokens per theme, and the component tokens they reach. */
+  resolved: Record<ThemeName, Record<string, string>>;
+  dependents: Record<string, string[]>;
+}
+
+/**
+ * Every axis at once, over real components.
+ *
+ * The three axes are the ones the token system is actually built on — brand ×
+ * theme × density — plus colour vision, which is not an axis of the system but
+ * is the thing a reviewer most needs to check and cannot check by reading hex
+ * values.
+ *
+ * What this screen deliberately does *not* do is render Oxygen components
+ * inside Ant Design or Material UI. It could only do that by importing them,
+ * and the app never resolves a UI framework — that is the architectural
+ * claim the whole bridge design rests on, and an app that quietly broke it
+ * to make a demo prettier would be arguing against its own product. The
+ * cross-framework proof is `e2e/bridge-hosts.spec.ts`, which mounts one
+ * `Application.tsx` under antd, under MUI, and under neither.
+ */
+export function Playground({ themes }: { themes: readonly PlaygroundTheme[] }) {
+  const [slug, setSlug] = useState(themes[0]?.slug ?? "");
+  const [theme, setTheme] = useState<ThemeName>("light");
+  const [settling, setSettling] = useState(true);
+
+  /*
+   * Open on the mode the reader is already in.
+   *
+   * The preview is a light card by default, so someone working in the dark app
+   * met a white panel and had to change it on every visit — the one axis of
+   * four whose starting value was certainly wrong for them.
+   *
+   * `useLayoutEffect`, not `useEffect`, and the difference is the whole point.
+   * The server cannot read the choice: it lives in `localStorage`, which is why
+   * `layout.tsx` corrects the document in a blocking script rather than in
+   * React. So this component must render light and then move — and where it
+   * moves decides whether anyone sees it. A passive effect lands after paint,
+   * which shows the reader a white card that turns dark, and leaves the panel
+   * briefly holding one theme's surface under the other's text. The audit in
+   * `app-a11y.spec.ts` caught exactly that and reported a contrast failure at
+   * a ratio that measures 7.61:1 once settled — a phantom, and its own comment
+   * warns about this trap in the same words.
+   *
+   * A layout effect runs before the browser paints, so there is no first frame
+   * to catch and nothing composited across a half-applied theme.
+   *
+   * Runs once. After this the reader's own choice stands: following the app
+   * afterwards would silently overwrite a deliberate switch to "high contrast",
+   * which the app's own toggle cannot even express.
+   */
+  useLayoutEffect(() => {
+    if (document.documentElement.classList.contains("dark")) setTheme("dark");
+    /*
+     * Transitions off for the first paint, back on one frame later.
+     *
+     * The components inside animate `background` over 180ms, which is right
+     * when a reader presses "Dark" and wrong here: there is nothing to animate
+     * *from*, because the light card was never a state anyone chose. Left
+     * running, the preview cross-fades on arrival and — for those 180ms —
+     * holds the light surface under the dark theme's text. The audit sampled
+     * inside that window and reported 2.43:1 on a pair that settles at 7.61:1.
+     *
+     * `requestAnimationFrame` fires after the paint this render produces, so
+     * the frame that would have animated is the one that has transitions
+     * disabled, and every deliberate change after it still animates.
+     */
+    const frame = requestAnimationFrame(() => setSettling(false));
+    return () => cancelAnimationFrame(frame);
+  }, []);
+  const [density, setDensity] = useState<Density>("standard");
+  const [vision, setVision] = useState<VisionKind | "none">("none");
+
+  const active = themes.find((entry) => entry.slug === slug) ?? themes[0];
+  if (!active) return null;
+
+  /*
+   * The full token set, then its dependants, then the simulation.
+   *
+   * Order matters. Simulating first and then deriving component tokens would
+   * simulate a colour twice wherever a component token falls through to a
+   * semantic one — visibly wrong on any saturated brand.
+   */
+  const tokens: Record<string, string> = { ...active.resolved[theme] };
+  for (const [semantic, names] of Object.entries(active.dependents)) {
+    const value = tokens[semantic];
+    if (value) for (const name of names) tokens[name] = value;
+  }
+  if (vision !== "none") {
+    for (const [name, value] of Object.entries(tokens)) {
+      tokens[name] = simulateVision(value, vision) ?? value;
+    }
+  }
+
+  const snippet = setupSnippet(active);
+
+  return (
+    <div className="space-y-5">
+      <Toolbar>
+        {/*
+          With one theme this was a segmented control holding a single option:
+          the same border, height and radius as the switches beside it, and
+          nothing happened when you pressed it. Identical form, different
+          behaviour — the mapping problem, on a screen whose whole job is to
+          demonstrate a design system.
+          
+          One theme is a fact and reads as one. Two or more is a choice and
+          gets the control.
+        */}
+        {themes.length > 1 ? (
+          <AxisGroup
+            label="Theme"
+            value={slug}
+            onChange={setSlug}
+            options={themes.map((entry) => ({ value: entry.slug, label: entry.name }))}
+          />
+        ) : (
+          <div>
+            <p className="eyebrow mb-1.5 text-[0.5625rem] text-graphite-soft">Theme</p>
+            <p className="py-1.5 text-[0.8125rem] font-medium text-ink">{active.name}</p>
+          </div>
+        )}
+        <AxisGroup
+          label="Mode"
+          value={theme}
+          onChange={setTheme}
+          options={[
+            { value: "light" as const, label: "Light" },
+            { value: "dark" as const, label: "Dark" },
+            { value: "high-contrast" as const, label: "High contrast" },
+          ]}
+        />
+        <AxisGroup
+          label="Density"
+          value={density}
+          onChange={setDensity}
+          options={[
+            { value: "patient" as const, label: "Patient" },
+            { value: "standard" as const, label: "Standard" },
+            { value: "clinical" as const, label: "Clinical" },
+          ]}
+        />
+        <AxisGroup
+          // Five options against everyone else's three, so it takes the row.
+          className="sm:col-span-3"
+          label="Vision"
+          value={vision}
+          onChange={setVision}
+          options={[
+            { value: "none" as const, label: "Normal" },
+            ...VISION_KINDS.map((kind) => ({ value: kind, label: VISION_LABELS[kind].label })),
+          ]}
+        />
+      </Toolbar>
+
+      {vision !== "none" && (
+        <Callout tone="info" title={VISION_LABELS[vision].note}>
+          A review simulation, not a diagnosis — dichromacy, which is about a quarter of
+          colour-vision deficiency. The clinical status colours are simulated here too, which is the
+          point: they are the ones that must stay distinguishable.
+        </Callout>
+      )}
+
+      <Preview
+        label={`${active.name} — ${theme}, ${density} density`}
+        tokens={tokens}
+        theme={theme}
+        density={density}
+        className={settling ? "ox-settling" : undefined}
+      >
+        <div className="space-y-6">
+          <section aria-labelledby="pg-flags" className="space-y-3">
+            <h3 id="pg-flags" className="text-[0.8125rem] font-semibold">
+              Flags
+            </h3>
+            {/*
+              A flex column, not `space-y`. `Switch` is inline-level, so three
+              of them flowed onto one line and the labels ran into the next
+              control — `space-y` adds a top margin, which does nothing to
+              separate boxes that are sharing a line. The third value is the
+              component's whole clinical contribution: a binary control cannot
+              tell "no" from "nobody asked".
+            */}
+            <div className="flex flex-col items-start gap-3">
+              <Switch id="pg-precautions" label="Contact precautions" value={true} />
+              <Switch id="pg-directive" label="Advance directive" value="unknown" />
+              <Switch id="pg-consent" label="Research consent" value={false} />
+            </div>
+          </section>
+
+          <section aria-labelledby="pg-history" className="space-y-3">
+            <h3 id="pg-history" className="text-[0.8125rem] font-semibold">
+              History
+            </h3>
+            <Timeline
+              aria-label="Admission history"
+              items={[
+                { key: "admit", content: "Admitted to ward 4B" },
+                { key: "review", content: "Consultant review" },
+                { key: "discharge", content: "Discharge planned" },
+              ]}
+            />
+          </section>
+
+          <section aria-labelledby="pg-detail" className="space-y-3">
+            <h3 id="pg-detail" className="text-[0.8125rem] font-semibold">
+              Detail
+            </h3>
+            <Accordion
+              items={[
+                {
+                  key: "obs",
+                  label: "Observations",
+                  // `summary` is the slot that makes a collapsed row worth
+                  // reading: a header saying only "Observations" costs an
+                  // interaction to learn anything.
+                  summary: "K⁺ 5.9 mmol/L · above reference",
+                  children: "Serum potassium 5.9 mmol/L · reference 3.5–5.1",
+                },
+                {
+                  key: "meds",
+                  label: "Medications",
+                  summary: "None active",
+                  children: "No active prescriptions",
+                },
+              ]}
+            />
+          </section>
+        </div>
+      </Preview>
+
+      <Panel
+        title="Use this theme"
+        description="Link the published stylesheet and set the two attributes. No build step, no JavaScript, and no flash of unstyled content."
+        actions={<CopyButton value={snippet}>Copy setup</CopyButton>}
+      >
+        <pre className="instrument overflow-x-auto p-4 font-mono text-[0.6875rem] leading-relaxed">
+          {snippet}
+        </pre>
+        {active.liveVersion === null && (
+          <p className="body-sm mt-3 flex flex-wrap items-center gap-2 text-graphite">
+            <StatusChip tone="warn">draft</StatusChip>
+            This theme has never been published, so the URL above does not exist yet. Publish it and
+            the version in the path becomes real.
+          </p>
+        )}
+      </Panel>
+    </div>
+  );
+}
+
+/**
+ * The setup, as a customer would paste it.
+ *
+ * Two attributes and a stylesheet. `data-ox-theme` and `data-ox-density` go on
+ * the *root* element rather than a wrapper, because the semantic and component
+ * tiers are declared at `:root` and a `var()` resolves at the element that
+ * declares it — scoping the attributes to a subtree moves the primitives and
+ * leaves the rest behind.
+ */
+function setupSnippet(theme: PlaygroundTheme): string {
+  const version = theme.liveVersion ?? 1;
+  return [
+    "<!-- The version is in the URL, so these bytes never change. -->",
+    `<link rel="stylesheet" href="/t/{org}/${theme.slug}@${version}.css">`,
+    "",
+    "<!-- On <html>, not a wrapper: the token tiers are declared at :root. -->",
+    '<html data-ox-theme="light" data-ox-density="standard">',
+  ].join("\n");
+}

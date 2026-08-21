@@ -3,10 +3,10 @@
  *
  * Every number this produces comes from `@oxygenui-design/tokens/validate` —
  * the same module the build runs over the DTCG source, the same module the
- * console runs in the browser as a customer types, and the same module the
+ * app runs in the browser as a customer types, and the same module the
  * publish gate runs server-side before a theme ships. That is the entire point
  * of this file. A designer who is told 4.62:1 in Figma and 3.98:1 in the
- * console has been told two things about one colour, and will believe the one
+ * app has been told two things about one colour, and will believe the one
  * that is more convenient.
  *
  * Nothing here touches `figma.*` or the DOM. It takes the plain snapshot the
@@ -31,7 +31,7 @@ import {
 
 import { colourAt, hasStamps, stampedTokens } from "./snapshot";
 
-/** The two WCAG rules this gate distinguishes, in the console's own words. */
+/** The two WCAG rules this gate distinguishes, in the app's own words. */
 const CRITERION = {
   text: "SC 1.4.3 (text)",
   ui: "SC 1.4.11 (interface component)",

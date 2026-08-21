@@ -5,7 +5,7 @@
  * close to the most, for one reason: **an SVG is a document, not an image.** It
  * can carry `<script>`, event-handler attributes, `<foreignObject>` holding
  * arbitrary HTML, and external references that fire on load. Serving one from
- * the same origin as the console — which is what "host our customer's logo"
+ * the same origin as the app — which is what "host our customer's logo"
  * means — is stored cross-site scripting with a file picker in front of it.
  *
  * So the check here is not a formality around a size limit. It is the reason
@@ -33,7 +33,7 @@ export type { LogoFormat };
 /**
  * Where a piece of artwork is meant to be used.
  *
- * `light` and `dark` are separate uploads rather than one file the console
+ * `light` and `dark` are separate uploads rather than one file the app
  * recolours, because a logo is not a token: a mark that reverses to white is a
  * design decision its owner has already made, and inverting it for them
  * produces something their brand guidelines forbid.
@@ -156,7 +156,7 @@ export function checkLogo(bytes: Uint8Array): LogoCheck {
           ok: false,
           reason: `This SVG contains ${what}, so it cannot be hosted.`,
           detail:
-            "An SVG is a document rather than a picture: served from this origin it would run with the console's privileges. Re-export it as plain artwork — most design tools have an option to omit interactivity and metadata — or upload a PNG.",
+            "An SVG is a document rather than a picture: served from this origin it would run with the app's privileges. Re-export it as plain artwork — most design tools have an option to omit interactivity and metadata — or upload a PNG.",
         };
       }
     }

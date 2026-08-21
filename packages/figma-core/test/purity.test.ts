@@ -68,7 +68,7 @@ describe("its dependencies stay pure too", () => {
   /**
    * One runtime dependency, and it is the validator.
    *
-   * That is the point: the plugin, the console and the publish gate give one
+   * That is the point: the plugin, the app and the publish gate give one
    * answer for one palette because they run the same code. A second dependency
    * arriving here is how that stops being true.
    */

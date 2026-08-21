@@ -3,7 +3,7 @@
  *
  * The return shape is deliberately the one `importDtcg` already produces —
  * `{ matched, unmatched, discardedClinical }` — because a designer pulling
- * their own file back should meet the same report a console user meets when
+ * their own file back should meet the same report an app user meets when
  * they import a DTCG file. Two vocabularies for one operation is how a product
  * teaches somebody that two features are unrelated when they are the same one.
  */

@@ -2,7 +2,7 @@
  * A customer theme, judged by the same gate the build uses.
  *
  * There is exactly one validator. It lives in `@oxygenui-design/tokens/validate`
- * as pure functions so that the build, the console's live preview, and the
+ * as pure functions so that the build, the app's live preview, and the
  * server-side publish check all call identical code — because a customer whose
  * palette passed in the browser and failed in CI has been told two different
  * things about the same colour.
@@ -138,9 +138,9 @@ export function componentProblems(tokens: ThemeTokensInput): TokenProblem[] {
  * Validate a theme against the shipped token source.
  *
  * `source` is the base palette and semantic tiers — loaded from disk by the
- * build, and by the console from the same published artifact its components
+ * build, and by the app from the same published artifact its components
  * render against. Passing it in rather than reading it keeps this pure and
- * keeps the console honest about which palette it validated on.
+ * keeps the app honest about which palette it validated on.
  *
  * The customer's brand *replaces* any brands the source already carries: the
  * gate reports a problem per brand, and including the built-in ones would tell

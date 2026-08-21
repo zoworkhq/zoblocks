@@ -16,7 +16,7 @@ accordion draws its chevron. These encode meaning rather than decorating it: the
 switch's `unknown` mark is the whole reason that component has a third value,
 because a binary control cannot tell "no" from "nobody asked". A customer who
 replaces it with something reading as "off" deletes that distinction and nothing
-downstream notices. They appear in the registry so the console can show them
+downstream notices. They appear in the registry so the app can show them
 locked with the reason attached — a refusal nobody can see reads as a missing
 feature — and the schema will not accept them.
 

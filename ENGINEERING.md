@@ -86,7 +86,7 @@ These are not preferences. A change that breaks one needs an ADR.
 5. **Zero runtime dependencies by default.** Each one is a supply-chain entry a
    customer's security team must review.
 6. **Components cannot reach the environment, the network, `eval`, `innerHTML`,
-   or the console.** Lint-enforced and re-checked at registry build.
+   or the app.** Lint-enforced and re-checked at registry build.
 7. **Generated files are never hand-edited.** They carry a banner; CI fails on
    drift.
 

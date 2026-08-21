@@ -15,7 +15,7 @@ The inverse bridge: an Oxygen brand, pushed into the host's own framework.
 
 The forward bridge answers "make Oxygen's components look like our antd app".
 This answers the question customers ask second and care about more: _we
-configured our brand in your console — why do our **own** buttons still look
+configured our brand in your app — why do our **own** buttons still look
 like Ant Design's default blue?_ A customer configures once and their whole
 application follows, which is the difference between a component library with
 theming and a design system.

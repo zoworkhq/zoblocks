@@ -9,7 +9,7 @@
 
 ## Context
 
-The theme-bridge architecture and the customer theme console are built and
+The theme-bridge architecture and the customer theme app are built and
 green. Four questions came up during that work that are **not** engineering
 decisions, and answering them by writing code would have been answering them by
 stealth.
@@ -41,7 +41,7 @@ moment.
 
 **Current implementation: no.** `--ox-status-*` and `--ox-flag-*` are marked
 `bridgeable: false` in the generated surface, the theme emitter is structurally
-incapable of writing them, a bridge that tries throws, and the console renders
+incapable of writing them, a bridge that tries throws, and the app renders
 them locked.
 
 **Why the recommendation is no.** What the restriction protects is not the hue.
@@ -105,7 +105,7 @@ eight maintained by nobody.
 > not after. The reason to write that down now is that the marginal bridge
 > always looks cheap in the week somebody asks for it.
 
-## 3. Is the console a product surface or an internal tool?
+## 3. Is the app a product surface or an internal tool?
 
 **Current implementation: built as a product, deployed as neither.** It has
 organisations, four roles, an authorisation boundary, per-tenant scoping proven
@@ -131,7 +131,7 @@ application links `/t/{org}/{slug}@{v}.css`, our uptime is their page.
 > directly, and the reasoning is in
 > [0015](0015-the-direction-of-truth-for-design-tool-sync.md): a plugin
 > published privately is private to _our_ organisation, so it reaches customers
-> only once the console does.
+> only once the app does.
 
 ## 4. Do `signature` and `copilot` genuinely require Ant Design?
 

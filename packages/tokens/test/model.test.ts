@@ -2,7 +2,7 @@
  * The model helpers: the naming rule, the reference syntax, and the DTCG
  * flattener.
  *
- * `flattenDtcg` is the part the theme console depends on most directly — it is
+ * `flattenDtcg` is the part the theme app depends on most directly — it is
  * how a payload a customer uploaded becomes something the gate can judge — and
  * it was previously a private function inside a build script.
  */

@@ -3,7 +3,7 @@
  *
  * This file holds everything about the shape of a token source that does not
  * involve reading one. The split matters: the generator reads DTCG documents
- * off disk, but the theme console has to validate a palette a customer typed
+ * off disk, but the theme app has to validate a palette a customer typed
  * into a browser, and both must be judged by exactly the same rules.
  *
  * Nothing here may import `node:*`. That constraint is the whole point of the
@@ -114,7 +114,7 @@ export interface DtcgNode {
  *
  * Pure: the caller supplies the already-parsed document and a label for it, so
  * this works identically over a file the generator read and over a payload the
- * console received.
+ * app received.
  */
 export function flattenDtcg(
   node: DtcgNode,

@@ -82,7 +82,7 @@ describe("toAntdTheme", () => {
 describe("the two directions agree", () => {
   /**
    * Out and back. A brand pushed into antd and read straight back must be the
-   * brand we started with — otherwise the console's export and the runtime
+   * brand we started with — otherwise the app's export and the runtime
    * bridge disagree about what a customer's colour means.
    */
   it("round-trips the accent, text, surfaces and border", () => {

@@ -8,9 +8,9 @@
       "port": 6001
     },
     {
-      "name": "console",
+      "name": "app",
       "runtimeExecutable": "pnpm",
-      "runtimeArgs": ["--filter", "@oxygenui-design/console", "dev"],
+      "runtimeArgs": ["--filter", "@oxygenui-design/app", "dev"],
       "port": 6003
     }
   ]

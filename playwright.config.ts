@@ -19,8 +19,8 @@ import { defineConfig, devices } from "@playwright/test";
  *
  * ## `Error: The destination stream closed early.`
  *
- * A clean run prints this ~60 times against the console server. It is benign,
- * it is not the console's, and it has been chased once already — so the
+ * A clean run prints this ~60 times against the app server. It is benign,
+ * it is not the app's, and it has been chased once already — so the
  * measurements are here rather than in someone's terminal history.
  *
  * Every aborted request carries `?_rsc=`: they are `next/link` prefetches of
@@ -28,7 +28,7 @@ import { defineConfig, devices } from "@playwright/test";
  * response finishes. React's Flight server logs a cancelled stream as an error
  * because it usually is one. Here it is a browser closing a tab.
  *
- * What the numbers said, on `e2e/console.spec.ts` alone:
+ * What the numbers said, on `e2e/app.spec.ts` alone:
  *
  *   - `--workers=1` → 0 errors. `--workers=2` → 4. `--workers=4` → 27.
  *   - a prefetch stops at `(app)/loading.tsx` and completes in ~7ms
@@ -199,17 +199,17 @@ export default defineConfig({
     },
     {
       /*
-       * The console's own lifecycle, in one engine.
+       * The app's own lifecycle, in one engine.
        *
        * Chromium only, on the same reasoning as `@bridge`: this suite asserts
        * that a sequence of *our* screens is reachable and that our gate refuses
-       * what it should. None of that differs by engine. The console's
+       * what it should. None of that differs by engine. The app's
        * cross-engine coverage is `@a11y`, which checks the things engines do
        * genuinely disagree about — focus rings, forced colours, name
        * computation.
        */
-      name: "console-chromium",
-      grep: /@console/,
+      name: "app-chromium",
+      grep: /@app/,
       use: { ...devices["Desktop Chrome"], colorScheme: "light" },
     },
   ],
@@ -226,7 +226,7 @@ export default defineConfig({
   // framework suite failed on connection refused rather than on anything real.
   webServer: [
     /*
-     * The console, with a throwaway MongoDB of its own.
+     * The app, with a throwaway MongoDB of its own.
      *
      * One command rather than three, because the steps are ordered and
      * Playwright's `webServer` owns exactly one: the database has to exist
@@ -235,12 +235,12 @@ export default defineConfig({
      * flaky login. `scripts/e2e-server.mjs` does all three and tears the
      * database down with the process.
      */
-    ...(process.env.OXYGEN_CONSOLE_URL
+    ...(process.env.OXYGEN_APP_URL
       ? []
       : [
           {
             command:
-              "pnpm --filter @oxygenui-design/console build && pnpm --filter @oxygenui-design/console e2e:server",
+              "pnpm --filter @oxygenui-design/app build && pnpm --filter @oxygenui-design/app e2e:server",
             url: "http://localhost:6003/login",
             reuseExistingServer: !process.env.CI,
             timeout: 180_000,

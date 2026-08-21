@@ -26,7 +26,7 @@ export interface IconSlot {
   slot: string;
   /** What it is, for somebody choosing which file to drop on it. */
   label: string;
-  /** Which component draws it, so the console can group the grid. */
+  /** Which component draws it, so the app can group the grid. */
   component: string;
   /**
    * Why it cannot be replaced, or absent when it can.
@@ -76,7 +76,7 @@ const COPILOT: readonly IconSlot[] = [
 ];
 
 /**
- * Shown in the console and refused there, rather than hidden.
+ * Shown in the app and refused there, rather than hidden.
  *
  * Hiding them would make the refusal invisible and the list look arbitrary —
  * somebody would ask why the switch is missing. The token editor already shows

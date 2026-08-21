@@ -1,0 +1,762 @@
+@import "tailwindcss";
+
+/* ===========================================================================
+ * app.oxygenui.design
+ *
+ * The design language is oxygenui.design's, not a new one. Palette, type
+ * scale, the eyebrow, the dark instrument panel and the ease curve are ported
+ * from apps/docs/src/app/globals.css rather than reinterpreted — a customer
+ * moves between the two in one click, and the fastest way to make a product
+ * feel like somebody else's is to change the vocabulary at the boundary.
+ *
+ * Three rules carry over because they are safety rules, not style ones:
+ *
+ *   --site-trace is DARK-PANEL ONLY. The luminous teal has no contrast on
+ *   paper, and using it there is the fastest way to make this look generic.
+ *
+ *   RED ONLY EVER MEANS CRITICAL. Never a brand colour, never a destructive
+ *   button by default, and never carrying meaning alone — every coloured thing
+ *   also has a word or an icon.
+ *
+ *   The instrument is the lit object. A page sits on paper, content sits on a
+ *   surface, and anything *rendering* something sits in a dark panel. Losing
+ *   that relationship flattens the whole thing into a generic admin grid.
+ *
+ * One rule this app adds: where a customer's own colours are on screen, the
+ * surrounding chrome goes achromatic — an Oxygen-teal control beside a
+ * customer's teal makes theirs look wrong. That is `.preview-region`, and it
+ * applies there and nowhere else.
+ * ======================================================================== */
+
+@theme inline {
+  --color-paper: var(--site-paper);
+  --color-paper-sunk: var(--site-paper-sunk);
+  --color-rule: var(--site-rule);
+  --color-rule-strong: var(--site-rule-strong);
+  --color-shimmer: var(--site-shimmer);
+
+  --color-ink: var(--site-ink);
+  --color-graphite: var(--site-graphite);
+  --color-graphite-soft: var(--site-graphite-soft);
+
+  --color-oxygen: var(--site-oxygen);
+  --color-oxygen-deep: var(--site-accent-text);
+  /* A filled accent surface, with the colour that is legible *on* it. Separate
+     from `oxygen-deep`, which is a text colour and inverts between themes. */
+  --color-accent-solid: var(--site-accent-solid);
+  --color-accent-on: var(--site-accent-on);
+  --color-electric: var(--site-electric);
+  --color-critical: var(--site-critical);
+  --color-cta: var(--site-cta);
+  --color-cta-hover: var(--site-cta-hover);
+
+  /* Always-dark surfaces: previews, code blocks, validation readouts. These
+     are hardware rather than document, so they keep their colour in both
+     themes and only their relationship to the page inverts. */
+  --color-panel: var(--site-panel);
+  --color-panel-raised: var(--site-panel-raised);
+  --color-panel-rule: var(--site-panel-rule);
+  --color-panel-fg: var(--site-panel-fg);
+  --color-panel-muted: var(--site-panel-muted);
+  --color-trace: var(--site-trace);
+  --color-critical-lum: var(--site-critical-lum);
+
+  /* Validation outcomes. Distinct from the accent so "this passes" never reads
+     as "this is branded", and paired with a word at every call site. */
+  --color-pass: var(--site-pass);
+  --color-pass-wash: var(--site-pass-wash);
+  --color-fail: var(--site-critical);
+  --color-fail-wash: var(--site-critical-wash);
+  --color-warn: var(--site-warn);
+  --color-warn-wash: var(--site-warn-wash);
+  --color-accent-wash: var(--site-accent-wash);
+
+  --font-display: var(--font-instrument-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-instrument-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains-mono), ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* -----------------------------------------------------------------------
+ * Light — a calm clinical document with a dark instrument set into it.
+ * -------------------------------------------------------------------- */
+:root {
+  --site-paper: #f7f9f8;
+  --site-paper-sunk: #eef3f1;
+  --site-rule: #dde5e2;
+  --site-rule-strong: #c3d0cc;
+
+  /* The travelling band in a loading bar. Always a step *lighter* than
+     `paper-sunk`, which the two themes reach from opposite directions. */
+  --site-shimmer: #fdfefe;
+
+  --site-ink: #08110f;
+  --site-graphite: #5a6b67;
+  --site-graphite-soft: #5c6d68;
+
+  --site-oxygen: #10b995;
+  --site-accent-text: #067662;
+  --site-accent-solid: #067662;
+  --site-accent-on: #ffffff;
+  --site-accent-wash: #e8f6f1;
+  --site-electric: #0b7285;
+  --site-critical: #b3261e;
+  --site-critical-wash: #fdeaea;
+  --site-warn: #a15c07;
+  --site-warn-wash: #fdf3e3;
+  --site-pass: #0f7a5f;
+  --site-pass-wash: #e6f5ef;
+
+  /* The primary action is the accent.
+
+     It was #08110f — near-black — so in light mode the brand appeared nowhere
+     on the thing people click most, and the same product read as two products
+     depending on the time of day. brand.700 is what `accent` already resolves
+     to in this theme, and the label measures 5.26:1 on it against a 4.5 floor.
+     Dark keeps its light-on-dark inversion; only the hue is now shared. */
+  --site-cta: #067662;
+  /* Hover darkens rather than dims.
+  
+     `hover:opacity-90` composited the green against the page at #1e8371 and
+     the label measured 4.37:1 — under the 4.5 floor, on the primary action.
+     The near-black this replaced survived dimming because it had contrast to
+     spare; a mid-tone brand colour does not. brand.800 is 7.38:1. */
+  --site-cta-hover: #0a5d4f;
+
+  --site-panel: #08110f;
+  --site-panel-raised: #0d1a18;
+  --site-panel-rule: #1d302d;
+  --site-panel-fg: #e8f4f1;
+  --site-panel-muted: #8b9c98;
+  --site-trace: #2dd4b0;
+  --site-critical-lum: #fb7185;
+
+  color-scheme: light;
+}
+
+/* -----------------------------------------------------------------------
+ * Dark — the page drops BELOW the instrument rather than matching it, so the
+ * instrument stays the lit object instead of everything flattening into one
+ * dark field. The docs site's reasoning, and its values.
+ * -------------------------------------------------------------------- */
+.dark {
+  --site-paper: #080b10;
+  --site-paper-sunk: #0d1219;
+  --site-rule: #1d2733;
+  --site-rule-strong: #2c3744;
+
+  /* Lighter than `paper-sunk` here too, but reached by going *up* from a dark
+     ground rather than down from a light one — hence its own value and not
+     `--site-paper`, which is the darker of the pair in this theme. */
+  --site-shimmer: #1a2432;
+
+  --site-ink: #edf2f7;
+  --site-graphite: #a2aebb;
+  --site-graphite-soft: #8592a1;
+
+  /* The mark takes the saturated brand step; accent *text* takes the
+     lighter one, so the two stay as distinguishable as they were when this
+     pair was two different cyans. */
+  --site-oxygen: #2dd4b0;
+  --site-accent-text: #6ce7cb;
+  /* Inverted here on purpose. `accent-text` is a *light* green in dark mode
+     because it sits on a dark page; filling a shape with it and writing white
+     on top measures about 1.2:1, which is what the axe sweep caught on the
+     account avatar. Filled shapes take the light ground and dark ink.
+
+     It was a light *cyan* until August 2026, which made the same product teal
+     in light and cyan in dark. brand.300 is the same step of the brand's own
+     ramp and measures within half a point of what the cyan did. */
+  --site-accent-solid: #6ce7cb;
+  --site-accent-on: #08110f;
+  --site-accent-wash: #0f2a25;
+  --site-electric: #73d8ff;
+  --site-critical: #fb7185;
+  --site-critical-wash: #2c1216;
+  --site-warn: #fbbf24;
+  --site-warn-wash: #2a2010;
+  --site-pass: #4ade80;
+  --site-pass-wash: #0f2a1c;
+
+  --site-cta: #6ce7cb;
+  --site-cta-hover: #a4f3df;
+
+  /* Lighter than --site-paper on purpose — the instrument has to remain the
+     brightest object on the page. */
+  --site-panel: #151a21;
+  --site-panel-raised: #1c232c;
+  --site-panel-rule: #303b47;
+  --site-panel-fg: #edf2f7;
+  --site-panel-muted: #96a3b3;
+  --site-trace: #2dd4b0;
+  --site-critical-lum: #fb7185;
+
+  color-scheme: dark;
+}
+
+/* ---------------------------------------------------------------------------
+ * Base
+ * ------------------------------------------------------------------------ */
+
+body {
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  font-size: 0.9375rem;
+  line-height: 1.65;
+  letter-spacing: -0.005em;
+}
+
+/* ---------------------------------------------------------------------------
+ * Type scale — the docs site's, verbatim.
+ * ------------------------------------------------------------------------ */
+
+.display-xl {
+  font-family: var(--font-display);
+  font-size: clamp(2.25rem, 5.2vw, 4rem);
+  line-height: 0.98;
+  letter-spacing: -0.038em;
+  font-weight: 600;
+  text-wrap: balance;
+}
+.display-lg {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 4.4vw, 3.5rem);
+  line-height: 1;
+  letter-spacing: -0.035em;
+  font-weight: 600;
+  text-wrap: balance;
+}
+.display-sm {
+  font-family: var(--font-display);
+  font-size: clamp(1.375rem, 2.2vw, 1.875rem);
+  line-height: 1.12;
+  letter-spacing: -0.025em;
+  font-weight: 600;
+  text-wrap: balance;
+}
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+.lede {
+  font-size: clamp(1.0625rem, 1.5vw, 1.25rem);
+  line-height: 1.55;
+  color: var(--color-graphite);
+  letter-spacing: -0.011em;
+}
+.body {
+  font-size: 0.9375rem;
+  line-height: 1.65;
+  letter-spacing: -0.005em;
+}
+.body-sm {
+  font-size: 0.8125rem;
+  line-height: 1.55;
+}
+
+/*
+ * Digits that line up.
+ *
+ * Not decoration: every screen here shows contrast ratios in a column, and two
+ * ratios that do not align cannot be compared at a glance — which is the whole
+ * reason the number is on screen rather than a tick.
+ */
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------------------------------------------------------------------------
+ * Surfaces — three levels, and the third is the signature.
+ * ------------------------------------------------------------------------ */
+
+/*
+ * `--color-scroll-ground` follows this background rather than restating it.
+ * The scroll shadows in the motion section mask themselves with an opaque
+ * band of the surface colour, so the two must not drift apart — a mismatch
+ * shows up as a pale stripe down the edge of every wide table.
+ */
+.surface {
+  --color-scroll-ground: var(--color-paper);
+  background: var(--color-paper);
+  border: 1px solid var(--color-rule);
+  border-radius: 0.875rem;
+  box-shadow: 0 1px 2px -1px rgb(2 20 17 / 0.04);
+}
+.dark .surface {
+  --color-scroll-ground: #0e141b;
+  background: #0e141b;
+}
+
+/*
+ * The instrument. Anything that *renders* something — a live preview, a code
+ * block, a validation readout — sits in one of these. Always dark, in both
+ * themes, because it is hardware rather than document.
+ */
+.instrument {
+  position: relative;
+  background: var(--color-panel);
+  color: var(--color-panel-fg);
+  border: 1px solid var(--color-panel-rule);
+  border-radius: 1.125rem;
+  box-shadow:
+    0 0 0 1px rgb(255 255 255 / 0.02) inset,
+    0 30px 70px -24px rgb(0 0 0 / 0.5),
+    0 8px 24px -12px rgb(0 0 0 / 0.34);
+  overflow: hidden;
+}
+
+/*
+ * The achromatic zone.
+ *
+ * The one thing this app adds to the docs vocabulary. Where a customer's own
+ * colours are being displayed, the surrounding chrome drops its hue: an
+ * Oxygen-teal control sitting beside a customer's teal swatch makes the
+ * customer's swatch look wrong, and they will change a colour that was fine.
+ */
+/*
+ * The preview's first paint, before any transition is allowed to run.
+ *
+ * The playground opens on the reader's own mode, which it can only know after
+ * hydration — so the card renders light and is corrected in a layout effect.
+ * Everything inside animates `background` over 180ms, and animating that
+ * correction would cross-fade a card nobody asked for and briefly composite
+ * one theme's surface under the other's text.
+ *
+ * Removed a frame later, so a deliberate press of "Dark" still animates.
+ */
+.ox-settling,
+.ox-settling * {
+  transition: none !important;
+}
+
+.preview-region {
+  --color-oxygen-deep: var(--color-graphite);
+  --color-accent-wash: var(--color-paper-sunk);
+  background: var(--color-paper-sunk);
+  border: 1px solid var(--color-rule);
+  border-radius: 0.875rem;
+}
+
+/* ---------------------------------------------------------------------------
+ * Motion — one curve, a short list of uses, all of it optional.
+ *
+ * There was a `.lift` hover here and it is gone. It styled a card that rises
+ * on hover, and this app has no clickable cards: every navigation is a
+ * rail item, a link inside a table cell, or a link inside a sentence. Putting
+ * it on the static panels to justify keeping it would have been motion with
+ * nothing behind it — a panel that lifts when you pass over it is promising a
+ * click that never happens.
+ * ------------------------------------------------------------------------ */
+
+/*
+ * A result arriving.
+ *
+ * The publish gate's refusal is the most important thing this app says,
+ * and rendered without movement it is indistinguishable from a message that
+ * was already on the screen. Small and quick: it needs to catch the eye, not
+ * hold it.
+ */
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.rise-in {
+  animation: rise-in 240ms var(--ease-out-expo) both;
+}
+
+/*
+ * Loading, as distinct from disabled.
+ *
+ * `animate-pulse` fades the whole bar in and out, which is the same treatment
+ * a disabled control gets — a screen full of it reads as "you may not touch
+ * this" rather than "this is on its way". A sweep travels, and travel is what
+ * says work is happening.
+ *
+ * The gradient sits on top of the bar's own background, so if the animation is
+ * suppressed below the reader is left with a plain bar rather than a frozen
+ * bright band.
+ */
+@keyframes shimmer {
+  from {
+    background-position: 200% 0;
+  }
+  to {
+    background-position: -200% 0;
+  }
+}
+.shimmer {
+  background-image: linear-gradient(
+    90deg,
+    transparent 20%,
+    var(--color-shimmer) 50%,
+    transparent 80%
+  );
+  background-size: 200% 100%;
+  background-repeat: no-repeat;
+  animation: shimmer 1.6s linear infinite;
+}
+
+/*
+ * The rail, when it is a panel over the page.
+ *
+ * Scoped to below `lg` with a media query rather than assembled from a dozen
+ * `lg:` utilities that undo each other. Above the breakpoint none of this
+ * applies and the rail is an ordinary column again.
+ *
+ * The two `transition` declarations differ in one detail that is the whole
+ * reason this is not inline Tailwind. `visibility` is not continuously
+ * interpolable: during a transition it reads as `visible` at any progress
+ * above zero, and as the *start* value at exactly zero. So a panel opening
+ * with `visibility` in its transition list is still computed `hidden` at the
+ * moment React's effect runs — and `.focus()` on a hidden element is a silent
+ * no-op. A keyboard reader opened the menu and their focus stayed on the
+ * button behind it.
+ *
+ * Opening therefore flips visibility with no delay; closing delays it by the
+ * length of the slide, so the panel is still painted on its way out.
+ */
+@media (max-width: 63.999rem) {
+  .rail-panel {
+    position: fixed;
+    inset-block: 0;
+    left: 0;
+    z-index: 50;
+    display: flex;
+    width: 17rem;
+    max-width: 85vw;
+    overflow-y: auto;
+    padding: 1.25rem;
+    background: var(--color-paper);
+    border-right: 1px solid var(--color-rule);
+    visibility: hidden;
+    transform: translateX(-100%);
+    transition:
+      transform 300ms var(--ease-out-expo),
+      visibility 0s linear 300ms;
+  }
+  .rail-panel[data-open="true"] {
+    visibility: visible;
+    transform: none;
+    box-shadow: 0 24px 60px -20px rgb(2 20 17 / 0.35);
+    transition:
+      transform 300ms var(--ease-out-expo),
+      visibility 0s;
+  }
+}
+
+/*
+ * The edge of a table that scrolls sideways.
+ *
+ * A wide table clipped at a hard edge looks like the table ends there, and the
+ * columns past it are simply never found. These are the classic
+ * `background-attachment` shadows: the two `local` layers scroll with the
+ * content and mask the shadow when that edge is reached, so a shadow appears
+ * on exactly the sides that have more to show. No JavaScript, no scroll
+ * listener, and it is correct on first paint.
+ */
+.scroll-x {
+  background-image:
+    linear-gradient(to right, var(--color-scroll-ground) 30%, transparent),
+    linear-gradient(to left, var(--color-scroll-ground) 30%, transparent),
+    radial-gradient(farthest-side at 0 50%, rgb(2 20 17 / 0.14), transparent),
+    radial-gradient(farthest-side at 100% 50%, rgb(2 20 17 / 0.14), transparent);
+  background-position:
+    0 0,
+    100% 0,
+    0 0,
+    100% 0;
+  background-size:
+    2.5rem 100%,
+    2.5rem 100%,
+    0.875rem 100%,
+    0.875rem 100%;
+  background-repeat: no-repeat;
+  background-attachment: local, local, scroll, scroll;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  /*
+   * Both of these are removed rather than shortened. The blanket rule above
+   * collapses an animation to a single 0.01ms frame, which leaves a shimmer
+   * frozen mid-sweep as a permanent bright stripe and a `rise-in` stuck at its
+   * `from` keyframe — an element that never becomes opaque. Turning them off
+   * is the only correct reduction.
+   */
+  .shimmer {
+    background-image: none;
+    animation: none;
+  }
+  .rise-in {
+    animation: none;
+  }
+  /*
+   * `transition-property: none` rather than a shorter duration. The blanket
+   * rule above only caps `transition-duration`, and this panel's closing state
+   * carries a 300ms `transition-delay` on `visibility` — left alone it would
+   * keep the panel painted for a third of a second after it closed.
+   */
+  .rail-panel,
+  .rail-panel[data-open="true"] {
+    transition: none;
+  }
+}
+
+/*
+ * A link inside a paragraph.
+ *
+ * Underlined at rest, not on hover. WCAG 1.4.1 is explicit that colour cannot
+ * be the only thing distinguishing a link from surrounding text, and the axe
+ * sweep over this app found exactly that on three screens — the treatment
+ * looked deliberate and was a failure.
+ *
+ * Standalone links (nav items, cards, table rows) are exempt and do not use
+ * this: they are not embedded in a block of text, so their position and role
+ * already distinguish them.
+ */
+.link {
+  color: var(--color-oxygen-deep);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  text-decoration-thickness: 1px;
+}
+.link:hover {
+  text-decoration-thickness: 2px;
+}
+
+/*
+ * The one entrance in the product.
+ *
+ * A toast that simply exists is a toast that was already there as far as the
+ * eye is concerned — the movement is what makes it register as new. Short and
+ * eased out, so it reads as arriving rather than as sliding.
+ */
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/*
+ * Scrollbars, at the weight of a rule rather than a control.
+ *
+ * The rail keeps its navigation in its own scroller so the organisation block
+ * and the theme toggle stay put while a long list of theme screens moves. That
+ * is the right structure and it looked wrong: the platform default draws a
+ * wide grey track down the middle of the rail, heavier than every border on the
+ * screen and permanently visible on a mouse that has none.
+ *
+ * A thumb the colour of a rule, no track, and inset by its own transparent
+ * border so it reads as a hairline rather than a bar. `background-clip:
+ * content-box` is what makes the border show the page through rather than the
+ * thumb colour.
+ */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-rule-strong) transparent;
+}
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-rule-strong);
+  background-clip: content-box;
+  border: 3px solid transparent;
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-graphite-soft);
+  background-clip: content-box;
+}
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/*
+ * Autofill, wearing this product's colours.
+ *
+ * Chrome paints a filled field its own pale blue and ignores `background`,
+ * which put two bright blue boxes in the middle of the sign-in screen —
+ * the first thing a customer sees, and the one part of it we appeared not to
+ * have styled. The colour cannot be set directly, but an inset shadow covers
+ * the field's whole box and `-webkit-text-fill-color` beats the forced text
+ * colour. The long transition delay is the standard trick for the brief flash
+ * before the shadow applies.
+ */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--color-ink);
+  -webkit-box-shadow: 0 0 0 100px var(--color-paper) inset;
+  caret-color: var(--color-ink);
+  transition: background-color 100000s ease-in-out 0s;
+}
+
+/*
+ * Focus that is always visible, on both grounds — as a floor, not a ceiling.
+ *
+ * `@layer base` is doing real work here. Unlayered CSS beats anything inside a
+ * layer, and Tailwind's utilities are layered, so this rule was overriding the
+ * `focus:outline-none` that every form control sets on itself. A focused input
+ * therefore drew all three treatments at once: this outline, the control's own
+ * ring, and its accent border — a thick double ring in two greens that looked
+ * like a validation error.
+ *
+ * In `base` it applies to everything that does not style its own focus, and
+ * yields to anything that does.
+ */
+@layer base {
+  :focus-visible {
+    outline: 2px solid var(--color-oxygen-deep);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+}
+
+/*
+ * The hue slider in the colour picker.
+ *
+ * A `range` input rather than a custom widget, because hue is one dimension and
+ * HTML already has that control — keyboard, screen reader and touch come free.
+ * Only its paint is ours, and the thumb is styled per engine because there is
+ * still no standard pseudo-element for it.
+ */
+.ox-hue {
+  background: linear-gradient(
+    to right,
+    #f00 0%,
+    #ff0 17%,
+    #0f0 33%,
+    #0ff 50%,
+    #00f 67%,
+    #f0f 83%,
+    #f00 100%
+  );
+}
+
+.ox-hue::-webkit-slider-thumb {
+  appearance: none;
+  width: 0.875rem;
+  height: 0.875rem;
+  border-radius: 999px;
+  background: #fff;
+  border: 2px solid rgb(0 0 0 / 0.35);
+  cursor: grab;
+}
+
+.ox-hue::-moz-range-thumb {
+  width: 0.875rem;
+  height: 0.875rem;
+  border-radius: 999px;
+  background: #fff;
+  border: 2px solid rgb(0 0 0 / 0.35);
+  cursor: grab;
+}
+
+.ox-hue:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--color-oxygen, rgb(59 130 246 / 0.3));
+}
+
+/* ---------------------------------------------------------------------------
+ * Coming-soon previews
+ *
+ * Motifs for catalogue items that have nothing to measure yet. Motion safety
+ * lives here rather than at each call site: the animation is only ever declared
+ * inside `prefers-reduced-motion: no-preference`, so a reader who opts out gets
+ * the element's resting style — which is a finished composition, not a frozen
+ * first frame. A `motion-safe:` variant on thirty spans is thirty chances to
+ * forget one.
+ *
+ * Long, slow and low-contrast on purpose. These sit twelve to a grid, and a
+ * catalogue that flickers is a catalogue nobody reads.
+ * ------------------------------------------------------------------------ */
+
+@keyframes ox-fade {
+  0%,
+  100% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes ox-sweep {
+  0%,
+  100% {
+    transform: scaleY(0.72);
+  }
+  50% {
+    transform: scaleY(1);
+  }
+}
+
+@keyframes ox-slide {
+  0%,
+  100% {
+    opacity: 0.4;
+    transform: translateX(-3px);
+  }
+  50% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes ox-draw {
+  0% {
+    stroke-dashoffset: 100;
+  }
+  45%,
+  70% {
+    stroke-dashoffset: 0;
+  }
+  100% {
+    stroke-dashoffset: -100;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .ox-fade {
+    animation: ox-fade 2.8s ease-in-out infinite;
+  }
+  .ox-sweep {
+    animation: ox-sweep 3.2s ease-in-out infinite;
+    transform-origin: bottom;
+  }
+  .ox-slide {
+    animation: ox-slide 3s ease-in-out infinite;
+  }
+  .ox-draw {
+    animation: ox-draw 4.5s ease-in-out infinite;
+  }
+}

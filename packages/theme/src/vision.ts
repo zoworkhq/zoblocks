@@ -12,9 +12,9 @@
  * sit somewhere between this output and the original. So a palette that
  * survives here survives the harder case, and one that fails here fails for
  * somebody. It is a design review tool, not a clinical instrument, and the
- * console says so on the screen rather than only here.
+ * app says so on the screen rather than only here.
  *
- * Why it is in this package rather than in the console: the 60° hue-separation
+ * Why it is in this package rather than in the app: the 60° hue-separation
  * floor between `status.high` and `status.low` exists precisely so the
  * *direction* of an abnormal result survives this transform. A rule and the
  * demonstration of the rule belong together, and this one has tests.

@@ -16,7 +16,7 @@ import { hexToFigmaRgb } from "@oxygenui-design/figma-core";
 import { applyPull, readPin } from "../src/sandbox/apply";
 import { readFile } from "../src/sandbox/read";
 import { previewPull, PIN } from "../src/pull";
-import type { ResolvedPayload } from "../src/console";
+import type { ResolvedPayload } from "../src/app";
 import { FakeFigma } from "./fake-figma";
 
 const CLINICAL = "Clinical. Carries a validated contrast floor and 60° of hue separation.";

@@ -47,7 +47,7 @@ export type IconProps = Omit<HTMLAttributes<HTMLSpanElement>, "children">;
  * source text, and the repository lints against exactly that. These are the
  * copilot's own classes rather than Tailwind's so nothing would have gone
  * missing here — but an attribute carries the same information without the
- * trap, and it keeps the console free to render these spans too.
+ * trap, and it keeps the app free to render these spans too.
  */
 function icon(slot: string) {
   return function Glyph({ className, ...props }: IconProps) {

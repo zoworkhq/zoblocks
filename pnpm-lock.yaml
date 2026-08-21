@@ -175,7 +175,7 @@ importers:
         specifier: ^3.24.1
         version: 3.25.76
 
-  apps/console:
+  apps/app:
     dependencies:
       '@emotion/react':
         specifier: ^11.14.0

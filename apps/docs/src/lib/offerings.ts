@@ -147,7 +147,7 @@ export const TIERS: Tier[] = [
      * waitlist, so nobody has paid it and nothing has to be refunded.
      *
      * What replaces it is the thing that can actually be bought today: packs,
-     * priced individually, delivered by the console. A tier that bundles work
+     * priced individually, delivered by the app. A tier that bundles work
      * still in build is a promise; a pack is a file.
      */
     name: "Marketplace",
@@ -165,7 +165,7 @@ export const TIERS: Tier[] = [
     cta: "Browse the marketplace",
     href: "/marketplace",
     featured: true,
-    note: "Bought in the console, because a purchase belongs to an organisation rather than a person.",
+    note: "Bought in the app, because a purchase belongs to an organisation rather than a person.",
   },
   {
     name: "Team",
@@ -231,7 +231,7 @@ export const FAQ: Array<{ q: string; a: string }> = [
   },
   {
     q: "Is any of this actually buyable yet?",
-    a: "The marketplace is. Those packs exist, they are delivered by the console, and buying one charges you today. The starter kits are not — the first is still in build, and charging before a kit ships would be charging for a promise, so that half stays a free waitlist until there is something to bill for.",
+    a: "The marketplace is. Those packs exist, they are delivered by the app, and buying one charges you today. The starter kits are not — the first is still in build, and charging before a kit ships would be charging for a promise, so that half stays a free waitlist until there is something to bill for.",
   },
 ];
 

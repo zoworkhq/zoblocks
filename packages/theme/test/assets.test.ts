@@ -244,7 +244,7 @@ describe("what gets printed", () => {
    * declared once at the root and never switched per theme — a letterhead that
    * followed the screen theme would come out reversed on the page.
    */
-  it("judges print artwork on paper, whatever theme the console is in", () => {
+  it("judges print artwork on paper, whatever theme the app is in", () => {
     for (const spec of BRAND_ASSETS.filter((a) => a.group === "print")) {
       expect(spec.ground, spec.role).toBe("light");
     }

@@ -5,7 +5,7 @@
  * the gate used to be reachable only by putting JSON on disk and running the
  * generator, so nothing could hand it a deliberately broken palette and check
  * that it objected. Every test below builds a source in memory, which is also
- * exactly what the theme console does with a payload a customer typed.
+ * exactly what the theme app does with a payload a customer typed.
  */
 
 import {

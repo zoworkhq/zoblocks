@@ -2,11 +2,11 @@
  * The token gate — now owned by `@oxygenui-design/tokens/validate`.
  *
  * This file used to hold 604 lines of contrast, parity and tier checking. It
- * was reachable only by running the generator, which meant the theme console
+ * was reachable only by running the generator, which meant the theme app
  * would have had to reimplement it — and two definitions of "accessible
  * clinical palette" is two answers to the same question.
  *
- * The rules moved to the package so the build, the console's live preview, and
+ * The rules moved to the package so the build, the app's live preview, and
  * the server-side publish gate all run identical code. This re-export exists so
  * the generator's own modules keep importing `./validate`.
  *

@@ -59,8 +59,8 @@ export interface SignatureProps {
    * this control is not operable without a pointer. It is permitted because a
    * host may have a genuinely equivalent alternative elsewhere on the page,
    * but it is never the default — and `@oxygenui/signature-requires-typed-path`
-   * makes it a lint error rather than a runtime console message, because a
-   * component has no business writing to a customer's console.
+   * makes it a lint error rather than a runtime app message, because a
+   * component has no business writing to a customer's app.
    */
   methods?: CaptureMethod[];
   outcomes?: Array<"declined" | "unable" | "verbal" | "on-paper">;
