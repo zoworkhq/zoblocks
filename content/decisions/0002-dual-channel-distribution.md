@@ -4,6 +4,7 @@
 
 > **Ratified 16 August 2026.** Both channels ship and are generated from one source (scripts/gen/emit/react-package.ts). The upgrade channel this ADR called for exists as @oxygenui-design/react.
 > **Supersedes part of:** the distribution assumption implicit in [0001](0001-fhir-typed-props.md)
+> **Superseded in part by [0016](0016-the-installer-is-ours.md):** the decision below stands, but the registry is now installed by `@oxygenui-design/cli` in a format we define, not by a third-party CLI.
 
 ## Context
 

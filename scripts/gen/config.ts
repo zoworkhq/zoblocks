@@ -40,12 +40,17 @@ export const SUPPORT_ITEM_NAMES: ReadonlySet<string> = new Set([
   "timeline-fhir",
 ]);
 
-/** Prefix the shadcn CLI writes component files under, inside the consumer's project. */
+/** Prefix the Oxygen CLI writes component files under, inside the consumer's project. */
 export const CONSUMER_COMPONENT_DIR = "components/oxygen";
 
 export const paths = {
   registryJson: path.join(ROOT, "registry.json"),
   registryOut: path.join(ROOT, "apps", "docs", "public", "r"),
+  /**
+   * The JSON Schema documents every registry item and every `oxygen.json`
+   * points at. Served from the docs site, so the `$schema` URLs resolve.
+   */
+  schemaOut: path.join(ROOT, "apps", "docs", "public", "schema"),
   tsconfigPaths: path.join(ROOT, "tsconfig.generated.json"),
   /**
    * The same mappings, rebased for the docs app.

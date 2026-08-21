@@ -1,0 +1,122 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://oxygenui.design/schema/registry.json",
+  "title": "Oxygen registry",
+  "description": "The manifest of every item a registry serves.",
+  "type": "object",
+  "required": [
+    "name",
+    "homepage",
+    "items"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "homepage": {
+      "type": "string",
+      "format": "uri"
+    },
+    "items": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "name",
+          "type",
+          "title"
+        ],
+        "properties": {
+          "$schema": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string",
+            "description": "Registry name, URL slug, and directory name."
+          },
+          "type": {
+            "enum": [
+              "oxygen:component",
+              "oxygen:lib",
+              "oxygen:hook",
+              "oxygen:ui",
+              "oxygen:block",
+              "oxygen:page",
+              "oxygen:file",
+              "oxygen:style"
+            ]
+          },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string",
+            "description": "The install-time blurb."
+          },
+          "categories": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "dependencies": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "npm packages the consumer must install."
+          },
+          "registryDependencies": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Other registry items, as bare names or absolute URLs."
+          },
+          "files": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "path",
+                "type"
+              ],
+              "properties": {
+                "path": {
+                  "type": "string",
+                  "description": "Path in the Oxygen repository. Provenance, not a destination."
+                },
+                "type": {
+                  "enum": [
+                    "oxygen:component",
+                    "oxygen:lib",
+                    "oxygen:hook",
+                    "oxygen:ui",
+                    "oxygen:block",
+                    "oxygen:page",
+                    "oxygen:file",
+                    "oxygen:style"
+                  ]
+                },
+                "target": {
+                  "type": "string",
+                  "description": "Where this lands in the consumer's project, relative to the alias root for its kind. Absent means derive it from `path`."
+                },
+                "content": {
+                  "type": "string",
+                  "description": "The source itself. Present in an item document, absent from the index."
+                }
+              },
+              "additionalProperties": true
+            }
+          }
+        },
+        "additionalProperties": true
+      }
+    }
+  },
+  "additionalProperties": true
+}

@@ -20,7 +20,7 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 const description =
-  "React components for healthcare products, typed to FHIR R4. Reference ranges, interpretation flags, restricted records, and the uninterpreted case — handled. Installed with the shadcn CLI, source copied into your repo.";
+  "React components for healthcare products, typed to FHIR R4. Reference ranges, interpretation flags, restricted records, and the uninterpreted case — handled. Installed with the Oxygen CLI, source copied into your repo.";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://oxygenui.design"),
@@ -34,7 +34,7 @@ export const metadata: Metadata = {
     "FHIR R4",
     "healthcare UI",
     "React components",
-    "shadcn registry",
+    "design system",
     "Tailwind CSS",
     "health tech",
     "clinical UI",

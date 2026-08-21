@@ -126,7 +126,7 @@ For a React project we still recommend the registry components — they are copi
 into your repo as readable source:
 
 ```bash
-pnpm dlx shadcn@latest add @oxygenui/pulse-loader
+npx @oxygenui-design/cli add pulse-loader
 ```
 
 ### Before the bundle loads

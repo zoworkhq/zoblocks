@@ -5,7 +5,8 @@
  * every shared artifact the platform derives from them:
  *
  *   tsconfig.generated.json                     path mappings
- *   registry.json + apps/docs/public/r/*.json   the shadcn registry
+ *   registry.json + apps/docs/public/r/*.json   the Oxygen registry
+ *   apps/docs/public/schema/*.json              the formats those declare
  *   apps/docs/src/lib/generated/catalog.ts      the docs catalog
  *   apps/docs/src/app/generated-sources.css     Tailwind source globs
  *   apps/docs/public/llms.txt                   agent-readable catalog
@@ -24,6 +25,7 @@ import { buildCatalog, emitCatalog } from "./emit/catalog";
 import { buildCoverage, emitCoverage } from "./emit/coverage";
 import { emitReactPackage, ensureReactPackageDirs } from "./emit/react-package";
 import { emitRegistry } from "./emit/registry";
+import { emitSchemas } from "./emit/schema";
 import {
   buildSurface,
   danglingReferences,
@@ -106,6 +108,10 @@ async function main() {
   // of a component's documentation, and a package component that renders three
   // empty headings looks broken rather than undocumented.
   const props = extractProps(components);
+
+  // The formats the registry documents declare. Emitted alongside them so a
+  // new file kind cannot reach the registry without reaching the schema too.
+  await emitSchemas(emitter);
 
   const registryProblems = await emitRegistry(registryComponents, emitter);
   if (registryProblems.length) {

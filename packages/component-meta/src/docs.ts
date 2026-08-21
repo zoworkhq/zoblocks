@@ -46,7 +46,7 @@ export interface ComponentDoc {
   layer: Layer;
   /**
    * How a consumer gets it. Drives the install command the docs page shows —
-   * a `shadcn add` line for a registry component, `npm install` for a package.
+   * an `oxygen add` line for a registry component, `npm install` for a package.
    */
   distribution: Distribution;
   /** npm package name. Present only for `package` components. */
@@ -106,7 +106,7 @@ export interface ComponentDoc {
 
   /** npm packages a consumer inherits by installing this component. */
   dependencies: string[];
-  /** Registry install command, e.g. `pnpm dlx shadcn@latest add @oxygenui/vitals-panel`. */
+  /** Registry install command, e.g. `npx @oxygenui-design/cli add vitals-panel`. */
   install: string;
 }
 

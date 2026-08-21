@@ -4,6 +4,7 @@ dist
 .turbo
 pnpm-lock.yaml
 apps/docs/public/r
+apps/docs/public/schema
 
 # Machine-written. Formatting these would fight the tool that produces them:
 # Prettier reformats, the next `pnpm gen` or `drizzle-kit generate` writes it

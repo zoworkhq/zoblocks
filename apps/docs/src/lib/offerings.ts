@@ -160,7 +160,7 @@ export const TIERS: Tier[] = [
       "Perpetual — it does not expire",
       "Every item states what was checked",
       "Installs into a theme draft",
-      "Components install with the shadcn CLI",
+      "Components install with the Oxygen CLI",
     ],
     cta: "Browse the marketplace",
     href: "/marketplace",
@@ -211,7 +211,7 @@ export const FAQ: Array<{ q: string; a: string }> = [
   },
   {
     q: "What exactly do I own?",
-    a: "The source. Components are copied into your repository by the shadcn CLI — there is no runtime package between you and the render, and you can read, audit, fork, and change every line. Core is MIT. Pro adds a commercial licence for the premium catalog; it does not restrict what you build with it.",
+    a: "The source. Components are copied into your repository by the Oxygen CLI — there is no runtime package between you and the render, and you can read, audit, fork, and change every line. Core is MIT. Pro adds a commercial licence for the premium catalog; it does not restrict what you build with it.",
   },
   {
     q: "Can I use it for client work?",

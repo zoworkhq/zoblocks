@@ -51,6 +51,9 @@ importers:
       '@next/eslint-plugin-next':
         specifier: ^16.3.0
         version: 16.3.0(eslint@10.8.1(jiti@2.7.0))
+      '@oxygenui-design/cli':
+        specifier: workspace:*
+        version: link:packages/cli
       '@oxygenui-design/clinical-note-core':
         specifier: workspace:*
         version: link:packages/clinical-note-core
@@ -195,6 +198,9 @@ importers:
       '@oxygenui-design/bridge-mui':
         specifier: workspace:*
         version: link:../../packages/bridge-mui
+      '@oxygenui-design/cli':
+        specifier: workspace:*
+        version: link:../../packages/cli
       '@oxygenui-design/copilot-react':
         specifier: workspace:*
         version: link:../../packages/copilot-react
@@ -675,6 +681,24 @@ importers:
       react-dom:
         specifier: ^19.0.0
         version: 19.2.8(react@19.2.8)
+      typescript:
+        specifier: ^5.7.2
+        version: 5.9.3
+      vitest:
+        specifier: ^4.1.10
+        version: 4.1.10(@types/node@22.20.1)(@vitest/coverage-v8@4.1.10)(jsdom@30.0.1)(vite@8.2.1(@types/node@22.20.1)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.12)(yaml@2.9.0))
+
+  packages/cli:
+    devDependencies:
+      '@oxygenui-design/tsconfig':
+        specifier: workspace:*
+        version: link:../tsconfig
+      '@types/node':
+        specifier: ^22.10.2
+        version: 22.20.1
+      '@vitest/coverage-v8':
+        specifier: ^4.1.10
+        version: 4.1.10(vitest@4.1.10)
       typescript:
         specifier: ^5.7.2
         version: 5.9.3

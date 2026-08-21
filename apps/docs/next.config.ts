@@ -49,7 +49,7 @@ const nextConfig: NextConfig = {
   async headers() {
     return [
       {
-        // Registry JSON is fetched by the shadcn CLI from any origin.
+        // Registry JSON is fetched by the Oxygen CLI from any origin.
         source: "/r/:path*",
         headers: [
           { key: "Access-Control-Allow-Origin", value: "*" },

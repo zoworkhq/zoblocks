@@ -2,7 +2,7 @@
   // Path mappings live in tsconfig.generated.json, produced by `pnpm gen`.
   //
   // Registry components import "@/lib/utils" and "@/components/oxygen/*"
-  // because that is where the shadcn CLI writes them in the consumer's project,
+  // because that is where the Oxygen CLI writes them in the consumer's project,
   // so those specifiers have to resolve here too. That map used to be
   // maintained by hand, with a comment asking authors to add an entry per
   // component; four were missing and nothing reported it, because no workspace

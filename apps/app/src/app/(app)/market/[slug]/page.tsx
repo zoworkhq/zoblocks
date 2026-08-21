@@ -234,7 +234,7 @@ export default async function MarketItemPage({ params }: { params: Promise<{ slu
 
           {item.kind === "component" && (
             <pre className="mt-4 overflow-x-auto rounded-lg bg-panel p-3 font-mono text-[0.6875rem] text-panel-fg">
-              {`// components.json
+              {`// oxygen.json
 "registries": {
   "@oxygen-pro": {
     "url": "${"https://app.oxygenui.design/r/pro/{name}.json"}",
@@ -242,7 +242,7 @@ export default async function MarketItemPage({ params }: { params: Promise<{ slu
   }
 }
 
-npx shadcn@latest add @oxygen-pro/${item.slug}`}
+npx @oxygenui-design/cli add @oxygen-pro/${item.slug}`}
             </pre>
           )}
         </Panel>

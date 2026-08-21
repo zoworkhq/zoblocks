@@ -130,7 +130,7 @@ ruleTester.run("tabs-semantic-mode", tabsSemanticMode, {
       errors: [{ messageId: "missingMode" }],
     },
     {
-      // Ours, by the specifier the shadcn CLI writes into a consumer project.
+      // Ours, by the specifier the Oxygen CLI writes into a consumer project.
       code: 'import { Tabs } from "@/components/oxygen/tabs";\nconst a = <Tabs items={items} />;',
       errors: [{ messageId: "missingMode" }],
     },

@@ -146,6 +146,27 @@ export default tseslint.config(
   },
 
   // -------------------------------------------------------------------------
+  // The CLI is a Node binary, not shipped component source.
+  //
+  // It matches `packages/*/src/**` and inherits the component rules, two of
+  // which it must break to do its job: it reads `process.env` to expand the
+  // `${OXYGEN_TOKEN}` reference out of `oxygen.json`, and it fetches registry
+  // items over the network. Both are the entire point of an installer, and the
+  // rule they violate exists to protect *copied component source* — code that
+  // lands in a customer's repository, where their build has neither our
+  // environment nor a reason to make requests.
+  //
+  // Off by name rather than by ignoring the package, so everything else stays
+  // live. The claims that matter here are asserted directly instead:
+  // `test/cli.test.ts` holds target resolution to paths inside the project and
+  // refuses a token written literally into a committed file.
+  // -------------------------------------------------------------------------
+  {
+    files: ["packages/cli/**/*.ts", "packages/cli/**/*.mjs"],
+    rules: { "@oxygenui/no-forbidden-capability": "off" },
+  },
+
+  // -------------------------------------------------------------------------
   // Build tooling. Runs in Node, may read the environment and write output.
   // -------------------------------------------------------------------------
   {

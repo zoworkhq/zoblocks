@@ -19,12 +19,12 @@ import "@oxygenui-design/tokens/oxygen-tokens.css";
 
 ## Two ways to install
 
-|           | npm package                    | shadcn registry                                     |
-| --------- | ------------------------------ | --------------------------------------------------- |
-| Install   | `npm i @oxygenui-design/react` | `pnpm dlx shadcn@latest add @oxygenui/pulse-loader` |
-| Upgrades  | semver                         | you own the source                                  |
-| Auditable | in `node_modules`              | in your repository                                  |
-| Best for  | teams who want upgrades        | teams who want to read every line                   |
+|           | npm package                    | Oxygen registry                             |
+| --------- | ------------------------------ | ------------------------------------------- |
+| Install   | `npm i @oxygenui-design/react` | `npx @oxygenui-design/cli add pulse-loader` |
+| Upgrades  | semver                         | you own the source                          |
+| Auditable | in `node_modules`              | in your repository                          |
+| Best for  | teams who want upgrades        | teams who want to read every line           |
 
 Both channels are generated from one source, so they cannot behave differently.
 

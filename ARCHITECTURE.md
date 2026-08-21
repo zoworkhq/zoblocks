@@ -16,7 +16,7 @@ arguments.
 
 ## 1. The scaling problem, stated concretely
 
-The repository today ships 24 components through a shadcn registry and works
+The repository today ships 24 components through the Oxygen registry and works
 well at that size. Three properties of it do not survive multiplication.
 
 ### 1.1 Adding one component edits five shared files
@@ -55,7 +55,7 @@ This is the load-bearing one, and it is in direct tension with four of the
 brief's requirements: versioning, backward compatibility, migration paths, and
 deprecation strategy.
 
-Once the shadcn CLI writes a file into a customer's repository, that file is
+Once the Oxygen CLI writes a file into a customer's repository, that file is
 theirs. There is no channel to reach it. A bug in `ClinicalValue` that
 misrenders a comparator ships to every customer who installed it and can never
 be recalled — not by a patch release, not by a security advisory, not by a
@@ -94,7 +94,7 @@ that.
 
 ```
 ┌──────────────────────────────────────────────────────────────────┐
-│  L4  Distribution   npm channels · shadcn registry · CDN · Figma │
+│  L4  Distribution   npm channels · Oxygen registry · CDN · Figma │
 ├──────────────────────────────────────────────────────────────────┤
 │  L3  Composition    blocks · patterns · app shells · templates   │
 ├──────────────────────────────────────────────────────────────────┤
@@ -278,7 +278,7 @@ a test, rather than a growing hand-maintained map.
 
 ### 5.1 Two channels, one source
 
-|                                | npm                       | Registry (shadcn CLI)           |
+|                                | npm                       | Registry (Oxygen CLI)           |
 | ------------------------------ | ------------------------- | ------------------------------- |
 | Upgrade path                   | semver, patches, codemods | none — the customer has forked  |
 | Security fixes reach customers | yes                       | no                              |
@@ -305,9 +305,10 @@ notices.
 The npm scope is `@oxygenui-design`, not `@oxygenui`. The shorter one is not
 available: `oxygen-ui` is already published by an unrelated project, and npm
 rejects names that differ from an existing package only by punctuation, so every
-variant of it is blocked. This is unrelated to the `@oxygenui` that appears in
-install commands — that is a shadcn registry namespace declared in the
-consumer's `components.json`, and it is free to keep the shorter name.
+variant of it is blocked. Registry installs name a component directly
+(`oxygen add pulse-loader`) and need no namespace at all; the namespaces that do
+appear — `@oxygen-pro` — are registry aliases declared in the consumer's
+`oxygen.json` and are unconstrained by npm.
 
 Pro source never reaches the public CDN, and CI asserts that: a check walks the
 generated public registry output and fails if any item's meta says `tier: "pro"`.
@@ -532,8 +533,8 @@ Hand-written: guidance, limitations, and clinical rationale. These are the parts
 that carry the product's actual value and must not be generated.
 
 Also generated: `llms.txt` and an MCP manifest. Coding agents are a real
-distribution channel for a shadcn-lineage library, and the catalog is already
-structured data.
+distribution channel for a source-distributed library, and the catalog is
+already structured data.
 
 ---
 

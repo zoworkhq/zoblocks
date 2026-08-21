@@ -1,7 +1,7 @@
 /**
  * The path mappings, checked in both places they have to exist.
  *
- * Registry components import each other by the path the shadcn CLI writes into
+ * Registry components import each other by the path the Oxygen CLI writes into
  * a consumer's project — `@/components/oxygen/accordion`, `@/lib/oxygen-switch`
  * — so those specifiers have to resolve in this repository too, and separately
  * in the docs app, which resolves from its own directory and cannot extend the
@@ -96,7 +96,7 @@ describe("every component is importable from the docs app", () => {
   it.each(consumerSpecifiers)("%s points at the same file the generator emitted", (specifier) => {
     // `@/lib/utils` is the deliberate exception: the docs app maps it to its own
     // copy under src/lib, because `cn` is used by the site's own components as
-    // well as by registry source, and the site is not a shadcn consumer.
+    // well as by registry source, and the site is not a registry consumer.
     if (specifier === "@/lib/utils") {
       expect(path.resolve(DOCS, docsPaths[specifier]![0]!)).toBe(
         path.join(DOCS, "src", "lib", "utils.ts"),
@@ -123,7 +123,7 @@ describe("every component is importable from the docs app", () => {
 
 describe("the support modules registry components share", () => {
   /*
-   * These are installed into a consumer's project under `lib/` by the shadcn
+   * These are installed into a consumer's project under `lib/` by the Oxygen
    * CLI and imported by that path. A missing one does not fail loudly — the
    * component simply cannot be resolved by whichever project is missing it,
    * which is how the accordion family stayed out of the docs app.

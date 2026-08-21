@@ -1,6 +1,6 @@
 /**
- * Emits the shadcn registry: registry.json and one document per item under
- * apps/docs/public/r/.
+ * Emits the Oxygen registry: registry.json and one document per item under
+ * apps/docs/public/r/, in the format @oxygenui-design/cli installs from.
  *
  * Two guarantees this build makes that a hand-written registry cannot:
  *
@@ -16,6 +16,7 @@
 import { readFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import path from "node:path";
+import { ITEM_SCHEMA_URL, REGISTRY_SCHEMA_URL } from "@oxygenui-design/cli";
 import { HOMEPAGE, REGISTRY_NAME, ROOT, SUPPORT_ITEM_NAMES, paths } from "../config";
 import type { LoadedComponent } from "../load";
 import type { Emitter } from "../write";
@@ -32,16 +33,16 @@ import type { Emitter } from "../write";
 const SUPPORT_ITEMS: BuildableItem[] = [
   {
     name: "utils",
-    type: "registry:lib",
+    type: "oxygen:lib",
     title: "Utils",
     description: "Class-name merge helper shared by every Oxygen component.",
     dependencies: ["clsx", "tailwind-merge"],
     registryDependencies: [] as string[],
-    files: [{ path: "registry/oxygen/lib/utils.ts", type: "registry:lib", target: "lib/utils.ts" }],
+    files: [{ path: "registry/oxygen/lib/utils.ts", type: "oxygen:lib", target: "lib/utils.ts" }],
   },
   {
     name: "loader-core",
-    type: "registry:lib",
+    type: "oxygen:lib",
     title: "Loader core",
     description:
       "Shared frame, timing gate, and stylesheet behind every Oxygen loader. Installed automatically with any loader.",
@@ -50,19 +51,19 @@ const SUPPORT_ITEMS: BuildableItem[] = [
     files: [
       {
         path: "registry/oxygen/lib/loader.tsx",
-        type: "registry:lib",
+        type: "oxygen:lib",
         target: "lib/oxygen-loader.tsx",
       },
       {
         path: "registry/oxygen/lib/loader.css",
-        type: "registry:file",
+        type: "oxygen:file",
         target: "styles/oxygen-loader.css",
       },
     ],
   },
   {
     name: "accordion-core",
-    type: "registry:lib",
+    type: "oxygen:lib",
     title: "Accordion core",
     description:
       "Headless disclosure behaviour and stylesheet behind Accordion and Disclosure: the open-set policies, the ARIA wiring, the access model, and find-in-page support. Installed automatically with either.",
@@ -71,19 +72,19 @@ const SUPPORT_ITEMS: BuildableItem[] = [
     files: [
       {
         path: "registry/oxygen/lib/accordion-core.tsx",
-        type: "registry:hook",
+        type: "oxygen:hook",
         target: "lib/oxygen-accordion.tsx",
       },
       {
         path: "registry/oxygen/lib/accordion.css",
-        type: "registry:file",
+        type: "oxygen:file",
         target: "styles/oxygen-accordion.css",
       },
     ],
   },
   {
     name: "switch-core",
-    type: "registry:lib",
+    type: "oxygen:lib",
     title: "Switch core",
     description:
       "The three-axis state model behind Oxygen's Switch: the commit phase machine, the state-label presets, and the absence vocabulary. Installed automatically with Switch.",
@@ -92,19 +93,19 @@ const SUPPORT_ITEMS: BuildableItem[] = [
     files: [
       {
         path: "registry/oxygen/lib/switch.tsx",
-        type: "registry:lib",
+        type: "oxygen:lib",
         target: "lib/oxygen-switch.tsx",
       },
       {
         path: "registry/oxygen/lib/switch.css",
-        type: "registry:file",
+        type: "oxygen:file",
         target: "styles/oxygen-switch.css",
       },
     ],
   },
   {
     name: "timeline-core",
-    type: "registry:lib",
+    type: "oxygen:lib",
     title: "Timeline core",
     description:
       "The chronology engine behind Timeline and CareTimeline: precision-preserving time, the stable comparator, grouping, clustering with critical promotion, the coverage claim and its sentence. Installed automatically with either.",
@@ -113,19 +114,19 @@ const SUPPORT_ITEMS: BuildableItem[] = [
     files: [
       {
         path: "registry/oxygen/lib/timeline-core.ts",
-        type: "registry:lib",
+        type: "oxygen:lib",
         target: "lib/timeline-core.ts",
       },
       {
         path: "registry/oxygen/lib/timeline.css",
-        type: "registry:file",
+        type: "oxygen:file",
         target: "styles/oxygen-timeline.css",
       },
     ],
   },
   {
     name: "timeline-fhir",
-    type: "registry:lib",
+    type: "oxygen:lib",
     title: "Timeline FHIR adapters",
     description:
       "Thirteen FHIR R4 resource types read into timeline events, plus an honest report of everything that could not be mapped. Pure functions — no fetching. Installed automatically with CareTimeline.",
@@ -134,14 +135,14 @@ const SUPPORT_ITEMS: BuildableItem[] = [
     files: [
       {
         path: "registry/oxygen/lib/timeline-fhir.ts",
-        type: "registry:lib",
+        type: "oxygen:lib",
         target: "lib/timeline-fhir.ts",
       },
     ],
   },
   {
     name: "clinical-note-core",
-    type: "registry:lib",
+    type: "oxygen:lib",
     title: "Clinical note core",
     description:
       "The ProseMirror binding behind Clinical Note: the editor view, the provenance decorations, the toolbar commands, and the document builders. The clinical engine itself is the npm package; this is the part that needs a DOM. Installed automatically with Clinical Note.",
@@ -158,19 +159,19 @@ const SUPPORT_ITEMS: BuildableItem[] = [
     files: [
       {
         path: "registry/oxygen/lib/clinical-note.tsx",
-        type: "registry:hook",
+        type: "oxygen:hook",
         target: "lib/oxygen-clinical-note.tsx",
       },
       {
         path: "registry/oxygen/lib/clinical-note.css",
-        type: "registry:file",
+        type: "oxygen:file",
         target: "styles/oxygen-clinical-note.css",
       },
     ],
   },
   {
     name: "tokens",
-    type: "registry:style",
+    type: "oxygen:style",
     title: "Oxygen tokens",
     description:
       "Semantic clinical status tokens, three density modes, and light/dark themes. Required by every Oxygen component.",
@@ -179,7 +180,7 @@ const SUPPORT_ITEMS: BuildableItem[] = [
     files: [
       {
         path: "packages/tokens/src/oxygen-tokens.css",
-        type: "registry:file",
+        type: "oxygen:file",
         target: "styles/oxygen-tokens.css",
       },
     ],
@@ -200,8 +201,7 @@ interface BuildableItem {
 /**
  * Registry categories are identifiers used for filtering, not display text.
  * The catalog carries them in sentence case for the docs; the registry gets
- * slugs, which is what the shadcn ecosystem expects and what survives being
- * put in a URL.
+ * slugs, which is what survives being put in a URL.
  */
 function slugifyCategory(category: string): string {
   return category
@@ -214,12 +214,12 @@ function toBuildable(component: LoadedComponent): BuildableItem {
   const { meta } = component;
   return {
     name: meta.name,
-    // Deliberately not derived from `layer`. In shadcn's vocabulary
-    // `registry:block` means a multi-file composition installed as a unit;
-    // `layer` is our dependency-direction concept. They are different axes that
-    // happen to share a word, and conflating them would change install
-    // behaviour as a side effect of an architectural label.
-    type: "registry:component",
+    // Deliberately not derived from `layer`. `oxygen:block` means a
+    // multi-file composition installed as a unit; `layer` is our
+    // dependency-direction concept. They are different axes that happen to
+    // share a word, and conflating them would change install behaviour as a
+    // side effect of an architectural label.
+    type: "oxygen:component",
     title: meta.title,
     // The install-time blurb. The long form lives in `rationale`, on the docs
     // page, which is the only surface with room for it.
@@ -228,7 +228,7 @@ function toBuildable(component: LoadedComponent): BuildableItem {
     dependencies: meta.dependencies,
     registryDependencies: meta.registryDependencies,
     files: meta.files ?? [
-      { path: component.sourcePath, type: "registry:component", target: component.consumerTarget },
+      { path: component.sourcePath, type: "oxygen:component", target: component.consumerTarget },
     ],
   };
 }
@@ -248,6 +248,83 @@ const FORBIDDEN: Array<{ pattern: RegExp; why: string }> = [
   { pattern: /\bnew\s+WebSocket\b/, why: "opens a WebSocket" },
   { pattern: /\beval\s*\(/, why: "calls eval" },
 ];
+
+/**
+ * Every `@/…` specifier in a published file must be installable.
+ *
+ * Registry source imports itself by the path it lands on in the consumer's
+ * project — `@/lib/utils`, `@/components/oxygen/timeline`. Those specifiers
+ * resolve inside this repository because tsconfig.generated.json maps them, so
+ * nothing here fails when an item forgets to declare the dependency that
+ * supplies one. The consumer is where it fails: the CLI writes exactly the
+ * files the item asked for, the import resolves to nothing, and their build
+ * breaks on source we told them was self-contained.
+ *
+ * `clinical-note` shipped in that state. It imports `@/lib/oxygen-clinical-note`
+ * and declared only `utils` and `tokens`, so the file supplying it — the
+ * `clinical-note-core` support item — was never installed. Typechecking passed
+ * here on every run, because here the path is mapped.
+ *
+ * The check walks the transitive closure of `registryDependencies` and asks
+ * what it provides, which is the same question the CLI answers at install time.
+ */
+function unresolvedImports(
+  built: Array<Record<string, unknown>>,
+  items: BuildableItem[],
+): string[] {
+  const byName = new Map(items.map((i) => [i.name, i]));
+
+  /** `@/`-specifiers each item writes into the consumer's project. */
+  const provides = new Map<string, Set<string>>();
+  for (const item of items) {
+    provides.set(
+      item.name,
+      new Set(
+        item.files
+          .map((f) => f.target)
+          .filter((t): t is string => Boolean(t))
+          .map((t) => `@/${t.replace(/\.(tsx|ts)$/, "")}`),
+      ),
+    );
+  }
+
+  const closure = (name: string, seen = new Set<string>()): Set<string> => {
+    if (seen.has(name)) return seen;
+    seen.add(name);
+    for (const dep of byName.get(name)?.registryDependencies ?? []) {
+      // Anything with a slash is a cross-registry URL; we cannot see inside it
+      // and do not guess at what it provides.
+      if (!dep.includes("/")) closure(dep, seen);
+    }
+    return seen;
+  };
+
+  const problems: string[] = [];
+
+  for (const entry of built) {
+    const name = entry.name as string;
+    const available = new Set<string>();
+    for (const member of closure(name)) {
+      for (const specifier of provides.get(member) ?? []) available.add(specifier);
+    }
+
+    const files = entry.files as Array<{ target: string; content: string }>;
+    const reported = new Set<string>();
+
+    for (const file of files) {
+      for (const match of file.content.matchAll(/from "(@\/[^"]+)"/g)) {
+        const specifier = match[1] as string;
+        if (available.has(specifier) || reported.has(specifier)) continue;
+        reported.add(specifier);
+        problems.push(
+          `${name}: ${file.target} imports ${specifier}, but nothing in its registryDependencies installs that file`,
+        );
+      }
+    }
+  }
+
+  return problems;
+}
 
 export async function emitRegistry(
   components: LoadedComponent[],
@@ -278,8 +355,8 @@ export async function emitRegistry(
   // stubbed. The registry served from the CDN is the free catalog.
   // Two exclusions, for different reasons. Pro items are commercial and must
   // never reach the public CDN. Package components have no source to copy —
-  // they ship on npm — so an item for one would tell the shadcn CLI to fetch
-  // files that do not exist.
+  // they ship on npm — so an item for one would tell the CLI to fetch files
+  // that do not exist.
   const publicComponents = components.filter(
     (c) => c.meta.tier === "free" && c.meta.distribution !== "package",
   );
@@ -324,7 +401,7 @@ export async function emitRegistry(
     }
 
     built.push({
-      $schema: "https://ui.shadcn.com/schema/registry-item.json",
+      $schema: ITEM_SCHEMA_URL,
       name: item.name,
       type: item.type,
       title: item.title,
@@ -333,16 +410,31 @@ export async function emitRegistry(
       ...(item.dependencies.length ? { dependencies: item.dependencies } : {}),
       ...(item.registryDependencies.length
         ? {
-            // Bare names are expanded to absolute URLs here so authors never
-            // write the homepage into metadata, and a domain change is one edit.
-            registryDependencies: item.registryDependencies.map((d) =>
-              d.includes("/") ? d : `${HOMEPAGE}/r/${d}.json`,
-            ),
+            /*
+             * Bare names are emitted as bare names.
+             *
+             * They used to be expanded to absolute `oxygenui.design` URLs. That
+             * baked this registry's own domain into every document it serves,
+             * which meant a copy of the registry — a mirror, an air-gapped
+             * enterprise cache, a local build under test — resolved its
+             * dependencies back to production and could never be self-contained.
+             * A customer who is allowed to reach only their own mirror got a
+             * component whose dependencies silently pointed somewhere else.
+             *
+             * The CLI reads a bare name as "the registry this item came from",
+             * falling back to the public catalog, so the document now describes
+             * a relationship rather than a location. Anything genuinely
+             * cross-registry still carries a full URL and passes through here
+             * untouched.
+             */
+            registryDependencies: item.registryDependencies,
           }
         : {}),
       files,
     });
   }
+
+  problems.push(...unresolvedImports(built, items));
 
   if (problems.length) return problems;
 
@@ -351,7 +443,7 @@ export async function emitRegistry(
     paths.registryJson,
     JSON.stringify(
       {
-        $schema: "https://ui.shadcn.com/schema/registry.json",
+        $schema: REGISTRY_SCHEMA_URL,
         name: REGISTRY_NAME,
         homepage: HOMEPAGE,
         items: items.map((item) => ({
@@ -362,11 +454,7 @@ export async function emitRegistry(
           ...(item.categories?.length ? { categories: item.categories } : {}),
           ...(item.dependencies.length ? { dependencies: item.dependencies } : {}),
           ...(item.registryDependencies.length
-            ? {
-                registryDependencies: item.registryDependencies.map((d) =>
-                  d.includes("/") ? d : `${HOMEPAGE}/r/${d}.json`,
-                ),
-              }
+            ? { registryDependencies: item.registryDependencies }
             : {}),
           files: item.files.map((f) => ({ path: f.path, type: f.type, target: f.target ?? "" })),
         })),
@@ -384,8 +472,8 @@ export async function emitRegistry(
   }
 
   // A component removed from the repository must stop being served. Its JSON
-  // would otherwise sit on the CDN and the shadcn CLI would keep installing
-  // source nobody maintains.
+  // would otherwise sit on the CDN and the CLI would keep installing source
+  // nobody maintains.
   await emitter.prune(
     paths.registryOut,
     new Set([...built.map((i) => `${i.name as string}.json`), "index.json", "coverage.json"]),

@@ -108,10 +108,10 @@ items  = <comma-separated catalogue slugs>
 | Icons                   | Written into a theme's **draft** icon slots. Publishing stays separate. |
 | Illustrations, fixtures | `GET /m/{item}/pack.zip` — a deterministic store-only archive.          |
 | Themes                  | A **draft** theme. Nothing is live until an admin publishes it.         |
-| Components              | The shadcn CLI, through a private namespace.                            |
+| Components              | The Oxygen CLI, through a private namespace.                            |
 
 ```jsonc
-// the customer's components.json
+// the customer's oxygen.json
 "registries": {
   "@oxygen-pro": {
     "url": "https://app.oxygenui.design/r/pro/{name}.json",
@@ -121,7 +121,7 @@ items  = <comma-separated catalogue slugs>
 ```
 
 ```bash
-OXYGEN_TOKEN=oxy_live_… npx shadcn@latest add @oxygen-pro/vitals-flowsheet
+OXYGEN_TOKEN=oxy_live_… npx @oxygenui-design/cli add @oxygen-pro/vitals-flowsheet
 ```
 
 Tokens are minted under **Access tokens**, shown once, and stored only as a

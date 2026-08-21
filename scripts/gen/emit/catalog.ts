@@ -9,7 +9,7 @@
  */
 
 import type { ComponentDoc, PropDoc } from "@oxygenui-design/component-meta";
-import { HOMEPAGE, banner, paths } from "../config";
+import { banner, paths } from "../config";
 import type { LoadedComponent } from "../load";
 import type { ExtractedExport } from "../props";
 import type { Emitter } from "../write";
@@ -85,7 +85,7 @@ export function buildCatalog(
       related: meta.related,
 
       dependencies: meta.dependencies,
-      install: `pnpm dlx shadcn@latest add ${HOMEPAGE}/r/${meta.name}.json`,
+      install: `npx @oxygenui-design/cli add ${meta.name}`,
     };
 
     return doc;

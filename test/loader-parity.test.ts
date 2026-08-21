@@ -2,7 +2,7 @@
  * The two delivery channels must draw the same loader.
  *
  * Oxygen ships each loader twice: as React source copied into a customer's repo
- * by the shadcn CLI, and as a custom element on npm for every other framework.
+ * by the Oxygen CLI, and as a custom element on npm for every other framework.
  * The React file has to be self-contained — it is copied verbatim, so it cannot
  * import from a workspace package — which means the geometry genuinely exists
  * in two places.

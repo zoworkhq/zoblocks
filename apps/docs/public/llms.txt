@@ -1,7 +1,7 @@
 # Oxygen UI
 
 > React components for healthcare interfaces, typed to FHIR R4 and delivered as
-> source through a shadcn registry. Components take FHIR resources as props
+> source through the Oxygen registry. Components take FHIR resources as props
 > directly and render absence, preliminary status, restricted records, and
 > critical results as explicit states rather than as blanks.
 
@@ -23,72 +23,72 @@ Rules that matter when generating code with these components:
 ## Primitive
 
 - [Accordion](https://oxygenui.design/components/accordion): A disclosure widget whose headers can be read while closed, with a per-section access model for content a reader may not simply be shown.
-  install: pnpm dlx shadcn@latest add https://oxygenui.design/r/accordion.json
+  install: npx @oxygenui-design/cli add accordion
   states: Closed, Open, Summary in the header, Severity on the leading edge, Pinned — cannot be closed, Advisory gate, Reason gate, Consent gate, Consent refused, Withheld, Single open at a time, Nested, with heading levels
   status: beta
 - [Breath Loader](https://oxygenui.design/components/breath-loader): Three rings expanding and fading from a soft core, paced at a resting breath rather than a spinner's tempo.
-  install: pnpm dlx shadcn@latest add https://oxygenui.design/r/breath-loader.json
+  install: npx @oxygenui-design/cli add breath-loader
   states: Indeterminate, Delayed (not yet shown), Slow wait, Reduced motion, With a brand mark in the core
   status: beta
 - [Helix Loader](https://oxygenui.design/components/helix-loader): Two strands of dots turning on a slow sine. For the parts of a product that are laboratory rather than bedside.
-  install: pnpm dlx shadcn@latest add https://oxygenui.design/r/helix-loader.json
+  install: npx @oxygenui-design/cli add helix-loader
   states: Indeterminate, Delayed (not yet shown), Slow wait, Reduced motion
   status: beta
 - [Infusion Loader](https://oxygenui.design/components/infusion-loader): A capsule with a soft slug — the only loader in the set that can tell the truth about how much is left.
-  install: pnpm dlx shadcn@latest add https://oxygenui.design/r/infusion-loader.json
+  install: npx @oxygenui-design/cli add infusion-loader
   states: Indeterminate, Determinate (0–100), Delayed (not yet shown), Slow wait, Reduced motion
   status: beta
 - [Pulse Loader](https://oxygenui.design/components/pulse-loader): An open heart with a rhythm line running through it, beating at a resting sixty. The library's signature wait.
-  install: pnpm dlx shadcn@latest add https://oxygenui.design/r/pulse-loader.json
+  install: npx @oxygenui-design/cli add pulse-loader
   states: Indeterminate, Delayed (not yet shown), Slow wait, Reduced motion, Below 40px (renders as Rhythm Loader)
   status: beta
 - [Rhythm Loader](https://oxygenui.design/components/rhythm-loader): One rhythm strip, swept like a monitor. The quietest way for an interface to say it is still there.
-  install: pnpm dlx shadcn@latest add https://oxygenui.design/r/rhythm-loader.json
+  install: npx @oxygenui-design/cli add rhythm-loader
   states: Indeterminate, Delayed (not yet shown), Slow wait, Reduced motion, Inline
   status: beta
 - [Switch](https://oxygenui.design/components/switch): A binary control for a record that is shared, asynchronous, and often missing the fact you are asking it about.
-  install: pnpm dlx shadcn@latest add https://oxygenui.design/r/switch.json
+  install: npx @oxygenui-design/cli add switch
   states: On, Off, Unknown (absence, with a reason), Pending — the write is in flight, Committed, Reverted — the write failed, Blocked — refused before trying, Queued — offline, Stale — changed by someone else, Read-only, with a reason, Disabled, Time-boxed (until), Awaiting confirmation, Segmented — both answers visible, Chip — a filter bar, Row — the whole row is the target
   status: experimental
 - [Timeline](https://oxygenui.design/components/timeline): Ant Design v6's Timeline, prop for prop, with the accessible name and the ordered-list semantics it does not ship.
-  install: pnpm dlx shadcn@latest add https://oxygenui.design/r/timeline.json
+  install: npx @oxygenui-design/cli add timeline
   states: Vertical, the default, Alternate, items on both sides, Horizontal, Filled and outlined variants, Custom node icons, Preset and custom node colours, A loading node, Reversed, Ant Design v5 prop names, still accepted
   status: experimental
 - [Tabs](https://oxygenui.design/components/tabs): Tabs that know what they are: a view switch, a link list, a form value or a wizard — four accessibility trees behind one silhouette.
-  install: pnpm dlx shadcn@latest add https://oxygenui.design/r/tabs.json
+  install: npx @oxygenui-design/cli add tabs
   states: Selected, Unselected, Disabled with a stated reason, Restricted (present, gated, explained), Stale — showing cached data, Unavailable offline, Unsaved changes pending, Locked step, Completed step, Overflowing into a menu, Collapsed to a native picker, Awaiting an async guard
   status: beta
 
 ## Clinical
 
 - [Care Timeline](https://oxygenui.design/components/care-timeline): A patient's chronology that cannot be rendered without saying what it is a view of — the window, the sources, the filters and the order.
-  install: pnpm dlx shadcn@latest add https://oxygenui.design/r/care-timeline.json
+  install: npx @oxygenui-design/cli add care-timeline
   fhir: Encounter, Appointment, Communication, Observation, DiagnosticReport, Procedure, MedicationRequest, Immunization, DocumentReference, QuestionnaireResponse, Consent, Provenance
   states: Newest first, grouped by month, Planned, above the now marker, Lapsed — planned, and nothing recorded against it, Cancelled, Attempted and did not connect, Amended, with what changed, Entered in error, retained and struck, Restricted — it exists and you may not read it, Consent-gated, A thread with its own steps, A cluster, and a critical event promoted out of one, A stated gap in coverage, A source that could not be reached, Filtered, with the hidden count stated, New since last reviewed, An imprecise date, kept imprecise, No record · none in this window · none you may see, Patient-facing, with a result not yet reviewed
   status: experimental
 - [Chart Accordion](https://oxygenui.design/components/chart-accordion): A record's sections with their headers composed to the house rules, so a severity can never reach the screen without the words that explain it.
-  install: pnpm dlx shadcn@latest add https://oxygenui.design/r/chart-accordion.json
+  install: npx @oxygenui-design/cli add chart-accordion
   states: Closed, with summaries, Expanded, Severity across the scale, Consent gate, Withheld section, Section that failed to load, No sections
   status: beta
 - [Clinical Note](https://oxygenui.design/components/clinical-note): A clinical note editor that records where every character came from, and refuses to let anyone sign what they have not read.
-  install: pnpm dlx shadcn@latest add https://oxygenui.design/r/clinical-note.json
+  install: npx @oxygenui-design/cli add clinical-note
   fhir: Composition, DocumentReference, Provenance, Narrative
   states: Empty draft, In progress, Origins ribbon, Unreviewed AI, Copied forward, Unfilled blanks, Stale pulled value, Gate blocking, Gate clear, Offline draft, Save failed, Signed, Signed with addendum, Awaiting countersignature
   status: experimental
 - [Patient identity](https://oxygenui.design/components/identity): An avatar, a chip and a patient banner — with the pass that keeps two patients who share a name apart on the same worklist.
-  install: pnpm dlx shadcn@latest add https://oxygenui.design/r/identity.json
+  install: npx @oxygenui-design/cli add identity
   fhir: Patient
   states: Active, Inactive — discharged, transferred, or disengaged, Deceased, with the age frozen at age-at-death, Record merged — care is recorded elsewhere, Test patient (meta.security HTEST), Sensitive record, categories withheld pending an audited reveal, Photo on file, No photo on file, Photo could not be loaded, Photo withheld by site policy, Loading — a skeleton, never a half-identity, Could not load the record, Escalated: a similar name is on this list, Wrong patient — the form and the chart disagree, Identifier failing its check digit
   status: beta
 - [Signature](https://oxygenui.design/components/signature): Signature capture that records the times nobody signed — declined, unable, verbal, on paper — not just the times they did.
-  install: pnpm dlx shadcn@latest add https://oxygenui.design/r/signature.json
+  install: npx @oxygenui-design/cli add signature
   states: Signed, Declined to sign, Unable to sign (witnessed), Consented verbally (witnessed), Signed on paper, Awaiting countersignature, Consent withdrawn, Required and empty, Locked / read-only
   status: beta
 
 ## Pattern
 
 - [Copilot](https://oxygenui.design/components/copilot): A floating clinical copilot: a dock above the chart that takes a question and opens into a sourced, auditable thread.
-  install: pnpm dlx shadcn@latest add https://oxygenui.design/r/copilot.json
+  install: npx @oxygenui-design/cli add copilot
   fhir: AuditEvent, Provenance, QuestionnaireResponse
   states: Rest, Mode tray, Shortcuts, Dictating, Streaming, Grounded answer, General-knowledge answer, Sources open, Refused, Crisis, Error, Suppressed
   status: experimental
@@ -96,7 +96,7 @@ Rules that matter when generating code with these components:
 ## Block
 
 - [Safety Plan](https://oxygenui.design/components/safety-plan): The six steps of the Stanley-Brown Safety Planning Intervention, in order, with the crisis step rendered open and uncloseable.
-  install: pnpm dlx shadcn@latest add https://oxygenui.design/r/safety-plan.json
+  install: npx @oxygenui-design/cli add safety-plan
   states: Complete plan, Crisis step pinned open, Unfinished step, Empty plan, Clinician editing view, nothing pinned
   status: beta
 

@@ -1,0 +1,15 @@
+{
+  "extends": "@oxygenui-design/tsconfig/base.json",
+  "compilerOptions": {
+    "outDir": "dist",
+    "rootDir": "src",
+    "types": ["node"]
+  },
+  // Relative imports carry `.js` extensions, as in packages/tabs. This package
+  // is a published Node binary rather than something a consumer bundles, so its
+  // emitted imports must be resolvable by Node's ESM loader — which requires
+  // explicit extensions. `moduleResolution: "Bundler"` maps them back to the
+  // `.ts` files here, so both sides resolve.
+  "include": ["src"],
+  "exclude": ["src/**/*.test.ts", "test"]
+}

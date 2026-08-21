@@ -7,10 +7,10 @@
  *   import "@oxygenui-design/loaders/pulse";     // ~1 kB
  *   import "@oxygenui-design/loaders";           // all five
  *
- * React users should prefer the shadcn registry components, which are copied
+ * React users should prefer the Oxygen registry components, which are copied
  * into the project as readable source:
  *
- *   pnpm dlx shadcn@latest add @oxygenui/pulse-loader
+ *   npx @oxygenui-design/cli add pulse-loader
  */
 
 import "./pulse.js";

@@ -345,7 +345,7 @@ await upsertItem(
 );
 
 /* --------------------------------------------------------------------------
- * 4 · A paid component, installed by the shadcn CLI.
+ * 4 · A paid component, installed by the Oxygen CLI.
  * ----------------------------------------------------------------------- */
 await upsertItem(
   {

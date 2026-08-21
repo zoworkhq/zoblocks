@@ -4,7 +4,7 @@ export default defineComponentMeta({
   name: "clinical-note",
   title: "Clinical Note",
   // Free, for the same reason Consult is: the registry item is the adoption
-  // engine. A developer runs `shadcn add clinical-note`, and the revenue line
+  // engine. A developer runs `oxygen add clinical-note`, and the revenue line
   // is the services and enterprise contracts that follow — not a toll on the
   // front door.
   tier: "free",
@@ -114,7 +114,7 @@ export default defineComponentMeta({
     "prosemirror-history",
     "prosemirror-commands",
   ],
-  registryDependencies: ["utils", "tokens"],
+  registryDependencies: ["utils", "tokens", "clinical-note-core"],
 
   usage: `import { ClinicalNote } from "@/components/oxygen/clinical-note";
 

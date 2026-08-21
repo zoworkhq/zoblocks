@@ -5,7 +5,7 @@ export default defineComponentMeta({
   title: "Copilot",
   // Free, and deliberately so. `pro` would keep this out of the public registry
   // entirely, and the registry item *is* the adoption engine — a developer
-  // tries `shadcn add copilot`, then buys the services and enterprise contracts
+  // tries `oxygen add copilot`, then buys the services and enterprise contracts
   // that are the actual revenue line. Charging for the front door would be
   // charging for the wrong thing.
   tier: "free",

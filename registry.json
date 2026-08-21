@@ -1,11 +1,11 @@
 {
-  "$schema": "https://ui.shadcn.com/schema/registry.json",
+  "$schema": "https://oxygenui.design/schema/registry.json",
   "name": "oxygenui",
   "homepage": "https://oxygenui.design",
   "items": [
     {
       "name": "utils",
-      "type": "registry:lib",
+      "type": "oxygen:lib",
       "title": "Utils",
       "description": "Class-name merge helper shared by every Oxygen component.",
       "dependencies": [
@@ -15,14 +15,14 @@
       "files": [
         {
           "path": "registry/oxygen/lib/utils.ts",
-          "type": "registry:lib",
+          "type": "oxygen:lib",
           "target": "lib/utils.ts"
         }
       ]
     },
     {
       "name": "loader-core",
-      "type": "registry:lib",
+      "type": "oxygen:lib",
       "title": "Loader core",
       "description": "Shared frame, timing gate, and stylesheet behind every Oxygen loader. Installed automatically with any loader.",
       "dependencies": [
@@ -30,45 +30,45 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "https://oxygenui.design/r/utils.json"
+        "utils"
       ],
       "files": [
         {
           "path": "registry/oxygen/lib/loader.tsx",
-          "type": "registry:lib",
+          "type": "oxygen:lib",
           "target": "lib/oxygen-loader.tsx"
         },
         {
           "path": "registry/oxygen/lib/loader.css",
-          "type": "registry:file",
+          "type": "oxygen:file",
           "target": "styles/oxygen-loader.css"
         }
       ]
     },
     {
       "name": "accordion-core",
-      "type": "registry:lib",
+      "type": "oxygen:lib",
       "title": "Accordion core",
       "description": "Headless disclosure behaviour and stylesheet behind Accordion and Disclosure: the open-set policies, the ARIA wiring, the access model, and find-in-page support. Installed automatically with either.",
       "registryDependencies": [
-        "https://oxygenui.design/r/utils.json"
+        "utils"
       ],
       "files": [
         {
           "path": "registry/oxygen/lib/accordion-core.tsx",
-          "type": "registry:hook",
+          "type": "oxygen:hook",
           "target": "lib/oxygen-accordion.tsx"
         },
         {
           "path": "registry/oxygen/lib/accordion.css",
-          "type": "registry:file",
+          "type": "oxygen:file",
           "target": "styles/oxygen-accordion.css"
         }
       ]
     },
     {
       "name": "switch-core",
-      "type": "registry:lib",
+      "type": "oxygen:lib",
       "title": "Switch core",
       "description": "The three-axis state model behind Oxygen's Switch: the commit phase machine, the state-label presets, and the absence vocabulary. Installed automatically with Switch.",
       "dependencies": [
@@ -76,66 +76,66 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "https://oxygenui.design/r/utils.json"
+        "utils"
       ],
       "files": [
         {
           "path": "registry/oxygen/lib/switch.tsx",
-          "type": "registry:lib",
+          "type": "oxygen:lib",
           "target": "lib/oxygen-switch.tsx"
         },
         {
           "path": "registry/oxygen/lib/switch.css",
-          "type": "registry:file",
+          "type": "oxygen:file",
           "target": "styles/oxygen-switch.css"
         }
       ]
     },
     {
       "name": "timeline-core",
-      "type": "registry:lib",
+      "type": "oxygen:lib",
       "title": "Timeline core",
       "description": "The chronology engine behind Timeline and CareTimeline: precision-preserving time, the stable comparator, grouping, clustering with critical promotion, the coverage claim and its sentence. Installed automatically with either.",
       "registryDependencies": [
-        "https://oxygenui.design/r/utils.json",
-        "https://oxygenui.design/r/accordion-core.json"
+        "utils",
+        "accordion-core"
       ],
       "files": [
         {
           "path": "registry/oxygen/lib/timeline-core.ts",
-          "type": "registry:lib",
+          "type": "oxygen:lib",
           "target": "lib/timeline-core.ts"
         },
         {
           "path": "registry/oxygen/lib/timeline.css",
-          "type": "registry:file",
+          "type": "oxygen:file",
           "target": "styles/oxygen-timeline.css"
         }
       ]
     },
     {
       "name": "timeline-fhir",
-      "type": "registry:lib",
+      "type": "oxygen:lib",
       "title": "Timeline FHIR adapters",
       "description": "Thirteen FHIR R4 resource types read into timeline events, plus an honest report of everything that could not be mapped. Pure functions — no fetching. Installed automatically with CareTimeline.",
       "dependencies": [
         "@oxygenui-design/fhir"
       ],
       "registryDependencies": [
-        "https://oxygenui.design/r/utils.json",
-        "https://oxygenui.design/r/timeline-core.json"
+        "utils",
+        "timeline-core"
       ],
       "files": [
         {
           "path": "registry/oxygen/lib/timeline-fhir.ts",
-          "type": "registry:lib",
+          "type": "oxygen:lib",
           "target": "lib/timeline-fhir.ts"
         }
       ]
     },
     {
       "name": "clinical-note-core",
-      "type": "registry:lib",
+      "type": "oxygen:lib",
       "title": "Clinical note core",
       "description": "The ProseMirror binding behind Clinical Note: the editor view, the provenance decorations, the toolbar commands, and the document builders. The clinical engine itself is the npm package; this is the part that needs a DOM. Installed automatically with Clinical Note.",
       "dependencies": [
@@ -148,37 +148,37 @@
         "prosemirror-commands"
       ],
       "registryDependencies": [
-        "https://oxygenui.design/r/utils.json"
+        "utils"
       ],
       "files": [
         {
           "path": "registry/oxygen/lib/clinical-note.tsx",
-          "type": "registry:hook",
+          "type": "oxygen:hook",
           "target": "lib/oxygen-clinical-note.tsx"
         },
         {
           "path": "registry/oxygen/lib/clinical-note.css",
-          "type": "registry:file",
+          "type": "oxygen:file",
           "target": "styles/oxygen-clinical-note.css"
         }
       ]
     },
     {
       "name": "tokens",
-      "type": "registry:style",
+      "type": "oxygen:style",
       "title": "Oxygen tokens",
       "description": "Semantic clinical status tokens, three density modes, and light/dark themes. Required by every Oxygen component.",
       "files": [
         {
           "path": "packages/tokens/src/oxygen-tokens.css",
-          "type": "registry:file",
+          "type": "oxygen:file",
           "target": "styles/oxygen-tokens.css"
         }
       ]
     },
     {
       "name": "accordion",
-      "type": "registry:component",
+      "type": "oxygen:component",
       "title": "Accordion",
       "description": "Collapsible sections with a summary slot in the header, clinical severity on the leading edge, sections that cannot be closed, and four kinds of gate between a reader and content that is governed rather than merely hidden. Ant Design's Collapse API, with the accordion mode's accessibility defects fixed.",
       "categories": [
@@ -190,21 +190,21 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "https://oxygenui.design/r/utils.json",
-        "https://oxygenui.design/r/tokens.json",
-        "https://oxygenui.design/r/accordion-core.json"
+        "utils",
+        "tokens",
+        "accordion-core"
       ],
       "files": [
         {
           "path": "registry/oxygen/accordion/accordion.tsx",
-          "type": "registry:component",
+          "type": "oxygen:component",
           "target": "components/oxygen/accordion.tsx"
         }
       ]
     },
     {
       "name": "breath-loader",
-      "type": "registry:component",
+      "type": "oxygen:component",
       "title": "Breath Loader",
       "description": "Symbol-free loader cycling at roughly fifteen a minute, the rate of calm breathing. Carries no clinical imagery, so it suits any specialty, and its core accepts a customer's logo mark.",
       "categories": [
@@ -216,21 +216,21 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "https://oxygenui.design/r/utils.json",
-        "https://oxygenui.design/r/tokens.json",
-        "https://oxygenui.design/r/loader-core.json"
+        "utils",
+        "tokens",
+        "loader-core"
       ],
       "files": [
         {
           "path": "registry/oxygen/breath-loader/breath-loader.tsx",
-          "type": "registry:component",
+          "type": "oxygen:component",
           "target": "components/oxygen/breath-loader.tsx"
         }
       ]
     },
     {
       "name": "care-timeline",
-      "type": "registry:component",
+      "type": "oxygen:component",
       "title": "Care Timeline",
       "description": "A timeline over clinical, administrative, communication and patient-reported events, with coverage as a required prop. Separates planned from happened, keeps an entry recorded in error visible and marked, and refuses to collapse anything a reader would act on.",
       "categories": [
@@ -242,23 +242,23 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "https://oxygenui.design/r/utils.json",
-        "https://oxygenui.design/r/tokens.json",
-        "https://oxygenui.design/r/timeline-core.json",
-        "https://oxygenui.design/r/timeline-fhir.json",
-        "https://oxygenui.design/r/timeline.json"
+        "utils",
+        "tokens",
+        "timeline-core",
+        "timeline-fhir",
+        "timeline"
       ],
       "files": [
         {
           "path": "registry/oxygen/care-timeline/care-timeline.tsx",
-          "type": "registry:component",
+          "type": "oxygen:component",
           "target": "components/oxygen/care-timeline.tsx"
         }
       ]
     },
     {
       "name": "chart-accordion",
-      "type": "registry:component",
+      "type": "oxygen:component",
       "title": "Chart Accordion",
       "description": "Accordion with a clinical summary vocabulary: a status paired with its severity, a count, and a timestamp at the precision the record holds. Adds an expand-all control that never opens a section the reader may not have.",
       "categories": [
@@ -270,22 +270,22 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "https://oxygenui.design/r/utils.json",
-        "https://oxygenui.design/r/tokens.json",
-        "https://oxygenui.design/r/accordion-core.json",
-        "https://oxygenui.design/r/accordion.json"
+        "utils",
+        "tokens",
+        "accordion-core",
+        "accordion"
       ],
       "files": [
         {
           "path": "registry/oxygen/chart-accordion/chart-accordion.tsx",
-          "type": "registry:component",
+          "type": "oxygen:component",
           "target": "components/oxygen/chart-accordion.tsx"
         }
       ]
     },
     {
       "name": "clinical-note",
-      "type": "registry:component",
+      "type": "oxygen:component",
       "title": "Clinical Note",
       "description": "LOINC-coded sections, per-range provenance across six origins, a composable sign gate with three severities, and deterministic FHIR, XHTML and plain-text output. The engine ships as an npm package with no DOM; this item is the Tailwind skin over it.",
       "categories": [
@@ -304,20 +304,21 @@
         "prosemirror-commands"
       ],
       "registryDependencies": [
-        "https://oxygenui.design/r/utils.json",
-        "https://oxygenui.design/r/tokens.json"
+        "utils",
+        "tokens",
+        "clinical-note-core"
       ],
       "files": [
         {
           "path": "registry/oxygen/clinical-note/clinical-note.tsx",
-          "type": "registry:component",
+          "type": "oxygen:component",
           "target": "components/oxygen/clinical-note.tsx"
         }
       ]
     },
     {
       "name": "copilot",
-      "type": "registry:component",
+      "type": "oxygen:component",
       "title": "Copilot",
       "description": "Model-agnostic clinical assistant with mode-level scope contracts, inline source attribution, a deterministic crisis interrupt, and FHIR audit output. The engine and the accessibility behaviour ship as npm packages; this item is the Tailwind skin over them.",
       "categories": [
@@ -331,20 +332,20 @@
         "@oxygenui-design/copilot-react"
       ],
       "registryDependencies": [
-        "https://oxygenui.design/r/utils.json",
-        "https://oxygenui.design/r/tokens.json"
+        "utils",
+        "tokens"
       ],
       "files": [
         {
           "path": "registry/oxygen/copilot/copilot.tsx",
-          "type": "registry:component",
+          "type": "oxygen:component",
           "target": "components/oxygen/copilot.tsx"
         }
       ]
     },
     {
       "name": "helix-loader",
-      "type": "registry:component",
+      "type": "oxygen:component",
       "title": "Helix Loader",
       "description": "Loader for genomics, pathology, and diagnostics surfaces. Depth comes from scale and opacity rather than a 3D transform, so the strands cross convincingly while staying cheap to composite.",
       "categories": [
@@ -356,21 +357,21 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "https://oxygenui.design/r/utils.json",
-        "https://oxygenui.design/r/tokens.json",
-        "https://oxygenui.design/r/loader-core.json"
+        "utils",
+        "tokens",
+        "loader-core"
       ],
       "files": [
         {
           "path": "registry/oxygen/helix-loader/helix-loader.tsx",
-          "type": "registry:component",
+          "type": "oxygen:component",
           "target": "components/oxygen/helix-loader.tsx"
         }
       ]
     },
     {
       "name": "infusion-loader",
-      "type": "registry:component",
+      "type": "oxygen:component",
       "title": "Infusion Loader",
       "description": "Determinate and indeterminate progress in one component. Pass progress for a real 0–100 measurement with role=progressbar; omit it and the slug drifts as an honest unknown.",
       "categories": [
@@ -382,21 +383,21 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "https://oxygenui.design/r/utils.json",
-        "https://oxygenui.design/r/tokens.json",
-        "https://oxygenui.design/r/loader-core.json"
+        "utils",
+        "tokens",
+        "loader-core"
       ],
       "files": [
         {
           "path": "registry/oxygen/infusion-loader/infusion-loader.tsx",
-          "type": "registry:component",
+          "type": "oxygen:component",
           "target": "components/oxygen/infusion-loader.tsx"
         }
       ]
     },
     {
       "name": "pulse-loader",
-      "type": "registry:component",
+      "type": "oxygen:component",
       "title": "Pulse Loader",
       "description": "Page and region loader: an open heart that draws itself once, then beats at a resting 60bpm while a monitor sweep crosses the rhythm line. Renders as Rhythm Loader below 40px, where the heart's detail would collapse.",
       "categories": [
@@ -408,22 +409,22 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "https://oxygenui.design/r/utils.json",
-        "https://oxygenui.design/r/tokens.json",
-        "https://oxygenui.design/r/loader-core.json",
-        "https://oxygenui.design/r/rhythm-loader.json"
+        "utils",
+        "tokens",
+        "loader-core",
+        "rhythm-loader"
       ],
       "files": [
         {
           "path": "registry/oxygen/pulse-loader/pulse-loader.tsx",
-          "type": "registry:component",
+          "type": "oxygen:component",
           "target": "components/oxygen/pulse-loader.tsx"
         }
       ]
     },
     {
       "name": "rhythm-loader",
-      "type": "registry:component",
+      "type": "oxygen:component",
       "title": "Rhythm Loader",
       "description": "Loader drawn as a single PQRST complex on a baseline, swept once per beat by a bright head with a fading tail. Nothing scales and nothing grows, and it stays legible down to 20px.",
       "categories": [
@@ -435,21 +436,21 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "https://oxygenui.design/r/utils.json",
-        "https://oxygenui.design/r/tokens.json",
-        "https://oxygenui.design/r/loader-core.json"
+        "utils",
+        "tokens",
+        "loader-core"
       ],
       "files": [
         {
           "path": "registry/oxygen/rhythm-loader/rhythm-loader.tsx",
-          "type": "registry:component",
+          "type": "oxygen:component",
           "target": "components/oxygen/rhythm-loader.tsx"
         }
       ]
     },
     {
       "name": "safety-plan",
-      "type": "registry:component",
+      "type": "oxygen:component",
       "title": "Safety Plan",
       "description": "A patient-facing safety plan: warning signs, coping, distraction, people to ask, professionals and agencies, and means restriction. The crisis step cannot be collapsed, empty steps say they are unfinished rather than disappearing, and the wording is a patient catalog throughout.",
       "categories": [
@@ -461,22 +462,22 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "https://oxygenui.design/r/utils.json",
-        "https://oxygenui.design/r/tokens.json",
-        "https://oxygenui.design/r/accordion-core.json",
-        "https://oxygenui.design/r/accordion.json"
+        "utils",
+        "tokens",
+        "accordion-core",
+        "accordion"
       ],
       "files": [
         {
           "path": "registry/oxygen/safety-plan/safety-plan.tsx",
-          "type": "registry:component",
+          "type": "oxygen:component",
           "target": "components/oxygen/safety-plan.tsx"
         }
       ]
     },
     {
       "name": "switch",
-      "type": "registry:component",
+      "type": "oxygen:component",
       "title": "Switch",
       "description": "Switch with three independent axes: the value the record holds, the phase of the write, and whether you may change it. Models the request and the outcome separately, so it never renders a state it cannot substantiate.",
       "categories": [
@@ -488,21 +489,21 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "https://oxygenui.design/r/utils.json",
-        "https://oxygenui.design/r/tokens.json",
-        "https://oxygenui.design/r/switch-core.json"
+        "utils",
+        "tokens",
+        "switch-core"
       ],
       "files": [
         {
           "path": "registry/oxygen/switch/switch.tsx",
-          "type": "registry:component",
+          "type": "oxygen:component",
           "target": "components/oxygen/switch.tsx"
         }
       ]
     },
     {
       "name": "timeline",
-      "type": "registry:component",
+      "type": "oxygen:component",
       "title": "Timeline",
       "description": "An ordered list with a rail. The API matches Ant Design v6 exactly, including the v5 names it still accepts, and takes no dependency on it. Adds a required accessible name and drops the current-step behaviour a chronology has no use for.",
       "categories": [
@@ -514,14 +515,14 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "https://oxygenui.design/r/utils.json",
-        "https://oxygenui.design/r/tokens.json",
-        "https://oxygenui.design/r/timeline-core.json"
+        "utils",
+        "tokens",
+        "timeline-core"
       ],
       "files": [
         {
           "path": "registry/oxygen/timeline/timeline.tsx",
-          "type": "registry:component",
+          "type": "oxygen:component",
           "target": "components/oxygen/timeline.tsx"
         }
       ]

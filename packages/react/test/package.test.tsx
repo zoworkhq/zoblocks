@@ -109,7 +109,7 @@ describe("packaging correctness", () => {
 
   it("rewrote every consumer-project specifier", () => {
     // "@/lib/..." and "@/components/oxygen/..." only resolve inside a project
-    // that has the shadcn path aliases. Inside a package they resolve nowhere.
+    // that has the consumer path aliases. Inside a package they resolve nowhere.
     for (const file of [
       "src/index.ts",
       "src/lib/loader.tsx",

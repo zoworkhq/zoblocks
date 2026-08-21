@@ -12,7 +12,7 @@
     "plugins": [{ "name": "next" }],
     "baseUrl": ".",
     "paths": {
-      // Oxygen components are consumed by the same specifier the shadcn CLI
+      // Oxygen components are consumed by the same specifier the Oxygen CLI
       // writes into a customer's project (`@/components/oxygen/app-shell`).
       // While the registry is being rebuilt those files live under
       // src/components/oxygen/ — exactly a customer's install layout — and

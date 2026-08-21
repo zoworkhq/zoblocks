@@ -552,7 +552,7 @@ export const CATALOG: ComponentDoc[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "install": "pnpm dlx shadcn@latest add https://oxygenui.design/r/accordion.json"
+    "install": "npx @oxygenui-design/cli add accordion"
   },
   {
     "name": "breath-loader",
@@ -847,7 +847,7 @@ export const CATALOG: ComponentDoc[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "install": "pnpm dlx shadcn@latest add https://oxygenui.design/r/breath-loader.json"
+    "install": "npx @oxygenui-design/cli add breath-loader"
   },
   {
     "name": "care-timeline",
@@ -1296,7 +1296,7 @@ export const CATALOG: ComponentDoc[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "install": "pnpm dlx shadcn@latest add https://oxygenui.design/r/care-timeline.json"
+    "install": "npx @oxygenui-design/cli add care-timeline"
   },
   {
     "name": "chart-accordion",
@@ -1657,7 +1657,7 @@ export const CATALOG: ComponentDoc[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "install": "pnpm dlx shadcn@latest add https://oxygenui.design/r/chart-accordion.json"
+    "install": "npx @oxygenui-design/cli add chart-accordion"
   },
   {
     "name": "clinical-note",
@@ -2002,7 +2002,7 @@ export const CATALOG: ComponentDoc[] = [
       "prosemirror-history",
       "prosemirror-commands"
     ],
-    "install": "pnpm dlx shadcn@latest add https://oxygenui.design/r/clinical-note.json"
+    "install": "npx @oxygenui-design/cli add clinical-note"
   },
   {
     "name": "copilot",
@@ -2406,7 +2406,7 @@ export const CATALOG: ComponentDoc[] = [
       "@oxygenui-design/copilot-core",
       "@oxygenui-design/copilot-react"
     ],
-    "install": "pnpm dlx shadcn@latest add https://oxygenui.design/r/copilot.json"
+    "install": "npx @oxygenui-design/cli add copilot"
   },
   {
     "name": "helix-loader",
@@ -2686,7 +2686,7 @@ export const CATALOG: ComponentDoc[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "install": "pnpm dlx shadcn@latest add https://oxygenui.design/r/helix-loader.json"
+    "install": "npx @oxygenui-design/cli add helix-loader"
   },
   {
     "name": "infusion-loader",
@@ -2967,7 +2967,7 @@ export const CATALOG: ComponentDoc[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "install": "pnpm dlx shadcn@latest add https://oxygenui.design/r/infusion-loader.json"
+    "install": "npx @oxygenui-design/cli add infusion-loader"
   },
   {
     "name": "pulse-loader",
@@ -3382,7 +3382,7 @@ export const CATALOG: ComponentDoc[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "install": "pnpm dlx shadcn@latest add https://oxygenui.design/r/pulse-loader.json"
+    "install": "npx @oxygenui-design/cli add pulse-loader"
   },
   {
     "name": "rhythm-loader",
@@ -3677,7 +3677,7 @@ export const CATALOG: ComponentDoc[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "install": "pnpm dlx shadcn@latest add https://oxygenui.design/r/rhythm-loader.json"
+    "install": "npx @oxygenui-design/cli add rhythm-loader"
   },
   {
     "name": "safety-plan",
@@ -3837,7 +3837,7 @@ export const CATALOG: ComponentDoc[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "install": "pnpm dlx shadcn@latest add https://oxygenui.design/r/safety-plan.json"
+    "install": "npx @oxygenui-design/cli add safety-plan"
   },
   {
     "name": "switch",
@@ -4804,7 +4804,7 @@ export const CATALOG: ComponentDoc[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "install": "pnpm dlx shadcn@latest add https://oxygenui.design/r/switch.json"
+    "install": "npx @oxygenui-design/cli add switch"
   },
   {
     "name": "timeline",
@@ -5077,7 +5077,7 @@ export const CATALOG: ComponentDoc[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "install": "pnpm dlx shadcn@latest add https://oxygenui.design/r/timeline.json"
+    "install": "npx @oxygenui-design/cli add timeline"
   },
   {
     "name": "identity",
@@ -5344,7 +5344,7 @@ export const CATALOG: ComponentDoc[] = [
     "dependencies": [
       "@oxygenui-design/identity-core"
     ],
-    "install": "pnpm dlx shadcn@latest add https://oxygenui.design/r/identity.json"
+    "install": "npx @oxygenui-design/cli add identity"
   },
   {
     "name": "signature",
@@ -5720,7 +5720,7 @@ export const CATALOG: ComponentDoc[] = [
       "antd",
       "@oxygenui-design/signature-core"
     ],
-    "install": "pnpm dlx shadcn@latest add https://oxygenui.design/r/signature.json"
+    "install": "npx @oxygenui-design/cli add signature"
   },
   {
     "name": "tabs",
@@ -6198,7 +6198,7 @@ export const CATALOG: ComponentDoc[] = [
     "dependencies": [
       "@oxygenui-design/tabs-core"
     ],
-    "install": "pnpm dlx shadcn@latest add https://oxygenui.design/r/tabs.json"
+    "install": "npx @oxygenui-design/cli add tabs"
   }
 ];
 

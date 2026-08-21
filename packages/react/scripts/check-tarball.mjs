@@ -36,7 +36,7 @@ for (const file of files.filter((f) => /\.(js|mjs|d\.ts)$/.test(f))) {
   }
 }
 
-/** A consumer alias resolves only inside a shadcn project, never inside a package. */
+/** A consumer alias resolves only inside a registry-installed project, never inside a package. */
 for (const file of files.filter((f) => /\.(js|d\.ts)$/.test(f))) {
   const source = readFileSync(path.join(pkgDir, file), "utf8");
   if (/from\s+["']@\//.test(source)) {

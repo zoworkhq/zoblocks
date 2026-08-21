@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://oxygenui.design/schema/oxygen.json",
+  "title": "oxygen.json",
+  "description": "Install configuration for @oxygenui-design/cli: where components land in this project, and which registries it may reach.",
+  "type": "object",
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "root": {
+      "type": "string",
+      "default": "src",
+      "description": "Directory this project's \"@/\" import alias resolves to. Every registry target is written beneath it."
+    },
+    "registries": {
+      "type": "object",
+      "description": "Namespaced registries, keyed by a name beginning with '@'.",
+      "propertyNames": {
+        "pattern": "^@"
+      },
+      "additionalProperties": {
+        "type": "object",
+        "required": [
+          "url"
+        ],
+        "properties": {
+          "url": {
+            "type": "string",
+            "description": "A URL template containing {name}.",
+            "pattern": "\\{name\\}"
+          },
+          "headers": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Sent with every request. Write credentials as ${ENV_VAR}; the CLI refuses a literal token, because this file is meant to be committed."
+          }
+        },
+        "additionalProperties": true
+      }
+    }
+  },
+  "additionalProperties": true
+}

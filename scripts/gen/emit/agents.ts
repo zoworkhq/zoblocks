@@ -1,7 +1,7 @@
 /**
  * Emits llms.txt — the catalog in a form a coding agent can read in one fetch.
  *
- * For a library with shadcn lineage this is a real distribution channel rather
+ * For a source-distributed library this is a real distribution channel rather
  * than a novelty: agents install components on a developer's behalf, and an
  * agent that cannot tell which component handles a restricted record will
  * reach for the wrong one. The catalog is already structured data, so this
@@ -34,7 +34,7 @@ export async function emitAgentManifest(
           const fhir = c.meta.fhir.map((r) => r.name).join(", ");
           return [
             `- [${c.meta.title}](${HOMEPAGE}/components/${c.meta.name}): ${c.meta.summary}`,
-            `  install: pnpm dlx shadcn@latest add ${HOMEPAGE}/r/${c.meta.name}.json`,
+            `  install: npx @oxygenui-design/cli add ${c.meta.name}`,
             fhir ? `  fhir: ${fhir}` : undefined,
             `  states: ${c.meta.states.join(", ")}`,
             `  status: ${c.meta.status}`,
@@ -49,7 +49,7 @@ export async function emitAgentManifest(
   const content = `# Oxygen UI
 
 > React components for healthcare interfaces, typed to FHIR R4 and delivered as
-> source through a shadcn registry. Components take FHIR resources as props
+> source through the Oxygen registry. Components take FHIR resources as props
 > directly and render absence, preliminary status, restricted records, and
 > critical results as explicit states rather than as blanks.
 

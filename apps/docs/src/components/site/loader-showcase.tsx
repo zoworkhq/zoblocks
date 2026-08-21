@@ -2,7 +2,7 @@
  * The homepage instrument: all five loaders, running.
  *
  * Not a screenshot and not a video — the real registry components, the same
- * files `shadcn add` copies into a customer's project. A loader is one of the
+ * files `oxygen add` copies into a customer's project. A loader is one of the
  * few components whose entire value is visible in three seconds, so the
  * honest thing to put on a homepage is the component itself.
  *

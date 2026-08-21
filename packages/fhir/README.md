@@ -4,7 +4,7 @@
 
 Zero runtime dependencies. This package is the data layer behind
 [Oxygen UI](https://oxygenui.design) — the components are installed as source
-through the shadcn CLI, and they import their types and read helpers from here.
+through the Oxygen CLI, and they import their types and read helpers from here.
 
 ```bash
 npm install @oxygenui-design/fhir

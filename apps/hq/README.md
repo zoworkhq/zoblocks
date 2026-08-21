@@ -10,7 +10,7 @@ the core is ever open-sourced — nothing outside this directory refers to it.
 ## Why it lives here
 
 It is the dogfood consumer of the registry. Screens import Oxygen components by
-the exact specifier the shadcn CLI writes into a customer's project
+the exact specifier the Oxygen CLI writes into a customer's project
 (`@/components/oxygen/app-shell`). A component that breaks breaks our own daily
 tool first.
 
@@ -18,7 +18,7 @@ tool first.
 the component library can be planned and rebuilt from scratch. Until the new
 components land, the two this app needs — `AppShell` and `ActionGate` — are
 vendored under `src/components/oxygen/`, which is exactly the layout a customer
-ends up with after `shadcn add`. When the rebuilt registry ships, delete those
+ends up with after `oxygen add`. When the rebuilt registry ships, delete those
 copies and map the specifiers back to `registry/` source through tsconfig paths
 (see the comment in `tsconfig.json`).
 

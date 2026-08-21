@@ -42,7 +42,7 @@ export async function generateMetadata({
  * Read the component's source from the generated registry JSON rather than
  * from the .tsx file directly. The registry is what customers actually
  * receive, so documenting it guarantees the page can never show source that
- * differs from what `shadcn add` installs.
+ * differs from what `oxygen add` installs.
  */
 async function readRegistrySource(name: string): Promise<string | undefined> {
   try {
@@ -154,8 +154,8 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
             <div className="mt-8 max-w-2xl">
               {/*
                 Two channels, and the command has to match the one this
-                component actually uses. A package component shown a
-                `shadcn add` line sends the reader to a registry item that does
+                component actually uses. A package component shown an
+                `oxygen add` line sends the reader to a registry item that does
                 not exist — which is worse than no install instructions.
               */}
               {component.distribution === "package" ? (
@@ -181,21 +181,14 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
                 />
               ) : (
                 <InstallCommand
-                  command={`pnpm dlx shadcn@latest add @oxygenui/${component.name}`}
+                  command={`npx @oxygenui-design/cli add ${component.name}`}
                   note={
                     <>
-                      First install? Add{" "}
-                      <code className="font-mono text-[0.6875rem] text-ink">
-                        {'"@oxygenui": "https://oxygenui.design/r/{name}.json"'}
-                      </code>{" "}
-                      to the <code className="font-mono text-[0.6875rem] text-ink">registries</code>{" "}
-                      block of your{" "}
-                      <code className="font-mono text-[0.6875rem] text-ink">components.json</code>{" "}
-                      first — or skip the config and pass{" "}
-                      <code className="font-mono text-[0.6875rem] text-ink">
-                        {`https://oxygenui.design/r/${component.name}.json`}
-                      </code>{" "}
-                      directly.
+                      First install? Run{" "}
+                      <code className="font-mono text-[0.6875rem] text-ink">oxygen init</code> once
+                      to say where your{" "}
+                      <code className="font-mono text-[0.6875rem] text-ink">@/</code> alias points.
+                      The source is copied into your repository, along with anything it depends on.
                     </>
                   }
                 />

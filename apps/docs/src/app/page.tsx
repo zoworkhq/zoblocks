@@ -88,7 +88,7 @@ function Hero() {
               style={{ "--enter-delay": "390ms" } as React.CSSProperties}
             >
               <InstallCommand
-                command="pnpm dlx shadcn@latest add @oxygenui/pulse-loader"
+                command="npx @oxygenui-design/cli add pulse-loader"
                 className="min-w-0 flex-1"
               />
               <Link
@@ -472,17 +472,14 @@ function ClosingCta() {
             </p>
             <div className="mx-auto mt-8 max-w-xl">
               <InstallCommand
-                command="pnpm dlx shadcn@latest add @oxygenui/pulse-loader"
+                command="npx @oxygenui-design/cli add pulse-loader"
                 note={
                   <>
-                    <code className="font-mono text-[0.6875rem] text-ink">@oxygenui</code> is a
-                    shadcn registry namespace — add{" "}
-                    <code className="font-mono text-[0.6875rem] text-ink">
-                      {'"@oxygenui": "https://oxygenui.design/r/{name}.json"'}
-                    </code>{" "}
-                    to your{" "}
-                    <code className="font-mono text-[0.6875rem] text-ink">components.json</code>{" "}
-                    once, or pass the full URL instead.
+                    Run <code className="font-mono text-[0.6875rem] text-ink">oxygen init</code>{" "}
+                    once to say where your{" "}
+                    <code className="font-mono text-[0.6875rem] text-ink">@/</code> alias points.
+                    The public catalog needs no configuration and no account — paid components add a
+                    registry namespace and a token.
                   </>
                 }
               />

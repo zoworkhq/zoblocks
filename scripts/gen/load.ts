@@ -46,7 +46,7 @@ export interface LoadedComponent {
   propsFile: string;
   /** Import specifier a consumer uses after installing, e.g. "@/components/oxygen/vitals-panel". */
   consumerSpecifier: string;
-  /** Where the shadcn CLI writes it, e.g. "components/oxygen/vitals-panel.tsx". */
+  /** Where the Oxygen CLI writes it, e.g. "components/oxygen/vitals-panel.tsx". */
   consumerTarget: string;
   hasStory: boolean;
   hasTest: boolean;
@@ -73,7 +73,7 @@ async function listComponentDirs(): Promise<string[]> {
  * A package keeps its own `component.meta.ts` beside its source rather than
  * putting a stub in `registry/oxygen`. The metadata belongs with the thing it
  * describes, and a registry directory containing no source would be a
- * standing invitation to `shadcn add` something that ships on npm.
+ * standing invitation to `oxygen add` something that ships on npm.
  */
 async function listPackageMetaFiles(): Promise<string[]> {
   const packagesDir = path.join(ROOT, "packages");
@@ -174,7 +174,7 @@ export async function loadComponents(): Promise<LoadedComponent[]> {
 
     // The file is only read because it sits in a package, so declaring
     // `registry` here would produce a component the registry cannot build and
-    // the docs would offer a `shadcn add` command for something on npm.
+    // the docs would offer a `oxygen add` command for something on npm.
     if (parsed.data.distribution !== "package") {
       problems.push(
         `${rel(metaFile)}: a component.meta.ts inside packages/ must set distribution: "package". Registry components live in registry/oxygen.`,

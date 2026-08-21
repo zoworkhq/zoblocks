@@ -3,7 +3,7 @@
  *
  * The invariant this exists to protect: **no component's logic is written
  * twice.** Oxygen ships React two ways — copied into a customer's repository by
- * the shadcn CLI, and installed from npm — and the moment those are two
+ * the Oxygen CLI, and installed from npm — and the moment those are two
  * hand-written trees they drift. The parity test between the registry and the
  * custom elements already caught two divergences in its first week; a third
  * copy would make that the project's main source of bugs.
@@ -15,7 +15,7 @@
  * mechanically produced.
  *
  * The only transformation is import specifiers. A registry component imports
- * the way the shadcn CLI lays files out in a consumer's project
+ * the way the Oxygen CLI lays files out in a consumer's project
  * (`@/components/oxygen/rhythm-loader`); inside a package those become ordinary
  * relative paths. Nothing else is rewritten — if this file ever needs to change
  * logic, the abstraction is wrong.

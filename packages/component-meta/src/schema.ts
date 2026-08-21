@@ -2,7 +2,7 @@
  * The component metadata schema.
  *
  * One `<component>.meta.ts` per component is the single source of truth for
- * everything the platform generates: the shadcn registry, the docs catalog,
+ * everything the platform generates: the Oxygen registry, the docs catalog,
  * TypeScript path mappings, Tailwind source globs, package barrels, the agent
  * manifest, and the CI coverage gate.
  *
@@ -45,7 +45,7 @@ export const layerSchema = z.enum(["primitive", "clinical", "pattern", "block"])
  * How a consumer gets this component.
  *
  * `registry` is the default and the house style: the source is copied into the
- * customer's repository by the shadcn CLI, so it must be self-contained and
+ * customer's repository by the Oxygen CLI, so it must be self-contained and
  * readable on its own.
  *
  * `package` is for components that cannot satisfy that constraint. Signature is
@@ -135,17 +135,23 @@ export const deprecationSchema = z.object({
 export const registryFileSchema = z.object({
   /** Path relative to the repository root. */
   path: nonEmpty("file path"),
+  /**
+   * What the file is, which decides where the CLI puts it. The vocabulary is
+   * Oxygen's own — `@oxygenui-design/cli` maps each kind to an alias root in
+   * the consumer's `oxygen.json`, so adding a kind here means deciding where
+   * it lands there.
+   */
   type: z.enum([
-    "registry:lib",
-    "registry:component",
-    "registry:ui",
-    "registry:hook",
-    "registry:block",
-    "registry:page",
-    "registry:file",
-    "registry:style",
+    "oxygen:lib",
+    "oxygen:component",
+    "oxygen:ui",
+    "oxygen:hook",
+    "oxygen:block",
+    "oxygen:page",
+    "oxygen:file",
+    "oxygen:style",
   ]),
-  /** Where the shadcn CLI writes it in the consumer's project. */
+  /** Where the CLI writes it in the consumer's project. */
   target: z.string().optional(),
 });
 
@@ -167,8 +173,8 @@ export const componentMetaSchema = z
      * How the component is delivered. Defaults to `registry`.
      *
      * A `package` component has no source in `registry/oxygen`, emits no
-     * registry item, and shows an `npm install` command rather than a
-     * `shadcn add` one. Its `packageName` is what a consumer installs.
+     * registry item, and shows an `npm install` command rather than an
+     * `oxygen add` one. Its `packageName` is what a consumer installs.
      */
     /**
      * Per-framework relationship, keyed by npm package name — `antd`,
@@ -295,7 +301,7 @@ export const componentMetaSchema = z
     }
     // Registry dependencies are resolved to registry URLs, which a package
     // component has none of. Left unchecked this produces a docs page telling
-    // someone to `shadcn add` a component that ships on npm.
+    // someone to `oxygen add` a component that ships on npm.
     if (meta.distribution === "package" && meta.registryDependencies.length > 0) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,

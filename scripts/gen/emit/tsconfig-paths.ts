@@ -4,7 +4,7 @@
  *
  * Registry components import each other the way they will be laid out in a
  * consumer's project ("@/components/oxygen/absent-value"), because that is what
- * the shadcn CLI writes. Those specifiers have to resolve here too.
+ * the Oxygen CLI writes. Those specifiers have to resolve here too.
  *
  * This file used to be maintained by hand in the root tsconfig, with a comment
  * asking authors to add a mapping per component. Four were missing when the
@@ -36,7 +36,7 @@ export const WORKSPACE_ALIASES: Record<string, string[]> = {
   "@oxygenui-design/component-meta": ["./packages/component-meta/src/index.ts"],
   "@/lib/utils": ["./registry/oxygen/lib/utils.ts"],
   // Support modules under registry/oxygen/lib are installed into a consumer's
-  // project by the shadcn CLI under lib/, and imported by that path. They
+  // project by the Oxygen CLI under lib/, and imported by that path. They
   // resolve here the same way component specifiers do.
   "@/lib/oxygen-loader": ["./registry/oxygen/lib/loader.tsx"],
   "@/lib/oxygen-accordion": ["./registry/oxygen/lib/accordion-core.tsx"],

@@ -1,5 +1,5 @@
 /**
- * Credentials for the shadcn CLI.
+ * Credentials for the Oxygen CLI.
  *
  * The shape is `sessions` and `password_resets`, deliberately: **only the
  * SHA-256 is stored.** The token is shown once, at mint time, and never again,

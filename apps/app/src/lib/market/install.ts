@@ -138,7 +138,7 @@ export async function install(
     case "component":
       return {
         message:
-          "Components install with the shadcn CLI. Mint an access token and add the @oxygen-pro registry to components.json.",
+          "Components install with the Oxygen CLI. Mint an access token and add the @oxygen-pro registry to oxygen.json.",
         href: "/market/tokens",
       };
 

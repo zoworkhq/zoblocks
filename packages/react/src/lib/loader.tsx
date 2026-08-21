@@ -11,8 +11,8 @@
 /**
  * loader-core — everything the Oxygen loaders share.
  *
- * Each loader is installed on its own (`shadcn add @oxygenui/pulse-loader`),
- * and shadcn pulls this file in as a dependency. Two things live here because
+ * Each loader is installed on its own (`oxygen add pulse-loader`), and the
+ * CLI pulls this file in as a dependency. Two things live here because
  * duplicating them per loader would mean five copies of the same clinical
  * judgement:
  *

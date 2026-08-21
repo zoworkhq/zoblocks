@@ -1,11 +1,11 @@
 /**
- * The private registry the shadcn CLI installs paid components from.
+ * The private registry the Oxygen CLI installs paid components from.
  *
  *     GET /r/pro/vitals-flowsheet.json
  *     Authorization: Bearer oxy_live_…
  *
- * The customer's `components.json` carries the namespace and the header, with
- * the token expanded from their environment so nothing secret is committed:
+ * The customer's `oxygen.json` carries the namespace and the header, with the
+ * token expanded from their environment so nothing secret is committed:
  *
  *     "registries": {
  *       "@oxygen-pro": {
@@ -14,7 +14,7 @@
  *       }
  *     }
  *
- *     npx shadcn@latest add @oxygen-pro/vitals-flowsheet
+ *     npx @oxygenui-design/cli add @oxygen-pro/vitals-flowsheet
  *
  * Four steps, in order, refusing at the first failure:
  *
@@ -37,6 +37,7 @@
  */
 
 import { NextResponse } from "next/server";
+import { ITEM_SCHEMA_URL } from "@oxygenui-design/cli";
 import { unscopedMarketAsset, unscopedRegistryToken, unscopedTouchRegistryToken } from "@/db/scope";
 import { itemBySlug, versionFor } from "@/lib/market/catalogue";
 import { entitlementFor } from "@/lib/market/entitlements";
@@ -100,7 +101,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ name
     if (!asset) continue;
     files.push({
       path: file.path,
-      type: "registry:component",
+      type: "oxygen:component",
       target: file.path,
       content: Buffer.from(asset.bytes.buffer).toString("utf8"),
     });
@@ -112,9 +113,9 @@ export async function GET(request: Request, { params }: { params: Promise<{ name
 
   return NextResponse.json(
     {
-      $schema: "https://ui.shadcn.com/schema/registry-item.json",
+      $schema: ITEM_SCHEMA_URL,
       name: item.slug,
-      type: "registry:component",
+      type: "oxygen:component",
       title: item.title,
       description: item.blurb,
       ...version.registry,

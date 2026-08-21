@@ -128,8 +128,13 @@ describe("the registry item", () => {
       ["chart-accordion", chart],
       ["safety-plan", plan],
     ] as const) {
+      /*
+       * Bare names, not URLs. ADR 0016 stopped expanding registry dependencies
+       * to absolute oxygenui.design URLs so that a mirror resolves within
+       * itself; a dependency is now a relationship rather than a location.
+       */
       expect(
-        item.registryDependencies.some((d: string) => d.endsWith("/accordion-core.json")),
+        item.registryDependencies.includes("accordion-core"),
         `${name} does not install accordion-core`,
       ).toBe(true);
     }
@@ -137,9 +142,7 @@ describe("the registry item", () => {
 
   it("makes the compositions pull the primitive in", () => {
     for (const item of [chart, plan]) {
-      expect(item.registryDependencies.some((d: string) => d.endsWith("/accordion.json"))).toBe(
-        true,
-      );
+      expect(item.registryDependencies.includes("accordion")).toBe(true);
     }
   });
 

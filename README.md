@@ -134,37 +134,59 @@ Angular, Svelte, or plain HTML — see [`@oxygenui-design/loaders`](packages/loa
 Components are distributed as **source you own**. The CLI writes the files into
 your project, pulls in anything they share, and adds any runtime dependencies.
 
-Register the namespace once in `components.json`:
+Run once, to say where your `@/` import alias points:
 
-```json
-{
-  "registries": {
-    "@oxygenui": "https://oxygenui.design/r/{name}.json"
-  }
-}
+```bash
+npx @oxygenui-design/cli init
 ```
 
 Then add components by name:
 
 ```bash
-pnpm dlx shadcn@latest add @oxygenui/pulse-loader
+npx @oxygenui-design/cli add pulse-loader
 ```
 
-<details>
-<summary>Without editing <code>components.json</code></summary>
+The public catalog needs no configuration, no namespace, and no account.
 
-Pass the URL directly — without the `registries` entry the CLI cannot resolve
-`@oxygenui` and fails before reaching the network:
+<details>
+<summary>Paid components</summary>
+
+Pro components come from an authenticated registry. Mint a token with the
+`registry` scope in the console under **Marketplace → Access tokens**, add the
+namespace to `oxygen.json`, and keep the token in your environment:
+
+```jsonc
+// oxygen.json — committed; the token is not
+"registries": {
+  "@oxygen-pro": {
+    "url": "https://app.oxygenui.design/r/pro/{name}.json",
+    "headers": { "Authorization": "Bearer ${OXYGEN_TOKEN}" }
+  }
+}
+```
 
 ```bash
-pnpm dlx shadcn@latest add https://oxygenui.design/r/pulse-loader.json
+OXYGEN_TOKEN=oxy_live_… npx @oxygenui-design/cli add @oxygen-pro/vitals-flowsheet
 ```
 
 </details>
 
-The `@oxygenui` above is a shadcn registry namespace, not an npm scope — a local
-alias you can rename. The npm packages it pulls in are published under
-`@oxygenui-design`.
+<details>
+<summary>Installing by URL</summary>
+
+Any registry item can be named by its full URL instead, which is what a mirror
+or a vendored copy of the catalog needs:
+
+```bash
+npx @oxygenui-design/cli add https://oxygenui.design/r/pulse-loader.json
+```
+
+</details>
+
+Installing from the registry means you have forked, deliberately: the source is
+yours to read and change, and no release we publish will reach it. For semver
+and patches, install [`@oxygenui-design/react`](packages/react/README.md)
+instead. Both channels are generated from the same source.
 
 ---
 

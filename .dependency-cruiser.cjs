@@ -79,7 +79,7 @@ module.exports = {
         // `@oxygenui-design/fhir` is the one exception, and it is a resolution
         // artefact rather than a real coupling: the package is published, and
         // every registry item that imports it declares it in `dependencies`, so
-        // the shadcn CLI installs it and the specifier resolves from npm in the
+        // the Oxygen CLI installs it and the specifier resolves from npm in the
         // customer's project. It only appears here as a workspace path because
         // the package's `main` points at `src` for this repository's benefit,
         // where every other published package points at `dist`.
