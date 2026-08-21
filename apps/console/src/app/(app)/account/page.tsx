@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { currentMember } from "@/lib/auth";
+import { requireMember } from "@/lib/auth";
 import { scoped } from "@/db/scope";
 import { ROLE_SUMMARY } from "@/lib/roles";
 import { Callout, PageHeader, Panel, StatusChip } from "@/components/ui";
@@ -21,7 +21,7 @@ export const metadata = { title: "Account" };
  * publishing a theme would make the audit trail a suggestion.
  */
 export default async function AccountPage() {
-  const member = (await currentMember())!;
+  const member = await requireMember();
   const org = await scoped(member.orgId).organisation.get();
 
   return (

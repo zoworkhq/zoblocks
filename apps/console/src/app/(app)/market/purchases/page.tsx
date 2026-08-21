@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { currentMember } from "@/lib/auth";
+import { requireMember } from "@/lib/auth";
 import { scoped } from "@/db/scope";
 import { itemsByIds, priceLabel } from "@/lib/market/catalogue";
 import { heldIncludingRevoked } from "@/lib/market/entitlements";
@@ -20,7 +20,7 @@ export const metadata = { title: "Purchases" };
  * belongs to the organisation. A designer who has left still bought it.
  */
 export default async function PurchasesPage() {
-  const member = (await currentMember())!;
+  const member = await requireMember();
   const data = scoped(member.orgId);
 
   const entitlements = await heldIncludingRevoked(member.orgId);

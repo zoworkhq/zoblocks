@@ -4,7 +4,7 @@ import { buildEditorModel } from "@/lib/token-editor";
 import { FrameworkSpecimen } from "./FrameworkSpecimen";
 import { notFound } from "next/navigation";
 import { AlertTriangle } from "lucide-react";
-import { currentMember } from "@/lib/auth";
+import { requireMember } from "@/lib/auth";
 import { scoped } from "@/db/scope";
 import { can, whyNot } from "@/lib/roles";
 import { exportThemeAs } from "@/lib/themes";
@@ -81,7 +81,7 @@ function mimeFor(filename: string): string {
  */
 export default async function TransferPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const member = (await currentMember())!;
+  const member = await requireMember();
   const data = scoped(member.orgId);
 
   const theme = await data.themes.findOne({ slug });

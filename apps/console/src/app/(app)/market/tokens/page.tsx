@@ -1,4 +1,4 @@
-import { currentMember } from "@/lib/auth";
+import { requireMember } from "@/lib/auth";
 import { scoped } from "@/db/scope";
 import { can } from "@/lib/roles";
 import { TOKEN_LIFETIME_DAYS } from "@/lib/market/tokens";
@@ -24,7 +24,7 @@ export const metadata = { title: "Access tokens" };
  * and last use is visible — which is how a leaked one is noticed at all.
  */
 export default async function TokensPage() {
-  const member = (await currentMember())!;
+  const member = await requireMember();
   // Not a disabled screen: a member without the capability has no reason to
   // know this route exists, and the rail does not offer it to them either.
   if (!can(member.role, "market.token")) notFound();

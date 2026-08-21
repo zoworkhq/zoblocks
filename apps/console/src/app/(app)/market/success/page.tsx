@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { currentMember } from "@/lib/auth";
+import { requireMember } from "@/lib/auth";
 import { fulfil } from "@/lib/market/fulfil";
 import { itemBySlug } from "@/lib/market/catalogue";
 import { Callout, PageHeader, Panel, buttonClasses } from "@/components/ui";
@@ -27,7 +27,7 @@ export default async function SuccessPage({
   searchParams: Promise<{ session_id?: string }>;
 }) {
   const { session_id: sessionId } = await searchParams;
-  const member = (await currentMember())!;
+  const member = await requireMember();
 
   if (!sessionId) {
     return (

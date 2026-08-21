@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { THEME_NAMES, type ThemeName } from "@oxygenui-design/theme";
-import { currentMember } from "@/lib/auth";
+import { requireMember } from "@/lib/auth";
 import { scoped } from "@/db/scope";
 import { baseTokens } from "@/lib/base-tokens";
 import { buildEditorModel } from "@/lib/token-editor";
@@ -17,7 +17,7 @@ export const metadata = { title: "Playground" };
  * and still looks wrong at clinical density in dark mode.
  */
 export default async function PlaygroundPage() {
-  const member = (await currentMember())!;
+  const member = await requireMember();
   const data = scoped(member.orgId);
   const themes = await data.themes.find().sort({ updatedAt: -1 }).toArray();
   const source = await baseTokens();

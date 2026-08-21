@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { currentMember } from "@/lib/auth";
+import { requireMember } from "@/lib/auth";
 import { scoped } from "@/db/scope";
 import { baseTokens } from "@/lib/base-tokens";
 import { can, whyNot } from "@/lib/roles";
@@ -29,7 +29,7 @@ export const metadata = { title: "Design tokens" };
  */
 export default async function TokensPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const member = (await currentMember())!;
+  const member = await requireMember();
   const theme = await scoped(member.orgId).themes.findOne({ slug });
   if (!theme) notFound();
 

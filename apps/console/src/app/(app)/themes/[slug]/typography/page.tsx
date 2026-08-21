@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { MAX_FONT_BYTES } from "@oxygenui-design/theme";
-import { currentMember } from "@/lib/auth";
+import { requireMember } from "@/lib/auth";
 import { scoped } from "@/db/scope";
 import { baseTokens } from "@/lib/base-tokens";
 import { can, whyNot } from "@/lib/roles";
@@ -28,7 +28,7 @@ export const metadata = { title: "Typography" };
  */
 export default async function TypographyPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const member = (await currentMember())!;
+  const member = await requireMember();
   const theme = await scoped(member.orgId).themes.findOne({ slug });
   if (!theme) notFound();
 

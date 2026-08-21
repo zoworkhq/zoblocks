@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { currentMember } from "@/lib/auth";
+import { requireMember } from "@/lib/auth";
 import { scoped } from "@/db/scope";
 import { can, whyNot } from "@/lib/roles";
 import { KIND_LABEL, detail, priceLabel, versionFor } from "@/lib/market/catalogue";
@@ -34,7 +34,7 @@ export const metadata = { title: "Item" };
  */
 export default async function MarketItemPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const member = (await currentMember())!;
+  const member = await requireMember();
 
   let found;
   try {

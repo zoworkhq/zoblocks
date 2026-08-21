@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { SURFACE_COMPONENTS, surfaceFor } from "@oxygenui-design/tokens/surface";
 import { THEME_NAMES, withTierDefaults, type ThemeName } from "@oxygenui-design/theme";
-import { currentMember } from "@/lib/auth";
+import { requireMember } from "@/lib/auth";
 import { scoped } from "@/db/scope";
 import { baseTokens } from "@/lib/base-tokens";
 import { can, whyNot } from "@/lib/roles";
@@ -35,7 +35,7 @@ export default async function ComponentsPage({
 }) {
   const { slug } = await params;
   const { c } = await searchParams;
-  const member = (await currentMember())!;
+  const member = await requireMember();
 
   const theme = await scoped(member.orgId).themes.findOne({ slug });
   if (!theme) notFound();

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { currentMember } from "@/lib/auth";
+import { requireMember } from "@/lib/auth";
 import { scoped } from "@/db/scope";
 import { whyNot } from "@/lib/roles";
 import {
@@ -36,7 +36,7 @@ export default async function SettingsPage({
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
-  const member = (await currentMember())!;
+  const member = await requireMember();
   const data = scoped(member.orgId);
 
   const query = tableQuery(await searchParams, { sort: "at", dir: "desc" });

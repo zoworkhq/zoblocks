@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { currentMember } from "@/lib/auth";
+import { requireMember } from "@/lib/auth";
 import { scoped } from "@/db/scope";
 import { baseTokens } from "@/lib/base-tokens";
 import { RAMP_STEPS, themeHref, validateTheme, withTierDefaults } from "@oxygenui-design/theme";
@@ -34,7 +34,7 @@ export const metadata = { title: "Theme" };
  */
 export default async function ThemePage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const member = (await currentMember())!;
+  const member = await requireMember();
   const data = scoped(member.orgId);
 
   const theme = await data.themes.findOne({ slug });

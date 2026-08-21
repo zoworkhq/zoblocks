@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { currentMember } from "@/lib/auth";
+import { requireMember } from "@/lib/auth";
 import { scoped } from "@/db/scope";
 import { baseTokens } from "@/lib/base-tokens";
 import { validateTheme } from "@oxygenui-design/theme";
@@ -36,7 +36,7 @@ export default async function ComparePage({
 }) {
   const { slug } = await params;
   const { a, b } = await searchParams;
-  const member = (await currentMember())!;
+  const member = await requireMember();
   const data = scoped(member.orgId);
 
   const theme = await data.themes.findOne({ slug });

@@ -1,5 +1,4 @@
-import { redirect } from "next/navigation";
-import { currentMember } from "@/lib/auth";
+import { requireMember } from "@/lib/auth";
 import { scoped } from "@/db/scope";
 import { can } from "@/lib/roles";
 import { Rail } from "@/components/Rail";
@@ -23,9 +22,7 @@ import { ToastProvider } from "@/components/ui";
  * on a client-side navigation.
  */
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
-  const member = await currentMember();
-  if (!member) redirect("/login");
-  if (member.status !== "active") redirect("/pending");
+  const member = await requireMember();
 
   const data = scoped(member.orgId);
   const org = await data.organisation.get();

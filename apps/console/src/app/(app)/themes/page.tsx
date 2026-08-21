@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { themeHref } from "@oxygenui-design/theme";
-import { currentMember } from "@/lib/auth";
+import { requireMember } from "@/lib/auth";
 import { scoped } from "@/db/scope";
 import { can } from "@/lib/roles";
 import {
@@ -39,7 +39,7 @@ export default async function ThemesPage({
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
-  const member = (await currentMember())!;
+  const member = await requireMember();
   const data = scoped(member.orgId);
   const org = await data.organisation.get();
   const canWrite = can(member.role, "theme.write");

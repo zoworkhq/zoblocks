@@ -1,4 +1,4 @@
-import { currentMember } from "@/lib/auth";
+import { requireMember } from "@/lib/auth";
 import { scoped } from "@/db/scope";
 import { whyNot } from "@/lib/roles";
 import { CLINICAL_TOTAL, FRAMEWORKS, SURFACE_TOTAL } from "@/lib/frameworks";
@@ -21,7 +21,7 @@ export const metadata = { title: "Frameworks" };
  * bridges themselves at build time.
  */
 export default async function FrameworksPage() {
-  const member = (await currentMember())!;
+  const member = await requireMember();
   const org = await scoped(member.orgId).organisation.get();
 
   return (

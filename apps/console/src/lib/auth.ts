@@ -19,6 +19,7 @@
 
 import { createHash, randomBytes, timingSafeEqual } from "node:crypto";
 import { cookies, headers } from "next/headers";
+import { redirect } from "next/navigation";
 import { ObjectId } from "mongodb";
 import bcrypt from "bcryptjs";
 import { db } from "@/db/client";
@@ -139,6 +140,38 @@ export async function currentMember(): Promise<SessionMember | null> {
   const user = await members.findOne({ _id: session.userId });
   if (!user || user.status !== "active") return null;
   return toSessionMember(user);
+}
+
+/**
+ * The member, or a redirect. For any page inside the signed-in app.
+ *
+ * Twenty pages opened with `const member = (await currentMember())!`, and the
+ * assertion was a lie every one of them told. `(app)/layout.tsx` does redirect
+ * an unauthenticated request — but the page is not waiting for the layout to
+ * decide, so the assertion still evaluated, still dereferenced null, and still
+ * threw. The reader never saw it because the redirect won the race; the server
+ * logged `Cannot read properties of null (reading 'orgId')` on every one.
+ *
+ * Nothing was broken, which is exactly why it survived. What it cost was the
+ * log: twenty routes emitting a stack trace under normal operation is a
+ * background hum that a real error has to be heard over.
+ *
+ * **There is deliberately no status check here.** The layout carried one —
+ * `if (member.status !== "active") redirect("/pending")` — and it could never
+ * fire, twice over: `currentMember` already returns null for anyone not active,
+ * and `signIn` refuses pending and disabled accounts before a session exists at
+ * all. The only route to `/pending` is `signUp`, which sends you there without
+ * one. Reproducing that branch would have looked careful while doing nothing,
+ * which is the same thing the assertion did.
+ *
+ * So a disabled account lands on `/login`, and that is the right door: an admin
+ * disabling someone mid-session takes effect on their next request, and the
+ * waiting room is not where a revoked member belongs.
+ */
+export async function requireMember(): Promise<SessionMember> {
+  const member = await currentMember();
+  if (!member) redirect("/login");
+  return member;
 }
 
 // ---------------------------------------------------------------------------

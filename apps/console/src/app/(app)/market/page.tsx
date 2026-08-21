@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { currentMember } from "@/lib/auth";
+import { requireMember } from "@/lib/auth";
 import { can, whyNot } from "@/lib/roles";
 import { KIND_LABEL, listing, priceLabel } from "@/lib/market/catalogue";
 import { ComingSoonPreview } from "@/components/market/ComingSoonPreview";
@@ -24,7 +24,7 @@ export const metadata = { title: "Catalogue" };
  * packs a predecessor bought.
  */
 export default async function MarketPage() {
-  const member = (await currentMember())!;
+  const member = await requireMember();
   const items = await listing(member.orgId);
   const available = items.filter(({ item }) => !item.comingSoon);
   const soon = items.filter(({ item }) => item.comingSoon);
