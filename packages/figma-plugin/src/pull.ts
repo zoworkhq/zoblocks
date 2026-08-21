@@ -49,7 +49,8 @@ export interface PullPreview {
   restores: { name: string; reason: string }[];
 }
 
-export function toResolvedTheme(payload: ResolvedPayload): ResolvedTheme {
+/** The payload's shape is already `ResolvedTheme`'s, minus the optional tiers. */
+function toResolvedTheme(payload: ResolvedPayload): ResolvedTheme {
   return {
     ramp: payload.ramp,
     semantic: payload.semantic,
