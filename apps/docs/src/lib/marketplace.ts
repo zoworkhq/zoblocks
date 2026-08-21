@@ -50,7 +50,11 @@ export interface MarketItem {
   publishedAt: string | null;
 }
 
-export const CONSOLE = process.env.NEXT_PUBLIC_CONSOLE_URL ?? "https://console.oxygenui.design";
+// Re-exported rather than redefined: `lib/console.ts` owns the address, and two
+// copies of it drift the moment one deployment moves.
+import { CONSOLE } from "./console";
+
+export { CONSOLE };
 
 /** Where a reader goes to actually buy one. Buying needs an organisation. */
 export const buyHref = (slug: string) => `${CONSOLE}/market/${slug}`;

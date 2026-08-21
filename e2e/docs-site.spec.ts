@@ -269,7 +269,14 @@ test.describe("the catalog @a11y", () => {
             // Positive: the band holds more height than the art needs.
             unused: Math.round(reserved.height - (bottom - top)),
             // Positive: the art paints outside the band it was given.
-            spill: Math.max(Math.round(reserved.top - top), Math.round(bottom - reserved.bottom)),
+            //
+            // Unrounded, deliberately. `Math.round` here made the assertion
+            // depend on which side of 0.5 a float happened to land: Care
+            // Timeline overhangs its band by the same ~0.65px in every engine,
+            // and Gecko measured the top gap at exactly 0.5 (rounds to 1, and
+            // failed) where Blink measured 0.4952 (rounds to 0, and passed).
+            // The check was real but only enforced in one browser by accident.
+            spill: Math.max(reserved.top - top, bottom - reserved.bottom),
           };
         })
         .filter((entry): entry is NonNullable<typeof entry> => entry !== null),
@@ -286,9 +293,19 @@ test.describe("the catalog @a11y", () => {
       "a card is reserving more than a band of empty height above and below its art",
     ).toEqual([]);
 
+    /*
+     * A whole CSS pixel, not a hair over zero.
+     *
+     * The bug this guards against reserved *hundreds* of pixels; the residue
+     * left after the fix is sub-pixel, and it is not removable by tightening
+     * the number — `ScaledArt` paints through `transform: scale()`, so a
+     * fractional height is what scaling produces. Stating the tolerance out
+     * loud is the honest version of a threshold that was already 0.5px in
+     * Blink and 0.4999px in Gecko without saying so.
+     */
     expect(
-      slack.filter((entry) => entry.spill > 0),
-      "a card's art paints outside the band, so the frame clips it",
+      slack.filter((entry) => entry.spill >= 1).map((entry) => entry.name),
+      "a card's art paints a full pixel outside the band, so the frame clips it",
     ).toEqual([]);
   });
 
@@ -482,6 +499,87 @@ test.describe("the tab gallery @a11y", () => {
 /* ==================================================================== */
 /* Chrome                                                               */
 /* ==================================================================== */
+
+/* ==================================================================== */
+/* The way into the console                                             */
+/* ==================================================================== */
+
+test.describe("the console doors @a11y", () => {
+  /**
+   * Sign in and Sign up leave for another application.
+   *
+   * Asserted on the pathname and on *having* an origin rather than on the
+   * origin itself, because that address is configuration: `NEXT_PUBLIC_CONSOLE_URL`
+   * in a deployment, localhost on a laptop. Pinning the host here would make
+   * the test pass only on the machine it was written on.
+   */
+  for (const [label, path] of [
+    ["Sign in", "/login"],
+    ["Sign up", "/signup"],
+  ] as const) {
+    test(`${label} points at the console's ${path}`, async ({ page }) => {
+      await page.goto("/");
+
+      const link = page.locator("header").getByRole("link", { name: label, exact: true });
+      await expect(link).toBeVisible();
+
+      const href = (await link.getAttribute("href"))!;
+      const url = new URL(href);
+      expect(url.pathname).toBe(path);
+      // Absolute, so it is a real cross-origin navigation rather than a route
+      // this site is pretending to own.
+      expect(href).toMatch(/^https?:\/\//);
+    });
+  }
+
+  /**
+   * The header holds both doors at a phone width without clipping.
+   *
+   * This is the assertion the change actually needed. The bar was at exactly
+   * its width before the links were added — 375px of content in a 375px
+   * viewport — so adding two controls silently pushed `Sign up` off the edge
+   * and wrapped the wordmark onto a second line. Neither breaks a page-level
+   * overflow check, which is why one is written here against the header itself.
+   */
+  test("neither door is clipped on a phone", async ({ page }) => {
+    await page.setViewportSize({ width: 375, height: 812 });
+    await page.goto("/");
+
+    const overflow = await page.locator("header").evaluate((el) => ({
+      content: el.scrollWidth,
+      box: Math.round(el.getBoundingClientRect().width),
+    }));
+    expect(overflow.content, "header content is wider than the header").toBeLessThanOrEqual(
+      overflow.box,
+    );
+
+    for (const label of ["Sign in", "Sign up"]) {
+      await expect(
+        page.locator("header").getByRole("link", { name: label, exact: true }),
+      ).toBeVisible();
+    }
+  });
+
+  /**
+   * What the room was bought with, and the proof it cost nothing.
+   *
+   * Fitting both doors on a phone meant standing the theme picker down from the
+   * header below `sm`, and it carries the high-contrast theme — an
+   * accessibility control, not a preference. So it moves to the footer rather
+   * than disappearing, and exactly one instance is ever rendered: two would put
+   * two radiogroups called "Color theme" in front of a screen reader.
+   */
+  for (const width of [375, 1280]) {
+    test(`the theme picker is reachable, exactly once, at ${width}px`, async ({ page }) => {
+      await page.setViewportSize({ width, height: 900 });
+      await page.goto("/");
+
+      const pickers = page.getByRole("radiogroup", { name: "Color theme" });
+      await expect(pickers).toHaveCount(1);
+      await expect(pickers.first()).toBeVisible();
+    });
+  }
+});
 
 test.describe("site chrome @a11y", () => {
   test("the tab icon is declared and served", async ({ page, request }) => {

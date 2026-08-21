@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { ArrowUpRight, Github } from "lucide-react";
 import { CommandMenu } from "@/components/site/command-menu";
 import { ThemeToggle } from "@/components/site/theme-toggle";
+import { signInHref, signUpHref } from "@/lib/console";
 import { cn } from "@/lib/utils";
 
 export function OxygenMark({ className = "h-4 w-7" }: { className?: string }) {
@@ -114,17 +115,58 @@ export function SiteHeader() {
 
           <CommandMenu />
 
+          {/* GitHub and the theme picker stand down on a phone.
+
+              The header was at exactly its width before the console links were
+              added: 375px of content in a 375px viewport, with the wordmark
+              already wrapping to two lines. Two more controls do not fit, and
+              the ones to sacrifice are the ones that are reachable elsewhere —
+              GitHub is in the footer, and the picker moves there below `sm`.
+
+              Nothing is lost, which is the condition for hiding it. The picker
+              carries the high-contrast theme, and that is an accessibility
+              control rather than a preference; dropping it on small screens
+              would take it from exactly the readers most likely to need it. */}
           <a
             href="https://github.com/zoworkhq/oxygenui"
-            className="ml-1 inline-flex items-center gap-1.5 rounded-lg border border-rule px-2.5 py-1.5 text-sm text-graphite transition-colors duration-200 hover:border-rule-strong hover:text-ink"
+            className="ml-1 hidden items-center gap-1.5 rounded-lg border border-rule px-2.5 py-1.5 text-sm text-graphite transition-colors duration-200 hover:border-rule-strong hover:text-ink sm:inline-flex"
           >
             <Github aria-hidden="true" className="size-3.5" />
             <span className="sr-only">GitHub</span>
           </a>
 
-          <div className="ml-1">
+          <div className="ml-1 hidden sm:block">
             <ThemeToggle />
           </div>
+
+          {/* The way into the console.
+
+              A rule rather than a gap separates these from the utilities to
+              their left. GitHub and the theme toggle are things you do *to*
+              this page; these two leave it for another application entirely,
+              and a plain gap reads as one more icon in the same row.
+
+              Plain `<a>`, not `<Link>`: the console is a different origin, and
+              a client-side navigation cannot cross one. `Link` would prefetch
+              an address it can never render. */}
+          <span aria-hidden="true" className="mx-2 hidden h-4 w-px bg-rule sm:block" />
+
+          <a
+            href={signInHref}
+            className="rounded-lg px-3 py-1.5 text-sm text-graphite transition-colors duration-200 hover:text-ink"
+          >
+            Sign in
+          </a>
+
+          {/* The only filled control in the header. It is the same `bg-cta` as
+              the hero's primary action because it is the same weight of
+              decision — everything else up here is navigation. */}
+          <a
+            href={signUpHref}
+            className="ml-1 inline-flex shrink-0 items-center rounded-lg bg-cta px-3 py-1.5 text-sm font-medium text-paper transition-colors duration-200 hover:bg-cta-hover"
+          >
+            Sign up
+          </a>
         </nav>
       </div>
     </header>
@@ -149,6 +191,22 @@ const FOOTER_LINKS = [
       { href: "https://hl7.org/fhir/R4/", label: "FHIR R4 spec", external: true },
     ],
   },
+  /*
+   * Both doors again, down here.
+   *
+   * Not redundancy for its own sake: the header hides Sign in below `sm` to
+   * keep six controls off a phone-width bar, and a returning reader on a phone
+   * needs somewhere to go that is not the sign-up form. `external` marks them
+   * because they leave for the console's origin, which is what the arrow on
+   * hover is telling the reader.
+   */
+  {
+    title: "Console",
+    links: [
+      { href: signInHref, label: "Sign in", external: true },
+      { href: signUpHref, label: "Sign up", external: true },
+    ],
+  },
 ];
 
 export function SiteFooter() {
@@ -167,9 +225,23 @@ export function SiteFooter() {
               Healthcare components typed to FHIR R4. Source you own, states you can trust.
             </p>
             <p className="axis-label mt-4">MIT core · v0.1.0 · by Zowork</p>
+
+            {/* Where the theme picker goes when the header cannot hold it.
+
+                `sm:hidden` against the header's `hidden sm:block`: exactly one
+                of the two is ever rendered, so a screen reader never meets two
+                radiogroups both called "Color theme". `hidden` is
+                `display: none`, which takes the other out of the accessibility
+                tree rather than merely out of sight. */}
+            <div className="mt-6 sm:hidden">
+              <p className="axis-label mb-2">Theme</p>
+              <ThemeToggle />
+            </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-10 sm:gap-16">
+          {/* Three columns now, so two-up on a phone and three-up once there is
+              room — `grid-cols-2` alone left Console stranded on its own row. */}
+          <div className="grid grid-cols-2 gap-10 sm:grid-cols-3 sm:gap-16">
             {FOOTER_LINKS.map((column) => (
               <div key={column.title}>
                 <p className="axis-label">{column.title}</p>
