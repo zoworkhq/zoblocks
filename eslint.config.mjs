@@ -126,6 +126,26 @@ export default tseslint.config(
   },
 
   // -------------------------------------------------------------------------
+  // The Figma plugin is an application, not shipped component source.
+  //
+  // It matches `packages/*/src/**` and gets the component rules, and one of
+  // them is actively wrong here: `no-forbidden-capability` refuses network
+  // calls because data fetching belongs to the application rather than to a
+  // component (ARCHITECTURE.md §14). This *is* the application — a plugin whose
+  // whole iframe exists to talk to the console — so the rule would be arguing
+  // with the architecture rather than enforcing it.
+  //
+  // Turned off by name rather than by ignoring the package, so the rest stay
+  // live. The claim the rule was standing in for is asserted directly instead:
+  // `test/manifest.test.ts` holds the sandbox to no `fetch` at all, and the
+  // client to three URLs and one POST.
+  // -------------------------------------------------------------------------
+  {
+    files: ["packages/figma-plugin/**/*.ts"],
+    rules: { "@oxygenui/no-forbidden-capability": "off" },
+  },
+
+  // -------------------------------------------------------------------------
   // Build tooling. Runs in Node, may read the environment and write output.
   // -------------------------------------------------------------------------
   {

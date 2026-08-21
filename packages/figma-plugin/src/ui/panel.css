@@ -301,3 +301,163 @@ button.copy[data-state="copied"] .copied {
   background: var(--fail-wash);
   border-radius: 4px;
 }
+
+/* ---------------------------------------------------------------- panes */
+
+/*
+ * The tab strip.
+ *
+ * Underline rather than filled pills: the panel is 380px wide and three filled
+ * buttons read as three actions rather than as three views of one file.
+ */
+
+#tabs {
+  display: flex;
+  gap: 0.25rem;
+  margin: -0.25rem 0 0.75rem;
+  border-bottom: 1px solid var(--rule);
+}
+
+.tab {
+  appearance: none;
+  padding: 0.4rem 0.6rem;
+  margin-bottom: -1px;
+  font: inherit;
+  font-weight: 500;
+  color: var(--ink-soft);
+  background: none;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+}
+
+.tab[aria-selected="true"] {
+  color: var(--ink);
+  border-bottom-color: var(--focus);
+}
+
+.tab:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+#pane {
+  display: grid;
+  gap: 0.6rem;
+}
+
+#report[hidden] {
+  display: none;
+}
+
+/* Buttons and inputs shared by the connect, pull and propose screens. */
+
+button.primary,
+button.secondary {
+  justify-self: start;
+  padding: 0.35rem 0.7rem;
+  font: inherit;
+  font-weight: 500;
+  border-radius: 4px;
+  cursor: pointer;
+  border: 1px solid var(--rule-strong);
+}
+
+button.primary {
+  color: var(--paper);
+  background: var(--focus);
+  border-color: var(--focus);
+}
+
+button.secondary {
+  color: inherit;
+  background: var(--sunk);
+}
+
+button.primary:disabled,
+button.secondary:disabled {
+  opacity: 0.55;
+  cursor: progress;
+}
+
+input {
+  width: 100%;
+  padding: 0.35rem 0.4rem;
+  font: inherit;
+  color: inherit;
+  background: var(--sunk);
+  border: 1px solid var(--rule-strong);
+  border-radius: 4px;
+}
+
+form.connect {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.connect-block {
+  margin-top: 0.9rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--rule);
+}
+
+.connected {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.connected .note {
+  margin: 0;
+}
+
+.preview {
+  display: grid;
+  gap: 0.4rem;
+  padding: 0.75rem;
+  background: var(--sunk);
+  border-radius: 4px;
+}
+
+.preview .count {
+  margin: 0;
+  font-size: 0.9375rem;
+  font-weight: 650;
+}
+
+.preview .count[data-state="pass"] {
+  color: var(--pass);
+}
+
+.preview .count[data-state="fail"] {
+  color: var(--ink);
+}
+
+.preview p,
+.restores p,
+.refusal p {
+  margin: 0;
+}
+
+.preview a {
+  color: var(--focus);
+  word-break: break-all;
+}
+
+.restores,
+.refusal {
+  display: grid;
+  gap: 0.35rem;
+  padding: 0.6rem 0.7rem;
+  background: var(--fail-wash);
+  border-radius: 4px;
+}
+
+.restores ul,
+.refusal ul {
+  margin: 0;
+  padding-left: 1.1rem;
+  color: var(--ink-soft);
+}

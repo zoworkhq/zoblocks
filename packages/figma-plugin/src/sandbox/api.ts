@@ -9,9 +9,18 @@
  * plugin's blast radius. Every capability it holds is on this page, and adding
  * one is a diff somebody reviews.
  *
- * It is deliberately read-only. There is no `createVariable`, no
- * `setValueForMode`, no `remove`. Phase 2 reports; Phase 4 earns the right to
- * write by previewing every change first.
+ * It was read-only until the pull direction existed. It is not any more, and
+ * the boundary that replaced "cannot write" is worth stating precisely, because
+ * "we preview first" is a weaker promise than a missing function:
+ *
+ *   - **There is no `remove`, on anything.** Not on a variable, not on a
+ *     collection, not on a mode. A pull can create and it can set; it cannot
+ *     delete. Orphans are listed and left, which is why the preview can say "no
+ *     longer in this theme" without that being a threat.
+ *   - **Nothing here publishes.** Figma's library-publishing API is absent, so
+ *     a pull changes a file and never what other files inherit.
+ *   - **Writes are reached through `applyPull` only**, which takes a diff it did
+ *     not compute. The sandbox cannot decide to change something.
  */
 
 /** Figma's colour, and the only value shape this plugin reads. */
@@ -53,6 +62,51 @@ export interface FigmaReadApi {
   variables: {
     getLocalVariableCollectionsAsync(): Promise<FigmaVariableCollection[]>;
     getLocalVariablesAsync(type?: string): Promise<FigmaVariable[]>;
+  };
+}
+
+/* ==========================================================================
+ * Writing. Everything below exists for the pull direction.
+ * ======================================================================== */
+
+/** A collection the plugin may add modes to and stamp. Never remove from. */
+export interface FigmaWritableCollection extends FigmaVariableCollection {
+  addMode(name: string): string;
+  renameMode(modeId: string, name: string): void;
+  setPluginData(key: string, value: string): void;
+  getPluginData(key: string): string;
+}
+
+export interface FigmaWritableVariable extends FigmaVariable {
+  description: string;
+  setValueForMode(modeId: string, value: FigmaVariableValue): void;
+  setPluginData(key: string, value: string): void;
+}
+
+/**
+ * Where the credential lives.
+ *
+ * `clientStorage` is per-user and per-plugin, on this machine — not in the
+ * document. A token written into the file would travel with it: into every
+ * branch, every duplicate, and every copy shared with an agency.
+ */
+export interface FigmaClientStorage {
+  getAsync(key: string): Promise<unknown>;
+  setAsync(key: string, value: unknown): Promise<void>;
+  deleteAsync(key: string): Promise<void>;
+}
+
+export interface FigmaWriteApi extends FigmaReadApi {
+  clientStorage: FigmaClientStorage;
+  variables: FigmaReadApi["variables"] & {
+    createVariableCollection(name: string): FigmaWritableCollection;
+    createVariable(
+      name: string,
+      collection: FigmaWritableCollection,
+      type: "COLOR" | "STRING" | "FLOAT" | "BOOLEAN",
+    ): FigmaWritableVariable;
+    getVariableByIdAsync(id: string): Promise<FigmaWritableVariable | null>;
+    getVariableCollectionByIdAsync(id: string): Promise<FigmaWritableCollection | null>;
   };
 }
 

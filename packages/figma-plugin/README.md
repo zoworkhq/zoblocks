@@ -1,13 +1,24 @@
-# Oxygen — contrast
+# Oxygen
 
-Oxygen's accessibility gate, running inside Figma. It reads the variables
-already in the open file, measures them with the same code the build and the
-publish gate run, and reports what fails, by how much, and what would fix it.
+Oxygen's design system, inside Figma. Three things:
 
-No account, no network, no sync. `manifest.json` declares
-`networkAccess: { allowedDomains: ["none"] }`, and a test over the source keeps
-that declaration honest — there is no `fetch`, no `XMLHttpRequest`, no dynamic
-`import()` anywhere in it.
+- **Check** — reads the variables already in the open file and measures them
+  with the same code the build and the publish gate run. Needs no account.
+- **Pull** — a published theme becomes variables, previewed before anything is
+  written.
+- **Propose** — one brand colour goes to the console as a draft.
+
+`manifest.json` allows exactly one origin in production and no wildcard. The
+sandbox has no `fetch` at all; the iframe has the network. The key lives in
+`figma.clientStorage`, never in the document — plugin data travels with a file,
+so a token written there reaches every branch, every duplicate, and every copy
+handed to an agency.
+
+Two things it cannot do, and both are enforced by the API surface in
+`src/sandbox/api.ts` declaring no such call rather than by a check somebody
+could remove: **it cannot delete anything** — not a variable, not a mode, not a
+collection — and **it cannot publish**, neither a Figma library nor a theme
+version.
 
 ## Running it
 
@@ -18,6 +29,19 @@ pnpm --filter @oxygenui-design/figma-plugin build
 Then in Figma: **Plugins → Development → Import plugin from manifest**, and
 choose `packages/figma-plugin/manifest.json`. The manifest points at `dist/`,
 which is not committed, so the build has to run first.
+
+Against a local console, the address is `http://localhost:6003` — allowed by
+`devAllowedDomains`, which is deliberately not `allowedDomains`. A published
+plugin that may talk to whatever is listening on a designer's own machine is a
+different product.
+
+## Connecting
+
+Mint a key in the console at **Market → Tokens** with the scope set to _Themes,
+for the Figma plugin_, then paste it with the console address. `apps/console/
+PLUGIN-API.md` covers what the key can reach; the short version is that it reads
+themes and proposes a brand anchor, cannot install purchased components, and
+never exceeds the role of the person who minted it.
 
 ## The two readings, and why there are two
 
@@ -71,6 +95,13 @@ applying one.
 - **Its own panel.** `panel-contrast.test.ts` measures this interface with the
   thing this interface measures. It found `--rule-strong` — the border of every
   control, and so an SC 1.4.11 surface — at 1.63:1 the first time it ran.
+- **Writes, counted.** `test/fake-figma.ts` records every call rather than only
+  the values afterwards, because "pull twice writes nothing" is a claim about
+  writes. A run that sets each variable to the value it already had reaches the
+  same end state and churns the history.
+- **The claims in the manifest.** One origin, no wildcard, localhost only in the
+  development list, no `fetch` in the sandbox, no credential in plugin data, and
+  a client that can build exactly three URLs and issue exactly one POST.
 
 ## See also
 

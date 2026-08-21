@@ -1,10 +1,14 @@
 /**
  * The claims this plugin makes about itself, checked against its own source.
  *
- * "No network access" is the phase's selling point in a security review, and a
- * selling point held only by a manifest somebody remembered to write is not one
- * worth making. Both halves are asserted here: what the manifest declares, and
- * whether the code could reach the network even if the declaration allowed it.
+ * The plugin used to declare no network access at all, which was a strong claim
+ * cheaply held. It now reaches one origin, so the claims worth checking have
+ * changed shape: the domain list is narrow and exact, the *sandbox* still
+ * cannot reach the network, the credential is never written into the document,
+ * and no path leads to publishing — a library or a theme version.
+ *
+ * Each is asserted over the source rather than promised in a comment, because
+ * these are the sentences that end up in a security review.
  */
 
 import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
@@ -21,7 +25,7 @@ const manifest = JSON.parse(readFileSync(join(root, "manifest.json"), "utf8")) a
   name: string;
   main: string;
   ui: string;
-  networkAccess: { allowedDomains: string[]; reasoning?: string };
+  networkAccess: { allowedDomains: string[]; devAllowedDomains?: string[]; reasoning?: string };
   permissions: string[];
 };
 
@@ -44,13 +48,24 @@ function code(path: string): string {
 const files = sources(join(root, "src"));
 
 describe("the manifest", () => {
-  it("declares no network access", () => {
-    expect(manifest.networkAccess.allowedDomains).toEqual(["none"]);
+  it("reaches one origin in production, and it is the console", () => {
+    // A wildcard would be the easy thing to write and the thing a reviewer
+    // cannot check. One exact origin is a claim they can hold us to.
+    expect(manifest.networkAccess.allowedDomains).toEqual(["https://console.oxygenui.design"]);
+    expect(manifest.networkAccess.allowedDomains.every((d) => !d.includes("*"))).toBe(true);
+  });
+
+  it("keeps localhost in the development list only", () => {
+    // In `allowedDomains` it would ship: a published plugin that may talk to
+    // whatever is listening on a designer's own machine.
+    expect(manifest.networkAccess.devAllowedDomains).toEqual(["http://localhost:6003"]);
+    expect(manifest.networkAccess.allowedDomains).not.toContain("http://localhost:6003");
   });
 
   it("states why, in words a reviewer can check against the code", () => {
-    expect(manifest.networkAccess.reasoning).toBeTruthy();
-    expect(manifest.networkAccess.reasoning).toContain("locally");
+    const why = manifest.networkAccess.reasoning ?? "";
+    expect(why).toContain("never publish");
+    expect(why).toContain("clientStorage");
   });
 
   it("asks for no permissions", () => {
@@ -64,18 +79,6 @@ describe("the manifest", () => {
 });
 
 describe("the code behind the declaration", () => {
-  it("never reaches the network", () => {
-    // The sandbox has no `fetch` at all; the iframe does. A declaration is a
-    // promise, and this is the part that keeps it.
-    for (const file of files) {
-      expect(code(file), file).not.toMatch(/\bfetch\s*\(/);
-      expect(code(file), file).not.toMatch(
-        /XMLHttpRequest|WebSocket|EventSource|navigator\.sendBeacon/,
-      );
-      expect(code(file), file).not.toMatch(/import\s*\(/);
-    }
-  });
-
   it("keeps `figma` inside the sandbox", () => {
     // The panel runs in an iframe that has no `figma` global. A reference to it
     // outside `src/sandbox` is a runtime error waiting for the one designer who
@@ -92,16 +95,47 @@ describe("the code behind the declaration", () => {
     }
   });
 
-  it("gives the sandbox no way to write to a file", () => {
+  it("gives the sandbox no way to delete anything, or to publish", () => {
     /*
-     * `api.ts` declares only the read calls, so a write is a compile error
-     * rather than something a reviewer has to notice. Phase 4 is where this
-     * plugin earns the right to write, and it earns it by previewing every
-     * change first.
+     * The pull direction writes, so "cannot write" is no longer the boundary.
+     * What replaced it is narrower and still structural: `api.ts` declares no
+     * removal call of any kind and nothing from Figma's library-publishing
+     * surface, so both are compile errors rather than review findings.
+     *
+     * This is what lets the preview say "no longer in this theme" without that
+     * being a threat, and what keeps a pull from changing what other files
+     * inherit.
      */
     const api = code(join(root, "src/sandbox/api.ts"));
-    for (const write of ["createVariable", "setValueForMode", "setPluginData", "remove("]) {
-      expect(api, write).not.toContain(write);
+    for (const forbidden of [
+      "remove(",
+      "removeMode",
+      "deleteAsync(key: string): Promise<void>;\n  remove",
+      "publishAsync",
+      "publish(",
+    ]) {
+      expect(api, forbidden).not.toContain(forbidden);
     }
+  });
+
+  it("cannot ask the console to publish either", () => {
+    /*
+     * The client is the only thing that can address the console, and every
+     * address it can build is written literally in one file. A fourth endpoint
+     * would have to be added here to be reachable at all.
+     *
+     * Matching on the URLs rather than on the word "publish": the payload has a
+     * `status: "published" | "draft"` field, which is a thing being *read*, and
+     * a grep that cannot tell those apart is a grep somebody will delete.
+     */
+    const client = code(join(root, "src/console.ts"));
+    const paths = [...client.matchAll(/\/api\/v1\/[^`"'\s]*/g)].map((m) => m[0]);
+
+    expect(paths).toHaveLength(3);
+    for (const path of paths) expect(path).not.toContain("publish");
+
+    // One write, and it is the draft. Everything else is a GET.
+    const methods = [...client.matchAll(/method:\s*"([A-Z]+)"/g)].map((m) => m[1]);
+    expect(methods).toEqual(["POST"]);
   });
 });

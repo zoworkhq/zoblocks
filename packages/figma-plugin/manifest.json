@@ -1,14 +1,15 @@
 {
-  "name": "Oxygen — contrast",
-  "id": "oxygen-contrast",
+  "name": "Oxygen",
+  "id": "oxygen-design-system",
   "api": "1.0.0",
   "main": "dist/code.js",
   "ui": "dist/ui.html",
-  "editorType": ["figma", "figjam", "dev"],
+  "editorType": ["figma", "dev"],
   "documentAccess": "dynamic-page",
   "networkAccess": {
-    "allowedDomains": ["none"],
-    "reasoning": "This plugin reads the variables already in the open file and measures them locally. It has no account, no sync, and nothing to send."
+    "allowedDomains": ["https://console.oxygenui.design"],
+    "devAllowedDomains": ["http://localhost:6003"],
+    "reasoning": "Reads your organisation's themes from the Oxygen console and proposes a brand colour as a draft. It sends one colour and can never publish. The console address and key are entered by you and held in figma.clientStorage on this machine, never in the document."
   },
   "permissions": []
 }

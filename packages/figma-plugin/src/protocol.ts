@@ -12,6 +12,8 @@
  */
 
 import type { GateReport, PairKindName } from "./gate";
+import type { Credential, ResolvedPayload } from "./console";
+import type { PullPreview } from "./pull";
 
 /** A collection, as the picker needs to show it. */
 export interface CollectionSummary {
@@ -28,10 +30,28 @@ export interface CollectionSummary {
   colours: number;
 }
 
+/** What the file is pinned to, and the key it would sync with. */
+export interface Standing {
+  /** Absent until somebody pastes a key. The iframe spends it; it lives here. */
+  credential?: Credential;
+  /** Absent until this file has been pulled at least once. */
+  pinned?: { slug: string; version: number };
+}
+
+export interface Applied {
+  created: number;
+  updated: number;
+  /** Clinical variables put back. Named, because these undid somebody's edit. */
+  restored: string[];
+}
+
 /** Sandbox → UI. */
 export type ToUi =
   | { type: "collections"; collections: CollectionSummary[] }
   | { type: "report"; report: GateReport }
+  | { type: "standing"; standing: Standing }
+  | { type: "preview"; preview: PullPreview }
+  | { type: "applied"; applied: Applied }
   | { type: "error"; message: string };
 
 /** UI → sandbox. */
@@ -44,7 +64,26 @@ export type FromUi =
       ground?: string;
       kind?: PairKindName;
     }
-  | { type: "resize"; width: number; height: number };
+  | { type: "resize"; width: number; height: number }
+  | { type: "connect"; credential: Credential }
+  | { type: "disconnect" }
+  /**
+   * Preview a pull. The iframe fetched the payload; the sandbox owns the file.
+   *
+   * The payload travels rather than the plan, because computing the plan needs
+   * only the payload and computing the *diff* needs the file — so the side that
+   * holds each does its own half and neither has to be told about the other.
+   */
+  | { type: "preview"; payload: ResolvedPayload; includeComponent?: boolean }
+  /**
+   * Apply the pull that was previewed.
+   *
+   * Carries the payload again rather than a token for a remembered preview. The
+   * diff is recomputed against the file as it is *now*, so a designer who
+   * changed something between preview and apply gets their change respected
+   * rather than silently overwritten by a decision made a minute ago.
+   */
+  | { type: "apply"; payload: ResolvedPayload; includeComponent?: boolean };
 
 /**
  * Figma wraps every message the UI sends in `{ pluginMessage }`, and delivers
@@ -57,8 +96,8 @@ export function readPluginMessage(data: unknown): FromUi | undefined {
   const message = (data as { pluginMessage?: unknown }).pluginMessage ?? data;
   if (typeof message !== "object" || message === null) return undefined;
   const type = (message as { type?: unknown }).type;
-  if (type === "ready" || type === "inspect" || type === "resize") return message as FromUi;
-  return undefined;
+  const accepted = ["ready", "inspect", "resize", "connect", "disconnect", "preview", "apply"];
+  return accepted.includes(type as string) ? (message as FromUi) : undefined;
 }
 
 export function readUiMessage(data: unknown): ToUi | undefined {
@@ -66,6 +105,6 @@ export function readUiMessage(data: unknown): ToUi | undefined {
   const message = (data as { pluginMessage?: unknown }).pluginMessage ?? data;
   if (typeof message !== "object" || message === null) return undefined;
   const type = (message as { type?: unknown }).type;
-  if (type === "collections" || type === "report" || type === "error") return message as ToUi;
-  return undefined;
+  const accepted = ["collections", "report", "standing", "preview", "applied", "error"];
+  return accepted.includes(type as string) ? (message as ToUi) : undefined;
 }
