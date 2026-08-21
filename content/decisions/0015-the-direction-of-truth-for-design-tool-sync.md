@@ -1,6 +1,6 @@
 # 0015 — The direction of truth for design-tool sync
 
-**Status:** proposed · 21 August 2026
+**Status:** accepted · 21 August 2026
 
 ## Context
 
@@ -40,17 +40,53 @@ Three consequences worth stating explicitly:
   its Oxygen token name in `setPluginData`. A designer will rename things; the
   label is theirs and the plugin data is the key.
 
+## Distribution, and the plan the REST API needs
+
+Two facts the plan asked to confirm before building. Both were checked against
+Figma's own documentation on 21 August rather than assumed, and both change
+something.
+
+**The REST Variables API is Enterprise-only, and needs a Full seat.** It is not
+available as an add-on to Professional or Organization teams. The Plugin API's
+variables access carries no such restriction — which is the entire reason
+phases 1 to 5 were ordered not to touch REST, and that ordering is now
+vindicated rather than lucky. The consequence is narrow and worth stating
+plainly: **everything through push works on any plan; automated sync is
+reachable only for customers already on Enterprise.** Automation is therefore a
+feature for a subset, and should be sold as one.
+
+**Distribution: private to our own organisation first, Community when the
+console is customer-facing.** Private publishing skips Figma's review entirely;
+Community takes up to two weeks. But the fact that decides this is a different
+one: _private_ means private to the **publisher's** organisation, so a privately
+published plugin does not reach a customer's designers at all. It reaches ours.
+
+That makes distribution a consequence of
+[0013](0013-open-questions-for-product.md) question 3 rather than an independent
+choice. The console is customer-facing _staged_, run internally first with our
+own team authoring real themes on customers' behalf — and the plugin belongs in
+exactly the same stage. Private now costs nothing, because the plugin's audience
+during that stage is us. Community publishing arrives with the login page.
+
+Going private first also forecloses nothing: converting a private plugin to a
+public one requires the review it would have needed anyway.
+
 ## Consequences
 
 Automated two-way sync stays out of scope until there is a concrete reason for
 it. One-way with a per-tier owner is a feature; two-way without one is a way for
 both sides to end up wrong and for neither to be able to say which is right.
 
-This rule inherits an unanswered question. **ADR 0013 asks whether a customer
-may override clinical status colours and is still `proposed`.** The clinical row
-above assumes today's answer — no. If that changes, the plugin's refusal path
-becomes a re-validation path, which is a different feature with different tests.
-That question has to be settled before the pull direction is built, not after.
+**ADR 0013's clinical question is now answered: no.** It was accepted on the
+same day as this record, so the clinical row above is a decision rather than an
+assumption, and the pull direction can be built against it. What that buys
+concretely: a designer who edits a clinical variable and pulls again has it
+restored, with the reason in the variable's own description — a refusal path,
+not a re-validation path.
+
+The conditions under which that answer should be reopened are written in 0013
+beside the answer itself, deliberately, so that reopening it is a decision made
+against stated criteria rather than in a deal review.
 
 ## What was verified, and three corrections to the plan this came from
 

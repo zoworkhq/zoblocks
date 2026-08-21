@@ -11,20 +11,20 @@ Format: **Context** (the forces, stated honestly) → **Decision** (what we do)
 | #                                                            | Decision                                                                         | Status   |
 | ------------------------------------------------------------ | -------------------------------------------------------------------------------- | -------- |
 | [0001](0001-fhir-typed-props.md)                             | Component props are FHIR resources                                               | accepted |
-| [0002](0002-dual-channel-distribution.md)                    | npm is the source of truth; the registry is generated from it                    | proposed |
-| [0003](0003-package-topology.md)                             | Domain-scoped packages, not one package per component                            | proposed |
-| [0004](0004-generated-component-metadata.md)                 | Component metadata is colocated and everything shared is generated               | proposed |
-| [0005](0005-three-tier-token-pipeline.md)                    | Tokens are built from a DTCG source across brand × theme × density               | proposed |
-| [0006](0006-stability-tiers-and-deprecation.md)              | Stability tiers gate the export path; deprecation is a sequence                  | proposed |
-| [0007](0007-story-derived-testing.md)                        | Tests derive from stories; quality is gated at the catalog level                 | proposed |
-| [0008](0008-internationalisation-before-fifty-components.md) | Internationalisation lands before the catalog reaches ~50 components             | proposed |
-| [0009](0009-supply-chain-and-component-constraints.md)       | Component capability is constrained by lint; the supply chain is attested        | proposed |
+| [0002](0002-dual-channel-distribution.md)                    | npm is the source of truth; the registry is generated from it                    | accepted |
+| [0003](0003-package-topology.md)                             | Domain-scoped packages, not one package per component                            | accepted |
+| [0004](0004-generated-component-metadata.md)                 | Component metadata is colocated and everything shared is generated               | accepted |
+| [0005](0005-three-tier-token-pipeline.md)                    | Tokens are built from a DTCG source across brand × theme × density               | accepted |
+| [0006](0006-stability-tiers-and-deprecation.md)              | Stability tiers gate the export path; deprecation is a sequence                  | accepted |
+| [0007](0007-story-derived-testing.md)                        | Tests derive from stories; quality is gated at the catalog level                 | accepted |
+| [0008](0008-internationalisation-before-fifty-components.md) | Internationalisation lands before the catalog reaches ~50 components             | accepted |
+| [0009](0009-supply-chain-and-component-constraints.md)       | Component capability is constrained by lint; the supply chain is attested        | accepted |
 | [0010](0010-antd-compatible-primitives.md)                   | Primitives match Ant Design's API and take no dependency on it                   | accepted |
 | [0011](0011-summaries-declare-their-boundaries.md)           | A component that summarises a set declares the set's boundaries                  | accepted |
 | [0012](0012-token-surface-is-a-contract.md)                  | The component token surface is a public contract                                 | accepted |
-| [0013](0013-open-questions-for-product.md)                   | Four questions the engineering work cannot answer                                | proposed |
+| [0013](0013-open-questions-for-product.md)                   | Four questions the engineering work cannot answer                                | accepted |
 | [0014](0014-customer-themes-may-override-two-more-tiers.md)  | A customer theme may override semantic and component tokens, never clinical ones | accepted |
-| [0015](0015-the-direction-of-truth-for-design-tool-sync.md)  | The direction of truth for design-tool sync                                      | proposed |
+| [0015](0015-the-direction-of-truth-for-design-tool-sync.md)  | The direction of truth for design-tool sync                                      | accepted |
 
 See [ARCHITECTURE.md](../../ARCHITECTURE.md) for how these fit together.
 

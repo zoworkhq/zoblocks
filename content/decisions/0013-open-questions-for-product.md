@@ -1,6 +1,6 @@
 # 0013 — Four questions the engineering work cannot answer
 
-**Status:** proposed · 19 August 2026
+**Status:** accepted · 21 August 2026
 
 > **Relates to:** [0002](0002-dual-channel-distribution.md) (dual-channel
 > distribution), [0010](0010-antd-compatible-primitives.md) (antd-compatible
@@ -14,18 +14,30 @@ green. Four questions came up during that work that are **not** engineering
 decisions, and answering them by writing code would have been answering them by
 stealth.
 
-Each is recorded here with the position the implementation currently takes, so
-that position is visible and reversible rather than accidental. **Status is
-`proposed` rather than `accepted` deliberately: this ADR is a request for a
-decision, not a record of one.** Whoever signs it off should change the status
-and delete this paragraph.
+Each was recorded here with the position the implementation takes, so that
+position is visible and reversible rather than accidental.
 
-Three of the four are reversible in a day. The first is not, and it is the one
-worth the most attention.
+**All four are now decided, on 21 August 2026, in favour of the recommendation
+each already carried.** Nothing in the code changed as a result — which is the
+outcome to expect when the recommendations were written by the people who
+built the thing, and is also why this ADR was worth writing rather than
+assuming. The value was never in the answer being surprising; it was in the
+position being written down somewhere it can be argued with.
+
+The decision was delegated rather than deliberated at length, and the four
+answers are not equally cheap to revisit. Three are reversible in about a week
+each. **Question 1 is not**, and the conditions under which it should be
+reopened are stated in its own section rather than left to judgement in the
+moment.
 
 ---
 
 ## 1. May a customer override clinical status colours?
+
+> **Decided: no.** Clinical colours stay fixed. The Figma plugin pushes them so
+> a designer can see them, carries the reason in the variable's own description,
+> and refuses them on the way back — the same treatment the framework bridges
+> give the same tokens.
 
 **Current implementation: no.** `--ox-status-*` and `--ox-flag-*` are marked
 `bridgeable: false` in the generated surface, the theme emitter is structurally
@@ -56,6 +68,16 @@ brand), an explicit written acknowledgement captured per organisation, and a
 decision about what happens to an existing published theme when the rules
 tighten. **Do not answer yes under commercial pressure in a live deal.**
 
+**What would make reopening this legitimate.** Not a customer asking — a
+customer will ask. Two things would: a customer whose product genuinely does not
+display clinical results, where the tokens carry no signal to remove and the
+right fix is a build that omits the clinical tier rather than a theme that
+overrides it; or a regulator or house style that mandates specific status
+colours, where the floors can be re-measured against _their_ values and the
+answer is a validated exception rather than an unlocked field. Both are
+narrower than "may a customer override clinical colours", and both are the
+question worth answering instead.
+
 ## 2. Is Material UI a commitment or a hedge?
 
 **Current implementation: built.** `@oxygenui-design/bridge-mui` exists, is
@@ -77,6 +99,12 @@ contract. Building it cost a week. Supporting it is ongoing.
 only with a named customer behind each.** Three bridges maintained well beats
 eight maintained by nobody.
 
+> **Decided: a commitment, with a ceiling.** MUI is supported — documented, in
+> the version matrix, and answered for. The ceiling is the operative half: a
+> third framework bridge needs a named customer behind it before it is written,
+> not after. The reason to write that down now is that the marginal bridge
+> always looks cheap in the week somebody asks for it.
+
 ## 3. Is the console a product surface or an internal tool?
 
 **Current implementation: built as a product, deployed as neither.** It has
@@ -93,6 +121,17 @@ page, and the gap between the two is small — mostly SSO and invitations.
 export, an availability commitment for the stylesheet endpoint, and a security
 review. The endpoint is the part to think hardest about: once a customer's
 application links `/t/{org}/{slug}@{v}.css`, our uptime is their page.
+
+> **Decided: customer-facing, staged — internal first.** The staging is not
+> hedging; it is what makes the stylesheet commitment safe to make. Authoring
+> real customer themes on their behalf exercises validation and delivery against
+> real palettes while an outage is still our problem rather than theirs.
+>
+> This decision now has a dependent. The Figma plugin's distribution follows it
+> directly, and the reasoning is in
+> [0015](0015-the-direction-of-truth-for-design-tool-sync.md): a plugin
+> published privately is private to _our_ organisation, so it reaches customers
+> only once the console does.
 
 ## 4. Do `signature` and `copilot` genuinely require Ant Design?
 
@@ -115,6 +154,12 @@ If the count ever needs to grow, that is the moment to build Oxygen's own
 overlay primitives instead — a real project, and one that should be scheduled
 rather than arrived at.
 
+> **Decided: accept it for these two, and treat two as the ceiling.** A third
+> component wanting to wrap antd is not a third exception; it is the trigger for
+> the overlay-primitives project. Naming the number is the whole point — "we
+> allow a few" has no edge, and a rule with no edge is a rule that has already
+> been crossed.
+
 ---
 
 ## Consequences
@@ -129,6 +174,12 @@ later is materially harder than saying yes now: published themes exist, and
 widening what a theme may contain means deciding what happens to every theme
 already live. The other three are a week each.
 
-**This ADR stays `proposed` until someone with the authority signs it.** An
-architecture decision record with no decision in it is a memo, and marking it
-accepted without that signature would misrepresent the state.
+**Accepted 21 August 2026.** Every position is the one the implementation
+already took, so no code changed on acceptance. What changed is that four
+defaults became four decisions, each with the conditions for reopening it
+written beside it.
+
+**Two of the four now carry a stated ceiling** — one more framework bridge, one
+more antd-wrapping component — and a ceiling is only worth writing if it is
+enforced when somebody has a good reason to cross it. That is the point at which
+this file is either useful or decorative.
