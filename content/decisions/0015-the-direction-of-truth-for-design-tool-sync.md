@@ -71,6 +71,34 @@ during that stage is us. Community publishing arrives with the login page.
 Going private first also forecloses nothing: converting a private plugin to a
 public one requires the review it would have needed anyway.
 
+## Code Connect and automated sync are not being built
+
+Decided on 21 August, and recorded here rather than left as an unstarted item,
+because the reason is not "we ran out of time".
+
+**Code Connect maps Figma components to real React exports.** It could be
+generated from `component-meta`, which is already the source every other
+artefact derives from, so the engineering is a day. What it maps _to_ is a
+maintained Figma component library, and there is no library and no named owner
+for one. Generating mappings to components that do not exist produces a Dev Mode
+panel that confidently shows the wrong import — worse than the blank one it
+replaces, because a developer will believe it.
+
+_Build it when:_ somebody owns a Figma component library and has kept it current
+for a release cycle. Not before, and not as part of a sprint that also has to
+create the library.
+
+**Automated sync removes the human step from the pull direction.** It needs the
+REST Variables API, which is Enterprise plan and Full seat, and webhooks. So
+even built, it would work for a subset of customers — and the one-way rule this
+ADR sets means what it automates is the _console to Figma_ leg, which is the leg
+a designer can already run in two clicks.
+
+_Build it when:_ a customer on Enterprise asks, having used the manual pull
+enough to be tired of it. That order matters. Automating a step nobody has found
+tedious is how a sync feature acquires a schedule, a failure mode and an on-call
+rotation before it has a user.
+
 ## Consequences
 
 Automated two-way sync stays out of scope until there is a concrete reason for
