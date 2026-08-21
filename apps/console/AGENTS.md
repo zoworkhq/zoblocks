@@ -14,3 +14,10 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 that are load-bearing rather than incidental — why `/m/…` is the one non-public
 route, why prices are resolved server-side, and why nothing purchased publishes
 itself.
+
+# The plugin API
+
+`PLUGIN-API.md` covers the three `/api/v1` endpoints the Figma plugin talks to,
+the scoped bearer credential behind them, and the two properties that are
+structural rather than checked — a key never exceeds the person who minted it,
+and nothing under the API can reach the publish path.

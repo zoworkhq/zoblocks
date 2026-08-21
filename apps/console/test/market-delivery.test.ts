@@ -183,7 +183,34 @@ describe("registry tokens", () => {
     const auth = await actingAs(northwind, "developer");
 
     for (let i = 0; i < MAX_TOKENS; i += 1) await mintToken(auth, `machine ${i}`);
-    await expect(mintToken(auth, "one more")).rejects.toThrow("live tokens");
+    // Named, because there is a cap per scope and being told which one is full
+    // is the difference between revoking something and guessing.
+    await expect(mintToken(auth, "one more")).rejects.toThrow("live registry tokens");
+  });
+
+  it("caps each scope separately", async () => {
+    const { northwind } = await twoOrgs();
+    const auth = await actingAs(northwind, "developer");
+
+    for (let i = 0; i < MAX_TOKENS; i += 1) await mintToken(auth, `machine ${i}`);
+
+    // A designer refused a Figma key because CI holds ten registry keys is a
+    // failure nobody can act on from the screen they are looking at.
+    const figma = await mintToken(auth, "Ada's Figma", "figma");
+    expect(figma.scope).toBe("figma");
+  });
+
+  it("counts tokens minted before scopes existed as registry tokens", async () => {
+    const { northwind } = await twoOrgs();
+    const auth = await actingAs(northwind, "developer");
+
+    for (let i = 0; i < MAX_TOKENS; i += 1) await mintToken(auth, `machine ${i}`);
+    // The shape of every token in the database before the field was added.
+    await auth.data.registryTokens.updateOne({}, { $unset: { scope: "" } });
+
+    // Otherwise an organisation at the cap could mint an eleventh by being old
+    // enough, which is the quiet kind of cap failure.
+    await expect(mintToken(auth, "one more")).rejects.toThrow("live registry tokens");
   });
 
   it("refuses to revoke another organisation's token", async () => {

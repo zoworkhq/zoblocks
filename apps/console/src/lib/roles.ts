@@ -26,7 +26,8 @@ export type Capability =
   | "market.browse"
   | "market.purchase"
   | "market.install"
-  | "market.token";
+  | "market.token"
+  | "plugin.token";
 
 const GRANTS: Record<MemberRole, readonly Capability[]> = {
   admin: [
@@ -42,6 +43,7 @@ const GRANTS: Record<MemberRole, readonly Capability[]> = {
     "market.purchase",
     "market.install",
     "market.token",
+    "plugin.token",
   ],
   designer: [
     "theme.read",
@@ -50,8 +52,9 @@ const GRANTS: Record<MemberRole, readonly Capability[]> = {
     "market.browse",
     "market.install",
     "market.token",
+    "plugin.token",
   ],
-  developer: ["theme.read", "theme.export", "market.browse", "market.token"],
+  developer: ["theme.read", "theme.export", "market.browse", "market.token", "plugin.token"],
   viewer: ["theme.read", "market.browse"],
 };
 
@@ -86,6 +89,19 @@ const GRANTS: Record<MemberRole, readonly Capability[]> = {
  * **`market.browse` is universal.** Seeing the shelf costs nothing and a
  * viewer who spots a pack tells the admin, which is the only marketing channel
  * inside the product.
+ *
+ * **`plugin.token` is granted to exactly the same roles as `market.token`**, and
+ * is a separate capability anyway. What it mints is a different credential
+ * reaching a different surface — a Figma key reads themes and cannot install a
+ * purchased component — and a grant that is identical today is still the honest
+ * place to change one of the two without changing the other. The name is also
+ * what a member reads in the role table, and "market.token" would describe the
+ * wrong thing.
+ *
+ * A Figma key can never exceed the person who minted it: the API resolves the
+ * token to its creator and re-checks their capabilities on every request. A
+ * developer's key reads themes and is refused a draft, because a developer has
+ * `theme.read` and not `theme.write`.
  */
 
 /**

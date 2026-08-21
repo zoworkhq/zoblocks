@@ -38,6 +38,16 @@ export interface Authorized {
   member: SessionMember;
   /** Already restricted to this member's organisation. */
   data: Scoped;
+  /**
+   * The credential this request arrived on, when it was not a browser session.
+   *
+   * Absent for someone signed in; set to a token's label for the Figma plugin.
+   * It lands in the audit detail, which is what makes "a draft authored by that
+   * key" answerable — without it, a change made from a design file is recorded
+   * as the person who minted the key sitting at the console, which is a true
+   * statement about the actor and a misleading one about what happened.
+   */
+  via?: string;
 }
 
 /**

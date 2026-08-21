@@ -40,7 +40,7 @@ import { NextResponse } from "next/server";
 import { unscopedMarketAsset, unscopedRegistryToken, unscopedTouchRegistryToken } from "@/db/scope";
 import { itemBySlug, versionFor } from "@/lib/market/catalogue";
 import { entitlementFor } from "@/lib/market/entitlements";
-import { hashToken } from "@/lib/market/tokens";
+import { hashToken, scopeOf } from "@/lib/market/tokens";
 
 const notFound = () => new NextResponse("Not found", { status: 404 });
 
@@ -65,6 +65,16 @@ export async function GET(request: Request, { params }: { params: Promise<{ name
 
   const token = await unscopedRegistryToken(hashToken(match[1]));
   if (!token) return notFound();
+
+  /*
+   * A Figma key does not install components.
+   *
+   * The plugin's credential reaches themes and nothing else; without this line
+   * a designer's key would also pull down paid component source, which is the
+   * whole reason tokens carry a scope. A 404 rather than a 403, like every
+   * other refusal on this route.
+   */
+  if (scopeOf(token) !== "registry") return notFound();
 
   const slug = name.replace(/\.json$/, "");
   const item = await itemBySlug(slug).catch(() => undefined);

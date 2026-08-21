@@ -458,10 +458,31 @@ export interface EntitlementDoc {
  * the reasoning behind `sessions` and `password_resets`, and for the same
  * reason: the thing being protected is reachable by anyone holding the string.
  */
+/**
+ * What a token may reach.
+ *
+ * `registry` installs purchased components through the shadcn CLI; `figma`
+ * reads themes and proposes drafts through the plugin API. They are separate
+ * because the people are separate: handing a designer a Figma key that also
+ * pulls down paid component source would grant a privilege nobody asked for,
+ * and revoking the designer's key would break the CI that installs components.
+ *
+ * One scope per token, deliberately. A combined key is a key nobody can revoke
+ * without deciding which of two things to break.
+ */
+export const TOKEN_SCOPES = ["registry", "figma"] as const;
+export type TokenScope = (typeof TOKEN_SCOPES)[number];
+
 export interface RegistryTokenDoc {
   /** SHA-256 of the token value. */
   _id: string;
   orgId: ObjectId;
+  /**
+   * Absent on every token minted before scopes existed, which is why nothing
+   * reads this field directly — `scopeOf()` supplies `registry` for them,
+   * because the registry was the only thing a token could reach.
+   */
+  scope?: TokenScope;
   label: string;
   createdBy: ObjectId;
   createdAt: Date;

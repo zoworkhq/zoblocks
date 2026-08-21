@@ -34,6 +34,7 @@ import { install } from "./market/install";
 import { grant } from "./market/entitlements";
 import { itemBySlug } from "./market/catalogue";
 import { mintToken, revokeToken } from "./market/tokens";
+import { TOKEN_SCOPES, type TokenScope } from "@/db/collections";
 import {
   ThemeError,
   applyImport,
@@ -946,10 +947,22 @@ export async function grantAction(form: FormData): Promise<ActionResult> {
  */
 export async function mintTokenAction(form: FormData): Promise<ActionResult> {
   const label = String(form.get("label") ?? "");
+  const raw = String(form.get("scope") ?? "registry");
 
   return run(async () => {
-    const auth = await authorize("market.token");
-    const { token, expiresAt } = await mintToken(auth, label);
+    /*
+     * The scope decides the capability, and it is validated before either.
+     *
+     * A form value reaching `authorize()` unchecked would be a caller choosing
+     * which permission to be measured against — so an unknown scope is refused
+     * here rather than defaulting, which would silently mint the wrong kind of
+     * key for whoever typo'd it.
+     */
+    if (!TOKEN_SCOPES.includes(raw as TokenScope)) throw new ThemeError("Unknown token scope.");
+    const scope = raw as TokenScope;
+
+    const auth = await authorize(scope === "figma" ? "plugin.token" : "market.token");
+    const { token, expiresAt } = await mintToken(auth, label, scope);
     revalidatePath("/market/tokens");
     return `${token} — copy it now. It expires ${expiresAt.toISOString().slice(0, 10)} and cannot be shown again.`;
   });
@@ -959,6 +972,9 @@ export async function revokeTokenAction(form: FormData): Promise<ActionResult> {
   const hash = String(form.get("hash") ?? "");
 
   return run(async () => {
+    // Revoking is the safe direction, so it takes the capability every holder
+    // of either kind already has rather than making somebody prove which kind
+    // they are about to stop.
     const auth = await authorize("market.token");
     await revokeToken(auth, hash);
     revalidatePath("/market/tokens");

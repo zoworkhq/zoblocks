@@ -159,12 +159,19 @@ export async function saveDraft(
     { _id: themeId },
     { $set: { tokens: next, updatedAt: now, updatedBy: new ObjectId(auth.member.id) } },
   );
+  /*
+   * The credential, appended to whatever the caller was describing.
+   *
+   * Here rather than at each call site because every path that writes a draft
+   * should say how it arrived, and one that forgets is the one nobody notices.
+   */
+  const note = [detail, auth.via ? `via ${auth.via}` : undefined].filter(Boolean).join(" · ");
   await auth.data.audit.insertOne({
     _id: new ObjectId(),
     actorId: new ObjectId(auth.member.id),
     action: "theme.updated",
     subject: theme.slug,
-    ...(detail ? { detail } : {}),
+    ...(note ? { detail: note } : {}),
     at: now,
   });
 }

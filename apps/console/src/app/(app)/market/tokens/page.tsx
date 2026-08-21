@@ -3,6 +3,7 @@ import { scoped } from "@/db/scope";
 import { can } from "@/lib/roles";
 import { TOKEN_LIFETIME_DAYS } from "@/lib/market/tokens";
 import { revokeTokenAction } from "@/lib/actions";
+import { scopeOf } from "@/lib/market/tokens";
 import { ActionForm } from "@/components/action-form";
 import { MintForm } from "./MintForm";
 import { Callout, EmptyState, PageHeader, Panel, StatusChip, SubmitButton } from "@/components/ui";
@@ -77,6 +78,15 @@ npx shadcn@latest add @oxygen-pro/vitals-flowsheet`}
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2">
                     <span className="font-medium">{token.label}</span>
+                    {/*
+                      The scope, beside the label.
+                      A revocation screen that does not say what each key
+                      reaches asks somebody to decide from a name alone, which
+                      is how the one key nobody recognised turns out to be CI.
+                    */}
+                    <StatusChip tone="neutral">
+                      {scopeOf(token) === "figma" ? "Figma" : "Registry"}
+                    </StatusChip>
                     {token.revokedAt ? (
                       <StatusChip tone="fail">Revoked</StatusChip>
                     ) : token.expiresAt.getTime() < Date.now() ? (
