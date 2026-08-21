@@ -98,7 +98,15 @@ export default async function MarketItemPage({ params }: { params: Promise<{ slu
         </Callout>
       )}
 
-      <div className="mt-6 grid gap-4 lg:grid-cols-[1.3fr_1fr]">
+      {/*
+        `items-start`, so a short panel is short.
+        
+        Grid items stretch to the row height by default, so "What you get" —
+        four filenames — was padded out to match the length of "What was
+        checked" and left a void most of a screen tall. An empty region that
+        large reads as something failing to load.
+      */}
+      <div className="mt-6 grid items-start gap-4 lg:grid-cols-[1.3fr_1fr]">
         <Panel tone="instrument" title="What you get">
           {version ? (
             <ul className="space-y-1.5">
