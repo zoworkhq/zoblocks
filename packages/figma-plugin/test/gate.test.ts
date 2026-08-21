@@ -293,3 +293,97 @@ describe("themeFromModeName", () => {
     expect(themeFromModeName("Brand")).toBe("light");
   });
 });
+
+describe("colours the gate cannot measure", () => {
+  it("reports zero rather than throwing when a value is not parseable", () => {
+    // A file where somebody's plugin wrote a malformed hex into a variable.
+    // `contrastBetween` returns undefined; the reading must not become NaN, or
+    // the panel prints "NaN:1" and the comparison silently passes.
+    const file = snapshot([
+      {
+        token: "--ox-text",
+        name: "text",
+        collection: OXYGEN,
+        values: { light: { kind: "color", hex: "not-a-colour", rgb: { r: 0, g: 0, b: 0 } } },
+      },
+      colour("bg", "#ffffff", { token: "--ox-bg", collection: OXYGEN }),
+    ]);
+
+    const reading = runGate(file, { collection: OXYGEN, figmaMode: "light" }).readings.find(
+      (r) => r.fg === "text" && r.bg === "bg",
+    )!;
+    expect(Number.isFinite(reading.ratio)).toBe(true);
+    expect(reading.passes).toBe(false);
+  });
+
+  it("skips the hue finding when a status colour will not parse", () => {
+    /*
+     * Built by hand rather than through the fixture, which refuses a hex it
+     * cannot parse — correctly, since a fixture typo should stop a test. Here
+     * the unparseable value is the subject.
+     */
+    const file = snapshot(
+      oxygenFile().variables.map((v) =>
+        v.token === "--ox-status-high"
+          ? {
+              ...v,
+              values: {
+                light: { kind: "color" as const, hex: "rgb(1,2,3)", rgb: { r: 0, g: 0, b: 0 } },
+              },
+            }
+          : v,
+      ),
+    );
+
+    // Better to say nothing about hue than to report a separation computed from
+    // a colour nobody can read.
+    expect(runGate(file, { collection: OXYGEN, figmaMode: "light" }).findings).toEqual([]);
+  });
+
+  it("ignores a colour it cannot parse when choosing a default ground", () => {
+    const file = snapshot([
+      {
+        name: "Broken",
+        collection: "Swatches",
+        values: { light: { kind: "color", hex: "??", rgb: { r: 0, g: 0, b: 0 } } },
+      },
+      colour("Paper", "#ffffff", { collection: "Swatches" }),
+      colour("Mist", "#c9d1d9", { collection: "Swatches" }),
+    ]);
+
+    const report = runGate(file, { collection: "Swatches", figmaMode: "light" });
+    expect(report.readings.every((r) => r.bg === "Paper")).toBe(true);
+  });
+
+  it("holds a status pair to 7:1 in high contrast, as `floorFor` does", () => {
+    const report = runGate(oxygenFile({}, "high-contrast"), {
+      collection: OXYGEN,
+      figmaMode: "high-contrast",
+    });
+    const status = report.readings.find((r) => r.fg === "status.critical")!;
+    expect(status.floor).toBe(floorFor("high-contrast"));
+    expect(status.floor).toBe(7);
+  });
+
+  it("prefers a named mode over the default when a variable carries both", () => {
+    const file = snapshot([
+      {
+        token: "--ox-text",
+        name: "text",
+        collection: OXYGEN,
+        values: {
+          default: { kind: "color", hex: "#888888", rgb: { r: 0.53, g: 0.53, b: 0.53 } },
+          light: { kind: "color", hex: "#16181d", rgb: { r: 0.086, g: 0.094, b: 0.114 } },
+        },
+      },
+      colour("bg", "#ffffff", { token: "--ox-bg", collection: OXYGEN }),
+    ]);
+
+    const reading = runGate(file, { collection: OXYGEN, figmaMode: "light" }).readings.find(
+      (r) => r.fg === "text",
+    )!;
+    // Falling back to `default` when a named mode exists would measure a colour
+    // the theme does not use in that mode.
+    expect(reading.fgValue).toBe("#16181d");
+  });
+});

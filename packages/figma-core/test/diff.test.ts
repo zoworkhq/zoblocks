@@ -14,7 +14,12 @@
 
 import { describe, expect, it } from "vitest";
 import { diffPlan, type VariableSnapshot } from "../src/diff";
-import { toVariablePlan } from "../src/plan";
+import {
+  toVariablePlan,
+  type PlannedValue,
+  type PlannedVariable,
+  type VariablePlan,
+} from "../src/plan";
 import { theme } from "./fixture";
 
 /**
@@ -170,5 +175,73 @@ describe("what counts as a change", () => {
     };
 
     expect(diffPlan(plan, snapshot).clean).toBe(false);
+  });
+});
+
+describe("values that are not colours", () => {
+  /** A collection may hold strings and numbers; the diff has to compare them. */
+  const named = (token: string, value: PlannedValue): PlannedVariable => ({
+    token,
+    name: token.replace("--ox-", ""),
+    tier: "semantic",
+    collection: "Oxygen / Semantic",
+    values: { light: value },
+  });
+
+  const planOf = (variables: PlannedVariable[]): VariablePlan => ({
+    collections: [{ name: "Oxygen / Semantic", modes: ["light"] }],
+    variables,
+  });
+
+  const fileOf = (token: string, value: PlannedValue): VariableSnapshot => ({
+    variables: [
+      {
+        token,
+        name: token.replace("--ox-", ""),
+        collection: "Oxygen / Semantic",
+        values: { light: value },
+      },
+    ],
+  });
+
+  it("sees no change when a string is unchanged", () => {
+    const value: PlannedValue = { kind: "string", value: "Inter" };
+    expect(diffPlan(planOf([named("--ox-font", value)]), fileOf("--ox-font", value)).clean).toBe(
+      true,
+    );
+  });
+
+  it("sees a changed string", () => {
+    const diff = diffPlan(
+      planOf([named("--ox-font", { kind: "string", value: "Inter" })]),
+      fileOf("--ox-font", { kind: "string", value: "Helvetica" }),
+    );
+    expect(diff.update[0]?.because).toEqual(["light"]);
+  });
+
+  it("sees no change when a number is unchanged", () => {
+    const value: PlannedValue = { kind: "number", value: 8 };
+    expect(
+      diffPlan(planOf([named("--ox-radius", value)]), fileOf("--ox-radius", value)).clean,
+    ).toBe(true);
+  });
+
+  it("sees a changed number", () => {
+    const diff = diffPlan(
+      planOf([named("--ox-radius", { kind: "number", value: 8 })]),
+      fileOf("--ox-radius", { kind: "number", value: 12 }),
+    );
+    expect(diff.update[0]?.because).toEqual(["light"]);
+  });
+
+  it("treats a change of kind as a change", () => {
+    // A variable that was a colour and is now an alias, or the reverse. Equal
+    // by neither branch, and comparing `.value` across kinds would throw or,
+    // worse, compare undefined to undefined and report no change.
+    const diff = diffPlan(
+      planOf([named("--ox-accent", { kind: "alias", token: "--ox-ref-brand-700" })]),
+      fileOf("--ox-accent", { kind: "string", value: "--ox-ref-brand-700" }),
+    );
+    expect(diff.update[0]?.because).toEqual(["light"]);
   });
 });

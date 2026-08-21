@@ -9,6 +9,7 @@
 import { beforeEach, describe, expect, it } from "vitest";
 
 import { renderConnect, renderPull, renderPush } from "../src/ui/sync";
+import { renderControls } from "../src/ui/controls";
 import { renderTabs } from "../src/ui/tabs";
 import { previewPull } from "../src/pull";
 import type { ResolvedPayload, ThemeSummary } from "../src/console";
@@ -340,5 +341,37 @@ describe("the tab strip", () => {
 
     root.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true }));
     expect(chosen).toEqual(["pull"]);
+  });
+});
+
+describe("the radio group when nothing changes", () => {
+  it("reports nothing when a radio is cleared rather than chosen", () => {
+    // Browsers fire `change` on the radio losing selection too. Reporting that
+    // would emit the value the designer just moved *away* from.
+    const changes: unknown[] = [];
+    const paletteOnly = {
+      id: "c2",
+      name: "Swatches",
+      modes: ["Mode 1"],
+      stamped: 0,
+      colours: 3,
+    };
+
+    renderControls(root, {
+      collections: [paletteOnly],
+      grounds: ["Paper"],
+      value: { collection: "Swatches", mode: "Mode 1", kind: "text" },
+      onChange: (c) => changes.push(c),
+    });
+
+    const ui = root.querySelector<HTMLInputElement>("input[value='ui']")!;
+    const text = root.querySelector<HTMLInputElement>("input[value='text']")!;
+    text.checked = false;
+    text.dispatchEvent(new Event("change"));
+    expect(changes).toEqual([]);
+
+    ui.checked = true;
+    ui.dispatchEvent(new Event("change"));
+    expect(changes).toHaveLength(1);
   });
 });

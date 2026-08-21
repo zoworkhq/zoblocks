@@ -20,7 +20,7 @@ import { GET as listRoute } from "@/app/api/v1/themes/route";
 import { GET as resolvedRoute } from "@/app/api/v1/themes/[slug]/resolved/route";
 import { POST as draftRoute } from "@/app/api/v1/themes/[slug]/draft/route";
 import { GET as registryRoute } from "@/app/r/pro/[name]/route";
-import { createTheme, publishTheme, saveOverrides } from "@/lib/themes";
+import { createTheme, publishTheme, saveOverrides, setThemeArchived } from "@/lib/themes";
 import { hashToken, mintToken } from "@/lib/market/tokens";
 import type { Authorized } from "@/lib/authorize";
 import { loadTokenSource } from "../../../scripts/gen/tokens/load";
@@ -529,5 +529,226 @@ describe("what the plugin API cannot reach", () => {
     // A token request has no session. Reaching for one would authenticate a
     // browser tab that happens to be open on the same machine as the plugin.
     expect(await scan(/from "next\/headers"/)).toEqual([]);
+  });
+});
+
+describe("states the happy path does not reach", () => {
+  it("refuses a key whose creator was deleted, not merely disabled", async () => {
+    const { asNorthwind } = await twoOrgs();
+    const nw = await asNorthwind();
+    const { token } = await withKey(nw);
+
+    // Offboarding that removes the row rather than flipping a flag. A key that
+    // outlives its owner is a credential nobody is accountable for.
+    await db().members.deleteOne({ _id: new ObjectId(nw.member.id) });
+
+    expect((await listRoute(get("/api/v1/themes", token))).status).toBe(404);
+  });
+
+  it("hides an archived theme from the picker but still resolves it", async () => {
+    const { asNorthwind } = await twoOrgs();
+    const nw = await asNorthwind();
+    const { theme, token } = await withKey(nw);
+    await setThemeArchived(nw, (await nw.data.themes.findOne({ slug: theme.slug }))!._id, true);
+
+    const { themes } = await (await listRoute(get("/api/v1/themes", token))).json();
+    expect(themes).toEqual([]);
+
+    /*
+     * Absent from the list, still readable by slug.
+     *
+     * Archiving takes a theme out of circulation; it does not unpublish, and
+     * published stylesheets keep serving. A file already pulled from it should
+     * still be able to ask what it is pinned to rather than getting a 404 that
+     * reads as "deleted".
+     */
+    const resolved = await resolvedRoute(
+      get(`/api/v1/themes/${theme.slug}/resolved`, token),
+      slugParams(theme.slug),
+    );
+    expect(resolved.status).toBe(200);
+  });
+
+  it("survives a slug with characters that mean something in a URL", async () => {
+    const { asNorthwind } = await twoOrgs();
+    const nw = await asNorthwind();
+    const { token } = await withKey(nw);
+
+    for (const slug of ["../../admin", "clinical?x=1", "clinical#frag", "%2e%2e", "  "]) {
+      const response = await resolvedRoute(
+        get(`/api/v1/themes/${encodeURIComponent(slug)}/resolved`, token),
+        slugParams(slug),
+      );
+      // Nothing but a 404, and never another organisation's theme.
+      expect(response.status, slug).toBe(404);
+    }
+  });
+
+  it("refuses a version number that is not a version, however it is spelled", async () => {
+    const { asNorthwind } = await twoOrgs();
+    const nw = await asNorthwind();
+    const { token } = await withKey(nw);
+
+    for (const bad of ["1e400", "NaN", "Infinity", "0x3", "3 ", "١٢٣", "9007199254740993"]) {
+      const response = await resolvedRoute(
+        get(`/api/v1/themes/clinical/resolved?version=${encodeURIComponent(bad)}`, token),
+        slugParams("clinical"),
+      );
+      // 400 for a malformed number, 404 for a well-formed one that does not
+      // exist. Never a silent fall back to the draft.
+      expect([400, 404], bad).toContain(response.status);
+    }
+  });
+
+  it("keeps two proposals to the same theme from losing one another", async () => {
+    const { asNorthwind } = await twoOrgs();
+    const nw = await asNorthwind();
+    const { token } = await withKey(nw);
+
+    // Two designers, one theme, one instant. Both are valid ramps.
+    const [a, b] = await Promise.all([
+      draftRoute(
+        post("/api/v1/themes/clinical/draft", token, { anchor: "#7c3aed" }),
+        slugParams("clinical"),
+      ),
+      draftRoute(
+        post("/api/v1/themes/clinical/draft", token, { anchor: "#b91c1c" }),
+        slugParams("clinical"),
+      ),
+    ]);
+
+    expect([a.status, b.status]).toEqual([201, 201]);
+
+    // One of them wins, and the draft is one of the two colours rather than a
+    // blend of both or an empty ramp.
+    const theme = await nw.data.themes.findOne({ slug: "clinical" });
+    expect(["#7c3aed", "#b91c1c"]).toContain(theme?.tokens.ref?.brand?.["600"]);
+    expect(Object.keys(theme?.tokens.ref?.brand ?? {})).toHaveLength(11);
+  });
+
+  it("refuses an anchor that is the right shape and the wrong type", async () => {
+    const { asNorthwind } = await twoOrgs();
+    const nw = await asNorthwind();
+    const { token } = await withKey(nw);
+
+    for (const anchor of [null, 42, true, ["#1d63c9"], { hex: "#1d63c9" }, ""]) {
+      const response = await draftRoute(
+        post("/api/v1/themes/clinical/draft", token, { anchor }),
+        slugParams("clinical"),
+      );
+      expect(response.status, JSON.stringify(anchor)).toBe(422);
+    }
+  });
+
+  it("accepts a three-digit hex, because the console's own form does", async () => {
+    const { asNorthwind } = await twoOrgs();
+    const nw = await asNorthwind();
+    const { token } = await withKey(nw);
+
+    const response = await draftRoute(
+      post("/api/v1/themes/clinical/draft", token, { anchor: "#70e" }),
+      slugParams("clinical"),
+    );
+
+    // Refusing here and accepting on the brand screen would be two answers to
+    // one question. The stored value keeps the three-digit form the designer
+    // typed rather than being expanded, which is what `generateRamp` does for
+    // the anchor step everywhere else.
+    expect(response.status).toBe(201);
+    expect((await response.json()).anchor).toBe("#70e");
+    expect((await nw.data.themes.findOne({ slug: "clinical" }))?.tokens.ref?.brand?.["600"]).toBe(
+      "#70e",
+    );
+  });
+
+  it("keeps the plugin's local reading and the gate in agreement on a real refusal", async () => {
+    const { asNorthwind } = await twoOrgs();
+    const nw = await asNorthwind();
+    const { token } = await withKey(nw);
+
+    /*
+     * The parity that matters for the propose screen.
+     *
+     * The plugin measures one pair locally so a designer sees a refusal while
+     * choosing rather than after a round trip. If that number and this one
+     * disagree, the local reading is worse than useless — it says pass where
+     * the gate says fail. `#0f766e` is the case that caught it: an ordinary
+     * brand teal whose derived accent puts white at 2.98:1.
+     */
+    const response = await draftRoute(
+      post("/api/v1/themes/clinical/draft", token, { anchor: "#0f766e" }),
+      slugParams("clinical"),
+    );
+
+    expect(response.status).toBe(422);
+    const detail = (await response.json()).detail.join(" ");
+    expect(detail).toContain("text-on-accent on accent");
+
+    // The exact figure the plugin panel puts in front of the designer.
+    expect(detail).toContain("2.98:1");
+  });
+
+  it("does not let a draft proposal touch a theme in another organisation, even by id", async () => {
+    const { asNorthwind, asSouthmere } = await twoOrgs();
+    const nw = await asNorthwind();
+    const sm = await asSouthmere();
+    const theirs = await createTheme(sm, { name: "Oncology", brandColour: "#b91c1c" });
+    const { token } = await mintToken(nw, "Ada's Figma", "figma");
+
+    const response = await draftRoute(
+      // The slug is theirs. Nothing in the request names an organisation, which
+      // is the point: the key decides, and it decides Northwind.
+      post(`/api/v1/themes/${theirs.slug}/draft`, token, { anchor: "#7c3aed" }),
+      slugParams(theirs.slug),
+    );
+
+    expect(response.status).toBe(422);
+    const untouched = await sm.data.themes.findOne({ slug: theirs.slug });
+    expect(untouched?.tokens.ref?.brand?.["600"]).toBe("#b91c1c");
+  });
+
+  it("answers a resolved request for a theme with an empty ramp", async () => {
+    const { asNorthwind } = await twoOrgs();
+    const nw = await asNorthwind();
+    const { theme, token } = await withKey(nw);
+
+    // A theme whose ramp was cleared by an import. The plugin should get an
+    // honest empty ramp rather than a 500.
+    await nw.data.themes.updateOne({ slug: theme.slug }, { $set: { "tokens.ref": {} } });
+
+    const response = await resolvedRoute(
+      get(`/api/v1/themes/${theme.slug}/resolved`, token),
+      slugParams(theme.slug),
+    );
+    expect(response.status).toBe(200);
+    expect((await response.json()).ramp).toEqual({});
+  });
+
+  it("carries no Set-Cookie, so nothing in between treats it as a session", async () => {
+    const { asNorthwind } = await twoOrgs();
+    const nw = await asNorthwind();
+    const { token } = await withKey(nw);
+
+    const response = await listRoute(get("/api/v1/themes", token));
+    expect(response.headers.get("set-cookie")).toBeNull();
+    expect(response.headers.get("cache-control")).toBe("private, no-store");
+  });
+
+  it("ignores a cookie entirely — the key is the only identity", async () => {
+    const { asNorthwind, asSouthmere } = await twoOrgs();
+    const nw = await asNorthwind();
+    const sm = await asSouthmere();
+    await createTheme(sm, { name: "Oncology", brandColour: "#b91c1c" });
+    await createTheme(nw, { name: "Clinical", brandColour: "#1d63c9" });
+    const { token } = await mintToken(nw, "Ada's Figma", "figma");
+
+    const request = new Request(`${ORIGIN}/api/v1/themes`, {
+      headers: { authorization: `Bearer ${token}`, cookie: "oxygen_session=whatever" },
+    });
+    const { themes } = await (await listRoute(request)).json();
+
+    // A route that read both would authenticate whichever browser tab happens
+    // to be open on the same machine as the plugin.
+    expect(themes.map((t: { slug: string }) => t.slug)).toEqual(["clinical"]);
   });
 });

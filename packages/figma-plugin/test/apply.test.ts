@@ -227,3 +227,132 @@ describe("moving between versions", () => {
     expect(figma.writes.pluginData).toBe(0);
   });
 });
+
+describe("the file in states nobody planned for", () => {
+  it("skips an alias whose target is missing rather than flattening it", async () => {
+    const fresh = new FakeFigma();
+
+    await applyPull(fresh.api(), {
+      write: [
+        {
+          token: "--ox-accent",
+          name: "accent",
+          tier: "semantic",
+          collection: "Oxygen / Semantic",
+          values: {
+            // Points at a brand variable that is neither in this write list nor
+            // already in the file — the state after somebody deletes one.
+            light: { kind: "alias", token: "--ox-ref-brand-700" },
+            dark: { kind: "color", hex: "#5a94e7", rgb: hexToFigmaRgb("#5a94e7")! },
+          },
+        },
+      ],
+      pin: { slug: "clinical", version: 1 },
+    });
+
+    const accent = fresh.variable("--ox-accent")!;
+    const modes = fresh.collection("Oxygen / Semantic")!.modes;
+    const light = modes.find((m) => m.name === "light")!.modeId;
+    const dark = modes.find((m) => m.name === "dark")!.modeId;
+
+    /*
+     * Nothing written for light, rather than the colour the alias resolves to.
+     *
+     * Writing the hex would silently flatten the tiering the plan went to
+     * trouble to express, and it would look entirely correct in the file —
+     * which is exactly why it is worth a test rather than a comment.
+     */
+    expect(accent.valuesByMode[light]).toBeUndefined();
+    expect(accent.valuesByMode[dark]).toEqual(hexToFigmaRgb("#5a94e7"));
+  });
+
+  it("writes a variable that is not a colour", async () => {
+    // Figma collections hold strings and numbers too. The adapter has a branch
+    // for each and neither is reachable from a theme today.
+    await applyPull(figma.api(), {
+      write: [
+        {
+          token: "--ox-font-family",
+          name: "font/family",
+          tier: "semantic",
+          collection: "Oxygen / Semantic",
+          values: { light: { kind: "string", value: "Inter" } },
+        },
+        {
+          token: "--ox-radius-md",
+          name: "radius/md",
+          tier: "semantic",
+          collection: "Oxygen / Semantic",
+          values: { light: { kind: "number", value: 8 } },
+        },
+      ],
+      pin: { slug: "clinical", version: 1 },
+    });
+
+    const family = figma.variable("--ox-font-family")!;
+    const radius = figma.variable("--ox-radius-md")!;
+    expect(Object.values(family.valuesByMode)).toEqual(["Inter"]);
+    expect(Object.values(radius.valuesByMode)).toEqual([8]);
+  });
+
+  it("leaves a mode the collection does not have rather than inventing one", async () => {
+    const fresh = new FakeFigma();
+    // A collection somebody made by hand, with only one mode.
+    fresh.seedCollection("Oxygen / Semantic", ["light"]);
+
+    await applyPull(fresh.api(), {
+      write: [
+        {
+          token: "--ox-text",
+          name: "text",
+          tier: "semantic",
+          collection: "Oxygen / Semantic",
+          values: {
+            light: { kind: "color", hex: "#16181d", rgb: hexToFigmaRgb("#16181d")! },
+            dark: { kind: "color", hex: "#e8ecf1", rgb: hexToFigmaRgb("#e8ecf1")! },
+          },
+        },
+      ],
+      pin: { slug: "clinical", version: 1 },
+    });
+
+    // `ensureCollection` adds the missing modes, so both land. What must not
+    // happen is a value written against a mode id that does not exist.
+    const text = fresh.variable("--ox-text")!;
+    for (const modeId of Object.keys(text.valuesByMode)) {
+      expect(
+        fresh.collection("Oxygen / Semantic")!.modes.some((m) => m.modeId === modeId),
+        modeId,
+      ).toBe(true);
+    }
+  });
+
+  it("writes nothing when the diff is empty, not even a collection", async () => {
+    const fresh = new FakeFigma();
+    await applyPull(fresh.api(), { write: [], pin: { slug: "clinical", version: 1 } });
+    expect(fresh.total).toBe(0);
+  });
+});
+
+describe("reading the pin back", () => {
+  it("finds nothing in a file that has never been pulled", async () => {
+    expect(await readPin(new FakeFigma().api())).toBeUndefined();
+  });
+
+  it("ignores a collection carrying a version that is not one", async () => {
+    const fresh = new FakeFigma();
+    const collection = fresh.seedCollection("Oxygen / Brand", ["Default"]);
+    collection.setPluginData(PIN.theme, "clinical");
+    collection.setPluginData(PIN.version, "not-a-number");
+
+    // A half-written pin is worse than none: the panel would say "this file is
+    // on clinical vNaN".
+    expect(await readPin(fresh.api())).toBeUndefined();
+  });
+
+  it("ignores a version with no theme beside it", async () => {
+    const fresh = new FakeFigma();
+    fresh.seedCollection("Oxygen / Brand", ["Default"]).setPluginData(PIN.version, "3");
+    expect(await readPin(fresh.api())).toBeUndefined();
+  });
+});

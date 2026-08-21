@@ -158,12 +158,6 @@ export function versionMove(
   return next.version > pinned.version ? "forward" : "back";
 }
 
-/** Every collection the plan needs, whether or not the file has them yet. */
-export function collectionsIn(plan: VariablePlan): string[] {
-  const named = new Set(plan.variables.map((v) => v.collection));
-  return Object.values(COLLECTION).filter((c) => named.has(c));
-}
-
 /** The modes a tier needs. Brand has one; the themed tiers have three. */
 export function modesFor(collection: string): string[] {
   return collection === COLLECTION.brand ? ["Default"] : [...THEMES];
