@@ -24,7 +24,8 @@
  */
 
 import { NextResponse } from "next/server";
-import { fontHeaders, logoHeaders, type FontFormat, type LogoFormat } from "@oxygenui-design/theme";
+import { fontHeaders, type FontFormat, type LogoFormat } from "@oxygenui-design/theme";
+import { logoHeaders } from "@oxygenui-design/theme/logo";
 import { unscopedFontAsset } from "@/db/scope";
 
 const FONTS = new Set(["woff2", "woff", "ttf", "otf"]);

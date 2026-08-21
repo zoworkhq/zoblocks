@@ -19,13 +19,16 @@
  */
 
 import { createHash } from "node:crypto";
-import { brandAsset, type BrandAssetRole } from "./assets";
+import { brandAsset, type BrandAssetRole, type LogoFormat } from "./assets";
 import { imageSize, type Dimensions } from "./dimensions";
+
+export { imageSize, type Dimensions };
 
 /** 512 KB. A logo is line art; anything larger is a photograph or a mistake. */
 export const MAX_LOGO_BYTES = 512 * 1024;
 
-export type LogoFormat = "svg" | "png" | "jpeg" | "webp";
+/** Defined in `./assets`, beside the roles that enumerate it. */
+export type { LogoFormat };
 
 /**
  * Where a piece of artwork is meant to be used.

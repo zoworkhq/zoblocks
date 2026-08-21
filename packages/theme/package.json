@@ -24,6 +24,7 @@
   "exports": {
     ".": "./src/index.ts",
     "./react": "./src/react.tsx",
+    "./logo": "./src/logo.ts",
     "./package.json": "./package.json"
   },
   "files": [
@@ -47,6 +48,10 @@
       "./react": {
         "types": "./dist/react.d.ts",
         "default": "./dist/react.js"
+      },
+      "./logo": {
+        "types": "./dist/logo.d.ts",
+        "default": "./dist/logo.js"
       },
       "./package.json": "./package.json"
     }

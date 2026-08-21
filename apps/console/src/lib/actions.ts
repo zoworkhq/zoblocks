@@ -20,7 +20,8 @@ import {
   recordFailure,
   verifyPassword,
 } from "./auth";
-import { MAX_LOGO_BYTES, brandAsset } from "@oxygenui-design/theme";
+import { brandAsset } from "@oxygenui-design/theme";
+import { MAX_LOGO_BYTES } from "@oxygenui-design/theme/logo";
 import { authorize } from "./authorize";
 import { baseTokens } from "./base-tokens";
 import { MAX_FONT_BYTES, removeFont, uploadFont } from "./fonts";

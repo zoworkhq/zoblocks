@@ -24,7 +24,14 @@ export {
 
 export { ICON_SLOTS, REPLACEABLE_SLOTS, iconSlot, iconVar, type IconSlot } from "./icons";
 
-export { imageSize, type Dimensions } from "./dimensions";
+/*
+ * `imageSize` sits at `@oxygenui-design/theme/logo` with the checker that calls
+ * it. It reads a width and a height out of the first few hundred bytes of an
+ * upload, which is a thing you do on a server holding an upload — and it is
+ * 6 kB of PNG, JPEG, WebP and SVG header parsing that no browser consumer has
+ * ever imported.
+ */
+export type { Dimensions } from "./dimensions";
 
 export { brandManifest, type ManifestAsset, type ThemeManifest } from "./manifest";
 
@@ -107,19 +114,20 @@ export {
   type ImportReport,
 } from "./export";
 
-export {
-  LOGO_VARIANTS,
-  MAX_LOGO_BYTES,
-  checkBrandAsset,
-  checkLogo,
-  logoContentType,
-  logoHeaders,
-  type LogoAcceptance,
-  type LogoCheck,
-  type LogoFormat,
-  type LogoRejection,
-  type LogoVariant,
-} from "./logo";
+/*
+ * `checkLogo` and its neighbours are at `@oxygenui-design/theme/logo`, not here.
+ *
+ * They hash uploaded bytes with `node:crypto`, which is correct — the digest is
+ * how an upload becomes an addressable asset — and it means the module cannot
+ * be bundled for a browser. Re-exported from this barrel it dragged
+ * `node:crypto` into every consumer of `@oxygenui-design/theme` and broke the
+ * bundle budget, which is exactly what that budget is for.
+ *
+ * The type is still here because it is data about an image rather than code
+ * that reads one, and a caller describing a format should not have to import a
+ * server module to name it.
+ */
+export type { LogoFormat } from "./assets";
 
 export {
   MAX_FONT_BYTES,

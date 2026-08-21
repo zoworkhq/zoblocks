@@ -19,7 +19,18 @@
  * them silently missing its accessibility check.
  */
 
-import type { LogoFormat } from "./logo";
+/**
+ * The image formats a brand asset may arrive in.
+ *
+ * Here rather than in `logo.ts`, which is where it started and where it read
+ * more naturally. `logo.ts` imports this registry to look a role up, and this
+ * registry needs the union to say which formats each role accepts — a cycle
+ * that is type-only and harmless at runtime, and that `pnpm deps` correctly
+ * refuses because the next edge added to it may not be. The registry is the
+ * file that enumerates formats per role, so the union belongs with it;
+ * `logo.ts` re-exports it and no caller changed.
+ */
+export type LogoFormat = "svg" | "png" | "jpeg" | "webp";
 
 export type BrandAssetRole =
   | "mark-light"

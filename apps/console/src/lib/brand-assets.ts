@@ -1,11 +1,11 @@
 import { Binary, ObjectId } from "mongodb";
 import {
   BRAND_ASSET_ROLES,
-  checkBrandAsset,
   emptyAssets,
   type BrandAssetFile,
   type BrandAssetRole,
 } from "@oxygenui-design/theme";
+import { checkBrandAsset } from "@oxygenui-design/theme/logo";
 import type { Authorized } from "./authorize";
 import { ThemeError, orgSlug } from "./themes";
 

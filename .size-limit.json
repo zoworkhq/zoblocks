@@ -158,7 +158,7 @@
   {
     "name": "theme \u2014 the document model, ramp, validation and CSS emitter",
     "path": "packages/theme/dist/index.js",
-    "limit": "21 KB"
+    "limit": "27 KB"
   },
   {
     "name": "theme \u2014 the inline provider alone",

@@ -55,14 +55,29 @@ export const CONSOLE = process.env.NEXT_PUBLIC_CONSOLE_URL ?? "https://console.o
 /** Where a reader goes to actually buy one. Buying needs an organisation. */
 export const buyHref = (slug: string) => `${CONSOLE}/market/${slug}`;
 
+/**
+ * `RequestInit` plus the field Next adds to it.
+ *
+ * Declared rather than inherited, because this module is compiled by two
+ * programs. Next's own build sees `next-env.d.ts` and knows about `next`; the
+ * root `tsconfig.json` reaches this file through `test/marketplace-public.test.ts`
+ * and does not, so the plain `fetch` overload rejects the option and the root
+ * typecheck fails while the app's passes. Narrower than adding Next's types to
+ * the root program for one property.
+ */
+interface NextFetchInit extends RequestInit {
+  next?: { revalidate?: number | false; tags?: string[] };
+}
+
 export async function catalogue(): Promise<MarketItem[]> {
   try {
-    const response = await fetch(`${CONSOLE}/c/catalog.json`, {
+    const init: NextFetchInit = {
       // Ten minutes. The catalogue changes when somebody publishes a pack,
       // which is rare; the cost of being ten minutes late is nothing and the
       // cost of hammering the console on every request is not.
       next: { revalidate: 600 },
-    });
+    };
+    const response = await fetch(`${CONSOLE}/c/catalog.json`, init);
     if (!response.ok) return [];
     const body = (await response.json()) as { items?: MarketItem[] };
     return body.items ?? [];

@@ -1,11 +1,11 @@
 import { Binary, ObjectId } from "mongodb";
 import {
   REPLACEABLE_SLOTS,
-  checkLogo,
   emptyAssets,
   iconSlot,
   type IconOverride,
 } from "@oxygenui-design/theme";
+import { checkLogo } from "@oxygenui-design/theme/logo";
 import type { Authorized } from "./authorize";
 import { ThemeError, orgSlug } from "./themes";
 import { assetHref } from "./brand-assets";
