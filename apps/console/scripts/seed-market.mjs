@@ -472,6 +472,217 @@ await upsertItem(
   },
 );
 
+/* --------------------------------------------------------------------------
+ * 6 · The roadmap.
+ *
+ * Announced rather than hidden. A team deciding whether to build a results
+ * grid themselves deserves to know one is coming, and an empty catalogue makes
+ * a specialist look like a hobby.
+ *
+ * These carry no version, no files and no provenance worth the name: nothing
+ * has been measured because nothing has been built, and inventing a pass rate
+ * for an unwritten pack would be the one lie this product cannot afford. The
+ * card shows a motif instead. Every purchase path refuses them.
+ * ----------------------------------------------------------------------- */
+
+/** Nothing measured yet. Zero of zero, honestly, rather than a flattering guess. */
+const unmeasured = {
+  checkedAt: PUBLISHED,
+  checkerVersion: 3,
+  contrastPairs: { passed: 0, total: 0, floor: "4.5:1" },
+  forcedColors: "not-applicable",
+  nonColourChannel: "not yet designed",
+};
+
+async function announce({ slug, kind, title, blurb, priceMinor }) {
+  await db.collection("catalog_items").updateOne(
+    { slug },
+    {
+      $set: {
+        slug,
+        kind,
+        title,
+        blurb,
+        priceMinor,
+        currency: "usd",
+        stripePriceId: null,
+        liveVersion: 0,
+        frameworks: null,
+        comingSoon: true,
+        provenance: {
+          accessibility: unmeasured,
+          authorship: { method: "hand-drawn", thirdPartyContent: [] },
+          licence,
+        },
+        listedAt: PUBLISHED,
+      },
+      $setOnInsert: { _id: new ObjectId() },
+    },
+    { upsert: true },
+  );
+  console.log(`  ${slug} — coming soon`);
+}
+
+console.log("\nAnnouncing the roadmap…");
+
+const ROADMAP = [
+  // Behavioural health — the underserved half.
+  {
+    slug: "measurement-based-care",
+    kind: "component",
+    title: "Measurement-based care instruments",
+    blurb:
+      "PHQ-9, GAD-7, AUDIT-C and PCL-5 in the published wording, scored and banded. Item 9 asks about self-harm, so it gets a route out of the form rather than a score.",
+    priceMinor: 60000,
+  },
+  {
+    slug: "cssrs-screener",
+    kind: "component",
+    title: "C-SSRS risk screener",
+    blurb:
+      "The Columbia protocol, branching as published — later questions appear only on particular answers, because the branching is the instrument rather than a convenience.",
+    priceMinor: 70000,
+  },
+  {
+    slug: "safety-plan-patient-copy",
+    kind: "illustration",
+    title: "Safety plan — the patient's copy",
+    blurb:
+      "The artefact somebody leaves the room with. A5, legible without the app, and readable at the worst moment of their year.",
+    priceMinor: 25000,
+  },
+  {
+    slug: "part-2-consent",
+    kind: "component",
+    title: "42 CFR Part 2 consent and disclosure",
+    blurb:
+      "US substance-use records are governed more strictly than HIPAA: consent names the recipient, redisclosure is prohibited, and the prohibition travels with the record.",
+    priceMinor: 80000,
+  },
+  {
+    slug: "caseload-dashboard",
+    kind: "component",
+    title: "Caseload dashboard",
+    blurb:
+      "A panel of clients by next-contact-due, missed appointments and assessments falling out of date. Sorted by who is overdue, because the clinician already knows who is sickest.",
+    priceMinor: 55000,
+  },
+  {
+    slug: "crisis-resources",
+    kind: "component",
+    title: "Crisis resources block",
+    blurb:
+      "Localised hotline and warmline details that state plainly the app is not a crisis service. Free, because charging for this is the wrong look.",
+    priceMinor: 0,
+  },
+
+  // The generic components, made specific.
+  {
+    slug: "results-grid",
+    kind: "component",
+    title: "Results grid",
+    blurb:
+      "Reference ranges that vary by age and sex, results amended twice, units that disagree between labs, and the difference between pending, cancelled and never ordered.",
+    priceMinor: 65000,
+  },
+  {
+    slug: "clinical-date-entry",
+    kind: "component",
+    title: "Clinical date entry",
+    blurb:
+      "Partial dates, because FHIR permits them and patients say “around 2019”. Relative dates for post-op days, and administration times that survive a time zone.",
+    priceMinor: 30000,
+  },
+  {
+    slug: "dictation-note-editor",
+    kind: "component",
+    title: "Dictation-aware note editor",
+    blurb:
+      "Coded autocomplete for SNOMED and ICD, and the legal difference between an addendum and an amendment — a signed note cannot be edited, only appended to.",
+    priceMinor: 90000,
+  },
+  {
+    slug: "patient-identity-header",
+    kind: "component",
+    title: "Patient identity header",
+    blurb:
+      "The band at the top of every clinical screen: preferred name against legal name, pronouns, allergy flags, and the identifiers a ward actually uses.",
+    priceMinor: 22000,
+  },
+
+  // Themes and iconography.
+  {
+    slug: "low-arousal-palette",
+    kind: "theme",
+    title: "Low-arousal palette",
+    blurb:
+      "Clinical palettes are built around alarm. A behavioural-health surface is used by people in distress, and red for a non-urgent state is an unkind default.",
+    priceMinor: 18000,
+  },
+  {
+    slug: "print-and-fax-palette",
+    kind: "theme",
+    title: "Print and fax palette",
+    blurb:
+      "Healthcare still faxes. A palette whose meaning survives one-bit monochrome, which is harder than greyscale and the case nobody tests.",
+    priceMinor: 15000,
+  },
+  {
+    slug: "behavioural-health-icons",
+    kind: "icons",
+    title: "Behavioural-health iconography",
+    blurb:
+      "Therapy modality, group against individual, telehealth, medication-assisted treatment, peer support. Generic sets offer a brain or a puzzle piece, both of which mean something else.",
+    priceMinor: 22000,
+  },
+  {
+    slug: "trauma-informed-imagery",
+    kind: "illustration",
+    title: "Trauma-informed imagery guidance",
+    blurb:
+      "Partly a set and partly a document: what not to draw. Restraints, seclusion, pills in a hand, a figure alone behind glass. The prohibitions are the product.",
+    priceMinor: 28000,
+  },
+
+  // Fixtures.
+  {
+    slug: "behavioural-health-caseload",
+    kind: "fixtures",
+    title: "Behavioural-health caseload",
+    blurb:
+      "Forty synthetic clients with the awkward cases built in: a no-show streak, a half-finished PHQ-9, somebody who declined item 9, a client whose insurer has a different name.",
+    priceMinor: 40000,
+  },
+  {
+    slug: "adversarial-palettes",
+    kind: "fixtures",
+    title: "Adversarial accessibility fixtures",
+    blurb:
+      "Palettes that pass in isolation and fail in place — an ordinary brand teal whose derived accent puts white at 2.98:1. A test suite nobody else has to discover.",
+    priceMinor: 20000,
+  },
+
+  // Figma, and the categories the schema does not have yet.
+  {
+    slug: "figma-library",
+    kind: "component",
+    title: "Figma library — the whole system",
+    blurb:
+      "Variables for three tiers and three themes, every component published, with Code Connect so Dev Mode shows the real import. Needs a named owner before it starts.",
+    priceMinor: 150000,
+  },
+  {
+    slug: "vpat-and-acr",
+    kind: "fixtures",
+    title: "VPAT and conformance report",
+    blurb:
+      "Pre-filled from the gate's own measurements rather than written from memory the week before a deadline. Every healthcare procurement asks for one.",
+    priceMinor: 90000,
+  },
+];
+
+for (const entry of ROADMAP) await announce(entry);
+
 const count = await db.collection("catalog_items").countDocuments();
 console.log(`\nCatalogue seeded: ${count} item(s).`);
 console.log("Sign in and open /market.");

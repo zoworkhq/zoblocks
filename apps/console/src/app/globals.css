@@ -669,3 +669,78 @@ input:-webkit-autofill:focus {
   outline: none;
   box-shadow: 0 0 0 3px var(--color-oxygen, rgb(59 130 246 / 0.3));
 }
+
+/* ---------------------------------------------------------------------------
+ * Coming-soon previews
+ *
+ * Motifs for catalogue items that have nothing to measure yet. Motion safety
+ * lives here rather than at each call site: the animation is only ever declared
+ * inside `prefers-reduced-motion: no-preference`, so a reader who opts out gets
+ * the element's resting style — which is a finished composition, not a frozen
+ * first frame. A `motion-safe:` variant on thirty spans is thirty chances to
+ * forget one.
+ *
+ * Long, slow and low-contrast on purpose. These sit twelve to a grid, and a
+ * catalogue that flickers is a catalogue nobody reads.
+ * ------------------------------------------------------------------------ */
+
+@keyframes ox-fade {
+  0%,
+  100% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes ox-sweep {
+  0%,
+  100% {
+    transform: scaleY(0.72);
+  }
+  50% {
+    transform: scaleY(1);
+  }
+}
+
+@keyframes ox-slide {
+  0%,
+  100% {
+    opacity: 0.4;
+    transform: translateX(-3px);
+  }
+  50% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes ox-draw {
+  0% {
+    stroke-dashoffset: 100;
+  }
+  45%,
+  70% {
+    stroke-dashoffset: 0;
+  }
+  100% {
+    stroke-dashoffset: -100;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .ox-fade {
+    animation: ox-fade 2.8s ease-in-out infinite;
+  }
+  .ox-sweep {
+    animation: ox-sweep 3.2s ease-in-out infinite;
+    transform-origin: bottom;
+  }
+  .ox-slide {
+    animation: ox-slide 3s ease-in-out infinite;
+  }
+  .ox-draw {
+    animation: ox-draw 4.5s ease-in-out infinite;
+  }
+}

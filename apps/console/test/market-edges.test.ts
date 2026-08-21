@@ -24,9 +24,10 @@ import { grant, held, heldIncludingRevoked, revoke } from "@/lib/market/entitlem
 import { fulfilSession, markExpired, orderItems, revokeForCharge } from "@/lib/market/fulfil";
 import { install } from "@/lib/market/install";
 import { hashToken, mintToken } from "@/lib/market/tokens";
+import { createCheckout } from "@/lib/market/checkout";
 import { createTheme } from "@/lib/themes";
 import { actingAs, twoOrgs } from "./harness";
-import { checkoutSession, seedItem } from "./market-harness";
+import { checkoutSession, fakeGateway, seedItem } from "./market-harness";
 
 describe("a session that reports no total", () => {
   it("delivers rather than treating the unknown as a shortfall", async () => {
@@ -235,5 +236,64 @@ describe("revoking something never granted", () => {
     await revoke(northwind, item._id, "mistake");
 
     expect(await scoped(northwind).entitlements.countDocuments()).toBe(0);
+  });
+});
+
+describe("an announcement is not a product", () => {
+  /**
+   * A coming-soon item is listed on purpose — it is the roadmap, and a team
+   * deciding whether to build something deserves to know we are. Every other
+   * guard in the purchase path therefore lets it through: it has a slug, it is
+   * listed, it is not already owned.
+   *
+   * Nothing exists to deliver. A checkout that succeeded would take money for
+   * an empty entitlement, and a grant would hand somebody a download that 404s.
+   */
+  async function announced(price: number | null = 60000) {
+    const item = await seedItem({ slug: "results-grid", priceMinor: price });
+    await db().catalogItems.updateOne(
+      { _id: item._id },
+      { $set: { comingSoon: true, liveVersion: 0, stripePriceId: null } },
+    );
+    return item;
+  }
+
+  it("refuses a checkout, and says why rather than pretending it is unlisted", async () => {
+    const { asNorthwind } = await twoOrgs();
+    const nw = await asNorthwind();
+    await announced();
+
+    await expect(
+      createCheckout(nw, "results-grid", "https://console.test", fakeGateway()),
+    ).rejects.toThrow(/not finished yet/);
+  });
+
+  it("refuses a contract grant, so nobody is told they own nothing", async () => {
+    const { asNorthwind } = await twoOrgs();
+    const nw = await asNorthwind();
+    const item = await announced();
+
+    // The grant path is the one that bypasses Stripe entirely, so it needs its
+    // own guard rather than inheriting checkout's.
+    const before = await nw.data.entitlements.countDocuments({ itemId: item._id });
+    await expect(
+      createCheckout(nw, "results-grid", "https://console.test", fakeGateway()),
+    ).rejects.toThrow();
+    expect(await nw.data.entitlements.countDocuments({ itemId: item._id })).toBe(before);
+  });
+
+  it("stays listed, because hiding it would defeat the point", async () => {
+    await announced();
+    const item = await db().catalogItems.findOne({ slug: "results-grid" });
+    expect(item?.listedAt).not.toBeNull();
+    expect(item?.comingSoon).toBe(true);
+  });
+
+  it("carries no invented provenance", async () => {
+    await announced();
+    const item = await db().catalogItems.findOne({ slug: "results-grid" });
+    // Nothing has been measured because nothing has been built. A flattering
+    // pass rate on an unwritten pack is the one lie this product cannot afford.
+    expect(item?.liveVersion).toBe(0);
   });
 });

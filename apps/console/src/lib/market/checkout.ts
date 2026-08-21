@@ -43,6 +43,18 @@ export async function createCheckout(
   if (!item.listedAt) {
     throw new MarketError(`${item.title} is not currently for sale.`);
   }
+  /*
+   * An announcement is not a product.
+   *
+   * A coming-soon item is listed on purpose — it is the roadmap — so every
+   * other guard here would let it through. Nothing exists to deliver, so a
+   * checkout that succeeded would take money for an empty entitlement.
+   */
+  if (item.comingSoon) {
+    throw new MarketError(`${item.title} is not finished yet.`, [
+      "It is on the catalogue so you can see it coming, not so you can buy it.",
+    ]);
+  }
   if (item.priceMinor === null || !item.stripePriceId) {
     throw new MarketError(`${item.title} is sold as part of an engagement.`, [
       "Ask for an invoice and it will be granted to this organisation directly.",

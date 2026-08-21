@@ -2,6 +2,7 @@ import Link from "next/link";
 import { currentMember } from "@/lib/auth";
 import { can, whyNot } from "@/lib/roles";
 import { KIND_LABEL, listing, priceLabel } from "@/lib/market/catalogue";
+import { ComingSoonPreview } from "@/components/market/ComingSoonPreview";
 import { EmptyState, PageHeader, StatusChip, buttonClasses } from "@/components/ui";
 
 export const metadata = { title: "Catalogue" };
@@ -25,6 +26,8 @@ export const metadata = { title: "Catalogue" };
 export default async function MarketPage() {
   const member = (await currentMember())!;
   const items = await listing(member.orgId);
+  const available = items.filter(({ item }) => !item.comingSoon);
+  const soon = items.filter(({ item }) => item.comingSoon);
 
   const canBuy = can(member.role, "market.purchase");
   const refusal = whyNot(member.role, "market.purchase");
@@ -53,8 +56,16 @@ export default async function MarketPage() {
         lede="Purchases are perpetual and belong to the organisation, not to the person who paid. Nothing installed here is live until a theme is published."
       />
 
+      {/*
+        Two lists, not one sorted list.
+        
+        A coming-soon item and a buyable one answer different questions — "what
+        can I use today" and "should I build this myself" — and interleaving
+        them makes a reader check every card for a Buy button. Available first,
+        because that is what somebody arrived for.
+      */}
       <ul className="mt-6 grid gap-4 sm:grid-cols-2">
-        {items.map(({ item, owned, entitlement }) => (
+        {available.map(({ item, owned, entitlement }) => (
           <li key={item.slug} className="surface flex flex-col overflow-hidden p-0">
             {/*
               The dark panel is what this design language does with anything
@@ -181,6 +192,67 @@ export default async function MarketPage() {
           </li>
         ))}
       </ul>
+
+      {soon.length > 0 && (
+        <>
+          <div className="mt-10 flex items-baseline justify-between gap-3 border-t border-rule pt-6">
+            <h2 className="font-display text-[1.0625rem] font-semibold tracking-[-0.015em]">
+              Coming soon
+            </h2>
+            <p className="body-xs text-graphite-soft">
+              {soon.length} in the making · nothing here can be bought yet
+            </p>
+          </div>
+
+          <p className="body-sm mt-1.5 max-w-[46rem] text-graphite">
+            Listed so you can see what is coming before deciding to build it yourself. Each one is
+            here because it is hazardous to get wrong rather than merely tedious to write.
+          </p>
+
+          <ul className="mt-5 grid gap-4 sm:grid-cols-2">
+            {soon.map(({ item }) => (
+              <li key={item.slug} className="surface flex flex-col overflow-hidden p-0 opacity-95">
+                <div className="flex flex-col gap-2 border-b border-panel-rule bg-panel px-4 py-3.5">
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="eyebrow text-[0.5625rem] text-panel-muted">
+                      {KIND_LABEL[item.kind]}
+                    </span>
+                    <span className="font-mono text-[0.625rem] text-panel-muted">in progress</span>
+                  </div>
+                  <ComingSoonPreview kind={item.kind} slug={item.slug} />
+                </div>
+
+                <div className="flex flex-1 flex-col gap-2 p-4">
+                  <div className="flex items-start justify-between gap-2">
+                    <h3 className="font-display text-[0.9375rem] font-semibold tracking-[-0.015em]">
+                      {item.title}
+                    </h3>
+                    <StatusChip tone="neutral">Coming soon</StatusChip>
+                  </div>
+
+                  <p className="body-sm text-graphite">{item.blurb}</p>
+
+                  {/*
+                    The intended price, and no control.
+                    
+                    A disabled Buy button invites the click it then refuses. The
+                    price is worth showing — it is what somebody is weighing
+                    against building it — and the absence of a button is the
+                    clearest possible statement that it is not for sale.
+                  */}
+                  <p className="mt-auto pt-2 font-mono text-[0.8125rem] text-graphite-soft">
+                    {item.priceMinor === null
+                      ? "Priced on enquiry"
+                      : item.priceMinor === 0
+                        ? "Free when it ships"
+                        : `${priceLabel(item)} when it ships`}
+                  </p>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
     </>
   );
 }

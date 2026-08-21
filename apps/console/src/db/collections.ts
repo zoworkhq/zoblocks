@@ -340,6 +340,18 @@ export interface CatalogItemDoc {
   provenance: Provenance;
   /** `null` while unlisted — drafted, or withdrawn without being deleted. */
   listedAt: Date | null;
+  /**
+   * Announced but not yet buyable.
+   *
+   * Distinct from `listedAt: null`, which hides an item entirely. A coming-soon
+   * item is deliberately visible: it is the roadmap, and a customer deciding
+   * whether to build something themselves deserves to know we are building it.
+   *
+   * Absent means available, so every item that predates this field stays
+   * buyable. Every purchase path checks it — an announcement somebody can pay
+   * for is worse than no announcement.
+   */
+  comingSoon?: true;
 }
 
 /** A file inside a catalogue version. Bytes live once, in `marketAssets`. */

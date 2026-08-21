@@ -919,6 +919,14 @@ export async function grantAction(form: FormData): Promise<ActionResult> {
       ]);
 
     const item = await itemBySlug(slug);
+    // Granting an unfinished item hands over an entitlement to nothing, and
+    // the download route would 404 for a customer who was told they own it.
+    if (item.comingSoon) {
+      throw new MarketError(`${item.title} is not finished yet.`, [
+        "It cannot be granted until there is a version to grant.",
+      ]);
+    }
+
     await grant(auth.member.orgId, item._id, {
       via: `contract:${reason}`,
       by: new ObjectId(auth.member.id),
