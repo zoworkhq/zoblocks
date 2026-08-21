@@ -61,6 +61,10 @@
    component in light, dark and high contrast at once. */
 @import "./tabs-gallery.css";
 
+/* Showcase blocks. Scoped under `.oxb`, so the plain class names inside a
+   block cannot collide with the site around it. */
+@import "./blocks.css";
+
 /* ===========================================================================
  * oxygenui.design — site design layer
  *

@@ -1,0 +1,1647 @@
+/* ===========================================================================
+ * Showcase blocks.
+ *
+ * Everything here is scoped under `.oxb`. The class names inside a block are
+ * deliberately plain — `.tile`, `.card`, `.panel` — because they read as the
+ * thing they are when you are looking at the markup, and the scope is what
+ * keeps them from colliding with the site around them.
+ *
+ * Colour comes from the site tokens rather than a second palette, so a block
+ * and the page it sits on cannot drift. The one addition is the clinical
+ * status set: five hues held apart by more than the accent is, because a
+ * severity that reads as "brand green" is a severity nobody sees.
+ * =========================================================================== */
+
+.oxb {
+  --crit: #c0393e;
+  --high: #a16207;
+  --low: #1d6fa5;
+  --norm: #177a52;
+  --unk: #6b7775;
+  --crit-bg: #fdf0f0;
+  --high-bg: #fdf6e7;
+  --low-bg: #eff6fc;
+  --norm-bg: #eefaf4;
+  --unk-bg: #f1f4f3;
+
+  /* The same hue cannot serve a 3px rail and 11px text. A severity rail is
+     non-text and answers to 3:1; the clock beside it is text and answers to
+     4.5:1, and the light-mode amber measured 3.82:1 — legible enough to look
+     fine and not legible enough to be. These are the text-weight variants. */
+  --crit-text: #a32c31;
+  --high-text: #7d4c05;
+  --low-text: #175d8c;
+  --norm-text: #126644;
+  --unk-text: #545f5d;
+
+  --b-ease: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Keyed to `.dark`, which is how this site switches themes — `globals.css`
+   toggles that class on <html> and every `--site-*` value follows it.
+   These tokens were first written against `data-theme`, an attribute the site
+   never sets. It looked correct only because the author's OS was dark and the
+   media query happened to agree; a reader choosing light on a dark machine
+   would have got light severities on a dark ground. */
+.dark .oxb {
+  --crit: #f2555a;
+  --high: #e8a33d;
+  --low: #5aa9e6;
+  --norm: #3fbf87;
+  --unk: #8592a1;
+  --crit-text: #f2555a;
+  --high-text: #e8a33d;
+  --low-text: #5aa9e6;
+  --norm-text: #3fbf87;
+  --unk-text: #97a4b2;
+  --crit-bg: #25141a;
+  --high-bg: #241d10;
+  --low-bg: #101d2a;
+  --norm-bg: #0f2119;
+  --unk-bg: #151b23;
+}
+
+/* ---------- shared shell ---------- */
+.oxb {
+  color: var(--site-ink);
+  background: var(--site-paper);
+  font-size: 16px;
+}
+.oxb .app {
+  display: grid;
+  grid-template-columns: 216px minmax(0, 1fr);
+  min-height: 520px;
+}
+.oxb .app.cop3 {
+  grid-template-columns: 216px minmax(0, 1fr) 330px;
+}
+.oxb .main {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  min-width: 0;
+}
+
+/* ---------- rail ----------
+   The active state is a tick, not a filled pill. A 9px radius around a
+   straight 2px marker clips the marker into a curve, and the site header
+   already settled this: a measured underline reads as a tick on a scale. */
+.oxb .rail {
+  border-right: 1px solid var(--site-rule);
+  background: var(--site-paper-sunk);
+  padding: 16px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.oxb .railBrand {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 6px 16px 18px;
+  font-weight: 640;
+  font-size: 14px;
+  letter-spacing: -0.02em;
+}
+.oxb .railItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 16px;
+  position: relative;
+  font-size: 13.5px;
+  color: var(--site-graphite);
+  cursor: default;
+  transition:
+    color 0.18s var(--b-ease),
+    background 0.18s var(--b-ease);
+}
+.oxb .railItem::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 2px;
+  height: 17px;
+  background: var(--site-oxygen);
+  transform: translateY(-50%) scaleY(0);
+  transform-origin: center;
+  transition: transform 0.32s var(--b-ease);
+}
+.oxb .railItem:hover {
+  background: color-mix(in srgb, var(--site-paper) 55%, transparent);
+  color: var(--site-ink);
+}
+.oxb .railItem[aria-current] {
+  color: var(--site-ink);
+  font-weight: 560;
+}
+.oxb .railItem[aria-current]::before {
+  transform: translateY(-50%) scaleY(1);
+}
+.oxb .railItem svg {
+  flex: none;
+  opacity: 0.62;
+  transition: opacity 0.18s;
+}
+.oxb .railItem[aria-current] svg {
+  opacity: 1;
+  color: var(--site-oxygen);
+}
+.oxb .railGroup {
+  margin-top: 16px;
+  padding: 0 16px 7px;
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--site-graphite-soft);
+}
+
+/* ---------- pills ----------
+   Sans, not mono. Mono is for data that benefits from tabular alignment —
+   scores, identifiers, clocks — and a word set in mono reads as code. */
+.oxb .pill {
+  font-size: 11px;
+  font-weight: 520;
+  padding: 2.5px 8px;
+  border-radius: 6px;
+  border: 1px solid;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+.oxb .pill.num {
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-variant-numeric: tabular-nums;
+  font-size: 10.5px;
+}
+.oxb .p-crit {
+  color: var(--crit-text);
+  border-color: color-mix(in srgb, var(--crit) 40%, transparent);
+  background: var(--crit-bg);
+}
+.oxb .p-high {
+  color: var(--high-text);
+  border-color: color-mix(in srgb, var(--high) 40%, transparent);
+  background: var(--high-bg);
+}
+.oxb .p-low {
+  color: var(--low-text);
+  border-color: color-mix(in srgb, var(--low) 40%, transparent);
+  background: var(--low-bg);
+}
+.oxb .p-norm {
+  color: var(--norm-text);
+  border-color: color-mix(in srgb, var(--norm) 40%, transparent);
+  background: var(--norm-bg);
+}
+.oxb .p-unk {
+  color: var(--unk-text);
+  border-color: color-mix(in srgb, var(--unk) 40%, transparent);
+  background: var(--unk-bg);
+}
+
+/* ---------- tiles ----------
+   Every tile is the same four rows: caption and status, figure, bar, footing.
+   They were ragged before because some of the little charts carried their own
+   label row and others did not, so the status and the footing landed at four
+   different heights across one strip of four cards. The bar is a fixed height
+   and any scale labels belong in the footing, which every tile has.
+
+   The status is coloured text with a dot, not a bordered chip. Chips read as
+   buttons, and nothing here is pressable.
+
+   There is deliberately no count-up. It was in the first draft and the
+   prototype caught it — for 900ms the dashboard displayed 1 where the answer
+   was 7. A clinical tile that animates through wrong numbers is worse than a
+   static one that is right. */
+.oxb .tiles {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+.oxb .tile {
+  border: 1px solid var(--site-rule);
+  border-radius: 13px;
+  background: var(--site-paper-sunk);
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  transition:
+    border-color 0.3s,
+    transform 0.4s var(--b-ease);
+}
+.oxb .tile:hover {
+  border-color: var(--site-rule-strong);
+  transform: translateY(-2px);
+}
+/* One line, always. A caption allowed to wrap pushes the figure down by a
+   line, and four tiles then read their numbers at four different heights —
+   which is what "align all four" was asking for. Captions are written short
+   enough to fit; the ellipsis is the backstop, not the plan. */
+.oxb .tHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  height: 16px;
+}
+.oxb .tile .cap {
+  font-size: 12px;
+  color: var(--site-graphite);
+  line-height: 16px;
+  font-weight: 500;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.oxb .tile .stat {
+  font-size: 11px;
+  line-height: 16px;
+  font-weight: 560;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
+  flex: none;
+}
+.oxb .tile .stat::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  flex: none;
+}
+.oxb .tile .fig {
+  display: flex;
+  align-items: baseline;
+  gap: 7px;
+  margin-top: 10px;
+}
+.oxb .tile .fig .n {
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-variant-numeric: tabular-nums;
+  font-size: 30px;
+  font-weight: 700;
+  letter-spacing: -0.05em;
+  line-height: 1;
+}
+.oxb .tile .fig .u {
+  font-size: 12.5px;
+  color: var(--site-graphite);
+  min-width: 0;
+}
+/* Fixed height, so four tiles line up whatever their little chart is doing. */
+.oxb .tBar {
+  margin-top: 13px;
+  height: 4px;
+  position: relative;
+}
+.oxb .trk {
+  height: 4px;
+  border-radius: 3px;
+  background: var(--site-rule);
+  position: relative;
+  overflow: hidden;
+}
+.oxb .trk i {
+  position: absolute;
+  inset: 0 auto 0 0;
+  border-radius: 3px;
+  width: var(--w, 0);
+}
+.oxb .trkTicks {
+  position: absolute;
+  inset: 0;
+  background-image: repeating-linear-gradient(
+    90deg,
+    transparent 0 calc(25% - 1px),
+    color-mix(in srgb, var(--site-paper-sunk) 90%, transparent) calc(25% - 1px) 25%
+  );
+}
+.oxb .tgt {
+  position: absolute;
+  top: -3px;
+  width: 2px;
+  height: 10px;
+  background: var(--site-ink);
+  border-radius: 1px;
+  box-shadow: 0 0 0 2px var(--site-paper-sunk);
+}
+.oxb .tFoot {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 10px;
+  margin-top: 9px;
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-variant-numeric: tabular-nums;
+  font-size: 10px;
+  color: var(--site-graphite-soft);
+}
+.oxb .tFoot span {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ---------- panels & cards ---------- */
+.oxb .panel,
+.oxb .card {
+  border: 1px solid var(--site-rule);
+  border-radius: 14px;
+  background: var(--site-paper-sunk);
+  overflow: hidden;
+}
+.oxb .card {
+  border-radius: 13px;
+}
+.oxb .panelTop {
+  padding: 14px 16px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+.oxb .panelTop h3 {
+  font-size: 15.5px;
+  font-weight: 640;
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+.oxb .panelTop p {
+  font-size: 12.5px;
+  color: var(--site-graphite);
+  margin-top: 3px;
+}
+.oxb .cardTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--site-rule);
+}
+.oxb .cardTop h4 {
+  font-size: 14px;
+  font-weight: 620;
+  letter-spacing: -0.015em;
+  margin: 0;
+}
+.oxb .seeAll {
+  font-size: 11.5px;
+  color: var(--site-graphite);
+}
+/* Two panels side by side are one pair, so they share a width and a height.
+   `align-items: start` let them settle at whatever height their content
+   wanted, which put two cards of different sizes next to each other. */
+.oxb .two {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  align-items: stretch;
+}
+.oxb .two > .panel,
+.oxb .two > .card {
+  display: flex;
+  flex-direction: column;
+}
+/* The body takes the slack, so neither card ends in a band of empty ground. */
+.oxb .two > .panel > .grow,
+.oxb .two > .card > .grow {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.oxb .cols {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 296px;
+  gap: 14px;
+  padding: 16px 18px;
+}
+.oxb .colStack {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+}
+.oxb .miniLegend {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 9px 14px;
+  border-top: 1px solid var(--site-rule);
+  font-size: 10.5px;
+  color: var(--site-graphite-soft);
+  line-height: 1.5;
+}
+
+/* ---------- segmented ---------- */
+.oxb .seg {
+  display: inline-flex;
+  border: 1px solid var(--site-rule);
+  border-radius: 9px;
+  overflow: hidden;
+  background: var(--site-paper);
+}
+.oxb .seg button {
+  border: 0;
+  background: transparent;
+  color: var(--site-graphite);
+  font: inherit;
+  font-size: 12px;
+  padding: 6px 11px;
+  cursor: pointer;
+  transition: 0.18s var(--b-ease);
+}
+.oxb .seg button[aria-pressed="true"] {
+  background: var(--site-ink);
+  color: var(--site-paper);
+}
+
+/* ---------- table ---------- */
+.oxb table.dt {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.oxb table.dt th {
+  text-align: left;
+  font-size: 10.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--site-graphite-soft);
+  font-weight: 500;
+  padding: 9px 14px;
+  border-top: 1px solid var(--site-rule);
+  border-bottom: 1px solid var(--site-rule);
+  background: color-mix(in srgb, var(--site-paper) 50%, transparent);
+}
+.oxb table.dt td {
+  padding: 10px 14px;
+  border-bottom: 1px solid color-mix(in srgb, var(--site-rule) 60%, transparent);
+}
+.oxb table.dt tbody tr {
+  transition: background 0.18s;
+}
+.oxb table.dt tbody tr:hover {
+  background: color-mix(in srgb, var(--site-paper) 70%, transparent);
+}
+/* Status as a dot and a word, everywhere. Bordered chips read as buttons,
+   and nothing in a read-only table is pressable. */
+.oxb .stDot {
+  font-size: 11.5px;
+  font-weight: 545;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+.oxb .stDot::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  flex: none;
+}
+.oxb .rail-sev {
+  display: inline-block;
+  width: 3px;
+  height: 22px;
+  border-radius: 2px;
+  vertical-align: middle;
+  margin-right: 9px;
+  flex: none;
+}
+
+/* ---------- patient header ---------- */
+.oxb .crumbs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  border-bottom: 1px solid var(--site-rule);
+  font-size: 12.5px;
+  color: var(--site-graphite);
+}
+.oxb .crumbs b {
+  color: var(--site-ink);
+  font-weight: 560;
+}
+.oxb .ptHead {
+  padding: 16px 18px 14px;
+  display: flex;
+  gap: 15px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+.oxb .ptAvatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  font-weight: 650;
+  font-size: 18px;
+  background: linear-gradient(
+    140deg,
+    color-mix(in srgb, var(--site-oxygen) 26%, transparent),
+    color-mix(in srgb, var(--low) 22%, transparent)
+  );
+  border: 1px solid var(--site-rule-strong);
+  letter-spacing: -0.02em;
+}
+.oxb .nameRow {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  flex-wrap: wrap;
+}
+.oxb .nameRow h3 {
+  font-size: 19px;
+  font-weight: 660;
+  letter-spacing: -0.028em;
+  margin: 0;
+}
+.oxb .nameRow .pill {
+  font-size: 10.5px;
+  padding: 2px 7px;
+}
+.oxb .idline {
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-variant-numeric: tabular-nums;
+  font-size: 11.5px;
+  color: var(--site-graphite);
+  margin-top: 4px;
+  display: flex;
+  gap: 6px 14px;
+  flex-wrap: wrap;
+}
+.oxb .idline span {
+  white-space: nowrap;
+}
+/* A data strip, not five floating pairs.
+   As a flex row with a fixed gap the columns landed wherever their content
+   ended, so the labels never lined up with each other and the row read as
+   ragged text under the name. On a grid with hairline separators it reads as
+   what it is: a fixed set of identifying facts, each in its own cell. */
+.oxb .ptFacts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(152px, 1fr));
+  gap: 0;
+  margin-top: 14px;
+  padding: 0;
+  border-top: 1px solid var(--site-rule);
+  border-bottom: 1px solid var(--site-rule);
+  background: color-mix(in srgb, var(--site-paper-sunk) 55%, transparent);
+}
+.oxb .fact {
+  padding: 10px 16px;
+  border-left: 1px solid var(--site-rule);
+  min-width: 0;
+}
+.oxb .fact:first-child {
+  border-left: 0;
+  padding-left: 18px;
+}
+.oxb .fact .fk {
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--site-graphite-soft);
+}
+.oxb .fact .fv {
+  font-size: 12.5px;
+  margin-top: 3px;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+/* The identity pass and the task list mean different things, so they must not
+   look the same. Two amber-washed boxes stacked read as one wall of warning
+   and the reader stops seeing either. The pass spends its colour on a rail. */
+.oxb .samename {
+  margin: 0 18px 12px;
+  padding: 11px 13px;
+  border-radius: 10px;
+  background: var(--site-paper-sunk);
+  border: 1px solid var(--site-rule);
+  border-left: 3px solid var(--high);
+  font-size: 12.5px;
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  line-height: 1.5;
+}
+.oxb .samename b {
+  color: var(--site-ink);
+}
+.oxb .attn {
+  margin: 0 18px 14px;
+  border-radius: 12px;
+  border: 1px solid var(--site-rule);
+  background: var(--site-paper-sunk);
+  overflow: hidden;
+}
+.oxb .attnTop {
+  display: flex;
+  align-items: baseline;
+  gap: 9px;
+  padding: 11px 14px;
+  font-size: 13.5px;
+  border-bottom: 1px solid var(--site-rule);
+  flex-wrap: wrap;
+}
+.oxb .attnTop b {
+  color: var(--site-ink);
+  font-weight: 620;
+}
+.oxb .attnRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  font-size: 13px;
+  border-bottom: 1px solid color-mix(in srgb, var(--site-rule) 55%, transparent);
+  transition: background 0.18s;
+}
+.oxb .attnRow:last-child {
+  border-bottom: 0;
+}
+.oxb .attnRow:hover {
+  background: color-mix(in srgb, var(--site-paper) 55%, transparent);
+}
+.oxb .attnRow .who {
+  font-size: 11.5px;
+  color: var(--site-graphite-soft);
+  white-space: nowrap;
+}
+.oxb .attnRow .clock {
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-variant-numeric: tabular-nums;
+  font-size: 11.5px;
+  white-space: nowrap;
+  min-width: 74px;
+  text-align: right;
+}
+
+/* ---------- tabs ---------- */
+.oxb .tabbar {
+  display: flex;
+  gap: 2px;
+  padding: 0 18px;
+  border-bottom: 1px solid var(--site-rule);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.oxb .tabbar::-webkit-scrollbar {
+  display: none;
+}
+.oxb .tabbar button {
+  border: 0;
+  background: transparent;
+  font: inherit;
+  font-size: 13px;
+  color: var(--site-graphite);
+  padding: 11px 12px;
+  cursor: pointer;
+  position: relative;
+  white-space: nowrap;
+  transition: color 0.2s;
+}
+.oxb .tabbar button[aria-selected="true"] {
+  color: var(--site-ink);
+  font-weight: 560;
+}
+.oxb .tabbar button::after {
+  content: "";
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: -1px;
+  height: 2px;
+  background: var(--site-oxygen);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.35s var(--b-ease);
+}
+.oxb .tabbar button[aria-selected="true"]::after {
+  transform: scaleX(1);
+}
+
+/* ---------- instrument card ---------- */
+.oxb .instrGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  padding: 12px 14px;
+}
+.oxb .instr {
+  border: 1px solid var(--site-rule);
+  border-radius: 12px;
+  background: var(--site-paper);
+  padding: 12px;
+  transition:
+    border-color 0.25s,
+    transform 0.4s var(--b-ease);
+}
+.oxb .instr:hover {
+  border-color: var(--site-rule-strong);
+  transform: translateY(-2px);
+}
+.oxb .instrTop {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+.oxb .instrName {
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  color: var(--site-graphite-soft);
+}
+.oxb .instrVal {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin-top: 6px;
+}
+.oxb .instrVal .v {
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-variant-numeric: tabular-nums;
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -0.045em;
+}
+.oxb .instrVal .of {
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 11px;
+  color: var(--site-graphite-soft);
+}
+.oxb .scaleBar {
+  height: 5px;
+  border-radius: 3px;
+  margin-top: 9px;
+  position: relative;
+  background: linear-gradient(
+    90deg,
+    var(--norm) 0%,
+    var(--norm) 18%,
+    var(--high) 38%,
+    var(--crit) 72%,
+    var(--crit) 100%
+  );
+  opacity: 0.42;
+}
+.oxb .scaleMark {
+  position: absolute;
+  top: -3px;
+  width: 2px;
+  height: 11px;
+  border-radius: 2px;
+  background: var(--site-ink);
+  box-shadow: 0 0 0 2px var(--site-paper);
+}
+.oxb .instrFoot {
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 9.5px;
+  color: var(--site-graphite-soft);
+  margin-top: 7px;
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+/* ---------- lists, team, side rows ----------
+   A record row is two lines and always two lines: what it is, then how it is
+   qualified. Letting the title wrap gave four rows four different heights and
+   pushed the status chip away from the thing it described. Mono is kept for
+   the code alone — "F33.1" earns it, "since Feb 2026 · focus of treatment"
+   does not, and setting the whole line in it made a list of diagnoses read
+   like console output. */
+.oxb .lrow {
+  display: grid;
+  grid-template-columns: 3px minmax(0, 1fr) auto;
+  gap: 0 11px;
+  padding: 11px 14px;
+  align-items: baseline;
+  border-bottom: 1px solid color-mix(in srgb, var(--site-rule) 55%, transparent);
+  transition: background 0.18s;
+}
+.oxb .lrow:last-child {
+  border-bottom: 0;
+}
+.oxb .lrow:hover {
+  background: color-mix(in srgb, var(--site-paper) 60%, transparent);
+}
+.oxb .lrow .bar3 {
+  grid-row: 1 / span 2;
+  align-self: stretch;
+  border-radius: 2px;
+}
+.oxb .lrow .t {
+  font-size: 13px;
+  font-weight: 555;
+  letter-spacing: -0.01em;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.oxb .lrow .st {
+  font-size: 11px;
+  font-weight: 560;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
+  flex: none;
+}
+.oxb .lrow .st::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  flex: none;
+}
+.oxb .lrow .m {
+  grid-column: 2 / span 2;
+  font-size: 11.5px;
+  color: var(--site-graphite-soft);
+  margin-top: 3px;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.oxb .lrow .m .code {
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-variant-numeric: tabular-nums;
+  color: var(--site-graphite);
+}
+/* A labelled meter. Was written against `.vizLbl`, a class deleted when the
+   tiles were rebuilt — with the rule gone the label and its value collapsed
+   into one run of body text ("ATTENDED11 of 13"). Named and owned here now. */
+.oxb .meter + .meter {
+  margin-top: 13px;
+}
+.oxb .meterTop {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 11px;
+}
+.oxb .meterTop .k {
+  color: var(--site-graphite);
+  font-weight: 500;
+}
+.oxb .meterTop .v {
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-variant-numeric: tabular-nums;
+  color: var(--site-ink);
+  font-weight: 600;
+}
+.oxb .meterTrk {
+  height: 4px;
+  border-radius: 3px;
+  background: var(--site-rule);
+  overflow: hidden;
+  margin-top: 6px;
+}
+.oxb .meterTrk i {
+  display: block;
+  height: 100%;
+  border-radius: 3px;
+}
+
+.oxb .teamRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 14px;
+  border-bottom: 1px solid color-mix(in srgb, var(--site-rule) 55%, transparent);
+  font-size: 12.5px;
+}
+.oxb .teamRow:last-child {
+  border-bottom: 0;
+}
+.oxb .tAv {
+  width: 28px;
+  height: 28px;
+  border-radius: 9px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  font-size: 10.5px;
+  font-weight: 640;
+  background: var(--site-paper);
+  border: 1px solid var(--site-rule-strong);
+}
+.oxb .sideRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 11px 14px;
+  border-bottom: 1px solid color-mix(in srgb, var(--site-rule) 55%, transparent);
+  font-size: 13px;
+  transition: background 0.18s;
+}
+.oxb .sideRow:last-child {
+  border-bottom: 0;
+}
+.oxb .empty {
+  padding: 26px 14px;
+  text-align: center;
+  color: var(--site-graphite-soft);
+  font-size: 12.5px;
+}
+.oxb .empty .ic {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  border: 1px solid var(--site-rule);
+  display: grid;
+  place-items: center;
+  margin: 0 auto 9px;
+  background: var(--site-paper);
+}
+
+/* ---------- timeline ---------- */
+.oxb .tl {
+  padding: 6px 16px 16px;
+  position: relative;
+}
+.oxb .tlItem {
+  display: grid;
+  grid-template-columns: 74px 18px minmax(0, 1fr);
+  gap: 10px;
+  align-items: start;
+  padding: 8px 0;
+}
+.oxb .tlItem .when {
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 10.5px;
+  color: var(--site-graphite-soft);
+  padding-top: 3px;
+}
+.oxb .tlDot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  margin: 5px auto 0;
+  position: relative;
+  z-index: 1;
+}
+.oxb .tlLine {
+  position: absolute;
+  left: calc(16px + 74px + 10px + 4px);
+  top: 6px;
+  bottom: 16px;
+  width: 1px;
+  background: var(--site-rule);
+}
+.oxb .tlItem .what {
+  font-size: 13px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.oxb .tlItem .sub2 {
+  font-size: 11.5px;
+  color: var(--site-graphite-soft);
+  margin-top: 2px;
+}
+
+/* ---------- accordion ---------- */
+.oxb .acc {
+  border-top: 1px solid var(--site-rule);
+}
+.oxb .accItem {
+  border-bottom: 1px solid var(--site-rule);
+}
+.oxb .accBtn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 12px 16px;
+  background: transparent;
+  border: 0;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  color: inherit;
+  transition: background 0.18s;
+}
+.oxb .accBtn:hover {
+  background: color-mix(in srgb, var(--site-paper) 60%, transparent);
+}
+.oxb .accBtn .cw {
+  flex: 1;
+  min-width: 0;
+}
+.oxb .accBtn .t {
+  font-size: 14px;
+  font-weight: 560;
+  display: block;
+}
+.oxb .accBtn .s {
+  font-size: 12px;
+  color: var(--site-graphite);
+  margin-top: 2px;
+  display: block;
+}
+.oxb .caret {
+  transition: transform 0.3s var(--b-ease);
+  flex: none;
+  color: var(--site-graphite-soft);
+}
+.oxb .accBtn[aria-expanded="true"] .caret {
+  transform: rotate(90deg);
+}
+.oxb .accBody {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.4s var(--b-ease);
+}
+.oxb .accBody[data-open] {
+  grid-template-rows: 1fr;
+}
+.oxb .accBody > div {
+  overflow: hidden;
+}
+.oxb .accInner {
+  padding: 0 16px 14px;
+  font-size: 13px;
+  color: var(--site-graphite);
+}
+.oxb .gate {
+  margin: 0 16px 14px;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px dashed var(--site-rule-strong);
+  background: color-mix(in srgb, var(--site-paper) 50%, transparent);
+  font-size: 12.5px;
+}
+
+/* ---------- note ---------- */
+.oxb .note {
+  padding: 16px;
+  font-size: 13.5px;
+  line-height: 1.75;
+  max-height: 196px;
+  overflow: auto;
+}
+.oxb .prov {
+  border-radius: 3px;
+  padding: 1px 2px;
+  cursor: help;
+  transition:
+    background 0.2s,
+    box-shadow 0.2s;
+  box-shadow: inset 0 -2px 0 transparent;
+}
+.oxb .pv-dict {
+  background: color-mix(in srgb, var(--low) 15%, transparent);
+  box-shadow: inset 0 -2px 0 color-mix(in srgb, var(--low) 45%, transparent);
+}
+.oxb .pv-tmpl {
+  background: color-mix(in srgb, var(--unk) 16%, transparent);
+  box-shadow: inset 0 -2px 0 color-mix(in srgb, var(--unk) 45%, transparent);
+}
+.oxb .pv-fwd {
+  background: color-mix(in srgb, var(--high) 16%, transparent);
+  box-shadow: inset 0 -2px 0 color-mix(in srgb, var(--high) 50%, transparent);
+}
+.oxb .pv-ai {
+  background: color-mix(in srgb, var(--site-oxygen) 15%, transparent);
+  box-shadow: inset 0 -2px 0 color-mix(in srgb, var(--site-oxygen) 50%, transparent);
+}
+.oxb .legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 11px 16px;
+  border-top: 1px solid var(--site-rule);
+  font-size: 11.5px;
+  color: var(--site-graphite);
+}
+.oxb .legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.oxb .sw {
+  width: 15px;
+  height: 9px;
+  border-radius: 3px;
+  display: inline-block;
+}
+.oxb .signBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 13px 16px;
+  border-top: 1px solid var(--site-rule);
+  background: color-mix(in srgb, var(--site-paper) 55%, transparent);
+  flex-wrap: wrap;
+}
+.oxb .readMeter {
+  flex: 1;
+  min-width: 150px;
+  max-width: 260px;
+}
+.oxb .readMeter .bar {
+  height: 5px;
+  border-radius: 3px;
+  background: var(--site-rule);
+  overflow: hidden;
+}
+.oxb .readMeter .bar i {
+  display: block;
+  height: 100%;
+  width: 0;
+  background: var(--site-oxygen);
+  transition: width 0.3s var(--b-ease);
+}
+.oxb .btn {
+  border: 1px solid transparent;
+  border-radius: 9px;
+  padding: 8px 14px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 550;
+  cursor: pointer;
+  transition: 0.2s var(--b-ease);
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+.oxb .btn.primary {
+  background: var(--site-cta);
+  color: var(--site-paper);
+}
+.oxb .btn.primary:hover:not([disabled]) {
+  background: var(--site-cta-hover);
+}
+.oxb .btn[disabled] {
+  opacity: 0.42;
+  cursor: not-allowed;
+}
+.oxb .btn.ghost {
+  border-color: var(--site-rule-strong);
+  background: transparent;
+  color: var(--site-ink);
+}
+.oxb .btn.ghost:hover {
+  background: var(--site-paper);
+}
+
+/* ---------- copilot ---------- */
+.oxb .copSide {
+  border-left: 1px solid var(--site-rule);
+  background: var(--site-paper-sunk);
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.oxb .cop {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 400px;
+}
+.oxb .copThread {
+  flex: 1;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  overflow: auto;
+}
+.oxb .bubble {
+  max-width: 84%;
+  padding: 11px 13px;
+  border-radius: 13px;
+  font-size: 13.5px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+.oxb .bubble.me {
+  align-self: flex-end;
+  background: var(--site-ink);
+  color: var(--site-paper);
+  border-bottom-right-radius: 4px;
+}
+.oxb .bubble.ai {
+  align-self: flex-start;
+  background: var(--site-paper);
+  border: 1px solid var(--site-rule);
+  border-bottom-left-radius: 4px;
+}
+.oxb .cite {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 10px;
+  padding: 1px 5px;
+  border-radius: 5px;
+  background: color-mix(in srgb, var(--site-oxygen) 16%, transparent);
+  border: 1px solid color-mix(in srgb, var(--site-oxygen) 40%, transparent);
+  color: var(--site-accent-text);
+  cursor: pointer;
+  transition: 0.18s var(--b-ease);
+}
+.oxb .cite:hover {
+  background: color-mix(in srgb, var(--site-oxygen) 30%, transparent);
+}
+.oxb .copDock {
+  border-top: 1px solid var(--site-rule);
+  padding: 12px 14px;
+  display: flex;
+  gap: 9px;
+  align-items: center;
+  background: color-mix(in srgb, var(--site-paper) 55%, transparent);
+}
+.oxb .copInput {
+  flex: 1;
+  min-width: 0;
+  border: 1px solid var(--site-rule);
+  border-radius: 10px;
+  padding: 9px 12px;
+  background: var(--site-paper);
+  color: var(--site-ink);
+  font: inherit;
+  font-size: 13px;
+}
+.oxb .srcCard {
+  margin-top: 9px;
+  border: 1px solid var(--site-rule);
+  border-radius: 10px;
+  overflow: hidden;
+  font-size: 12px;
+}
+.oxb .srcCard .h {
+  padding: 7px 10px;
+  background: color-mix(in srgb, var(--site-paper) 60%, transparent);
+  border-bottom: 1px solid var(--site-rule);
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+.oxb .srcCard .b {
+  padding: 9px 10px;
+  color: var(--site-graphite);
+}
+.oxb .flash {
+  animation: oxb-flash 1.6s var(--b-ease);
+}
+@keyframes oxb-flash {
+  0% {
+    background: color-mix(in srgb, var(--site-oxygen) 34%, transparent);
+  }
+  100% {
+    background: transparent;
+  }
+}
+
+/* ---------- risk queue ----------
+   A row here is a shift plan, so it carries the four things a plan needs: who,
+   what, how long is left, and how much of the window has already gone. The
+   earlier version was a line of text with a clock on the end, which told you
+   there was a deadline without telling you where in it you were. */
+.oxb .riskRow {
+  display: grid;
+  grid-template-columns: 3px minmax(0, 1fr) auto;
+  gap: 0 12px;
+  padding: 12px 14px;
+  border-bottom: 1px solid color-mix(in srgb, var(--site-rule) 55%, transparent);
+  transition: background 0.18s;
+}
+.oxb .riskRow:last-child {
+  border-bottom: 0;
+}
+.oxb .riskRow:hover {
+  background: color-mix(in srgb, var(--site-paper) 55%, transparent);
+}
+.oxb .riskRow .bar3 {
+  grid-row: 1 / span 3;
+  border-radius: 2px;
+}
+.oxb .riskRow .who2 {
+  font-size: 13.5px;
+  font-weight: 580;
+  letter-spacing: -0.01em;
+}
+.oxb .riskRow .left {
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-variant-numeric: tabular-nums;
+  font-size: 13px;
+  font-weight: 600;
+  text-align: right;
+  white-space: nowrap;
+}
+.oxb .riskRow .meta2 {
+  grid-column: 2;
+  font-size: 11.5px;
+  color: var(--site-graphite);
+  margin-top: 2px;
+}
+.oxb .riskRow .owner2 {
+  grid-column: 3;
+  font-size: 10.5px;
+  color: var(--site-graphite-soft);
+  text-align: right;
+  white-space: nowrap;
+  margin-top: 3px;
+}
+.oxb .riskRow .win {
+  grid-column: 2 / span 2;
+  margin-top: 9px;
+}
+.oxb .riskRow .winTrk {
+  height: 4px;
+  border-radius: 3px;
+  background: var(--site-rule);
+  position: relative;
+  overflow: hidden;
+}
+.oxb .riskRow .winTrk i {
+  position: absolute;
+  inset: 0 auto 0 0;
+  border-radius: 3px;
+}
+.oxb .riskRow .winLbl {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  color: var(--site-graphite-soft);
+  margin-top: 4px;
+}
+
+/* ---------- engagement funnel ----------
+   Four aligned rows: stage, count, bar, share. Two earlier versions tried
+   harder than this — hatched remainders, then a tapering ribbon — and both
+   were more drawing than reading. The panel has one job, which is to show
+   where the cohort falls away, and a plain set of bars on a common baseline
+   does it without asking anyone to interpret a shape. */
+.oxb .funRow {
+  display: grid;
+  grid-template-columns: 92px 34px minmax(0, 1fr) 34px;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 0;
+}
+.oxb .funRow .lbl {
+  font-size: 12px;
+  color: var(--site-graphite);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.oxb .funRow .cnt {
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-variant-numeric: tabular-nums;
+  font-size: 13px;
+  font-weight: 660;
+  text-align: right;
+}
+.oxb .funRow .pct {
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-variant-numeric: tabular-nums;
+  font-size: 10.5px;
+  color: var(--site-graphite-soft);
+  text-align: right;
+}
+.oxb .funRow .fbar {
+  height: 8px;
+  border-radius: 4px;
+  background: var(--site-rule);
+  overflow: hidden;
+}
+.oxb .funRow .fbar i {
+  display: block;
+  height: 100%;
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--low) 70%, transparent);
+}
+.oxb .funRow.worst .fbar i {
+  background: color-mix(in srgb, var(--high) 75%, transparent);
+}
+.oxb .funRow.worst .cnt {
+  color: var(--high-text);
+}
+
+/* ---------- charts ---------- */
+.oxb .chartWrap {
+  padding: 4px 16px 16px;
+}
+.oxb svg.chart {
+  width: 100%;
+  height: auto;
+  display: block;
+  overflow: visible;
+}
+.oxb .axis {
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 8.5px;
+  fill: var(--site-graphite-soft);
+}
+.oxb .gridline {
+  stroke: var(--site-rule);
+  stroke-width: 1;
+}
+.oxb .refline {
+  stroke: var(--site-rule-strong);
+  stroke-width: 1;
+  stroke-dasharray: 3 3;
+}
+
+/* Motion is declared only inside no-preference, so opting out yields the
+   finished composition rather than a frozen first frame: the trajectory is
+   drawn, the band is present, the flag is a static ring. */
+@media (prefers-reduced-motion: no-preference) {
+  .oxb .draw {
+    stroke-dasharray: var(--len);
+    stroke-dashoffset: var(--len);
+    animation: oxb-draw 1.5s cubic-bezier(0.65, 0, 0.35, 1) forwards;
+    animation-delay: var(--dd, 120ms);
+  }
+  @keyframes oxb-draw {
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+  .oxb .pulseRing {
+    animation: oxb-ring 2.6s ease-out infinite;
+  }
+  @keyframes oxb-ring {
+    0% {
+      r: 4;
+      opacity: 0.55;
+    }
+    70% {
+      r: 13;
+      opacity: 0;
+    }
+    100% {
+      r: 13;
+      opacity: 0;
+    }
+  }
+}
+
+/* ---------- narrow frames ----------
+   Found by opening each block at 390px, not by precaution. The header packed
+   an avatar, a name, two pills and two buttons onto one flex row, so the name
+   broke in half; the MRN wrapped mid-token; and the copilot's three panes were
+   set by an inline style no rule could reach. */
+.oxb[data-vp="tablet"] .app,
+.oxb[data-vp="mobile"] .app {
+  grid-template-columns: 1fr;
+}
+.oxb[data-vp="tablet"] .rail,
+.oxb[data-vp="mobile"] .rail {
+  display: none;
+}
+.oxb[data-vp="tablet"] .app.cop3 {
+  grid-template-columns: minmax(0, 1fr) 310px;
+}
+.oxb[data-vp="mobile"] .app.cop3 {
+  grid-template-columns: 1fr;
+}
+.oxb[data-vp="mobile"] .copSide {
+  border-left: 0;
+  border-top: 1px solid var(--site-rule);
+}
+.oxb[data-vp="tablet"] .tiles {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.oxb[data-vp="mobile"] .tiles {
+  grid-template-columns: 1fr;
+}
+.oxb[data-vp="tablet"] .cols,
+.oxb[data-vp="mobile"] .cols {
+  grid-template-columns: 1fr;
+}
+.oxb[data-vp="tablet"] .instrGrid,
+.oxb[data-vp="mobile"] .instrGrid {
+  grid-template-columns: 1fr;
+}
+.oxb[data-vp="mobile"] .two {
+  grid-template-columns: 1fr;
+}
+.oxb[data-vp="mobile"] .ptHead > .btnRow {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.oxb[data-vp="mobile"] .ptHead .btn {
+  width: 100%;
+  justify-content: center;
+}
+.oxb[data-vp="mobile"] .ptAvatar {
+  width: 44px;
+  height: 44px;
+  font-size: 15px;
+}
+.oxb[data-vp="mobile"] .nameRow h3 {
+  font-size: 17px;
+  width: 100%;
+}
+.oxb[data-vp="mobile"] .ptFacts {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.oxb[data-vp="mobile"] .fact {
+  padding: 9px 14px;
+  border-top: 1px solid var(--site-rule);
+}
+.oxb[data-vp="mobile"] .fact:nth-child(-n + 2) {
+  border-top: 0;
+}
+.oxb[data-vp="mobile"] .fact:nth-child(odd) {
+  border-left: 0;
+  padding-left: 14px;
+}
+.oxb[data-vp="mobile"] .attnTop {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 3px;
+}
+.oxb[data-vp="mobile"] .attnRow {
+  flex-wrap: wrap;
+  gap: 7px 10px;
+}
+.oxb[data-vp="mobile"] .attnRow .txt {
+  flex: 1 1 100%;
+  order: 1;
+}
+.oxb[data-vp="mobile"] .attnRow .who {
+  order: 2;
+  margin-left: 19px;
+}
+.oxb[data-vp="mobile"] .attnRow .clock {
+  order: 3;
+  min-width: 0;
+  margin-left: auto;
+}
+.oxb[data-vp="mobile"] .tlItem {
+  grid-template-columns: 14px minmax(0, 1fr);
+  gap: 0 10px;
+}
+.oxb[data-vp="mobile"] .tlItem .when {
+  grid-column: 2;
+  order: -1;
+  padding-top: 0;
+  margin-bottom: 2px;
+}
+.oxb[data-vp="mobile"] .tlItem .dotCell {
+  grid-row: 2;
+}
+.oxb[data-vp="mobile"] .tlItem .what {
+  grid-row: 2;
+}
+.oxb[data-vp="mobile"] .tlLine {
+  display: none;
+}
+.oxb[data-vp="mobile"] .main,
+.oxb[data-vp="mobile"] .cols {
+  padding: 14px;
+}
+.oxb[data-vp="mobile"] .ptHead,
+.oxb[data-vp="mobile"] .tabbar {
+  padding-left: 14px;
+  padding-right: 14px;
+}
+.oxb[data-vp="mobile"] .samename,
+.oxb[data-vp="mobile"] .attn {
+  margin-left: 14px;
+  margin-right: 14px;
+}
+.oxb[data-vp="mobile"] .panelTop {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 9px;
+}
+.oxb[data-vp="mobile"] .seg {
+  width: 100%;
+}
+.oxb[data-vp="mobile"] .seg button {
+  flex: 1;
+}
