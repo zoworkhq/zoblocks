@@ -174,13 +174,16 @@
      dark ground needs to be lighter than intuition suggests. */
   --site-graphite-soft: #8592a1;
 
-  --site-oxygen: #67e8f9;
-  --site-accent-text: #86e1f2;
+  /* The mark takes the saturated brand step; accent *text* takes the
+     lighter one, so the two stay as distinguishable as they were when this
+     pair was two different cyans. */
+  --site-oxygen: #2dd4b0;
+  --site-accent-text: #6ce7cb;
   --site-electric: #73d8ff;
   --site-critical: #fb7185;
 
   /* Bright button on a dark page; text-paper resolves dark, so it still reads. */
-  --site-cta: #8be8f4;
+  --site-cta: #6ce7cb;
 
   /* Lighter than --site-paper AND than every .surface-* level on purpose —
      the instrument has to remain the brightest object on the page. */
@@ -189,7 +192,7 @@
   --site-panel-rule: #303b47;
   --site-panel-fg: #edf2f7;
   --site-panel-muted: #96a3b3;
-  --site-trace: #65e6e0;
+  --site-trace: #2dd4b0;
   --site-critical-lum: #fb7185;
 
   color-scheme: dark;

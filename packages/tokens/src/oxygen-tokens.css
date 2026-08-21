@@ -106,8 +106,8 @@
   --ox-ref-tint-normal-border: #1e5138;
   --ox-ref-tint-unknown-bg: #141f22;
   --ox-ref-tint-unknown-border: #253338;
-  --ox-ref-tint-accent-bg: #102a32;
-  --ox-ref-tint-accent-border: #1b4655;
+  --ox-ref-tint-accent-bg: #0f2a25;
+  --ox-ref-tint-accent-border: #1b4a42;
   --ox-ref-hc-critical: #8a0000;
   --ox-ref-hc-high: #6b3000;
   --ox-ref-hc-low: #003a8c;
@@ -569,11 +569,11 @@
   --ox-text-muted: var(--ox-ref-ink-200);
   --ox-text-subtle: var(--ox-ref-ink-300);
   --ox-text-on-accent: var(--ox-ref-ink-on-accent);
-  --ox-accent: var(--ox-ref-cyan-300);
-  --ox-accent-hover: var(--ox-ref-cyan-200);
+  --ox-accent: var(--ox-ref-brand-300);
+  --ox-accent-hover: var(--ox-ref-brand-200);
   --ox-accent-subtle: var(--ox-ref-tint-accent-bg);
   --ox-accent-border: var(--ox-ref-tint-accent-border);
-  --ox-focus-ring: var(--ox-ref-cyan-300);
+  --ox-focus-ring: var(--ox-ref-brand-300);
   --ox-focus-ring-offset: var(--ox-ref-ink-950);
   --ox-status-critical: var(--ox-ref-red-400);
   --ox-status-critical-bg: var(--ox-ref-tint-critical-bg);

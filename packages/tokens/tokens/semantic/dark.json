@@ -22,12 +22,13 @@
   "text-subtle": { "$type": "color", "$value": "{ref.ink.300}" },
   "text-on-accent": { "$type": "color", "$value": "{ref.ink.on-accent}" },
 
-  "accent": { "$type": "color", "$value": "{ref.cyan.300}" },
-  "accent-hover": { "$type": "color", "$value": "{ref.cyan.200}" },
+  "$comment-accent": "brand.300, not cyan.300. The dark tier used to reach for a hue the brand does not contain, so the same product was teal-green in light and cyan in dark — a difference nobody chose and everybody saw. brand.300 measures 12.74:1 for text-on-accent and 12.91:1 on bg, against cyan.300's 13.25 and 13.42: the same step of a different ramp, and the floors are untouched.",
+  "accent": { "$type": "color", "$value": "{ref.brand.300}" },
+  "accent-hover": { "$type": "color", "$value": "{ref.brand.200}" },
   "accent-subtle": { "$type": "color", "$value": "{ref.tint.accent.bg}" },
   "accent-border": { "$type": "color", "$value": "{ref.tint.accent.border}" },
 
-  "focus-ring": { "$type": "color", "$value": "{ref.cyan.300}" },
+  "focus-ring": { "$type": "color", "$value": "{ref.brand.300}" },
   "focus-ring-offset": { "$type": "color", "$value": "{ref.ink.950}" },
 
   "status": {

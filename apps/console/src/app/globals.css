@@ -141,15 +141,22 @@
   --site-graphite: #a2aebb;
   --site-graphite-soft: #8592a1;
 
-  --site-oxygen: #67e8f9;
-  --site-accent-text: #86e1f2;
-  /* Inverted here on purpose. `accent-text` is a *light* cyan in dark mode
+  /* The mark takes the saturated brand step; accent *text* takes the
+     lighter one, so the two stay as distinguishable as they were when this
+     pair was two different cyans. */
+  --site-oxygen: #2dd4b0;
+  --site-accent-text: #6ce7cb;
+  /* Inverted here on purpose. `accent-text` is a *light* green in dark mode
      because it sits on a dark page; filling a shape with it and writing white
      on top measures about 1.2:1, which is what the axe sweep caught on the
-     account avatar. Filled shapes take the light ground and dark ink. */
-  --site-accent-solid: #86e1f2;
+     account avatar. Filled shapes take the light ground and dark ink.
+
+     It was a light *cyan* until August 2026, which made the same product teal
+     in light and cyan in dark. brand.300 is the same step of the brand's own
+     ramp and measures within half a point of what the cyan did. */
+  --site-accent-solid: #6ce7cb;
   --site-accent-on: #08110f;
-  --site-accent-wash: #0d2630;
+  --site-accent-wash: #0f2a25;
   --site-electric: #73d8ff;
   --site-critical: #fb7185;
   --site-critical-wash: #2c1216;
@@ -158,7 +165,7 @@
   --site-pass: #4ade80;
   --site-pass-wash: #0f2a1c;
 
-  --site-cta: #8be8f4;
+  --site-cta: #6ce7cb;
 
   /* Lighter than --site-paper on purpose — the instrument has to remain the
      brightest object on the page. */
@@ -167,7 +174,7 @@
   --site-panel-rule: #303b47;
   --site-panel-fg: #edf2f7;
   --site-panel-muted: #96a3b3;
-  --site-trace: #65e6e0;
+  --site-trace: #2dd4b0;
   --site-critical-lum: #fb7185;
 
   color-scheme: dark;

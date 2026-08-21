@@ -124,8 +124,8 @@
         "border": { "$value": "#253338" }
       },
       "accent": {
-        "bg": { "$value": "#102a32" },
-        "border": { "$value": "#1b4655" }
+        "bg": { "$value": "#0f2a25" },
+        "border": { "$value": "#1b4a42" }
       }
     },
 

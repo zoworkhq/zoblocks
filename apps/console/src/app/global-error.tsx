@@ -56,7 +56,7 @@ export default function GlobalError({
             body { background: #080b10 !important; color: #edf2f7 !important; }
             .ox-panel { background: #0e1614 !important; border-color: #1f2b28 !important; }
             .ox-muted { color: #9aaba4 !important; }
-            .ox-btn { background: #8be8f4 !important; color: #08110f !important; }
+            .ox-btn { background: #6ce7cb !important; color: #08110f !important; }
           }
         `}</style>
 
