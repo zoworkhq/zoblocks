@@ -55,6 +55,14 @@ const PAIRS: [string, string, string, number][] = [
   ["the focus ring on a control", "--focus", "--sunk", 3],
   ["a control border on the page", "--rule-strong", "--paper", 3],
   ["a control border on its fill", "--rule-strong", "--sunk", 3],
+  // The pull and propose screens, which arrived after the first pass here.
+  ["a primary button's label", "--paper", "--focus", 4.5],
+  ["a secondary button's label", "--ink", "--sunk", 4.5],
+  ["a preview's heading", "--ink", "--sunk", 4.5],
+  ["a preview's body", "--ink-soft", "--sunk", 4.5],
+  ["a restore notice on its wash", "--ink-soft", "--fail-wash", 4.5],
+  ["an unselected tab", "--ink-soft", "--paper", 4.5],
+  ["the selected tab's underline", "--focus", "--paper", 3],
 ];
 
 describe("the panel's own palette", () => {
