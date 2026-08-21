@@ -156,7 +156,7 @@ export default function ShowcasePage() {
               <div className="mt-8 flex flex-wrap gap-3" data-reveal>
                 <a
                   href="mailto:hello@zowork.com?subject=Oxygen%20UI%20showcase%20submission"
-                  className="group inline-flex items-center gap-2 rounded-xl bg-cta px-5 py-3.5 text-sm font-medium text-paper transition-all duration-300 ease-[var(--ease-out-expo)] hover:-translate-y-0.5 hover:opacity-90"
+                  className="group inline-flex items-center gap-2 rounded-xl bg-cta px-5 py-3.5 text-sm font-medium text-paper transition-all duration-300 ease-[var(--ease-out-expo)] hover:-translate-y-0.5 hover:bg-cta-hover"
                 >
                   Submit your build
                   <ArrowRight

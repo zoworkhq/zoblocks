@@ -59,7 +59,7 @@ export function buttonClasses({
     "inline-flex items-center justify-center gap-1.5 whitespace-nowrap rounded-lg border border-transparent font-medium",
     SIZES[size],
     "transition-[background-color,border-color,color] duration-200",
-    !blocked && variant === "primary" && "bg-cta text-paper hover:opacity-90",
+    !blocked && variant === "primary" && "bg-cta text-paper hover:bg-cta-hover",
     !blocked && variant === "secondary" && "border-rule-strong bg-paper hover:bg-paper-sunk",
     !blocked && variant === "ghost" && "text-oxygen-deep hover:bg-accent-wash",
     !blocked &&

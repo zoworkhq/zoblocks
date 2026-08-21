@@ -30,16 +30,63 @@ const ROLES: readonly { value: MemberRole; label: string; can: string }[] = (
  * disabling yourself — come back as messages rather than being prevented by a
  * greyed control, because the reason is the useful part.
  */
-export function MemberRow({
+/**
+ * The role, as a column of its own.
+ *
+ * A pending member has no role yet — approving them chooses one — so this
+ * shows what they will get and leaves the choice with the Approve control,
+ * where it is part of a single decision rather than a second one.
+ */
+export function RoleCell({
   memberId,
   role,
+  status,
+  canManage,
+}: {
+  memberId: string;
+  role: MemberRole;
+  status: "pending" | "active" | "disabled";
+  canManage: boolean;
+}) {
+  if (status === "pending") {
+    return <span className="text-[0.8125rem] text-graphite">On approval</span>;
+  }
+
+  return (
+    <ActionForm quiet action={updateMemberAction}>
+      <input type="hidden" name="memberId" value={memberId} />
+      <input type="hidden" name="intent" value="role" />
+      <label className="sr-only" htmlFor={`role-${memberId}`}>
+        Role
+      </label>
+      <Select
+        id={`role-${memberId}`}
+        name="role"
+        size="sm"
+        defaultValue={role}
+        disabled={!canManage}
+        onChange={(event) => event.currentTarget.form?.requestSubmit()}
+      >
+        {ROLES.map((entry) => (
+          // The description lives on the option rather than in a reference
+          // panel beside the table: it is the moment the choice is being made.
+          <option key={entry.value} value={entry.value} title={entry.can}>
+            {entry.label}
+          </option>
+        ))}
+      </Select>
+    </ActionForm>
+  );
+}
+
+export function MemberRow({
+  memberId,
   status,
   isSelf,
   canManage,
   reason,
 }: {
   memberId: string;
-  role: MemberRole;
   status: "pending" | "active" | "disabled";
   isSelf: boolean;
   canManage: boolean;
@@ -74,33 +121,16 @@ export function MemberRow({
     );
   }
 
+  /*
+   * A left-aligned column, not a wrapping row.
+   *
+   * `SubmitButton` renders its `reason` as a sibling, so a row that wraps put
+   * the button, a two-line sentence and a link at three different left edges.
+   * The reason is worth keeping visible — a disabled control that does not say
+   * why is a dead end — so the fix is to stop pretending these are inline.
+   */
   return (
-    <div className="flex flex-wrap items-center gap-2">
-      <ActionForm quiet action={updateMemberAction}>
-        <input type="hidden" name="memberId" value={memberId} />
-        <input type="hidden" name="intent" value="role" />
-        <label className="sr-only" htmlFor={`role-${memberId}`}>
-          Role
-        </label>
-        <Select
-          id={`role-${memberId}`}
-          name="role"
-          size="sm"
-          defaultValue={role}
-          disabled={!canManage}
-          onChange={(event) => event.currentTarget.form?.requestSubmit()}
-          className="w-32"
-        >
-          {ROLES.map((entry) => (
-            // The description lives on the option rather than in a reference
-            // panel beside the table: it is the moment the choice is being made.
-            <option key={entry.value} value={entry.value} title={entry.can}>
-              {entry.label}
-            </option>
-          ))}
-        </Select>
-      </ActionForm>
-
+    <div className="flex flex-col items-start gap-1.5">
       <ActionForm quiet action={updateMemberAction}>
         <input type="hidden" name="memberId" value={memberId} />
         <input type="hidden" name="intent" value="status" />

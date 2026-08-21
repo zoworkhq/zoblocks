@@ -93,7 +93,7 @@ export default async function MarketplaceItemPage({
             <div className="mt-6 flex flex-wrap gap-3" data-reveal>
               <a
                 href={buyHref(item.slug)}
-                className="group inline-flex items-center gap-2 rounded-xl bg-cta px-5 py-3.5 text-sm font-medium text-paper transition-all duration-300 ease-[var(--ease-out-expo)] hover:-translate-y-0.5 hover:opacity-90"
+                className="group inline-flex items-center gap-2 rounded-xl bg-cta px-5 py-3.5 text-sm font-medium text-paper transition-all duration-300 ease-[var(--ease-out-expo)] hover:-translate-y-0.5 hover:bg-cta-hover"
               >
                 Buy in the console
                 <ArrowUpRight

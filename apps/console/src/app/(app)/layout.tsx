@@ -4,6 +4,7 @@ import { scoped } from "@/db/scope";
 import { can } from "@/lib/roles";
 import { Rail } from "@/components/Rail";
 import { AccountMenu } from "@/components/AccountMenu";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { ToastProvider } from "@/components/ui";
 
 /**
@@ -84,13 +85,21 @@ export default async function AppLayout({ children }: { children: React.ReactNod
           {/*
             The account bar.
 
-            Thin, sticky and right-aligned, holding one control. The rail says
-            which organisation you are in; this says which person you are, and
-            it is the only place in the console that ends a session. Sticky
-            because signing out is the one thing somebody may want at any scroll
-            position, on any screen.
+            Thin, sticky and right-aligned. The rail says which organisation
+            you are in; this says which person you are, and it is the only place
+            in the console that ends a session. Sticky because signing out is
+            the one thing somebody may want at any scroll position.
+
+            The theme toggle sits here too, for two reasons. It belongs to the
+            person rather than to the organisation, which is what this bar is
+            for and what the rail's own comment says. And in the rail it sat in
+            the bottom-left corner — exactly where Next's development badge
+            lands, so every developer working locally saw its first button
+            covered by a black circle and reasonably assumed the control was
+            broken.
           */}
-          <div className="sticky top-0 z-30 flex justify-end border-b border-rule bg-paper/85 px-5 py-2.5 backdrop-blur-md sm:px-8 lg:px-10">
+          <div className="sticky top-0 z-30 flex items-center justify-end gap-3 border-b border-rule bg-paper/85 px-5 py-2.5 backdrop-blur-md sm:px-8 lg:px-10">
+            <ThemeToggle />
             <AccountMenu
               name={member.name}
               email={member.email}

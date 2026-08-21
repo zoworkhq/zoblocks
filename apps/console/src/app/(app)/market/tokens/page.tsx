@@ -47,21 +47,6 @@ export default async function TokensPage() {
           again — the same reason a session cookie cannot be re-read. Tokens expire after{" "}
           {TOKEN_LIFETIME_DAYS} days.
         </Callout>
-
-        <pre className="mt-4 overflow-x-auto rounded-lg bg-panel p-3 font-mono text-[0.6875rem] text-panel-fg">
-          {`// components.json — the token stays in the environment, never in the repo
-"registries": {
-  "@oxygen-pro": {
-    "url": "${"https://console.oxygenui.design/r/pro/{name}.json"}",
-    "headers": { "Authorization": "Bearer \${OXYGEN_TOKEN}" }
-  }
-}
-
-# .env.local
-OXYGEN_TOKEN=oxy_live_…
-
-npx shadcn@latest add @oxygen-pro/vitals-flowsheet`}
-        </pre>
       </Panel>
 
       {tokens.length === 0 ? (
@@ -117,6 +102,33 @@ npx shadcn@latest add @oxygen-pro/vitals-flowsheet`}
           </ul>
         </Panel>
       )}
+      {/*
+        Reference material, after the list and closed by default.
+        
+        It used to sit inside the mint panel: a tall dark slab pushing the
+        actual list of tokens — the reason an administrator opens this page —
+        below the fold and into a panel that read as unrelated. You read this
+        once, on your first token, and never again.
+      */}
+      <details className="mt-4 rounded-xl border border-rule bg-paper-sunk px-4 py-3">
+        <summary className="cursor-pointer text-[0.8125rem] font-medium text-ink">
+          Wiring a registry token into the shadcn CLI
+        </summary>
+        <pre className="mt-3 overflow-x-auto rounded-lg bg-panel p-3 font-mono text-[0.6875rem] text-panel-fg">
+          {`// components.json — the token stays in the environment, never in the repo
+"registries": {
+  "@oxygen-pro": {
+    "url": "${"https://console.oxygenui.design/r/pro/{name}.json"}",
+    "headers": { "Authorization": "Bearer \${OXYGEN_TOKEN}" }
+  }
+}
+
+# .env.local
+OXYGEN_TOKEN=oxy_live_…
+
+npx shadcn@latest add @oxygen-pro/vitals-flowsheet`}
+        </pre>
+      </details>
     </>
   );
 }

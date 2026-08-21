@@ -161,9 +161,19 @@ export function Toolbar({
     <div
       role="group"
       className={cn(
-        // `items-start` and a wider gap: the axes are blocks now, and a row of
-        // blocks centred on each other leaves their labels at different heights.
-        "flex flex-wrap items-start gap-x-7 gap-y-4 rounded-xl border border-rule bg-paper-sunk px-4 py-3.5",
+        /*
+          A grid, not a wrapping flex row.
+          
+          Flex packed the axes by content width, so their labels landed at
+          x=407, 609 and 857 — intervals of 202 and 248 — and whichever axis
+          did not fit dropped to a second row on its own with three columns of
+          width unused beside it. Nobody names that; everybody feels it.
+          
+          Two equal columns, and an axis too wide for one says so with
+          `className="sm:col-span-2"`. That keeps the alignment a property of
+          the bar rather than of how long the option labels happen to be.
+        */
+        "grid grid-cols-1 items-start gap-x-7 gap-y-4 rounded-xl border border-rule bg-paper-sunk px-4 py-3.5 sm:grid-cols-3",
         className,
       )}
     >

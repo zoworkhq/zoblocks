@@ -13,7 +13,7 @@ import {
   type Column,
 } from "@/components/ui";
 import type { MemberRole } from "@/db/collections";
-import { MemberRow } from "./MemberRow";
+import { MemberRow, RoleCell } from "./MemberRow";
 
 export const metadata = { title: "Members" };
 
@@ -89,6 +89,23 @@ export default async function MembersPage({
       ),
     },
     {
+      /*
+        Its own column, with a header.
+        
+        The select used to live in the actions cell beside a Disable button, a
+        sentence explaining why Disable was unavailable, and a Reset link — four
+        kinds of control in 16rem, wrapping into a ragged stack that set the row
+        height. A role is a property of the person, like their status; it is not
+        something you *do* to them.
+      */
+      key: "role",
+      header: "Role",
+      width: "9rem",
+      cell: (row) => (
+        <RoleCell memberId={row.id} role={row.role} status={row.status} canManage={canManage} />
+      ),
+    },
+    {
       key: "status",
       header: "Status",
       width: "8rem",
@@ -123,11 +140,10 @@ export default async function MembersPage({
     {
       key: "actions",
       header: "",
-      width: "16rem",
+      width: "12rem",
       cell: (row) => (
         <MemberRow
           memberId={row.id}
-          role={row.role}
           status={row.status}
           isSelf={row.isSelf}
           canManage={canManage}

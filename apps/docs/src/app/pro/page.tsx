@@ -46,7 +46,7 @@ export default function ProPage() {
               <div className="mt-8 flex flex-wrap gap-3" data-reveal>
                 <a
                   href="#pricing"
-                  className="group inline-flex items-center gap-2 rounded-xl bg-cta px-5 py-3.5 text-sm font-medium text-paper transition-all duration-300 ease-[var(--ease-out-expo)] hover:-translate-y-0.5 hover:opacity-90"
+                  className="group inline-flex items-center gap-2 rounded-xl bg-cta px-5 py-3.5 text-sm font-medium text-paper transition-all duration-300 ease-[var(--ease-out-expo)] hover:-translate-y-0.5 hover:bg-cta-hover"
                 >
                   See pricing
                   <ArrowRight
@@ -263,7 +263,7 @@ export default function ProPage() {
                       className={cn(
                         "mt-6 inline-flex items-center justify-center rounded-xl px-4 py-2.5 text-sm font-medium transition-all duration-300 ease-[var(--ease-out-expo)] hover:-translate-y-0.5",
                         tier.featured
-                          ? "bg-cta text-paper hover:opacity-90"
+                          ? "bg-cta text-paper hover:bg-cta-hover"
                           : "border border-rule text-ink hover:border-oxygen/45",
                       )}
                     >

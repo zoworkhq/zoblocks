@@ -48,6 +48,7 @@
   --color-electric: var(--site-electric);
   --color-critical: var(--site-critical);
   --color-cta: var(--site-cta);
+  --color-cta-hover: var(--site-cta-hover);
 
   /* Always-dark surfaces: previews, code blocks, validation readouts. These
      are hardware rather than document, so they keep their colour in both
@@ -108,7 +109,21 @@
   --site-pass: #0f7a5f;
   --site-pass-wash: #e6f5ef;
 
-  --site-cta: #08110f;
+  /* The primary action is the accent.
+
+     It was #08110f — near-black — so in light mode the brand appeared nowhere
+     on the thing people click most, and the same product read as two products
+     depending on the time of day. brand.700 is what `accent` already resolves
+     to in this theme, and the label measures 5.26:1 on it against a 4.5 floor.
+     Dark keeps its light-on-dark inversion; only the hue is now shared. */
+  --site-cta: #067662;
+  /* Hover darkens rather than dims.
+  
+     `hover:opacity-90` composited the green against the page at #1e8371 and
+     the label measured 4.37:1 — under the 4.5 floor, on the primary action.
+     The near-black this replaced survived dimming because it had contrast to
+     spare; a mid-tone brand colour does not. brand.800 is 7.38:1. */
+  --site-cta-hover: #0a5d4f;
 
   --site-panel: #08110f;
   --site-panel-raised: #0d1a18;
@@ -166,6 +181,7 @@
   --site-pass-wash: #0f2a1c;
 
   --site-cta: #6ce7cb;
+  --site-cta-hover: #a4f3df;
 
   /* Lighter than --site-paper on purpose — the instrument has to remain the
      brightest object on the page. */

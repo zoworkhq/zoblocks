@@ -15,7 +15,6 @@ import {
   PlayCircle,
   Settings,
 } from "lucide-react";
-import { ThemeToggle } from "@/components/ThemeToggle";
 import { themeScreenHref, themeScreens } from "@/lib/theme-screens";
 import { cn } from "@/lib/utils";
 
@@ -340,19 +339,6 @@ export function Rail({
 
           <Group label="Organisation" items={organisation} current={current} />
         </nav>
-
-        {/*
-          The theme toggle, alone.
-
-          Sign out used to sit beside it, which put a session-ending control a
-          few pixels from a preference control in the corner of a navigation
-          list it had nothing to do with. It now lives in the account menu at
-          the top right, with the rest of what belongs to the person rather
-          than to the organisation.
-        */}
-        <div className="flex items-center border-t border-rule pt-4">
-          <ThemeToggle />
-        </div>
       </div>
     </div>
   );

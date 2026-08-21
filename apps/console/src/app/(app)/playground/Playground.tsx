@@ -78,12 +78,29 @@ export function Playground({ themes }: { themes: readonly PlaygroundTheme[] }) {
   return (
     <div className="space-y-5">
       <Toolbar>
-        <AxisGroup
-          label="Theme"
-          value={slug}
-          onChange={setSlug}
-          options={themes.map((entry) => ({ value: entry.slug, label: entry.name }))}
-        />
+        {/*
+          With one theme this was a segmented control holding a single option:
+          the same border, height and radius as the switches beside it, and
+          nothing happened when you pressed it. Identical form, different
+          behaviour — the mapping problem, on a screen whose whole job is to
+          demonstrate a design system.
+          
+          One theme is a fact and reads as one. Two or more is a choice and
+          gets the control.
+        */}
+        {themes.length > 1 ? (
+          <AxisGroup
+            label="Theme"
+            value={slug}
+            onChange={setSlug}
+            options={themes.map((entry) => ({ value: entry.slug, label: entry.name }))}
+          />
+        ) : (
+          <div>
+            <p className="eyebrow mb-1.5 text-[0.5625rem] text-graphite-soft">Theme</p>
+            <p className="py-1.5 text-[0.8125rem] font-medium text-ink">{active.name}</p>
+          </div>
+        )}
         <AxisGroup
           label="Mode"
           value={theme}
@@ -105,6 +122,8 @@ export function Playground({ themes }: { themes: readonly PlaygroundTheme[] }) {
           ]}
         />
         <AxisGroup
+          // Five options against everyone else's three, so it takes the row.
+          className="sm:col-span-3"
           label="Vision"
           value={vision}
           onChange={setVision}

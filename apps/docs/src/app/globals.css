@@ -96,6 +96,7 @@
   --color-critical: var(--site-critical);
 
   --color-cta: var(--site-cta);
+  --color-cta-hover: var(--site-cta-hover);
 
   /* Panel family — the always-dark surfaces: instrument bezels, code blocks,
      the install pill. These are hardware, not document, so they stay dark in
@@ -139,7 +140,21 @@
   --site-critical: #dc2626;
 
   /* Primary button: dark on light. Pairs with text-paper, which inverts too. */
-  --site-cta: #08110f;
+  /* The primary action is the accent.
+
+     It was #08110f — near-black — so in light mode the brand appeared nowhere
+     on the thing people click most, and the same product read as two products
+     depending on the time of day. brand.700 is what `accent` already resolves
+     to in this theme, and the label measures 5.26:1 on it against a 4.5 floor.
+     Dark keeps its light-on-dark inversion; only the hue is now shared. */
+  --site-cta: #067662;
+  /* Hover darkens rather than dims.
+  
+     `hover:opacity-90` composited the green against the page at #1e8371 and
+     the label measured 4.37:1 — under the 4.5 floor, on the primary action.
+     The near-black this replaced survived dimming because it had contrast to
+     spare; a mid-tone brand colour does not. brand.800 is 7.38:1. */
+  --site-cta-hover: #0a5d4f;
 
   --site-panel: #08110f;
   --site-panel-raised: #0d1a18;
@@ -184,6 +199,7 @@
 
   /* Bright button on a dark page; text-paper resolves dark, so it still reads. */
   --site-cta: #6ce7cb;
+  --site-cta-hover: #a4f3df;
 
   /* Lighter than --site-paper AND than every .surface-* level on purpose —
      the instrument has to remain the brightest object on the page. */
@@ -233,6 +249,7 @@
   --site-critical: #8c0000;
 
   --site-cta: #000000;
+  --site-cta-hover: #1a1a1a;
 
   --site-panel: #000000;
   --site-panel-raised: #141414;
