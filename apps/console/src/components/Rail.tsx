@@ -229,6 +229,12 @@ export function Rail({
     { href: "/settings", label: "Settings", Icon: Settings },
   ];
 
+  // One winner, decided across every group, so no two entries look current.
+  const current = currentHref(
+    pathname,
+    [...design, ...themeItems, ...tools, ...marketplace, ...organisation].map((i) => i.href),
+  );
+
   return (
     <div className="flex h-full flex-col gap-4 lg:gap-6">
       <div className="flex items-center justify-between gap-3">
@@ -302,7 +308,7 @@ export function Rail({
           place to keep in step, and the one that was easiest to miss.
         */}
         <nav aria-label="Console" className="flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto">
-          <Group label="Design" items={design} pathname={pathname}>
+          <Group label="Design" items={design} current={current}>
             {openTheme && (
               <li>
                 {/*
@@ -321,18 +327,18 @@ export function Rail({
                 </p>
                 <ul className="mt-1 space-y-0.5 border-l border-rule pl-2">
                   {themeItems.map((item) => (
-                    <NavLink key={item.href} item={item} pathname={pathname} />
+                    <NavLink key={item.href} item={item} current={current} />
                   ))}
                 </ul>
               </li>
             )}
           </Group>
 
-          {tools.length > 0 && <Group label="Tools" items={tools} pathname={pathname} />}
+          {tools.length > 0 && <Group label="Tools" items={tools} current={current} />}
 
-          <Group label="Marketplace" items={marketplace} pathname={pathname} />
+          <Group label="Marketplace" items={marketplace} current={current} />
 
-          <Group label="Organisation" items={organisation} pathname={pathname} />
+          <Group label="Organisation" items={organisation} current={current} />
         </nav>
 
         {/*
@@ -355,12 +361,12 @@ export function Rail({
 function Group({
   label,
   items,
-  pathname,
+  current,
   children,
 }: {
   label: string;
   items: readonly Item[];
-  pathname: string;
+  current: string | undefined;
   children?: React.ReactNode;
 }) {
   return (
@@ -368,7 +374,7 @@ function Group({
       <p className="eyebrow mb-1.5 px-2.5 text-[0.5625rem] text-graphite-soft">{label}</p>
       <ul className="space-y-0.5">
         {items.map((item) => (
-          <NavLink key={item.href} item={item} pathname={pathname} />
+          <NavLink key={item.href} item={item} current={current} />
         ))}
         {children}
       </ul>
@@ -376,15 +382,23 @@ function Group({
   );
 }
 
-function NavLink({ item, pathname }: { item: Item; pathname: string }) {
-  /*
-   * Prefix match, with `/themes` narrowed to itself.
-   *
-   * Without the narrowing every screen under `/themes/…` would light up Themes
-   * *and* the nested item, and two simultaneously-current entries is the same
-   * as none.
-   */
-  const active = item.href === "/themes" ? pathname === "/themes" : pathname.startsWith(item.href);
+/**
+ * Which single rail item is the current page.
+ *
+ * The longest href the path sits inside, rather than every href it starts
+ * with. `startsWith` alone lit Catalogue (`/market`) as well as Access tokens
+ * on `/market/tokens`, so two entries claimed to be current — which reads the
+ * same as none. `/themes` carried a hand-written exception for exactly this;
+ * resolving the winner once removes the need for one per section.
+ */
+export function currentHref(pathname: string, hrefs: readonly string[]): string | undefined {
+  return hrefs
+    .filter((href) => pathname === href || pathname.startsWith(`${href}/`))
+    .sort((a, b) => b.length - a.length)[0];
+}
+
+function NavLink({ item, current }: { item: Item; current: string | undefined }) {
+  const active = item.href === current;
 
   return (
     <li>

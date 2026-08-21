@@ -136,6 +136,17 @@ export function can(role: MemberRole, capability: Capability): boolean {
   return GRANTS[role].includes(capability);
 }
 
+/**
+ * Every capability there is, which is what a per-role count is a fraction of.
+ *
+ * The members table printed `${capabilitiesFor(role).length} of 8` with the
+ * eight written in. Capabilities were added, the numerator followed and the
+ * denominator did not, and the screen settled on "13 of 8" — a fraction that
+ * says nothing except that somebody stopped maintaining it. Derived from the
+ * grants, so it cannot drift again.
+ */
+export const ALL_CAPABILITIES: readonly Capability[] = [...new Set(Object.values(GRANTS).flat())];
+
 export function capabilitiesFor(role: MemberRole): readonly Capability[] {
   return GRANTS[role];
 }

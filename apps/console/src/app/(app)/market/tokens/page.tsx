@@ -36,7 +36,7 @@ export default async function TokensPage() {
       <PageHeader
         eyebrow="Marketplace"
         title="Access tokens"
-        lede="For the shadcn CLI, so a paid component installs with one command. Tokens belong to the organisation and are visible to every admin and developer in it."
+        lede="A key for the shadcn CLI or for the Figma plugin — one scope each, chosen when it is minted. Tokens belong to the organisation and are visible to every admin and developer in it."
       />
 
       <Panel className="mt-6" title="Mint a token">

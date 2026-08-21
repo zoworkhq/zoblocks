@@ -1,6 +1,6 @@
 import { currentMember } from "@/lib/auth";
 import { scoped } from "@/db/scope";
-import { ROLE_SUMMARY, can, capabilitiesFor, whyNot } from "@/lib/roles";
+import { ALL_CAPABILITIES, ROLE_SUMMARY, can, capabilitiesFor, whyNot } from "@/lib/roles";
 import {
   Callout,
   DataTable,
@@ -107,7 +107,9 @@ export default async function MembersPage({
       numeric: true,
       cell: (row) => (
         <span className="tabular text-graphite" title={capabilitiesFor(row.role).join(", ")}>
-          {row.status === "active" ? `${capabilitiesFor(row.role).length} of 8` : "—"}
+          {row.status === "active"
+            ? `${capabilitiesFor(row.role).length} of ${ALL_CAPABILITIES.length}`
+            : "—"}
         </span>
       ),
     },

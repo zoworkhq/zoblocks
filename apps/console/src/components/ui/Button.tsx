@@ -45,16 +45,27 @@ export function buttonClasses({
   className?: string;
 } = {}): string {
   return cn(
-    "inline-flex items-center justify-center gap-1.5 whitespace-nowrap rounded-lg font-medium",
+    /*
+     * `border` on the base, not per variant.
+     *
+     * `primary` and `ghost` had no border while `secondary` and `danger` had
+     * one, so with identical padding a primary rendered 37px and a secondary
+     * 39px. Side by side — which is where buttons live — they did not line up,
+     * and the small size drifted the same 2px between 32 and 34.
+     *
+     * A transparent border costs nothing, keeps every variant one box, and
+     * means a variant that gains a visible border later does not resize.
+     */
+    "inline-flex items-center justify-center gap-1.5 whitespace-nowrap rounded-lg border border-transparent font-medium",
     SIZES[size],
     "transition-[background-color,border-color,color] duration-200",
     !blocked && variant === "primary" && "bg-cta text-paper hover:opacity-90",
-    !blocked && variant === "secondary" && "border border-rule-strong bg-paper hover:bg-paper-sunk",
+    !blocked && variant === "secondary" && "border-rule-strong bg-paper hover:bg-paper-sunk",
     !blocked && variant === "ghost" && "text-oxygen-deep hover:bg-accent-wash",
     !blocked &&
       variant === "danger" &&
-      "border border-fail/30 bg-fail-wash text-fail hover:bg-fail-wash/70",
-    blocked && "cursor-not-allowed border border-rule bg-paper-sunk text-graphite-soft",
+      "border-fail/30 bg-fail-wash text-fail hover:bg-fail-wash/70",
+    blocked && "cursor-not-allowed border-rule bg-paper-sunk text-graphite-soft",
     className,
   );
 }
