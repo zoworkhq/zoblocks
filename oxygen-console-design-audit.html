@@ -1,0 +1,813 @@
+<title>Console Design Audit</title>
+
+<style>
+  /* ─────────────────────────────────────────────────────────────
+     Oxygen console — design audit
+     A document about a design system, so it borrows that system's
+     restraint without impersonating its chrome: the accent is used
+     once per section, never as decoration.
+     ───────────────────────────────────────────────────────────── */
+
+  :root {
+    --paper: #fbfcfb;
+    --raised: #ffffff;
+    --sunk: #f1f4f2;
+    --rule: #dfe6e2;
+    --rule-firm: #c6d1cc;
+    --ink: #0a1210;
+    --ink-2: #46564f;
+    --ink-3: #6c7c75;
+
+    --accent: #0d7a63;
+    --accent-wash: #e6f4ef;
+    --critical: #a52318;
+    --critical-wash: #fceeec;
+    --warn: #96560a;
+    --warn-wash: #fdf3e6;
+    --pass: #0f6b52;
+    --pass-wash: #e6f3ee;
+
+    --panel: #08110f;
+    --panel-2: #101b18;
+    --panel-rule: #1e2f2a;
+    --panel-ink: #e9f3ef;
+    --panel-ink-2: #8fa39c;
+
+    --shadow-sm: 0 1px 2px -1px rgb(6 24 19 / 0.06);
+    --shadow: 0 12px 32px -20px rgb(6 24 19 / 0.28);
+
+    --sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+
+    --ease: cubic-bezier(0.16, 1, 0.3, 1);
+    color-scheme: light;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper: #070b0a;
+      --raised: #0d1412;
+      --sunk: #111a17;
+      --rule: #1e2a26;
+      --rule-firm: #2c3b36;
+      --ink: #eaf2ef;
+      --ink-2: #a4b3ad;
+      --ink-3: #7e8f88;
+
+      --accent: #4fd6b0;
+      --accent-wash: #0c2620;
+      --critical: #ff8a80;
+      --critical-wash: #2a1310;
+      --warn: #f0b64d;
+      --warn-wash: #291f10;
+      --pass: #56d99b;
+      --pass-wash: #0d2a1e;
+
+      --panel: #101b18;
+      --panel-2: #16231f;
+      --panel-rule: #263833;
+      --shadow-sm: 0 1px 2px -1px rgb(0 0 0 / 0.5);
+      --shadow: 0 12px 32px -20px rgb(0 0 0 / 0.7);
+      color-scheme: dark;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --paper: #070b0a;
+    --raised: #0d1412;
+    --sunk: #111a17;
+    --rule: #1e2a26;
+    --rule-firm: #2c3b36;
+    --ink: #eaf2ef;
+    --ink-2: #a4b3ad;
+    --ink-3: #7e8f88;
+
+    --accent: #4fd6b0;
+    --accent-wash: #0c2620;
+    --critical: #ff8a80;
+    --critical-wash: #2a1310;
+    --warn: #f0b64d;
+    --warn-wash: #291f10;
+    --pass: #56d99b;
+    --pass-wash: #0d2a1e;
+
+    --panel: #101b18;
+    --panel-2: #16231f;
+    --panel-rule: #263833;
+    --shadow-sm: 0 1px 2px -1px rgb(0 0 0 / 0.5);
+    --shadow: 0 12px 32px -20px rgb(0 0 0 / 0.7);
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 16px;
+    line-height: 1.65;
+    letter-spacing: -0.006em;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap { max-width: 60rem; margin: 0 auto; padding: 0 1.5rem; }
+
+  /* ── Type scale ─────────────────────────────────────────────── */
+  h1, h2, h3, h4 { margin: 0; text-wrap: balance; letter-spacing: -0.028em; font-weight: 640; }
+  h1 { font-size: clamp(2.1rem, 5vw, 3.4rem); line-height: 1.02; }
+  h2 { font-size: clamp(1.5rem, 2.6vw, 2rem); line-height: 1.12; }
+  h3 { font-size: 1.0625rem; letter-spacing: -0.015em; }
+  h4 { font-size: 0.9375rem; letter-spacing: -0.01em; }
+  p { margin: 0; }
+  a { color: var(--accent); text-decoration: underline; text-underline-offset: 2px; }
+
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.17em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    font-weight: 500;
+  }
+  .lede { font-size: clamp(1.0625rem, 1.6vw, 1.25rem); line-height: 1.55; color: var(--ink-2); }
+  .small { font-size: 0.8125rem; line-height: 1.55; color: var(--ink-2); }
+  .num { font-variant-numeric: tabular-nums; }
+  code, .mono { font-family: var(--mono); font-size: 0.86em; }
+  code { background: var(--sunk); padding: 0.1em 0.34em; border-radius: 4px; }
+
+  /* ── Hero ───────────────────────────────────────────────────── */
+  header.hero { padding: 4.5rem 0 3rem; border-bottom: 1px solid var(--rule); }
+  .hero h1 { margin-top: 0.75rem; }
+  .hero .lede { margin-top: 1.25rem; max-width: 46ch; }
+
+  .verdict {
+    margin-top: 2.5rem;
+    display: grid;
+    gap: 1px;
+    grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+    background: var(--rule);
+    border: 1px solid var(--rule);
+    border-radius: 14px;
+    overflow: hidden;
+  }
+  .verdict div { background: var(--raised); padding: 1rem 1.1rem; }
+  .verdict dt { font-size: 0.6875rem; letter-spacing: 0.09em; text-transform: uppercase; color: var(--ink-3); }
+  .verdict dd { margin: 0.35rem 0 0; font-size: 1.5rem; font-weight: 640; letter-spacing: -0.03em; }
+  .verdict dd span { font-size: 0.8125rem; font-weight: 400; color: var(--ink-2); letter-spacing: 0; }
+
+  /* ── Sections ───────────────────────────────────────────────── */
+  section { padding: 3.5rem 0; border-bottom: 1px solid var(--rule); }
+  section > .wrap > .eyebrow { display: block; margin-bottom: 0.6rem; }
+  section h2 + .lede { margin-top: 0.9rem; max-width: 60ch; }
+
+  .stack { display: grid; gap: 1rem; margin-top: 2rem; }
+  .cols-2 { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr)); margin-top: 2rem; }
+
+  /* ── Finding card ───────────────────────────────────────────── */
+  .find {
+    background: var(--raised);
+    border: 1px solid var(--rule);
+    border-radius: 14px;
+    padding: 1.15rem 1.25rem;
+    box-shadow: var(--shadow-sm);
+  }
+  .find header { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.6rem; }
+  .find h3 { flex: 1 1 16rem; }
+  .find p { margin-top: 0.55rem; color: var(--ink-2); font-size: 0.9rem; }
+  .find .where {
+    margin-top: 0.7rem;
+    font-family: var(--mono);
+    font-size: 0.6875rem;
+    color: var(--ink-3);
+    word-break: break-word;
+  }
+
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.15rem 0.5rem;
+    border-radius: 5px;
+    font-family: var(--mono);
+    font-size: 0.625rem;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .c-hi { background: var(--critical-wash); color: var(--critical); }
+  .c-md { background: var(--warn-wash); color: var(--warn); }
+  .c-lo { background: var(--sunk); color: var(--ink-2); border: 1px solid var(--rule); }
+  .c-ok { background: var(--pass-wash); color: var(--pass); }
+  .c-ac { background: var(--accent-wash); color: var(--accent); }
+
+  /* ── Tables ─────────────────────────────────────────────────── */
+  .tablewrap {
+    margin-top: 1.5rem;
+    border: 1px solid var(--rule);
+    border-radius: 14px;
+    overflow-x: auto;
+    background: var(--raised);
+  }
+  table { border-collapse: collapse; width: 100%; font-size: 0.8125rem; }
+  th, td { text-align: left; padding: 0.6rem 0.85rem; border-bottom: 1px solid var(--rule); vertical-align: top; }
+  thead th {
+    background: var(--sunk);
+    font-family: var(--mono);
+    font-size: 0.625rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    font-weight: 500;
+    white-space: nowrap;
+  }
+  tbody tr:last-child td { border-bottom: 0; }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+  /* ── Instrument (code / spec blocks) ────────────────────────── */
+  .instrument {
+    background: var(--panel);
+    color: var(--panel-ink);
+    border: 1px solid var(--panel-rule);
+    border-radius: 14px;
+    padding: 1.1rem 1.25rem;
+    overflow-x: auto;
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    line-height: 1.75;
+    box-shadow: var(--shadow);
+  }
+  .instrument .dim { color: var(--panel-ink-2); }
+  .instrument .add { color: #56d99b; }
+  .instrument .del { color: #ff8a80; }
+
+  /* ── Callout ────────────────────────────────────────────────── */
+  .note {
+    border: 1px solid var(--rule);
+    border-left: 3px solid var(--accent);
+    background: var(--raised);
+    border-radius: 0 12px 12px 0;
+    padding: 0.9rem 1.1rem;
+    margin-top: 1.5rem;
+  }
+  .note.warn { border-left-color: var(--warn); background: var(--warn-wash); border-color: transparent; }
+  .note strong { display: block; font-size: 0.875rem; }
+  .note p { margin-top: 0.35rem; font-size: 0.875rem; color: var(--ink-2); }
+  .note.warn p { color: var(--ink); opacity: 0.85; }
+
+  ul.tight { margin: 0.6rem 0 0; padding-left: 1.1rem; color: var(--ink-2); font-size: 0.9rem; }
+  ul.tight li { margin-top: 0.3rem; }
+
+  footer { padding: 3rem 0 4rem; color: var(--ink-3); font-size: 0.8125rem; }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .find { transition: border-color 260ms var(--ease), transform 420ms var(--ease); }
+    .find:hover { border-color: var(--rule-firm); transform: translateY(-1px); }
+  }
+</style>
+
+<header class="hero">
+  <div class="wrap">
+    <span class="eyebrow">Design audit · app.oxygenui.design</span>
+    <h1>Correct, and not yet premium.</h1>
+    <p class="lede">
+      Thirteen screens, one component kit, zero accessibility violations. The engineering is
+      finished; the finish is not. This is what stands between the current build and something a
+      client would call polished — and the shortest path through it.
+    </p>
+
+    <dl class="verdict">
+      <div><dt>Screens reviewed</dt><dd class="num">15</dd></div>
+      <div><dt>Findings</dt><dd class="num">24</dd></div>
+      <div><dt>High severity</dt><dd class="num">7</dd></div>
+      <div><dt>Kit components</dt><dd class="num">17 <span>3 missing</span></dd></div>
+      <div><dt>Est. effort</dt><dd class="num">9–12 <span>days</span></dd></div>
+    </dl>
+  </div>
+</header>
+
+<!-- ─────────────────────────────────────────────────────────── -->
+<section>
+  <div class="wrap">
+    <span class="eyebrow">Section 01</span>
+    <h2>What is already right</h2>
+    <p class="lede">
+      Stated first so the plan does not re-solve it, and so the effort estimate is believable.
+      None of the following needs revisiting.
+    </p>
+
+    <div class="cols-2">
+      <div class="find">
+        <header><h3>Accessibility</h3><span class="chip c-ok">verified</span></header>
+        <p>
+          Zero WCAG 2.2 AA violations across 16 screens × 2 themes × 3 engines, plus no horizontal
+          scroll at 320&nbsp;px. This is measured on every run, not asserted.
+        </p>
+        <p class="where">e2e/console-a11y.spec.ts · 7 tests</p>
+      </div>
+
+      <div class="find">
+        <header><h3>The disabled-with-reason pattern</h3><span class="chip c-ok">keep</span></header>
+        <p>
+          Every blocked control stays focusable and carries the reason beneath it. It is applied
+          consistently and it is genuinely better than the industry default of hiding the control.
+        </p>
+        <p class="where">components/ui/Button.tsx · lib/roles.ts whyNot()</p>
+      </div>
+
+      <div class="find">
+        <header><h3>Depth vocabulary</h3><span class="chip c-ok">keep</span></header>
+        <p>
+          Paper → surface → instrument, with the dark panel reserved for anything <em>rendering</em>
+          something. It gives the product a signature and it is applied correctly.
+        </p>
+        <p class="where">app/globals.css · .surface, .instrument, .preview-region</p>
+      </div>
+
+      <div class="find">
+        <header><h3>Error copy</h3><span class="chip c-ok">keep</span></header>
+        <p>
+          Failures state the pair, the measured ratio, the floor and the WCAG criterion. Most
+          products ship “Invalid colour”. Do not dilute this while shortening elsewhere.
+        </p>
+        <p class="where">components/ui/Callout.tsx</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─────────────────────────────────────────────────────────── -->
+<section>
+  <div class="wrap">
+    <span class="eyebrow">Section 02</span>
+    <h2>Authentication — the weakest surface</h2>
+    <p class="lede">
+      The first screen a client sees is the least designed one in the product. It is a centred card
+      on an almost-invisible wash, floating in roughly 60% dead space, with no product proof and no
+      social sign-in.
+    </p>
+
+    <div class="stack">
+      <div class="find">
+        <header><h3>No social sign-in at all</h3><span class="chip c-hi">high</span></header>
+        <p>
+          Google and Microsoft are absent. For an enterprise console sold into health systems,
+          Microsoft in particular is the expected path — its absence reads as unfinished rather than
+          as a deliberate security posture.
+        </p>
+        <p class="where">app/(auth)/login/LoginForm.tsx</p>
+      </div>
+
+      <div class="find">
+        <header><h3>Password reset is built and unreachable</h3><span class="chip c-hi">high</span></header>
+        <p>
+          The <code>password_resets</code> collection, its TTL index and its token hashing all exist
+          and are referenced in seven places. No screen links to them. A sign-in with no “forgot
+          password” is the single most common support ticket in any product.
+        </p>
+        <p class="where">db/collections.ts PasswordResetDoc · lib/auth.ts</p>
+      </div>
+
+      <div class="find">
+        <header><h3>The card carries no proof</h3><span class="chip c-md">medium</span></header>
+        <p>
+          A premium console earns trust before the credential field. Nothing on this screen says what
+          the product does or that it is a clinical-grade system — the two facts that justify the
+          price. Right-hand panel with a live token/contrast demonstration is the obvious move, and
+          the material for it already exists.
+        </p>
+        <p class="where">app/(auth)/layout.tsx</p>
+      </div>
+
+      <div class="find">
+        <header><h3>Vertical composition is unresolved</h3><span class="chip c-md">medium</span></header>
+        <p>
+          The card is top-aligned under a small header with <code>pt-8 sm:pt-16</code>, so at desktop
+          heights it sits high with a large empty field beneath. It reads as a fragment of a page
+          rather than a composition.
+        </p>
+        <p class="where">app/(auth)/layout.tsx</p>
+      </div>
+
+      <div class="find">
+        <header><h3>Required markers are noise</h3><span class="chip c-lo">low</span></header>
+        <p>
+          Every field on a two-field form is marked <code>*</code>. When everything is required,
+          marking anything is decoration. Mark the optional ones instead, or nothing.
+        </p>
+        <p class="where">components/ui/Field.tsx</p>
+      </div>
+    </div>
+
+    <div class="note">
+      <strong>Recommended composition</strong>
+      <p>
+        Split screen at ≥1024&nbsp;px: form left at a fixed 26&nbsp;rem in an optically centred
+        column; right pane an always-dark instrument showing a live contrast readout over the
+        Northwind palette — the product demonstrating its own thesis. Below 1024&nbsp;px the right
+        pane drops and the form centres. Social buttons above the email field, separated by a
+        labelled rule, because that is where a returning user looks first.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ─────────────────────────────────────────────────────────── -->
+<section>
+  <div class="wrap">
+    <span class="eyebrow">Section 03</span>
+    <h2>Component consistency</h2>
+    <p class="lede">
+      The kit covers 17 components and the screens use it well. What breaks consistency is what the
+      kit does <em>not</em> cover — every gap has been filled ad hoc, in more than one way.
+    </p>
+
+    <div class="tablewrap">
+      <table>
+        <thead>
+          <tr><th>Gap</th><th>Current state</th><th class="num">Sites</th><th>Severity</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>No <code>Select</code></strong></td>
+            <td>Raw <code>&lt;select&gt;</code> with a hand-copied class string; no focus ring beyond the global outline, no disabled treatment, no size parity with <code>Input</code>.</td>
+            <td class="num">5</td>
+            <td><span class="chip c-hi">high</span></td>
+          </tr>
+          <tr>
+            <td><strong>No <code>Textarea</code></strong></td>
+            <td>Raw <code>&lt;textarea&gt;</code> with its own border and padding, visibly different from <code>Input</code>.</td>
+            <td class="num">1</td>
+            <td><span class="chip c-md">medium</span></td>
+          </tr>
+          <tr>
+            <td><strong>No <code>Toast</code></strong></td>
+            <td>Every action result renders inline inside its own form. On the theme page that means a publish confirmation appears in a 22&nbsp;rem column in the header, where it is easy to miss.</td>
+            <td class="num">—</td>
+            <td><span class="chip c-hi">high</span></td>
+          </tr>
+          <tr>
+            <td><strong><code>DownloadButton</code> re-implements <code>buttonClasses</code></strong></td>
+            <td>A hand-written anchor class string that duplicates the secondary variant and will drift from it.</td>
+            <td class="num">1</td>
+            <td><span class="chip c-md">medium</span></td>
+          </tr>
+          <tr>
+            <td><strong>Ad-hoc button padding</strong></td>
+            <td><code>className="px-2 py-1"</code> and <code>px-2.5 py-1.5</code> passed at call sites; there is no <code>size</code> prop, so “small” means four different things.</td>
+            <td class="num">7</td>
+            <td><span class="chip c-md">medium</span></td>
+          </tr>
+          <tr>
+            <td><strong>Emoji beside a line-icon set</strong></td>
+            <td>🔒 ⚠ ✓ ✗ used as glyphs while the rest of the product uses Lucide. Different weight, different metrics, different rendering per platform.</td>
+            <td class="num">8</td>
+            <td><span class="chip c-md">medium</span></td>
+          </tr>
+          <tr>
+            <td><strong>Two empty-state treatments</strong></td>
+            <td><code>EmptyState</code> on two screens; a bare <code>&lt;p class="surface"&gt;</code> in four <code>DataTable</code> <code>empty</code> props.</td>
+            <td class="num">6</td>
+            <td><span class="chip c-md">medium</span></td>
+          </tr>
+          <tr>
+            <td><strong>One loading skeleton for every screen</strong></td>
+            <td>A single <code>loading.tsx</code> renders a table skeleton — shown even for the three-pane token editor, which looks nothing like a table.</td>
+            <td class="num">1</td>
+            <td><span class="chip c-md">medium</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="note warn">
+      <strong>Semantic collision: <code>StatusChip</code> carries two unrelated meanings</strong>
+      <p>
+        The same component and the same tones express <em>lifecycle</em> (<code>draft</code>,
+        <code>published</code>, <code>live</code>) and <em>severity</em> (<code>passes</code>,
+        <code>fails</code>, <code>clinical</code>). A green chip therefore means both “this is live”
+        and “this clears the contrast floor”, and on the history screen both appear in one row. Split
+        into <code>StatusChip</code> (lifecycle, neutral shapes) and <code>VerdictChip</code>
+        (severity, retains the pass/fail palette).
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ─────────────────────────────────────────────────────────── -->
+<section>
+  <div class="wrap">
+    <span class="eyebrow">Section 04</span>
+    <h2>Motion, and the absence of it</h2>
+    <p class="lede">
+      The design system defines a motion vocabulary that the product never uses. Nothing animates
+      except colour, so every state change is instantaneous and slightly jarring.
+    </p>
+
+    <div class="instrument">
+<span class="dim">/* globals.css — defined, and used exactly zero times */</span>
+.lift            <span class="del">0 usages</span>   <span class="dim">translateY + shadow on hover</span>
+--ease-spring    <span class="del">0 usages</span>   <span class="dim">cubic-bezier(.34,1.56,.64,1)</span>
+--ease-out-expo  <span class="add">2 usages</span>   <span class="dim">mark rotation, rail transitions</span>
+
+<span class="dim">/* what has no transition at all */</span>
+Callout          <span class="del">appears instantly</span>  <span class="dim">incl. every save + publish result</span>
+Skeleton         <span class="del">no shimmer</span>         <span class="dim">static grey blocks</span>
+Panel / card     <span class="del">no hover state</span>     <span class="dim">framework cards are clickable</span>
+Rail (mobile)    <span class="del">no scrim, no slide</span> <span class="dim">menu snaps open</span>
+    </div>
+
+    <div class="stack">
+      <div class="find">
+        <header><h3>Results appear with no entrance</h3><span class="chip c-hi">high</span></header>
+        <p>
+          A publish confirmation, a validation failure and a save acknowledgement all pop into
+          existence. This is the single highest-value motion fix: a 180&nbsp;ms fade-and-rise on
+          <code>Callout</code> makes the whole product feel considered, and it is one component.
+        </p>
+        <p class="where">components/ui/Callout.tsx · action-form.tsx</p>
+      </div>
+
+      <div class="find">
+        <header><h3>Skeletons do not read as loading</h3><span class="chip c-md">medium</span></header>
+        <p>
+          Static blocks look like empty content. A slow shimmer — respecting
+          <code>prefers-reduced-motion</code> — is the convention readers already understand.
+        </p>
+        <p class="where">components/ui/Skeleton.tsx</p>
+      </div>
+
+      <div class="find">
+        <header><h3>Table scroll has no affordance</h3><span class="chip c-md">medium</span></header>
+        <p>
+          Wide tables scroll inside their container, correctly — but nothing indicates it. A masked
+          edge fade that appears only when there is more to see solves it without a scrollbar.
+        </p>
+        <p class="where">components/ui/DataTable.tsx</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─────────────────────────────────────────────────────────── -->
+<section>
+  <div class="wrap">
+    <span class="eyebrow">Section 05</span>
+    <h2>Layout, responsiveness and rhythm</h2>
+
+    <div class="stack">
+      <div class="find">
+        <header><h3>The token editor collapses too late</h3><span class="chip c-hi">high</span></header>
+        <p>
+          Its three panes are gated at <code>xl</code> (1280&nbsp;px), so on a 1280&nbsp;px laptop —
+          the most common desktop width there is — the editor renders as one stacked column and the
+          live preview falls below the fold. It should split at <code>lg</code>, with the navigator
+          collapsing first and the preview held.
+        </p>
+        <p class="where">tokens/TokenEditor.tsx · xl:grid-cols-[10rem_1fr_17rem]</p>
+      </div>
+
+      <div class="find">
+        <header><h3>Mobile menu has no scrim</h3><span class="chip c-md">medium</span></header>
+        <p>
+          The rail expands in flow and pushes content down rather than overlaying it, so on a phone
+          the page appears to jump. An overlay with a dimmed backdrop and a close affordance is the
+          expected behaviour.
+        </p>
+        <p class="where">components/Rail.tsx</p>
+      </div>
+
+      <div class="find">
+        <header><h3>Content column is uniform regardless of content</h3><span class="chip c-lo">low</span></header>
+        <p>
+          Every screen sits in <code>max-w-[900px]</code>. The token editor and playground want more;
+          settings and typography want less. One measure for a table and a form is a compromise that
+          suits neither.
+        </p>
+        <p class="where">app/(app)/layout.tsx</p>
+      </div>
+
+      <div class="find">
+        <header><h3>Page headers are heavy</h3><span class="chip c-md">medium</span></header>
+        <p>
+          Every screen opens with an eyebrow, a large title and a two-line lede — roughly 180&nbsp;px
+          before any content. On a return visit it is the same 180&nbsp;px every time. Ledes should
+          shorten to one line and the largest sizes reserved for the entry screens.
+        </p>
+        <p class="where">components/ui/PageHeader.tsx · all 13 screens</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─────────────────────────────────────────────────────────── -->
+<section>
+  <div class="wrap">
+    <span class="eyebrow">Section 06</span>
+    <h2>Copy</h2>
+    <p class="lede">
+      The voice is genuinely good — specific, reasoned, never marketing. It is also long. The
+      product explains itself at length on every screen, including ones a user visits daily.
+    </p>
+
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>Screen</th><th>Current</th><th>Recommended</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>Frameworks</td>
+            <td class="small">Lede + two full explanatory paragraphs in a panel, ~140 words below the fold.</td>
+            <td class="small">Keep the clinical explanation, move it behind a “Why?” disclosure. One-line lede.</td>
+          </tr>
+          <tr>
+            <td>Members</td>
+            <td class="small">Lede, two callouts, plus a role-reference panel repeating what the table shows.</td>
+            <td class="small">Drop the reference panel; put role descriptions in the <code>&lt;select&gt;</code> option titles.</td>
+          </tr>
+          <tr>
+            <td>Token editor</td>
+            <td class="small">Three-sentence lede on the screen users spend the most time on.</td>
+            <td class="small">One sentence. The screen teaches itself through the contrast readouts.</td>
+          </tr>
+          <tr>
+            <td>Login</td>
+            <td class="small">“Author a design language, validate it against the same gate the build uses, publish it.”</td>
+            <td class="small">Good line — promote it to the marketing pane, not the form.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ─────────────────────────────────────────────────────────── -->
+<section>
+  <div class="wrap">
+    <span class="eyebrow">Section 07</span>
+    <h2>Screen-by-screen</h2>
+
+    <div class="tablewrap">
+      <table>
+        <thead>
+          <tr><th>Screen</th><th>Verdict</th><th>Principal issue</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>/login</code></td><td><span class="chip c-hi">rebuild</span></td><td>No social sign-in, no reset link, no proof, unresolved composition</td></tr>
+          <tr><td><code>/signup</code></td><td><span class="chip c-md">revise</span></td><td>Inherits the same shell; hint text pushes the submit below the fold</td></tr>
+          <tr><td><code>/pending</code></td><td><span class="chip c-ok">good</span></td><td>Clear, has an exit — leave alone</td></tr>
+          <tr><td><code>/themes</code></td><td><span class="chip c-md">revise</span></td><td>No row actions, no sort or filter; five columns of mostly-empty table</td></tr>
+          <tr><td><code>/themes/new</code></td><td><span class="chip c-ok">good</span></td><td>Live ramp preview earns its place</td></tr>
+          <tr><td><code>/themes/[slug]</code></td><td><span class="chip c-md">revise</span></td><td>Publish result renders in a narrow header column</td></tr>
+          <tr><td><code>…/brand</code></td><td><span class="chip c-ok">strong</span></td><td>Vision simulation is the best screen in the product</td></tr>
+          <tr><td><code>…/tokens</code></td><td><span class="chip c-hi">revise</span></td><td>Panes collapse at 1280px; heavy header on the most-used screen</td></tr>
+          <tr><td><code>…/typography</code></td><td><span class="chip c-md">revise</span></td><td>File input is unstyled browser chrome</td></tr>
+          <tr><td><code>…/components</code></td><td><span class="chip c-md">revise</span></td><td>282 rows with no search or filter</td></tr>
+          <tr><td><code>…/compare</code></td><td><span class="chip c-md">revise</span></td><td>Raw selects; no changed-only filter</td></tr>
+          <tr><td><code>…/history</code></td><td><span class="chip c-ok">good</span></td><td>Re-validation column is a genuinely original idea</td></tr>
+          <tr><td><code>…/transfer</code></td><td><span class="chip c-ok">good</span></td><td>Five cards read well; drop zone needs a visible target</td></tr>
+          <tr><td><code>/playground</code></td><td><span class="chip c-ok">strong</span></td><td>Four live axes; the demo screen for a client</td></tr>
+          <tr><td><code>/frameworks</code></td><td><span class="chip c-md">revise</span></td><td>Copy-heavy; stat grid is the strongest part</td></tr>
+          <tr><td><code>/members</code></td><td><span class="chip c-md">revise</span></td><td>Raw selects; redundant reference panel</td></tr>
+          <tr><td><code>/settings</code></td><td><span class="chip c-ok">good</span></td><td>Frozen-address treatment is exemplary</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ─────────────────────────────────────────────────────────── -->
+<section>
+  <div class="wrap">
+    <span class="eyebrow">Section 08</span>
+    <h2>Implementation plan</h2>
+    <p class="lede">
+      Ordered so that each phase ships something a client can see, and so that the kit work lands
+      before the screens that depend on it. Estimates assume one engineer.
+    </p>
+
+    <div class="tablewrap">
+      <table>
+        <thead>
+          <tr><th>#</th><th>Work</th><th>Affects</th><th>Why</th><th class="num">Days</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="chip c-ac">P1</span></td>
+            <td><strong>Close the kit gaps</strong><br><span class="small"><code>Select</code>, <code>Textarea</code>, <code>Toast</code>; <code>size</code> prop on <code>Button</code>; <code>DownloadButton</code> onto <code>buttonClasses</code>; replace all emoji with Lucide</span></td>
+            <td class="small">components/ui/* · 14 call sites</td>
+            <td class="small">Everything after this depends on it. Nothing here is visible alone, and every later phase is cheaper for it.</td>
+            <td class="num">2.0</td>
+          </tr>
+          <tr>
+            <td><span class="chip c-ac">P2</span></td>
+            <td><strong>Rebuild the login</strong><br><span class="small">Split composition, Google + Microsoft (stubbed), forgot-password link, reset screen, apply the same shell to signup and pending</span></td>
+            <td class="small">app/(auth)/* · new ResetForm</td>
+            <td class="small">The explicit client ask and the first impression. Depends on P1 for <code>Button</code> sizes and the icon set.</td>
+            <td class="num">2.5</td>
+          </tr>
+          <tr>
+            <td><span class="chip c-ac">P3</span></td>
+            <td><strong>Motion and feedback</strong><br><span class="small">Callout entrance, skeleton shimmer, toast for action results, card hover via <code>.lift</code>, table scroll fade, mobile rail overlay + scrim</span></td>
+            <td class="small">Callout, Skeleton, DataTable, Rail, action-form</td>
+            <td class="small">Highest perceived-quality gain per hour in the whole plan. Depends on <code>Toast</code> from P1.</td>
+            <td class="num">1.5</td>
+          </tr>
+          <tr>
+            <td><span class="chip c-ac">P4</span></td>
+            <td><strong>Layout and density pass</strong><br><span class="small">Token editor to <code>lg</code>; per-screen measures; <code>PageHeader</code> compact variant; ledes to one line</span></td>
+            <td class="small">layout.tsx, PageHeader, all 13 screens</td>
+            <td class="small">Fixes the 1280&nbsp;px regression and reclaims ~120&nbsp;px above the fold everywhere.</td>
+            <td class="num">1.5</td>
+          </tr>
+          <tr>
+            <td><span class="chip c-ac">P5</span></td>
+            <td><strong>Semantic split and states</strong><br><span class="small"><code>VerdictChip</code> vs <code>StatusChip</code>; <code>EmptyState</code> in every <code>DataTable</code>; per-route loading skeletons; styled file input</span></td>
+            <td class="small">StatusChip, EmptyState, 6 screens, 4 loading files</td>
+            <td class="small">Removes the one place the visual language is genuinely ambiguous.</td>
+            <td class="num">1.5</td>
+          </tr>
+          <tr>
+            <td><span class="chip c-ac">P6</span></td>
+            <td><strong>Table utility</strong><br><span class="small">Search on components (282 rows) and themes; sort on themes and history; changed-only filter on compare; row actions</span></td>
+            <td class="small">DataTable, components, themes, compare</td>
+            <td class="small">The largest usability gap left once the surface is right.</td>
+            <td class="num">1.5</td>
+          </tr>
+          <tr>
+            <td><span class="chip c-ac">P7</span></td>
+            <td><strong>Copy pass and proof</strong><br><span class="small">Shorten every lede; move explanations behind disclosures; VRT baselines for the eight highest-traffic screens; re-run axe</span></td>
+            <td class="small">All screens · e2e/</td>
+            <td class="small">Locks the result in so the next change cannot quietly undo it.</td>
+            <td class="num">1.5</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="note">
+      <strong>If only part can be funded</strong>
+      <p>
+        P1 → P2 → P3 is five days and delivers the entire perceived change: a login worth showing,
+        a consistent kit, and a product that feels responsive. P4–P7 are what make it hold up under
+        a second look.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ─────────────────────────────────────────────────────────── -->
+<section style="border-bottom:0">
+  <div class="wrap">
+    <span class="eyebrow">Section 09</span>
+    <h2>Definition of done</h2>
+    <p class="lede">Checkable, because “feels premium” is not something a build can verify and these are.</p>
+
+    <div class="cols-2">
+      <div class="find">
+        <header><h4>Consistency</h4></header>
+        <ul class="tight">
+          <li>Zero raw <code>&lt;select&gt;</code> or <code>&lt;textarea&gt;</code> outside the kit</li>
+          <li>Zero emoji used as an icon</li>
+          <li>Zero <code>className</code> padding overrides on <code>Button</code></li>
+          <li>Every <code>DataTable</code> has an <code>EmptyState</code></li>
+        </ul>
+      </div>
+      <div class="find">
+        <header><h4>Experience</h4></header>
+        <ul class="tight">
+          <li>Every action result is announced and animated</li>
+          <li>Token editor keeps three panes at 1280&nbsp;px</li>
+          <li>Mobile rail overlays rather than pushes</li>
+          <li>Login offers Google, Microsoft, email and reset</li>
+        </ul>
+      </div>
+      <div class="find">
+        <header><h4>Held</h4></header>
+        <ul class="tight">
+          <li>axe stays at zero across 3 engines × 2 themes</li>
+          <li>No horizontal scroll at 320&nbsp;px</li>
+          <li>All motion respects <code>prefers-reduced-motion</code></li>
+          <li>VRT baselines for 8 screens, light and dark</li>
+        </ul>
+      </div>
+      <div class="find">
+        <header><h4>Unchanged</h4></header>
+        <ul class="tight">
+          <li>Clinical tokens stay locked in every tier</li>
+          <li>Error copy keeps its measurements</li>
+          <li>Disabled controls keep their reason</li>
+          <li>Tenant isolation untouched</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    Reviewed against the running build at <code>localhost:6003</code> · 24 findings across 15 screens ·
+    counts verified by inspection of <code>apps/console/src</code>, not estimated.
+  </div>
+</footer>

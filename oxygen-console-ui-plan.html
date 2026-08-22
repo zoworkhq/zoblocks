@@ -1,0 +1,1445 @@
+<meta charset="utf-8" />
+<title>Console Build Plan</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<style>
+  /* ==================================================================
+     Oxygen theme console — UI build plan
+     Design direction: oxygenui.design's own language, not a new one.
+     The palette, the type scale, the eyebrow, the dark "instrument"
+     panel and the ease curve are lifted from
+     apps/docs/src/app/globals.css so this document argues for the
+     system by being built in it. Instrument Sans cannot be fetched
+     under the artifact CSP, so a geometric-humanist system stack
+     stands in; the console itself loads the real face via next/font.
+     ================================================================== */
+
+  :root {
+    --paper: #f7f9f8;
+    --paper-sunk: #eef3f1;
+    --surface: #ffffff;
+    --rule: #dde5e2;
+    --rule-strong: #c3d0cc;
+
+    --ink: #08110f;
+    --graphite: #5a6b67;
+    --graphite-soft: #6b7c78;
+
+    --oxygen: #10b995;
+    --accent: #067662;
+    --accent-wash: #e8f6f1;
+    --electric: #0b7285;
+    --critical: #b3261e;
+    --critical-wash: #fdeaea;
+    --warn: #a15c07;
+    --warn-wash: #fdf3e3;
+
+    --panel: #08110f;
+    --panel-raised: #0d1a18;
+    --panel-rule: #1d302d;
+    --panel-fg: #e8f4f1;
+    --panel-muted: #8b9c98;
+    --trace: #2dd4b0;
+
+    --ease: cubic-bezier(0.16, 1, 0.3, 1);
+    --font-display: "Instrument Sans", "Avenir Next", "Segoe UI Variable Display",
+      ui-sans-serif, system-ui, sans-serif;
+    --font-body: "Instrument Sans", -apple-system, BlinkMacSystemFont, "Segoe UI",
+      ui-sans-serif, system-ui, sans-serif;
+    --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+    color-scheme: light;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper: #080b10;
+      --paper-sunk: #0d1219;
+      --surface: #0e141b;
+      --rule: #1d2733;
+      --rule-strong: #2c3744;
+      --ink: #edf2f7;
+      --graphite: #a2aebb;
+      --graphite-soft: #8592a1;
+      --oxygen: #67e8f9;
+      --accent: #86e1f2;
+      --accent-wash: #0d2630;
+      --electric: #73d8ff;
+      --critical: #fb7185;
+      --critical-wash: #2c1216;
+      --warn: #fbbf24;
+      --warn-wash: #2a2010;
+      --panel: #151a21;
+      --panel-raised: #1c232c;
+      --panel-rule: #303b47;
+      --trace: #65e6e0;
+      color-scheme: dark;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --paper: #080b10;
+    --paper-sunk: #0d1219;
+    --surface: #0e141b;
+    --rule: #1d2733;
+    --rule-strong: #2c3744;
+    --ink: #edf2f7;
+    --graphite: #a2aebb;
+    --graphite-soft: #8592a1;
+    --oxygen: #67e8f9;
+    --accent: #86e1f2;
+    --accent-wash: #0d2630;
+    --electric: #73d8ff;
+    --critical: #fb7185;
+    --critical-wash: #2c1216;
+    --warn: #fbbf24;
+    --warn-wash: #2a2010;
+    --panel: #151a21;
+    --panel-raised: #1c232c;
+    --panel-rule: #303b47;
+    --trace: #65e6e0;
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-size: 15px;
+    line-height: 1.65;
+    letter-spacing: -0.005em;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ---- the docs site's own devices ------------------------------ */
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    font-weight: 500;
+    color: var(--accent);
+  }
+  .display-xl {
+    font-family: var(--font-display);
+    font-size: clamp(2.25rem, 5.2vw, 4rem);
+    line-height: 0.98;
+    letter-spacing: -0.038em;
+    font-weight: 600;
+    text-wrap: balance;
+  }
+  .display-lg {
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 4vw, 3rem);
+    line-height: 1.02;
+    letter-spacing: -0.035em;
+    font-weight: 600;
+    text-wrap: balance;
+  }
+  .display-sm {
+    font-family: var(--font-display);
+    font-size: clamp(1.375rem, 2.2vw, 1.75rem);
+    line-height: 1.12;
+    letter-spacing: -0.025em;
+    font-weight: 600;
+    text-wrap: balance;
+  }
+  .lede {
+    font-size: clamp(1.0625rem, 1.5vw, 1.1875rem);
+    line-height: 1.55;
+    color: var(--graphite);
+    letter-spacing: -0.011em;
+    max-width: 62ch;
+  }
+  .instrument {
+    background: var(--panel);
+    border: 1px solid var(--panel-rule);
+    border-radius: 1.125rem;
+    box-shadow:
+      0 0 0 1px rgb(255 255 255 / 0.02) inset,
+      0 30px 70px -24px rgb(0 0 0 / 0.5),
+      0 8px 24px -12px rgb(0 0 0 / 0.34);
+    overflow: hidden;
+    color: var(--panel-fg);
+  }
+  .surface {
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-radius: 0.875rem;
+    box-shadow: 0 1px 2px -1px rgb(2 20 17 / 0.04);
+  }
+
+  /* ---- masthead -------------------------------------------------- */
+  .mast {
+    position: relative;
+    background: var(--panel);
+    color: var(--panel-fg);
+    padding: 76px 32px 64px;
+    overflow: hidden;
+  }
+  .mast::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(880px 420px at 78% -18%, rgb(45 212 176 / 0.16), transparent 68%),
+      radial-gradient(520px 280px at 6% 112%, rgb(11 114 133 / 0.14), transparent 72%);
+    pointer-events: none;
+  }
+  .mast-in { max-width: 1120px; margin: 0 auto; position: relative; z-index: 1; }
+  .mast .eyebrow { color: var(--trace); }
+  .mast h1 { margin: 20px 0 20px; max-width: 19ch; }
+  .mast .lede { color: #b6cdc7; max-width: 60ch; }
+  .mast-meta {
+    margin-top: 32px;
+    padding-top: 20px;
+    border-top: 1px solid var(--panel-rule);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 28px;
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    color: var(--panel-muted);
+  }
+  .mast-meta b { color: #b6cdc7; font-weight: 500; }
+
+  /* ---- shell ----------------------------------------------------- */
+  .shell {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 0 32px 120px;
+    display: grid;
+    grid-template-columns: 200px minmax(0, 1fr);
+    gap: 56px;
+    align-items: start;
+  }
+  .toc { position: sticky; top: 24px; padding-top: 56px; font-size: 13px; }
+  .toc h2 {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--graphite-soft);
+    margin: 0 0 14px;
+    font-weight: 500;
+  }
+  .toc ol { list-style: none; margin: 0; padding: 0; counter-reset: t; }
+  .toc li { counter-increment: t; margin-bottom: 2px; }
+  .toc a {
+    display: grid;
+    grid-template-columns: 20px 1fr;
+    gap: 8px;
+    text-decoration: none;
+    color: var(--graphite);
+    padding: 6px 8px 6px 0;
+    border-radius: 6px;
+    line-height: 1.35;
+    transition: color 200ms var(--ease), background 200ms var(--ease);
+  }
+  .toc a::before {
+    content: counter(t, decimal-leading-zero);
+    font-family: var(--font-mono);
+    font-size: 9.5px;
+    color: var(--rule-strong);
+    padding-top: 3px;
+  }
+  .toc a:hover { color: var(--accent); background: var(--accent-wash); }
+
+  .doc { min-width: 0; padding-top: 56px; }
+  section { scroll-margin-top: 24px; margin-bottom: 88px; }
+  section > *:first-child { margin-top: 0; }
+
+  h2.sh { margin: 0 0 8px; }
+  h3 {
+    font-family: var(--font-display);
+    font-size: 1.1875rem;
+    line-height: 1.25;
+    letter-spacing: -0.018em;
+    font-weight: 600;
+    margin: 44px 0 12px;
+    text-wrap: balance;
+  }
+  h4 {
+    font-family: var(--font-display);
+    font-size: 0.9375rem;
+    font-weight: 600;
+    margin: 28px 0 8px;
+    letter-spacing: -0.008em;
+  }
+  p { margin: 0 0 16px; max-width: 72ch; }
+  ul, ol { margin: 0 0 16px; padding-left: 20px; max-width: 72ch; }
+  li { margin-bottom: 6px; }
+  strong { font-weight: 600; }
+  a { color: var(--accent); }
+  code, .mono { font-family: var(--font-mono); font-size: 0.855em; }
+  p code, li code, td code {
+    background: var(--paper-sunk);
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    padding: 1px 5px;
+    white-space: nowrap;
+  }
+  .muted { color: var(--graphite); }
+  .small { font-size: 13.5px; line-height: 1.55; }
+  .tiny { font-size: 12px; line-height: 1.5; }
+
+  /* ---- chips ----------------------------------------------------- */
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    padding: 2px 7px;
+    border-radius: 4px;
+    white-space: nowrap;
+    vertical-align: 1px;
+    font-weight: 500;
+  }
+  .chip.gone { background: var(--critical-wash); color: var(--critical); }
+  .chip.thin { background: var(--warn-wash); color: var(--warn); }
+  .chip.ok { background: var(--accent-wash); color: var(--accent); }
+  .chip.neu { background: var(--paper-sunk); color: var(--graphite); border: 1px solid var(--rule); }
+
+  /* ---- tables ---------------------------------------------------- */
+  .tw {
+    overflow-x: auto;
+    margin: 22px 0;
+    border: 1px solid var(--rule);
+    border-radius: 0.875rem;
+    background: var(--surface);
+  }
+  table { border-collapse: collapse; width: 100%; font-size: 13.5px; min-width: 560px; }
+  th, td { text-align: left; padding: 11px 15px; border-bottom: 1px solid var(--rule); vertical-align: top; line-height: 1.5; }
+  thead th {
+    background: var(--paper-sunk);
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.11em;
+    text-transform: uppercase;
+    color: var(--graphite-soft);
+    font-weight: 500;
+    white-space: nowrap;
+  }
+  tbody tr:last-child td { border-bottom: none; }
+  td.num { text-align: right; font-family: var(--font-mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .tcap { font-size: 12px; color: var(--graphite-soft); margin: -12px 0 24px; }
+
+  /* ---- callouts -------------------------------------------------- */
+  .callout {
+    border: 1px solid var(--rule);
+    border-left: 3px solid var(--accent);
+    background: var(--surface);
+    border-radius: 0 0.75rem 0.75rem 0;
+    padding: 18px 22px;
+    margin: 24px 0;
+  }
+  .callout.crit { border-left-color: var(--critical); }
+  .callout.warn { border-left-color: var(--warn); }
+  .callout > *:first-child { margin-top: 0; }
+  .callout > *:last-child { margin-bottom: 0; }
+  .callout .ct {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--graphite-soft);
+    display: block;
+    margin-bottom: 8px;
+  }
+
+  /* ---- metrics --------------------------------------------------- */
+  .metrics {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1px;
+    background: var(--rule);
+    border: 1px solid var(--rule);
+    border-radius: 0.875rem;
+    overflow: hidden;
+    margin: 26px 0;
+  }
+  .metric { background: var(--surface); padding: 16px 18px; }
+  .metric .v {
+    font-family: var(--font-display);
+    font-size: 30px;
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+    display: block;
+  }
+  .metric .k { font-size: 12px; color: var(--graphite); margin-top: 7px; display: block; line-height: 1.4; }
+  .metric.bad .v { color: var(--critical); }
+  .metric.good .v { color: var(--accent); }
+
+  /* ---- code ------------------------------------------------------- */
+  pre {
+    background: var(--panel);
+    color: var(--panel-fg);
+    border: 1px solid var(--panel-rule);
+    border-radius: 0.875rem;
+    padding: 18px 20px;
+    overflow-x: auto;
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    line-height: 1.62;
+    margin: 20px 0;
+  }
+  pre .c { color: var(--panel-muted); }
+  pre .k { color: #7dd3fc; }
+  pre .s { color: #b7e9c7; }
+  pre .t { color: var(--trace); }
+
+  /* ---- swatches --------------------------------------------------- */
+  .swatches { display: flex; flex-wrap: wrap; gap: 10px; margin: 20px 0; }
+  .sw {
+    border: 1px solid var(--rule);
+    border-radius: 0.625rem;
+    overflow: hidden;
+    width: 128px;
+    background: var(--surface);
+  }
+  .sw .fill { height: 44px; }
+  .sw .lab { padding: 7px 9px; font-family: var(--font-mono); font-size: 10px; line-height: 1.5; }
+  .sw .lab b { display: block; color: var(--ink); font-weight: 500; }
+  .sw .lab span { color: var(--graphite-soft); }
+
+  /* ---- phases ----------------------------------------------------- */
+  .phase {
+    display: grid;
+    grid-template-columns: 104px 1fr;
+    border: 1px solid var(--rule);
+    border-radius: 0.875rem;
+    overflow: hidden;
+    background: var(--surface);
+    margin-bottom: 4px;
+  }
+  .phase .id {
+    background: var(--paper-sunk);
+    border-right: 1px solid var(--rule);
+    padding: 16px 14px;
+    text-align: center;
+  }
+  .phase .id .n {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--graphite-soft);
+    display: block;
+  }
+  .phase .id .w {
+    font-family: var(--font-display);
+    font-size: 22px;
+    font-weight: 600;
+    display: block;
+    margin-top: 2px;
+    letter-spacing: -0.02em;
+  }
+  .phase .id .u { font-size: 11px; color: var(--graphite-soft); display: block; }
+  .phase .b { padding: 16px 20px; min-width: 0; }
+  .phase.now { border-color: var(--accent); }
+  .phase.now .id { background: var(--accent-wash); }
+  .phase.now .id .w { color: var(--accent); }
+
+  /* ---- mockups ---------------------------------------------------- */
+  .mock {
+    border: 1px solid var(--rule-strong);
+    border-radius: 0.875rem;
+    overflow: hidden;
+    margin: 22px 0;
+    background: var(--surface);
+    box-shadow: 0 18px 44px -28px rgb(2 20 17 / 0.3);
+  }
+  .mock-bar {
+    background: var(--paper-sunk);
+    border-bottom: 1px solid var(--rule);
+    padding: 8px 14px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--graphite-soft);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .mock-bar i { width: 8px; height: 8px; border-radius: 50%; background: var(--rule-strong); display: block; }
+  .mk { display: grid; grid-template-columns: 176px minmax(0, 1fr); min-height: 300px; }
+  .mk-rail { background: var(--paper-sunk); border-right: 1px solid var(--rule); padding: 16px 12px; font-size: 12px; }
+  .mk-rail .g {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--graphite-soft);
+    margin: 14px 0 6px 8px;
+  }
+  .mk-rail .g:first-child { margin-top: 0; }
+  .mk-rail .i { padding: 5px 9px; border-radius: 6px; color: var(--graphite); display: flex; justify-content: space-between; gap: 6px; }
+  .mk-rail .i.on { background: var(--accent-wash); color: var(--accent); font-weight: 600; }
+  .mk-body { padding: 20px 22px; min-width: 0; }
+  .mk-h { display: flex; justify-content: space-between; align-items: flex-start; gap: 14px; flex-wrap: wrap; margin-bottom: 16px; }
+  .mk-t { font-family: var(--font-display); font-size: 19px; font-weight: 600; letter-spacing: -0.02em; }
+  .mk-s { font-size: 12.5px; color: var(--graphite); margin-top: 3px; line-height: 1.5; }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12.5px;
+    font-weight: 500;
+    padding: 7px 14px;
+    border-radius: 0.5rem;
+    border: 1px solid var(--rule-strong);
+    background: var(--surface);
+    color: var(--ink);
+    white-space: nowrap;
+  }
+  .btn.pri { background: var(--ink); border-color: var(--ink); color: var(--paper); }
+  .mock-note {
+    border-top: 1px dashed var(--rule-strong);
+    background: var(--paper-sunk);
+    padding: 11px 16px;
+    font-size: 12px;
+    color: var(--graphite);
+    line-height: 1.55;
+  }
+  .mock-note b { color: var(--ink); font-weight: 600; }
+
+  .g2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(270px, 1fr)); gap: 14px; margin: 22px 0; }
+  .card { border: 1px solid var(--rule); border-radius: 0.875rem; padding: 16px 18px; background: var(--surface); }
+  .card > *:first-child { margin-top: 0; }
+  .card > *:last-child { margin-bottom: 0; }
+  .card .ch {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+    color: var(--graphite-soft);
+    display: block;
+    margin-bottom: 8px;
+  }
+
+  footer.end {
+    background: var(--panel);
+    color: var(--panel-muted);
+    padding: 44px 32px;
+    font-size: 13px;
+  }
+  footer.end .in { max-width: 1120px; margin: 0 auto; }
+  footer.end b { color: var(--panel-fg); }
+
+  @media (max-width: 900px) {
+    .shell { grid-template-columns: minmax(0, 1fr); gap: 0; padding: 0 20px 80px; }
+    .toc { position: static; padding: 32px 0 20px; border-bottom: 1px solid var(--rule); }
+    .toc ol { columns: 2; column-gap: 18px; }
+    .doc { padding-top: 32px; }
+    .mast { padding: 52px 20px 44px; }
+    .mk { grid-template-columns: minmax(0, 1fr); }
+    .mk-rail { border-right: none; border-bottom: 1px solid var(--rule); }
+    .phase { grid-template-columns: 84px 1fr; }
+    p code, li code, td code { white-space: normal; overflow-wrap: anywhere; }
+  }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+  :focus-visible { outline: 2px solid var(--oxygen); outline-offset: 2px; border-radius: 4px; }
+</style>
+
+<header class="mast">
+  <div class="mast-in">
+    <p class="eyebrow">Build plan · Theme console · 19 August 2026</p>
+    <h1 class="display-xl">The engine runs. The dashboard is a wireframe.</h1>
+    <p class="lede">
+      The architecture underneath the theme console is finished and tested — validation,
+      versioning, tenant isolation, immutable delivery. The interface on top of it is
+      scaffolding I wrote to exercise that architecture, and it shows. This is an honest
+      account of the gap and a plan to close it in the design language
+      <span style="color:var(--trace)">oxygenui.design</span> already has.
+    </p>
+    <div class="mast-meta">
+      <span>Screens built <b>8 of 13</b></span>
+      <span>Console UI <b>1,233 lines</b></span>
+      <span>Docs site <b>10,122 lines</b></span>
+      <span>Broken nav links <b>1</b></span>
+      <span>Read-only screens <b>4</b></span>
+    </div>
+  </div>
+</header>
+
+<div class="shell">
+  <nav class="toc" aria-label="Contents">
+    <h2>Contents</h2>
+    <ol>
+      <li><a href="#s1">What is actually wrong</a></li>
+      <li><a href="#s2">Screen-by-screen gap</a></li>
+      <li><a href="#s3">The design system</a></li>
+      <li><a href="#s4">Component kit</a></li>
+      <li><a href="#s5">Screen specifications</a></li>
+      <li><a href="#s6">Phases and tasks</a></li>
+      <li><a href="#s7">Definition of done</a></li>
+    </ol>
+  </nav>
+
+  <main class="doc">
+
+<!-- ============================ 1 ============================ -->
+<section id="s1">
+  <p class="eyebrow">Section 01</p>
+  <h2 class="sh display-lg">What is actually wrong</h2>
+
+  <p class="lede">
+    Not "it needs polish". Four separate failures, three of them structural, and the
+    screenshot is a fair sample rather than an unlucky one.
+  </p>
+
+  <div class="metrics">
+    <div class="metric bad"><span class="v">5</span><span class="k">of 13 mockup screens do not exist</span></div>
+    <div class="metric bad"><span class="v">4</span><span class="k">screens have zero inputs — read-only</span></div>
+    <div class="metric bad"><span class="v">404</span><span class="k">what <code>/frameworks</code> returns, from the main nav</span></div>
+    <div class="metric"><span class="v">12%</span><span class="k">console UI size against the docs site</span></div>
+  </div>
+
+  <h3>1.1 A navigation link that 404s</h3>
+  <p>
+    The left rail links to <code>/frameworks</code>. That route was never built. Anyone
+    clicking the second item in the primary navigation gets Next's default not-found page.
+    This is not a polish issue; it is a broken product.
+  </p>
+
+  <h3>1.2 Four screens are viewers pretending to be editors</h3>
+  <p>
+    The component customisation screen renders the word <em>Override</em> in an accent
+    colour. It is a <code>&lt;span&gt;</code>. Nothing happens. Typography lists three
+    fields as read-only text. Comparison shows a diff with no way to act on it. Measured
+    by counting form controls in each page:
+  </p>
+
+  <div class="tw">
+    <table>
+      <thead><tr><th>Screen</th><th class="num">Inputs</th><th>State</th></tr></thead>
+      <tbody>
+        <tr><td><code>/themes</code></td><td class="num">0</td><td>List only — correct, the list is the job</td></tr>
+        <tr><td><code>/themes/new</code></td><td class="num">3</td><td>Works</td></tr>
+        <tr><td><code>/themes/[slug]</code></td><td class="num">1</td><td>Publish button only; no token editing</td></tr>
+        <tr><td><code>/themes/[slug]/components</code></td><td class="num">0</td><td><span class="chip gone">read-only</span> "Override" is decorative</td></tr>
+        <tr><td><code>/themes/[slug]/typography</code></td><td class="num">0</td><td><span class="chip gone">read-only</span> static values, no controls</td></tr>
+        <tr><td><code>/themes/[slug]/compare</code></td><td class="num">0</td><td><span class="chip gone">read-only</span> no version pickers</td></tr>
+        <tr><td><code>/themes/[slug]/transfer</code></td><td class="num">2</td><td>Import works; export is preview-only, no download</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>1.3 It does not look like a product</h3>
+  <p>
+    The screenshot shows the diagnosis precisely. A form on a flat ground, controls at
+    default sizes, no card, no section rhythm, help text the same weight as labels, and a
+    submit button floating with no footer to sit in. There is no visual hierarchy because
+    there is no layout system — every screen is <code>&lt;h1&gt;</code>, a paragraph, then
+    content, with Tailwind utilities applied ad hoc.
+  </p>
+
+  <div class="callout crit">
+    <span class="ct">The specific mistake</span>
+    <p style="margin-bottom:0">
+      I gave the console <strong>its own design</strong> — Inter, a low-chroma blue accent,
+      a neutral grey scale — reasoning that a theme editor should stay visually quiet so it
+      does not compete with the customer's colours. That reasoning is sound for the
+      <em>preview surface</em> and wrong for everything around it. The result is a
+      generic admin panel wearing none of Oxygen's identity, sitting one hop from a
+      marketing site with 1,686 lines of considered design language. The quiet-preview
+      principle survives; it belongs to one region of one screen, not the whole product.
+    </p>
+  </div>
+
+  <h3>1.4 What is genuinely finished underneath</h3>
+  <p>
+    Worth stating so the plan does not re-solve it. None of the following needs revisiting:
+  </p>
+  <ul>
+    <li><strong>Validation</strong> — a customer's palette runs through the same gate the build uses; 78 contrast pairs across three themes.</li>
+    <li><strong>Publish gating</strong> — a failing theme cannot be published by any role, tested against all four.</li>
+    <li><strong>Tenant isolation</strong> — scoped queries that cannot express an unscoped read, proven at the API and the public stylesheet boundary.</li>
+    <li><strong>Immutable delivery</strong> — version-pinned CSS with correct cache and <code>nosniff</code> headers, live and verified.</li>
+    <li><strong>Versioning and audit</strong> — immutable versions, pointer rollback, append-only trail.</li>
+  </ul>
+  <p>
+    The work below is almost entirely interface. Where it touches the server it is to add
+    a mutation the screens need — token overrides, typography, framework selection — never
+    to change how any of the above behaves.
+  </p>
+</section>
+
+<!-- ============================ 2 ============================ -->
+<section id="s2">
+  <p class="eyebrow">Section 02</p>
+  <h2 class="sh display-lg">Screen-by-screen gap</h2>
+
+  <p class="lede">
+    The original brief specified thirteen surfaces. Here is each one against what exists,
+    with the honest label rather than a generous one.
+  </p>
+
+  <div class="tw">
+    <table>
+      <thead>
+        <tr><th style="width:38px">#</th><th>Mockup</th><th style="width:96px">State</th><th>What is missing</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="num">1</td><td>UI framework selection</td><td><span class="chip gone">absent</span></td><td>Route does not exist and is linked from the nav. Needs framework cards, detected versions, per-application usage, enable/disable.</td></tr>
+        <tr><td class="num">2</td><td>Theme management</td><td><span class="chip thin">thin</span></td><td>Renders. No sort, no filter, no row actions, no duplicate or archive, no validation summary per row.</td></tr>
+        <tr><td class="num">3</td><td>Design-token editor</td><td><span class="chip gone">absent</span></td><td>The core screen of the product. Three panes, colour picker with live contrast, per-token revert, live preview.</td></tr>
+        <tr><td class="num">4</td><td>Brand &amp; colour</td><td><span class="chip thin">thin</span></td><td>Create form only. No ramp display, no per-step override, no vision simulation, no logo extraction.</td></tr>
+        <tr><td class="num">5</td><td>Typography</td><td><span class="chip thin">thin</span></td><td>Static text. No family selection, no upload, no size control — the font checker exists in the package and is unreachable from the UI.</td></tr>
+        <tr><td class="num">6</td><td>Component customisation</td><td><span class="chip thin">thin</span></td><td>Lists the surface correctly. Cannot edit. No preview of the component being customised.</td></tr>
+        <tr><td class="num">7</td><td>Preview playground</td><td><span class="chip gone">absent</span></td><td>Theme × density × bridge × viewport × vision-simulation axes over real components.</td></tr>
+        <tr><td class="num">8</td><td>Theme comparison</td><td><span class="chip thin">thin</span></td><td>Diffs two versions. No pickers, no swap, no rendered side-by-side preview.</td></tr>
+        <tr><td class="num">9</td><td>Import / export</td><td><span class="chip thin">thin</span></td><td>Five formats generated. No download button — the bytes are shown in a <code>&lt;details&gt;</code> and cannot leave the page.</td></tr>
+        <tr><td class="num">10</td><td>Version history</td><td><span class="chip thin">thin</span></td><td>A list on the detail page. No restore action, no diff link, no re-validation notice.</td></tr>
+        <tr><td class="num">11</td><td>Organisation settings</td><td><span class="chip gone">absent</span></td><td>Members, roles, approvals, default theme, slug. The data model and role table exist; nothing renders them.</td></tr>
+        <tr><td class="num">12</td><td>Developer setup flow</td><td><span class="chip gone">absent</span></td><td>The three-step install with copyable snippets, on the docs site rather than the console.</td></tr>
+        <tr><td class="num">13</td><td>Empty / loading / error / permission states</td><td><span class="chip thin">thin</span></td><td>One empty state and one permission message exist. No skeletons, no determinate progress, no error treatment.</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="tcap">
+    <span class="chip gone">absent</span> the route does not exist ·
+    <span class="chip thin">thin</span> renders but cannot do the job the mockup specified
+  </p>
+
+  <div class="callout warn">
+    <span class="ct">The honest summary</span>
+    <p style="margin-bottom:0">
+      A customer can create a theme from a colour, look at it, and publish it. They cannot
+      change a single token, choose a font, pick a framework, manage a colleague, download
+      an export, or restore a version. It is a viewer with one write path, not a theme
+      management product.
+    </p>
+  </div>
+</section>
+
+<!-- ============================ 3 ============================ -->
+<section id="s3">
+  <p class="eyebrow">Section 03</p>
+  <h2 class="sh display-lg">The design system, inherited not invented</h2>
+
+  <p class="lede">
+    Everything below already exists in <code>apps/docs/src/app/globals.css</code> — 1,686
+    lines of it. The console's job is to adopt it, not to interpret it. This document is
+    built in the same language so the argument is visible rather than described.
+  </p>
+
+  <h3>3.1 Palette</h3>
+  <p>
+    The <code>--site-*</code> set, lifted verbatim. A cool, faintly green off-white — a
+    clean clinical surface, not warm cream — with a single teal accent and an always-dark
+    instrument panel that keeps its colour in both themes.
+  </p>
+
+  <div class="swatches">
+    <div class="sw"><div class="fill" style="background:#f7f9f8"></div><div class="lab"><b>paper</b><span>#f7f9f8</span></div></div>
+    <div class="sw"><div class="fill" style="background:#eef3f1"></div><div class="lab"><b>paper-sunk</b><span>#eef3f1</span></div></div>
+    <div class="sw"><div class="fill" style="background:#dde5e2"></div><div class="lab"><b>rule</b><span>#dde5e2</span></div></div>
+    <div class="sw"><div class="fill" style="background:#08110f"></div><div class="lab"><b>ink · panel</b><span>#08110f</span></div></div>
+    <div class="sw"><div class="fill" style="background:#5a6b67"></div><div class="lab"><b>graphite</b><span>#5a6b67</span></div></div>
+    <div class="sw"><div class="fill" style="background:#10b995"></div><div class="lab"><b>oxygen</b><span>#10b995</span></div></div>
+    <div class="sw"><div class="fill" style="background:#067662"></div><div class="lab"><b>accent-text</b><span>#067662</span></div></div>
+    <div class="sw"><div class="fill" style="background:#2dd4b0"></div><div class="lab"><b>trace</b><span>#2dd4b0</span></div></div>
+  </div>
+
+  <div class="callout">
+    <span class="ct">Two rules that carry over unchanged</span>
+    <p>
+      <strong><code>--site-trace</code> is dark-panel only.</strong> The luminous teal has
+      no contrast on paper, and using it there is the fastest way to make this look
+      generic. The docs CSS says so in a comment; the console inherits the rule.
+    </p>
+    <p style="margin-bottom:0">
+      <strong>Red only ever means critical.</strong> Never a brand colour, never a
+      destructive-button default, and never carrying meaning alone — every coloured thing
+      also has a word or an icon.
+    </p>
+  </div>
+
+  <h3>3.2 Type</h3>
+  <p>
+    <strong>Instrument Sans</strong> for display and body, <strong>JetBrains Mono</strong>
+    for tokens, hex values, ratios and file paths — both already loaded by the docs site
+    through <code>next/font</code>. Inter is dropped: it is a fine interface face and it
+    is not this product's face, and the two sites sitting one hop apart in different
+    typefaces is most of why the console reads as a different company's software.
+  </p>
+
+  <div class="tw">
+    <table>
+      <thead><tr><th>Role</th><th>Class</th><th>Size</th><th>Where</th></tr></thead>
+      <tbody>
+        <tr><td>Page title</td><td><code>.display-lg</code></td><td>clamp(2rem, 4vw, 3rem) · -0.035em</td><td>One per screen</td></tr>
+        <tr><td>Section</td><td><code>.display-sm</code></td><td>clamp(1.375rem, 2.2vw, 1.75rem)</td><td>Panel and section headings</td></tr>
+        <tr><td>Kicker</td><td><code>.eyebrow</code></td><td>0.6875rem mono · 0.16em · upper</td><td>Above a title; names the section</td></tr>
+        <tr><td>Lede</td><td><code>.lede</code></td><td>clamp(1.0625rem, 1.5vw, 1.25rem)</td><td>One paragraph under a title, graphite</td></tr>
+        <tr><td>Body</td><td><code>.body</code></td><td>0.9375rem / 1.65</td><td>Everything else</td></tr>
+        <tr><td>Data</td><td><code>.mono .tabular</code></td><td>JetBrains Mono, tabular-nums</td><td>Hex, ratios, versions, token names</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p>
+    <strong>Tabular numerals are not decoration here.</strong> Every screen shows contrast
+    ratios in a column, and two ratios that do not line up cannot be compared at a glance —
+    which is the entire reason the number is on screen.
+  </p>
+
+  <h3>3.3 Surfaces and depth</h3>
+  <p>
+    Three levels, and the third is the signature. A page sits on <code>paper</code>.
+    Content sits on a <code>.surface</code> card — white, hairline rule, a barely-there
+    shadow. Anything that is <em>rendering something</em> — a live preview, a code block, a
+    validation readout — sits in an <code>.instrument</code>: the always-dark panel with a
+    1.125rem radius and a deep, soft shadow. The instrument reads as the lit object on the
+    page, and preserving that relationship is what stops the console flattening into a
+    generic admin grid.
+  </p>
+
+  <div class="g2">
+    <div class="card">
+      <span class="ch">Surface · content</span>
+      <p class="small muted" style="margin:0">White, <code>1px</code> rule, <code>0.875rem</code> radius, <code>0 1px 2px -1px</code> shadow. Forms, tables, lists.</p>
+    </div>
+    <div class="instrument" style="padding:16px 18px">
+      <span class="ch" style="font-family:var(--font-mono);font-size:10px;letter-spacing:.13em;text-transform:uppercase;color:var(--panel-muted);display:block;margin-bottom:8px">Instrument · rendering</span>
+      <p class="small" style="margin:0;color:#b6cdc7">Always dark, both themes. <code style="background:var(--panel-raised);border-color:var(--panel-rule);color:var(--trace)">1.125rem</code> radius, deep shadow. Previews, snippets, readouts.</p>
+    </div>
+  </div>
+
+  <h3>3.4 Motion</h3>
+  <p>
+    One curve — <code>cubic-bezier(0.16, 1, 0.3, 1)</code>, the docs site's
+    <code>--ease-out-expo</code> — and a short list of uses. Hover lift on interactive
+    cards at 420ms. Entry on first paint at 780ms, once, never on navigation. Everything
+    else is instant. All of it inside <code>prefers-reduced-motion</code>.
+  </p>
+
+  <h3>3.5 The one thing the console adds</h3>
+  <p>
+    A <strong>neutral preview region</strong>. My original instinct was right in the wrong
+    scope: where a customer's colours are being shown, the surrounding chrome must be
+    achromatic, because an Oxygen-teal button beside a customer's teal makes their teal
+    look wrong. That is a rule for the preview panel and the swatch grid — a defined
+    region with its own reduced palette — and nowhere else.
+  </p>
+</section>
+
+<!-- ============================ 4 ============================ -->
+<section id="s4">
+  <p class="eyebrow">Section 04</p>
+  <h2 class="sh display-lg">Component kit</h2>
+
+  <p class="lede">
+    Thirteen screens built from ad-hoc utilities is thirteen slightly different products.
+    These are built once, in <code>apps/console/src/components/ui/</code>, before any
+    screen is rewritten.
+  </p>
+
+  <div class="tw">
+    <table>
+      <thead><tr><th>Component</th><th>Job</th><th>The detail that matters</th></tr></thead>
+      <tbody>
+        <tr><td><code>&lt;PageHeader&gt;</code></td><td>Eyebrow, title, lede, actions</td><td>One per screen, so every page has the same first 120px and the reader always knows where they are.</td></tr>
+        <tr><td><code>&lt;Panel&gt;</code></td><td>A titled surface card</td><td>Optional <code>tone="instrument"</code> switches to the dark panel. One component, so the depth rule cannot drift.</td></tr>
+        <tr><td><code>&lt;Field&gt;</code></td><td>Label, control, hint, error</td><td>Binds hint and error with <code>aria-describedby</code> and sets <code>aria-invalid</code>. Getting this wrong once is getting it wrong on every form.</td></tr>
+        <tr><td><code>&lt;ColorField&gt;</code></td><td>Swatch, picker, hex input</td><td>The hex input is the real control; the picker is the convenience. A picker alone is not keyboard-operable.</td></tr>
+        <tr><td><code>&lt;ContrastBadge&gt;</code></td><td>Ratio, floor, verdict</td><td>Shows <code>5.82:1</code> against <code>4.5</code> and names the WCAG criterion. Never a bare tick.</td></tr>
+        <tr><td><code>&lt;Ramp&gt;</code></td><td>Eleven steps, selectable</td><td>Each step is a button with an accessible name of "step 600, #1D63C9" — operable and readable without sight.</td></tr>
+        <tr><td><code>&lt;DataTable&gt;</code></td><td>Sortable, keyboard-navigable rows</td><td>A real <code>&lt;table&gt;</code> with <code>&lt;caption&gt;</code> and <code>aria-sort</code>. Cards on narrow screens.</td></tr>
+        <tr><td><code>&lt;StatusChip&gt;</code></td><td>Published, draft, locked, failing</td><td>Always a word. Colour is reinforcement.</td></tr>
+        <tr><td><code>&lt;Toolbar&gt;</code></td><td>Axis switches for the playground</td><td>A labelled radio group per axis, not a row of unlabelled buttons.</td></tr>
+        <tr><td><code>&lt;Preview&gt;</code></td><td>Neutral region rendering real components</td><td>The achromatic zone from §3.5. Renders the actual library, not a mock.</td></tr>
+        <tr><td><code>&lt;Skeleton&gt;</code></td><td>Loading placeholder</td><td>Matches the final layout so nothing shifts on arrival.</td></tr>
+        <tr><td><code>&lt;EmptyState&gt;</code></td><td>Nothing here yet</td><td>Always offers the two real next actions. Never an illustration with no route out.</td></tr>
+        <tr><td><code>&lt;Callout&gt;</code></td><td>Validation failure, notice</td><td>What happened · what it affects · what to do. Never "something went wrong".</td></tr>
+        <tr><td><code>&lt;CopyButton&gt;</code></td><td>Copy a snippet</td><td>Confirms in the button: <em>Copy</em> → <em>Copied</em>, reverting after two seconds.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout">
+    <span class="ct">Why this is Phase 1 and not a refactor afterwards</span>
+    <p style="margin-bottom:0">
+      Every screen in Section 5 is specified in terms of these. Building the screens first
+      and extracting components later produces thirteen sets of nearly-identical markup and
+      a week of reconciliation — which is exactly how the current console ended up with a
+      decorative <code>&lt;span&gt;</code> where a button belongs.
+    </p>
+  </div>
+</section>
+
+<!-- ============================ 5 ============================ -->
+<section id="s5">
+  <p class="eyebrow">Section 05</p>
+  <h2 class="sh display-lg">Screen specifications</h2>
+
+  <p class="lede">
+    Four worked in full — the app shell, the token editor, the brand page and the
+    playground — because they set the pattern the rest follow. The remaining nine are
+    specified as deltas in Section 6.
+  </p>
+
+  <h3>5.1 The shell</h3>
+  <p>
+    Every authenticated screen sits in this. It is the thing most responsible for the
+    console reading as one product: a constant rail, a constant header shape, and the
+    organisation identity always present.
+  </p>
+
+  <div class="mock">
+    <div class="mock-bar"><i></i><i></i><i></i><span>app.oxygenui.design/themes/northwind-clinical/tokens</span></div>
+    <div class="mk">
+      <div class="mk-rail">
+        <div style="padding:0 8px 14px;border-bottom:1px solid var(--rule);margin-bottom:12px">
+          <div style="font-family:var(--font-display);font-weight:600;font-size:13.5px;letter-spacing:-0.01em">Northwind Health</div>
+          <div class="tiny" style="color:var(--graphite-soft)">R. Okafor · admin</div>
+        </div>
+        <div class="g">Design</div>
+        <div class="i">Themes <span class="tiny" style="color:var(--graphite-soft)">3</span></div>
+        <div class="i on">Tokens</div>
+        <div class="i">Brand</div>
+        <div class="i">Typography</div>
+        <div class="i">Components</div>
+        <div class="g">Tools</div>
+        <div class="i">Playground</div>
+        <div class="i">Compare</div>
+        <div class="i">Transfer</div>
+        <div class="g">Organisation</div>
+        <div class="i">Frameworks</div>
+        <div class="i">Members <span class="tiny" style="color:var(--graphite-soft)">12</span></div>
+      </div>
+      <div class="mk-body">
+        <div class="mk-h">
+          <div>
+            <p class="eyebrow" style="margin:0 0 6px">Northwind Clinical · v7 live</p>
+            <div class="mk-t">Design tokens</div>
+            <div class="mk-s">Three tiers. Components read the semantic tier; a brand replaces the palette beneath it.</div>
+          </div>
+          <div style="display:flex;gap:8px">
+            <span class="btn">Discard</span><span class="btn pri">Publish</span>
+          </div>
+        </div>
+        <div style="border:1px dashed var(--rule-strong);border-radius:.75rem;padding:28px;text-align:center;color:var(--graphite-soft);font-size:12px">
+          screen content
+        </div>
+      </div>
+    </div>
+    <div class="mock-note">
+      <b>Against today.</b> The rail gains an organisation block, a third group, and counts.
+      The header gains an eyebrow naming the theme and version, and a right-aligned action
+      pair — so the primary action has a fixed home instead of floating after the help text,
+      which is the single clearest tell in the screenshot.
+    </div>
+  </div>
+
+  <h3>5.2 Design-token editor — the missing core</h3>
+  <p>
+    The screen the product is named after, and the one that does not exist. Three panes:
+    tier and group navigator, the fields, and a live preview that renders real components.
+  </p>
+
+  <div class="mock">
+    <div class="mock-bar"><i></i><i></i><i></i><span>…/northwind-clinical/tokens</span></div>
+    <div class="mk" style="grid-template-columns:150px minmax(0,1fr) 216px">
+      <div class="mk-rail" style="padding:14px 10px">
+        <div class="g">Tiers</div>
+        <div class="i on">Primitive <span class="tiny">141</span></div>
+        <div class="i">Semantic <span class="tiny">84</span></div>
+        <div class="i">Component <span class="tiny">282</span></div>
+        <div class="g">Groups</div>
+        <div class="i">brand</div>
+        <div class="i">slate</div>
+        <div class="i" style="opacity:.55">status 🔒</div>
+      </div>
+
+      <div class="mk-body" style="padding:16px 18px">
+        <div style="margin-bottom:14px">
+          <div class="mk-t" style="font-size:15px">Primitive · brand</div>
+          <div class="mk-s">The reference ramp. Semantic tokens point here; components never do.</div>
+        </div>
+
+        <div style="margin-bottom:12px">
+          <div class="tiny" style="font-weight:600;margin-bottom:5px"><code style="font-size:10.5px">ref.brand.600</code></div>
+          <div style="display:flex;align-items:center;gap:8px;border:1px solid var(--rule-strong);border-radius:.5rem;padding:6px 9px;background:var(--surface)">
+            <span style="width:18px;height:18px;border-radius:4px;background:#1d63c9;border:1px solid var(--rule-strong)"></span>
+            <code style="font-size:12px;flex:1">#1D63C9</code>
+            <span class="chip ok">5.82:1 ✓</span>
+          </div>
+          <div class="tiny" style="color:var(--graphite-soft);margin-top:4px">on surface · needs 4.5:1 · SC 1.4.3</div>
+        </div>
+
+        <div style="margin-bottom:12px">
+          <div class="tiny" style="font-weight:600;margin-bottom:5px"><code style="font-size:10.5px">ref.brand.700</code></div>
+          <div style="display:flex;align-items:center;gap:8px;border:1px solid var(--critical);border-radius:.5rem;padding:6px 9px;background:var(--critical-wash)">
+            <span style="width:18px;height:18px;border-radius:4px;background:#8fb8f0;border:1px solid var(--rule-strong)"></span>
+            <code style="font-size:12px;flex:1">#8FB8F0</code>
+            <span class="chip gone">2.14:1 ✗</span>
+          </div>
+          <div class="tiny" style="color:var(--critical);margin-top:4px">
+            Below the 4.5:1 floor for SC 1.4.3. Nearest passing at this hue: <b>#1A53A8</b> ·
+            <span style="text-decoration:underline">apply</span>
+          </div>
+        </div>
+
+        <div>
+          <div class="tiny" style="font-weight:600;margin-bottom:5px"><code style="font-size:10.5px">status.critical</code></div>
+          <div style="display:flex;align-items:center;gap:8px;border:1px solid var(--rule);border-radius:.5rem;padding:6px 9px;background:var(--paper-sunk);opacity:.72">
+            <span style="width:18px;height:18px;border-radius:4px;background:#b91c1c"></span>
+            <code style="font-size:12px;flex:1">#B91C1C</code>
+            <span class="chip neu">🔒 locked</span>
+          </div>
+          <div class="tiny" style="color:var(--graphite-soft);margin-top:4px">
+            Clinical status. Carries a validated floor and 60° of hue separation from
+            <code>status.low</code>. <span style="text-decoration:underline">Why?</span>
+          </div>
+        </div>
+      </div>
+
+      <div style="border-left:1px solid var(--rule);background:var(--paper-sunk);padding:14px 13px">
+        <p class="eyebrow" style="margin:0 0 10px;color:var(--graphite-soft)">Live preview</p>
+        <div style="background:#fff;border:1px solid var(--rule);border-radius:.5rem;padding:11px;margin-bottom:10px">
+          <div style="display:flex;gap:5px;margin-bottom:9px">
+            <span class="tiny" style="background:#1d63c9;color:#fff;padding:3px 9px;border-radius:5px">Primary</span>
+            <span class="tiny" style="background:#8fb8f0;color:#fff;padding:3px 9px;border-radius:5px;outline:1.5px dashed var(--critical);outline-offset:1px">Hover</span>
+          </div>
+          <div class="tiny" style="display:flex;gap:4px;flex-wrap:wrap">
+            <span style="background:#fdeaea;color:#b3261e;border:1px solid #f5c6c6;padding:2px 6px;border-radius:4px">⬤ Critical</span>
+            <span style="background:#fdf3e3;color:#a15c07;border:1px solid #f2dcb4;padding:2px 6px;border-radius:4px">▲ High</span>
+            <span style="background:#eff6ff;color:#1d4ed8;border:1px solid #c7dbfd;padding:2px 6px;border-radius:4px">▼ Low</span>
+          </div>
+        </div>
+        <p class="eyebrow" style="margin:0 0 7px;color:var(--graphite-soft)">Checks</p>
+        <div class="tiny mono" style="line-height:1.9">
+          <div style="display:flex;justify-content:space-between"><span>Pairs</span><span><b>77</b>/78</span></div>
+          <div style="display:flex;justify-content:space-between;color:var(--critical)"><span>Failing</span><span><b>1</b></span></div>
+          <div style="display:flex;justify-content:space-between"><span>Hue sep.</span><span>84° ✓</span></div>
+          <div style="display:flex;justify-content:space-between"><span>Themes</span><span>3</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="mock-note">
+      <b>Every number here is real.</b> The validator is already an importable module with
+      85 tests — the failing row, the ratio, the floor, the WCAG criterion and the nearest
+      passing shade all come from <code>@oxygenui-design/tokens/validate</code> and
+      <code>nearestPassing()</code>, which exist and are tested. This screen is the missing
+      interface over finished logic, not new logic.
+    </div>
+  </div>
+
+  <h3>5.3 Brand and colour</h3>
+  <p>
+    Where the screenshot's form should have led. One colour in, eleven validated steps out,
+    with the vision simulation that makes the hue-separation rule visible rather than
+    merely enforced.
+  </p>
+
+  <div class="mock">
+    <div class="mock-bar"><i></i><i></i><i></i><span>…/northwind-clinical/brand</span></div>
+    <div class="mk" style="grid-template-columns:minmax(0,1fr) 232px">
+      <div class="mk-body">
+        <div class="mk-h" style="margin-bottom:14px">
+          <div>
+            <div class="mk-t">Brand colour</div>
+            <div class="mk-s">Pick one. We generate the ramp, validate every derived pair, and show what fails before you can publish it.</div>
+          </div>
+        </div>
+
+        <div style="margin-bottom:14px">
+          <div class="tiny" style="font-weight:600;margin-bottom:5px">Primary</div>
+          <div style="display:flex;align-items:center;gap:8px;border:1px solid var(--rule-strong);border-radius:.5rem;padding:7px 10px;background:var(--surface);max-width:340px">
+            <span style="width:20px;height:20px;border-radius:4px;background:#1d63c9;border:1px solid var(--rule-strong)"></span>
+            <code style="font-size:12.5px;flex:1">#1D63C9</code>
+            <span class="tiny" style="color:var(--graphite-soft)">from logo</span>
+          </div>
+        </div>
+
+        <div class="tiny" style="font-weight:600;margin-bottom:6px">Generated ramp <span style="font-weight:400;color:var(--graphite-soft)">— 11 steps, each validated in three themes</span></div>
+        <div style="display:flex;border-radius:.5rem;overflow:hidden;border:1px solid var(--rule-strong)">
+          <span style="flex:1;height:40px;background:#f2f6fd"></span>
+          <span style="flex:1;height:40px;background:#e4eefb"></span>
+          <span style="flex:1;height:40px;background:#c1d6f6"></span>
+          <span style="flex:1;height:40px;background:#90b6ef"></span>
+          <span style="flex:1;height:40px;background:#5a94e7"></span>
+          <span style="flex:1;height:40px;background:#2e76e1"></span>
+          <span style="flex:1;height:40px;background:#1d63c9;outline:2px solid var(--ink);outline-offset:-2px"></span>
+          <span style="flex:1;height:40px;background:#1851a5"></span>
+          <span style="flex:1;height:40px;background:#134286"></span>
+          <span style="flex:1;height:40px;background:#0f3468"></span>
+          <span style="flex:1;height:40px;background:#0a2242"></span>
+        </div>
+        <div class="tiny" style="color:var(--graphite-soft);margin-top:6px">
+          600 is your colour. Click any step to override it — an overridden step re-runs the whole check.
+        </div>
+      </div>
+
+      <div style="border-left:1px solid var(--rule);background:var(--paper-sunk);padding:14px 13px">
+        <p class="eyebrow" style="margin:0 0 10px;color:var(--graphite-soft)">Vision simulation</p>
+        <div style="display:flex;flex-direction:column;gap:7px">
+          <div style="background:#fff;border:1px solid var(--rule);border-radius:.5rem;padding:8px">
+            <div class="tiny" style="color:var(--graphite-soft);margin-bottom:5px">Normal</div>
+            <div style="display:flex;gap:3px">
+              <span style="flex:1;height:14px;background:#b3261e;border-radius:3px"></span>
+              <span style="flex:1;height:14px;background:#a15c07;border-radius:3px"></span>
+              <span style="flex:1;height:14px;background:#1d4ed8;border-radius:3px"></span>
+              <span style="flex:1;height:14px;background:#047857;border-radius:3px"></span>
+            </div>
+          </div>
+          <div style="background:#fff;border:1px solid var(--rule);border-radius:.5rem;padding:8px">
+            <div class="tiny" style="color:var(--graphite-soft);margin-bottom:5px">Deuteranopia</div>
+            <div style="display:flex;gap:3px">
+              <span style="flex:1;height:14px;background:#7a5a20;border-radius:3px"></span>
+              <span style="flex:1;height:14px;background:#8a7020;border-radius:3px"></span>
+              <span style="flex:1;height:14px;background:#3f5fa8;border-radius:3px"></span>
+              <span style="flex:1;height:14px;background:#6b6a3a;border-radius:3px"></span>
+            </div>
+          </div>
+        </div>
+        <div class="tiny" style="margin-top:11px;padding:8px;background:var(--accent-wash);border-radius:.5rem;color:var(--accent);line-height:1.5">
+          ✓ High and low stay 84° apart. The direction of an abnormal result survives.
+        </div>
+      </div>
+    </div>
+    <div class="mock-note">
+      <b>The simulation earns its place.</b> It is the only part of the console that
+      explains the locked clinical tokens rather than asserting them — a customer who sees
+      their two abnormal-direction colours collapse into one under deuteranopia stops
+      asking why they cannot change them.
+    </div>
+  </div>
+
+  <h3>5.4 Preview playground</h3>
+  <p>
+    The screen that sells the architecture. Real components, five axes, and the bridge
+    switch that demonstrates the whole theme-bridge argument in one click.
+  </p>
+
+  <div class="mock">
+    <div class="mock-bar"><i></i><i></i><i></i><span>…/playground</span></div>
+    <div class="mk" style="grid-template-columns:minmax(0,1fr)">
+      <div class="mk-body">
+        <div class="mk-h" style="margin-bottom:12px">
+          <div><div class="mk-t">Playground</div><div class="mk-s">Real components, your theme, every axis. The same render path your application uses.</div></div>
+          <span class="btn">Copy setup</span>
+        </div>
+
+        <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;padding:9px 11px;background:var(--paper-sunk);border:1px solid var(--rule);border-radius:.625rem;margin-bottom:14px">
+          <span class="eyebrow" style="color:var(--graphite-soft);font-size:9.5px">Theme</span>
+          <span class="btn" style="padding:3px 9px;font-size:11px;background:var(--ink);color:var(--paper);border-color:var(--ink)">Light</span>
+          <span class="btn" style="padding:3px 9px;font-size:11px">Dark</span>
+          <span class="btn" style="padding:3px 9px;font-size:11px">High contrast</span>
+          <span style="width:1px;height:16px;background:var(--rule-strong)"></span>
+          <span class="eyebrow" style="color:var(--graphite-soft);font-size:9.5px">Bridge</span>
+          <span class="btn" style="padding:3px 9px;font-size:11px">None</span>
+          <span class="btn" style="padding:3px 9px;font-size:11px;background:var(--ink);color:var(--paper);border-color:var(--ink)">antd</span>
+          <span class="btn" style="padding:3px 9px;font-size:11px">MUI</span>
+        </div>
+
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px">
+          <div style="border:1px solid var(--rule);border-radius:.625rem;padding:12px;background:#fff">
+            <p class="eyebrow" style="margin:0 0 9px;color:var(--graphite-soft);font-size:9.5px">Switch</p>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <span style="display:flex;align-items:center;gap:8px"><span style="width:32px;height:18px;background:#1d63c9;border-radius:9px;position:relative;display:inline-block"><span style="position:absolute;right:2px;top:2px;width:14px;height:14px;background:#fff;border-radius:50%"></span></span><span class="tiny">Contact precautions</span></span>
+              <span style="display:flex;align-items:center;gap:8px"><span style="width:32px;height:18px;background:#eef3f1;border:1px dashed #9aa8a4;border-radius:9px;display:inline-block"></span><span class="tiny">Advance directive <span style="color:var(--graphite-soft)">· not asked</span></span></span>
+            </div>
+          </div>
+          <div style="border:1px solid var(--rule);border-radius:.625rem;padding:12px;background:#fff">
+            <p class="eyebrow" style="margin:0 0 9px;color:var(--graphite-soft);font-size:9.5px">Status</p>
+            <div class="tiny" style="display:flex;gap:4px;flex-wrap:wrap">
+              <span style="background:#fdeaea;color:#b3261e;border:1px solid #f5c6c6;padding:2px 7px;border-radius:4px">⬤ Critical</span>
+              <span style="background:#fdf3e3;color:#a15c07;border:1px solid #f2dcb4;padding:2px 7px;border-radius:4px">▲ High</span>
+              <span style="background:#eff6ff;color:#1d4ed8;border:1px solid #c7dbfd;padding:2px 7px;border-radius:4px">▼ Low</span>
+            </div>
+            <div class="tiny" style="color:var(--graphite-soft);margin-top:8px">Unchanged by the bridge — clinical status is never mapped.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="mock-note">
+      <b>Toggling the bridge is the demo.</b> Nothing remounts; the accent and radius change
+      and the clinical chips do not. That is the entire theme-bridge argument, visible in a
+      click, and it is already proven by <code>e2e/bridge-hosts.spec.ts</code>.
+    </div>
+  </div>
+</section>
+
+<!-- ============================ 6 ============================ -->
+<section id="s6">
+  <p class="eyebrow">Section 06</p>
+  <h2 class="sh display-lg">Phases and tasks</h2>
+
+  <p class="lede">
+    Six phases, sequenced so the product is shippable at the end of each rather than only
+    at the end of all six. Estimates assume one engineer and are relative, not commitments.
+  </p>
+
+  <div style="margin:26px 0">
+    <div class="phase now">
+      <div class="id"><span class="n">Phase</span><span class="w">A</span><span class="u">3–4 days</span></div>
+      <div class="b">
+        <h4 style="margin:0 0 6px">Foundation — adopt the design system</h4>
+        <p class="small muted" style="margin:0">
+          Nothing user-visible ships alone here, and everything after it depends on it.
+          Instrument Sans and JetBrains Mono via <code>next/font</code>, the
+          <code>--site-*</code> palette, the type scale, the surface and instrument
+          treatments, and the fourteen kit components from §4.
+        </p>
+      </div>
+    </div>
+    <div class="phase">
+      <div class="id"><span class="n">Phase</span><span class="w">B</span><span class="u">2–3 days</span></div>
+      <div class="b">
+        <h4 style="margin:0 0 6px">Shell and the broken link</h4>
+        <p class="small muted" style="margin:0">
+          The three-group rail, the standard page header, and <code>/frameworks</code> —
+          which currently 404s from the primary navigation and is the one thing here that
+          is a live defect rather than a shortfall.
+        </p>
+      </div>
+    </div>
+    <div class="phase">
+      <div class="id"><span class="n">Phase</span><span class="w">C</span><span class="u">5–6 days</span></div>
+      <div class="b">
+        <h4 style="margin:0 0 6px">The editors — make it a product</h4>
+        <p class="small muted" style="margin:0">
+          Token editor, brand and ramp, typography with real upload, component overrides.
+          This is the phase where the console stops being a viewer.
+        </p>
+      </div>
+    </div>
+    <div class="phase">
+      <div class="id"><span class="n">Phase</span><span class="w">D</span><span class="u">3–4 days</span></div>
+      <div class="b">
+        <h4 style="margin:0 0 6px">The tools</h4>
+        <p class="small muted" style="margin:0">
+          Playground, comparison with pickers and rendered previews, transfer with actual
+          downloads, version history with restore.
+        </p>
+      </div>
+    </div>
+    <div class="phase">
+      <div class="id"><span class="n">Phase</span><span class="w">E</span><span class="u">3–4 days</span></div>
+      <div class="b">
+        <h4 style="margin:0 0 6px">Organisation and states</h4>
+        <p class="small muted" style="margin:0">
+          Members, roles, approvals, settings — the data model exists and nothing renders
+          it. Then the full state treatment across every screen.
+        </p>
+      </div>
+    </div>
+    <div class="phase">
+      <div class="id"><span class="n">Phase</span><span class="w">F</span><span class="u">3–4 days</span></div>
+      <div class="b">
+        <h4 style="margin:0 0 6px">Proof</h4>
+        <p class="small muted" style="margin:0">
+          Console E2E, axe across every screen in three themes, VRT baselines, responsive
+          verification. The console currently has no browser test of its own.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <h3>Phase A — Foundation</h3>
+  <div class="tw">
+    <table>
+      <thead><tr><th style="width:52px">Task</th><th>Work</th><th style="width:180px">Files</th><th style="width:60px">Days</th></tr></thead>
+      <tbody>
+        <tr><td class="num">A1</td><td>Load Instrument Sans and JetBrains Mono; drop Inter</td><td><code>app/layout.tsx</code></td><td class="num">0.2</td></tr>
+        <tr><td class="num">A2</td><td>Replace the console palette with <code>--site-*</code>; add the dark set and the three-state theming pattern</td><td><code>app/globals.css</code></td><td class="num">0.5</td></tr>
+        <tr><td class="num">A3</td><td>Port <code>.display-*</code>, <code>.eyebrow</code>, <code>.lede</code>, <code>.body</code>, <code>.surface</code>, <code>.instrument</code>, <code>.lift</code>, the ease curve</td><td><code>app/globals.css</code></td><td class="num">0.5</td></tr>
+        <tr><td class="num">A4</td><td>Kit: <code>PageHeader</code>, <code>Panel</code>, <code>Field</code>, <code>StatusChip</code>, <code>Callout</code>, <code>EmptyState</code></td><td><code>components/ui/</code></td><td class="num">1.0</td></tr>
+        <tr><td class="num">A5</td><td>Kit: <code>ColorField</code>, <code>ContrastBadge</code>, <code>Ramp</code>, <code>CopyButton</code></td><td><code>components/ui/</code></td><td class="num">0.8</td></tr>
+        <tr><td class="num">A6</td><td>Kit: <code>DataTable</code>, <code>Toolbar</code>, <code>Preview</code>, <code>Skeleton</code></td><td><code>components/ui/</code></td><td class="num">0.8</td></tr>
+        <tr><td class="num">A7</td><td>Unit tests for the kit: focus order, <code>aria-describedby</code> binding, disabled-with-reason, tabular numerals present</td><td><code>test/ui/</code></td><td class="num">0.5</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>Phase B — Shell</h3>
+  <div class="tw">
+    <table>
+      <thead><tr><th style="width:52px">Task</th><th>Work</th><th style="width:180px">Files</th><th style="width:60px">Days</th></tr></thead>
+      <tbody>
+        <tr><td class="num">B1</td><td>Rail: organisation block, three groups, counts, current-page state</td><td><code>(app)/layout.tsx</code></td><td class="num">0.6</td></tr>
+        <tr><td class="num">B2</td><td>Every screen adopts <code>&lt;PageHeader&gt;</code>; actions move to the header</td><td>all 8 screens</td><td class="num">0.6</td></tr>
+        <tr><td class="num">B3</td><td><strong>Build <code>/frameworks</code></strong> — cards, detected versions, mapped-token counts, per-application usage, enable/disable</td><td><code>(app)/frameworks/</code></td><td class="num">1.0</td></tr>
+        <tr><td class="num">B4</td><td><code>setFrameworksAction</code> behind <code>org.configure</code>; disabling one in use names the applications</td><td><code>lib/actions.ts</code></td><td class="num">0.4</td></tr>
+        <tr><td class="num">B5</td><td>Sign-out in the rail; the session has no exit today</td><td><code>(app)/layout.tsx</code></td><td class="num">0.2</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>Phase C — Editors</h3>
+  <div class="tw">
+    <table>
+      <thead><tr><th style="width:52px">Task</th><th>Work</th><th style="width:180px">Files</th><th style="width:60px">Days</th></tr></thead>
+      <tbody>
+        <tr><td class="num">C1</td><td>Token editor: three-pane layout, tier and group navigator</td><td><code>[slug]/tokens/</code></td><td class="num">0.8</td></tr>
+        <tr><td class="num">C2</td><td>Token fields with live contrast, per-token revert, locked clinical rows with the reason</td><td><code>[slug]/tokens/</code></td><td class="num">1.2</td></tr>
+        <tr><td class="num">C3</td><td>"Apply nearest passing" — wire the existing <code>nearestPassing()</code> to a button</td><td><code>lib/actions.ts</code></td><td class="num">0.3</td></tr>
+        <tr><td class="num">C4</td><td>Live preview pane rendering real components under the draft</td><td><code>components/Preview.tsx</code></td><td class="num">0.7</td></tr>
+        <tr><td class="num">C5</td><td>Brand page: ramp display, per-step override, vision simulation, logo colour extraction</td><td><code>[slug]/brand/</code></td><td class="num">1.2</td></tr>
+        <tr><td class="num">C6</td><td>Typography: family selection, size control, <strong>font upload wired to <code>checkFont()</code></strong>, live specimen</td><td><code>[slug]/typography/</code></td><td class="num">1.0</td></tr>
+        <tr><td class="num">C7</td><td>Component overrides: make the row editable, persist to the component tier</td><td><code>[slug]/components/</code></td><td class="num">0.8</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="tcap">
+    C3 and C6 are wiring, not building: <code>nearestPassing()</code> and
+    <code>checkFont()</code> are written, tested, and currently unreachable from any screen.
+  </p>
+
+  <h3>Phase D — Tools</h3>
+  <div class="tw">
+    <table>
+      <thead><tr><th style="width:52px">Task</th><th>Work</th><th style="width:180px">Files</th><th style="width:60px">Days</th></tr></thead>
+      <tbody>
+        <tr><td class="num">D1</td><td>Playground: axis toolbar, component grid, generated setup snippet</td><td><code>(app)/playground/</code></td><td class="num">1.2</td></tr>
+        <tr><td class="num">D2</td><td>Bridge switching in the preview; vision-simulation and viewport axes</td><td><code>(app)/playground/</code></td><td class="num">0.8</td></tr>
+        <tr><td class="num">D3</td><td>Comparison: version pickers, swap, changed-only filter, rendered side-by-side</td><td><code>[slug]/compare/</code></td><td class="num">0.8</td></tr>
+        <tr><td class="num">D4</td><td>Transfer: real downloads, drop zone alongside the textarea, per-token accept on import</td><td><code>[slug]/transfer/</code></td><td class="num">0.7</td></tr>
+        <tr><td class="num">D5</td><td>Version history as its own screen: restore with reason, diff links, re-validation notice</td><td><code>[slug]/history/</code></td><td class="num">0.6</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>Phase E — Organisation and states</h3>
+  <div class="tw">
+    <table>
+      <thead><tr><th style="width:52px">Task</th><th>Work</th><th style="width:180px">Files</th><th style="width:60px">Days</th></tr></thead>
+      <tbody>
+        <tr><td class="num">E1</td><td>Members: list, role change, approve, disable — all behind <code>member.manage</code></td><td><code>(app)/members/</code></td><td class="num">1.0</td></tr>
+        <tr><td class="num">E2</td><td>Member actions with the last-admin guard and reassignment on removal</td><td><code>lib/actions.ts</code></td><td class="num">0.6</td></tr>
+        <tr><td class="num">E3</td><td>Settings: name, slug (locked after first publish), default theme</td><td><code>(app)/settings/</code></td><td class="num">0.5</td></tr>
+        <tr><td class="num">E4</td><td>Skeletons matching final layout; determinate progress for validation</td><td>all screens</td><td class="num">0.6</td></tr>
+        <tr><td class="num">E5</td><td>Error, empty and permission treatments per §6.13 of the original mockups</td><td>all screens</td><td class="num">0.7</td></tr>
+        <tr><td class="num">E6</td><td>Sign-up and invitation flow, matching hq's approve-before-access rule</td><td><code>(auth)/</code></td><td class="num">0.6</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>Phase F — Proof</h3>
+  <div class="tw">
+    <table>
+      <thead><tr><th style="width:52px">Task</th><th>Work</th><th style="width:180px">Files</th><th style="width:60px">Days</th></tr></thead>
+      <tbody>
+        <tr><td class="num">F1</td><td>Console E2E: sign in → create → edit a token → fix a failure → publish → consume the stylesheet</td><td><code>e2e/console.spec.ts</code></td><td class="num">1.0</td></tr>
+        <tr><td class="num">F2</td><td>Negative E2E: no role can publish a failing theme; a designer sees Publish disabled with the reason</td><td><code>e2e/console.spec.ts</code></td><td class="num">0.5</td></tr>
+        <tr><td class="num">F3</td><td>axe over every console screen × 3 themes, added to <code>scripts/a11y.ts</code></td><td><code>scripts/a11y.ts</code></td><td class="num">0.6</td></tr>
+        <tr><td class="num">F4</td><td>VRT baselines for the eight highest-traffic screens, light and dark</td><td><code>e2e/console.spec.ts</code></td><td class="num">0.6</td></tr>
+        <tr><td class="num">F5</td><td>320 / 768 / 1280 reflow on every screen; the rail collapses rather than scrolls sideways</td><td>all screens</td><td class="num">0.5</td></tr>
+        <tr><td class="num">F6</td><td>Raise the console coverage floor as the new logic lands</td><td><code>vitest.config.ts</code></td><td class="num">0.3</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="metrics">
+    <div class="metric"><span class="v">36</span><span class="k">tasks</span></div>
+    <div class="metric"><span class="v">6</span><span class="k">phases</span></div>
+    <div class="metric good"><span class="v">19–25</span><span class="k">days, one engineer</span></div>
+    <div class="metric"><span class="v">5</span><span class="k">new screens</span></div>
+  </div>
+
+  <div class="callout">
+    <span class="ct">If the whole thing cannot be funded</span>
+    <p style="margin-bottom:0">
+      <strong>A, B and C are the shippable minimum</strong> — roughly ten days. That gets a
+      product that looks like Oxygen, has no broken navigation, and lets a customer actually
+      change their design language. D and E are what make it feel finished; F is what keeps
+      it that way. Stopping after B would leave a well-dressed viewer, which is the current
+      problem with better typography.
+    </p>
+  </div>
+</section>
+
+<!-- ============================ 7 ============================ -->
+<section id="s7">
+  <p class="eyebrow">Section 07</p>
+  <h2 class="sh display-lg">Definition of done</h2>
+
+  <p class="lede">
+    Checkable rather than aesthetic, because "looks like a SaaS product" is not something a
+    build can verify and these are.
+  </p>
+
+  <div class="g2">
+    <div class="card">
+      <span class="ch">Visual</span>
+      <ul class="small" style="margin:0;padding-left:17px">
+        <li>Instrument Sans and JetBrains Mono only — no Inter anywhere</li>
+        <li>Every colour resolves from a <code>--site-*</code> token</li>
+        <li>Every screen opens with <code>&lt;PageHeader&gt;</code></li>
+        <li>Every primary action sits in a header or a panel footer, never loose in flow</li>
+        <li>At least one <code>.instrument</code> per screen that renders something</li>
+      </ul>
+    </div>
+    <div class="card">
+      <span class="ch">Functional</span>
+      <ul class="small" style="margin:0;padding-left:17px">
+        <li>No navigation link 404s</li>
+        <li>All 13 mockup screens exist</li>
+        <li>No screen labelled with an action it cannot perform</li>
+        <li>A customer can change a token, a font, a component and a framework</li>
+        <li>Every export downloads</li>
+      </ul>
+    </div>
+    <div class="card">
+      <span class="ch">Accessible</span>
+      <ul class="small" style="margin:0;padding-left:17px">
+        <li>axe clean on every screen × light, dark, high contrast</li>
+        <li>Every form control has a bound label and hint</li>
+        <li>Disabled controls use <code>aria-disabled</code> with a reachable reason</li>
+        <li>No state conveyed by colour alone</li>
+        <li>Full keyboard path through create → edit → publish</li>
+      </ul>
+    </div>
+    <div class="card">
+      <span class="ch">Proven</span>
+      <ul class="small" style="margin:0;padding-left:17px">
+        <li>E2E covers the full lifecycle and the negative path</li>
+        <li>VRT baselines for eight screens, light and dark</li>
+        <li>No horizontal scroll at 320px on any screen</li>
+        <li>Coverage floor raised, never lowered</li>
+        <li>The whole CI gate green</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>What I would change about how this happened</h3>
+  <p>
+    The mockups in the original report were detailed and I treated them as illustration
+    rather than specification — I built the data model against them and the interface
+    against my own shorthand. The check that would have caught it is trivial and was
+    never run: <em>open every route the navigation links to</em>. That would have found the
+    404 on day one, and finding it would have prompted the wider comparison.
+  </p>
+  <p style="margin-bottom:0">
+    Phase F exists so that check is automatic rather than remembered.
+  </p>
+</section>
+
+  </main>
+</div>
+
+<footer class="end">
+  <div class="in">
+    <p style="margin:0 0 10px"><b>Oxygen theme console — UI build plan.</b> 19 August 2026.</p>
+    <p style="margin:0 0 10px;max-width:78ch">
+      Every count is measured from the working tree at
+      <code>claude/multi-framework-ui-theming-52a8a8</code>: routes by enumerating
+      <code>page.tsx</code> under <code>apps/console/src/app</code>, interactivity by
+      counting form controls per screen, the 404 by requesting it. The design tokens and
+      type scale are read from <code>apps/docs/src/app/globals.css</code> rather than
+      proposed.
+    </p>
+    <p style="margin:0;font-size:12px">
+      Architecture underneath is complete and green — see ADR
+      <b>0012</b> (token surface) and <b>0013</b> (four open product decisions).
+    </p>
+  </div>
+</footer>
