@@ -42,9 +42,18 @@ fi
 # zowork.com is allowed: our own contact address on the marketing pages is not
 # patient data. The point of this pass is a real person's address reaching a
 # fixture or a component default.
+#
+# The third pass drops versioned asset paths. `clinical@7.css` in a CDN URL is
+# an `@version` tag followed by a file extension, and the email pattern reads it
+# as a local part and a two-letter TLD — which turned a docs page into a PHI
+# alert. The rule is "a filename is not a domain", stated as the extensions this
+# repository actually serves, rather than "a domain contains a letter": the
+# latter passes `@7.css` and still fails on `@v7.css` and `@2x.png`, which is an
+# accident rather than a fix.
 # shellcheck disable=SC2086
 if grep -rInE '[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}' $TARGETS \
-  | grep -vE '@(example\.(org|com)|zowork\.com)'; then
+  | grep -vE '@(example\.(org|com)|zowork\.com)' \
+  | grep -vE '@[A-Za-z0-9.-]*\.(css|js|mjs|cjs|json|map|ts|tsx|jsx|svg|png|jpe?g|gif|webp|avif|woff2?|ttf|otf|ico|txt|md|mdx|zip|pdf)([^A-Za-z0-9]|$)'; then
   echo "::error::Email address outside example.org / example.com / zowork.com found above."
   fail=1
 fi
