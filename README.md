@@ -194,6 +194,7 @@ instead. Both channels are generated from the same source.
 
 | Package                           | What it is                                                                |
 | --------------------------------- | ------------------------------------------------------------------------- |
+| `@oxygenui-design/cli`            | Installs components into your repo. Zero runtime dependencies.            |
 | `@oxygenui-design/loaders`        | The five loaders as custom elements. Zero dependencies, SSR-safe.         |
 | `@oxygenui-design/signature`      | Signature capture for Ant Design. antd is a peer dependency.              |
 | `@oxygenui-design/signature-core` | The capture engine. No React, no antd, no DOM, no dependencies.           |
