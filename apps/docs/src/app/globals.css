@@ -65,6 +65,10 @@
    block cannot collide with the site around it. */
 @import "./blocks.css";
 
+/* The Pro page: glance stages, the feature browser and the tier table.
+   Scoped under `.oxp`. */
+@import "./pro.css";
+
 /* ===========================================================================
  * oxygenui.design — site design layer
  *

@@ -1,177 +1,137 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight, Check, Layers } from "lucide-react";
-import { getComponent } from "@/lib/catalog";
-import { FAQ, STATUS_COPY, TEMPLATES, TIERS } from "@/lib/offerings";
+import { ArrowRight } from "lucide-react";
+import { TIERS } from "@/lib/offerings";
+import { PRO_FEATURES } from "@/lib/pro-features";
+import { signInHref, signUpHref } from "@/lib/app";
 import { SiteFooter, SiteHeader } from "@/components/site/chrome";
-import { cn } from "@/lib/utils";
 import { RevealRoot } from "@/components/site/interactions";
-import { TelemetryTrace } from "@/components/site/telemetry-trace";
+import { FeatureBrowser } from "@/components/pro/feature-browser";
+import { Stage } from "@/components/pro/stage-map";
+import { StageGate, VisionFilters } from "@/components/pro/stages";
+
+/**
+ * Pro.
+ *
+ * The page this replaces sold Team and Enterprise with a waitlist and six
+ * bullet points. Pro is not a tier we are going to build — it is the
+ * application already running at app.oxygenui.design, and a page listing what
+ * a shipped product *will* do is weaker than one showing it doing it.
+ *
+ * So the argument is made by ten glances rather than by adjectives, and the
+ * tier table moves below them: Enterprise is a real conversation, but it is
+ * not the first thing this page should say.
+ */
 
 export const metadata: Metadata = {
-  title: "Pro — starter kits and workflow blocks",
+  title: "Pro — the Oxygen console",
   description:
-    "Production-ready healthcare starter kits built on Oxygen UI: patient portal, provider workspace, clinic operations, and telehealth. Source you own, FHIR-typed, MIT core.",
+    "A theming console for behavioral health. One brand colour becomes eleven validated steps, a failing theme cannot be published, and every publish ships a stylesheet pinned to a version.",
   alternates: { canonical: "/pro" },
-};
-
-const STATUS_STYLE: Record<string, string> = {
-  available: "border-oxygen/30 bg-oxygen/8 text-oxygen-deep",
-  building: "border-rule-strong bg-paper-sunk text-graphite",
-  planned: "border-rule bg-transparent text-graphite-soft",
 };
 
 export default function ProPage() {
   return (
     <RevealRoot>
       <SiteHeader />
+      <VisionFilters />
 
-      <main id="main">
-        {/* Hero --------------------------------------------------------- */}
+      <main id="main" className="oxp">
+        {/* ---------------------------------------------------------- hero */}
         <section className="border-b border-rule">
-          <div className="mx-auto grid max-w-6xl section-major gap-10 px-5 sm:px-8 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)] lg:items-end lg:gap-16">
+          <div className="mx-auto grid max-w-6xl section-major gap-10 px-5 sm:px-8 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] lg:items-center lg:gap-16">
             <div>
               <p className="eyebrow eyebrow-rule text-oxygen-deep" data-reveal>
                 Oxygen Pro
               </p>
-              <h1 className="display-xl mt-5 max-w-4xl text-balance" data-reveal>
-                Whole products, not just components.
+              <h1 className="display-lg mt-5 text-balance" data-reveal>
+                Your brand, through a gate that will not let it fail.
               </h1>
-              <p className="lede mt-6 max-w-2xl text-pretty" data-reveal>
-                Core gets you a component. Pro gets you the information architecture, the routes,
-                the empty states, and the fixtures — a healthcare product you can hand to a
-                clinician on day one instead of week six.
+              <p className="body-lg mt-6 max-w-xl text-pretty text-graphite" data-reveal>
+                A theming console for behavioral health. Set one brand colour, get eleven validated
+                steps. Publish only what passes contrast. Ship a stylesheet pinned to a version, so
+                an edit here cannot change a running application until somebody moves the pin.
               </p>
 
               <div className="mt-8 flex flex-wrap gap-3" data-reveal>
                 <a
-                  href="#pricing"
+                  href={signUpHref}
                   className="group inline-flex items-center gap-2 rounded-xl bg-cta px-5 py-3.5 text-sm font-medium text-paper transition-all duration-300 ease-[var(--ease-out-expo)] hover:-translate-y-0.5 hover:bg-cta-hover"
                 >
-                  See pricing
+                  Create an organisation
                   <ArrowRight
                     aria-hidden="true"
                     className="size-4 transition-transform duration-300 ease-[var(--ease-out-expo)] group-hover:translate-x-0.5"
                   />
                 </a>
-                <Link
-                  href="/components"
+                <a
+                  href={signInHref}
                   className="inline-flex items-center gap-2 rounded-xl border border-rule px-5 py-3.5 text-sm font-medium text-ink transition-all duration-300 ease-[var(--ease-out-expo)] hover:-translate-y-0.5 hover:border-oxygen/40"
                 >
-                  Start free with Core
-                </Link>
+                  Sign in
+                </a>
               </div>
-
-              {/* Said up front, not buried in the FAQ. A team that discovers
-                this at checkout will not come back. */}
-              <p
-                className="mt-8 max-w-2xl rounded-xl border border-rule bg-paper-sunk px-4 py-3 text-sm leading-relaxed text-graphite"
-                data-reveal
-              >
-                <strong className="text-ink">The kits are pre-launch.</strong> The catalog is eight
-                components and the first starter kit is still in build, so nothing bills for a kit
-                until one ships. The marketplace is not pre-launch — those packs exist, and buying
-                one charges you today.
+              <p className="mt-4 text-xs text-graphite-soft" data-reveal>
+                Free while in preview · no card · the marketplace is the paid part
               </p>
             </div>
 
-            {/* Right column carried the same emptiness as every other hero. */}
-            <dl className="lg:pb-1" data-reveal="right">
-              <div className="ticks mb-5 opacity-70" aria-hidden="true" />
-              {[
-                { label: "Launch kits", value: TEMPLATES.length },
-                {
-                  label: "Screens across kits",
-                  value: TEMPLATES.reduce((n, t) => n + t.screens.length, 0),
-                },
-                {
-                  label: "Built on components",
-                  value: new Set(TEMPLATES.flatMap((t) => t.uses)).size,
-                },
-              ].map((stat) => (
-                <div
-                  key={stat.label}
-                  className="flex items-baseline justify-between border-b border-rule/70 py-2.5"
-                >
-                  <dt className="axis-label">{stat.label}</dt>
-                  <dd className="numeric text-2xl font-semibold text-oxygen-deep">{stat.value}</dd>
-                </div>
-              ))}
-            </dl>
+            <div className="fStage seen" style={{ height: 200 }} data-reveal="right">
+              <StageGate />
+            </div>
           </div>
         </section>
 
-        {/* Kits --------------------------------------------------------- */}
-        <section className="border-b border-rule bg-paper-sunk/40">
-          <div className="mx-auto max-w-6xl section-major px-5 sm:px-8">
-            <div className="max-w-3xl">
-              <p className="eyebrow text-graphite" data-reveal>
-                Launch kits
+        {/* --------------------------------------------------------- proof */}
+        <section className="border-b border-rule bg-paper-sunk/30">
+          <div className="mx-auto grid max-w-6xl grid-cols-1 gap-px overflow-hidden px-5 sm:grid-cols-3 sm:px-8">
+            {(
+              [
+                ["11", "token steps from one colour"],
+                ["3", "tiers: reference, semantic, component"],
+                ["0", "failing themes can reach production"],
+              ] as const
+            ).map(([k, v]) => (
+              <div key={v} className="py-7 sm:px-6 sm:first:pl-0" data-reveal>
+                <div className="numeric text-2xl font-semibold tracking-tight">{k}</div>
+                <div className="mt-1 text-xs text-graphite-soft">{v}</div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* ------------------------------------------------------- glances */}
+        <section className="border-b border-rule">
+          <div className="mx-auto max-w-6xl section-minor px-5 sm:px-8">
+            <div className="max-w-2xl">
+              <p className="axis-label" data-reveal>
+                Ten features
               </p>
-              <h2 className="display-lg mt-4 text-balance" data-reveal>
-                Six products, one design system.
+              <h2 className="display-sm mt-3 text-balance" data-reveal>
+                Each one shown in about four seconds.
               </h2>
-              <p className="lede mt-5 max-w-2xl text-pretty" data-reveal>
-                Each kit is a working Next.js application — routes, role-based navigation, synthetic
-                FHIR fixtures, and every state wired up. Not a landing page with a dashboard
-                screenshot.
+              <p className="mt-4 text-pretty leading-relaxed text-graphite" data-reveal>
+                Not screenshots and not recordings — markup, so each one themes with the page,
+                scales without artefacts and rests on its finished frame if you have asked for
+                reduced motion.
               </p>
             </div>
 
-            <div className="mt-12 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {TEMPLATES.map((template, index) => (
+            <div className="glances mt-9">
+              {PRO_FEATURES.map((f, i) => (
                 <article
-                  key={template.slug}
+                  key={f.id}
+                  className="glance"
                   data-reveal
-                  style={{ "--reveal-delay": `${(index % 3) * 70}ms` } as React.CSSProperties}
-                  className="group flex flex-col surface-2 lift rounded-2xl p-5 hover:border-oxygen/45"
+                  style={{ ["--enter-delay" as string]: `${(i % 3) * 60}ms` }}
                 >
-                  <div className="flex items-start justify-between gap-3">
-                    <h3 className="font-display text-base font-semibold tracking-tight">
-                      {template.title}
-                    </h3>
-                    <span
-                      className={`shrink-0 rounded-full border px-2 py-0.5 font-mono text-[0.625rem] uppercase tracking-wider ${STATUS_STYLE[template.status]}`}
-                    >
-                      {STATUS_COPY[template.status]}
-                    </span>
+                  <div className="stage seen">
+                    <Stage id={f.id} />
                   </div>
-
-                  <p className="numeric mt-2 text-xs text-oxygen-deep">{template.role}</p>
-                  <p className="mt-3 flex-1 text-sm leading-relaxed text-graphite">
-                    {template.summary}
-                  </p>
-
-                  <div className="mt-4 border-t border-rule pt-3">
-                    <p className="text-[0.6875rem] uppercase tracking-wide text-graphite-soft">
-                      {template.screens.length} screens
-                    </p>
-                    <p className="mt-1.5 text-xs leading-relaxed text-graphite">
-                      {template.screens.join(" · ")}
-                    </p>
-                  </div>
-
-                  <div className="mt-3 flex flex-wrap gap-1.5">
-                    {/* Linked only once the component exists in the catalog;
-                        until then the name is a plan, not a page. */}
-                    {template.uses.map((item) =>
-                      getComponent(item) ? (
-                        <Link
-                          key={item}
-                          href={`/components/${item}`}
-                          className="numeric rounded-md border border-rule px-1.5 py-0.5 text-[0.625rem] text-graphite transition-colors hover:border-oxygen/40 hover:text-oxygen-deep"
-                        >
-                          {item}
-                        </Link>
-                      ) : (
-                        <span
-                          key={item}
-                          className="numeric rounded-md border border-dashed border-rule px-1.5 py-0.5 text-[0.625rem] text-graphite-soft"
-                        >
-                          {item}
-                        </span>
-                      ),
-                    )}
+                  <div className="gBody">
+                    <h3>{f.title}</h3>
+                    <p>{f.body}</p>
+                    <p className="gWhere">{f.where}</p>
                   </div>
                 </article>
               ))}
@@ -179,182 +139,117 @@ export default function ProPage() {
           </div>
         </section>
 
-        {/* Pricing ------------------------------------------------------ */}
-        <section id="pricing" className="scroll-mt-16 border-b border-rule">
-          <div className="mx-auto max-w-6xl section-major px-5 sm:px-8">
-            <div className="max-w-3xl">
-              <p className="eyebrow text-graphite" data-reveal>
-                Pricing
-              </p>
-              <h2 className="display-lg mt-4 text-balance" data-reveal>
-                Free forever at the bottom. Real support at the top.
-              </h2>
+        {/* ------------------------------------------------ feature browser */}
+        <section className="border-b border-rule bg-paper-sunk/30">
+          <div className="mx-auto max-w-6xl section-minor px-5 sm:px-8">
+            <div className="mb-6 flex flex-wrap items-baseline justify-between gap-4">
+              <div>
+                <h2 className="display-sm text-balance" data-reveal>
+                  Everything in the console
+                </h2>
+                <p className="mt-2 text-sm text-graphite" data-reveal>
+                  One stage, switched by tab. Pick a feature and watch it happen.
+                </p>
+              </div>
+              <span className="chip" data-reveal>
+                {PRO_FEATURES.length} features
+              </span>
+            </div>
+            <div data-reveal>
+              <FeatureBrowser />
+            </div>
+          </div>
+        </section>
+
+        {/* ------------------------------------------------------- pricing */}
+        <section className="border-b border-rule" id="pricing">
+          <div className="mx-auto max-w-6xl section-minor px-5 sm:px-8">
+            <div className="mb-7 flex flex-wrap items-baseline justify-between gap-4">
+              <div className="max-w-2xl">
+                <h2 className="display-sm text-balance" data-reveal>
+                  What it costs
+                </h2>
+                <p className="mt-3 text-pretty leading-relaxed text-graphite" data-reveal>
+                  The console is free while it is in preview. The marketplace is the part that
+                  charges today — and the tier that used to sit in the middle is gone rather than
+                  quietly still on the page.
+                </p>
+              </div>
+              <span className="chip" data-reveal>
+                no card to start
+              </span>
             </div>
 
-            {/*
-              Four equal columns is the default answer and it flattens the
-              decision. Free and Enterprise are the two real ends of this
-              ladder — one is where everyone starts, one is where the revenue
-              is — so they anchor, and the paid middle sits between them at
-              standard weight, with the marketplace carried on border rather
-              than on scale. It is the only one of the four somebody can buy
-              from without talking to us, which is the whole reason it is
-              marked at all.
-            */}
-            <div className="mt-12 grid gap-4 md:grid-cols-2 lg:grid-cols-12">
-              {TIERS.map((tier, index) => {
-                const anchor = tier.name === "Core" || tier.name === "Enterprise";
-                return (
-                  <article
-                    key={tier.name}
-                    data-reveal
-                    style={{ "--reveal-delay": `${index * 70}ms` } as React.CSSProperties}
-                    className={cn(
-                      "flex flex-col rounded-2xl p-6 lg:col-span-3",
-                      tier.featured
-                        ? "surface-3 border-oxygen/45 ring-1 ring-oxygen/15"
-                        : anchor
-                          ? "surface-2"
-                          : "surface-1",
-                    )}
-                  >
-                    <div className="flex items-center justify-between gap-2">
-                      <h3 className="font-display text-lg font-semibold tracking-tight">
-                        {tier.name}
-                      </h3>
-                      {tier.featured && (
-                        <span className="rounded-full bg-oxygen/12 px-2 py-0.5 font-mono text-[0.625rem] uppercase tracking-wider text-oxygen-deep">
-                          Popular
-                        </span>
-                      )}
-                    </div>
-
-                    <p className="mt-5 flex items-baseline gap-1.5">
-                      <span className="numeric text-3xl font-semibold tracking-tight text-ink">
-                        {tier.price}
+            <div className="tiers">
+              {TIERS.map((tier, i) => (
+                <div
+                  key={tier.name}
+                  className="tier"
+                  data-reveal
+                  style={{ ["--enter-delay" as string]: `${i * 55}ms` }}
+                  {...(tier.featured ? { "data-featured": "" } : {})}
+                >
+                  <div className="tn">
+                    <b>{tier.name}</b>
+                    {tier.featured ? <span className="badge">buyable today</span> : null}
+                    {tier.href === "#waitlist" ? (
+                      <span className="badge" style={{ color: "var(--site-graphite-soft)" }}>
+                        waitlist
                       </span>
-                      {tier.cadence && (
-                        <span className="text-xs text-graphite-soft">{tier.cadence}</span>
-                      )}
-                    </p>
-
-                    <p className="body-sm mt-3 text-graphite">{tier.summary}</p>
-
-                    <div className="ticks my-5 opacity-60" aria-hidden="true" />
-
-                    <ul className="flex-1 space-y-2.5">
-                      {tier.features.map((feature) => (
-                        <li key={feature} className="flex items-start gap-2 text-sm text-graphite">
-                          <Check
-                            aria-hidden="true"
-                            className="mt-[3px] size-3.5 shrink-0 text-oxygen-deep"
-                          />
-                          {feature}
-                        </li>
-                      ))}
-                    </ul>
-
-                    {tier.note && (
-                      <p className="mt-4 text-xs leading-relaxed text-graphite-soft">{tier.note}</p>
-                    )}
-
-                    <a
-                      href={tier.href}
-                      className={cn(
-                        "mt-6 inline-flex items-center justify-center rounded-xl px-4 py-2.5 text-sm font-medium transition-all duration-300 ease-[var(--ease-out-expo)] hover:-translate-y-0.5",
-                        tier.featured
-                          ? "bg-cta text-paper hover:bg-cta-hover"
-                          : "border border-rule text-ink hover:border-oxygen/45",
-                      )}
-                    >
+                    ) : null}
+                  </div>
+                  <div className="pr">
+                    <span className="amt">{tier.price}</span>
+                    {tier.cadence ? <span className="cad">{tier.cadence}</span> : null}
+                  </div>
+                  <p className="sm">{tier.summary}</p>
+                  <ul>
+                    {tier.features.map((f) => (
+                      <li key={f}>{f}</li>
+                    ))}
+                  </ul>
+                  {tier.href.startsWith("/") ? (
+                    <Link href={tier.href} className="tcta">
+                      {tier.cta}
+                    </Link>
+                  ) : (
+                    <a href={tier.href} className="tcta">
                       {tier.cta}
                     </a>
-                  </article>
-                );
-              })}
-            </div>
-
-            <div
-              className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-2 rounded-2xl border border-rule bg-paper-sunk px-5 py-4 text-sm text-graphite"
-              data-reveal
-            >
-              <span className="inline-flex items-center gap-2 font-medium text-ink">
-                <Layers aria-hidden="true" className="size-4 text-oxygen-deep" />
-                Services
-              </span>
-              <span>
-                Component sprints, design-system setup, accessibility review, and template
-                customisation are quoted per engagement.
-              </span>
-              <a
-                href="mailto:hello@zowork.com?subject=Oxygen%20UI%20services"
-                className="font-medium text-oxygen-deep transition-colors hover:text-ink"
-              >
-                Start a conversation →
-              </a>
-            </div>
-          </div>
-        </section>
-
-        {/* Waitlist ----------------------------------------------------- */}
-        <section id="waitlist" className="scroll-mt-16 border-b border-rule bg-paper-sunk/40">
-          <div className="mx-auto max-w-6xl section-major px-5 sm:px-8">
-            <div className="instrument relative px-6 py-12 sm:px-12" data-reveal>
-              <div
-                className="pointer-events-none absolute inset-x-0 bottom-0 opacity-30"
-                aria-hidden="true"
-              >
-                <TelemetryTrace mode="normal" height={80} />
-              </div>
-              <div className="relative mx-auto max-w-2xl text-center">
-                <h2 className="display-lg text-balance text-panel-fg">
-                  Tell us which kit you need first.
-                </h2>
-                <p className="mt-5 text-pretty leading-relaxed text-panel-muted">
-                  We are building in the open and the order is not fixed. Email us the workflow you
-                  are stuck on — it genuinely moves the roadmap, and there is nothing to pay.
-                </p>
-                <a
-                  href="mailto:hello@zowork.com?subject=Oxygen%20UI%20waitlist"
-                  className="mt-8 inline-flex items-center gap-2 rounded-xl bg-trace px-5 py-3.5 text-sm font-medium text-[#04211c] transition-opacity duration-200 hover:opacity-90"
-                >
-                  Email us
-                  <ArrowRight aria-hidden="true" className="size-4" />
-                </a>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* FAQ ---------------------------------------------------------- */}
-        <section>
-          <div className="mx-auto max-w-6xl section-major px-5 sm:px-8">
-            <div className="max-w-3xl">
-              <p className="eyebrow text-graphite" data-reveal>
-                Questions
-              </p>
-              <h2 className="display-lg mt-4 text-balance" data-reveal>
-                The ones procurement actually asks.
-              </h2>
-            </div>
-
-            <div className="mt-10 max-w-3xl divide-y divide-rule border-y border-rule">
-              {FAQ.map((item) => (
-                <div key={item.q} data-reveal>
-                  <details className="group py-5">
-                    <summary className="flex cursor-pointer items-start justify-between gap-4 font-display text-base font-semibold tracking-tight">
-                      {item.q}
-                      <span
-                        aria-hidden="true"
-                        className="mt-1 shrink-0 text-graphite transition-transform duration-300 group-open:rotate-45"
-                      >
-                        +
-                      </span>
-                    </summary>
-                    <p className="mt-3 max-w-2xl text-sm leading-relaxed text-graphite">{item.a}</p>
-                  </details>
+                  )}
+                  {tier.note ? <p className="tnote">{tier.note}</p> : null}
                 </div>
               ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ------------------------------------------------------ the way in */}
+        <section>
+          <div className="mx-auto max-w-6xl section-minor px-5 sm:px-8">
+            <div className="authBand" data-reveal>
+              <div>
+                <h2>Create an organisation, or sign back in.</h2>
+                <p>
+                  Themes, members and purchases belong to an organisation rather than a person, so
+                  the first account creates one. Signing up puts you in a pending state until an
+                  administrator approves you — on a new organisation that is you, immediately.
+                </p>
+              </div>
+              <div className="authBtns">
+                <a
+                  href={signUpHref}
+                  className="inline-flex items-center gap-2 rounded-xl bg-cta px-5 py-3 text-sm font-medium text-paper transition-colors duration-200 hover:bg-cta-hover"
+                >
+                  Create an organisation
+                </a>
+                <a
+                  href={signInHref}
+                  className="inline-flex items-center gap-2 rounded-xl border border-rule-strong px-5 py-3 text-sm font-medium text-ink transition-colors duration-200 hover:bg-paper"
+                >
+                  Sign in
+                </a>
+              </div>
             </div>
           </div>
         </section>
