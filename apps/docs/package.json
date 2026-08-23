@@ -4,11 +4,12 @@
   "private": true,
   "description": "oxygenui.design \u2014 marketing site, component catalog, and registry host.",
   "scripts": {
-    "dev": "next dev --turbopack --port ${PORT:-6001}",
     "build": "next build",
+    "dev": "next dev --turbopack --port ${PORT:-6001}",
+    "lint": "next lint",
     "start": "next start --port 6001",
-    "typecheck": "tsc --noEmit",
-    "lint": "next lint"
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@oxygenui-design/clinical-note-core": "workspace:*",
@@ -33,10 +34,17 @@
   "devDependencies": {
     "@oxygenui-design/tsconfig": "workspace:*",
     "@tailwindcss/postcss": "^4.0.0",
+    "@testing-library/dom": "^10",
+    "@testing-library/jest-dom": "^7",
+    "@testing-library/react": "^16",
+    "@testing-library/user-event": "^14",
     "@types/node": "^22.10.2",
     "@types/react": "^19.0.2",
     "@types/react-dom": "^19.0.2",
+    "@vitejs/plugin-react": "^5",
+    "jsdom": "^30",
     "tailwindcss": "^4.0.0",
-    "typescript": "^5.7.2"
+    "typescript": "^5.7.2",
+    "vitest": "^4.1.10"
   }
 }

@@ -16,6 +16,7 @@
 
 import * as React from "react";
 import { ConfigProvider, Form, theme } from "antd";
+import { useSiteTheme } from "./use-site-theme";
 import {
   Signature,
   SignatureManifest,
@@ -98,36 +99,6 @@ const SIGNED_EXAMPLE: SignedValue = {
   documentHash: "sha256:9f4b…c210",
   provenance: { method: "type" },
 };
-
-/**
- * Follows the site's theme, and keeps following it.
- *
- * antd is themed by an algorithm passed in React, not by CSS that inherits, so
- * a demo that hardcodes `defaultAlgorithm` renders antd's light palette
- * whatever the page around it is doing. On the dark site that put near-black
- * body text on a near-black surface — the signed manifest, which is the one
- * scenario made almost entirely of text, was the worst of it.
- *
- * `false` on the server and on first paint, then corrected in an effect: the
- * class is written by a blocking script in `layout.tsx` before hydration, so
- * reading it during render would disagree with the server-rendered HTML.
- */
-function useSiteTheme(): boolean {
-  const [dark, setDark] = React.useState(false);
-
-  React.useEffect(() => {
-    const read = () => setDark(document.documentElement.classList.contains("dark"));
-    read();
-
-    // The site toggle mutates the class rather than firing an event, so the
-    // class itself is what gets watched.
-    const observer = new MutationObserver(read);
-    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
-    return () => observer.disconnect();
-  }, []);
-
-  return dark;
-}
 
 /** Signed by the patient, still waiting on the clinician who has to countersign. */
 const PENDING_EXAMPLE: SignatureValue = {
@@ -232,7 +203,7 @@ export function SignatureDemo() {
           type="button"
           onClick={() => setDark((d) => !d)}
           aria-pressed={dark}
-          className="rounded-md px-2 py-1 font-mono text-[0.625rem] uppercase tracking-wider text-panel-muted transition-colors hover:text-panel-fg"
+          className="inline-flex min-h-6 items-center rounded-md px-2 py-1 font-mono text-[0.625rem] uppercase tracking-wider text-panel-muted transition-colors hover:text-panel-fg"
         >
           {dark ? "Dark" : "Light"}
         </button>
