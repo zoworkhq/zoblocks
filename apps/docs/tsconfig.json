@@ -27,10 +27,14 @@
       "@/lib/oxygen-switch": ["../../registry/oxygen/lib/switch.tsx"],
       "@/lib/oxygen-accordion": ["../../registry/oxygen/lib/accordion-core.tsx"],
       "@/lib/oxygen-clinical-note": ["../../registry/oxygen/lib/clinical-note.tsx"],
+      "@/lib/oxygen-clinical-status": ["../../registry/oxygen/lib/clinical-status.ts"],
       "@/lib/timeline-core": ["../../registry/oxygen/lib/timeline-core.ts"],
       "@/lib/timeline-fhir": ["../../registry/oxygen/lib/timeline-fhir.ts"],
       "@/components/oxygen/clinical-note": [
         "../../registry/oxygen/clinical-note/clinical-note.tsx"
+      ],
+      "@/components/oxygen/clinical-status": [
+        "../../registry/oxygen/clinical-status/clinical-status.tsx"
       ],
       "@/components/oxygen/accordion": ["../../registry/oxygen/accordion/accordion.tsx"],
       "@/components/oxygen/care-timeline": [

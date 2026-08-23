@@ -80,8 +80,10 @@
   --ox-ref-green-600: #059669;
   --ox-ref-green-700: #047857;
   --ox-ref-violet-50: #f5f3ff;
+  --ox-ref-violet-200: #ddd6fe;
   --ox-ref-violet-300: #c4b5fd;
   --ox-ref-violet-600: #7c3aed;
+  --ox-ref-violet-700: #6d28d9;
   --ox-ref-violet-950: #1c1533;
   --ox-ref-ink-100: #edf2f7;
   --ox-ref-ink-200: #a5b1be;
@@ -108,6 +110,10 @@
   --ox-ref-tint-unknown-border: #253338;
   --ox-ref-tint-accent-bg: #0f2a25;
   --ox-ref-tint-accent-border: #1b4a42;
+  --ox-ref-tint-restricted-bg: #1c1533;
+  --ox-ref-tint-restricted-border: #3c2d68;
+  --ox-ref-tint-provisional-bg: #0a1f24;
+  --ox-ref-tint-provisional-border: #14454f;
   --ox-ref-hc-critical: #8a0000;
   --ox-ref-hc-high: #6b3000;
   --ox-ref-hc-low: #003a8c;
@@ -117,8 +123,11 @@
   --ox-ref-hc-accent: #005141;
   --ox-ref-hc-accent-hover: #00332a;
   --ox-ref-hc-text-muted: #1f1f1f;
+  --ox-ref-hc-provisional: #0b4a58;
+  --ox-ref-cyan-50: #ecfeff;
   --ox-ref-cyan-200: #a5f3fc;
   --ox-ref-cyan-300: #67e8f9;
+  --ox-ref-cyan-700: #0e7490;
   --ox-ref-swatch-teal-fg: #115e59;
   --ox-ref-swatch-teal-bg: #f0fdfa;
   --ox-ref-swatch-teal-border: #99f6e4;
@@ -242,6 +251,12 @@
   --ox-status-unknown: var(--ox-ref-slate-500);
   --ox-status-unknown-bg: var(--ox-ref-slate-50);
   --ox-status-unknown-border: var(--ox-ref-slate-200);
+  --ox-status-restricted: var(--ox-ref-violet-700);
+  --ox-status-restricted-bg: var(--ox-ref-violet-50);
+  --ox-status-restricted-border: var(--ox-ref-violet-200);
+  --ox-status-provisional: var(--ox-ref-cyan-700);
+  --ox-status-provisional-bg: var(--ox-ref-cyan-50);
+  --ox-status-provisional-border: var(--ox-ref-cyan-200);
   --ox-flag-restricted: var(--ox-ref-violet-600);
   --ox-flag-restricted-bg: var(--ox-ref-violet-50);
   --ox-flag-provisional: var(--ox-ref-amber-700);
@@ -456,6 +471,10 @@
   --ox-nav-border-current: var(--ox-accent);
   --ox-nav-bg-hover: var(--ox-bg-muted);
   --ox-nav-radius: var(--ox-radius);
+  --ox-cs-height-default: 1.625rem;
+  --ox-cs-height-compact: 1.375rem;
+  --ox-cs-glyph: 0.5rem;
+  --ox-cs-glyph-compact: 0.4375rem;
 }
 
   /* Brand — northwind ---------------------------------------------------
@@ -590,6 +609,12 @@
   --ox-status-unknown: var(--ox-ref-slate-400);
   --ox-status-unknown-bg: var(--ox-ref-tint-unknown-bg);
   --ox-status-unknown-border: var(--ox-ref-tint-unknown-border);
+  --ox-status-restricted: var(--ox-ref-violet-300);
+  --ox-status-restricted-bg: var(--ox-ref-tint-restricted-bg);
+  --ox-status-restricted-border: var(--ox-ref-tint-restricted-border);
+  --ox-status-provisional: var(--ox-ref-cyan-300);
+  --ox-status-provisional-bg: var(--ox-ref-tint-provisional-bg);
+  --ox-status-provisional-border: var(--ox-ref-tint-provisional-border);
   --ox-flag-restricted: var(--ox-ref-violet-300);
   --ox-flag-restricted-bg: var(--ox-ref-violet-950);
   --ox-flag-provisional: var(--ox-ref-amber-400);
@@ -656,6 +681,12 @@
   --ox-status-unknown: var(--ox-ref-hc-unknown);
   --ox-status-unknown-bg: var(--ox-ref-white);
   --ox-status-unknown-border: var(--ox-ref-hc-unknown);
+  --ox-status-restricted: var(--ox-ref-hc-restricted);
+  --ox-status-restricted-bg: var(--ox-ref-white);
+  --ox-status-restricted-border: var(--ox-ref-hc-restricted);
+  --ox-status-provisional: var(--ox-ref-hc-provisional);
+  --ox-status-provisional-bg: var(--ox-ref-white);
+  --ox-status-provisional-border: var(--ox-ref-hc-provisional);
   --ox-flag-restricted: var(--ox-ref-hc-restricted);
   --ox-flag-restricted-bg: var(--ox-ref-white);
   --ox-flag-provisional: var(--ox-ref-hc-high);

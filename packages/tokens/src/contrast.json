@@ -36,6 +36,20 @@
   },
   {
     "theme": "light",
+    "token": "status.restricted",
+    "against": "status.restricted-bg",
+    "ratio": 6.48,
+    "floor": 4.5
+  },
+  {
+    "theme": "light",
+    "token": "status.provisional",
+    "against": "status.provisional-bg",
+    "ratio": 5.15,
+    "floor": 4.5
+  },
+  {
+    "theme": "light",
     "token": "text",
     "against": "bg",
     "ratio": 17.85,
@@ -218,6 +232,20 @@
   },
   {
     "theme": "dark",
+    "token": "status.restricted",
+    "against": "status.restricted-bg",
+    "ratio": 9.44,
+    "floor": 4.5
+  },
+  {
+    "theme": "dark",
+    "token": "status.provisional",
+    "against": "status.provisional-bg",
+    "ratio": 11.74,
+    "floor": 4.5
+  },
+  {
+    "theme": "dark",
     "token": "text",
     "against": "bg",
     "ratio": 17.28,
@@ -396,6 +424,20 @@
     "token": "status.unknown",
     "against": "status.unknown-bg",
     "ratio": 12.63,
+    "floor": 7
+  },
+  {
+    "theme": "high-contrast",
+    "token": "status.restricted",
+    "against": "status.restricted-bg",
+    "ratio": 10.95,
+    "floor": 7
+  },
+  {
+    "theme": "high-contrast",
+    "token": "status.provisional",
+    "against": "status.provisional-bg",
+    "ratio": 9.84,
     "floor": 7
   },
   {

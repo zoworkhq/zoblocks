@@ -1,98 +1,233 @@
 {
   "$description": "Semantic tier, high-contrast theme.\n\nTargets 7:1 rather than the 4.5:1 the default theme clears, and does it by removing tint rather than deepening it. Every status surface is plain white with a border in the status colour — a pale wash behind dark text is the first thing to disappear for a low-vision reader, so this theme spends its contrast budget on the text and the border instead.\n\nThis is a value set over the same key space, not a parallel stylesheet. That is the whole reason the tier exists: high-contrast support is data, not a fork.",
-
-  "bg": { "$type": "color", "$value": "{ref.white}" },
-  "bg-subtle": { "$type": "color", "$value": "{ref.white}" },
-  "bg-muted": { "$type": "color", "$value": "{ref.slate.100}" },
-
-  "surface": { "$type": "color", "$value": "{ref.white}" },
-  "surface-raised": { "$type": "color", "$value": "{ref.white}" },
-  "surface-overlay": { "$type": "color", "$value": "{ref.white}" },
-
+  "bg": {
+    "$type": "color",
+    "$value": "{ref.white}"
+  },
+  "bg-subtle": {
+    "$type": "color",
+    "$value": "{ref.white}"
+  },
+  "bg-muted": {
+    "$type": "color",
+    "$value": "{ref.slate.100}"
+  },
+  "surface": {
+    "$type": "color",
+    "$value": "{ref.white}"
+  },
+  "surface-raised": {
+    "$type": "color",
+    "$value": "{ref.white}"
+  },
+  "surface-overlay": {
+    "$type": "color",
+    "$value": "{ref.white}"
+  },
   "border": {
     "$type": "color",
     "$value": "{ref.black}",
     "$description": "A 1px hairline in slate-200 is invisible to the reader this theme exists for. Structure has to be drawn, not implied."
   },
-  "border-strong": { "$type": "color", "$value": "{ref.black}" },
-
-  "text": { "$type": "color", "$value": "{ref.black}" },
+  "border-strong": {
+    "$type": "color",
+    "$value": "{ref.black}"
+  },
+  "text": {
+    "$type": "color",
+    "$value": "{ref.black}"
+  },
   "text-muted": {
     "$type": "color",
     "$value": "{ref.hc.text-muted}",
     "$description": "Muted here means one step down from black, not grey. De-emphasis that costs legibility is not de-emphasis, it is a second class of content the reader cannot reach."
   },
-  "text-subtle": { "$type": "color", "$value": "{ref.hc.text-muted}" },
-  "text-on-accent": { "$type": "color", "$value": "{ref.white}" },
-
-  "accent": { "$type": "color", "$value": "{ref.hc.accent}" },
-  "accent-hover": { "$type": "color", "$value": "{ref.hc.accent-hover}" },
-  "accent-subtle": { "$type": "color", "$value": "{ref.white}" },
-  "accent-border": { "$type": "color", "$value": "{ref.hc.accent}" },
-
-  "focus-ring": { "$type": "color", "$value": "{ref.black}" },
-  "focus-ring-offset": { "$type": "color", "$value": "{ref.white}" },
-
+  "text-subtle": {
+    "$type": "color",
+    "$value": "{ref.hc.text-muted}"
+  },
+  "text-on-accent": {
+    "$type": "color",
+    "$value": "{ref.white}"
+  },
+  "accent": {
+    "$type": "color",
+    "$value": "{ref.hc.accent}"
+  },
+  "accent-hover": {
+    "$type": "color",
+    "$value": "{ref.hc.accent-hover}"
+  },
+  "accent-subtle": {
+    "$type": "color",
+    "$value": "{ref.white}"
+  },
+  "accent-border": {
+    "$type": "color",
+    "$value": "{ref.hc.accent}"
+  },
+  "focus-ring": {
+    "$type": "color",
+    "$value": "{ref.black}"
+  },
+  "focus-ring-offset": {
+    "$type": "color",
+    "$value": "{ref.white}"
+  },
   "status": {
     "$type": "color",
-    "critical": { "$value": "{ref.hc.critical}" },
-    "critical-bg": { "$value": "{ref.white}" },
-    "critical-border": { "$value": "{ref.hc.critical}" },
-
-    "high": { "$value": "{ref.hc.high}" },
-    "high-bg": { "$value": "{ref.white}" },
-    "high-border": { "$value": "{ref.hc.high}" },
-
-    "low": { "$value": "{ref.hc.low}" },
-    "low-bg": { "$value": "{ref.white}" },
-    "low-border": { "$value": "{ref.hc.low}" },
-
-    "normal": { "$value": "{ref.hc.normal}" },
-    "normal-bg": { "$value": "{ref.white}" },
-    "normal-border": { "$value": "{ref.hc.normal}" },
-
-    "unknown": { "$value": "{ref.hc.unknown}" },
-    "unknown-bg": { "$value": "{ref.white}" },
-    "unknown-border": { "$value": "{ref.hc.unknown}" }
+    "critical": {
+      "$value": "{ref.hc.critical}"
+    },
+    "critical-bg": {
+      "$value": "{ref.white}"
+    },
+    "critical-border": {
+      "$value": "{ref.hc.critical}"
+    },
+    "high": {
+      "$value": "{ref.hc.high}"
+    },
+    "high-bg": {
+      "$value": "{ref.white}"
+    },
+    "high-border": {
+      "$value": "{ref.hc.high}"
+    },
+    "low": {
+      "$value": "{ref.hc.low}"
+    },
+    "low-bg": {
+      "$value": "{ref.white}"
+    },
+    "low-border": {
+      "$value": "{ref.hc.low}"
+    },
+    "normal": {
+      "$value": "{ref.hc.normal}"
+    },
+    "normal-bg": {
+      "$value": "{ref.white}"
+    },
+    "normal-border": {
+      "$value": "{ref.hc.normal}"
+    },
+    "unknown": {
+      "$value": "{ref.hc.unknown}"
+    },
+    "unknown-bg": {
+      "$value": "{ref.white}"
+    },
+    "unknown-border": {
+      "$value": "{ref.hc.unknown}"
+    },
+    "restricted": {
+      "$value": "{ref.hc.restricted}"
+    },
+    "restricted-bg": {
+      "$value": "{ref.white}"
+    },
+    "restricted-border": {
+      "$value": "{ref.hc.restricted}"
+    },
+    "provisional": {
+      "$value": "{ref.hc.provisional}"
+    },
+    "provisional-bg": {
+      "$value": "{ref.white}"
+    },
+    "provisional-border": {
+      "$value": "{ref.hc.provisional}"
+    }
   },
-
   "flag": {
     "$type": "color",
-    "restricted": { "$value": "{ref.hc.restricted}" },
-    "restricted-bg": { "$value": "{ref.white}" },
-    "provisional": { "$value": "{ref.hc.high}" },
-    "deceased": { "$value": "{ref.black}" }
+    "restricted": {
+      "$value": "{ref.hc.restricted}"
+    },
+    "restricted-bg": {
+      "$value": "{ref.white}"
+    },
+    "provisional": {
+      "$value": "{ref.hc.high}"
+    },
+    "deceased": {
+      "$value": "{ref.black}"
+    }
   },
-
   "swatch": {
     "$description": "Decoration is the first thing to give up its contrast budget. In this theme every swatch collapses to the same near-black on white — an avatar tint is not information, and six pale hues competing with the text is a cost with no return.",
     "$type": "color",
-    "1": { "$value": "{ref.hc.text-muted}" },
-    "1-bg": { "$value": "{ref.white}" },
-    "1-border": { "$value": "{ref.black}" },
-    "2": { "$value": "{ref.hc.text-muted}" },
-    "2-bg": { "$value": "{ref.white}" },
-    "2-border": { "$value": "{ref.black}" },
-    "3": { "$value": "{ref.hc.text-muted}" },
-    "3-bg": { "$value": "{ref.white}" },
-    "3-border": { "$value": "{ref.black}" },
-    "4": { "$value": "{ref.hc.text-muted}" },
-    "4-bg": { "$value": "{ref.white}" },
-    "4-border": { "$value": "{ref.black}" },
-    "5": { "$value": "{ref.hc.text-muted}" },
-    "5-bg": { "$value": "{ref.white}" },
-    "5-border": { "$value": "{ref.black}" },
-    "6": { "$value": "{ref.hc.text-muted}" },
-    "6-bg": { "$value": "{ref.white}" },
-    "6-border": { "$value": "{ref.black}" }
+    "1": {
+      "$value": "{ref.hc.text-muted}"
+    },
+    "1-bg": {
+      "$value": "{ref.white}"
+    },
+    "1-border": {
+      "$value": "{ref.black}"
+    },
+    "2": {
+      "$value": "{ref.hc.text-muted}"
+    },
+    "2-bg": {
+      "$value": "{ref.white}"
+    },
+    "2-border": {
+      "$value": "{ref.black}"
+    },
+    "3": {
+      "$value": "{ref.hc.text-muted}"
+    },
+    "3-bg": {
+      "$value": "{ref.white}"
+    },
+    "3-border": {
+      "$value": "{ref.black}"
+    },
+    "4": {
+      "$value": "{ref.hc.text-muted}"
+    },
+    "4-bg": {
+      "$value": "{ref.white}"
+    },
+    "4-border": {
+      "$value": "{ref.black}"
+    },
+    "5": {
+      "$value": "{ref.hc.text-muted}"
+    },
+    "5-bg": {
+      "$value": "{ref.white}"
+    },
+    "5-border": {
+      "$value": "{ref.black}"
+    },
+    "6": {
+      "$value": "{ref.hc.text-muted}"
+    },
+    "6-bg": {
+      "$value": "{ref.white}"
+    },
+    "6-border": {
+      "$value": "{ref.black}"
+    }
   },
-
   "shadow-sm": {
     "$type": "shadow",
     "$value": "none",
     "$description": "Elevation is carried by the border in this theme. A shadow that is too faint to see is a separation cue that is not there."
   },
-  "shadow": { "$type": "shadow", "$value": "none" },
-  "shadow-md": { "$type": "shadow", "$value": "none" },
-  "shadow-lg": { "$type": "shadow", "$value": "none" }
+  "shadow": {
+    "$type": "shadow",
+    "$value": "none"
+  },
+  "shadow-md": {
+    "$type": "shadow",
+    "$value": "none"
+  },
+  "shadow-lg": {
+    "$type": "shadow",
+    "$value": "none"
+  }
 }

@@ -66,6 +66,12 @@
   --color-ox-status-unknown: var(--ox-status-unknown);
   --color-ox-status-unknown-bg: var(--ox-status-unknown-bg);
   --color-ox-status-unknown-border: var(--ox-status-unknown-border);
+  --color-ox-status-restricted: var(--ox-status-restricted);
+  --color-ox-status-restricted-bg: var(--ox-status-restricted-bg);
+  --color-ox-status-restricted-border: var(--ox-status-restricted-border);
+  --color-ox-status-provisional: var(--ox-status-provisional);
+  --color-ox-status-provisional-bg: var(--ox-status-provisional-bg);
+  --color-ox-status-provisional-border: var(--ox-status-provisional-border);
   --color-ox-flag-restricted: var(--ox-flag-restricted);
   --color-ox-flag-restricted-bg: var(--ox-flag-restricted-bg);
   --color-ox-flag-provisional: var(--ox-flag-provisional);
@@ -253,4 +259,8 @@
   --color-ox-nav-border-current: var(--ox-nav-border-current);
   --color-ox-nav-bg-hover: var(--ox-nav-bg-hover);
   --spacing-ox-nav-radius: var(--ox-nav-radius);
+  --spacing-ox-cs-height-default: var(--ox-cs-height-default);
+  --spacing-ox-cs-height-compact: var(--ox-cs-height-compact);
+  --spacing-ox-cs-glyph: var(--ox-cs-glyph);
+  --spacing-ox-cs-glyph-compact: var(--ox-cs-glyph-compact);
 }

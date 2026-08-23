@@ -34,6 +34,14 @@
    so the distinction survives greyscale, forced colours and print. */
 @import "../../../../registry/oxygen/lib/clinical-note.css";
 
+/* The closed status vocabulary: seven tones and eleven CSS-drawn glyphs.
+   Shipped as styles/oxygen-clinical-status.css by the `clinical-status-core`
+   registry item. Imported here so the previews render the file a customer
+   installs — which matters more than usual for this one, since the whole
+   claim is about what survives when the palette is stripped, and a copy could
+   drift from the shipped rules without anyone seeing it. */
+@import "../../../../registry/oxygen/lib/clinical-status.css";
+
 /* The rail, the coverage footer and the two-column register split. Shipped as
    styles/oxygen-timeline.css by the `timeline-core` registry item, carrying
    Timeline and CareTimeline between them.

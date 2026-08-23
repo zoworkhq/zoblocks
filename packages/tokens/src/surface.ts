@@ -13,7 +13,7 @@
  * change, because customers style against these names. The manifest is
  * committed so that change shows up as a reviewable diff.
  *
- * 282 tokens across 19 components:
+ * 290 tokens across 20 components:
  *
  *   switch          55
  *   tabs            44
@@ -26,6 +26,7 @@
  *   copilot         10
  *   loader          10
  *   timeline         9
+ *   cs               8
  *   nav              8
  *   range            6
  *   surface-card     6
@@ -35,7 +36,7 @@
  *   care-timeline    2
  *   patient-chip     1
  *
- * `bridgeable: false` (83 tokens) marks the ones resolving to clinical
+ * `bridgeable: false` (86 tokens) marks the ones resolving to clinical
  * status or an identity flag. A host framework's `colorError` is not our
  * `status.critical`: ours carries a validated contrast floor and a 60° hue
  * separation from `status.low`, so the direction of an abnormal result
@@ -1377,6 +1378,82 @@ export const TOKEN_SURFACE: readonly SurfaceEntry[] = [
     ],
     "fallback": true,
     "bridgeable": false
+  },
+  {
+    "name": "--ox-cs-bg",
+    "component": "cs",
+    "source": "packages/react/src/styles.css",
+    "kind": "color",
+    "semantic": "--ox-status-unknown-bg",
+    "frameworks": [],
+    "fallback": true,
+    "bridgeable": false
+  },
+  {
+    "name": "--ox-cs-border",
+    "component": "cs",
+    "source": "packages/react/src/styles.css",
+    "kind": "color",
+    "semantic": "--ox-status-unknown-border",
+    "frameworks": [],
+    "fallback": true,
+    "bridgeable": false
+  },
+  {
+    "name": "--ox-cs-fg",
+    "component": "cs",
+    "source": "packages/react/src/styles.css",
+    "kind": "color",
+    "semantic": "--ox-status-unknown",
+    "frameworks": [],
+    "fallback": true,
+    "bridgeable": false
+  },
+  {
+    "name": "--ox-cs-glyph",
+    "component": "cs",
+    "source": "packages/tokens/tokens/component.json",
+    "kind": "dimension",
+    "frameworks": [],
+    "fallback": true,
+    "bridgeable": true
+  },
+  {
+    "name": "--ox-cs-glyph-compact",
+    "component": "cs",
+    "source": "packages/tokens/tokens/component.json",
+    "kind": "dimension",
+    "frameworks": [],
+    "fallback": true,
+    "bridgeable": true
+  },
+  {
+    "name": "--ox-cs-height",
+    "component": "cs",
+    "source": "packages/react/src/styles.css",
+    "kind": "dimension",
+    "semantic": "--ox-cs-height-default",
+    "frameworks": [],
+    "fallback": true,
+    "bridgeable": true
+  },
+  {
+    "name": "--ox-cs-height-compact",
+    "component": "cs",
+    "source": "packages/tokens/tokens/component.json",
+    "kind": "dimension",
+    "frameworks": [],
+    "fallback": true,
+    "bridgeable": true
+  },
+  {
+    "name": "--ox-cs-height-default",
+    "component": "cs",
+    "source": "packages/tokens/tokens/component.json",
+    "kind": "dimension",
+    "frameworks": [],
+    "fallback": true,
+    "bridgeable": true
   },
   {
     "name": "--ox-field-bg",
@@ -2968,6 +3045,7 @@ export const SURFACE_COMPONENTS: readonly string[] = [
   "care-timeline",
   "chart",
   "copilot",
+  "cs",
   "field",
   "loader",
   "nav",
@@ -3055,6 +3133,11 @@ export const BRIDGEABLE: readonly string[] = [
   "--ox-copilot-rule",
   "--ox-copilot-shadow",
   "--ox-copilot-surface",
+  "--ox-cs-glyph",
+  "--ox-cs-glyph-compact",
+  "--ox-cs-height",
+  "--ox-cs-height-compact",
+  "--ox-cs-height-default",
   "--ox-field-bg",
   "--ox-field-border",
   "--ox-field-border-focus",
@@ -3241,6 +3324,9 @@ export const NOT_BRIDGEABLE: readonly string[] = [
   "--ox-copilot-bad",
   "--ox-copilot-ok",
   "--ox-copilot-warn",
+  "--ox-cs-bg",
+  "--ox-cs-border",
+  "--ox-cs-fg",
   "--ox-field-border-invalid",
   "--ox-field-error-fg",
   "--ox-range-band",
@@ -3299,6 +3385,12 @@ export const CLINICAL_SEMANTIC: readonly string[] = [
   "--ox-status-normal",
   "--ox-status-normal-bg",
   "--ox-status-normal-border",
+  "--ox-status-provisional",
+  "--ox-status-provisional-bg",
+  "--ox-status-provisional-border",
+  "--ox-status-restricted",
+  "--ox-status-restricted-bg",
+  "--ox-status-restricted-border",
   "--ox-status-unknown",
   "--ox-status-unknown-bg",
   "--ox-status-unknown-border"

@@ -30,6 +30,11 @@ Rules that matter when generating code with these components:
   install: npx @oxygenui-design/cli add breath-loader
   states: Indeterminate, Delayed (not yet shown), Slow wait, Reduced motion, With a brand mark in the core
   status: beta
+- [Clinical Status](https://oxygenui.design/components/clinical-status): One closed status vocabulary: nine scales whose every step carries a hue, a CSS shape and a word, emitted together or not at all.
+  install: npx @oxygenui-design/cli add clinical-status
+  fhir: Observation, AllergyIntolerance, Consent
+  states: Critical — the panic value, High — outside the range, not dangerous, Normal, Not assessed — absence as a fact, Preliminary — in flight, Corrected — the value changed, Entered in error, Restricted — present, gated, explained, Part 2 segmented, Break-glass open, Stale — true once, Self-reported, AI draft, awaiting a clinician, Disengaged — behavioral health, Dot, in a status column, Grid affix, at forty rows, Compact density, Explainable — the chip is a button
+  status: stable
 - [Helix Loader](https://oxygenui.design/components/helix-loader): Two strands of dots turning on a slow sine. For the parts of a product that are laboratory rather than bedside.
   install: npx @oxygenui-design/cli add helix-loader
   states: Indeterminate, Delayed (not yet shown), Slow wait, Reduced motion

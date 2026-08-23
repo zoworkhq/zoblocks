@@ -50,6 +50,7 @@ import { Tabs } from "@oxygenui-design/tabs";
 import { Copilot } from "@/registry/oxygen/copilot/copilot";
 import { createStaticProvider, lookUp, minimalDisclosure } from "@oxygenui-design/copilot-core";
 import { SignatureMark } from "@/components/site/signature-mark";
+import { ClinicalStatus } from "@/registry/oxygen/clinical-status/clinical-status";
 import { IdentityProvider, PatientChip, IdentitySet } from "@oxygenui-design/identity";
 import { STATUS_LABEL, type ComponentDoc } from "@/lib/catalog";
 import { cn } from "@/lib/utils";
@@ -237,6 +238,52 @@ const PREVIEW: Record<string, (featured: boolean) => React.ReactNode> = {
   // does not carry. This draws the same geometry from the same engine — see
   // signature-mark.tsx.
   signature: (featured) => <SignatureMark size={featured ? 120 : 96} />,
+
+  /*
+   * Six chips from six different scales, at card scale.
+   *
+   * Not one scale's five steps: the card has to say "this is a vocabulary",
+   * and a single scale reads as a severity badge — which is the component
+   * every other library already ships.
+   */
+  "clinical-status": (featured) => (
+    <div
+      style={{
+        display: "flex",
+        flexWrap: "wrap",
+        justifyContent: "center",
+        gap: featured ? 8 : 6,
+        maxInlineSize: featured ? 300 : 232,
+      }}
+    >
+      <ClinicalStatus
+        scale="criticality"
+        step="critical"
+        density={featured ? "default" : "compact"}
+      />
+      <ClinicalStatus
+        scale="result-status"
+        step="preliminary"
+        density={featured ? "default" : "compact"}
+      />
+      <ClinicalStatus scale="access" step="part-2" density={featured ? "default" : "compact"} />
+      <ClinicalStatus
+        scale="criticality"
+        step="not-assessed"
+        density={featured ? "default" : "compact"}
+      />
+      <ClinicalStatus
+        scale="data-quality"
+        step="stale"
+        density={featured ? "default" : "compact"}
+      />
+      <ClinicalStatus
+        scale="engagement"
+        step="engaged"
+        density={featured ? "default" : "compact"}
+      />
+    </div>
+  ),
 
   /*
    * The composite components, at card scale.

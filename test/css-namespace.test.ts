@@ -43,6 +43,7 @@ const SHEETS: ReadonlyArray<{ owner: string; file: string }> = [
   { owner: "react/switch", file: "packages/react/src/styles/switch.css" },
   { owner: "react/accordion", file: "packages/react/src/styles/accordion.css" },
   { owner: "react/clinical-note", file: "packages/react/src/styles/clinical-note.css" },
+  { owner: "react/clinical-status", file: "packages/react/src/styles/clinical-status.css" },
   { owner: "react/timeline", file: "packages/react/src/styles/timeline.css" },
 ];
 

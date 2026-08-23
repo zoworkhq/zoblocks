@@ -27,6 +27,9 @@
       "@/components/oxygen/clinical-note": [
         "../../registry/oxygen/clinical-note/clinical-note.tsx"
       ],
+      "@/components/oxygen/clinical-status": [
+        "../../registry/oxygen/clinical-status/clinical-status.tsx"
+      ],
       "@/components/oxygen/copilot": [
         "../../registry/oxygen/copilot/copilot.tsx"
       ],
@@ -56,6 +59,9 @@
       ],
       "@/lib/oxygen-clinical-note": [
         "../../registry/oxygen/lib/clinical-note.tsx"
+      ],
+      "@/lib/oxygen-clinical-status": [
+        "../../registry/oxygen/lib/clinical-status.ts"
       ],
       "@/lib/oxygen-loader": [
         "../../registry/oxygen/lib/loader.tsx"

@@ -16,6 +16,7 @@ export * from "./components/accordion/accordion";
 export * from "./components/breath-loader/breath-loader";
 export * from "./components/care-timeline/care-timeline";
 export * from "./components/chart-accordion/chart-accordion";
+export * from "./components/clinical-status/clinical-status";
 export * from "./components/copilot/copilot";
 export * from "./components/helix-loader/helix-loader";
 export * from "./components/infusion-loader/infusion-loader";

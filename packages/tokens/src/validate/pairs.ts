@@ -10,7 +10,19 @@
 import type { Theme } from "./model";
 
 /** Status pairs whose contrast is load-bearing, checked in every theme. */
-export const STATUS_PAIRS = ["critical", "high", "low", "normal", "unknown"] as const;
+export const STATUS_PAIRS = [
+  "critical",
+  "high",
+  "low",
+  "normal",
+  "unknown",
+  // The two the nine clinical-status scales need. `restricted` backs the access
+  // scale and `provisional` backs everything not yet final — preliminary
+  // results, unverified data, AI drafts. Both are chip text on a chip ground,
+  // so both are load-bearing at 4.5:1 exactly like the other five.
+  "restricted",
+  "provisional",
+] as const;
 export type StatusName = (typeof STATUS_PAIRS)[number];
 
 /**

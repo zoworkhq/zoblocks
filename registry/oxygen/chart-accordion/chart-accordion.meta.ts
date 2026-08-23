@@ -65,7 +65,7 @@ export default defineComponentMeta({
     "Expand all opens gated sections to their gate, not to their content — one press cannot consent on the reader's behalf.",
     "Sections are rendered in the order given. It does not sort by severity, because a record's order is usually clinical rather than alphabetical.",
   ],
-  related: ["accordion", "safety-plan", "care-timeline", "tabs", "timeline"],
+  related: ["accordion", "safety-plan", "care-timeline", "tabs", "timeline", "clinical-status"],
 
   dependencies: ["clsx", "tailwind-merge"],
   registryDependencies: ["utils", "tokens", "accordion-core", "accordion"],

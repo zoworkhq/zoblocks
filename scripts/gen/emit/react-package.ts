@@ -126,6 +126,7 @@ export async function emitReactPackage(
     ["lib/accordion.css", "styles/accordion.css"],
     ["lib/switch.css", "styles/switch.css"],
     ["lib/clinical-note.css", "styles/clinical-note.css"],
+    ["lib/clinical-status.css", "styles/clinical-status.css"],
     ["lib/timeline.css", "styles/timeline.css"],
   ] as const) {
     const css = await readFile(path.join(COMPONENTS_DIR, file), "utf8");

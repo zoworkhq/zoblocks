@@ -1,91 +1,232 @@
 {
   "$description": "Semantic tier, dark theme.\n\nStatus colours are re-tuned rather than reused. The light-mode values do not hold contrast on a dark surface, and critical must stay unmistakable — so each hue moves to a lighter step and each surface tint moves to the ink-composited version. Same key space as light; the build fails if a key is missing.",
-
-  "bg": { "$type": "color", "$value": "{ref.ink.950}" },
-  "bg-subtle": { "$type": "color", "$value": "{ref.ink.900}" },
-  "bg-muted": { "$type": "color", "$value": "{ref.ink.820}" },
-
-  "surface": { "$type": "color", "$value": "{ref.ink.860}" },
-  "surface-raised": { "$type": "color", "$value": "{ref.ink.780}" },
+  "bg": {
+    "$type": "color",
+    "$value": "{ref.ink.950}"
+  },
+  "bg-subtle": {
+    "$type": "color",
+    "$value": "{ref.ink.900}"
+  },
+  "bg-muted": {
+    "$type": "color",
+    "$value": "{ref.ink.820}"
+  },
+  "surface": {
+    "$type": "color",
+    "$value": "{ref.ink.860}"
+  },
+  "surface-raised": {
+    "$type": "color",
+    "$value": "{ref.ink.780}"
+  },
   "surface-overlay": {
     "$type": "color",
     "$value": "{ref.ink.740}",
     "$description": "Was #1d263000 in the hand-written file — an eight-digit hex with a zero alpha, which made every overlay surface fully transparent. Popovers and dialogs rendered with the page showing through. Fixed here at the source."
   },
-
-  "border": { "$type": "color", "$value": "{ref.ink.700}" },
+  "border": {
+    "$type": "color",
+    "$value": "{ref.ink.700}"
+  },
   "$comment-border-strong": "ink.600 measured 2.02:1 on the dark ground, below the 3:1 floor for a field border. ink.500 is 3.21:1.",
-  "border-strong": { "$type": "color", "$value": "{ref.ink.500}" },
-
-  "text": { "$type": "color", "$value": "{ref.ink.100}" },
-  "text-muted": { "$type": "color", "$value": "{ref.ink.200}" },
-  "text-subtle": { "$type": "color", "$value": "{ref.ink.300}" },
-  "text-on-accent": { "$type": "color", "$value": "{ref.ink.on-accent}" },
-
+  "border-strong": {
+    "$type": "color",
+    "$value": "{ref.ink.500}"
+  },
+  "text": {
+    "$type": "color",
+    "$value": "{ref.ink.100}"
+  },
+  "text-muted": {
+    "$type": "color",
+    "$value": "{ref.ink.200}"
+  },
+  "text-subtle": {
+    "$type": "color",
+    "$value": "{ref.ink.300}"
+  },
+  "text-on-accent": {
+    "$type": "color",
+    "$value": "{ref.ink.on-accent}"
+  },
   "$comment-accent": "brand.300, not cyan.300. The dark tier used to reach for a hue the brand does not contain, so the same product was teal-green in light and cyan in dark — a difference nobody chose and everybody saw. brand.300 measures 12.74:1 for text-on-accent and 12.91:1 on bg, against cyan.300's 13.25 and 13.42: the same step of a different ramp, and the floors are untouched.",
-  "accent": { "$type": "color", "$value": "{ref.brand.300}" },
-  "accent-hover": { "$type": "color", "$value": "{ref.brand.200}" },
-  "accent-subtle": { "$type": "color", "$value": "{ref.tint.accent.bg}" },
-  "accent-border": { "$type": "color", "$value": "{ref.tint.accent.border}" },
-
-  "focus-ring": { "$type": "color", "$value": "{ref.brand.300}" },
-  "focus-ring-offset": { "$type": "color", "$value": "{ref.ink.950}" },
-
+  "accent": {
+    "$type": "color",
+    "$value": "{ref.brand.300}"
+  },
+  "accent-hover": {
+    "$type": "color",
+    "$value": "{ref.brand.200}"
+  },
+  "accent-subtle": {
+    "$type": "color",
+    "$value": "{ref.tint.accent.bg}"
+  },
+  "accent-border": {
+    "$type": "color",
+    "$value": "{ref.tint.accent.border}"
+  },
+  "focus-ring": {
+    "$type": "color",
+    "$value": "{ref.brand.300}"
+  },
+  "focus-ring-offset": {
+    "$type": "color",
+    "$value": "{ref.ink.950}"
+  },
   "status": {
     "$type": "color",
-    "critical": { "$value": "{ref.red.400}" },
-    "critical-bg": { "$value": "{ref.tint.critical.bg}" },
-    "critical-border": { "$value": "{ref.tint.critical.border}" },
-
-    "high": { "$value": "{ref.amber.400}" },
-    "high-bg": { "$value": "{ref.tint.high.bg}" },
-    "high-border": { "$value": "{ref.tint.high.border}" },
-
-    "low": { "$value": "{ref.blue.400}" },
-    "low-bg": { "$value": "{ref.tint.low.bg}" },
-    "low-border": { "$value": "{ref.tint.low.border}" },
-
-    "normal": { "$value": "{ref.green.400}" },
-    "normal-bg": { "$value": "{ref.tint.normal.bg}" },
-    "normal-border": { "$value": "{ref.tint.normal.border}" },
-
-    "unknown": { "$value": "{ref.slate.400}" },
-    "unknown-bg": { "$value": "{ref.tint.unknown.bg}" },
-    "unknown-border": { "$value": "{ref.tint.unknown.border}" }
+    "critical": {
+      "$value": "{ref.red.400}"
+    },
+    "critical-bg": {
+      "$value": "{ref.tint.critical.bg}"
+    },
+    "critical-border": {
+      "$value": "{ref.tint.critical.border}"
+    },
+    "high": {
+      "$value": "{ref.amber.400}"
+    },
+    "high-bg": {
+      "$value": "{ref.tint.high.bg}"
+    },
+    "high-border": {
+      "$value": "{ref.tint.high.border}"
+    },
+    "low": {
+      "$value": "{ref.blue.400}"
+    },
+    "low-bg": {
+      "$value": "{ref.tint.low.bg}"
+    },
+    "low-border": {
+      "$value": "{ref.tint.low.border}"
+    },
+    "normal": {
+      "$value": "{ref.green.400}"
+    },
+    "normal-bg": {
+      "$value": "{ref.tint.normal.bg}"
+    },
+    "normal-border": {
+      "$value": "{ref.tint.normal.border}"
+    },
+    "unknown": {
+      "$value": "{ref.slate.400}"
+    },
+    "unknown-bg": {
+      "$value": "{ref.tint.unknown.bg}"
+    },
+    "unknown-border": {
+      "$value": "{ref.tint.unknown.border}"
+    },
+    "restricted": {
+      "$value": "{ref.violet.300}"
+    },
+    "restricted-bg": {
+      "$value": "{ref.tint.restricted.bg}"
+    },
+    "restricted-border": {
+      "$value": "{ref.tint.restricted.border}"
+    },
+    "provisional": {
+      "$value": "{ref.cyan.300}"
+    },
+    "provisional-bg": {
+      "$value": "{ref.tint.provisional.bg}"
+    },
+    "provisional-border": {
+      "$value": "{ref.tint.provisional.border}"
+    }
   },
-
   "flag": {
     "$type": "color",
-    "restricted": { "$value": "{ref.violet.300}" },
-    "restricted-bg": { "$value": "{ref.violet.950}" },
-    "provisional": { "$value": "{ref.amber.400}" },
-    "deceased": { "$value": "{ref.slate.300}" }
+    "restricted": {
+      "$value": "{ref.violet.300}"
+    },
+    "restricted-bg": {
+      "$value": "{ref.violet.950}"
+    },
+    "provisional": {
+      "$value": "{ref.amber.400}"
+    },
+    "deceased": {
+      "$value": "{ref.slate.300}"
+    }
   },
-
   "swatch": {
     "$type": "color",
-    "1": { "$value": "{ref.swatch.teal.fg-dark}" },
-    "1-bg": { "$value": "{ref.swatch.teal.bg-dark}" },
-    "1-border": { "$value": "{ref.swatch.teal.border-dark}" },
-    "2": { "$value": "{ref.swatch.cyan.fg-dark}" },
-    "2-bg": { "$value": "{ref.swatch.cyan.bg-dark}" },
-    "2-border": { "$value": "{ref.swatch.cyan.border-dark}" },
-    "3": { "$value": "{ref.swatch.indigo.fg-dark}" },
-    "3-bg": { "$value": "{ref.swatch.indigo.bg-dark}" },
-    "3-border": { "$value": "{ref.swatch.indigo.border-dark}" },
-    "4": { "$value": "{ref.swatch.fuchsia.fg-dark}" },
-    "4-bg": { "$value": "{ref.swatch.fuchsia.bg-dark}" },
-    "4-border": { "$value": "{ref.swatch.fuchsia.border-dark}" },
-    "5": { "$value": "{ref.swatch.olive.fg-dark}" },
-    "5-bg": { "$value": "{ref.swatch.olive.bg-dark}" },
-    "5-border": { "$value": "{ref.swatch.olive.border-dark}" },
-    "6": { "$value": "{ref.swatch.stone.fg-dark}" },
-    "6-bg": { "$value": "{ref.swatch.stone.bg-dark}" },
-    "6-border": { "$value": "{ref.swatch.stone.border-dark}" }
+    "1": {
+      "$value": "{ref.swatch.teal.fg-dark}"
+    },
+    "1-bg": {
+      "$value": "{ref.swatch.teal.bg-dark}"
+    },
+    "1-border": {
+      "$value": "{ref.swatch.teal.border-dark}"
+    },
+    "2": {
+      "$value": "{ref.swatch.cyan.fg-dark}"
+    },
+    "2-bg": {
+      "$value": "{ref.swatch.cyan.bg-dark}"
+    },
+    "2-border": {
+      "$value": "{ref.swatch.cyan.border-dark}"
+    },
+    "3": {
+      "$value": "{ref.swatch.indigo.fg-dark}"
+    },
+    "3-bg": {
+      "$value": "{ref.swatch.indigo.bg-dark}"
+    },
+    "3-border": {
+      "$value": "{ref.swatch.indigo.border-dark}"
+    },
+    "4": {
+      "$value": "{ref.swatch.fuchsia.fg-dark}"
+    },
+    "4-bg": {
+      "$value": "{ref.swatch.fuchsia.bg-dark}"
+    },
+    "4-border": {
+      "$value": "{ref.swatch.fuchsia.border-dark}"
+    },
+    "5": {
+      "$value": "{ref.swatch.olive.fg-dark}"
+    },
+    "5-bg": {
+      "$value": "{ref.swatch.olive.bg-dark}"
+    },
+    "5-border": {
+      "$value": "{ref.swatch.olive.border-dark}"
+    },
+    "6": {
+      "$value": "{ref.swatch.stone.fg-dark}"
+    },
+    "6-bg": {
+      "$value": "{ref.swatch.stone.bg-dark}"
+    },
+    "6-border": {
+      "$value": "{ref.swatch.stone.border-dark}"
+    }
   },
-
-  "shadow-sm": { "$type": "shadow", "$value": "0 1px 2px 0 rgb(0 0 0 / 0.4)" },
-  "shadow": { "$type": "shadow", "$value": "0 1px 3px 0 rgb(0 0 0 / 0.5)" },
-  "shadow-md": { "$type": "shadow", "$value": "0 4px 14px -2px rgb(0 0 0 / 0.55)" },
-  "shadow-lg": { "$type": "shadow", "$value": "0 16px 40px -10px rgb(0 0 0 / 0.65)" }
+  "shadow-sm": {
+    "$type": "shadow",
+    "$value": "0 1px 2px 0 rgb(0 0 0 / 0.4)"
+  },
+  "shadow": {
+    "$type": "shadow",
+    "$value": "0 1px 3px 0 rgb(0 0 0 / 0.5)"
+  },
+  "shadow-md": {
+    "$type": "shadow",
+    "$value": "0 4px 14px -2px rgb(0 0 0 / 0.55)"
+  },
+  "shadow-lg": {
+    "$type": "shadow",
+    "$value": "0 16px 40px -10px rgb(0 0 0 / 0.65)"
+  }
 }

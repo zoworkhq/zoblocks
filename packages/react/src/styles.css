@@ -2187,6 +2187,433 @@
   }
 }
 
+/* ---- registry/oxygen/lib/clinical-status.css ---- */
+/**
+ * ClinicalStatus — the chip, the dot, the grid affix, and eleven CSS glyphs.
+ *
+ * Every colour resolves through a component token that falls back to a
+ * semantic one, so a brand override reaches it. Every glyph is drawn in
+ * `currentColor` from borders, gradients and `clip-path` — no icon font, no
+ * SVG, no network request — which is what lets the shape survive Windows
+ * high-contrast, where the background is stripped and the glyph is the only
+ * channel left carrying the state.
+ */
+
+.ox-cs {
+  --ox-cs-fg: var(--ox-status-unknown, #64748b);
+  --ox-cs-bg: var(--ox-status-unknown-bg, #f8fafc);
+  --ox-cs-border: var(--ox-status-unknown-border, #e2e8f0);
+  --ox-cs-height: var(--ox-cs-height-default, 1.625rem);
+  --ox-cs-glyph: var(--ox-cs-glyph, 0.5rem);
+
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  min-block-size: var(--ox-cs-height);
+  padding-inline: 0.4375rem;
+  border: 1px solid var(--ox-cs-border);
+  border-radius: var(--ox-radius-full, 999px);
+  background: var(--ox-cs-bg);
+  color: var(--ox-cs-fg);
+  font-family: var(--ox-font-sans, inherit);
+  font-size: var(--ox-text-xs, 0.75rem);
+  font-weight: 500;
+  line-height: 1;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
+/* ---------------------------------------------------------------- */
+/* Tones                                                             */
+/* ---------------------------------------------------------------- */
+
+.ox-cs[data-ox-tone="critical"] {
+  --ox-cs-fg: var(--ox-status-critical, #b91c1c);
+  --ox-cs-bg: var(--ox-status-critical-bg, #fef2f2);
+  --ox-cs-border: var(--ox-status-critical-border, #fecaca);
+}
+
+.ox-cs[data-ox-tone="high"] {
+  --ox-cs-fg: var(--ox-status-high, #b45309);
+  --ox-cs-bg: var(--ox-status-high-bg, #fffbeb);
+  --ox-cs-border: var(--ox-status-high-border, #fde68a);
+}
+
+.ox-cs[data-ox-tone="low"] {
+  --ox-cs-fg: var(--ox-status-low, #2563eb);
+  --ox-cs-bg: var(--ox-status-low-bg, #eff6ff);
+  --ox-cs-border: var(--ox-status-low-border, #bfdbfe);
+}
+
+.ox-cs[data-ox-tone="normal"] {
+  --ox-cs-fg: var(--ox-status-normal, #047857);
+  --ox-cs-bg: var(--ox-status-normal-bg, #ecfdf5);
+  --ox-cs-border: var(--ox-status-normal-border, #a7f3d0);
+}
+
+.ox-cs[data-ox-tone="unknown"] {
+  --ox-cs-fg: var(--ox-status-unknown, #64748b);
+  --ox-cs-bg: var(--ox-status-unknown-bg, #f8fafc);
+  --ox-cs-border: var(--ox-status-unknown-border, #e2e8f0);
+}
+
+.ox-cs[data-ox-tone="restricted"] {
+  --ox-cs-fg: var(--ox-status-restricted, #6d28d9);
+  --ox-cs-bg: var(--ox-status-restricted-bg, #f5f3ff);
+  --ox-cs-border: var(--ox-status-restricted-border, #ddd6fe);
+}
+
+.ox-cs[data-ox-tone="provisional"] {
+  --ox-cs-fg: var(--ox-status-provisional, #0e7490);
+  --ox-cs-bg: var(--ox-status-provisional-bg, #ecfeff);
+  --ox-cs-border: var(--ox-status-provisional-border, #a5f3fc);
+}
+
+/* ---------------------------------------------------------------- */
+/* Density                                                           */
+/*                                                                   */
+/* Two heights, both above the 24px floor once the row's own padding */
+/* is counted. Density changes the chip, never the target: SC 2.5.8  */
+/* has no compact exemption.                                         */
+/* ---------------------------------------------------------------- */
+
+.ox-cs[data-ox-density="compact"] {
+  --ox-cs-height: var(--ox-cs-height-compact, 1.375rem);
+  --ox-cs-glyph: 0.4375rem;
+  gap: 0.3125rem;
+  padding-inline: 0.375rem;
+  font-size: var(--ox-text-2xs, 0.6875rem);
+}
+
+/* ---------------------------------------------------------------- */
+/* Presentations                                                     */
+/* ---------------------------------------------------------------- */
+
+/*
+ * Dot: the glyph alone, with the word in the accessible name only.
+ *
+ * The one presentation that does drop to a single channel, and the only one
+ * where that is safe — it is for a dense list where every row carries one, and
+ * the legend is the column itself. It is never the default.
+ */
+.ox-cs[data-ox-shape="dot"] {
+  gap: 0;
+  min-inline-size: var(--ox-cs-height);
+  padding-inline: 0;
+  justify-content: center;
+}
+
+/*
+ * Grid affix: a 3px rule at the row's leading edge instead of a chip.
+ *
+ * At forty rows, forty chips is a colour field with a table behind it. The
+ * rule carries the tone, the short word carries the meaning, and the row stays
+ * readable.
+ */
+.ox-cs[data-ox-shape="affix"] {
+  gap: 0.375rem;
+  min-block-size: 0;
+  padding-inline: 0 0;
+  padding-inline-start: 0.5rem;
+  border: 0;
+  border-inline-start: 3px solid var(--ox-cs-fg);
+  border-radius: 0;
+  background: none;
+  font-variant-numeric: tabular-nums;
+}
+
+.ox-cs__short {
+  font-size: var(--ox-text-2xs, 0.6875rem);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+/* ---------------------------------------------------------------- */
+/* Explain                                                           */
+/* ---------------------------------------------------------------- */
+
+/*
+ * Interactive only when there is something to open. A focusable element with
+ * no action is a keyboard trap with extra steps.
+ */
+button.ox-cs {
+  cursor: pointer;
+  appearance: none;
+  font: inherit;
+  /* The chip is small; the hit area is not. */
+  min-block-size: max(var(--ox-cs-height), 1.5rem);
+}
+
+button.ox-cs:hover {
+  border-color: var(--ox-cs-fg);
+}
+
+button.ox-cs:focus-visible {
+  outline: 2px solid var(--ox-focus-ring, var(--ox-accent, #1677ff));
+  outline-offset: 2px;
+}
+
+/* ---------------------------------------------------------------- */
+/* Glyphs                                                            */
+/*                                                                   */
+/* All in currentColor, all from geometry rather than from a font.   */
+/* ---------------------------------------------------------------- */
+
+.ox-cs__glyph {
+  position: relative;
+  flex: none;
+  inline-size: var(--ox-cs-glyph);
+  block-size: var(--ox-cs-glyph);
+  color: inherit;
+}
+
+/* Filled triangle. */
+.ox-cs__glyph[data-ox-glyph="alert"] {
+  background: currentColor;
+  clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
+}
+
+/*
+ * Hollow triangle, drawn as a filled one with a smaller one punched out.
+ * `clip-path` cannot subtract, so the hole is a second element.
+ */
+.ox-cs__glyph[data-ox-glyph="caution"] {
+  background: currentColor;
+  clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
+}
+
+.ox-cs__glyph[data-ox-glyph="caution"]::after {
+  content: "";
+  position: absolute;
+  inset: 28% 18% 12%;
+  background: var(--ox-cs-bg);
+  clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
+}
+
+/* Filled disc. */
+.ox-cs__glyph[data-ox-glyph="solid"] {
+  border-radius: 50%;
+  background: currentColor;
+}
+
+/* Hollow ring — in flight. */
+.ox-cs__glyph[data-ox-glyph="pending"] {
+  border: 1.5px solid currentColor;
+  border-radius: 50%;
+}
+
+/*
+ * Hatched square — absent, and the absence is the fact.
+ *
+ * A gradient rather than a pattern fill so it inherits currentColor, which is
+ * what makes it survive forced-colors.
+ */
+.ox-cs__glyph[data-ox-glyph="unknown"] {
+  border: 1px solid currentColor;
+  background: repeating-linear-gradient(
+    45deg,
+    currentColor 0,
+    currentColor 1px,
+    transparent 1px,
+    transparent 3px
+  );
+}
+
+/* Padlock: a body, and a shackle above it. */
+.ox-cs__glyph[data-ox-glyph="locked"],
+.ox-cs__glyph[data-ox-glyph="unlocked"] {
+  display: block;
+}
+
+.ox-cs__glyph[data-ox-glyph="locked"]::after,
+.ox-cs__glyph[data-ox-glyph="unlocked"]::after {
+  content: "";
+  position: absolute;
+  inset-block-end: 0;
+  inset-inline: 0;
+  block-size: 58%;
+  border-radius: 1px;
+  background: currentColor;
+}
+
+.ox-cs__glyph[data-ox-glyph="locked"]::before,
+.ox-cs__glyph[data-ox-glyph="unlocked"]::before {
+  content: "";
+  position: absolute;
+  inset-block-start: 0;
+  inline-size: 62%;
+  block-size: 52%;
+  border: 1.5px solid currentColor;
+  border-block-end: 0;
+  border-start-start-radius: 999px;
+  border-start-end-radius: 999px;
+}
+
+.ox-cs__glyph[data-ox-glyph="locked"]::before {
+  inset-inline-start: 19%;
+}
+
+/* The open shackle is hinged off to one side — the difference has to be
+   visible at 8px, so it moves rather than merely tilting. */
+.ox-cs__glyph[data-ox-glyph="unlocked"]::before {
+  inset-inline-start: 52%;
+}
+
+/* Struck-through disc — withdrawn, cancelled, in error. */
+.ox-cs__glyph[data-ox-glyph="void"] {
+  border: 1.5px solid currentColor;
+  border-radius: 50%;
+}
+
+.ox-cs__glyph[data-ox-glyph="void"]::after {
+  content: "";
+  position: absolute;
+  inset-inline: -10%;
+  inset-block-start: 50%;
+  block-size: 1.5px;
+  background: currentColor;
+  transform: rotate(-45deg);
+  transform-origin: center;
+}
+
+/* Diamond — between two named states. */
+.ox-cs__glyph[data-ox-glyph="watch"] {
+  background: currentColor;
+  clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+}
+
+/* Half-filled disc — reported, but not by the system of record. */
+.ox-cs__glyph[data-ox-glyph="reported"] {
+  border: 1.5px solid currentColor;
+  border-radius: 50%;
+  background: linear-gradient(to right, currentColor 50%, transparent 50%);
+}
+
+/* Clock — true once, and old enough that it may not be now. */
+.ox-cs__glyph[data-ox-glyph="stale"] {
+  border: 1.5px solid currentColor;
+  border-radius: 50%;
+}
+
+.ox-cs__glyph[data-ox-glyph="stale"]::after {
+  content: "";
+  position: absolute;
+  inset-block-start: 22%;
+  inset-inline-start: 44%;
+  inline-size: 1.5px;
+  block-size: 32%;
+  background: currentColor;
+}
+
+/* ---------------------------------------------------------------- */
+/* Narrow                                                            */
+/*                                                                   */
+/* Below 360px the word abbreviates. It never disappears: the full   */
+/* word stays in the accessible name, and glyph-alone is a legend    */
+/* the reader does not have.                                         */
+/* ---------------------------------------------------------------- */
+
+.ox-cs__word[data-ox-full] {
+  display: inline;
+}
+
+.ox-cs__word[data-ox-abbr] {
+  display: none;
+}
+
+@media (max-width: 359px) {
+  .ox-cs[data-ox-shape="chip"] .ox-cs__word[data-ox-full] {
+    display: none;
+  }
+
+  .ox-cs[data-ox-shape="chip"] .ox-cs__word[data-ox-abbr] {
+    display: inline;
+  }
+}
+
+/* ---------------------------------------------------------------- */
+/* Forced colors                                                     */
+/*                                                                   */
+/* Windows strips every background and every custom colour. The      */
+/* glyph is drawn in currentColor, so it is the channel that         */
+/* survives — and the word was never colour-dependent.               */
+/* ---------------------------------------------------------------- */
+
+@media (forced-colors: active) {
+  .ox-cs {
+    border-color: CanvasText;
+    background: Canvas;
+    color: CanvasText;
+    forced-color-adjust: none;
+  }
+
+  .ox-cs__glyph,
+  .ox-cs__glyph::before,
+  .ox-cs__glyph::after {
+    color: CanvasText;
+  }
+
+  .ox-cs__glyph[data-ox-glyph="caution"]::after {
+    background: Canvas;
+  }
+
+  button.ox-cs:focus-visible {
+    outline-color: Highlight;
+  }
+}
+
+/* ---------------------------------------------------------------- */
+/* Print                                                             */
+/*                                                                   */
+/* Toner does not print backgrounds by default. The chip becomes an  */
+/* outline and the glyph carries the tone, which is the same         */
+/* fallback the monochrome case already relies on.                   */
+/* ---------------------------------------------------------------- */
+
+@media print {
+  .ox-cs {
+    border-color: #000;
+    background: none;
+    color: #000;
+  }
+
+  .ox-cs__glyph[data-ox-glyph="caution"]::after {
+    background: #fff;
+  }
+}
+
+/* ---------------------------------------------------------------- */
+/* Legend                                                            */
+/*                                                                   */
+/* The dot presentation is only legible beside one of these. A       */
+/* product using dots without a legend has shipped colour-alone      */
+/* with extra steps.                                                 */
+/* ---------------------------------------------------------------- */
+
+.ox-cs-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  margin: 0;
+  font-family: var(--ox-font-sans, inherit);
+  font-size: var(--ox-text-xs, 0.75rem);
+}
+
+.ox-cs-legend__row {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+.ox-cs-legend__row dt,
+.ox-cs-legend__row dd {
+  margin: 0;
+}
+
+.ox-cs-legend__row dd {
+  color: var(--ox-text-muted, inherit);
+}
+
 /* ---- registry/oxygen/lib/timeline.css ---- */
 /**
  * Oxygen timeline — the rail, the nodes, and the states that are not decoration.

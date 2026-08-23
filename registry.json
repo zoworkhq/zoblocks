@@ -67,6 +67,24 @@
       ]
     },
     {
+      "name": "clinical-status-core",
+      "type": "oxygen:lib",
+      "title": "Clinical status core",
+      "description": "The closed status vocabulary: nine scales, forty steps, each carrying a tone, a CSS glyph and a word in both a clinician and a patient register — plus the FHIR adapters that map Observation, AllergyIntolerance, Encounter, Task, Consent and DetectedIssue onto them. Installed automatically with ClinicalStatus.",
+      "files": [
+        {
+          "path": "registry/oxygen/lib/clinical-status.ts",
+          "type": "oxygen:lib",
+          "target": "lib/oxygen-clinical-status.ts"
+        },
+        {
+          "path": "registry/oxygen/lib/clinical-status.css",
+          "type": "oxygen:style",
+          "target": "styles/oxygen-clinical-status.css"
+        }
+      ]
+    },
+    {
       "name": "switch-core",
       "type": "oxygen:lib",
       "title": "Switch core",
@@ -313,6 +331,32 @@
           "path": "registry/oxygen/clinical-note/clinical-note.tsx",
           "type": "oxygen:component",
           "target": "components/oxygen/clinical-note.tsx"
+        }
+      ]
+    },
+    {
+      "name": "clinical-status",
+      "type": "oxygen:component",
+      "title": "Clinical Status",
+      "description": "A chip, a dot, or a grid affix — three presentations of one datum, drawn from nine fixed scales with no free-text status. Each step pairs a tone with a CSS-drawn glyph and a word in both a clinician and a patient register, so the state survives greyscale, Windows high-contrast and monochrome print.",
+      "categories": [
+        "clinical",
+        "primitives"
+      ],
+      "dependencies": [
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "utils",
+        "tokens",
+        "clinical-status-core"
+      ],
+      "files": [
+        {
+          "path": "registry/oxygen/clinical-status/clinical-status.tsx",
+          "type": "oxygen:component",
+          "target": "components/oxygen/clinical-status.tsx"
         }
       ]
     },

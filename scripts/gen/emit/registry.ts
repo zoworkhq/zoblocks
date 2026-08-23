@@ -83,6 +83,27 @@ const SUPPORT_ITEMS: BuildableItem[] = [
     ],
   },
   {
+    name: "clinical-status-core",
+    type: "oxygen:lib",
+    title: "Clinical status core",
+    description:
+      "The closed status vocabulary: nine scales, forty steps, each carrying a tone, a CSS glyph and a word in both a clinician and a patient register — plus the FHIR adapters that map Observation, AllergyIntolerance, Encounter, Task, Consent and DetectedIssue onto them. Installed automatically with ClinicalStatus.",
+    dependencies: [] as string[],
+    registryDependencies: [] as string[],
+    files: [
+      {
+        path: "registry/oxygen/lib/clinical-status.ts",
+        type: "oxygen:lib",
+        target: "lib/oxygen-clinical-status.ts",
+      },
+      {
+        path: "registry/oxygen/lib/clinical-status.css",
+        type: "oxygen:style",
+        target: "styles/oxygen-clinical-status.css",
+      },
+    ],
+  },
+  {
     name: "switch-core",
     type: "oxygen:lib",
     title: "Switch core",

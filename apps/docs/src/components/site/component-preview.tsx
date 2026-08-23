@@ -38,6 +38,14 @@ import type { AccordionItem } from "@/registry/oxygen/lib/accordion-core";
 import { Tabs } from "@oxygenui-design/tabs";
 import { Copilot } from "@/registry/oxygen/copilot/copilot";
 import { ClinicalNote, ClinicalNoteReader } from "@/registry/oxygen/clinical-note/clinical-note";
+import {
+  ClinicalStatus,
+  SCALES,
+  SCALE_NAMES,
+  StatusLegend,
+  type ScaleName,
+  type StatusStep,
+} from "@/registry/oxygen/clinical-status/clinical-status";
 import { mixed, noteDoc, noteSection, para } from "@/registry/oxygen/lib/clinical-note";
 import {
   betweenVisits,
@@ -575,6 +583,166 @@ function NaiveTimeline() {
 }
 
 const SCENARIOS: Record<string, Scenario[]> = {
+  /**
+   * Four demos, and the second is the component.
+   *
+   * Every other status chip in every other library looks fine in band one.
+   * The argument is what band two shows: the same chips with the hue removed,
+   * where the shape and the word are still carrying the state.
+   */
+  "clinical-status": [
+    {
+      id: "vocabulary",
+      label: "Nine scales, one vocabulary",
+      note: "Nine scales and forty steps, and no free text anywhere. Amber means the same thing in the lab module and the vitals module because there is only one place it is defined. Each step pairs a tone with a CSS-drawn glyph and a word — a filled triangle for a panic value, a hollow one for merely abnormal, a hatched square for an absence, a padlock for a gate.",
+      render: () => (
+        <div style={{ display: "grid", gap: 18 }}>
+          {SCALE_NAMES.map((name: ScaleName) => (
+            <div key={name} style={{ display: "grid", gap: 6 }}>
+              <p
+                style={{
+                  margin: 0,
+                  fontFamily: "var(--ox-font-mono, monospace)",
+                  fontSize: 10,
+                  letterSpacing: "0.08em",
+                  textTransform: "uppercase",
+                  opacity: 0.55,
+                }}
+              >
+                {SCALES[name].label}
+              </p>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                {SCALES[name].steps.map((step: StatusStep) => (
+                  <ClinicalStatus key={step.id} scale={name} step={step.id} />
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      ),
+    },
+    {
+      id: "monochrome",
+      label: "Hue removed",
+      note: "The same six chips, desaturated — a monochrome display, a ward printer, or the roughly 8% of male clinicians with a red-green deficiency. Shape and word both survive; nothing is lost but the pleasantness. This is the band that decides whether a status component is honest, and it is the band nobody screenshots.",
+      render: () => (
+        <div style={{ display: "grid", gap: 14 }}>
+          {[false, true].map((flat) => (
+            <div key={String(flat)} style={{ display: "grid", gap: 6 }}>
+              <p
+                style={{
+                  margin: 0,
+                  fontFamily: "var(--ox-font-mono, monospace)",
+                  fontSize: 10,
+                  letterSpacing: "0.08em",
+                  textTransform: "uppercase",
+                  opacity: 0.55,
+                }}
+              >
+                {flat ? "Desaturated" : "In colour"}
+              </p>
+              <div
+                style={{
+                  display: "flex",
+                  flexWrap: "wrap",
+                  gap: 6,
+                  filter: flat ? "grayscale(1)" : undefined,
+                }}
+              >
+                <ClinicalStatus scale="criticality" step="critical" />
+                <ClinicalStatus scale="criticality" step="high" />
+                <ClinicalStatus scale="criticality" step="normal" />
+                <ClinicalStatus scale="criticality" step="not-assessed" />
+                <ClinicalStatus scale="access" step="restricted" />
+                <ClinicalStatus scale="result-status" step="preliminary" />
+              </div>
+            </div>
+          ))}
+        </div>
+      ),
+    },
+    {
+      id: "presentations",
+      label: "Three presentations",
+      note: "One datum, three shapes. The chip carries all three channels and is the only one safe on its own. The dot drops the visible word and needs the legend beside it. The grid affix replaces the chip with a 3px row rule past about forty rows, where forty pills stop being a table and become a colour field.",
+      render: () => (
+        <div style={{ display: "grid", gap: 18 }}>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center" }}>
+            <ClinicalStatus scale="criticality" step="critical" />
+            <ClinicalStatus scale="criticality" step="critical" density="compact" />
+            <ClinicalStatus scale="criticality" step="critical" shape="dot" />
+            <ClinicalStatus scale="criticality" step="critical" shape="affix" />
+          </div>
+          <StatusLegend scale="criticality" />
+          <table style={{ borderCollapse: "collapse", fontSize: 13 }}>
+            <tbody>
+              {(
+                [
+                  ["Sodium", "139 mmol/L", "final"],
+                  ["Potassium", "6.8 mmol/L", "final"],
+                  ["TSH", "3.1 mIU/L", "preliminary"],
+                  ["HbA1c", "52 mmol/mol", "corrected"],
+                ] as const
+              ).map(([analyte, value, step]) => (
+                <tr key={analyte}>
+                  <td style={{ padding: "5px 16px 5px 0", opacity: 0.8 }}>{analyte}</td>
+                  <td
+                    style={{
+                      padding: "5px 16px 5px 0",
+                      fontVariantNumeric: "tabular-nums",
+                    }}
+                  >
+                    {value}
+                  </td>
+                  <td style={{ padding: "5px 0" }}>
+                    <ClinicalStatus
+                      scale="result-status"
+                      step={step}
+                      shape="affix"
+                      density="compact"
+                    />
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      ),
+    },
+    {
+      id: "registers",
+      label: "Two registers",
+      note: "The same steps, in the words the person reading them would use. \u201cEntered in error\u201d is a system word; a portal that ships it has not translated anything, it has published an internal state to the person the record is about. The register is a prop, and both sides are required by the type.",
+      render: () => (
+        <div style={{ display: "grid", gap: 14 }}>
+          {(["clinician", "patient"] as const).map((audience) => (
+            <div key={audience} style={{ display: "grid", gap: 6 }}>
+              <p
+                style={{
+                  margin: 0,
+                  fontFamily: "var(--ox-font-mono, monospace)",
+                  fontSize: 10,
+                  letterSpacing: "0.08em",
+                  textTransform: "uppercase",
+                  opacity: 0.55,
+                }}
+              >
+                {audience}
+              </p>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                <ClinicalStatus scale="result-status" step="entered-in-error" audience={audience} />
+                <ClinicalStatus scale="result-status" step="preliminary" audience={audience} />
+                <ClinicalStatus scale="data-quality" step="self-reported" audience={audience} />
+                <ClinicalStatus scale="access" step="part-2" audience={audience} />
+                <ClinicalStatus scale="criticality" step="critical" audience={audience} />
+              </div>
+            </div>
+          ))}
+        </div>
+      ),
+    },
+  ],
+
   identity: [
     {
       id: "banner",
