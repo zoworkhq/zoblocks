@@ -41,6 +41,7 @@ export default defineComponentMeta({
     use: [
       "Laboratory, genomics, pathology, and research surfaces where analysis is the thing being waited on.",
       "Wide containers — it is a landscape mark and wants at least 48px of width.",
+      "Waits long enough to be worth a domain mark. Under about 400ms the strands never complete a rotation, and an animation cut off mid-cycle reads as a stall rather than as progress.",
     ],
     avoid: [
       "General application waits. It is domain-specific by design; Breath Loader is the neutral choice.",

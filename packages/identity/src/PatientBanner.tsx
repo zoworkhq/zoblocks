@@ -167,7 +167,14 @@ export function PatientBanner(props: PatientBannerProps): ReactNode {
 
   if ("error" in props && props.error) {
     return (
-      <div className={joined("ox-banner ox-banner--error", className)} role="alert">
+      <div
+        className={joined("ox-banner ox-banner--error", className)}
+        // Marked like every other root in the library. Without it the failure
+        // states are the two a visual-regression harness cannot target and a
+        // host's CSS cannot reach — which is the wrong two to leave out.
+        data-ox-banner="error"
+        role="alert"
+      >
         <span className="ox-banner__rail ox-banner__rail--error" aria-hidden="true" />
         <div className="ox-banner__block">
           <div className="ox-banner__line1">
@@ -185,7 +192,11 @@ export function PatientBanner(props: PatientBannerProps): ReactNode {
   // carries a name without its identifiers.
   if (!identity) {
     return (
-      <div className={joined("ox-banner ox-banner--loading", className)} aria-busy="true">
+      <div
+        className={joined("ox-banner ox-banner--loading", className)}
+        data-ox-banner="loading"
+        aria-busy="true"
+      >
         <span className="ox-avatar ox-avatar--40 ox-avatar--loading" aria-hidden="true" />
         <div className="ox-banner__block">
           <span className="ox-banner__skeleton ox-banner__skeleton--name" aria-hidden="true" />
@@ -260,6 +271,7 @@ export function PatientBanner(props: PatientBannerProps): ReactNode {
       */}
       <section
         aria-label={label}
+        data-ox-banner="ready"
         data-ox-patient-id={identity.key}
         data-ox-context={context}
         data-ox-fields={rendered.join(",")}
