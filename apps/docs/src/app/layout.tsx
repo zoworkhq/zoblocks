@@ -4,6 +4,7 @@ import { Instrument_Sans, JetBrains_Mono } from "next/font/google";
 // Component tokens first, so the site layer can override deliberately.
 import "@oxygenui-design/tokens/oxygen-tokens.css";
 import "./globals.css";
+import { THEME_BOOT_SCRIPT } from "@/lib/theme";
 
 const instrumentSans = Instrument_Sans({
   subsets: ["latin"],
@@ -71,7 +72,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         */}
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{var e=document.documentElement,t=localStorage.getItem("oxygen-theme")||"system";if(t==="high-contrast"){e.setAttribute("data-ox-theme","high-contrast");return}var d=t==="dark"||(t==="system"&&matchMedia("(prefers-color-scheme: dark)").matches);e.classList.toggle("dark",d)}catch(e){}})()`,
+            __html: THEME_BOOT_SCRIPT,
           }}
         />
       </head>

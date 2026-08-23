@@ -1,12 +1,19 @@
 /**
- * The high-contrast theme is reachable, and audited.
+ * The high-contrast theme is applied faithfully, and audited.
  *
- * It was neither. `packages/tokens` has emitted 59 high-contrast values held to
+ * It was neither reachable nor audited when this file was written. `packages/tokens` has emitted 59 high-contrast values held to
  * a 7:1 floor since the pipeline landed, selected by
  * `[data-ox-theme="high-contrast"]` — an attribute nothing in the repository
  * ever set. A mode we advertise, hold to AAA, and had no evidence for is worse
  * than one we do not ship: the token gate reported it green while no page could
  * turn it on and `scripts/a11y.ts` iterated two themes.
+ *
+ * The picker has since narrowed to Light and Dark, which removed the way in
+ * but not the theme — the tokens, the site palette and the axe run all still
+ * cover it, and a preference stored before that change is still honoured. So
+ * the assertions moved with it: they now check that a `high-contrast` value
+ * arriving from anywhere is applied completely, rather than that a menu offers
+ * it.
  *
  * These assertions are cheap and they are the ones that would have caught it.
  */
@@ -49,11 +56,30 @@ describe("the token build emits it", () => {
   });
 });
 
-describe("a page can select it", () => {
-  it("is an option in the theme toggle", () => {
+describe("it survives without being an option", () => {
+  /*
+   * The picker offers Light and Dark only, by product decision. That removed
+   * the *way in*, not the theme: 59 tokens at a 7:1 floor still sit behind
+   * `[data-ox-theme="high-contrast"]`, the site palette still matches them,
+   * and the axe run still covers all three.
+   *
+   * These assertions exist because a theme with no way in is exactly the state
+   * this file was written to catch. It is still reachable — a stored
+   * preference from before the change, or a host application that sets the
+   * attribute — so the contract is now "applied faithfully when set", not
+   * "offered in a menu".
+   */
+  it("is not offered in the theme toggle", () => {
     const toggle = read("apps/docs/src/components/site/theme-toggle.tsx");
-    expect(toggle).toContain('value: "high-contrast"');
-    expect(toggle).toContain('setAttribute("data-ox-theme", "high-contrast")');
+    expect(toggle).not.toContain('value: "high-contrast"');
+  });
+
+  it("is still a value the theme layer accepts and applies", () => {
+    const theme = read("apps/docs/src/lib/theme.ts");
+    expect(theme).toContain('setAttribute("data-ox-theme", "high-contrast")');
+    // Read back, so a preference stored before the picker changed is honoured
+    // rather than silently downgraded to light.
+    expect(theme).toContain('raw === "high-contrast"');
   });
 
   /**
@@ -61,21 +87,21 @@ describe("a page can select it", () => {
    * would give a reader two half-applied palettes.
    */
   it("clears the dark class rather than combining with it", () => {
-    const toggle = read("apps/docs/src/components/site/theme-toggle.tsx");
-    const branch = toggle.slice(toggle.indexOf('if (theme === "high-contrast")'));
-    expect(branch.slice(0, 200)).toContain('classList.remove("dark")');
+    const theme = read("apps/docs/src/lib/theme.ts");
+    const branch = theme.slice(theme.indexOf('if (theme === "high-contrast")'));
+    expect(branch.slice(0, 240)).toContain('classList.remove("dark")');
   });
 
   it("is applied before first paint, like the other themes", () => {
     // A deferred application paints light and snaps, which for a reader who
     // needs high contrast is the flash that matters most.
-    expect(read("apps/docs/src/app/layout.tsx")).toContain("high-contrast");
+    expect(read("apps/docs/src/lib/theme.ts")).toContain(
+      'if(t==="high-contrast"){e.setAttribute("data-ox-theme","high-contrast")',
+    );
   });
 
   it("removes the attribute when another theme is chosen", () => {
-    expect(read("apps/docs/src/components/site/theme-toggle.tsx")).toContain(
-      'removeAttribute("data-ox-theme")',
-    );
+    expect(read("apps/docs/src/lib/theme.ts")).toContain('removeAttribute("data-ox-theme")');
   });
 });
 

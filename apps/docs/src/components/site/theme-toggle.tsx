@@ -3,20 +3,27 @@
 /**
  * Theme toggle.
  *
- * Three states rather than two: light, dark, and system. "System" is the
- * default and is a real setting, not the absence of one — a reader who has
- * their OS in dark mode should not have to re-pick it here, and a reader who
- * deliberately chose light should keep it when the OS flips at sunset.
+ * Two states: light and dark.
+ *
+ * It had four. "System" and "High contrast" were removed from the picker — the
+ * first because pinning "follow the OS" as a third state is a preference almost
+ * nobody revisits, and the behaviour survives anyway: with nothing stored the
+ * boot script still follows `prefers-color-scheme`, so a machine in dark still
+ * lands on dark. The second is a harder trade and is written up in
+ * `lib/theme.ts`: the 7:1 token set and its audit are untouched and the value
+ * still applies, it is simply no longer offered here.
+ *
+ * The choice is written to a cookie, not just `localStorage`, so it survives
+ * the hop to the app on another origin. See `lib/theme.ts`.
  *
  * The applied class is written by an inline script in the document head before
- * first paint (see layout.tsx). This component only handles changes.
+ * first paint (see `layout.tsx`). This component only handles changes.
  */
 
 import * as React from "react";
-import { Contrast, Monitor, Moon, Sun } from "lucide-react";
+import { Moon, Sun } from "lucide-react";
 import { cn } from "@/lib/utils";
-
-type Theme = "light" | "dark" | "high-contrast" | "system";
+import { applyTheme, readStoredTheme, resolveTheme, writeTheme, type Theme } from "@/lib/theme";
 
 const OPTIONS: Array<{
   value: Theme;
@@ -25,58 +32,26 @@ const OPTIONS: Array<{
 }> = [
   { value: "light", label: "Light", icon: Sun },
   { value: "dark", label: "Dark", icon: Moon },
-  { value: "high-contrast", label: "High contrast", icon: Contrast },
-  { value: "system", label: "System", icon: Monitor },
 ];
 
-export function applyTheme(theme: Theme) {
-  const root = document.documentElement;
-
-  // High contrast is a third theme, not a modifier on the other two: the token
-  // build emits it as its own value set held to 7:1, and layering it over dark
-  // would give a reader two half-applied palettes.
-  if (theme === "high-contrast") {
-    root.classList.remove("dark");
-    root.setAttribute("data-ox-theme", "high-contrast");
-    return;
-  }
-
-  root.removeAttribute("data-ox-theme");
-  const dark =
-    theme === "dark" ||
-    (theme === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
-  root.classList.toggle("dark", dark);
-}
+export { applyTheme };
 
 export function ThemeToggle() {
-  const [theme, setTheme] = React.useState<Theme>("system");
+  const [theme, setTheme] = React.useState<Theme>("light");
   const [mounted, setMounted] = React.useState(false);
 
   React.useEffect(() => {
     setMounted(true);
-    const stored = localStorage.getItem("oxygen-theme") as Theme | null;
-    if (
-      stored === "light" ||
-      stored === "dark" ||
-      stored === "high-contrast" ||
-      stored === "system"
-    ) {
-      setTheme(stored);
-    }
+    // `high-contrast` may still be stored by the a11y audit or by a reader who
+    // set it before it left the picker. Neither button is then selected, which
+    // is honest — the applied theme is not one of the two on offer.
+    const resolved = resolveTheme(readStoredTheme());
+    if (resolved === "light" || resolved === "dark") setTheme(resolved);
   }, []);
-
-  // Follow the OS while the preference is "system".
-  React.useEffect(() => {
-    if (theme !== "system") return;
-    const query = window.matchMedia("(prefers-color-scheme: dark)");
-    const onChange = () => applyTheme("system");
-    query.addEventListener("change", onChange);
-    return () => query.removeEventListener("change", onChange);
-  }, [theme]);
 
   function choose(next: Theme) {
     setTheme(next);
-    localStorage.setItem("oxygen-theme", next);
+    writeTheme(next);
     applyTheme(next);
   }
 

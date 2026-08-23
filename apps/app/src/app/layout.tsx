@@ -17,6 +17,7 @@ import "@oxygenui-design/react/styles.css";
  */
 import "@oxygenui-design/copilot-react/icons.css";
 import "./globals.css";
+import { THEME_BOOT_SCRIPT } from "@/lib/theme";
 
 /**
  * The same two faces the marketing and documentation site uses.
@@ -73,7 +74,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         */}
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{var e=document.documentElement,t=localStorage.getItem("oxygen-app-theme")||localStorage.getItem("oxygen-console-theme")||"system";if(t==="dark"||(t==="system"&&matchMedia("(prefers-color-scheme: dark)").matches))e.classList.add("dark")}catch(e){}})()`,
+            __html: THEME_BOOT_SCRIPT,
           }}
         />
       </head>
