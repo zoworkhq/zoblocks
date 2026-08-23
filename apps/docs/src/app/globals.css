@@ -1059,6 +1059,58 @@ body {
   font-size: 0.6875rem;
 }
 
+/*
+ * Conformance status.
+ *
+ * A word, and a colour behind it. Colour alone would be the exact failure the
+ * table is reporting on — 1.4.1 is one of the rows.
+ */
+[data-ox-check] {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  border-radius: 999px;
+  padding: 0.125rem 0.5rem;
+  border: 1px solid var(--color-rule);
+  color: var(--color-graphite);
+  white-space: nowrap;
+}
+
+[data-ox-check]::before {
+  content: "";
+  inline-size: 0.375rem;
+  block-size: 0.375rem;
+  border-radius: 999px;
+  background: currentColor;
+}
+
+[data-ox-check="pass"] {
+  color: var(--color-oxygen-deep);
+  border-color: color-mix(in oklab, var(--color-oxygen) 35%, var(--color-rule));
+  background: color-mix(in oklab, var(--color-oxygen) 8%, transparent);
+}
+
+[data-ox-check="partial"] {
+  color: var(--color-ink);
+  border-color: var(--color-rule-strong);
+}
+
+[data-ox-check="fail"] {
+  color: var(--color-critical);
+  border-color: color-mix(in oklab, var(--color-critical) 40%, var(--color-rule));
+  background: color-mix(in oklab, var(--color-critical) 8%, transparent);
+}
+
+/* Not a smaller pass. The dot is dropped so it does not read as a result. */
+[data-ox-check="not-applicable"] {
+  color: var(--color-graphite-soft);
+  border-style: dashed;
+}
+
+[data-ox-check="not-applicable"]::before {
+  display: none;
+}
+
 .limitation-list {
   margin: 0;
   padding: 0;

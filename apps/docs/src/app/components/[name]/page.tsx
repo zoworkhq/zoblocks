@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, ArrowUpRight, Check, CircleAlert, X } from "lucide-react";
-import type { ComponentDoc, FrameworkRelation } from "@oxygenui-design/component-meta";
+import type { Alternative, ComponentDoc, FrameworkRelation } from "@oxygenui-design/component-meta";
 import { CATALOG, STATUS_LABEL, getComponent } from "@/lib/catalog";
 import { SiteFooter, SiteHeader } from "@/components/site/chrome";
 import { ComponentPreview } from "@/components/site/component-preview";
@@ -13,6 +13,8 @@ import { CopilotGallery } from "@/components/site/copilot-gallery";
 import { SwitchGallery } from "@/components/site/switch-gallery";
 import { InstallCommand, RevealRoot } from "@/components/site/interactions";
 import { SectionRail, type RailSection } from "@/components/site/section-rail";
+import { Playground } from "@/components/site/playground";
+import { hasPlayground } from "@/components/site/playground-registry";
 
 export function generateStaticParams() {
   return CATALOG.map((component) => ({ name: component.name }));
@@ -27,14 +29,65 @@ export async function generateMetadata({
   const component = getComponent(name);
   if (!component) return {};
 
-  // Primitives take no FHIR resource, and "FHIR undefined React component" is
-  // the kind of title that ends up in a search result.
-  return {
-    title: component.resource
+  /*
+   * An authored title wins over the derived one.
+   *
+   * The fallback is still here and still matters — most components have not
+   * declared `seo` yet — but a derived title is a guess, and on the components
+   * that have thought about it the guess is worse than the answer. Primitives
+   * take no FHIR resource, and "FHIR undefined React component" is the kind of
+   * title that ends up in a search result.
+   */
+  const seo = component.seo;
+  const title =
+    seo?.title ??
+    (component.resource
       ? `${component.title} — FHIR ${component.resource} React component`
-      : `${component.title} — React component for healthcare interfaces`,
-    description: component.summary,
-    alternates: { canonical: `/components/${component.name}` },
+      : `${component.title} — React component for healthcare interfaces`);
+  const description = seo?.description ?? component.summary;
+  const slug = seo?.slug ?? component.name;
+  const keywords = [seo?.primaryKeyword, ...(seo?.secondaryKeywords ?? [])].filter(
+    (keyword): keyword is string => Boolean(keyword),
+  );
+
+  return {
+    title,
+    description,
+    ...(keywords.length ? { keywords } : {}),
+    alternates: { canonical: `/components/${slug}` },
+    openGraph: {
+      type: "article",
+      title,
+      description,
+      url: `/components/${slug}`,
+    },
+    twitter: { card: "summary_large_image", title, description },
+  };
+}
+
+/**
+ * Structured data for the page, as `SoftwareSourceCode`.
+ *
+ * Not `Product`: nothing here is for sale on its own, and marking a free
+ * component as a product with no offer is the kind of mismatch that gets a
+ * whole domain's rich results withdrawn. `TechArticle` was the other
+ * candidate and describes the prose rather than the thing the prose is about.
+ */
+function structuredData(component: ComponentDoc) {
+  const seo = component.seo;
+  return {
+    "@context": "https://schema.org",
+    "@type": "SoftwareSourceCode",
+    name: component.title,
+    alternateName: component.aliases,
+    description: seo?.description ?? component.summary,
+    programmingLanguage: "TypeScript",
+    runtimePlatform: "React",
+    codeRepository: "https://github.com/oxygenui-design/oxygen",
+    url: `https://oxygenui.design/components/${seo?.slug ?? component.name}`,
+    keywords: [seo?.primaryKeyword, ...(seo?.secondaryKeywords ?? [])].filter(Boolean).join(", "),
+    isAccessibleForFree: component.tier === "free",
+    license: "https://opensource.org/licenses/MIT",
   };
 }
 
@@ -101,13 +154,37 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
    * nothing, and it could never be marked current, so the rail's last entry was
    * permanently dead.
    */
+  const variants = component.variants ?? [];
+  const examples = component.examples ?? [];
+  const a11yChecks = component.a11yChecks ?? [];
+  const domain = component.domain;
+  const alternatives = component.relationships?.alternatives ?? [];
+  const controls = component.controls ?? [];
+  const playable = controls.length > 0 && hasPlayground(component.name);
+  const builtWith = component.relationships?.builtWith ?? [];
+  const usedIn = component.relationships?.usedIn ?? [];
+  const hasClinical = Boolean(
+    domain?.industries.length ||
+    domain?.workflows.length ||
+    domain?.phi ||
+    domain?.permissions.length ||
+    domain?.terminology.length,
+  );
+
   const railSections: RailSection[] = [
     { id: "preview", label: "Preview" },
+    ...(playable ? [{ id: "playground", label: "Playground" }] : []),
+    ...(variants.length ? [{ id: "variants", label: "Variants" }] : []),
     ...(component.usage ? [{ id: "usage", label: "Usage & props" }] : []),
+    ...(examples.length ? [{ id: "examples", label: "Examples" }] : []),
     ...(component.guidance.use.length ? [{ id: "guidance", label: "Guidance" }] : []),
+    ...(hasClinical ? [{ id: "clinical", label: "Clinical" }] : []),
     ...(component.accessibility.length ? [{ id: "quality", label: "Quality" }] : []),
+    ...(a11yChecks.length ? [{ id: "conformance", label: "Conformance" }] : []),
     ...(source ? [{ id: "source", label: "Source" }] : []),
-    ...(related.length ? [{ id: "related", label: "Related" }] : []),
+    ...(related.length || alternatives.length || builtWith.length || usedIn.length
+      ? [{ id: "related", label: "Related" }]
+      : []),
   ];
 
   return (
@@ -115,6 +192,14 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
       <SiteHeader />
 
       <main id="main">
+        <script
+          type="application/ld+json"
+          // Serialised from the same metadata the page renders, so the two
+          // cannot disagree — a rich result describing a component page that
+          // says something else is worse than no rich result.
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData(component)) }}
+        />
+
         {/* Header ------------------------------------------------------- */}
         <section className="border-b border-rule">
           <div className="mx-auto max-w-6xl section-minor px-5 sm:px-8">
@@ -296,6 +381,68 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
           )}
         </section>
 
+        {/* Playground --------------------------------------------------- */}
+        {playable && (
+          <section id="playground" className="scroll-mt-24 border-b border-rule">
+            <div className="mx-auto max-w-6xl section-minor px-5 sm:px-8">
+              <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
+                <SectionHeading eyebrow="Playground" title="Change a prop, watch it change." />
+                <p className="numeric shrink-0 text-xs text-graphite-soft">
+                  {controls.length} PROPS / LIVE
+                </p>
+              </div>
+              {/* The knobs come from the same metadata the props table does,
+                  and the generator checks every option against the prop's real
+                  type — so a control here cannot offer a value the component
+                  would reject. */}
+              <div className="mt-8" data-reveal>
+                <Playground name={component.name} controls={controls} />
+              </div>
+            </div>
+          </section>
+        )}
+
+        {/* Variants ----------------------------------------------------- */}
+        {variants.length > 0 && (
+          <section id="variants" className="scroll-mt-24 border-b border-rule">
+            <div className="mx-auto max-w-6xl section-minor px-5 sm:px-8">
+              <SectionHeading
+                eyebrow="Variants"
+                title="One component, and what each skin is for."
+              />
+              <p className="mt-3 max-w-2xl text-sm text-graphite" data-reveal>
+                Every variant is the same accessibility contract and the same keyboard model. Pick
+                by what the surface needs, not by what the code would be easier to write.
+              </p>
+
+              <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {variants.map((variant, index) => (
+                  <div
+                    key={variant.id}
+                    data-reveal
+                    style={{ "--reveal-delay": `${index * 40}ms` } as React.CSSProperties}
+                    className="surface-2 rounded-2xl p-5"
+                  >
+                    <h3 className="font-display text-base font-semibold tracking-tight">
+                      {variant.label}
+                    </h3>
+                    <p className="mt-2 text-sm leading-relaxed text-graphite">
+                      {variant.description}
+                    </p>
+                    {Object.keys(variant.args ?? {}).length > 0 && (
+                      <p className="mt-3 font-mono text-[0.7rem] leading-relaxed text-graphite-soft">
+                        {Object.entries(variant.args ?? {})
+                          .map(([key, value]) => `${key}=${JSON.stringify(value)}`)
+                          .join("  ")}
+                      </p>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+        )}
+
         {/* Usage & props ------------------------------------------------ */}
         {component.usage && (
           <section id="usage" className="scroll-mt-24 border-b border-rule">
@@ -377,6 +524,52 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
           </section>
         )}
 
+        {/* Examples ----------------------------------------------------- */}
+        {examples.length > 0 && (
+          <section id="examples" className="scroll-mt-24 border-b border-rule bg-paper-sunk/40">
+            <div className="mx-auto max-w-6xl section-minor px-5 sm:px-8">
+              <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
+                <SectionHeading eyebrow="Examples" title="The cases worth copying." />
+                {(component.fixtures ?? []).length > 0 && (
+                  <p className="numeric shrink-0 text-xs text-graphite-soft">
+                    DATA / {(component.fixtures ?? []).join(", ")}
+                  </p>
+                )}
+              </div>
+
+              <div className="mt-8 space-y-8">
+                {examples.map((example, index) => (
+                  <article
+                    key={example.id}
+                    data-reveal
+                    style={{ "--reveal-delay": `${index * 60}ms` } as React.CSSProperties}
+                  >
+                    <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                      <h3 className="font-display text-lg font-semibold tracking-tight">
+                        {example.title}
+                      </h3>
+                      {example.fixture && (
+                        <span className="numeric text-[0.625rem] uppercase tracking-wide text-graphite-soft">
+                          {example.fixture}
+                        </span>
+                      )}
+                    </div>
+                    <p className="mt-2 max-w-3xl text-sm leading-relaxed text-graphite">
+                      {example.description}
+                    </p>
+                    <pre
+                      tabIndex={0}
+                      className="scroll-thin-dark mt-4 overflow-auto rounded-2xl border border-panel-rule bg-panel p-5 font-mono text-[0.7rem] leading-relaxed text-panel-fg/90"
+                    >
+                      <code>{example.code}</code>
+                    </pre>
+                  </article>
+                ))}
+              </div>
+            </div>
+          </section>
+        )}
+
         {/* Guidance ----------------------------------------------------- */}
         {(component.guidance.use.length > 0 || component.guidance.avoid.length > 0) && (
           <section id="guidance" className="scroll-mt-24 border-b border-rule bg-paper-sunk/40">
@@ -406,6 +599,57 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
                   delay
                 />
               </div>
+            </div>
+          </section>
+        )}
+
+        {/* Clinical ----------------------------------------------------- */}
+        {hasClinical && domain && (
+          <section id="clinical" className="scroll-mt-24 border-b border-rule">
+            <div className="mx-auto max-w-6xl section-minor px-5 sm:px-8">
+              <SectionHeading eyebrow="Clinical" title="Where it sits in the record." />
+
+              {domain.clinicalContext && (
+                <p className="mt-3 max-w-3xl text-sm leading-relaxed text-graphite" data-reveal>
+                  {domain.clinicalContext}
+                </p>
+              )}
+
+              <dl className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3" data-reveal>
+                <Fact label="Industries" values={domain.industries} />
+                <Fact label="Workflows" values={domain.workflows} />
+                <Fact label="Terminology" values={domain.terminology} />
+                <Fact label="Permissions" values={domain.permissions} />
+                {typeof domain.auditable === "boolean" && (
+                  <Fact
+                    label="Audit"
+                    values={[domain.auditable ? "Emits AuditEvent" : "Emits no AuditEvent"]}
+                  />
+                )}
+              </dl>
+
+              {domain.phi && (
+                <div className="limitation-panel mt-8 self-start" data-reveal>
+                  <div className="limitation-panel__header">
+                    <div className="flex min-w-0 items-center gap-3">
+                      <span className="limitation-panel__signal" aria-hidden="true">
+                        <CircleAlert className="size-4" />
+                      </span>
+                      <div>
+                        <p className="limitation-panel__kicker numeric text-[0.625rem] text-graphite-soft">
+                          Protected health information
+                        </p>
+                        <h3 className="mt-1 font-display text-base font-semibold tracking-tight">
+                          {domain.phi.handles ? "Handles PHI" : "Handles no PHI"}
+                        </h3>
+                      </div>
+                    </div>
+                  </div>
+                  <p className="px-5 pb-5 text-sm leading-relaxed text-graphite">
+                    {domain.phi.notes}
+                  </p>
+                </div>
+              )}
             </div>
           </section>
         )}
@@ -483,6 +727,65 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
           </section>
         )}
 
+        {/* Conformance -------------------------------------------------- */}
+        {a11yChecks.length > 0 && (
+          <section id="conformance" className="scroll-mt-24 border-b border-rule bg-paper-sunk/40">
+            <div className="mx-auto max-w-6xl section-minor px-5 sm:px-8">
+              <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
+                <SectionHeading
+                  eyebrow="Conformance"
+                  title="Every claim, and the test behind it."
+                />
+                <p className="numeric shrink-0 text-xs text-graphite-soft">
+                  WCAG 2.2 AA / {a11yChecks.filter((c) => c.status === "pass").length} OF{" "}
+                  {a11yChecks.length} PASS
+                </p>
+              </div>
+
+              {/* A claim with no evidence is prose, and prose in an
+                  accessibility panel is how a library ends up asserting
+                  conformance it has never measured. The schema requires the
+                  evidence column; this renders it. */}
+              <div className="scroll-thin mt-8 overflow-x-auto" data-reveal>
+                <table className="w-full min-w-[44rem] border-collapse text-left text-sm">
+                  <thead>
+                    <tr className="border-b border-rule">
+                      <Th>Criterion</Th>
+                      <Th>Status</Th>
+                      <Th>How</Th>
+                      <Th>Evidence</Th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {a11yChecks.map((check) => (
+                      <tr key={`${check.wcag}-${check.name}`} className="border-b border-rule/60">
+                        <td className="py-3 pr-4 align-top">
+                          <span className="numeric text-xs text-graphite-soft">{check.wcag}</span>
+                          <span className="mt-0.5 block font-medium">{check.name}</span>
+                        </td>
+                        <td className="py-3 pr-4 align-top">
+                          <span
+                            className="numeric text-[0.625rem] uppercase tracking-wide"
+                            data-ox-check={check.status}
+                          >
+                            {check.status === "not-applicable" ? "n/a" : check.status}
+                          </span>
+                        </td>
+                        <td className="max-w-md py-3 pr-4 align-top leading-relaxed text-graphite">
+                          {check.how}
+                        </td>
+                        <td className="py-3 align-top font-mono text-[0.7rem] text-graphite-soft">
+                          {check.evidence ?? "—"}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </section>
+        )}
+
         {/* Source ------------------------------------------------------- */}
         {source && (
           <section id="source" className="scroll-mt-24 border-b border-rule bg-paper-sunk/40">
@@ -512,10 +815,41 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
         )}
 
         {/* Related ------------------------------------------------------ */}
-        {related.length > 0 && (
+        {(related.length > 0 ||
+          alternatives.length > 0 ||
+          builtWith.length > 0 ||
+          usedIn.length > 0) && (
           <section id="related" className="scroll-mt-24">
             <div className="mx-auto max-w-6xl section-minor px-5 sm:px-8">
               <SectionHeading eyebrow="Related" title="Pairs well with." />
+
+              {/* "Use X instead when Y" is the single strongest trust signal a
+                  component page carries: a library that will send you
+                  elsewhere is one you can believe when it does not. */}
+              {alternatives.length > 0 && (
+                <ul className="mt-6 space-y-2" data-reveal>
+                  {alternatives.map((alternative: Alternative) => {
+                    const target = getComponent(alternative.ref);
+                    return (
+                      <li key={alternative.ref} className="text-sm leading-relaxed text-graphite">
+                        Use{" "}
+                        {target ? (
+                          <Link
+                            href={`/components/${target.name}`}
+                            className="font-medium text-ink underline decoration-rule-strong underline-offset-4 hover:decoration-oxygen"
+                          >
+                            {target.title}
+                          </Link>
+                        ) : (
+                          <span className="font-medium text-ink">{alternative.ref}</span>
+                        )}{" "}
+                        instead when {alternative.when}.
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
+
               <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {related.map((item) => (
                   <Link
@@ -532,6 +866,16 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
                   </Link>
                 ))}
               </div>
+
+              {/* Derived from what each component depends on, never declared.
+                  `usedIn` in particular is a fact no component can know about
+                  itself, and a hand-maintained one is wrong within a month. */}
+              {(builtWith.length > 0 || usedIn.length > 0) && (
+                <dl className="mt-10 grid gap-6 sm:grid-cols-2" data-reveal>
+                  <ComponentLinks label="Built with" names={builtWith} />
+                  <ComponentLinks label="Used in" names={usedIn} />
+                </dl>
+              )}
             </div>
           </section>
         )}
@@ -553,6 +897,45 @@ function SectionHeading({ eyebrow, title }: { eyebrow: string; title: string }) 
       <h2 className="display-sm mt-3 text-balance" data-reveal>
         {title}
       </h2>
+    </div>
+  );
+}
+
+/** A labelled row of links to other components, or nothing when empty. */
+function ComponentLinks({ label, names }: { label: string; names: readonly string[] }) {
+  if (!names.length) return null;
+  return (
+    <div>
+      <dt className="numeric text-[0.625rem] uppercase tracking-wide text-graphite-soft">
+        {label}
+      </dt>
+      <dd className="mt-1 flex flex-wrap gap-x-3 gap-y-1 text-sm text-graphite">
+        {names.map((name) => {
+          const target = getComponent(name);
+          return (
+            <Link
+              key={name}
+              href={`/components/${name}`}
+              className="underline decoration-rule-strong underline-offset-4 hover:text-ink hover:decoration-oxygen"
+            >
+              {target?.title ?? name}
+            </Link>
+          );
+        })}
+      </dd>
+    </div>
+  );
+}
+
+/** One labelled list of short values, or nothing when the list is empty. */
+function Fact({ label, values }: { label: string; values: readonly string[] }) {
+  if (!values.length) return null;
+  return (
+    <div>
+      <dt className="numeric text-[0.625rem] uppercase tracking-wide text-graphite-soft">
+        {label}
+      </dt>
+      <dd className="mt-1 text-sm leading-relaxed text-graphite">{values.join(", ")}</dd>
     </div>
   );
 }
