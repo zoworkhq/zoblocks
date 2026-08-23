@@ -10,13 +10,21 @@
  */
 
 import type {
+  A11yCheck,
   A11yNote,
+  Control,
   Distribution,
+  Domain,
+  Example,
   FhirResource,
   FrameworkRelation,
   Layer,
+  Relationships,
+  Seo,
   Stability,
+  Tag,
   Tier,
+  Variant,
 } from "./schema";
 
 export interface PropDoc {
@@ -36,6 +44,18 @@ export interface ComponentExportDoc {
   props: PropDoc[];
   extendsType?: string;
 }
+
+export type {
+  A11yCheck,
+  Alternative,
+  Control,
+  Domain,
+  Example,
+  Relationships,
+  Seo,
+  Tag,
+  Variant,
+} from "./schema.js";
 
 export interface ComponentDoc {
   name: string;
@@ -106,6 +126,25 @@ export interface ComponentDoc {
 
   /** npm packages a consumer inherits by installing this component. */
   dependencies: string[];
+
+  /* ---- the standard's second half; present once a component adopts it ---- */
+
+  /** The React export, e.g. "Tabs". Derived from the title when unset. */
+  technicalName?: string;
+  /** What people search for that is not the title. Feeds search, never the URL. */
+  aliases?: string[];
+  tags?: Tag[];
+  uxGuidelines?: { do: string[]; dont: string[] };
+  domain?: Domain;
+  variants?: Variant[];
+  /** The playground schema — which props are knobbable and with what widget. */
+  controls?: Control[];
+  /** Accessibility claims, each citing the test that proves it. */
+  a11yChecks?: A11yCheck[];
+  examples?: Example[];
+  fixtures?: string[];
+  seo?: Seo;
+  relationships?: Relationships;
   /** Registry install command, e.g. `npx @oxygenui-design/cli add vitals-panel`. */
   install: string;
 }

@@ -86,6 +86,36 @@ export function buildCatalog(
 
       dependencies: meta.dependencies,
       install: `npx @oxygenui-design/cli add ${meta.name}`,
+
+      // The standard's second half. Emitted only when populated, so a component
+      // that has not adopted it yet produces the same catalogue entry it always
+      // did rather than a row of empty arrays in a generated file people read.
+      ...(meta.technicalName ? { technicalName: meta.technicalName } : {}),
+      ...(meta.aliases.length ? { aliases: meta.aliases } : {}),
+      ...(meta.tags.length ? { tags: meta.tags } : {}),
+      ...(meta.uxGuidelines ? { uxGuidelines: meta.uxGuidelines } : {}),
+      ...(meta.domain.industries.length ? { domain: meta.domain } : {}),
+      ...(meta.variants.length ? { variants: meta.variants } : {}),
+      ...(meta.controls.length ? { controls: meta.controls } : {}),
+      ...(meta.a11yChecks.length ? { a11yChecks: meta.a11yChecks } : {}),
+      ...(meta.examples.length ? { examples: meta.examples } : {}),
+      ...(meta.fixtures.length ? { fixtures: meta.fixtures } : {}),
+      ...(meta.seo.primaryKeyword ? { seo: meta.seo } : {}),
+      // `builtWith` and `usedIn` come from the loader, which derived them from
+      // what each component actually depends on. The schema refuses them in
+      // hand-written metadata, so overwriting here is the only path they take.
+      ...(meta.relationships.patterns.length ||
+      meta.relationships.alternatives.length ||
+      component.derived.builtWith.length ||
+      component.derived.usedIn.length
+        ? {
+            relationships: {
+              ...meta.relationships,
+              builtWith: component.derived.builtWith,
+              usedIn: component.derived.usedIn,
+            },
+          }
+        : {}),
     };
 
     return doc;

@@ -155,6 +155,192 @@ export const registryFileSchema = z.object({
   target: z.string().optional(),
 });
 
+/* =========================================================================
+ * The standard's second half.
+ *
+ * Everything below is optional on the object and *required by
+ * `superRefine` once `status` is `"stable"`. That is deliberate and it is the
+ * maturity model expressed as code rather than as a checklist: a component may
+ * ship at experimental or beta with none of this, and cannot be promoted
+ * without all of it. Making the fields unconditionally required would have
+ * invalidated fourteen shipping components on the day the schema landed, which
+ * is how a standard gets reverted instead of adopted.
+ * ====================================================================== */
+
+/** Closed vocabulary. A free-text industry is how a Button acquires a FHIR paragraph. */
+export const industrySchema = z.enum([
+  "general",
+  "healthcare",
+  "behavioral-health",
+  "payer",
+  "human-services",
+]);
+
+/** Closed vocabulary. Drives the pattern hubs and the workflow search facet. */
+export const workflowSchema = z.enum([
+  "intake",
+  "assessment",
+  "documentation",
+  "treatment-planning",
+  "medication",
+  "scheduling",
+  "billing",
+  "telehealth",
+  "care-coordination",
+]);
+
+/** Closed vocabulary. Rendered as a chip row and indexed for search. */
+export const codeSystemSchema = z.enum([
+  "LOINC",
+  "SNOMED CT",
+  "RxNorm",
+  "ICD-10-CM",
+  "CPT",
+  "HL7 v2",
+  "FHIR",
+]);
+
+/**
+ * Multi-axis tags describing what a component *does*, not what it is called.
+ * This is what answers "table with filtering", which name-only search cannot.
+ */
+export const tagSchema = z.enum([
+  "virtualised",
+  "filterable",
+  "sortable",
+  "streaming",
+  "keyboard-first",
+  "offline-capable",
+  "form-control",
+  "overlay",
+  "navigation",
+  "data-entry",
+  "data-display",
+  "feedback",
+  "layout",
+  "disclosure",
+  "headless",
+  "animated",
+  "themeable",
+  "print-safe",
+]);
+
+export const searchIntentSchema = z.enum([
+  "informational",
+  "navigational",
+  "commercial",
+  "transactional",
+]);
+
+/** A named appearance variant, with the args that demonstrate it. */
+export const variantSchema = z.object({
+  id: nonEmpty("variant id"),
+  label: nonEmpty("variant label"),
+  description: nonEmpty("variant description"),
+  args: z.record(z.string(), z.unknown()).default({}),
+});
+
+/**
+ * The playground schema.
+ *
+ * Controls are data rather than markup so coverage is uniform. Mantine's
+ * playground is the pattern to beat and its weakness is that each demo declares
+ * its own knobs by hand — some components get twelve and some get none, which
+ * is the inconsistency this whole schema exists to prevent.
+ */
+export const controlSchema = z.object({
+  prop: nonEmpty("control prop"),
+  /** Widget. Chosen from the prop's type, not from taste — see the standard §6. */
+  control: z.enum(["switch", "segmented", "select", "slider", "text", "token", "fixture", "event"]),
+  label: z.string().optional(),
+  options: z.array(z.string()).optional(),
+  min: z.number().optional(),
+  max: z.number().optional(),
+  step: z.number().optional(),
+  defaultValue: z.unknown().optional(),
+});
+
+/**
+ * A machine-checkable accessibility claim.
+ *
+ * `evidence` is a test id, and it is required: a claim with no test behind it
+ * is prose, and prose in an accessibility panel is how a library ends up
+ * asserting conformance it has never measured.
+ */
+export const a11yCheckSchema = z.object({
+  /** WCAG success criterion, e.g. "2.1.1". */
+  wcag: nonEmpty("wcag criterion").regex(/^\d+\.\d+\.\d+$/, "must be a WCAG SC number like 2.1.1"),
+  name: nonEmpty("criterion name"),
+  status: z.enum(["pass", "fail", "not-applicable"]),
+  /** How it is met, in one sentence. */
+  how: nonEmpty("how the criterion is met"),
+  /** The test file or gate that proves it. Required unless the status is not-applicable. */
+  evidence: z.string().optional(),
+});
+
+/** A realistic, copyable example. Prose usage is not an example — nothing renders it. */
+export const exampleSchema = z.object({
+  id: nonEmpty("example id"),
+  title: nonEmpty("example title"),
+  description: nonEmpty("example description"),
+  /** Named dataset from @oxygenui-design/fixtures. Lorem ipsum is a build error. */
+  fixture: z.string().optional(),
+  code: nonEmpty("example code"),
+});
+
+export const alternativeSchema = z.object({
+  ref: nonEmpty("alternative ref"),
+  /** "…instead when X." The single strongest trust signal on a component page. */
+  when: nonEmpty("alternative when"),
+});
+
+export const domainSchema = z.object({
+  industries: z.array(industrySchema).default([]),
+  /** Rendered only when industries contains a clinical value. */
+  clinicalContext: z.string().optional(),
+  workflows: z.array(workflowSchema).default([]),
+  phi: z
+    .object({
+      handles: z.boolean(),
+      notes: nonEmpty("phi notes"),
+    })
+    .optional(),
+  /** Whether the component emits AuditEvent. Drives a badge and an audit section. */
+  auditable: z.boolean().optional(),
+  permissions: z.array(nonEmpty("permission")).default([]),
+  terminology: z.array(codeSystemSchema).default([]),
+});
+
+export const relationshipsSchema = z.object({
+  /**
+   * Derived from imports by the generator, not authored. Present on the schema
+   * so a hand-written value can be rejected rather than silently trusted.
+   */
+  builtWith: z.array(nonEmpty("builtWith")).default([]),
+  /** The inverse edge, computed. A primitive discovers its own consumers. */
+  usedIn: z.array(nonEmpty("usedIn")).default([]),
+  patterns: z.array(nonEmpty("pattern")).default([]),
+  alternatives: z.array(alternativeSchema).default([]),
+});
+
+export const seoSchema = z.object({
+  /** Defaults to `name`. Changing it requires a redirect entry in the same commit. */
+  slug: z.string().optional(),
+  title: z.string().max(60, "SEO title must be 60 characters or fewer").optional(),
+  description: z
+    .string()
+    .min(120, "meta description under 120 characters wastes the slot")
+    .max(158, "meta description over 158 characters is truncated in results")
+    .optional(),
+  /** Exactly one. Two components may not claim the same one — checked across the catalogue. */
+  primaryKeyword: z.string().optional(),
+  secondaryKeywords: z.array(nonEmpty("secondary keyword")).max(5).default([]),
+  searchIntent: searchIntentSchema.optional(),
+  /** "generated" renders from the component's own preview at build time. */
+  ogImage: z.union([z.literal("generated"), z.string().url()]).default("generated"),
+  noindex: z.boolean().optional(),
+});
+
 export const componentMetaSchema = z
   .object({
     /** Registry name, URL slug, and directory name. All three are the same string. */
@@ -258,6 +444,44 @@ export const componentMetaSchema = z
 
     /** Curation for the generated prop table. Never changes the contract, only its presentation. */
     props: z.array(propOverrideSchema).default([]),
+
+    /* ---- the standard's second half; required at `stable` ---------------- */
+
+    /** The React export. Derived from `title` when absent. */
+    technicalName: z.string().optional(),
+    /**
+     * What people type that is not the title — "patient switcher", "chart
+     * picker", a creative internal name. Feeds search and the keyword set,
+     * never the URL.
+     */
+    aliases: z.array(nonEmpty("alias")).default([]),
+    tags: z.array(tagSchema).default([]),
+    /** Rendered as a paired do/don't grid. */
+    uxGuidelines: z
+      .object({
+        do: z.array(nonEmpty("uxGuidelines.do item")).default([]),
+        dont: z.array(nonEmpty("uxGuidelines.dont item")).default([]),
+      })
+      .optional(),
+    domain: domainSchema.default({
+      industries: [],
+      workflows: [],
+      permissions: [],
+      terminology: [],
+    }),
+    variants: z.array(variantSchema).default([]),
+    controls: z.array(controlSchema).default([]),
+    a11yChecks: z.array(a11yCheckSchema).default([]),
+    relationships: relationshipsSchema.default({
+      builtWith: [],
+      usedIn: [],
+      patterns: [],
+      alternatives: [],
+    }),
+    examples: z.array(exampleSchema).default([]),
+    /** Named synthetic datasets. Lorem ipsum is a build error. */
+    fixtures: z.array(nonEmpty("fixture")).default([]),
+    seo: seoSchema.default({ secondaryKeywords: [], ogImage: "generated" }),
   })
   .strict()
   .superRefine((meta, ctx) => {
@@ -351,6 +575,96 @@ export const componentMetaSchema = z
         message: 'a deprecation block is present but status is not "deprecated".',
       });
     }
+    /* ---------------------------------------------------------------------
+     * The promotion gate.
+     *
+     * "Stable" is a semver promise to consumers, and the standard's position is
+     * that promotion is a CI result rather than a reviewer's judgement. So the
+     * whole second half of the schema becomes required here, and nowhere else.
+     * A component sitting at experimental or beta is untouched by any of it.
+     * ------------------------------------------------------------------ */
+    if (meta.status !== "stable") return;
+
+    const require = (ok: boolean, path: (string | number)[], message: string) => {
+      if (!ok) ctx.addIssue({ code: z.ZodIssueCode.custom, path, message });
+    };
+    const at = (label: string) => `${label} — required to be stable`;
+
+    require(!!meta.technicalName?.trim(), ["technicalName"], at("the React export name"));
+    require((meta.tags ?? []).length > 0, ["tags"], at("at least one capability tag"));
+    require((meta.domain?.industries ?? []).length > 0, ["domain", "industries"], at(
+      "at least one industry — use ['general'] for a non-clinical component",
+    ));
+    require(meta.summary.length <= 160, [
+      "summary",
+    ], `summary is ${meta.summary.length} characters; it doubles as the meta description, so 160 is the ceiling`);
+    require(meta.guidance.use.length >= 3, ["guidance", "use"], at(
+      "three or more useWhen entries",
+    ));
+    require((meta.related ?? []).length > 0, ["related"], at(
+      "at least one related component — an orphan page does not rank and cannot be navigated to",
+    ));
+    require((meta.examples ?? []).length >= 3, ["examples"], at(
+      "three examples (one is enough for beta, three for stable)",
+    ));
+    require((meta.fixtures ?? []).length > 0, ["fixtures"], at("a named fixture"));
+    require((meta.a11yChecks ?? []).length > 0, ["a11yChecks"], at(
+      "machine-checkable accessibility claims",
+    ));
+    require(!!meta.seo?.primaryKeyword?.trim(), ["seo", "primaryKeyword"], at(
+      "exactly one primary keyword",
+    ));
+    require(!!meta.seo?.searchIntent, ["seo", "searchIntent"], at("a search intent"));
+
+    // An accessibility claim that passes must name the test that proves it.
+    // Without this the panel is prose wearing a table's clothes.
+    (meta.a11yChecks ?? []).forEach((check, i) => {
+      if (check.status !== "not-applicable" && !check.evidence?.trim()) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["a11yChecks", i, "evidence"],
+          message: `${check.wcag} claims "${check.status}" with no evidence. Cite the test id, or mark it not-applicable.`,
+        });
+      }
+    });
+
+    // Every example must name a fixture, and that fixture must be declared.
+    (meta.examples ?? []).forEach((example, i) => {
+      if (example.fixture && !(meta.fixtures ?? []).includes(example.fixture)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["examples", i, "fixture"],
+          message: `fixture "${example.fixture}" is not declared in fixtures[]`,
+        });
+      }
+    });
+
+    // FHIR is conditional, not universal. A loader consumes no resource and
+    // forcing one on it produces the "FHIR undefined React component" title the
+    // docs site already guards against. Required only where it is meaningful.
+    const clinical = (meta.domain?.industries ?? []).some((i) =>
+      ["healthcare", "behavioral-health", "payer", "human-services"].includes(i),
+    );
+    if (clinical && meta.fhir.length === 0 && !meta.domain?.clinicalContext?.trim()) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["domain", "clinicalContext"],
+        message:
+          "a clinical component must declare either the FHIR resources it reads or a clinicalContext explaining why it reads none",
+      });
+    }
+
+    // Derived edges are computed by the generator from imports. A hand-written
+    // value is not a shortcut, it is a second source of truth that will drift.
+    for (const key of ["builtWith", "usedIn"] as const) {
+      if ((meta.relationships?.[key] ?? []).length > 0) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["relationships", key],
+          message: `relationships.${key} is derived from imports by the generator and must not be authored by hand`,
+        });
+      }
+    }
   });
 
 export type ComponentMeta = z.infer<typeof componentMetaSchema>;
@@ -362,6 +676,19 @@ export type Distribution = z.infer<typeof distributionSchema>;
 export type FrameworkPolicy = z.infer<typeof frameworkPolicySchema>;
 export type FrameworkRelation = z.infer<typeof frameworkRelationSchema>;
 export type A11yNote = z.infer<typeof a11yNoteSchema>;
+export type Tag = z.infer<typeof tagSchema>;
+export type Industry = z.infer<typeof industrySchema>;
+export type Workflow = z.infer<typeof workflowSchema>;
+export type CodeSystem = z.infer<typeof codeSystemSchema>;
+export type SearchIntent = z.infer<typeof searchIntentSchema>;
+export type Variant = z.infer<typeof variantSchema>;
+export type Control = z.infer<typeof controlSchema>;
+export type A11yCheck = z.infer<typeof a11yCheckSchema>;
+export type Example = z.infer<typeof exampleSchema>;
+export type Domain = z.infer<typeof domainSchema>;
+export type Relationships = z.infer<typeof relationshipsSchema>;
+export type Alternative = z.infer<typeof alternativeSchema>;
+export type Seo = z.infer<typeof seoSchema>;
 export type FhirResource = z.infer<typeof fhirResourceSchema>;
 
 /**
