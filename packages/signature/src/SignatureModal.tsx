@@ -77,6 +77,30 @@ export interface SignatureModalProps {
 /** Real ink colours, not tokens: these are baked into the archived PNG. */
 const INK_HEX = { black: "#141414", blue: "#1d39c4" } as const;
 
+/**
+ * The name to start the field with.
+ *
+ * An explicit `signer.name` always wins — the host knows who is holding the
+ * tablet. Failing that, a signer acting for themselves *is* the subject, whose
+ * name the dialog is already displaying in its own header: making somebody
+ * retype a name printed six inches above the box is friction with no
+ * safeguard behind it, and on a bedside tablet it is the step that gets
+ * skipped by handing the device over half-filled.
+ *
+ * Only for `self`. A proxy, parent, witness or interpreter is by definition
+ * not the subject, and prefilling the patient's name into a field that will be
+ * stored as *who signed* would be a false attribution — the one error this
+ * component exists to make impossible.
+ */
+function defaultNameFor(
+  capacity: Capacity,
+  signer: Partial<Signer> | undefined,
+  subject: Subject | undefined,
+): string {
+  if (signer?.name) return signer.name;
+  return capacity === "self" ? (subject?.display ?? "") : "";
+}
+
 const TYPE_STYLES = ["formal", "script", "plain"] as const;
 type TypeStyle = (typeof TYPE_STYLES)[number];
 
@@ -117,8 +141,19 @@ export function SignatureModal({
     width: number;
     height: number;
   } | null>(null);
-  const [name, setName] = React.useState(signerDefaults?.name ?? "");
   const [capacity, setCapacity] = React.useState<Capacity>(capacities[0] ?? "self");
+  const [name, setName] = React.useState(() =>
+    defaultNameFor(capacities[0] ?? "self", signerDefaults, subject),
+  );
+  /*
+   * Whether the reader has taken ownership of the field.
+   *
+   * The default follows the capacity — switching from "the patient" to "a
+   * parent or guardian" has to clear the patient's name, or the record says
+   * the parent is called Amara Okonkwo. But once somebody has typed, the
+   * field is theirs and no capacity change may overwrite it.
+   */
+  const [nameEdited, setNameEdited] = React.useState(false);
   const [showOutcomes, setShowOutcomes] = React.useState(false);
   const [tooLittleInk, setTooLittleInk] = React.useState(false);
   // Black or blue. Some institutions still require blue to distinguish an
@@ -171,7 +206,9 @@ export function SignatureModal({
     setUploaded(null);
     setShowOutcomes(false);
     setTooLittleInk(false);
-    setName(signerDefaults?.name ?? "");
+    setName(defaultNameFor(capacities[0] ?? "self", signerDefaults, subject));
+    setNameEdited(false);
+    setCapacity(capacities[0] ?? "self");
     setMethod(methods[0] ?? "draw");
     setInkColour("black");
     audit("opened");
@@ -306,16 +343,35 @@ export function SignatureModal({
                   cursor: "pointer",
                 }}
               >
+                {/*
+                  The swatch sits on paper, like the ink it samples.
+                  #141414 on a themed surface is invisible in dark mode — the
+                  same reason the pad itself is paper — and a bordered circle
+                  showing nothing is worse than no swatch, because it reads as
+                  a disabled control.
+                */}
                 <span
                   aria-hidden="true"
                   style={{
-                    width: 12,
-                    height: 12,
+                    display: "inline-flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    width: 16,
+                    height: 16,
                     borderRadius: "50%",
-                    background: INK_HEX[colour],
-                    border: "1px solid var(--ant-color-border, #d9d9d9)",
+                    background: "#ffffff",
+                    border: "1px solid rgb(0 0 0 / 0.24)",
                   }}
-                />
+                >
+                  <span
+                    style={{
+                      width: 10,
+                      height: 10,
+                      borderRadius: "50%",
+                      background: INK_HEX[colour],
+                    }}
+                  />
+                </span>
                 {/* Named, never colour alone — the swatch is decoration. */}
                 {t.ink[colour]}
               </button>
@@ -440,7 +496,10 @@ export function SignatureModal({
           <Input
             ref={nameRef}
             value={name}
-            onChange={(e) => setName(e.target.value)}
+            onChange={(e) => {
+              setNameEdited(true);
+              setName(e.target.value);
+            }}
             required
             autoComplete="off"
           />
@@ -454,7 +513,12 @@ export function SignatureModal({
           </div>
           <Select<Capacity>
             value={capacity}
-            onChange={setCapacity}
+            onChange={(next) => {
+              setCapacity(next);
+              // Only while the field is still the default's to set. See
+              // `nameEdited`.
+              if (!nameEdited) setName(defaultNameFor(next, signerDefaults, subject));
+            }}
             style={{ width: "100%" }}
             options={capacities.map((c) => ({ value: c, label: t.capacity[c] ?? c }))}
           />

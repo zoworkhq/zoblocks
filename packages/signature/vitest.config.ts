@@ -25,7 +25,7 @@ export default defineConfig({
       provider: "v8",
       reporter: ["text-summary", "json-summary", "lcov"],
       include: [`${packageRoot}src/**/*.{ts,tsx}`],
-      exclude: ["src/index.ts", "**/*.d.ts"],
+      exclude: ["src/index.ts", "**/*.stories.tsx", "**/*.d.ts"],
       // The tier bar from the readiness audit: nothing merges below `beta`,
       // and `beta` is 90% lines / 85% branches.
       thresholds: { lines: 90, functions: 90, branches: 85, statements: 90 },
@@ -60,6 +60,6 @@ export default defineConfig({
     testTimeout: 20_000,
     globals: true,
     setupFiles: ["./test/setup.ts"],
-    include: ["src/**/*.test.tsx", "test/**/*.test.tsx"],
+    include: ["src/**/*.test.{ts,tsx}", "test/**/*.test.{ts,tsx}"],
   },
 });

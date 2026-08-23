@@ -741,7 +741,7 @@ describe("the field, remaining paths", () => {
 
   it("takes an explicit error status without a Form", () => {
     const { container } = render(<Signature now={NOW} status="error" />);
-    expect(container.querySelector('[data-status="error"]')).not.toBeNull();
+    expect(container.querySelector('[data-ox-status="error"]')).not.toBeNull();
   });
 
   it("offers only the methods it was given", async () => {

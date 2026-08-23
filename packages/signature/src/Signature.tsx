@@ -116,7 +116,14 @@ export function Signature({
   return (
     <div
       className={["ox-signature-field", className ?? ""].filter(Boolean).join(" ")}
-      data-status={effectiveStatus}
+      /*
+       * Namespaced, like every other root in the library. A bare
+       * `data-status` on a public component root is a name a host page is
+       * entitled to use for its own purposes, and the collision would style
+       * this field from somewhere nobody thinks to look.
+       */
+      data-ox-signature=""
+      data-ox-status={effectiveStatus}
     >
       {value ? (
         <div style={{ display: "grid", gap: 8 }}>
