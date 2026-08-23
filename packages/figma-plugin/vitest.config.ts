@@ -22,7 +22,7 @@ export default defineConfig({
   test: {
     env: { PLUGIN_ROOT: here },
     environment: "jsdom",
-    include: ["test/**/*.test.ts"],
+    include: ["src/**/*.test.{ts,tsx}", "test/**/*.test.{ts,tsx}"],
     coverage: {
       provider: "v8",
       reporter: ["text-summary", "json-summary", "lcov"],

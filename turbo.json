@@ -22,7 +22,11 @@
     },
     "test": {
       "dependsOn": ["^build"],
-      "outputs": ["coverage/**"]
+      // No artefacts. `test` runs `vitest run`; only `test:coverage` passes
+      // --coverage, so declaring coverage/** here made turbo warn on every
+      // package whose suite produced nothing — noise on each CI run, and the
+      // kind that trains people to skim past warnings.
+      "outputs": []
     },
     "test:coverage": {
       "dependsOn": ["^build"],

@@ -14,6 +14,6 @@ export default defineConfig({
     // because the test script passes with no tests, the first rule test added
     // would have been skipped silently — the exact failure this file's comment
     // was written to prevent.
-    include: ["rules/**/*.test.js"],
+    include: ["rules/**/*.test.{js,ts}"],
   },
 });

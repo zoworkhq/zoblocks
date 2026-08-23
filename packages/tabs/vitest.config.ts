@@ -34,7 +34,13 @@ export default defineConfig({
        * own suites and their own thresholds, and hiding what this package's
        * tests actually reach.
        */
-      exclude: ["src/index.ts", "**/*.d.ts", "**/tabs-core/**", "**/tabs-testing/**"],
+      exclude: [
+        "src/index.ts",
+        "**/*.stories.tsx",
+        "**/*.d.ts",
+        "**/tabs-core/**",
+        "**/tabs-testing/**",
+      ],
       /*
        * Set at what the suite reaches under Vitest 4.
        *
