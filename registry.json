@@ -124,6 +124,24 @@
       ]
     },
     {
+      "name": "risk-core",
+      "type": "oxygen:lib",
+      "title": "Risk core",
+      "description": "Five bands including one for a patient the model could not score, driver attribution with its concentration, and a validity window that turns an old score into an expired one. Includes the FHIR RiskAssessment adapter. Installed automatically with RiskIndicator.",
+      "files": [
+        {
+          "path": "registry/oxygen/lib/risk.ts",
+          "type": "oxygen:lib",
+          "target": "lib/oxygen-risk.ts"
+        },
+        {
+          "path": "registry/oxygen/lib/risk.css",
+          "type": "oxygen:style",
+          "target": "styles/oxygen-risk.css"
+        }
+      ]
+    },
+    {
       "name": "switch-core",
       "type": "oxygen:lib",
       "title": "Switch core",
@@ -582,6 +600,33 @@
           "path": "registry/oxygen/rhythm-loader/rhythm-loader.tsx",
           "type": "oxygen:component",
           "target": "components/oxygen/rhythm-loader.tsx"
+        }
+      ]
+    },
+    {
+      "name": "risk-indicator",
+      "type": "oxygen:component",
+      "title": "Risk Indicator",
+      "description": "The band leads and the numeral is demoted. Staleness is on the face rather than in a tooltip, an expired score offers recompute or acknowledge and no third option, and the not-a-diagnosis framing is a required prop rather than a convention.",
+      "categories": [
+        "clinical",
+        "ai"
+      ],
+      "dependencies": [
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "utils",
+        "tokens",
+        "risk-core",
+        "clinical-status"
+      ],
+      "files": [
+        {
+          "path": "registry/oxygen/risk-indicator/risk-indicator.tsx",
+          "type": "oxygen:component",
+          "target": "components/oxygen/risk-indicator.tsx"
         }
       ]
     },

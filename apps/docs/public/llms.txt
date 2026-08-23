@@ -90,6 +90,11 @@ Rules that matter when generating code with these components:
   fhir: Observation
   states: Final, in range, Critical, with a delta, Preliminary — not verified by the laboratory, Corrected — the superseded value is shown, No reference range for this patient, A range that needs its qualification, Delta suppressed — the method changed, Patient-reported, Extracted by a model, Absent — never ordered, Absent — awaiting a result, Absent — cancelled, Absent — specimen problem, Absent — patient declined, Absent — restricted, and a value exists, Absent — no value and no reason, Compact, in a grid, Interactive — opens the report
   status: stable
+- [Risk Indicator](https://oxygenui.design/components/risk-indicator): A risk score that cannot be displayed without its date, its drivers, and the fact that it is not a diagnosis.
+  install: npx @oxygenui-design/cli add risk-indicator
+  fhir: RiskAssessment
+  states: High, with weighted drivers, Moderate, Low, Imminent, Not scored — the model could not, Expired — past its validity window, Unbounded — no validity window declared, One factor dominates the score, Drivers with no weights, from basis[], Percentile with its cohort, Model card reachable, Compact, in a panel list
+  status: stable
 - [Patient identity](https://oxygenui.design/components/identity): An avatar, a chip and a patient banner — with the pass that keeps two patients who share a name apart on the same worklist.
   install: npx @oxygenui-design/cli add identity
   fhir: Patient

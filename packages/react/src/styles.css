@@ -3237,6 +3237,369 @@ button.ox-allergy:focus-visible {
   }
 }
 
+/* ---- registry/oxygen/lib/risk.css ---- */
+/**
+ * RiskIndicator — band first, numeral demoted, staleness on the face.
+ */
+
+.ox-risk {
+  display: grid;
+  gap: 0.5rem;
+  inline-size: 100%;
+  padding: 0.75rem 0.875rem;
+  border: 1px solid var(--ox-border, #e2e8f0);
+  border-radius: var(--ox-radius-lg, 8px);
+  background: var(--ox-surface, transparent);
+  font-family: var(--ox-font-sans, inherit);
+  color: var(--ox-text, inherit);
+}
+
+.ox-risk[data-ox-density="compact"] {
+  gap: 0.375rem;
+  padding: 0.5rem 0.625rem;
+}
+
+/*
+ * The band tints the leading edge, not the card.
+ *
+ * A red panel behind a risk score is the single most common way a statistical
+ * estimate comes to read as a finding — it borrows the visual language of an
+ * alert, which is a thing somebody asserted.
+ */
+.ox-risk[data-ox-band="high"] {
+  border-inline-start: 3px solid var(--ox-status-critical, #b91c1c);
+}
+
+.ox-risk[data-ox-band="imminent"] {
+  border-inline-start: 3px solid var(--ox-status-critical, #b91c1c);
+}
+
+.ox-risk[data-ox-band="moderate"] {
+  border-inline-start: 3px solid var(--ox-status-high, #b45309);
+}
+
+.ox-risk[data-ox-band="low"] {
+  border-inline-start: 3px solid var(--ox-status-low, #2563eb);
+}
+
+.ox-risk[data-ox-band="unknown"] {
+  border-inline-start: 3px dashed var(--ox-status-unknown, #64748b);
+}
+
+/* ---------------------------------------------------------------- */
+/* Head                                                              */
+/* ---------------------------------------------------------------- */
+
+.ox-risk__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.ox-risk__outcome {
+  font-size: var(--ox-text-sm, 0.8125rem);
+  font-weight: 600;
+}
+
+/* ---------------------------------------------------------------- */
+/* Figures                                                           */
+/* ---------------------------------------------------------------- */
+
+.ox-risk__figures {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+
+/*
+ * Demoted, deliberately.
+ *
+ * Large enough to read and smaller than the band above it, because the band is
+ * the honest resolution of the estimate and the numeral is a convenience. Two
+ * decimal places would imply a precision the model does not have, so the value
+ * is rounded to a whole per cent before it ever reaches here.
+ */
+.ox-risk__probability {
+  font-size: var(--ox-risk-figure, 1.25rem);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+
+.ox-risk__unit {
+  margin-inline-start: 0.0625rem;
+  font-size: var(--ox-text-sm, 0.8125rem);
+  font-weight: 500;
+  color: var(--ox-text-muted, inherit);
+}
+
+.ox-risk__percentile {
+  font-size: var(--ox-text-xs, 0.75rem);
+  font-variant-numeric: tabular-nums;
+  color: var(--ox-text-muted, inherit);
+}
+
+/*
+ * Not a low score, and it does not look like one.
+ *
+ * Rendering an unscored patient as the bottom band is how somebody the model
+ * cannot see becomes somebody the panel does not call.
+ */
+.ox-risk__unscored {
+  margin: 0;
+  font-size: var(--ox-text-xs, 0.75rem);
+  font-style: italic;
+  color: var(--ox-text-muted, inherit);
+}
+
+/* ---------------------------------------------------------------- */
+/* Drivers                                                           */
+/* ---------------------------------------------------------------- */
+
+.ox-risk__drivers {
+  display: grid;
+  gap: 0.25rem;
+  padding-block-start: 0.375rem;
+  border-block-start: 1px solid var(--ox-border, #e2e8f0);
+}
+
+.ox-risk__drivers-title {
+  margin: 0;
+  font-family: var(--ox-font-mono, monospace);
+  font-size: var(--ox-text-2xs, 0.6875rem);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ox-text-subtle, var(--ox-text-muted, inherit));
+}
+
+.ox-risk__driver-list {
+  display: grid;
+  gap: 0.1875rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ox-risk__driver {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 3.5rem auto;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: var(--ox-text-xs, 0.75rem);
+}
+
+.ox-risk__driver-label {
+  min-inline-size: 0;
+  overflow-wrap: break-word;
+}
+
+.ox-risk__driver-bar {
+  display: block;
+  block-size: 0.25rem;
+  border-radius: 999px;
+  background: var(--ox-bg-subtle, rgb(0 0 0 / 0.06));
+  overflow: hidden;
+}
+
+.ox-risk__driver-fill {
+  display: block;
+  block-size: 100%;
+  border-radius: 999px;
+  background: var(--ox-status-high, #b45309);
+}
+
+/*
+ * Direction is a sign and a fill colour, and the sign is the one that carries.
+ * The signed number is in the markup and in the accessible name; the hue only
+ * repeats it.
+ */
+.ox-risk__driver[data-ox-direction="lowers"] .ox-risk__driver-fill {
+  background: var(--ox-status-normal, #047857);
+}
+
+.ox-risk__driver[data-ox-direction="neutral"] .ox-risk__driver-fill {
+  background: var(--ox-status-unknown, #64748b);
+}
+
+.ox-risk__driver-weight {
+  font-variant-numeric: tabular-nums;
+  text-align: end;
+  color: var(--ox-text-muted, inherit);
+}
+
+.ox-risk__driver-weight[data-ox-unweighted] {
+  font-style: italic;
+  color: var(--ox-text-subtle, var(--ox-text-muted, inherit));
+}
+
+/*
+ * The line that says whether this is a synthesis or a proxy for one event.
+ * Amber rather than neutral: a score that is mostly one ED visit is not wrong,
+ * but reading it as a model output is.
+ */
+.ox-risk__concentration {
+  margin: 0.125rem 0 0;
+  font-size: var(--ox-text-2xs, 0.6875rem);
+  color: var(--ox-status-high, #b45309);
+}
+
+/* ---------------------------------------------------------------- */
+/* Foot                                                              */
+/* ---------------------------------------------------------------- */
+
+.ox-risk__foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.375rem 0.75rem;
+  font-size: var(--ox-text-2xs, 0.6875rem);
+  color: var(--ox-text-muted, inherit);
+}
+
+/*
+ * Staleness on the face, and loud when it matters.
+ *
+ * A score computed nightly and read at noon — after the admission that would
+ * have changed it — is the failure nobody sees, because nobody hovered.
+ */
+.ox-risk__age[data-ox-freshness="expired"] {
+  padding: 0.0625rem 0.3125rem;
+  border-radius: var(--ox-radius-sm, 4px);
+  background: var(--ox-status-critical-bg, #fef2f2);
+  color: var(--ox-status-critical, #b91c1c);
+  font-weight: 600;
+}
+
+.ox-risk__model {
+  appearance: none;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: var(--ox-accent, #1677ff);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+
+.ox-risk__model[data-ox-static] {
+  color: var(--ox-text-subtle, var(--ox-text-muted, inherit));
+  text-decoration: none;
+  cursor: default;
+}
+
+.ox-risk__model:focus-visible,
+.ox-risk__action:focus-visible {
+  outline: 2px solid var(--ox-focus-ring, var(--ox-accent, #1677ff));
+  outline-offset: 2px;
+}
+
+/* ---------------------------------------------------------------- */
+/* Expired                                                           */
+/*                                                                   */
+/* Two ways out and no third. Dismissal is not offered: a score       */
+/* somebody waved away is a score that stays on the panel looking     */
+/* current.                                                          */
+/* ---------------------------------------------------------------- */
+
+.ox-risk__expired {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+}
+
+.ox-risk__action {
+  min-block-size: 1.5rem;
+  padding: 0.1875rem 0.5rem;
+  border: 1px solid var(--ox-status-critical-border, #fecaca);
+  border-radius: var(--ox-radius-sm, 4px);
+  background: var(--ox-surface, transparent);
+  font: inherit;
+  font-size: var(--ox-text-xs, 0.75rem);
+  font-weight: 500;
+  color: var(--ox-status-critical, #b91c1c);
+  cursor: pointer;
+}
+
+.ox-risk__action[data-ox-secondary] {
+  border-color: var(--ox-border, #e2e8f0);
+  color: var(--ox-text-muted, inherit);
+}
+
+.ox-risk__action:hover {
+  border-color: currentColor;
+}
+
+/* ---------------------------------------------------------------- */
+/* Framing                                                           */
+/* ---------------------------------------------------------------- */
+
+/*
+ * Quiet, and always present.
+ *
+ * A required prop rather than a convention, because every product that made it
+ * optional shipped without it — and this is the line that stops a score with
+ * an AUC of 0.63 being read as a finding.
+ */
+.ox-risk__framing {
+  margin: 0;
+  padding-block-start: 0.375rem;
+  border-block-start: 1px solid var(--ox-border, #e2e8f0);
+  font-size: var(--ox-text-2xs, 0.6875rem);
+  color: var(--ox-text-subtle, var(--ox-text-muted, inherit));
+}
+
+/* ---------------------------------------------------------------- */
+/* Narrow                                                            */
+/*                                                                   */
+/* The drivers collapse to label and weight; the staleness signal     */
+/* never collapses.                                                   */
+/* ---------------------------------------------------------------- */
+
+@media (max-width: 420px) {
+  .ox-risk__driver {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .ox-risk__driver-bar {
+    display: none;
+  }
+}
+
+/* ---------------------------------------------------------------- */
+/* Forced colors and print                                           */
+/* ---------------------------------------------------------------- */
+
+@media (forced-colors: active) {
+  .ox-risk {
+    border-color: CanvasText;
+  }
+
+  .ox-risk[data-ox-band="unknown"] {
+    border-inline-start-style: dashed;
+  }
+
+  .ox-risk__driver-fill {
+    background: CanvasText;
+  }
+}
+
+@media print {
+  .ox-risk {
+    border-color: #000;
+    color: #000;
+  }
+
+  /* The two lines a printed score must not lose. */
+  .ox-risk__age,
+  .ox-risk__framing {
+    color: #000;
+  }
+}
+
 /* ---- registry/oxygen/lib/timeline.css ---- */
 /**
  * Oxygen timeline — the rail, the nodes, and the states that are not decoration.

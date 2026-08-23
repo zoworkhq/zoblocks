@@ -144,7 +144,9 @@ export const AllergyChip = React.forwardRef<HTMLElement, AllergyChipProps>(funct
         ) : null}
 
         {record.verification ? (
-          <span className="ox-allergy__verification">{VERIFICATION_LABEL[record.verification]}</span>
+          <span className="ox-allergy__verification">
+            {VERIFICATION_LABEL[record.verification]}
+          </span>
         ) : null}
       </span>
 
@@ -223,7 +225,17 @@ export interface AllergyListProps extends Omit<React.HTMLAttributes<HTMLDivEleme
 }
 
 export const AllergyList = React.forwardRef<HTMLDivElement, AllergyListProps>(function AllergyList(
-  { records, noneKnown, density = "default", expandClass, onOpenDetail, onAsk, askLabel = "Ask and record", className, ...rest },
+  {
+    records,
+    noneKnown,
+    density = "default",
+    expandClass,
+    onOpenDetail,
+    onAsk,
+    askLabel = "Ask and record",
+    className,
+    ...rest
+  },
   ref,
 ) {
   const state = resolveListState({ records: records ?? [], noneKnown: noneKnown ?? {} });

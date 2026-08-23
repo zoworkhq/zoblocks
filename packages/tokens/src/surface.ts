@@ -13,7 +13,7 @@
  * change, because customers style against these names. The manifest is
  * committed so that change shows up as a reviewable diff.
  *
- * 295 tokens across 22 components:
+ * 296 tokens across 23 components:
  *
  *   switch          55
  *   tabs            44
@@ -37,6 +37,7 @@
  *   care-timeline    2
  *   allergy          1
  *   patient-chip     1
+ *   risk             1
  *
  * `bridgeable: false` (86 tokens) marks the ones resolving to clinical
  * status or an identity flag. A host framework's `colorError` is not our
@@ -1848,6 +1849,15 @@ export const TOKEN_SURFACE: readonly SurfaceEntry[] = [
     "bridgeable": true
   },
   {
+    "name": "--ox-risk-figure",
+    "component": "risk",
+    "source": "packages/tokens/tokens/component.json",
+    "kind": "dimension",
+    "frameworks": [],
+    "fallback": true,
+    "bridgeable": true
+  },
+  {
     "name": "--ox-rv-gap",
     "component": "rv",
     "source": "packages/react/src/styles.css",
@@ -3100,6 +3110,7 @@ export const SURFACE_COMPONENTS: readonly string[] = [
   "nav",
   "patient-chip",
   "range",
+  "risk",
   "rv",
   "surface-card",
   "switch",
@@ -3223,6 +3234,7 @@ export const BRIDGEABLE: readonly string[] = [
   "--ox-range-height",
   "--ox-range-marker",
   "--ox-range-track",
+  "--ox-risk-figure",
   "--ox-rv-gap",
   "--ox-rv-value-compact",
   "--ox-rv-value-default",

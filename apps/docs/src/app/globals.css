@@ -50,6 +50,10 @@
    the same fact. Shipped as styles/oxygen-allergy.css by `allergy-core`. */
 @import "../../../../registry/oxygen/lib/allergy.css";
 
+/* Band first, numeral demoted, staleness on the face. Shipped as
+   styles/oxygen-risk.css by `risk-core`. */
+@import "../../../../registry/oxygen/lib/risk.css";
+
 /* The rail, the coverage footer and the two-column register split. Shipped as
    styles/oxygen-timeline.css by the `timeline-core` registry item, carrying
    Timeline and CareTimeline between them.

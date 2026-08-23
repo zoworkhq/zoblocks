@@ -627,5 +627,12 @@
     "value-compact": {
       "$value": "0.9375rem"
     }
+  },
+  "risk": {
+    "$description": "RiskIndicator. One token: how large the numeral is. Exposed because the band is the honest resolution and the numeral is a convenience, and a deployment that wants the convenience quieter should be able to have it without forking the component.",
+    "$type": "dimension",
+    "figure": {
+      "$value": "1.25rem"
+    }
   }
 }

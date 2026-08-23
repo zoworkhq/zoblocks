@@ -146,6 +146,23 @@ const SUPPORT_ITEMS: BuildableItem[] = [
     ],
   },
   {
+    name: "risk-core",
+    type: "oxygen:lib",
+    title: "Risk core",
+    description:
+      "Five bands including one for a patient the model could not score, driver attribution with its concentration, and a validity window that turns an old score into an expired one. Includes the FHIR RiskAssessment adapter. Installed automatically with RiskIndicator.",
+    dependencies: [] as string[],
+    registryDependencies: [] as string[],
+    files: [
+      { path: "registry/oxygen/lib/risk.ts", type: "oxygen:lib", target: "lib/oxygen-risk.ts" },
+      {
+        path: "registry/oxygen/lib/risk.css",
+        type: "oxygen:style",
+        target: "styles/oxygen-risk.css",
+      },
+    ],
+  },
+  {
     name: "switch-core",
     type: "oxygen:lib",
     title: "Switch core",

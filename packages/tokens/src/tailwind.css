@@ -265,4 +265,5 @@
   --spacing-ox-cs-glyph-compact: var(--ox-cs-glyph-compact);
   --spacing-ox-rv-value-default: var(--ox-rv-value-default);
   --spacing-ox-rv-value-compact: var(--ox-rv-value-compact);
+  --spacing-ox-risk-figure: var(--ox-risk-figure);
 }

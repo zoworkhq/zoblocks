@@ -53,6 +53,7 @@ import { SignatureMark } from "@/components/site/signature-mark";
 import { ClinicalStatus } from "@/registry/oxygen/clinical-status/clinical-status";
 import { ResultValue } from "@/registry/oxygen/result-value/result-value";
 import { AllergyChip } from "@/registry/oxygen/allergy-chip/allergy-chip";
+import { RiskIndicator } from "@/registry/oxygen/risk-indicator/risk-indicator";
 import { IdentityProvider, PatientChip, IdentitySet } from "@oxygenui-design/identity";
 import { STATUS_LABEL, type ComponentDoc } from "@/lib/catalog";
 import { cn } from "@/lib/utils";
@@ -260,6 +261,34 @@ const PREVIEW: Record<string, (featured: boolean) => React.ReactNode> = {
    * Same manifestation, opposite consequences. A card showing one allergy
    * would be a card for a component every library already ships.
    */
+  /* The whole card, because the point is what surrounds the number. */
+  "risk-indicator": (featured) => (
+    <div style={{ maxInlineSize: featured ? 320 : 258, inlineSize: "100%" }}>
+      <RiskIndicator
+        density={featured ? "default" : "compact"}
+        now="2026-08-12T10:00:00Z"
+        notADiagnosis="A statistical estimate. Not a diagnosis."
+        assessment={{
+          id: "card-risk",
+          outcome: "30-day readmission",
+          band: "high",
+          probability: 0.31,
+          percentile: 94,
+          cohort: "adult medicine",
+          computedAt: "2026-08-12T04:12:00Z",
+          validUntil: "2026-08-13T04:12:00Z",
+          drivers: [
+            { label: "3 admissions / 6 mo", weight: 11.2 },
+            { label: "Lives alone", weight: 4.8 },
+            { label: "Adherent to statin", weight: -2.1 },
+          ],
+          model: { name: "Readmit-v4", auc: 0.71 },
+        }}
+        driverCount={3}
+      />
+    </div>
+  ),
+
   "allergy-chip": (featured) => (
     <div
       style={{ display: "grid", gap: 8, maxInlineSize: featured ? 320 : 250, inlineSize: "100%" }}

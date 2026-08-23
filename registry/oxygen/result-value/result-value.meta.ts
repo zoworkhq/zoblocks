@@ -82,7 +82,7 @@ export default defineComponentMeta({
     "The spoken-unit table covers the common laboratory units. An unlisted unit is spoken as written, which is correct but reads poorly.",
   ],
 
-  related: ["clinical-status", "care-timeline", "allergy-chip"],
+  related: ["clinical-status", "care-timeline", "allergy-chip", "risk-indicator"],
 
   dependencies: ["clsx", "tailwind-merge"],
   registryDependencies: ["utils", "tokens", "result-value-core", "clinical-status"],

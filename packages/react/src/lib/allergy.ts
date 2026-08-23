@@ -52,12 +52,7 @@ export const KIND_LABEL: Record<AllergyKind, string> = {
 
 /** How much the record is believed. Six, and two of them mean "do not act". */
 export type Verification =
-  | "unconfirmed"
-  | "presumed"
-  | "confirmed"
-  | "refuted"
-  | "entered-in-error"
-  | "unable-to-verify";
+  "unconfirmed" | "presumed" | "confirmed" | "refuted" | "entered-in-error" | "unable-to-verify";
 
 export const VERIFICATION_LABEL: Record<Verification, string> = {
   unconfirmed: "Unconfirmed",
@@ -352,11 +347,17 @@ export function fromAllergyIntolerance(resource: FhirAllergy): AllergyRecord | n
   const reactions = (resource.reaction ?? [])
     .map((reaction) => {
       const manifestation =
-        reaction.manifestation?.map((m) => conceptText(m)).filter(Boolean).join(", ") ??
-        reaction.description;
+        reaction.manifestation
+          ?.map((m) => conceptText(m))
+          .filter(Boolean)
+          .join(", ") ?? reaction.description;
       if (!manifestation) return null;
       const out: Reaction = { manifestation };
-      if (reaction.severity === "mild" || reaction.severity === "moderate" || reaction.severity === "severe") {
+      if (
+        reaction.severity === "mild" ||
+        reaction.severity === "moderate" ||
+        reaction.severity === "severe"
+      ) {
         out.severity = reaction.severity;
       }
       if (reaction.onset) out.onset = reaction.onset;
@@ -370,11 +371,19 @@ export function fromAllergyIntolerance(resource: FhirAllergy): AllergyRecord | n
   if (resource.lastOccurrence) record.lastOccurrence = resource.lastOccurrence;
 
   const category = resource.category?.[0];
-  if (category === "food" || category === "medication" || category === "environment" || category === "biologic") {
+  if (
+    category === "food" ||
+    category === "medication" ||
+    category === "environment" ||
+    category === "biologic"
+  ) {
     record.category = category;
   }
 
-  const note = (resource.note ?? []).map((n) => n.text).filter(Boolean).join(" · ");
+  const note = (resource.note ?? [])
+    .map((n) => n.text)
+    .filter(Boolean)
+    .join(" · ");
   if (note) record.note = note;
 
   return record;
@@ -398,7 +407,10 @@ export function noKnownFromFHIR(resource: FhirAllergy): NoKnownAllergies | null 
   const assertion: NoKnownAllergies = { asserter, assertedAt };
   const scope = NO_KNOWN_ALLERGY_CODES[code];
   if (scope) assertion.scope = scope;
-  const note = (resource.note ?? []).map((n) => n.text).filter(Boolean).join(" · ");
+  const note = (resource.note ?? [])
+    .map((n) => n.text)
+    .filter(Boolean)
+    .join(" · ");
   if (note) assertion.context = note;
   return assertion;
 }

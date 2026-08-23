@@ -40,6 +40,10 @@ import { Copilot } from "@/registry/oxygen/copilot/copilot";
 import { ClinicalNote, ClinicalNoteReader } from "@/registry/oxygen/clinical-note/clinical-note";
 import { ResultValue, type ResultValueData } from "@/registry/oxygen/result-value/result-value";
 import {
+  RiskIndicator,
+  type RiskAssessment,
+} from "@/registry/oxygen/risk-indicator/risk-indicator";
+import {
   AllergyChip,
   AllergyList,
   type AllergyRecord,
@@ -769,7 +773,100 @@ const AL_RECORDS: AllergyRecord[] = [
   },
 ];
 
+/* ------------------------------------------------------------------ */
+/* RiskIndicator fixtures                                              */
+/* ------------------------------------------------------------------ */
+
+const RI_NOW = "2026-08-12T10:00:00Z";
+const RI_COMPUTED = "2026-08-12T04:12:00Z";
+const RI_FRAMING =
+  "A statistical estimate from historical patterns. Not a diagnosis, and not a substitute for assessment.";
+
+const RI_READMISSION: RiskAssessment = {
+  id: "ri1",
+  outcome: "30-day readmission",
+  band: "high",
+  probability: 0.31,
+  percentile: 94,
+  cohort: "adult medicine",
+  computedAt: RI_COMPUTED,
+  validUntil: "2026-08-13T04:12:00Z",
+  drivers: [
+    { label: "3 admissions / 6 mo", weight: 11.2 },
+    { label: "Lives alone", weight: 4.8 },
+    { label: "No PCP visit < 90 d", weight: 3.9 },
+    { label: "Adherent to statin", weight: -2.1 },
+  ],
+  model: { name: "Readmit-v4", auc: 0.71 },
+};
+
 const SCENARIOS: Record<string, Scenario[]> = {
+  /** Three demos, one per failure. */
+  "risk-indicator": [
+    {
+      id: "attributed",
+      label: "Date, drivers, framing",
+      note: "The band leads and the numeral is demoted, because two decimal places imply a precision the model does not have. Staleness is on the face rather than in a tooltip — a score computed nightly and read at noon, after the admission that would have changed it, is the failure nobody sees because nobody hovered. The framing sentence is a required prop: every product that made it optional shipped without it.",
+      render: () => (
+        <div style={{ maxInlineSize: 420 }}>
+          <RiskIndicator
+            assessment={RI_READMISSION}
+            now={RI_NOW}
+            notADiagnosis={RI_FRAMING}
+            onOpenModel={() => {}}
+          />
+        </div>
+      ),
+    },
+    {
+      id: "expired",
+      label: "Expired, and not scored",
+      note: "Past its validity window a score stops being stale and starts being something the model no longer stands behind — and there are two ways out, neither of them dismissal. Beneath it, a patient the model could not score: missing features, outside the training population, a service that timed out. That is a fact, and it is not \u201clow\u201d. Rendering it as the bottom band is how somebody the model cannot see becomes somebody the panel does not call.",
+      render: () => (
+        <div style={{ display: "grid", gap: 12, maxInlineSize: 420 }}>
+          <RiskIndicator
+            assessment={RI_READMISSION}
+            now="2026-08-14T09:00:00Z"
+            notADiagnosis={RI_FRAMING}
+            onRecompute={() => {}}
+            onAcknowledge={() => {}}
+          />
+          <RiskIndicator
+            assessment={{
+              id: "ri2",
+              outcome: "30-day readmission",
+              band: "unknown",
+              computedAt: RI_COMPUTED,
+            }}
+            now={RI_NOW}
+            notADiagnosis={RI_FRAMING}
+          />
+        </div>
+      ),
+    },
+    {
+      id: "concentration",
+      label: "When one factor is the score",
+      note: "A model whose top driver carries most of the attribution is not modelling a patient; it is reporting one event — an ED visit eighteen months ago. The component says so, because a clinician who knows that reads the number correctly and one who does not treats it as a synthesis. Weights are the model's own units and are never rescaled across models: a bar is scaled within one assessment only, which is a comparison the data supports.",
+      render: () => (
+        <div style={{ maxInlineSize: 420 }}>
+          <RiskIndicator
+            assessment={{
+              ...RI_READMISSION,
+              drivers: [
+                { label: "ED visit, 18 months ago", weight: 14 },
+                { label: "Lives alone", weight: 2.1 },
+                { label: "No PCP visit < 90 d", weight: 1.8 },
+              ],
+            }}
+            now={RI_NOW}
+            notADiagnosis={RI_FRAMING}
+          />
+        </div>
+      ),
+    },
+  ],
+
   /** Three demos, and the first two are the two failures. */
   "allergy-chip": [
     {

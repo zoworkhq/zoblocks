@@ -51,6 +51,9 @@
       "@/components/oxygen/rhythm-loader": [
         "./registry/oxygen/rhythm-loader/rhythm-loader.tsx"
       ],
+      "@/components/oxygen/risk-indicator": [
+        "./registry/oxygen/risk-indicator/risk-indicator.tsx"
+      ],
       "@/components/oxygen/safety-plan": [
         "./registry/oxygen/safety-plan/safety-plan.tsx"
       ],
@@ -77,6 +80,9 @@
       ],
       "@/lib/oxygen-result-value": [
         "./registry/oxygen/lib/result-value.ts"
+      ],
+      "@/lib/oxygen-risk": [
+        "./registry/oxygen/lib/risk.ts"
       ],
       "@/lib/oxygen-switch": [
         "./registry/oxygen/lib/switch.tsx"

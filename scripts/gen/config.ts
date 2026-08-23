@@ -39,6 +39,7 @@ export const SUPPORT_ITEM_NAMES: ReadonlySet<string> = new Set([
   "clinical-status-core",
   "result-value-core",
   "allergy-core",
+  "risk-core",
   "timeline-core",
   "timeline-fhir",
 ]);
