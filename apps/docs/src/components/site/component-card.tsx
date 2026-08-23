@@ -51,6 +51,7 @@ import { Copilot } from "@/registry/oxygen/copilot/copilot";
 import { createStaticProvider, lookUp, minimalDisclosure } from "@oxygenui-design/copilot-core";
 import { SignatureMark } from "@/components/site/signature-mark";
 import { ClinicalStatus } from "@/registry/oxygen/clinical-status/clinical-status";
+import { ResultValue } from "@/registry/oxygen/result-value/result-value";
 import { IdentityProvider, PatientChip, IdentitySet } from "@oxygenui-design/identity";
 import { STATUS_LABEL, type ComponentDoc } from "@/lib/catalog";
 import { cn } from "@/lib/utils";
@@ -246,6 +247,43 @@ const PREVIEW: Record<string, (featured: boolean) => React.ReactNode> = {
    * and a single scale reads as a severity badge — which is the component
    * every other library already ships.
    */
+  /*
+   * A critical value and an absence, together.
+   *
+   * One of each, because the card has to say what the component is for: the
+   * number nobody gets wrong, and the blank cell everybody does.
+   */
+  "result-value": (featured) => (
+    <div
+      style={{ display: "grid", gap: 12, maxInlineSize: featured ? 320 : 250, inlineSize: "100%" }}
+    >
+      <ResultValue
+        density={featured ? "default" : "compact"}
+        now="2026-08-12T10:41:00Z"
+        value={{
+          id: "card-k",
+          analyte: "Potassium",
+          value: 6.8,
+          unit: "mmol/L",
+          interpretation: "critical",
+          range: { low: 3.5, high: 5.1 },
+          status: "final",
+          prior: { value: 4.7, at: "2026-08-12T06:00:00Z" },
+          resultedAt: "2026-08-12T10:00:00Z",
+        }}
+      />
+      <ResultValue
+        density={featured ? "default" : "compact"}
+        value={{
+          id: "card-hb",
+          analyte: "HbA1c",
+          absent: "specimen-problem",
+          absentDetail: "Haemolysed. Recollection requested.",
+        }}
+      />
+    </div>
+  ),
+
   "clinical-status": (featured) => (
     <div
       style={{

@@ -28,7 +28,7 @@ import {
   fromObservationStatus,
   fromRequestStatus,
   resolveStatus,
-  wordFor,
+  statusWord,
   type ScaleName,
 } from "./clinical-status";
 
@@ -322,7 +322,7 @@ describe("describeStatus", () => {
 
   it("defaults to the clinician register", () => {
     const step = resolveStatus("data-quality", "self-reported");
-    expect(wordFor(step)).toBe("Self-reported");
-    expect(wordFor(step, "patient")).toBe("You told us this");
+    expect(statusWord(step)).toBe("Self-reported");
+    expect(statusWord(step, "patient")).toBe("You told us this");
   });
 });

@@ -617,5 +617,15 @@
     "glyph-compact": {
       "$value": "0.4375rem"
     }
+  },
+  "rv": {
+    "$description": "ResultValue. The two value sizes, exposed because a results grid and a chart panel want different ones and the difference is not density in general — it is how large a number has to be before a clinician trusts they read it correctly.",
+    "$type": "dimension",
+    "value-default": {
+      "$value": "1.0625rem"
+    },
+    "value-compact": {
+      "$value": "0.9375rem"
+    }
   }
 }

@@ -21,6 +21,7 @@ export * from "./components/copilot/copilot";
 export * from "./components/helix-loader/helix-loader";
 export * from "./components/infusion-loader/infusion-loader";
 export * from "./components/pulse-loader/pulse-loader";
+export * from "./components/result-value/result-value";
 export * from "./components/rhythm-loader/rhythm-loader";
 export * from "./components/safety-plan/safety-plan";
 export * from "./components/switch/switch";

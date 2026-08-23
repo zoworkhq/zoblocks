@@ -42,6 +42,10 @@
    drift from the shipped rules without anyone seeing it. */
 @import "../../../../registry/oxygen/lib/clinical-status.css";
 
+/* The value line, the seven absences and the superseded-value rule. Shipped as
+   styles/oxygen-result-value.css by the `result-value-core` registry item. */
+@import "../../../../registry/oxygen/lib/result-value.css";
+
 /* The rail, the coverage footer and the two-column register split. Shipped as
    styles/oxygen-timeline.css by the `timeline-core` registry item, carrying
    Timeline and CareTimeline between them.

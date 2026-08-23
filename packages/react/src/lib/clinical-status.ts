@@ -1,3 +1,11 @@
+// GENERATED FILE — DO NOT EDIT.
+//
+// Produced by `pnpm gen` from each component's *.meta.ts.
+// Edit the metadata, then re-run. CI fails if this file is stale.
+//
+// See content/decisions/0004-generated-component-metadata.md
+//
+// Generated from registry/oxygen/lib/clinical-status.ts. Edit that file, not this one.
 /**
  * The clinical status vocabulary — nine scales, closed.
  *

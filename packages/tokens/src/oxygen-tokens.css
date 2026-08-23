@@ -475,6 +475,8 @@
   --ox-cs-height-compact: 1.375rem;
   --ox-cs-glyph: 0.5rem;
   --ox-cs-glyph-compact: 0.4375rem;
+  --ox-rv-value-default: 1.0625rem;
+  --ox-rv-value-compact: 0.9375rem;
 }
 
   /* Brand — northwind ---------------------------------------------------

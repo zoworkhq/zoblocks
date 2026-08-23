@@ -38,6 +38,7 @@ import type { AccordionItem } from "@/registry/oxygen/lib/accordion-core";
 import { Tabs } from "@oxygenui-design/tabs";
 import { Copilot } from "@/registry/oxygen/copilot/copilot";
 import { ClinicalNote, ClinicalNoteReader } from "@/registry/oxygen/clinical-note/clinical-note";
+import { ResultValue, type ResultValueData } from "@/registry/oxygen/result-value/result-value";
 import {
   ClinicalStatus,
   SCALES,
@@ -582,7 +583,220 @@ function NaiveTimeline() {
   );
 }
 
+/* ------------------------------------------------------------------ */
+/* ResultValue fixtures                                                */
+/* ------------------------------------------------------------------ */
+
+const RV_NOW = "2026-08-12T10:41:00Z";
+const RV_RESULTED = "2026-08-12T10:00:00Z";
+const RV_EARLIER = "2026-08-12T06:00:00Z";
+
+const RV_PRESENT: ResultValueData[] = [
+  {
+    id: "na",
+    analyte: "Sodium",
+    value: 139,
+    unit: "mmol/L",
+    range: { low: 135, high: 145 },
+    status: "final",
+    resultedAt: RV_RESULTED,
+  },
+  {
+    id: "k",
+    analyte: "Potassium",
+    value: 6.8,
+    unit: "mmol/L",
+    interpretation: "critical",
+    range: { low: 3.5, high: 5.1 },
+    status: "final",
+    prior: { value: 4.7, at: RV_EARLIER },
+    resultedAt: RV_RESULTED,
+  },
+  {
+    id: "tsh",
+    analyte: "TSH",
+    value: 6.4,
+    unit: "mIU/L",
+    range: { low: 0.4, high: 4.0 },
+    status: "preliminary",
+    resultedAt: RV_RESULTED,
+  },
+  {
+    id: "li",
+    analyte: "Lithium level",
+    value: 0.9,
+    unit: "mmol/L",
+    range: { low: 0.6, high: 1.2, appliesTo: "maintenance" },
+    status: "final",
+    notes: ["12 h post-dose · trough assumed"],
+  },
+  {
+    id: "fer",
+    analyte: "Ferritin",
+    value: 212,
+    unit: "ng/mL",
+    noRangeReason: "Lab supplied no range · not asserted normal",
+    status: "final",
+  },
+  {
+    id: "bp",
+    analyte: "Home systolic",
+    value: 148,
+    unit: "mmHg",
+    provenance: "patient-reported",
+    status: "final",
+  },
+];
+
+const RV_ABSENT: ResultValueData[] = [
+  {
+    id: "x1",
+    analyte: "HbA1c",
+    absent: "not-ordered",
+    absentDetail: "No HbA1c has ever been ordered for this patient.",
+  },
+  {
+    id: "x2",
+    analyte: "Chemistry panel",
+    absent: "awaiting",
+    absentDetail: "Collected 09:14. Expected by 15:00.",
+  },
+  {
+    id: "x3",
+    analyte: "Chest X-ray",
+    absent: "cancelled",
+    absentDetail: "Cancelled by ordering provider, 08:40.",
+  },
+  {
+    id: "x4",
+    analyte: "Potassium",
+    absent: "specimen-problem",
+    absentDetail: "Haemolysed. Recollection requested.",
+  },
+  {
+    id: "x5",
+    analyte: "Toxicology",
+    absent: "declined",
+    absentDetail: "Patient declined the draw on 3 Aug.",
+  },
+  { id: "x6", analyte: "Substance use screen", absent: "masked" },
+  { id: "x7", analyte: "TSH", absent: "unknown" },
+];
+
+const RV_CORRECTED: ResultValueData = {
+  id: "trop",
+  versionId: "2",
+  analyte: "Troponin I",
+  value: 0.09,
+  unit: "ng/mL",
+  range: { high: 0.04 },
+  status: "corrected",
+  superseded: { value: "<0.04", at: "14:22 today" },
+  resultedAt: RV_RESULTED,
+  notes: ["You viewed the prior value at 13:58"],
+};
+
+const RV_METHOD_CHANGED: ResultValueData = {
+  id: "tsh2",
+  analyte: "TSH",
+  value: 6.4,
+  unit: "mIU/L",
+  range: { low: 0.4, high: 4.0 },
+  status: "final",
+  // Same analyte, different assay. The delta is suppressed rather than
+  // annotated: an annotated wrong number still gets read as a number.
+  prior: { value: 3.1, at: RV_EARLIER, differentMethod: true },
+  resultedAt: RV_RESULTED,
+};
+
 const SCENARIOS: Record<string, Scenario[]> = {
+  /**
+   * Four demos, and the third is the one worth arguing about.
+   *
+   * `RV_NOW` is frozen so the relative ages say the same thing every day, and
+   * because the component takes the clock as a prop precisely so a demo, a
+   * test and a ward workstation can each supply their own.
+   */
+  "result-value": [
+    {
+      id: "present",
+      label: "Present values",
+      note: "Six results, and none of them is just a number. A critical potassium carries its delta and how long ago it landed. A preliminary TSH says it has not been verified. A lithium level carries the qualification that decides whether 0.9 is therapeutic or low. A ferritin with no range says so, because a number with nothing highlighted beside it reads as normal.",
+      render: () => (
+        <div style={{ display: "grid", gap: 14, maxInlineSize: 560 }}>
+          {RV_PRESENT.map((row) => (
+            <ResultValue key={row.id} value={row} now={RV_NOW} />
+          ))}
+        </div>
+      ),
+    },
+    {
+      id: "absence",
+      label: "Seven absences",
+      note: "An em dash is indistinguishable from a rendering bug, and it asks the reader to guess between answers with different next actions. Haemolysis raises potassium — rendering that as a blank beside a normal sodium invites the assumption that the potassium was normal too. Restricted is the one that is not a gap at all: a value exists and you may not see it.",
+      render: () => (
+        <div style={{ display: "grid", gap: 14, maxInlineSize: 560 }}>
+          {RV_ABSENT.map((row) => (
+            <ResultValue key={row.id} value={row} />
+          ))}
+        </div>
+      ),
+    },
+    {
+      id: "correction",
+      label: "A correction",
+      note: "The troponin was under 0.04 at 13:58, when somebody read it and wrote it into a note. It is 0.09 now. A badge saying \u201ccorrected\u201d does not address that hazard; the old number with a line through it and the time it changed does. The delta below it is suppressed on the TSH, because the assay changed and two numbers from two scales subtracted from each other is not a delta.",
+      render: () => (
+        <div style={{ display: "grid", gap: 14, maxInlineSize: 560 }}>
+          <ResultValue value={RV_CORRECTED} now={RV_NOW} />
+          <ResultValue value={RV_METHOD_CHANGED} now={RV_NOW} />
+        </div>
+      ),
+    },
+    {
+      id: "grid",
+      label: "In a grid",
+      note: "Compact, with the analyte hidden because the column header carries it — and tabular figures throughout, because a results column that does not line up cannot be scanned, which is the only way anybody reads forty rows of chemistry. The accessible name still opens with the analyte: a cell has no column header in its accessible context.",
+      render: () => (
+        <table style={{ borderCollapse: "collapse", fontSize: 13, minInlineSize: 400 }}>
+          <thead>
+            <tr>
+              {["Analyte", "Result"].map((h) => (
+                <th
+                  key={h}
+                  style={{
+                    padding: "4px 20px 10px 0",
+                    textAlign: "start",
+                    fontFamily: "var(--ox-font-mono, monospace)",
+                    fontSize: 10,
+                    letterSpacing: "0.08em",
+                    textTransform: "uppercase",
+                    fontWeight: 500,
+                    opacity: 0.55,
+                  }}
+                >
+                  {h}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {[...RV_PRESENT.slice(0, 4), RV_ABSENT[0]!].map((row) => (
+              <tr key={row.id}>
+                <td style={{ padding: "7px 20px 7px 0", verticalAlign: "top", opacity: 0.85 }}>
+                  {row.analyte}
+                </td>
+                <td style={{ padding: "7px 0", verticalAlign: "top" }}>
+                  <ResultValue value={row} now={RV_NOW} density="compact" hideAnalyte />
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      ),
+    },
+  ],
+
   /**
    * Four demos, and the second is the component.
    *

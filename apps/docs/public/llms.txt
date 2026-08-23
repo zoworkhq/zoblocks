@@ -80,6 +80,11 @@ Rules that matter when generating code with these components:
   fhir: Composition, DocumentReference, Provenance, Narrative
   states: Empty draft, In progress, Origins ribbon, Unreviewed AI, Copied forward, Unfilled blanks, Stale pulled value, Gate blocking, Gate clear, Offline draft, Save failed, Signed, Signed with addendum, Awaiting countersignature
   status: experimental
+- [Result Value](https://oxygenui.design/components/result-value): A single observation rendered so that the four ways a number can lie to you are all impossible.
+  install: npx @oxygenui-design/cli add result-value
+  fhir: Observation
+  states: Final, in range, Critical, with a delta, Preliminary — not verified by the laboratory, Corrected — the superseded value is shown, No reference range for this patient, A range that needs its qualification, Delta suppressed — the method changed, Patient-reported, Extracted by a model, Absent — never ordered, Absent — awaiting a result, Absent — cancelled, Absent — specimen problem, Absent — patient declined, Absent — restricted, and a value exists, Absent — no value and no reason, Compact, in a grid, Interactive — opens the report
+  status: stable
 - [Patient identity](https://oxygenui.design/components/identity): An avatar, a chip and a patient banner — with the pass that keeps two patients who share a name apart on the same worklist.
   install: npx @oxygenui-design/cli add identity
   fhir: Patient

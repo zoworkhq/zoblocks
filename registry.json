@@ -85,6 +85,27 @@
       ]
     },
     {
+      "name": "result-value-core",
+      "type": "oxygen:lib",
+      "title": "Result value core",
+      "description": "The seven absence reasons, the interpretation precedence rule, the delta suppression rule, and the sentence composer that turns an observation into one spoken clinical statement. Includes the FHIR Observation adapter. Installed automatically with ResultValue.",
+      "registryDependencies": [
+        "clinical-status-core"
+      ],
+      "files": [
+        {
+          "path": "registry/oxygen/lib/result-value.ts",
+          "type": "oxygen:lib",
+          "target": "lib/oxygen-result-value.ts"
+        },
+        {
+          "path": "registry/oxygen/lib/result-value.css",
+          "type": "oxygen:style",
+          "target": "styles/oxygen-result-value.css"
+        }
+      ]
+    },
+    {
       "name": "switch-core",
       "type": "oxygen:lib",
       "title": "Switch core",
@@ -463,6 +484,33 @@
           "path": "registry/oxygen/pulse-loader/pulse-loader.tsx",
           "type": "oxygen:component",
           "target": "components/oxygen/pulse-loader.tsx"
+        }
+      ]
+    },
+    {
+      "name": "result-value",
+      "type": "oxygen:component",
+      "title": "Result Value",
+      "description": "Value, unit and interpretation on one line, qualifiers on a second only when they exist. Seven distinct absence reasons instead of an em dash, a stated interpretation that always beats a derived one, a reference range that says so when there isn't one, and a correction that shows the superseded value rather than a badge.",
+      "categories": [
+        "clinical",
+        "data-display"
+      ],
+      "dependencies": [
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "utils",
+        "tokens",
+        "result-value-core",
+        "clinical-status"
+      ],
+      "files": [
+        {
+          "path": "registry/oxygen/result-value/result-value.tsx",
+          "type": "oxygen:component",
+          "target": "components/oxygen/result-value.tsx"
         }
       ]
     },

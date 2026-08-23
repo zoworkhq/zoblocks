@@ -42,6 +42,9 @@
       "@/components/oxygen/pulse-loader": [
         "./registry/oxygen/pulse-loader/pulse-loader.tsx"
       ],
+      "@/components/oxygen/result-value": [
+        "./registry/oxygen/result-value/result-value.tsx"
+      ],
       "@/components/oxygen/rhythm-loader": [
         "./registry/oxygen/rhythm-loader/rhythm-loader.tsx"
       ],
@@ -65,6 +68,9 @@
       ],
       "@/lib/oxygen-loader": [
         "./registry/oxygen/lib/loader.tsx"
+      ],
+      "@/lib/oxygen-result-value": [
+        "./registry/oxygen/lib/result-value.ts"
       ],
       "@/lib/oxygen-switch": [
         "./registry/oxygen/lib/switch.tsx"

@@ -104,6 +104,27 @@ const SUPPORT_ITEMS: BuildableItem[] = [
     ],
   },
   {
+    name: "result-value-core",
+    type: "oxygen:lib",
+    title: "Result value core",
+    description:
+      "The seven absence reasons, the interpretation precedence rule, the delta suppression rule, and the sentence composer that turns an observation into one spoken clinical statement. Includes the FHIR Observation adapter. Installed automatically with ResultValue.",
+    dependencies: [] as string[],
+    registryDependencies: ["clinical-status-core"],
+    files: [
+      {
+        path: "registry/oxygen/lib/result-value.ts",
+        type: "oxygen:lib",
+        target: "lib/oxygen-result-value.ts",
+      },
+      {
+        path: "registry/oxygen/lib/result-value.css",
+        type: "oxygen:style",
+        target: "styles/oxygen-result-value.css",
+      },
+    ],
+  },
+  {
     name: "switch-core",
     type: "oxygen:lib",
     title: "Switch core",

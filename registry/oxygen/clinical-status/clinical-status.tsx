@@ -25,7 +25,7 @@ import {
   SCALES,
   describeStatus,
   resolveStatus,
-  wordFor,
+  statusWord,
   type ScaleName,
   type StatusAudience,
   type StatusStep,
@@ -45,7 +45,7 @@ export {
   fromObservationStatus,
   fromRequestStatus,
   resolveStatus,
-  wordFor,
+  statusWord,
   type ScaleName,
   type StatusAudience,
   type StatusGlyph,
@@ -114,7 +114,7 @@ export const ClinicalStatus = React.forwardRef<HTMLElement, ClinicalStatusProps>
     // fallback: a chip that renders "unknown" for a typo will one day render
     // it for a critical potassium.
     const resolved = resolveStatus(scale, step);
-    const word = wordFor(resolved, audience);
+    const word = statusWord(resolved, audience);
     const label = describeStatus(scale, resolved, { audience, qualifier });
 
     const glyph = (
@@ -219,7 +219,7 @@ export const StatusLegend = React.forwardRef<HTMLDListElement, StatusLegendProps
             <dt>
               <ClinicalStatus scale={scale} step={step.id} shape="dot" density={density} />
             </dt>
-            <dd>{wordFor(step, audience)}</dd>
+            <dd>{statusWord(step, audience)}</dd>
           </div>
         ))}
       </dl>

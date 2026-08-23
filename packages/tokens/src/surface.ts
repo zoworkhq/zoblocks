@@ -13,7 +13,7 @@
  * change, because customers style against these names. The manifest is
  * committed so that change shows up as a reviewable diff.
  *
- * 290 tokens across 20 components:
+ * 294 tokens across 21 components:
  *
  *   switch          55
  *   tabs            44
@@ -31,6 +31,7 @@
  *   range            6
  *   surface-card     6
  *   avatar           4
+ *   rv               4
  *   absent           3
  *   value            3
  *   care-timeline    2
@@ -1837,6 +1838,43 @@ export const TOKEN_SURFACE: readonly SurfaceEntry[] = [
     "bridgeable": true
   },
   {
+    "name": "--ox-rv-gap",
+    "component": "rv",
+    "source": "packages/react/src/styles.css",
+    "kind": "dimension",
+    "frameworks": [],
+    "fallback": true,
+    "bridgeable": true
+  },
+  {
+    "name": "--ox-rv-value-compact",
+    "component": "rv",
+    "source": "packages/tokens/tokens/component.json",
+    "kind": "dimension",
+    "frameworks": [],
+    "fallback": true,
+    "bridgeable": true
+  },
+  {
+    "name": "--ox-rv-value-default",
+    "component": "rv",
+    "source": "packages/tokens/tokens/component.json",
+    "kind": "dimension",
+    "frameworks": [],
+    "fallback": true,
+    "bridgeable": true
+  },
+  {
+    "name": "--ox-rv-value-size",
+    "component": "rv",
+    "source": "packages/react/src/styles.css",
+    "kind": "dimension",
+    "semantic": "--ox-rv-value-default",
+    "frameworks": [],
+    "fallback": true,
+    "bridgeable": true
+  },
+  {
     "name": "--ox-surface-card-bg",
     "component": "surface-card",
     "source": "packages/tokens/tokens/component.json",
@@ -3051,6 +3089,7 @@ export const SURFACE_COMPONENTS: readonly string[] = [
   "nav",
   "patient-chip",
   "range",
+  "rv",
   "surface-card",
   "switch",
   "tabs",
@@ -3172,6 +3211,10 @@ export const BRIDGEABLE: readonly string[] = [
   "--ox-range-height",
   "--ox-range-marker",
   "--ox-range-track",
+  "--ox-rv-gap",
+  "--ox-rv-value-compact",
+  "--ox-rv-value-default",
+  "--ox-rv-value-size",
   "--ox-surface-card-bg",
   "--ox-surface-card-border",
   "--ox-surface-card-pad-x",
