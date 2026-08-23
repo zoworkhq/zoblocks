@@ -30,8 +30,18 @@ export function Ramp({
   const order = Object.keys(steps).sort((a, b) => Number(a) - Number(b));
 
   return (
+    /*
+     * Scrolls rather than squeezes.
+     *
+     * Eleven steps sharing the width meant 19px each at 320px — under WCAG
+     * 2.5.8's 24px floor, and the Spacing exception cannot rescue it because
+     * adjacent swatches touch, so their 24px circles always intersect. Each
+     * step now claims 24px and the strip scrolls when the container cannot
+     * hold 264px of them. A colour ramp is a natural scroll strip; a row of
+     * untappable slivers is not.
+     */
     <div
-      className="flex overflow-hidden rounded-lg border border-rule-strong"
+      className="flex overflow-x-auto overflow-y-hidden rounded-lg border border-rule-strong"
       role="group"
       aria-label={label}
     >
@@ -48,7 +58,7 @@ export function Ramp({
             // The name carries both facts, because the swatch carries neither.
             aria-label={`Step ${step}, ${value.toUpperCase()}${isAnchor ? ", your chosen colour" : ""}`}
             className={cn(
-              "relative h-11 flex-1 transition-[flex-grow] duration-300",
+              "relative h-11 min-w-6 flex-1 transition-[flex-grow] duration-300",
               onSelect && "cursor-pointer hover:flex-[1.4]",
               !onSelect && "cursor-default",
               step === selected && "flex-[1.4]",

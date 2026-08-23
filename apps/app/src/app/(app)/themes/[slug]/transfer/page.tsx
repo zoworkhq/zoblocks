@@ -226,7 +226,7 @@ export default async function TransferPage({ params }: { params: Promise<{ slug:
                     panel in both themes.
                   */}
                   <details className="mt-3">
-                    <summary className="cursor-pointer text-[0.75rem] text-oxygen-deep">
+                    <summary className="flex min-h-6 cursor-pointer items-center text-[0.75rem] text-oxygen-deep">
                       Preview
                     </summary>
                     <pre className="instrument mt-2 max-h-48 overflow-auto p-3 font-mono text-[0.625rem] leading-relaxed">

@@ -39,11 +39,37 @@ export function Checkbox({
         {...props}
         type="checkbox"
         className={cn(
-          "peer size-[1.125rem] appearance-none rounded-full border border-rule-strong bg-paper",
-          "transition-[background-color,border-color,box-shadow] duration-150",
-          "checked:border-accent-solid checked:bg-accent-solid",
-          "disabled:cursor-not-allowed disabled:border-rule disabled:bg-paper-sunk",
-          "disabled:checked:border-graphite-soft disabled:checked:bg-graphite-soft",
+          /*
+           * 18px of circle, 24px of target.
+           *
+           * WCAG 2.5.8 measures the control, and an 18px box fails it. An
+           * `<input>` cannot carry a pseudo-element to borrow the extra space,
+           * and growing the circle would coarsen every row it sits in — so the
+           * box is 24px and `bg-clip-content` with 3px of padding keeps the
+           * painted circle at 18px. The border is drawn by the sibling ring
+           * below for the same reason: a border on a 24px box would be a 24px
+           * circle.
+           */
+          "peer size-6 appearance-none rounded-full bg-paper bg-clip-content p-[3px]",
+          "transition-[background-color] duration-150",
+          "checked:bg-accent-solid",
+          "disabled:cursor-not-allowed disabled:bg-paper-sunk",
+          "disabled:checked:bg-graphite-soft",
+        )}
+      />
+      {/*
+        The ring, drawn as a sibling rather than as the input's own border.
+
+        With the input grown to a 24px target, a border on it would be a 24px
+        circle around an 18px fill. This sits exactly on the content box, so
+        the control still looks 18px while remaining tappable at 24px.
+      */}
+      <span
+        aria-hidden="true"
+        className={cn(
+          "pointer-events-none absolute left-[3px] top-[3px] size-[1.125rem] rounded-full",
+          "border border-rule-strong transition-colors duration-150",
+          "peer-checked:border-accent-solid peer-disabled:border-rule",
         )}
       />
       {/*
@@ -53,7 +79,7 @@ export function Checkbox({
       <svg
         aria-hidden="true"
         viewBox="0 0 16 16"
-        className="pointer-events-none absolute inset-0 size-[1.125rem] text-accent-on opacity-0 transition-opacity duration-150 peer-checked:opacity-100"
+        className="pointer-events-none absolute left-[3px] top-[3px] size-[1.125rem] text-accent-on opacity-0 transition-opacity duration-150 peer-checked:opacity-100"
       >
         <path
           d="M4.2 8.3 6.9 11 11.8 5.6"

@@ -737,10 +737,33 @@
   flex-direction: column;
   align-items: stretch;
 }
+/*
+ * The scroll axis follows the orientation.
+ *
+ * This was `overflow-x: auto` for every strip, which is wrong twice over on a
+ * vertical rail. A rail that outgrows its container scrolls in the *block*
+ * direction, and setting the inline axis to `auto` turns the list into a
+ * horizontal scroll container the moment anything overhangs by a pixel — a
+ * focus ring, the indicator, a sub-pixel rounding at some zoom levels. The
+ * visible symptom is a scroll container edge cutting vertically through the
+ * count badges on a rail that has no horizontal overflow worth scrolling.
+ *
+ * `clip` rather than `hidden` on the cross axis: `hidden` establishes a scroll
+ * container (it is scrollable programmatically, it just has no scrollbar), and
+ * pairing it with `auto` reintroduces the thing being fixed. `clip` does not.
+ */
 .ox-tabs__bar[data-ox-scrollable] > .ox-tabs__list {
-  overflow-x: auto;
-  overscroll-behavior-inline: contain;
   flex: 1 1 auto;
+}
+.ox-tabs:not([data-ox-orientation="vertical"]) .ox-tabs__bar[data-ox-scrollable] > .ox-tabs__list {
+  overflow-x: auto;
+  overflow-y: clip;
+  overscroll-behavior-inline: contain;
+}
+.ox-tabs[data-ox-orientation="vertical"] .ox-tabs__bar[data-ox-scrollable] > .ox-tabs__list {
+  overflow-y: auto;
+  overflow-x: clip;
+  overscroll-behavior-block: contain;
 }
 .ox-tabs__nudge {
   flex: 0 0 auto;
@@ -791,6 +814,28 @@
 .ox-tabs__bar[data-ox-scrollable]::after {
   inset-inline-end: 1.9rem;
   background: linear-gradient(to left, var(--ox-tabs-surface), transparent);
+}
+
+/*
+ * The fades are horizontal geometry — full-height slivers with a left-to-right
+ * gradient — so on a vertical rail they painted a smear down the side of the
+ * list instead of hinting at content above and below. Rotate them onto the
+ * block axis with the same idea: a fade at whichever end still has content.
+ */
+.ox-tabs[data-ox-orientation="vertical"] .ox-tabs__bar[data-ox-scrollable]::before,
+.ox-tabs[data-ox-orientation="vertical"] .ox-tabs__bar[data-ox-scrollable]::after {
+  inset-inline: 0;
+  inset-block: auto;
+  inline-size: auto;
+  block-size: 2.25rem;
+}
+.ox-tabs[data-ox-orientation="vertical"] .ox-tabs__bar[data-ox-scrollable]::before {
+  inset-block-start: 0;
+  background: linear-gradient(to bottom, var(--ox-tabs-surface), transparent);
+}
+.ox-tabs[data-ox-orientation="vertical"] .ox-tabs__bar[data-ox-scrollable]::after {
+  inset-block-end: 0;
+  background: linear-gradient(to top, var(--ox-tabs-surface), transparent);
 }
 .ox-tabs__bar[data-ox-start="false"]::before {
   opacity: 1;

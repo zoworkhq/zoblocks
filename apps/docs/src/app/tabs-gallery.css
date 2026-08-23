@@ -49,6 +49,13 @@
   font-family: var(--font-mono);
   font-size: 0.6875rem;
   padding: 0.2rem 0.5rem;
+  /* WCAG 2.5.8: 11px mono with 0.2rem of padding measured 23px, one short of
+     the 24px floor. A theme or density switch is not inline text, so none of
+     the exceptions apply. inline-flex rather than more padding keeps the
+     control bar the same height. */
+  min-block-size: 1.5rem;
+  display: inline-flex;
+  align-items: center;
   border-radius: 0.4rem;
   color: var(--color-graphite);
   transition:

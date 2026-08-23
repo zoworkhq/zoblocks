@@ -19,7 +19,7 @@ import { Field, Input, SubmitButton } from "@/components/ui";
 export function GrantForm({ slug }: { slug: string }) {
   return (
     <details className="mt-4 border-t border-rule pt-3">
-      <summary className="body-sm cursor-pointer text-graphite">
+      <summary className="body-sm flex min-h-6 cursor-pointer items-center text-graphite">
         Granted with a contract, or paid against an invoice?
       </summary>
 

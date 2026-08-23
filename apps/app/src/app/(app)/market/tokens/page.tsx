@@ -111,7 +111,7 @@ export default async function TokensPage() {
         once, on your first token, and never again.
       */}
       <details className="mt-4 rounded-xl border border-rule bg-paper-sunk px-4 py-3">
-        <summary className="cursor-pointer text-[0.8125rem] font-medium text-ink">
+        <summary className="flex min-h-6 cursor-pointer items-center text-[0.8125rem] font-medium text-ink">
           Wiring a registry token into the Oxygen CLI
         </summary>
         <pre className="mt-3 overflow-x-auto rounded-lg bg-panel p-3 font-mono text-[0.6875rem] text-panel-fg">

@@ -137,9 +137,30 @@ export function ColorField({
               aria-expanded={open}
               aria-label={label ? `Pick ${label} visually` : "Pick colour visually"}
               onClick={() => setOpen((wasOpen) => !wasOpen)}
-              className="size-5 rounded border border-rule-strong transition-transform duration-150 hover:scale-110"
-              style={{ background: complete ? draft : "transparent" }}
-            />
+              /*
+               * 20px of swatch, 24px of target.
+               *
+               * WCAG 2.5.8 wants 24×24 and this is icon-only, so none of the
+               * exceptions apply: it is not inline text, and there is no other
+               * control that opens the picker.
+               *
+               * The button carries the 24px box and an inner span paints the
+               * 20px square, rather than the button being 20px with a
+               * pseudo-element spilling over. That was tried first and is
+               * unreliable — an `::after` with no stacking context is painted
+               * under the adjacent field, so the bottom-right of the enlarged
+               * area hit the sibling `div` instead of the button. A real box
+               * cannot be overlapped by accident, and it is measurable, which
+               * matters because the audit asserts this.
+               */
+              className="grid size-6 shrink-0 place-items-center rounded transition-transform duration-150 hover:scale-110"
+            >
+              <span
+                aria-hidden="true"
+                className="size-5 rounded border border-rule-strong"
+                style={{ background: complete ? draft : "transparent" }}
+              />
+            </button>
 
             {open && (
               <>
@@ -191,7 +212,17 @@ export function ColorField({
           spellCheck={false}
           autoComplete="off"
           className={cn(
-            "tabular min-w-0 flex-1 bg-transparent font-mono text-[0.8125rem] uppercase",
+            /*
+             * `min-h-6` is the WCAG 2.5.8 floor, not styling.
+             *
+             * The field is 13px mono with no vertical padding of its own, so
+             * its box came out at 21px — under the 24px minimum, and unlike the
+             * links around it a text input has no Inline exception. It sits
+             * inside a bordered row that is already taller than this, so
+             * raising the input's own box changes nothing visually and makes
+             * the target honest.
+             */
+            "tabular min-h-6 min-w-0 flex-1 bg-transparent font-mono text-[0.8125rem] uppercase",
             "focus:outline-none",
             locked && "text-graphite",
           )}

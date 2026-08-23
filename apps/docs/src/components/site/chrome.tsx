@@ -70,7 +70,11 @@ export function SiteHeader() {
       <div className="mx-auto flex h-full max-w-6xl items-center justify-between gap-6 px-5 sm:px-8">
         <Link
           href="/"
-          className="group flex items-center gap-2.5 text-ink"
+          // min-h-6 is the WCAG 2.5.8 floor. The wordmark's own line box came
+          // to 23px, one short — and the logo is a standalone navigation
+          // target, not a link inside a sentence, so the Inline exception does
+          // not cover it. It sits in a taller header row, so nothing moves.
+          className="group flex min-h-6 items-center gap-2.5 text-ink"
           aria-label="Oxygen UI home"
         >
           <OxygenMark className="h-4 w-7 transition-transform duration-500 ease-[var(--ease-out-expo)] group-hover:rotate-180" />
@@ -124,9 +128,17 @@ export function SiteHeader() {
               GitHub is in the footer, and the picker moves there below `sm`.
 
               Nothing is lost, which is the condition for hiding it. The picker
-              carries the high-contrast theme, and that is an accessibility
-              control rather than a preference; dropping it on small screens
-              would take it from exactly the readers most likely to need it. */}
+              is light/dark only now, and both are preferences — a reader on a
+              phone whose machine is dark already lands on dark, because the
+              boot script follows `prefers-color-scheme` when nothing is stored.
+
+              This used to say the opposite, and the reason is worth keeping:
+              the picker carried high contrast, which is an accessibility
+              control rather than a preference, so hiding it on small screens
+              took it from the readers most likely to need it. High contrast is
+              no longer offered here (see `lib/theme.ts`) — the 7:1 tokens and
+              their audit are untouched, but nothing in the UI turns them on. If
+              it ever returns to the picker, this exemption has to go with it. */}
           <a
             href="https://github.com/zoworkhq/oxygenui"
             className="ml-1 hidden items-center gap-1.5 rounded-lg border border-rule px-2.5 py-1.5 text-sm text-graphite transition-colors duration-200 hover:border-rule-strong hover:text-ink sm:inline-flex"

@@ -50,16 +50,30 @@ export default async function TypographyPage({ params }: { params: Promise<{ slu
         lede="Upload the faces your brand uses. Sizes live on the token editor."
       />
 
+      {/*
+       * `min-w-0` on both children is load-bearing, not tidying.
+       *
+       * A grid item defaults to `min-width: auto`, which floors it at its
+       * content's min-content width. The specimen lists font stacks with
+       * `truncate` — and `truncate` sets `white-space: nowrap`, whose
+       * min-content width is the *entire* string. So the column widened to fit
+       * `ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+       * sans-serif`, truncation never engaged, and the page scrolled sideways
+       * by 197px at 320px wide. `minmax(0, …)` already covered the second
+       * column at `lg`; below `lg` the grid is one column and nothing did.
+       */}
       <div className="grid gap-6 lg:grid-cols-[1fr_minmax(0,21rem)] lg:items-start">
-        <TypographyEditor
-          themeId={theme._id.toHexString()}
-          fonts={fonts}
-          maxBytes={MAX_FONT_BYTES}
-          canWrite={can(member.role, "theme.write")}
-          reason={whyNot(member.role, "theme.write")}
-        />
+        <div className="min-w-0">
+          <TypographyEditor
+            themeId={theme._id.toHexString()}
+            fonts={fonts}
+            maxBytes={MAX_FONT_BYTES}
+            canWrite={can(member.role, "theme.write")}
+            reason={whyNot(member.role, "theme.write")}
+          />
+        </div>
 
-        <div className="space-y-4 lg:sticky lg:top-6">
+        <div className="min-w-0 space-y-4 lg:sticky lg:top-6">
           <Panel
             title="Specimen"
             description="A result table, not a paragraph. Ragged digits are invisible in prose and obvious here."

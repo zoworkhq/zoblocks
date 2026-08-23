@@ -1600,7 +1600,12 @@ export function ComponentPreview({ name }: { name: string }) {
               onClick={() => setDensity(item)}
               aria-pressed={density === item}
               className={cn(
-                "rounded-md px-2 py-1 font-mono text-[0.625rem] uppercase tracking-wider transition-colors duration-200",
+                // min-h-6 is WCAG 2.5.8's floor. At 10px mono with py-1 these
+                // came out 23px — one pixel short, and a density switch is not
+                // inline text so no exception applies. inline-flex rather than
+                // extra padding so the label stays optically centred and the
+                // row height does not change.
+                "inline-flex min-h-6 items-center rounded-md px-2 py-1 font-mono text-[0.625rem] uppercase tracking-wider transition-colors duration-200",
                 density === item
                   ? "bg-panel-fg/10 text-panel-fg"
                   : "text-panel-muted hover:text-panel-fg/80",
@@ -1632,7 +1637,7 @@ export function ComponentPreview({ name }: { name: string }) {
               aria-selected={item.id === scenario.id}
               onClick={() => setScenarioId(item.id)}
               className={cn(
-                "rounded-lg px-2.5 py-1.5 font-mono text-[0.6875rem] uppercase tracking-wider",
+                "inline-flex min-h-6 items-center rounded-lg px-2.5 py-1.5 font-mono text-[0.6875rem] uppercase tracking-wider",
                 "transition-all duration-200 ease-[var(--ease-out-expo)]",
                 item.id === scenario.id
                   ? "bg-trace/12 text-trace ring-1 ring-trace/35"

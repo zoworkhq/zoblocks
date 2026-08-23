@@ -215,7 +215,7 @@ function Gap({
 }) {
   return (
     <details className="rounded-lg border border-rule bg-paper-sunk px-3.5 py-2.5">
-      <summary className="flex cursor-pointer items-center gap-2 text-[0.75rem] font-medium">
+      <summary className="flex min-h-6 cursor-pointer items-center gap-2 text-[0.75rem] font-medium">
         <StatusChip tone={tone} icon={icon}>
           {tone === "locked" ? "locked" : "gap"}
         </StatusChip>
