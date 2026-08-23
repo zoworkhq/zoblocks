@@ -44,6 +44,7 @@ export const WORKSPACE_ALIASES: Record<string, string[]> = {
   "@/lib/oxygen-clinical-note": ["./registry/oxygen/lib/clinical-note.tsx"],
   "@/lib/oxygen-clinical-status": ["./registry/oxygen/lib/clinical-status.ts"],
   "@/lib/oxygen-result-value": ["./registry/oxygen/lib/result-value.ts"],
+  "@/lib/oxygen-allergy": ["./registry/oxygen/lib/allergy.ts"],
   "@/lib/timeline-core": ["./registry/oxygen/lib/timeline-core.ts"],
   "@/lib/timeline-fhir": ["./registry/oxygen/lib/timeline-fhir.ts"],
 };

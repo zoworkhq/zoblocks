@@ -19,7 +19,7 @@ import {
   describeResult,
   formatRange,
   fromDataAbsentReason,
-  fromFHIR,
+  fromObservation,
   resolveDelta,
   resolveInterpretation,
   type ResultValueData,
@@ -372,9 +372,9 @@ describe("interaction", () => {
 /* FHIR                                                                */
 /* ------------------------------------------------------------------ */
 
-describe("fromFHIR", () => {
+describe("fromObservation", () => {
   it("reads value, unit, range and status", () => {
-    const data = fromFHIR({
+    const data = fromObservation({
       id: "obs-1",
       meta: { versionId: "3" },
       status: "final",
@@ -416,7 +416,7 @@ describe("fromFHIR", () => {
   it("treats an absent reason as beating a value", () => {
     // A record carrying both is malformed, and rendering the value would
     // publish something the source said is not there.
-    const data = fromFHIR({
+    const data = fromObservation({
       id: "x",
       valueQuantity: { value: 5 },
       dataAbsentReason: { coding: [{ code: "masked" }] },
@@ -427,13 +427,17 @@ describe("fromFHIR", () => {
 
   it("leaves a missing range undefined rather than empty", () => {
     // An empty range would derive "normal" from nothing at all.
-    const data = fromFHIR({ id: "x", code: { text: "Ferritin" }, valueQuantity: { value: 212 } });
+    const data = fromObservation({
+      id: "x",
+      code: { text: "Ferritin" },
+      valueQuantity: { value: 212 },
+    });
     expect(data.range).toBeUndefined();
     expect(resolveInterpretation(data)?.step).toBe("not-assessed");
   });
 
   it("carries the range's appliesTo through", () => {
-    const data = fromFHIR({
+    const data = fromObservation({
       id: "li",
       code: { text: "Lithium" },
       valueQuantity: { value: 0.9 },

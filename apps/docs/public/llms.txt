@@ -66,6 +66,11 @@ Rules that matter when generating code with these components:
 
 ## Clinical
 
+- [Allergy Chip](https://oxygenui.design/components/allergy-chip): The chip that refuses to conflate how bad the last reaction was with how bad the next one could be.
+  install: npx @oxygenui-design/cli add allergy-chip
+  fhir: AllergyIntolerance
+  states: High criticality, mild past reaction, Low criticality, same manifestation, Intolerance, not an allergy, Refuted after a rechallenge, Entered in error, Unconfirmed — reported at intake, Unable to assess, No reaction recorded, Substance class expansion, Contraindication, No known allergies — asserted, Allergy status not recorded, An assertion with no author degrades, Compact, in a banner, Interactive — opens the history
+  status: stable
 - [Care Timeline](https://oxygenui.design/components/care-timeline): A patient's chronology that cannot be rendered without saying what it is a view of — the window, the sources, the filters and the order.
   install: npx @oxygenui-design/cli add care-timeline
   fhir: Encounter, Appointment, Communication, Observation, DiagnosticReport, Procedure, MedicationRequest, Immunization, DocumentReference, QuestionnaireResponse, Consent, Provenance

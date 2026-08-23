@@ -3,7 +3,7 @@
  * all impossible.
  *
  *     <ResultValue value={potassium} now={serverTime} />
- *     <ResultValue value={fromFHIR(observation)} density="compact" />
+ *     <ResultValue value={fromObservation(observation)} density="compact" />
  *
  * The four failures it exists to prevent, each with the shape that prevents it:
  *
@@ -46,7 +46,7 @@ export {
   describeResult,
   formatRange,
   fromDataAbsentReason,
-  fromFHIR,
+  fromObservation,
   resolveDelta,
   resolveInterpretation,
   type ResultAbsence,

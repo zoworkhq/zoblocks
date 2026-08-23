@@ -53,6 +53,7 @@ function rewriteImports(source: string, fromDepth: number): string {
       .replace(/(["'])@\/lib\/oxygen-clinical-note\1/g, `"${up}lib/clinical-note"`)
       .replace(/(["'])@\/lib\/oxygen-clinical-status\1/g, `"${up}lib/clinical-status"`)
       .replace(/(["'])@\/lib\/oxygen-result-value\1/g, `"${up}lib/result-value"`)
+      .replace(/(["'])@\/lib\/oxygen-allergy\1/g, `"${up}lib/allergy"`)
       // The chronology engine and its FHIR adapters.
       .replace(/(["'])@\/lib\/timeline-core\1/g, `"${up}lib/timeline-core"`)
       .replace(/(["'])@\/lib\/timeline-fhir\1/g, `"${up}lib/timeline-fhir"`)
@@ -102,6 +103,7 @@ export async function emitReactPackage(
     ["lib/clinical-note.tsx", "lib/clinical-note.tsx", 1],
     ["lib/clinical-status.ts", "lib/clinical-status.ts", 1],
     ["lib/result-value.ts", "lib/result-value.ts", 1],
+    ["lib/allergy.ts", "lib/allergy.ts", 1],
     ["lib/timeline-core.ts", "lib/timeline-core.ts", 1],
     ["lib/timeline-fhir.ts", "lib/timeline-fhir.ts", 1],
   ] as const) {
@@ -132,6 +134,7 @@ export async function emitReactPackage(
     ["lib/clinical-note.css", "styles/clinical-note.css"],
     ["lib/clinical-status.css", "styles/clinical-status.css"],
     ["lib/result-value.css", "styles/result-value.css"],
+    ["lib/allergy.css", "styles/allergy.css"],
     ["lib/timeline.css", "styles/timeline.css"],
   ] as const) {
     const css = await readFile(path.join(COMPONENTS_DIR, file), "utf8");

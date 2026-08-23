@@ -82,15 +82,15 @@ export default defineComponentMeta({
     "The spoken-unit table covers the common laboratory units. An unlisted unit is spoken as written, which is correct but reads poorly.",
   ],
 
-  related: ["clinical-status", "care-timeline"],
+  related: ["clinical-status", "care-timeline", "allergy-chip"],
 
   dependencies: ["clsx", "tailwind-merge"],
   registryDependencies: ["utils", "tokens", "result-value-core", "clinical-status"],
 
-  usage: `import { ResultValue, fromFHIR } from "@/components/oxygen/result-value";
+  usage: `import { ResultValue, fromObservation } from "@/components/oxygen/result-value";
 import "@/styles/oxygen-result-value.css";
 
-<ResultValue value={fromFHIR(observation)} now={serverTime} />`,
+<ResultValue value={fromObservation(observation)} now={serverTime} />`,
 
   guidance: {
     use: [
@@ -259,12 +259,12 @@ import "@/styles/oxygen-result-value.css";
       description:
         "The adapter leaves undefined everything it cannot determine. A missing referenceRange becomes no range — not an empty one, and not a silent assumption of normality.",
       fixture: "observationPotassiumCritical",
-      code: `import { ResultValue, fromFHIR } from "@/components/oxygen/result-value";
+      code: `import { ResultValue, fromObservation } from "@/components/oxygen/result-value";
 import { observationPotassiumCritical } from "@oxygenui-design/fixtures";
 
 // \`now\` is the host's, never a clock this component reads: a relative time
 // computed at render silently ages on a ward workstation left open all shift.
-<ResultValue value={fromFHIR(observationPotassiumCritical)} now={serverTime} />;`,
+<ResultValue value={fromObservation(observationPotassiumCritical)} now={serverTime} />;`,
     },
     {
       id: "absence",

@@ -487,7 +487,7 @@ export function fromDataAbsentReason(code: string | undefined): ResultAbsence {
  * missing `referenceRange` becomes no range — not an empty one, and not a
  * silent assumption of normality.
  */
-export function fromFHIR(observation: FhirObservation): ResultValueData {
+export function fromObservation(observation: FhirObservation): ResultValueData {
   const range = observation.referenceRange?.[0];
   const absentCode = observation.dataAbsentReason?.coding?.[0]?.code;
   const interpretationCode = observation.interpretation?.[0]?.coding?.[0]?.code;

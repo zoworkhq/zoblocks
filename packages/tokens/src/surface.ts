@@ -13,7 +13,7 @@
  * change, because customers style against these names. The manifest is
  * committed so that change shows up as a reviewable diff.
  *
- * 294 tokens across 21 components:
+ * 295 tokens across 22 components:
  *
  *   switch          55
  *   tabs            44
@@ -35,6 +35,7 @@
  *   absent           3
  *   value            3
  *   care-timeline    2
+ *   allergy          1
  *   patient-chip     1
  *
  * `bridgeable: false` (86 tokens) marks the ones resolving to clinical
@@ -513,6 +514,15 @@ export const TOKEN_SURFACE: readonly SurfaceEntry[] = [
     "frameworks": [],
     "fallback": true,
     "bridgeable": false
+  },
+  {
+    "name": "--ox-allergy-gap",
+    "component": "allergy",
+    "source": "packages/react/src/styles.css",
+    "kind": "dimension",
+    "frameworks": [],
+    "fallback": true,
+    "bridgeable": true
   },
   {
     "name": "--ox-av-size",
@@ -3077,6 +3087,7 @@ export const SURFACE_COMPONENTS: readonly string[] = [
   "absent",
   "accordion",
   "alert",
+  "allergy",
   "avatar",
   "badge",
   "banner",
@@ -3124,6 +3135,7 @@ export const BRIDGEABLE: readonly string[] = [
   "--ox-alert-pad-x",
   "--ox-alert-pad-y",
   "--ox-alert-radius",
+  "--ox-allergy-gap",
   "--ox-av-size",
   "--ox-sw-bg",
   "--ox-sw-border",

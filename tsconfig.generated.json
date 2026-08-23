@@ -15,6 +15,9 @@
       "@/components/oxygen/accordion": [
         "./registry/oxygen/accordion/accordion.tsx"
       ],
+      "@/components/oxygen/allergy-chip": [
+        "./registry/oxygen/allergy-chip/allergy-chip.tsx"
+      ],
       "@/components/oxygen/breath-loader": [
         "./registry/oxygen/breath-loader/breath-loader.tsx"
       ],
@@ -59,6 +62,9 @@
       ],
       "@/lib/oxygen-accordion": [
         "./registry/oxygen/lib/accordion-core.tsx"
+      ],
+      "@/lib/oxygen-allergy": [
+        "./registry/oxygen/lib/allergy.ts"
       ],
       "@/lib/oxygen-clinical-note": [
         "./registry/oxygen/lib/clinical-note.tsx"

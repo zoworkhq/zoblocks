@@ -52,6 +52,7 @@ import { createStaticProvider, lookUp, minimalDisclosure } from "@oxygenui-desig
 import { SignatureMark } from "@/components/site/signature-mark";
 import { ClinicalStatus } from "@/registry/oxygen/clinical-status/clinical-status";
 import { ResultValue } from "@/registry/oxygen/result-value/result-value";
+import { AllergyChip } from "@/registry/oxygen/allergy-chip/allergy-chip";
 import { IdentityProvider, PatientChip, IdentitySet } from "@oxygenui-design/identity";
 import { STATUS_LABEL, type ComponentDoc } from "@/lib/catalog";
 import { cn } from "@/lib/utils";
@@ -253,6 +254,41 @@ const PREVIEW: Record<string, (featured: boolean) => React.ReactNode> = {
    * One of each, because the card has to say what the component is for: the
    * number nobody gets wrong, and the blank cell everybody does.
    */
+  /*
+   * The two rows that are the whole argument.
+   *
+   * Same manifestation, opposite consequences. A card showing one allergy
+   * would be a card for a component every library already ships.
+   */
+  "allergy-chip": (featured) => (
+    <div
+      style={{ display: "grid", gap: 8, maxInlineSize: featured ? 320 : 250, inlineSize: "100%" }}
+    >
+      <AllergyChip
+        density={featured ? "default" : "compact"}
+        record={{
+          id: "card-1",
+          substance: "Penicillin G",
+          kind: "allergy",
+          criticality: "high",
+          verification: "confirmed",
+          reactions: [{ manifestation: "Urticaria", severity: "mild", onset: "1998" }],
+        }}
+      />
+      <AllergyChip
+        density={featured ? "default" : "compact"}
+        record={{
+          id: "card-2",
+          substance: "Amoxicillin",
+          kind: "allergy",
+          criticality: "low",
+          verification: "unconfirmed",
+          reactions: [{ manifestation: "Urticaria", severity: "mild", onset: "2019" }],
+        }}
+      />
+    </div>
+  ),
+
   "result-value": (featured) => (
     <div
       style={{ display: "grid", gap: 12, maxInlineSize: featured ? 320 : 250, inlineSize: "100%" }}

@@ -106,6 +106,24 @@
       ]
     },
     {
+      "name": "allergy-core",
+      "type": "oxygen:lib",
+      "title": "Allergy core",
+      "description": "The distinction between criticality (risk of a future reaction) and reaction severity (how bad a past one was), six verification states, four kinds, and the rule that a no-known-allergies assertion without an asserter and a date is not an assertion. Includes the FHIR AllergyIntolerance adapter. Installed automatically with AllergyChip.",
+      "files": [
+        {
+          "path": "registry/oxygen/lib/allergy.ts",
+          "type": "oxygen:lib",
+          "target": "lib/oxygen-allergy.ts"
+        },
+        {
+          "path": "registry/oxygen/lib/allergy.css",
+          "type": "oxygen:style",
+          "target": "styles/oxygen-allergy.css"
+        }
+      ]
+    },
+    {
       "name": "switch-core",
       "type": "oxygen:lib",
       "title": "Switch core",
@@ -238,6 +256,33 @@
           "path": "registry/oxygen/accordion/accordion.tsx",
           "type": "oxygen:component",
           "target": "components/oxygen/accordion.tsx"
+        }
+      ]
+    },
+    {
+      "name": "allergy-chip",
+      "type": "oxygen:component",
+      "title": "Allergy Chip",
+      "description": "Substance first at full weight, criticality as the primary signal, the worst past reaction as secondary text, and verification as a hairline affix. AllergyList carries the other half: a no-known-allergies assertion and an unasked question look nothing alike, and an assertion missing its author degrades to the second.",
+      "categories": [
+        "clinical",
+        "data-display"
+      ],
+      "dependencies": [
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "utils",
+        "tokens",
+        "allergy-core",
+        "clinical-status"
+      ],
+      "files": [
+        {
+          "path": "registry/oxygen/allergy-chip/allergy-chip.tsx",
+          "type": "oxygen:component",
+          "target": "components/oxygen/allergy-chip.tsx"
         }
       ]
     },

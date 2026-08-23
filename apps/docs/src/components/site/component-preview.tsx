@@ -40,6 +40,11 @@ import { Copilot } from "@/registry/oxygen/copilot/copilot";
 import { ClinicalNote, ClinicalNoteReader } from "@/registry/oxygen/clinical-note/clinical-note";
 import { ResultValue, type ResultValueData } from "@/registry/oxygen/result-value/result-value";
 import {
+  AllergyChip,
+  AllergyList,
+  type AllergyRecord,
+} from "@/registry/oxygen/allergy-chip/allergy-chip";
+import {
   ClinicalStatus,
   SCALES,
   SCALE_NAMES,
@@ -709,7 +714,127 @@ const RV_METHOD_CHANGED: ResultValueData = {
   resultedAt: RV_RESULTED,
 };
 
+/* ------------------------------------------------------------------ */
+/* AllergyChip fixtures                                                */
+/* ------------------------------------------------------------------ */
+
+const AL_BETA_LACTAM = (substance: string) =>
+  substance.startsWith("Penicillin") ? { label: "beta-lactam", count: 12 } : null;
+
+/*
+ * Rows one and two are the argument.
+ *
+ * Same manifestation, same severity, opposite consequences — and only the
+ * criticality field separates them, which is the field most implementations
+ * drop.
+ */
+const AL_RECORDS: AllergyRecord[] = [
+  {
+    id: "al1",
+    substance: "Penicillin G",
+    kind: "allergy",
+    criticality: "high",
+    verification: "confirmed",
+    reactions: [{ manifestation: "Urticaria", severity: "mild", onset: "1998", note: "age 6" }],
+  },
+  {
+    id: "al2",
+    substance: "Amoxicillin",
+    kind: "allergy",
+    criticality: "low",
+    verification: "unconfirmed",
+    note: "Reported by patient at intake",
+    reactions: [{ manifestation: "Urticaria", severity: "mild", onset: "2019" }],
+  },
+  {
+    id: "al3",
+    substance: "Lithium carbonate",
+    kind: "intolerance",
+    criticality: "unable-to-assess",
+    verification: "confirmed",
+    reactions: [
+      {
+        manifestation: "Tremor, polyuria",
+        severity: "moderate",
+        note: "ongoing at therapeutic level",
+      },
+    ],
+  },
+  {
+    id: "al4",
+    substance: "Sulfa drugs",
+    kind: "allergy",
+    verification: "refuted",
+    note: "Rechallenged 2024 · tolerated · refuted by allergist",
+  },
+];
+
 const SCENARIOS: Record<string, Scenario[]> = {
+  /** Three demos, and the first two are the two failures. */
+  "allergy-chip": [
+    {
+      id: "criticality",
+      label: "Criticality is not severity",
+      note: "Rows one and two carry the same manifestation and opposite consequences. `criticality` is the clinician's judgement of the risk of a future life-threatening reaction; `reaction.severity` describes how bad a past one was. A patient whose only documented reaction was mild urticaria can still be high criticality — that is the whole point of the field, and it is the field most implementations drop.",
+      render: () => (
+        <div style={{ display: "grid", gap: 10, maxInlineSize: 520 }}>
+          <AllergyList records={AL_RECORDS} expandClass={AL_BETA_LACTAM} />
+        </div>
+      ),
+    },
+    {
+      id: "absences",
+      label: "The two empty states",
+      note: "A no-known assertion is a positive clinical finding with an author and a date, and it is safe to prescribe against. An unrecorded status is neither. They differ in shape as well as colour — solid against dashed — because a reader scanning a chart has to tell them apart without reading either. Supply an assertion missing its author and the component renders the second, because that is what an unattributed assertion is worth.",
+      render: () => (
+        <div style={{ display: "grid", gap: 14, maxInlineSize: 520 }}>
+          <AllergyList
+            noneKnown={{
+              asserter: "R. Okafor, RN",
+              assertedAt: "14 Aug 2026",
+              context: "reconciled at intake",
+            }}
+          />
+          <AllergyList onAsk={() => {}} />
+          <AllergyList noneKnown={{ assertedAt: "14 Aug 2026" }} />
+        </div>
+      ),
+    },
+    {
+      id: "kinds",
+      label: "Four kinds",
+      note: "An intolerance is not a weak allergy. Akathisia on aripiprazole and sedation on quetiapine dominate psychotropic histories and are the entries most often lost, because somebody decided they were not real allergies. A contraindication is neither — it is a reason not to prescribe that has nothing to do with the immune system. The common case goes unlabelled so the exceptions carry weight.",
+      render: () => (
+        <div style={{ display: "grid", gap: 10, maxInlineSize: 520 }}>
+          {(
+            [
+              AL_RECORDS[0]!,
+              AL_RECORDS[2]!,
+              {
+                id: "al5",
+                substance: "NSAIDs",
+                kind: "contraindication",
+                criticality: "high",
+                verification: "confirmed",
+                note: "Stage 4 CKD",
+              },
+              {
+                id: "al6",
+                substance: "Unknown antibiotic",
+                kind: "adverse-reaction",
+                criticality: "unable-to-assess",
+                verification: "unable-to-verify",
+                note: "Patient recalls a reaction in childhood; agent unknown",
+              },
+            ] as AllergyRecord[]
+          ).map((record) => (
+            <AllergyChip key={record.id} record={record} />
+          ))}
+        </div>
+      ),
+    },
+  ],
+
   /**
    * Four demos, and the third is the one worth arguing about.
    *

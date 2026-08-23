@@ -125,6 +125,27 @@ const SUPPORT_ITEMS: BuildableItem[] = [
     ],
   },
   {
+    name: "allergy-core",
+    type: "oxygen:lib",
+    title: "Allergy core",
+    description:
+      "The distinction between criticality (risk of a future reaction) and reaction severity (how bad a past one was), six verification states, four kinds, and the rule that a no-known-allergies assertion without an asserter and a date is not an assertion. Includes the FHIR AllergyIntolerance adapter. Installed automatically with AllergyChip.",
+    dependencies: [] as string[],
+    registryDependencies: [] as string[],
+    files: [
+      {
+        path: "registry/oxygen/lib/allergy.ts",
+        type: "oxygen:lib",
+        target: "lib/oxygen-allergy.ts",
+      },
+      {
+        path: "registry/oxygen/lib/allergy.css",
+        type: "oxygen:style",
+        target: "styles/oxygen-allergy.css",
+      },
+    ],
+  },
+  {
     name: "switch-core",
     type: "oxygen:lib",
     title: "Switch core",

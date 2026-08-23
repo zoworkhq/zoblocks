@@ -48,13 +48,7 @@ import { fromInterpretation, fromObservationStatus } from "./clinical-status";
  * and the interface should say so rather than absorb it.
  */
 export type ResultAbsence =
-  | "not-ordered"
-  | "awaiting"
-  | "cancelled"
-  | "specimen-problem"
-  | "declined"
-  | "masked"
-  | "unknown";
+  "not-ordered" | "awaiting" | "cancelled" | "specimen-problem" | "declined" | "masked" | "unknown";
 
 export const ABSENT_REASONS: readonly ResultAbsence[] = [
   "not-ordered",
@@ -335,7 +329,7 @@ const SPOKEN_UNIT: Record<string, string> = {
   "ng/mL": "nanograms per millilitre",
   "mIU/L": "milli-international units per litre",
   "g/dL": "grams per decilitre",
-  "mmHg": "millimetres of mercury",
+  mmHg: "millimetres of mercury",
   "%": "per cent",
 };
 
@@ -501,7 +495,7 @@ export function fromDataAbsentReason(code: string | undefined): ResultAbsence {
  * missing `referenceRange` becomes no range — not an empty one, and not a
  * silent assumption of normality.
  */
-export function fromFHIR(observation: FhirObservation): ResultValueData {
+export function fromObservation(observation: FhirObservation): ResultValueData {
   const range = observation.referenceRange?.[0];
   const absentCode = observation.dataAbsentReason?.coding?.[0]?.code;
   const interpretationCode = observation.interpretation?.[0]?.coding?.[0]?.code;

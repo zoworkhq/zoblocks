@@ -13,6 +13,7 @@ export * from "./lib/switch";
 export { cn } from "./lib/utils";
 
 export * from "./components/accordion/accordion";
+export * from "./components/allergy-chip/allergy-chip";
 export * from "./components/breath-loader/breath-loader";
 export * from "./components/care-timeline/care-timeline";
 export * from "./components/chart-accordion/chart-accordion";
