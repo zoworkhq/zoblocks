@@ -57,7 +57,7 @@ Rules that matter when generating code with these components:
 - [Tabs](https://oxygenui.design/components/tabs): Tabs that know what they are: a view switch, a link list, a form value or a wizard — four accessibility trees behind one silhouette.
   install: npx @oxygenui-design/cli add tabs
   states: Selected, Unselected, Disabled with a stated reason, Restricted (present, gated, explained), Stale — showing cached data, Unavailable offline, Unsaved changes pending, Locked step, Completed step, Overflowing into a menu, Collapsed to a native picker, Awaiting an async guard
-  status: beta
+  status: stable
 
 ## Clinical
 
@@ -82,8 +82,9 @@ Rules that matter when generating code with these components:
   status: beta
 - [Signature](https://oxygenui.design/components/signature): Signature capture that records the times nobody signed — declined, unable, verbal, on paper — not just the times they did.
   install: npx @oxygenui-design/cli add signature
+  fhir: Provenance, Consent
   states: Signed, Declined to sign, Unable to sign (witnessed), Consented verbally (witnessed), Signed on paper, Awaiting countersignature, Consent withdrawn, Required and empty, Locked / read-only
-  status: beta
+  status: stable
 
 ## Pattern
 

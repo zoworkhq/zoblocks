@@ -546,13 +546,25 @@ export const CATALOG: ComponentDoc[] = [
     ],
     "related": [
       "chart-accordion",
-      "safety-plan"
+      "safety-plan",
+      "care-timeline",
+      "tabs",
+      "timeline"
     ],
     "dependencies": [
       "clsx",
       "tailwind-merge"
     ],
-    "install": "npx @oxygenui-design/cli add accordion"
+    "install": "npx @oxygenui-design/cli add accordion",
+    "relationships": {
+      "builtWith": [],
+      "usedIn": [
+        "chart-accordion",
+        "safety-plan"
+      ],
+      "patterns": [],
+      "alternatives": []
+    }
   },
   {
     "name": "breath-loader",
@@ -841,7 +853,8 @@ export const CATALOG: ComponentDoc[] = [
     "related": [
       "pulse-loader",
       "rhythm-loader",
-      "infusion-loader"
+      "infusion-loader",
+      "helix-loader"
     ],
     "dependencies": [
       "clsx",
@@ -1296,7 +1309,15 @@ export const CATALOG: ComponentDoc[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "install": "npx @oxygenui-design/cli add care-timeline"
+    "install": "npx @oxygenui-design/cli add care-timeline",
+    "relationships": {
+      "builtWith": [
+        "timeline"
+      ],
+      "usedIn": [],
+      "patterns": [],
+      "alternatives": []
+    }
   },
   {
     "name": "chart-accordion",
@@ -1651,13 +1672,24 @@ export const CATALOG: ComponentDoc[] = [
     ],
     "related": [
       "accordion",
-      "safety-plan"
+      "safety-plan",
+      "care-timeline",
+      "tabs",
+      "timeline"
     ],
     "dependencies": [
       "clsx",
       "tailwind-merge"
     ],
-    "install": "npx @oxygenui-design/cli add chart-accordion"
+    "install": "npx @oxygenui-design/cli add chart-accordion",
+    "relationships": {
+      "builtWith": [
+        "accordion"
+      ],
+      "usedIn": [],
+      "patterns": [],
+      "alternatives": []
+    }
   },
   {
     "name": "clinical-note",
@@ -1989,7 +2021,9 @@ export const CATALOG: ComponentDoc[] = [
     ],
     "related": [
       "copilot",
-      "switch"
+      "switch",
+      "care-timeline",
+      "signature"
     ],
     "dependencies": [
       "clsx",
@@ -2399,7 +2433,9 @@ export const CATALOG: ComponentDoc[] = [
       "Copilot cannot secure a backend. It guarantees the shape of what it sends and the provenance of what it renders; it cannot stop a host wiring an agent with standing EHR write access behind it.",
       "Requires @oxygenui-design/copilot-react and @oxygenui-design/copilot-core from npm. The engine is deliberately not inlined — a safety control nobody reads before pasting is not a safety control."
     ],
-    "related": [],
+    "related": [
+      "clinical-note"
+    ],
     "dependencies": [
       "clsx",
       "tailwind-merge",
@@ -2680,7 +2716,8 @@ export const CATALOG: ComponentDoc[] = [
     "related": [
       "breath-loader",
       "rhythm-loader",
-      "infusion-loader"
+      "infusion-loader",
+      "pulse-loader"
     ],
     "dependencies": [
       "clsx",
@@ -2961,7 +2998,8 @@ export const CATALOG: ComponentDoc[] = [
     "related": [
       "pulse-loader",
       "rhythm-loader",
-      "breath-loader"
+      "breath-loader",
+      "helix-loader"
     ],
     "dependencies": [
       "clsx",
@@ -3376,13 +3414,22 @@ export const CATALOG: ComponentDoc[] = [
     "related": [
       "rhythm-loader",
       "breath-loader",
-      "infusion-loader"
+      "infusion-loader",
+      "helix-loader"
     ],
     "dependencies": [
       "clsx",
       "tailwind-merge"
     ],
-    "install": "npx @oxygenui-design/cli add pulse-loader"
+    "install": "npx @oxygenui-design/cli add pulse-loader",
+    "relationships": {
+      "builtWith": [
+        "rhythm-loader"
+      ],
+      "usedIn": [],
+      "patterns": [],
+      "alternatives": []
+    }
   },
   {
     "name": "rhythm-loader",
@@ -3671,13 +3718,22 @@ export const CATALOG: ComponentDoc[] = [
     "related": [
       "pulse-loader",
       "breath-loader",
-      "infusion-loader"
+      "infusion-loader",
+      "helix-loader"
     ],
     "dependencies": [
       "clsx",
       "tailwind-merge"
     ],
-    "install": "npx @oxygenui-design/cli add rhythm-loader"
+    "install": "npx @oxygenui-design/cli add rhythm-loader",
+    "relationships": {
+      "builtWith": [],
+      "usedIn": [
+        "pulse-loader"
+      ],
+      "patterns": [],
+      "alternatives": []
+    }
   },
   {
     "name": "safety-plan",
@@ -3831,13 +3887,22 @@ export const CATALOG: ComponentDoc[] = [
     ],
     "related": [
       "accordion",
-      "chart-accordion"
+      "chart-accordion",
+      "signature"
     ],
     "dependencies": [
       "clsx",
       "tailwind-merge"
     ],
-    "install": "npx @oxygenui-design/cli add safety-plan"
+    "install": "npx @oxygenui-design/cli add safety-plan",
+    "relationships": {
+      "builtWith": [
+        "accordion"
+      ],
+      "usedIn": [],
+      "patterns": [],
+      "alternatives": []
+    }
   },
   {
     "name": "switch",
@@ -4799,7 +4864,10 @@ export const CATALOG: ComponentDoc[] = [
       "audience selects the default label preset and size. Wiring it to separate clinician and patient intl catalogs is not done yet.",
       "Requires styles/oxygen-switch.css, installed with switch-core."
     ],
-    "related": [],
+    "related": [
+      "clinical-note",
+      "tabs"
+    ],
     "dependencies": [
       "clsx",
       "tailwind-merge"
@@ -5077,7 +5145,15 @@ export const CATALOG: ComponentDoc[] = [
       "clsx",
       "tailwind-merge"
     ],
-    "install": "npx @oxygenui-design/cli add timeline"
+    "install": "npx @oxygenui-design/cli add timeline",
+    "relationships": {
+      "builtWith": [],
+      "usedIn": [
+        "care-timeline"
+      ],
+      "patterns": [],
+      "alternatives": []
+    }
   },
   {
     "name": "identity",
@@ -5340,7 +5416,9 @@ export const CATALOG: ComponentDoc[] = [
       "The compact Double Metaphone omits the alternate code and several Slavic and Germanic cases. It fails safe: a missed similarity produces an ordinary row rather than a wrong one.",
       "Wristband matching and the ID-reentry verification step are built but unstyled beyond the base sheet; a deployment wanting positive patient identification supplies the scanner integration."
     ],
-    "related": [],
+    "related": [
+      "signature"
+    ],
     "dependencies": [
       "@oxygenui-design/identity-core"
     ],
@@ -5350,7 +5428,7 @@ export const CATALOG: ComponentDoc[] = [
     "name": "signature",
     "title": "Signature",
     "tier": "free",
-    "status": "beta",
+    "status": "stable",
     "since": "0.1.0",
     "layer": "clinical",
     "distribution": "package",
@@ -5374,7 +5452,18 @@ export const CATALOG: ComponentDoc[] = [
       "Clinical",
       "Data Entry"
     ],
-    "fhir": [],
+    "fhir": [
+      {
+        "name": "Provenance",
+        "url": "https://hl7.org/fhir/R4/provenance.html"
+      },
+      {
+        "name": "Consent",
+        "url": "https://hl7.org/fhir/R4/consent.html"
+      }
+    ],
+    "resource": "Provenance",
+    "resourceUrl": "https://hl7.org/fhir/R4/provenance.html",
     "states": [
       "Signed",
       "Declined to sign",
@@ -5715,18 +5804,310 @@ export const CATALOG: ComponentDoc[] = [
       "Stroke biometrics are captured into the model but never emitted unless explicitly opted in, because whether stroke dynamics are a 'writing sample' is unsettled under BIPA and CUBI.",
       "Interpreter attestation, adopt-and-apply, and saved signatures are designed but not built."
     ],
-    "related": [],
+    "related": [
+      "clinical-note",
+      "safety-plan",
+      "identity"
+    ],
     "dependencies": [
       "antd",
       "@oxygenui-design/signature-core"
     ],
-    "install": "npx @oxygenui-design/cli add signature"
+    "install": "npx @oxygenui-design/cli add signature",
+    "technicalName": "Signature",
+    "aliases": [
+      "signature pad",
+      "consent signature",
+      "e-signature",
+      "sign and file",
+      "attestation"
+    ],
+    "tags": [
+      "form-control",
+      "data-entry",
+      "keyboard-first",
+      "print-safe",
+      "themeable"
+    ],
+    "uxGuidelines": {
+      "do": [
+        "Pass a server-supplied `now`. A signature timestamped by the client's clock is not evidence.",
+        "State the attestation above the pad, in the words the signer is agreeing to.",
+        "Offer decline as a first-class outcome, not a cancel button.",
+        "Record a witness when the outcome is `unable` — it is a compile error without one."
+      ],
+      "dont": [
+        "Do not treat an empty pad as \"not signed yet\". It is indistinguishable from a refusal unless the outcome says which.",
+        "Do not ship a draw-only pad. A signature reachable only by pointer fails WCAG 2.1.1 and is a lint error here.",
+        "Do not write the signature into Consent — R4 and R5 carry no signature element on it. Only Provenance.signature does."
+      ]
+    },
+    "domain": {
+      "industries": [
+        "healthcare",
+        "behavioral-health"
+      ],
+      "clinicalContext": "Consent, attestation and clinical sign-off. The value is a discriminated union over seven outcomes rather than string | null, because a patient who refused to sign and a form nobody opened are different facts with different consequences — and only one of them is a reason to stop.",
+      "workflows": [
+        "intake",
+        "documentation",
+        "treatment-planning"
+      ],
+      "phi": {
+        "handles": true,
+        "notes": "Captures a signature image, the signer's name and role, and a server-supplied timestamp — all PHI. The stroke buffer never leaves the browser except in the emitted Bundle, and `now` is a required prop rather than a Date.now() call so the recorded time is the server's and is testable."
+      },
+      "auditable": true,
+      "permissions": [
+        "provenance.write",
+        "consent.write"
+      ],
+      "terminology": [
+        "FHIR",
+        "SNOMED CT"
+      ]
+    },
+    "variants": [
+      {
+        "id": "draw",
+        "label": "Draw",
+        "description": "Pointer or stylus. The default on a tablet at the bedside.",
+        "args": {
+          "methods": [
+            "draw"
+          ]
+        }
+      },
+      {
+        "id": "type",
+        "label": "Type",
+        "description": "A typed name rendered in a cursive face. The keyboard-reachable path, and never the only one offered.",
+        "args": {
+          "methods": [
+            "type"
+          ]
+        }
+      },
+      {
+        "id": "upload",
+        "label": "Upload",
+        "description": "An image of a wet signature, for a form that arrived on paper.",
+        "args": {
+          "methods": [
+            "upload"
+          ]
+        }
+      },
+      {
+        "id": "all",
+        "label": "All three",
+        "description": "The house default. Every signer has a path that works for them.",
+        "args": {
+          "methods": [
+            "draw",
+            "type",
+            "upload"
+          ]
+        }
+      }
+    ],
+    "controls": [
+      {
+        "prop": "meaning",
+        "control": "select",
+        "label": "Meaning",
+        "options": [
+          "consent",
+          "verification",
+          "author",
+          "coauthor",
+          "validation",
+          "witness",
+          "interpreter",
+          "review"
+        ],
+        "defaultValue": "consent"
+      },
+      {
+        "prop": "methods",
+        "control": "segmented",
+        "label": "Capture methods",
+        "options": [
+          "draw",
+          "type",
+          "upload"
+        ],
+        "defaultValue": "draw"
+      },
+      {
+        "prop": "outcomes",
+        "control": "select",
+        "label": "Non-signed outcomes offered",
+        "options": [
+          "declined",
+          "unable",
+          "verbal",
+          "on-paper"
+        ]
+      },
+      {
+        "prop": "disabled",
+        "control": "switch",
+        "label": "Disabled",
+        "defaultValue": false
+      },
+      {
+        "prop": "status",
+        "control": "segmented",
+        "label": "Validation status",
+        "options": [
+          "error",
+          "warning"
+        ]
+      },
+      {
+        "prop": "attestation",
+        "control": "text",
+        "label": "Attestation text"
+      },
+      {
+        "prop": "captureBiometrics",
+        "control": "switch",
+        "label": "Capture biometrics",
+        "defaultValue": false
+      },
+      {
+        "prop": "onChange",
+        "control": "event",
+        "label": "onChange"
+      }
+    ],
+    "a11yChecks": [
+      {
+        "wcag": "2.1.1",
+        "name": "Keyboard",
+        "status": "pass",
+        "how": "One test signs the whole form using tab() and keyboard() only, never dispatching a pointer event. A draw-only pad is a lint error.",
+        "evidence": "Signature.test.tsx"
+      },
+      {
+        "wcag": "4.1.2",
+        "name": "Name, role, value",
+        "status": "pass",
+        "how": "The pad is a labelled control with its current outcome in the accessible name, not a bare canvas.",
+        "evidence": "Signature.test.tsx"
+      },
+      {
+        "wcag": "3.3.1",
+        "name": "Error identification",
+        "status": "pass",
+        "how": "signatureRequired() accepts a decline as a valid answer, so refusing is submittable rather than an error state.",
+        "evidence": "Signature.test.tsx"
+      },
+      {
+        "wcag": "3.3.2",
+        "name": "Labels or instructions",
+        "status": "pass",
+        "how": "The attestation is rendered above the pad and is part of the control's accessible description.",
+        "evidence": "Signature.test.tsx"
+      },
+      {
+        "wcag": "1.4.11",
+        "name": "Non-text contrast",
+        "status": "pass",
+        "how": "Pad border, baseline and focus ring are gated in the token build across three themes.",
+        "evidence": "contrast.gate"
+      },
+      {
+        "wcag": "2.5.8",
+        "name": "Target size",
+        "status": "pass",
+        "how": "Every method control and the clear affordance hold a 24px minimum.",
+        "evidence": "e2e/docs-site.spec.ts"
+      },
+      {
+        "wcag": "2.4.11",
+        "name": "Focus not obscured",
+        "status": "pass",
+        "how": "The signing dialog returns focus to the invoking control and never leaves it behind the sticky footer.",
+        "evidence": "e2e/docs-site.spec.ts"
+      },
+      {
+        "wcag": "2.2.1",
+        "name": "Timing adjustable",
+        "status": "not-applicable",
+        "how": "No session timeout is imposed by the component."
+      }
+    ],
+    "examples": [
+      {
+        "id": "consent-in-a-form",
+        "title": "Consent inside an antd Form",
+        "description": "The common case. `signatureRequired()` treats a decline as a valid answer — a rule demanding outcome === \"signed\" would make refusal impossible to submit.",
+        "fixture": "patientRoutine",
+        "code": "import { Form } from \"antd\";\nimport { Signature, signatureRequired } from \"@oxygenui-design/signature\";\nimport \"@oxygenui-design/signature/styles.css\";\n\n<Form.Item name=\"consent\" rules={[signatureRequired()]}>\n  <Signature\n    now={serverTime}\n    meaning=\"consent\"\n    attestation=\"I agree to the treatment described above.\"\n  />\n</Form.Item>;"
+      },
+      {
+        "id": "refusal",
+        "title": "The patient who refused to sign",
+        "description": "Seven outcomes, not two. A refusal and an unopened form are different clinical facts, and the union makes it impossible to record them the same way.",
+        "fixture": "consentDeclined",
+        "code": "// The value is a discriminated union, so this compiles only if every\n// outcome is handled — including the three that are not \"signed\".\nswitch (value.outcome) {\n  case \"signed\":   return file(value.image, value.signedAt);\n  case \"declined\": return recordRefusal(value.reason, value.recordedAt);\n  case \"unable\":   return recordUnable(value.reason, value.witness); // witness is required\n  case \"verbal\":   return recordVerbal(value.witness);\n  case \"on-paper\": return awaitScan();\n  case \"pending\":  return null;\n  case \"revoked\":  return revoke(value.revokedAt);\n}"
+      },
+      {
+        "id": "provenance-bundle",
+        "title": "What it emits, and why it is not a Consent",
+        "description": "Consent carries no signature element in R4 or R5 — only Provenance.signature does. The component emits a transaction Bundle so the two land together or not at all.",
+        "fixture": "provenanceConsent",
+        "code": "import { toFhirBundle } from \"@oxygenui-design/signature\";\nimport { patientRoutine } from \"@oxygenui-design/fixtures\";\n\n// A transaction Bundle: the Consent and the Provenance that signs it, posted\n// together or not at all. Emitting the Consent alone would store an agreement\n// with nothing proving anyone made it.\nconst bundle = toFhirBundle(value, {\n  release: \"R4\",\n  subject: {\n    display: \"Amara Okonkwo\",\n    reference: `Patient/${patientRoutine.id}`,\n  },\n});\n\n// bundle.entry[0] → POST Consent\n// bundle.entry[1] → POST Provenance, carrying Provenance.signature\n\n// The signer travels on the value, not in these options: who signed is part of\n// what was captured, and re-supplying it here would let the two disagree."
+      }
+    ],
+    "fixtures": [
+      "patientRoutine",
+      "practitionerSigner",
+      "practitionerWitness",
+      "consentTreatment",
+      "consentDeclined",
+      "provenanceConsent"
+    ],
+    "seo": {
+      "slug": "signature",
+      "title": "Signature — React consent signature component",
+      "description": "A React signature component for clinical consent: draw, type or upload, with seven outcomes including refusal, and a FHIR Provenance bundle on submit.",
+      "primaryKeyword": "react signature component healthcare",
+      "secondaryKeywords": [
+        "consent signature react",
+        "e-signature react",
+        "fhir provenance signature",
+        "patient consent form react"
+      ],
+      "searchIntent": "commercial",
+      "ogImage": "generated"
+    },
+    "relationships": {
+      "builtWith": [],
+      "usedIn": [],
+      "patterns": [
+        "patient-intake",
+        "clinical-documentation"
+      ],
+      "alternatives": [
+        {
+          "ref": "clinical-note",
+          "when": "you need the whole note signed rather than a single attestation"
+        },
+        {
+          "ref": "switch",
+          "when": "the answer is a yes/no acknowledgement with no legal weight"
+        }
+      ]
+    }
   },
   {
     "name": "tabs",
     "title": "Tabs",
     "tier": "free",
-    "status": "beta",
+    "status": "stable",
     "since": "0.1.0",
     "layer": "primitive",
     "distribution": "package",
@@ -6194,11 +6575,298 @@ export const CATALOG: ComponentDoc[] = [
       "`hotkeys` is off by default. Ctrl+1…9 belongs to the browser first on Windows and Linux, so claiming it takes a shortcut the user already had.",
       "Drag-to-reorder is not implemented. Keyboard reorder is (Ctrl+Shift+Arrow), because a pointer-only affordance for a destructive-feeling action is the wrong half to build first."
     ],
-    "related": [],
+    "related": [
+      "accordion",
+      "chart-accordion",
+      "switch"
+    ],
     "dependencies": [
       "@oxygenui-design/tabs-core"
     ],
-    "install": "npx @oxygenui-design/cli add tabs"
+    "install": "npx @oxygenui-design/cli add tabs",
+    "technicalName": "Tabs",
+    "aliases": [
+      "tab strip",
+      "segmented control",
+      "view switcher",
+      "wizard steps",
+      "chart sections"
+    ],
+    "tags": [
+      "navigation",
+      "keyboard-first",
+      "disclosure",
+      "themeable",
+      "headless"
+    ],
+    "uxGuidelines": {
+      "do": [
+        "Declare `as` on every strip. It selects the accessibility tree, and there is no default.",
+        "Give a disabled tab a `disabledReason`. \"Restricted\" and \"not applicable here\" are different clinical facts.",
+        "Keep the count of tabs under about seven for a view switch; beyond that, use the rail or a menu.",
+        "Let the overflow strategy be chosen by the surface, not by the tab count."
+      ],
+      "dont": [
+        "Do not wrap anchors in `as=\"tabs\"` — it passes every automated checker and destroys focus on the first arrow key.",
+        "Do not nest an interactive control inside a trigger. The close affordance is aria-hidden and the keyboard path is Delete on the tab.",
+        "Do not use colour alone for a count's tone. A red 2 must announce as \"2 critical\"."
+      ]
+    },
+    "domain": {
+      "industries": [
+        "general",
+        "healthcare"
+      ],
+      "clinicalContext": "Consumes no FHIR resource. It is listed as clinical because a chart's section strip must distinguish a section that is empty from one that is restricted, stale, or unavailable offline — four facts that a generic tab component collapses into one, and that a clinician reads as if they were the same.",
+      "workflows": [
+        "documentation",
+        "care-coordination"
+      ],
+      "phi": {
+        "handles": false,
+        "notes": "Renders no PHI of its own. A tab label supplied by the host may carry it — a patient name on a chart tab — so labels are never logged and never sent to telemetry."
+      },
+      "auditable": false,
+      "permissions": [],
+      "terminology": []
+    },
+    "variants": [
+      {
+        "id": "underline",
+        "label": "Underline",
+        "description": "The default. An underline indicator on a hairline track, for a page's primary sections.",
+        "args": {
+          "variant": "underline"
+        }
+      },
+      {
+        "id": "enclosed",
+        "label": "Enclosed",
+        "description": "Tabs as connected cards. For a workspace where each tab owns a document.",
+        "args": {
+          "variant": "enclosed"
+        }
+      },
+      {
+        "id": "segmented",
+        "label": "Segmented",
+        "description": "A form control. Belongs in a Form.Item and carries a value, not a view.",
+        "args": {
+          "variant": "segmented",
+          "as": "radiogroup"
+        }
+      },
+      {
+        "id": "rail",
+        "label": "Rail",
+        "description": "Vertical. Arrow keys become up and down, because the orientation is the keyboard model.",
+        "args": {
+          "variant": "rail",
+          "orientation": "vertical"
+        }
+      },
+      {
+        "id": "ghost",
+        "label": "Ghost",
+        "description": "No track, no indicator, no measurement pass. For dense toolbars and popovers.",
+        "args": {
+          "variant": "ghost"
+        }
+      }
+    ],
+    "controls": [
+      {
+        "prop": "as",
+        "control": "segmented",
+        "label": "Semantic mode",
+        "options": [
+          "tabs",
+          "nav",
+          "radiogroup",
+          "steps"
+        ],
+        "defaultValue": "tabs"
+      },
+      {
+        "prop": "variant",
+        "control": "select",
+        "label": "Variant",
+        "options": [
+          "underline",
+          "segmented",
+          "pill",
+          "enclosed",
+          "rail",
+          "ghost",
+          "stepper",
+          "command",
+          "card",
+          "stat",
+          "unstyled"
+        ],
+        "defaultValue": "underline"
+      },
+      {
+        "prop": "orientation",
+        "control": "segmented",
+        "label": "Orientation",
+        "options": [
+          "horizontal",
+          "vertical"
+        ],
+        "defaultValue": "horizontal"
+      },
+      {
+        "prop": "size",
+        "control": "segmented",
+        "label": "Size",
+        "options": [
+          "sm",
+          "md",
+          "lg"
+        ],
+        "defaultValue": "md"
+      },
+      {
+        "prop": "overflow",
+        "control": "select",
+        "label": "Overflow",
+        "options": [
+          "scroll",
+          "menu",
+          "wrap",
+          "collapse",
+          "none"
+        ],
+        "defaultValue": "scroll"
+      },
+      {
+        "prop": "items",
+        "control": "fixture",
+        "label": "Chart",
+        "options": [
+          "patientRoutine",
+          "patientRestricted"
+        ]
+      }
+    ],
+    "a11yChecks": [
+      {
+        "wcag": "4.1.2",
+        "name": "Name, role, value",
+        "status": "pass",
+        "how": "`as` selects the tree: a tablist of buttons, a real nav of anchors, or a radiogroup. Passing an href under as=\"tabs\" throws.",
+        "evidence": "tabs.test.tsx"
+      },
+      {
+        "wcag": "2.1.1",
+        "name": "Keyboard",
+        "status": "pass",
+        "how": "Roving tabindex. Tab enters at the selected trigger; the next Tab leaves the group entirely.",
+        "evidence": "tabs.test.tsx"
+      },
+      {
+        "wcag": "2.4.3",
+        "name": "Focus order",
+        "status": "pass",
+        "how": "After a close, focus moves to the neighbour deterministically rather than to body.",
+        "evidence": "tabs.test.tsx"
+      },
+      {
+        "wcag": "1.4.1",
+        "name": "Use of colour",
+        "status": "pass",
+        "how": "A count's tone reaches the accessible name as a word — \"Labs, 2 critical\", never \"Labs 2\".",
+        "evidence": "tabs.test.tsx"
+      },
+      {
+        "wcag": "1.4.11",
+        "name": "Non-text contrast",
+        "status": "pass",
+        "how": "Indicator, track and focus ring are gated in the token build across three themes.",
+        "evidence": "contrast.gate"
+      },
+      {
+        "wcag": "2.5.8",
+        "name": "Target size",
+        "status": "pass",
+        "how": "Triggers hold a 24px minimum at every density; density changes spacing, never target size.",
+        "evidence": "e2e/docs-site.spec.ts"
+      },
+      {
+        "wcag": "2.3.3",
+        "name": "Animation from interactions",
+        "status": "pass",
+        "how": "prefers-reduced-motion collapses the indicator transition to a designed still state.",
+        "evidence": "tabs.test.tsx"
+      },
+      {
+        "wcag": "2.2.1",
+        "name": "Timing adjustable",
+        "status": "not-applicable",
+        "how": "No time limit exists anywhere in the component."
+      }
+    ],
+    "examples": [
+      {
+        "id": "chart-sections",
+        "title": "Chart sections",
+        "description": "The common case: a view switch over a patient chart, with a critical count on Labs that reaches the accessible name as a word.",
+        "fixture": "patientRoutine",
+        "code": "import { Tabs } from \"@oxygenui-design/tabs\";\nimport { allergyList, medicationList, observationPanel } from \"@oxygenui-design/fixtures\";\nimport \"@oxygenui-design/tabs/styles.css\";\n\nconst critical = observationPanel.filter(isCritical);\n\n<Tabs\n  as=\"tabs\"\n  aria-label=\"Chart sections\"\n  defaultValue=\"summary\"\n  items={[\n    { value: \"summary\", label: \"Summary\", children: <Summary /> },\n    {\n      value: \"labs\",\n      label: \"Labs\",\n      // Counted from the data, never typed in. A tone is a claim about the\n      // patient, so it has to come from the same place the panel does.\n      count: critical.length,\n      tone: critical.length ? \"critical\" : \"neutral\",\n      children: <Labs observations={observationPanel} />,\n    },\n    { value: \"meds\", label: \"Medications\", count: medicationList.length, children: <Meds /> },\n    { value: \"allergies\", label: \"Allergies\", count: allergyList.length, children: <Allergies /> },\n  ]}\n/>;"
+      },
+      {
+        "id": "restricted-section",
+        "title": "A section that is restricted, not absent",
+        "description": "A disabled tab requires a reason. Omitting the section entirely would tell the clinician it does not exist; greying it silently tells them nothing.",
+        "fixture": "patientRestricted",
+        "code": "import { patientRestricted } from \"@oxygenui-design/fixtures\";\n\n<Tabs\n  as=\"tabs\"\n  aria-label=\"Chart sections\"\n  defaultValue=\"summary\"\n  items={[\n    { value: \"summary\", label: \"Summary\", children: <Summary /> },\n    {\n      value: \"bh\",\n      label: \"Behavioural health\",\n      disabled: true,\n      // Mandatory. aria-disabled, never the disabled attribute — a keyboard\n      // user has to be able to reach it to find out why they cannot open it.\n      disabledReason:\n        \"Restricted. Opening it records an access event and notifies the record owner.\",\n    },\n  ]}\n/>;"
+      },
+      {
+        "id": "segmented-filter",
+        "title": "A segmented control is a form value",
+        "description": "Not every tab strip is a view switch. A filter is a form control and belongs in a Form.Item, which is what `as=\"radiogroup\"` declares.",
+        "code": "import { Form } from \"antd\";\n\n<Form.Item name=\"density\" label=\"Density\">\n  <Tabs\n    as=\"radiogroup\"\n    variant=\"segmented\"\n    items={[\n      { value: \"compact\", label: \"Compact\" },\n      { value: \"default\", label: \"Default\" },\n      { value: \"comfortable\", label: \"Comfortable\" },\n    ]}\n  />\n</Form.Item>;"
+      }
+    ],
+    "fixtures": [
+      "patientRoutine",
+      "patientRestricted",
+      "observationPanel",
+      "allergyList",
+      "medicationList"
+    ],
+    "seo": {
+      "slug": "tabs",
+      "title": "Tabs — accessible React tab component",
+      "description": "A React tabs component with four semantic modes — view switch, navigation, form value, steps — each with the correct ARIA tree and keyboard model.",
+      "primaryKeyword": "react tabs component",
+      "secondaryKeywords": [
+        "accessible tabs react",
+        "vertical tabs react",
+        "segmented control react",
+        "aria tablist"
+      ],
+      "searchIntent": "commercial",
+      "ogImage": "generated"
+    },
+    "relationships": {
+      "builtWith": [],
+      "usedIn": [],
+      "patterns": [
+        "clinical-documentation"
+      ],
+      "alternatives": [
+        {
+          "ref": "accordion",
+          "when": "the sections should be readable at the same time, or the surface is a phone"
+        },
+        {
+          "ref": "switch",
+          "when": "there are exactly two states and one of them is the default"
+        }
+      ]
+    }
   }
 ];
 

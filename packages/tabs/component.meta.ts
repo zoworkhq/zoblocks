@@ -14,7 +14,7 @@ export default defineComponentMeta({
   name: "tabs",
   title: "Tabs",
   tier: "free",
-  status: "beta",
+  status: "stable",
   since: "0.1.0",
   layer: "primitive",
   frameworks: {
@@ -124,7 +124,7 @@ export default defineComponentMeta({
     "Drag-to-reorder is not implemented. Keyboard reorder is (Ctrl+Shift+Arrow), because a pointer-only affordance for a destructive-feeling action is the wrong half to build first.",
   ],
 
-  related: [],
+  related: ["accordion", "chart-accordion", "switch"],
 
   usage: `import { Tabs } from "@oxygenui-design/tabs";
 import "@oxygenui-design/tabs/styles.css";
@@ -148,6 +148,322 @@ import "@oxygenui-design/tabs/styles.css";
     },
   ]}
 />;`,
+
+  technicalName: "Tabs",
+  aliases: ["tab strip", "segmented control", "view switcher", "wizard steps", "chart sections"],
+  tags: ["navigation", "keyboard-first", "disclosure", "themeable", "headless"],
+
+  /*
+   * `general` and `healthcare` both, and the conditional FHIR rule below is
+   * the reason that is not a contradiction. Tabs reads no resource — it is a
+   * navigation primitive. What makes it clinical is the set of states it has
+   * to render honestly: a section that is restricted is not a section that is
+   * absent, and a strip that renders them the same way is the defect this
+   * component exists to prevent.
+   */
+  domain: {
+    industries: ["general", "healthcare"],
+    clinicalContext:
+      "Consumes no FHIR resource. It is listed as clinical because a chart's section strip must distinguish a section that is empty from one that is restricted, stale, or unavailable offline — four facts that a generic tab component collapses into one, and that a clinician reads as if they were the same.",
+    workflows: ["documentation", "care-coordination"],
+    phi: {
+      handles: false,
+      notes:
+        "Renders no PHI of its own. A tab label supplied by the host may carry it — a patient name on a chart tab — so labels are never logged and never sent to telemetry.",
+    },
+    auditable: false,
+    permissions: [],
+    terminology: [],
+  },
+
+  uxGuidelines: {
+    do: [
+      "Declare `as` on every strip. It selects the accessibility tree, and there is no default.",
+      'Give a disabled tab a `disabledReason`. "Restricted" and "not applicable here" are different clinical facts.',
+      "Keep the count of tabs under about seven for a view switch; beyond that, use the rail or a menu.",
+      "Let the overflow strategy be chosen by the surface, not by the tab count.",
+    ],
+    dont: [
+      'Do not wrap anchors in `as="tabs"` — it passes every automated checker and destroys focus on the first arrow key.',
+      "Do not nest an interactive control inside a trigger. The close affordance is aria-hidden and the keyboard path is Delete on the tab.",
+      'Do not use colour alone for a count\'s tone. A red 2 must announce as "2 critical".',
+    ],
+  },
+
+  variants: [
+    {
+      id: "underline",
+      label: "Underline",
+      description:
+        "The default. An underline indicator on a hairline track, for a page's primary sections.",
+      args: { variant: "underline" },
+    },
+    {
+      id: "enclosed",
+      label: "Enclosed",
+      description: "Tabs as connected cards. For a workspace where each tab owns a document.",
+      args: { variant: "enclosed" },
+    },
+    {
+      id: "segmented",
+      label: "Segmented",
+      description: "A form control. Belongs in a Form.Item and carries a value, not a view.",
+      args: { variant: "segmented", as: "radiogroup" },
+    },
+    {
+      id: "rail",
+      label: "Rail",
+      description:
+        "Vertical. Arrow keys become up and down, because the orientation is the keyboard model.",
+      args: { variant: "rail", orientation: "vertical" },
+    },
+    {
+      id: "ghost",
+      label: "Ghost",
+      description: "No track, no indicator, no measurement pass. For dense toolbars and popovers.",
+      args: { variant: "ghost" },
+    },
+  ],
+
+  controls: [
+    {
+      prop: "as",
+      control: "segmented",
+      label: "Semantic mode",
+      options: ["tabs", "nav", "radiogroup", "steps"],
+      defaultValue: "tabs",
+    },
+    {
+      prop: "variant",
+      control: "select",
+      label: "Variant",
+      // All eleven. A playground that offers five has decided for the reader
+      // which half of the API is real.
+      options: [
+        "underline",
+        "segmented",
+        "pill",
+        "enclosed",
+        "rail",
+        "ghost",
+        "stepper",
+        "command",
+        "card",
+        "stat",
+        "unstyled",
+      ],
+      defaultValue: "underline",
+    },
+    {
+      prop: "orientation",
+      control: "segmented",
+      label: "Orientation",
+      options: ["horizontal", "vertical"],
+      defaultValue: "horizontal",
+    },
+    {
+      prop: "size",
+      control: "segmented",
+      label: "Size",
+      options: ["sm", "md", "lg"],
+      defaultValue: "md",
+    },
+    {
+      prop: "overflow",
+      control: "select",
+      label: "Overflow",
+      options: ["scroll", "menu", "wrap", "collapse", "none"],
+      defaultValue: "scroll",
+    },
+    {
+      prop: "items",
+      control: "fixture",
+      label: "Chart",
+      options: ["patientRoutine", "patientRestricted"],
+    },
+  ],
+
+  a11yChecks: [
+    {
+      wcag: "4.1.2",
+      name: "Name, role, value",
+      status: "pass",
+      how: '`as` selects the tree: a tablist of buttons, a real nav of anchors, or a radiogroup. Passing an href under as="tabs" throws.',
+      evidence: "tabs.test.tsx",
+    },
+    {
+      wcag: "2.1.1",
+      name: "Keyboard",
+      status: "pass",
+      how: "Roving tabindex. Tab enters at the selected trigger; the next Tab leaves the group entirely.",
+      evidence: "tabs.test.tsx",
+    },
+    {
+      wcag: "2.4.3",
+      name: "Focus order",
+      status: "pass",
+      how: "After a close, focus moves to the neighbour deterministically rather than to body.",
+      evidence: "tabs.test.tsx",
+    },
+    {
+      wcag: "1.4.1",
+      name: "Use of colour",
+      status: "pass",
+      how: 'A count\'s tone reaches the accessible name as a word — "Labs, 2 critical", never "Labs 2".',
+      evidence: "tabs.test.tsx",
+    },
+    {
+      wcag: "1.4.11",
+      name: "Non-text contrast",
+      status: "pass",
+      how: "Indicator, track and focus ring are gated in the token build across three themes.",
+      evidence: "contrast.gate",
+    },
+    {
+      wcag: "2.5.8",
+      name: "Target size",
+      status: "pass",
+      how: "Triggers hold a 24px minimum at every density; density changes spacing, never target size.",
+      evidence: "e2e/docs-site.spec.ts",
+    },
+    {
+      wcag: "2.3.3",
+      name: "Animation from interactions",
+      status: "pass",
+      how: "prefers-reduced-motion collapses the indicator transition to a designed still state.",
+      evidence: "tabs.test.tsx",
+    },
+    {
+      wcag: "2.2.1",
+      name: "Timing adjustable",
+      status: "not-applicable",
+      how: "No time limit exists anywhere in the component.",
+    },
+  ],
+
+  /*
+   * The chart the playground renders is assembled from these, not typed out.
+   * A tab's count is `allergyList.length`, so a count that drifts from the data
+   * behind it is a build error rather than a screenshot nobody re-took.
+   */
+  fixtures: [
+    "patientRoutine",
+    "patientRestricted",
+    "observationPanel",
+    "allergyList",
+    "medicationList",
+  ],
+
+  examples: [
+    {
+      id: "chart-sections",
+      title: "Chart sections",
+      description:
+        "The common case: a view switch over a patient chart, with a critical count on Labs that reaches the accessible name as a word.",
+      fixture: "patientRoutine",
+      code: `import { Tabs } from "@oxygenui-design/tabs";
+import { allergyList, medicationList, observationPanel } from "@oxygenui-design/fixtures";
+import "@oxygenui-design/tabs/styles.css";
+
+const critical = observationPanel.filter(isCritical);
+
+<Tabs
+  as="tabs"
+  aria-label="Chart sections"
+  defaultValue="summary"
+  items={[
+    { value: "summary", label: "Summary", children: <Summary /> },
+    {
+      value: "labs",
+      label: "Labs",
+      // Counted from the data, never typed in. A tone is a claim about the
+      // patient, so it has to come from the same place the panel does.
+      count: critical.length,
+      tone: critical.length ? "critical" : "neutral",
+      children: <Labs observations={observationPanel} />,
+    },
+    { value: "meds", label: "Medications", count: medicationList.length, children: <Meds /> },
+    { value: "allergies", label: "Allergies", count: allergyList.length, children: <Allergies /> },
+  ]}
+/>;`,
+    },
+    {
+      id: "restricted-section",
+      title: "A section that is restricted, not absent",
+      description:
+        "A disabled tab requires a reason. Omitting the section entirely would tell the clinician it does not exist; greying it silently tells them nothing.",
+      fixture: "patientRestricted",
+      code: `import { patientRestricted } from "@oxygenui-design/fixtures";
+
+<Tabs
+  as="tabs"
+  aria-label="Chart sections"
+  defaultValue="summary"
+  items={[
+    { value: "summary", label: "Summary", children: <Summary /> },
+    {
+      value: "bh",
+      label: "Behavioural health",
+      disabled: true,
+      // Mandatory. aria-disabled, never the disabled attribute — a keyboard
+      // user has to be able to reach it to find out why they cannot open it.
+      disabledReason:
+        "Restricted. Opening it records an access event and notifies the record owner.",
+    },
+  ]}
+/>;`,
+    },
+    {
+      id: "segmented-filter",
+      title: "A segmented control is a form value",
+      description:
+        'Not every tab strip is a view switch. A filter is a form control and belongs in a Form.Item, which is what `as="radiogroup"` declares.',
+      // No fixture: a density filter is a preference, not patient data, and
+      // dressing it in a chart would misrepresent what the mode is for.
+      code: `import { Form } from "antd";
+
+<Form.Item name="density" label="Density">
+  <Tabs
+    as="radiogroup"
+    variant="segmented"
+    items={[
+      { value: "compact", label: "Compact" },
+      { value: "default", label: "Default" },
+      { value: "comfortable", label: "Comfortable" },
+    ]}
+  />
+</Form.Item>;`,
+    },
+  ],
+
+  relationships: {
+    builtWith: [],
+    usedIn: [],
+    patterns: ["clinical-documentation"],
+    alternatives: [
+      {
+        ref: "accordion",
+        when: "the sections should be readable at the same time, or the surface is a phone",
+      },
+      { ref: "switch", when: "there are exactly two states and one of them is the default" },
+    ],
+  },
+
+  seo: {
+    slug: "tabs",
+    title: "Tabs — accessible React tab component",
+    description:
+      "A React tabs component with four semantic modes — view switch, navigation, form value, steps — each with the correct ARIA tree and keyboard model.",
+    primaryKeyword: "react tabs component",
+    secondaryKeywords: [
+      "accessible tabs react",
+      "vertical tabs react",
+      "segmented control react",
+      "aria tablist",
+    ],
+    searchIntent: "commercial",
+    ogImage: "generated",
+  },
 
   dependencies: ["@oxygenui-design/tabs-core"],
   registryDependencies: [],

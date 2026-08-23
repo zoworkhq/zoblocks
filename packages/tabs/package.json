@@ -39,7 +39,8 @@
     "dist",
     "src",
     "!src/**/*.test.tsx",
-    "!src/**/*.test.ts"
+    "!src/**/*.test.ts",
+    "!src/**/*.stories.tsx"
   ],
   "engines": {
     "node": ">=20.11.0"
@@ -62,7 +63,7 @@
     }
   },
   "scripts": {
-    "build": "tsc -p tsconfig.json && cp src/styles.css dist/styles.css",
+    "build": "tsc -p tsconfig.build.json && cp src/styles.css dist/styles.css",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage"
@@ -82,6 +83,7 @@
   },
   "devDependencies": {
     "@oxygenui-design/component-meta": "workspace:*",
+    "@oxygenui-design/fixtures": "workspace:*",
     "@oxygenui-design/tabs-testing": "workspace:*",
     "@oxygenui-design/tsconfig": "workspace:*",
     "@testing-library/dom": "^10",

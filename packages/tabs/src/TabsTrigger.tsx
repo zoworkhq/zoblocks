@@ -164,7 +164,18 @@ export const TabsTrigger = React.forwardRef<HTMLElement, TabsTriggerProps>(funct
    * accessible name at all — the icon-only view switcher, silently unusable.
    * Validation already requires `textLabel` in exactly that case.
    */
-  const needsExplicitName = supplement !== undefined || typeof children !== "string";
+  /*
+   * A `disabledReason` forces the explicit name too.
+   *
+   * The reason lives in a visually-hidden span *inside* the trigger, because
+   * `aria-describedby` needs an element to point at. Name computation
+   * concatenates descendants, so without an explicit name the trigger is
+   * called "Behavioural health Restricted under 42 CFR Part 2. Opening it
+   * records an access event…" — the whole reason, read as the control's name,
+   * and then read again as its description.
+   */
+  const needsExplicitName =
+    supplement !== undefined || typeof children !== "string" || reasonId !== undefined;
   const composedLabel = needsExplicitName
     ? supplement
       ? `${resolvedText}, ${supplement}`

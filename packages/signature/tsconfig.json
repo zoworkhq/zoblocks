@@ -2,7 +2,7 @@
   "extends": "@oxygenui-design/tsconfig/react-library.json",
   "compilerOptions": {
     "outDir": "dist",
-    "rootDir": "src"
+    "rootDir": "../.."
   },
   "include": ["src"]
 }

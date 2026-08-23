@@ -1,7 +1,7 @@
 {
   "name": "@oxygenui-design/signature",
   "version": "0.1.0",
-  "description": "Healthcare signature capture for Ant Design. Draw, type or upload — and record the times nobody signed. WCAG 2.2 AA, FHIR-shaped.",
+  "description": "Healthcare signature capture for Ant Design. Draw, type or upload \u2014 and record the times nobody signed. WCAG 2.2 AA, FHIR-shaped.",
   "license": "MIT",
   "homepage": "https://oxygenui.design/components/signature",
   "repository": {
@@ -35,7 +35,9 @@
   "files": [
     "dist",
     "src",
-    "!src/**/*.test.tsx"
+    "!src/**/*.test.tsx",
+    "!src/**/*.stories.tsx",
+    "!src/**/*.test.ts"
   ],
   "engines": {
     "node": ">=20.11.0"
@@ -54,7 +56,7 @@
     }
   },
   "scripts": {
-    "build": "tsc -p tsconfig.json && node scripts/fix-esm-extensions.mjs && cp src/styles.css dist/styles.css",
+    "build": "tsc -p tsconfig.build.json && node scripts/fix-esm-extensions.mjs && cp src/styles.css dist/styles.css",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage"
@@ -69,6 +71,7 @@
   },
   "devDependencies": {
     "@oxygenui-design/component-meta": "workspace:*",
+    "@oxygenui-design/fixtures": "workspace:*",
     "@oxygenui-design/tsconfig": "workspace:*",
     "@testing-library/dom": "^10",
     "@testing-library/jest-dom": "^7",
