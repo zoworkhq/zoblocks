@@ -226,14 +226,21 @@ export function describeProvenance(
   const parts: string[] = [`Source: ${SOURCE_LABEL[record.source].toLowerCase()}`];
 
   if (record.organisation) {
-    parts.push(record.exchange ? `${record.organisation} via ${record.exchange}` : record.organisation);
+    parts.push(
+      record.exchange ? `${record.organisation} via ${record.exchange}` : record.organisation,
+    );
   }
   if (record.document) parts.push(record.document);
-  if (record.device) parts.push(record.deviceNote ? `${record.device}, ${record.deviceNote}` : record.device);
+  if (record.device)
+    parts.push(record.deviceNote ? `${record.device}, ${record.deviceNote}` : record.device);
 
   const performer = record.performer;
   if (performer) {
-    parts.push(performer.role ? `observed by ${performer.display}, ${performer.role}` : `observed by ${performer.display}`);
+    parts.push(
+      performer.role
+        ? `observed by ${performer.display}, ${performer.role}`
+        : `observed by ${performer.display}`,
+    );
   }
   // Only when it is somebody else — otherwise it is the same fact twice.
   if (record.recorder && record.recorder.display !== performer?.display) {
@@ -309,9 +316,7 @@ export interface ProvenanceLedger {
 }
 
 /** A ledger over a plain record map, for hosts with no streaming source. */
-export function ledgerFrom(
-  entries: Record<string, ProvenanceRecord>,
-): ProvenanceLedger {
+export function ledgerFrom(entries: Record<string, ProvenanceRecord>): ProvenanceLedger {
   return {
     get(resourceId, versionId) {
       // The versioned key first: an amended value and its original are two

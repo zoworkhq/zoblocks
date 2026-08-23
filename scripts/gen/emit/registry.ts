@@ -184,6 +184,23 @@ const SUPPORT_ITEMS: BuildableItem[] = [
     ],
   },
   {
+    name: "trend-core",
+    type: "oxygen:lib",
+    title: "Trend core",
+    description:
+      "Comparability segmentation across assay, method and unit changes, a minimum-points floor, the reliable-change threshold that renders noise as flat, and a required valence because half of clinical measures improve by falling. One SVG path per segment, no chart library. Installed automatically with TrendIndicator.",
+    dependencies: [] as string[],
+    registryDependencies: [] as string[],
+    files: [
+      { path: "registry/oxygen/lib/trend.ts", type: "oxygen:lib", target: "lib/oxygen-trend.ts" },
+      {
+        path: "registry/oxygen/lib/trend.css",
+        type: "oxygen:style",
+        target: "styles/oxygen-trend.css",
+      },
+    ],
+  },
+  {
     name: "switch-core",
     type: "oxygen:lib",
     title: "Switch core",

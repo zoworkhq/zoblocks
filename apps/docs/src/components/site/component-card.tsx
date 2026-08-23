@@ -55,6 +55,7 @@ import { ResultValue } from "@/registry/oxygen/result-value/result-value";
 import { AllergyChip } from "@/registry/oxygen/allergy-chip/allergy-chip";
 import { RiskIndicator } from "@/registry/oxygen/risk-indicator/risk-indicator";
 import { ProvenanceChip } from "@/registry/oxygen/provenance-chip/provenance-chip";
+import { TrendIndicator } from "@/registry/oxygen/trend-indicator/trend-indicator";
 import { IdentityProvider, PatientChip, IdentitySet } from "@oxygenui-design/identity";
 import { STATUS_LABEL, type ComponentDoc } from "@/lib/catalog";
 import { cn } from "@/lib/utils";
@@ -265,6 +266,41 @@ const PREVIEW: Record<string, (featured: boolean) => React.ReactNode> = {
   /* The whole card, because the point is what surrounds the number. */
   /* Three of the six, beside the value they qualify — because the chip alone
      reads as a badge rather than a qualifier. */
+  /* Two falling lines with opposite meanings, and one it refuses to draw. */
+  "trend-indicator": (featured) => (
+    <div style={{ display: "grid", gap: featured ? 10 : 7 }}>
+      {(
+        [
+          {
+            id: "card-phq9",
+            label: "PHQ-9",
+            valence: "higher-is-worse",
+            points: [
+              { at: "2026-03-04", value: 21 },
+              { at: "2026-05-04", value: 14 },
+              { at: "2026-07-04", value: 9 },
+            ],
+          },
+          {
+            id: "card-egfr",
+            label: "eGFR",
+            valence: "higher-is-better",
+            points: [
+              { at: "2026-03-04", value: 74 },
+              { at: "2026-05-04", value: 64 },
+              { at: "2026-07-04", value: 52 },
+            ],
+          },
+        ] as const
+      ).map((series) => (
+        <div key={series.id} style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <span style={{ inlineSize: 46, fontSize: 12, opacity: 0.75 }}>{series.label}</span>
+          <TrendIndicator series={series} width={featured ? 110 : 84} height={20} />
+        </div>
+      ))}
+    </div>
+  ),
+
   "provenance-chip": (featured) => (
     <div style={{ display: "grid", gap: featured ? 10 : 7 }}>
       {(

@@ -100,6 +100,11 @@ Rules that matter when generating code with these components:
   fhir: RiskAssessment
   states: High, with weighted drivers, Moderate, Low, Imminent, Not scored — the model could not, Expired — past its validity window, Unbounded — no validity window declared, One factor dominates the score, Drivers with no weights, from basis[], Percentile with its cohort, Model card reachable, Compact, in a panel list
   status: stable
+- [Trend Indicator](https://oxygenui.design/components/trend-indicator): A sparkline that refuses to draw a trend it cannot justify — across an assay change, a unit change, or two points.
+  install: npx @oxygenui-design/cli add trend-indicator
+  fhir: Observation
+  states: Rising, and worsening, Falling, and improving, Within the reliable-change threshold, Broken by an assay change, Broken by a silent unit change, Two points — no trend, One point, No results at all, Neutral valence, With a reference band, Narrow — glyph and delta only, Sixty points, Points reachable from the table
+  status: stable
 - [Patient identity](https://oxygenui.design/components/identity): An avatar, a chip and a patient banner — with the pass that keeps two patients who share a name apart on the same worklist.
   install: npx @oxygenui-design/cli add identity
   fhir: Patient

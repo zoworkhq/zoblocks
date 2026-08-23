@@ -3807,16 +3807,7 @@ button.ox-prov:focus-visible,
 /* AI-extracted: a four-point spark. */
 .ox-prov__glyph[data-ox-glyph="spark"] {
   background: currentColor;
-  clip-path: polygon(
-    50% 0%,
-    61% 39%,
-    100% 50%,
-    61% 61%,
-    50% 100%,
-    39% 61%,
-    0% 50%,
-    39% 39%
-  );
+  clip-path: polygon(50% 0%, 61% 39%, 100% 50%, 61% 61%, 50% 100%, 39% 61%, 0% 50%, 39% 39%);
 }
 
 /* Amended: a revision loop, open at one end. */
@@ -3868,6 +3859,241 @@ button.ox-prov:focus-visible,
     background: none;
     color: #000;
     border: 1px solid #000;
+  }
+}
+
+/* ---- registry/oxygen/lib/trend.css ---- */
+/**
+ * TrendIndicator — a line, a glyph and a delta, and none of them alone.
+ *
+ * The glyph carries direction, the sign carries magnitude, and the colour
+ * carries valence. Remove the colour and both the other two survive, which
+ * matters more here than almost anywhere: a falling line means the opposite
+ * thing on a PHQ-9 and an eGFR, and the hue is the only channel that ever
+ * distinguished them.
+ */
+
+.ox-trend {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-family: var(--ox-font-sans, inherit);
+  font-size: var(--ox-text-xs, 0.75rem);
+  color: var(--ox-text-muted, inherit);
+  vertical-align: middle;
+}
+
+.ox-trend__chart {
+  display: block;
+  flex: none;
+  overflow: visible;
+}
+
+.ox-trend__line {
+  stroke: var(--ox-text-muted, #64748b);
+  stroke-width: 1.25;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.ox-trend__terminus {
+  fill: var(--ox-text-muted, #64748b);
+}
+
+/*
+ * The reference band, behind the line.
+ *
+ * Very low contrast on purpose: it is a backdrop that tells the reader where
+ * normal is, and a band that competes with the line has inverted the two.
+ */
+.ox-trend__band {
+  fill: var(--ox-status-normal, #047857);
+  opacity: 0.1;
+}
+
+/* ---------------------------------------------------------------- */
+/* Valence                                                           */
+/*                                                                   */
+/* Colour follows the judgement, never the direction. A falling      */
+/* PHQ-9 is improvement and a falling eGFR is not, and a library     */
+/* that colours by direction gets one of them wrong in green.        */
+/* ---------------------------------------------------------------- */
+
+.ox-trend[data-ox-judgement="worse"] .ox-trend__line,
+.ox-trend[data-ox-judgement="worse"] .ox-trend__terminus {
+  stroke: var(--ox-status-critical, #b91c1c);
+  fill: var(--ox-status-critical, #b91c1c);
+}
+
+.ox-trend[data-ox-judgement="worse"] .ox-trend__line {
+  fill: none;
+}
+
+.ox-trend[data-ox-judgement="better"] .ox-trend__line,
+.ox-trend[data-ox-judgement="better"] .ox-trend__terminus {
+  stroke: var(--ox-status-normal, #047857);
+  fill: var(--ox-status-normal, #047857);
+}
+
+.ox-trend[data-ox-judgement="better"] .ox-trend__line {
+  fill: none;
+}
+
+.ox-trend[data-ox-judgement="worse"] .ox-trend__delta {
+  color: var(--ox-status-critical, #b91c1c);
+}
+
+.ox-trend[data-ox-judgement="better"] .ox-trend__delta {
+  color: var(--ox-status-normal, #047857);
+}
+
+/*
+ * Within the noise threshold: neutral, whatever the arithmetic says.
+ *
+ * A 2-point PHQ-9 move is not a change, and colouring it as one invites
+ * somebody to act on it. This is the actual clinical rule rather than a
+ * visual softening.
+ */
+.ox-trend[data-ox-noise] .ox-trend__line,
+.ox-trend[data-ox-noise] .ox-trend__terminus,
+.ox-trend[data-ox-noise] .ox-trend__delta {
+  stroke: var(--ox-text-muted, #64748b);
+  fill: var(--ox-text-muted, #64748b);
+  color: var(--ox-text-muted, #64748b);
+}
+
+.ox-trend[data-ox-noise] .ox-trend__line {
+  fill: none;
+}
+
+/* ---------------------------------------------------------------- */
+/* Readout                                                           */
+/* ---------------------------------------------------------------- */
+
+.ox-trend__readout {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.1875rem;
+  font-variant-numeric: tabular-nums;
+}
+
+/*
+ * Direction as geometry, independent of the hue.
+ *
+ * A triangle for rising, an inverted one for falling, a bar for flat. Below
+ * 40px wide this is the only thing left, which is more honest than a line
+ * nobody can read.
+ */
+.ox-trend__glyph {
+  inline-size: 0.4375rem;
+  block-size: 0.4375rem;
+  background: currentColor;
+  color: inherit;
+}
+
+.ox-trend__glyph[data-ox-direction="rising"] {
+  clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
+}
+
+.ox-trend__glyph[data-ox-direction="falling"] {
+  clip-path: polygon(0% 0%, 100% 0%, 50% 100%);
+}
+
+.ox-trend__glyph[data-ox-direction="flat"] {
+  block-size: 0.125rem;
+  border-radius: 999px;
+}
+
+.ox-trend__delta {
+  font-weight: 600;
+}
+
+.ox-trend__unit {
+  margin-inline-start: 0.0625rem;
+  font-weight: 400;
+  color: var(--ox-text-subtle, var(--ox-text-muted, inherit));
+}
+
+/* ---------------------------------------------------------------- */
+/* No trend                                                          */
+/*                                                                   */
+/* Words, not a flat line. An absent trend and a trend that did not  */
+/* move are different facts.                                         */
+/* ---------------------------------------------------------------- */
+
+.ox-trend__none {
+  font-size: var(--ox-text-2xs, 0.6875rem);
+  font-style: italic;
+  color: var(--ox-text-subtle, var(--ox-text-muted, inherit));
+}
+
+/* Why the line stops. Never left to be interpreted from a gap. */
+.ox-trend__break {
+  padding-inline: 0.25rem;
+  border-inline-start: 2px solid var(--ox-status-high, #b45309);
+  font-size: var(--ox-text-2xs, 0.6875rem);
+  color: var(--ox-status-high, #b45309);
+}
+
+/* ---------------------------------------------------------------- */
+/* The text alternative                                              */
+/*                                                                   */
+/* Visually hidden and genuinely present: readable by a screen       */
+/* reader, findable by a page search, and selectable. `display:none` */
+/* would remove all three.                                           */
+/* ---------------------------------------------------------------- */
+
+.ox-trend__table {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ---------------------------------------------------------------- */
+/* Forced colors, reduced motion and print                           */
+/* ---------------------------------------------------------------- */
+
+@media (forced-colors: active) {
+  .ox-trend__line,
+  .ox-trend__terminus,
+  .ox-trend__glyph {
+    stroke: CanvasText;
+    fill: CanvasText;
+    background: CanvasText;
+  }
+
+  .ox-trend__line {
+    fill: none;
+  }
+
+  /* The band would be invisible anyway; hiding it keeps the line legible. */
+  .ox-trend__band {
+    display: none;
+  }
+}
+
+@media print {
+  .ox-trend__line,
+  .ox-trend__terminus {
+    stroke: #000;
+    fill: #000;
+  }
+
+  .ox-trend__line {
+    fill: none;
+  }
+
+  .ox-trend__delta,
+  .ox-trend__break,
+  .ox-trend__none {
+    color: #000;
   }
 }
 

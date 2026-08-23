@@ -49,6 +49,11 @@ import {
   type StalenessPolicy,
 } from "@/registry/oxygen/provenance-chip/provenance-chip";
 import {
+  TrendIndicator,
+  type TrendPoint,
+  type TrendSeries,
+} from "@/registry/oxygen/trend-indicator/trend-indicator";
+import {
   AllergyChip,
   AllergyList,
   type AllergyRecord,
@@ -888,7 +893,137 @@ function PcValue({ children }: { children: React.ReactNode }) {
   );
 }
 
+/* ------------------------------------------------------------------ */
+/* TrendIndicator fixtures                                             */
+/* ------------------------------------------------------------------ */
+
+const TI_AT = (month: number, value: number, breaks?: string): TrendPoint => {
+  const point: TrendPoint = { at: `2026-0${month}-04T09:00:00Z`, value };
+  if (breaks) point.breaksComparability = breaks;
+  return point;
+};
+
+/*
+ * The same falling shape, twice, with opposite meanings.
+ *
+ * Every sparkline library draws both of these in the same colour.
+ */
+const TI_VALENCE: TrendSeries[] = [
+  {
+    id: "ti-phq9",
+    label: "PHQ-9",
+    valence: "higher-is-worse",
+    significantChange: 5,
+    referenceRange: { low: 0, high: 4 },
+    points: [TI_AT(3, 21), TI_AT(4, 18), TI_AT(5, 14), TI_AT(6, 11), TI_AT(7, 9)],
+  },
+  {
+    id: "ti-egfr",
+    label: "eGFR",
+    valence: "higher-is-better",
+    unit: "mL/min",
+    points: [TI_AT(3, 74), TI_AT(4, 70), TI_AT(5, 64), TI_AT(6, 58), TI_AT(7, 52)],
+  },
+  {
+    id: "ti-wt",
+    label: "Weight",
+    valence: "neutral",
+    unit: "kg",
+    points: [TI_AT(3, 82), TI_AT(4, 81), TI_AT(5, 79), TI_AT(6, 78), TI_AT(7, 77)],
+  },
+];
+
+const TI_REFUSALS: Array<{ series: TrendSeries; why: string }> = [
+  {
+    series: {
+      id: "ti-fer",
+      label: "Ferritin",
+      valence: "neutral",
+      unit: "µg/L",
+      points: [
+        TI_AT(1, 180),
+        TI_AT(2, 176),
+        TI_AT(3, 171),
+        TI_AT(5, 212, "switched to Roche Elecsys"),
+        TI_AT(7, 218),
+      ],
+    },
+    why: "A platform switch shifts every ferritin by 20% with no clinical change.",
+  },
+  {
+    series: {
+      id: "ti-b12",
+      label: "Vitamin B12",
+      valence: "higher-is-better",
+      unit: "ng/L",
+      points: [
+        { at: "2026-01-04T09:00:00Z", value: 320, unit: "ng/L" },
+        { at: "2026-02-04T09:00:00Z", value: 316, unit: "ng/L" },
+        { at: "2026-03-04T09:00:00Z", value: 310, unit: "ng/L" },
+        { at: "2026-05-04T09:00:00Z", value: 229, unit: "pmol/L" },
+      ],
+    },
+    why: "Nobody declared this one. The units changed in the feed.",
+  },
+  {
+    series: {
+      id: "ti-cr",
+      label: "Creatinine",
+      valence: "higher-is-worse",
+      points: [TI_AT(6, 88), TI_AT(7, 104)],
+    },
+    why: "A line between two points is not a trend.",
+  },
+  {
+    series: {
+      id: "ti-phq9-noise",
+      label: "PHQ-9",
+      valence: "higher-is-worse",
+      significantChange: 5,
+      points: [TI_AT(5, 14), TI_AT(6, 13), TI_AT(7, 12)],
+    },
+    why: "Two points of PHQ-9 is below the reliable-change threshold.",
+  },
+];
+
 const SCENARIOS: Record<string, Scenario[]> = {
+  /** Two demos: what it draws, and what it refuses to. */
+  "trend-indicator": [
+    {
+      id: "valence",
+      label: "Direction has no valence",
+      note: "The same falling shape, three times. A falling PHQ-9 is improvement; a falling eGFR is not; a falling weight is neither until somebody says so. Every sparkline library draws all three in the same colour, which means it gets one of them wrong. Valence is a required prop here, and the glyph carries the direction independently of the hue so the distinction survives greyscale.",
+      render: () => (
+        <div style={{ display: "grid", gap: 12, maxInlineSize: 420 }}>
+          {TI_VALENCE.map((series) => (
+            <div key={series.id} style={{ display: "flex", alignItems: "center", gap: 12 }}>
+              <span style={{ inlineSize: 84, fontSize: 13, opacity: 0.8 }}>{series.label}</span>
+              <TrendIndicator series={series} width={120} height={24} />
+            </div>
+          ))}
+        </div>
+      ),
+    },
+    {
+      id: "refusals",
+      label: "What it refuses to draw",
+      note: "Four series a chart library would happily render as a line. A platform switch, an undeclared unit change, two points, and a move below the instrument's reliable-change threshold. Where comparability breaks the line breaks — two lines that do not join say so without a legend, and the reason is in text rather than a tooltip.",
+      render: () => (
+        <div style={{ display: "grid", gap: 14, maxInlineSize: 520 }}>
+          {TI_REFUSALS.map(({ series, why }) => (
+            <div key={series.id} style={{ display: "grid", gap: 3 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                <span style={{ inlineSize: 92, fontSize: 13, opacity: 0.8 }}>{series.label}</span>
+                <TrendIndicator series={series} width={120} height={24} />
+              </div>
+              <span style={{ fontSize: 12, opacity: 0.6, paddingInlineStart: 104 }}>{why}</span>
+            </div>
+          ))}
+        </div>
+      ),
+    },
+  ],
+
   /** Three demos, and the first is the whole argument. */
   "provenance-chip": [
     {

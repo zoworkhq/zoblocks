@@ -32,6 +32,7 @@
       "@/lib/oxygen-allergy": ["../../registry/oxygen/lib/allergy.ts"],
       "@/lib/oxygen-risk": ["../../registry/oxygen/lib/risk.ts"],
       "@/lib/oxygen-provenance": ["../../registry/oxygen/lib/provenance.ts"],
+      "@/lib/oxygen-trend": ["../../registry/oxygen/lib/trend.ts"],
       "@/lib/timeline-core": ["../../registry/oxygen/lib/timeline-core.ts"],
       "@/lib/timeline-fhir": ["../../registry/oxygen/lib/timeline-fhir.ts"],
       "@/components/oxygen/clinical-note": [
@@ -47,6 +48,9 @@
       ],
       "@/components/oxygen/provenance-chip": [
         "../../registry/oxygen/provenance-chip/provenance-chip.tsx"
+      ],
+      "@/components/oxygen/trend-indicator": [
+        "../../registry/oxygen/trend-indicator/trend-indicator.tsx"
       ],
       "@/components/oxygen/accordion": ["../../registry/oxygen/accordion/accordion.tsx"],
       "@/components/oxygen/care-timeline": [

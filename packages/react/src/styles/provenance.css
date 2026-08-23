@@ -204,16 +204,7 @@ button.ox-prov:focus-visible,
 /* AI-extracted: a four-point spark. */
 .ox-prov__glyph[data-ox-glyph="spark"] {
   background: currentColor;
-  clip-path: polygon(
-    50% 0%,
-    61% 39%,
-    100% 50%,
-    61% 61%,
-    50% 100%,
-    39% 61%,
-    0% 50%,
-    39% 39%
-  );
+  clip-path: polygon(50% 0%, 61% 39%, 100% 50%, 61% 61%, 50% 100%, 39% 61%, 0% 50%, 39% 39%);
 }
 
 /* Amended: a revision loop, open at one end. */

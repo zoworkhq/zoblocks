@@ -88,6 +88,7 @@ export default defineComponentMeta({
     "allergy-chip",
     "risk-indicator",
     "provenance-chip",
+    "trend-indicator",
   ],
 
   dependencies: ["clsx", "tailwind-merge"],

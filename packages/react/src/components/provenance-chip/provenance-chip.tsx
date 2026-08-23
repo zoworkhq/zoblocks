@@ -138,7 +138,11 @@ export const ProvenanceChip = React.forwardRef<HTMLElement, ProvenanceChipProps>
 
     const body = (
       <>
-        <span className="ox-prov__glyph" data-ox-glyph={SOURCE_GLYPH[record.source]} aria-hidden="true" />
+        <span
+          className="ox-prov__glyph"
+          data-ox-glyph={SOURCE_GLYPH[record.source]}
+          aria-hidden="true"
+        />
         {glyphOnly ? null : (
           <span className="ox-prov__word" aria-hidden="true">
             {SOURCE_LABEL[record.source]}

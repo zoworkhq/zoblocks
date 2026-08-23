@@ -160,6 +160,24 @@
       ]
     },
     {
+      "name": "trend-core",
+      "type": "oxygen:lib",
+      "title": "Trend core",
+      "description": "Comparability segmentation across assay, method and unit changes, a minimum-points floor, the reliable-change threshold that renders noise as flat, and a required valence because half of clinical measures improve by falling. One SVG path per segment, no chart library. Installed automatically with TrendIndicator.",
+      "files": [
+        {
+          "path": "registry/oxygen/lib/trend.ts",
+          "type": "oxygen:lib",
+          "target": "lib/oxygen-trend.ts"
+        },
+        {
+          "path": "registry/oxygen/lib/trend.css",
+          "type": "oxygen:style",
+          "target": "styles/oxygen-trend.css"
+        }
+      ]
+    },
+    {
       "name": "switch-core",
       "type": "oxygen:lib",
       "title": "Switch core",
@@ -750,6 +768,32 @@
           "path": "registry/oxygen/timeline/timeline.tsx",
           "type": "oxygen:component",
           "target": "components/oxygen/timeline.tsx"
+        }
+      ]
+    },
+    {
+      "name": "trend-indicator",
+      "type": "oxygen:component",
+      "title": "Trend Indicator",
+      "description": "Breaks the line wherever comparability breaks and says why in words. Renders no trend below three comparable points. Takes the valence as a required prop, so a falling PHQ-9 reads as improvement and a falling eGFR does not, and carries the reliable-change threshold so a two-point move renders as noise.",
+      "categories": [
+        "clinical",
+        "data-display"
+      ],
+      "dependencies": [
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "utils",
+        "tokens",
+        "trend-core"
+      ],
+      "files": [
+        {
+          "path": "registry/oxygen/trend-indicator/trend-indicator.tsx",
+          "type": "oxygen:component",
+          "target": "components/oxygen/trend-indicator.tsx"
         }
       ]
     }

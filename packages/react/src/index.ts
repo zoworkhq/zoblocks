@@ -29,3 +29,4 @@ export * from "./components/risk-indicator/risk-indicator";
 export * from "./components/safety-plan/safety-plan";
 export * from "./components/switch/switch";
 export * from "./components/timeline/timeline";
+export * from "./components/trend-indicator/trend-indicator";

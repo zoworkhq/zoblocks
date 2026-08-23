@@ -66,6 +66,9 @@
       "@/components/oxygen/timeline": [
         "../../registry/oxygen/timeline/timeline.tsx"
       ],
+      "@/components/oxygen/trend-indicator": [
+        "../../registry/oxygen/trend-indicator/trend-indicator.tsx"
+      ],
       "@/lib/oxygen-accordion": [
         "../../registry/oxygen/lib/accordion-core.tsx"
       ],
@@ -92,6 +95,9 @@
       ],
       "@/lib/oxygen-switch": [
         "../../registry/oxygen/lib/switch.tsx"
+      ],
+      "@/lib/oxygen-trend": [
+        "../../registry/oxygen/lib/trend.ts"
       ],
       "@/lib/timeline-core": [
         "../../registry/oxygen/lib/timeline-core.ts"
