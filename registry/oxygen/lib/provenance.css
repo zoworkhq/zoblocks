@@ -1,0 +1,260 @@
+/**
+ * ProvenanceChip — an affix, six CSS glyphs, and staleness folded in.
+ *
+ * Never a headline and never on its own line: it sits beside a value and does
+ * not compete with it. Every glyph is geometry in `currentColor`, so the
+ * source class survives greyscale and forced colours — where colour would have
+ * been the only channel, and where colour was never the right one anyway.
+ */
+
+.ox-prov {
+  --ox-prov-glyph: 0.625rem;
+
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  min-block-size: 1.25rem;
+  padding-inline: 0.25rem;
+  border-radius: var(--ox-radius-sm, 4px);
+  font-family: var(--ox-font-sans, inherit);
+  font-size: var(--ox-text-2xs, 0.6875rem);
+  line-height: 1;
+  white-space: nowrap;
+  vertical-align: middle;
+  color: var(--ox-text-subtle, var(--ox-text-muted, #64748b));
+}
+
+/*
+ * The pair, when an extracted value can jump to its span.
+ * Kept inline so the whole thing still reads as an affix.
+ */
+.ox-prov__pair {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.ox-prov__word {
+  font-weight: 500;
+}
+
+/*
+ * Staleness folded in, not kept in the chain.
+ *
+ * A device reading from four days ago and one from four minutes ago carry
+ * different weight, and the reader has to see that without hovering.
+ */
+.ox-prov__age {
+  font-variant-numeric: tabular-nums;
+}
+
+.ox-prov__age[data-ox-staleness="stale"] {
+  padding-inline: 0.1875rem;
+  border-radius: var(--ox-radius-sm, 4px);
+  background: var(--ox-status-high-bg, #fffbeb);
+  color: var(--ox-status-high, #b45309);
+  font-weight: 600;
+}
+
+/*
+ * Nobody has looked at it.
+ *
+ * Not a confidence score — a model can be very confident and still wrong, and
+ * the fact a reader needs is whether a human has been involved at all.
+ */
+.ox-prov__unconfirmed {
+  padding-inline: 0.1875rem;
+  border-radius: var(--ox-radius-sm, 4px);
+  background: var(--ox-status-provisional-bg, #ecfeff);
+  color: var(--ox-status-provisional, #0e7490);
+  font-weight: 600;
+}
+
+/* The one source class that tints the whole chip, because it is the one where
+   the reader's next action differs. */
+.ox-prov[data-ox-unconfirmed] {
+  color: var(--ox-status-provisional, #0e7490);
+}
+
+/* ---------------------------------------------------------------- */
+/* Interactive                                                       */
+/* ---------------------------------------------------------------- */
+
+button.ox-prov,
+.ox-prov__span {
+  appearance: none;
+  border: 0;
+  background: none;
+  font: inherit;
+  cursor: pointer;
+}
+
+button.ox-prov:hover,
+.ox-prov__span:hover {
+  background: var(--ox-bg-subtle, rgb(0 0 0 / 0.04));
+}
+
+button.ox-prov:focus-visible,
+.ox-prov__span:focus-visible {
+  outline: 2px solid var(--ox-focus-ring, var(--ox-accent, #1677ff));
+  outline-offset: 1px;
+}
+
+.ox-prov__span {
+  min-block-size: 1.25rem;
+  padding-inline: 0.25rem;
+  border-radius: var(--ox-radius-sm, 4px);
+  font-family: var(--ox-font-sans, inherit);
+  font-size: var(--ox-text-2xs, 0.6875rem);
+  font-weight: 600;
+  color: var(--ox-accent, #1677ff);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* ---------------------------------------------------------------- */
+/* Glyphs                                                            */
+/*                                                                   */
+/* Six shapes rather than six colours. Colour would put them on a    */
+/* scale from better to worse, and they are not one — a              */
+/* patient-reported PHQ-9 is the correct provenance for a PHQ-9.     */
+/* ---------------------------------------------------------------- */
+
+.ox-prov__glyph {
+  position: relative;
+  flex: none;
+  inline-size: var(--ox-prov-glyph);
+  block-size: var(--ox-prov-glyph);
+  color: inherit;
+}
+
+/* Clinic: a building. Two uprights and a roofline. */
+.ox-prov__glyph[data-ox-glyph="building"] {
+  border: 1.5px solid currentColor;
+  border-block-end-width: 2.5px;
+}
+
+.ox-prov__glyph[data-ox-glyph="building"]::after {
+  content: "";
+  position: absolute;
+  inset-inline: 30%;
+  inset-block: 20% 0;
+  border-inline: 1px solid currentColor;
+}
+
+/* Device: a transmission wave. Two arcs off a point. */
+.ox-prov__glyph[data-ox-glyph="wave"] {
+  border: 1.5px solid currentColor;
+  border-block-start-color: transparent;
+  border-inline-start-color: transparent;
+  border-start-end-radius: 100%;
+  transform: rotate(-45deg);
+}
+
+/* Patient-reported: a person. A head and shoulders. */
+.ox-prov__glyph[data-ox-glyph="person"]::before {
+  content: "";
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-start: 28%;
+  inline-size: 44%;
+  block-size: 44%;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.ox-prov__glyph[data-ox-glyph="person"]::after {
+  content: "";
+  position: absolute;
+  inset-block-end: 0;
+  inset-inline: 8%;
+  block-size: 40%;
+  border-start-start-radius: 100%;
+  border-start-end-radius: 100%;
+  background: currentColor;
+}
+
+/* External: an arrow coming in over a threshold. */
+.ox-prov__glyph[data-ox-glyph="arrow-in"] {
+  border-inline-end: 1.5px solid currentColor;
+}
+
+.ox-prov__glyph[data-ox-glyph="arrow-in"]::before {
+  content: "";
+  position: absolute;
+  inset-block-start: 45%;
+  inset-inline-start: 0;
+  inline-size: 62%;
+  block-size: 1.5px;
+  background: currentColor;
+}
+
+.ox-prov__glyph[data-ox-glyph="arrow-in"]::after {
+  content: "";
+  position: absolute;
+  inset-block-start: 25%;
+  inset-inline-start: 30%;
+  inline-size: 42%;
+  block-size: 42%;
+  border-block-start: 1.5px solid currentColor;
+  border-inline-end: 1.5px solid currentColor;
+  transform: rotate(45deg);
+}
+
+/* AI-extracted: a four-point spark. */
+.ox-prov__glyph[data-ox-glyph="spark"] {
+  background: currentColor;
+  clip-path: polygon(50% 0%, 61% 39%, 100% 50%, 61% 61%, 50% 100%, 39% 61%, 0% 50%, 39% 39%);
+}
+
+/* Amended: a revision loop, open at one end. */
+.ox-prov__glyph[data-ox-glyph="revision"] {
+  border: 1.5px solid currentColor;
+  border-radius: 50%;
+  border-block-start-color: transparent;
+}
+
+.ox-prov__glyph[data-ox-glyph="revision"]::after {
+  content: "";
+  position: absolute;
+  inset-block-start: -1px;
+  inset-inline-end: -1px;
+  inline-size: 40%;
+  block-size: 1.5px;
+  background: currentColor;
+  transform: rotate(35deg);
+  transform-origin: 100% 50%;
+}
+
+/* ---------------------------------------------------------------- */
+/* Forced colors and print                                           */
+/* ---------------------------------------------------------------- */
+
+@media (forced-colors: active) {
+  .ox-prov {
+    color: CanvasText;
+    forced-color-adjust: none;
+  }
+
+  .ox-prov__age[data-ox-staleness="stale"],
+  .ox-prov__unconfirmed {
+    background: Canvas;
+    color: CanvasText;
+    /* The background is gone, so the border is what keeps them distinct. */
+    border: 1px solid CanvasText;
+  }
+}
+
+@media print {
+  .ox-prov {
+    color: #000;
+  }
+
+  /* The two facts a printed value must not lose. */
+  .ox-prov__age[data-ox-staleness="stale"],
+  .ox-prov__unconfirmed {
+    background: none;
+    color: #000;
+    border: 1px solid #000;
+  }
+}

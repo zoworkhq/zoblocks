@@ -42,6 +42,9 @@
       "@/components/oxygen/infusion-loader": [
         "./registry/oxygen/infusion-loader/infusion-loader.tsx"
       ],
+      "@/components/oxygen/provenance-chip": [
+        "./registry/oxygen/provenance-chip/provenance-chip.tsx"
+      ],
       "@/components/oxygen/pulse-loader": [
         "./registry/oxygen/pulse-loader/pulse-loader.tsx"
       ],
@@ -77,6 +80,9 @@
       ],
       "@/lib/oxygen-loader": [
         "./registry/oxygen/lib/loader.tsx"
+      ],
+      "@/lib/oxygen-provenance": [
+        "./registry/oxygen/lib/provenance.ts"
       ],
       "@/lib/oxygen-result-value": [
         "./registry/oxygen/lib/result-value.ts"

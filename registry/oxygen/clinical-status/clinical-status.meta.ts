@@ -91,7 +91,14 @@ export default defineComponentMeta({
     "No terminology service. The words here are English clinician and patient phrasings; a deployment needing another language supplies them through @oxygenui-design/intl.",
   ],
 
-  related: ["chart-accordion", "switch", "result-value", "allergy-chip", "risk-indicator"],
+  related: [
+    "chart-accordion",
+    "switch",
+    "result-value",
+    "allergy-chip",
+    "risk-indicator",
+    "provenance-chip",
+  ],
 
   dependencies: ["clsx", "tailwind-merge"],
   registryDependencies: ["utils", "tokens", "clinical-status-core"],

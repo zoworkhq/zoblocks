@@ -54,6 +54,10 @@
    styles/oxygen-risk.css by `risk-core`. */
 @import "../../../../registry/oxygen/lib/risk.css";
 
+/* Six source glyphs and the staleness affix. Shipped as
+   styles/oxygen-provenance.css by `provenance-core`. */
+@import "../../../../registry/oxygen/lib/provenance.css";
+
 /* The rail, the coverage footer and the two-column register split. Shipped as
    styles/oxygen-timeline.css by the `timeline-core` registry item, carrying
    Timeline and CareTimeline between them.

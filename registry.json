@@ -142,6 +142,24 @@
       ]
     },
     {
+      "name": "provenance-core",
+      "type": "oxygen:lib",
+      "title": "Provenance core",
+      "description": "Six source classes with CSS glyphs rather than colours, observed-at kept separate from recorded-at, per-datum staleness policies, and the confirmation state of an AI-extracted value. Includes a ledger keyed by resource and version, and the FHIR Provenance adapter. Installed automatically with ProvenanceChip.",
+      "files": [
+        {
+          "path": "registry/oxygen/lib/provenance.ts",
+          "type": "oxygen:lib",
+          "target": "lib/oxygen-provenance.ts"
+        },
+        {
+          "path": "registry/oxygen/lib/provenance.css",
+          "type": "oxygen:style",
+          "target": "styles/oxygen-provenance.css"
+        }
+      ]
+    },
+    {
       "name": "switch-core",
       "type": "oxygen:lib",
       "title": "Switch core",
@@ -520,6 +538,32 @@
           "path": "registry/oxygen/infusion-loader/infusion-loader.tsx",
           "type": "oxygen:component",
           "target": "components/oxygen/infusion-loader.tsx"
+        }
+      ]
+    },
+    {
+      "name": "provenance-chip",
+      "type": "oxygen:component",
+      "title": "Provenance Chip",
+      "description": "A 20px affix beside a value, never competing with it. Six source classes with CSS glyphs rather than colours, staleness folded in against a per-datum policy, and — for an AI-extracted value — the model, the source span and whether anybody has confirmed it.",
+      "categories": [
+        "clinical",
+        "ai"
+      ],
+      "dependencies": [
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "utils",
+        "tokens",
+        "provenance-core"
+      ],
+      "files": [
+        {
+          "path": "registry/oxygen/provenance-chip/provenance-chip.tsx",
+          "type": "oxygen:component",
+          "target": "components/oxygen/provenance-chip.tsx"
         }
       ]
     },

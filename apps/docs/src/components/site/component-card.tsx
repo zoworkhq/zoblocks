@@ -54,6 +54,7 @@ import { ClinicalStatus } from "@/registry/oxygen/clinical-status/clinical-statu
 import { ResultValue } from "@/registry/oxygen/result-value/result-value";
 import { AllergyChip } from "@/registry/oxygen/allergy-chip/allergy-chip";
 import { RiskIndicator } from "@/registry/oxygen/risk-indicator/risk-indicator";
+import { ProvenanceChip } from "@/registry/oxygen/provenance-chip/provenance-chip";
 import { IdentityProvider, PatientChip, IdentitySet } from "@oxygenui-design/identity";
 import { STATUS_LABEL, type ComponentDoc } from "@/lib/catalog";
 import { cn } from "@/lib/utils";
@@ -262,6 +263,37 @@ const PREVIEW: Record<string, (featured: boolean) => React.ReactNode> = {
    * would be a card for a component every library already ships.
    */
   /* The whole card, because the point is what surrounds the number. */
+  /* Three of the six, beside the value they qualify — because the chip alone
+     reads as a badge rather than a qualifier. */
+  "provenance-chip": (featured) => (
+    <div style={{ display: "grid", gap: featured ? 10 : 7 }}>
+      {(
+        [
+          { source: "clinic", observedAt: "2026-08-12T09:48:00Z" },
+          { source: "device", observedAt: "2026-08-08T08:10:00Z", device: "Omron BP7450" },
+          { source: "ai-extracted", model: "oxy-extract-3", confirmed: false },
+        ] as const
+      ).map((record, index) => (
+        <span key={index} style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
+          <span
+            style={{
+              fontSize: featured ? 16 : 14,
+              fontWeight: 600,
+              fontVariantNumeric: "tabular-nums",
+            }}
+          >
+            128/76
+          </span>
+          <ProvenanceChip
+            record={record}
+            now="2026-08-12T10:00:00Z"
+            stalenessPolicy={(r) => (r.source === "device" ? 48 * 3_600_000 : null)}
+          />
+        </span>
+      ))}
+    </div>
+  ),
+
   "risk-indicator": (featured) => (
     <div style={{ maxInlineSize: featured ? 320 : 258, inlineSize: "100%" }}>
       <RiskIndicator

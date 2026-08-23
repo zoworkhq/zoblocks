@@ -85,6 +85,11 @@ Rules that matter when generating code with these components:
   fhir: Composition, DocumentReference, Provenance, Narrative
   states: Empty draft, In progress, Origins ribbon, Unreviewed AI, Copied forward, Unfilled blanks, Stale pulled value, Gate blocking, Gate clear, Offline draft, Save failed, Signed, Signed with addendum, Awaiting countersignature
   status: experimental
+- [Provenance Chip](https://oxygenui.design/components/provenance-chip): Where a value came from, how it got here, and how much of it a human has actually looked at.
+  install: npx @oxygenui-design/cli add provenance-chip
+  fhir: Provenance
+  states: Clinic — measured in the room, Home device, with its caveats, Patient-reported — the instrument, External, with the exchange named, AI-extracted, unconfirmed, AI-extracted, confirmed by a clinician, Amended — the original retained, Stale against a per-datum policy, Observed long before it was recorded, Glyph only, in a dense grid, Chain reachable, Span reachable, No ledger entry — renders nothing
+  status: stable
 - [Result Value](https://oxygenui.design/components/result-value): A single observation rendered so that the four ways a number can lie to you are all impossible.
   install: npx @oxygenui-design/cli add result-value
   fhir: Observation

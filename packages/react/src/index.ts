@@ -21,6 +21,7 @@ export * from "./components/clinical-status/clinical-status";
 export * from "./components/copilot/copilot";
 export * from "./components/helix-loader/helix-loader";
 export * from "./components/infusion-loader/infusion-loader";
+export * from "./components/provenance-chip/provenance-chip";
 export * from "./components/pulse-loader/pulse-loader";
 export * from "./components/result-value/result-value";
 export * from "./components/rhythm-loader/rhythm-loader";

@@ -163,6 +163,27 @@ const SUPPORT_ITEMS: BuildableItem[] = [
     ],
   },
   {
+    name: "provenance-core",
+    type: "oxygen:lib",
+    title: "Provenance core",
+    description:
+      "Six source classes with CSS glyphs rather than colours, observed-at kept separate from recorded-at, per-datum staleness policies, and the confirmation state of an AI-extracted value. Includes a ledger keyed by resource and version, and the FHIR Provenance adapter. Installed automatically with ProvenanceChip.",
+    dependencies: [] as string[],
+    registryDependencies: [] as string[],
+    files: [
+      {
+        path: "registry/oxygen/lib/provenance.ts",
+        type: "oxygen:lib",
+        target: "lib/oxygen-provenance.ts",
+      },
+      {
+        path: "registry/oxygen/lib/provenance.css",
+        type: "oxygen:style",
+        target: "styles/oxygen-provenance.css",
+      },
+    ],
+  },
+  {
     name: "switch-core",
     type: "oxygen:lib",
     title: "Switch core",

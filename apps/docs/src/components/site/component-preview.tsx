@@ -44,6 +44,11 @@ import {
   type RiskAssessment,
 } from "@/registry/oxygen/risk-indicator/risk-indicator";
 import {
+  ProvenanceChip,
+  type ProvenanceRecord,
+  type StalenessPolicy,
+} from "@/registry/oxygen/provenance-chip/provenance-chip";
+import {
   AllergyChip,
   AllergyList,
   type AllergyRecord,
@@ -800,7 +805,173 @@ const RI_READMISSION: RiskAssessment = {
   model: { name: "Readmit-v4", auc: 0.71 },
 };
 
+/* ------------------------------------------------------------------ */
+/* ProvenanceChip fixtures                                             */
+/* ------------------------------------------------------------------ */
+
+const PC_NOW = "2026-08-12T10:00:00Z";
+
+/** Two days for a device reading, a month for self-report, silence otherwise. */
+const PC_POLICY: StalenessPolicy = (record) => {
+  if (record.source === "device") return 48 * 3_600_000;
+  if (record.source === "patient-reported") return 30 * 86_400_000;
+  return null;
+};
+
+/*
+ * Six provenances for one blood pressure.
+ *
+ * They are not the same fact and they do not support the same decision, and
+ * only the affix says which.
+ */
+const PC_SOURCES: Array<{ record: ProvenanceRecord; means: string }> = [
+  {
+    record: {
+      source: "clinic",
+      observedAt: "2026-08-12T09:48:00Z",
+      performer: { display: "M. Adeyemi", role: "MA" },
+      device: "Welch Allyn 6000",
+    },
+    means: "Measured in the room. Act on it.",
+  },
+  {
+    record: {
+      source: "device",
+      observedAt: "2026-08-08T08:10:00Z",
+      device: "Omron BP7450",
+      deviceNote: "unvalidated cuff size, median of 3",
+    },
+    means: "Not reviewed by a clinician.",
+  },
+  {
+    record: { source: "patient-reported", observedAt: "2026-08-11T20:00:00Z" },
+    means: "Entered in the portal. No device, no technique, no time of day.",
+  },
+  {
+    record: {
+      source: "external",
+      organisation: "Northgate Family Med",
+      exchange: "Carequality",
+      document: "C-CDA, authored 11 Mar",
+      observedAt: "2026-01-14T09:00:00Z",
+      recordedAt: "2026-03-11T00:00:00Z",
+    },
+    means: "Document vintage, not observation vintage.",
+  },
+  {
+    record: {
+      source: "ai-extracted",
+      model: "oxy-extract-3",
+      span: { document: "Scanned referral", page: 2, line: 14 },
+      confirmed: false,
+    },
+    means: "From a scanned referral, page 2 line 14. Nobody has confirmed it.",
+  },
+  {
+    record: {
+      source: "amended",
+      recordedAt: "2026-08-12T09:20:00Z",
+      supersedes: { value: "182/76", reason: "corrected by the author 40 min later as a typo" },
+    },
+    means: "Originally 182/76. Both versions retained.",
+  },
+];
+
+function PcValue({ children }: { children: React.ReactNode }) {
+  return (
+    <span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
+      <span style={{ fontSize: 17, fontWeight: 600, fontVariantNumeric: "tabular-nums" }}>
+        128/76
+      </span>
+      {children}
+    </span>
+  );
+}
+
 const SCENARIOS: Record<string, Scenario[]> = {
+  /** Three demos, and the first is the whole argument. */
+  "provenance-chip": [
+    {
+      id: "six",
+      label: "One value, six provenances",
+      note: "The same 128/76, six times. A reading typed by a medical assistant, streamed from a home cuff, entered in the portal, pulled from an HIE document of unknown vintage, lifted from a scanned fax by a model, and corrected forty minutes after it was first recorded. They are not the same fact and they do not support the same decision — and the AI row is the one that will matter most in three years, because it names the model, links the source span, and states that no human has confirmed it.",
+      render: () => (
+        <div style={{ display: "grid", gap: 12, maxInlineSize: 560 }}>
+          {PC_SOURCES.map((entry, index) => (
+            <div key={index} style={{ display: "grid", gap: 2 }}>
+              <PcValue>
+                <ProvenanceChip
+                  record={entry.record}
+                  now={PC_NOW}
+                  stalenessPolicy={PC_POLICY}
+                  {...(entry.record.span ? { onOpenSpan: () => {} } : {})}
+                />
+              </PcValue>
+              <span style={{ fontSize: 12, opacity: 0.62 }}>{entry.means}</span>
+            </div>
+          ))}
+        </div>
+      ),
+    },
+    {
+      id: "dates",
+      label: "Two dates, not one",
+      note: "A C-CDA authored on 11 March may carry a blood pressure measured in January. Rendering the document's date as the observation's is how a nine-week-old reading is acted on as current, so the two are separate fields and the age is measured from the first. Beneath it, the same record with the receipt used instead — five months against seven, and the wrong one looks fresher.",
+      render: () => (
+        <div style={{ display: "grid", gap: 12, maxInlineSize: 560 }}>
+          <PcValue>
+            <ProvenanceChip
+              now={PC_NOW}
+              stalenessPolicy={() => 7 * 86_400_000}
+              record={PC_SOURCES[3]!.record}
+            />
+          </PcValue>
+          <PcValue>
+            <ProvenanceChip
+              now={PC_NOW}
+              stalenessPolicy={() => 7 * 86_400_000}
+              record={{
+                source: "external",
+                organisation: "Northgate Family Med",
+                exchange: "Carequality",
+                document: "C-CDA, authored 11 Mar",
+                // No observedAt: all the component has is the receipt.
+                recordedAt: "2026-03-11T00:00:00Z",
+              }}
+            />
+          </PcValue>
+        </div>
+      ),
+    },
+    {
+      id: "policy",
+      label: "Four days differs by datum",
+      note: "Four days is nothing for a problem list and a lot for a blood pressure, so the staleness threshold is injected per datum type rather than shared. The device reading below is stale at four days; the clinic reading of the same age says nothing about its age at all, because the policy has no opinion — and a wrong threshold is worse than no threshold.",
+      render: () => (
+        <div style={{ display: "grid", gap: 12, maxInlineSize: 560 }}>
+          <PcValue>
+            <ProvenanceChip
+              now={PC_NOW}
+              stalenessPolicy={PC_POLICY}
+              record={{
+                source: "device",
+                observedAt: "2026-08-08T08:00:00Z",
+                device: "Omron BP7450",
+              }}
+            />
+          </PcValue>
+          <PcValue>
+            <ProvenanceChip
+              now={PC_NOW}
+              stalenessPolicy={PC_POLICY}
+              record={{ source: "clinic", observedAt: "2026-08-08T08:00:00Z" }}
+            />
+          </PcValue>
+        </div>
+      ),
+    },
+  ],
+
   /** Three demos, one per failure. */
   "risk-indicator": [
     {

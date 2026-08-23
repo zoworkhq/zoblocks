@@ -182,9 +182,7 @@ export function freshness(assessment: RiskAssessment, now: string): Freshness {
   if (!assessment.validUntil) return { state: "unbounded", ageMs };
 
   const expiredForMs = Date.parse(now) - Date.parse(assessment.validUntil);
-  return expiredForMs > 0
-    ? { state: "expired", ageMs, expiredForMs }
-    : { state: "fresh", ageMs };
+  return expiredForMs > 0 ? { state: "expired", ageMs, expiredForMs } : { state: "fresh", ageMs };
 }
 
 /** "4 hours", "3 days". Coarse: precision here implies a freshness nobody has. */
@@ -250,7 +248,9 @@ export function describeRisk(
 
   if (assessment.model) {
     const auc = typeof assessment.model.auc === "number" ? `, AUC ${assessment.model.auc}` : "";
-    parts.push(`${assessment.model.name}${assessment.model.version ? ` ${assessment.model.version}` : ""}${auc}`);
+    parts.push(
+      `${assessment.model.name}${assessment.model.version ? ` ${assessment.model.version}` : ""}${auc}`,
+    );
   }
 
   // Joined as sentences, so each clause is capitalised. "…adult medicine.

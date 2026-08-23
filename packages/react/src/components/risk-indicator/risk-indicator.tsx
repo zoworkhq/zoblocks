@@ -62,8 +62,7 @@ export {
   type RiskDriver,
 } from "../../lib/risk";
 
-export interface RiskIndicatorProps
-  extends Omit<React.HTMLAttributes<HTMLDivElement>, "children"> {
+export interface RiskIndicatorProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "children"> {
   assessment: RiskAssessment;
   /** ISO 8601, supplied by the host. The component never reads a clock. */
   now: string;
@@ -165,9 +164,7 @@ export const RiskIndicator = React.forwardRef<HTMLDivElement, RiskIndicatorProps
           </p>
         )}
 
-        {drivers.length ? (
-          <Drivers drivers={drivers} dominant={dominant} />
-        ) : null}
+        {drivers.length ? <Drivers drivers={drivers} dominant={dominant} /> : null}
 
         {/*
           Staleness on the face, never in a tooltip.
@@ -188,7 +185,11 @@ export const RiskIndicator = React.forwardRef<HTMLDivElement, RiskIndicatorProps
 
           {assessment.model ? (
             onOpenModel ? (
-              <button type="button" className="ox-risk__model" onClick={() => onOpenModel(assessment)}>
+              <button
+                type="button"
+                className="ox-risk__model"
+                onClick={() => onOpenModel(assessment)}
+              >
                 {assessment.model.name}
                 {typeof assessment.model.auc === "number" ? ` · AUC ${assessment.model.auc}` : ""}
               </button>
@@ -209,7 +210,11 @@ export const RiskIndicator = React.forwardRef<HTMLDivElement, RiskIndicatorProps
         {fresh.state === "expired" && (onRecompute || onAcknowledge) ? (
           <div className="ox-risk__expired">
             {onRecompute ? (
-              <button type="button" className="ox-risk__action" onClick={() => onRecompute(assessment)}>
+              <button
+                type="button"
+                className="ox-risk__action"
+                onClick={() => onRecompute(assessment)}
+              >
                 Recompute
               </button>
             ) : null}
@@ -254,7 +259,11 @@ function Drivers({ drivers, dominant }: { drivers: RiskDriver[]; dominant: numbe
       <p className="ox-risk__drivers-title">Top drivers</p>
       <ul className="ox-risk__driver-list">
         {drivers.map((driver) => (
-          <li key={driver.label} className="ox-risk__driver" data-ox-direction={driverDirection(driver)}>
+          <li
+            key={driver.label}
+            className="ox-risk__driver"
+            data-ox-direction={driverDirection(driver)}
+          >
             <span className="ox-risk__driver-label">{driver.label}</span>
             {weighted ? (
               <>

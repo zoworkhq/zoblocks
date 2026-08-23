@@ -13,7 +13,7 @@
  * change, because customers style against these names. The manifest is
  * committed so that change shows up as a reviewable diff.
  *
- * 296 tokens across 23 components:
+ * 297 tokens across 24 components:
  *
  *   switch          55
  *   tabs            44
@@ -37,6 +37,7 @@
  *   care-timeline    2
  *   allergy          1
  *   patient-chip     1
+ *   prov             1
  *   risk             1
  *
  * `bridgeable: false` (86 tokens) marks the ones resolving to clinical
@@ -1790,6 +1791,15 @@ export const TOKEN_SURFACE: readonly SurfaceEntry[] = [
     "bridgeable": true
   },
   {
+    "name": "--ox-prov-glyph",
+    "component": "prov",
+    "source": "packages/react/src/styles.css",
+    "kind": "dimension",
+    "frameworks": [],
+    "fallback": true,
+    "bridgeable": true
+  },
+  {
     "name": "--ox-range-band",
     "component": "range",
     "source": "packages/tokens/tokens/component.json",
@@ -3109,6 +3119,7 @@ export const SURFACE_COMPONENTS: readonly string[] = [
   "loader",
   "nav",
   "patient-chip",
+  "prov",
   "range",
   "risk",
   "rv",
@@ -3231,6 +3242,7 @@ export const BRIDGEABLE: readonly string[] = [
   "--ox-nav-fg-current",
   "--ox-nav-radius",
   "--ox-patient-chip-rail",
+  "--ox-prov-glyph",
   "--ox-range-height",
   "--ox-range-marker",
   "--ox-range-track",
