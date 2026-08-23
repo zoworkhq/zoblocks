@@ -17,6 +17,7 @@ import type {
   Bundle,
   Communication,
   Condition,
+  Consent,
   Coverage,
   DocumentReference,
   Encounter,
@@ -24,6 +25,7 @@ import type {
   MedicationRequest,
   Observation,
   Patient,
+  Practitioner,
   Provenance,
   QuestionnaireResponse,
 } from "@oxygenui-design/fhir";
@@ -952,4 +954,123 @@ export const timelineBundle: Bundle = {
     { resource: observationPotassiumCritical },
     { resource: { resourceType: "CarePlan", id: "syn-careplan-1" } as never },
   ],
+};
+
+// ---------------------------------------------------------------------------
+// Signing — who attests, what they attested to, and the proof
+//
+// A signature has three parts and products routinely ship one of them. The
+// signer without a register is a name; the consent without a Provenance is an
+// agreement nobody signed; the Provenance without the signed bytes is a claim.
+// All three are here so a demo cannot quietly omit the awkward one.
+// ---------------------------------------------------------------------------
+
+const NPI_SYSTEM = "http://hl7.org/fhir/sid/us-npi";
+
+/**
+ * The clinician the rest of this file already references as
+ * `Practitioner/syn-pr-1`.
+ *
+ * `identifier` carries the register as well as the number. A bare "1710details"
+ * identifies nobody, because the reader cannot tell which body to check it
+ * against — which is the whole point of recording it.
+ */
+export const practitionerSigner: Practitioner = {
+  resourceType: "Practitioner",
+  id: "syn-pr-1",
+  active: true,
+  identifier: [{ use: "official", system: NPI_SYSTEM, value: "1710293846" }],
+  name: [{ use: "official", prefix: ["Dr"], given: ["Wade"], family: "Warren" }],
+  telecom: [{ system: "email", value: "w.warren@example.org", use: "work" }],
+  qualification: [{ code: { text: "MD, Consultant Endocrinologist" } }],
+};
+
+/** A second signer, for the countersignature and witness paths. */
+export const practitionerWitness: Practitioner = {
+  resourceType: "Practitioner",
+  id: "syn-pr-2",
+  active: true,
+  identifier: [{ use: "official", system: NPI_SYSTEM, value: "1548302977" }],
+  name: [{ use: "official", given: ["Priya"], family: "Menon" }],
+  qualification: [{ code: { text: "RN" } }],
+};
+
+/**
+ * A signed treatment consent.
+ *
+ * Note what is *not* here: a signature. `Consent` has no signature element in
+ * R4 or R5, so a system that stores this alone has recorded an agreement with
+ * no proof anyone made it — see `provenanceConsent`.
+ */
+export const consentTreatment: Consent = {
+  resourceType: "Consent",
+  id: "syn-consent-treatment",
+  status: "active",
+  scope: {
+    coding: [{ system: "http://terminology.hl7.org/CodeSystem/consentscope", code: "treatment" }],
+  },
+  category: [{ text: "Consent to treatment" }],
+  patient: { reference: "Patient/syn-patient-routine", display: "Amara Okonkwo" },
+  dateTime: "2026-08-12T10:02:00+05:30",
+  performer: [{ reference: "Patient/syn-patient-routine" }],
+  provision: { type: "permit", period: { start: "2026-08-12" } },
+};
+
+/**
+ * A consent the patient refused.
+ *
+ * `rejected` is an answer, not a missing record. A form that can only store a
+ * signature forces this case to be recorded as "not yet signed", which is a
+ * different — and false — clinical fact.
+ */
+export const consentDeclined: Consent = {
+  resourceType: "Consent",
+  id: "syn-consent-declined",
+  status: "rejected",
+  scope: {
+    coding: [{ system: "http://terminology.hl7.org/CodeSystem/consentscope", code: "research" }],
+  },
+  category: [{ text: "Consent to research participation" }],
+  patient: { reference: "Patient/syn-patient-routine", display: "Amara Okonkwo" },
+  dateTime: "2026-08-12T10:24:00+05:30",
+  provision: { type: "deny" },
+};
+
+/**
+ * The Provenance that makes `consentTreatment` a signed consent.
+ *
+ * `signature.data` is bare base64, not a data URL: the element is
+ * `base64Binary`, and a value beginning `data:image/png;base64,` validates
+ * silently while every consumer that decodes it gets garbage. Truncated here.
+ */
+export const provenanceConsent: Provenance = {
+  resourceType: "Provenance",
+  id: "syn-prov-consent",
+  target: [{ reference: "Consent/syn-consent-treatment" }],
+  recorded: "2026-08-12T10:02:00+05:30",
+  agent: [{ who: { reference: "Patient/syn-patient-routine", display: "Amara Okonkwo" } }],
+  signature: [
+    {
+      type: [
+        {
+          system: "urn:iso-astm:E1762-95:2013",
+          code: "1.2.840.10065.1.12.1.7",
+          display: "Consent Signature",
+        },
+      ],
+      when: "2026-08-12T10:02:00+05:30",
+      who: { reference: "Patient/syn-patient-routine", display: "Amara Okonkwo" },
+      targetFormat: "application/fhir+json",
+      sigFormat: "image/png",
+      data: "iVBORw0KGgoAAAANSUhEUg",
+    },
+  ],
+};
+
+export const signing = {
+  signer: practitionerSigner,
+  witness: practitionerWitness,
+  consent: consentTreatment,
+  declined: consentDeclined,
+  provenance: provenanceConsent,
 };

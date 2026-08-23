@@ -448,6 +448,35 @@ export interface Provenance extends Resource {
     role?: "derivation" | "revision" | "quotation" | "source" | "removal";
     what?: Reference;
   }>;
+  /**
+   * The signature itself.
+   *
+   * There is nowhere else for it to go: neither `Consent` nor
+   * `DocumentReference` carries a signature element in R4 or R5, so a record
+   * with an agreement and no Provenance.signature is an agreement with no
+   * proof that anybody made it.
+   */
+  signature?: Signature[];
+}
+
+/**
+ * https://hl7.org/fhir/R4/datatypes.html#Signature
+ *
+ * `data` is `base64Binary` — bare base64, not a data URL. A value beginning
+ * `data:image/png;base64,` passes every validator that only checks the field
+ * is a string, and produces garbage in every consumer that decodes it.
+ */
+export interface Signature {
+  /** ISO/ASTM E1762-95 purpose codes. Required: an unlabelled signature means nothing. */
+  type: Coding[];
+  when?: string;
+  who?: Reference;
+  onBehalfOf?: Reference;
+  /** MIME type of the content that was signed. */
+  targetFormat?: string;
+  /** MIME type of `data` — "image/png" for a drawn signature. */
+  sigFormat?: string;
+  data?: string;
 }
 
 /** https://hl7.org/fhir/R4/flag.html */
