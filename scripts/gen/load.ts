@@ -8,7 +8,7 @@
  */
 
 import { existsSync } from "node:fs";
-import { readdir } from "node:fs/promises";
+import { readFile, readdir } from "node:fs/promises";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 import { componentMetaSchema, type ComponentMeta } from "@oxygenui-design/component-meta";
@@ -50,6 +50,16 @@ export interface LoadedComponent {
   consumerTarget: string;
   hasStory: boolean;
   hasTest: boolean;
+  /**
+   * The relationship graph, derived rather than declared.
+   *
+   * `builtWith` and `usedIn` are the two facts on a component page that an
+   * author has no way to keep true: the first drifts the moment a dependency
+   * is added, and the second cannot be known from inside the component at all.
+   * The schema rejects them in hand-written metadata for that reason, and they
+   * are computed here from what each component actually depends on.
+   */
+  derived: { builtWith: string[]; usedIn: string[] };
 }
 
 export class MetaError extends Error {
@@ -145,6 +155,7 @@ export async function loadComponents(): Promise<LoadedComponent[]> {
       consumerTarget: `${CONSUMER_COMPONENT_DIR}/${name}.tsx`,
       hasStory: existsSync(path.join(dir, `${name}.stories.tsx`)),
       hasTest: existsSync(path.join(dir, `${name}.test.tsx`)),
+      derived: { builtWith: [], usedIn: [] },
     });
   }
 
@@ -220,6 +231,7 @@ export async function loadComponents(): Promise<LoadedComponent[]> {
       // A package owns its own suite; `test/` is the convention across this
       // workspace, so its presence is the honest signal for the coverage gate.
       hasTest: existsSync(path.join(dir, "test")) || existsSync(path.join(dir, "src", "__tests__")),
+      derived: { builtWith: [], usedIn: [] },
     });
   }
 
@@ -234,6 +246,28 @@ export async function loadComponents(): Promise<LoadedComponent[]> {
       );
     }
     seen.set(component.meta.name, rel(component.dir));
+  }
+
+  /*
+   * The fixtures package's public exports, read from its source rather than
+   * imported.
+   *
+   * Importing it would pull a React-adjacent module into a generator that runs
+   * in plain Node before anything is built, for the sake of a list of names.
+   * Reading the barrel is enough: a fixture that is not re-exported there is
+   * not reachable by the example that names it either.
+   */
+  const fixtureExports = new Set<string>();
+  const fixturesBarrel = path.join(ROOT, "packages/fixtures/src/index.ts");
+  if (existsSync(fixturesBarrel)) {
+    const source = await readFile(fixturesBarrel, "utf8");
+    for (const match of source.matchAll(/^export const (\w+)/gm)) {
+      if (match[1]) fixtureExports.add(match[1]);
+    }
+  } else {
+    problems.push(
+      `cannot verify fixtures: ${rel(fixturesBarrel)} is missing. Every fixture named in metadata is unverifiable without it.`,
+    );
   }
 
   // Cross-references are validated only once every component has loaded,
@@ -259,6 +293,81 @@ export async function loadComponents(): Promise<LoadedComponent[]> {
     if (component.meta.related.includes(component.meta.name)) {
       problems.push(`${component.meta.name}: lists itself in related`);
     }
+
+    /*
+     * `related` must be reciprocal.
+     *
+     * A one-way edge is not a small inconsistency: the graph is what generates
+     * navigation, discovery and every internal link, so a component that
+     * claims a neighbour which does not claim it back produces a page you can
+     * leave and cannot return to. Enforced here rather than trusted, because
+     * the reverse edge is exactly the thing an author forgets.
+     */
+    for (const related of component.meta.related) {
+      const other = loaded.find((c) => c.meta.name === related);
+      if (other && !other.meta.related.includes(component.meta.name)) {
+        problems.push(
+          `${component.meta.name}: related "${related}" is one-way — add "${component.meta.name}" to ${related}'s related, or drop the edge`,
+        );
+      }
+    }
+
+    /*
+     * A named fixture must be a real export of the fixtures package.
+     *
+     * The standard bans lorem ipsum and requires realistic data; a fixture name
+     * that resolves to nothing is the same defect wearing a better disguise,
+     * because the example reads as though it were backed by data and is not.
+     */
+    for (const fixture of component.meta.fixtures) {
+      if (fixtureExports.size && !fixtureExports.has(fixture)) {
+        problems.push(
+          `${component.meta.name}: fixture "${fixture}" is not exported by @oxygenui-design/fixtures`,
+        );
+      }
+    }
+  }
+
+  /*
+   * The relationship graph.
+   *
+   * `builtWith` is a component's registry dependencies, minus the support
+   * items (utils, tokens, the headless cores) — those are infrastructure, and
+   * listing them under "built with" on every page says nothing. `usedIn` is
+   * the inverse edge, which no component can know about itself.
+   */
+  const byName = new Map(loaded.map((c) => [c.meta.name, c]));
+  for (const component of loaded) {
+    component.derived.builtWith = component.meta.registryDependencies
+      .filter((dep) => byName.has(dep))
+      .sort();
+  }
+  for (const component of loaded) {
+    for (const dep of component.derived.builtWith) {
+      byName.get(dep)?.derived.usedIn.push(component.meta.name);
+    }
+  }
+  for (const component of loaded) component.derived.usedIn.sort();
+
+  /*
+   * Two components must not claim the same primary keyword.
+   *
+   * They would compete with each other for it, and the search engine would
+   * pick — usually the older page, which is rarely the better answer. The
+   * whole point of declaring one is that it is the term this page intends to
+   * be the best result for.
+   */
+  const byKeyword = new Map<string, string>();
+  for (const component of loaded) {
+    const keyword = component.meta.seo.primaryKeyword?.trim().toLowerCase();
+    if (!keyword) continue;
+    const owner = byKeyword.get(keyword);
+    if (owner) {
+      problems.push(
+        `${component.meta.name}: primary keyword "${keyword}" is already claimed by ${owner} — two pages competing for one term means neither wins it`,
+      );
+    }
+    byKeyword.set(keyword, component.meta.name);
   }
 
   if (problems.length) throw new MetaError(problems);

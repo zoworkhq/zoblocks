@@ -40,6 +40,7 @@ import { diagnoseComponents, extractProps } from "./props";
 import { emitTokens } from "./tokens/emit";
 import { loadTokenSource } from "./tokens/load";
 import { validateTokens } from "./tokens/validate";
+import { validateControls } from "./validate-controls";
 import { Emitter } from "./write";
 
 const CHECK = process.argv.includes("--check");
@@ -108,6 +109,16 @@ async function main() {
   // of a component's documentation, and a package component that renders three
   // empty headings looks broken rather than undocumented.
   const props = extractProps(components);
+
+  // Metadata that names a prop or a value is checked against the types here,
+  // where both are in hand. A playground control offering a variant the union
+  // does not contain renders a switch that does nothing, and nothing else in
+  // the build can see it.
+  const controlProblems = validateControls(components, props);
+  if (controlProblems.length) {
+    report(`${controlProblems.length} metadata reference(s) do not match the API`, controlProblems);
+    process.exit(1);
+  }
 
   // The formats the registry documents declare. Emitted alongside them so a
   // new file kind cannot reach the registry without reaching the schema too.

@@ -62,7 +62,7 @@ export default defineComponentMeta({
     "Requires styles/oxygen-loader.css, installed with loader-core.",
     "Percentage only. It shows no time estimate and no per-step breakdown.",
   ],
-  related: ["pulse-loader", "rhythm-loader", "breath-loader"],
+  related: ["pulse-loader", "rhythm-loader", "breath-loader", "helix-loader"],
 
   dependencies: ["clsx", "tailwind-merge"],
   registryDependencies: ["utils", "tokens", "loader-core"],

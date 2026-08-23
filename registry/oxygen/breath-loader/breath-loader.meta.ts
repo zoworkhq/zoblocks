@@ -62,7 +62,7 @@ export default defineComponentMeta({
     "Requires styles/oxygen-loader.css, installed with loader-core.",
     "Needs about 40px to read as three distinct rings rather than one soft pulse.",
   ],
-  related: ["pulse-loader", "rhythm-loader", "infusion-loader"],
+  related: ["pulse-loader", "rhythm-loader", "infusion-loader", "helix-loader"],
 
   dependencies: ["clsx", "tailwind-merge"],
   registryDependencies: ["utils", "tokens", "loader-core"],

@@ -89,7 +89,7 @@ export default defineComponentMeta({
     "Above roughly 200 sections, render your own windowed list over useAccordion. Virtualising breaks find-in-page, so the component does not do it silently.",
     "persistKey is not implemented. Remembering which sections a reader opened is per-product storage, and storing it for a gated section would defeat the gate.",
   ],
-  related: ["chart-accordion", "safety-plan"],
+  related: ["chart-accordion", "safety-plan", "care-timeline", "tabs", "timeline"],
 
   dependencies: ["clsx", "tailwind-merge"],
   registryDependencies: ["utils", "tokens", "accordion-core"],

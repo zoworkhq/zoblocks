@@ -107,7 +107,7 @@ export default defineComponentMeta({
     "Requires @oxygenui-design/copilot-react and @oxygenui-design/copilot-core from npm. The engine is deliberately not inlined — a safety control nobody reads before pasting is not a safety control.",
   ],
 
-  related: [],
+  related: ["clinical-note"],
 
   dependencies: [
     "clsx",

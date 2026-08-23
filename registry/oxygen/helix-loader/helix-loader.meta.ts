@@ -55,7 +55,7 @@ export default defineComponentMeta({
     "Eighteen animated nodes — the heaviest of the five, though still compositor-only.",
     "Depicts no real sequence data. It is a mark, not a visualisation.",
   ],
-  related: ["breath-loader", "rhythm-loader", "infusion-loader"],
+  related: ["breath-loader", "rhythm-loader", "infusion-loader", "pulse-loader"],
 
   dependencies: ["clsx", "tailwind-merge"],
   registryDependencies: ["utils", "tokens", "loader-core"],

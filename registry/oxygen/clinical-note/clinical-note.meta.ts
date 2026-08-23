@@ -92,7 +92,7 @@ export default defineComponentMeta({
     ],
   },
 
-  related: ["copilot", "switch"],
+  related: ["copilot", "switch", "care-timeline", "signature"],
 
   limitations: [
     "No phrase library, terminology or attestation wording ships here. Those are jurisdictional, organisational and licensing decisions; the component provides the seams.",

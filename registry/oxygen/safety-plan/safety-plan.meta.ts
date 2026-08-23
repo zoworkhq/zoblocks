@@ -69,7 +69,7 @@ export default defineComponentMeta({
     "Default wording is English and patient-facing. A clinician-facing surface needs its own catalog, not a tone change.",
     "No expiry logic. Whether a plan is stale is a clinical judgement, so revisedAt is displayed rather than interpreted.",
   ],
-  related: ["accordion", "chart-accordion"],
+  related: ["accordion", "chart-accordion", "signature"],
 
   dependencies: ["clsx", "tailwind-merge"],
   registryDependencies: ["utils", "tokens", "accordion-core", "accordion"],

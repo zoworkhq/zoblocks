@@ -30,6 +30,16 @@ export interface ExtractedExport {
   props: PropDoc[];
   /** What the props interface extends, e.g. "React.HTMLAttributes<HTMLSpanElement>". */
   extendsType?: string;
+  /**
+   * The string-literal members of any prop whose type is a union of them,
+   * by prop name.
+   *
+   * Not emitted anywhere. It exists so metadata that *names* a value — a
+   * playground control's `options`, a variant's `args` — can be checked
+   * against the values the type actually admits. The displayed type is the
+   * alias (`TabVariant`), which reads better and proves nothing.
+   */
+  enums: Record<string, string[]>;
 }
 
 /**
@@ -168,6 +178,70 @@ function renderType(checker: ts.TypeChecker, type: ts.Type, at: ts.Node): string
 function withoutUndefined(type: string): string {
   const parts = type.split(" | ").filter((part) => part !== "undefined");
   return parts.length ? parts.join(" | ") : type;
+}
+
+/**
+ * The element type of an array prop, or the type itself.
+ *
+ * `T[] | undefined` on an optional prop is the common shape, so the undefined
+ * arm is stripped before asking whether what remains is an array.
+ */
+function elementOfArray(checker: ts.TypeChecker, type: ts.Type): ts.Type {
+  const arms = type.isUnion()
+    ? type.types.filter((t) => !(t.flags & (ts.TypeFlags.Undefined | ts.TypeFlags.Null)))
+    : [type];
+  if (arms.length !== 1) return type;
+
+  const only = arms[0]!;
+  const element = checker.getIndexTypeOfType(only, ts.IndexKind.Number);
+  return checker.isArrayLikeType(only) && element ? element : type;
+}
+
+/**
+ * The string-literal members of each prop whose type is a union of them.
+ *
+ * Read from the checker rather than from the rendered type string: the string
+ * says `TabVariant`, which is the right thing to print and the wrong thing to
+ * validate against. Only props declared in this repository are walked, for the
+ * same reason the props table skips the ~280 inherited HTML attributes.
+ */
+function enumsFromType(checker: ts.TypeChecker, type: ts.Type, ownFile: string) {
+  const enums: Record<string, string[]> = {};
+
+  for (const symbol of checker.getPropertiesOfType(type)) {
+    const declaration = symbol.declarations?.[0];
+    if (!declaration || !isOwnSource(declaration.getSourceFile().fileName)) continue;
+
+    /*
+     * An array of literals counts.
+     *
+     * `methods?: CaptureMethod[]` has no literal members of its own, so
+     * reading only the prop's own union would leave it unvalidated — and an
+     * unvalidated array prop is where a playground control offers a value the
+     * component then maps over and crashes on. The element type is what a
+     * control's `options` are actually naming, so that is what is recorded.
+     */
+    const propType = elementOfArray(
+      checker,
+      checker.getTypeOfSymbolAtLocation(symbol, declaration),
+    );
+    if (!propType.isUnion()) continue;
+
+    const literals: string[] = [];
+    let onlyLiteralsAndUndefined = true;
+    for (const member of propType.types) {
+      if (member.isStringLiteral()) literals.push(member.value);
+      else if (member.flags & (ts.TypeFlags.Undefined | ts.TypeFlags.Null)) continue;
+      // A union mixing literals with `string` admits anything, so naming its
+      // members would produce a check that rejects valid values.
+      else onlyLiteralsAndUndefined = false;
+    }
+
+    if (onlyLiteralsAndUndefined && literals.length) enums[symbol.getName()] = literals;
+  }
+
+  void ownFile;
+  return enums;
 }
 
 function propsFromType(
@@ -387,7 +461,7 @@ export function extractProps(components: LoadedComponent[]): Map<string, Extract
 
         const parameter = statement.parameters[0];
         if (!parameter) {
-          exports.push({ exportName: name, props: [] });
+          exports.push({ exportName: name, props: [], enums: {} });
           continue;
         }
 
@@ -403,6 +477,7 @@ export function extractProps(components: LoadedComponent[]): Map<string, Extract
             component.sourceFile,
             defaultsFromParameter(parameter),
           ),
+          enums: enumsFromType(checker, propsType, component.sourceFile),
           ...(extendsType ? { extendsType } : {}),
         });
         continue;
@@ -418,6 +493,7 @@ export function extractProps(components: LoadedComponent[]): Map<string, Extract
           props: propsType
             ? propsFromType(checker, propsType, statement, component.sourceFile, new Map())
             : [],
+          enums: propsType ? enumsFromType(checker, propsType, component.sourceFile) : {},
         });
         continue;
       }
@@ -436,7 +512,7 @@ export function extractProps(components: LoadedComponent[]): Map<string, Extract
 
           const parameter = fn.parameters[0];
           if (!parameter) {
-            exports.push({ exportName: name, props: [] });
+            exports.push({ exportName: name, props: [], enums: {} });
             continue;
           }
 
@@ -452,6 +528,7 @@ export function extractProps(components: LoadedComponent[]): Map<string, Extract
               component.sourceFile,
               defaultsFromParameter(parameter),
             ),
+            enums: enumsFromType(checker, propsType, component.sourceFile),
             ...(extendsType ? { extendsType } : {}),
           });
         }
