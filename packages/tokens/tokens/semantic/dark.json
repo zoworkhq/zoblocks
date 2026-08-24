@@ -50,6 +50,11 @@
     "$type": "color",
     "$value": "{ref.ink.on-accent}"
   },
+  "text-on-fill": {
+    "$type": "color",
+    "$value": "{ref.white}",
+    "$description": "A label on a filled neutral — the Switch's off track, which is {border-strong} in every theme and therefore a mid-grey in every theme. Separate from text-on-accent because that one follows the accent, and the dark accent is light: pointing the off label at it put #071014 on #5d6c7e at 3.57:1. White clears AA on border-strong in all three themes, and the pair is in the contrast gate so it stays that way."
+  },
   "$comment-accent": "brand.300, not cyan.300. The dark tier used to reach for a hue the brand does not contain, so the same product was teal-green in light and cyan in dark — a difference nobody chose and everybody saw. brand.300 measures 12.74:1 for text-on-accent and 12.91:1 on bg, against cyan.300's 13.25 and 13.42: the same step of a different ramp, and the floors are untouched.",
   "accent": {
     "$type": "color",

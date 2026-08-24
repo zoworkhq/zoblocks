@@ -54,6 +54,29 @@ import {
   type TrendSeries,
 } from "@/registry/oxygen/trend-indicator/trend-indicator";
 import {
+  ChartCoPresence,
+  CoverageCard,
+  PresenceChip,
+  type ChartPresence,
+  type Clinician,
+  type CoverageWindow,
+  type Presence,
+} from "@/registry/oxygen/care-team-presence/care-team-presence";
+import type { Patient } from "@oxygenui-design/fhir";
+import {
+  ChartHeader,
+  type EncounterOption,
+  type SafetyInput,
+} from "@/registry/oxygen/chart-header/chart-header";
+import {
+  RecentPatientStack,
+  type OpenChart,
+} from "@/registry/oxygen/recent-patient-stack/recent-patient-stack";
+import {
+  ChartCommandPalette,
+  type PaletteItem,
+} from "@/registry/oxygen/chart-command-palette/chart-command-palette";
+import {
   AllergyChip,
   AllergyList,
   type AllergyRecord,
@@ -986,7 +1009,513 @@ const TI_REFUSALS: Array<{ series: TrendSeries; why: string }> = [
   },
 ];
 
+/* ------------------------------------------------------------------ */
+/* CareTeamPresence fixtures                                           */
+/* ------------------------------------------------------------------ */
+
+/** Fixed, because a demo that reads the wall clock is a different demo at 03:00. */
+const CTP_NOW = "2026-08-24T02:30:00+05:30";
+
+const CTP_VANCE: Clinician = { id: "clin-4", display: "A. Vance, MD", role: "Attending" };
+const CTP_BOATENG: Clinician = {
+  id: "clin-1",
+  display: "T. Boateng, MD",
+  role: "Night attending",
+  contact: "pager 4471",
+};
+const CTP_MARSH: Clinician = {
+  id: "clin-5",
+  display: "L. Marsh, LCSW",
+  role: "Therapist",
+  assignedTherapist: true,
+};
+const CTP_OKAFOR: Clinician = {
+  id: "clin-7",
+  display: "N. Okafor, PMHNP",
+  role: "Nurse practitioner",
+};
+
+/*
+ * Nine people, and a green dot would draw six of them identically.
+ *
+ * Every one of these is at a computer. The question is not whether they are
+ * there — it is whether they are the person to contact, and how.
+ */
+const CTP_STATES: Array<{ presence: Presence; means: string }> = [
+  {
+    presence: { clinician: CTP_VANCE, state: "available" },
+    means: "The only one of the nine that means what a green dot means.",
+  },
+  {
+    presence: {
+      clinician: CTP_MARSH,
+      state: "in-session",
+      detail: "Individual therapy",
+      until: "15:50",
+    },
+    means: "At their desk, online, and must not be interrupted.",
+  },
+  {
+    presence: {
+      clinician: CTP_MARSH,
+      state: "in-group",
+      detail: "IOP group · 8 members",
+      until: "11:30",
+    },
+    means: "Interrupting this one reaches eight patients rather than one.",
+  },
+  {
+    presence: { clinician: CTP_OKAFOR, state: "on-crisis-line", detail: "Regional line" },
+    means: "Reachable, and only for an escalation.",
+  },
+  {
+    presence: { clinician: CTP_BOATENG, state: "on-call", until: "07:00" },
+    means: "The right person to page out of hours, and the pager is on the chip.",
+  },
+  {
+    presence: {
+      clinician: CTP_VANCE,
+      state: "signed-out",
+      coveredBy: CTP_BOATENG,
+      until: "07:00",
+    },
+    means: "Online, and the wrong person. The right one is named on the next line.",
+  },
+  {
+    presence: { clinician: CTP_MARSH, state: "off-shift" },
+    means: "Not working, and nobody took the handover. No ring at all.",
+  },
+  {
+    presence: {
+      clinician: CTP_VANCE,
+      state: "degraded",
+      since: "2026-08-23T23:30:00+05:30",
+    },
+    means: "The channel dropped three hours ago. A frozen dot would still look live.",
+  },
+  {
+    presence: { clinician: CTP_OKAFOR, state: "unknown" },
+    means: "Never reported. Which is not the same as offline.",
+  },
+];
+
+const CTP_ROTA: CoverageWindow[] = [
+  {
+    clinician: CTP_VANCE,
+    start: "2026-08-23T09:00:00+05:30",
+    end: "2026-08-23T19:00:00+05:30",
+    reason: "Day service",
+  },
+  {
+    clinician: CTP_BOATENG,
+    start: "2026-08-23T19:00:00+05:30",
+    end: "2026-08-24T09:00:00+05:30",
+    reason: "Night coverage for A. Vance",
+  },
+];
+
+/** The same rota with the night window removed — 02:30 now falls in a hole. */
+const CTP_ROTA_GAP: CoverageWindow[] = [CTP_ROTA[0] as CoverageWindow];
+
+const CTP_DOCUMENTING: ChartPresence[] = [
+  {
+    clinician: CTP_MARSH,
+    activity: "documenting",
+    since: "2026-08-24T02:20:00+05:30",
+    target: "Progress note",
+    unsigned: true,
+  },
+  { clinician: CTP_OKAFOR, activity: "viewing", since: "2026-08-24T02:28:00+05:30" },
+];
+
+const CTP_VIEWING: ChartPresence[] = [CTP_VANCE, CTP_BOATENG, CTP_MARSH, CTP_OKAFOR].map(
+  (clinician) => ({
+    clinician,
+    activity: "viewing" as const,
+    since: "2026-08-24T02:25:00+05:30",
+  }),
+);
+
+/* ------------------------------------------------------------------ */
+/* ChartHeader fixtures                                                */
+/* ------------------------------------------------------------------ */
+
+const CH_NOW = "2026-08-24T10:00:00Z";
+
+const CH_SPCU_EXT = "http://hl7.org/fhir/StructureDefinition/patient-sexParameterForClinicalUse";
+
+/*
+ * Two patients, and the difference between them is one extension.
+ *
+ * Both carry `gender: "female"` on the resource. Neither ever renders it.
+ */
+const CH_PATIENT: Patient = {
+  resourceType: "Patient",
+  id: "syn-ch-1",
+  name: [{ use: "official", family: "Okonkwo", given: ["Amara"] }],
+  birthDate: "1985-03-08",
+  gender: "female",
+  identifier: [
+    { use: "official", system: "http://example.org/fhir/sid/mrn", value: "093-441-208" },
+    { use: "official", system: "https://fhir.nhs.uk/Id/nhs-number", value: "943 476 5919" },
+  ],
+};
+
+const CH_PATIENT_SPCU: Patient = {
+  ...CH_PATIENT,
+  extension: [
+    {
+      url: CH_SPCU_EXT,
+      extension: [
+        { url: "value", valueCodeableConcept: { text: "female" } },
+        { url: "comment", valueString: "for medication dosing" },
+      ],
+    },
+  ],
+};
+
+const CH_IDENTIFIERS = [{ kind: "mrn" }, { kind: "nhs" }] as const;
+
+const CH_ENCOUNTERS: EncounterOption[] = [
+  { id: "enc-1", label: "Inpatient — Ward 4B", type: "inpatient" },
+  { id: "enc-2", label: "Outpatient — 24 Aug, 09:00", type: "ambulatory" },
+  { id: "enc-3", label: "Telehealth — 24 Aug, 14:00", type: "virtual" },
+];
+
+const CH_SAFETY: SafetyInput = {
+  allergies: { label: "Penicillin — anaphylaxis", tone: "critical", detail: "confirmed" },
+  codeStatus: { label: "DNR" },
+  isolation: { label: "Contact precautions", detail: "MRSA" },
+  legalStatus: { label: "Involuntary hold", until: "2026-08-24T09:00:00Z" },
+};
+
+/* ------------------------------------------------------------------ */
+/* RecentPatientStack fixtures                                         */
+/* ------------------------------------------------------------------ */
+
+const RPS_NOW = "2026-08-24T10:00:00Z";
+
+const RPS_CHARTS: OpenChart[] = [
+  {
+    id: "chart-okonkwo",
+    display: "A. Okonkwo",
+    identifier: "093-441-208",
+    reason: "Ward round",
+    lastActiveAt: "2026-08-24T09:58:00Z",
+  },
+  {
+    id: "chart-boateng",
+    display: "T. Boateng",
+    identifier: "093-118-774",
+    reason: "Discharge summary",
+    lastActiveAt: "2026-08-24T09:30:00Z",
+    work: [{ kind: "unsigned-note", label: "Progress note", since: "2026-08-21T09:00:00Z" }],
+  },
+  {
+    id: "chart-marsh",
+    display: "L. Marsh",
+    identifier: "093-772-115",
+    reason: "Triage",
+    lastActiveAt: "2026-08-24T08:00:00Z",
+    work: [{ kind: "draft-order", label: "Lithium level" }],
+  },
+  {
+    id: "chart-vance",
+    display: "R. Vance",
+    identifier: "093-004-661",
+    reason: "Med review",
+    pinned: true,
+    lastActiveAt: "2026-08-23T17:00:00Z",
+  },
+];
+
+/* Two names four letters apart, which is where the wrong note goes. */
+const RPS_LOOKALIKES: OpenChart[] = [
+  { id: "look-a", display: "J. Okonkwo", identifier: "093-441-208", reason: "Ward round" },
+  { id: "look-b", display: "J. Okonjo", identifier: "093-118-774", reason: "Triage" },
+  { id: "look-c", display: "T. Boateng", identifier: "093-772-115", reason: "Med review" },
+];
+
+/* ------------------------------------------------------------------ */
+/* ChartCommandPalette fixtures                                        */
+/* ------------------------------------------------------------------ */
+
+/*
+ * Three of these verbs are behavioral-health-specific and no general clinical
+ * library ships them. The fourth is the one with consequences.
+ */
+const CP_ITEMS: PaletteItem[] = [
+  {
+    id: "phq",
+    kind: "action",
+    label: "Start PHQ-9",
+    detail: "Assessment · 9 items · 4 min",
+    keywords: ["depression screen"],
+  },
+  { id: "safety", kind: "action", label: "Open safety plan", detail: "Reviewed 12 Aug" },
+  { id: "collateral", kind: "action", label: "Log a collateral contact" },
+  { id: "noshow", kind: "action", label: "Document a no-show", detail: "Today, 14:00" },
+  {
+    id: "order",
+    kind: "action",
+    label: "Order lithium level",
+    detail: "Serum · trough",
+    argument: { label: "when" },
+  },
+  { id: "stop", kind: "action", label: "Discontinue lithium", significant: true },
+  { id: "sign", kind: "action", label: "Sign note", unavailable: { reason: "Offline" } },
+  { id: "phq-doc", kind: "chart-resource", label: "PHQ-9 result, 12 Aug", detail: "Score 14" },
+  { id: "p-mine", kind: "patient", label: "A. Okonkwo", detail: "093-441-208" },
+  { id: "p-other-1", kind: "patient", label: "A. Okonjo", detail: "093-118-774" },
+  { id: "p-other-2", kind: "patient", label: "A. Okoro", detail: "093-772-115" },
+  { id: "theme", kind: "setting", label: "Appearance and theme" },
+];
+
+const CP_SCOPE = { inScope: new Set(["p-mine"]), breakGlass: true };
+
+/**
+ * The palette is `position: fixed`, so a demo needs a positioned box to sit
+ * inside rather than covering the page it is being read on.
+ */
+function CpStage({ children }: { children: React.ReactNode }) {
+  return (
+    <div
+      style={{
+        position: "relative",
+        minBlockSize: 320,
+        overflow: "hidden",
+        borderRadius: 12,
+        contain: "layout paint",
+      }}
+    >
+      {children}
+    </div>
+  );
+}
+
 const SCENARIOS: Record<string, Scenario[]> = {
+  /** Two demos: what it counts, and what it will not run on one keystroke. */
+  "chart-command-palette": [
+    {
+      id: "counted",
+      label: "Counted, never named",
+      note: "Type “oko”. One of these three patients is yours; the other two are a number. Typing a name into a global patient search is a privacy event whether or not you open the chart, so a palette that helpfully autocompletes across the whole index has created a compliance problem at the speed of thought. The count is the answer: the reader learns the search was not empty without learning who, and every search — including the ones that matched nobody — produces an audit record the host keeps.",
+      render: () => (
+        <CpStage>
+          <ChartCommandPalette open items={CP_ITEMS} scope={CP_SCOPE} onRun={() => {}} />
+        </CpStage>
+      ),
+    },
+    {
+      id: "verbs",
+      label: "Verbs first, and one of them asks twice",
+      note: "Type “lith”. Actions rank above records because a verb is usually what was meant, and the gap between the groups is larger than anything frequency can close. “Order lithium level” takes Tab, not Enter — it still needs its object. “Discontinue lithium” takes two Enters, and the confirmation is a row in the palette rather than a modal, because a modal takes the keyboard away from the surface built for it. “Sign note” is offline and says so instead of disappearing.",
+      render: () => (
+        <CpStage>
+          <ChartCommandPalette
+            open
+            items={CP_ITEMS}
+            scope={CP_SCOPE}
+            placeholder="Try “lith”, or “phq”…"
+            onRun={() => {}}
+          />
+        </CpStage>
+      ),
+    },
+  ],
+
+  /** Three demos: the stack, the lookalikes, and what closing costs. */
+  "recent-patient-stack": [
+    {
+      id: "stack",
+      label: "Eleven tabs, or four charts",
+      note: "The state of the art is a dropdown of names, or eleven browser tabs whose titles truncate to “Chart — Riverside…”. A stack does three things a dropdown cannot: it makes the set visible without being opened, it gives each chart a hue derived from its id so it is the same colour tomorrow, and it carries what is owed on each — a draft order in red, an unsigned note in amber, ranked by consequence rather than by age.",
+      render: () => (
+        <div style={{ maxInlineSize: 640 }}>
+          <RecentPatientStack
+            charts={RPS_CHARTS}
+            activeId="chart-okonkwo"
+            now={RPS_NOW}
+            onActivate={() => {}}
+            onExpandedChange={() => {}}
+          />
+        </div>
+      ),
+    },
+    {
+      id: "lookalikes",
+      label: "Two names four letters apart",
+      note: "Wrong-patient documentation survives every amount of staff training because it is a design defect: two charts that look identical, one keyboard shortcut, and an interruption. Both sides of a similar pair grow an identifier — marking only the newcomer would leave the reader comparing a row that has one against a row that does not. The third chart, which nothing resembles, stays clean.",
+      render: () => (
+        <div style={{ maxInlineSize: 640 }}>
+          <RecentPatientStack charts={RPS_LOOKALIKES} activeId="look-a" onActivate={() => {}} />
+        </div>
+      ),
+    },
+    {
+      id: "closing",
+      label: "Closing is graded, not binary",
+      note: "Open the panel and try to close each of the four. A clean chart closes. One with an unsigned note asks, because losing the draft is a real loss somebody may still choose. One with a draft order refuses outright — an order that vanishes with its tab is an order somebody believes they placed, and nothing downstream will ever show its absence.",
+      render: () => (
+        <div style={{ maxInlineSize: 640 }}>
+          <RecentPatientStack
+            charts={RPS_CHARTS}
+            activeId="chart-okonkwo"
+            now={RPS_NOW}
+            expanded
+            onActivate={() => {}}
+            onPin={() => {}}
+            onClose={() => {}}
+          />
+        </div>
+      ),
+    },
+  ],
+
+  /** Three demos: the collapse, the field it refuses, and the control. */
+  "chart-header": [
+    {
+      id: "collapse",
+      label: "It collapses to the strip, not the name",
+      note: "The same header at both heights. Everything below the strip moves behind a disclosure rather than out of the DOM, so the content is one keystroke away for a screen-reader user and one click away for a sighted one — and the strip says exactly the same thing in both. Allergies, code status, isolation and the legal status appear in that order on every chart in the building. Expanded it wraps so nothing is clipped; collapsed it scrolls behind a fade, because a second line at 44px would move the content underneath at the moment the alerts are being read.",
+      render: () => (
+        <div style={{ display: "grid", gap: 18, maxInlineSize: 720 }}>
+          <ChartHeader
+            patient={CH_PATIENT}
+            identifiers={CH_IDENTIFIERS}
+            now={CH_NOW}
+            safety={CH_SAFETY}
+            program={{ name: "IOP", week: 3, of: 8 }}
+            encounters={CH_ENCOUNTERS}
+            selectedEncounterId="enc-1"
+            onSelectEncounter={() => {}}
+          />
+          <ChartHeader
+            patient={CH_PATIENT}
+            identifiers={CH_IDENTIFIERS}
+            now={CH_NOW}
+            safety={CH_SAFETY}
+            collapsed
+          />
+        </div>
+      ),
+    },
+    {
+      id: "spcu",
+      label: "The field it refuses to show",
+      note: 'Both of these patients carry gender: "female" on the FHIR resource, and neither header renders it. On an order screen the Sex Parameter for Clinical Use appears with the context it applies to; where the surface calls for it and nothing is recorded, the header says so, because a blank space there is exactly where somebody reaches for the administrative field instead. On an overview screen it is not shown at all — out of context it is a demographic wearing a clinical name.',
+      render: () => (
+        <div style={{ display: "grid", gap: 18, maxInlineSize: 720 }}>
+          <ChartHeader
+            patient={CH_PATIENT_SPCU}
+            identifiers={CH_IDENTIFIERS}
+            surface="orders"
+            now={CH_NOW}
+            safety={{ allergies: { label: "No known allergies", tone: "info" } }}
+          />
+          <ChartHeader
+            patient={CH_PATIENT}
+            identifiers={CH_IDENTIFIERS}
+            surface="orders"
+            now={CH_NOW}
+            safety={{ allergies: { label: "No known allergies", tone: "info" } }}
+          />
+        </div>
+      ),
+    },
+    {
+      id: "encounter",
+      label: "The encounter is a control",
+      note: "Three encounters are open and none is selected, because a note filed into an encounter nobody read is the most common misfiling in the building. A subtitle cannot be wrong on purpose; a control can say nothing is chosen and mean it. One open encounter is different — there is nothing to choose between, so choosing it is not a guess.",
+      render: () => (
+        <div style={{ display: "grid", gap: 18, maxInlineSize: 720 }}>
+          <ChartHeader
+            patient={CH_PATIENT}
+            identifiers={CH_IDENTIFIERS}
+            now={CH_NOW}
+            encounters={CH_ENCOUNTERS}
+            onSelectEncounter={() => {}}
+            safety={{ allergies: { label: "No known allergies", tone: "info" } }}
+          />
+          <ChartHeader
+            patient={CH_PATIENT}
+            identifiers={CH_IDENTIFIERS}
+            now={CH_NOW}
+            encounters={[CH_ENCOUNTERS[1] as EncounterOption]}
+            onSelectEncounter={() => {}}
+            safety={{ allergies: { label: "No known allergies", tone: "info" } }}
+          />
+        </div>
+      ),
+    },
+  ],
+
+  /** Three demos: who they are, who is responsible, and who else is here. */
+  "care-team-presence": [
+    {
+      id: "nine",
+      label: "Nine states, one green dot",
+      note: "Every person here is at a computer and online. A presence system with one green dot draws six of them identically — and two of those six are the ones that matter: the therapist in session who must not be interrupted, and the hospitalist who is signed out and is the wrong person to page. The ring is a shape rather than a hue, because nine colours on a small avatar is unreadable before it is inaccessible.",
+      render: () => (
+        <div style={{ display: "grid", gap: 14, maxInlineSize: 560 }}>
+          {CTP_STATES.map((entry, index) => (
+            <div key={index} style={{ display: "grid", gap: 3 }}>
+              <PresenceChip presence={entry.presence} now={CTP_NOW} />
+              <span style={{ fontSize: 12, opacity: 0.62, paddingInlineStart: 36 }}>
+                {entry.means}
+              </span>
+            </div>
+          ))}
+        </div>
+      ),
+    },
+    {
+      id: "coverage",
+      label: "Who is responsible at 02:30",
+      note: "The question a PDF on a shared drive answers today. On the left the rota resolves; on the right the night window has been removed and 02:30 falls in a two-hour hole. A component that rounded to the nearest window would name somebody who is asleep, so the gap is returned as a gap — and it is the one state in this component loud enough to stop a reader.",
+      render: () => (
+        <div
+          style={{
+            display: "grid",
+            gap: 16,
+            gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
+            maxInlineSize: 620,
+          }}
+        >
+          <CoverageCard windows={CTP_ROTA} now={CTP_NOW} backup={CTP_OKAFOR} onPage={() => {}} />
+          <CoverageCard windows={CTP_ROTA_GAP} now={CTP_NOW} onPage={() => {}} />
+        </div>
+      ),
+    },
+    {
+      id: "copresence",
+      label: "Told before you type, not at save",
+      note: "Four people reading a chart is not a conflict, and warning about it would train somebody to dismiss the warning that matters. One person with an unsigned note open is — and the timing is the whole value: told at save, a second note in the same encounter is a merge problem; told before the first keystroke, it is a choice between three reasonable options. None of the three is highlighted, because which one is right depends on facts the component does not have.",
+      render: () => (
+        <div style={{ display: "grid", gap: 20, maxInlineSize: 560 }}>
+          <div style={{ display: "grid", gap: 6 }}>
+            <ChartCoPresence others={CTP_VIEWING} now={CTP_NOW} />
+            <span style={{ fontSize: 12, opacity: 0.62 }}>
+              Four in the chart, all reading. Nothing to say.
+            </span>
+          </div>
+          <div style={{ display: "grid", gap: 6 }}>
+            <ChartCoPresence
+              others={CTP_DOCUMENTING}
+              now={CTP_NOW}
+              onOpenTheirs={() => {}}
+              onRequestHandoff={() => {}}
+              onSeparateAddendum={() => {}}
+            />
+            <span style={{ fontSize: 12, opacity: 0.62 }}>
+              One of them is writing, and the note is unsigned.
+            </span>
+          </div>
+        </div>
+      ),
+    },
+  ],
+
   /** Two demos: what it draws, and what it refuses to. */
   "trend-indicator": [
     {

@@ -374,3 +374,70 @@ describe("comparableRun", () => {
     expect(comparableRun({ id: "x", label: "X", valence: "neutral", points: [] })).toBeNull();
   });
 });
+
+/* ------------------------------------------------------------------ */
+/* The memo boundary                                                   */
+/*                                                                     */
+/* A flowsheet renders one of these per row and re-renders on every     */
+/* filter keystroke. The comparator is what makes that cheap, and it    */
+/* had no test at all — so nothing would have noticed it comparing the  */
+/* whole object, which hosts rebuild from a query response and which    */
+/* therefore changes identity when nothing did.                        */
+/* ------------------------------------------------------------------ */
+
+describe("re-rendering in a flowsheet", () => {
+  /** Counts renders of the memoised component by watching its output change. */
+  function Host({ series, width }: { series: TrendSeries; width: number }) {
+    return <TrendIndicator series={series} width={width} height={20} />;
+  }
+
+  it("skips the render when nothing it draws from has changed", () => {
+    const { rerender, container } = render(<Host series={phq9} width={64} />);
+    const svg = container.querySelector(".ox-trend__chart");
+
+    // A new props object holding the same series identity and the same points
+    // array: the comparator must say "equal".
+    rerender(<Host series={{ ...phq9 }} width={64} />);
+
+    // Same element instance means React reused the tree rather than rebuilding
+    // it — which is the only observable consequence of the comparator.
+    expect(container.querySelector(".ox-trend__chart")).toBe(svg);
+  });
+
+  it("re-renders when the width changes", () => {
+    const { rerender, container } = render(<Host series={phq9} width={64} />);
+    rerender(<Host series={phq9} width={160} />);
+    expect(container.querySelector(".ox-trend__chart")).toHaveAttribute("width", "160");
+  });
+
+  it("re-renders when the points array is a different array", () => {
+    const { rerender, container } = render(<Host series={phq9} width={64} />);
+    const before = container.querySelector(".ox-trend__line")?.getAttribute("d");
+
+    rerender(
+      <Host
+        series={{
+          ...phq9,
+          points: points(["2026-05-02", 4], ["2026-06-06", 9], ["2026-07-04", 18]),
+        }}
+        width={64}
+      />,
+    );
+
+    expect(container.querySelector(".ox-trend__line")?.getAttribute("d")).not.toBe(before);
+  });
+
+  it("re-renders when the valence flips, because the colour is the answer", () => {
+    const { rerender, container } = render(<Host series={phq9} width={64} />);
+    expect(container.querySelector(".ox-trend")).toHaveAttribute("data-ox-judgement", "better");
+
+    rerender(<Host series={{ ...phq9, valence: "higher-is-better" }} width={64} />);
+    // Same shape, opposite meaning — the exact failure a comparator that
+    // ignored valence would produce.
+    expect(container.querySelector(".ox-trend")).toHaveAttribute("data-ox-judgement", "worse");
+  });
+
+  it("carries a display name, so a profiler names the row rather than Anonymous", () => {
+    expect(TrendIndicator.displayName).toBe("TrendIndicator");
+  });
+});

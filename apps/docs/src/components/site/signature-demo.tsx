@@ -219,7 +219,24 @@ export function SignatureDemo() {
         className={cn("relative p-4 sm:p-6", dark && "bg-[#141414]")}
         style={dark ? { colorScheme: "dark" } : undefined}
       >
-        <ConfigProvider theme={{ algorithm: dark ? theme.darkAlgorithm : theme.defaultAlgorithm }}>
+        {/*
+          The accent comes from Oxygen, not from Ant Design.
+
+          With only the algorithm set, the primary button was antd's default
+          #1677ff with white on it — 4.1:1, an AA failure, and on the one page
+          in the docs that renders antd. It was also the wrong demo: a reader
+          looking at Oxygen's signature control should see Oxygen's accent.
+          `colorTextLightSolid` has to move with it, because the dark accent is
+          a light teal and white on it would be worse than what it replaced.
+        */}
+        <ConfigProvider
+          theme={{
+            algorithm: dark ? theme.darkAlgorithm : theme.defaultAlgorithm,
+            token: dark
+              ? { colorPrimary: "#6ce7cb", colorTextLightSolid: "#071014" }
+              : { colorPrimary: "#067662", colorTextLightSolid: "#ffffff" },
+          }}
+        >
           <Form layout="vertical" style={{ maxWidth: 560, margin: "0 auto" }}>
             <Form.Item
               label="Patient signature"

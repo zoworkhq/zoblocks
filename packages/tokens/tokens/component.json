@@ -393,7 +393,8 @@
       "$value": "{text-on-accent}"
     },
     "label-off-fg": {
-      "$value": "{text-on-accent}"
+      "$value": "{text-on-fill}",
+      "$description": "The off track is {border-strong}, not the accent — a mid-grey in every theme. This pointed at {text-on-accent}, which follows the accent, and the dark accent is light: the off word rendered #071014 on #5d6c7e at 3.57:1 and shipped."
     },
     "state-fg": {
       "$value": "{text-muted}"
@@ -633,6 +634,27 @@
     "$type": "dimension",
     "figure": {
       "$value": "1.25rem"
+    }
+  },
+  "presence": {
+    "$description": "CareTeamPresence. One token: the avatar diameter. Exposed because presence sits beside a patient's name in a header on one screen and inside a co-presence stack on another, and the ring geometry is drawn relative to it — scaling the avatar is the supported way to move between the two without forking the stylesheet.",
+    "$type": "dimension",
+    "avatar": {
+      "$value": "1.75rem"
+    }
+  },
+  "chart-header": {
+    "$description": "ChartHeader. One token: the tone bar on a safety fact. It is a colour rather than a dimension because the strip's whole restraint is that the bar is the only coloured pixel in the row — a deployment that wants a house palette for severity changes this and nothing else, and cannot accidentally turn six facts into six filled chips.",
+    "$type": "color",
+    "tone": {
+      "$value": "{text-muted}"
+    }
+  },
+  "stack": {
+    "$description": "RecentPatientStack. One token: the fallback chart accent, used by the eighth slot and by any chart whose hash lands outside the palette. The other seven route through the status and flag families rather than a new palette, so a brand override reaches them and none can drift into a hue a clinical severity already owns.",
+    "$type": "color",
+    "accent": {
+      "$value": "{text-muted}"
     }
   }
 }

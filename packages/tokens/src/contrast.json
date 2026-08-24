@@ -127,6 +127,13 @@
   },
   {
     "theme": "light",
+    "token": "text-on-fill",
+    "against": "border-strong",
+    "ratio": 4.76,
+    "floor": 4.5
+  },
+  {
+    "theme": "light",
     "token": "focus-ring",
     "against": "bg",
     "ratio": 3.81,
@@ -323,6 +330,13 @@
   },
   {
     "theme": "dark",
+    "token": "text-on-fill",
+    "against": "border-strong",
+    "ratio": 5.37,
+    "floor": 4.5
+  },
+  {
+    "theme": "dark",
     "token": "focus-ring",
     "against": "bg",
     "ratio": 12.91,
@@ -515,6 +529,13 @@
     "token": "text-on-accent",
     "against": "accent-hover",
     "ratio": 13.94,
+    "floor": 7
+  },
+  {
+    "theme": "high-contrast",
+    "token": "text-on-fill",
+    "against": "border-strong",
+    "ratio": 21,
     "floor": 7
   },
   {

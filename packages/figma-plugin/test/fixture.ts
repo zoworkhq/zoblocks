@@ -75,6 +75,24 @@ export const PASSING: Record<string, string> = {
   "--ox-status-normal-bg": "#e6f4ec",
   "--ox-status-unknown": "#4b5563",
   "--ox-status-unknown-bg": "#f0f2f5",
+  /*
+   * Restricted and provisional are part of the status family and were missing
+   * here, so `report.missing` carried two entries and the two tests asserting
+   * an empty gate had been red since the pair was added to contrast.json. The
+   * fixture is a synthetic palette that passes rather than the shipped one, so
+   * these are chosen to clear the 4.5:1 floor with room, not copied from
+   * tokens.json.
+   */
+  /*
+   * The label on a filled neutral — the Switch's off word on its off track.
+   * White, because `border-strong` is a mid-grey in every theme and the pair
+   * is held to 4.5:1 (7:1 in high contrast).
+   */
+  "--ox-text-on-fill": "#ffffff",
+  "--ox-status-restricted": "#5b21b6",
+  "--ox-status-restricted-bg": "#f5f3ff",
+  "--ox-status-provisional": "#0b5c70",
+  "--ox-status-provisional-bg": "#ecfeff",
   "--ox-flag-restricted": "#8a1c22",
   "--ox-flag-restricted-bg": "#fdeced",
   "--ox-flag-provisional": "#7a4a05",

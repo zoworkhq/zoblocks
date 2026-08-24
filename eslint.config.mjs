@@ -23,6 +23,15 @@ export default tseslint.config(
       "**/dist/**",
       "**/.next/**",
       "**/.turbo/**",
+      /*
+       * Agent worktrees — checkouts of this same repository under a scratch
+       * directory. Linting them counts every warning in the repo once per
+       * worktree, so three stale checkouts put the `--max-warnings` ratchet
+       * four times over budget on a tree whose own source was clean. CI never
+       * has them, which is the worst version of this: the gate fails only on
+       * the machine where the work is being done.
+       */
+      ".claude/worktrees/**",
       // Generated. Lint the generator, not its output.
       "apps/docs/src/lib/generated/**",
       "apps/docs/public/**",

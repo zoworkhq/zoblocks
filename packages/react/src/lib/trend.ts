@@ -184,12 +184,15 @@ export function readTrend(series: TrendSeries): TrendReading | null {
   // Below the reliable-change threshold the series is flat, whatever the
   // arithmetic says. A 2-point PHQ-9 move is noise, and rendering it as a
   // direction invites somebody to act on it.
-  const direction: Direction = withinNoise || change === 0 ? "flat" : change > 0 ? "rising" : "falling";
+  const direction: Direction =
+    withinNoise || change === 0 ? "flat" : change > 0 ? "rising" : "falling";
 
   let judgement: Judgement = "unknown";
   if (direction === "flat") judgement = "flat";
-  else if (series.valence === "higher-is-worse") judgement = direction === "rising" ? "worse" : "better";
-  else if (series.valence === "higher-is-better") judgement = direction === "rising" ? "better" : "worse";
+  else if (series.valence === "higher-is-worse")
+    judgement = direction === "rising" ? "worse" : "better";
+  else if (series.valence === "higher-is-better")
+    judgement = direction === "rising" ? "better" : "worse";
 
   return { direction, judgement, change, first, last, used: run.points.length, withinNoise };
 }
@@ -237,12 +240,7 @@ export interface PathGeometry {
  *
  * Sixty points in one path element, no per-point DOM.
  */
-export function geometry(
-  series: TrendSeries,
-  width = 64,
-  height = 20,
-  padding = 2,
-): PathGeometry {
+export function geometry(series: TrendSeries, width = 64, height = 20, padding = 2): PathGeometry {
   const all = series.points;
   if (!all.length) return { paths: [], width, height };
 
@@ -270,7 +268,10 @@ export function geometry(
   const paths = segment(series)
     .map((s) =>
       s.points
-        .map((p, index) => `${index === 0 ? "M" : "L"}${x(Date.parse(p.at)).toFixed(2)} ${y(p.value).toFixed(2)}`)
+        .map(
+          (p, index) =>
+            `${index === 0 ? "M" : "L"}${x(Date.parse(p.at)).toFixed(2)} ${y(p.value).toFixed(2)}`,
+        )
         .join(" "),
     )
     .filter((d) => d.includes("L") || d.length > 0);

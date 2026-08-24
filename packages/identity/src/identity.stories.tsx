@@ -124,16 +124,46 @@ export const TestPatient: Story = {
   },
 };
 
+/**
+ * Counts the reveals this story performs.
+ *
+ * The story used to pass `onReveal={() => {}}` and never click anything, which
+ * is a prop asserted by its own existence: the callback was declared, the
+ * banner offered a Reveal button, and nothing checked that pressing it raised
+ * the event the application audits against. Coverage caught it as one
+ * uncovered function; the real defect was a story that documented the audit
+ * hook without exercising it.
+ */
+let reveals = 0;
+
 export const Sensitive: Story = {
   name: "Sensitive record",
   parameters: { state: "Sensitive record, categories withheld pending an audited reveal" },
-  render: () =>
-    within_(<PatientBanner patient={F.sensitive} context="navigation" onReveal={() => {}} />),
+  render: () => {
+    reveals = 0;
+    return within_(
+      <PatientBanner
+        patient={F.sensitive}
+        context="navigation"
+        onReveal={() => {
+          reveals += 1;
+        }}
+      />,
+    );
+  },
   play: async ({ canvasElement }) => {
-    // Withheld, not absent — and revealing it is an event the application
-    // records, which is why the component raises rather than writes.
-    const region = within(canvasElement).getByRole("region");
+    const canvas = within(canvasElement);
+
+    // Withheld, not absent.
+    const region = canvas.getByRole("region");
     expect(region.getAttribute("aria-label")).toMatch(/withheld|restricted|sensitive/i);
+
+    // And revealing it raises the event rather than writing the audit entry
+    // itself — the component cannot know the actor or the session, so the
+    // application does. Pressing the button is the only way to check that.
+    await userEvent.click(canvas.getByRole("button", { name: "Reveal" }));
+    expect(reveals).toBe(1);
+    expect(canvas.getByText(/^Sensitivity:/)).toBeTruthy();
   },
 };
 

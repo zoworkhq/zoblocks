@@ -44,7 +44,6 @@ const TAGS = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"];
 
 async function main() {
   const browser = await chromium.launch();
-  const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
 
   let failures = 0;
 
@@ -52,17 +51,29 @@ async function main() {
   // by nothing, which is the worst combination: a mode we advertise, hold to a
   // 7:1 floor, and had no evidence for.
   for (const theme of ["light", "dark", "high-contrast"] as const) {
-    for (const path of PAGES) {
-      // Set the preference BEFORE navigating so the no-flash head script applies
-      // it during first paint. Toggling after load leaves translucent surfaces
-      // composited against the previous theme and produces phantom contrast
-      // failures that a real visitor would never see.
-      await page.addInitScript((t) => {
-        try {
-          localStorage.setItem("oxygen-theme", t);
-        } catch {}
-      }, theme);
+    /*
+     * One page per theme, not one page for the whole run.
+     *
+     * `addInitScript` is cumulative and it used to be called inside the inner
+     * loop, so by the second theme every navigation carried thirty copies of
+     * the same script and by the third, sixty. The first page of the dark pass
+     * stopped reaching `networkidle` inside thirty seconds and the run failed
+     * on `/` — a timeout that looked like a slow home page and was actually the
+     * harness loading itself.
+     *
+     * Setting it before the first navigation is still required: the no-flash
+     * head script has to see the value during first paint. Toggling after load
+     * leaves translucent surfaces composited against the previous theme and
+     * produces phantom contrast failures a real visitor would never see.
+     */
+    const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
+    await page.addInitScript((t) => {
+      try {
+        localStorage.setItem("oxygen-theme", t);
+      } catch {}
+    }, theme);
 
+    for (const path of PAGES) {
       await page.goto(`${BASE}${path}`, { waitUntil: "networkidle" });
       await page.addScriptTag({ content: AXE_SOURCE });
 
@@ -71,6 +82,29 @@ async function main() {
         document
           .querySelectorAll("[data-reveal]")
           .forEach((el) => el.setAttribute("data-revealed", "true"));
+      });
+
+      /*
+       * Settle every running animation before measuring contrast.
+       *
+       * axe computes a contrast ratio from what is composited, so an element
+       * caught mid-fade reports its blended colour: the Pro page's entrance
+       * animation made a 5.1:1 label read as 2.29:1 and failed the run for a
+       * state no visitor is ever shown. Finishing the animations audits the
+       * page a reader actually sees — the opposite of relaxing the check,
+       * because a genuinely low-contrast element still fails afterwards.
+       */
+      await page.evaluate(async () => {
+        for (const animation of document.getAnimations()) {
+          try {
+            animation.finish();
+          } catch {
+            // An infinite animation cannot finish. Pausing it is the honest
+            // equivalent: it settles at a frame the reader really sees.
+            animation.pause();
+          }
+        }
+        await new Promise((resolve) => requestAnimationFrame(() => resolve(null)));
       });
 
       const result = await page.evaluate(
@@ -96,6 +130,8 @@ async function main() {
         console.log(`✓ ${theme.padEnd(5)} ${path}  (${result.passes.length} checks passed)`);
       }
     }
+
+    await page.close();
   }
 
   await browser.close();

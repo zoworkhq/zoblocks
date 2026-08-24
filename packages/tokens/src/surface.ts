@@ -13,7 +13,7 @@
  * change, because customers style against these names. The manifest is
  * committed so that change shows up as a reviewable diff.
  *
- * 297 tokens across 24 components:
+ * 301 tokens across 27 components:
  *
  *   switch          55
  *   tabs            44
@@ -35,12 +35,15 @@
  *   absent           3
  *   value            3
  *   care-timeline    2
+ *   presence         2
  *   allergy          1
+ *   chart-header     1
  *   patient-chip     1
  *   prov             1
  *   risk             1
+ *   stack            1
  *
- * `bridgeable: false` (86 tokens) marks the ones resolving to clinical
+ * `bridgeable: false` (87 tokens) marks the ones resolving to clinical
  * status or an identity flag. A host framework's `colorError` is not our
  * `status.critical`: ours carries a validated contrast floor and a 60° hue
  * separation from `status.low`, so the direction of an abnormal result
@@ -1276,6 +1279,16 @@ export const TOKEN_SURFACE: readonly SurfaceEntry[] = [
     "bridgeable": true
   },
   {
+    "name": "--ox-chart-header-tone",
+    "component": "chart-header",
+    "source": "packages/tokens/tokens/component.json",
+    "kind": "color",
+    "semantic": "--ox-text-muted",
+    "frameworks": [],
+    "fallback": true,
+    "bridgeable": true
+  },
+  {
     "name": "--ox-copilot-accent",
     "component": "copilot",
     "source": "packages/copilot/src/styles.css",
@@ -1791,6 +1804,25 @@ export const TOKEN_SURFACE: readonly SurfaceEntry[] = [
     "bridgeable": true
   },
   {
+    "name": "--ox-presence-avatar",
+    "component": "presence",
+    "source": "packages/tokens/tokens/component.json",
+    "kind": "dimension",
+    "frameworks": [],
+    "fallback": true,
+    "bridgeable": true
+  },
+  {
+    "name": "--ox-presence-ring",
+    "component": "presence",
+    "source": "packages/react/src/styles.css",
+    "kind": "color",
+    "semantic": "--ox-status-normal",
+    "frameworks": [],
+    "fallback": true,
+    "bridgeable": false
+  },
+  {
     "name": "--ox-prov-glyph",
     "component": "prov",
     "source": "packages/react/src/styles.css",
@@ -1900,6 +1932,16 @@ export const TOKEN_SURFACE: readonly SurfaceEntry[] = [
     "source": "packages/react/src/styles.css",
     "kind": "dimension",
     "semantic": "--ox-rv-value-default",
+    "frameworks": [],
+    "fallback": true,
+    "bridgeable": true
+  },
+  {
+    "name": "--ox-stack-accent",
+    "component": "stack",
+    "source": "packages/tokens/tokens/component.json",
+    "kind": "color",
+    "semantic": "--ox-text-muted",
     "frameworks": [],
     "fallback": true,
     "bridgeable": true
@@ -2106,7 +2148,7 @@ export const TOKEN_SURFACE: readonly SurfaceEntry[] = [
     "component": "switch",
     "source": "packages/tokens/tokens/component.json",
     "kind": "color",
-    "semantic": "--ox-text-on-accent",
+    "semantic": "--ox-text-on-fill",
     "frameworks": [],
     "fallback": true,
     "bridgeable": true
@@ -3113,16 +3155,19 @@ export const SURFACE_COMPONENTS: readonly string[] = [
   "banner",
   "care-timeline",
   "chart",
+  "chart-header",
   "copilot",
   "cs",
   "field",
   "loader",
   "nav",
   "patient-chip",
+  "presence",
   "prov",
   "range",
   "risk",
   "rv",
+  "stack",
   "surface-card",
   "switch",
   "tabs",
@@ -3199,6 +3244,7 @@ export const BRIDGEABLE: readonly string[] = [
   "--ox-chart-point-radius",
   "--ox-chart-point-radius-flagged",
   "--ox-chart-surface",
+  "--ox-chart-header-tone",
   "--ox-copilot-accent",
   "--ox-copilot-ink",
   "--ox-copilot-muted",
@@ -3242,6 +3288,7 @@ export const BRIDGEABLE: readonly string[] = [
   "--ox-nav-fg-current",
   "--ox-nav-radius",
   "--ox-patient-chip-rail",
+  "--ox-presence-avatar",
   "--ox-prov-glyph",
   "--ox-range-height",
   "--ox-range-marker",
@@ -3251,6 +3298,7 @@ export const BRIDGEABLE: readonly string[] = [
   "--ox-rv-value-compact",
   "--ox-rv-value-default",
   "--ox-rv-value-size",
+  "--ox-stack-accent",
   "--ox-surface-card-bg",
   "--ox-surface-card-border",
   "--ox-surface-card-pad-x",
@@ -3408,6 +3456,7 @@ export const NOT_BRIDGEABLE: readonly string[] = [
   "--ox-cs-fg",
   "--ox-field-border-invalid",
   "--ox-field-error-fg",
+  "--ox-presence-ring",
   "--ox-range-band",
   "--ox-range-band-border",
   "--ox-range-marker-abnormal",

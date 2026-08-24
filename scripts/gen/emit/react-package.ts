@@ -57,6 +57,11 @@ function rewriteImports(source: string, fromDepth: number): string {
       .replace(/(["'])@\/lib\/oxygen-risk\1/g, `"${up}lib/risk"`)
       .replace(/(["'])@\/lib\/oxygen-provenance\1/g, `"${up}lib/provenance"`)
       .replace(/(["'])@\/lib\/oxygen-trend\1/g, `"${up}lib/trend"`)
+      .replace(/(["'])@\/lib\/oxygen-clock\1/g, `"${up}lib/clock"`)
+      .replace(/(["'])@\/lib\/oxygen-presence\1/g, `"${up}lib/presence"`)
+      .replace(/(["'])@\/lib\/oxygen-chart-header\1/g, `"${up}lib/chart-header"`)
+      .replace(/(["'])@\/lib\/oxygen-workspace\1/g, `"${up}lib/workspace"`)
+      .replace(/(["'])@\/lib\/oxygen-palette\1/g, `"${up}lib/palette"`)
       // The chronology engine and its FHIR adapters.
       .replace(/(["'])@\/lib\/timeline-core\1/g, `"${up}lib/timeline-core"`)
       .replace(/(["'])@\/lib\/timeline-fhir\1/g, `"${up}lib/timeline-fhir"`)
@@ -110,6 +115,11 @@ export async function emitReactPackage(
     ["lib/risk.ts", "lib/risk.ts", 1],
     ["lib/provenance.ts", "lib/provenance.ts", 1],
     ["lib/trend.ts", "lib/trend.ts", 1],
+    ["lib/clock.ts", "lib/clock.ts", 1],
+    ["lib/presence.ts", "lib/presence.ts", 1],
+    ["lib/chart-header.ts", "lib/chart-header.ts", 1],
+    ["lib/workspace.ts", "lib/workspace.ts", 1],
+    ["lib/palette.ts", "lib/palette.ts", 1],
     ["lib/timeline-core.ts", "lib/timeline-core.ts", 1],
     ["lib/timeline-fhir.ts", "lib/timeline-fhir.ts", 1],
   ] as const) {
@@ -144,6 +154,10 @@ export async function emitReactPackage(
     ["lib/risk.css", "styles/risk.css"],
     ["lib/provenance.css", "styles/provenance.css"],
     ["lib/trend.css", "styles/trend.css"],
+    ["lib/presence.css", "styles/presence.css"],
+    ["lib/chart-header.css", "styles/chart-header.css"],
+    ["lib/workspace.css", "styles/workspace.css"],
+    ["lib/palette.css", "styles/palette.css"],
     ["lib/timeline.css", "styles/timeline.css"],
   ] as const) {
     const css = await readFile(path.join(COMPONENTS_DIR, file), "utf8");

@@ -222,19 +222,45 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
               {/* Primitives take no FHIR resource. Rendering the link anyway
                   leaves an anchor with no text and no destination, which is
                   both an empty affordance and an axe violation. */}
-              {component.resource && component.resourceUrl ? (
+              {/* Every resource, not just the first. A component that reads
+                  three of them said so in its metadata and showed one. */}
+              {component.fhir.map((resource) => (
                 <a
-                  href={component.resourceUrl}
+                  key={resource.url}
+                  href={resource.url}
                   className="numeric inline-flex items-center gap-1 text-oxygen-deep transition-colors hover:text-ink"
                 >
-                  {component.resource}
+                  {resource.name}
                   <ArrowUpRight aria-hidden="true" className="size-3" />
                 </a>
-              ) : null}
+              ))}
               <span className="text-graphite-soft">{component.categories.join(" · ")}</span>
             </p>
 
             <p className="lede mt-6 max-w-3xl text-pretty">{component.rationale}</p>
+
+            {/*
+              Which elements the component reads, and what it does with them.
+              Visible text rather than a `title` tooltip: this is the detail an
+              integrator checks their own feed against, and a tooltip is
+              unreachable by keyboard, invisible on touch, and unsearchable.
+
+              Six components wrote these notes before the schema had a field
+              for them — zod dropped the key and nothing said so, which is why
+              the page showed a bare resource name for a year.
+            */}
+            {component.fhir.some((resource) => resource.note) ? (
+              <dl className="mt-6 max-w-3xl space-y-2 border-l-2 border-rule pl-4 text-sm">
+                {component.fhir
+                  .filter((resource) => resource.note)
+                  .map((resource) => (
+                    <div key={resource.url} className="flex flex-wrap gap-x-2">
+                      <dt className="numeric font-medium text-ink">{resource.name}</dt>
+                      <dd className="flex-1 text-graphite">{resource.note}</dd>
+                    </div>
+                  ))}
+              </dl>
+            ) : null}
 
             <div className="mt-8 max-w-2xl">
               {/*

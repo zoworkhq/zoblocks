@@ -45,6 +45,7 @@
   --color-ox-text-muted: var(--ox-text-muted);
   --color-ox-text-subtle: var(--ox-text-subtle);
   --color-ox-text-on-accent: var(--ox-text-on-accent);
+  --color-ox-text-on-fill: var(--ox-text-on-fill);
   --color-ox-accent: var(--ox-accent);
   --color-ox-accent-hover: var(--ox-accent-hover);
   --color-ox-accent-subtle: var(--ox-accent-subtle);
@@ -266,4 +267,7 @@
   --spacing-ox-rv-value-default: var(--ox-rv-value-default);
   --spacing-ox-rv-value-compact: var(--ox-rv-value-compact);
   --spacing-ox-risk-figure: var(--ox-risk-figure);
+  --spacing-ox-presence-avatar: var(--ox-presence-avatar);
+  --color-ox-chart-header-tone: var(--ox-chart-header-tone);
+  --color-ox-stack-accent: var(--ox-stack-accent);
 }

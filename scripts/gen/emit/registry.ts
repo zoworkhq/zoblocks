@@ -201,6 +201,106 @@ const SUPPORT_ITEMS: BuildableItem[] = [
     ],
   },
   {
+    name: "clock-core",
+    type: "oxygen:lib",
+    title: "Clock",
+    description:
+      'One date format shared by the components that have to say "until when": an ISO timestamp read as the wall-clock time it was written in, rather than re-zoned through the reader\'s browser. Its own item rather than part of `utils`, because inside an application `@/lib/utils` is a name the application usually already owns.',
+    dependencies: [] as string[],
+    registryDependencies: [] as string[],
+    files: [
+      {
+        path: "registry/oxygen/lib/clock.ts",
+        type: "oxygen:lib",
+        target: "lib/oxygen-clock.ts",
+      },
+    ],
+  },
+  {
+    name: "presence-core",
+    type: "oxygen:lib",
+    title: "Presence core",
+    description:
+      "Nine clinical presence states rather than a green dot, ring geometry that survives a colour deficiency, rota resolution that returns a gap instead of the nearest plausible name, chart co-presence conflict detection, and escalation routing that offers the covering clinician before it offers an override. Installed automatically with CareTeamPresence.",
+    dependencies: [] as string[],
+    registryDependencies: ["clock-core"],
+    files: [
+      {
+        path: "registry/oxygen/lib/presence.ts",
+        type: "oxygen:lib",
+        target: "lib/oxygen-presence.ts",
+      },
+      {
+        path: "registry/oxygen/lib/presence.css",
+        type: "oxygen:style",
+        target: "styles/oxygen-presence.css",
+      },
+    ],
+  },
+  {
+    name: "chart-header-core",
+    type: "oxygen:lib",
+    title: "Chart header core",
+    description:
+      'The Sex Parameter for Clinical Use resolved against what is on screen rather than read as a demographic, a safety strip whose absences are named rather than omitted, encounter context that will sit in "none selected" rather than pick one for you, and EpisodeOfCare into a program and a week. Installed automatically with ChartHeader.',
+    dependencies: [] as string[],
+    registryDependencies: ["clock-core"],
+    files: [
+      {
+        path: "registry/oxygen/lib/chart-header.ts",
+        type: "oxygen:lib",
+        target: "lib/oxygen-chart-header.ts",
+      },
+      {
+        path: "registry/oxygen/lib/chart-header.css",
+        type: "oxygen:style",
+        target: "styles/oxygen-chart-header.css",
+      },
+    ],
+  },
+  {
+    name: "workspace-core",
+    type: "oxygen:lib",
+    title: "Workspace core",
+    description:
+      "The multi-chart workspace rules: a per-chart accent derived from the chart id so it is the same hue in every session, automatic disambiguation when two open charts look alike, a graded close verdict that asks about an unsigned note and refuses a draft order, and the fifteen-minute rule for re-asserting identity on return. Installed automatically with RecentPatientStack.",
+    dependencies: [] as string[],
+    registryDependencies: [] as string[],
+    files: [
+      {
+        path: "registry/oxygen/lib/workspace.ts",
+        type: "oxygen:lib",
+        target: "lib/oxygen-workspace.ts",
+      },
+      {
+        path: "registry/oxygen/lib/workspace.css",
+        type: "oxygen:style",
+        target: "styles/oxygen-workspace.css",
+      },
+    ],
+  },
+  {
+    name: "palette-core",
+    type: "oxygen:lib",
+    title: "Command palette core",
+    description:
+      "Verb-first ranking with a sixty-line fuzzy matcher, treatment-relationship scoping that counts out-of-scope patients rather than naming them, an audit record for every patient search including the empty ones, and the second-Enter rule for a clinically significant action. Installed automatically with ChartCommandPalette.",
+    dependencies: [] as string[],
+    registryDependencies: [] as string[],
+    files: [
+      {
+        path: "registry/oxygen/lib/palette.ts",
+        type: "oxygen:lib",
+        target: "lib/oxygen-palette.ts",
+      },
+      {
+        path: "registry/oxygen/lib/palette.css",
+        type: "oxygen:style",
+        target: "styles/oxygen-palette.css",
+      },
+    ],
+  },
+  {
     name: "switch-core",
     type: "oxygen:lib",
     title: "Switch core",

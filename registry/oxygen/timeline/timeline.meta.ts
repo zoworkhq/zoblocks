@@ -15,7 +15,7 @@ export default defineComponentMeta({
   rationale:
     "antd's Timeline is a thin adapter over Steps, and it inherits two things a chronology should not have. It hardcodes current to the last item, which marks that item process — and antd's own stylesheet gives that state a dotted rail. On a wizard that reads as 'the step you are on, and it continues'. On a history it is a mark of incompleteness applied to whichever event happened to be last, and because reverse reverses the array first, on a newest-first clinical timeline it lands on the oldest event in the chart. It also inherits rc-steps' accessibility, which is none: no role, no aria-current, no way to name the list, so a page with a care timeline and an access-history timeline gives a screen-reader user two unnamed lists. Matching the API rather than wrapping it means an existing antd call site migrates by changing one import, and no consumer of a primitive inherits antd.",
 
-  categories: ["Data display", "Primitives"],
+  categories: ["Data Display", "Primitives"],
   fhir: [],
 
   states: [

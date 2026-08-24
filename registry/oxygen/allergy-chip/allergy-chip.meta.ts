@@ -78,7 +78,7 @@ export default defineComponentMeta({
     "The component renders one record. Deduplicating three penicillin entries from three source systems is a reconciliation problem, and solving it here would hide the fact that they disagree.",
   ],
 
-  related: ["clinical-status", "result-value"],
+  related: ["clinical-status", "result-value", "chart-header"],
 
   dependencies: ["clsx", "tailwind-merge"],
   registryDependencies: ["utils", "tokens", "allergy-core", "clinical-status"],

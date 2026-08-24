@@ -17,7 +17,25 @@
  * the declared states are honest rather than aspirational.
  */
 
-import type { ComponentType, ReactElement } from "react";
+import type { ComponentType, JSXElementConstructor, ReactElement } from "react";
+
+/**
+ * The props of the component a story file is about.
+ *
+ * `Meta<typeof PresenceChip>` should type its own args, and for a long time it
+ * did not: `args` and `render` were both `Record<string, unknown>`, so
+ * `render: (args) => <X {...args} />` failed to typecheck on every component
+ * with a required prop — the spread of an index signature satisfies nothing —
+ * and every story author worked around it by re-passing the required props by
+ * hand. Worse in the other direction: an arg named after a prop that does not
+ * exist was accepted in silence, which is exactly how a story ends up written
+ * against a remembered API.
+ *
+ * Falls back to the old permissive shape for a `component` that is not a
+ * constructor, so a story file about a hook or a plain object still compiles.
+ */
+type ArgsOf<TComponent> =
+  TComponent extends JSXElementConstructor<infer P> ? P : Record<string, unknown>;
 
 /** The subset of the CSF3 play-function context our harness supplies. */
 export interface PlayContext {
@@ -46,17 +64,23 @@ export interface Meta<TComponent = unknown> {
   title: string;
   component: TComponent;
   /** Args every story in the file inherits. */
-  args?: Record<string, unknown>;
+  args?: Partial<ArgsOf<TComponent>>;
   parameters?: StoryParameters;
   tags?: string[];
 }
 
 export interface StoryObj<TComponent = unknown> {
   name?: string;
-  args?: Record<string, unknown>;
+  args?: Partial<ArgsOf<TComponent>>;
   parameters?: StoryParameters;
-  /** Overrides the default render for compositions and multi-element stories. */
-  render?: (args: Record<string, unknown>) => ReactElement;
+  /**
+   * Overrides the default render for compositions and multi-element stories.
+   *
+   * Receives the merged args — file-level plus story-level — typed as the
+   * component's own props, which is what CSF3 guarantees at runtime and what
+   * makes `<X {...args} />` legal.
+   */
+  render?: (args: ArgsOf<TComponent>) => ReactElement;
   /** Interaction test. Runs in the harness and, later, in Storybook. */
   play?: (context: PlayContext) => Promise<void> | void;
   tags?: string[];

@@ -48,6 +48,11 @@ export const WORKSPACE_ALIASES: Record<string, string[]> = {
   "@/lib/oxygen-risk": ["./registry/oxygen/lib/risk.ts"],
   "@/lib/oxygen-provenance": ["./registry/oxygen/lib/provenance.ts"],
   "@/lib/oxygen-trend": ["./registry/oxygen/lib/trend.ts"],
+  "@/lib/oxygen-clock": ["./registry/oxygen/lib/clock.ts"],
+  "@/lib/oxygen-presence": ["./registry/oxygen/lib/presence.ts"],
+  "@/lib/oxygen-chart-header": ["./registry/oxygen/lib/chart-header.ts"],
+  "@/lib/oxygen-workspace": ["./registry/oxygen/lib/workspace.ts"],
+  "@/lib/oxygen-palette": ["./registry/oxygen/lib/palette.ts"],
   "@/lib/timeline-core": ["./registry/oxygen/lib/timeline-core.ts"],
   "@/lib/timeline-fhir": ["./registry/oxygen/lib/timeline-fhir.ts"],
 };

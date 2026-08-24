@@ -140,7 +140,7 @@ export default defineComponentMeta({
     "Wristband matching and the ID-reentry verification step are built but unstyled beyond the base sheet; a deployment wanting positive patient identification supplies the scanner integration.",
   ],
 
-  related: ["signature"],
+  related: ["signature", "care-team-presence", "chart-header", "recent-patient-stack"],
 
   usage: `import {
   IdentityProvider,

@@ -584,7 +584,8 @@ export const CATALOG: ComponentDoc[] = [
     "fhir": [
       {
         "name": "AllergyIntolerance",
-        "url": "https://hl7.org/fhir/R4/allergyintolerance.html"
+        "url": "https://hl7.org/fhir/R4/allergyintolerance.html",
+        "note": "type, category, criticality, verificationStatus, reaction[].manifestation and severity, onset, lastOccurrence and asserter. The no-known-allergy SNOMED codes are read as a positive assertion with provenance rather than as an allergy to nothing."
       }
     ],
     "resource": "AllergyIntolerance",
@@ -760,7 +761,8 @@ export const CATALOG: ComponentDoc[] = [
     ],
     "related": [
       "clinical-status",
-      "result-value"
+      "result-value",
+      "chart-header"
     ],
     "dependencies": [
       "clsx",
@@ -1287,6 +1289,438 @@ export const CATALOG: ComponentDoc[] = [
     "install": "npx @oxygenui-design/cli add breath-loader"
   },
   {
+    "name": "care-team-presence",
+    "title": "Care Team Presence",
+    "tier": "free",
+    "status": "stable",
+    "since": "0.4.0",
+    "layer": "clinical",
+    "distribution": "registry",
+    "summary": "Presence with clinical semantics: in session, on call, signed out to whom — and who else is in this chart right now.",
+    "description": "Nine states rather than a green dot, each drawn as a ring shape before it is a colour. Resolves a rota to the person responsible at this moment and returns a gap when nobody is. Routes an escalation to the covering clinician before it offers an override, and warns about a documentation conflict before you type rather than at save.",
+    "rationale": "A green dot meaning \"online\" is worse than useless on a ward, because the two states that matter most both look identical to it. A therapist who is in session is at their desk, is online, and must not be interrupted — interrupting a group session reaches eight patients rather than one. A hospitalist who is signed out is at their desk, is online, and is the wrong person to page; the right person is named in a handover the dot does not know about. The second half of the component answers the question a PDF on a shared drive answers today: who covers this patient at 02:00 on a Sunday, and until when. And the third — chart co-presence — is the only presence signal here that appears without being asked for, because the timing is the whole value: told at save, a second note in the same encounter is a merge problem with somebody else's unsigned draft; told before you type, it is a choice between three reasonable options.",
+    "categories": [
+      "Clinical",
+      "Data Display"
+    ],
+    "fhir": [
+      {
+        "name": "CareTeam",
+        "url": "https://hl7.org/fhir/R4/careteam.html",
+        "note": "participant[].period becomes a coverage window; a participant with no period is on the team but is not the answer to who is responsible now, and is dropped."
+      }
+    ],
+    "resource": "CareTeam",
+    "resourceUrl": "https://hl7.org/fhir/R4/careteam.html",
+    "states": [
+      "Available",
+      "In session — do not disturb",
+      "In group — eight patients, not one",
+      "On crisis line",
+      "On call",
+      "Signed out, with the cover named",
+      "Off shift, nobody covering",
+      "Presence degraded, with its age",
+      "Presence unknown",
+      "Assigned therapist",
+      "Compact — avatar only",
+      "Coverage resolved",
+      "Coverage gap",
+      "Someone else is documenting",
+      "Someone else is signing",
+      "Four in the chart, viewing only"
+    ],
+    "props": [
+      {
+        "name": "presence",
+        "type": "Presence",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "compact",
+        "type": "boolean",
+        "description": "Avatar only, for a co-presence stack. The name stays in the label.",
+        "required": false,
+        "default": "false"
+      },
+      {
+        "name": "now",
+        "type": "string",
+        "description": "ISO 8601, supplied by the host. Needed for the degraded state's age.",
+        "required": false
+      },
+      {
+        "name": "onContact",
+        "type": "((target: EscalationTarget) => void)",
+        "description": "Contact this person. Routed through `resolveEscalation`, so a do-not-disturb clinician offers their cover instead and an override is a second, deliberate action.",
+        "required": false
+      }
+    ],
+    "extendsType": "Omit<React.HTMLAttributes<HTMLDivElement>, \"children\">",
+    "exports": [
+      {
+        "name": "PresenceChip",
+        "props": [
+          {
+            "name": "presence",
+            "type": "Presence",
+            "description": "",
+            "required": true
+          },
+          {
+            "name": "compact",
+            "type": "boolean",
+            "description": "Avatar only, for a co-presence stack. The name stays in the label.",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "now",
+            "type": "string",
+            "description": "ISO 8601, supplied by the host. Needed for the degraded state's age.",
+            "required": false
+          },
+          {
+            "name": "onContact",
+            "type": "((target: EscalationTarget) => void)",
+            "description": "Contact this person. Routed through `resolveEscalation`, so a do-not-disturb clinician offers their cover instead and an override is a second, deliberate action.",
+            "required": false
+          }
+        ],
+        "extendsType": "Omit<React.HTMLAttributes<HTMLDivElement>, \"children\">"
+      },
+      {
+        "name": "CoverageCard",
+        "props": [
+          {
+            "name": "now",
+            "type": "string",
+            "description": "",
+            "required": true
+          },
+          {
+            "name": "windows",
+            "type": "readonly CoverageWindow[]",
+            "description": "",
+            "required": true
+          },
+          {
+            "name": "backup",
+            "type": "Clinician",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "onPage",
+            "type": "((clinician: Clinician) => void)",
+            "description": "",
+            "required": false
+          }
+        ],
+        "extendsType": "Omit<React.HTMLAttributes<HTMLDivElement>, \"children\">"
+      },
+      {
+        "name": "ChartCoPresence",
+        "props": [
+          {
+            "name": "others",
+            "type": "readonly ChartPresence[]",
+            "description": "",
+            "required": true
+          },
+          {
+            "name": "now",
+            "type": "string",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "onOpenTheirs",
+            "type": "((other: ChartPresence) => void)",
+            "description": "Opens the other person's draft, read-only.",
+            "required": false
+          },
+          {
+            "name": "onRequestHandoff",
+            "type": "((other: ChartPresence) => void)",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "onSeparateAddendum",
+            "type": "((other: ChartPresence) => void)",
+            "description": "",
+            "required": false
+          }
+        ],
+        "extendsType": "Omit< React.HTMLAttributes<HTMLDivElement>, \"children\" >"
+      }
+    ],
+    "usage": "import {\n  CoverageCard,\n  PresenceChip,\n} from \"@/components/oxygen/care-team-presence\";\nimport \"@/styles/oxygen-presence.css\";\n\n<PresenceChip\n  presence={{\n    clinician: { id: \"pr-4\", display: \"A. Vance, MD\", role: \"Attending\" },\n    state: \"signed-out\",\n    coveredBy: { id: \"pr-1\", display: \"T. Boateng, MD\", role: \"Night attending\" },\n    until: \"07:00\",\n  }}\n  onContact={(target) => page(target)}\n/>\n\n<CoverageCard windows={rota} now={serverTime} onPage={page} />",
+    "guidance": {
+      "use": [
+        "Beside a clinician's name anywhere the reader might be about to contact them — a care team panel, a message composer, a chart header.",
+        "With CoverageCard on any surface where somebody might need to escalate out of hours. That is the question the shared-drive PDF answers today.",
+        "With ChartCoPresence above the editor rather than inside it, so the warning arrives before the first keystroke.",
+        "Compact, inside a co-presence stack, where the count matters more than any one face."
+      ],
+      "avoid": [
+        "As a productivity signal. \"Who is online\" is a management question and this is a clinical one; the states exist to route contact, not to report attendance.",
+        "Without a role on the clinician. A name with no role is not actionable, and the component will render it but the reader still cannot use it.",
+        "As the only escalation path. It names who to reach; the page itself, and the audit entry for an override, belong to the host."
+      ]
+    },
+    "accessibility": [
+      {
+        "label": "The ring is a shape before it is a colour",
+        "detail": "Nine states will not fit in nine hues on a 28px avatar — three would be indistinguishable to a reader with a common colour deficiency and all nine at arm's length on a ward monitor. Solid, blocked, doubled, halved, dashed, dotted or absent carries the state; the hue repeats it."
+      },
+      {
+        "label": "The whole presence is one spoken statement",
+        "detail": "\"A. Vance, MD. Attending. Signed out. Covered by T. Boateng, MD, night attending.\" Name, role, state, redirect — a reader who stops after the third part has enough to decide whether to make contact, and one who hears the fourth knows where to go instead."
+      },
+      {
+        "label": "The role is never omitted",
+        "detail": "\"Dr Vance\" is not actionable and \"Attending, night coverage until 07:00\" is. The difference is whether a reader knows they have found the right person, which is the entire job of this component."
+      },
+      {
+        "label": "The conflict notice is polite and throttled",
+        "detail": "One announcement per ten seconds. A ward round where six people open the same chart would otherwise produce six interruptions in as many seconds, and a screen-reader user would lose their place each time — this component exists to prevent an interruption, not to become one."
+      },
+      {
+        "label": "A rota gap is an alert, not an empty state",
+        "detail": "role=\"alert\" with the escalation named in the accessible label. Every other state here is deliberately quiet; nobody being responsible for a patient at 02:00 is the one thing that should stop a reader."
+      },
+      {
+        "label": "The one animation is a slow breath, and it respects the preference",
+        "detail": "The crisis-line ring fades over 2.4 seconds rather than flashing. A crisis line is staffed for a whole shift, and a blinking ring in somebody's peripheral vision for eight hours is an accessibility problem. prefers-reduced-motion stops it entirely."
+      }
+    ],
+    "limitations": [
+      "It carries no transport. Presence has to arrive from somewhere — a WebSocket, a poll, a presence service — and the host subscribes once and passes it down. That is deliberate: a component that opened its own socket would open one per avatar.",
+      "It cannot tell a stale channel from a stationary person on its own. The degraded state has to be set by whatever knows the channel dropped; without it, a frozen dot looks live, which is the failure the state exists to name.",
+      "Coverage resolves against one flat list of windows. Overlapping rotas — a service rota and a psychiatry back-up rota on the same patient — need the caller to pick which one answers \"responsible\", because the component has no basis for preferring one.",
+      "Chart co-presence detects a conflict; it does not resolve one. Whether the right move is a handoff, a read-only look or a separate addendum depends on facts the component does not have, which is why none of the three actions is a highlighted default.",
+      "An override is offered and logged by the host, not by the component. The escalation target says an override is required; recording who overrode a do-not-disturb is an audit concern that belongs where the page is actually sent."
+    ],
+    "related": [
+      "identity",
+      "clinical-status",
+      "chart-header"
+    ],
+    "dependencies": [
+      "clsx",
+      "tailwind-merge"
+    ],
+    "install": "npx @oxygenui-design/cli add care-team-presence",
+    "technicalName": "CareTeamPresence",
+    "aliases": [
+      "presence indicator",
+      "on call",
+      "coverage",
+      "who is on call",
+      "care team availability",
+      "chart co-presence"
+    ],
+    "tags": [
+      "data-display",
+      "themeable",
+      "print-safe",
+      "headless",
+      "animated"
+    ],
+    "uxGuidelines": {
+      "do": [
+        "Set coveredBy whenever the state is signed-out or off-shift. A redirect with no destination is a dead end at the moment somebody needs a person.",
+        "Pass `now` from the server rather than the browser. A degraded state's age is the one number here that must not come from a clock the user can change.",
+        "Mark the assigned therapist. In behavioral health that is the person a disclosure decision routes through, which is a different fact from care-team membership.",
+        "Render the gap. A rota with a two-hour hole in it is a real state, and it is the one worth finding before 02:00 rather than at it."
+      ],
+      "dont": [
+        "Do not distinguish the states by colour alone. Three of the nine are amber, and the ring geometry is what separates them.",
+        "Do not put the redirect in a tooltip. A page sent to a signed-out clinician because the cover was one hover away is the defect this component was built against.",
+        "Do not announce every arrival. The live region is throttled for a reason, and lowering it turns a ward round into a stream of interruptions.",
+        "Do not default the co-presence conflict to one action. Highlighting one of the three is a recommendation the component cannot justify."
+      ]
+    },
+    "domain": {
+      "industries": [
+        "healthcare",
+        "behavioral-health"
+      ],
+      "clinicalContext": "Four of the nine states exist because behavioral health needs them and no generic presence system has them: in session, in group, on the crisis line, and assigned therapist. Interrupting a group reaches eight patients rather than one, and the assigned therapist is the person a disclosure decision routes through.",
+      "workflows": [
+        "care-coordination",
+        "documentation",
+        "scheduling"
+      ],
+      "phi": {
+        "handles": false,
+        "notes": "Renders clinicians rather than patients. Chart co-presence implies which chart is open, so it should not be rendered outside the chart it describes."
+      },
+      "auditable": false,
+      "permissions": [
+        "careteam.read"
+      ],
+      "terminology": [
+        "FHIR"
+      ]
+    },
+    "variants": [
+      {
+        "id": "default",
+        "label": "Default",
+        "description": "Avatar, name, role and state, with the redirect on its own line.",
+        "args": {
+          "compact": false
+        }
+      },
+      {
+        "id": "compact",
+        "label": "Compact",
+        "description": "Avatar only, for a co-presence stack. The name stays in the accessible label rather than disappearing.",
+        "args": {
+          "compact": true
+        }
+      }
+    ],
+    "controls": [
+      {
+        "prop": "compact",
+        "control": "switch",
+        "label": "Compact",
+        "defaultValue": false
+      },
+      {
+        "prop": "onContact",
+        "control": "event",
+        "label": "onContact"
+      }
+    ],
+    "a11yChecks": [
+      {
+        "wcag": "1.4.1",
+        "name": "Use of colour",
+        "status": "pass",
+        "how": "Every state has a ring geometry and a state word, and both reach the accessible name. A test asserts the nine states produce nine distinct ring shapes, so two states can never collapse into one hue.",
+        "evidence": "care-team-presence.test.tsx"
+      },
+      {
+        "wcag": "4.1.2",
+        "name": "Name, role, value",
+        "status": "pass",
+        "how": "role=\"group\" carrying the composed statement, with the visual content aria-hidden so a screen reader gets one sentence rather than a scattering of fragments.",
+        "evidence": "care-team-presence.test.tsx"
+      },
+      {
+        "wcag": "4.1.3",
+        "name": "Status messages",
+        "status": "pass",
+        "how": "The co-presence conflict is aria-live=\"polite\" and throttled to one announcement per ten seconds; the rota gap is role=\"alert\" because nobody being responsible is the one state here that should interrupt.",
+        "evidence": "care-team-presence.test.tsx"
+      },
+      {
+        "wcag": "2.5.8",
+        "name": "Target size (minimum)",
+        "status": "pass",
+        "how": "Every button — contact, page, and the three conflict actions — has a 28px minimum block size, above the 24px floor.",
+        "evidence": "care-team-presence.test.tsx"
+      },
+      {
+        "wcag": "2.2.2",
+        "name": "Pause, stop, hide",
+        "status": "pass",
+        "how": "The crisis-line ring is the only animation, it is a 2.4s opacity breath rather than a flash, and prefers-reduced-motion removes it. Nothing else moves.",
+        "evidence": "care-team-presence.test.tsx"
+      },
+      {
+        "wcag": "2.1.1",
+        "name": "Keyboard",
+        "status": "pass",
+        "how": "Every affordance is a native button. The component manages no focus and traps none.",
+        "evidence": "care-team-presence.test.tsx"
+      },
+      {
+        "wcag": "1.4.11",
+        "name": "Non-text contrast",
+        "status": "pass",
+        "how": "The rings and the button borders draw from gated status tokens; the ring is also 2px or wider so the geometry survives at the contrast floor.",
+        "evidence": "contrast.gate"
+      },
+      {
+        "wcag": "1.3.1",
+        "name": "Info and relationships",
+        "status": "pass",
+        "how": "The redirect, the cover and the degraded age are text in the accessible name rather than position or colour, so a reader who cannot see the layout still gets the relationship.",
+        "evidence": "care-team-presence.test.tsx"
+      }
+    ],
+    "examples": [
+      {
+        "id": "not-a-green-dot",
+        "title": "In session is not away, and signed out is not offline",
+        "description": "Both of these people are at a computer and both would be a green dot. One must not be interrupted; the other is simply the wrong person, and the right one is named on the next line.",
+        "fixture": "careTeamNightCoverage",
+        "code": "<PresenceChip presence={{ clinician: marsh, state: \"in-session\", until: \"15:50\" }} />\n\n<PresenceChip\n  presence={{\n    clinician: vance,\n    state: \"signed-out\",\n    coveredBy: boateng,\n    until: \"07:00\",\n  }}\n/>"
+      },
+      {
+        "id": "coverage-gap",
+        "title": "A hole in the rota is drawn as a hole",
+        "description": "Nothing covers 07:00–09:00. The resolver returns null rather than the nearest window, because filling a gap with a plausible name is how a page goes to somebody who is asleep.",
+        "fixture": "careTeamCoverageGap",
+        "code": "const windows = coverageFromCareTeam(careTeamCoverageGap.participant ?? []);\n\n// 08:00 falls between the two windows.\n<CoverageCard windows={windows} now=\"2026-08-24T08:00:00+05:30\" />\n// → \"Nobody is covering right now. Escalate to the on-call supervisor.\""
+      },
+      {
+        "id": "escalation",
+        "title": "Do not disturb is a redirect, not a locked door",
+        "description": "A clinician in a group session with cover offers the cover. The same clinician with nobody covering offers an override — a second, deliberate action the host logs. Interrupting a group reaches eight patients rather than one, and the default has to reflect that.",
+        "fixture": "practitionerSigner",
+        "code": "resolveEscalation({ clinician: marsh, state: \"in-group\", coveredBy: okafor });\n// → { kind: \"covering\", clinician: okafor, instead: marsh, reason: \"L. Marsh, LCSW is in group\" }\n\nresolveEscalation({ clinician: marsh, state: \"in-group\" });\n// → { kind: \"override-required\", … }"
+      },
+      {
+        "id": "co-presence",
+        "title": "Told before you type, not at save",
+        "description": "A second note in the same encounter is a merge problem once both exist. Announced before the first keystroke, it is a choice between three reasonable options — and none of them is highlighted, because which is right depends on facts the component does not have.",
+        "fixture": "careTeamNightCoverage",
+        "code": "<ChartCoPresence\n  others={[\n    { clinician: marsh, activity: \"documenting\", since: \"2026-08-24T09:12:00+05:30\",\n      target: \"Progress note\", unsigned: true },\n  ]}\n  now={serverTime}\n  onOpenTheirs={openReadOnly}\n  onRequestHandoff={requestHandoff}\n  onSeparateAddendum={startAddendum}\n/>"
+      }
+    ],
+    "fixtures": [
+      "careTeamNightCoverage",
+      "careTeamCoverageGap",
+      "practitionerSigner"
+    ],
+    "seo": {
+      "slug": "care-team-presence",
+      "title": "Care Team Presence — React on-call and coverage UI",
+      "description": "React presence for clinical teams: in session, on call, signed out to whom — plus rota coverage with a real gap state and chart co-presence conflicts.",
+      "primaryKeyword": "react care team presence",
+      "secondaryKeywords": [
+        "on call coverage component",
+        "clinician availability ui",
+        "chart co-presence conflict",
+        "healthcare presence indicator"
+      ],
+      "searchIntent": "informational",
+      "ogImage": "generated"
+    },
+    "relationships": {
+      "builtWith": [],
+      "usedIn": [],
+      "patterns": [
+        "care-coordination",
+        "chart-review"
+      ],
+      "alternatives": [
+        {
+          "ref": "identity",
+          "when": "the identity that needs to be unambiguous is the patient's"
+        }
+      ]
+    }
+  },
+  {
     "name": "care-timeline",
     "title": "Care Timeline",
     "tier": "free",
@@ -1299,7 +1733,7 @@ export const CATALOG: ComponentDoc[] = [
     "rationale": "A table is read as rows and a chart as a shape, but a timeline is read as an account — and an account is understood to be continuous, so a gap in it becomes a fact. Meanwhile the timeline on screen is nearly always a slice: paginated to five, filtered to one register, assembled from sources that fail independently. Every one of those renders as the same tidy, confident, continuous list. A clinician reads a timeline with no imaging on it and orders a CT; the study was done eleven weeks ago at another hospital and the exchange query timed out four seconds earlier. Nothing was wrong on screen. So coverage is required in the type, with no default, because every plausible default is a claim the caller did not make — and the sentence it produces is rendered in a fixed place and printed. Two consequences follow: planned is not happened, so a future event sits above a now marker and a planned event whose time has passed with nothing against it is lapsed rather than silent; and clinical events are not administrative ones, so registers are typed rather than mixed at one weight.",
     "categories": [
       "Clinical",
-      "Data display"
+      "Data Display"
     ],
     "fhir": [
       {
@@ -2118,6 +2552,955 @@ export const CATALOG: ComponentDoc[] = [
     }
   },
   {
+    "name": "chart-command-palette",
+    "title": "Chart Command Palette",
+    "tier": "free",
+    "status": "stable",
+    "since": "0.4.0",
+    "layer": "clinical",
+    "distribution": "registry",
+    "summary": "A command palette that understands clinical verbs, scopes every search to a treatment relationship, and audits the searches it refuses.",
+    "description": "Actions rank above records, because a verb is usually what was meant. Patients outside your relationships are counted rather than named. Every patient search emits an audit event, including the ones that matched nobody, and a clinically significant action never runs on the first Enter.",
+    "rationale": "Clinical navigation is a menu tree six levels deep, and the fastest people in every organisation have memorised a set of shortcuts nobody documented. A palette is the obvious answer and almost nobody ships one, for a reason that is not obvious: in healthcare, search is a regulated act. Typing a name into a global patient search is a privacy event whether or not you open the chart, and a palette that helpfully autocompletes across the whole patient index has created a compliance problem at the speed of thought. So out-of-scope matches are rendered as a count — 3 further matches, break-glass required — which is the whole design: the reader learns the search was not empty without learning who.",
+    "categories": [
+      "Clinical",
+      "Navigation"
+    ],
+    "fhir": [
+      {
+        "name": "Patient",
+        "url": "https://hl7.org/fhir/R4/patient.html",
+        "note": "Searched, and the only kind of result that is scoped. Matches outside the treatment relationship are counted, never named, and the search is audited whether or not it matched."
+      },
+      {
+        "name": "Task",
+        "url": "https://hl7.org/fhir/R4/task.html",
+        "note": "Actions map to Task, ServiceRequest and Communication creation in the host. The palette runs the verb; it never writes the resource."
+      }
+    ],
+    "resource": "Patient",
+    "resourceUrl": "https://hl7.org/fhir/R4/patient.html",
+    "states": [
+      "Empty, before anything is typed",
+      "Actions ranked above records",
+      "A verb waiting for its argument",
+      "A significant action, first Enter",
+      "An action that cannot run",
+      "Out-of-scope patients, counted",
+      "Break-glass unavailable to this role",
+      "Nothing matches",
+      "Grouped results",
+      "Keyboard navigation",
+      "Frequency weighting",
+      "Every match named, with no scope"
+    ],
+    "props": [
+      {
+        "name": "items",
+        "type": "readonly PaletteItem[]",
+        "description": "Everything the palette may match. A flat list rather than registered providers: the provider interface, its abort signals and its per-source failure handling belong to the host, which is the only place that knows which of them is a slow terminology server.",
+        "required": true
+      },
+      {
+        "name": "open",
+        "type": "boolean",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "className",
+        "type": "string",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "onClose",
+        "type": "(() => void)",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "onRun",
+        "type": "((item: PaletteItem) => void)",
+        "description": "Runs an item. Only ever called for an outcome of `run`.",
+        "required": false
+      },
+      {
+        "name": "onSearchAudit",
+        "type": "((audit: SearchAudit) => void)",
+        "description": "Called once per search that touched the patient index — including the ones that matched nobody. The host writes the audit entry.",
+        "required": false
+      },
+      {
+        "name": "placeholder",
+        "type": "string",
+        "description": "",
+        "required": false,
+        "default": "\"Search or run a command…\""
+      },
+      {
+        "name": "scope",
+        "type": "PatientScope",
+        "description": "",
+        "required": false
+      }
+    ],
+    "exports": [
+      {
+        "name": "ChartCommandPalette",
+        "props": [
+          {
+            "name": "items",
+            "type": "readonly PaletteItem[]",
+            "description": "Everything the palette may match. A flat list rather than registered providers: the provider interface, its abort signals and its per-source failure handling belong to the host, which is the only place that knows which of them is a slow terminology server.",
+            "required": true
+          },
+          {
+            "name": "open",
+            "type": "boolean",
+            "description": "",
+            "required": true
+          },
+          {
+            "name": "className",
+            "type": "string",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "onClose",
+            "type": "(() => void)",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "onRun",
+            "type": "((item: PaletteItem) => void)",
+            "description": "Runs an item. Only ever called for an outcome of `run`.",
+            "required": false
+          },
+          {
+            "name": "onSearchAudit",
+            "type": "((audit: SearchAudit) => void)",
+            "description": "Called once per search that touched the patient index — including the ones that matched nobody. The host writes the audit entry.",
+            "required": false
+          },
+          {
+            "name": "placeholder",
+            "type": "string",
+            "description": "",
+            "required": false,
+            "default": "\"Search or run a command…\""
+          },
+          {
+            "name": "scope",
+            "type": "PatientScope",
+            "description": "",
+            "required": false
+          }
+        ]
+      }
+    ],
+    "usage": "import { ChartCommandPalette } from \"@/components/oxygen/chart-command-palette\";\nimport \"@/styles/oxygen-palette.css\";\n\n<ChartCommandPalette\n  open={open}\n  items={items}\n  scope={{ inScope: myPatients, breakGlass: true }}\n  onRun={run}\n  onSearchAudit={(audit) => log(\"patient-search\", audit)}\n  onClose={() => setOpen(false)}\n/>",
+    "guidance": {
+      "use": [
+        "Behind ⌘K, everywhere. The palette is the shortcut the fastest clinicians already invented for themselves.",
+        "With a scope. Without one, patient results are unfiltered — which is the compliance problem the component exists to avoid.",
+        "With `onSearchAudit` wired before the first patient source is added. A palette that searches the index without recording it is worse than no palette.",
+        "With `significant` set on anything destructive or clinically consequential, so it takes a second Enter rather than the first."
+      ],
+      "avoid": [
+        "Without an audit sink. The component will still produce the record; nothing will keep it.",
+        "As a replacement for the menu. It is the fast path for people who know what they want, not the only path.",
+        "With the whole patient index passed as items. Pre-filter server-side; ranking a hundred thousand candidates in the render is not what this is.",
+        "With confirmations delegated to a modal. The palette is a keyboard surface and a modal takes the keyboard away from it mid-flow."
+      ]
+    },
+    "accessibility": [
+      {
+        "label": "A combobox with an active descendant",
+        "detail": "role=\"combobox\" on the input with aria-activedescendant pointing at the highlighted option, so focus never leaves the field a person is typing into."
+      },
+      {
+        "label": "The result count is announced once, not per keystroke",
+        "detail": "The live region is debounced by 350ms. A palette that announces on every keystroke restarts its own announcement before the previous word finishes, and a screen-reader user hears nothing in full."
+      },
+      {
+        "label": "Focus returns to the invoking element on every close path",
+        "detail": "Escape, running an item, and an external close all restore focus to whatever was focused when the palette opened. A palette that drops focus to the body has stranded the user it exists for."
+      },
+      {
+        "label": "Unavailable actions are shown with the reason",
+        "detail": "aria-disabled with the reason as text — \"Offline\", \"Requires prescriber role\". An action that vanishes teaches somebody the feature does not exist; one shown disabled teaches them what to change."
+      },
+      {
+        "label": "The withheld count is a row, not a footnote",
+        "detail": "It sits in the list where the results would be. A reader who does not see it concludes the search was empty, which is the one wrong conclusion available."
+      },
+      {
+        "label": "Groups are labelled groups",
+        "detail": "Each section is role=\"group\" with its own name inside the listbox, so a screen reader announces \"Actions, 3 items\" rather than reading twelve options as one undifferentiated list."
+      }
+    ],
+    "limitations": [
+      "Sources are a flat array rather than registered providers. The provider interface, its abort signals and its per-source failure handling belong to the host, which is the only place that knows which of them is a slow terminology server.",
+      "Ranking is synchronous and unwindowed. Above roughly a thousand candidates it belongs in a worker, and the host should pre-filter rather than hand the palette its whole index.",
+      "The audit record is produced, not written. The palette says what was searched and what was withheld; where that goes is the host's, because it is the host that knows the actor and the session.",
+      "Break-glass is signalled, never performed. The palette says an override exists and that the user may request one; the workflow behind it is a separate surface with its own consent and its own record.",
+      "The matcher is deliberately about sixty lines. It does not do transposition or phonetic matching, so a genuine typo in a patient's name will miss — which is the safer failure for a component whose other job is to not over-report people."
+    ],
+    "related": [
+      "recent-patient-stack",
+      "chart-header"
+    ],
+    "dependencies": [
+      "clsx",
+      "tailwind-merge"
+    ],
+    "install": "npx @oxygenui-design/cli add chart-command-palette",
+    "technicalName": "ChartCommandPalette",
+    "aliases": [
+      "command palette",
+      "cmd k",
+      "quick search",
+      "clinical search",
+      "spotlight"
+    ],
+    "tags": [
+      "navigation",
+      "keyboard-first",
+      "overlay",
+      "themeable",
+      "headless"
+    ],
+    "uxGuidelines": {
+      "do": [
+        "Give behavioral-health verbs first-class entries: start PHQ-9, open safety plan, log a collateral contact, document a no-show, begin group note.",
+        "Route a Part 2 disclosure request to the consent workflow, never to the document. The verb is legitimate; the shortcut to the file is not.",
+        "Put enough in `detail` to choose between two similar rows. Two identical labels with no detail is a coin toss with a chart.",
+        "Show unavailable actions rather than hiding them, and say why."
+      ],
+      "dont": [
+        "Do not name a patient outside the treatment relationship, under any weighting. The count is the answer.",
+        "Do not suppress the audit for an empty search. In a privacy review the empty ones are the interesting ones.",
+        "Do not let frequency outrank the group. A much-visited document above the verb somebody just typed has stopped being a command palette.",
+        "Do not run a significant action on the first Enter, even when the user is fast. Especially then."
+      ]
+    },
+    "domain": {
+      "industries": [
+        "healthcare",
+        "behavioral-health"
+      ],
+      "clinicalContext": "Behavioral-health verbs are distinct and worth first-class ranking — start PHQ-9, open safety plan, log a collateral contact, document a no-show, begin group note — and one of them has consequences: a Part 2 disclosure request routes to a consent workflow rather than to a document.",
+      "workflows": [
+        "documentation",
+        "medication",
+        "care-coordination",
+        "intake"
+      ],
+      "phi": {
+        "handles": true,
+        "notes": "Searches the patient index. The out-of-scope count and the audit record exist because a search is a privacy event before any chart is opened."
+      },
+      "auditable": true,
+      "permissions": [
+        "patient.read",
+        "audit.write"
+      ],
+      "terminology": [
+        "FHIR"
+      ]
+    },
+    "variants": [
+      {
+        "id": "scoped",
+        "label": "Scoped",
+        "description": "With a treatment-relationship scope. Out-of-scope patients are counted rather than named.",
+        "args": {
+          "open": true
+        }
+      },
+      {
+        "id": "unscoped",
+        "label": "Unscoped",
+        "description": "No treatment-relationship scope, so every match is named. The contrast is the argument.",
+        "args": {
+          "open": true
+        }
+      }
+    ],
+    "controls": [
+      {
+        "prop": "open",
+        "control": "switch",
+        "label": "Open",
+        "defaultValue": true
+      },
+      {
+        "prop": "onRun",
+        "control": "event",
+        "label": "onRun"
+      },
+      {
+        "prop": "onSearchAudit",
+        "control": "event",
+        "label": "onSearchAudit"
+      }
+    ],
+    "a11yChecks": [
+      {
+        "wcag": "4.1.2",
+        "name": "Name, role, value",
+        "status": "pass",
+        "how": "A labelled combobox with aria-expanded, aria-controls and aria-activedescendant; a listbox of options with aria-selected, and labelled groups inside it.",
+        "evidence": "chart-command-palette.test.tsx"
+      },
+      {
+        "wcag": "2.1.1",
+        "name": "Keyboard",
+        "status": "pass",
+        "how": "Arrows move the active option, Tab accepts an argument, Enter runs, Escape closes. Nothing needs a pointer.",
+        "evidence": "chart-command-palette.test.tsx"
+      },
+      {
+        "wcag": "2.4.3",
+        "name": "Focus order",
+        "status": "pass",
+        "how": "Focus stays in the input for the whole session and returns to the invoking element on close — a test asserts it, because this is the failure that strands a keyboard user.",
+        "evidence": "chart-command-palette.test.tsx"
+      },
+      {
+        "wcag": "4.1.3",
+        "name": "Status messages",
+        "status": "pass",
+        "how": "aria-live=\"polite\" carrying the result count and the withheld count, debounced by 350ms so typing does not restart the announcement on every keystroke.",
+        "evidence": "chart-command-palette.test.tsx"
+      },
+      {
+        "wcag": "3.3.4",
+        "name": "Error prevention",
+        "status": "pass",
+        "how": "A significant action requires a second Enter, and the confirmation is a row in the palette rather than a modal that takes the keyboard away.",
+        "evidence": "chart-command-palette.test.tsx"
+      },
+      {
+        "wcag": "1.4.1",
+        "name": "Use of colour",
+        "status": "pass",
+        "how": "The active row carries a bar and a background; a significant action carries a marker before its confirmation; an unavailable one is struck through and states its reason in words.",
+        "evidence": "chart-command-palette.test.tsx"
+      },
+      {
+        "wcag": "2.5.8",
+        "name": "Target size (minimum)",
+        "status": "pass",
+        "how": "Options are 32px on a pointer device and 44px below 40rem, both above the 24px floor.",
+        "evidence": "chart-command-palette.test.tsx"
+      },
+      {
+        "wcag": "1.4.10",
+        "name": "Reflow",
+        "status": "pass",
+        "how": "Below 40rem the palette becomes a full-screen sheet with taller rows and no keyboard hints, because there is no keyboard to hint at.",
+        "evidence": "chart-command-palette.test.tsx"
+      }
+    ],
+    "examples": [
+      {
+        "id": "counted",
+        "title": "Out of scope is a count, never a name",
+        "description": "Typing a name into a global patient search is a privacy event whether or not you open the chart. Matches outside your treatment relationships are rendered as a number, so the reader learns the search was not empty without learning who — and the row sits in the list rather than under it, because a reader who misses it concludes the search was empty.",
+        "fixture": "patients",
+        "code": "applyScope(rank(\"okon\", items), { inScope: new Set([\"p-mine\"]) });\n// → { visible: [ … 1 patient … ], withheld: 3 }\n\ndescribeWithheld(3, { breakGlass: true });\n// → \"3 further matches outside your patients — break-glass required\""
+      },
+      {
+        "id": "audit",
+        "title": "Every patient search is recorded, including the empty ones",
+        "description": "A search that found nobody is still a search that was made, and in a privacy review the empty ones are the interesting ones. The component produces the record and the host keeps it; a term that never reached the patient index produces nothing, because there is nothing to record.",
+        "fixture": "patientRestricted",
+        "code": "auditFor(\"okonkwo\", results, /* searchedPatients */ true);\n// → { term: \"okonkwo\", shown: 1, withheld: 3, empty: false }\n\nauditFor(\"zzzz\", empty, true);   // → { …, shown: 0, withheld: 0, empty: true }\nauditFor(\"dark mode\", results, false); // → null — the index was never touched"
+      },
+      {
+        "id": "verbs",
+        "title": "Actions rank above records, because a verb is what was meant",
+        "description": "The gap between a group and the next is deliberately larger than anything frequency can close. A palette where a much-visited document outranks the verb somebody just typed has stopped being a command palette — and behavioral-health verbs are first-class here, including the one with consequences: a Part 2 disclosure request routes to consent, never to a file.",
+        "fixture": "patientRoutine",
+        "code": "rank(\"phq\", [\n  { id: \"doc\", kind: \"chart-resource\", label: \"PHQ-9 result, 12 Aug\" },\n  { id: \"run\", kind: \"action\",         label: \"Start PHQ-9\" },\n])[0].item.id;\n// → \"run\""
+      },
+      {
+        "id": "second-enter",
+        "title": "A significant action never runs on the first Enter",
+        "description": "The confirmation is a row inside the palette rather than a modal, because a modal takes the keyboard away from the surface that was built for it. The marker is on the row before it is chosen, so the second Enter is not a surprise mid-keystroke.",
+        "fixture": "patientRoutine",
+        "code": "outcomeFor(discontinue);        // { kind: \"confirm\", prompt: \"… press Enter again\" }\noutcomeFor(discontinue, true);  // { kind: \"run\" }\noutcomeFor(offlineOrder);       // { kind: \"blocked\", reason: \"Offline\" }"
+      }
+    ],
+    "fixtures": [
+      "patientRoutine",
+      "patientRestricted",
+      "patients"
+    ],
+    "seo": {
+      "slug": "chart-command-palette",
+      "title": "Chart Command Palette — React clinical ⌘K",
+      "description": "React ⌘K for clinical apps: verb-first ranking, relationship scoping that counts rather than names, and an audit for every patient search.",
+      "primaryKeyword": "react clinical command palette",
+      "secondaryKeywords": [
+        "cmd k healthcare ui",
+        "treatment relationship scoping",
+        "patient search audit",
+        "break glass component"
+      ],
+      "searchIntent": "informational",
+      "ogImage": "generated"
+    },
+    "relationships": {
+      "builtWith": [],
+      "usedIn": [],
+      "patterns": [
+        "chart-review",
+        "care-coordination",
+        "documentation"
+      ],
+      "alternatives": [
+        {
+          "ref": "recent-patient-stack",
+          "when": "the chart you want is already open"
+        }
+      ]
+    }
+  },
+  {
+    "name": "chart-header",
+    "title": "Chart Header",
+    "tier": "free",
+    "status": "stable",
+    "since": "0.4.0",
+    "layer": "clinical",
+    "distribution": "registry",
+    "summary": "Persistent patient context that collapses to a safety bar rather than to a name, and never renders administrative gender beside a dose.",
+    "description": "Sticky chrome over PatientBanner. Collapse moves content behind a disclosure rather than out of the accessibility tree. The encounter is an explicit control that will sit in “none selected” rather than pick one for you. The Sex Parameter for Clinical Use appears only where an order or a result is in view, with the context it applies to.",
+    "rationale": "The chart header is the most-read eighty pixels in healthcare software and it is almost always built as a heading. Three consequences follow. It scrolls away, so the clinician acts with no identity on screen. It shows Patient.gender, which is the wrong field for every clinical decision — the right one is the Sex Parameter for Clinical Use, which is context-specific and can legitimately differ between a medication order and a reference range. And it treats the encounter as a subtitle, when which encounter am I documenting into is the single most common cause of a misfiled note. A subtitle cannot be wrong on purpose; a control can say nothing is selected and mean it.",
+    "categories": [
+      "Clinical",
+      "Navigation"
+    ],
+    "fhir": [
+      {
+        "name": "Patient",
+        "url": "https://hl7.org/fhir/R4/patient.html",
+        "note": "Identity through PatientBanner. patient-sexParameterForClinicalUse is read with its comment and period; Patient.gender is never read, not even as a fallback."
+      },
+      {
+        "name": "Encounter",
+        "url": "https://hl7.org/fhir/R4/encounter.html",
+        "note": "Each open encounter becomes one option. Nothing is auto-selected when more than one is open."
+      },
+      {
+        "name": "EpisodeOfCare",
+        "url": "https://hl7.org/fhir/R4/episodeofcare.html",
+        "note": "status and type give the program; period.start gives the week, and an episode with no start gets no week rather than a guessed one."
+      }
+    ],
+    "resource": "Patient",
+    "resourceUrl": "https://hl7.org/fhir/R4/patient.html",
+    "states": [
+      "Expanded",
+      "Collapsed to the safety strip",
+      "No encounter is open",
+      "Three encounters open — choose one",
+      "Sex parameter, with its context",
+      "Sex parameter not recorded, on an order screen",
+      "Sex parameter withheld on an overview screen",
+      "Allergies not asked",
+      "Code status not recorded",
+      "Isolation and fall risk",
+      "Involuntary hold, with its expiry",
+      "Hold expired",
+      "Program and week",
+      "With actions"
+    ],
+    "props": [
+      {
+        "name": "identifiers",
+        "type": "TwoOrMore<IdentifierSpec>",
+        "description": "Two, enforced by the type — this is NPSG.01.01.01 in the signature rather than in a review comment.",
+        "required": true
+      },
+      {
+        "name": "patient",
+        "type": "Patient",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "actions",
+        "type": "React.ReactNode",
+        "description": "Rendered at the end of the expanded row. Actions belong to the application.",
+        "required": false
+      },
+      {
+        "name": "children",
+        "type": "React.ReactNode",
+        "description": "The screen, rendered inside the patient context the banner establishes. This is what lets `PatientGuard` compare a form against the chart on screen — the header is not a decoration above the content, it is the statement the content is made under.",
+        "required": false
+      },
+      {
+        "name": "className",
+        "type": "string",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "collapsed",
+        "type": "boolean",
+        "description": "Start collapsed. Uncontrolled by design: the host owns the scroll sentinel because only the host knows what its scroll container is, and an IntersectionObserver wired to the wrong ancestor is worse than none.",
+        "required": false,
+        "default": "false"
+      },
+      {
+        "name": "encounters",
+        "type": "readonly EncounterOption[]",
+        "description": "Every encounter open for this patient. One is selected by the caller.",
+        "required": false,
+        "default": "[]"
+      },
+      {
+        "name": "now",
+        "type": "string",
+        "description": "ISO 8601, supplied by the host. Decides whether a dated fact has lapsed.",
+        "required": false
+      },
+      {
+        "name": "onCollapsedChange",
+        "type": "((collapsed: boolean) => void)",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "onSelectEncounter",
+        "type": "((id: string | undefined) => void)",
+        "description": "Switching encounter is a deliberate act, and the host re-guards every open form on the far side of it.",
+        "required": false
+      },
+      {
+        "name": "program",
+        "type": "Program",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "safety",
+        "type": "SafetyInput",
+        "description": "",
+        "required": false,
+        "default": "{}"
+      },
+      {
+        "name": "selectedEncounterId",
+        "type": "string",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "surface",
+        "type": "ChartSurface",
+        "description": "What the clinician has in view. Decides whether the Sex Parameter for Clinical Use appears at all.",
+        "required": false,
+        "default": "\"overview\""
+      },
+      {
+        "name": "ward",
+        "type": "string",
+        "description": "",
+        "required": false
+      }
+    ],
+    "exports": [
+      {
+        "name": "ChartHeader",
+        "props": [
+          {
+            "name": "identifiers",
+            "type": "TwoOrMore<IdentifierSpec>",
+            "description": "Two, enforced by the type — this is NPSG.01.01.01 in the signature rather than in a review comment.",
+            "required": true
+          },
+          {
+            "name": "patient",
+            "type": "Patient",
+            "description": "",
+            "required": true
+          },
+          {
+            "name": "actions",
+            "type": "React.ReactNode",
+            "description": "Rendered at the end of the expanded row. Actions belong to the application.",
+            "required": false
+          },
+          {
+            "name": "children",
+            "type": "React.ReactNode",
+            "description": "The screen, rendered inside the patient context the banner establishes. This is what lets `PatientGuard` compare a form against the chart on screen — the header is not a decoration above the content, it is the statement the content is made under.",
+            "required": false
+          },
+          {
+            "name": "className",
+            "type": "string",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "collapsed",
+            "type": "boolean",
+            "description": "Start collapsed. Uncontrolled by design: the host owns the scroll sentinel because only the host knows what its scroll container is, and an IntersectionObserver wired to the wrong ancestor is worse than none.",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "encounters",
+            "type": "readonly EncounterOption[]",
+            "description": "Every encounter open for this patient. One is selected by the caller.",
+            "required": false,
+            "default": "[]"
+          },
+          {
+            "name": "now",
+            "type": "string",
+            "description": "ISO 8601, supplied by the host. Decides whether a dated fact has lapsed.",
+            "required": false
+          },
+          {
+            "name": "onCollapsedChange",
+            "type": "((collapsed: boolean) => void)",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "onSelectEncounter",
+            "type": "((id: string | undefined) => void)",
+            "description": "Switching encounter is a deliberate act, and the host re-guards every open form on the far side of it.",
+            "required": false
+          },
+          {
+            "name": "program",
+            "type": "Program",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "safety",
+            "type": "SafetyInput",
+            "description": "",
+            "required": false,
+            "default": "{}"
+          },
+          {
+            "name": "selectedEncounterId",
+            "type": "string",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "surface",
+            "type": "ChartSurface",
+            "description": "What the clinician has in view. Decides whether the Sex Parameter for Clinical Use appears at all.",
+            "required": false,
+            "default": "\"overview\""
+          },
+          {
+            "name": "ward",
+            "type": "string",
+            "description": "",
+            "required": false
+          }
+        ]
+      }
+    ],
+    "usage": "import { ChartHeader } from \"@/components/oxygen/chart-header\";\nimport \"@/styles/oxygen-chart-header.css\";\n\n<ChartHeader\n  patient={patient}\n  identifiers={[{ kind: \"mrn\" }, { kind: \"nhs\" }]}\n  surface=\"orders\"\n  now={serverTime}\n  encounters={open}\n  selectedEncounterId={encounterId}\n  onSelectEncounter={setEncounterId}\n  safety={{\n    allergies: { label: \"Penicillin — anaphylaxis\", tone: \"critical\" },\n    codeStatus: { label: \"DNR\" },\n  }}\n>\n  <OrderForm />\n</ChartHeader>",
+    "guidance": {
+      "use": [
+        "On every chart screen, for the whole session. It is chrome, not a section.",
+        "Wrapping the screen rather than sitting above it — the children render inside the patient context the banner establishes, which is what lets PatientGuard compare a form against the chart on screen.",
+        "With `surface` set to what is actually in view. That is what decides whether the Sex Parameter for Clinical Use appears at all.",
+        "With the safety facts resolved upstream, so the strip states an answer rather than a count."
+      ],
+      "avoid": [
+        "As a page title. A heading scrolls away; this is the thing that must not.",
+        "With `Patient.gender` mapped into the SPCU slot. They are different fields and the whole point of the second one is that the first was being misused.",
+        "With an encounter auto-selected when several are open. Picking one for the user is picking where the note lands.",
+        "Collapsed by default. The first render of a chart is the one where identity matters most."
+      ]
+    },
+    "accessibility": [
+      {
+        "label": "Collapse hides nothing from the accessibility tree",
+        "detail": "The expanded content moves behind a disclosure rather than out of the DOM, so a screen-reader user is never worse off than a sighted one. A test asserts the toggle's aria-expanded and aria-controls agree with the region's hidden state in both heights."
+      },
+      {
+        "label": "Focus never lands behind the sticky bar",
+        "detail": "Everything below the header carries a scroll margin the height of the expanded bar (WCAG 2.4.11). A focus ring hidden under sticky chrome is the most common way a keyboard user loses their place in a long chart."
+      },
+      {
+        "label": "The strip is one spoken statement",
+        "detail": "The banner landmark's accessible name is the whole safety strip in reading order, so a screen-reader user hears the six facts as a sentence rather than as six unlabelled chips."
+      },
+      {
+        "label": "Absence is drawn as well as spoken",
+        "detail": "\"Allergies not asked\" is a dashed border and an italic label, not a missing chip. A blank space where an allergy status should be is the state that gets prescribed against, and it is the only one with no visual weight at all."
+      },
+      {
+        "label": "Tone never carries a fact on its own",
+        "detail": "Each fact is a word plus a 3px bar. Remove the colour and the strip is unchanged in content — which matters here more than on most components, because this is the row read at a glance from two metres away."
+      },
+      {
+        "label": "The encounter control keeps its place in the tab order",
+        "detail": "A header with no change handler renders the encounter as static text rather than as a disabled select. A disabled control leaves the tab order, so a keyboard user could not reach the one fact that says where their note is going."
+      }
+    ],
+    "limitations": [
+      "It does not own the scroll sentinel. Only the host knows what its scroll container is, and an IntersectionObserver wired to the wrong ancestor collapses at the wrong moment — so `collapsed` is a prop and the observer belongs to the application.",
+      "The safety facts arrive pre-resolved. The allergy question in particular has five answers and its own component; taking a count here would collapse “none known” and “never asked” into the same zero.",
+      "It renders one program. A patient in an IOP and a medication clinic has two, and which one belongs in the header is a decision the deployment makes.",
+      "Guardianship and conservatorship are carried as an alert rather than modelled. The shape varies by jurisdiction, and a field that means something different in two states is worse than free text that means what it says.",
+      "It does not re-guard forms on an encounter change. It reports the change; PatientGuard is what enforces it, and wiring the two is the application's call because only it knows which forms are open."
+    ],
+    "related": [
+      "identity",
+      "allergy-chip",
+      "care-team-presence",
+      "recent-patient-stack",
+      "chart-command-palette"
+    ],
+    "dependencies": [
+      "clsx",
+      "tailwind-merge",
+      "@oxygenui-design/identity"
+    ],
+    "install": "npx @oxygenui-design/cli add chart-header",
+    "technicalName": "ChartHeader",
+    "aliases": [
+      "patient header",
+      "chart banner",
+      "sticky patient bar",
+      "safety strip",
+      "encounter context"
+    ],
+    "tags": [
+      "navigation",
+      "layout",
+      "themeable",
+      "print-safe",
+      "headless"
+    ],
+    "uxGuidelines": {
+      "do": [
+        "Keep the safety strip in the same order on every screen. Reading it at a glance is the only thing it is for, and contents that move are contents nobody can glance at.",
+        "Pass `now` from the server. Whether a hold has expired is not a question to answer with a clock the user can change.",
+        "Re-guard open forms when the encounter changes. The component reports the change deliberately so the host can.",
+        "Show an expired hold as expired rather than removing it. Its disappearance is not the same signal as its lapse."
+      ],
+      "dont": [
+        "Do not shorten a name to initials in the header. Initials are for avatars; the header is where the name is checked.",
+        "Do not put a sixth alert on the strip because it fits. Every extra chip makes allergies and code status harder to find.",
+        "Do not unmount the detail on collapse. `hidden` keeps it findable, searchable and reachable by a disclosure — unmounting makes the collapsed header worse for a screen-reader user than for a sighted one.",
+        "Do not render the SPCU on an overview screen. Out of context it is a demographic wearing a clinical name."
+      ]
+    },
+    "domain": {
+      "industries": [
+        "healthcare",
+        "behavioral-health"
+      ],
+      "clinicalContext": "Carries the fields behavioral health needs in a header and nowhere else: the program and the week (IOP, week 3 of 8), the legal status with its expiry, and the safety facts that must survive a collapse. The week is what decides whether today's session is a mid-course review or a discharge plan.",
+      "workflows": [
+        "documentation",
+        "medication",
+        "care-coordination",
+        "intake"
+      ],
+      "phi": {
+        "handles": true,
+        "notes": "The most PHI-dense element on any chart screen, and the one most likely to be in a screenshot. It is also sticky, so it is on screen during every screen share."
+      },
+      "auditable": false,
+      "permissions": [
+        "patient.read",
+        "encounter.read"
+      ],
+      "terminology": [
+        "FHIR",
+        "SNOMED CT"
+      ]
+    },
+    "variants": [
+      {
+        "id": "expanded",
+        "label": "Expanded",
+        "description": "Banner, encounter control, program and the safety strip.",
+        "args": {
+          "collapsed": false
+        }
+      },
+      {
+        "id": "collapsed",
+        "label": "Collapsed",
+        "description": "The 44px strip a clinician must not act without. Everything else is behind a disclosure, not gone.",
+        "args": {
+          "collapsed": true
+        }
+      }
+    ],
+    "controls": [
+      {
+        "prop": "surface",
+        "control": "segmented",
+        "label": "Surface",
+        "options": [
+          "overview",
+          "orders",
+          "results",
+          "documentation"
+        ],
+        "defaultValue": "overview"
+      },
+      {
+        "prop": "collapsed",
+        "control": "switch",
+        "label": "Collapsed",
+        "defaultValue": false
+      },
+      {
+        "prop": "onSelectEncounter",
+        "control": "event",
+        "label": "onSelectEncounter"
+      }
+    ],
+    "a11yChecks": [
+      {
+        "wcag": "1.3.1",
+        "name": "Info and relationships",
+        "status": "pass",
+        "how": "The strip is a list with an accessible name, each fact is a list item, and the disclosure is a button with aria-expanded and aria-controls pointing at the region it governs.",
+        "evidence": "chart-header.test.tsx"
+      },
+      {
+        "wcag": "2.4.11",
+        "name": "Focus not obscured (minimum)",
+        "status": "pass",
+        "how": "Content below the sticky header carries a scroll margin the height of the expanded bar, so a focused element is never rendered behind it.",
+        "evidence": "chart-header.test.tsx"
+      },
+      {
+        "wcag": "4.1.2",
+        "name": "Name, role, value",
+        "status": "pass",
+        "how": "role=\"banner\" carrying the safety strip as its name; the encounter is a labelled select, or static text when the host supplies no handler rather than a disabled control.",
+        "evidence": "chart-header.test.tsx"
+      },
+      {
+        "wcag": "1.4.1",
+        "name": "Use of colour",
+        "status": "pass",
+        "how": "Every safety fact is a word before it is a tone, and the tone is a 3px bar rather than a fill. A test asserts the collapsed and expanded strips carry identical text — they differ in how they fit, never in what they say.",
+        "evidence": "chart-header.test.tsx"
+      },
+      {
+        "wcag": "4.1.3",
+        "name": "Status messages",
+        "status": "pass",
+        "how": "The \"no encounter selected\" reason is role=\"status\", because it changes as encounters open and close and the difference decides what the clinician does next.",
+        "evidence": "chart-header.test.tsx"
+      },
+      {
+        "wcag": "2.1.1",
+        "name": "Keyboard",
+        "status": "pass",
+        "how": "The disclosure is a native button and the encounter is a native select. Nothing is a div with a click handler and nothing traps focus.",
+        "evidence": "chart-header.test.tsx"
+      },
+      {
+        "wcag": "2.5.8",
+        "name": "Target size (minimum)",
+        "status": "pass",
+        "how": "The toggle and the encounter select both carry a 28px minimum block size, above the 24px floor.",
+        "evidence": "chart-header.test.tsx"
+      },
+      {
+        "wcag": "1.4.10",
+        "name": "Reflow",
+        "status": "pass",
+        "how": "Expanded, the strip wraps, so a patient with four alerts has none of them clipped. Collapsed, it scrolls behind a visible fade instead, because a second line there would move the content underneath at the moment the alerts are being read.",
+        "evidence": "chart-header.test.tsx"
+      }
+    ],
+    "examples": [
+      {
+        "id": "collapse",
+        "title": "It collapses to the strip, not to the name",
+        "description": "Forty-four pixels carrying allergies, code status, isolation, fall risk, legal status and alerts. The detail moves behind a disclosure rather than out of the DOM, so a screen-reader user is never worse off than a sighted one.",
+        "fixture": "patientRoutine",
+        "code": "const [collapsed, setCollapsed] = useState(false);\n\n<ChartHeader\n  patient={patient}\n  identifiers={[{ kind: \"mrn\" }, { kind: \"nhs\" }]}\n  collapsed={collapsed}\n  onCollapsedChange={setCollapsed}\n  safety={safety}\n/>"
+      },
+      {
+        "id": "spcu",
+        "title": "The sex parameter, with its context — and never the gender",
+        "description": "On an order screen it is shown with what it applies to. On an overview screen it is not shown at all, because out of context it is a demographic wearing a clinical name. Where the surface calls for it and nothing is recorded, the header says so rather than leaving the space that invites somebody to reach for Patient.gender.",
+        "fixture": "patientRoutine",
+        "code": "resolveSpcu(patient, \"orders\");\n// → { value: \"female\", context: \"for medication dosing\", recorded: true }\n\nresolveSpcu(patient, \"overview\");\n// → null — not a demographic\n\nresolveSpcu({ extension: [] }, \"orders\");\n// → { recorded: false } — \"not recorded. Do not substitute the administrative gender.\""
+      },
+      {
+        "id": "encounter",
+        "title": "No encounter selected is a state, not a default",
+        "description": "One open encounter is chosen, because there is nothing to choose between. Three open encounters are not, because a note filed into an encounter nobody read is the most common misfiling in the building — and a selection that no longer matches an open encounter reverts to none rather than sliding to the first.",
+        "fixture": "encounterRoutine",
+        "code": "resolveEncounterContext(three);\n// → { kind: \"none\", reason: \"3 encounters are open — choose one before documenting\" }\n\nresolveEncounterContext(three, \"enc-2\");\n// → { kind: \"selected\", encounter: … }\n\nresolveEncounterContext(three, \"enc-closed\");\n// → { kind: \"none\", reason: \"The selected encounter is no longer open\" }"
+      },
+      {
+        "id": "absence",
+        "title": "Two facts are always on the strip, recorded or not",
+        "description": "Allergy status and code status appear whether or not the host supplied them, because their absence is the finding. Everything else appears only when it exists — an isolation chip on every chart in the hospital is noise, and noise here is what makes the two rows that matter invisible.",
+        "fixture": "allergyHighRisk",
+        "code": "safetyStrip({});\n// → [{ kind: \"allergy\",     label: \"Allergies not asked\",     tone: \"absent\" },\n//    { kind: \"code-status\", label: \"Code status not recorded\", tone: \"absent\" }]"
+      }
+    ],
+    "fixtures": [
+      "patientRoutine",
+      "encounterRoutine",
+      "allergyHighRisk"
+    ],
+    "seo": {
+      "slug": "chart-header",
+      "title": "Chart Header — React sticky patient header",
+      "description": "A React chart header that collapses to a safety strip, makes the encounter an explicit control, and never renders administrative gender beside a dose.",
+      "primaryKeyword": "react patient chart header",
+      "secondaryKeywords": [
+        "sticky patient banner react",
+        "sex parameter for clinical use ui",
+        "encounter context control",
+        "clinical safety strip component"
+      ],
+      "searchIntent": "informational",
+      "ogImage": "generated"
+    },
+    "relationships": {
+      "builtWith": [],
+      "usedIn": [],
+      "patterns": [
+        "chart-review",
+        "documentation",
+        "patient-safety"
+      ],
+      "alternatives": [
+        {
+          "ref": "identity",
+          "when": "the surface needs the safety banner without the workspace chrome"
+        }
+      ]
+    }
+  },
+  {
     "name": "clinical-note",
     "title": "Clinical Note",
     "tier": "free",
@@ -2482,15 +3865,18 @@ export const CATALOG: ComponentDoc[] = [
     "fhir": [
       {
         "name": "Observation",
-        "url": "https://hl7.org/fhir/R4/observation.html"
+        "url": "https://hl7.org/fhir/R4/observation.html",
+        "note": "status and interpretation map onto the result-status and criticality scales, one adapter each."
       },
       {
         "name": "AllergyIntolerance",
-        "url": "https://hl7.org/fhir/R4/allergyintolerance.html"
+        "url": "https://hl7.org/fhir/R4/allergyintolerance.html",
+        "note": "criticality maps onto the criticality scale — high becomes critical, because the FHIR word understates it."
       },
       {
         "name": "Consent",
-        "url": "https://hl7.org/fhir/R4/consent.html"
+        "url": "https://hl7.org/fhir/R4/consent.html",
+        "note": "provision.type plus security labels map onto the access scale, with 42 CFR Part 2 as its own step."
       }
     ],
     "resource": "Observation",
@@ -2690,7 +4076,8 @@ export const CATALOG: ComponentDoc[] = [
       "allergy-chip",
       "risk-indicator",
       "provenance-chip",
-      "trend-indicator"
+      "trend-indicator",
+      "care-team-presence"
     ],
     "dependencies": [
       "clsx",
@@ -3970,7 +5357,8 @@ export const CATALOG: ComponentDoc[] = [
     "fhir": [
       {
         "name": "Provenance",
-        "url": "https://hl7.org/fhir/R4/provenance.html"
+        "url": "https://hl7.org/fhir/R4/provenance.html",
+        "note": "agent[].type and who, entity[].role, recorded and occurredDateTime as two separate fields, and activity. The adapter will not call an authorship an extraction on the strength of the agent type alone."
       }
     ],
     "resource": "Provenance",
@@ -4805,6 +6193,440 @@ export const CATALOG: ComponentDoc[] = [
     }
   },
   {
+    "name": "recent-patient-stack",
+    "title": "Recent Patient Stack",
+    "tier": "free",
+    "status": "stable",
+    "since": "0.4.0",
+    "layer": "clinical",
+    "distribution": "registry",
+    "summary": "A multi-chart workspace that makes the active patient unmistakable, because the alternative is eleven identical browser tabs.",
+    "description": "Each open chart gets a hue derived from its id, so it is the same colour in every session. Two charts whose names look alike both grow an identifier. Per-chart badges carry the unfinished work, closing is graded rather than binary, and returning after fifteen minutes away re-asserts who the chart belongs to.",
+    "rationale": "Clinicians work several charts at once and the tooling pretends they do not. The state of the art is a dropdown of names, or worse, eleven browser tabs whose titles truncate to \"Chart — Riverside…\". Wrong-patient documentation survives every amount of staff training because it is not a training problem: it is two charts that look identical, one keyboard shortcut, and an interruption. A stack does three things a dropdown cannot — it makes the set visible without being opened, it gives each chart a persistent visual identity, and it carries per-chart state. The identity has to be derived from the chart rather than handed out in arrival order, or a clinician who has learned \"Okonkwo is the green one\" has learned something that will be false tomorrow.",
+    "categories": [
+      "Clinical",
+      "Navigation"
+    ],
+    "fhir": [
+      {
+        "name": "Patient",
+        "url": "https://hl7.org/fhir/R4/patient.html",
+        "note": "Identity per chart. The accent is derived from the chart id rather than from the patient, so a merged record does not silently change colour."
+      },
+      {
+        "name": "Task",
+        "url": "https://hl7.org/fhir/R4/task.html",
+        "note": "Outstanding work per chart — a draft order, an unsigned note, an unacknowledged result — ranked by consequence rather than by age."
+      }
+    ],
+    "resource": "Patient",
+    "resourceUrl": "https://hl7.org/fhir/R4/patient.html",
+    "states": [
+      "Four charts, one active",
+      "A pinned chart",
+      "An unsigned note",
+      "A draft order",
+      "Two charts with similar names",
+      "Closing a clean chart",
+      "Closing one with an unsigned note",
+      "Closing one with a draft order",
+      "Returning after fifteen minutes",
+      "Expanded panel",
+      "Keyboard reordering",
+      "Roving focus across the stack",
+      "One chart",
+      "Notes owed across the caseload"
+    ],
+    "props": [
+      {
+        "name": "charts",
+        "type": "readonly OpenChart[]",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "activeId",
+        "type": "string",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "expanded",
+        "type": "boolean",
+        "description": "Start expanded, showing the panel rather than the avatar row.",
+        "required": false,
+        "default": "false"
+      },
+      {
+        "name": "now",
+        "type": "string",
+        "description": "ISO 8601 from the host. Decides whether returning re-asserts identity.",
+        "required": false
+      },
+      {
+        "name": "onActivate",
+        "type": "((chart: OpenChart, options: { reassert: boolean; }) => void)",
+        "description": "Switch to a chart. Called with `reassert: true` when the clinician has been away long enough that the host should confirm the patient before showing the chart. Fifteen minutes is roughly the length of an interruption you do not remember.",
+        "required": false
+      },
+      {
+        "name": "onClose",
+        "type": "((chart: OpenChart) => void)",
+        "description": "Close a chart. Called only when `canClose` returns `close` or the host confirmed a `confirm`. A `refuse` never reaches here.",
+        "required": false
+      },
+      {
+        "name": "onExpandedChange",
+        "type": "((expanded: boolean) => void)",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "onPin",
+        "type": "((chart: OpenChart, pinned: boolean) => void)",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "onReorder",
+        "type": "((charts: OpenChart[]) => void)",
+        "description": "Keyboard reordering, the equivalent of a drag (WCAG 2.5.7).",
+        "required": false
+      }
+    ],
+    "extendsType": "Omit< React.HTMLAttributes<HTMLDivElement>, \"children\" | \"onSelect\" >",
+    "exports": [
+      {
+        "name": "RecentPatientStack",
+        "props": [
+          {
+            "name": "charts",
+            "type": "readonly OpenChart[]",
+            "description": "",
+            "required": true
+          },
+          {
+            "name": "activeId",
+            "type": "string",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "expanded",
+            "type": "boolean",
+            "description": "Start expanded, showing the panel rather than the avatar row.",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "now",
+            "type": "string",
+            "description": "ISO 8601 from the host. Decides whether returning re-asserts identity.",
+            "required": false
+          },
+          {
+            "name": "onActivate",
+            "type": "((chart: OpenChart, options: { reassert: boolean; }) => void)",
+            "description": "Switch to a chart. Called with `reassert: true` when the clinician has been away long enough that the host should confirm the patient before showing the chart. Fifteen minutes is roughly the length of an interruption you do not remember.",
+            "required": false
+          },
+          {
+            "name": "onClose",
+            "type": "((chart: OpenChart) => void)",
+            "description": "Close a chart. Called only when `canClose` returns `close` or the host confirmed a `confirm`. A `refuse` never reaches here.",
+            "required": false
+          },
+          {
+            "name": "onExpandedChange",
+            "type": "((expanded: boolean) => void)",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "onPin",
+            "type": "((chart: OpenChart, pinned: boolean) => void)",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "onReorder",
+            "type": "((charts: OpenChart[]) => void)",
+            "description": "Keyboard reordering, the equivalent of a drag (WCAG 2.5.7).",
+            "required": false
+          }
+        ],
+        "extendsType": "Omit< React.HTMLAttributes<HTMLDivElement>, \"children\" | \"onSelect\" >"
+      }
+    ],
+    "usage": "import { RecentPatientStack } from \"@/components/oxygen/recent-patient-stack\";\nimport \"@/styles/oxygen-workspace.css\";\n\n<RecentPatientStack\n  charts={open}\n  activeId={activeId}\n  now={serverTime}\n  onActivate={(chart, { reassert }) =>\n    reassert ? confirmIdentity(chart) : switchTo(chart)\n  }\n  onClose={closeChart}\n  onReorder={setOrder}\n/>",
+    "guidance": {
+      "use": [
+        "In the top bar of a clinical workspace, above the chart header rather than inside it.",
+        "With `now` from the server, so the fifteen-minute re-assertion is not decided by a clock the user can change.",
+        "With the outstanding work resolved upstream — a draft order and an unsigned note are different consequences and the component ranks them, but it cannot discover them.",
+        "With `onReorder` wired. Without it the keyboard move is silently inert, and a drag with no keyboard path is a 2.5.7 failure."
+      ],
+      "avoid": [
+        "As a substitute for the chart header. The stack says which chart; the header says who the patient is and what must not be forgotten about them.",
+        "With more than about eight charts open. Past that the accents repeat, the names truncate and the stack stops being scannable — which is a workflow signal, not a component limit.",
+        "On a phone as a full workspace. The component narrows itself deliberately; do not widen it back.",
+        "With an accent assigned by arrival order. The whole value is that the hue is the same tomorrow."
+      ]
+    },
+    "accessibility": [
+      {
+        "label": "A tablist with roving focus",
+        "detail": "One tab stop for the whole stack; arrows move within it, Home and End jump to the ends. A workspace with eleven tab stops is a workspace a keyboard user leaves."
+      },
+      {
+        "label": "Every drag has a keyboard equivalent",
+        "detail": "Alt with the up and down arrows moves a chart rather than the focus (WCAG 2.5.7). Reordering never crosses the pinned boundary, so a keystroke cannot silently pin or unpin a chart."
+      },
+      {
+        "label": "Colour is never the only chart identity",
+        "detail": "The initials and the name are drawn in every mode, and the active chart is marked by weight and a ring as well as a hue. Eight accents rather than twelve, because twelve near-neighbours nobody can tell apart is a decoration pretending to be an identity."
+      },
+      {
+        "label": "The accessible name carries the outstanding work",
+        "detail": "\"A. Okonkwo. Ward round. Unsigned note.\" A screen-reader user should not have to open a chart to learn there is something owed on it."
+      },
+      {
+        "label": "Refusal is not dressed as a question",
+        "detail": "Closing a chart with a draft order opens an alertdialog with one way out and no confirm button. A dialogue with only one exit that offers two is how people learn to click through the ones that matter."
+      },
+      {
+        "label": "Small screens get one legible chart",
+        "detail": "Below 40rem the inactive tabs shrink to their avatar and only the active chart keeps its name. A multi-chart workspace on a phone is a wrong-patient generator, so the set stays visible and only one chart is legible enough to act on."
+      }
+    ],
+    "limitations": [
+      "It holds no state. Which charts are open, which is active and what is outstanding all belong to the host's workspace store — a component that owned them would be a second source of truth for the thing a wrong-patient event turns on.",
+      "The similarity pass is deliberately blunt: it compares folded names and their first four letters. A false positive costs a visible identifier on a row and a false negative costs a note in the wrong chart, so it is tuned to over-report.",
+      "Re-assertion is reported, not performed. The component says the clinician has been away long enough; showing the confirmation is the host's, because only the host knows what the chart is about to reveal.",
+      "No LRU eviction, no refetch on restore. Both belong to the workspace store — and a nine-hour-old vitals set that looks live is a hazard the store has to prevent, not the tab strip.",
+      "Pointer drag reordering is not implemented; the keyboard path is. A drag with no keyboard equivalent fails WCAG 2.5.7, and shipping the accessible half first is the order that cannot produce an inaccessible release."
+    ],
+    "related": [
+      "identity",
+      "chart-header",
+      "chart-command-palette"
+    ],
+    "dependencies": [
+      "clsx",
+      "tailwind-merge"
+    ],
+    "install": "npx @oxygenui-design/cli add recent-patient-stack",
+    "technicalName": "RecentPatientStack",
+    "aliases": [
+      "chart switcher",
+      "patient tabs",
+      "multi chart workspace",
+      "open charts",
+      "caseload switcher"
+    ],
+    "tags": [
+      "navigation",
+      "keyboard-first",
+      "themeable",
+      "print-safe",
+      "headless"
+    ],
+    "uxGuidelines": {
+      "do": [
+        "Keep chart ids stable across sessions. The accent is derived from the id, and an id that changes is a chart that changes colour.",
+        "Show the identifier on both charts of a similar pair. One row with an identifier and one without is a harder comparison than two that both have one.",
+        "Refuse to close a chart with a draft order. An order that vanishes with its tab is an order somebody believes they placed, and nothing downstream will show its absence.",
+        "Surface the caseload total. Six unsigned notes with the oldest at three days is the number that decides whether the week ends on time."
+      ],
+      "dont": [
+        "Do not put a close affordance on the tab. It is one mis-tap from losing a draft, and the tab is already the target for the thing people mean to do.",
+        "Do not use the accent as the only difference between two charts. Some readers cannot see it and nobody has learned it on their first day.",
+        "Do not reorder charts automatically. A chart that moves while the clinician is reaching for it is the interruption this component exists to survive.",
+        "Do not treat pinned as a sort key the user can trip over. Reordering must not cross the pinned boundary."
+      ]
+    },
+    "domain": {
+      "industries": [
+        "healthcare",
+        "behavioral-health"
+      ],
+      "clinicalContext": "A therapist's day is six to eight charts with a note owed on each. The stack shows which notes are unsigned and how long they have been unsigned, which is the number that determines whether the week ends on time — and it is the number no dropdown of names can carry.",
+      "workflows": [
+        "documentation",
+        "care-coordination",
+        "intake"
+      ],
+      "phi": {
+        "handles": true,
+        "notes": "Every open patient's name is on screen at once, persistently, including during a screen share. The small-screen behaviour narrows that deliberately."
+      },
+      "auditable": false,
+      "permissions": [
+        "patient.read"
+      ],
+      "terminology": [
+        "FHIR"
+      ]
+    },
+    "variants": [
+      {
+        "id": "bar",
+        "label": "Bar",
+        "description": "The tab strip. The set is visible without being opened.",
+        "args": {
+          "expanded": false
+        }
+      },
+      {
+        "id": "panel",
+        "label": "Panel",
+        "description": "Expanded, with the per-chart pin and close actions.",
+        "args": {
+          "expanded": true
+        }
+      }
+    ],
+    "controls": [
+      {
+        "prop": "expanded",
+        "control": "switch",
+        "label": "Expanded",
+        "defaultValue": false
+      },
+      {
+        "prop": "onActivate",
+        "control": "event",
+        "label": "onActivate"
+      },
+      {
+        "prop": "onClose",
+        "control": "event",
+        "label": "onClose"
+      }
+    ],
+    "a11yChecks": [
+      {
+        "wcag": "4.1.2",
+        "name": "Name, role, value",
+        "status": "pass",
+        "how": "A tablist of tabs with aria-selected, each named with the patient, the reason the chart is open and the work outstanding on it.",
+        "evidence": "recent-patient-stack.test.tsx"
+      },
+      {
+        "wcag": "2.1.1",
+        "name": "Keyboard",
+        "status": "pass",
+        "how": "Roving tabindex with arrow, Home and End navigation; every affordance is a native button.",
+        "evidence": "recent-patient-stack.test.tsx"
+      },
+      {
+        "wcag": "2.5.7",
+        "name": "Dragging movements",
+        "status": "pass",
+        "how": "Reordering is Alt with the up and down arrows. The pointer drag is not shipped without it, so no release can have one and not the other.",
+        "evidence": "recent-patient-stack.test.tsx"
+      },
+      {
+        "wcag": "1.4.1",
+        "name": "Use of colour",
+        "status": "pass",
+        "how": "The accent is one of four channels: initials, name, weight and ring. A test asserts two charts with the same accent index are still told apart by name and identifier.",
+        "evidence": "recent-patient-stack.test.tsx"
+      },
+      {
+        "wcag": "3.2.2",
+        "name": "On input",
+        "status": "pass",
+        "how": "Moving focus across the stack never activates a chart; activation is a click or Enter. Arrowing past a chart must not open it.",
+        "evidence": "recent-patient-stack.test.tsx"
+      },
+      {
+        "wcag": "2.5.8",
+        "name": "Target size (minimum)",
+        "status": "pass",
+        "how": "Tabs carry a 36px minimum block size and every action a 28px one, both above the 24px floor.",
+        "evidence": "recent-patient-stack.test.tsx"
+      },
+      {
+        "wcag": "4.1.3",
+        "name": "Status messages",
+        "status": "pass",
+        "how": "A close that is refused or needs confirming opens role=\"alertdialog\" with the reason as its content rather than as a toast that disappears.",
+        "evidence": "recent-patient-stack.test.tsx"
+      },
+      {
+        "wcag": "1.4.10",
+        "name": "Reflow",
+        "status": "pass",
+        "how": "Below 40rem the inactive tabs shrink to their avatar and the active one keeps its name, rather than the strip scrolling eleven full-width tabs off the side.",
+        "evidence": "recent-patient-stack.test.tsx"
+      }
+    ],
+    "examples": [
+      {
+        "id": "identity",
+        "title": "The hue is derived, not handed out",
+        "description": "A chart that was blue this morning must be blue this afternoon. The accent is an FNV-1a hash of the chart id modulo eight, so it is stable across sessions and machines — and it is never the only identity, because a clinician who has learned \"Okonkwo is the green one\" has learned something no new colleague knows.",
+        "fixture": "patientRoutine",
+        "code": "chartAccent(\"chart-okonkwo\");   // → 3, today and next month\nchartAccent(\"chart-okonkwo-2\"); // → a different slot, deterministically"
+      },
+      {
+        "id": "similar",
+        "title": "Two charts that look alike both grow an identifier",
+        "description": "Marking only the newcomer would leave the reader comparing a row that has an identifier against a row that does not, which is a harder comparison than two that both do. The pass is deliberately over-eager: a false positive costs a visible MRN and a false negative costs a note in the wrong chart.",
+        "fixture": "patients",
+        "code": "needsIdentifier([\n  { id: \"a\", display: \"J. Okonkwo\", identifier: \"093-441-208\" },\n  { id: \"b\", display: \"J. Okonjo\",  identifier: \"093-118-774\" },\n]);\n// → Set { \"a\", \"b\" }"
+      },
+      {
+        "id": "closing",
+        "title": "Closing is graded, not binary",
+        "description": "A clean chart closes. One with an unsigned note asks, because losing the draft is a real loss that a person may still choose. One with a draft order refuses, because an order that vanishes with its tab is an order somebody believes they placed and nothing downstream will show its absence.",
+        "fixture": "patientRestricted",
+        "code": "canClose(clean);     // { kind: \"close\" }\ncanClose(withNote);  // { kind: \"confirm\", reason: \"… Close and lose the draft?\" }\ncanClose(withOrder); // { kind: \"refuse\",  reason: \"… Sign it or discard it first.\" }"
+      },
+      {
+        "id": "return",
+        "title": "Coming back re-asserts who the chart belongs to",
+        "description": "Fifteen minutes, because that is roughly the length of an interruption you do not remember having — and that is the interruption that produces the wrong-chart note. A chart with no recorded activity re-asserts too: not knowing how long you were away is not the same as having just left.",
+        "fixture": "patientRoutine",
+        "code": "needsReassertion({ id, display, lastActiveAt: \"10:00\" }, \"10:20\"); // true\nneedsReassertion({ id, display, lastActiveAt: \"10:00\" }, \"10:05\"); // false\nneedsReassertion({ id, display }, \"10:05\");                        // true"
+      }
+    ],
+    "fixtures": [
+      "patientRoutine",
+      "patientRestricted",
+      "patients"
+    ],
+    "seo": {
+      "slug": "recent-patient-stack",
+      "title": "Recent Patient Stack — React multi-chart workspace",
+      "description": "A React chart switcher for clinicians: a stable per-chart accent, automatic disambiguation of similar names, unsigned-note badges and a graded close.",
+      "primaryKeyword": "react multi chart workspace",
+      "secondaryKeywords": [
+        "patient chart switcher react",
+        "wrong patient error prevention ui",
+        "clinical tab strip component",
+        "caseload switcher"
+      ],
+      "searchIntent": "informational",
+      "ogImage": "generated"
+    },
+    "relationships": {
+      "builtWith": [],
+      "usedIn": [],
+      "patterns": [
+        "chart-review",
+        "care-coordination"
+      ],
+      "alternatives": [
+        {
+          "ref": "chart-header",
+          "when": "there is one chart and the question is who the patient is"
+        }
+      ]
+    }
+  },
+  {
     "name": "result-value",
     "title": "Result Value",
     "tier": "free",
@@ -4822,7 +6644,8 @@ export const CATALOG: ComponentDoc[] = [
     "fhir": [
       {
         "name": "Observation",
-        "url": "https://hl7.org/fhir/R4/observation.html"
+        "url": "https://hl7.org/fhir/R4/observation.html",
+        "note": "value[x], dataAbsentReason, status, interpretation, referenceRange including appliesTo, and note. DataAbsentReason renders as seven distinct states rather than one blank."
       }
     ],
     "resource": "Observation",
@@ -5549,7 +7372,8 @@ export const CATALOG: ComponentDoc[] = [
     "fhir": [
       {
         "name": "RiskAssessment",
-        "url": "https://hl7.org/fhir/R4/riskassessment.html"
+        "url": "https://hl7.org/fhir/R4/riskassessment.html",
+        "note": "prediction[].probabilityDecimal and qualitativeRisk, whenPeriod.end as the validity window, basis[] as unweighted drivers, occurrenceDateTime and method. Pairs with a DSI source-attribute record for the model itself."
       }
     ],
     "resource": "RiskAssessment",
@@ -7119,7 +8943,7 @@ export const CATALOG: ComponentDoc[] = [
     "description": "An ordered list with a rail. The API matches Ant Design v6 exactly, including the v5 names it still accepts, and takes no dependency on it. Adds a required accessible name and drops the current-step behaviour a chronology has no use for.",
     "rationale": "antd's Timeline is a thin adapter over Steps, and it inherits two things a chronology should not have. It hardcodes current to the last item, which marks that item process — and antd's own stylesheet gives that state a dotted rail. On a wizard that reads as 'the step you are on, and it continues'. On a history it is a mark of incompleteness applied to whichever event happened to be last, and because reverse reverses the array first, on a newest-first clinical timeline it lands on the oldest event in the chart. It also inherits rc-steps' accessibility, which is none: no role, no aria-current, no way to name the list, so a page with a care timeline and an access-history timeline gives a screen-reader user two unnamed lists. Matching the API rather than wrapping it means an existing antd call site migrates by changing one import, and no consumer of a primitive inherits antd.",
     "categories": [
-      "Data display",
+      "Data Display",
       "Primitives"
     ],
     "fhir": [],
@@ -7406,7 +9230,8 @@ export const CATALOG: ComponentDoc[] = [
     "fhir": [
       {
         "name": "Observation",
-        "url": "https://hl7.org/fhir/R4/observation.html"
+        "url": "https://hl7.org/fhir/R4/observation.html",
+        "note": "Consumes a series. method, device and valueQuantity.unit decide comparability; referenceRange shades the band behind the line."
       }
     ],
     "resource": "Observation",
@@ -7460,7 +9285,7 @@ export const CATALOG: ComponentDoc[] = [
         "default": "64"
       }
     ],
-    "extendsType": "Omit<React.HTMLAttributes<HTMLDivElement>, \"children\">",
+    "extendsType": "Omit< React.HTMLAttributes<HTMLDivElement>, \"children\" >",
     "exports": [
       {
         "name": "TrendIndicator",
@@ -7498,7 +9323,7 @@ export const CATALOG: ComponentDoc[] = [
             "default": "64"
           }
         ],
-        "extendsType": "Omit<React.HTMLAttributes<HTMLDivElement>, \"children\">"
+        "extendsType": "Omit< React.HTMLAttributes<HTMLDivElement>, \"children\" >"
       }
     ],
     "usage": "import { TrendIndicator } from \"@/components/oxygen/trend-indicator\";\nimport \"@/styles/oxygen-trend.css\";\n\n<TrendIndicator\n  series={{\n    id: \"phq9\",\n    label: \"PHQ-9\",\n    valence: \"higher-is-worse\",\n    significantChange: 5,\n    points: [{ at: \"2026-05-02\", value: 18 }, { at: \"2026-06-06\", value: 14 }],\n  }}\n/>",
@@ -7865,7 +9690,7 @@ export const CATALOG: ComponentDoc[] = [
       },
       {
         "name": "identifiers",
-        "type": "readonly IdentifierSpec[] | TwoOrMore<IdentifierSpec>",
+        "type": "TwoOrMore<IdentifierSpec> | readonly IdentifierSpec[]",
         "description": "",
         "required": false
       },
@@ -7942,7 +9767,7 @@ export const CATALOG: ComponentDoc[] = [
           },
           {
             "name": "identifiers",
-            "type": "readonly IdentifierSpec[] | TwoOrMore<IdentifierSpec>",
+            "type": "TwoOrMore<IdentifierSpec> | readonly IdentifierSpec[]",
             "description": "",
             "required": false
           },
@@ -8040,7 +9865,10 @@ export const CATALOG: ComponentDoc[] = [
       "Wristband matching and the ID-reentry verification step are built but unstyled beyond the base sheet; a deployment wanting positive patient identification supplies the scanner integration."
     ],
     "related": [
-      "signature"
+      "signature",
+      "care-team-presence",
+      "chart-header",
+      "recent-patient-stack"
     ],
     "dependencies": [
       "@oxygenui-design/identity-core"

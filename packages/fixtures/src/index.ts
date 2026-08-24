@@ -17,6 +17,7 @@ import type {
   Bundle,
   Communication,
   Condition,
+  CareTeam,
   Consent,
   Coverage,
   DocumentReference,
@@ -1074,3 +1075,74 @@ export const signing = {
   declined: consentDeclined,
   provenance: provenanceConsent,
 };
+
+// ---------------------------------------------------------------------------
+// Care team and coverage — who is responsible right now
+//
+// The question a PDF on a shared drive answers today: who covers this patient
+// at 02:00 on a Sunday, and until when. Two teams here, and the second exists
+// only to exercise the gap — a rota that stops at 07:00 and resumes at 09:00
+// is not a rota with a handover, it is two hours in which a page reaches
+// nobody, and a component that rounds to the nearest window hides it.
+// ---------------------------------------------------------------------------
+
+/**
+ * A night-coverage rota with no holes in it.
+ *
+ * Every participant carries a bounded `period`. An open-ended membership means
+ * "on the team", which is a different question from "responsible right now",
+ * and the adapter drops it rather than treating it as covering all of time.
+ */
+export const careTeamNightCoverage: CareTeam = {
+  resourceType: "CareTeam",
+  id: "syn-careteam-night",
+  status: "active",
+  name: "Inpatient psychiatry — night coverage",
+  subject: { reference: "Patient/syn-patient-routine", display: "Amara Okonkwo" },
+  participant: [
+    {
+      role: [{ text: "Attending" }],
+      member: { reference: "Practitioner/syn-pr-1", display: "T. Boateng, MD" },
+      period: { start: "2026-08-23T09:00:00+05:30", end: "2026-08-23T19:00:00+05:30" },
+    },
+    {
+      role: [{ text: "Night attending" }],
+      member: { reference: "Practitioner/syn-pr-4", display: "A. Vance, MD" },
+      period: { start: "2026-08-23T19:00:00+05:30", end: "2026-08-24T09:00:00+05:30" },
+    },
+    {
+      // No period. On the team, and not the answer to "who is on now".
+      role: [{ text: "Assigned therapist" }],
+      member: { reference: "Practitioner/syn-pr-5", display: "L. Marsh, LCSW" },
+    },
+  ],
+};
+
+/**
+ * The same rota with a two-hour hole in it.
+ *
+ * Nothing covers 07:00–09:00. This is the state the coverage resolver returns
+ * `null` for, and the reason it does: filling the gap with the nearest
+ * plausible name is how a page goes to somebody who is asleep.
+ */
+export const careTeamCoverageGap: CareTeam = {
+  resourceType: "CareTeam",
+  id: "syn-careteam-gap",
+  status: "active",
+  name: "Inpatient psychiatry — coverage with a gap",
+  subject: { reference: "Patient/syn-patient-routine", display: "Amara Okonkwo" },
+  participant: [
+    {
+      role: [{ text: "Night attending" }],
+      member: { reference: "Practitioner/syn-pr-4", display: "A. Vance, MD" },
+      period: { start: "2026-08-23T19:00:00+05:30", end: "2026-08-24T07:00:00+05:30" },
+    },
+    {
+      role: [{ text: "Attending" }],
+      member: { reference: "Practitioner/syn-pr-1", display: "T. Boateng, MD" },
+      period: { start: "2026-08-24T09:00:00+05:30", end: "2026-08-24T19:00:00+05:30" },
+    },
+  ],
+};
+
+export const careTeams = [careTeamNightCoverage, careTeamCoverageGap];

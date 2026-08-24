@@ -370,6 +370,33 @@ export async function loadComponents(): Promise<LoadedComponent[]> {
     byKeyword.set(keyword, component.meta.name);
   }
 
+  /*
+   * One spelling per category.
+   *
+   * Categories are free text, and "Data display" and "Data Display" both
+   * existed for months — which produced two facets on the catalogue page, each
+   * holding half the components that belong in one. Nothing failed: both are
+   * valid strings, both render, and the split is invisible until somebody
+   * filters by one and wonders where the rest went.
+   *
+   * The rule is one spelling rather than a fixed vocabulary: a closed list
+   * would have to be edited before a genuinely new category could be used, and
+   * that is a gate on writing rather than on drift.
+   */
+  const byCategory = new Map<string, { spelling: string; owner: string }>();
+  for (const component of loaded) {
+    for (const category of component.meta.categories) {
+      const key = category.trim().toLowerCase();
+      const seen = byCategory.get(key);
+      if (seen && seen.spelling !== category) {
+        problems.push(
+          `${component.meta.name}: category "${category}" is spelled "${seen.spelling}" on ${seen.owner} — one spelling per category, or the catalogue grows two facets for one thing`,
+        );
+      }
+      if (!seen) byCategory.set(key, { spelling: category, owner: component.meta.name });
+    }
+  }
+
   if (problems.length) throw new MetaError(problems);
 
   return loaded;

@@ -78,6 +78,11 @@ export const CONTRAST_PAIRS: ContrastPair[] = [
   // readable, and it was the one nobody was checking.
   { fg: "text-on-accent", bg: "accent", kind: "text" },
   { fg: "text-on-accent", bg: "accent-hover", kind: "text" },
+  // Label on a filled neutral — the Switch's off word on its off track. Absent
+  // from this list, the off label pointed at `text-on-accent` and rendered
+  // #071014 on #5d6c7e at 3.57:1 in dark, which is the failure the comment
+  // above this list describes: a pair nobody named is a pair nobody checked.
+  { fg: "text-on-fill", bg: "border-strong", kind: "text" },
   // Interface components and graphical objects — SC 1.4.11.
   { fg: "focus-ring", bg: "bg", kind: "ui" },
   { fg: "focus-ring", bg: "surface", kind: "ui" },

@@ -71,6 +71,11 @@ Rules that matter when generating code with these components:
   fhir: AllergyIntolerance
   states: High criticality, mild past reaction, Low criticality, same manifestation, Intolerance, not an allergy, Refuted after a rechallenge, Entered in error, Unconfirmed — reported at intake, Unable to assess, No reaction recorded, Substance class expansion, Contraindication, No known allergies — asserted, Allergy status not recorded, An assertion with no author degrades, Compact, in a banner, Interactive — opens the history
   status: stable
+- [Care Team Presence](https://oxygenui.design/components/care-team-presence): Presence with clinical semantics: in session, on call, signed out to whom — and who else is in this chart right now.
+  install: npx @oxygenui-design/cli add care-team-presence
+  fhir: CareTeam
+  states: Available, In session — do not disturb, In group — eight patients, not one, On crisis line, On call, Signed out, with the cover named, Off shift, nobody covering, Presence degraded, with its age, Presence unknown, Assigned therapist, Compact — avatar only, Coverage resolved, Coverage gap, Someone else is documenting, Someone else is signing, Four in the chart, viewing only
+  status: stable
 - [Care Timeline](https://oxygenui.design/components/care-timeline): A patient's chronology that cannot be rendered without saying what it is a view of — the window, the sources, the filters and the order.
   install: npx @oxygenui-design/cli add care-timeline
   fhir: Encounter, Appointment, Communication, Observation, DiagnosticReport, Procedure, MedicationRequest, Immunization, DocumentReference, QuestionnaireResponse, Consent, Provenance
@@ -80,6 +85,16 @@ Rules that matter when generating code with these components:
   install: npx @oxygenui-design/cli add chart-accordion
   states: Closed, with summaries, Expanded, Severity across the scale, Consent gate, Withheld section, Section that failed to load, No sections
   status: beta
+- [Chart Command Palette](https://oxygenui.design/components/chart-command-palette): A command palette that understands clinical verbs, scopes every search to a treatment relationship, and audits the searches it refuses.
+  install: npx @oxygenui-design/cli add chart-command-palette
+  fhir: Patient, Task
+  states: Empty, before anything is typed, Actions ranked above records, A verb waiting for its argument, A significant action, first Enter, An action that cannot run, Out-of-scope patients, counted, Break-glass unavailable to this role, Nothing matches, Grouped results, Keyboard navigation, Frequency weighting, Every match named, with no scope
+  status: stable
+- [Chart Header](https://oxygenui.design/components/chart-header): Persistent patient context that collapses to a safety bar rather than to a name, and never renders administrative gender beside a dose.
+  install: npx @oxygenui-design/cli add chart-header
+  fhir: Patient, Encounter, EpisodeOfCare
+  states: Expanded, Collapsed to the safety strip, No encounter is open, Three encounters open — choose one, Sex parameter, with its context, Sex parameter not recorded, on an order screen, Sex parameter withheld on an overview screen, Allergies not asked, Code status not recorded, Isolation and fall risk, Involuntary hold, with its expiry, Hold expired, Program and week, With actions
+  status: stable
 - [Clinical Note](https://oxygenui.design/components/clinical-note): A clinical note editor that records where every character came from, and refuses to let anyone sign what they have not read.
   install: npx @oxygenui-design/cli add clinical-note
   fhir: Composition, DocumentReference, Provenance, Narrative
@@ -89,6 +104,11 @@ Rules that matter when generating code with these components:
   install: npx @oxygenui-design/cli add provenance-chip
   fhir: Provenance
   states: Clinic — measured in the room, Home device, with its caveats, Patient-reported — the instrument, External, with the exchange named, AI-extracted, unconfirmed, AI-extracted, confirmed by a clinician, Amended — the original retained, Stale against a per-datum policy, Observed long before it was recorded, Glyph only, in a dense grid, Chain reachable, Span reachable, No ledger entry — renders nothing
+  status: stable
+- [Recent Patient Stack](https://oxygenui.design/components/recent-patient-stack): A multi-chart workspace that makes the active patient unmistakable, because the alternative is eleven identical browser tabs.
+  install: npx @oxygenui-design/cli add recent-patient-stack
+  fhir: Patient, Task
+  states: Four charts, one active, A pinned chart, An unsigned note, A draft order, Two charts with similar names, Closing a clean chart, Closing one with an unsigned note, Closing one with a draft order, Returning after fifteen minutes, Expanded panel, Keyboard reordering, Roving focus across the stack, One chart, Notes owed across the caseload
   status: stable
 - [Result Value](https://oxygenui.design/components/result-value): A single observation rendered so that the four ways a number can lie to you are all impossible.
   install: npx @oxygenui-design/cli add result-value

@@ -1,31 +1,31 @@
 import type { Metadata } from "next";
+import Link from "next/link";
+import { ArrowUpRight } from "lucide-react";
 import { CATALOG } from "@/lib/catalog";
-import { ComponentCard } from "@/components/site/component-card";
+import { TIERS } from "@/lib/offerings";
+import { CatalogExplorer } from "@/components/site/catalog-explorer";
 import { SiteFooter, SiteHeader } from "@/components/site/chrome";
-import { RevealRoot } from "@/components/site/interactions";
+import { InstallCommand, RevealRoot } from "@/components/site/interactions";
 
 export const metadata: Metadata = {
   title: "Components",
   description:
-    "Every Oxygen UI component. Healthcare loaders paced to resting physiology, installed one at a time, with a designed reduced-motion state and a wait that is announced in words.",
+    "Every Oxygen UI component, with a live preview and the exact install line on each card. Free and MIT licensed, installed one at a time, with the states a demo would skip.",
 };
 
 export default function ComponentsPage() {
-  // These two carry the product's argument — the signature wait, and the only
-  // loader that can tell the truth about how much is left — so they lead, each
-  // paired with a standard cell to keep the rhythm even.
-  const FEATURED = ["pulse-loader", "infusion-loader"];
+  const current = CATALOG.filter((component) => component.status !== "deprecated");
+  const free = current.filter((component) => component.tier !== "pro").length;
 
-  // Deprecated components are still installable and still documented, but they
-  // do not belong in the lead grid. Every other tier does: a beta component is
-  // real, shipped, and the thing a visitor came to see. Filtering the grid down
-  // to "stable" only made sense when the catalog had any.
-  const current = CATALOG.filter((c) => c.status !== "deprecated");
-  const deprecated = CATALOG.filter((c) => c.status === "deprecated");
-
-  const featured = FEATURED.map((n) => current.find((c) => c.name === n)).filter(Boolean);
-  const rest = current.filter((c) => !FEATURED.includes(c.name));
-  const ordered = [featured[0], rest[0], featured[1], rest[1], ...rest.slice(2)].filter(Boolean);
+  /*
+   * The commercial tiers, read from the one place that owns them.
+   *
+   * Not restated here and not priced here. `offerings.ts` says the model moves,
+   * and a second copy on the catalogue page is the copy that will be six months
+   * out of date the first time it does.
+   */
+  const core = TIERS.find((tier) => tier.name === "Core");
+  const marketplace = TIERS.find((tier) => tier.featured);
 
   return (
     <RevealRoot>
@@ -42,25 +42,43 @@ export default function ComponentsPage() {
                 Every component ships the states a demo would skip.
               </h1>
               <p className="body-lg mt-6 max-w-xl text-pretty text-graphite" data-reveal>
-                Install them one at a time. Each one handles reduced motion with a designed still
-                state, announces itself in words, and resolves every colour through a token your
-                brand can override.
+                {/*
+                  The count is derived. It used to be a number in a sentence and
+                  a different number in the pricing table, and both were wrong
+                  by the time anybody read them.
+                */}
+                All {free} of them are free and MIT licensed. Install them one at a time — the line
+                is on every card. Each one handles reduced motion with a designed still state,
+                announces itself in words, and resolves every colour through a token your brand can
+                override.
               </p>
+
+              <div className="mt-8 max-w-md" data-reveal>
+                <InstallCommand
+                  size="sm"
+                  command="npx @oxygenui-design/cli init"
+                  note={
+                    <>
+                      Once per project, to say where your{" "}
+                      <code className="font-mono text-[0.6875rem] text-ink">@/</code> alias points.
+                      After that every card&rsquo;s install line works.
+                    </>
+                  }
+                />
+              </div>
             </div>
 
-            {/* The right column was empty. Stats belong here, set as an
-                instrument readout rather than a row under the paragraph. */}
             <dl className="lg:pb-1" data-reveal="right">
               <div className="ticks mb-5 opacity-70" aria-hidden="true" />
               {[
                 { label: "Components", value: current.length },
                 {
                   label: "Categories",
-                  value: new Set(CATALOG.flatMap((c) => c.categories)).size,
+                  value: new Set(CATALOG.flatMap((component) => component.categories)).size,
                 },
                 {
                   label: "States handled",
-                  value: CATALOG.reduce((total, c) => total + c.states.length, 0),
+                  value: CATALOG.reduce((total, component) => total + component.states.length, 0),
                 },
               ].map((stat) => (
                 <div
@@ -77,51 +95,75 @@ export default function ComponentsPage() {
 
         <section className="bg-paper-sunk/40">
           <div className="mx-auto max-w-6xl section-minor px-5 sm:px-8">
-            {CATALOG.length === 0 && (
-              <p
-                className="max-w-xl rounded-2xl border border-dashed border-rule px-6 py-8 text-sm leading-relaxed text-graphite"
-                data-reveal
-              >
+            {CATALOG.length === 0 ? (
+              <p className="max-w-xl rounded-2xl border border-dashed border-rule px-6 py-8 text-sm leading-relaxed text-graphite">
                 The catalog is being rebuilt from scratch. Components appear here as each one ships.
               </p>
-            )}
-
-            {/* No `auto-rows-fr`. It sizes every row in the grid to the
-                tallest row, so one preview taller than the rest — Care
-                Timeline, which carries a banner, its events and the coverage
-                sentence — set the height of all sixteen cards and left a
-                column of empty frame in the other fifteen. Default `auto`
-                rows still stretch the cards within a row to match each
-                other, which is the part that was actually wanted. */}
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {ordered.map((component, index) => (
-                <ComponentCard
-                  key={component!.name}
-                  component={component!}
-                  index={index}
-                  featured={FEATURED.includes(component!.name)}
-                />
-              ))}
-            </div>
-
-            {deprecated.length > 0 && (
-              <>
-                <h2 className="display-sm mt-16" data-reveal>
-                  Deprecated
-                </h2>
-                <p className="mt-2 max-w-xl text-sm text-graphite" data-reveal>
-                  Still installable and still documented, with a removal version and a migration
-                  note on each page.
-                </p>
-                <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                  {deprecated.map((component, index) => (
-                    <ComponentCard key={component.name} component={component} index={index} />
-                  ))}
-                </div>
-              </>
+            ) : (
+              <CatalogExplorer catalog={CATALOG} />
             )}
           </div>
         </section>
+
+        {/*
+          What it costs, at the bottom of the thing being priced.
+          Every component on this page is free; the paid surface is the
+          marketplace, and saying so here is more honest than a "Pro" badge on
+          a component nobody can buy separately.
+        */}
+        {core && marketplace ? (
+          <section className="border-t border-rule">
+            <div className="mx-auto max-w-6xl section-minor px-5 sm:px-8">
+              <h2 className="display-sm" data-reveal>
+                What this costs
+              </h2>
+
+              <div className="mt-6 grid gap-4 md:grid-cols-2" data-reveal>
+                <div className="surface-2 rounded-2xl p-6">
+                  <p className="axis-label text-oxygen-deep">{core.name}</p>
+                  <p className="mt-2 font-display text-3xl font-semibold tracking-tight">
+                    {core.price}
+                  </p>
+                  <p className="mt-3 text-sm leading-relaxed text-graphite">{core.summary}</p>
+                  <p className="mt-4 text-sm text-graphite">
+                    That is every card above — all {free} of them, commercial use permitted, with no
+                    account and nothing to sign.
+                  </p>
+                </div>
+
+                <div className="surface-2 rounded-2xl border-oxygen/30 p-6">
+                  <p className="axis-label text-oxygen-deep">{marketplace.name}</p>
+                  <p className="mt-2 font-display text-3xl font-semibold tracking-tight">
+                    {marketplace.price}
+                    {marketplace.cadence ? (
+                      <span className="ml-2 text-sm font-normal text-graphite-soft">
+                        {marketplace.cadence}
+                      </span>
+                    ) : null}
+                  </p>
+                  <p className="mt-3 text-sm leading-relaxed text-graphite">
+                    {marketplace.summary}
+                  </p>
+                  <Link
+                    href={marketplace.href}
+                    className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-oxygen-deep transition-colors hover:text-ink"
+                  >
+                    {marketplace.cta}
+                    <ArrowUpRight aria-hidden="true" className="size-3.5" />
+                  </Link>
+                </div>
+              </div>
+
+              <p className="mt-4 text-xs text-graphite-soft" data-reveal>
+                Team and Enterprise add starter kits, shared design assets and support —{" "}
+                <Link href="/pro" className="underline underline-offset-2 hover:text-ink">
+                  the full table is on the Pro page
+                </Link>
+                .
+              </p>
+            </div>
+          </section>
+        ) : null}
       </main>
 
       <SiteFooter />

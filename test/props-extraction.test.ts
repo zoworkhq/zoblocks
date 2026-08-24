@@ -121,6 +121,9 @@ function componentFor(name: string): LoadedComponent {
     consumerTarget: `components/oxygen/${name}.tsx`,
     hasStory: false,
     hasTest: false,
+    // The relationship graph is computed across the whole catalog; a fixture
+    // that exists for one file has no neighbours to derive it from.
+    derived: { builtWith: [], usedIn: [] },
   };
 }
 

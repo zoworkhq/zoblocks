@@ -50,6 +50,11 @@
     "$type": "color",
     "$value": "{ref.white}"
   },
+  "text-on-fill": {
+    "$type": "color",
+    "$value": "{ref.white}",
+    "$description": "A label on a filled neutral — the Switch's off track, which is {border-strong} in every theme and therefore a mid-grey in every theme. Separate from text-on-accent because that one follows the accent, and the dark accent is light: pointing the off label at it put #071014 on #5d6c7e at 3.57:1. White clears AA on border-strong in all three themes, and the pair is in the contrast gate so it stays that way."
+  },
   "accent": {
     "$type": "color",
     "$value": "{ref.hc.accent}"

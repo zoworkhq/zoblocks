@@ -19,7 +19,7 @@ const RELEASES = [
 ];
 
 const meta: Meta<typeof Timeline> = {
-  title: "Data display/Timeline",
+  title: "Data Display/Timeline",
   component: Timeline,
   args: { "aria-label": "Release history", items: RELEASES },
 };

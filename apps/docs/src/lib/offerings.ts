@@ -126,7 +126,15 @@ export const TIERS: Tier[] = [
     price: "Free",
     summary: "Every component in the public catalog, MIT licensed, forever.",
     features: [
-      "All 8 shipping components",
+      /*
+       * No count here.
+       *
+       * It said "All 8 shipping components" for long enough that the catalogue
+       * reached twenty-six with the table still claiming eight — a number in
+       * prose is a number nobody updates. The catalogue page derives its own
+       * from `CATALOG`; this line simply stops asserting one.
+       */
+      "Every component in the public catalog",
       "FHIR R4 types and helpers",
       "Design tokens and density modes",
       "Public registry and docs",

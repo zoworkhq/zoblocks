@@ -56,8 +56,13 @@ import { AllergyChip } from "@/registry/oxygen/allergy-chip/allergy-chip";
 import { RiskIndicator } from "@/registry/oxygen/risk-indicator/risk-indicator";
 import { ProvenanceChip } from "@/registry/oxygen/provenance-chip/provenance-chip";
 import { TrendIndicator } from "@/registry/oxygen/trend-indicator/trend-indicator";
+import { PresenceChip } from "@/registry/oxygen/care-team-presence/care-team-presence";
+import { ChartHeader } from "@/registry/oxygen/chart-header/chart-header";
+import { RecentPatientStack } from "@/registry/oxygen/recent-patient-stack/recent-patient-stack";
+import { ChartCommandPalette } from "@/registry/oxygen/chart-command-palette/chart-command-palette";
 import { IdentityProvider, PatientChip, IdentitySet } from "@oxygenui-design/identity";
 import { STATUS_LABEL, type ComponentDoc } from "@/lib/catalog";
+import { AcquireAction, PriceTag } from "@/components/site/acquire";
 import { cn } from "@/lib/utils";
 
 /**
@@ -301,6 +306,130 @@ const PREVIEW: Record<string, (featured: boolean) => React.ReactNode> = {
     </div>
   ),
 
+  /*
+   * The row nobody else has: the count of what may not be named.
+   *
+   * The palette is `position: fixed`, so the card gives it a contained box to
+   * sit in — `contain: layout paint` makes the stage its containing block —
+   * rather than letting it cover the page it is being read on.
+   */
+  "chart-command-palette": (featured) => (
+    <div
+      style={{
+        position: "relative",
+        inlineSize: "100%",
+        maxInlineSize: featured ? 340 : 268,
+        blockSize: featured ? 168 : 148,
+        overflow: "hidden",
+        borderRadius: 10,
+        contain: "layout paint",
+      }}
+    >
+      <ChartCommandPalette
+        open
+        placeholder="oko"
+        scope={{ inScope: new Set(["p-mine"]), breakGlass: true }}
+        items={[
+          { id: "p-mine", kind: "patient", label: "A. Okonkwo", detail: "093-441-208" },
+          { id: "p-other-1", kind: "patient", label: "A. Okonjo" },
+          { id: "p-other-2", kind: "patient", label: "A. Okoro" },
+        ]}
+      />
+    </div>
+  ),
+
+  /*
+   * Three charts, one active, one with a note owed.
+   *
+   * The card has to say what the component is for in one glance: a set that is
+   * visible without being opened, and a badge that says which one is unfinished.
+   */
+  "recent-patient-stack": (featured) => (
+    <div style={{ maxInlineSize: featured ? 340 : 268, inlineSize: "100%" }}>
+      <RecentPatientStack
+        activeId="card-a"
+        now="2026-08-24T10:00:00Z"
+        charts={[
+          { id: "card-a", display: "A. Okonkwo", reason: "Ward round" },
+          {
+            id: "card-b",
+            display: "T. Boateng",
+            work: [{ kind: "unsigned-note", since: "2026-08-21T09:00:00Z" }],
+          },
+          { id: "card-c", display: "L. Marsh", pinned: true },
+        ]}
+      />
+    </div>
+  ),
+
+  /*
+   * The collapsed strip, which is the whole argument in 44 pixels.
+   *
+   * A card showing the expanded header would be a card for a component every
+   * library already ships. The strip is the part nothing else has.
+   */
+  "chart-header": (featured) => (
+    <div style={{ maxInlineSize: featured ? 340 : 272, inlineSize: "100%" }}>
+      <ChartHeader
+        collapsed
+        now="2026-08-24T10:00:00Z"
+        identifiers={[{ kind: "mrn" }, { kind: "nhs" }]}
+        patient={{
+          resourceType: "Patient",
+          id: "card-ch",
+          name: [{ use: "official", family: "Okonkwo", given: ["Amara"] }],
+          birthDate: "1985-03-08",
+          identifier: [{ system: "http://example.org/fhir/sid/mrn", value: "MRN-4417" }],
+        }}
+        safety={{
+          allergies: { label: "Penicillin", tone: "critical" },
+          codeStatus: { label: "DNR" },
+          legalStatus: { label: "Hold", until: "2026-08-24T09:00:00Z" },
+        }}
+      />
+    </div>
+  ),
+
+  /*
+   * Three people, all online, all a different answer.
+   *
+   * The card has to make the argument in one glance, so it is the three states
+   * a green dot collapses: available, in session, and signed out to somebody
+   * else. The rings differ in shape before they differ in hue.
+   */
+  "care-team-presence": (featured) => (
+    <div style={{ display: "grid", gap: featured ? 10 : 7 }}>
+      {(
+        [
+          {
+            clinician: { id: "card-a", display: "A. Vance, MD", role: "Attending" },
+            state: "available",
+          },
+          {
+            clinician: { id: "card-b", display: "L. Marsh, LCSW", role: "Therapist" },
+            state: "in-session",
+            until: "15:50",
+          },
+          {
+            clinician: { id: "card-c", display: "R. Adeyemi, MD", role: "Hospitalist" },
+            state: "signed-out",
+            coveredBy: {
+              id: "card-d",
+              display: "T. Boateng, MD",
+              role: "Night attending",
+            },
+          },
+        ] as const
+      ).map((presence) => (
+        <PresenceChip
+          key={presence.clinician.id}
+          presence={presence}
+          now="2026-08-24T02:30:00+05:30"
+        />
+      ))}
+    </div>
+  ),
+
   "provenance-chip": (featured) => (
     <div style={{ display: "grid", gap: featured ? 10 : 7 }}>
       {(
@@ -330,60 +459,74 @@ const PREVIEW: Record<string, (featured: boolean) => React.ReactNode> = {
     </div>
   ),
 
+  /*
+   * Wrapped in `ScaledArt`, because the card cannot shorten it.
+   *
+   * The band, the score, the drivers and the staleness affix are the component:
+   * dropping one to fit a thumbnail would make the card advertise a different
+   * component. It painted 266px inside a 156px band and the frame clipped the
+   * overflow silently — `fit` shrinks the paint instead, which is what a
+   * thumbnail is.
+   */
   "risk-indicator": (featured) => (
-    <div style={{ maxInlineSize: featured ? 320 : 258, inlineSize: "100%" }}>
-      <RiskIndicator
-        density={featured ? "default" : "compact"}
-        now="2026-08-12T10:00:00Z"
-        notADiagnosis="A statistical estimate. Not a diagnosis."
-        assessment={{
-          id: "card-risk",
-          outcome: "30-day readmission",
-          band: "high",
-          probability: 0.31,
-          percentile: 94,
-          cohort: "adult medicine",
-          computedAt: "2026-08-12T04:12:00Z",
-          validUntil: "2026-08-13T04:12:00Z",
-          drivers: [
-            { label: "3 admissions / 6 mo", weight: 11.2 },
-            { label: "Lives alone", weight: 4.8 },
-            { label: "Adherent to statin", weight: -2.1 },
-          ],
-          model: { name: "Readmit-v4", auc: 0.71 },
-        }}
-        driverCount={3}
-      />
-    </div>
+    <ScaledArt scale={featured ? 0.9 : 0.72} fit={featured ? FEATURED_ART : STANDARD_ART}>
+      <div style={{ maxInlineSize: featured ? 320 : 258, inlineSize: "100%" }}>
+        <RiskIndicator
+          density={featured ? "default" : "compact"}
+          now="2026-08-12T10:00:00Z"
+          notADiagnosis="A statistical estimate. Not a diagnosis."
+          assessment={{
+            id: "card-risk",
+            outcome: "30-day readmission",
+            band: "high",
+            probability: 0.31,
+            percentile: 94,
+            cohort: "adult medicine",
+            computedAt: "2026-08-12T04:12:00Z",
+            validUntil: "2026-08-13T04:12:00Z",
+            drivers: [
+              { label: "3 admissions / 6 mo", weight: 11.2 },
+              { label: "Lives alone", weight: 4.8 },
+              { label: "Adherent to statin", weight: -2.1 },
+            ],
+            model: { name: "Readmit-v4", auc: 0.71 },
+          }}
+          driverCount={3}
+        />
+      </div>
+    </ScaledArt>
   ),
 
+  /* Two rows of chip, 3.5px over the band. `fit` takes the last hair off. */
   "allergy-chip": (featured) => (
-    <div
-      style={{ display: "grid", gap: 8, maxInlineSize: featured ? 320 : 250, inlineSize: "100%" }}
-    >
-      <AllergyChip
-        density={featured ? "default" : "compact"}
-        record={{
-          id: "card-1",
-          substance: "Penicillin G",
-          kind: "allergy",
-          criticality: "high",
-          verification: "confirmed",
-          reactions: [{ manifestation: "Urticaria", severity: "mild", onset: "1998" }],
-        }}
-      />
-      <AllergyChip
-        density={featured ? "default" : "compact"}
-        record={{
-          id: "card-2",
-          substance: "Amoxicillin",
-          kind: "allergy",
-          criticality: "low",
-          verification: "unconfirmed",
-          reactions: [{ manifestation: "Urticaria", severity: "mild", onset: "2019" }],
-        }}
-      />
-    </div>
+    <ScaledArt scale={featured ? 1 : 0.96} fit={featured ? FEATURED_ART : STANDARD_ART}>
+      <div
+        style={{ display: "grid", gap: 8, maxInlineSize: featured ? 320 : 250, inlineSize: "100%" }}
+      >
+        <AllergyChip
+          density={featured ? "default" : "compact"}
+          record={{
+            id: "card-1",
+            substance: "Penicillin G",
+            kind: "allergy",
+            criticality: "high",
+            verification: "confirmed",
+            reactions: [{ manifestation: "Urticaria", severity: "mild", onset: "1998" }],
+          }}
+        />
+        <AllergyChip
+          density={featured ? "default" : "compact"}
+          record={{
+            id: "card-2",
+            substance: "Amoxicillin",
+            kind: "allergy",
+            criticality: "low",
+            verification: "unconfirmed",
+            reactions: [{ manifestation: "Urticaria", severity: "mild", onset: "2019" }],
+          }}
+        />
+      </div>
+    </ScaledArt>
   ),
 
   "result-value": (featured) => (
@@ -834,12 +977,31 @@ export function ComponentCard({
   const preview = PREVIEW[component.name];
 
   return (
-    <Link
-      href={`/components/${component.name}`}
+    /*
+     * An article with an overlay link, not one big anchor.
+     *
+     * The card carries a second action now — copy the install command, or open
+     * the marketplace — and an interactive element inside an anchor is invalid
+     * HTML that browsers resolve by guessing. The title is the real link and
+     * its `::after` covers the card; the action row sits above that overlay on
+     * `z-10`, so the whole card opens the component and one corner does not.
+     */
+    <article
       data-reveal
+      /*
+       * The stable hook the browser suite selects on.
+       *
+       * It used to select `a[href^='/components/']` and reach *inside* the
+       * anchor for the preview frame, which worked only while the whole card
+       * was one link. The card grew a second action and became an article with
+       * an overlay link, and five browser tests broke on a selector that was
+       * describing the implementation rather than the thing.
+       */
+      data-ox-component-card={component.name}
       style={{ "--reveal-delay": `${(index % 3) * 70}ms` } as React.CSSProperties}
       className={cn(
-        "surface-2 lift group relative flex flex-col overflow-hidden rounded-2xl hover:border-oxygen/45",
+        "surface-2 lift group relative flex flex-col overflow-hidden rounded-2xl",
+        "focus-within:border-oxygen/45 hover:border-oxygen/45",
         // Span only at 3 columns. At 2 columns a span-2 cell after an odd number
         // of standard cards leaves an empty grid slot.
         featured ? "p-6 lg:col-span-2" : "p-5",
@@ -859,7 +1021,12 @@ export function ComponentCard({
             featured ? "text-xl" : "text-base",
           )}
         >
-          {component.title}
+          <Link
+            href={`/components/${component.name}`}
+            className="after:absolute after:inset-0 after:content-[''] focus-visible:outline-none"
+          >
+            {component.title}
+          </Link>
         </h3>
         <span
           className={cn(
@@ -947,18 +1114,30 @@ export function ComponentCard({
         </div>
       ) : null}
 
-      <div className="mt-5 flex items-center justify-between border-t border-rule pt-3">
-        <span className="numeric text-[0.6875rem] text-graphite-soft">
-          {component.states.length} states
-        </span>
-        <span className="inline-flex items-center gap-1 text-xs font-medium text-oxygen-deep">
-          View
-          <ArrowRight
+      {/*
+        What it is, and how to get it — on the card rather than one page in.
+        A catalogue that answers "what is this" and stops makes the reader open
+        a page to find out whether they can even have it.
+      */}
+      <div className="mt-5 flex flex-wrap items-center justify-between gap-2 border-t border-rule pt-3">
+        <div className="flex items-center gap-2">
+          <PriceTag component={component} />
+          <span className="numeric text-[0.6875rem] text-graphite-soft">
+            {component.states.length} states
+          </span>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <AcquireAction component={component} />
+          <span
             aria-hidden="true"
-            className="size-3.5 transition-transform duration-300 ease-[var(--ease-out-expo)] group-hover:translate-x-1"
-          />
-        </span>
+            className="inline-flex items-center gap-1 text-xs font-medium text-oxygen-deep"
+          >
+            View
+            <ArrowRight className="size-3.5 transition-transform duration-300 ease-[var(--ease-out-expo)] group-hover:translate-x-1" />
+          </span>
+        </div>
       </div>
-    </Link>
+    </article>
   );
 }

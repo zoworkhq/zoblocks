@@ -178,6 +178,97 @@
       ]
     },
     {
+      "name": "clock-core",
+      "type": "oxygen:lib",
+      "title": "Clock",
+      "description": "One date format shared by the components that have to say \"until when\": an ISO timestamp read as the wall-clock time it was written in, rather than re-zoned through the reader's browser. Its own item rather than part of `utils`, because inside an application `@/lib/utils` is a name the application usually already owns.",
+      "files": [
+        {
+          "path": "registry/oxygen/lib/clock.ts",
+          "type": "oxygen:lib",
+          "target": "lib/oxygen-clock.ts"
+        }
+      ]
+    },
+    {
+      "name": "presence-core",
+      "type": "oxygen:lib",
+      "title": "Presence core",
+      "description": "Nine clinical presence states rather than a green dot, ring geometry that survives a colour deficiency, rota resolution that returns a gap instead of the nearest plausible name, chart co-presence conflict detection, and escalation routing that offers the covering clinician before it offers an override. Installed automatically with CareTeamPresence.",
+      "registryDependencies": [
+        "clock-core"
+      ],
+      "files": [
+        {
+          "path": "registry/oxygen/lib/presence.ts",
+          "type": "oxygen:lib",
+          "target": "lib/oxygen-presence.ts"
+        },
+        {
+          "path": "registry/oxygen/lib/presence.css",
+          "type": "oxygen:style",
+          "target": "styles/oxygen-presence.css"
+        }
+      ]
+    },
+    {
+      "name": "chart-header-core",
+      "type": "oxygen:lib",
+      "title": "Chart header core",
+      "description": "The Sex Parameter for Clinical Use resolved against what is on screen rather than read as a demographic, a safety strip whose absences are named rather than omitted, encounter context that will sit in \"none selected\" rather than pick one for you, and EpisodeOfCare into a program and a week. Installed automatically with ChartHeader.",
+      "registryDependencies": [
+        "clock-core"
+      ],
+      "files": [
+        {
+          "path": "registry/oxygen/lib/chart-header.ts",
+          "type": "oxygen:lib",
+          "target": "lib/oxygen-chart-header.ts"
+        },
+        {
+          "path": "registry/oxygen/lib/chart-header.css",
+          "type": "oxygen:style",
+          "target": "styles/oxygen-chart-header.css"
+        }
+      ]
+    },
+    {
+      "name": "workspace-core",
+      "type": "oxygen:lib",
+      "title": "Workspace core",
+      "description": "The multi-chart workspace rules: a per-chart accent derived from the chart id so it is the same hue in every session, automatic disambiguation when two open charts look alike, a graded close verdict that asks about an unsigned note and refuses a draft order, and the fifteen-minute rule for re-asserting identity on return. Installed automatically with RecentPatientStack.",
+      "files": [
+        {
+          "path": "registry/oxygen/lib/workspace.ts",
+          "type": "oxygen:lib",
+          "target": "lib/oxygen-workspace.ts"
+        },
+        {
+          "path": "registry/oxygen/lib/workspace.css",
+          "type": "oxygen:style",
+          "target": "styles/oxygen-workspace.css"
+        }
+      ]
+    },
+    {
+      "name": "palette-core",
+      "type": "oxygen:lib",
+      "title": "Command palette core",
+      "description": "Verb-first ranking with a sixty-line fuzzy matcher, treatment-relationship scoping that counts out-of-scope patients rather than naming them, an audit record for every patient search including the empty ones, and the second-Enter rule for a clinically significant action. Installed automatically with ChartCommandPalette.",
+      "files": [
+        {
+          "path": "registry/oxygen/lib/palette.ts",
+          "type": "oxygen:lib",
+          "target": "lib/oxygen-palette.ts"
+        },
+        {
+          "path": "registry/oxygen/lib/palette.css",
+          "type": "oxygen:style",
+          "target": "styles/oxygen-palette.css"
+        }
+      ]
+    },
+    {
       "name": "switch-core",
       "type": "oxygen:lib",
       "title": "Switch core",
@@ -367,6 +458,32 @@
       ]
     },
     {
+      "name": "care-team-presence",
+      "type": "oxygen:component",
+      "title": "Care Team Presence",
+      "description": "Nine states rather than a green dot, each drawn as a ring shape before it is a colour. Resolves a rota to the person responsible at this moment and returns a gap when nobody is. Routes an escalation to the covering clinician before it offers an override, and warns about a documentation conflict before you type rather than at save.",
+      "categories": [
+        "clinical",
+        "data-display"
+      ],
+      "dependencies": [
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "utils",
+        "tokens",
+        "presence-core"
+      ],
+      "files": [
+        {
+          "path": "registry/oxygen/care-team-presence/care-team-presence.tsx",
+          "type": "oxygen:component",
+          "target": "components/oxygen/care-team-presence.tsx"
+        }
+      ]
+    },
+    {
       "name": "care-timeline",
       "type": "oxygen:component",
       "title": "Care Timeline",
@@ -418,6 +535,59 @@
           "path": "registry/oxygen/chart-accordion/chart-accordion.tsx",
           "type": "oxygen:component",
           "target": "components/oxygen/chart-accordion.tsx"
+        }
+      ]
+    },
+    {
+      "name": "chart-command-palette",
+      "type": "oxygen:component",
+      "title": "Chart Command Palette",
+      "description": "Actions rank above records, because a verb is usually what was meant. Patients outside your relationships are counted rather than named. Every patient search emits an audit event, including the ones that matched nobody, and a clinically significant action never runs on the first Enter.",
+      "categories": [
+        "clinical",
+        "navigation"
+      ],
+      "dependencies": [
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "utils",
+        "tokens",
+        "palette-core"
+      ],
+      "files": [
+        {
+          "path": "registry/oxygen/chart-command-palette/chart-command-palette.tsx",
+          "type": "oxygen:component",
+          "target": "components/oxygen/chart-command-palette.tsx"
+        }
+      ]
+    },
+    {
+      "name": "chart-header",
+      "type": "oxygen:component",
+      "title": "Chart Header",
+      "description": "Sticky chrome over PatientBanner. Collapse moves content behind a disclosure rather than out of the accessibility tree. The encounter is an explicit control that will sit in “none selected” rather than pick one for you. The Sex Parameter for Clinical Use appears only where an order or a result is in view, with the context it applies to.",
+      "categories": [
+        "clinical",
+        "navigation"
+      ],
+      "dependencies": [
+        "clsx",
+        "tailwind-merge",
+        "@oxygenui-design/identity"
+      ],
+      "registryDependencies": [
+        "utils",
+        "tokens",
+        "chart-header-core"
+      ],
+      "files": [
+        {
+          "path": "registry/oxygen/chart-header/chart-header.tsx",
+          "type": "oxygen:component",
+          "target": "components/oxygen/chart-header.tsx"
         }
       ]
     },
@@ -609,6 +779,32 @@
           "path": "registry/oxygen/pulse-loader/pulse-loader.tsx",
           "type": "oxygen:component",
           "target": "components/oxygen/pulse-loader.tsx"
+        }
+      ]
+    },
+    {
+      "name": "recent-patient-stack",
+      "type": "oxygen:component",
+      "title": "Recent Patient Stack",
+      "description": "Each open chart gets a hue derived from its id, so it is the same colour in every session. Two charts whose names look alike both grow an identifier. Per-chart badges carry the unfinished work, closing is graded rather than binary, and returning after fifteen minutes away re-asserts who the chart belongs to.",
+      "categories": [
+        "clinical",
+        "navigation"
+      ],
+      "dependencies": [
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "utils",
+        "tokens",
+        "workspace-core"
+      ],
+      "files": [
+        {
+          "path": "registry/oxygen/recent-patient-stack/recent-patient-stack.tsx",
+          "type": "oxygen:component",
+          "target": "components/oxygen/recent-patient-stack.tsx"
         }
       ]
     },

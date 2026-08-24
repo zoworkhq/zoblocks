@@ -101,6 +101,18 @@ export const fhirResourceSchema = z.object({
   /** Resource type as spelled in the FHIR specification, e.g. "Observation". */
   name: nonEmpty("fhir resource name"),
   url: z.string().url(),
+  /**
+   * Which elements the component actually reads, and what it does with them.
+   *
+   * Optional, and the difference between "this touches Observation" and
+   * something a reader can check their own feed against — `method` and
+   * `valueQuantity.unit` decide comparability, `participant[].period` becomes
+   * a coverage window. Six components were already writing this before the
+   * schema had a home for it: zod dropped it silently and TypeScript rejected
+   * it, so the note existed in the source and reached neither the catalog nor
+   * the page.
+   */
+  note: nonEmpty("fhir resource note").optional(),
 });
 
 export const a11yNoteSchema = z.object({

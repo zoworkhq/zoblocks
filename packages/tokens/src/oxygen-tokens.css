@@ -230,6 +230,7 @@
   --ox-text-muted: var(--ox-ref-slate-600);
   --ox-text-subtle: var(--ox-ref-slate-500);
   --ox-text-on-accent: var(--ox-ref-white);
+  --ox-text-on-fill: var(--ox-ref-white);
   --ox-accent: var(--ox-ref-brand-700);
   --ox-accent-hover: var(--ox-ref-brand-800);
   --ox-accent-subtle: var(--ox-ref-brand-50);
@@ -411,7 +412,7 @@
   --ox-switch-thumb-unknown-bg: var(--ox-status-unknown);
   --ox-switch-thumb-unknown-fg: var(--ox-bg);
   --ox-switch-label-on-fg: var(--ox-text-on-accent);
-  --ox-switch-label-off-fg: var(--ox-text-on-accent);
+  --ox-switch-label-off-fg: var(--ox-text-on-fill);
   --ox-switch-state-fg: var(--ox-text-muted);
   --ox-switch-state-on-fg: var(--ox-accent);
   --ox-switch-desc-fg: var(--ox-text-muted);
@@ -478,6 +479,9 @@
   --ox-rv-value-default: 1.0625rem;
   --ox-rv-value-compact: 0.9375rem;
   --ox-risk-figure: 1.25rem;
+  --ox-presence-avatar: 1.75rem;
+  --ox-chart-header-tone: var(--ox-text-muted);
+  --ox-stack-accent: var(--ox-text-muted);
 }
 
   /* Brand — northwind ---------------------------------------------------
@@ -591,6 +595,7 @@
   --ox-text-muted: var(--ox-ref-ink-200);
   --ox-text-subtle: var(--ox-ref-ink-300);
   --ox-text-on-accent: var(--ox-ref-ink-on-accent);
+  --ox-text-on-fill: var(--ox-ref-white);
   --ox-accent: var(--ox-ref-brand-300);
   --ox-accent-hover: var(--ox-ref-brand-200);
   --ox-accent-subtle: var(--ox-ref-tint-accent-bg);
@@ -663,6 +668,7 @@
   --ox-text-muted: var(--ox-ref-hc-text-muted);
   --ox-text-subtle: var(--ox-ref-hc-text-muted);
   --ox-text-on-accent: var(--ox-ref-white);
+  --ox-text-on-fill: var(--ox-ref-white);
   --ox-accent: var(--ox-ref-hc-accent);
   --ox-accent-hover: var(--ox-ref-hc-accent-hover);
   --ox-accent-subtle: var(--ox-ref-white);

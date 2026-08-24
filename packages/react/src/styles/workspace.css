@@ -1,0 +1,400 @@
+/**
+ * RecentPatientStack — eight hues, and none of them alone.
+ *
+ * The accent is an accelerant for a reader who already knows the chart. The
+ * initials and the name are always drawn, so a reader who cannot distinguish
+ * the hues — or who has just opened the workspace for the first time — is
+ * never worse off than one who can.
+ *
+ * Eight rather than twelve, because twelve is twelve near-neighbours nobody
+ * can tell apart, and an identity nobody can tell apart is a decoration
+ * pretending to be one.
+ */
+
+.ox-stack {
+  --ox-stack-accent: var(--ox-text-muted, #64748b);
+
+  display: grid;
+  gap: 0.5rem;
+  font-family: var(--ox-font-sans, inherit);
+  font-size: var(--ox-text-xs, 0.75rem);
+  color: var(--ox-text, inherit);
+}
+
+.ox-stack__bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.75rem;
+}
+
+.ox-stack__tabs {
+  display: flex;
+  /* Takes the whole row and pushes the controls below it when space is short,
+     rather than shrinking the charts to make room for a count. */
+  flex: 1 1 28rem;
+  gap: 0.375rem;
+  min-inline-size: 0;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+
+/* ---------------------------------------------------------------- */
+/* The eight accents                                                 */
+/*                                                                   */
+/* Drawn from the status and flag families rather than a new palette */
+/* so a brand override reaches them, and so none of them can drift   */
+/* into the hue a clinical severity already owns.                    */
+/* ---------------------------------------------------------------- */
+
+.ox-stack__tab[data-ox-accent="0"],
+.ox-stack__row[data-ox-accent="0"] {
+  --ox-stack-accent: var(--ox-status-low, #2563eb);
+}
+
+.ox-stack__tab[data-ox-accent="1"],
+.ox-stack__row[data-ox-accent="1"] {
+  --ox-stack-accent: var(--ox-status-normal, #047857);
+}
+
+.ox-stack__tab[data-ox-accent="2"],
+.ox-stack__row[data-ox-accent="2"] {
+  --ox-stack-accent: var(--ox-status-provisional, #0e7490);
+}
+
+.ox-stack__tab[data-ox-accent="3"],
+.ox-stack__row[data-ox-accent="3"] {
+  --ox-stack-accent: var(--ox-status-restricted, #6d28d9);
+}
+
+.ox-stack__tab[data-ox-accent="4"],
+.ox-stack__row[data-ox-accent="4"] {
+  --ox-stack-accent: var(--ox-flag-provisional, #b45309);
+}
+
+.ox-stack__tab[data-ox-accent="5"],
+.ox-stack__row[data-ox-accent="5"] {
+  --ox-stack-accent: var(--ox-accent, #1677ff);
+}
+
+.ox-stack__tab[data-ox-accent="6"],
+.ox-stack__row[data-ox-accent="6"] {
+  --ox-stack-accent: var(--ox-flag-restricted, #7c3aed);
+}
+
+.ox-stack__tab[data-ox-accent="7"],
+.ox-stack__row[data-ox-accent="7"] {
+  --ox-stack-accent: var(--ox-text-muted, #64748b);
+}
+
+/* ---------------------------------------------------------------- */
+/* Tabs                                                              */
+/* ---------------------------------------------------------------- */
+
+.ox-stack__tab {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 0.5rem;
+  min-block-size: 2.25rem;
+  max-inline-size: 11.5rem;
+  padding: 0.25rem 0.625rem 0.25rem 0.375rem;
+  border: 1px solid var(--ox-border, #e2e8f0);
+  border-radius: var(--ox-radius-sm, 4px);
+  background: var(--ox-surface, transparent);
+  color: inherit;
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+
+.ox-stack__tab:hover {
+  background: var(--ox-bg-muted, #f1f5f9);
+}
+
+.ox-stack__tab:focus-visible {
+  outline: 2px solid var(--ox-focus-ring, var(--ox-accent, #1677ff));
+  outline-offset: 2px;
+}
+
+/*
+ * The active chart is lifted and outlined in its own hue.
+ *
+ * Two channels, both redundant with the name: the accent bar thickens and the
+ * whole tab gains weight. Neither is the identity — the name is — but together
+ * they answer "whose chart is this" from across a room.
+ */
+.ox-stack__tab[data-ox-active] {
+  border-color: var(--ox-stack-accent);
+  box-shadow: inset 0 0 0 1px var(--ox-stack-accent);
+  font-weight: 600;
+}
+
+.ox-stack__tab[data-ox-pinned]::before {
+  content: "";
+  inline-size: 0.375rem;
+  block-size: 0.375rem;
+  border-radius: 999px;
+  background: var(--ox-stack-accent);
+}
+
+.ox-stack__avatar {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  inline-size: 1.5rem;
+  block-size: 1.5rem;
+  border-radius: 999px;
+  /*
+   * The hue at low opacity behind the initials, so the chip reads as this
+   * chart's colour without the initials losing contrast against it.
+   */
+  background: color-mix(in srgb, var(--ox-stack-accent) 16%, transparent);
+  color: var(--ox-stack-accent);
+  font-size: var(--ox-text-2xs, 0.6875rem);
+  font-weight: 700;
+}
+
+.ox-stack__who {
+  display: grid;
+  min-inline-size: 0;
+  line-height: 1.25;
+}
+
+.ox-stack__name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/*
+ * The disambiguating identifier, when two names look alike.
+ *
+ * Monospaced and full-strength: it is only rendered when it is the thing that
+ * tells two charts apart, so it is not secondary information.
+ */
+.ox-stack__identifier {
+  font-family: var(--ox-font-mono, ui-monospace, monospace);
+  font-size: var(--ox-text-2xs, 0.6875rem);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+/*
+ * Why the chart is open — on the active tab only.
+ *
+ * "Ward round" is what the clinician is doing in *this* chart; on the three
+ * they are not looking at it costs the width the name and the badge need. The
+ * reason stays in the accessible name for every tab, and in the panel.
+ */
+.ox-stack__tab:not([data-ox-active]) .ox-stack__reason {
+  display: none;
+}
+
+.ox-stack__reason {
+  color: var(--ox-text-muted, #64748b);
+  font-size: var(--ox-text-2xs, 0.6875rem);
+  font-weight: 400;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/*
+ * Outstanding work, tinted by consequence.
+ *
+ * A draft order reads as an error because losing one is an error; an unsigned
+ * note reads as a warning because losing one is visible.
+ */
+.ox-stack__work {
+  flex: none;
+  padding: 0.0625rem 0.3125rem;
+  border-radius: var(--ox-radius-sm, 4px);
+  background: var(--ox-bg-muted, #f1f5f9);
+  color: var(--ox-text-muted, #64748b);
+  font-size: var(--ox-text-2xs, 0.6875rem);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.ox-stack__tab[data-ox-work="draft-order"] .ox-stack__work {
+  background: var(--ox-status-critical-bg, #fef2f2);
+  color: var(--ox-status-critical, #b91c1c);
+}
+
+.ox-stack__tab[data-ox-work="unsigned-note"] .ox-stack__work {
+  background: var(--ox-status-high-bg, #fffbeb);
+  color: var(--ox-status-high, #b45309);
+}
+
+/* ---------------------------------------------------------------- */
+/* Controls                                                          */
+/* ---------------------------------------------------------------- */
+
+.ox-stack__controls {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.ox-stack__owed {
+  color: var(--ox-status-high, #b45309);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.ox-stack__expand,
+.ox-stack__action {
+  min-block-size: 1.75rem;
+  padding: 0.25rem 0.5rem;
+  border: 1px solid var(--ox-border, #e2e8f0);
+  border-radius: var(--ox-radius-sm, 4px);
+  background: var(--ox-surface, transparent);
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.ox-stack__expand:hover,
+.ox-stack__action:hover {
+  background: var(--ox-bg-muted, #f1f5f9);
+}
+
+.ox-stack__expand:focus-visible,
+.ox-stack__action:focus-visible {
+  outline: 2px solid var(--ox-focus-ring, var(--ox-accent, #1677ff));
+  outline-offset: 2px;
+}
+
+/* ---------------------------------------------------------------- */
+/* The panel                                                         */
+/* ---------------------------------------------------------------- */
+
+.ox-stack__panel {
+  display: grid;
+  gap: 0.25rem;
+  margin: 0;
+  padding: 0.5rem;
+  border: 1px solid var(--ox-border, #e2e8f0);
+  border-radius: var(--ox-radius-lg, 8px);
+  background: var(--ox-surface, transparent);
+  list-style: none;
+}
+
+.ox-stack__row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding-inline-start: 0.5rem;
+  border-inline-start: 3px solid var(--ox-stack-accent);
+}
+
+.ox-stack__row-name {
+  flex: 1 1 auto;
+  font-weight: 600;
+}
+
+/* ---------------------------------------------------------------- */
+/* Closing                                                           */
+/* ---------------------------------------------------------------- */
+
+.ox-stack__verdict {
+  display: grid;
+  gap: 0.5rem;
+  padding: 0.625rem 0.75rem;
+  border: 1px solid var(--ox-status-high, #b45309);
+  border-radius: var(--ox-radius-lg, 8px);
+  background: var(--ox-status-high-bg, #fffbeb);
+}
+
+/*
+ * Refusal looks different from confirmation.
+ *
+ * A dialogue with one way out is not a question, and dressing it as one
+ * teaches people to click through the ones that are.
+ */
+.ox-stack__verdict[data-ox-verdict="refuse"] {
+  border-color: var(--ox-status-critical, #b91c1c);
+  background: var(--ox-status-critical-bg, #fef2f2);
+}
+
+.ox-stack__verdict-reason {
+  margin: 0;
+  color: var(--ox-text, inherit);
+}
+
+.ox-stack__verdict-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+}
+
+.ox-stack__verdict-actions button {
+  min-block-size: 1.75rem;
+  padding: 0.25rem 0.5rem;
+  border: 1px solid var(--ox-border-strong, var(--ox-border, #cbd5e1));
+  border-radius: var(--ox-radius-sm, 4px);
+  background: var(--ox-surface, transparent);
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.ox-stack__verdict-actions button:focus-visible {
+  outline: 2px solid var(--ox-focus-ring, var(--ox-accent, #1677ff));
+  outline-offset: 2px;
+}
+
+/* ---------------------------------------------------------------- */
+/* Small screens                                                     */
+/*                                                                   */
+/* A multi-chart workspace on a 375px screen is a wrong-patient      */
+/* generator. Below the breakpoint the inactive tabs shrink to the   */
+/* avatar and the active one keeps its name — the set is still       */
+/* visible, and only one chart is legible enough to act on.          */
+/* ---------------------------------------------------------------- */
+
+@media (max-width: 40rem) {
+  .ox-stack__tab:not([data-ox-active]) .ox-stack__who,
+  .ox-stack__tab:not([data-ox-active]) .ox-stack__work {
+    display: none;
+  }
+
+  .ox-stack__tab[data-ox-active] {
+    max-inline-size: none;
+  }
+}
+
+/* ---------------------------------------------------------------- */
+/* Forced colors and print                                           */
+/* ---------------------------------------------------------------- */
+
+@media (forced-colors: active) {
+  /* Every hue collapses, so the active chart is marked by geometry. */
+  .ox-stack__tab[data-ox-active] {
+    border-width: 2px;
+    border-color: Highlight;
+  }
+
+  .ox-stack__avatar {
+    background: Canvas;
+    color: CanvasText;
+    border: 1px solid CanvasText;
+  }
+
+  .ox-stack__row {
+    border-inline-start-color: CanvasText;
+  }
+}
+
+@media print {
+  /* A workspace is not a document. On paper only the active chart matters. */
+  .ox-stack__tab:not([data-ox-active]),
+  .ox-stack__controls,
+  .ox-stack__panel,
+  .ox-stack__verdict {
+    display: none;
+  }
+}

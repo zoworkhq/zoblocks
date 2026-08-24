@@ -99,6 +99,7 @@ export default defineComponentMeta({
     "risk-indicator",
     "provenance-chip",
     "trend-indicator",
+    "care-team-presence",
   ],
 
   dependencies: ["clsx", "tailwind-merge"],

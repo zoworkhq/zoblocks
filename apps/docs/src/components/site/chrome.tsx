@@ -59,6 +59,15 @@ export function SiteHeader() {
 
   return (
     <header
+      /*
+       * The site's own header, named.
+       *
+       * `page.locator("header")` used to be unambiguous and is not any more:
+       * ChartHeader *is* a `<header role="banner">`, and it appears as card art
+       * on this page. A test that has to guess which header it meant is a test
+       * that will guess wrong.
+       */
+      data-site-header=""
       data-scrolled={scrolled || undefined}
       className={cn(
         "sticky top-0 z-40 backdrop-blur-xl transition-[height,background-color,border-color] duration-500 ease-[var(--ease-out-expo)]",

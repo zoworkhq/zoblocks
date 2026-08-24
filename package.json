@@ -63,6 +63,7 @@
     "@oxygenui-design/eslint-plugin": "workspace:^",
     "@oxygenui-design/fhir": "workspace:*",
     "@oxygenui-design/fixtures": "workspace:*",
+    "@oxygenui-design/identity": "workspace:*",
     "@oxygenui-design/theme": "workspace:*",
     "@oxygenui-design/tokens": "workspace:*",
     "@playwright/test": "^1.62.1",

@@ -90,11 +90,12 @@ export default defineConfig({
        * sign-in rather than every branch of password recovery.
        *
        * Ratcheted from 90/90/80/90 once the asset store, the marketplace and
-       * the webhook route were covered. Doing that is the whole point of the
-       * rule above — a floor left at what the suite cleared two features ago
-       * stops being a floor and becomes a decoration.
+       * the webhook route were covered, and again once `theme.ts` was — it sat
+       * at 0% while this comment claimed the floor protected "the theme
+       * lifecycle", which is the most specific way a floor can become a
+       * decoration. Doing this is the whole point of the rule above.
        */
-      thresholds: { lines: 96, functions: 95, branches: 87, statements: 94 },
+      thresholds: { lines: 98, functions: 97, branches: 90, statements: 96 },
     },
     /*
      * jsdom, not node.

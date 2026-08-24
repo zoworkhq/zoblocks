@@ -404,7 +404,22 @@ export function Playground({ name, controls }: { name: string; controls: readonl
         className="surface-2 min-w-0 rounded-2xl p-6"
         style={dark ? { colorScheme: "dark" } : undefined}
       >
-        <ConfigProvider theme={{ algorithm: dark ? theme.darkAlgorithm : theme.defaultAlgorithm }}>
+        {/*
+          Oxygen's accent, not Ant Design's default.
+
+          With only the algorithm set this rendered antd's #1677ff with white
+          on it — 4.1:1, an AA failure on the one page in the docs that mounts
+          antd. `colorTextLightSolid` moves with it because the dark accent is a
+          light teal, and white on that is worse than the blue it replaced.
+        */}
+        <ConfigProvider
+          theme={{
+            algorithm: dark ? theme.darkAlgorithm : theme.defaultAlgorithm,
+            token: dark
+              ? { colorPrimary: "#6ce7cb", colorTextLightSolid: "#071014" }
+              : { colorPrimary: "#067662", colorTextLightSolid: "#ffffff" },
+          }}
+        >
           <PlaygroundBoundary resetKey={JSON.stringify(props)}>
             {render(withHandlers)}
           </PlaygroundBoundary>

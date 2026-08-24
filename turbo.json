@@ -4,6 +4,20 @@
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
+      // `registry/` is an input even though it lives outside every package.
+      //
+      // The docs app imports the registry directly — component sources through
+      // `@/registry/*`, and every component stylesheet through an `@import` in
+      // globals.css. Neither is inside `apps/docs` and neither belongs to a
+      // workspace package it depends on, so the default hash could not see
+      // them: editing a component's CSS left the docs build a cache hit and
+      // the site kept serving the previous stylesheet.
+      //
+      // That is a bad failure to have. It looks like the change had no effect,
+      // so the next move is to change something else — and the browser suite
+      // spent three rounds failing against a build that predated the fix it
+      // was testing.
+      "inputs": ["$TURBO_DEFAULT$", "$TURBO_ROOT$/registry/**"],
       "outputs": ["dist/**", ".next/**", "!.next/cache/**"]
     },
     // Builds workspace dependencies first, like every other task here. The docs

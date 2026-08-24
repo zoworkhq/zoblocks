@@ -21,11 +21,20 @@
       "@/components/oxygen/breath-loader": [
         "../../registry/oxygen/breath-loader/breath-loader.tsx"
       ],
+      "@/components/oxygen/care-team-presence": [
+        "../../registry/oxygen/care-team-presence/care-team-presence.tsx"
+      ],
       "@/components/oxygen/care-timeline": [
         "../../registry/oxygen/care-timeline/care-timeline.tsx"
       ],
       "@/components/oxygen/chart-accordion": [
         "../../registry/oxygen/chart-accordion/chart-accordion.tsx"
+      ],
+      "@/components/oxygen/chart-command-palette": [
+        "../../registry/oxygen/chart-command-palette/chart-command-palette.tsx"
+      ],
+      "@/components/oxygen/chart-header": [
+        "../../registry/oxygen/chart-header/chart-header.tsx"
       ],
       "@/components/oxygen/clinical-note": [
         "../../registry/oxygen/clinical-note/clinical-note.tsx"
@@ -47,6 +56,9 @@
       ],
       "@/components/oxygen/pulse-loader": [
         "../../registry/oxygen/pulse-loader/pulse-loader.tsx"
+      ],
+      "@/components/oxygen/recent-patient-stack": [
+        "../../registry/oxygen/recent-patient-stack/recent-patient-stack.tsx"
       ],
       "@/components/oxygen/result-value": [
         "../../registry/oxygen/result-value/result-value.tsx"
@@ -75,14 +87,26 @@
       "@/lib/oxygen-allergy": [
         "../../registry/oxygen/lib/allergy.ts"
       ],
+      "@/lib/oxygen-chart-header": [
+        "../../registry/oxygen/lib/chart-header.ts"
+      ],
       "@/lib/oxygen-clinical-note": [
         "../../registry/oxygen/lib/clinical-note.tsx"
       ],
       "@/lib/oxygen-clinical-status": [
         "../../registry/oxygen/lib/clinical-status.ts"
       ],
+      "@/lib/oxygen-clock": [
+        "../../registry/oxygen/lib/clock.ts"
+      ],
       "@/lib/oxygen-loader": [
         "../../registry/oxygen/lib/loader.tsx"
+      ],
+      "@/lib/oxygen-palette": [
+        "../../registry/oxygen/lib/palette.ts"
+      ],
+      "@/lib/oxygen-presence": [
+        "../../registry/oxygen/lib/presence.ts"
       ],
       "@/lib/oxygen-provenance": [
         "../../registry/oxygen/lib/provenance.ts"
@@ -98,6 +122,9 @@
       ],
       "@/lib/oxygen-trend": [
         "../../registry/oxygen/lib/trend.ts"
+      ],
+      "@/lib/oxygen-workspace": [
+        "../../registry/oxygen/lib/workspace.ts"
       ],
       "@/lib/timeline-core": [
         "../../registry/oxygen/lib/timeline-core.ts"

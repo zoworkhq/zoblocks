@@ -190,16 +190,16 @@ test.describe("the catalog @a11y", () => {
     await page.goto(CATALOG);
     await settle(page);
 
-    const cards = page.locator("a[href^='/components/']");
+    const cards = page.locator("[data-ox-component-card]");
     const count = await cards.count();
     expect(count).toBeGreaterThanOrEqual(12);
 
     for (let i = 0; i < count; i += 1) {
       const card = cards.nth(i);
-      const href = (await card.getAttribute("href"))!;
+      const name = (await card.getAttribute("data-ox-component-card"))!;
       await expect(
         card.locator(".component-preview-frame"),
-        `${href} has no preview frame — it fell back to the state chips`,
+        `${name} has no preview frame — it fell back to the state chips`,
       ).toHaveCount(1);
     }
   });
@@ -209,13 +209,13 @@ test.describe("the catalog @a11y", () => {
     await settle(page);
 
     const overflowing = await page.evaluate(() =>
-      [...document.querySelectorAll<HTMLElement>("a[href^='/components/']")]
+      [...document.querySelectorAll<HTMLElement>("[data-ox-component-card]")]
         .map((card) => {
           const frame = card.querySelector<HTMLElement>(".component-preview-frame");
           const art = frame?.firstElementChild as HTMLElement | undefined;
           if (!frame || !art) return null;
           return {
-            name: card.getAttribute("href")!.split("/").pop()!,
+            name: card.getAttribute("data-ox-component-card")!,
             over: Math.round(art.scrollWidth - frame.clientWidth),
           };
         })
@@ -245,7 +245,7 @@ test.describe("the catalog @a11y", () => {
     await settle(page);
 
     const slack = await page.evaluate(() =>
-      [...document.querySelectorAll<HTMLElement>("a[href^='/components/']")]
+      [...document.querySelectorAll<HTMLElement>("[data-ox-component-card]")]
         .map((card) => {
           const frame = card.querySelector<HTMLElement>(".component-preview-frame");
           const band = frame?.firstElementChild as HTMLElement | undefined;
@@ -265,7 +265,7 @@ test.describe("the catalog @a11y", () => {
 
           const reserved = band.getBoundingClientRect();
           return {
-            name: card.getAttribute("href")!.split("/").pop()!,
+            name: card.getAttribute("data-ox-component-card")!,
             // Positive: the band holds more height than the art needs.
             unused: Math.round(reserved.height - (bottom - top)),
             // Positive: the art paints outside the band it was given.
@@ -322,7 +322,7 @@ test.describe("the catalog @a11y", () => {
     const rows = await page.evaluate(() => {
       // Derived from a card rather than by class: `main div.grid` is the hero's
       // two-column header, which is also a grid and also matches.
-      const card = document.querySelector<HTMLElement>("a[href^='/components/']");
+      const card = document.querySelector<HTMLElement>("[data-ox-component-card]");
       const grid = card?.parentElement;
       if (!grid || getComputedStyle(grid).display !== "grid") return null;
       return getComputedStyle(grid)
@@ -351,7 +351,7 @@ test.describe("the catalog @a11y", () => {
     await page.goto(CATALOG);
     await settle(page);
 
-    const tabsCard = page.locator("a[href='/components/tabs']");
+    const tabsCard = page.locator("[data-ox-component-card='tabs']");
     const selected = () =>
       tabsCard.locator("[role='radio'][aria-checked='true']").first().textContent();
 
@@ -545,7 +545,15 @@ test.describe("the app doors @a11y", () => {
     await page.setViewportSize({ width: 375, height: 812 });
     await page.goto("/");
 
-    const overflow = await page.locator("header").evaluate((el) => ({
+    /*
+     * The site header, not any header.
+     *
+     * `page.locator("header")` became ambiguous the moment a card rendered
+     * ChartHeader as its art — that component *is* a `<header role="banner">`,
+     * and a strict locator is right to refuse rather than pick one.
+     */
+    const siteHeader = page.locator("[data-site-header]");
+    const overflow = await siteHeader.evaluate((el) => ({
       content: el.scrollWidth,
       box: Math.round(el.getBoundingClientRect().width),
     }));
@@ -554,9 +562,7 @@ test.describe("the app doors @a11y", () => {
     );
 
     for (const label of ["Sign in", "Sign up"]) {
-      await expect(
-        page.locator("header").getByRole("link", { name: label, exact: true }),
-      ).toBeVisible();
+      await expect(siteHeader.getByRole("link", { name: label, exact: true })).toBeVisible();
     }
   });
 

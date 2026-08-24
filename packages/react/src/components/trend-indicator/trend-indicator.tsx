@@ -55,8 +55,10 @@ export {
   type Valence,
 } from "../../lib/trend";
 
-export interface TrendIndicatorProps
-  extends Omit<React.HTMLAttributes<HTMLDivElement>, "children"> {
+export interface TrendIndicatorProps extends Omit<
+  React.HTMLAttributes<HTMLDivElement>,
+  "children"
+> {
   series: TrendSeries;
   /** Caller's choice. Below 40px the line is dropped for the glyph and delta. */
   width?: number;
@@ -86,10 +88,7 @@ function TrendIndicatorImpl({
 }: TrendIndicatorProps) {
   const reading = readTrend(series);
   const breaks = React.useMemo(() => segment(series).filter((s) => s.breakReason), [series]);
-  const path = React.useMemo(
-    () => geometry(series, width, height),
-    [series, width, height],
-  );
+  const path = React.useMemo(() => geometry(series, width, height), [series, width, height]);
 
   const tableId = React.useId();
   const label = describeTrend(series);

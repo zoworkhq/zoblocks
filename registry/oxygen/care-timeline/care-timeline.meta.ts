@@ -15,7 +15,7 @@ export default defineComponentMeta({
   rationale:
     "A table is read as rows and a chart as a shape, but a timeline is read as an account — and an account is understood to be continuous, so a gap in it becomes a fact. Meanwhile the timeline on screen is nearly always a slice: paginated to five, filtered to one register, assembled from sources that fail independently. Every one of those renders as the same tidy, confident, continuous list. A clinician reads a timeline with no imaging on it and orders a CT; the study was done eleven weeks ago at another hospital and the exchange query timed out four seconds earlier. Nothing was wrong on screen. So coverage is required in the type, with no default, because every plausible default is a claim the caller did not make — and the sentence it produces is rendered in a fixed place and printed. Two consequences follow: planned is not happened, so a future event sits above a now marker and a planned event whose time has passed with nothing against it is lapsed rather than silent; and clinical events are not administrative ones, so registers are typed rather than mixed at one weight.",
 
-  categories: ["Clinical", "Data display"],
+  categories: ["Clinical", "Data Display"],
   fhir: [
     { name: "Encounter", url: "https://hl7.org/fhir/R4/encounter.html" },
     { name: "Appointment", url: "https://hl7.org/fhir/R4/appointment.html" },
