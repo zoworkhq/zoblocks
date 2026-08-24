@@ -218,6 +218,43 @@ describe("what happens when the app is not there", () => {
     expect(item?.provenance.accessibility.contrastPairs.passed).toBe(17);
     expect(item?.provenance.licence.id).toBe("oxygen-pack-1.0");
   });
+
+  /*
+   * The console must not make the shelf worse.
+   *
+   * `catalog.json` sends `files: 4` — a count, with no paths and no SVG —
+   * because serving artwork is not its job. Spreading it verbatim replaced the
+   * empty-state drawings, the severity ramp and the file manifests with the
+   * string "4 files · v2" on every published pack, so switching the backend on
+   * downgraded the storefront. The artwork is committed in this repository; it
+   * is attached by slug.
+   */
+  it("keeps the pack's own artwork when the console answers", async () => {
+    respondWith({ items: [ITEM] });
+
+    const [item] = await shelf();
+
+    expect(item?.source).toBe("console");
+    expect(item?.art.length, "empty-state-system ships drawings").toBeGreaterThan(0);
+    expect(item?.filePaths.length, "and a manifest").toBeGreaterThan(0);
+
+    // The console still wins on everything it actually owns.
+    expect(item?.price?.minor).toBe(29000);
+    expect(item?.version).toBe(2);
+  });
+
+  it("shows a file count for a pack this repository has never seen", async () => {
+    respondWith({ items: [{ ...ITEM, slug: "published-straight-to-the-console" }] });
+
+    const [item] = await shelf();
+
+    // No invented artwork: a picture of a pack nobody here has seen would be
+    // worse than the honest count the card falls back to.
+    expect(item?.art).toEqual([]);
+    expect(item?.swatches).toEqual([]);
+    expect(item?.filePaths).toEqual([]);
+    expect(item?.files).toBe(4);
+  });
 });
 
 describe("finding one item", () => {

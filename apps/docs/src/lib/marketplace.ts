@@ -152,6 +152,32 @@ function fromPreview(): ShelfItem[] {
 }
 
 /**
+ * The pack's own artwork, which the console does not send.
+ *
+ * `catalog.json` carries `files: 4` — a count, not paths — and no SVG at all,
+ * because the console's job is to say what is for sale and at what price, not
+ * to serve illustrations. So when it answers, every published pack loses its
+ * preview and the shelf renders "4 files · v2" where the empty-state drawings,
+ * the severity ramp and the file manifests used to be. That is the storefront
+ * getting worse the moment the backend starts working.
+ *
+ * Attaching this by slug is not merging two catalogues. The console still wins
+ * outright on everything it owns — what exists, what it costs, which version,
+ * whether it is published. This supplies one thing it has no field for, from
+ * the repository the artwork is committed in.
+ *
+ * A pack the console publishes that this repository has never heard of gets no
+ * artwork and falls back to its file count, which is honest: drawing something
+ * for it would be inventing a picture of a pack nobody here has seen.
+ */
+const ARTWORK = new Map(
+  PREVIEW_CATALOGUE.map((item) => [
+    item.slug,
+    { art: item.art ?? [], swatches: item.swatches ?? [], files: item.files ?? [] },
+  ]),
+);
+
+/**
  * Drop the clinical review, whatever the console sent.
  *
  * No pack has been reviewed by a clinician. The seed says so in the field
@@ -192,15 +218,18 @@ export async function shelf(): Promise<ShelfItem[]> {
   const live = await catalogue();
   if (live.length === 0) return fromPreview();
 
-  return live.map((item) => ({
-    ...item,
-    provenance: withoutClinicalReview(item.provenance),
-    comingSoon: item.publishedAt === null,
-    filePaths: [],
-    art: [],
-    swatches: [],
-    source: "console",
-  }));
+  return live.map((item) => {
+    const local = ARTWORK.get(item.slug);
+    return {
+      ...item,
+      provenance: withoutClinicalReview(item.provenance),
+      comingSoon: item.publishedAt === null,
+      filePaths: local?.files ?? [],
+      art: local?.art ?? [],
+      swatches: local?.swatches ?? [],
+      source: "console",
+    };
+  });
 }
 
 export async function findItem(slug: string): Promise<ShelfItem | undefined> {
