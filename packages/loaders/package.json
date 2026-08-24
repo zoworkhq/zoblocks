@@ -91,6 +91,6 @@
     "@oxygenui-design/tsconfig": "workspace:*",
     "jsdom": "^30",
     "typescript": "^5.7.2",
-    "vitest": "^4.1.10"
+    "vitest": "^4.1.11"
   }
 }
