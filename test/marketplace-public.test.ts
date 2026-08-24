@@ -21,6 +21,7 @@ import {
   catalogue,
   findItem,
   priceLabel,
+  shelf,
   type MarketItem,
 } from "../apps/docs/src/lib/marketplace";
 
@@ -118,9 +119,60 @@ describe("what happens when the app is not there", () => {
     await expect(catalogue()).resolves.toEqual([]);
   });
 
-  it("finds nothing rather than throwing when the catalogue is empty", async () => {
+  /*
+   * `catalogue()` still reports the console honestly — empty is empty. What
+   * changed is what the *page* does with that: `shelf()` falls back, because a
+   * storefront that cannot list anything until a separate service exists is a
+   * storefront that does not work, and the console has never been deployed.
+   */
+  it("falls back to the local catalogue rather than showing nothing", async () => {
     respondWith({ items: [] });
-    await expect(findItem("empty-state-system")).resolves.toBeUndefined();
+
+    await expect(catalogue()).resolves.toEqual([]);
+
+    const items = await shelf();
+    expect(items.length).toBeGreaterThan(0);
+    expect(items.every((item) => item.source === "preview")).toBe(true);
+  });
+
+  it("still finds nothing for a slug that is in neither", async () => {
+    respondWith({ items: [] });
+    await expect(findItem("no-such-pack")).resolves.toBeUndefined();
+  });
+
+  it("never publishes a clinical review nobody performed", async () => {
+    respondWith({ items: [] });
+    // The seed carries `reviewedBy: "SEED DATA — nobody has reviewed this"`,
+    // and a plausible substitute would be worse than the seed. The public
+    // shelf omits the block entirely, so the page renders nothing rather than
+    // a claim.
+    for (const item of await shelf()) {
+      expect(item.provenance.clinical).toBeUndefined();
+    }
+  });
+
+  it("refuses a purchase path for anything announced", async () => {
+    respondWith({ items: [] });
+    const announced = (await shelf()).filter((item) => item.comingSoon);
+
+    expect(announced.length).toBeGreaterThan(0);
+    // No version, no files, and nothing measured — because nothing has been
+    // built to measure.
+    for (const item of announced) {
+      expect(item.version).toBe(0);
+      expect(item.files).toBe(0);
+      expect(item.provenance.accessibility.contrastPairs.total).toBe(0);
+    }
+  });
+
+  it("lets the console win outright the moment it answers", async () => {
+    respondWith({ items: [ITEM] });
+    const items = await shelf();
+
+    // One live item replaces the whole local list rather than merging: a
+    // half-live catalogue is one nobody can reason about.
+    expect(items).toHaveLength(1);
+    expect(items[0]?.source).toBe("console");
   });
 });
 

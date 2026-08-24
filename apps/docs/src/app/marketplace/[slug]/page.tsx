@@ -4,7 +4,8 @@ import { notFound } from "next/navigation";
 import { ArrowLeft, ArrowUpRight, Check, CircleAlert, Info } from "lucide-react";
 import { SiteFooter, SiteHeader } from "@/components/site/chrome";
 import { RevealRoot } from "@/components/site/interactions";
-import { KIND_LABEL, buyHref, catalogue, findItem, priceLabel } from "@/lib/marketplace";
+import { KIND_LABEL, buyHref, findItem, priceLabel, shelf } from "@/lib/marketplace";
+import { DOES_NOT_CLAIM } from "@/lib/market-preview";
 
 export const revalidate = 600;
 
@@ -18,7 +19,10 @@ export const revalidate = 600;
 export const dynamicParams = true;
 
 export async function generateStaticParams() {
-  return (await catalogue()).map((item) => ({ slug: item.slug }));
+  // The shelf, not the console. With the console unreachable this used to
+  // return nothing, so not one detail page was generated — every /marketplace
+  // link was a 404 waiting for a service that does not exist yet.
+  return (await shelf()).map((item) => ({ slug: item.slug }));
 }
 
 export async function generateMetadata({
@@ -135,12 +139,26 @@ export default async function MarketplaceItemPage({
                 <Detail>meaning carried by {accessibility.nonColourChannel}</Detail>
               </Fact>
 
-              {clinical && (
+              {clinical ? (
                 <Fact tone="pass">
                   Clinically reviewed {clinical.reviewedAt.slice(0, 10)}
                   <Detail>
                     {clinical.reviewedBy} ({clinical.registration}) — {clinical.scope}
                   </Detail>
+                </Fact>
+              ) : (
+                /*
+                 * Stated, not omitted.
+                 *
+                 * Clinical review is the differentiator this whole page is
+                 * built on, and it is the one thing not yet in place. A missing
+                 * row reads as an oversight; a row that says so reads as the
+                 * truth, and it is the truth a safety officer needs before they
+                 * read anything else here.
+                 */
+                <Fact tone="info">
+                  Clinical review pending
+                  <Detail>no registered clinician has reviewed this pack</Detail>
                 </Fact>
               )}
 
@@ -168,24 +186,22 @@ export default async function MarketplaceItemPage({
               </Fact>
             </ul>
 
-            {clinical && (
-              <div className="surface mt-8 px-6 py-6" data-reveal>
-                <p className="flex items-center gap-2 font-display text-base font-semibold">
-                  <CircleAlert aria-hidden="true" className="size-4 text-graphite" />
-                  What it does not claim
-                </p>
-                <ul className="mt-3 space-y-1.5">
-                  {clinical.doesNotClaim.map((claim) => (
-                    <li key={claim} className="body-sm text-graphite">
-                      {claim}
-                    </li>
-                  ))}
-                </ul>
-                <p className="body-xs mt-4 text-graphite-soft">
-                  We would rather lose a sale than imply otherwise.
-                </p>
-              </div>
-            )}
+            <div className="surface mt-8 px-6 py-6" data-reveal>
+              <p className="flex items-center gap-2 font-display text-base font-semibold">
+                <CircleAlert aria-hidden="true" className="size-4 text-graphite" />
+                What it does not claim
+              </p>
+              <ul className="mt-3 space-y-1.5">
+                {(clinical?.doesNotClaim ?? DOES_NOT_CLAIM).map((claim) => (
+                  <li key={claim} className="body-sm text-graphite">
+                    {claim}
+                  </li>
+                ))}
+              </ul>
+              <p className="body-xs mt-4 text-graphite-soft">
+                We would rather lose a sale than imply otherwise.
+              </p>
+            </div>
           </div>
         </section>
 

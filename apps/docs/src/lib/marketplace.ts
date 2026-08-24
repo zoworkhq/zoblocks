@@ -53,6 +53,7 @@ export interface MarketItem {
 // Re-exported rather than redefined: `lib/app.ts` owns the address, and two
 // copies of it drift the moment one deployment moves.
 import { APP } from "./app";
+import { PACK_LICENCE, PREVIEW_CATALOGUE, type PreviewArt } from "./market-preview";
 
 export { APP };
 
@@ -90,8 +91,93 @@ export async function catalogue(): Promise<MarketItem[]> {
   }
 }
 
-export async function findItem(slug: string): Promise<MarketItem | undefined> {
-  return (await catalogue()).find((item) => item.slug === slug);
+/**
+ * An item as the shelf renders it, whichever half it came from.
+ *
+ * `source` is not decoration. A price the console served and a price this
+ * repository remembers are different kinds of fact, and the page says which
+ * one a reader is looking at rather than presenting both as live.
+ */
+export interface ShelfItem extends MarketItem {
+  /** Announced rather than published. Priced, and no purchase path. */
+  comingSoon: boolean;
+  /** Every file the pack ships. Empty for an announced item, which ships none. */
+  filePaths: string[];
+  /** A real sample of the pack's own artwork, where it ships any. */
+  art: PreviewArt[];
+  /** The pack's own palette, for a theme pack. */
+  swatches: { step: string; hex: string }[];
+  source: "console" | "preview";
+}
+
+/** The date the seed publishes these under, so both halves agree on it. */
+const PREVIEW_PUBLISHED = "2026-08-14T09:12:03.000Z";
+
+function fromPreview(): ShelfItem[] {
+  return PREVIEW_CATALOGUE.map((item) => ({
+    slug: item.slug,
+    kind: item.kind,
+    title: item.title,
+    blurb: item.blurb,
+    price: { minor: item.priceMinor, currency: item.currency },
+    version: item.version,
+    frameworks: item.frameworks ?? null,
+    provenance: {
+      accessibility: {
+        checkedAt: PREVIEW_PUBLISHED,
+        checkerVersion: 3,
+        contrastPairs: {
+          passed: item.checked?.contrastPairs ?? 0,
+          total: item.checked?.contrastPairs ?? 0,
+          floor: item.checked?.floor ?? "4.5:1",
+        },
+        forcedColors: item.checked?.forcedColors ?? "not-applicable",
+        nonColourChannel: item.checked?.nonColourChannel ?? "not yet designed",
+      },
+      // `clinical` is deliberately absent. Nobody has reviewed these packs, and
+      // the detail page renders the block only when it is present — so the
+      // absence reads as "not yet reviewed" rather than as a claim.
+      authorship: { method: item.authorship ?? "hand-drawn", thirdPartyContent: [] },
+      licence: { ...PACK_LICENCE },
+      ...(item.fhir ? { fhir: item.fhir } : {}),
+    },
+    files: item.files?.length ?? 0,
+    publishedAt: item.comingSoon ? null : PREVIEW_PUBLISHED,
+    comingSoon: item.comingSoon,
+    filePaths: item.files ?? [],
+    art: item.art ?? [],
+    swatches: item.swatches ?? [],
+    source: "preview",
+  }));
+}
+
+/**
+ * The shelf, from the console when it answers and from this repository when it
+ * does not.
+ *
+ * The console owns what is for sale and still wins outright: one item from it
+ * replaces the whole local list rather than merging, because a half-live
+ * catalogue is a catalogue nobody can reason about. What the fallback buys is
+ * a page that works — `app.oxygenui.design` has no DNS record today, so every
+ * fetch has failed and the storefront has rendered its empty state since the
+ * day it shipped.
+ */
+export async function shelf(): Promise<ShelfItem[]> {
+  const live = await catalogue();
+  if (live.length === 0) return fromPreview();
+
+  return live.map((item) => ({
+    ...item,
+    comingSoon: item.publishedAt === null,
+    filePaths: [],
+    art: [],
+    swatches: [],
+    source: "console",
+  }));
+}
+
+export async function findItem(slug: string): Promise<ShelfItem | undefined> {
+  return (await shelf()).find((item) => item.slug === slug);
 }
 
 export const KIND_LABEL: Record<MarketItem["kind"], string> = {
@@ -105,6 +191,9 @@ export const KIND_LABEL: Record<MarketItem["kind"], string> = {
 /** `29000` → `$290`. Minor units in transit, formatting at the edge. */
 export function priceLabel(price: MarketItem["price"]): string {
   if (!price) return "By arrangement";
+  // Zero is a decision, not a missing price: the crisis-resources block is free
+  // because charging for it is the wrong look. "$0" reads as a bug.
+  if (price.minor === 0) return "Free";
   return new Intl.NumberFormat("en-US", {
     style: "currency",
     currency: price.currency.toUpperCase(),

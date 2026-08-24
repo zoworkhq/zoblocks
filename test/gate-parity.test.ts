@@ -45,6 +45,10 @@ const NOT_A_GATE = new Set([
   "Deploy",
   "Verify the deployed registry",
   "Verify hq is serving hq",
+  // Same shape as hq's: it asserts a deployment, which is the one thing a
+  // local run has no equivalent of. It also self-skips until the domain is
+  // attached — `app.oxygenui.design` has no DNS record yet.
+  "Verify the console is serving its catalogue",
   "Deploy preview",
 ]);
 

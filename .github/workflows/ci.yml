@@ -526,6 +526,85 @@ jobs:
           fi
           echo "hq responded $code — signed-out redirect intact."
 
+  # The console — sign-in, the marketplace catalogue, checkout and delivery.
+  #
+  # It has never been deployed. `app.oxygenui.design` has no DNS record, which
+  # is why /login is unreachable and why the public marketplace fetched an
+  # empty catalogue from the day it shipped: every one of those symptoms is
+  # this missing job.
+  #
+  # Self-skipping on VERCEL_PROJECT_ID_APP, exactly as deploy-hq does, so this
+  # is committable before the Vercel project exists rather than red until
+  # somebody creates it. Three things are needed to switch it on, and none of
+  # them can be done from here:
+  #
+  #   1. A Vercel project with Root Directory `apps/app`, and its id set as the
+  #      repository variable VERCEL_PROJECT_ID_APP.
+  #   2. `app.oxygenui.design` attached to that project.
+  #   3. Its runtime environment: DATABASE_URL for a production MongoDB, and
+  #      the Stripe keys if checkout is to complete. Without the database the
+  #      deploy succeeds and every request 500s.
+  deploy-app:
+    name: Deploy app (production)
+    needs: [verify, no-phi]
+    if: >-
+      github.event_name == 'push' && github.ref == 'refs/heads/main' &&
+      vars.VERCEL_PROJECT_ID_APP != ''
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment:
+      name: production-app
+      url: https://app.oxygenui.design
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4
+
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Deploy
+        env:
+          VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID_APP }}
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: |
+          # --token on every call. The CLI does not read VERCEL_TOKEN from the
+          # environment for these, and relying on it reports "No existing
+          # credentials found" with the secret correctly set.
+          if [ -z "${VERCEL_TOKEN:-}" ]; then
+            echo "::error::VERCEL_TOKEN is not set. Add it under Settings → Secrets → Actions."
+            exit 1
+          fi
+          pnpm dlx vercel@48 pull --yes --environment=production --token "$VERCEL_TOKEN"
+          pnpm dlx vercel@48 build --prod --token "$VERCEL_TOKEN"
+          url=$(pnpm dlx vercel@48 deploy --prebuilt --prod --token "$VERCEL_TOKEN")
+          echo "Deployed: $url"
+
+      # The catalogue is the one endpoint the public site depends on, so it is
+      # the one worth asserting. Skipped until the domain is attached, for the
+      # same reason hq's check is: a failure for a reason outside what is being
+      # checked teaches people to ignore the check.
+      - name: Verify the console is serving its catalogue
+        run: |
+          set -uo pipefail
+          host=app.oxygenui.design
+
+          if ! getent hosts "$host" >/dev/null 2>&1 && ! host "$host" >/dev/null 2>&1; then
+            echo "$host does not resolve yet — domain not attached to this project. Skipping the check." \
+              >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+
+          code=$(curl -s -o /dev/null -w "%{http_code}" --max-time 20 "https://$host/c/catalog.json")
+          if [ "$code" != "200" ]; then
+            echo "::error::https://$host/c/catalog.json returned $code. The public marketplace falls back to its local catalogue while this is broken."
+            exit 1
+          fi
+          echo "Catalogue responded 200 — the public marketplace will read it rather than its fallback."
+
   # Preview per pull request. Same build path as production, so a PR that
   # deploys is a PR that can be looked at rather than imagined.
   deploy-preview:

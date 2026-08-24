@@ -654,11 +654,11 @@ test.describe("the public marketplace @a11y", () => {
    * it can be linked to and indexed, and the app keeps the parts that need
    * to know who you are.
    *
-   * These assertions are deliberately tolerant of an empty catalogue. The data
-   * comes from a separate service over HTTP, and the page is built to read
-   * perfectly well without it — a marketing page that fails because a private
-   * app is restarting is a worse property than one showing yesterday's
-   * shelf.
+   * These used to be tolerant of an empty catalogue, because the data came
+   * from a separate service over HTTP and that service has never been
+   * deployed. It still wins when it answers — but the page now has a floor, so
+   * "there might be nothing here" is no longer a state worth allowing: an
+   * empty shelf means the fallback broke too.
    */
   test("is reachable from the site chrome", async ({ page }) => {
     await page.goto("/");
@@ -668,33 +668,84 @@ test.describe("the public marketplace @a11y", () => {
     await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
   });
 
-  test("lists what the app publishes, or says it is loading", async ({ page }) => {
+  test("lists the packs, priced, whether or not the console answers", async ({ page }) => {
     await page.goto("/marketplace");
 
-    const cards = page.getByRole("main").getByRole("listitem");
-    const count = await cards.count();
+    const cards = page.locator("[data-ox-pack]");
+    // A floor, not a maybe. The console has never been deployed and the shelf
+    // still has to work.
+    await expect(cards.first()).toBeVisible();
+    expect(await cards.count()).toBeGreaterThan(1);
 
-    if (count === 0) {
-      // The fallback is a state, not an error. It must never read as a broken
-      // page to somebody who arrived from a search result.
-      await expect(page.getByText("The catalogue is loading")).toBeVisible();
-      return;
-    }
+    // The title owns the card; the buy control is the second destination, which
+    // is why this names the link rather than taking the first one it finds.
+    const first = cards.first();
+    await expect(first.getByRole("link").first()).toHaveAttribute("href", /\/marketplace\//);
+    await expect(first).toContainText(/\$|Free|By arrangement/);
+  });
 
-    // Every card is a link into a detail page, priced.
-    await expect(cards.first().getByRole("link")).toHaveAttribute("href", /\/marketplace\//);
-    await expect(cards.first()).toContainText(/\$|By arrangement/);
+  test("separates what can be bought from what has only been announced", async ({ page }) => {
+    await page.goto("/marketplace");
+
+    await expect(page.getByRole("heading", { name: "Available now" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "In production" })).toBeVisible();
+
+    // An announced pack is priced and refuses every purchase path — the same
+    // rule the console applies to it.
+    const announced = page.locator("[data-ox-pack]", { hasText: "Not yet purchasable" });
+    expect(await announced.count()).toBeGreaterThan(0);
+    await expect(announced.first().getByRole("link", { name: /Buy in the app/ })).toHaveCount(0);
+  });
+
+  /*
+   * Source-agnostic on purpose.
+   *
+   * This suite starts the console with a seeded catalogue, so here the console
+   * wins and the cards carry what it sends — a count, since it does not send
+   * file paths. Against the local fallback the same cards draw artwork, a
+   * manifest or a motif. What must hold either way is that every card shows
+   * *something* about the pack: which of the four it is belongs to the unit
+   * tests, where the source can be chosen.
+   */
+  test("shows what is in a pack rather than only describing it", async ({ page }) => {
+    await page.goto("/marketplace");
+
+    const cards = page.locator("[data-ox-pack]");
+    const total = await cards.count();
+    expect(total).toBeGreaterThan(1);
+
+    await expect(page.locator("[data-ox-pack-preview]")).toHaveCount(total);
+  });
+
+  test("never publishes a clinical review nobody performed", async ({ page }) => {
+    await page.goto("/marketplace");
+    // The seed's reviewer is "SEED DATA — nobody has reviewed this". Neither
+    // that nor a plausible substitute may reach a reader.
+    await expect(page.getByText(/SEED DATA/i)).toHaveCount(0);
+    await expect(page.getByText(/Clinical review is not yet in place/)).toBeVisible();
   });
 
   test("an item states what was checked and where it is bought", async ({ page }) => {
     await page.goto("/marketplace");
 
-    const first = page.getByRole("main").getByRole("listitem").first();
-    if ((await page.getByRole("main").getByRole("listitem").count()) === 0) test.skip();
-    await first.getByRole("link").click();
+    await page.locator("[data-ox-pack]").first().getByRole("link").first().click();
 
     await expect(page.getByRole("heading", { name: "What was checked" })).toBeVisible();
     await expect(page.getByText(/contrast pairs at or above/)).toBeVisible();
+
+    /*
+     * The review is stated either way.
+     *
+     * Reviewed, with a name and a registration; or pending, in those words.
+     * What must never happen is the row going missing — a safety officer told
+     * by omission has been told nothing, and this is the field the whole page
+     * is built on.
+     */
+    await expect(page.getByText(/Clinically reviewed|Clinical review pending/)).toBeVisible();
+
+    // The limitations survive whichever it is: a pack is not a medical device
+    // regardless of who looked at it.
+    await expect(page.getByText("Not a medical device or clinical decision support")).toBeVisible();
 
     /*
      * Buying leaves for the app, because a purchase belongs to an
