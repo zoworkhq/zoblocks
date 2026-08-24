@@ -22,7 +22,7 @@
     "@oxygenui-design/signature": "workspace:*",
     "@oxygenui-design/tabs": "workspace:*",
     "@oxygenui-design/tokens": "workspace:*",
-    "antd": "^6.6.0",
+    "antd": "^6.6.1",
     "clsx": "^2.1.1",
     "lucide-react": "^0.468.0",
     "motion": "^11.15.0",

@@ -217,8 +217,8 @@ importers:
         specifier: workspace:*
         version: link:../../packages/tokens
       antd:
-        specifier: ^6.6.0
-        version: 6.6.0(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
+        specifier: ^6.6.1
+        version: 6.6.1(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       bcryptjs:
         specifier: ^3.0.2
         version: 3.0.3
@@ -323,8 +323,8 @@ importers:
         specifier: workspace:*
         version: link:../../packages/tokens
       antd:
-        specifier: ^6.6.0
-        version: 6.6.0(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
+        specifier: ^6.6.1
+        version: 6.6.1(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       clsx:
         specifier: ^2.1.1
         version: 2.1.1
@@ -539,8 +539,8 @@ importers:
         specifier: workspace:*
         version: link:../../packages/tokens
       antd:
-        specifier: ^6.6.0
-        version: 6.6.0(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
+        specifier: ^6.6.1
+        version: 6.6.1(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       react:
         specifier: ^19.0.0
         version: 19.2.8
@@ -614,8 +614,8 @@ importers:
         specifier: ^4.1.10
         version: 4.1.10(vitest@4.1.10)
       antd:
-        specifier: ^6.6.0
-        version: 6.6.0(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
+        specifier: ^6.6.1
+        version: 6.6.1(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       jsdom:
         specifier: ^30
         version: 30.0.1
@@ -817,8 +817,8 @@ importers:
         specifier: ^4.1.10
         version: 4.1.10(vitest@4.1.10)
       antd:
-        specifier: ^6.6.0
-        version: 6.6.0(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
+        specifier: ^6.6.1
+        version: 6.6.1(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       axe-core:
         specifier: ^4.13.0
         version: 4.13.0
@@ -1201,8 +1201,8 @@ importers:
         specifier: ^4.1.10
         version: 4.1.10(vitest@4.1.10)
       antd:
-        specifier: ^6.6.0
-        version: 6.6.0(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
+        specifier: ^6.6.1
+        version: 6.6.1(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       axe-core:
         specifier: ^4.13.0
         version: 4.13.0
@@ -1277,8 +1277,8 @@ importers:
         specifier: ^4.1.10
         version: 4.1.10(vitest@4.1.10)
       antd:
-        specifier: ^6.6.0
-        version: 6.6.0(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
+        specifier: ^6.6.1
+        version: 6.6.1(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       axe-core:
         specifier: ^4.13.0
         version: 4.13.0
@@ -1433,6 +1433,7 @@ packages:
   '@angular/platform-browser-dynamic@22.1.2':
     resolution: {integrity: sha512-nNARbs9zXfoJL72zsTso6GHt1VuIGXWEpyZtzxcC32qQFG1YbzVqGkQTwZ0mZ2/Ctv8dAZ6PPiDo8sbYvAvUDw==}
     engines: {node: ^22.22.3 || ^24.15.0 || >=26.0.0}
+    deprecated: '@angular/platform-browser-dynamic is deprecated. Use `@angular/platform-browser` instead.'
     peerDependencies:
       '@angular/common': 22.1.2
       '@angular/compiler': 22.1.2
@@ -3320,8 +3321,8 @@ packages:
     resolution: {integrity: sha512-4Dj6M28JB+oAH8kFkTLUo+a2jwOFkuqb3yucU0CANcRRUbxS0cP0nZYCGjcc3BNXwRIsUVmDGgzawme7zvJHvg==}
     engines: {node: '>=12'}
 
-  antd@6.6.0:
-    resolution: {integrity: sha512-UDwWIbpmrCHB9ZQ+bPh4vQfB6DTI2ulIyoQ0Tc9xxalFblttiNGHl3ySBD9SyV/8+gUjFzfSx1+iU1Fog2i46w==}
+  antd@6.6.1:
+    resolution: {integrity: sha512-QHIHYoUk9N9nJy1T9fyxWKjY0qApdTEDd/6lzqYng8Uryv9FejNmbhKvYF7obGqB+TuLXQsPVF7fOVgyzM1KrQ==}
     peerDependencies:
       react: '>=18.0.0'
       react-dom: '>=18.0.0'
@@ -3640,8 +3641,8 @@ packages:
     resolution: {integrity: sha512-23XHcCF+coGYevirZceTVD7NdJOqVn+49IHyxgszm+JIiHLoB2TkmPtsYkNWT1pvRSGkc35L6NHs0yHkN2SumA==}
     engines: {node: ^20.19.0 || ^22.12.0 || >=24.0.0}
 
-  dayjs@1.11.22:
-    resolution: {integrity: sha512-1YRnxzt/AabP3GHxnaB9/b+ZScCKu5TeF+co+BWG+lnWVIwEcTFc1FVE0WLNmNO3sA6GGXL40i5qkHfbLzpwrg==}
+  dayjs@1.11.23:
+    resolution: {integrity: sha512-QDTCU0M0MxR3hQfnlDJfwekQiaanm1ubOD231u73WBckQ/fsamwRLiE2GBz6D3a/xF1NgfiDLJjXBa1hYOYTtQ==}
 
   debug@4.3.1:
     resolution: {integrity: sha512-doEwdvm4PCeK4K3RQN2ZC2BYUBaxwLARCqZmMjtF8a51J2Rb0xpVloFRnCODwqjpwnAoao4pelN8l3RJdv3gRQ==}
@@ -6784,7 +6785,7 @@ snapshots:
       react: 19.2.8
       react-dom: 19.2.8(react@19.2.8)
 
-  '@rc-component/picker@1.12.0(dayjs@1.11.22)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)':
+  '@rc-component/picker@1.12.0(dayjs@1.11.23)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)':
     dependencies:
       '@rc-component/overflow': 1.0.1(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       '@rc-component/resize-observer': 1.1.2(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
@@ -6794,7 +6795,7 @@ snapshots:
       react: 19.2.8
       react-dom: 19.2.8(react@19.2.8)
     optionalDependencies:
-      dayjs: 1.11.22
+      dayjs: 1.11.23
 
   '@rc-component/portal@2.2.1(react-dom@19.2.8(react@19.2.8))(react@19.2.8)':
     dependencies:
@@ -7555,7 +7556,7 @@ snapshots:
 
   ansi-styles@6.2.3: {}
 
-  antd@6.6.0(react-dom@19.2.8(react@19.2.8))(react@19.2.8):
+  antd@6.6.1(react-dom@19.2.8(react@19.2.8))(react@19.2.8):
     dependencies:
       '@ant-design/colors': 8.0.1
       '@ant-design/cssinjs': 2.1.2(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
@@ -7582,7 +7583,7 @@ snapshots:
       '@rc-component/mutate-observer': 2.0.1(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       '@rc-component/notification': 2.0.7(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       '@rc-component/pagination': 1.4.0(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
-      '@rc-component/picker': 1.12.0(dayjs@1.11.22)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
+      '@rc-component/picker': 1.12.0(dayjs@1.11.23)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       '@rc-component/progress': 1.0.2(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       '@rc-component/qrcode': 2.0.0(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       '@rc-component/rate': 1.0.1(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
@@ -7602,7 +7603,7 @@ snapshots:
       '@rc-component/upload': 1.1.1(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       '@rc-component/util': 1.12.0(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       clsx: 2.1.1
-      dayjs: 1.11.22
+      dayjs: 1.11.23
       react: 19.2.8
       react-dom: 19.2.8(react@19.2.8)
       scroll-into-view-if-needed: 3.1.0
@@ -7893,7 +7894,7 @@ snapshots:
     transitivePeerDependencies:
       - '@noble/hashes'
 
-  dayjs@1.11.22: {}
+  dayjs@1.11.23: {}
 
   debug@4.3.1:
     dependencies:

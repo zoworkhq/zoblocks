@@ -18,7 +18,7 @@
     "@oxygenui-design/bridge-mui": "workspace:*",
     "@oxygenui-design/react": "workspace:*",
     "@oxygenui-design/tokens": "workspace:*",
-    "antd": "^6.6.0",
+    "antd": "^6.6.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },

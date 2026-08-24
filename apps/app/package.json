@@ -31,7 +31,7 @@
     "@oxygenui-design/react": "workspace:*",
     "@oxygenui-design/theme": "workspace:*",
     "@oxygenui-design/tokens": "workspace:*",
-    "antd": "^6.6.0",
+    "antd": "^6.6.1",
     "bcryptjs": "^3.0.2",
     "clsx": "^2.1.1",
     "lucide-react": "^0.468.0",
