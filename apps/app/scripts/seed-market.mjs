@@ -23,8 +23,27 @@ if (!uri) {
   console.error("DATABASE_URL is not set. Copy .env.example to .env.local first.");
   process.exit(1);
 }
-if (!/localhost|127\.0\.0\.1/.test(uri)) {
+/*
+ * Publishing to a real database is a different act from seeding a throwaway one.
+ *
+ * The artwork below is the real product — hand-drawn, committed, and the thing
+ * customers are shown. Only two fields here are fixtures: the clinical reviewer,
+ * which says in words that nobody has reviewed anything, and the Stripe price
+ * ids, which do not exist in any Stripe account. Those two are what the
+ * localhost guard has always been protecting a real database from, not the
+ * content.
+ *
+ * `OXYGEN_PUBLISH=1` therefore does not merely lift the guard. It drops the
+ * clinical block entirely rather than writing a reviewer nobody can vouch for,
+ * and it writes `stripePriceId: null`, which the checkout already treats as a
+ * deliberate state — "sold as part of an engagement, ask for an invoice" —
+ * rather than a fake id that would fail against Stripe at the till.
+ */
+const PUBLISH = process.env.OXYGEN_PUBLISH === "1";
+
+if (!PUBLISH && !/localhost|127\.0\.0\.1/.test(uri)) {
   console.error("Refusing to seed anything that is not localhost.");
+  console.error("To publish the real content to a real database: OXYGEN_PUBLISH=1");
   process.exit(1);
 }
 
@@ -68,7 +87,21 @@ const glyph = (body) =>
 const illustration = (body, title) =>
   `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 90" role="img" aria-label="${title}" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">${body}</svg>`;
 
-async function upsertItem(item, version) {
+/**
+ * Strip the two fixture fields when publishing for real.
+ *
+ * Central rather than at each call site, so a sixth pack added below cannot
+ * forget it and quietly ship a reviewer that does not exist.
+ */
+function forPublication(item) {
+  if (!PUBLISH) return item;
+  const provenance = { ...item.provenance };
+  delete provenance.clinical;
+  return { ...item, stripePriceId: null, provenance };
+}
+
+async function upsertItem(rawItem, version) {
+  const item = forPublication(rawItem);
   const existing = await db.collection("catalog_items").findOne({ slug: item.slug });
   const _id = existing?._id ?? new ObjectId();
 
@@ -127,7 +160,7 @@ const clinical = (scope) => ({
   ],
 });
 
-console.log("Seeding the catalogue…");
+console.log(PUBLISH ? "Publishing the catalogue…" : "Seeding the catalogue…");
 
 /* --------------------------------------------------------------------------
  * 1 · The flagship. One region, three meanings.

@@ -75,6 +75,36 @@ describe("the public catalogue mirrors the seed", () => {
   });
 });
 
+/*
+ * The seed can now write to a real database, which makes its two fixture fields
+ * a production concern rather than a local one.
+ *
+ * The artwork in that script is the real product. The clinical reviewer and the
+ * `price_seed_*` ids are not, and those are the only reasons a localhost guard
+ * ever made sense. `OXYGEN_PUBLISH=1` lifts the guard *and* removes both — so
+ * the invariant worth protecting is that lifting it stays coupled to removing
+ * them. A future edit that separates the two would put "SEED DATA — nobody has
+ * reviewed this" into a customer-facing database.
+ */
+describe("publishing the catalogue for real", () => {
+  it("only leaves localhost when explicitly asked", () => {
+    expect(SEED).toMatch(/OXYGEN_PUBLISH/);
+    // The guard still exists, and still mentions localhost.
+    expect(SEED).toMatch(/Refusing to seed anything that is not localhost/);
+  });
+
+  it("drops the reviewer and the placeholder price when it does", () => {
+    const fn = SEED.slice(SEED.indexOf("function forPublication"));
+    const body = fn.slice(0, fn.indexOf("\n}"));
+
+    expect(body).toMatch(/delete provenance\.clinical/);
+    expect(body).toMatch(/stripePriceId: null/);
+    // Guarded by the flag rather than applied unconditionally, or local
+    // development would lose the block whose rendering it exists to exercise.
+    expect(body).toMatch(/if \(!PUBLISH\) return item/);
+  });
+});
+
 describe("what the public shelf refuses to claim", () => {
   it("carries no clinical review, for any pack", () => {
     // The seed's reviewer is literally "SEED DATA — nobody has reviewed this",
