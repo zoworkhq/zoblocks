@@ -152,6 +152,32 @@ function fromPreview(): ShelfItem[] {
 }
 
 /**
+ * Drop the clinical review, whatever the console sent.
+ *
+ * No pack has been reviewed by a clinician. The seed says so in the field
+ * itself — `reviewedBy` is the string "SEED DATA — nobody has reviewed this" —
+ * and the detail page renders a reviewer when one is present, so a console with
+ * a seeded database publishes "Clinically reviewed 2026-08-11 — SEED DATA —
+ * nobody has reviewed this" to the open web. That is not a cosmetic bug. A
+ * screenshot of it is indistinguishable from a real attestation, and this
+ * product's entire claim is that its safety facts can be trusted.
+ *
+ * So the public site does not render a review at all, from any source. The
+ * local fallback has never carried one; this makes the console agree, and the
+ * page says review is pending instead — which is true.
+ *
+ * Re-enabling this is a deliberate act, not a cleanup. It needs a named
+ * clinician with a registration, and it needs the console to distinguish a
+ * verified review from a row somebody typed. Until both exist, the honest
+ * output is the one below. See `test/marketplace-public.test.ts`.
+ */
+function withoutClinicalReview(provenance: Provenance): Provenance {
+  const kept = { ...provenance };
+  delete kept.clinical;
+  return kept;
+}
+
+/**
  * The shelf, from the console when it answers and from this repository when it
  * does not.
  *
@@ -168,6 +194,7 @@ export async function shelf(): Promise<ShelfItem[]> {
 
   return live.map((item) => ({
     ...item,
+    provenance: withoutClinicalReview(item.provenance),
     comingSoon: item.publishedAt === null,
     filePaths: [],
     art: [],

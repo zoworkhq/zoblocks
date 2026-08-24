@@ -723,6 +723,20 @@ test.describe("the public marketplace @a11y", () => {
     // that nor a plausible substitute may reach a reader.
     await expect(page.getByText(/SEED DATA/i)).toHaveCount(0);
     await expect(page.getByText(/Clinical review is not yet in place/)).toBeVisible();
+
+    /*
+     * The detail page too, which is where this actually escaped.
+     *
+     * This suite runs against a seeded console, and the index never renders a
+     * reviewer — so an index-only assertion passed while the item page printed
+     * "Clinically reviewed 2026-08-11 — SEED DATA — nobody has reviewed this"
+     * from the console's own provenance. The reviewer is rendered on exactly
+     * one page, so that is the page this has to open.
+     */
+    await page.goto("/marketplace/empty-state-system");
+    await expect(page.getByText(/SEED DATA/i)).toHaveCount(0);
+    await expect(page.getByText(/Clinically reviewed/)).toHaveCount(0);
+    await expect(page.getByText("Clinical review pending").first()).toBeVisible();
   });
 
   test("an item states what was checked and where it is bought", async ({ page }) => {

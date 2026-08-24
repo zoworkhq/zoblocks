@@ -174,6 +174,50 @@ describe("what happens when the app is not there", () => {
     expect(items).toHaveLength(1);
     expect(items[0]?.source).toBe("console");
   });
+
+  /*
+   * The regression this file did not have.
+   *
+   * `ITEM` above carries no clinical block, so every assertion here passed
+   * while the real console — whose seed fills `reviewedBy` with the string
+   * "SEED DATA — nobody has reviewed this" — would have had the detail page
+   * render "Clinically reviewed 2026-08-11 — SEED DATA — nobody has reviewed
+   * this" on the open web. It was reproduced against a seeded console before
+   * this test was written, not imagined from reading the code.
+   *
+   * Nobody has reviewed any pack. Until a named clinician has, and until the
+   * console can tell a verified review from a row somebody typed, the public
+   * site renders no reviewer from any source.
+   */
+  it("never republishes a clinical review the console sent", async () => {
+    respondWith({
+      items: [
+        {
+          ...ITEM,
+          provenance: {
+            ...ITEM.provenance,
+            clinical: {
+              reviewedBy: "SEED DATA — nobody has reviewed this",
+              registration: "not a registration",
+              reviewedAt: "2026-08-11T00:00:00.000Z",
+              scope: "Vocabulary and state semantics.",
+              doesNotClaim: ["Not medical advice"],
+            },
+          },
+        },
+      ],
+    });
+
+    const [item] = await shelf();
+
+    expect(item?.source).toBe("console");
+    expect(item?.provenance.clinical).toBeUndefined();
+
+    // The rest of the record survives: this drops one field, it does not
+    // discard the provenance a buyer is paying for.
+    expect(item?.provenance.accessibility.contrastPairs.passed).toBe(17);
+    expect(item?.provenance.licence.id).toBe("oxygen-pack-1.0");
+  });
 });
 
 describe("finding one item", () => {

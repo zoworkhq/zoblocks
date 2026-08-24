@@ -250,10 +250,23 @@ export default defineConfig({
       ? []
       : [
           {
-            command: "pnpm --filter @oxygenui-design/docs start",
+            /*
+             * Built here, not assumed.
+             *
+             * `next start` serves whatever is in `.next` from whenever it was
+             * last written, so a fix made after the previous build is invisible
+             * and the suite reports a failure that no longer exists. That has
+             * now cost two debugging sessions — once on a stale registry, once
+             * on a marketplace fix two hours older than the build under test.
+             * The app entry above already builds for the same reason; turbo
+             * makes the no-op case cheap.
+             */
+            command:
+              "pnpm --filter @oxygenui-design/docs build && pnpm --filter @oxygenui-design/docs start",
             url: "http://localhost:6001",
             reuseExistingServer: !process.env.CI,
-            timeout: 120_000,
+            // Matches the app's, now that this one builds before it serves.
+            timeout: 180_000,
           },
         ]),
     ...(process.env.OXYGEN_SMOKE_URL
