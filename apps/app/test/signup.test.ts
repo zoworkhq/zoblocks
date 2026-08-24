@@ -10,6 +10,7 @@
 
 import { describe, expect, it } from "vitest";
 import { unscopedMemberByEmail, unscopedSignUp } from "@/db/scope";
+import { signUpAction } from "@/lib/actions";
 import { hashPassword } from "@/lib/auth";
 import { twoOrgs } from "./harness";
 
@@ -87,5 +88,48 @@ describe("signing up", () => {
       ok: false,
       reason: "taken",
     });
+  });
+});
+
+/*
+ * The form, not just the write beneath it.
+ *
+ * `unscopedSignUp` takes whatever slug it is handed and looks it up exactly,
+ * which is correct — normalising belongs at the edge, with the other input.
+ * The edge was not doing it: `email` was lower-cased and `organisation` was
+ * not, so somebody typing their own company's name with a capital letter was
+ * told to check the address with an administrator who, on a brand-new
+ * organisation, is themselves. Found in production on the first real sign-up.
+ */
+describe("the organisation address a person actually types", () => {
+  function form(organisation: string, email = "capitals@northwind.example") {
+    const data = new FormData();
+    data.set("name", "A Newcomer");
+    data.set("email", email);
+    data.set("password", "correct-horse-battery-staple");
+    data.set("organisation", organisation);
+    return data;
+  }
+
+  it.each(["Northwind", "NORTHWIND", "  northwind  "])(
+    "accepts %j for the organisation whose slug is northwind",
+    async (typed) => {
+      await twoOrgs();
+
+      // `redirect()` throws in the stub, which is how the success path ends.
+      await expect(signUpAction(form(typed, `${typed.trim()}@example.test`))).rejects.toThrow();
+
+      const member = await unscopedMemberByEmail(`${typed.trim().toLowerCase()}@example.test`);
+      expect(member?.status).toBe("pending");
+    },
+  );
+
+  it("still refuses an organisation that does not exist", async () => {
+    await twoOrgs();
+
+    const result = await signUpAction(form("nowhere"));
+
+    expect(result.ok).toBe(false);
+    expect(await unscopedMemberByEmail("capitals@northwind.example")).toBeNull();
   });
 });

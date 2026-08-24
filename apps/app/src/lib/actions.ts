@@ -492,7 +492,20 @@ const signUpInput = z.object({
   name: z.string().trim().min(1, "Give your name.").max(80),
   email: z.string().trim().toLowerCase().email("That is not an email address."),
   password: z.string().min(12, "Use at least 12 characters. Length beats punctuation."),
-  organisation: z.string().trim().min(1, "Which organisation are you joining?"),
+  /*
+   * Lower-cased, like the email above it.
+   *
+   * An organisation address is a slug — `bootstrap-org.mjs` refuses to create
+   * one that is not `[a-z0-9-]+`, and every URL carrying it is lower-case. So
+   * the only thing case-sensitivity can do here is reject a person who typed
+   * their own company's name the way they write it. "Zowork" missed "zowork"
+   * and the form told them to check the address with their administrator —
+   * who, on a new organisation, is the person reading the message.
+   *
+   * Safe by construction: no slug that exists can contain an upper-case letter,
+   * so lower-casing can never match something it should not have.
+   */
+  organisation: z.string().trim().toLowerCase().min(1, "Which organisation are you joining?"),
 });
 
 export async function signUpAction(form: FormData): Promise<ActionResult> {
