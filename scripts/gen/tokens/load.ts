@@ -103,16 +103,58 @@ async function loadBrands(): Promise<Brand[]> {
   return brands;
 }
 
-export async function loadTokenSource(): Promise<TokenSource> {
-  const [primitive, shared, light, dark, highContrast, densityDoc, component] = await Promise.all([
-    load("primitive.json"),
-    load("semantic/shared.json"),
-    load("semantic/light.json"),
-    load("semantic/dark.json"),
-    load("semantic/high-contrast.json"),
-    load("density.json"),
-    load("component.json"),
-  ]);
+/**
+ * The seven documents a token source is made of, already parsed.
+ *
+ * Named so a caller that cannot read a directory can still supply them. The
+ * generator reads them from disk; the console imports them, because a file read
+ * at runtime is a file Next never traces into a serverless bundle — the theme
+ * screens crashed in production for exactly that reason while passing every
+ * test locally, where the repository is simply there on disk.
+ */
+export interface TokenDocs {
+  primitive: DtcgNode;
+  shared: DtcgNode;
+  light: DtcgNode;
+  dark: DtcgNode;
+  highContrast: DtcgNode;
+  density: DtcgNode;
+  component: DtcgNode;
+}
+
+/**
+ * Assemble a token source from parsed documents.
+ *
+ * Every caller goes through here, so the density split and the shape of the
+ * result have one implementation. Two copies of this would be two answers to
+ * "what palette is a customer theme judged against", and the whole point of
+ * `base-tokens.ts` is that there is only one.
+ */
+export function tokenSourceFrom(docs: TokenDocs, brands: Brand[] = []): TokenSource {
+  const primitive = flattenDtcg(docs.primitive, "primitive.json");
+  const shared = flattenDtcg(docs.shared, "semantic/shared.json");
+  const light = flattenDtcg(docs.light, "semantic/light.json");
+  const dark = flattenDtcg(docs.dark, "semantic/dark.json");
+  const highContrast = flattenDtcg(docs.highContrast, "semantic/high-contrast.json");
+  const densityDoc = flattenDtcg(docs.density, "density.json");
+  const component = flattenDtcg(docs.component, "component.json");
+
+  return assemble({ primitive, shared, light, dark, highContrast, densityDoc, component }, brands);
+}
+
+function assemble(
+  maps: {
+    primitive: TokenMap;
+    shared: TokenMap;
+    light: TokenMap;
+    dark: TokenMap;
+    highContrast: TokenMap;
+    densityDoc: TokenMap;
+    component: TokenMap;
+  },
+  brands: Brand[],
+): TokenSource {
+  const { primitive, shared, light, dark, highContrast, densityDoc, component } = maps;
 
   // Density arrives as one document holding all three profiles. Split it so the
   // parity check has three comparable key spaces rather than one flat list in
@@ -142,6 +184,24 @@ export async function loadTokenSource(): Promise<TokenSource> {
     density,
     densityRoot,
     component,
-    brands: await loadBrands(),
+    brands,
   };
+}
+
+/** The generator's entry point: the same assembly, with the bytes read from disk. */
+export async function loadTokenSource(): Promise<TokenSource> {
+  const [primitive, shared, light, dark, highContrast, densityDoc, component] = await Promise.all([
+    load("primitive.json"),
+    load("semantic/shared.json"),
+    load("semantic/light.json"),
+    load("semantic/dark.json"),
+    load("semantic/high-contrast.json"),
+    load("density.json"),
+    load("component.json"),
+  ]);
+
+  return assemble(
+    { primitive, shared, light, dark, highContrast, densityDoc, component },
+    await loadBrands(),
+  );
 }

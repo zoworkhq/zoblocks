@@ -26,7 +26,8 @@
     ".": "./src/tokens.ts",
     "./validate": "./src/validate/index.ts",
     "./surface": "./src/surface.ts",
-    "./package.json": "./package.json"
+    "./package.json": "./package.json",
+    "./tokens/*": "./tokens/*"
   },
   "files": [
     "dist",
@@ -69,7 +70,7 @@
   "type": "module",
   "main": "./src/tokens.ts",
   "types": "./src/tokens.ts",
-  "//publishConfig": "main/types/exports are rewritten to ./dist at publish time. That rewrite is a pnpm feature \u2014 publishing with npm ships raw TypeScript, which is exactly what 0.1.0 did.",
+  "//publishConfig": "main/types/exports are rewritten to ./dist at publish time. That rewrite is a pnpm feature — publishing with npm ships raw TypeScript, which is exactly what 0.1.0 did.",
   "devDependencies": {
     "@oxygenui-design/tsconfig": "workspace:*",
     "@vitest/coverage-v8": "^4.1.10",
