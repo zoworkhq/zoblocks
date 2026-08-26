@@ -397,6 +397,23 @@ export const componentMetaSchema = z
     propsSource: z.string().optional(),
 
     /**
+     * Extra files to extract a public API from, relative to the component
+     * directory.
+     *
+     * The default assumption — one file, one API — stops holding the moment a
+     * component's surface is a `variant` union over parts that live elsewhere.
+     * `DatePicker` is a dispatch: the type checker sees the intersection of
+     * fourteen prop interfaces, which is three props, and a reader learns
+     * nothing about the thirteen variants they came for. Naming the parts file
+     * here documents each part as its own export rather than flattening them
+     * into a table that would mean nothing.
+     *
+     * Registry components only — a package names one entry point with
+     * `propsSource` instead.
+     */
+    extraPropsSources: z.array(nonEmpty("extraPropsSources")).default([]),
+
+    /**
      * Three lengths for three surfaces. They are separate fields because each
      * is read in a different place, under different attention, and collapsing
      * them produces text that is wrong for at least two of the three.

@@ -45,6 +45,9 @@
       "@/components/oxygen/copilot": [
         "../../registry/oxygen/copilot/copilot.tsx"
       ],
+      "@/components/oxygen/date-picker": [
+        "../../registry/oxygen/date-picker/date-picker.tsx"
+      ],
       "@/components/oxygen/helix-loader": [
         "../../registry/oxygen/helix-loader/helix-loader.tsx"
       ],
@@ -87,6 +90,9 @@
       "@/lib/oxygen-allergy": [
         "../../registry/oxygen/lib/allergy.ts"
       ],
+      "@/lib/oxygen-availability": [
+        "../../registry/oxygen/lib/availability.ts"
+      ],
       "@/lib/oxygen-chart-header": [
         "../../registry/oxygen/lib/chart-header.ts"
       ],
@@ -99,6 +105,15 @@
       "@/lib/oxygen-clock": [
         "../../registry/oxygen/lib/clock.ts"
       ],
+      "@/lib/oxygen-datetime": [
+        "../../registry/oxygen/lib/datetime.ts"
+      ],
+      "@/lib/oxygen-datetime-field": [
+        "../../registry/oxygen/lib/datetime-field.tsx"
+      ],
+      "@/lib/oxygen-datetime-parts": [
+        "../../registry/oxygen/lib/datetime-parts.tsx"
+      ],
       "@/lib/oxygen-loader": [
         "../../registry/oxygen/lib/loader.tsx"
       ],
@@ -110,6 +125,9 @@
       ],
       "@/lib/oxygen-provenance": [
         "../../registry/oxygen/lib/provenance.ts"
+      ],
+      "@/lib/oxygen-recurrence": [
+        "../../registry/oxygen/lib/recurrence.ts"
       ],
       "@/lib/oxygen-result-value": [
         "../../registry/oxygen/lib/result-value.ts"

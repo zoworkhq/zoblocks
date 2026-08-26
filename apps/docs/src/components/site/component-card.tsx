@@ -65,6 +65,8 @@ import { STATUS_LABEL, type ComponentDoc } from "@/lib/catalog";
 import { AcquireAction, PriceTag } from "@/components/site/acquire";
 import { cn } from "@/lib/utils";
 
+import { DateField } from "@/registry/oxygen/date-picker/date-picker";
+import { plainDate } from "@/lib/oxygen-datetime";
 /**
  * Keyed by the stability tiers in ADR 0006. These used to be "shipping",
  * "review", and "design" — labels from an earlier vocabulary that no longer
@@ -228,7 +230,21 @@ function ScaledArt({
 const STANDARD_ART = 156;
 const FEATURED_ART = 184;
 
+const DT_TODAY = plainDate(2026, 8, 26);
+
 const PREVIEW: Record<string, (featured: boolean) => React.ReactNode> = {
+  /* One card for the whole family. It shows the field with its calendar
+     because that is the variant a reader reaches for first, and the card is
+     an identifier rather than a tour — the fourteen variants are the page. */
+  "date-picker": () => (
+    <DateField
+      label="Date of service"
+      showCalendar
+      now={DT_TODAY}
+      defaultValue={DT_TODAY}
+      showRelative
+    />
+  ),
   "pulse-loader": (featured) => (
     <PulseLoader size={featured ? 124 : 96} label="Loading your records" />
   ),

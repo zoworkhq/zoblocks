@@ -44,6 +44,15 @@ export interface LoadedComponent {
    * between a props table and an empty one with three headings.
    */
   propsFile: string;
+  /**
+   * Further files whose exported components are part of the same public API.
+   *
+   * Empty for almost everything. A component whose surface is a `variant`
+   * union over parts kept in a support module names them in
+   * `extraPropsSources`, or its props table documents the intersection of
+   * every variant — which is a handful of props and no help at all.
+   */
+  extraPropsFiles: string[];
   /** Import specifier a consumer uses after installing, e.g. "@/components/oxygen/vitals-panel". */
   consumerSpecifier: string;
   /** Where the Oxygen CLI writes it, e.g. "components/oxygen/vitals-panel.tsx". */
@@ -144,6 +153,24 @@ export async function loadComponents(): Promise<LoadedComponent[]> {
       continue;
     }
 
+    // A missing extra source extracts nothing and reports nothing — the props
+    // table would just be short, which is exactly how it looked before anyone
+    // noticed it was wrong.
+    const extraPropsFiles = parsed.data.extraPropsSources.map((source) =>
+      path.resolve(dir, source),
+    );
+    const missingExtra = parsed.data.extraPropsSources.filter(
+      (source) => !existsSync(path.resolve(dir, source)),
+    );
+    if (missingExtra.length > 0) {
+      problems.push(
+        `${rel(metaFile)}: extraPropsSources names ${missingExtra.join(", ")}, which ${
+          missingExtra.length === 1 ? "does" : "do"
+        } not exist relative to ${name}/`,
+      );
+      continue;
+    }
+
     loaded.push({
       meta: parsed.data,
       dir,
@@ -151,6 +178,7 @@ export async function loadComponents(): Promise<LoadedComponent[]> {
       sourcePath: path.relative(ROOT, sourceFile),
       // One and the same for a registry component: the file is the API.
       propsFile: sourceFile,
+      extraPropsFiles,
       consumerSpecifier: `@/${CONSUMER_COMPONENT_DIR}/${name}`,
       consumerTarget: `${CONSUMER_COMPONENT_DIR}/${name}.tsx`,
       hasStory: existsSync(path.join(dir, `${name}.stories.tsx`)),
@@ -225,6 +253,8 @@ export async function loadComponents(): Promise<LoadedComponent[]> {
       sourceFile: "",
       sourcePath: "",
       propsFile,
+      // A package names its one entry point with `propsSource` instead.
+      extraPropsFiles: [],
       consumerSpecifier: parsed.data.packageName ?? "",
       consumerTarget: "",
       hasStory: existsSync(path.join(dir, "src", `${parsed.data.name}.stories.tsx`)),

@@ -98,7 +98,14 @@ export default defineComponentMeta({
     "Dates are formatted by Intl at the record's precision, and a stamp with an offset renders in the record's zone rather than the reader's. Pass localeTag to control the language; there is no per-field format override yet.",
     "The commonest way to defeat the coverage claim is upstream: catching a source's failure in the data layer and returning a shorter array. See content/guides/populating-coverage.md — the component cannot detect what never reached it.",
   ],
-  related: ["timeline", "chart-accordion", "clinical-note", "accordion", "result-value"],
+  related: [
+    "timeline",
+    "chart-accordion",
+    "clinical-note",
+    "accordion",
+    "result-value",
+    "date-picker",
+  ],
 
   dependencies: ["clsx", "tailwind-merge"],
   registryDependencies: ["utils", "tokens", "timeline-core", "timeline-fhir", "timeline"],

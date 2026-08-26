@@ -492,7 +492,15 @@ test.describe("the tab gallery @a11y", () => {
 
     // A page-wide dark theme with eleven light-mode panels inside it argues
     // against the thing the gallery exists to demonstrate.
-    await expect(page.locator(".ox-gallery__stage")).toHaveAttribute("data-ox-demo-theme", "dark");
+    //
+    // The attribute is the product's own `data-ox-theme`, not a docs-only
+    // stand-in. The galleries used to carry `data-ox-demo-theme` with three
+    // hand-written palettes behind it, which themed the stage and nothing
+    // inside it: component tokens are substituted where they are declared, so
+    // every field and popover kept the root's light values. Setting the real
+    // attribute means the demos are themed by the shipped mechanism, and a
+    // token that stops following a theme breaks here rather than quietly.
+    await expect(page.locator(".ox-gallery__stage")).toHaveAttribute("data-ox-theme", "dark");
   });
 });
 

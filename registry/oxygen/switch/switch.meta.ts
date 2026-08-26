@@ -110,7 +110,7 @@ export default defineComponentMeta({
     "audience selects the default label preset and size. Wiring it to separate clinician and patient intl catalogs is not done yet.",
     "Requires styles/oxygen-switch.css, installed with switch-core.",
   ],
-  related: ["clinical-note", "tabs", "clinical-status"],
+  related: ["clinical-note", "tabs", "clinical-status", "date-picker"],
 
   dependencies: ["clsx", "tailwind-merge"],
   registryDependencies: ["utils", "tokens", "switch-core"],

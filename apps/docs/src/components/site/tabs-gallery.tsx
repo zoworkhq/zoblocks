@@ -164,10 +164,15 @@ interface DemoProps {
  *
  * The frame states the API being demonstrated, because a gallery where you
  * cannot tell which prop produced which pixels teaches nothing.
+ *
+ * Deliberately not a `data-reveal` target. These figures mount when a reader
+ * presses a chapter button rather than when they scroll, so a scroll animation
+ * would fire on every switch — and a gallery is for comparing, which means the
+ * next chapter has to be there the instant it is asked for.
  */
 function Demo({ id, name, api, tags, note, children, wide }: DemoProps) {
   return (
-    <figure id={id} className="ox-demo scroll-mt-28" data-reveal>
+    <figure id={id} className="ox-demo scroll-mt-28">
       <figcaption className="ox-demo__head">
         <span className="ox-demo__id">{id.toUpperCase()}</span>
         <span className="ox-demo__name">{name}</span>
@@ -931,7 +936,11 @@ const DENSITIES = ["patient", "standard", "clinical"] as const;
 
 function MatrixCell({ theme, density }: { theme: string; density: string }) {
   return (
-    <div className="ox-matrix__cell" data-ox-demo-theme={theme} data-ox-density={density}>
+    <div
+      className="ox-matrix__cell"
+      data-ox-theme={theme === "hc" ? "high-contrast" : theme}
+      data-ox-density={density}
+    >
       <div className="ox-matrix__label">
         {theme} · {density}
       </div>
@@ -1140,7 +1149,7 @@ export function TabsGallery() {
 
       <div
         className="ox-gallery__stage"
-        data-ox-demo-theme={theme}
+        data-ox-theme={theme === "hc" ? "high-contrast" : theme}
         data-ox-density={density}
         data-ox-motion={motion ? "on" : "off"}
         dir={rtl ? "rtl" : "ltr"}

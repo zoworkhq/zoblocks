@@ -113,6 +113,17 @@ import {
 } from "@/components/site/identity-demo";
 import { cn } from "@/lib/utils";
 
+import {
+  BEHAVIORAL_HEALTH_DURATIONS,
+  BirthDateField,
+  Calendar,
+  ClinicalDateTime,
+  DateField,
+  SessionTimeField,
+  TimeField,
+  timeGrid,
+} from "@/registry/oxygen/date-picker/date-picker";
+import { plainDate, plainTime, sessionFrom, withSessionEnd } from "@/lib/oxygen-datetime";
 type Density = "patient" | "standard" | "clinical";
 
 interface Scenario {
@@ -1293,7 +1304,213 @@ function CpStage({ children }: { children: React.ReactNode }) {
   );
 }
 
+/**
+ * The injected clock for every date preview on the site.
+ *
+ * Nothing in this family reads the wall clock — ENGINEERING.md §9 forbids it,
+ * because output that depends on when it rendered cannot be regression-tested.
+ * One constant here means the docs render identically next March, which is the
+ * same property the components promise a customer.
+ */
+const DT_TODAY = plainDate(2026, 8, 26);
+
+const DT_SIGNED = {
+  kind: "instant" as const,
+  date: plainDate(2026, 8, 24),
+  time: plainTime(8, 12),
+  zone: "America/New_York",
+};
+
+/** An organisation's own thresholds. The component ships none. */
+const DT_BANDS = [
+  { minMinutes: 0, maxMinutes: 15, code: null, label: "Not billable" },
+  { minMinutes: 16, maxMinutes: 52, code: "SHORT", label: "Standard session" },
+  { minMinutes: 53, maxMinutes: 999, code: "LONG", label: "Extended session" },
+];
+
+function DtStage({ children }: { children: React.ReactNode }) {
+  return <div className="flex flex-wrap items-start gap-8">{children}</div>;
+}
+
 const SCENARIOS: Record<string, Scenario[]> = {
+  /* ---- the date, time and session family --------------------------- */
+
+  "date-picker": [
+    {
+      id: "typed",
+      label: "Eight keystrokes, no calendar",
+      note: "Click into the field and type 08262026. Three bounded segments, one tab stop, and a segment that advances itself the moment no further digit could be valid — typing 9 in the month jumps on, typing 1 waits for a possible 12. That rule is what makes eight keystrokes enough, and it is why there is no calendar here at all: DatePicker is the one with a grid. Count what a clinician touches in a day and the calendar is the rare case; the common case is somebody who already knows the answer.",
+      render: () => (
+        <DtStage>
+          <DateField label="Date of service" now={DT_TODAY} />
+        </DtStage>
+      ),
+    },
+    {
+      id: "tiers",
+      label: "Three tiers, three behaviours",
+      note: "The same component with three different rules about the future, because there is no correct default. A date of birth may never be in the future and blocks, assertively, with aria-invalid. Session documentation in the future is suspicious rather than impossible and warns — politely, and without marking the field invalid, because the value is legal. A retrospective date is ordinary and gets an advisory with no colour weight at all; blocking it is what teaches staff to date notes to today to get past the validator.",
+      render: () => (
+        <DtStage>
+          <DateField
+            label="Date of birth"
+            now={DT_TODAY}
+            futurePolicy="block"
+            defaultValue={plainDate(2027, 1, 1)}
+          />
+          <DateField
+            label="Session documented"
+            now={DT_TODAY}
+            futurePolicy="warn"
+            defaultValue={plainDate(2026, 9, 2)}
+          />
+          <DateField
+            label="Date of service"
+            now={DT_TODAY}
+            showRelative
+            defaultValue={plainDate(2026, 8, 21)}
+          />
+        </DtStage>
+      ),
+    },
+    {
+      id: "grid",
+      label: "One tab stop, and every cell named in full",
+      note: "Tab to the grid and move with the arrow keys; PageUp and PageDown change month, Shift with them changes year. Exactly one cell is reachable by Tab — forty-two tab stops is the most common accessibility failure in a date picker. And every cell is named as its whole date plus its state: “Wednesday, August 26, 2026, 8 times available”, not “26”. A cell in a grid has no column header in its accessible context, so a grid of bare numerals is navigable and useless.",
+      render: () => (
+        <DtStage>
+          <Calendar
+            now={DT_TODAY}
+            defaultMonth={{ y: 2026, m: 9 }}
+            load={(d) => (d.d % 4 === 0 ? 8 : d.d % 3 === 0 ? 2 : null)}
+            unavailable={(d) => (d.d === 7 ? "Labor Day — clinic closed" : null)}
+          />
+        </DtStage>
+      ),
+    },
+    {
+      id: "modes",
+      label: "Range in two clicks, multiple with a cap",
+      note: "Range selection is two clicks and never a drag — WCAG 2.2 SC 2.5.7 asks that no function require one, and there is no drag path anywhere in the component. In multiple mode, clicking a selected date removes it: a remove control inside a 32px cell would be under the 24px target floor, and a second click is what people try first anyway.",
+      render: () => (
+        <DtStage>
+          <Calendar mode="range" now={DT_TODAY} defaultMonth={{ y: 2026, m: 9 }} />
+          <Calendar mode="multiple" maxDates={4} now={DT_TODAY} defaultMonth={{ y: 2026, m: 9 }} />
+        </DtStage>
+      ),
+    },
+    {
+      id: "field-first",
+      label: "The calendar most users never open",
+      note: "Type into the field and the grid never appears; press the button and it does. That ordering is the whole design: for the four-fifths of healthcare date fields that are recall rather than choice, a popover is four clicks where eight keystrokes would do. Escape closes and keeps what was typed — an Escape that discards a half-entered date is the reason people stop using keyboards.",
+      render: () => (
+        <DtStage>
+          <DateField
+            label="Appointment date"
+            showCalendar
+            now={DT_TODAY}
+            unavailable={(d) => ([0, 6].includes((d.d + 5) % 7) ? "Weekend — clinic closed" : null)}
+          />
+        </DtStage>
+      ),
+    },
+    {
+      id: "ambiguity",
+      label: "The 9 it will not resolve",
+      note: "Type a bare 9 into the first field. The meridiem segment stays empty, the value stays incomplete, and the field asks. Every other time picker resolves this silently, and on some ward that turns a 9 PM discharge into a 9 AM one — twelve hours of a record being wrong with nothing on screen to suggest anybody guessed. The second field shows the interval as data: twenty minutes is as real as fifteen, and so is fifty-three.",
+      render: () => (
+        <DtStage>
+          <TimeField label="Discharge time" />
+          <TimeField
+            label="Time given"
+            presets={timeGrid(8 * 60, 10 * 60, 20)}
+            defaultValue={plainTime(8, 20)}
+          />
+        </DtStage>
+      ),
+    },
+    {
+      id: "driver",
+      label: "Which number is the one you set",
+      note: "Press a duration chip and the end moves, marked Derived. Type an end time instead and the duration recomputes — and the Held badge moves with it. Now move the start: hold the duration and the whole session slides, hold the end and it stretches. Both are correct, only one can be the default, and which one you got is information you would otherwise discover by making a mistake on a real appointment. That badge is the component.",
+      render: () => (
+        <DtStage>
+          <SessionTimeField
+            label="Individual therapy"
+            defaultValue={sessionFrom(plainTime(9, 0), 53)}
+            durationPresets={BEHAVIORAL_HEALTH_DURATIONS}
+            bands={DT_BANDS}
+          />
+        </DtStage>
+      ),
+    },
+    {
+      id: "midnight",
+      label: "Crossing midnight is a value",
+      note: "11:30 PM to 7:30 AM is a crisis-line shift and a residential handover, not a typo. Refusing it teaches staff to type the wrong date to get past the validator, which is how you lose the real data — so the day boundary is stated in the value instead. The second one is the guard: a start dragged past a held end is the only way to reach an absurd duration, and the component says so and offers the likeliest correction rather than quietly rounding it into range.",
+      render: () => (
+        <DtStage>
+          <SessionTimeField
+            label="Crisis line shift"
+            maxMinutes={720}
+            nextDateLabel="Aug 27"
+            defaultValue={withSessionEnd(sessionFrom(plainTime(23, 30), 0), plainTime(7, 30))}
+          />
+          <SessionTimeField
+            label="Typed 2:00 meaning the afternoon"
+            defaultValue={withSessionEnd(sessionFrom(plainTime(9, 0), 60), plainTime(2, 0))}
+          />
+        </DtStage>
+      ),
+    },
+    {
+      id: "age",
+      label: "The age is the proof-read",
+      note: "Type 07181986. The age is not decoration: a transposed year is invisible in 07/18/1968 and screaming in “58 years old”, and it is the only error check this field has. Under two years it reads in months and under four weeks in days, because a paediatric chart that says “0 years old” for a four-month-old has discarded the only number that mattered. No calendar opens by default — and when one does, it opens on the year, because a date-of-birth calendar that opens on this month has decided the patient was born this month.",
+      render: () => (
+        <DtStage>
+          <BirthDateField now={DT_TODAY} />
+          <BirthDateField now={DT_TODAY} value={plainDate(2026, 4, 20)} />
+        </DtStage>
+      ),
+    },
+    {
+      id: "partial-and-absent",
+      label: "A year is a date, and nothing has a reason",
+      note: "FHIR permits YYYY and YYYY-MM for Patient.birthDate, because homeless services, unaccompanied minors and forensic intake all produce them — and coercing “born around 1962” to 1 January 1962 invents a fact every downstream system will read as precise, including the one calculating a dose. Absence is the same argument Switch makes for its third value: a form that cannot tell “no date of birth” from “nobody asked” is lying, and CONTENT.md forbids punctuating the difference away as an em dash.",
+      render: () => (
+        <DtStage>
+          <BirthDateField
+            now={DT_TODAY}
+            allowEstimated
+            allowAbsent
+            precision="year"
+            value={{ kind: "partial-date", y: 1962 }}
+          />
+          <BirthDateField
+            now={DT_TODAY}
+            allowAbsent
+            absentReason="asked-declined"
+            value={{ kind: "absent", reason: "asked-declined" }}
+          />
+        </DtStage>
+      ),
+    },
+    {
+      id: "readout",
+      label: "The record first, the reading aid second",
+      note: "“3 days after service” is an aid; the timestamp is the record, and a reviewer will ask. Anything a signature depends on prints its stored instant and its IANA zone, because “8:12 AM” on a countersignature is not a time until somebody says where — and it survives print, which is where a great many of these are actually read. The second time zone appears only when the zones differ: rendering “3:00 PM ET” to somebody already in Eastern Time is noise that teaches readers to stop reading zone labels.",
+      render: () => (
+        <DtStage>
+          <ClinicalDateTime as="time" value={DT_SIGNED} now={DT_TODAY} showRelative showZone />
+          <ClinicalDateTime value={DT_SIGNED} now={DT_TODAY} viewerZone="America/Los_Angeles" />
+          <ClinicalDateTime value={{ kind: "absent", reason: "asked-declined" }} />
+          <ClinicalDateTime value={DT_TODAY} restricted />
+        </DtStage>
+      ),
+    },
+  ],
+
   /** Two demos: what it counts, and what it will not run on one keystroke. */
   "chart-command-palette": [
     {

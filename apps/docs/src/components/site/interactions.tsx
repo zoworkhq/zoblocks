@@ -120,33 +120,99 @@ export function InstallCommand({
 // ---------------------------------------------------------------------------
 
 /**
- * One observer for the whole page, attached at the root. Elements opt in with
- * `data-reveal`; the CSS handles the transition. Content is styled visible if
- * this never runs, so a failed observer degrades to a static page rather than
- * an invisible one.
+ * One observer for the whole page. Elements opt in with `data-reveal`; the CSS
+ * handles the transition.
+ *
+ * Two rules earned by getting this wrong twice, both worth stating.
+ *
+ * **The sweep repeats.** It used to run `querySelectorAll` once, on mount, so
+ * anything that arrived later was never observed. Every gallery switches
+ * chapters with a control, so each chapter mounts long after that — and under
+ * a CSS default of `opacity: 0` "never observed" means invisible, permanently.
+ * Every chapter after the first, on every component page, was a blank slab. A
+ * MutationObserver now re-runs the sweep whenever nodes are added.
+ *
+ * **Nothing is hidden until hiding is known to be reversible.** The fix for
+ * the above was to hide an element as the observer began watching it, which
+ * failed harder: an IntersectionObserver computes nothing while the document
+ * is hidden, so a page opened in a background tab hid all 58 of its elements
+ * and revealed none. The flag that switches hiding on is therefore written
+ * from inside the **first delivered callback** — the only proof that
+ * intersections are being computed at all — and a `visibilitychange` listener
+ * covers the tab that starts hidden and is brought forward later.
  */
 export function RevealRoot({ children }: { children: React.ReactNode }) {
   React.useEffect(() => {
-    const targets = document.querySelectorAll<HTMLElement>("[data-reveal]");
+    const root = document.documentElement;
+    const pending = () =>
+      document.querySelectorAll<HTMLElement>("[data-reveal]:not([data-revealed])");
+    const revealAll = () => pending().forEach((el) => el.setAttribute("data-revealed", "true"));
 
+    // Under reduced motion there is no animation to stage, so everything is
+    // simply marked revealed and the live flag is never set.
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      targets.forEach((el) => el.setAttribute("data-revealed", "true"));
-      return;
+      revealAll();
+      const mutations = new MutationObserver(revealAll);
+      mutations.observe(document.body, { subtree: true, childList: true });
+      return () => mutations.disconnect();
     }
 
     const observer = new IntersectionObserver(
       (entries) => {
+        // Proof that intersections are being computed. Only now is it safe for
+        // the stylesheet to hide anything, because only now is something able
+        // to show it again.
+        root.setAttribute("data-reveal-live", "");
         for (const entry of entries) {
           if (!entry.isIntersecting) continue;
           entry.target.setAttribute("data-revealed", "true");
           observer.unobserve(entry.target);
         }
       },
-      { rootMargin: "0px 0px -12% 0px", threshold: 0.1 },
+      // `threshold: 0`, not a fraction. A fraction is a share of the *element*,
+      // so anything taller than the viewport can never satisfy it: a 14,906px
+      // section needed 1,490px on screen in a 900px window, never intersected,
+      // and stayed invisible however far you scrolled. The bottom `rootMargin`
+      // is what actually paces the reveal, and it works at any height.
+      { rootMargin: "0px 0px -12% 0px", threshold: 0 },
     );
 
-    targets.forEach((el) => observer.observe(el));
-    return () => observer.disconnect();
+    const sweep = () => pending().forEach((el) => observer.observe(el));
+
+    // Batched: one React commit can add hundreds of nodes, and the sweep is a
+    // document-wide query.
+    let queued = false;
+    const schedule = () => {
+      if (queued) return;
+      queued = true;
+      queueMicrotask(() => {
+        queued = false;
+        sweep();
+      });
+    };
+
+    sweep();
+    // `childList` only. Revealing writes an attribute, and watching attributes
+    // as well would feed the observer its own output.
+    const mutations = new MutationObserver(schedule);
+    mutations.observe(document.body, { subtree: true, childList: true });
+
+    // A tab that was hidden at load has had no intersections computed. When it
+    // comes forward the observer resumes on its own, but the sweep is re-run
+    // in case anything mounted meanwhile.
+    const onVisible = () => {
+      if (document.visibilityState === "visible") sweep();
+    };
+    document.addEventListener("visibilitychange", onVisible);
+
+    return () => {
+      document.removeEventListener("visibilitychange", onVisible);
+      mutations.disconnect();
+      observer.disconnect();
+      // Leaving the flag set would hide everything the next observer has not
+      // reached yet.
+      root.removeAttribute("data-reveal-live");
+    };
   }, []);
 
   return <>{children}</>;

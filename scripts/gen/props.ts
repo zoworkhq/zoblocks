@@ -437,80 +437,37 @@ export function extractProps(components: LoadedComponent[]): Map<string, Extract
   // `propsFile`, not `sourceFile`: a package component has no registry source
   // and still has a public API to document.
   const program = ts.createProgram(
-    components.map((c) => c.propsFile).filter(Boolean),
+    components.flatMap((c) => [c.propsFile, ...c.extraPropsFiles]).filter(Boolean),
     compilerOptions(components),
   );
   const checker = program.getTypeChecker();
   const byComponent = new Map<string, ExtractedExport[]>();
 
   for (const component of components) {
-    const sourceFile = component.propsFile ? program.getSourceFile(component.propsFile) : undefined;
-    if (!sourceFile) {
+    // The component's own file first: its first export is the one the docs
+    // page leads with, and for a dispatch component that has to stay the
+    // dispatch rather than whichever part happens to be declared first.
+    const sourceFiles = [component.propsFile, ...component.extraPropsFiles]
+      .filter(Boolean)
+      .map((file) => program.getSourceFile(file))
+      .filter((file): file is ts.SourceFile => file !== undefined);
+
+    if (sourceFiles.length === 0) {
       byComponent.set(component.meta.name, []);
       continue;
     }
 
     const exports: ExtractedExport[] = [];
 
-    for (const statement of sourceFile.statements) {
-      if (!hasExportModifier(statement)) continue;
+    for (const sourceFile of sourceFiles)
+      for (const statement of sourceFile.statements) {
+        if (!hasExportModifier(statement)) continue;
 
-      if (ts.isFunctionDeclaration(statement) && statement.name) {
-        const name = statement.name.text;
-        if (!isComponentName(name)) continue;
-
-        const parameter = statement.parameters[0];
-        if (!parameter) {
-          exports.push({ exportName: name, props: [], enums: {} });
-          continue;
-        }
-
-        const propsType = checker.getTypeAtLocation(parameter);
-        const extendsType = extendsTypeOf(propsType, component.sourceFile);
-
-        exports.push({
-          exportName: name,
-          props: propsFromType(
-            checker,
-            propsType,
-            parameter,
-            component.sourceFile,
-            defaultsFromParameter(parameter),
-          ),
-          enums: enumsFromType(checker, propsType, component.sourceFile),
-          ...(extendsType ? { extendsType } : {}),
-        });
-        continue;
-      }
-
-      if (ts.isClassDeclaration(statement) && statement.name) {
-        const name = statement.name.text;
-        if (!isComponentName(name)) continue;
-
-        const propsType = classPropsType(checker, statement);
-        exports.push({
-          exportName: name,
-          props: propsType
-            ? propsFromType(checker, propsType, statement, component.sourceFile, new Map())
-            : [],
-          enums: propsType ? enumsFromType(checker, propsType, component.sourceFile) : {},
-        });
-        continue;
-      }
-
-      // `export const Foo = forwardRef(...)` / `memo(...)` / `(props) => ...`.
-      if (ts.isVariableStatement(statement)) {
-        for (const declaration of statement.declarationList.declarations) {
-          if (!ts.isIdentifier(declaration.name)) continue;
-          const name = declaration.name.text;
+        if (ts.isFunctionDeclaration(statement) && statement.name) {
+          const name = statement.name.text;
           if (!isComponentName(name)) continue;
 
-          const fn = declaration.initializer
-            ? unwrapComponent(declaration.initializer, sourceFile)
-            : undefined;
-          if (!fn) continue;
-
-          const parameter = fn.parameters[0];
+          const parameter = statement.parameters[0];
           if (!parameter) {
             exports.push({ exportName: name, props: [], enums: {} });
             continue;
@@ -531,9 +488,60 @@ export function extractProps(components: LoadedComponent[]): Map<string, Extract
             enums: enumsFromType(checker, propsType, component.sourceFile),
             ...(extendsType ? { extendsType } : {}),
           });
+          continue;
+        }
+
+        if (ts.isClassDeclaration(statement) && statement.name) {
+          const name = statement.name.text;
+          if (!isComponentName(name)) continue;
+
+          const propsType = classPropsType(checker, statement);
+          exports.push({
+            exportName: name,
+            props: propsType
+              ? propsFromType(checker, propsType, statement, component.sourceFile, new Map())
+              : [],
+            enums: propsType ? enumsFromType(checker, propsType, component.sourceFile) : {},
+          });
+          continue;
+        }
+
+        // `export const Foo = forwardRef(...)` / `memo(...)` / `(props) => ...`.
+        if (ts.isVariableStatement(statement)) {
+          for (const declaration of statement.declarationList.declarations) {
+            if (!ts.isIdentifier(declaration.name)) continue;
+            const name = declaration.name.text;
+            if (!isComponentName(name)) continue;
+
+            const fn = declaration.initializer
+              ? unwrapComponent(declaration.initializer, sourceFile)
+              : undefined;
+            if (!fn) continue;
+
+            const parameter = fn.parameters[0];
+            if (!parameter) {
+              exports.push({ exportName: name, props: [], enums: {} });
+              continue;
+            }
+
+            const propsType = checker.getTypeAtLocation(parameter);
+            const extendsType = extendsTypeOf(propsType, component.sourceFile);
+
+            exports.push({
+              exportName: name,
+              props: propsFromType(
+                checker,
+                propsType,
+                parameter,
+                component.sourceFile,
+                defaultsFromParameter(parameter),
+              ),
+              enums: enumsFromType(checker, propsType, component.sourceFile),
+              ...(extendsType ? { extendsType } : {}),
+            });
+          }
         }
       }
-    }
 
     byComponent.set(component.meta.name, exports);
   }

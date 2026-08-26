@@ -655,16 +655,20 @@ body {
 }
 
 /* Reveal variants. One uniform fade-up everywhere reads as a template; the
-   direction should follow the element's role in the layout. */
-[data-reveal="left"] {
+   direction should follow the element's role in the layout.
+
+   Gated on `html[data-reveal-live]` for the same reason as the base rule
+   below: an element the observer will never reach must not be left translated
+   off its own position. */
+:root[data-reveal-live] [data-reveal="left"]:not([data-revealed="true"]) {
   transform: translateX(-16px);
 }
 
-[data-reveal="right"] {
+:root[data-reveal-live] [data-reveal="right"]:not([data-revealed="true"]) {
   transform: translateX(16px);
 }
 
-[data-reveal="scale"] {
+:root[data-reveal-live] [data-reveal="scale"]:not([data-revealed="true"]) {
   transform: scale(0.985);
 }
 
@@ -1748,18 +1752,37 @@ html:not(.dark) .instrument-demo [class*="bg-panel"] {
  * one observer, no layout thrash, and it degrades to fully-visible content.
  * ------------------------------------------------------------------------ */
 
-[data-reveal] {
+/* Visible is the resting state. Hiding is switched on only once the observer
+   has proved it can switch it back off.
+
+   Two earlier versions of this got it wrong in the same direction. First
+   `[data-reveal]` alone carried `opacity: 0`, so every element the observer
+   never reached was invisible for good — and it swept once, on mount, so
+   everything mounted later qualified: every gallery chapter after the first,
+   on every component page. Then the hidden state moved onto an attribute the
+   observer wrote when it *started* watching, which is no better: an
+   IntersectionObserver delivers nothing at all while the document is hidden,
+   so a page loaded in a background tab armed all 58 of its elements and
+   revealed none of them.
+
+   The flag is now written after the observer's **first delivered callback** —
+   proof that intersections are actually being computed. Before that, and
+   forever if it never happens, the page renders normally. No script, a thrown
+   error, no IntersectionObserver, a tab that is never brought forward: all of
+   them leave a readable page, which is what this system always claimed to do.
+
+   There is no flash. The first callback reveals whatever is already on screen,
+   so the elements this rule hides a moment later are all below the fold. */
+:root[data-reveal-live] [data-reveal]:not([data-revealed="true"]) {
   opacity: 0;
   transform: translateY(14px);
+}
+
+[data-reveal] {
   transition:
     opacity 620ms var(--ease-out-expo),
     transform 620ms var(--ease-out-expo);
   transition-delay: var(--reveal-delay, 0ms);
-}
-
-[data-reveal][data-revealed="true"] {
-  opacity: 1;
-  transform: none;
 }
 
 /* ---------------------------------------------------------------------------
@@ -1836,3 +1859,10 @@ html:not(.dark) .instrument-demo [class*="bg-panel"] {
     transform-origin: bottom right;
   }
 }
+
+/* The date, time and session family. Shipped to a consumer as
+   styles/oxygen-datetime.css by the `datetime-core` registry item, and
+   imported here so the docs render the same chrome the CLI installs.
+   Every input in it spends the shared --ox-field-* tokens, so a date field
+   and a dose field cannot drift apart in a customer's theme. */
+@import "../../../../registry/oxygen/lib/datetime.css";

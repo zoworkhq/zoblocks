@@ -13,12 +13,13 @@
  * change, because customers style against these names. The manifest is
  * committed so that change shows up as a reviewable diff.
  *
- * 301 tokens across 27 components:
+ * 328 tokens across 28 components:
  *
  *   switch          55
  *   tabs            44
  *   banner          39
  *   accordion       29
+ *   datetime        27
  *   badge           16
  *   field           14
  *   alert           12
@@ -1477,6 +1478,275 @@ export const TOKEN_SURFACE: readonly SurfaceEntry[] = [
     "component": "cs",
     "source": "packages/tokens/tokens/component.json",
     "kind": "dimension",
+    "frameworks": [],
+    "fallback": true,
+    "bridgeable": true
+  },
+  {
+    "name": "--ox-datetime-cell-fg",
+    "component": "datetime",
+    "source": "packages/tokens/tokens/component.json",
+    "kind": "color",
+    "semantic": "--ox-text",
+    "frameworks": [],
+    "fallback": true,
+    "bridgeable": true
+  },
+  {
+    "name": "--ox-datetime-cell-hover-bg",
+    "component": "datetime",
+    "source": "packages/tokens/tokens/component.json",
+    "kind": "color",
+    "semantic": "--ox-bg-muted",
+    "frameworks": [],
+    "fallback": true,
+    "bridgeable": true
+  },
+  {
+    "name": "--ox-datetime-cell-muted-fg",
+    "component": "datetime",
+    "source": "packages/tokens/tokens/component.json",
+    "kind": "color",
+    "semantic": "--ox-text-muted",
+    "frameworks": [],
+    "fallback": true,
+    "bridgeable": true
+  },
+  {
+    "name": "--ox-datetime-cell-radius",
+    "component": "datetime",
+    "source": "packages/tokens/tokens/component.json",
+    "kind": "dimension",
+    "semantic": "--ox-radius-sm",
+    "frameworks": [],
+    "fallback": true,
+    "bridgeable": true
+  },
+  {
+    "name": "--ox-datetime-cell-range-bg",
+    "component": "datetime",
+    "source": "packages/tokens/tokens/component.json",
+    "kind": "color",
+    "semantic": "--ox-accent-subtle",
+    "frameworks": [],
+    "fallback": true,
+    "bridgeable": true
+  },
+  {
+    "name": "--ox-datetime-cell-range-fg",
+    "component": "datetime",
+    "source": "packages/tokens/tokens/component.json",
+    "kind": "color",
+    "semantic": "--ox-text",
+    "frameworks": [],
+    "fallback": true,
+    "bridgeable": true
+  },
+  {
+    "name": "--ox-datetime-cell-selected-bg",
+    "component": "datetime",
+    "source": "packages/tokens/tokens/component.json",
+    "kind": "color",
+    "semantic": "--ox-accent",
+    "frameworks": [],
+    "fallback": true,
+    "bridgeable": true
+  },
+  {
+    "name": "--ox-datetime-cell-selected-fg",
+    "component": "datetime",
+    "source": "packages/tokens/tokens/component.json",
+    "kind": "color",
+    "semantic": "--ox-text-on-accent",
+    "frameworks": [],
+    "fallback": true,
+    "bridgeable": true
+  },
+  {
+    "name": "--ox-datetime-cell-size",
+    "component": "datetime",
+    "source": "packages/tokens/tokens/component.json",
+    "kind": "dimension",
+    "frameworks": [],
+    "fallback": true,
+    "bridgeable": true
+  },
+  {
+    "name": "--ox-datetime-chip-bg",
+    "component": "datetime",
+    "source": "packages/tokens/tokens/component.json",
+    "kind": "color",
+    "semantic": "--ox-surface",
+    "frameworks": [],
+    "fallback": true,
+    "bridgeable": true
+  },
+  {
+    "name": "--ox-datetime-chip-border",
+    "component": "datetime",
+    "source": "packages/tokens/tokens/component.json",
+    "kind": "color",
+    "semantic": "--ox-border",
+    "frameworks": [],
+    "fallback": true,
+    "bridgeable": true
+  },
+  {
+    "name": "--ox-datetime-chip-fg",
+    "component": "datetime",
+    "source": "packages/tokens/tokens/component.json",
+    "kind": "color",
+    "semantic": "--ox-text-muted",
+    "frameworks": [],
+    "fallback": true,
+    "bridgeable": true
+  },
+  {
+    "name": "--ox-datetime-chip-on-bg",
+    "component": "datetime",
+    "source": "packages/tokens/tokens/component.json",
+    "kind": "color",
+    "semantic": "--ox-accent",
+    "frameworks": [],
+    "fallback": true,
+    "bridgeable": true
+  },
+  {
+    "name": "--ox-datetime-chip-on-fg",
+    "component": "datetime",
+    "source": "packages/tokens/tokens/component.json",
+    "kind": "color",
+    "semantic": "--ox-text-on-accent",
+    "frameworks": [],
+    "fallback": true,
+    "bridgeable": true
+  },
+  {
+    "name": "--ox-datetime-derived-fg",
+    "component": "datetime",
+    "source": "packages/tokens/tokens/component.json",
+    "kind": "color",
+    "semantic": "--ox-text-muted",
+    "frameworks": [],
+    "fallback": true,
+    "bridgeable": true
+  },
+  {
+    "name": "--ox-datetime-duration",
+    "component": "datetime",
+    "source": "packages/tokens/tokens/component.json",
+    "kind": "duration",
+    "semantic": "--ox-density-duration",
+    "frameworks": [],
+    "fallback": true,
+    "bridgeable": true
+  },
+  {
+    "name": "--ox-datetime-duration-bg",
+    "component": "datetime",
+    "source": "packages/tokens/tokens/component.json",
+    "kind": "color",
+    "semantic": "--ox-bg-muted",
+    "frameworks": [],
+    "fallback": true,
+    "bridgeable": true
+  },
+  {
+    "name": "--ox-datetime-duration-held-bg",
+    "component": "datetime",
+    "source": "packages/tokens/tokens/component.json",
+    "kind": "color",
+    "semantic": "--ox-accent-subtle",
+    "frameworks": [],
+    "fallback": true,
+    "bridgeable": true
+  },
+  {
+    "name": "--ox-datetime-duration-held-border",
+    "component": "datetime",
+    "source": "packages/tokens/tokens/component.json",
+    "kind": "color",
+    "semantic": "--ox-accent-border",
+    "frameworks": [],
+    "fallback": true,
+    "bridgeable": true
+  },
+  {
+    "name": "--ox-datetime-font",
+    "component": "datetime",
+    "source": "packages/tokens/tokens/component.json",
+    "kind": "dimension",
+    "semantic": "--ox-density-font",
+    "frameworks": [],
+    "fallback": true,
+    "bridgeable": true
+  },
+  {
+    "name": "--ox-datetime-gap",
+    "component": "datetime",
+    "source": "packages/tokens/tokens/component.json",
+    "kind": "dimension",
+    "semantic": "--ox-density-gap",
+    "frameworks": [],
+    "fallback": true,
+    "bridgeable": true
+  },
+  {
+    "name": "--ox-datetime-held-fg",
+    "component": "datetime",
+    "source": "packages/tokens/tokens/component.json",
+    "kind": "color",
+    "semantic": "--ox-accent",
+    "frameworks": [],
+    "fallback": true,
+    "bridgeable": true
+  },
+  {
+    "name": "--ox-datetime-popover-bg",
+    "component": "datetime",
+    "source": "packages/tokens/tokens/component.json",
+    "kind": "color",
+    "semantic": "--ox-surface-overlay",
+    "frameworks": [],
+    "fallback": true,
+    "bridgeable": true
+  },
+  {
+    "name": "--ox-datetime-popover-border",
+    "component": "datetime",
+    "source": "packages/tokens/tokens/component.json",
+    "kind": "color",
+    "semantic": "--ox-border",
+    "frameworks": [],
+    "fallback": true,
+    "bridgeable": true
+  },
+  {
+    "name": "--ox-datetime-target",
+    "component": "datetime",
+    "source": "packages/tokens/tokens/component.json",
+    "kind": "dimension",
+    "semantic": "--ox-density-target",
+    "frameworks": [],
+    "fallback": true,
+    "bridgeable": true
+  },
+  {
+    "name": "--ox-datetime-today-marker",
+    "component": "datetime",
+    "source": "packages/tokens/tokens/component.json",
+    "kind": "color",
+    "semantic": "--ox-accent",
+    "frameworks": [],
+    "fallback": true,
+    "bridgeable": true
+  },
+  {
+    "name": "--ox-datetime-weekday-fg",
+    "component": "datetime",
+    "source": "packages/tokens/tokens/component.json",
+    "kind": "color",
+    "semantic": "--ox-text-muted",
     "frameworks": [],
     "fallback": true,
     "bridgeable": true
@@ -3158,6 +3428,7 @@ export const SURFACE_COMPONENTS: readonly string[] = [
   "chart-header",
   "copilot",
   "cs",
+  "datetime",
   "field",
   "loader",
   "nav",
@@ -3257,6 +3528,33 @@ export const BRIDGEABLE: readonly string[] = [
   "--ox-cs-height",
   "--ox-cs-height-compact",
   "--ox-cs-height-default",
+  "--ox-datetime-cell-fg",
+  "--ox-datetime-cell-hover-bg",
+  "--ox-datetime-cell-muted-fg",
+  "--ox-datetime-cell-radius",
+  "--ox-datetime-cell-range-bg",
+  "--ox-datetime-cell-range-fg",
+  "--ox-datetime-cell-selected-bg",
+  "--ox-datetime-cell-selected-fg",
+  "--ox-datetime-cell-size",
+  "--ox-datetime-chip-bg",
+  "--ox-datetime-chip-border",
+  "--ox-datetime-chip-fg",
+  "--ox-datetime-chip-on-bg",
+  "--ox-datetime-chip-on-fg",
+  "--ox-datetime-derived-fg",
+  "--ox-datetime-duration",
+  "--ox-datetime-duration-bg",
+  "--ox-datetime-duration-held-bg",
+  "--ox-datetime-duration-held-border",
+  "--ox-datetime-font",
+  "--ox-datetime-gap",
+  "--ox-datetime-held-fg",
+  "--ox-datetime-popover-bg",
+  "--ox-datetime-popover-border",
+  "--ox-datetime-target",
+  "--ox-datetime-today-marker",
+  "--ox-datetime-weekday-fg",
   "--ox-field-bg",
   "--ox-field-border",
   "--ox-field-border-focus",

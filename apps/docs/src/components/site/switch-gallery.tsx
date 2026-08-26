@@ -49,7 +49,7 @@ interface DemoProps {
  */
 function Demo({ id, name, api, tags, note, children, wide }: DemoProps) {
   return (
-    <figure id={`switch-${id}`} className="ox-demo scroll-mt-28" data-reveal>
+    <figure id={`switch-${id}`} className="ox-demo scroll-mt-28">
       <figcaption className="ox-demo__head">
         <span className="ox-demo__id">{id.toUpperCase()}</span>
         <span className="ox-demo__name">{name}</span>
@@ -491,7 +491,7 @@ export function SwitchGallery() {
 
       <div
         className="ox-gallery__stage"
-        data-ox-demo-theme={theme}
+        data-ox-theme={theme === "hc" ? "high-contrast" : theme}
         data-ox-density={density}
         data-ox-motion={motion ? "on" : "off"}
         dir={rtl ? "rtl" : "ltr"}

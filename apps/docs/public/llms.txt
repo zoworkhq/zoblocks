@@ -100,6 +100,11 @@ Rules that matter when generating code with these components:
   fhir: Composition, DocumentReference, Provenance, Narrative
   states: Empty draft, In progress, Origins ribbon, Unreviewed AI, Copied forward, Unfilled blanks, Stale pulled value, Gate blocking, Gate clear, Offline draft, Save failed, Signed, Signed with addendum, Awaiting countersignature
   status: experimental
+- [Date Picker](https://oxygenui.design/components/date-picker): One temporal control with fourteen variants: field, calendar, birth date, session, slots, recurrence and the read-only record.
+  install: npx @oxygenui-design/cli add date-picker
+  fhir: Patient, Slot, Schedule, PractitionerRole, Timing
+  states: Picker — field with a calendar behind a button, Field — no popover at all, Calendar — inline month grid, Range — two clicks, never a drag, Multiple dates — capped, click again to remove, Birth date — age, partial dates, stated absence, Time — and the ambiguity it refuses to resolve, Session — start, end, duration, visible driver, Slots — grouped, counted, four states, Scheduler — provider, date and time on one surface, Recurrence — the rule in words, Series — conflicts resolved before anything is written, Group — the room, the roster and the real count, Read-only — the record a reviewer sees
+  status: beta
 - [Provenance Chip](https://oxygenui.design/components/provenance-chip): Where a value came from, how it got here, and how much of it a human has actually looked at.
   install: npx @oxygenui-design/cli add provenance-chip
   fhir: Provenance

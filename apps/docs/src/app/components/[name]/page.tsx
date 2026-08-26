@@ -11,6 +11,7 @@ import { ComponentPreview } from "@/components/site/component-preview";
 import { TabsGallery } from "@/components/site/tabs-gallery";
 import { CopilotGallery } from "@/components/site/copilot-gallery";
 import { SwitchGallery } from "@/components/site/switch-gallery";
+import { DatePickerGallery } from "@/components/site/date-picker-gallery";
 import { InstallCommand, RevealRoot } from "@/components/site/interactions";
 import { SectionRail, type RailSection } from "@/components/site/section-rail";
 import { Playground } from "@/components/site/playground";
@@ -161,6 +162,21 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
   const alternatives = component.relationships?.alternatives ?? [];
   const controls = component.controls ?? [];
   const playable = controls.length > 0 && hasPlayground(component.name);
+  /*
+   * One props table per exported component.
+   *
+   * `component.props` is the primary export's, already carrying any overrides
+   * from the meta, so it is used verbatim rather than re-read from `exports`.
+   * Exports with no props of their own — a component whose whole API is its
+   * children — get no table, because an empty table reads as a missing one.
+   */
+  const apiTables = (
+    component.exports.length > 0
+      ? component.exports.map((entry, index) =>
+          index === 0 ? { name: entry.name, props: component.props } : entry,
+        )
+      : [{ name: component.technicalName ?? component.title, props: component.props }]
+  ).filter((entry) => entry.props.length > 0);
   const builtWith = component.relationships?.builtWith ?? [];
   const usedIn = component.relationships?.usedIn ?? [];
   const hasClinical = Boolean(
@@ -384,6 +400,27 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
           )}
 
           {/*
+            The date control earns a gallery for Tabs' reason, doubled. Its
+            claim is that fourteen presentations share one value space, one
+            keyboard model and one accessibility contract — and a claim about
+            sameness cannot be made with one example. Several of the variants
+            are also compositions rather than controls: a scheduler and a
+            series review are wider than the prose column, and squeezed into
+            it they render permanently scrolled, which demonstrates overflow
+            rather than scheduling.
+          */}
+          {component.name === "date-picker" && (
+            <div className="mx-auto max-w-[92rem] px-5 pb-[clamp(2.75rem,5vw,4.5rem)] sm:px-8">
+              <div data-reveal>
+                <SectionHeading eyebrow="Gallery" title="Fourteen variants, one contract — live." />
+                <div className="mt-8">
+                  <DatePickerGallery />
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/*
             Copilot earns one for the opposite reason to Tabs. Tabs needs a
             gallery because one strip cannot show that eleven skins share a
             keyboard model. Copilot needs one because the scenario switcher
@@ -499,51 +536,86 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
                   </ul>
                 </div>
 
-                <div data-reveal style={{ "--reveal-delay": "80ms" } as React.CSSProperties}>
-                  {/* A container that scrolls must be reachable by keyboard —
+                <div
+                  data-reveal
+                  style={{ "--reveal-delay": "80ms" } as React.CSSProperties}
+                  className="space-y-6"
+                >
+                  {/*
+                    One table per exported component, not one for the first.
+
+                    The catalog has always carried `exports`; the page rendered
+                    only `props`, which is the primary export's. For most
+                    components those are the same list. For the ones whose
+                    surface is several components — Switch and its field and
+                    list, the note and its gate, the date control and its
+                    fourteen parts — everything after the first was extracted,
+                    written to the catalog, and never shown to anybody. The date
+                    control made it impossible to ignore: its dispatch is a
+                    union, so the intersection the checker can see is three
+                    props and the whole API was missing from its own page.
+                  */}
+                  {apiTables.map(({ name, props: exportProps }, tableIndex) => (
+                    <div key={name}>
+                      {apiTables.length > 1 && (
+                        <h3 className="mb-3 flex flex-wrap items-baseline gap-x-2 font-display text-sm font-semibold tracking-tight">
+                          <code className="numeric text-oxygen-deep">{name}</code>
+                          <span className="text-xs font-normal text-graphite-soft">
+                            {exportProps.length} {exportProps.length === 1 ? "prop" : "props"}
+                            {tableIndex === 0 && component.exports.length > 1
+                              ? " · the front door"
+                              : ""}
+                          </span>
+                        </h3>
+                      )}
+                      {/* A container that scrolls must be reachable by keyboard —
                       WCAG 2.1.1. `tabIndex={0}` makes it focusable so arrow
                       keys can pan it, and the group role plus label mean a
                       screen-reader user is told what they have landed on rather
                       than hearing an unnamed focus stop. This became a real
                       violation the moment the props table started listing the
                       full API instead of one prop. */}
-                  <div
-                    className="scroll-thin overflow-x-auto rounded-2xl border border-rule bg-paper"
-                    tabIndex={0}
-                    role="group"
-                    aria-label={`${component.title} props — scrollable table`}
-                  >
-                    <table className="w-full border-collapse text-sm">
-                      <caption className="sr-only">{component.title} props</caption>
-                      <thead>
-                        <tr className="border-b border-rule bg-paper-sunk">
-                          <Th>Prop</Th>
-                          <Th>Type</Th>
-                          <Th>Default</Th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {component.props.map((prop) => (
-                          <tr key={prop.name} className="border-b border-rule last:border-b-0">
-                            <td className="px-4 py-3 align-top">
-                              <span className="numeric text-xs font-medium text-ink">
-                                {prop.name}
-                              </span>
-                              <p className="mt-1 text-xs leading-relaxed text-graphite">
-                                {prop.description}
-                              </p>
-                            </td>
-                            <td className="px-4 py-3 align-top">
-                              <span className="numeric text-xs text-oxygen-deep">{prop.type}</span>
-                            </td>
-                            <td className="numeric px-4 py-3 align-top text-xs text-graphite-soft">
-                              {prop.default ?? "—"}
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
+                      <div
+                        className="scroll-thin overflow-x-auto rounded-2xl border border-rule bg-paper"
+                        tabIndex={0}
+                        role="group"
+                        aria-label={`${name} props — scrollable table`}
+                      >
+                        <table className="w-full border-collapse text-sm">
+                          <caption className="sr-only">{name} props</caption>
+                          <thead>
+                            <tr className="border-b border-rule bg-paper-sunk">
+                              <Th>Prop</Th>
+                              <Th>Type</Th>
+                              <Th>Default</Th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {exportProps.map((prop) => (
+                              <tr key={prop.name} className="border-b border-rule last:border-b-0">
+                                <td className="px-4 py-3 align-top">
+                                  <span className="numeric text-xs font-medium text-ink">
+                                    {prop.name}
+                                  </span>
+                                  <p className="mt-1 text-xs leading-relaxed text-graphite">
+                                    {prop.description}
+                                  </p>
+                                </td>
+                                <td className="px-4 py-3 align-top">
+                                  <span className="numeric text-xs text-oxygen-deep">
+                                    {prop.type}
+                                  </span>
+                                </td>
+                                <td className="numeric px-4 py-3 align-top text-xs text-graphite-soft">
+                                  {prop.default ?? "—"}
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>

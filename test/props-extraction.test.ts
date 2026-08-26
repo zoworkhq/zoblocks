@@ -117,6 +117,7 @@ function componentFor(name: string): LoadedComponent {
     sourceFile: file,
     sourcePath: path.relative(ROOT, file),
     propsFile: file,
+    extraPropsFiles: [],
     consumerSpecifier: `@/components/oxygen/${name}`,
     consumerTarget: `components/oxygen/${name}.tsx`,
     hasStory: false,
@@ -282,6 +283,42 @@ describe("the components that shipped with empty prop tables", () => {
     expect(checked!.type).toBe("SwitchValue");
     // And no absolute path leaked in with it — see generated.test.ts.
     expect(checked!.type).not.toContain("import(");
+  });
+
+  it("documents every part of a variant component, not the union's intersection", async () => {
+    const { CATALOG } = await import("../apps/docs/src/lib/generated/catalog");
+    const component = CATALOG.find((entry) => entry.name === "date-picker")!;
+    const byName = new Map(component.exports.map((entry) => [entry.name, entry.props]));
+
+    // The dispatch leads, because it is the front door and `variant` is the
+    // prop a reader needs first.
+    expect(component.exports[0]!.name).toBe("DatePicker");
+    expect(component.props.map((p) => p.name)).toContain("variant");
+
+    // And every part it dispatches to is documented in its own right. A
+    // union's intersection is three props; extracting only that leaves the
+    // whole API off the component's own page.
+    for (const part of [
+      "DateField",
+      "Calendar",
+      "TimeField",
+      "SessionTimeField",
+      "BirthDateField",
+      "ClinicalDateTime",
+      "TimeSlotGrid",
+      "RecurrenceField",
+      "AppointmentScheduler",
+      "RecurringSeriesScheduler",
+      "GroupSeriesScheduler",
+    ]) {
+      expect(byName.get(part)?.length ?? 0, `${part} has no props`).toBeGreaterThan(5);
+    }
+
+    // Spot-check props that exist on exactly one variant — these are the ones
+    // that vanish when only the intersection is read.
+    expect(byName.get("TimeSlotGrid")!.map((p) => p.name)).toContain("set");
+    expect(byName.get("AppointmentScheduler")!.map((p) => p.name)).toContain("providers");
+    expect(byName.get("SessionTimeField")!.map((p) => p.name)).toContain("durationPresets");
   });
 
   it("tabs documents `as`, which it requires and gives no default", async () => {

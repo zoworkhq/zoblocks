@@ -2162,7 +2162,8 @@ export const CATALOG: ComponentDoc[] = [
       "chart-accordion",
       "clinical-note",
       "accordion",
-      "result-value"
+      "result-value",
+      "date-picker"
     ],
     "dependencies": [
       "clsx",
@@ -3832,7 +3833,8 @@ export const CATALOG: ComponentDoc[] = [
       "copilot",
       "switch",
       "care-timeline",
-      "signature"
+      "signature",
+      "date-picker"
     ],
     "dependencies": [
       "clsx",
@@ -4774,6 +4776,1631 @@ export const CATALOG: ComponentDoc[] = [
       "@oxygenui-design/copilot-react"
     ],
     "install": "npx @oxygenui-design/cli add copilot"
+  },
+  {
+    "name": "date-picker",
+    "title": "Date Picker",
+    "tier": "free",
+    "status": "beta",
+    "since": "0.5.0",
+    "layer": "clinical",
+    "distribution": "registry",
+    "summary": "One temporal control with fourteen variants: field, calendar, birth date, session, slots, recurrence and the read-only record.",
+    "description": "Fourteen presentations of one value space, one keyboard model and one accessibility contract. `variant` picks the surface; the parts are separately testable components underneath.",
+    "rationale": "A clinician does not shop for a \"birth date field\". They reach for the date control, and it has to behave differently in fourteen places: a service date they already know, an appointment they have to be shown, a birth date that wants an age beside it, a session that is three numbers with two degrees of freedom, a course of treatment that is a rule rather than a date, and a signed timestamp that is a legal instrument. Splitting those into fourteen catalogue entries hides the thing that makes them a system — that every one shares a value space, a keyboard model and an accessibility contract — and it makes a reader choose between components before they have understood the choice. The deeper reason is that healthcare temporal input is four distinct jobs, not one: recall (the user knows the value), choose (the system knows the options), construct (the value is a structure with derived members) and witness (the value is an assertion about the past). Every general-purpose picker builds only for choose, which is the rarest of the four in an electronic record, and that inversion is why EHR date fields are the way they are.",
+    "categories": [
+      "Clinical",
+      "Forms"
+    ],
+    "fhir": [
+      {
+        "name": "Patient",
+        "url": "https://hl7.org/fhir/R4/patient.html",
+        "note": "birthDate permits YYYY and YYYY-MM, so the birth-date variant stores a partial date rather than inventing 1 January."
+      },
+      {
+        "name": "Slot",
+        "url": "https://hl7.org/fhir/R4/slot.html",
+        "note": "The slots variant renders a Slot set. busy-tentative becomes a hold rather than a booking, because it expires."
+      },
+      {
+        "name": "Schedule",
+        "url": "https://hl7.org/fhir/R4/schedule.html",
+        "note": "The scheduler variant asks the host for a Schedule's slots; it never fetches them itself."
+      },
+      {
+        "name": "PractitionerRole",
+        "url": "https://hl7.org/fhir/R4/practitionerrole.html",
+        "note": "availableTime and notAvailable are different facts — 'does not work Thursdays' and 'on leave until the 15th' — and are read separately."
+      },
+      {
+        "name": "Timing",
+        "url": "https://hl7.org/fhir/R4/datatypes.html#Timing",
+        "note": "The recurrence variant emits a real RFC 5545 RRULE with its EXDATE, so a series round-trips."
+      }
+    ],
+    "resource": "Patient",
+    "resourceUrl": "https://hl7.org/fhir/R4/patient.html",
+    "states": [
+      "Picker — field with a calendar behind a button",
+      "Field — no popover at all",
+      "Calendar — inline month grid",
+      "Range — two clicks, never a drag",
+      "Multiple dates — capped, click again to remove",
+      "Birth date — age, partial dates, stated absence",
+      "Time — and the ambiguity it refuses to resolve",
+      "Session — start, end, duration, visible driver",
+      "Slots — grouped, counted, four states",
+      "Scheduler — provider, date and time on one surface",
+      "Recurrence — the rule in words",
+      "Series — conflicts resolved before anything is written",
+      "Group — the room, the roster and the real count",
+      "Read-only — the record a reviewer sees"
+    ],
+    "props": [
+      {
+        "name": "defaultValue",
+        "type": "string | number | BirthDateValue | OxTime | SessionInterval | RecurrenceRule | readonly string[]",
+        "description": "Uncontrolled initial value. Pass this **or** `value`, never both. There is deliberately no runtime warning: ADR 0009 forbids component source writing to the console at all, because a component that logs is one error-reporting integration away from putting a date of birth in a third party's index. When both are passed, `value` wins — the ordinary React contract.",
+        "required": false
+      },
+      {
+        "name": "onChange",
+        "type": "((value: OxDate | null) => void) | ((value: OxDate | null) => void) | ((value: BirthDateValue) => void) | ((value: OxTime | null) => void) | ((value: SessionInterval) => void) | React.ChangeEventHandler<HTMLDivElement, Element> | ((rule: RecurrenceRule) => void) | React.ChangeEventHandler<HTMLElement, Element>",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "variant",
+        "type": "'picker' | 'field' | 'calendar' | 'range' | 'multiple' | 'birth-date' | 'time' | 'session' | 'slots' | 'scheduler' | 'recurrence' | 'series' | 'group' | 'readout'",
+        "description": "",
+        "required": false
+      }
+    ],
+    "exports": [
+      {
+        "name": "DatePicker",
+        "props": [
+          {
+            "name": "defaultValue",
+            "type": "string | number | BirthDateValue | OxTime | SessionInterval | RecurrenceRule | readonly string[]",
+            "description": "Uncontrolled initial value. Pass this **or** `value`, never both. There is deliberately no runtime warning: ADR 0009 forbids component source writing to the console at all, because a component that logs is one error-reporting integration away from putting a date of birth in a third party's index. When both are passed, `value` wins — the ordinary React contract.",
+            "required": false
+          },
+          {
+            "name": "onChange",
+            "type": "((value: OxDate | null) => void) | ((value: OxDate | null) => void) | ((value: BirthDateValue) => void) | ((value: OxTime | null) => void) | ((value: SessionInterval) => void) | React.ChangeEventHandler<HTMLDivElement, Element> | ((rule: RecurrenceRule) => void) | React.ChangeEventHandler<HTMLElement, Element>",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "variant",
+            "type": "'picker' | 'field' | 'calendar' | 'range' | 'multiple' | 'birth-date' | 'time' | 'session' | 'slots' | 'scheduler' | 'recurrence' | 'series' | 'group' | 'readout'",
+            "description": "",
+            "required": false
+          }
+        ]
+      },
+      {
+        "name": "DateField",
+        "props": [
+          {
+            "name": "calendarFooter",
+            "type": "React.ReactNode",
+            "description": "Rendered under the popover grid — relative-date chips, a clear action.",
+            "required": false
+          },
+          {
+            "name": "defaultValue",
+            "type": "OxDate | null",
+            "description": "Uncontrolled initial value. Pass this **or** `value`, never both. There is deliberately no runtime warning: ADR 0009 forbids component source writing to the console at all, because a component that logs is one error-reporting integration away from putting a date of birth in a third party's index. When both are passed, `value` wins — the ordinary React contract.",
+            "required": false
+          },
+          {
+            "name": "disabled",
+            "type": "boolean",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "error",
+            "type": "React.ReactNode",
+            "description": "A host-supplied error. Overrides the field's own policy message.",
+            "required": false
+          },
+          {
+            "name": "futurePolicy",
+            "type": "TemporalPolicy",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "hint",
+            "type": "React.ReactNode",
+            "description": "Advisory text under the field. Never announced assertively.",
+            "required": false
+          },
+          {
+            "name": "invalid",
+            "type": "boolean",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "label",
+            "type": "string",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "load",
+            "type": "((date: OxDate) => number | null)",
+            "description": "Forwarded to the popover calendar — open-slot count under the numeral.",
+            "required": false
+          },
+          {
+            "name": "max",
+            "type": "OxDate",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "min",
+            "type": "OxDate",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "name",
+            "type": "string",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "now",
+            "type": "OxDate",
+            "description": "Today, supplied by the host. Required wherever a policy or a relative label is in play, because ENGINEERING.md §9 forbids a component reading the wall clock to decide what to render — output that depends on when it rendered cannot be visually regression-tested, and server and client would disagree on the boundary between one day and the next.",
+            "required": false
+          },
+          {
+            "name": "onChange",
+            "type": "((value: OxDate | null) => void)",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "optional",
+            "type": "boolean",
+            "description": "Renders \"Optional\" beside the label. An unmarked field is ambiguous.",
+            "required": false
+          },
+          {
+            "name": "order",
+            "type": "DateOrder",
+            "description": "Segment order. From the locale, never guessed.",
+            "required": false
+          },
+          {
+            "name": "pastPolicy",
+            "type": "TemporalPolicy",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "readOnly",
+            "type": "boolean",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "required",
+            "type": "boolean",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "showCalendar",
+            "type": "boolean",
+            "description": "Puts a calendar behind a trigger button at the end of the field. Off by default, and that default is the component's argument rather than an oversight: the field is the common case and the calendar is the rare one. `variant=\"picker\"` turns it on; `variant=\"field\"` leaves it off.",
+            "required": false
+          },
+          {
+            "name": "showRelative",
+            "type": "boolean",
+            "description": "Show \"Today\", \"5 days ago\" under a complete value. Needs `now`.",
+            "required": false
+          },
+          {
+            "name": "twoDigitYearPivot",
+            "type": "number",
+            "description": "Two-digit years above this resolve to the 1900s, at or below to the 2000s. Only reachable through a paste — the year segment takes four digits — but pastes are how clinical dates actually move between systems, and a sliding window would make the same pasted text mean different things in different years. Defaults to 30.",
+            "required": false
+          },
+          {
+            "name": "unavailable",
+            "type": "((date: OxDate) => string | null)",
+            "description": "Forwarded to the popover calendar — the reason a day cannot be chosen.",
+            "required": false
+          },
+          {
+            "name": "value",
+            "type": "OxDate | null",
+            "description": "Controlled value. Pass `null` for empty, never `undefined`.",
+            "required": false
+          },
+          {
+            "name": "weekStart",
+            "type": "number",
+            "description": "0 = Sunday. Forwarded to the popover calendar.",
+            "required": false
+          }
+        ]
+      },
+      {
+        "name": "Calendar",
+        "props": [
+          {
+            "name": "dates",
+            "type": "OxDate[]",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "defaultMonth",
+            "type": "MonthRef",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "defaultValue",
+            "type": "OxDate | null",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "fluid",
+            "type": "boolean",
+            "description": "Fills its container rather than sitting at its natural 252px.",
+            "required": false
+          },
+          {
+            "name": "footer",
+            "type": "React.ReactNode",
+            "description": "Rendered under the grid — relative-date chips, a clear action.",
+            "required": false
+          },
+          {
+            "name": "load",
+            "type": "((date: OxDate) => number | null)",
+            "description": "Open-slot count under the numeral, so density is visible before a click.",
+            "required": false
+          },
+          {
+            "name": "max",
+            "type": "OxDate",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "maxDates",
+            "type": "number",
+            "description": "Cap for `mode=\"multiple\"`. Further dates are refused, never dialogued.",
+            "required": false
+          },
+          {
+            "name": "min",
+            "type": "OxDate",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "mode",
+            "type": "CalendarMode",
+            "description": "`single` is the default. `range` is two clicks; there is no drag path.",
+            "required": false
+          },
+          {
+            "name": "month",
+            "type": "MonthRef",
+            "description": "The month on screen. Uncontrolled when omitted.",
+            "required": false
+          },
+          {
+            "name": "monthLabel",
+            "type": "((month: MonthRef) => string)",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "monthNames",
+            "type": "readonly string[]",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "now",
+            "type": "OxDate | null",
+            "description": "The day marked \"today\". Required to mark one — the component reads no clock, so a calendar without `now` simply has no today, which is correct for a historical picker and deliberate everywhere else.",
+            "required": false
+          },
+          {
+            "name": "onChange",
+            "type": "((value: OxDate | null) => void)",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "onDatesChange",
+            "type": "((dates: OxDate[]) => void)",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "onMonthChange",
+            "type": "((month: MonthRef) => void)",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "onRangeChange",
+            "type": "((range: DateRangeValue) => void)",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "range",
+            "type": "DateRangeValue | null",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "unavailable",
+            "type": "((date: OxDate) => string | null)",
+            "description": "The reason a date cannot be chosen, or null. A string rather than a boolean because the reason is spoken and shown. One muted treatment covers every reason; five colours would be five things to learn and still illegible to a colour-blind reader.",
+            "required": false
+          },
+          {
+            "name": "value",
+            "type": "OxDate | null",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "weekdayLabels",
+            "type": "readonly string[]",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "weekdayNames",
+            "type": "readonly string[]",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "weekStart",
+            "type": "number",
+            "description": "0 = Sunday. From `Intl.Locale.getWeekInfo`, never hardcoded.",
+            "required": false
+          }
+        ]
+      },
+      {
+        "name": "TimeField",
+        "props": [
+          {
+            "name": "defaultValue",
+            "type": "OxTime | null",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "disabled",
+            "type": "boolean",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "error",
+            "type": "React.ReactNode",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "hint",
+            "type": "React.ReactNode",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "hour24",
+            "type": "boolean",
+            "description": "24-hour display. The stored value is 24-hour either way.",
+            "required": false
+          },
+          {
+            "name": "invalid",
+            "type": "boolean",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "label",
+            "type": "string",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "max",
+            "type": "OxTime",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "min",
+            "type": "OxTime",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "name",
+            "type": "string",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "onChange",
+            "type": "((value: OxTime | null) => void)",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "optional",
+            "type": "boolean",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "presetLabel",
+            "type": "string",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "presets",
+            "type": "readonly number[]",
+            "description": "Times offered as one-press chips — the organisation's own grid. Minutes past midnight, so `[480, 495, 510]` is 8:00, 8:15, 8:30. A psychiatry clinic on twenty-minute follow-ups and a therapy practice on fifty-three-minute sessions are the same component with different data.",
+            "required": false
+          },
+          {
+            "name": "readOnly",
+            "type": "boolean",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "required",
+            "type": "boolean",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "showSecond",
+            "type": "boolean",
+            "description": "A seconds segment. Off by default; on for a code call or a restraint.",
+            "required": false
+          },
+          {
+            "name": "value",
+            "type": "OxTime | null",
+            "description": "",
+            "required": false
+          }
+        ]
+      },
+      {
+        "name": "SessionTimeField",
+        "props": [
+          {
+            "name": "allowOvernight",
+            "type": "boolean",
+            "description": "Whether an end at or before the start is read as the next day.",
+            "required": false
+          },
+          {
+            "name": "bands",
+            "type": "readonly DurationBand[]",
+            "description": "Bands a duration is reported against — the organisation's own thresholds. Rendered, never asserted, and never used to recommend anything.",
+            "required": false
+          },
+          {
+            "name": "defaultValue",
+            "type": "SessionInterval | null",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "disabled",
+            "type": "boolean",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "durationLabel",
+            "type": "string",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "durationPresets",
+            "type": "readonly DurationPreset[]",
+            "description": "Durations offered as one-press chips. Organisation configuration. Behavioural health does not run on a tidy 15/30/45/60 ladder, and a component that ships one has made an assumption about somebody's contract.",
+            "required": false
+          },
+          {
+            "name": "endLabel",
+            "type": "string",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "error",
+            "type": "React.ReactNode",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "hour24",
+            "type": "boolean",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "label",
+            "type": "string",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "maxMinutes",
+            "type": "number",
+            "description": "Upper bound on a derived duration. Eight hours by default. Not a clamp. A start dragged past a held end is the one way to reach an absurd duration, and the component says so and offers the likeliest correction rather than quietly rounding the value into range.",
+            "required": false
+          },
+          {
+            "name": "nextDateLabel",
+            "type": "string",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "onChange",
+            "type": "((value: SessionInterval) => void)",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "readOnly",
+            "type": "boolean",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "startDateLabel",
+            "type": "string",
+            "description": "The date the session starts on, so the next-day badge can name a day.",
+            "required": false
+          },
+          {
+            "name": "startLabel",
+            "type": "string",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "value",
+            "type": "SessionInterval | null",
+            "description": "",
+            "required": false
+          }
+        ]
+      },
+      {
+        "name": "BirthDateField",
+        "props": [
+          {
+            "name": "now",
+            "type": "OxDate",
+            "description": "Today, supplied by the host. The age and the future check both need it.",
+            "required": true
+          },
+          {
+            "name": "absentReason",
+            "type": "TemporalAbsence",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "allowAbsent",
+            "type": "boolean",
+            "description": "Offers \"Not recorded\", which emits an absent value carrying a reason.",
+            "required": false
+          },
+          {
+            "name": "allowEstimated",
+            "type": "boolean",
+            "description": "Offers \"Exact date unknown\", which switches the field to year only.",
+            "required": false
+          },
+          {
+            "name": "defaultValue",
+            "type": "BirthDateValue",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "disabled",
+            "type": "boolean",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "error",
+            "type": "React.ReactNode",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "hideAge",
+            "type": "boolean",
+            "description": "Hide the age readout. Rarely right — it is the field's own error check.",
+            "required": false
+          },
+          {
+            "name": "hint",
+            "type": "React.ReactNode",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "label",
+            "type": "string",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "name",
+            "type": "string",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "onChange",
+            "type": "((value: BirthDateValue) => void)",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "onPrecisionChange",
+            "type": "((precision: BirthDatePrecision) => void)",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "order",
+            "type": "DateOrder",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "precision",
+            "type": "BirthDatePrecision",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "readOnly",
+            "type": "boolean",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "required",
+            "type": "boolean",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "suggested",
+            "type": "OxDate",
+            "description": "A value already on file, offered as a one-press fill. WCAG 2.2 SC 3.3.7 asks that previously entered information be available rather than re-typed — intake asks for a date of birth two and three times. Offered rather than applied, because silently pre-filling a legal attestation is a different defect from making somebody type it twice.",
+            "required": false
+          },
+          {
+            "name": "twoDigitYearPivot",
+            "type": "number",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "value",
+            "type": "BirthDateValue",
+            "description": "",
+            "required": false
+          }
+        ]
+      },
+      {
+        "name": "ClinicalDateTime",
+        "props": [
+          {
+            "name": "value",
+            "type": "OxTemporal | null",
+            "description": "Any member of the temporal value space, including absence.",
+            "required": true
+          },
+          {
+            "name": "as",
+            "type": "'time' | 'span' | 'div'",
+            "description": "Wrapping element. `time` where the value is a real instant.",
+            "required": false
+          },
+          {
+            "name": "hour24",
+            "type": "boolean",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "now",
+            "type": "OxDate",
+            "description": "Today, for the relative aid. Omit it and no relative label is rendered.",
+            "required": false
+          },
+          {
+            "name": "restricted",
+            "type": "boolean",
+            "description": "Marks a value the reader's access level hides rather than removes.",
+            "required": false
+          },
+          {
+            "name": "showRelative",
+            "type": "boolean",
+            "description": "Show \"5 days ago\" beside the value.",
+            "required": false
+          },
+          {
+            "name": "showZone",
+            "type": "boolean",
+            "description": "Print the stored instant and its zone underneath. On for anything a signature depends on. It survives print, which is where a great many of these values are actually read.",
+            "required": false
+          },
+          {
+            "name": "viewerZone",
+            "type": "string",
+            "description": "The reader's own zone. A second line appears only if it differs.",
+            "required": false
+          }
+        ]
+      },
+      {
+        "name": "TimeSlotGrid",
+        "props": [
+          {
+            "name": "set",
+            "type": "AvailabilitySet",
+            "description": "Availability as the host read it. Never fetched here.",
+            "required": true
+          },
+          {
+            "name": "disabled",
+            "type": "boolean",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "emptyState",
+            "type": "React.ReactNode",
+            "description": "Rendered when there is nothing to choose.",
+            "required": false
+          },
+          {
+            "name": "hour24",
+            "type": "boolean",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "label",
+            "type": "string",
+            "description": "Group label, read by assistive technology before the times.",
+            "required": false
+          },
+          {
+            "name": "now",
+            "type": "{ date: OxDate; time: OxTime; }",
+            "description": "The clock, injected. Staleness is measured against it.",
+            "required": false
+          },
+          {
+            "name": "onRefresh",
+            "type": "(() => void)",
+            "description": "Offered when the set is stale. Absent means refreshing is not possible.",
+            "required": false
+          },
+          {
+            "name": "onSelect",
+            "type": "((slot: Slot) => void)",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "value",
+            "type": "string | null",
+            "description": "Selected slot id. Ids are stable across a refresh on purpose.",
+            "required": false
+          }
+        ]
+      },
+      {
+        "name": "RecurrenceField",
+        "props": [
+          {
+            "name": "startDate",
+            "type": "OxDate",
+            "description": "The first occurrence. The rule is meaningless without one.",
+            "required": true
+          },
+          {
+            "name": "allowNoEnd",
+            "type": "boolean",
+            "description": "Whether \"no end date\" may be chosen at all.",
+            "required": false
+          },
+          {
+            "name": "countOptions",
+            "type": "readonly number[]",
+            "description": "Session counts a practice offers. Configuration, not a ladder we chose.",
+            "required": false
+          },
+          {
+            "name": "defaultValue",
+            "type": "RecurrenceRule",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "disabled",
+            "type": "boolean",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "label",
+            "type": "string",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "onChange",
+            "type": "((rule: RecurrenceRule) => void)",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "onExpand",
+            "type": "((dates: OxDate[]) => void)",
+            "description": "Emitted whenever the expansion changes, so a host can check conflicts.",
+            "required": false
+          },
+          {
+            "name": "previewCount",
+            "type": "number",
+            "description": "How far the preview expands. Bounded twice; this is the softer bound.",
+            "required": false
+          },
+          {
+            "name": "showRRule",
+            "type": "boolean",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "timeLabel",
+            "type": "string",
+            "description": "Rendered into the sentence — \"at 3:00 PM\".",
+            "required": false
+          },
+          {
+            "name": "unsupported",
+            "type": "{ source: string; parts: string[]; } | null",
+            "description": "A rule imported from elsewhere that this component cannot express. Rendered read-only with the original string. Refusing is the feature: a general expander that drops what it does not understand is worse.",
+            "required": false
+          },
+          {
+            "name": "value",
+            "type": "RecurrenceRule",
+            "description": "",
+            "required": false
+          }
+        ]
+      },
+      {
+        "name": "AppointmentScheduler",
+        "props": [
+          {
+            "name": "availability",
+            "type": "AvailabilitySet",
+            "description": "",
+            "required": true
+          },
+          {
+            "name": "now",
+            "type": "{ date: OxDate; time: OxTime; }",
+            "description": "The clock, injected. Staleness and the strip both need it.",
+            "required": true
+          },
+          {
+            "name": "providers",
+            "type": "readonly SchedulableActor[]",
+            "description": "",
+            "required": true
+          },
+          {
+            "name": "actorId",
+            "type": "string",
+            "description": "Controlled actor. Uncontrolled falls back to the first.",
+            "required": false
+          },
+          {
+            "name": "buffers",
+            "type": "Buffers",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "date",
+            "type": "OxDate",
+            "description": "The day whose slots are shown.",
+            "required": false
+          },
+          {
+            "name": "dayLoads",
+            "type": "readonly DayLoad[]",
+            "description": "Open counts for the strip. The host supplies these; nothing is derived.",
+            "required": false
+          },
+          {
+            "name": "durationMinutes",
+            "type": "number",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "horizonDays",
+            "type": "number",
+            "description": "How many days the strip shows.",
+            "required": false
+          },
+          {
+            "name": "hour24",
+            "type": "boolean",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "label",
+            "type": "string",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "onActorChange",
+            "type": "((actorId: string) => void)",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "onDateChange",
+            "type": "((date: OxDate) => void)",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "onHoldExpired",
+            "type": "((slot: Slot) => void)",
+            "description": "A hold that ran out while the form was open.",
+            "required": false
+          },
+          {
+            "name": "onRefresh",
+            "type": "(() => void)",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "onRequestAvailability",
+            "type": "((query: AvailabilityQuery) => void)",
+            "description": "Called whenever the question changes. The host does the loading.",
+            "required": false
+          },
+          {
+            "name": "onSelect",
+            "type": "((choice: { actor: SchedulableActor; date: OxDate; slot: Slot; }) => void)",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "rejection",
+            "type": "SelectionRejection | null",
+            "description": "The server said no. Rendered with its alternatives.",
+            "required": false
+          },
+          {
+            "name": "value",
+            "type": "string | null",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "viewerZone",
+            "type": "string",
+            "description": "The viewer's own zone. A second line appears only when it differs.",
+            "required": false
+          }
+        ]
+      },
+      {
+        "name": "RecurringSeriesScheduler",
+        "props": [
+          {
+            "name": "rule",
+            "type": "RecurrenceRule",
+            "description": "",
+            "required": true
+          },
+          {
+            "name": "startDate",
+            "type": "OxDate",
+            "description": "",
+            "required": true
+          },
+          {
+            "name": "disabled",
+            "type": "boolean",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "label",
+            "type": "string",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "onBook",
+            "type": "((dates: OxDate[]) => void)",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "onExpand",
+            "type": "((dates: OxDate[]) => void)",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "onResolve",
+            "type": "((isoDate: string, to: OxDate) => void)",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "onResolveAll",
+            "type": "(() => void)",
+            "description": "Resolve every conflict that carries an alternative, in one press.",
+            "required": false
+          },
+          {
+            "name": "onUnresolve",
+            "type": "((isoDate: string) => void)",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "resolved",
+            "type": "ReadonlySet<string>",
+            "description": "ISO dates the user has already resolved.",
+            "required": false
+          },
+          {
+            "name": "timeLabel",
+            "type": "string",
+            "description": "Rendered into the sentence and each row — \"3:00 PM – 3:53 PM\".",
+            "required": false
+          },
+          {
+            "name": "verdicts",
+            "type": "readonly OccurrenceVerdict[]",
+            "description": "The host's answers. Absent means nothing has been checked yet.",
+            "required": false
+          },
+          {
+            "name": "visibleRows",
+            "type": "number",
+            "description": "How many rows to show before collapsing. The rest are counted.",
+            "required": false
+          }
+        ]
+      },
+      {
+        "name": "GroupSeriesScheduler",
+        "props": [
+          {
+            "name": "name",
+            "type": "string",
+            "description": "",
+            "required": true
+          },
+          {
+            "name": "rule",
+            "type": "RecurrenceRule",
+            "description": "",
+            "required": true
+          },
+          {
+            "name": "startDate",
+            "type": "OxDate",
+            "description": "",
+            "required": true
+          },
+          {
+            "name": "capacity",
+            "type": "number",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "enrolled",
+            "type": "number",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "exclusions",
+            "type": "readonly SeriesExclusion[]",
+            "description": "Dates the group does not meet. Folded into the rule as EXDATE.",
+            "required": false
+          },
+          {
+            "name": "facilitators",
+            "type": "readonly string[]",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "label",
+            "type": "string",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "modality",
+            "type": "string",
+            "description": "In-person, telehealth, or both. Rendered; never inferred.",
+            "required": false
+          },
+          {
+            "name": "room",
+            "type": "{ name: string; capacity?: number; }",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "sessionMinutes",
+            "type": "number",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "showRRule",
+            "type": "boolean",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "timeLabel",
+            "type": "string",
+            "description": "\"4:00 PM – 5:30 PM\". Rendered into the sentence and every row.",
+            "required": false
+          }
+        ]
+      }
+    ],
+    "usage": "import { DatePicker } from \"@/components/oxygen/date-picker\";\nimport { plainDate } from \"@/lib/oxygen-datetime\";\nimport \"@/styles/oxygen-datetime.css\";\n\n// The clock is injected. Nothing in this family reads it.\nconst today = plainDate(2026, 8, 26);\n\n<DatePicker variant=\"picker\" label=\"Appointment date\" now={today} value={date} onChange={setDate} />\n<DatePicker variant=\"birth-date\" now={today} allowEstimated allowAbsent />\n<DatePicker variant=\"session\" durationPresets={org.presets} bands={org.bands} />\n<DatePicker variant=\"slots\" set={availability} now={now} onSelect={hold} />\n\n// Or reach for a part directly when the surface chose at design time.\nimport { SessionTimeField } from \"@/components/oxygen/date-picker\";",
+    "guidance": {
+      "use": [
+        "variant=\"field\" for a date the user already knows — service date, admission, assessment. Four-fifths of healthcare date fields are this, and a popover there is four clicks where eight keystrokes would do.",
+        "variant=\"picker\" where they may need to see a month to answer, and as the drop-in for an existing antd DatePicker.",
+        "variant=\"birth-date\" at every registration and intake. The age readout is the field's own error check, not decoration.",
+        "variant=\"session\" wherever a session, shift or block has a start, an end and a length that have to agree.",
+        "variant=\"slots\" or \"scheduler\" only where the system knows the options and the user cannot — that is the one job in the four that needs availability at all.",
+        "With now passed from the server, so the field and the page agree about which day it is."
+      ],
+      "avoid": [
+        "Reaching for the scheduler variants on a documentation form. A clinician entering a session timestamp should not load, see, or tab through the machinery required to schedule a twelve-week series.",
+        "futurePolicy=\"block\" as a reflex. A discharge date can legitimately be in the future, and blocking it teaches staff to enter a wrong date to get past the validator.",
+        "Using the band readout to recommend a code. The component reports which band a value falls in; choosing a code is a human act and a compliance question.",
+        "Hiding the held/derived badge on the session variant. That returns the component to the defect it was built to fix."
+      ]
+    },
+    "accessibility": [
+      {
+        "label": "One tab stop per field, not three",
+        "detail": "Every segmented variant is a single tab stop whose segments move with arrow keys, which is what the APG specifies for a composite. Three tab stops in a date field is nine in a date range, and a form with six dates becomes fifty-four presses to cross."
+      },
+      {
+        "label": "One roving tabstop in every grid",
+        "detail": "Exactly one calendar cell carries tabindex 0, resolved against the month actually displayed. Forty-two focusable cells is the most common accessibility failure in a date picker, and a calendar opened on a month with no focus date has none at all — which is the same bug from the other side."
+      },
+      {
+        "label": "Every cell and slot is named in full",
+        "detail": "A cell reads \"Wednesday, August 26, 2026, 8 times available\", not \"26\"; a slot reads its whole interval and why it cannot be taken. An element in a grid has no column header in its accessible context."
+      },
+      {
+        "label": "Three message tiers, three ARIA treatments",
+        "detail": "An error is role=\"alert\", assertive, and sets aria-invalid. A conflict is a legal value colliding with other state: role=\"status\", polite, not invalid. An advisory is polite and toneless — a clinician documenting last Friday's session must not be told they have made a mistake."
+      },
+      {
+        "label": "Colour is never the only channel",
+        "detail": "Today is a dot as well as a weight, an unavailable day is struck as well as dimmed, and a held session member carries a lock glyph and the word Held beside its tint. All three survive greyscale, forced-colors and a red-green deficiency."
+      },
+      {
+        "label": "The value never mirrors in RTL",
+        "detail": "dir=\"ltr\" is set on the field itself. The grid mirrors; the digits do not. Letting the segments inherit dir=\"rtl\" renders 26/08/2026 as 2026/08/26, which is plausible and is the wrong date."
+      },
+      {
+        "label": "Target size holds at every density",
+        "detail": "Clinical density tightens type and gaps and never the target: every interactive element measures at least 24px in every profile, which is the WCAG 2.2 SC 2.5.8 floor. A mis-tap on a calendar cell is clinically consequential in a way it is not on a marketing site."
+      },
+      {
+        "label": "Escape keeps what was typed",
+        "detail": "Closing a calendar preserves a half-entered value and returns focus to the trigger. An Escape that discards it is the reason people stop using keyboards."
+      }
+    ],
+    "limitations": [
+      "The value is an OxDate, not a Dayjs. This is the deliberate divergence from Ant Design: matching the value type would put a date library in the graph of every form component — exactly what ADR 0010 exists to prevent — and would make a birth date representable as midnight UTC. A Dayjs codebase converts at the boundary.",
+      "Ant Design's prop names are not implemented, and ADR 0010 requires the divergences be named: there is no picker, showTime, allowClear, status or DatePicker.RangePicker, and antd's disabledDate and format are spelled unavailable and order. The reasons differ. unavailable returns the reason a day cannot be chosen rather than a boolean, because that reason is spoken and shown, and a boolean cannot carry it. picker=\"week\" and picker=\"quarter\" have no healthcare workflow we have found, and a stub rendering a day grid would be worse than an honest absence. The rest is unbuilt rather than rejected. A migration from antd is not yet one changed import line.",
+      "Recurrence implements a named RFC 5545 subset — DAILY, WEEKLY, MONTHLY with INTERVAL, BYDAY, BYSETPOS, BYMONTHDAY, COUNT, UNTIL and EXDATE. Anything else is refused and rendered read-only with its original string, rather than silently mis-expanded.",
+      "Nothing here fetches, holds, or books. Availability arrives as data with an age and every transition is reported through a callback — ADR 0009 forbids the network in component source, and the host is the only party that can reconcile a rejection anyway.",
+      "Non-Gregorian calendar input is not supported. Intl will format a Hijri or Buddhist date today, but a grid whose months have variable length and a year field with a different epoch is a project rather than a flag.",
+      "Duration bands and session presets ship empty. A fifty-three-minute session is a fact about somebody's payer contract rather than about therapy, and asserting a code would be clinical decision support, which ADR 0009 prohibits."
+    ],
+    "related": [
+      "clinical-note",
+      "switch",
+      "care-timeline"
+    ],
+    "dependencies": [
+      "clsx",
+      "tailwind-merge"
+    ],
+    "install": "npx @oxygenui-design/cli add date-picker",
+    "technicalName": "DatePicker",
+    "aliases": [
+      "react date picker",
+      "healthcare date time picker",
+      "appointment scheduler react",
+      "session time picker",
+      "date of birth input",
+      "recurrence rule builder react"
+    ],
+    "tags": [
+      "form-control",
+      "data-entry",
+      "overlay",
+      "keyboard-first",
+      "themeable",
+      "print-safe"
+    ],
+    "uxGuidelines": {
+      "do": [
+        "Pick the variant by the job — recall, choose, construct or witness — not by the shape of the data.",
+        "Let the reason be a string. `unavailable` and `disabledDate` return why, and the why reaches the accessible name.",
+        "Say Optional in words. An unmarked field is ambiguous: the reader cannot tell optional from an author who forgot.",
+        "Let a paste through. A date copied out of a referral letter is how a great deal of clinical data actually moves."
+      ],
+      "dont": [
+        "Do not colour-code the reasons a day or a slot is closed. One muted treatment and a spoken reason beats five hues nobody has a legend for.",
+        "Do not clamp a duration silently. The session variant reports an overrun and offers a correction on purpose.",
+        "Do not render absence as an em dash or N/A. Which kind of absence it is, is a fact.",
+        "Do not refuse a session that crosses midnight. It is a real shift, and refusing it corrupts the data you were protecting."
+      ]
+    },
+    "domain": {
+      "industries": [
+        "healthcare",
+        "behavioral-health"
+      ],
+      "clinicalContext": "Every temporal field in an electronic record, from a date of birth at intake to a twelve-week group series — organised around the four jobs healthcare temporal input actually is, rather than around the calendar that serves the rarest of them.",
+      "workflows": [
+        "intake",
+        "documentation",
+        "care-coordination",
+        "assessment",
+        "medication"
+      ],
+      "phi": {
+        "handles": true,
+        "notes": "Dates are identifying under HIPAA's Safe Harbor list. Nothing here logs a value, places one in a URL or query string, or writes one to browser storage — a prefilled date in a query string is a birth date in a web-server access log, a referrer header and a CDN cache. The restricted read-only mode exists so a protected value can be acknowledged on a screen its reader is not cleared for."
+      },
+      "auditable": false,
+      "permissions": [],
+      "terminology": [
+        "FHIR"
+      ]
+    },
+    "variants": [
+      {
+        "id": "picker",
+        "label": "Picker",
+        "description": "Field with a calendar behind a button. antd's DatePicker, with our value type.",
+        "args": {
+          "variant": "picker"
+        }
+      },
+      {
+        "id": "field",
+        "label": "Field",
+        "description": "No popover at all. A whole date in eight keystrokes.",
+        "args": {
+          "variant": "field"
+        }
+      },
+      {
+        "id": "calendar",
+        "label": "Calendar",
+        "description": "The month grid inline, with availability density under the numerals.",
+        "args": {
+          "variant": "calendar"
+        }
+      },
+      {
+        "id": "range",
+        "label": "Range",
+        "description": "Two clicks and a preview between them. Never a drag.",
+        "args": {
+          "variant": "range"
+        }
+      },
+      {
+        "id": "multiple",
+        "label": "Multiple dates",
+        "description": "Capped; clicking a selected date removes it.",
+        "args": {
+          "variant": "multiple"
+        }
+      },
+      {
+        "id": "birth-date",
+        "label": "Birth date",
+        "description": "Live age, year-only precision, and absence with a reason.",
+        "args": {
+          "variant": "birth-date"
+        }
+      },
+      {
+        "id": "time",
+        "label": "Time",
+        "description": "Bounded segments, optional seconds, and a bare 9 it will not resolve.",
+        "args": {
+          "variant": "time"
+        }
+      },
+      {
+        "id": "session",
+        "label": "Session",
+        "description": "Start, end and duration, with the held member always marked.",
+        "args": {
+          "variant": "session"
+        }
+      },
+      {
+        "id": "slots",
+        "label": "Slots",
+        "description": "Availability grouped and counted. Four states, three reasons, one treatment.",
+        "args": {
+          "variant": "slots"
+        }
+      },
+      {
+        "id": "scheduler",
+        "label": "Scheduler",
+        "description": "Provider, day and time on one surface, with a rejection path.",
+        "args": {
+          "variant": "scheduler"
+        }
+      },
+      {
+        "id": "recurrence",
+        "label": "Recurrence",
+        "description": "The rule in plain language, and a real RRULE beneath it.",
+        "args": {
+          "variant": "recurrence"
+        }
+      },
+      {
+        "id": "series",
+        "label": "Series",
+        "description": "A course of treatment, conflicts resolved before anything is written.",
+        "args": {
+          "variant": "series"
+        }
+      },
+      {
+        "id": "group",
+        "label": "Group",
+        "description": "Room, roster, capacity — and the count that survives the closures.",
+        "args": {
+          "variant": "group"
+        }
+      },
+      {
+        "id": "readout",
+        "label": "Read-only",
+        "description": "The record a reviewer, an auditor or a printer sees.",
+        "args": {
+          "variant": "readout"
+        }
+      }
+    ],
+    "controls": [
+      {
+        "prop": "variant",
+        "control": "select",
+        "label": "Variant",
+        "options": [
+          "picker",
+          "field",
+          "calendar",
+          "range",
+          "multiple",
+          "birth-date",
+          "time",
+          "session",
+          "slots",
+          "scheduler",
+          "recurrence",
+          "series",
+          "group",
+          "readout"
+        ],
+        "defaultValue": "picker"
+      }
+    ],
+    "a11yChecks": [
+      {
+        "wcag": "4.1.2",
+        "name": "Name, role, value",
+        "status": "pass",
+        "how": "Segments are role=\"spinbutton\" with aria-valuetext; grids are role=\"grid\" with rows, columnheaders and named gridcells; the calendar is role=\"dialog\".",
+        "evidence": "date-picker.test.tsx"
+      },
+      {
+        "wcag": "2.1.1",
+        "name": "Keyboard",
+        "status": "pass",
+        "how": "Every value is reachable with digits and arrow keys. PageUp/PageDown change month, Shift with them changes year, Escape closes and keeps the typed value.",
+        "evidence": "date-picker.test.tsx"
+      },
+      {
+        "wcag": "2.4.3",
+        "name": "Focus order",
+        "status": "pass",
+        "how": "One tab stop per field and one roving tabstop per grid, resolved against the month displayed.",
+        "evidence": "date-picker.test.tsx"
+      },
+      {
+        "wcag": "2.4.11",
+        "name": "Focus not obscured",
+        "status": "pass",
+        "how": "The calendar flips above the field when the space below it is too short, so the focused element is never what the popover covers.",
+        "evidence": "date-picker.test.tsx"
+      },
+      {
+        "wcag": "2.5.7",
+        "name": "Dragging movements",
+        "status": "pass",
+        "how": "Range selection is two clicks. There is no drag path anywhere in the component.",
+        "evidence": "date-picker.test.tsx"
+      },
+      {
+        "wcag": "2.5.8",
+        "name": "Target size",
+        "status": "pass",
+        "how": "Every interactive element holds 24px at all three density profiles; clinical density tightens type and gaps only.",
+        "evidence": "date-picker.test.tsx"
+      },
+      {
+        "wcag": "1.4.1",
+        "name": "Use of colour",
+        "status": "pass",
+        "how": "Today is a dot as well as a weight; unavailable is a strike as well as a tint; held carries a glyph and a word.",
+        "evidence": "date-picker.test.tsx"
+      },
+      {
+        "wcag": "3.3.1",
+        "name": "Error identification",
+        "status": "pass",
+        "how": "Errors set aria-invalid and use role=\"alert\"; conflicts and advisories are role=\"status\" and do not, because the value is legal.",
+        "evidence": "date-picker.test.tsx"
+      },
+      {
+        "wcag": "3.3.7",
+        "name": "Redundant entry",
+        "status": "pass",
+        "how": "The birth-date variant offers a value already on file as a one-press fill rather than pre-filling it — pre-filling a legal attestation is a different defect.",
+        "evidence": "date-picker.test.tsx"
+      },
+      {
+        "wcag": "2.2.1",
+        "name": "Timing adjustable",
+        "status": "not-applicable",
+        "how": "Slot holds are the host's timers; the component renders the remaining time it is given and never enforces one."
+      }
+    ],
+    "examples": [
+      {
+        "id": "four-jobs",
+        "title": "Four jobs, four variants",
+        "description": "The organising idea, in four lines. Recall is a value the user already holds; choose is one only the system knows; construct is a structure with derived members; witness is an assertion about the past. Each wants a different primary control, and picking the wrong one is how a date field becomes something staff route around.",
+        "fixture": "patientRoutine",
+        "code": "<DatePicker variant=\"field\"      label=\"Date of service\" now={today} showRelative />\n<DatePicker variant=\"slots\"      set={availability} now={now} onSelect={hold} />\n<DatePicker variant=\"session\"    durationPresets={org.presets} />\n<DatePicker variant=\"readout\"    value={signedAt} showZone viewerZone={me.zone} />"
+      },
+      {
+        "id": "antd-migration",
+        "title": "One changed import",
+        "description": "The props match antd's, so the migration is the import line and a conversion at the value boundary. That is ADR 0010's promise, and this is the component that tests it hardest — because antd actually has this one.",
+        "fixture": "appointmentBooked",
+        "code": "- import { DatePicker } from \"antd\";\n+ import { DatePicker } from \"@oxygenui-design/react\";\n\n  <DatePicker\n    disabledDate={closed}\n    allowClear\n    status={hasError ? \"error\" : undefined}\n-   value={dayjsValue}\n+   value={oxDate}          // { kind: \"date\", y, m, d }\n  />"
+      },
+      {
+        "id": "series-arithmetic",
+        "title": "26 dates, 2 closures, 24 sessions",
+        "description": "The arithmetic is the feature. A group scheduler that prints the naive occurrence count has told the billing team a number that will not match reality, and told nine enrolled patients they are attending two sessions that will not happen. The closures are written into the rule as EXDATE, so the count survives export.",
+        "fixture": "encounterRoutine",
+        "code": "<DatePicker\n  variant=\"group\"\n  name=\"DBT Skills Group\"\n  rule={{ freq: \"WEEKLY\", byWeekday: [2, 4], until: plainDate(2026, 11, 30) }}\n  startDate={plainDate(2026, 9, 1)}\n  exclusions={[\n    { date: plainDate(2026, 11, 24), reason: \"Facility closure — annual training\" },\n    { date: plainDate(2026, 11, 26), reason: \"Thanksgiving\" },\n  ]}\n  room={{ name: \"Group Room B\", capacity: 14 }}\n  capacity={12}\n  enrolled={9}\n/>"
+      }
+    ],
+    "fixtures": [
+      "patientRoutine",
+      "appointmentBooked",
+      "encounterRoutine"
+    ],
+    "seo": {
+      "slug": "date-picker",
+      "title": "Date Picker — accessible React healthcare control",
+      "description": "A React date picker for healthcare: fourteen variants over one value space — field, calendar, birth date with live age, sessions, slots and recurrence.",
+      "primaryKeyword": "react healthcare date picker",
+      "secondaryKeywords": [
+        "accessible date picker react",
+        "antd date picker alternative",
+        "appointment scheduler react component",
+        "session duration picker react",
+        "date of birth input react"
+      ],
+      "searchIntent": "informational",
+      "ogImage": "generated"
+    },
+    "relationships": {
+      "builtWith": [],
+      "usedIn": [],
+      "patterns": [
+        "clinical-documentation",
+        "intake"
+      ],
+      "alternatives": []
+    }
   },
   {
     "name": "helix-loader",
@@ -8041,7 +9668,7 @@ export const CATALOG: ComponentDoc[] = [
       },
       {
         "name": "confirm",
-        "type": "false | 'countersign' | 'hold' | 'dialog' | 'attest'",
+        "type": "false | 'dialog' | 'countersign' | 'hold' | 'attest'",
         "description": "",
         "required": false,
         "default": "false"
@@ -8323,7 +9950,7 @@ export const CATALOG: ComponentDoc[] = [
           },
           {
             "name": "confirm",
-            "type": "false | 'countersign' | 'hold' | 'dialog' | 'attest'",
+            "type": "false | 'dialog' | 'countersign' | 'hold' | 'attest'",
             "description": "",
             "required": false,
             "default": "false"
@@ -8603,7 +10230,7 @@ export const CATALOG: ComponentDoc[] = [
           },
           {
             "name": "confirm",
-            "type": "false | 'countersign' | 'hold' | 'dialog' | 'attest'",
+            "type": "false | 'dialog' | 'countersign' | 'hold' | 'attest'",
             "description": "",
             "required": false
           },
@@ -8923,7 +10550,8 @@ export const CATALOG: ComponentDoc[] = [
     "related": [
       "clinical-note",
       "tabs",
-      "clinical-status"
+      "clinical-status",
+      "date-picker"
     ],
     "dependencies": [
       "clsx",

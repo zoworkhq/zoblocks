@@ -36,9 +36,16 @@ export const tokenPaths = {
   contrast: path.join(ROOT, "packages", "tokens", "src", "contrast.json"),
 } as const;
 
-/** Selectors a theme's value set is applied under. */
+/**
+ * Selectors a theme's value set is applied under.
+ *
+ * Light is in `:root` *and* named, so a subtree can be forced light inside a
+ * dark page. Without the named selector the three themes are not symmetric —
+ * two of them can be scoped and one can only be a default — and a light panel
+ * inside a dark shell has no way to ask for the tokens it needs.
+ */
 const THEME_SELECTOR: Record<Theme, string | undefined> = {
-  light: undefined, // light lives in :root
+  light: '.light,\n[data-theme="light"],\n[data-ox-theme="light"]',
   dark: '.dark,\n[data-theme="dark"],\n[data-ox-theme="dark"]',
   "high-contrast": '[data-ox-theme="high-contrast"]',
 };
@@ -130,7 +137,7 @@ function buildCss(source: TokenSource): string {
   out.push(
     section(
       "Component — the override surface",
-      "Every one of these resolves to a semantic token, so they follow light,\ndark and high-contrast without being redeclared. Override any of them to\nrestyle a component without editing the source you were shipped.",
+      "Every one of these resolves to a semantic token. That makes them follow a\ntheme applied at the root, and — because a var() in a custom-property\ndeclaration is substituted where it is declared — *not* a theme applied to a\nsubtree, unless they are re-declared there too. They are, in each theme block\nbelow, the same way the density profiles handle it. Override any of them to\nrestyle a component without editing the source you were shipped.",
     ),
   );
   out.push(...declarations(source.component));
@@ -203,6 +210,28 @@ function buildCss(source: TokenSource): string {
   }
 
   // -- themes --------------------------------------------------------------
+  /*
+   * The same substitution rule that forced the density re-emit above, and it
+   * was missed here because a theme is nearly always applied to <html> — where
+   * `:root` and `.dark` are the *same element*, so the component tier resolves
+   * against the dark values and everything looks correct.
+   *
+   * Apply a theme to a subtree instead and it silently stops working: the
+   * component tokens were already substituted on the root against the light
+   * semantic values, and a descendant inherits those computed literals. The
+   * docs galleries are exactly that case — each demo stage carries its own
+   * theme so three can be shown at once — and every date field in a dark or
+   * high-contrast stage rendered on a white background, because
+   * `--ox-field-bg` still held the root's `--ox-surface`.
+   *
+   * It is not only ours: a customer putting a dark sidebar or a preview panel
+   * inside a light app hits it the same way, and the tier discipline is what
+   * promises them it will work.
+   */
+  const themeLinked = [...source.component].filter(
+    ([, token]) => /\{[^}]+\}/.test(token.value) && !/\{density\./.test(token.value),
+  );
+
   for (const theme of THEMES) {
     const selector = THEME_SELECTOR[theme];
     if (!selector) continue;
@@ -215,6 +244,11 @@ function buildCss(source: TokenSource): string {
     out.push(`/* ${theme}\n   ${note} */`);
     out.push(`${selector} {`);
     out.push(...declarations(source.semantic[theme]));
+    if (themeLinked.length) {
+      out.push("");
+      out.push("  /* Component tokens that track the semantic tier — see the note above. */");
+      out.push(...declarations(new Map(themeLinked)));
+    }
     out.push("}");
     out.push("");
   }

@@ -201,6 +201,47 @@ const SUPPORT_ITEMS: BuildableItem[] = [
     ],
   },
   {
+    name: "datetime-core",
+    type: "oxygen:lib",
+    title: "Date & time core",
+    description:
+      "The temporal engine and the behaviour every date, time and session control shares. Plain serialisable value types that carry their own precision — a birth date has no time member and cannot become midnight UTC — integer calendar arithmetic, a keyboard-first segmented field, an accessible month grid, and the session algebra whose driver is explicit state rather than an inference. Reads IANA zone data through Intl rather than shipping an offset table, and never reads the wall clock. Installed automatically with DateField, Calendar, DatePicker, BirthDateField, TimeField, SessionTimeField and ClinicalDateTime.",
+    dependencies: ["clsx", "tailwind-merge"] as string[],
+    registryDependencies: ["utils"] as string[],
+    files: [
+      {
+        path: "registry/oxygen/lib/datetime.ts",
+        type: "oxygen:lib",
+        target: "lib/oxygen-datetime.ts",
+      },
+      {
+        path: "registry/oxygen/lib/datetime-field.tsx",
+        type: "oxygen:lib",
+        target: "lib/oxygen-datetime-field.tsx",
+      },
+      {
+        path: "registry/oxygen/lib/availability.ts",
+        type: "oxygen:lib",
+        target: "lib/oxygen-availability.ts",
+      },
+      {
+        path: "registry/oxygen/lib/recurrence.ts",
+        type: "oxygen:lib",
+        target: "lib/oxygen-recurrence.ts",
+      },
+      {
+        path: "registry/oxygen/lib/datetime-parts.tsx",
+        type: "oxygen:lib",
+        target: "lib/oxygen-datetime-parts.tsx",
+      },
+      {
+        path: "registry/oxygen/lib/datetime.css",
+        type: "oxygen:style",
+        target: "styles/oxygen-datetime.css",
+      },
+    ],
+  },
+  {
     name: "clock-core",
     type: "oxygen:lib",
     title: "Clock",

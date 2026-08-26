@@ -511,7 +511,80 @@ export interface PractitionerRole extends Resource {
   code?: CodeableConcept[];
   specialty?: CodeableConcept[];
   telecom?: ContactPoint[];
+  /**
+   * The recurring working week.
+   *
+   * `daysOfWeek` omitted means every day, and `allDay` beats the two time
+   * members rather than being combined with them — both are R4's rules and
+   * both are the kind of thing an adapter gets wrong once and then explains
+   * for a year.
+   */
+  availableTime?: Array<{
+    daysOfWeek?: Array<"mon" | "tue" | "wed" | "thu" | "fri" | "sat" | "sun">;
+    allDay?: boolean;
+    /** `hh:mm:ss`, local to the practice. Not an instant. */
+    availableStartTime?: string;
+    availableEndTime?: string;
+  }>;
+  /**
+   * Periods the practitioner is *not* available, with a reason.
+   *
+   * Distinct from simply having no `availableTime`: "on leave until the 15th"
+   * and "does not work Thursdays" are different answers to a scheduler, and
+   * collapsing them is why a front desk books into somebody's annual leave.
+   */
+  notAvailable?: Array<{ description?: string; during?: Period }>;
   availabilityExceptions?: string;
+}
+
+/**
+ * https://hl7.org/fhir/R4/schedule.html
+ *
+ * A container for slots: who or what is being scheduled, over what horizon.
+ * The actor is a reference rather than a practitioner, because a room, a
+ * device and a group all take appointments.
+ */
+export interface Schedule extends Resource {
+  resourceType?: "Schedule";
+  active?: boolean;
+  serviceCategory?: CodeableConcept[];
+  serviceType?: CodeableConcept[];
+  specialty?: CodeableConcept[];
+  /** Practitioner, PractitionerRole, Location, Device, HealthcareService… */
+  actor?: Reference[];
+  /** The window the schedule describes. Outside it, absence means nothing. */
+  planningHorizon?: Period;
+  comment?: string;
+}
+
+/**
+ * https://hl7.org/fhir/R4/slot.html
+ *
+ * One bookable interval on a Schedule, and the resource an availability set
+ * is really made of.
+ *
+ * `status` is written out rather than typed as a string for the same reason
+ * Encounter's is: `entered-in-error` is a state a renderer must be able to
+ * name, and a slot that is merely `busy` is different from one that is
+ * `busy-tentative` — the second is somebody else's hold, which expires.
+ */
+export type SlotStatus =
+  "busy" | "free" | "busy-unavailable" | "busy-tentative" | "entered-in-error";
+
+export interface Slot extends Resource {
+  resourceType?: "Slot";
+  schedule?: Reference;
+  serviceCategory?: CodeableConcept[];
+  serviceType?: CodeableConcept[];
+  specialty?: CodeableConcept[];
+  appointmentType?: CodeableConcept;
+  status?: SlotStatus;
+  /** ISO instants. The pair is the interval; there is no duration member. */
+  start?: string;
+  end?: string;
+  /** True when the slot cannot be booked online even though it is free. */
+  overbooked?: boolean;
+  comment?: string;
 }
 
 /** https://hl7.org/fhir/R4/relatedperson.html */

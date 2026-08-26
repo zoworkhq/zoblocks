@@ -53,6 +53,11 @@ export const WORKSPACE_ALIASES: Record<string, string[]> = {
   "@/lib/oxygen-chart-header": ["./registry/oxygen/lib/chart-header.ts"],
   "@/lib/oxygen-workspace": ["./registry/oxygen/lib/workspace.ts"],
   "@/lib/oxygen-palette": ["./registry/oxygen/lib/palette.ts"],
+  "@/lib/oxygen-datetime": ["./registry/oxygen/lib/datetime.ts"],
+  "@/lib/oxygen-datetime-field": ["./registry/oxygen/lib/datetime-field.tsx"],
+  "@/lib/oxygen-datetime-parts": ["./registry/oxygen/lib/datetime-parts.tsx"],
+  "@/lib/oxygen-availability": ["./registry/oxygen/lib/availability.ts"],
+  "@/lib/oxygen-recurrence": ["./registry/oxygen/lib/recurrence.ts"],
   "@/lib/timeline-core": ["./registry/oxygen/lib/timeline-core.ts"],
   "@/lib/timeline-fhir": ["./registry/oxygen/lib/timeline-fhir.ts"],
 };

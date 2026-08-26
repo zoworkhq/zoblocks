@@ -4,14 +4,15 @@
  * Two jobs, and they are worth keeping separate in your head:
  *
  *   1. The frame — the site's instrument aesthetic around each demo.
- *   2. The demo theme scope — `[data-ox-demo-theme]`, which redefines the
- *      component's own `--ox-*` semantic tokens so the same strip can be shown
- *      in light, dark and high-contrast side by side on one page.
+ *   2. The demo theme scope — `[data-ox-theme]`, the product's own attribute,
+ *      set per stage so the same strip can be shown in light, dark and
+ *      high-contrast side by side on one page.
  *
- * The second is the interesting one. The tab package resolves every value
- * through `--ox-tabs-*` → `--ox-*` → `--ant-*` → a literal, so overriding the
- * middle tier here is enough to retheme it completely — no props, no JS, and
- * no fork of the stylesheet. If that chain is ever broken, this file stops
+ * The second is the interesting one, and it is deliberately *not* implemented
+ * here any more. The stages set the shipped attribute and `packages/tokens`
+ * does the work, so what the gallery demonstrates is the real theming
+ * mechanism rather than a hand-copied imitation of it. If that chain is ever
+ * broken, this file stops
  * working, which makes the matrix a live test of the token contract.
  */
 
@@ -138,9 +139,143 @@
 .ox-gallery__stage[data-ox-motion="off"] .ox-tabs *::after,
 .ox-gallery__stage[data-ox-motion="off"] .ox-switch *,
 .ox-gallery__stage[data-ox-motion="off"] .ox-switch *::before,
-.ox-gallery__stage[data-ox-motion="off"] .ox-switch *::after {
+.ox-gallery__stage[data-ox-motion="off"] .ox-switch *::after,
+.ox-gallery__stage[data-ox-motion="off"] [class*="ox-dt-"],
+.ox-gallery__stage[data-ox-motion="off"] [class*="ox-dt-"]::before,
+.ox-gallery__stage[data-ox-motion="off"] [class*="ox-dt-"]::after {
   transition-duration: 1ms !important;
   animation-duration: 1ms !important;
+}
+
+/* ===================================================================
+ * Date gallery furniture.
+ *
+ * Only the scaffolding a demo needs to put two controls side by side and
+ * name which prop produced which. Nothing here styles the component — if
+ * a date field needs a rule from this file to look right, the rule is in
+ * the wrong file.
+ * ================================================================== */
+
+/* Seven chapters do not fit a segmented control at the width the prose
+   column allows, and a segmented control that scrolls is a worse chapter
+   nav than a wrapping one. A radiogroup, because the stage below is not a
+   panel any single chapter owns. */
+.ox-dt-chapters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+}
+.ox-dt-chapter {
+  min-block-size: 2rem;
+  border: 1px solid var(--color-rule);
+  border-radius: 999px;
+  background: var(--color-paper);
+  padding-inline: 0.75rem;
+  font-size: 0.8125rem;
+  color: var(--color-graphite);
+  cursor: pointer;
+  transition:
+    border-color 140ms ease,
+    color 140ms ease,
+    background-color 140ms ease;
+}
+.ox-dt-chapter:hover {
+  border-color: var(--color-rule-strong, var(--color-rule));
+  color: var(--color-ink, inherit);
+}
+.ox-dt-chapter[aria-checked="true"] {
+  border-color: currentColor;
+  background: var(--color-ink);
+  color: var(--color-paper);
+  font-weight: 600;
+}
+
+.ox-dt-demo-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 1.5rem 2rem;
+}
+.ox-dt-demo-col {
+  display: grid;
+  gap: 0.375rem;
+  /* Without this a long caption sets the column's min-content width and one
+     demo stretches the whole row. `min-width: 0` alone does not do it on a
+     flex item whose content is a nowrap <code>. */
+  min-inline-size: 0;
+}
+.ox-dt-demo-cap {
+  font-family: var(--ox-font-mono, ui-monospace, monospace);
+  font-size: 0.6875rem;
+  letter-spacing: 0.02em;
+  color: var(--ox-text-muted, var(--color-graphite));
+}
+
+.ox-dt-demo-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+}
+.ox-dt-demo-chip {
+  min-block-size: 1.75rem;
+  border: 1px solid var(--ox-border, currentColor);
+  border-radius: 999px;
+  background: var(--ox-surface, transparent);
+  padding-inline: 0.625rem;
+  font-size: 0.75rem;
+  color: var(--ox-text, inherit);
+  cursor: pointer;
+}
+.ox-dt-demo-chip:hover {
+  border-color: var(--ox-accent, currentColor);
+  color: var(--ox-accent, inherit);
+}
+
+.ox-dt-demo-list {
+  display: grid;
+  gap: 0.5rem;
+  /* A nowrap <code> in one row would otherwise set the width of every row
+     and of the card around them. */
+  grid-auto-columns: minmax(0, 1fr);
+}
+.ox-dt-demo-listrow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.5rem 1rem;
+  border-block-end: 1px solid var(--ox-border, transparent);
+  padding-block-end: 0.5rem;
+  font-size: 0.8125rem;
+  color: var(--ox-text, inherit);
+}
+.ox-dt-demo-listrow--stack {
+  align-items: center;
+}
+.ox-dt-demo-listrow:last-child {
+  border-block-end: 0;
+  padding-block-end: 0;
+}
+.ox-dt-demo-listrow > code {
+  min-inline-size: 12rem;
+  font-family: var(--ox-font-mono, ui-monospace, monospace);
+  font-size: 0.75rem;
+  color: var(--ox-text-muted, inherit);
+}
+.ox-dt-demo-listrow > b {
+  min-inline-size: 13rem;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+/* The verdict is the point of the DST demo, so it carries a weight of its
+   own — and never colour alone. */
+.ox-dt-demo-listrow [data-ox-verdict="nonexistent"],
+.ox-dt-demo-listrow [data-ox-verdict="ambiguous"] {
+  font-weight: 600;
+  color: var(--ox-status-high, inherit);
+}
+.ox-dt-demo-listrow [data-ox-verdict="unknown-zone"] {
+  font-weight: 600;
+  color: var(--ox-status-critical, inherit);
 }
 
 /* ---- one demo ----------------------------------------------------- */
@@ -229,7 +364,7 @@
 .ox-demo-btn--primary {
   background: var(--ox-accent);
   border-color: var(--ox-accent);
-  color: var(--ox-accent-fg, #fff);
+  color: var(--ox-text-on-accent, #fff);
 }
 
 .ox-alert {
@@ -438,104 +573,31 @@
 }
 
 /* ===================================================================
- * Demo theme scopes.
+ * Demo theme scopes — deleted, and that is the fix.
  *
- * These redefine the component's *semantic* tier only. Nothing here touches
- * `--ox-tabs-*`, which is the component tier — so if a future change reaches
- * past the semantic tokens to a literal, these scopes stop having an effect
- * and the matrix visibly breaks. That is the intent.
+ * They used to be three hand-written palettes under `[data-ox-demo-theme]`,
+ * redefining the *semantic* tier only, on the stated theory that component
+ * tokens resolve to semantic ones and would follow. They do not. A `var()` in
+ * a custom-property declaration is substituted where it is declared, so
+ * `--ox-field-bg: var(--ox-surface)` was resolved once on `:root` against the
+ * light palette, and every descendant inherited that literal. Switching the
+ * bar to dark repainted the stage and left every field, input and popover
+ * white on it.
+ *
+ * The stages now carry `data-ox-theme`, which is the product's own theming
+ * attribute, and `packages/tokens` re-declares the component tier inside each
+ * theme block the same way it already did for density. So the demos are
+ * themed by the shipped mechanism rather than by a copy of it — which is also
+ * the honest thing for a gallery to demonstrate, and it means a token bug
+ * shows up here instead of being papered over.
  * ================================================================== */
 
-[data-ox-demo-theme="light"] {
-  --ox-bg: #ffffff;
-  --ox-bg-subtle: #f8fafc;
-  --ox-bg-muted: #f1f5f9;
-  --ox-surface: #ffffff;
-  --ox-surface-raised: #ffffff;
-  --ox-text: #0f172a;
-  --ox-text-muted: #475569;
-  --ox-text-subtle: #94a3b8;
-  --ox-border: #e2e8f0;
-  --ox-border-strong: #cbd5e1;
-  --ox-accent: #059478;
-  --ox-accent-hover: #067662;
-  --ox-accent-subtle: #ecfdf8;
-  --ox-accent-border: #a4f3df;
-  --ox-accent-fg: #ffffff;
-  --ox-focus-ring: #059478;
-  --ox-status-critical: #b91c1c;
-  --ox-status-critical-bg: #fef2f2;
-  --ox-status-critical-border: #fecaca;
-  --ox-status-high: #b45309;
-  --ox-status-high-bg: #fffbeb;
-  --ox-status-high-border: #fde68a;
-  --ox-status-normal: #15803d;
-  color-scheme: light;
-}
-
-/* Retuned rather than reused: the light values do not hold contrast on a dark
-   surface, and critical has to stay unmistakable. */
-[data-ox-demo-theme="dark"] {
-  --ox-bg: #0b1220;
-  --ox-bg-subtle: #0f172a;
-  --ox-bg-muted: #1e293b;
-  --ox-surface: #0f172a;
-  --ox-surface-raised: #27334a;
-  --ox-text: #e2e8f0;
-  --ox-text-muted: #94a3b8;
-  --ox-text-subtle: #64748b;
-  --ox-border: #1e293b;
-  --ox-border-strong: #334155;
-  --ox-accent: #2dd4b0;
-  --ox-accent-hover: #6ce7cb;
-  --ox-accent-subtle: #0a2c26;
-  --ox-accent-border: #10554a;
-  --ox-accent-fg: #012e28;
-  --ox-focus-ring: #2dd4b0;
-  --ox-status-critical: #fb7185;
-  --ox-status-critical-bg: #2a1214;
-  --ox-status-critical-border: #5c1f24;
-  --ox-status-high: #fbbf24;
-  --ox-status-high-bg: #2a2010;
-  --ox-status-high-border: #5c451a;
-  --ox-status-normal: #4ade80;
-  color-scheme: dark;
-}
-
-/* Borders do the work, not fills. In high contrast a control whose only
-   selection cue is a background has, effectively, no selection cue. */
-[data-ox-demo-theme="hc"] {
-  --ox-bg: #ffffff;
-  --ox-bg-subtle: #ffffff;
-  --ox-bg-muted: #ffffff;
-  --ox-surface: #ffffff;
-  --ox-surface-raised: #ffffff;
-  --ox-text: #000000;
-  --ox-text-muted: #1a1a1a;
-  --ox-text-subtle: #404040;
-  --ox-border: #000000;
-  --ox-border-strong: #000000;
-  --ox-accent: #005c47;
-  --ox-accent-hover: #00402f;
-  --ox-accent-subtle: #ffffff;
-  --ox-accent-border: #005c47;
-  --ox-accent-fg: #ffffff;
-  --ox-focus-ring: #000000;
-  --ox-status-critical: #8a0000;
-  --ox-status-critical-bg: #ffffff;
-  --ox-status-critical-border: #8a0000;
-  --ox-status-high: #6b3b00;
-  --ox-status-high-bg: #ffffff;
-  --ox-status-high-border: #6b3b00;
-  --ox-status-normal: #00521f;
-  color-scheme: light;
-}
-[data-ox-demo-theme="hc"] .ox-tabs {
+[data-ox-theme="high-contrast"] .ox-tabs {
   --ox-tabs-thumb-shadow: none;
   --ox-tabs-weight-selected: 700;
   --ox-tabs-indicator-size: 3px;
 }
-[data-ox-demo-theme="hc"] .ox-tabs__tab[data-ox-selected] {
+[data-ox-theme="high-contrast"] .ox-tabs__tab[data-ox-selected] {
   text-decoration: underline;
   text-underline-offset: 3px;
 }

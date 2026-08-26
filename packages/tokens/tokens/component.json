@@ -656,5 +656,101 @@
     "accent": {
       "$value": "{text-muted}"
     }
+  },
+  "datetime": {
+    "$description": "DateField, Calendar, DatePicker, BirthDateField, TimeField, SessionTimeField and ClinicalDateTime.\n\nThe input chrome is deliberately absent: these components spend the shared `field.*` tokens, so a date field and a dose field cannot drift apart in a customer's theme. What is here is the surface a calendar and a session triple add on top — the grid cell, the selected and range fills, and the held/derived pair.\n\n`held` is the one that carries meaning rather than decoration. Start, end and duration are three values with two degrees of freedom, and which one the user asserted has to be visible or the next edit is a surprise. It resolves to the accent family because it marks the value the user owns, not a status.",
+    "$type": "color",
+    "cell-fg": {
+      "$value": "{text}"
+    },
+    "cell-muted-fg": {
+      "$value": "{text-muted}",
+      "$description": "Adjacent-month and unavailable days. Not `text-subtle`: at the 4.5:1 floor the subtle step fails on the overlay ground a bottom sheet paints, and a day a user can still reach is not exempt."
+    },
+    "cell-hover-bg": {
+      "$value": "{bg-muted}"
+    },
+    "cell-selected-bg": {
+      "$value": "{accent}"
+    },
+    "cell-selected-fg": {
+      "$value": "{text-on-accent}"
+    },
+    "cell-range-bg": {
+      "$value": "{accent-subtle}"
+    },
+    "cell-range-fg": {
+      "$value": "{text}"
+    },
+    "today-marker": {
+      "$value": "{accent}",
+      "$description": "A dot under the numeral as well as a weight change, because today must survive greyscale like every other state in the library."
+    },
+    "weekday-fg": {
+      "$value": "{text-muted}"
+    },
+    "popover-bg": {
+      "$value": "{surface-overlay}"
+    },
+    "popover-border": {
+      "$value": "{border}"
+    },
+    "held-fg": {
+      "$value": "{accent}",
+      "$description": "The member of a session triple the user asserted. Paired with a lock glyph and the word `Held`, so the badge is never colour alone."
+    },
+    "derived-fg": {
+      "$value": "{text-muted}"
+    },
+    "duration-bg": {
+      "$value": "{bg-muted}"
+    },
+    "duration-held-bg": {
+      "$value": "{accent-subtle}"
+    },
+    "duration-held-border": {
+      "$value": "{accent-border}"
+    },
+    "chip-bg": {
+      "$value": "{surface}"
+    },
+    "chip-fg": {
+      "$value": "{text-muted}"
+    },
+    "chip-border": {
+      "$value": "{border}"
+    },
+    "chip-on-bg": {
+      "$value": "{accent}"
+    },
+    "chip-on-fg": {
+      "$value": "{text-on-accent}"
+    },
+    "cell-size": {
+      "$type": "dimension",
+      "$value": "2rem",
+      "$description": "The visible cell. The hit area is the whole grid track and is floored at the density target, so clinical density tightens the type and the gaps and never the target."
+    },
+    "cell-radius": {
+      "$type": "dimension",
+      "$value": "{radius-sm}"
+    },
+    "target": {
+      "$type": "dimension",
+      "$value": "{density.target}",
+      "$description": "WCAG 2.2 SC 2.5.8. Follows the density profile, which itself clamps at 24px."
+    },
+    "gap": {
+      "$type": "dimension",
+      "$value": "{density.gap}"
+    },
+    "font": {
+      "$type": "dimension",
+      "$value": "{density.font}"
+    },
+    "duration": {
+      "$type": "duration",
+      "$value": "{density.duration}"
+    }
   }
 }

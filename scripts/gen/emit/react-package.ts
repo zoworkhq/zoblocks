@@ -62,6 +62,15 @@ function rewriteImports(source: string, fromDepth: number): string {
       .replace(/(["'])@\/lib\/oxygen-chart-header\1/g, `"${up}lib/chart-header"`)
       .replace(/(["'])@\/lib\/oxygen-workspace\1/g, `"${up}lib/workspace"`)
       .replace(/(["'])@\/lib\/oxygen-palette\1/g, `"${up}lib/palette"`)
+      // The temporal engine and its React core. The longer specifier is
+      // rewritten first: `@/lib/oxygen-datetime` is a prefix of
+      // `@/lib/oxygen-datetime-field`, and the other order silently
+      // produces `"../lib/datetime-field"` from the wrong rule.
+      .replace(/(["'])@\/lib\/oxygen-datetime-parts\1/g, `"${up}lib/datetime-parts"`)
+      .replace(/(["'])@\/lib\/oxygen-datetime-field\1/g, `"${up}lib/datetime-field"`)
+      .replace(/(["'])@\/lib\/oxygen-availability\1/g, `"${up}lib/availability"`)
+      .replace(/(["'])@\/lib\/oxygen-recurrence\1/g, `"${up}lib/recurrence"`)
+      .replace(/(["'])@\/lib\/oxygen-datetime\1/g, `"${up}lib/datetime"`)
       // The chronology engine and its FHIR adapters.
       .replace(/(["'])@\/lib\/timeline-core\1/g, `"${up}lib/timeline-core"`)
       .replace(/(["'])@\/lib\/timeline-fhir\1/g, `"${up}lib/timeline-fhir"`)
@@ -120,6 +129,11 @@ export async function emitReactPackage(
     ["lib/chart-header.ts", "lib/chart-header.ts", 1],
     ["lib/workspace.ts", "lib/workspace.ts", 1],
     ["lib/palette.ts", "lib/palette.ts", 1],
+    ["lib/datetime.ts", "lib/datetime.ts", 1],
+    ["lib/datetime-field.tsx", "lib/datetime-field.tsx", 1],
+    ["lib/availability.ts", "lib/availability.ts", 1],
+    ["lib/recurrence.ts", "lib/recurrence.ts", 1],
+    ["lib/datetime-parts.tsx", "lib/datetime-parts.tsx", 1],
     ["lib/timeline-core.ts", "lib/timeline-core.ts", 1],
     ["lib/timeline-fhir.ts", "lib/timeline-fhir.ts", 1],
   ] as const) {
@@ -158,6 +172,7 @@ export async function emitReactPackage(
     ["lib/chart-header.css", "styles/chart-header.css"],
     ["lib/workspace.css", "styles/workspace.css"],
     ["lib/palette.css", "styles/palette.css"],
+    ["lib/datetime.css", "styles/datetime.css"],
     ["lib/timeline.css", "styles/timeline.css"],
   ] as const) {
     const css = await readFile(path.join(COMPONENTS_DIR, file), "utf8");
@@ -214,6 +229,13 @@ export async function emitReactPackage(
 export * from "./lib/loader";
 export * from "./lib/accordion-core";
 export * from "./lib/switch";
+// The temporal engine and its React core. Star-exported here rather than
+// from each date component, because the barrel is flat: two components
+// re-exporting formatPlainDate is a duplicate-identifier error at build.
+export * from "./lib/datetime";
+export * from "./lib/datetime-field";
+export * from "./lib/availability";
+export * from "./lib/recurrence";
 export { cn } from "./lib/utils";
 
 ${exports}
