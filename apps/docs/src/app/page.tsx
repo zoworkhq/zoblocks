@@ -1,12 +1,30 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { Activity, ArrowRight, Braces, ShieldCheck } from "lucide-react";
 import { CATALOG } from "@/lib/catalog";
-import { ComponentCard } from "@/components/site/component-card";
+import { HomeFeatured } from "@/components/site/home-featured";
 import { SiteFooter, SiteHeader } from "@/components/site/chrome";
-import { DemoPlaceholder } from "@/components/site/demo-placeholder";
+import { DataGridPreview } from "@/components/site/data-grid-preview";
 import { LoaderShowcase } from "@/components/site/loader-showcase";
 import { Counter, InstallCommand, RevealRoot } from "@/components/site/interactions";
 import { TelemetryTrace } from "@/components/site/telemetry-trace";
+
+/*
+ * The home page had no metadata of its own.
+ *
+ * It inherited the layout's `title.default` and site description, which is a
+ * reasonable fallback for a page nobody thought about and a poor one for the
+ * highest-value URL on the domain. The title now names the framework, because
+ * "React" is in the query and was not in the tag; `canonical` was absent here
+ * and on /components, the two pages most likely to be reached with tracking
+ * parameters attached.
+ */
+export const metadata: Metadata = {
+  title: {
+    absolute: "Oxygen UI — React healthcare components typed to FHIR",
+  },
+  alternates: { canonical: "/" },
+};
 
 export default function HomePage() {
   return (
@@ -15,8 +33,8 @@ export default function HomePage() {
       <main id="main">
         <Hero />
         <StatesArgument />
-        <CodeComparison />
-        <Catalog />
+        <DataGridSection />
+        <HomeFeatured total={CATALOG.length} />
         <Trust />
         <ClosingCta />
       </main>
@@ -75,13 +93,38 @@ function Hero() {
               Healthcare UI that already knows what the data means.
             </h1>
 
+            {/*
+              The plain sentence, under the good one.
+
+              The H1 is the strongest line on the site and contains nothing
+              anybody searches for — which is a fair trade for a headline whose
+              job is to stop someone, but it left the page's most weighted
+              heading doing no discovery work at all. Rather than compromise the
+              H1, the searched terms get their own heading beneath it: "React",
+              "components", "FHIR", "healthcare". Two headings, two jobs.
+            */}
+            <h2
+              className="enter mt-5 max-w-xl text-lg font-medium tracking-tight text-graphite"
+              style={{ "--enter-delay": "240ms" } as React.CSSProperties}
+            >
+              React components for healthcare interfaces, typed to FHIR R4.
+            </h2>
+
+            {/* Two sentences, not one compound. The licensing argument was
+                trailing behind an em dash on a 34-word opener; it is the second
+                thing a technical reader checks and deserves to stand alone. */}
             <p
-              className="body-lg enter mt-7 max-w-xl text-pretty text-graphite"
+              className="body-lg enter mt-6 max-w-xl text-pretty text-graphite"
               style={{ "--enter-delay": "300ms" } as React.CSSProperties}
             >
-              Components built for the moments a healthcare interface is judged: the wait, the
-              missing value, the result nobody interpreted. The source is copied into your repo —
-              yours to read, audit, and change.
+              Built for the moments a healthcare interface is judged: the wait, the missing value,
+              the result nobody interpreted.
+            </p>
+            <p
+              className="body-lg enter mt-3 max-w-xl text-pretty text-graphite"
+              style={{ "--enter-delay": "340ms" } as React.CSSProperties}
+            >
+              Source is copied into your repo. Yours to read, audit and change.
             </p>
             <div
               className="enter mt-8 flex max-w-2xl flex-col gap-3 sm:flex-row sm:items-center"
@@ -307,31 +350,49 @@ function StatesArgument() {
 
 /* ========================================================================== */
 
-function CodeComparison() {
+/**
+ * The Data Grid, previewed honestly.
+ *
+ * The section it replaces compared two renderers on five results. The argument
+ * was sound and the panel was not — and the grid is the better thing to lead
+ * with anyway: it is the largest piece of work in front of this library, and a
+ * clinical worklist is the screen an enterprise buyer already has an opinion
+ * about.
+ *
+ * Every claim below is from the brief and the architecture review, which are
+ * written and public. The component is not built. Both facts are on the page,
+ * because a preview that reads as shipping is the one thing that would cost
+ * more than saying nothing.
+ */
+function DataGridSection() {
   return (
-    <section className="border-t border-rule">
+    <section id="data-grid" className="scroll-mt-16 border-t border-rule">
       <div className="mx-auto max-w-6xl section-major px-5 sm:px-8">
         <div className="max-w-3xl">
           <p className="eyebrow eyebrow-rule text-graphite" data-reveal>
-            The difference
+            Coming next
           </p>
           <h2 className="display-lg mt-4 text-balance" data-reveal>
-            Same five results. Two renderers.
+            A worklist is a claim about a population.
           </h2>
           <p className="body-lg mt-5 max-w-2xl text-pretty text-graphite" data-reveal>
-            Not a feature list — the actual output. The left panel is written the way the
-            hand-rolled example in our docs is written, and every defect it produces follows
-            directly from that code.
+            Twenty-four rows on screen, 1,438 in the cohort, and a filter somebody set this morning
+            and has since stopped seeing. Most grids render the twenty-four and say nothing about
+            the other 1,414. This one states its coverage, prints the active predicate as a
+            sentence, holds arriving results behind a divider so nothing moves under your hand — and
+            refuses to sort by a model-derived column without naming the model, its version, and who
+            it was validated on.
+          </p>
+          <p className="body-sm mt-4 max-w-2xl text-pretty text-graphite-soft" data-reveal>
+            For contrast, we measured the engine underneath the grid most teams reach for:{" "}
+            <span className="numeric">@rc-component/table</span>, the table in antd v6, ships one{" "}
+            <span className="numeric">aria-*</span> attribute in its entire build, no{" "}
+            <span className="numeric">role</span>, and zero keyboard handlers.
           </p>
         </div>
 
-        <div className="mt-12">
-          {/* Was FailureDemo: the hand-rolled renderer beside the real one, on
-              the same five results. Returns with the rebuilt catalog. */}
-          <DemoPlaceholder label="Two renderers · same five results">
-            The side-by-side comparison renders the real component — it returns with the rebuilt
-            component catalog.
-          </DemoPlaceholder>
+        <div className="mt-12" data-reveal>
+          <DataGridPreview />
         </div>
       </div>
     </section>
@@ -339,62 +400,6 @@ function CodeComparison() {
 }
 
 /* ========================================================================== */
-
-function Catalog() {
-  return (
-    <section id="components" className="scroll-mt-16 border-t border-rule bg-paper-sunk/50">
-      <div className="mx-auto max-w-6xl section-major px-5 sm:px-8">
-        <div className="max-w-3xl">
-          <p className="eyebrow eyebrow-rule text-graphite" data-reveal>
-            Catalog
-          </p>
-          <h2 className="display-lg mt-4 text-balance" data-reveal>
-            Installed one at a time, built to one standard.
-          </h2>
-          <p className="lede mt-5 max-w-2xl text-pretty" data-reveal>
-            Every component carries its own tests, its own accessibility notes, and a designed
-            reduced-motion state. Take the one you need.
-          </p>
-        </div>
-
-        {CATALOG.length > 0 ? (
-          // Rows size to their own content — see the note on the catalog grid
-          // for why `auto-rows-fr` cannot be used here.
-          <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {CATALOG.map((component, index) => (
-              <ComponentCard
-                key={component.name}
-                component={component}
-                index={index}
-                featured={index === 0}
-              />
-            ))}
-          </div>
-        ) : (
-          <p
-            className="mt-12 max-w-xl rounded-2xl border border-dashed border-rule px-6 py-8 text-sm leading-relaxed text-graphite"
-            data-reveal
-          >
-            The catalog is being rebuilt from scratch. Components appear here as each one ships.
-          </p>
-        )}
-
-        <div className="mt-10" data-reveal>
-          <Link
-            href="/components"
-            className="group inline-flex items-center gap-2 rounded-xl border border-rule bg-paper px-5 py-3 text-sm font-medium text-ink transition-all duration-300 ease-[var(--ease-out-expo)] hover:-translate-y-0.5 hover:border-oxygen/40"
-          >
-            Browse the full catalog
-            <ArrowRight
-              aria-hidden="true"
-              className="size-4 transition-transform duration-300 ease-[var(--ease-out-expo)] group-hover:translate-x-0.5"
-            />
-          </Link>
-        </div>
-      </div>
-    </section>
-  );
-}
 
 /* ========================================================================== */
 
