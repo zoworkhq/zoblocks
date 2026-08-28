@@ -1067,7 +1067,16 @@ export function ComponentCard({
       <p
         className={cn("mt-3 leading-relaxed text-graphite", featured ? "body max-w-lg" : "text-sm")}
       >
-        {component.summary}
+        {/*
+          The card line, not the meta description.
+
+          `summary` is capped at 160 characters because it doubles as the page
+          description, which makes it a good description and a poor card: 27 of
+          them at a 21-word median rendered as a wall of grey. `tagline` is the
+          authored short form; falling back to `summary` keeps a component that
+          has not been given one readable rather than blank.
+        */}
+        {component.tagline ?? component.summary}
       </p>
 
       {preview ? (

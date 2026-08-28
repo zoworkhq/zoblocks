@@ -11,6 +11,8 @@ export default defineComponentMeta({
 
   summary:
     "Persistent patient context that collapses to a safety bar rather than to a name, and never renders administrative gender beside a dose.",
+
+  tagline: "Patient context that collapses to a safety bar, not a name.",
   description:
     "Sticky chrome over PatientBanner. Collapse moves content behind a disclosure rather than out of the accessibility tree. The encounter is an explicit control that will sit in “none selected” rather than pick one for you. The Sex Parameter for Clinical Use appears only where an order or a result is in view, with the context it applies to.",
   rationale:

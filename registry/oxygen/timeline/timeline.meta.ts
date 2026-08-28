@@ -10,6 +10,8 @@ export default defineComponentMeta({
 
   summary:
     "Ant Design v6's Timeline, prop for prop, with the accessible name and the ordered-list semantics it does not ship.",
+
+  tagline: "Ant Design's Timeline, with the semantics it does not ship.",
   description:
     "An ordered list with a rail. The API matches Ant Design v6 exactly, including the v5 names it still accepts, and takes no dependency on it. Adds a required accessible name and drops the current-step behaviour a chronology has no use for.",
   rationale:

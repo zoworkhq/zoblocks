@@ -10,6 +10,8 @@ export default defineComponentMeta({
 
   summary:
     "A disclosure widget whose headers can be read while closed, with a per-section access model for content a reader may not simply be shown.",
+
+  tagline: "Headers readable while closed, with per-section access control.",
   description:
     "Collapsible sections with a summary slot in the header, clinical severity on the leading edge, sections that cannot be closed, and four kinds of gate between a reader and content that is governed rather than merely hidden. Ant Design's Collapse API, with the accordion mode's accessibility defects fixed.",
   rationale:

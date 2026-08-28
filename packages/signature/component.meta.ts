@@ -32,6 +32,8 @@ export default defineComponentMeta({
 
   summary:
     "Signature capture that records the times nobody signed — declined, unable, verbal, on paper — not just the times they did.",
+
+  tagline: "Signature capture that records the times nobody signed.",
   description:
     "Draw, type or upload a signature inside an Ant Design form, and record the outcomes a signature pad has no answer for. The value is a discriminated union over seven outcomes rather than a base64 string, so a refusal is a fact the record can hold.",
   rationale:

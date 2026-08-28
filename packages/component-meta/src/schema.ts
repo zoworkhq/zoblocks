@@ -419,8 +419,23 @@ export const componentMetaSchema = z
      * them produces text that is wrong for at least two of the three.
      */
 
-    /** One line. Catalog cards, search results, page metadata, llms.txt. */
+    /** One line. Search results, page metadata, llms.txt. */
     summary: z.string().min(20, "summary must be useful, not a placeholder"),
+    /**
+     * The card line. Eight to twelve words.
+     *
+     * Split out of `summary` because the comment above this block was right and
+     * the schema was not yet acting on it: `summary` is capped at 160 characters
+     * *because* it doubles as the meta description, which makes it a good
+     * description and a poor card. Twenty-seven of them at a 21-word median
+     * turned the catalogue into a wall of grey, and a card is a decision aid —
+     * enough to choose a link, not enough to explain the component.
+     *
+     * Optional, so a component without one falls back to `summary` and the
+     * catalogue never renders a blank cell. Capped rather than floored: the
+     * failure mode here is length, not brevity.
+     */
+    tagline: z.string().max(75, "tagline is the card line; keep it under 75 characters").optional(),
     /** Two sentences. The registry manifest — what a developer reads at install time. */
     description: z
       .string()

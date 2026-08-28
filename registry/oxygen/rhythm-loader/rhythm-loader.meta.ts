@@ -10,6 +10,8 @@ export default defineComponentMeta({
 
   summary:
     "One rhythm strip, swept like a monitor. The quietest way for an interface to say it is still there.",
+
+  tagline: "One rhythm strip, swept like a monitor. The quiet wait.",
   description:
     "Loader drawn as a single PQRST complex on a baseline, swept once per beat by a bright head with a fading tail. Nothing scales and nothing grows, and it stays legible down to 20px.",
   rationale:

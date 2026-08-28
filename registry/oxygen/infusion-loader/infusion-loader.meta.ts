@@ -10,6 +10,8 @@ export default defineComponentMeta({
 
   summary:
     "A capsule with a soft slug — the only loader in the set that can tell the truth about how much is left.",
+
+  tagline: "The only loader here that can honestly show progress.",
   description:
     "Determinate and indeterminate progress in one component. Pass progress for a real 0–100 measurement with role=progressbar; omit it and the slug drifts as an honest unknown.",
   rationale:

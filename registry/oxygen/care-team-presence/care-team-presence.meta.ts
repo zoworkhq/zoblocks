@@ -11,6 +11,8 @@ export default defineComponentMeta({
 
   summary:
     "Presence with clinical semantics: in session, on call, signed out to whom — and who else is in this chart right now.",
+
+  tagline: "Who is in session, on call, and signed out to whom.",
   description:
     "Nine states rather than a green dot, each drawn as a ring shape before it is a colour. Resolves a rota to the person responsible at this moment and returns a gap when nobody is. Routes an escalation to the covering clinician before it offers an override, and warns about a documentation conflict before you type rather than at save.",
   rationale:

@@ -10,6 +10,8 @@ export default defineComponentMeta({
 
   summary:
     "A patient's chronology that cannot be rendered without saying what it is a view of — the window, the sources, the filters and the order.",
+
+  tagline: "A chronology that states its window, sources, filters and order.",
   description:
     "A timeline over clinical, administrative, communication and patient-reported events, with coverage as a required prop. Separates planned from happened, keeps an entry recorded in error visible and marked, and refuses to collapse anything a reader would act on.",
   rationale:

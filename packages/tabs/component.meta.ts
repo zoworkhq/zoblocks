@@ -32,6 +32,8 @@ export default defineComponentMeta({
 
   summary:
     "Tabs that know what they are: a view switch, a link list, a form value or a wizard — four accessibility trees behind one silhouette.",
+
+  tagline: "Eleven skins over one accessibility tree.",
   description:
     "Four semantic modes across eleven visual variants, with the WAI-ARIA keyboard model, five overflow strategies, and the states a clinical surface actually reaches — restricted, stale, unsaved. `as` is required and has no default, because the mode is the accessibility tree and the variant is only CSS.",
   rationale:

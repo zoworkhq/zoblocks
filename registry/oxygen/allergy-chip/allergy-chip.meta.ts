@@ -11,6 +11,8 @@ export default defineComponentMeta({
 
   summary:
     "The chip that refuses to conflate how bad the last reaction was with how bad the next one could be.",
+
+  tagline: "Past reaction severity and future risk, never conflated.",
   description:
     "Substance first at full weight, criticality as the primary signal, the worst past reaction as secondary text, and verification as a hairline affix. AllergyList carries the other half: a no-known-allergies assertion and an unasked question look nothing alike, and an assertion missing its author degrades to the second.",
   rationale:

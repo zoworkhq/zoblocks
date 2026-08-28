@@ -10,6 +10,8 @@ export default defineComponentMeta({
 
   summary:
     "An open heart with a rhythm line running through it, beating at a resting sixty. The library's signature wait.",
+
+  tagline: "An open heart at a resting sixty. The signature wait.",
   description:
     "Page and region loader: an open heart that draws itself once, then beats at a resting 60bpm while a monitor sweep crosses the rhythm line. Renders as Rhythm Loader below 40px, where the heart's detail would collapse.",
   rationale:

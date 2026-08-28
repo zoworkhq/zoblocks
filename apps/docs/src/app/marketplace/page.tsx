@@ -7,9 +7,9 @@ import { KIND_LABEL, buyHref, priceLabel, shelf, APP, type ShelfItem } from "@/l
 import { PackPreview } from "@/components/site/pack-preview";
 
 export const metadata: Metadata = {
-  title: "Marketplace — clinically-reviewed packs for healthcare interfaces",
+  title: "Marketplace — clinical icon & theme packs",
   description:
-    "Icon sets, empty-state systems, theme packs and components for clinical software. Every item states what was checked — contrast pairs, forced colours, who reviewed it, and what it does not claim.",
+    "Icon sets, empty-state systems and theme packs for clinical software. Every item states its contrast pairs, forced-colours behaviour and what it does not claim.",
   alternates: { canonical: "/marketplace" },
 };
 

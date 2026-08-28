@@ -11,6 +11,8 @@ export default defineComponentMeta({
 
   summary:
     "One closed status vocabulary: nine scales whose every step carries a hue, a CSS shape and a word, emitted together or not at all.",
+
+  tagline: "Nine status scales. Hue, shape and word, or nothing.",
   description:
     "A chip, a dot, or a grid affix — three presentations of one datum, drawn from nine fixed scales with no free-text status. Each step pairs a tone with a CSS-drawn glyph and a word in both a clinician and a patient register, so the state survives greyscale, Windows high-contrast and monochrome print.",
   rationale:

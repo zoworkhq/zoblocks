@@ -17,6 +17,7 @@ export const CATALOG: ComponentDoc[] = [
     "layer": "primitive",
     "distribution": "registry",
     "summary": "A disclosure widget whose headers can be read while closed, with a per-section access model for content a reader may not simply be shown.",
+    "tagline": "Headers readable while closed, with per-section access control.",
     "description": "Collapsible sections with a summary slot in the header, clinical severity on the leading edge, sections that cannot be closed, and four kinds of gate between a reader and content that is governed rather than merely hidden. Ant Design's Collapse API, with the accordion mode's accessibility defects fixed.",
     "rationale": "Every accordion assumes hidden means unneeded. In a behavioral health record it does not: what is collapsed may be a suicide-risk item, a safety plan someone needs in ninety seconds, a note the patient has a legal right to read but may not be ready to, or a substance-use record governed by a different federal rule than the chart around it. Three consequences follow, and together they are the component. Collapsed is not absent, so the header carries a summary and a severity rail. Disclosure is an event rather than a state change, so opening a governed section can require a consent, a reason code, or nothing but the reader's own choice. And content this reader cannot obtain still gets a row that says so, because deleting it claims the record is complete — which is CONTENT.md's governing rule applied to the one component whose entire job is omitting facts on purpose.",
     "categories": [
@@ -452,7 +453,7 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "onOpenChange",
             "type": "((open: boolean) => void)",
-            "description": "",
+            "description": "Fired when the section opens or closes, with the new state. For a gated section it fires only after the gate is satisfied — opening is an event, not a state change.",
             "required": false
           },
           {
@@ -575,6 +576,7 @@ export const CATALOG: ComponentDoc[] = [
     "layer": "clinical",
     "distribution": "registry",
     "summary": "The chip that refuses to conflate how bad the last reaction was with how bad the next one could be.",
+    "tagline": "Past reaction severity and future risk, never conflated.",
     "description": "Substance first at full weight, criticality as the primary signal, the worst past reaction as secondary text, and verification as a hairline affix. AllergyList carries the other half: a no-known-allergies assertion and an unasked question look nothing alike, and an assertion missing its author degrades to the second.",
     "rationale": "AllergyIntolerance carries two severity-shaped fields that mean opposite things. `criticality` is a clinician's judgement of the risk of a future life-threatening reaction; `reaction.severity` describes how bad a past one was. A patient whose only documented reaction was mild urticaria can still be criticality high — that is the entire reason the field exists — and nearly every implementation renders one and drops the other, keeping the past. The second failure is subtler and more common: no known allergies and nobody asked are shown the same way, and an empty allergy list beside a prescribing button is an assertion the software has not earned. Both failures are structural rather than cosmetic, so both get shapes: the two fields render as different kinds of thing, and the two empty states are different components that look nothing alike.",
     "categories": [
@@ -611,13 +613,13 @@ export const CATALOG: ComponentDoc[] = [
       {
         "name": "record",
         "type": "AllergyRecord",
-        "description": "",
+        "description": "The AllergyIntolerance, already adapted. Carries `criticality` and `reaction.severity` separately, because they mean opposite things and merging them is the defect this component exists to prevent.",
         "required": true
       },
       {
         "name": "density",
         "type": "'compact' | 'default'",
-        "description": "",
+        "description": "Row height and type scale. Inherited from the nearest density provider when omitted.",
         "required": false,
         "default": "\"default\""
       },
@@ -642,13 +644,13 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "record",
             "type": "AllergyRecord",
-            "description": "",
+            "description": "The AllergyIntolerance, already adapted. Carries `criticality` and `reaction.severity` separately, because they mean opposite things and merging them is the defect this component exists to prevent.",
             "required": true
           },
           {
             "name": "density",
             "type": "'compact' | 'default'",
-            "description": "",
+            "description": "Row height and type scale. Inherited from the nearest density provider when omitted.",
             "required": false,
             "default": "\"default\""
           },
@@ -673,14 +675,14 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "askLabel",
             "type": "string",
-            "description": "",
+            "description": "What to render when nobody has asked. \"No known allergies\" is a clinical assertion somebody made; an empty list is not, and the two must not look alike.",
             "required": false,
             "default": "\"Ask and record\""
           },
           {
             "name": "density",
             "type": "'compact' | 'default'",
-            "description": "",
+            "description": "Row height and type scale. Inherited from the nearest density provider when omitted.",
             "required": false,
             "default": "\"default\""
           },
@@ -711,7 +713,7 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "records",
             "type": "readonly AllergyRecord[]",
-            "description": "",
+            "description": "The allergies, in the order they should be read. An empty array and a `null` mean different things — see `askLabel`.",
             "required": false
           }
         ],
@@ -1001,6 +1003,7 @@ export const CATALOG: ComponentDoc[] = [
     "layer": "primitive",
     "distribution": "registry",
     "summary": "Three rings expanding and fading from a soft core, paced at a resting breath rather than a spinner's tempo.",
+    "tagline": "Three rings at a resting breath, not a spinner's tempo.",
     "description": "Symbol-free loader cycling at roughly fifteen a minute, the rate of calm breathing. Carries no clinical imagery, so it suits any specialty, and its core accepts a customer's logo mark.",
     "rationale": "A spinner's tempo tells a reader the system is working hard; breathing tells them they can wait. On a patient-facing screen — a results page, a portal sign-in, a check-in kiosk — the second is almost always what the product means to say. It is also the one loader in the set with no clinical symbol at all, which is what makes it safe across specialties: nothing here reads as cardiac, oncological, or obstetric to someone who is about to receive news. That neutrality is a feature, not an absence of one.",
     "categories": [
@@ -1297,6 +1300,7 @@ export const CATALOG: ComponentDoc[] = [
     "layer": "clinical",
     "distribution": "registry",
     "summary": "Presence with clinical semantics: in session, on call, signed out to whom — and who else is in this chart right now.",
+    "tagline": "Who is in session, on call, and signed out to whom.",
     "description": "Nine states rather than a green dot, each drawn as a ring shape before it is a colour. Resolves a rota to the person responsible at this moment and returns a gap when nobody is. Routes an escalation to the covering clinician before it offers an override, and warns about a documentation conflict before you type rather than at save.",
     "rationale": "A green dot meaning \"online\" is worse than useless on a ward, because the two states that matter most both look identical to it. A therapist who is in session is at their desk, is online, and must not be interrupted — interrupting a group session reaches eight patients rather than one. A hospitalist who is signed out is at their desk, is online, and is the wrong person to page; the right person is named in a handover the dot does not know about. The second half of the component answers the question a PDF on a shared drive answers today: who covers this patient at 02:00 on a Sunday, and until when. And the third — chart co-presence — is the only presence signal here that appears without being asked for, because the timing is the whole value: told at save, a second note in the same encounter is a merge problem with somebody else's unsigned draft; told before you type, it is a choice between three reasonable options.",
     "categories": [
@@ -1334,7 +1338,7 @@ export const CATALOG: ComponentDoc[] = [
       {
         "name": "presence",
         "type": "Presence",
-        "description": "",
+        "description": "The person and their current state — available, in session, signed out, off shift — with whoever is covering for them.",
         "required": true
       },
       {
@@ -1365,7 +1369,7 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "presence",
             "type": "Presence",
-            "description": "",
+            "description": "The person and their current state — available, in session, signed out, off shift — with whoever is covering for them.",
             "required": true
           },
           {
@@ -1402,19 +1406,19 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "windows",
             "type": "readonly CoverageWindow[]",
-            "description": "",
+            "description": "Who is covering, and when. Overlaps and gaps are both drawn: a gap in coverage is the fact a reader is looking for.",
             "required": true
           },
           {
             "name": "backup",
             "type": "Clinician",
-            "description": "",
+            "description": "Who to reach when the primary does not answer. Rendered before it is needed rather than found during an escalation.",
             "required": false
           },
           {
             "name": "onPage",
             "type": "((clinician: Clinician) => void)",
-            "description": "",
+            "description": "Fired when the reader pages somebody. The component never contacts anyone itself.",
             "required": false
           }
         ],
@@ -1426,7 +1430,7 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "others",
             "type": "readonly ChartPresence[]",
-            "description": "",
+            "description": "Who else has this chart open right now. Two people writing the same note is a merge nobody wins.",
             "required": true
           },
           {
@@ -1444,13 +1448,13 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "onRequestHandoff",
             "type": "((other: ChartPresence) => void)",
-            "description": "",
+            "description": "Fired when the reader asks the current editor to hand over.",
             "required": false
           },
           {
             "name": "onSeparateAddendum",
             "type": "((other: ChartPresence) => void)",
-            "description": "",
+            "description": "Fired when the reader chooses to write their own addendum instead of waiting. The honest alternative to a silent overwrite.",
             "required": false
           }
         ],
@@ -1729,6 +1733,7 @@ export const CATALOG: ComponentDoc[] = [
     "layer": "clinical",
     "distribution": "registry",
     "summary": "A patient's chronology that cannot be rendered without saying what it is a view of — the window, the sources, the filters and the order.",
+    "tagline": "A chronology that states its window, sources, filters and order.",
     "description": "A timeline over clinical, administrative, communication and patient-reported events, with coverage as a required prop. Separates planned from happened, keeps an entry recorded in error visible and marked, and refuses to collapse anything a reader would act on.",
     "rationale": "A table is read as rows and a chart as a shape, but a timeline is read as an account — and an account is understood to be continuous, so a gap in it becomes a fact. Meanwhile the timeline on screen is nearly always a slice: paginated to five, filtered to one register, assembled from sources that fail independently. Every one of those renders as the same tidy, confident, continuous list. A clinician reads a timeline with no imaging on it and orders a CT; the study was done eleven weeks ago at another hospital and the exchange query timed out four seconds earlier. Nothing was wrong on screen. So coverage is required in the type, with no default, because every plausible default is a claim the caller did not make — and the sentence it produces is rendered in a fixed place and printed. Two consequences follow: planned is not happened, so a future event sits above a now marker and a planned event whose time has passed with nothing against it is lapsed rather than silent; and clinical events are not administrative ones, so registers are typed rather than mixed at one weight.",
     "categories": [
@@ -1836,14 +1841,14 @@ export const CATALOG: ComponentDoc[] = [
       {
         "name": "cluster",
         "type": "false | ClusterOptions",
-        "description": "",
+        "description": "When to collapse a run of similar events into one row, or `false` never to. Twelve vitals recorded in one hour are one event to a reader and twelve to a renderer.",
         "required": false,
         "default": "false"
       },
       {
         "name": "defaultRegisters",
         "type": "readonly TimelineRegister[]",
-        "description": "",
+        "description": "Which registers are shown on first render — labs, medications, notes, encounters. The reader can change them; this is only where they start.",
         "required": false
       },
       {
@@ -1856,7 +1861,7 @@ export const CATALOG: ComponentDoc[] = [
       {
         "name": "group",
         "type": "GroupBy",
-        "description": "",
+        "description": "What events are grouped by: day, encounter, or source. Ungrouped, a busy chart reads as a list of timestamps.",
         "required": false,
         "default": "\"auto\""
       },
@@ -1894,7 +1899,7 @@ export const CATALOG: ComponentDoc[] = [
       {
         "name": "layout",
         "type": "CareTimelineLayout",
-        "description": "",
+        "description": "How the chronology is laid out — a single rail, or split by source. Changes the reading order, so it is a content decision rather than a visual one.",
         "required": false,
         "default": "\"default\""
       },
@@ -1919,7 +1924,7 @@ export const CATALOG: ComponentDoc[] = [
       {
         "name": "onLoadOlder",
         "type": "(() => void)",
-        "description": "",
+        "description": "Fired when the reader reaches the start of the loaded window. The component states how many events lie beyond the page rather than pretending the window is the record.",
         "required": false
       },
       {
@@ -1931,19 +1936,19 @@ export const CATALOG: ComponentDoc[] = [
       {
         "name": "onRegistersChange",
         "type": "((registers: TimelineRegister[]) => void)",
-        "description": "",
+        "description": "Fired when the reader shows or hides a register. Worth persisting: a clinician's register selection is a working preference, not a one-off.",
         "required": false
       },
       {
         "name": "onSelect",
         "type": "((event: TimelineEvent) => void)",
-        "description": "",
+        "description": "Fired with the chosen event. Without it the timeline is a read-only account, which is a legitimate way to use it.",
         "required": false
       },
       {
         "name": "ref",
         "type": "React.Ref<HTMLElement>",
-        "description": "",
+        "description": "The scrolling region. Useful for restoring a reader's position when they return to a chart.",
         "required": false
       },
       {
@@ -1991,14 +1996,14 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "cluster",
             "type": "false | ClusterOptions",
-            "description": "",
+            "description": "When to collapse a run of similar events into one row, or `false` never to. Twelve vitals recorded in one hour are one event to a reader and twelve to a renderer.",
             "required": false,
             "default": "false"
           },
           {
             "name": "defaultRegisters",
             "type": "readonly TimelineRegister[]",
-            "description": "",
+            "description": "Which registers are shown on first render — labs, medications, notes, encounters. The reader can change them; this is only where they start.",
             "required": false
           },
           {
@@ -2011,7 +2016,7 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "group",
             "type": "GroupBy",
-            "description": "",
+            "description": "What events are grouped by: day, encounter, or source. Ungrouped, a busy chart reads as a list of timestamps.",
             "required": false,
             "default": "\"auto\""
           },
@@ -2049,7 +2054,7 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "layout",
             "type": "CareTimelineLayout",
-            "description": "",
+            "description": "How the chronology is laid out — a single rail, or split by source. Changes the reading order, so it is a content decision rather than a visual one.",
             "required": false,
             "default": "\"default\""
           },
@@ -2074,7 +2079,7 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "onLoadOlder",
             "type": "(() => void)",
-            "description": "",
+            "description": "Fired when the reader reaches the start of the loaded window. The component states how many events lie beyond the page rather than pretending the window is the record.",
             "required": false
           },
           {
@@ -2086,19 +2091,19 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "onRegistersChange",
             "type": "((registers: TimelineRegister[]) => void)",
-            "description": "",
+            "description": "Fired when the reader shows or hides a register. Worth persisting: a clinician's register selection is a working preference, not a one-off.",
             "required": false
           },
           {
             "name": "onSelect",
             "type": "((event: TimelineEvent) => void)",
-            "description": "",
+            "description": "Fired with the chosen event. Without it the timeline is a read-only account, which is a legitimate way to use it.",
             "required": false
           },
           {
             "name": "ref",
             "type": "React.Ref<HTMLElement>",
-            "description": "",
+            "description": "The scrolling region. Useful for restoring a reader's position when they return to a chart.",
             "required": false
           },
           {
@@ -2188,6 +2193,7 @@ export const CATALOG: ComponentDoc[] = [
     "layer": "clinical",
     "distribution": "registry",
     "summary": "A record's sections with their headers composed to the house rules, so a severity can never reach the screen without the words that explain it.",
+    "tagline": "Chart sections whose severity always arrives with its words.",
     "description": "Accordion with a clinical summary vocabulary: a status paired with its severity, a count, and a timestamp at the precision the record holds. Adds an expand-all control that never opens a section the reader may not have.",
     "rationale": "Accordion will happily let a product build a header that says nothing, and at fourteen sections that produces a chart nobody reads. This component closes that gap by composing the summary itself from a small, closed vocabulary. The type does the enforcing: passing severity without status is a build error, because a coloured rail with no words beside it is a signal that forced-colors mode discards, monochrome printing discards, and roughly one in twelve men cannot resolve. The expand-all control is here rather than on the primitive because expanding a whole record is a chart-shaped action — it is what makes the record searchable and printable in one press — and it has to know not to touch a withheld section.",
     "categories": [
@@ -2208,7 +2214,7 @@ export const CATALOG: ComponentDoc[] = [
       {
         "name": "sections",
         "type": "readonly ChartSection[]",
-        "description": "",
+        "description": "The record's sections, in the order the house reads them. Each carries its own summary, severity and access rules.",
         "required": true
       },
       {
@@ -2294,7 +2300,7 @@ export const CATALOG: ComponentDoc[] = [
       {
         "name": "onChange",
         "type": "((keys: React.Key[]) => void)",
-        "description": "",
+        "description": "Fired with the open sections whenever they change.",
         "required": false
       },
       {
@@ -2355,7 +2361,7 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "sections",
             "type": "readonly ChartSection[]",
-            "description": "",
+            "description": "The record's sections, in the order the house reads them. Each carries its own summary, severity and access rules.",
             "required": true
           },
           {
@@ -2441,7 +2447,7 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "onChange",
             "type": "((keys: React.Key[]) => void)",
-            "description": "",
+            "description": "Fired with the open sections whenever they change.",
             "required": false
           },
           {
@@ -2561,6 +2567,7 @@ export const CATALOG: ComponentDoc[] = [
     "layer": "clinical",
     "distribution": "registry",
     "summary": "A command palette that understands clinical verbs, scopes every search to a treatment relationship, and audits the searches it refuses.",
+    "tagline": "Clinical verbs, scoped to a treatment relationship.",
     "description": "Actions rank above records, because a verb is usually what was meant. Patients outside your relationships are counted rather than named. Every patient search emits an audit event, including the ones that matched nobody, and a clinically significant action never runs on the first Enter.",
     "rationale": "Clinical navigation is a menu tree six levels deep, and the fastest people in every organisation have memorised a set of shortcuts nobody documented. A palette is the obvious answer and almost nobody ships one, for a reason that is not obvious: in healthcare, search is a regulated act. Typing a name into a global patient search is a privacy event whether or not you open the chart, and a palette that helpfully autocompletes across the whole patient index has created a compliance problem at the speed of thought. So out-of-scope matches are rendered as a count — 3 further matches, break-glass required — which is the whole design: the reader learns the search was not empty without learning who.",
     "categories": [
@@ -2605,19 +2612,19 @@ export const CATALOG: ComponentDoc[] = [
       {
         "name": "open",
         "type": "boolean",
-        "description": "",
+        "description": "Whether the palette is showing. Controlled, so the host owns the shortcut that summons it.",
         "required": true
       },
       {
         "name": "className",
         "type": "string",
-        "description": "",
+        "description": "Applied to the palette's outer element.",
         "required": false
       },
       {
         "name": "onClose",
         "type": "(() => void)",
-        "description": "",
+        "description": "Fired on Escape, on backdrop click, and after a command runs.",
         "required": false
       },
       {
@@ -2635,14 +2642,14 @@ export const CATALOG: ComponentDoc[] = [
       {
         "name": "placeholder",
         "type": "string",
-        "description": "",
+        "description": "The empty-field prompt. Say what can be typed — \"Search, or start with a verb\" — rather than \"Ask anything\", which promises a scope the palette will refuse.",
         "required": false,
         "default": "\"Search or run a command…\""
       },
       {
         "name": "scope",
         "type": "PatientScope",
-        "description": "",
+        "description": "The treatment relationship this search is bounded by. Every query is scoped to it, and searches it refuses are audited too.",
         "required": false
       }
     ],
@@ -2659,19 +2666,19 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "open",
             "type": "boolean",
-            "description": "",
+            "description": "Whether the palette is showing. Controlled, so the host owns the shortcut that summons it.",
             "required": true
           },
           {
             "name": "className",
             "type": "string",
-            "description": "",
+            "description": "Applied to the palette's outer element.",
             "required": false
           },
           {
             "name": "onClose",
             "type": "(() => void)",
-            "description": "",
+            "description": "Fired on Escape, on backdrop click, and after a command runs.",
             "required": false
           },
           {
@@ -2689,14 +2696,14 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "placeholder",
             "type": "string",
-            "description": "",
+            "description": "The empty-field prompt. Say what can be typed — \"Search, or start with a verb\" — rather than \"Ask anything\", which promises a scope the palette will refuse.",
             "required": false,
             "default": "\"Search or run a command…\""
           },
           {
             "name": "scope",
             "type": "PatientScope",
-            "description": "",
+            "description": "The treatment relationship this search is bounded by. Every query is scoped to it, and searches it refuses are audited too.",
             "required": false
           }
         ]
@@ -2981,6 +2988,7 @@ export const CATALOG: ComponentDoc[] = [
     "layer": "clinical",
     "distribution": "registry",
     "summary": "Persistent patient context that collapses to a safety bar rather than to a name, and never renders administrative gender beside a dose.",
+    "tagline": "Patient context that collapses to a safety bar, not a name.",
     "description": "Sticky chrome over PatientBanner. Collapse moves content behind a disclosure rather than out of the accessibility tree. The encounter is an explicit control that will sit in “none selected” rather than pick one for you. The Sex Parameter for Clinical Use appears only where an order or a result is in view, with the context it applies to.",
     "rationale": "The chart header is the most-read eighty pixels in healthcare software and it is almost always built as a heading. Three consequences follow. It scrolls away, so the clinician acts with no identity on screen. It shows Patient.gender, which is the wrong field for every clinical decision — the right one is the Sex Parameter for Clinical Use, which is context-specific and can legitimately differ between a medication order and a reference range. And it treats the encounter as a subtitle, when which encounter am I documenting into is the single most common cause of a misfiled note. A subtitle cannot be wrong on purpose; a control can say nothing is selected and mean it.",
     "categories": [
@@ -3032,7 +3040,7 @@ export const CATALOG: ComponentDoc[] = [
       {
         "name": "patient",
         "type": "Patient",
-        "description": "",
+        "description": "The patient this chart belongs to. `Patient.gender` is deliberately not rendered — it is administrative gender, and a bare “M” beside a dose is a prescriber reading the wrong reference range.",
         "required": true
       },
       {
@@ -3050,7 +3058,7 @@ export const CATALOG: ComponentDoc[] = [
       {
         "name": "className",
         "type": "string",
-        "description": "",
+        "description": "Applied to the header element.",
         "required": false
       },
       {
@@ -3076,7 +3084,7 @@ export const CATALOG: ComponentDoc[] = [
       {
         "name": "onCollapsedChange",
         "type": "((collapsed: boolean) => void)",
-        "description": "",
+        "description": "Fired when the header collapses to its safety strip or expands again. Content moves behind a disclosure rather than out of the DOM.",
         "required": false
       },
       {
@@ -3088,20 +3096,20 @@ export const CATALOG: ComponentDoc[] = [
       {
         "name": "program",
         "type": "Program",
-        "description": "",
+        "description": "The care programme and where the patient is in it, e.g. IOP week 3 of 8.",
         "required": false
       },
       {
         "name": "safety",
         "type": "SafetyInput",
-        "description": "",
+        "description": "The banner facts, in the fixed house order: allergies, code status, isolation, legal status. Same order on every chart in the building, because a reader scans position before words.",
         "required": false,
         "default": "{}"
       },
       {
         "name": "selectedEncounterId",
         "type": "string",
-        "description": "",
+        "description": "Which encounter is in view, controlled.",
         "required": false
       },
       {
@@ -3114,7 +3122,7 @@ export const CATALOG: ComponentDoc[] = [
       {
         "name": "ward",
         "type": "string",
-        "description": "",
+        "description": "Where the patient physically is. Shown because the answer changes who can act.",
         "required": false
       }
     ],
@@ -3131,7 +3139,7 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "patient",
             "type": "Patient",
-            "description": "",
+            "description": "The patient this chart belongs to. `Patient.gender` is deliberately not rendered — it is administrative gender, and a bare “M” beside a dose is a prescriber reading the wrong reference range.",
             "required": true
           },
           {
@@ -3149,7 +3157,7 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "className",
             "type": "string",
-            "description": "",
+            "description": "Applied to the header element.",
             "required": false
           },
           {
@@ -3175,7 +3183,7 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "onCollapsedChange",
             "type": "((collapsed: boolean) => void)",
-            "description": "",
+            "description": "Fired when the header collapses to its safety strip or expands again. Content moves behind a disclosure rather than out of the DOM.",
             "required": false
           },
           {
@@ -3187,20 +3195,20 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "program",
             "type": "Program",
-            "description": "",
+            "description": "The care programme and where the patient is in it, e.g. IOP week 3 of 8.",
             "required": false
           },
           {
             "name": "safety",
             "type": "SafetyInput",
-            "description": "",
+            "description": "The banner facts, in the fixed house order: allergies, code status, isolation, legal status. Same order on every chart in the building, because a reader scans position before words.",
             "required": false,
             "default": "{}"
           },
           {
             "name": "selectedEncounterId",
             "type": "string",
-            "description": "",
+            "description": "Which encounter is in view, controlled.",
             "required": false
           },
           {
@@ -3213,7 +3221,7 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "ward",
             "type": "string",
-            "description": "",
+            "description": "Where the patient physically is. Shown because the answer changes who can act.",
             "required": false
           }
         ]
@@ -3510,6 +3518,7 @@ export const CATALOG: ComponentDoc[] = [
     "layer": "clinical",
     "distribution": "registry",
     "summary": "A clinical note editor that records where every character came from, and refuses to let anyone sign what they have not read.",
+    "tagline": "A note editor that records provenance and gates the signature.",
     "description": "LOINC-coded sections, per-range provenance across six origins, a composable sign gate with three severities, and deterministic FHIR, XHTML and plain-text output. The engine ships as an npm package with no DOM; this item is the Tailwind skin over it.",
     "rationale": "A rich text editor is a solved problem and competes with a hundred free ones. The parts that are hard are knowing which passages were copied forward from a note about a different admission, proving a clinician actually read the text a model drafted before signing it, and producing bytes that hash the same way twice so a signature over them means something. A 2022 analysis of over 100 million notes found 50.1% of note text duplicated from prior documentation on the same patient; copy-and-paste has been implicated in roughly a third of errors in ambulatory patient-safety analyses; and CMS's July 2025 signature guidance treats an AI scribe exactly as it treats a human one, which makes the review gate the only thing standing between a clinician and words they never read. Note bloat, copy-paste error and AI attribution are one missing data structure seen three times. This component stores it.",
     "categories": [
@@ -3556,43 +3565,43 @@ export const CATALOG: ComponentDoc[] = [
       {
         "name": "author",
         "type": "NoteAuthor",
-        "description": "",
+        "description": "Who is signing, and in what capacity.",
         "required": true
       },
       {
         "name": "canSign",
         "type": "boolean",
-        "description": "",
+        "description": "Whether policy permits this author to sign at all. Separate from whether the findings currently allow it.",
         "required": true
       },
       {
         "name": "findings",
         "type": "readonly Finding[]",
-        "description": "",
+        "description": "What is standing between this note and a signature, each with a severity. Rendered in full rather than summarised: \"3 issues\" tells an author to hunt, and the point of the gate is that it already knows.",
         "required": true
       },
       {
         "name": "attestation",
         "type": "string",
-        "description": "",
+        "description": "The sentence being signed. Shown before the control, never after the decision.",
         "required": false
       },
       {
         "name": "onCancel",
         "type": "(() => void)",
-        "description": "",
+        "description": "Fired when the author backs out of signing. The draft is untouched.",
         "required": false
       },
       {
         "name": "onNavigate",
         "type": "((finding: Finding) => void)",
-        "description": "",
+        "description": "Fired when the author jumps to the passage a finding is about. Without it a finding names a problem and offers no way to reach it.",
         "required": false
       },
       {
         "name": "onSign",
         "type": "((acknowledged: string[]) => void)",
-        "description": "",
+        "description": "Fired with the ids of every finding the author acknowledged on the way through. Acknowledgement is part of the record, not a dismissal.",
         "required": false
       }
     ],
@@ -3603,43 +3612,43 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "author",
             "type": "NoteAuthor",
-            "description": "",
+            "description": "Who is signing, and in what capacity.",
             "required": true
           },
           {
             "name": "canSign",
             "type": "boolean",
-            "description": "",
+            "description": "Whether policy permits this author to sign at all. Separate from whether the findings currently allow it.",
             "required": true
           },
           {
             "name": "findings",
             "type": "readonly Finding[]",
-            "description": "",
+            "description": "What is standing between this note and a signature, each with a severity. Rendered in full rather than summarised: \"3 issues\" tells an author to hunt, and the point of the gate is that it already knows.",
             "required": true
           },
           {
             "name": "attestation",
             "type": "string",
-            "description": "",
+            "description": "The sentence being signed. Shown before the control, never after the decision.",
             "required": false
           },
           {
             "name": "onCancel",
             "type": "(() => void)",
-            "description": "",
+            "description": "Fired when the author backs out of signing. The draft is untouched.",
             "required": false
           },
           {
             "name": "onNavigate",
             "type": "((finding: Finding) => void)",
-            "description": "",
+            "description": "Fired when the author jumps to the passage a finding is about. Without it a finding names a problem and offers no way to reach it.",
             "required": false
           },
           {
             "name": "onSign",
             "type": "((acknowledged: string[]) => void)",
-            "description": "",
+            "description": "Fired with the ids of every finding the author acknowledged on the way through. Acknowledgement is part of the record, not a dismissal.",
             "required": false
           }
         ]
@@ -3650,32 +3659,32 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "doc",
             "type": "PMNode",
-            "description": "",
+            "description": "The signed document. Read-only by construction — this component has no editing path at all.",
             "required": true
           },
           {
             "name": "subject",
             "type": "NoteSubject",
-            "description": "",
+            "description": "Who the note is about. Rendered so a reader can check the chart before believing the note.",
             "required": true
           },
           {
             "name": "title",
             "type": "string",
-            "description": "",
+            "description": "The note's heading, and the article's accessible name.",
             "required": true
           },
           {
             "name": "addenda",
             "type": "readonly Addendum[]",
-            "description": "",
+            "description": "Addenda appended after signing. Never merged into the body: an addendum is a separate authored act, and folding it into the original text would rewrite what somebody signed.",
             "required": false,
             "default": "[]"
           },
           {
             "name": "attestations",
             "type": "readonly Attestation[]",
-            "description": "",
+            "description": "Signatures on the note, in order. A countersignature is another attestation rather than a second copy of the first, so each carries its own signer, capacity and time.",
             "required": false,
             "default": "[]"
           }
@@ -3687,7 +3696,7 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "author",
             "type": "NoteAuthor",
-            "description": "",
+            "description": "Who is writing. Distinct from `recordedBy` on the signature: the person composing and the person attesting are not always the same.",
             "required": true
           },
           {
@@ -3730,7 +3739,7 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "onChange",
             "type": "((doc: PMNode) => void)",
-            "description": "",
+            "description": "Fired as the note is edited, with the origin of the edit preserved.",
             "required": false
           },
           {
@@ -3858,6 +3867,7 @@ export const CATALOG: ComponentDoc[] = [
     "layer": "primitive",
     "distribution": "registry",
     "summary": "One closed status vocabulary: nine scales whose every step carries a hue, a CSS shape and a word, emitted together or not at all.",
+    "tagline": "Nine status scales. Hue, shape and word, or nothing.",
     "description": "A chip, a dot, or a grid affix — three presentations of one datum, drawn from nine fixed scales with no free-text status. Each step pairs a tone with a CSS-drawn glyph and a word in both a clinician and a patient register, so the state survives greyscale, Windows high-contrast and monochrome print.",
     "rationale": "Every healthcare product invents its own status colours, six times, in six teams, and the results disagree: amber means pending in the lab module and abnormal in the vitals module, so a clinician who learns one is actively misled by the other. The usual response is a nicer palette, which changes nothing, because the encoding is still colour plus a word in a colour-matched hue — and that collapses in forced-colors, in monochrome print, and for the roughly 8% of male clinicians with a red-green deficiency. The fix is a closed vocabulary. A step exists in it or it cannot be rendered at all, and every step carries three channels chosen together. The shape is not decoration and not an icon: it is a second channel carrying the same bit, drawn in currentColor from CSS geometry so it costs no network request and survives the theme being stripped entirely.",
     "categories": [
@@ -3926,7 +3936,7 @@ export const CATALOG: ComponentDoc[] = [
       {
         "name": "density",
         "type": "StatusDensity",
-        "description": "",
+        "description": "Row height and type scale. Inherited from the nearest density provider when omitted.",
         "required": false,
         "default": "\"default\""
       },
@@ -3977,7 +3987,7 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "density",
             "type": "StatusDensity",
-            "description": "",
+            "description": "Row height and type scale. Inherited from the nearest density provider when omitted.",
             "required": false,
             "default": "\"default\""
           },
@@ -4022,7 +4032,7 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "density",
             "type": "StatusDensity",
-            "description": "",
+            "description": "Row height and type scale. Inherited from the nearest density provider when omitted.",
             "required": false,
             "default": "\"default\""
           }
@@ -4387,6 +4397,7 @@ export const CATALOG: ComponentDoc[] = [
       }
     },
     "summary": "A floating clinical copilot: a dock above the chart that takes a question and opens into a sourced, auditable thread.",
+    "tagline": "A chart dock that answers with sources and an audit trail.",
     "description": "Model-agnostic clinical assistant with mode-level scope contracts, inline source attribution, a deterministic crisis interrupt, and FHIR audit output. The engine and the accessibility behaviour ship as npm packages; this item is the Tailwind skin over them.",
     "rationale": "The floating dock and the streaming text are two weeks of work and compete with a hundred free widgets. The parts that are hard are deciding what the model may see, proving where an answer came from, keeping chart text from being read as instructions, and knowing whether the thing makes clinicians better or worse. Those are what a digital-health team cannot build in a sprint, and they are what this component is. The design target is not a better answer — it is verification that costs less than acceptance, because automation bias is an effort asymmetry rather than a character flaw, and incorrect decision support has been measured making clinicians worse than no decision support at all.",
     "categories": [
@@ -4427,74 +4438,74 @@ export const CATALOG: ComponentDoc[] = [
       {
         "name": "modes",
         "type": "readonly CopilotMode[]",
-        "description": "",
+        "description": "The scope contracts. Each declares what it may read, what tools it may call, what it may output and what risk it carries — enforced in code rather than described in a prompt.",
         "required": true
       },
       {
         "name": "provider",
         "type": "CopilotProvider",
-        "description": "",
+        "description": "Where answers come from. Targets your endpoint, never a model vendor — there is no `apiKey` prop and no way to add one.",
         "required": true
       },
       {
         "name": "actor",
         "type": "Actor",
-        "description": "",
+        "description": "Who is asking, and in what role. Decides what `context` resolves and is stamped on every audit event.",
         "required": false
       },
       {
         "name": "anchor",
         "type": "'inline' | 'bottom-center' | 'bottom-right'",
-        "description": "",
+        "description": "Where the dock sits. `inline` renders it in flow for a surface that has its own layout.",
         "required": false,
         "default": "\"bottom-center\""
       },
       {
         "name": "announcementMode",
         "type": "AnnouncementMode",
-        "description": "",
+        "description": "How streamed answers reach assistive technology. Token-by-token is unreadable, so the default announces at sentence boundaries.",
         "required": false
       },
       {
         "name": "classifiers",
         "type": "SafetyClassifiers",
-        "description": "",
+        "description": "Safety checks run over the reader's question and the model's answer before either is shown. Crisis detection routes to `crisisLines` rather than to a model.",
         "required": false
       },
       {
         "name": "className",
         "type": "string",
-        "description": "",
+        "description": "Applied to the dock's outer element.",
         "required": false
       },
       {
         "name": "context",
         "type": "CopilotContextResolver",
-        "description": "",
+        "description": "Resolves what the copilot may see for this reader and this patient, returning a redacted view — so a mode cannot widen its own scope.",
         "required": false
       },
       {
         "name": "crisisLines",
         "type": "Readonly<Record<string, readonly CrisisLine[]>>",
-        "description": "",
+        "description": "Crisis resources by region. Rendered directly and never generated, because a hallucinated helpline number is the worst output this component could produce.",
         "required": false
       },
       {
         "name": "initialModeId",
         "type": "string",
-        "description": "",
+        "description": "Which mode opens first. Defaults to the first in `modes`.",
         "required": false
       },
       {
         "name": "locale",
         "type": "string",
-        "description": "",
+        "description": "BCP 47 tag for generated strings and crisis-line selection.",
         "required": false
       },
       {
         "name": "newId",
         "type": "(() => string)",
-        "description": "",
+        "description": "Injected for tests, so ids are deterministic in snapshots. Defaults to a real generator.",
         "required": false
       },
       {
@@ -4506,44 +4517,44 @@ export const CATALOG: ComponentDoc[] = [
       {
         "name": "onAudit",
         "type": "AuditSink",
-        "description": "",
+        "description": "Every question, answer, citation, refusal and escalation as a FHIR AuditEvent. This is the record that makes the feature defensible; without it the host has an unlogged clinical assistant.",
         "required": false
       },
       {
         "name": "onInsert",
         "type": "((text: string) => void)",
-        "description": "",
+        "description": "Called when the reader chooses to put an answer into the note they are writing. Receives text; the host owns where it lands and what provenance it carries.",
         "required": false
       },
       {
         "name": "onRiskProtocol",
         "type": "(() => void)",
-        "description": "",
+        "description": "Called when a safety classifier escalates. The host runs its own protocol — this component never decides what happens next in a crisis.",
         "required": false
       },
       {
         "name": "onTelemetry",
         "type": "TelemetrySink",
-        "description": "",
+        "description": "Latency, token counts and refusal reasons, for operating the thing. Deliberately separate from `onAudit`, which is the clinical record.",
         "required": false
       },
       {
         "name": "role",
         "type": "string",
-        "description": "",
+        "description": "ARIA role for the dock. Defaults to `complementary`, so the copilot is findable and skippable rather than an unnamed div.",
         "required": false
       },
       {
         "name": "shortcuts",
         "type": "readonly CopilotShortcut[]",
-        "description": "",
+        "description": "Prompts offered before the reader types. They are starting points, not commands — each still runs through its mode's contract.",
         "required": false,
         "default": "[]"
       },
       {
         "name": "subject",
         "type": "Reference",
-        "description": "",
+        "description": "The patient this session is about, as a FHIR reference. Stamped on every audit event; a question asked with no subject is not attributable to a chart.",
         "required": false
       },
       {
@@ -4567,74 +4578,74 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "modes",
             "type": "readonly CopilotMode[]",
-            "description": "",
+            "description": "The scope contracts. Each declares what it may read, what tools it may call, what it may output and what risk it carries — enforced in code rather than described in a prompt.",
             "required": true
           },
           {
             "name": "provider",
             "type": "CopilotProvider",
-            "description": "",
+            "description": "Where answers come from. Targets your endpoint, never a model vendor — there is no `apiKey` prop and no way to add one.",
             "required": true
           },
           {
             "name": "actor",
             "type": "Actor",
-            "description": "",
+            "description": "Who is asking, and in what role. Decides what `context` resolves and is stamped on every audit event.",
             "required": false
           },
           {
             "name": "anchor",
             "type": "'inline' | 'bottom-center' | 'bottom-right'",
-            "description": "",
+            "description": "Where the dock sits. `inline` renders it in flow for a surface that has its own layout.",
             "required": false,
             "default": "\"bottom-center\""
           },
           {
             "name": "announcementMode",
             "type": "AnnouncementMode",
-            "description": "",
+            "description": "How streamed answers reach assistive technology. Token-by-token is unreadable, so the default announces at sentence boundaries.",
             "required": false
           },
           {
             "name": "classifiers",
             "type": "SafetyClassifiers",
-            "description": "",
+            "description": "Safety checks run over the reader's question and the model's answer before either is shown. Crisis detection routes to `crisisLines` rather than to a model.",
             "required": false
           },
           {
             "name": "className",
             "type": "string",
-            "description": "",
+            "description": "Applied to the dock's outer element.",
             "required": false
           },
           {
             "name": "context",
             "type": "CopilotContextResolver",
-            "description": "",
+            "description": "Resolves what the copilot may see for this reader and this patient, returning a redacted view — so a mode cannot widen its own scope.",
             "required": false
           },
           {
             "name": "crisisLines",
             "type": "Readonly<Record<string, readonly CrisisLine[]>>",
-            "description": "",
+            "description": "Crisis resources by region. Rendered directly and never generated, because a hallucinated helpline number is the worst output this component could produce.",
             "required": false
           },
           {
             "name": "initialModeId",
             "type": "string",
-            "description": "",
+            "description": "Which mode opens first. Defaults to the first in `modes`.",
             "required": false
           },
           {
             "name": "locale",
             "type": "string",
-            "description": "",
+            "description": "BCP 47 tag for generated strings and crisis-line selection.",
             "required": false
           },
           {
             "name": "newId",
             "type": "(() => string)",
-            "description": "",
+            "description": "Injected for tests, so ids are deterministic in snapshots. Defaults to a real generator.",
             "required": false
           },
           {
@@ -4646,44 +4657,44 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "onAudit",
             "type": "AuditSink",
-            "description": "",
+            "description": "Every question, answer, citation, refusal and escalation as a FHIR AuditEvent. This is the record that makes the feature defensible; without it the host has an unlogged clinical assistant.",
             "required": false
           },
           {
             "name": "onInsert",
             "type": "((text: string) => void)",
-            "description": "",
+            "description": "Called when the reader chooses to put an answer into the note they are writing. Receives text; the host owns where it lands and what provenance it carries.",
             "required": false
           },
           {
             "name": "onRiskProtocol",
             "type": "(() => void)",
-            "description": "",
+            "description": "Called when a safety classifier escalates. The host runs its own protocol — this component never decides what happens next in a crisis.",
             "required": false
           },
           {
             "name": "onTelemetry",
             "type": "TelemetrySink",
-            "description": "",
+            "description": "Latency, token counts and refusal reasons, for operating the thing. Deliberately separate from `onAudit`, which is the clinical record.",
             "required": false
           },
           {
             "name": "role",
             "type": "string",
-            "description": "",
+            "description": "ARIA role for the dock. Defaults to `complementary`, so the copilot is findable and skippable rather than an unnamed div.",
             "required": false
           },
           {
             "name": "shortcuts",
             "type": "readonly CopilotShortcut[]",
-            "description": "",
+            "description": "Prompts offered before the reader types. They are starting points, not commands — each still runs through its mode's contract.",
             "required": false,
             "default": "[]"
           },
           {
             "name": "subject",
             "type": "Reference",
-            "description": "",
+            "description": "The patient this session is about, as a FHIR reference. Stamped on every audit event; a question asked with no subject is not attributable to a chart.",
             "required": false
           },
           {
@@ -4707,13 +4718,13 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "text",
             "type": "string",
-            "description": "",
+            "description": "The source passage, verbatim. Never re-flowed or truncated — a citation the reader cannot check against the original is not a citation.",
             "required": true
           },
           {
             "name": "at",
             "type": "readonly [number, number]",
-            "description": "",
+            "description": "Character offsets of the span the answer drew on, as `[start, end]`. Out-of-range offsets highlight nothing rather than throwing: a citation that points past the end of its own source is a bug in the caller, and silently marking the wrong sentence would be worse than marking none.",
             "required": false
           }
         ]
@@ -4786,6 +4797,7 @@ export const CATALOG: ComponentDoc[] = [
     "layer": "clinical",
     "distribution": "registry",
     "summary": "One temporal control with fourteen variants: field, calendar, birth date, session, slots, recurrence and the read-only record.",
+    "tagline": "One temporal control, fourteen variants, one value space.",
     "description": "Fourteen presentations of one value space, one keyboard model and one accessibility contract. `variant` picks the surface; the parts are separately testable components underneath.",
     "rationale": "A clinician does not shop for a \"birth date field\". They reach for the date control, and it has to behave differently in fourteen places: a service date they already know, an appointment they have to be shown, a birth date that wants an age beside it, a session that is three numbers with two degrees of freedom, a course of treatment that is a rule rather than a date, and a signed timestamp that is a legal instrument. Splitting those into fourteen catalogue entries hides the thing that makes them a system — that every one shares a value space, a keyboard model and an accessibility contract — and it makes a reader choose between components before they have understood the choice. The deeper reason is that healthcare temporal input is four distinct jobs, not one: recall (the user knows the value), choose (the system knows the options), construct (the value is a structure with derived members) and witness (the value is an assertion about the past). Every general-purpose picker builds only for choose, which is the rarest of the four in an electronic record, and that inversion is why EHR date fields are the way they are.",
     "categories": [
@@ -4841,19 +4853,19 @@ export const CATALOG: ComponentDoc[] = [
       {
         "name": "defaultValue",
         "type": "string | number | BirthDateValue | OxTime | SessionInterval | RecurrenceRule | readonly string[]",
-        "description": "Uncontrolled initial value. Pass this **or** `value`, never both. There is deliberately no runtime warning: ADR 0009 forbids component source writing to the console at all, because a component that logs is one error-reporting integration away from putting a date of birth in a third party's index. When both are passed, `value` wins — the ordinary React contract.",
+        "description": "Uncontrolled initial value. Pass this **or** `value`, never both. There is deliberately no runtime warning: ADR 0009 forbids component source writing to the console at all, because a component that logs is one error-reporting integration away from putting a date of birth in a third party's index. When both are passed, `value` wins — the ordinary React contract. Uncontrolled initial value. Pass this or `value`, never both; `value` wins if you pass both.",
         "required": false
       },
       {
         "name": "onChange",
         "type": "((value: OxDate | null) => void) | ((value: OxDate | null) => void) | ((value: BirthDateValue) => void) | ((value: OxTime | null) => void) | ((value: SessionInterval) => void) | React.ChangeEventHandler<HTMLDivElement, Element> | ((rule: RecurrenceRule) => void) | React.ChangeEventHandler<HTMLElement, Element>",
-        "description": "",
+        "description": "Fired on every complete, valid date, and with `null` when the field is cleared. Never fired mid-typing. Fired when a single date is chosen. Only meaningful in `mode=\"single\"`. Fired with the whole birth-date value, which carries its precision and any absence reason alongside the date. Fired on every complete time, and with `null` when cleared. Fired whenever start, end or duration changes. The interval is always internally consistent when it fires. Fired with the recurrence rule whenever any part of it changes.",
         "required": false
       },
       {
         "name": "variant",
         "type": "'picker' | 'field' | 'calendar' | 'range' | 'multiple' | 'birth-date' | 'time' | 'session' | 'slots' | 'scheduler' | 'recurrence' | 'series' | 'group' | 'readout'",
-        "description": "",
+        "description": "Which of the fourteen temporal controls to render. Defaults to the date field. A month grid. `range` is two clicks, `multiple` is a capped set. A date of birth, with its own precision and absence handling. A time of day, with optional organisation presets. A start, an end and a derived duration that may cross midnight. A grid of bookable times. Provider, date and slot, resolved together. A recurrence rule, expressed in words and emitted as RRULE. A recurring series with its conflicts resolved one occurrence at a time. A recurring group with capacity, facilitators and a room. The read-only record rendering. Not an input.",
         "required": false
       }
     ],
@@ -4864,19 +4876,19 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "defaultValue",
             "type": "string | number | BirthDateValue | OxTime | SessionInterval | RecurrenceRule | readonly string[]",
-            "description": "Uncontrolled initial value. Pass this **or** `value`, never both. There is deliberately no runtime warning: ADR 0009 forbids component source writing to the console at all, because a component that logs is one error-reporting integration away from putting a date of birth in a third party's index. When both are passed, `value` wins — the ordinary React contract.",
+            "description": "Uncontrolled initial value. Pass this **or** `value`, never both. There is deliberately no runtime warning: ADR 0009 forbids component source writing to the console at all, because a component that logs is one error-reporting integration away from putting a date of birth in a third party's index. When both are passed, `value` wins — the ordinary React contract. Uncontrolled initial value. Pass this or `value`, never both; `value` wins if you pass both.",
             "required": false
           },
           {
             "name": "onChange",
             "type": "((value: OxDate | null) => void) | ((value: OxDate | null) => void) | ((value: BirthDateValue) => void) | ((value: OxTime | null) => void) | ((value: SessionInterval) => void) | React.ChangeEventHandler<HTMLDivElement, Element> | ((rule: RecurrenceRule) => void) | React.ChangeEventHandler<HTMLElement, Element>",
-            "description": "",
+            "description": "Fired on every complete, valid date, and with `null` when the field is cleared. Never fired mid-typing. Fired when a single date is chosen. Only meaningful in `mode=\"single\"`. Fired with the whole birth-date value, which carries its precision and any absence reason alongside the date. Fired on every complete time, and with `null` when cleared. Fired whenever start, end or duration changes. The interval is always internally consistent when it fires. Fired with the recurrence rule whenever any part of it changes.",
             "required": false
           },
           {
             "name": "variant",
             "type": "'picker' | 'field' | 'calendar' | 'range' | 'multiple' | 'birth-date' | 'time' | 'session' | 'slots' | 'scheduler' | 'recurrence' | 'series' | 'group' | 'readout'",
-            "description": "",
+            "description": "Which of the fourteen temporal controls to render. Defaults to the date field. A month grid. `range` is two clicks, `multiple` is a capped set. A date of birth, with its own precision and absence handling. A time of day, with optional organisation presets. A start, an end and a derived duration that may cross midnight. A grid of bookable times. Provider, date and slot, resolved together. A recurrence rule, expressed in words and emitted as RRULE. A recurring series with its conflicts resolved one occurrence at a time. A recurring group with capacity, facilitators and a room. The read-only record rendering. Not an input.",
             "required": false
           }
         ]
@@ -4899,7 +4911,7 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "disabled",
             "type": "boolean",
-            "description": "",
+            "description": "Removes the field from the tab order entirely. Prefer `readOnly` for anything the reader may still need to read.",
             "required": false
           },
           {
@@ -4911,7 +4923,7 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "futurePolicy",
             "type": "TemporalPolicy",
-            "description": "",
+            "description": "What a future date means here — allowed, warned about, or refused. A date of birth and an appointment want opposite answers.",
             "required": false
           },
           {
@@ -4923,13 +4935,13 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "invalid",
             "type": "boolean",
-            "description": "",
+            "description": "Renders the invalid styling and sets `aria-invalid`. Pair with `error` so the reason is stated, not merely coloured.",
             "required": false
           },
           {
             "name": "label",
             "type": "string",
-            "description": "",
+            "description": "The field's visible label, and its accessible name.",
             "required": false
           },
           {
@@ -4941,19 +4953,19 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "max",
             "type": "OxDate",
-            "description": "",
+            "description": "Latest selectable date, inclusive.",
             "required": false
           },
           {
             "name": "min",
             "type": "OxDate",
-            "description": "",
+            "description": "Earliest selectable date, inclusive. Dates before it are refused with a spoken reason rather than silently ignored.",
             "required": false
           },
           {
             "name": "name",
             "type": "string",
-            "description": "",
+            "description": "Form field name, for an uncontrolled submit.",
             "required": false
           },
           {
@@ -4965,7 +4977,7 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "onChange",
             "type": "((value: OxDate | null) => void)",
-            "description": "",
+            "description": "Fired on every complete, valid date, and with `null` when the field is cleared. Never fired mid-typing.",
             "required": false
           },
           {
@@ -4983,19 +4995,19 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "pastPolicy",
             "type": "TemporalPolicy",
-            "description": "",
+            "description": "What a past date means here. The mirror of `futurePolicy`, and just as rarely the same.",
             "required": false
           },
           {
             "name": "readOnly",
             "type": "boolean",
-            "description": "",
+            "description": "Readable and focusable but not editable — the right prop for a value governed by policy or record state.",
             "required": false
           },
           {
             "name": "required",
             "type": "boolean",
-            "description": "",
+            "description": "Marks the field required and announces it. Does not itself validate.",
             "required": false
           },
           {
@@ -5042,19 +5054,19 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "dates",
             "type": "OxDate[]",
-            "description": "",
+            "description": "The selected dates, controlled. Only meaningful in `mode=\"multiple\"`.",
             "required": false
           },
           {
             "name": "defaultMonth",
             "type": "MonthRef",
-            "description": "",
+            "description": "The month shown on first render, uncontrolled. Defaults to the month of the value, or of `now`.",
             "required": false
           },
           {
             "name": "defaultValue",
             "type": "OxDate | null",
-            "description": "",
+            "description": "Uncontrolled initial value. Pass this or `value`, never both; `value` wins if you pass both.",
             "required": false
           },
           {
@@ -5078,7 +5090,7 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "max",
             "type": "OxDate",
-            "description": "",
+            "description": "Latest selectable date, inclusive.",
             "required": false
           },
           {
@@ -5090,7 +5102,7 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "min",
             "type": "OxDate",
-            "description": "",
+            "description": "Earliest selectable date, inclusive.",
             "required": false
           },
           {
@@ -5108,13 +5120,13 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "monthLabel",
             "type": "((month: MonthRef) => string)",
-            "description": "",
+            "description": "Overrides the rendered month heading, for a host that formats it differently from the default.",
             "required": false
           },
           {
             "name": "monthNames",
             "type": "readonly string[]",
-            "description": "",
+            "description": "Full month names, for the header and for each cell's accessible name.",
             "required": false
           },
           {
@@ -5126,31 +5138,31 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "onChange",
             "type": "((value: OxDate | null) => void)",
-            "description": "",
+            "description": "Fired when a single date is chosen. Only meaningful in `mode=\"single\"`.",
             "required": false
           },
           {
             "name": "onDatesChange",
             "type": "((dates: OxDate[]) => void)",
-            "description": "",
+            "description": "Fired whenever the multiple-selection set changes.",
             "required": false
           },
           {
             "name": "onMonthChange",
             "type": "((month: MonthRef) => void)",
-            "description": "",
+            "description": "Fired when the reader pages the grid. Use it to fetch availability for the month coming into view.",
             "required": false
           },
           {
             "name": "onRangeChange",
             "type": "((range: DateRangeValue) => void)",
-            "description": "",
+            "description": "Fired when a range completes — on the second click, not the first.",
             "required": false
           },
           {
             "name": "range",
             "type": "DateRangeValue | null",
-            "description": "",
+            "description": "The selected range, controlled. Only meaningful in `mode=\"range\"`.",
             "required": false
           },
           {
@@ -5162,19 +5174,19 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "value",
             "type": "OxDate | null",
-            "description": "",
+            "description": "Controlled value. Pass `null` for empty, never `undefined`.",
             "required": false
           },
           {
             "name": "weekdayLabels",
             "type": "readonly string[]",
-            "description": "",
+            "description": "The two-letter column headings. Visual only — each cell still carries its full weekday name for a screen reader.",
             "required": false
           },
           {
             "name": "weekdayNames",
             "type": "readonly string[]",
-            "description": "",
+            "description": "Full weekday names, used in each cell's accessible name. Supply both these and `weekdayLabels` for any language that is not English.",
             "required": false
           },
           {
@@ -5191,25 +5203,25 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "defaultValue",
             "type": "OxTime | null",
-            "description": "",
+            "description": "Uncontrolled initial value. Pass this or `value`, never both; `value` wins if you pass both.",
             "required": false
           },
           {
             "name": "disabled",
             "type": "boolean",
-            "description": "",
+            "description": "Removes the field from the tab order entirely. Prefer `readOnly` for anything the reader may still need to read.",
             "required": false
           },
           {
             "name": "error",
             "type": "React.ReactNode",
-            "description": "",
+            "description": "The validation message. Announced, and it replaces the hint rather than stacking under it.",
             "required": false
           },
           {
             "name": "hint",
             "type": "React.ReactNode",
-            "description": "",
+            "description": "Guidance under the field, associated with it so assistive technology reads it as part of the field.",
             "required": false
           },
           {
@@ -5221,49 +5233,49 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "invalid",
             "type": "boolean",
-            "description": "",
+            "description": "Renders the invalid styling and sets `aria-invalid`. Pair with `error` so the reason is stated, not merely coloured.",
             "required": false
           },
           {
             "name": "label",
             "type": "string",
-            "description": "",
+            "description": "The field's visible label, and its accessible name.",
             "required": false
           },
           {
             "name": "max",
             "type": "OxTime",
-            "description": "",
+            "description": "Latest selectable time, inclusive.",
             "required": false
           },
           {
             "name": "min",
             "type": "OxTime",
-            "description": "",
+            "description": "Earliest selectable time, inclusive.",
             "required": false
           },
           {
             "name": "name",
             "type": "string",
-            "description": "",
+            "description": "Form field name, for an uncontrolled submit.",
             "required": false
           },
           {
             "name": "onChange",
             "type": "((value: OxTime | null) => void)",
-            "description": "",
+            "description": "Fired on every complete time, and with `null` when cleared.",
             "required": false
           },
           {
             "name": "optional",
             "type": "boolean",
-            "description": "",
+            "description": "Marks the field explicitly optional. Use where most fields on the form are required and the exception needs saying.",
             "required": false
           },
           {
             "name": "presetLabel",
             "type": "string",
-            "description": "",
+            "description": "The heading above the preset chips. Name them for what they are — “Clinic slots”, not “Presets”.",
             "required": false
           },
           {
@@ -5275,13 +5287,13 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "readOnly",
             "type": "boolean",
-            "description": "",
+            "description": "Readable and focusable but not editable — the right prop for a value governed by policy or record state.",
             "required": false
           },
           {
             "name": "required",
             "type": "boolean",
-            "description": "",
+            "description": "Marks the field required and announces it. Does not itself validate.",
             "required": false
           },
           {
@@ -5293,7 +5305,7 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "value",
             "type": "OxTime | null",
-            "description": "",
+            "description": "Controlled value. Pass `null` for empty, never `undefined`.",
             "required": false
           }
         ]
@@ -5316,19 +5328,19 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "defaultValue",
             "type": "SessionInterval | null",
-            "description": "",
+            "description": "Uncontrolled initial value. Pass this or `value`, never both; `value` wins if you pass both.",
             "required": false
           },
           {
             "name": "disabled",
             "type": "boolean",
-            "description": "",
+            "description": "Removes the field from the tab order entirely. Prefer `readOnly` for anything the reader may still need to read.",
             "required": false
           },
           {
             "name": "durationLabel",
             "type": "string",
-            "description": "",
+            "description": "Label for the derived duration. Derived and editable — typing a duration moves the end, not the start.",
             "required": false
           },
           {
@@ -5340,25 +5352,25 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "endLabel",
             "type": "string",
-            "description": "",
+            "description": "Label for the end segment.",
             "required": false
           },
           {
             "name": "error",
             "type": "React.ReactNode",
-            "description": "",
+            "description": "The validation message. Announced, and it replaces the hint rather than stacking under it.",
             "required": false
           },
           {
             "name": "hour24",
             "type": "boolean",
-            "description": "",
+            "description": "24-hour display. The stored interval is 24-hour either way.",
             "required": false
           },
           {
             "name": "label",
             "type": "string",
-            "description": "",
+            "description": "The field's visible label, and its accessible name.",
             "required": false
           },
           {
@@ -5370,19 +5382,19 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "nextDateLabel",
             "type": "string",
-            "description": "",
+            "description": "How a session crossing midnight is labelled — “next day” by default. The crossing is a value, not a warning.",
             "required": false
           },
           {
             "name": "onChange",
             "type": "((value: SessionInterval) => void)",
-            "description": "",
+            "description": "Fired whenever start, end or duration changes. The interval is always internally consistent when it fires.",
             "required": false
           },
           {
             "name": "readOnly",
             "type": "boolean",
-            "description": "",
+            "description": "Readable and focusable but not editable — the right prop for a value governed by policy or record state.",
             "required": false
           },
           {
@@ -5394,13 +5406,13 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "startLabel",
             "type": "string",
-            "description": "",
+            "description": "Label for the start segment.",
             "required": false
           },
           {
             "name": "value",
             "type": "SessionInterval | null",
-            "description": "",
+            "description": "Controlled value. Pass `null` for empty, never `undefined`.",
             "required": false
           }
         ]
@@ -5417,7 +5429,7 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "absentReason",
             "type": "TemporalAbsence",
-            "description": "",
+            "description": "Why no date is recorded. A date of birth that is missing and one that was refused are different facts about the record.",
             "required": false
           },
           {
@@ -5435,19 +5447,19 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "defaultValue",
             "type": "BirthDateValue",
-            "description": "",
+            "description": "Uncontrolled initial value. Pass this or `value`, never both; `value` wins if you pass both.",
             "required": false
           },
           {
             "name": "disabled",
             "type": "boolean",
-            "description": "",
+            "description": "Removes the field from the tab order entirely. Prefer `readOnly` for anything the reader may still need to read.",
             "required": false
           },
           {
             "name": "error",
             "type": "React.ReactNode",
-            "description": "",
+            "description": "The validation message. Announced, and it replaces the hint rather than stacking under it.",
             "required": false
           },
           {
@@ -5459,55 +5471,55 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "hint",
             "type": "React.ReactNode",
-            "description": "",
+            "description": "Guidance under the field, associated with it so assistive technology reads it as part of the field.",
             "required": false
           },
           {
             "name": "label",
             "type": "string",
-            "description": "",
+            "description": "The field's visible label, and its accessible name.",
             "required": false
           },
           {
             "name": "name",
             "type": "string",
-            "description": "",
+            "description": "Form field name, for an uncontrolled submit.",
             "required": false
           },
           {
             "name": "onChange",
             "type": "((value: BirthDateValue) => void)",
-            "description": "",
+            "description": "Fired with the whole birth-date value, which carries its precision and any absence reason alongside the date.",
             "required": false
           },
           {
             "name": "onPrecisionChange",
             "type": "((precision: BirthDatePrecision) => void)",
-            "description": "",
+            "description": "Fired when the reader downgrades precision, e.g. choosing “Exact date unknown”.",
             "required": false
           },
           {
             "name": "order",
             "type": "DateOrder",
-            "description": "",
+            "description": "Segment order — from the locale, never guessed. A US and a UK intake form disagree, and getting it wrong silently swaps day and month.",
             "required": false
           },
           {
             "name": "precision",
             "type": "BirthDatePrecision",
-            "description": "",
+            "description": "How exactly the date is known — full, month, or year. Controlled; pair with `onPrecisionChange`.",
             "required": false
           },
           {
             "name": "readOnly",
             "type": "boolean",
-            "description": "",
+            "description": "Readable and focusable but not editable — the right prop for a value governed by policy or record state.",
             "required": false
           },
           {
             "name": "required",
             "type": "boolean",
-            "description": "",
+            "description": "Marks the field required and announces it. Does not itself validate.",
             "required": false
           },
           {
@@ -5519,13 +5531,13 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "twoDigitYearPivot",
             "type": "number",
-            "description": "",
+            "description": "The year two-digit input pivots on. Below it reads as 20xx, at or above as 19xx.",
             "required": false
           },
           {
             "name": "value",
             "type": "BirthDateValue",
-            "description": "",
+            "description": "Controlled value. Pass `null` for empty, never `undefined`.",
             "required": false
           }
         ]
@@ -5548,7 +5560,7 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "hour24",
             "type": "boolean",
-            "description": "",
+            "description": "24-hour display. The recorded value is 24-hour either way.",
             "required": false
           },
           {
@@ -5595,7 +5607,7 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "disabled",
             "type": "boolean",
-            "description": "",
+            "description": "Disables the whole grid. Individual slot availability comes from the slot data, not from here.",
             "required": false
           },
           {
@@ -5607,7 +5619,7 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "hour24",
             "type": "boolean",
-            "description": "",
+            "description": "24-hour display.",
             "required": false
           },
           {
@@ -5631,7 +5643,7 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "onSelect",
             "type": "((slot: Slot) => void)",
-            "description": "",
+            "description": "Fired with the chosen slot. A slot that is taken is rendered and disabled rather than removed, so the grid does not reflow under the reader's cursor.",
             "required": false
           },
           {
@@ -5666,25 +5678,25 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "defaultValue",
             "type": "RecurrenceRule",
-            "description": "",
+            "description": "Uncontrolled initial value. Pass this or `value`, never both; `value` wins if you pass both.",
             "required": false
           },
           {
             "name": "disabled",
             "type": "boolean",
-            "description": "",
+            "description": "Removes the field from the tab order entirely. Prefer `readOnly` for anything the reader may still need to read.",
             "required": false
           },
           {
             "name": "label",
             "type": "string",
-            "description": "",
+            "description": "The field's visible label, and its accessible name.",
             "required": false
           },
           {
             "name": "onChange",
             "type": "((rule: RecurrenceRule) => void)",
-            "description": "",
+            "description": "Fired with the recurrence rule whenever any part of it changes.",
             "required": false
           },
           {
@@ -5702,7 +5714,7 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "showRRule",
             "type": "boolean",
-            "description": "",
+            "description": "Shows the generated RFC 5545 RRULE. For an integrator checking what the control produces, not for a clinician.",
             "required": false
           },
           {
@@ -5720,7 +5732,7 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "value",
             "type": "RecurrenceRule",
-            "description": "",
+            "description": "Controlled value. Pass `null` for empty, never `undefined`.",
             "required": false
           }
         ]
@@ -5731,7 +5743,7 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "availability",
             "type": "AvailabilitySet",
-            "description": "",
+            "description": "Bookable slots for the current provider and date. Absence of a slot is not the same as a slot that is taken, and the grid draws both.",
             "required": true
           },
           {
@@ -5743,7 +5755,7 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "providers",
             "type": "readonly SchedulableActor[]",
-            "description": "",
+            "description": "The people who can be booked. Each carries its own availability; the grid is the intersection of provider, date and duration.",
             "required": true
           },
           {
@@ -5755,7 +5767,7 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "buffers",
             "type": "Buffers",
-            "description": "",
+            "description": "Time held before and after each appointment. Rendered, so the reader can see why an apparently free slot is not offered.",
             "required": false
           },
           {
@@ -5773,7 +5785,7 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "durationMinutes",
             "type": "number",
-            "description": "",
+            "description": "How long the appointment being booked is. Changes which slots can accommodate it.",
             "required": false
           },
           {
@@ -5791,19 +5803,19 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "label",
             "type": "string",
-            "description": "",
+            "description": "The field's visible label, and its accessible name.",
             "required": false
           },
           {
             "name": "onActorChange",
             "type": "((actorId: string) => void)",
-            "description": "",
+            "description": "Fired when the reader switches provider, so the host can fetch that provider's availability.",
             "required": false
           },
           {
             "name": "onDateChange",
             "type": "((date: OxDate) => void)",
-            "description": "",
+            "description": "Fired when the reader moves to another day.",
             "required": false
           },
           {
@@ -5827,7 +5839,7 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "onSelect",
             "type": "((choice: { actor: SchedulableActor; date: OxDate; slot: Slot; }) => void)",
-            "description": "",
+            "description": "Fired with the chosen slot. Booking itself is the host's, because it needs a write the component cannot make.",
             "required": false
           },
           {
@@ -5856,7 +5868,7 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "rule",
             "type": "RecurrenceRule",
-            "description": "",
+            "description": "The recurrence rule the series expands from.",
             "required": true
           },
           {
@@ -5868,19 +5880,19 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "disabled",
             "type": "boolean",
-            "description": "",
+            "description": "Removes the field from the tab order entirely. Prefer `readOnly` for anything the reader may still need to read.",
             "required": false
           },
           {
             "name": "label",
             "type": "string",
-            "description": "",
+            "description": "The field's visible label, and its accessible name.",
             "required": false
           },
           {
             "name": "onBook",
             "type": "((dates: OxDate[]) => void)",
-            "description": "",
+            "description": "Fired with the whole resolved series. Nothing is booked until every conflict is resolved or explicitly kept.",
             "required": false
           },
           {
@@ -5892,7 +5904,7 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "onResolve",
             "type": "((isoDate: string, to: OxDate) => void)",
-            "description": "",
+            "description": "Fired when the reader moves or drops one occurrence that conflicts. The series is edited per occurrence, never regenerated.",
             "required": false
           },
           {
@@ -5904,7 +5916,7 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "onUnresolve",
             "type": "((isoDate: string) => void)",
-            "description": "",
+            "description": "Fired when the reader undoes a resolution and restores the original occurrence.",
             "required": false
           },
           {
@@ -5957,13 +5969,13 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "capacity",
             "type": "number",
-            "description": "",
+            "description": "How many places the group has. Shown against enrolment, because a group at capacity is a scheduling fact and not an error.",
             "required": false
           },
           {
             "name": "enrolled",
             "type": "number",
-            "description": "",
+            "description": "Who is already enrolled. Counted against `capacity` and listed, so the reader can see who they are adding to.",
             "required": false
           },
           {
@@ -5975,7 +5987,7 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "facilitators",
             "type": "readonly string[]",
-            "description": "",
+            "description": "Who runs the group. Their availability constrains the series in the same way a provider's does.",
             "required": false
           },
           {
@@ -5993,13 +6005,13 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "room",
             "type": "{ name: string; capacity?: number; }",
-            "description": "",
+            "description": "Where it meets. A room is a resource with its own availability, and double-booking one is the most common group-scheduling failure.",
             "required": false
           },
           {
             "name": "sessionMinutes",
             "type": "number",
-            "description": "",
+            "description": "How long each session runs.",
             "required": false
           },
           {
@@ -6411,6 +6423,7 @@ export const CATALOG: ComponentDoc[] = [
     "layer": "primitive",
     "distribution": "registry",
     "summary": "Two strands of dots turning on a slow sine. For the parts of a product that are laboratory rather than bedside.",
+    "tagline": "Two strands on a slow sine. For the laboratory.",
     "description": "Loader for genomics, pathology, and diagnostics surfaces. Depth comes from scale and opacity rather than a 3D transform, so the strands cross convincingly while staying cheap to composite.",
     "rationale": "The most specific loader in the set, and deliberately so. Sequencing, pathology, and diagnostics screens are waiting on analysis rather than on a person, and a cardiac mark says the wrong thing there — as does a generic ring, which says nothing at all. Depth is faked with scale and opacity rather than a 3D transform because a rotateY helix renders differently across browsers and costs a layer per dot; eighteen phase-offset dots on one keyframe read as a rotation and cost nothing.",
     "categories": [
@@ -6693,6 +6706,7 @@ export const CATALOG: ComponentDoc[] = [
     "layer": "primitive",
     "distribution": "registry",
     "summary": "A capsule with a soft slug — the only loader in the set that can tell the truth about how much is left.",
+    "tagline": "The only loader here that can honestly show progress.",
     "description": "Determinate and indeterminate progress in one component. Pass progress for a real 0–100 measurement with role=progressbar; omit it and the slug drifts as an honest unknown.",
     "rationale": "Named for the one device in a hospital that displays a percentage and means it. The two modes are deliberately different animations rather than one animation with a value bolted on: a determinate bar that also drifts tells a reader a measurement is moving when it is not, and on an import, a batch upload, or a records transfer, movement is exactly the fact being watched. It is the only loader here that should ever carry a number, and only when the application genuinely knows it — a fabricated percentage parked at ninety is worse than a loader that never claimed to know.",
     "categories": [
@@ -6975,6 +6989,7 @@ export const CATALOG: ComponentDoc[] = [
     "layer": "clinical",
     "distribution": "registry",
     "summary": "Where a value came from, how it got here, and how much of it a human has actually looked at.",
+    "tagline": "Where a value came from, and who has actually read it.",
     "description": "A 20px affix beside a value, never competing with it. Six source classes with CSS glyphs rather than colours, staleness folded in against a per-datum policy, and — for an AI-extracted value — the model, the source span and whether anybody has confirmed it.",
     "rationale": "A blood pressure typed by a medical assistant, streamed from a home cuff, pulled from an HIE document of unknown vintage, and extracted by a language model from a scanned fax all render as 128/76. They are not the same fact and they do not support the same decision. As ambient AI and external exchange both scale, the proportion of chart content that no human ever typed is rising fast, and there is no widely used convention for saying so. Two distinctions carry the component. Observed-at is kept separate from recorded-at, because a C-CDA authored in March may carry a reading measured in January and rendering the document's date as the observation's is how a nine-week-old value is acted on as current. And patient-reported is a source class rather than a caveat: self-report is the primary instrument in behavioral health, so a patient-reported PHQ-9 is the correct provenance and rendering it as second-class is its own error — the same class standing in for a blood-pressure measurement is a different matter, and that judgement belongs to the caller.",
     "categories": [
@@ -7046,7 +7061,7 @@ export const CATALOG: ComponentDoc[] = [
       {
         "name": "resourceId",
         "type": "string",
-        "description": "",
+        "description": "The resource this provenance is about. Used to link back to the record rather than to re-fetch it.",
         "required": false
       },
       {
@@ -7058,7 +7073,7 @@ export const CATALOG: ComponentDoc[] = [
       {
         "name": "versionId",
         "type": "string",
-        "description": "",
+        "description": "Which version was seen. Provenance for a value that has since changed is provenance for a different value.",
         "required": false
       }
     ],
@@ -7107,7 +7122,7 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "resourceId",
             "type": "string",
-            "description": "",
+            "description": "The resource this provenance is about. Used to link back to the record rather than to re-fetch it.",
             "required": false
           },
           {
@@ -7119,7 +7134,7 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "versionId",
             "type": "string",
-            "description": "",
+            "description": "Which version was seen. Provenance for a value that has since changed is provenance for a different value.",
             "required": false
           }
         ],
@@ -7404,6 +7419,7 @@ export const CATALOG: ComponentDoc[] = [
     "layer": "primitive",
     "distribution": "registry",
     "summary": "An open heart with a rhythm line running through it, beating at a resting sixty. The library's signature wait.",
+    "tagline": "An open heart at a resting sixty. The signature wait.",
     "description": "Page and region loader: an open heart that draws itself once, then beats at a resting 60bpm while a monitor sweep crosses the rhythm line. Renders as Rhythm Loader below 40px, where the heart's detail would collapse.",
     "rationale": "A page loader is the first thing a clinician or a patient sees, it plays while the system is at its most fragile, and it is judged in the first three hundred milliseconds. This one is built from measured cardiac timing rather than from a spinner's tempo: sixty beats a minute is a resting sinus rhythm, the beat scales by seven percent so it is noticed peripherally and never tracked, and the heart draws in once rather than once per loop so the animation has no seam. Every colour is a semantic token and the whole thing is SVG and CSS, which means it renders before any JavaScript bundle has loaded — the one requirement a page loader has that a component loader does not.",
     "categories": [
@@ -7828,6 +7844,7 @@ export const CATALOG: ComponentDoc[] = [
     "layer": "clinical",
     "distribution": "registry",
     "summary": "A multi-chart workspace that makes the active patient unmistakable, because the alternative is eleven identical browser tabs.",
+    "tagline": "A multi-chart workspace where the active patient is unmistakable.",
     "description": "Each open chart gets a hue derived from its id, so it is the same colour in every session. Two charts whose names look alike both grow an identifier. Per-chart badges carry the unfinished work, closing is graded rather than binary, and returning after fifteen minutes away re-asserts who the chart belongs to.",
     "rationale": "Clinicians work several charts at once and the tooling pretends they do not. The state of the art is a dropdown of names, or worse, eleven browser tabs whose titles truncate to \"Chart — Riverside…\". Wrong-patient documentation survives every amount of staff training because it is not a training problem: it is two charts that look identical, one keyboard shortcut, and an interruption. A stack does three things a dropdown cannot — it makes the set visible without being opened, it gives each chart a persistent visual identity, and it carries per-chart state. The identity has to be derived from the chart rather than handed out in arrival order, or a clinician who has learned \"Okonkwo is the green one\" has learned something that will be false tomorrow.",
     "categories": [
@@ -7868,13 +7885,13 @@ export const CATALOG: ComponentDoc[] = [
       {
         "name": "charts",
         "type": "readonly OpenChart[]",
-        "description": "",
+        "description": "The open charts, most recent first. Each carries enough to tell two patients apart, which eleven identical browser tabs do not.",
         "required": true
       },
       {
         "name": "activeId",
         "type": "string",
-        "description": "",
+        "description": "Which chart is in front. The active patient has to be unmistakable — this is a wrong-patient control, not a tab bar.",
         "required": false
       },
       {
@@ -7905,13 +7922,13 @@ export const CATALOG: ComponentDoc[] = [
       {
         "name": "onExpandedChange",
         "type": "((expanded: boolean) => void)",
-        "description": "",
+        "description": "Fired when the stack expands or collapses.",
         "required": false
       },
       {
         "name": "onPin",
         "type": "((chart: OpenChart, pinned: boolean) => void)",
-        "description": "",
+        "description": "Fired when a chart is pinned, so it survives the recency ordering.",
         "required": false
       },
       {
@@ -7929,13 +7946,13 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "charts",
             "type": "readonly OpenChart[]",
-            "description": "",
+            "description": "The open charts, most recent first. Each carries enough to tell two patients apart, which eleven identical browser tabs do not.",
             "required": true
           },
           {
             "name": "activeId",
             "type": "string",
-            "description": "",
+            "description": "Which chart is in front. The active patient has to be unmistakable — this is a wrong-patient control, not a tab bar.",
             "required": false
           },
           {
@@ -7966,13 +7983,13 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "onExpandedChange",
             "type": "((expanded: boolean) => void)",
-            "description": "",
+            "description": "Fired when the stack expands or collapses.",
             "required": false
           },
           {
             "name": "onPin",
             "type": "((chart: OpenChart, pinned: boolean) => void)",
-            "description": "",
+            "description": "Fired when a chart is pinned, so it survives the recency ordering.",
             "required": false
           },
           {
@@ -8262,6 +8279,7 @@ export const CATALOG: ComponentDoc[] = [
     "layer": "clinical",
     "distribution": "registry",
     "summary": "A single observation rendered so that the four ways a number can lie to you are all impossible.",
+    "tagline": "One observation, rendered so the number cannot mislead.",
     "description": "Value, unit and interpretation on one line, qualifiers on a second only when they exist. Seven distinct absence reasons instead of an em dash, a stated interpretation that always beats a derived one, a reference range that says so when there isn't one, and a correction that shows the superseded value rather than a badge.",
     "rationale": "The most dangerous component in healthcare software is the one that renders a number, because every one of its failures looks perfect on screen. A preliminary result rendered identically to a final one: the clinician acts, and the value changes at 04:00. A result with no reference range rendered as though it were normal, because nothing was highlighted. A corrected result that silently replaced the value somebody read an hour ago and wrote into a note. An absent value rendered as an em dash, indistinguishable from a rendering bug, a cancelled test, a haemolysed specimen and a patient who declined the draw. None of the four is a styling problem and none is fixed by a nicer table. Each needs a shape: status is never implicit, an absent range is stated rather than left blank, a correction carries the old number with a line through it because the hazard is the reader's memory of it, and absence is seven sentences.",
     "categories": [
@@ -8301,13 +8319,13 @@ export const CATALOG: ComponentDoc[] = [
       {
         "name": "value",
         "type": "ResultValueData",
-        "description": "",
+        "description": "The result itself, already adapted from FHIR. Use `fromObservation()` rather than building it by hand — the adapter leaves undefined everything it cannot determine, which is what keeps a missing range from becoming an assumed one.",
         "required": true
       },
       {
         "name": "density",
         "type": "'compact' | 'default'",
-        "description": "",
+        "description": "Row height and type scale. Inherited from the nearest density provider when omitted.",
         "required": false,
         "default": "\"default\""
       },
@@ -8339,13 +8357,13 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "value",
             "type": "ResultValueData",
-            "description": "",
+            "description": "The result itself, already adapted from FHIR. Use `fromObservation()` rather than building it by hand — the adapter leaves undefined everything it cannot determine, which is what keeps a missing range from becoming an assumed one.",
             "required": true
           },
           {
             "name": "density",
             "type": "'compact' | 'default'",
-            "description": "",
+            "description": "Row height and type scale. Inherited from the nearest density provider when omitted.",
             "required": false,
             "default": "\"default\""
           },
@@ -8686,6 +8704,7 @@ export const CATALOG: ComponentDoc[] = [
     "layer": "primitive",
     "distribution": "registry",
     "summary": "One rhythm strip, swept like a monitor. The quietest way for an interface to say it is still there.",
+    "tagline": "One rhythm strip, swept like a monitor. The quiet wait.",
     "description": "Loader drawn as a single PQRST complex on a baseline, swept once per beat by a bright head with a fading tail. Nothing scales and nothing grows, and it stays legible down to 20px.",
     "rationale": "The clinical default, and the loader to reach for when a beating heart would be the wrong thing to put in front of someone. It carries no symbol, only the artifact a clinician already reads all day: P wave, QRS complex, T wave, in those proportions rather than the decorative zig-zag that generic ECG graphics use. Because it never scales, it is also the only cardiac loader that survives at twenty pixels — so it is what Pulse Loader renders when it is asked to be small, and what belongs beside a button label or in a table row.",
     "categories": [
@@ -8990,6 +9009,7 @@ export const CATALOG: ComponentDoc[] = [
     "layer": "clinical",
     "distribution": "registry",
     "summary": "A risk score that cannot be displayed without its date, its drivers, and the fact that it is not a diagnosis.",
+    "tagline": "A score with its date, its drivers, and its limits.",
     "description": "The band leads and the numeral is demoted. Staleness is on the face rather than in a tooltip, an expired score offers recompute or acknowledge and no third option, and the not-a-diagnosis framing is a required prop rather than a convention.",
     "rationale": "Risk scores are the most casually rendered artefact in healthcare software: a number, a colour, a tooltip nobody reads. Three things go wrong. The score is stale — computed nightly, shown at noon, after the admission that would have changed it. The score is unattributed, so the clinician cannot see that 70% of it is driven by one ED visit eighteen months ago. And the score is read as a diagnosis, which is how an externally validated sepsis model with an AUC of 0.63 came to be trusted by clinicians who were never shown its performance. Each needs a shape rather than a caveat: the validity window is data because a 24-hour deterioration model and a 12-month readmission model expire differently, drivers are part of the value type rather than an optional extra, and the framing sentence is a required prop because every product that made it optional shipped without it.",
     "categories": [
@@ -9023,7 +9043,7 @@ export const CATALOG: ComponentDoc[] = [
       {
         "name": "assessment",
         "type": "RiskAssessment",
-        "description": "",
+        "description": "The RiskAssessment, with its drivers and the date it was computed. A score cannot render without them — it is a statistical estimate, not a diagnosis, and undated it is not even that.",
         "required": true
       },
       {
@@ -9041,7 +9061,7 @@ export const CATALOG: ComponentDoc[] = [
       {
         "name": "density",
         "type": "'compact' | 'default'",
-        "description": "",
+        "description": "Row height and type scale. Inherited from the nearest density provider when omitted.",
         "required": false,
         "default": "\"default\""
       },
@@ -9067,7 +9087,7 @@ export const CATALOG: ComponentDoc[] = [
       {
         "name": "onRecompute",
         "type": "((assessment: RiskAssessment) => void)",
-        "description": "",
+        "description": "Fired when the reader asks for a fresh score. Without it a stale score says it is stale and offers nothing to do about it.",
         "required": false
       }
     ],
@@ -9079,7 +9099,7 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "assessment",
             "type": "RiskAssessment",
-            "description": "",
+            "description": "The RiskAssessment, with its drivers and the date it was computed. A score cannot render without them — it is a statistical estimate, not a diagnosis, and undated it is not even that.",
             "required": true
           },
           {
@@ -9097,7 +9117,7 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "density",
             "type": "'compact' | 'default'",
-            "description": "",
+            "description": "Row height and type scale. Inherited from the nearest density provider when omitted.",
             "required": false,
             "default": "\"default\""
           },
@@ -9123,7 +9143,7 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "onRecompute",
             "type": "((assessment: RiskAssessment) => void)",
-            "description": "",
+            "description": "Fired when the reader asks for a fresh score. Without it a stale score says it is stale and offers nothing to do about it.",
             "required": false
           }
         ],
@@ -9427,6 +9447,7 @@ export const CATALOG: ComponentDoc[] = [
     "layer": "block",
     "distribution": "registry",
     "summary": "The six steps of the Stanley-Brown Safety Planning Intervention, in order, with the crisis step rendered open and uncloseable.",
+    "tagline": "Stanley-Brown, six steps, with the crisis step always open.",
     "description": "A patient-facing safety plan: warning signs, coping, distraction, people to ask, professionals and agencies, and means restriction. The crisis step cannot be collapsed, empty steps say they are unfinished rather than disappearing, and the wording is a patient catalog throughout.",
     "rationale": "A safety plan is written collaboratively in a room and read alone, often on a phone, often at the worst hour of someone's week. That reading context is the whole design. The crisis step holds the phone numbers, so it renders open and its trigger reports itself disabled — a person in crisis does not scroll, does not scan, and should not have to make a correct decision about a chevron to reach a number. The step order is the intervention rather than a layout: the escalation from what someone can do alone to who they call is the clinical content, so nothing here sorts or filters. And a step nobody has filled in says so instead of vanishing, because a five-step plan numbered one to five claims the sixth was never part of the instrument.",
     "categories": [
@@ -9445,20 +9466,20 @@ export const CATALOG: ComponentDoc[] = [
       {
         "name": "steps",
         "type": "Partial<Record<SafetyPlanStepKey, SafetyPlanStepContent>>",
-        "description": "",
+        "description": "The six Stanley-Brown steps, in order. The order is the intervention; a plan rendered out of sequence is a different document.",
         "required": true
       },
       {
         "name": "density",
         "type": "AccordionDensity",
-        "description": "",
+        "description": "Row height and type scale. Inherited from the nearest density provider when omitted.",
         "required": false,
         "default": "\"patient\""
       },
       {
         "name": "headingLevel",
         "type": "AccordionHeadingLevel",
-        "description": "",
+        "description": "Where the plan's headings sit in the page outline. Set it to match the surrounding document rather than letting a plan start at h1 inside a chart.",
         "required": false,
         "default": "3"
       },
@@ -9490,20 +9511,20 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "steps",
             "type": "Partial<Record<SafetyPlanStepKey, SafetyPlanStepContent>>",
-            "description": "",
+            "description": "The six Stanley-Brown steps, in order. The order is the intervention; a plan rendered out of sequence is a different document.",
             "required": true
           },
           {
             "name": "density",
             "type": "AccordionDensity",
-            "description": "",
+            "description": "Row height and type scale. Inherited from the nearest density provider when omitted.",
             "required": false,
             "default": "\"patient\""
           },
           {
             "name": "headingLevel",
             "type": "AccordionHeadingLevel",
-            "description": "",
+            "description": "Where the plan's headings sit in the page outline. Set it to match the surrounding document rather than letting a plan start at h1 inside a chart.",
             "required": false,
             "default": "3"
           },
@@ -9596,6 +9617,7 @@ export const CATALOG: ComponentDoc[] = [
     "layer": "primitive",
     "distribution": "registry",
     "summary": "A binary control for a record that is shared, asynchronous, and often missing the fact you are asking it about.",
+    "tagline": "A binary control with a third value: nobody has said.",
     "description": "Switch with three independent axes: the value the record holds, the phase of the write, and whether you may change it. Models the request and the outcome separately, so it never renders a state it cannot substantiate.",
     "rationale": "A switch promises something it usually cannot keep — that a thing is now true. In healthcare that promise gets made over a hospital network, about a fact that may never have been asked, on a record that may already be signed and that somebody else may be editing. Every one of those is a state a clinician acts on, and a conventional switch renders all of them as ordinary on or off. This one separates the request from the outcome: a write in flight is visible and still operable, a failed write animates back and interrupts rather than snapping back silently, an absent answer says which kind of absence it is, and a value someone else changed underneath you shows both readings and asks. The API matches Ant Design's exactly and takes no dependency on it, so an existing antd form migrates by changing an import.",
     "categories": [
@@ -9631,20 +9653,20 @@ export const CATALOG: ComponentDoc[] = [
       {
         "name": "appearance",
         "type": "SwitchAppearance",
-        "description": "",
+        "description": "Track treatment. Defaults to the plain track, or to `\"labeled\"` when `checkedChildren` is supplied.",
         "required": false
       },
       {
         "name": "audience",
         "type": "SwitchAudience",
-        "description": "",
+        "description": "Who is reading. Selects the register of every generated sentence: a clinician is told the clinical consequence, a patient is told what it means for them.",
         "required": false,
         "default": "\"clinician\""
       },
       {
         "name": "autoFocus",
         "type": "boolean",
-        "description": "",
+        "description": "Focus on mount. Use only where the switch is the reason the surface opened — a confirmation sheet, not a settings list.",
         "required": false
       },
       {
@@ -9669,33 +9691,33 @@ export const CATALOG: ComponentDoc[] = [
       {
         "name": "confirm",
         "type": "false | 'dialog' | 'countersign' | 'hold' | 'attest'",
-        "description": "",
+        "description": "How much friction an activation earns. Escalates from a press-and-hold to a second person's signature. `false` for anything reversible.",
         "required": false,
         "default": "false"
       },
       {
         "name": "confirmCopy",
         "type": "{ title?: string; consequence: string; subject?: string; }",
-        "description": "",
+        "description": "The words in the confirmation. `consequence` is required because a confirmation that does not name what will happen is a speed bump, not a check.",
         "required": false
       },
       {
         "name": "countersign",
         "type": "CountersignRequirement",
-        "description": "",
+        "description": "Who else must sign, and in what capacity. Only meaningful with `confirm=\"countersign\"`.",
         "required": false
       },
       {
         "name": "defaultChecked",
         "type": "SwitchValue",
-        "description": "",
+        "description": "Uncontrolled starting value. Ignored once `checked` is supplied.",
         "required": false,
         "default": "false"
       },
       {
         "name": "description",
         "type": "React.ReactNode",
-        "description": "",
+        "description": "A second line under the label, for the qualification a label cannot carry. Associated with the control, so it is announced rather than merely nearby.",
         "required": false
       },
       {
@@ -9727,13 +9749,13 @@ export const CATALOG: ComponentDoc[] = [
       {
         "name": "label",
         "type": "React.ReactNode",
-        "description": "",
+        "description": "The switch's accessible name and visible label. Supply it or an `aria-label`: a switch whose meaning lives only in a neighbouring table header is unusable by anyone not reading the table.",
         "required": false
       },
       {
         "name": "labelPlacement",
         "type": "'start' | 'end'",
-        "description": "",
+        "description": "Which side the label sits on. `\"start\"` for a settings list where the labels should align; `\"end\"` inline.",
         "required": false,
         "default": "\"end\""
       },
@@ -9747,7 +9769,7 @@ export const CATALOG: ComponentDoc[] = [
       {
         "name": "lockedReason",
         "type": "React.ReactNode",
-        "description": "",
+        "description": "Why this reader cannot change it. A `readOnly` switch with no reason tells somebody they may not act without telling them who can.",
         "required": false
       },
       {
@@ -9765,7 +9787,7 @@ export const CATALOG: ComponentDoc[] = [
       {
         "name": "onAuditEvent",
         "type": "((event: SwitchAuditEvent) => void)",
-        "description": "",
+        "description": "Every activation, confirmation, revert and expiry, as a structured event for the host's audit log. Requires `now`, because an audit entry timed by the browser is not evidence.",
         "required": false
       },
       {
@@ -9783,7 +9805,7 @@ export const CATALOG: ComponentDoc[] = [
       {
         "name": "onExpire",
         "type": "((at: string) => void)",
-        "description": "",
+        "description": "Fired once when `until` passes. The component never writes on expiry — it reports, and the host decides.",
         "required": false
       },
       {
@@ -9796,13 +9818,13 @@ export const CATALOG: ComponentDoc[] = [
       {
         "name": "onResolveConflict",
         "type": "((keep: 'mine' | 'theirs') => void)",
-        "description": "",
+        "description": "Called from the `stale` affordance when the reader chooses whose value wins. Without it a stale switch states the conflict and offers no way out of it.",
         "required": false
       },
       {
         "name": "onSlow",
         "type": "(() => void)",
-        "description": "",
+        "description": "Fired once when `slowAfter` elapses, so the host can surface its own \"still saving\" affordance. The switch stays interactive either way.",
         "required": false
       },
       {
@@ -9814,13 +9836,13 @@ export const CATALOG: ComponentDoc[] = [
       {
         "name": "provenance",
         "type": "{ by: string; at: string; via?: string; }",
-        "description": "",
+        "description": "Who last changed the record, when, and through what. Rendered beside the control, because on a shared record the last writer is part of the value.",
         "required": false
       },
       {
         "name": "readOnly",
         "type": "boolean",
-        "description": "",
+        "description": "The right prop for almost every unavailability: policy, permission, record state, a missing dependency. Unlike `disabled` it stays focusable and readable, and pairs with `lockedReason`.",
         "required": false,
         "default": "false"
       },
@@ -9845,38 +9867,38 @@ export const CATALOG: ComponentDoc[] = [
       {
         "name": "size",
         "type": "SwitchSize",
-        "description": "",
+        "description": "`\"default\"` or `\"small\"`, matching antd. Track and thumb scale together; the hit area does not drop below 24px in either.",
         "required": false
       },
       {
         "name": "slots",
         "type": "SwitchSlots",
-        "description": "",
+        "description": "Replace individual internals — the thumb glyph, the state word, the lock affordance — without reimplementing the state machine around them.",
         "required": false
       },
       {
         "name": "slowAfter",
         "type": "number",
-        "description": "",
+        "description": "Milliseconds in `pending` before the commit is treated as slow. Announces rather than cancels: the write may still land.",
         "required": false
       },
       {
         "name": "stateLabels",
         "type": "'on-off' | 'yes-no' | 'active-inactive' | 'in-effect' | 'allowed-blocked' | 'given-declined' | 'enabled-disabled' | Partial<StateLabels>",
-        "description": "",
+        "description": "The words for on and off. A preset name, or an override of individual labels. Never omit them to save space — the word is what survives greyscale.",
         "required": false
       },
       {
         "name": "tone",
         "type": "SwitchTone",
-        "description": "",
+        "description": "Whether \"on\" is the safe answer (`\"affirmative\"`) or the consequential one (`\"restrictive\"`). Drives the state words and the confirmation defaults, never the hue alone.",
         "required": false,
         "default": "\"affirmative\""
       },
       {
         "name": "unCheckedChildren",
         "type": "React.ReactNode",
-        "description": "",
+        "description": "The off-state word. Sized against `checkedChildren` so the track does not change width as it toggles.",
         "required": false
       },
       {
@@ -9913,20 +9935,20 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "appearance",
             "type": "SwitchAppearance",
-            "description": "",
+            "description": "Track treatment. Defaults to the plain track, or to `\"labeled\"` when `checkedChildren` is supplied.",
             "required": false
           },
           {
             "name": "audience",
             "type": "SwitchAudience",
-            "description": "",
+            "description": "Who is reading. Selects the register of every generated sentence: a clinician is told the clinical consequence, a patient is told what it means for them.",
             "required": false,
             "default": "\"clinician\""
           },
           {
             "name": "autoFocus",
             "type": "boolean",
-            "description": "",
+            "description": "Focus on mount. Use only where the switch is the reason the surface opened — a confirmation sheet, not a settings list.",
             "required": false
           },
           {
@@ -9951,33 +9973,33 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "confirm",
             "type": "false | 'dialog' | 'countersign' | 'hold' | 'attest'",
-            "description": "",
+            "description": "How much friction an activation earns. Escalates from a press-and-hold to a second person's signature. `false` for anything reversible.",
             "required": false,
             "default": "false"
           },
           {
             "name": "confirmCopy",
             "type": "{ title?: string; consequence: string; subject?: string; }",
-            "description": "",
+            "description": "The words in the confirmation. `consequence` is required because a confirmation that does not name what will happen is a speed bump, not a check.",
             "required": false
           },
           {
             "name": "countersign",
             "type": "CountersignRequirement",
-            "description": "",
+            "description": "Who else must sign, and in what capacity. Only meaningful with `confirm=\"countersign\"`.",
             "required": false
           },
           {
             "name": "defaultChecked",
             "type": "SwitchValue",
-            "description": "",
+            "description": "Uncontrolled starting value. Ignored once `checked` is supplied.",
             "required": false,
             "default": "false"
           },
           {
             "name": "description",
             "type": "React.ReactNode",
-            "description": "",
+            "description": "A second line under the label, for the qualification a label cannot carry. Associated with the control, so it is announced rather than merely nearby.",
             "required": false
           },
           {
@@ -10009,13 +10031,13 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "label",
             "type": "React.ReactNode",
-            "description": "",
+            "description": "The switch's accessible name and visible label. Supply it or an `aria-label`: a switch whose meaning lives only in a neighbouring table header is unusable by anyone not reading the table.",
             "required": false
           },
           {
             "name": "labelPlacement",
             "type": "'start' | 'end'",
-            "description": "",
+            "description": "Which side the label sits on. `\"start\"` for a settings list where the labels should align; `\"end\"` inline.",
             "required": false,
             "default": "\"end\""
           },
@@ -10029,7 +10051,7 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "lockedReason",
             "type": "React.ReactNode",
-            "description": "",
+            "description": "Why this reader cannot change it. A `readOnly` switch with no reason tells somebody they may not act without telling them who can.",
             "required": false
           },
           {
@@ -10047,7 +10069,7 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "onAuditEvent",
             "type": "((event: SwitchAuditEvent) => void)",
-            "description": "",
+            "description": "Every activation, confirmation, revert and expiry, as a structured event for the host's audit log. Requires `now`, because an audit entry timed by the browser is not evidence.",
             "required": false
           },
           {
@@ -10065,7 +10087,7 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "onExpire",
             "type": "((at: string) => void)",
-            "description": "",
+            "description": "Fired once when `until` passes. The component never writes on expiry — it reports, and the host decides.",
             "required": false
           },
           {
@@ -10078,13 +10100,13 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "onResolveConflict",
             "type": "((keep: 'mine' | 'theirs') => void)",
-            "description": "",
+            "description": "Called from the `stale` affordance when the reader chooses whose value wins. Without it a stale switch states the conflict and offers no way out of it.",
             "required": false
           },
           {
             "name": "onSlow",
             "type": "(() => void)",
-            "description": "",
+            "description": "Fired once when `slowAfter` elapses, so the host can surface its own \"still saving\" affordance. The switch stays interactive either way.",
             "required": false
           },
           {
@@ -10096,13 +10118,13 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "provenance",
             "type": "{ by: string; at: string; via?: string; }",
-            "description": "",
+            "description": "Who last changed the record, when, and through what. Rendered beside the control, because on a shared record the last writer is part of the value.",
             "required": false
           },
           {
             "name": "readOnly",
             "type": "boolean",
-            "description": "",
+            "description": "The right prop for almost every unavailability: policy, permission, record state, a missing dependency. Unlike `disabled` it stays focusable and readable, and pairs with `lockedReason`.",
             "required": false,
             "default": "false"
           },
@@ -10127,38 +10149,38 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "size",
             "type": "SwitchSize",
-            "description": "",
+            "description": "`\"default\"` or `\"small\"`, matching antd. Track and thumb scale together; the hit area does not drop below 24px in either.",
             "required": false
           },
           {
             "name": "slots",
             "type": "SwitchSlots",
-            "description": "",
+            "description": "Replace individual internals — the thumb glyph, the state word, the lock affordance — without reimplementing the state machine around them.",
             "required": false
           },
           {
             "name": "slowAfter",
             "type": "number",
-            "description": "",
+            "description": "Milliseconds in `pending` before the commit is treated as slow. Announces rather than cancels: the write may still land.",
             "required": false
           },
           {
             "name": "stateLabels",
             "type": "'on-off' | 'yes-no' | 'active-inactive' | 'in-effect' | 'allowed-blocked' | 'given-declined' | 'enabled-disabled' | Partial<StateLabels>",
-            "description": "",
+            "description": "The words for on and off. A preset name, or an override of individual labels. Never omit them to save space — the word is what survives greyscale.",
             "required": false
           },
           {
             "name": "tone",
             "type": "SwitchTone",
-            "description": "",
+            "description": "Whether \"on\" is the safe answer (`\"affirmative\"`) or the consequential one (`\"restrictive\"`). Drives the state words and the confirmation defaults, never the hue alone.",
             "required": false,
             "default": "\"affirmative\""
           },
           {
             "name": "unCheckedChildren",
             "type": "React.ReactNode",
-            "description": "",
+            "description": "The off-state word. Sized against `checkedChildren` so the track does not change width as it toggles.",
             "required": false
           },
           {
@@ -10195,19 +10217,19 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "appearance",
             "type": "SwitchAppearance",
-            "description": "",
+            "description": "Track treatment. Defaults to the plain track, or to `\"labeled\"` when `checkedChildren` is supplied.",
             "required": false
           },
           {
             "name": "audience",
             "type": "SwitchAudience",
-            "description": "",
+            "description": "Who is reading. Selects the register of every generated sentence: a clinician is told the clinical consequence, a patient is told what it means for them.",
             "required": false
           },
           {
             "name": "autoFocus",
             "type": "boolean",
-            "description": "",
+            "description": "Focus on mount. Use only where the switch is the reason the surface opened — a confirmation sheet, not a settings list.",
             "required": false
           },
           {
@@ -10231,25 +10253,25 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "confirm",
             "type": "false | 'dialog' | 'countersign' | 'hold' | 'attest'",
-            "description": "",
+            "description": "How much friction an activation earns. Escalates from a press-and-hold to a second person's signature. `false` for anything reversible.",
             "required": false
           },
           {
             "name": "confirmCopy",
             "type": "{ title?: string; consequence: string; subject?: string; }",
-            "description": "",
+            "description": "The words in the confirmation. `consequence` is required because a confirmation that does not name what will happen is a speed bump, not a check.",
             "required": false
           },
           {
             "name": "countersign",
             "type": "CountersignRequirement",
-            "description": "",
+            "description": "Who else must sign, and in what capacity. Only meaningful with `confirm=\"countersign\"`.",
             "required": false
           },
           {
             "name": "defaultChecked",
             "type": "SwitchValue",
-            "description": "",
+            "description": "Uncontrolled starting value. Ignored once `checked` is supplied.",
             "required": false
           },
           {
@@ -10285,13 +10307,13 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "label",
             "type": "React.ReactNode",
-            "description": "",
+            "description": "The switch's accessible name and visible label. Supply it or an `aria-label`: a switch whose meaning lives only in a neighbouring table header is unusable by anyone not reading the table.",
             "required": false
           },
           {
             "name": "labelPlacement",
             "type": "'start' | 'end'",
-            "description": "",
+            "description": "Which side the label sits on. `\"start\"` for a settings list where the labels should align; `\"end\"` inline.",
             "required": false
           },
           {
@@ -10303,7 +10325,7 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "lockedReason",
             "type": "React.ReactNode",
-            "description": "",
+            "description": "Why this reader cannot change it. A `readOnly` switch with no reason tells somebody they may not act without telling them who can.",
             "required": false
           },
           {
@@ -10321,7 +10343,7 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "onAuditEvent",
             "type": "((event: SwitchAuditEvent) => void)",
-            "description": "",
+            "description": "Every activation, confirmation, revert and expiry, as a structured event for the host's audit log. Requires `now`, because an audit entry timed by the browser is not evidence.",
             "required": false
           },
           {
@@ -10339,7 +10361,7 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "onExpire",
             "type": "((at: string) => void)",
-            "description": "",
+            "description": "Fired once when `until` passes. The component never writes on expiry — it reports, and the host decides.",
             "required": false
           },
           {
@@ -10351,13 +10373,13 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "onResolveConflict",
             "type": "((keep: 'mine' | 'theirs') => void)",
-            "description": "",
+            "description": "Called from the `stale` affordance when the reader chooses whose value wins. Without it a stale switch states the conflict and offers no way out of it.",
             "required": false
           },
           {
             "name": "onSlow",
             "type": "(() => void)",
-            "description": "",
+            "description": "Fired once when `slowAfter` elapses, so the host can surface its own \"still saving\" affordance. The switch stays interactive either way.",
             "required": false
           },
           {
@@ -10369,13 +10391,13 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "provenance",
             "type": "{ by: string; at: string; via?: string; }",
-            "description": "",
+            "description": "Who last changed the record, when, and through what. Rendered beside the control, because on a shared record the last writer is part of the value.",
             "required": false
           },
           {
             "name": "readOnly",
             "type": "boolean",
-            "description": "",
+            "description": "The right prop for almost every unavailability: policy, permission, record state, a missing dependency. Unlike `disabled` it stays focusable and readable, and pairs with `lockedReason`.",
             "required": false
           },
           {
@@ -10399,37 +10421,37 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "size",
             "type": "SwitchSize",
-            "description": "",
+            "description": "`\"default\"` or `\"small\"`, matching antd. Track and thumb scale together; the hit area does not drop below 24px in either.",
             "required": false
           },
           {
             "name": "slots",
             "type": "SwitchSlots",
-            "description": "",
+            "description": "Replace individual internals — the thumb glyph, the state word, the lock affordance — without reimplementing the state machine around them.",
             "required": false
           },
           {
             "name": "slowAfter",
             "type": "number",
-            "description": "",
+            "description": "Milliseconds in `pending` before the commit is treated as slow. Announces rather than cancels: the write may still land.",
             "required": false
           },
           {
             "name": "stateLabels",
             "type": "'on-off' | 'yes-no' | 'active-inactive' | 'in-effect' | 'allowed-blocked' | 'given-declined' | 'enabled-disabled' | Partial<StateLabels>",
-            "description": "",
+            "description": "The words for on and off. A preset name, or an override of individual labels. Never omit them to save space — the word is what survives greyscale.",
             "required": false
           },
           {
             "name": "tone",
             "type": "SwitchTone",
-            "description": "",
+            "description": "Whether \"on\" is the safe answer (`\"affirmative\"`) or the consequential one (`\"restrictive\"`). Drives the state words and the confirmation defaults, never the hue alone.",
             "required": false
           },
           {
             "name": "unCheckedChildren",
             "type": "React.ReactNode",
-            "description": "",
+            "description": "The off-state word. Sized against `checkedChildren` so the track does not change width as it toggles.",
             "required": false
           },
           {
@@ -10459,7 +10481,7 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "children",
             "type": "React.ReactNode",
-            "description": "",
+            "description": "The switches. Rendered into a group with the heading above, so each one inherits the group's name rather than repeating it.",
             "required": false
           },
           {
@@ -10477,7 +10499,7 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "title",
             "type": "React.ReactNode",
-            "description": "",
+            "description": "The group's heading, and its accessible name. A list of switches with no name is a list of switches nobody can describe.",
             "required": false
           }
         ],
@@ -10568,6 +10590,7 @@ export const CATALOG: ComponentDoc[] = [
     "layer": "primitive",
     "distribution": "registry",
     "summary": "Ant Design v6's Timeline, prop for prop, with the accessible name and the ordered-list semantics it does not ship.",
+    "tagline": "Ant Design's Timeline, with the semantics it does not ship.",
     "description": "An ordered list with a rail. The API matches Ant Design v6 exactly, including the v5 names it still accepts, and takes no dependency on it. Adds a required accessible name and drops the current-step behaviour a chronology has no use for.",
     "rationale": "antd's Timeline is a thin adapter over Steps, and it inherits two things a chronology should not have. It hardcodes current to the last item, which marks that item process — and antd's own stylesheet gives that state a dotted rail. On a wizard that reads as 'the step you are on, and it continues'. On a history it is a mark of incompleteness applied to whichever event happened to be last, and because reverse reverses the array first, on a newest-first clinical timeline it lands on the oldest event in the chart. It also inherits rc-steps' accessibility, which is none: no role, no aria-current, no way to name the list, so a page with a care timeline and an access-history timeline gives a screen-reader user two unnamed lists. Matching the API rather than wrapping it means an existing antd call site migrates by changing one import, and no consumer of a primitive inherits antd.",
     "categories": [
@@ -10596,19 +10619,19 @@ export const CATALOG: ComponentDoc[] = [
       {
         "name": "className",
         "type": "string",
-        "description": "",
+        "description": "Applied to the list element.",
         "required": false
       },
       {
         "name": "classNames",
         "type": "Partial<Record<TimelineSlot, string>>",
-        "description": "",
+        "description": "Per-slot class names — rail, node, content, label. Ant Design v6's semantic-DOM API.",
         "required": false
       },
       {
         "name": "items",
         "type": "readonly TimelineItemType[]",
-        "description": "",
+        "description": "The events, in order. Ant Design's `items` API exactly — the difference is what this component refuses to infer from them.",
         "required": false
       },
       {
@@ -10620,55 +10643,55 @@ export const CATALOG: ComponentDoc[] = [
       {
         "name": "orientation",
         "type": "TimelineOrientation",
-        "description": "",
+        "description": "Horizontal or vertical. Ant Design's `tabPlacement`-style rename in v6.",
         "required": false
       },
       {
         "name": "pending",
         "type": "React.ReactNode",
-        "description": "",
+        "description": "A trailing \"in progress\" entry, as antd v5 wrote it.",
         "required": false
       },
       {
         "name": "pendingDot",
         "type": "React.ReactNode",
-        "description": "",
+        "description": "The icon for the pending entry, as antd v5 wrote it.",
         "required": false
       },
       {
         "name": "prefixCls",
         "type": "string",
-        "description": "",
+        "description": "Ant Design's class prefix. Accepted for parity with an existing antd theme.",
         "required": false
       },
       {
         "name": "ref",
         "type": "React.Ref<HTMLOListElement>",
-        "description": "",
+        "description": "The `<ol>` the timeline renders. It is a list, not a `<ul>` — antd's own docs say otherwise and its source does this.",
         "required": false
       },
       {
         "name": "reverse",
         "type": "boolean",
-        "description": "",
+        "description": "Newest first. Reverses the rendered order only — it does not change which item is treated as current, which is the bug this component exists not to reproduce.",
         "required": false
       },
       {
         "name": "rootClassName",
         "type": "string",
-        "description": "",
+        "description": "Applied to the root element, alongside the generated classes.",
         "required": false
       },
       {
         "name": "style",
         "type": "React.CSSProperties",
-        "description": "",
+        "description": "Inline styles on the list element.",
         "required": false
       },
       {
         "name": "styles",
         "type": "Partial<Record<TimelineSlot, React.CSSProperties>>",
-        "description": "",
+        "description": "Per-slot inline styles. The counterpart to `classNames`.",
         "required": false
       },
       {
@@ -10680,7 +10703,7 @@ export const CATALOG: ComponentDoc[] = [
       {
         "name": "variant",
         "type": "TimelineVariant",
-        "description": "",
+        "description": "Rail treatment. Never used to imply a state: antd's Timeline dots a rail for whatever it decides is `current`, and on a clinical chronology a dotted rail reads as a data claim nobody authored.",
         "required": false
       }
     ],
@@ -10697,19 +10720,19 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "className",
             "type": "string",
-            "description": "",
+            "description": "Applied to the list element.",
             "required": false
           },
           {
             "name": "classNames",
             "type": "Partial<Record<TimelineSlot, string>>",
-            "description": "",
+            "description": "Per-slot class names — rail, node, content, label. Ant Design v6's semantic-DOM API.",
             "required": false
           },
           {
             "name": "items",
             "type": "readonly TimelineItemType[]",
-            "description": "",
+            "description": "The events, in order. Ant Design's `items` API exactly — the difference is what this component refuses to infer from them.",
             "required": false
           },
           {
@@ -10721,55 +10744,55 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "orientation",
             "type": "TimelineOrientation",
-            "description": "",
+            "description": "Horizontal or vertical. Ant Design's `tabPlacement`-style rename in v6.",
             "required": false
           },
           {
             "name": "pending",
             "type": "React.ReactNode",
-            "description": "",
+            "description": "A trailing \"in progress\" entry, as antd v5 wrote it.",
             "required": false
           },
           {
             "name": "pendingDot",
             "type": "React.ReactNode",
-            "description": "",
+            "description": "The icon for the pending entry, as antd v5 wrote it.",
             "required": false
           },
           {
             "name": "prefixCls",
             "type": "string",
-            "description": "",
+            "description": "Ant Design's class prefix. Accepted for parity with an existing antd theme.",
             "required": false
           },
           {
             "name": "ref",
             "type": "React.Ref<HTMLOListElement>",
-            "description": "",
+            "description": "The `<ol>` the timeline renders. It is a list, not a `<ul>` — antd's own docs say otherwise and its source does this.",
             "required": false
           },
           {
             "name": "reverse",
             "type": "boolean",
-            "description": "",
+            "description": "Newest first. Reverses the rendered order only — it does not change which item is treated as current, which is the bug this component exists not to reproduce.",
             "required": false
           },
           {
             "name": "rootClassName",
             "type": "string",
-            "description": "",
+            "description": "Applied to the root element, alongside the generated classes.",
             "required": false
           },
           {
             "name": "style",
             "type": "React.CSSProperties",
-            "description": "",
+            "description": "Inline styles on the list element.",
             "required": false
           },
           {
             "name": "styles",
             "type": "Partial<Record<TimelineSlot, React.CSSProperties>>",
-            "description": "",
+            "description": "Per-slot inline styles. The counterpart to `classNames`.",
             "required": false
           },
           {
@@ -10781,7 +10804,7 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "variant",
             "type": "TimelineVariant",
-            "description": "",
+            "description": "Rail treatment. Never used to imply a state: antd's Timeline dots a rail for whatever it decides is `current`, and on a clinical chronology a dotted rail reads as a data claim nobody authored.",
             "required": false
           }
         ]
@@ -10849,6 +10872,7 @@ export const CATALOG: ComponentDoc[] = [
     "layer": "clinical",
     "distribution": "registry",
     "summary": "A sparkline that refuses to draw a trend it cannot justify — across an assay change, a unit change, or two points.",
+    "tagline": "A sparkline that refuses to draw an unjustifiable trend.",
     "description": "Breaks the line wherever comparability breaks and says why in words. Renders no trend below three comparable points. Takes the valence as a required prop, so a falling PHQ-9 reads as improvement and a falling eGFR does not, and carries the reliable-change threshold so a two-point move renders as noise.",
     "rationale": "A sparkline is a claim that the points are comparable, and three things routinely break that claim while no library checks any of them. The assay changed: a lab switching immunoassay platforms shifts every ferritin by 20% with no clinical change at all. The units changed, silently, in an interface feed. Or there are simply two points, and a line between two points is not a trend, it is a rhetorical device. The second problem is separate and just as common: a downward line is not automatically good news. A falling PHQ-9 is improvement; a falling eGFR is not. Direction has no valence until somebody supplies one, so valence is a required prop rather than an assumption baked into a colour — a library that guesses gets half of all clinical measures wrong, silently, in green.",
     "categories": [
@@ -10883,7 +10907,7 @@ export const CATALOG: ComponentDoc[] = [
       {
         "name": "series",
         "type": "TrendSeries",
-        "description": "",
+        "description": "The points, oldest first. A direction is drawn only when the units and the method match across them.",
         "required": true
       },
       {
@@ -10895,14 +10919,14 @@ export const CATALOG: ComponentDoc[] = [
       {
         "name": "height",
         "type": "number",
-        "description": "",
+        "description": "Drawing height in pixels. The sparkline scales to it; the labels do not, so very small heights lose the axis rather than the numbers.",
         "required": false,
         "default": "20"
       },
       {
         "name": "onSelectPoint",
         "type": "((index: number, series: TrendSeries) => void)",
-        "description": "",
+        "description": "Fired when a point is chosen. Supplying it makes the points interactive; without it the trend is a picture.",
         "required": false
       },
       {
@@ -10921,7 +10945,7 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "series",
             "type": "TrendSeries",
-            "description": "",
+            "description": "The points, oldest first. A direction is drawn only when the units and the method match across them.",
             "required": true
           },
           {
@@ -10933,14 +10957,14 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "height",
             "type": "number",
-            "description": "",
+            "description": "Drawing height in pixels. The sparkline scales to it; the labels do not, so very small heights lose the axis rather than the numbers.",
             "required": false,
             "default": "20"
           },
           {
             "name": "onSelectPoint",
             "type": "((index: number, series: TrendSeries) => void)",
-            "description": "",
+            "description": "Fired when a point is chosen. Supplying it makes the points interactive; without it the trend is a picture.",
             "required": false
           },
           {
@@ -11248,6 +11272,7 @@ export const CATALOG: ComponentDoc[] = [
       }
     },
     "summary": "An avatar, a chip and a patient banner — with the pass that keeps two patients who share a name apart on the same worklist.",
+    "tagline": "An avatar, a chip and a patient banner that agree on identity.",
     "description": "The banner is the last surface a clinician reads before they act, so it is built as a control rather than a heading: two person-specific identifiers before a care action are a compile error, `Patient.gender` is not a renderable field, and a form can refuse to submit when the chart on screen is not the chart it was opened for.",
     "rationale": "A patient banner is the most PHI-dense component in a healthcare product and the one nobody designs. It is pinned to the top of every screen, read hundreds of times a shift, and it is the last thing standing between a clinician and someone else's chart. Adelman et al. (JAMIA 2013, 901,776 ordering sessions) found a dismissible 'check the patient' alert cut wrong-patient orders with an odds ratio of 0.84, while making the clinician re-enter the patient's initials cut them with an odds ratio of 0.60 — so a banner that is only read is worth a sixth of one that is answered, and both require the header to know what action is about to happen. Everything else follows from treating identity as a resolved value rather than a bag of booleans: absence of a photograph is five different facts, 'Inactive' is four unrelated ones, and two patients sharing a surname on a ward list is a problem a component can see and an application never will.",
     "categories": [
@@ -11301,13 +11326,13 @@ export const CATALOG: ComponentDoc[] = [
       {
         "name": "className",
         "type": "string",
-        "description": "",
+        "description": "Applied to the banner element.",
         "required": false
       },
       {
         "name": "error",
         "type": "OperationOutcome | Error",
-        "description": "",
+        "description": "The record could not be fetched. Rendered as an explicit failure, never as an empty banner: a blank identity strip above a chart is indistinguishable from a patient with no name, and one of those is safe to act under.",
         "required": false
       },
       {
@@ -11319,19 +11344,19 @@ export const CATALOG: ComponentDoc[] = [
       {
         "name": "identifiers",
         "type": "TwoOrMore<IdentifierSpec> | readonly IdentifierSpec[]",
-        "description": "",
+        "description": "Which identifiers to show. Optional here; a worklist row is not a care action. Two person-specific identifiers, enforced by the type. NPSG.01.01.01 asks for two before a care action, so supplying one is a compile error rather than a review comment — this is the whole reason `context` is a required prop.",
         "required": false
       },
       {
         "name": "identityKey",
         "type": "string",
-        "description": "",
+        "description": "Overrides the swatch key. Prefer a stable record id, so the same patient keeps the same colour across sessions.",
         "required": false
       },
       {
         "name": "loading",
         "type": "true",
-        "description": "",
+        "description": "The record has not arrived yet. Renders a placeholder that is unmistakably not a patient.",
         "required": false
       },
       {
@@ -11343,13 +11368,13 @@ export const CATALOG: ComponentDoc[] = [
       {
         "name": "patient",
         "type": "Patient",
-        "description": "",
+        "description": "The patient this chart is about.",
         "required": false
       },
       {
         "name": "ward",
         "type": "string",
-        "description": "",
+        "description": "Where the patient physically is. Shown because it changes who is able to act.",
         "required": false
       }
     ],
@@ -11378,13 +11403,13 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "className",
             "type": "string",
-            "description": "",
+            "description": "Applied to the banner element.",
             "required": false
           },
           {
             "name": "error",
             "type": "OperationOutcome | Error",
-            "description": "",
+            "description": "The record could not be fetched. Rendered as an explicit failure, never as an empty banner: a blank identity strip above a chart is indistinguishable from a patient with no name, and one of those is safe to act under.",
             "required": false
           },
           {
@@ -11396,19 +11421,19 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "identifiers",
             "type": "TwoOrMore<IdentifierSpec> | readonly IdentifierSpec[]",
-            "description": "",
+            "description": "Which identifiers to show. Optional here; a worklist row is not a care action. Two person-specific identifiers, enforced by the type. NPSG.01.01.01 asks for two before a care action, so supplying one is a compile error rather than a review comment — this is the whole reason `context` is a required prop.",
             "required": false
           },
           {
             "name": "identityKey",
             "type": "string",
-            "description": "",
+            "description": "Overrides the swatch key. Prefer a stable record id, so the same patient keeps the same colour across sessions.",
             "required": false
           },
           {
             "name": "loading",
             "type": "true",
-            "description": "",
+            "description": "The record has not arrived yet. Renders a placeholder that is unmistakably not a patient.",
             "required": false
           },
           {
@@ -11420,13 +11445,13 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "patient",
             "type": "Patient",
-            "description": "",
+            "description": "The patient this chart is about.",
             "required": false
           },
           {
             "name": "ward",
             "type": "string",
-            "description": "",
+            "description": "Where the patient physically is. Shown because it changes who is able to act.",
             "required": false
           }
         ]
@@ -11525,6 +11550,7 @@ export const CATALOG: ComponentDoc[] = [
       }
     },
     "summary": "Signature capture that records the times nobody signed — declined, unable, verbal, on paper — not just the times they did.",
+    "tagline": "Signature capture that records the times nobody signed.",
     "description": "Draw, type or upload a signature inside an Ant Design form, and record the outcomes a signature pad has no answer for. The value is a discriminated union over seven outcomes rather than a base64 string, so a refusal is a fact the record can hold.",
     "rationale": "Almost every signature component solves one problem: get ink from a pointer onto a canvas and hand back a PNG. That is about fifteen percent of what a healthcare product needs. The rest is everything the PNG does not say — who signed, in what capacity, what they were agreeing to, and, most often of all, what to record when nobody signed at all. A patient who refused and a form nobody opened are different facts with different consequences, and a component whose only states are empty and signed makes the difference unrecordable. That is the same argument AbsentValue makes one tier down, at a much higher stake.",
     "categories": [
@@ -11564,43 +11590,43 @@ export const CATALOG: ComponentDoc[] = [
       {
         "name": "attestation",
         "type": "React.ReactNode",
-        "description": "",
+        "description": "The sentence the signer is agreeing to, shown above the control. Required for `meaning=\"attestation\"`; a signature over unstated words is not an attestation.",
         "required": false
       },
       {
         "name": "capacities",
         "type": "Capacity[]",
-        "description": "",
+        "description": "The capacities this signer may sign in — clinician, patient, guardian, interpreter. Offered as a choice when there is more than one, because the capacity changes what the signature means.",
         "required": false
       },
       {
         "name": "captureBiometrics",
         "type": "boolean",
-        "description": "",
+        "description": "Record stroke timing and pressure alongside the image. Off by default: it is additional personal data and most workflows do not need it.",
         "required": false
       },
       {
         "name": "className",
         "type": "string",
-        "description": "",
+        "description": "Applied to the outer element.",
         "required": false
       },
       {
         "name": "defaultValue",
         "type": "SignatureValue",
-        "description": "",
+        "description": "The starting signature, uncontrolled. Use for a form re-opened on an existing record.",
         "required": false
       },
       {
         "name": "disabled",
         "type": "boolean",
-        "description": "",
+        "description": "Blocks every path including the refusals. Rarely right — if the form is not signable yet, say why rather than removing the ability to decline.",
         "required": false
       },
       {
         "name": "documentHash",
         "type": "string",
-        "description": "",
+        "description": "A hash of exactly what was signed. Without it the signature attests to a document nobody can later identify.",
         "required": false
       },
       {
@@ -11612,13 +11638,13 @@ export const CATALOG: ComponentDoc[] = [
       {
         "name": "locale",
         "type": "Partial<SignatureLocale>",
-        "description": "",
+        "description": "Overrides for every generated string, including the seven outcome names. Supply it for any language that is not English.",
         "required": false
       },
       {
         "name": "meaning",
         "type": "SignatureMeaning",
-        "description": "",
+        "description": "What signing this asserts: consent, attestation, witness, receipt. It selects the wording and it is recorded, because a signature with no stated meaning is not evidence of anything.",
         "required": false
       },
       {
@@ -11631,61 +11657,61 @@ export const CATALOG: ComponentDoc[] = [
       {
         "name": "onAuditEvent",
         "type": "((event: { type: string; at: string; detail?: string; }) => void)",
-        "description": "",
+        "description": "Each capture, change and refusal as a structured event. Timed by `now`, never by the browser.",
         "required": false
       },
       {
         "name": "onChange",
         "type": "((value: SignatureValue) => void)",
-        "description": "",
+        "description": "Fired whenever the outcome changes — including when somebody declines, which is a value and not an error.",
         "required": false
       },
       {
         "name": "outcomes",
         "type": "('declined' | 'unable' | 'verbal' | 'on-paper')[]",
-        "description": "",
+        "description": "Which non-signing outcomes are offered. Removing `\"declined\"` makes a refusal unrecordable, which forces staff to either lie or abandon the form.",
         "required": false
       },
       {
         "name": "recordedBy",
         "type": "Signer",
-        "description": "",
+        "description": "The person operating the device when the signer is not. Required for `unable` — an unwitnessed `unable` is a compile error.",
         "required": false
       },
       {
         "name": "signer",
         "type": "Partial<Signer>",
-        "description": "",
+        "description": "Who is signing, as far as the host already knows. Anything omitted is asked for.",
         "required": false
       },
       {
         "name": "status",
         "type": "'error' | 'warning'",
-        "description": "",
+        "description": "Validation state from the surrounding form. Renders the field's error styling without inventing a message.",
         "required": false
       },
       {
         "name": "subject",
         "type": "Subject",
-        "description": "",
+        "description": "Who or what is being signed for. Rendered so the signer can check it before signing, which is the entire point of showing it.",
         "required": false
       },
       {
         "name": "subtitle",
         "type": "React.ReactNode",
-        "description": "",
+        "description": "A line under the title for the qualification the title cannot carry.",
         "required": false
       },
       {
         "name": "title",
         "type": "React.ReactNode",
-        "description": "",
+        "description": "The heading above the control. Also its accessible name.",
         "required": false
       },
       {
         "name": "value",
         "type": "SignatureValue",
-        "description": "",
+        "description": "The signature, controlled. A discriminated union over seven outcomes rather than `string | null`, because a refusal and an untouched field are different facts.",
         "required": false
       }
     ],
@@ -11702,43 +11728,43 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "attestation",
             "type": "React.ReactNode",
-            "description": "",
+            "description": "The sentence the signer is agreeing to, shown above the control. Required for `meaning=\"attestation\"`; a signature over unstated words is not an attestation.",
             "required": false
           },
           {
             "name": "capacities",
             "type": "Capacity[]",
-            "description": "",
+            "description": "The capacities this signer may sign in — clinician, patient, guardian, interpreter. Offered as a choice when there is more than one, because the capacity changes what the signature means.",
             "required": false
           },
           {
             "name": "captureBiometrics",
             "type": "boolean",
-            "description": "",
+            "description": "Record stroke timing and pressure alongside the image. Off by default: it is additional personal data and most workflows do not need it.",
             "required": false
           },
           {
             "name": "className",
             "type": "string",
-            "description": "",
+            "description": "Applied to the outer element.",
             "required": false
           },
           {
             "name": "defaultValue",
             "type": "SignatureValue",
-            "description": "",
+            "description": "The starting signature, uncontrolled. Use for a form re-opened on an existing record.",
             "required": false
           },
           {
             "name": "disabled",
             "type": "boolean",
-            "description": "",
+            "description": "Blocks every path including the refusals. Rarely right — if the form is not signable yet, say why rather than removing the ability to decline.",
             "required": false
           },
           {
             "name": "documentHash",
             "type": "string",
-            "description": "",
+            "description": "A hash of exactly what was signed. Without it the signature attests to a document nobody can later identify.",
             "required": false
           },
           {
@@ -11750,13 +11776,13 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "locale",
             "type": "Partial<SignatureLocale>",
-            "description": "",
+            "description": "Overrides for every generated string, including the seven outcome names. Supply it for any language that is not English.",
             "required": false
           },
           {
             "name": "meaning",
             "type": "SignatureMeaning",
-            "description": "",
+            "description": "What signing this asserts: consent, attestation, witness, receipt. It selects the wording and it is recorded, because a signature with no stated meaning is not evidence of anything.",
             "required": false
           },
           {
@@ -11769,61 +11795,61 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "onAuditEvent",
             "type": "((event: { type: string; at: string; detail?: string; }) => void)",
-            "description": "",
+            "description": "Each capture, change and refusal as a structured event. Timed by `now`, never by the browser.",
             "required": false
           },
           {
             "name": "onChange",
             "type": "((value: SignatureValue) => void)",
-            "description": "",
+            "description": "Fired whenever the outcome changes — including when somebody declines, which is a value and not an error.",
             "required": false
           },
           {
             "name": "outcomes",
             "type": "('declined' | 'unable' | 'verbal' | 'on-paper')[]",
-            "description": "",
+            "description": "Which non-signing outcomes are offered. Removing `\"declined\"` makes a refusal unrecordable, which forces staff to either lie or abandon the form.",
             "required": false
           },
           {
             "name": "recordedBy",
             "type": "Signer",
-            "description": "",
+            "description": "The person operating the device when the signer is not. Required for `unable` — an unwitnessed `unable` is a compile error.",
             "required": false
           },
           {
             "name": "signer",
             "type": "Partial<Signer>",
-            "description": "",
+            "description": "Who is signing, as far as the host already knows. Anything omitted is asked for.",
             "required": false
           },
           {
             "name": "status",
             "type": "'error' | 'warning'",
-            "description": "",
+            "description": "Validation state from the surrounding form. Renders the field's error styling without inventing a message.",
             "required": false
           },
           {
             "name": "subject",
             "type": "Subject",
-            "description": "",
+            "description": "Who or what is being signed for. Rendered so the signer can check it before signing, which is the entire point of showing it.",
             "required": false
           },
           {
             "name": "subtitle",
             "type": "React.ReactNode",
-            "description": "",
+            "description": "A line under the title for the qualification the title cannot carry.",
             "required": false
           },
           {
             "name": "title",
             "type": "React.ReactNode",
-            "description": "",
+            "description": "The heading above the control. Also its accessible name.",
             "required": false
           },
           {
             "name": "value",
             "type": "SignatureValue",
-            "description": "",
+            "description": "The signature, controlled. A discriminated union over seven outcomes rather than `string | null`, because a refusal and an untouched field are different facts.",
             "required": false
           }
         ]
@@ -12201,6 +12227,7 @@ export const CATALOG: ComponentDoc[] = [
       }
     },
     "summary": "Tabs that know what they are: a view switch, a link list, a form value or a wizard — four accessibility trees behind one silhouette.",
+    "tagline": "Eleven skins over one accessibility tree.",
     "description": "Four semantic modes across eleven visual variants, with the WAI-ARIA keyboard model, five overflow strategies, and the states a clinical surface actually reaches — restricted, stale, unsaved. `as` is required and has no default, because the mode is the accessibility tree and the variant is only CSS.",
     "rationale": "Almost every tab component solves the easy half: show one panel, hide the others, move an underline. The hard half is that “tabs” is four different components sharing a shape. A view switch owns panels and answers to arrow keys. A navigation menu is a list of links, and hijacking arrows on it destroys a keyboard user's focus the moment they press one. A segmented filter is a form value that belongs in a Form.Item. A wizard is ordered and gated. Shipping one of them and using it as all four is the most-reported tab defect in every design system audit, and it is invisible: a role=tablist wrapped around anchors spells every attribute correctly, so axe passes it. Making `as` required is the whole design — everything else follows from having said out loud what the control is.",
     "categories": [
@@ -12238,31 +12265,31 @@ export const CATALOG: ComponentDoc[] = [
       {
         "name": "items",
         "type": "readonly TabsItemProps[]",
-        "description": "",
+        "description": "The tabs, in order. Each carries its own trigger, panel and disabled state; the strip derives its keyboard model from the enabled ones.",
         "required": true
       },
       {
         "name": "activation",
         "type": "Activation",
-        "description": "",
+        "description": "Whether arrowing to a tab selects it (`automatic`) or merely focuses it (`manual`). Use `manual` when selecting is expensive or destructive.",
         "required": false
       },
       {
         "name": "defaultValue",
         "type": "string",
-        "description": "",
+        "description": "The initially selected tab, uncontrolled. Defaults to the first enabled item.",
         "required": false
       },
       {
         "name": "editable",
         "type": "TabsEditable",
-        "description": "",
+        "description": "Allows tabs to be added and closed, and supplies the handlers for it. Omit for a fixed strip.",
         "required": false
       },
       {
         "name": "fill",
         "type": "FillMode",
-        "description": "",
+        "description": "How triggers divide the available width — natural, equal, or stretched to fill.",
         "required": false
       },
       {
@@ -12280,31 +12307,31 @@ export const CATALOG: ComponentDoc[] = [
       {
         "name": "indicator",
         "type": "IndicatorKind",
-        "description": "",
+        "description": "The mark showing which tab is selected — an underline, a pill, or none. Never the only cue: selection is also in the accessibility tree.",
         "required": false
       },
       {
         "name": "keepScroll",
         "type": "boolean",
-        "description": "",
+        "description": "Restore each panel's scroll position when it is selected again. Off by default, because on a clinical surface returning to where somebody was is sometimes wrong.",
         "required": false
       },
       {
         "name": "listClassName",
         "type": "string",
-        "description": "",
+        "description": "Applied to the tablist element, for a host that needs to position the strip itself.",
         "required": false
       },
       {
         "name": "locale",
         "type": "Partial<TabsLocale>",
-        "description": "",
+        "description": "Overrides for every generated string — the overflow menu, the close affordance, the count announcements. Supply it for any language that is not English.",
         "required": false
       },
       {
         "name": "mount",
         "type": "MountStrategy",
-        "description": "",
+        "description": "When panels enter the DOM: all at once, on first selection, or only while selected. `eager` costs bytes; `unmount` costs panel state.",
         "required": false
       },
       {
@@ -12316,7 +12343,7 @@ export const CATALOG: ComponentDoc[] = [
       {
         "name": "onAuditEvent",
         "type": "((event: AuditEvent) => void)",
-        "description": "",
+        "description": "Selection changes as structured events, for hosts that must record which view a clinician was looking at. Pair with `now`.",
         "required": false
       },
       {
@@ -12328,49 +12355,49 @@ export const CATALOG: ComponentDoc[] = [
       {
         "name": "onChange",
         "type": "((value: string, meta: { via: ChangeSource; }) => void)",
-        "description": "",
+        "description": "Fired after a change commits. `meta.via` says what caused it — pointer, keyboard, hotkey, URL sync — which is what an audit trail needs and what a naive handler throws away.",
         "required": false
       },
       {
         "name": "orientation",
         "type": "Orientation",
-        "description": "",
+        "description": "Horizontal or vertical. Changes which arrow keys move selection, not merely the layout.",
         "required": false
       },
       {
         "name": "overflow",
         "type": "OverflowStrategy",
-        "description": "",
+        "description": "What happens when the triggers do not fit: scroll, wrap, or collapse into a menu. Never truncate — a tab you cannot reach is a tab that does not exist.",
         "required": false
       },
       {
         "name": "panelsClassName",
         "type": "string",
-        "description": "",
+        "description": "Applied to the panel container, not to each panel.",
         "required": false
       },
       {
         "name": "size",
         "type": "TabSize",
-        "description": "",
+        "description": "Trigger height and type scale. The hit area never drops below the 24px floor at any size.",
         "required": false
       },
       {
         "name": "syncHistory",
         "type": "'replace' | 'push'",
-        "description": "",
+        "description": "Whether a change replaces the history entry or pushes a new one. `push` makes Back step through tabs, which is usually not what a reader means by Back.",
         "required": false
       },
       {
         "name": "syncKey",
         "type": "string",
-        "description": "",
+        "description": "The parameter name used by `syncTo`. Required when two tab strips sync on one page.",
         "required": false
       },
       {
         "name": "syncTo",
         "type": "SyncTarget",
-        "description": "",
+        "description": "Mirror the selection into the URL — a query parameter or the hash — so a tab can be linked to and survives a reload.",
         "required": false
       },
       {
@@ -12382,19 +12409,19 @@ export const CATALOG: ComponentDoc[] = [
       {
         "name": "transition",
         "type": "TransitionKind",
-        "description": "",
+        "description": "How panels change. Respects `prefers-reduced-motion` regardless of what is set here.",
         "required": false
       },
       {
         "name": "value",
         "type": "string",
-        "description": "",
+        "description": "The selected tab, controlled. Pair with `onChange`.",
         "required": false
       },
       {
         "name": "variant",
         "type": "TabVariant",
-        "description": "",
+        "description": "Visual skin. Eleven of them share one keyboard model and one accessibility tree, so this changes appearance and nothing else.",
         "required": false
       },
       {
@@ -12423,31 +12450,31 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "items",
             "type": "readonly TabsItemProps[]",
-            "description": "",
+            "description": "The tabs, in order. Each carries its own trigger, panel and disabled state; the strip derives its keyboard model from the enabled ones.",
             "required": true
           },
           {
             "name": "activation",
             "type": "Activation",
-            "description": "",
+            "description": "Whether arrowing to a tab selects it (`automatic`) or merely focuses it (`manual`). Use `manual` when selecting is expensive or destructive.",
             "required": false
           },
           {
             "name": "defaultValue",
             "type": "string",
-            "description": "",
+            "description": "The initially selected tab, uncontrolled. Defaults to the first enabled item.",
             "required": false
           },
           {
             "name": "editable",
             "type": "TabsEditable",
-            "description": "",
+            "description": "Allows tabs to be added and closed, and supplies the handlers for it. Omit for a fixed strip.",
             "required": false
           },
           {
             "name": "fill",
             "type": "FillMode",
-            "description": "",
+            "description": "How triggers divide the available width — natural, equal, or stretched to fill.",
             "required": false
           },
           {
@@ -12465,31 +12492,31 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "indicator",
             "type": "IndicatorKind",
-            "description": "",
+            "description": "The mark showing which tab is selected — an underline, a pill, or none. Never the only cue: selection is also in the accessibility tree.",
             "required": false
           },
           {
             "name": "keepScroll",
             "type": "boolean",
-            "description": "",
+            "description": "Restore each panel's scroll position when it is selected again. Off by default, because on a clinical surface returning to where somebody was is sometimes wrong.",
             "required": false
           },
           {
             "name": "listClassName",
             "type": "string",
-            "description": "",
+            "description": "Applied to the tablist element, for a host that needs to position the strip itself.",
             "required": false
           },
           {
             "name": "locale",
             "type": "Partial<TabsLocale>",
-            "description": "",
+            "description": "Overrides for every generated string — the overflow menu, the close affordance, the count announcements. Supply it for any language that is not English.",
             "required": false
           },
           {
             "name": "mount",
             "type": "MountStrategy",
-            "description": "",
+            "description": "When panels enter the DOM: all at once, on first selection, or only while selected. `eager` costs bytes; `unmount` costs panel state.",
             "required": false
           },
           {
@@ -12501,7 +12528,7 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "onAuditEvent",
             "type": "((event: AuditEvent) => void)",
-            "description": "",
+            "description": "Selection changes as structured events, for hosts that must record which view a clinician was looking at. Pair with `now`.",
             "required": false
           },
           {
@@ -12513,49 +12540,49 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "onChange",
             "type": "((value: string, meta: { via: ChangeSource; }) => void)",
-            "description": "",
+            "description": "Fired after a change commits. `meta.via` says what caused it — pointer, keyboard, hotkey, URL sync — which is what an audit trail needs and what a naive handler throws away.",
             "required": false
           },
           {
             "name": "orientation",
             "type": "Orientation",
-            "description": "",
+            "description": "Horizontal or vertical. Changes which arrow keys move selection, not merely the layout.",
             "required": false
           },
           {
             "name": "overflow",
             "type": "OverflowStrategy",
-            "description": "",
+            "description": "What happens when the triggers do not fit: scroll, wrap, or collapse into a menu. Never truncate — a tab you cannot reach is a tab that does not exist.",
             "required": false
           },
           {
             "name": "panelsClassName",
             "type": "string",
-            "description": "",
+            "description": "Applied to the panel container, not to each panel.",
             "required": false
           },
           {
             "name": "size",
             "type": "TabSize",
-            "description": "",
+            "description": "Trigger height and type scale. The hit area never drops below the 24px floor at any size.",
             "required": false
           },
           {
             "name": "syncHistory",
             "type": "'replace' | 'push'",
-            "description": "",
+            "description": "Whether a change replaces the history entry or pushes a new one. `push` makes Back step through tabs, which is usually not what a reader means by Back.",
             "required": false
           },
           {
             "name": "syncKey",
             "type": "string",
-            "description": "",
+            "description": "The parameter name used by `syncTo`. Required when two tab strips sync on one page.",
             "required": false
           },
           {
             "name": "syncTo",
             "type": "SyncTarget",
-            "description": "",
+            "description": "Mirror the selection into the URL — a query parameter or the hash — so a tab can be linked to and survives a reload.",
             "required": false
           },
           {
@@ -12567,19 +12594,19 @@ export const CATALOG: ComponentDoc[] = [
           {
             "name": "transition",
             "type": "TransitionKind",
-            "description": "",
+            "description": "How panels change. Respects `prefers-reduced-motion` regardless of what is set here.",
             "required": false
           },
           {
             "name": "value",
             "type": "string",
-            "description": "",
+            "description": "The selected tab, controlled. Pair with `onChange`.",
             "required": false
           },
           {
             "name": "variant",
             "type": "TabVariant",
-            "description": "",
+            "description": "Visual skin. Eleven of them share one keyboard model and one accessibility tree, so this changes appearance and nothing else.",
             "required": false
           },
           {

@@ -9,7 +9,7 @@ import { BlockGallery } from "@/components/site/block-gallery";
 export const metadata: Metadata = {
   title: "Showcase — Oxygen UI blocks",
   description:
-    "Behavioral health blocks built with Oxygen UI: a clinical caseload dashboard, a progress note with provenance, a patient details view, and a sourced clinical copilot. Live compositions on synthetic data.",
+    "Production-shaped clinical screens built from Oxygen UI: caseload dashboard, progress note with provenance, patient view, sourced copilot. Live, synthetic data.",
   alternates: { canonical: "/showcase" },
 };
 
@@ -80,9 +80,26 @@ export default function ShowcasePage() {
           </div>
         </section>
 
-        <section className="border-b border-rule bg-paper-sunk/30">
+        {/*
+          The gallery had no heading of its own.
+
+          Every block inside it is an `<h3>`, which left them orphaned directly
+          under the page `<h1>` — a level skipped, and a page that reported one
+          `<h2>` for its entire body. The heading is not decoration here; it is
+          the parent those blocks were already assuming.
+        */}
+        <section aria-labelledby="blocks-heading" className="border-b border-rule bg-paper-sunk/30">
           <div className="mx-auto max-w-6xl section-minor px-5 sm:px-8">
-            <BlockGallery blocks={BLOCKS} />
+            <h2 id="blocks-heading" className="display-sm text-balance" data-reveal>
+              {BLOCKS.length} screens, assembled from the catalogue.
+            </h2>
+            <p className="mt-3 max-w-2xl text-pretty text-graphite" data-reveal>
+              Each one is a live composition on synthetic data, not a screenshot. Open any block to
+              read how it is built and which components it uses.
+            </p>
+            <div className="mt-10">
+              <BlockGallery blocks={BLOCKS} />
+            </div>
           </div>
         </section>
 

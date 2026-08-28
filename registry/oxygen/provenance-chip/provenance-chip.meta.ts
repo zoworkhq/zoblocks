@@ -11,6 +11,8 @@ export default defineComponentMeta({
 
   summary:
     "Where a value came from, how it got here, and how much of it a human has actually looked at.",
+
+  tagline: "Where a value came from, and who has actually read it.",
   description:
     "A 20px affix beside a value, never competing with it. Six source classes with CSS glyphs rather than colours, staleness folded in against a per-datum policy, and — for an AI-extracted value — the model, the source span and whether anybody has confirmed it.",
   rationale:

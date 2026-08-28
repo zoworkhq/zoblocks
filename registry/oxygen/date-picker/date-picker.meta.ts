@@ -11,6 +11,8 @@ export default defineComponentMeta({
 
   summary:
     "One temporal control with fourteen variants: field, calendar, birth date, session, slots, recurrence and the read-only record.",
+
+  tagline: "One temporal control, fourteen variants, one value space.",
   description:
     "Fourteen presentations of one value space, one keyboard model and one accessibility contract. `variant` picks the surface; the parts are separately testable components underneath.",
   rationale:

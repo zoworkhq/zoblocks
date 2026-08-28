@@ -63,6 +63,7 @@ export function buildCatalog(
       ...(meta.deprecation ? { deprecation: meta.deprecation } : {}),
 
       summary: meta.summary,
+      ...(meta.tagline ? { tagline: meta.tagline } : {}),
       description: meta.description,
       rationale: meta.rationale,
       categories: meta.categories,

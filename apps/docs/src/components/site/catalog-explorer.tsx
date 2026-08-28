@@ -139,6 +139,42 @@ export function CatalogExplorer({ catalog }: { catalog: readonly ComponentDoc[] 
     );
   }, [filtered, filtering]);
 
+  /*
+   * The catalogue, grouped.
+   *
+   * It used to render 27 cards as one flat grid under a single heading, which
+   * gave the page no outline at all — nothing for a reader to skim and nothing
+   * for a crawler to build a document structure from. The facets above were
+   * doing the categorising and leaving no trace in the markup.
+   *
+   * Grouping applies only to the unfiltered view. Once somebody has filtered,
+   * they have already said what they are looking for, and re-sorting their
+   * results into bands they did not ask for is the kind of help that gets in
+   * the way.
+   *
+   * A component may carry several categories; it appears once, under its first,
+   * so the bands partition the catalogue rather than overlapping it.
+   */
+  const bands = React.useMemo(() => {
+    if (filtering) return null;
+    const byName = new Map<string, ComponentDoc[]>();
+    for (const component of ordered) {
+      // "Clinical" is cross-cutting, not a band. It is the first category on 15
+      // of 26 components and describes 17, so banding on it produces one heap
+      // and five stragglers. The first *other* category is the functional one.
+      const primary =
+        component.categories.find((name) => name !== "Clinical") ??
+        component.categories[0] ??
+        "Other";
+      if (!byName.has(primary)) byName.set(primary, []);
+      byName.get(primary)!.push(component);
+    }
+    return BAND_ORDER.filter((band) => byName.has(band.name)).map((band) => ({
+      ...band,
+      components: byName.get(band.name)!,
+    }));
+  }, [ordered, filtering]);
+
   const clear = () => {
     setTerm("");
     setCategory(null);
@@ -215,14 +251,39 @@ export function CatalogExplorer({ catalog }: { catalog: readonly ComponentDoc[] 
       </div>
 
       {/* ---- the grid --------------------------------------------- */}
-      {ordered.length ? (
+      {bands ? (
+        bands.map((band) => {
+          const id = `band-${band.name.replace(/\s+/g, "-").toLowerCase()}`;
+          return (
+            <section key={band.name} aria-labelledby={id} className="mt-14 first:mt-8">
+              <h2 id={id} className="display-sm">
+                {band.name}
+                <span className="numeric ml-3 align-middle text-sm font-normal text-graphite-soft">
+                  {band.components.length}
+                </span>
+              </h2>
+              <p className="mt-2 max-w-xl text-sm leading-relaxed text-graphite">{band.blurb}</p>
+              <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {band.components.map((component, index) => (
+                  <ComponentCard
+                    key={component.name}
+                    component={component}
+                    index={index}
+                    featured={FEATURED.includes(component.name)}
+                  />
+                ))}
+              </div>
+            </section>
+          );
+        })
+      ) : ordered.length ? (
         <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {ordered.map((component, index) => (
             <ComponentCard
               key={component.name}
               component={component}
               index={index}
-              featured={!filtering && FEATURED.includes(component.name)}
+              featured={false}
             />
           ))}
         </div>
@@ -250,6 +311,42 @@ export function CatalogExplorer({ catalog }: { catalog: readonly ComponentDoc[] 
     </div>
   );
 }
+
+/**
+ * The bands, in reading order, each with the sentence that defines it.
+ *
+ * Fixed rather than derived: alphabetical order would open the catalogue on
+ * "Clinical" by accident and close it on "Navigation", and the order a reader
+ * needs is the order of a build — what you render, what you collect, where you
+ * put it, and what it says back.
+ *
+ * A category present in the data but missing here gets no band, which is a
+ * visible omission rather than a silent one: the counts on the page would stop
+ * adding up to the catalogue total.
+ */
+const BAND_ORDER: ReadonlyArray<{ name: string; blurb: string }> = [
+  {
+    name: "Data Display",
+    blurb: "Values, trends and records, rendered so the qualifier travels with the number.",
+  },
+  { name: "Data Entry", blurb: "Controls that write to the record, and prove who wrote it." },
+  { name: "Forms", blurb: "Inputs whose value has a third case: nobody has said." },
+  { name: "Navigation", blurb: "Moving through a record without losing where you were." },
+  { name: "Disclosure", blurb: "Showing and hiding content a reader may not simply be shown." },
+  { name: "Feedback", blurb: "What the interface says back — status, severity and refusal." },
+  {
+    name: "AI",
+    blurb: "Model output, marked as model output, with the evidence it was drawn from.",
+  },
+  {
+    name: "Loaders",
+    blurb: "Five waits with different meanings, each with a designed still state.",
+  },
+  { name: "Patterns", blurb: "Compositions rather than parts — whole surfaces of a record." },
+  { name: "Primitives", blurb: "The vocabulary the clinical components are built from." },
+  { name: "Layout", blurb: "Structure that holds a clinical screen together." },
+  { name: "Documentation", blurb: "Components for documenting the components." },
+];
 
 /**
  * One row of facets.
