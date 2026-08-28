@@ -159,13 +159,11 @@ export function CatalogExplorer({ catalog }: { catalog: readonly ComponentDoc[] 
     if (filtering) return null;
     const byName = new Map<string, ComponentDoc[]>();
     for (const component of ordered) {
-      // "Clinical" is cross-cutting, not a band. It is the first category on 15
-      // of 26 components and describes 17, so banding on it produces one heap
-      // and five stragglers. The first *other* category is the functional one.
+      // The first category that maps to a band. "Clinical" maps to none, which
+      // is what keeps it from swallowing two thirds of the catalogue.
       const primary =
-        component.categories.find((name) => name !== "Clinical") ??
-        component.categories[0] ??
-        "Other";
+        component.categories.map((c) => BAND_OF.get(c)).find(Boolean) ??
+        BAND_ORDER[BAND_ORDER.length - 1]!.name;
       if (!byName.has(primary)) byName.set(primary, []);
       byName.get(primary)!.push(component);
     }
@@ -253,9 +251,27 @@ export function CatalogExplorer({ catalog }: { catalog: readonly ComponentDoc[] 
       {/* ---- the grid --------------------------------------------- */}
       {bands ? (
         bands.map((band) => {
-          const id = `band-${band.name.replace(/\s+/g, "-").toLowerCase()}`;
+          /*
+           * Slug, not just de-spaced.
+           *
+           * Replacing whitespace alone turned "Entry & forms" into
+           * `band-entry-&-forms`. That is legal in an id attribute and
+           * useless everywhere it matters: `querySelector("#band-entry-&-forms")`
+           * throws, and it cannot be linked as a fragment without escaping.
+           * Anything that is not a letter or a digit becomes a hyphen.
+           */
+          const id = `band-${band.name
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, "-")
+            .replace(/^-|-$/g, "")}`;
           return (
-            <section key={band.name} aria-labelledby={id} className="mt-14 first:mt-8">
+            <section
+              key={band.name}
+              aria-labelledby={id}
+              // Clears the sticky filter panel, which is 186px tall with every
+              // facet shown. Without this a linked heading lands underneath it.
+              className="mt-16 scroll-mt-[calc(var(--header-h)+13rem)] first:mt-8"
+            >
               <h2 id={id} className="display-sm">
                 {band.name}
                 <span className="numeric ml-3 align-middle text-sm font-normal text-graphite-soft">
@@ -315,38 +331,52 @@ export function CatalogExplorer({ catalog }: { catalog: readonly ComponentDoc[] 
 /**
  * The bands, in reading order, each with the sentence that defines it.
  *
- * Fixed rather than derived: alphabetical order would open the catalogue on
- * "Clinical" by accident and close it on "Navigation", and the order a reader
- * needs is the order of a build — what you render, what you collect, where you
- * put it, and what it says back.
+ * Merged rather than one band per category. Banding straight on the category
+ * data produced ten headings for 27 components, six of which covered one or
+ * two cards — a display heading, a blurb and a single card, six times. That
+ * fragments the page rather than giving it an outline, which is the opposite
+ * of the point.
  *
- * A category present in the data but missing here gets no band, which is a
- * visible omission rather than a silent one: the counts on the page would stop
- * adding up to the catalogue total.
+ * These five cover 3 to 8 components each. A band is worth a heading when a
+ * reader could plausibly be looking for "one of those"; below about three it
+ * is a list with extra steps.
+ *
+ * "Clinical" is not a band. It is the first category on 15 of 26 components
+ * and describes 17, so it partitions nothing — the FHIR resource on each card
+ * already says which components are clinical.
  */
-const BAND_ORDER: ReadonlyArray<{ name: string; blurb: string }> = [
+const BAND_ORDER: ReadonlyArray<{ name: string; blurb: string; categories: readonly string[] }> = [
   {
-    name: "Data Display",
-    blurb: "Values, trends and records, rendered so the qualifier travels with the number.",
-  },
-  { name: "Data Entry", blurb: "Controls that write to the record, and prove who wrote it." },
-  { name: "Forms", blurb: "Inputs whose value has a third case: nobody has said." },
-  { name: "Navigation", blurb: "Moving through a record without losing where you were." },
-  { name: "Disclosure", blurb: "Showing and hiding content a reader may not simply be shown." },
-  { name: "Feedback", blurb: "What the interface says back — status, severity and refusal." },
-  {
-    name: "AI",
-    blurb: "Model output, marked as model output, with the evidence it was drawn from.",
+    name: "Clinical data",
+    blurb: "Values, trends and model output, rendered so the qualifier travels with the number.",
+    categories: ["Data Display", "AI"],
   },
   {
-    name: "Loaders",
+    name: "Entry & forms",
+    blurb: "Controls that write to the record, including the ones whose value has a third case.",
+    categories: ["Data Entry", "Forms"],
+  },
+  {
+    name: "Navigation & disclosure",
+    blurb: "Moving through a record, and showing content a reader may not simply be shown.",
+    categories: ["Navigation", "Disclosure"],
+  },
+  {
+    name: "Waiting & feedback",
     blurb: "Five waits with different meanings, each with a designed still state.",
+    categories: ["Loaders", "Feedback"],
   },
-  { name: "Patterns", blurb: "Compositions rather than parts — whole surfaces of a record." },
-  { name: "Primitives", blurb: "The vocabulary the clinical components are built from." },
-  { name: "Layout", blurb: "Structure that holds a clinical screen together." },
-  { name: "Documentation", blurb: "Components for documenting the components." },
+  {
+    name: "Patterns & primitives",
+    blurb: "Whole surfaces, and the vocabulary the clinical components are built from.",
+    categories: ["Patterns", "Primitives", "Layout", "Documentation"],
+  },
 ];
+
+/** Category → band, derived once from the table above. */
+const BAND_OF = new Map<string, string>(
+  BAND_ORDER.flatMap((band) => band.categories.map((c) => [c, band.name] as const)),
+);
 
 /**
  * One row of facets.
