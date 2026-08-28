@@ -104,23 +104,69 @@ export type DatePickerVariant =
 
 /** Every variant carries the same clock contract: nothing reads the wall clock. */
 export interface DatePickerCommonProps {
+  /**
+   * Which of the fourteen temporal controls to render. They share one contract and one
+   * keyboard model; this picks the surface.
+   */
   variant?: DatePickerVariant;
   /** Today, supplied by the host. ENGINEERING.md §9 — never read here. */
   now?: OxDate;
 }
 
+/**
+ * The dispatch union. Each member pairs a `variant` with exactly the props that
+ * variant accepts, so passing `durationPresets` to a calendar is a type error
+ * rather than a prop that is silently ignored.
+ *
+ * `variant` carries its description on every branch. The prop extractor reads
+ * the union member rather than `DatePickerCommonProps`, so a doc comment on the
+ * shared interface alone leaves the published table blank.
+ */
 export type DatePickerProps =
-  | ({ variant?: "picker" | "field" } & DateFieldProps & { showCalendar?: boolean })
-  | ({ variant: "calendar" | "range" | "multiple" } & CalendarProps)
-  | ({ variant: "birth-date" } & BirthDateFieldProps)
-  | ({ variant: "time" } & TimeFieldProps)
-  | ({ variant: "session" } & SessionTimeFieldProps)
-  | ({ variant: "slots" } & TimeSlotGridProps)
-  | ({ variant: "scheduler" } & AppointmentSchedulerProps)
-  | ({ variant: "recurrence" } & RecurrenceFieldProps)
-  | ({ variant: "series" } & RecurringSeriesSchedulerProps)
-  | ({ variant: "group" } & GroupSeriesSchedulerProps)
-  | ({ variant: "readout" } & ClinicalDateTimeProps);
+  | ({
+      /** Which of the fourteen temporal controls to render. Defaults to the date field. */
+      variant?: "picker" | "field";
+    } & DateFieldProps & { showCalendar?: boolean })
+  | ({
+      /** A month grid. `range` is two clicks, `multiple` is a capped set. */
+      variant: "calendar" | "range" | "multiple";
+    } & CalendarProps)
+  | ({
+      /** A date of birth, with its own precision and absence handling. */
+      variant: "birth-date";
+    } & BirthDateFieldProps)
+  | ({
+      /** A time of day, with optional organisation presets. */
+      variant: "time";
+    } & TimeFieldProps)
+  | ({
+      /** A start, an end and a derived duration that may cross midnight. */
+      variant: "session";
+    } & SessionTimeFieldProps)
+  | ({
+      /** A grid of bookable times. */
+      variant: "slots";
+    } & TimeSlotGridProps)
+  | ({
+      /** Provider, date and slot, resolved together. */
+      variant: "scheduler";
+    } & AppointmentSchedulerProps)
+  | ({
+      /** A recurrence rule, expressed in words and emitted as RRULE. */
+      variant: "recurrence";
+    } & RecurrenceFieldProps)
+  | ({
+      /** A recurring series with its conflicts resolved one occurrence at a time. */
+      variant: "series";
+    } & RecurringSeriesSchedulerProps)
+  | ({
+      /** A recurring group with capacity, facilitators and a room. */
+      variant: "group";
+    } & GroupSeriesSchedulerProps)
+  | ({
+      /** The read-only record rendering. Not an input. */
+      variant: "readout";
+    } & ClinicalDateTimeProps);
 
 /**
  * The front door.

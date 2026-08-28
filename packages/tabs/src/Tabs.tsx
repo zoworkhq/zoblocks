@@ -50,12 +50,18 @@ export interface TabsItemProps {
 }
 
 export interface TabsProps extends Omit<TabsRootProps, "children"> {
+  /**
+   * The tabs, in order. Each carries its own trigger, panel and disabled state; the strip
+   * derives its keyboard model from the enabled ones.
+   */
   items: readonly TabsItemProps[];
   /** Required: the accessible name of the strip. */
   "aria-label": string;
   /** Rendered between the strip and the panels — a toolbar, a filter row. */
   toolbar?: React.ReactNode;
+  /** Applied to the tablist element, for a host that needs to position the strip itself. */
   listClassName?: string;
+  /** Applied to the panel container, not to each panel. */
   panelsClassName?: string;
 }
 

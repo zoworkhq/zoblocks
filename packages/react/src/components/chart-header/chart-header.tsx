@@ -103,6 +103,11 @@ export {
 type BannerPatient = NonNullable<PatientBannerProps["patient"]>;
 
 export interface ChartHeaderProps {
+  /**
+   * The patient this chart belongs to. `Patient.gender` is deliberately not rendered — it is
+   * administrative gender, and a bare “M” beside a dose is a prescriber reading the wrong
+   * reference range.
+   */
   patient: BannerPatient;
   /**
    * Two, enforced by the type — this is NPSG.01.01.01 in the signature rather
@@ -118,14 +123,22 @@ export interface ChartHeaderProps {
   now?: string;
   /** Every encounter open for this patient. One is selected by the caller. */
   encounters?: readonly EncounterOption[];
+  /** Which encounter is in view, controlled. */
   selectedEncounterId?: string;
   /**
    * Switching encounter is a deliberate act, and the host re-guards every open
    * form on the far side of it.
    */
   onSelectEncounter?: (id: string | undefined) => void;
+  /**
+   * The banner facts, in the fixed house order: allergies, code status, isolation, legal
+   * status. Same order on every chart in the building, because a reader scans position before
+   * words.
+   */
   safety?: SafetyInput;
+  /** The care programme and where the patient is in it, e.g. IOP week 3 of 8. */
   program?: Program;
+  /** Where the patient physically is. Shown because the answer changes who can act. */
   ward?: string;
   /** Rendered at the end of the expanded row. Actions belong to the application. */
   actions?: React.ReactNode;
@@ -137,7 +150,12 @@ export interface ChartHeaderProps {
    * to the wrong ancestor is worse than none.
    */
   collapsed?: boolean;
+  /**
+   * Fired when the header collapses to its safety strip or expands again. Content moves behind
+   * a disclosure rather than out of the DOM.
+   */
   onCollapsedChange?: (collapsed: boolean) => void;
+  /** Applied to the header element. */
   className?: string;
   /**
    * The screen, rendered inside the patient context the banner establishes.

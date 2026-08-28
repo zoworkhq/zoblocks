@@ -216,6 +216,10 @@ export interface DateFieldProps extends Omit<
    * `value` wins — the ordinary React contract.
    */
   defaultValue?: OxDate | null;
+  /**
+   * Fired on every complete, valid date, and with `null` when the field is cleared. Never
+   * fired mid-typing.
+   */
   onChange?: (value: OxDate | null) => void;
 
   /**
@@ -241,14 +245,26 @@ export interface DateFieldProps extends Omit<
    */
   twoDigitYearPivot?: number;
 
+  /**
+   * Earliest selectable date, inclusive. Dates before it are refused with a spoken reason
+   * rather than silently ignored.
+   */
   min?: OxDate;
+  /** Latest selectable date, inclusive. */
   max?: OxDate;
+  /**
+   * What a future date means here — allowed, warned about, or refused. A date of birth and an
+   * appointment want opposite answers.
+   */
   futurePolicy?: TemporalPolicy;
+  /** What a past date means here. The mirror of `futurePolicy`, and just as rarely the same. */
   pastPolicy?: TemporalPolicy;
 
+  /** The field's visible label, and its accessible name. */
   label?: string;
   /** Renders "Optional" beside the label. An unmarked field is ambiguous. */
   optional?: boolean;
+  /** Marks the field required and announces it. Does not itself validate. */
   required?: boolean;
   /** Advisory text under the field. Never announced assertively. */
   hint?: React.ReactNode;
@@ -257,9 +273,22 @@ export interface DateFieldProps extends Omit<
   /** Show "Today", "5 days ago" under a complete value. Needs `now`. */
   showRelative?: boolean;
 
+  /**
+   * Removes the field from the tab order entirely. Prefer `readOnly` for anything the reader
+   * may still need to read.
+   */
   disabled?: boolean;
+  /**
+   * Readable and focusable but not editable — the right prop for a value governed by policy or
+   * record state.
+   */
   readOnly?: boolean;
+  /**
+   * Renders the invalid styling and sets `aria-invalid`. Pair with `error` so the reason is
+   * stated, not merely coloured.
+   */
   invalid?: boolean;
+  /** Form field name, for an uncontrolled submit. */
   name?: string;
 
   /**
@@ -570,21 +599,39 @@ export interface CalendarProps extends Omit<
   /** `single` is the default. `range` is two clicks; there is no drag path. */
   mode?: CalendarMode;
 
+  /** Controlled value. Pass `null` for empty, never `undefined`. */
   value?: OxDate | null;
+  /**
+   * Uncontrolled initial value. Pass this or `value`, never both; `value` wins if you pass
+   * both.
+   */
   defaultValue?: OxDate | null;
+  /** Fired when a single date is chosen. Only meaningful in `mode="single"`. */
   onChange?: (value: OxDate | null) => void;
 
+  /** The selected range, controlled. Only meaningful in `mode="range"`. */
   range?: DateRangeValue | null;
+  /** Fired when a range completes — on the second click, not the first. */
   onRangeChange?: (range: DateRangeValue) => void;
 
+  /** The selected dates, controlled. Only meaningful in `mode="multiple"`. */
   dates?: OxDate[];
+  /** Fired whenever the multiple-selection set changes. */
   onDatesChange?: (dates: OxDate[]) => void;
   /** Cap for `mode="multiple"`. Further dates are refused, never dialogued. */
   maxDates?: number;
 
   /** The month on screen. Uncontrolled when omitted. */
   month?: MonthRef;
+  /**
+   * The month shown on first render, uncontrolled. Defaults to the month of the value, or of
+   * `now`.
+   */
   defaultMonth?: MonthRef;
+  /**
+   * Fired when the reader pages the grid. Use it to fetch availability for the month coming
+   * into view.
+   */
   onMonthChange?: (month: MonthRef) => void;
 
   /**
@@ -594,7 +641,9 @@ export interface CalendarProps extends Omit<
    */
   now?: OxDate | null;
 
+  /** Earliest selectable date, inclusive. */
   min?: OxDate;
+  /** Latest selectable date, inclusive. */
   max?: OxDate;
   /**
    * The reason a date cannot be chosen, or null.
@@ -609,9 +658,22 @@ export interface CalendarProps extends Omit<
 
   /** 0 = Sunday. From `Intl.Locale.getWeekInfo`, never hardcoded. */
   weekStart?: number;
+  /**
+   * The two-letter column headings. Visual only — each cell still carries its full weekday
+   * name for a screen reader.
+   */
   weekdayLabels?: readonly string[];
+  /**
+   * Full weekday names, used in each cell's accessible name. Supply both these and
+   * `weekdayLabels` for any language that is not English.
+   */
   weekdayNames?: readonly string[];
+  /** Full month names, for the header and for each cell's accessible name. */
   monthNames?: readonly string[];
+  /**
+   * Overrides the rendered month heading, for a host that formats it differently from the
+   * default.
+   */
   monthLabel?: (month: MonthRef) => string;
 
   /** Fills its container rather than sitting at its natural 252px. */
@@ -837,8 +899,14 @@ export interface TimeFieldProps extends Omit<
   React.HTMLAttributes<HTMLDivElement>,
   "onChange" | "defaultValue" | "children"
 > {
+  /** Controlled value. Pass `null` for empty, never `undefined`. */
   value?: OxTime | null;
+  /**
+   * Uncontrolled initial value. Pass this or `value`, never both; `value` wins if you pass
+   * both.
+   */
   defaultValue?: OxTime | null;
+  /** Fired on every complete time, and with `null` when cleared. */
   onChange?: (value: OxTime | null) => void;
 
   /** 24-hour display. The stored value is 24-hour either way. */
@@ -853,20 +921,50 @@ export interface TimeFieldProps extends Omit<
    * fifty-three-minute sessions are the same component with different data.
    */
   presets?: readonly number[];
+  /**
+   * The heading above the preset chips. Name them for what they are — “Clinic slots”, not
+   * “Presets”.
+   */
   presetLabel?: string;
 
+  /** Earliest selectable time, inclusive. */
   min?: OxTime;
+  /** Latest selectable time, inclusive. */
   max?: OxTime;
 
+  /** The field's visible label, and its accessible name. */
   label?: string;
+  /** Marks the field required and announces it. Does not itself validate. */
   required?: boolean;
+  /**
+   * Marks the field explicitly optional. Use where most fields on the form are required and
+   * the exception needs saying.
+   */
   optional?: boolean;
+  /**
+   * Guidance under the field, associated with it so assistive technology reads it as part of
+   * the field.
+   */
   hint?: React.ReactNode;
+  /** The validation message. Announced, and it replaces the hint rather than stacking under it. */
   error?: React.ReactNode;
 
+  /**
+   * Removes the field from the tab order entirely. Prefer `readOnly` for anything the reader
+   * may still need to read.
+   */
   disabled?: boolean;
+  /**
+   * Readable and focusable but not editable — the right prop for a value governed by policy or
+   * record state.
+   */
   readOnly?: boolean;
+  /**
+   * Renders the invalid styling and sets `aria-invalid`. Pair with `error` so the reason is
+   * stated, not merely coloured.
+   */
   invalid?: boolean;
+  /** Form field name, for an uncontrolled submit. */
   name?: string;
 }
 
@@ -1093,8 +1191,17 @@ export interface SessionTimeFieldProps extends Omit<
   React.HTMLAttributes<HTMLDivElement>,
   "onChange" | "defaultValue" | "children"
 > {
+  /** Controlled value. Pass `null` for empty, never `undefined`. */
   value?: SessionInterval | null;
+  /**
+   * Uncontrolled initial value. Pass this or `value`, never both; `value` wins if you pass
+   * both.
+   */
   defaultValue?: SessionInterval | null;
+  /**
+   * Fired whenever start, end or duration changes. The interval is always internally
+   * consistent when it fires.
+   */
   onChange?: (value: SessionInterval) => void;
 
   /**
@@ -1121,18 +1228,39 @@ export interface SessionTimeFieldProps extends Omit<
   /** Whether an end at or before the start is read as the next day. */
   allowOvernight?: boolean;
 
+  /** 24-hour display. The stored interval is 24-hour either way. */
   hour24?: boolean;
   /** The date the session starts on, so the next-day badge can name a day. */
   startDateLabel?: string;
+  /**
+   * How a session crossing midnight is labelled — “next day” by default. The crossing is a
+   * value, not a warning.
+   */
   nextDateLabel?: string;
 
+  /** The field's visible label, and its accessible name. */
   label?: string;
+  /** Label for the start segment. */
   startLabel?: string;
+  /** Label for the end segment. */
   endLabel?: string;
+  /**
+   * Label for the derived duration. Derived and editable — typing a duration moves the end,
+   * not the start.
+   */
   durationLabel?: string;
 
+  /**
+   * Removes the field from the tab order entirely. Prefer `readOnly` for anything the reader
+   * may still need to read.
+   */
   disabled?: boolean;
+  /**
+   * Readable and focusable but not editable — the right prop for a value governed by policy or
+   * record state.
+   */
   readOnly?: boolean;
+  /** The validation message. Announced, and it replaces the hint rather than stacking under it. */
   error?: React.ReactNode;
 }
 
@@ -1424,22 +1552,45 @@ export interface BirthDateFieldProps extends Omit<
   React.HTMLAttributes<HTMLDivElement>,
   "onChange" | "defaultValue" | "children"
 > {
+  /** Controlled value. Pass `null` for empty, never `undefined`. */
   value?: BirthDateValue;
+  /**
+   * Uncontrolled initial value. Pass this or `value`, never both; `value` wins if you pass
+   * both.
+   */
   defaultValue?: BirthDateValue;
+  /**
+   * Fired with the whole birth-date value, which carries its precision and any absence reason
+   * alongside the date.
+   */
   onChange?: (value: BirthDateValue) => void;
 
   /** Today, supplied by the host. The age and the future check both need it. */
   now: OxDate;
 
+  /**
+   * How exactly the date is known — full, month, or year. Controlled; pair with
+   * `onPrecisionChange`.
+   */
   precision?: BirthDatePrecision;
+  /** Fired when the reader downgrades precision, e.g. choosing “Exact date unknown”. */
   onPrecisionChange?: (precision: BirthDatePrecision) => void;
   /** Offers "Exact date unknown", which switches the field to year only. */
   allowEstimated?: boolean;
   /** Offers "Not recorded", which emits an absent value carrying a reason. */
   allowAbsent?: boolean;
+  /**
+   * Why no date is recorded. A date of birth that is missing and one that was refused are
+   * different facts about the record.
+   */
   absentReason?: TemporalAbsence;
 
+  /**
+   * Segment order — from the locale, never guessed. A US and a UK intake form disagree, and
+   * getting it wrong silently swaps day and month.
+   */
   order?: DateOrder;
+  /** The year two-digit input pivots on. Below it reads as 20xx, at or above as 19xx. */
   twoDigitYearPivot?: number;
 
   /**
@@ -1452,15 +1603,31 @@ export interface BirthDateFieldProps extends Omit<
    */
   suggested?: OxDate;
 
+  /** The field's visible label, and its accessible name. */
   label?: string;
+  /** Marks the field required and announces it. Does not itself validate. */
   required?: boolean;
+  /**
+   * Guidance under the field, associated with it so assistive technology reads it as part of
+   * the field.
+   */
   hint?: React.ReactNode;
+  /** The validation message. Announced, and it replaces the hint rather than stacking under it. */
   error?: React.ReactNode;
   /** Hide the age readout. Rarely right — it is the field's own error check. */
   hideAge?: boolean;
 
+  /**
+   * Removes the field from the tab order entirely. Prefer `readOnly` for anything the reader
+   * may still need to read.
+   */
   disabled?: boolean;
+  /**
+   * Readable and focusable but not editable — the right prop for a value governed by policy or
+   * record state.
+   */
   readOnly?: boolean;
+  /** Form field name, for an uncontrolled submit. */
   name?: string;
 }
 
@@ -1810,6 +1977,7 @@ export interface ClinicalDateTimeProps extends Omit<React.HTMLAttributes<HTMLEle
   showZone?: boolean;
   /** The reader's own zone. A second line appears only if it differs. */
   viewerZone?: string;
+  /** 24-hour display. The recorded value is 24-hour either way. */
   hour24?: boolean;
   /** Marks a value the reader's access level hides rather than removes. */
   restricted?: boolean;
@@ -2009,15 +2177,24 @@ export interface TimeSlotGridProps extends Omit<
   now?: { date: OxDate; time: OxTime };
   /** Selected slot id. Ids are stable across a refresh on purpose. */
   value?: string | null;
+  /**
+   * Fired with the chosen slot. A slot that is taken is rendered and disabled rather than
+   * removed, so the grid does not reflow under the reader's cursor.
+   */
   onSelect?: (slot: Slot) => void;
   /** Offered when the set is stale. Absent means refreshing is not possible. */
   onRefresh?: () => void;
 
+  /** 24-hour display. */
   hour24?: boolean;
   /** Group label, read by assistive technology before the times. */
   label?: string;
   /** Rendered when there is nothing to choose. */
   emptyState?: React.ReactNode;
+  /**
+   * Disables the whole grid. Individual slot availability comes from the slot data, not from
+   * here.
+   */
   disabled?: boolean;
 }
 
@@ -2195,8 +2372,14 @@ export interface RecurrenceFieldProps extends Omit<
   React.HTMLAttributes<HTMLDivElement>,
   "onChange" | "defaultValue" | "children"
 > {
+  /** Controlled value. Pass `null` for empty, never `undefined`. */
   value?: RecurrenceRule;
+  /**
+   * Uncontrolled initial value. Pass this or `value`, never both; `value` wins if you pass
+   * both.
+   */
   defaultValue?: RecurrenceRule;
+  /** Fired with the recurrence rule whenever any part of it changes. */
   onChange?: (rule: RecurrenceRule) => void;
 
   /** The first occurrence. The rule is meaningless without one. */
@@ -2220,8 +2403,17 @@ export interface RecurrenceFieldProps extends Omit<
    */
   unsupported?: { source: string; parts: string[] } | null;
 
+  /** The field's visible label, and its accessible name. */
   label?: string;
+  /**
+   * Removes the field from the tab order entirely. Prefer `readOnly` for anything the reader
+   * may still need to read.
+   */
   disabled?: boolean;
+  /**
+   * Shows the generated RFC 5545 RRULE. For an integrator checking what the control produces,
+   * not for a clinician.
+   */
   showRRule?: boolean;
 }
 
@@ -2559,29 +2751,51 @@ export interface AppointmentSchedulerProps extends Omit<
   React.HTMLAttributes<HTMLDivElement>,
   "onSelect" | "children"
 > {
+  /**
+   * The people who can be booked. Each carries its own availability; the grid is the
+   * intersection of provider, date and duration.
+   */
   providers: readonly SchedulableActor[];
   /** Controlled actor. Uncontrolled falls back to the first. */
   actorId?: string;
+  /**
+   * Fired when the reader switches provider, so the host can fetch that provider's
+   * availability.
+   */
   onActorChange?: (actorId: string) => void;
 
   /** The day whose slots are shown. */
   date?: OxDate;
+  /** Fired when the reader moves to another day. */
   onDateChange?: (date: OxDate) => void;
   /** Open counts for the strip. The host supplies these; nothing is derived. */
   dayLoads?: readonly DayLoad[];
   /** How many days the strip shows. */
   horizonDays?: number;
 
+  /**
+   * Bookable slots for the current provider and date. Absence of a slot is not the same as a
+   * slot that is taken, and the grid draws both.
+   */
   availability: AvailabilitySet;
   /** Called whenever the question changes. The host does the loading. */
   onRequestAvailability?: (query: AvailabilityQuery) => void;
 
   /** The clock, injected. Staleness and the strip both need it. */
   now: { date: OxDate; time: OxTime };
+  /** How long the appointment being booked is. Changes which slots can accommodate it. */
   durationMinutes?: number;
+  /**
+   * Time held before and after each appointment. Rendered, so the reader can see why an
+   * apparently free slot is not offered.
+   */
   buffers?: Buffers;
 
   value?: string | null;
+  /**
+   * Fired with the chosen slot. Booking itself is the host's, because it needs a write the
+   * component cannot make.
+   */
   onSelect?: (choice: { actor: SchedulableActor; date: OxDate; slot: Slot }) => void;
   /** A hold that ran out while the form was open. */
   onHoldExpired?: (slot: Slot) => void;
@@ -2592,6 +2806,7 @@ export interface AppointmentSchedulerProps extends Omit<
   hour24?: boolean;
   /** The viewer's own zone. A second line appears only when it differs. */
   viewerZone?: string;
+  /** The field's visible label, and its accessible name. */
   label?: string;
 }
 
@@ -2867,6 +3082,7 @@ export interface RecurringSeriesSchedulerProps extends Omit<
   React.HTMLAttributes<HTMLDivElement>,
   "children" | "onSelect"
 > {
+  /** The recurrence rule the series expands from. */
   rule: RecurrenceRule;
   startDate: OxDate;
   /** Rendered into the sentence and each row — "3:00 PM – 3:53 PM". */
@@ -2875,16 +3091,30 @@ export interface RecurringSeriesSchedulerProps extends Omit<
   verdicts?: readonly OccurrenceVerdict[];
   /** ISO dates the user has already resolved. */
   resolved?: ReadonlySet<string>;
+  /**
+   * Fired when the reader moves or drops one occurrence that conflicts. The series is edited
+   * per occurrence, never regenerated.
+   */
   onResolve?: (isoDate: string, to: OxDate) => void;
+  /** Fired when the reader undoes a resolution and restores the original occurrence. */
   onUnresolve?: (isoDate: string) => void;
   /** Resolve every conflict that carries an alternative, in one press. */
   onResolveAll?: () => void;
+  /**
+   * Fired with the whole resolved series. Nothing is booked until every conflict is resolved
+   * or explicitly kept.
+   */
   onBook?: (dates: OxDate[]) => void;
   onExpand?: (dates: OxDate[]) => void;
 
+  /** The field's visible label, and its accessible name. */
   label?: string;
   /** How many rows to show before collapsing. The rest are counted. */
   visibleRows?: number;
+  /**
+   * Removes the field from the tab order entirely. Prefer `readOnly` for anything the reader
+   * may still need to read.
+   */
   disabled?: boolean;
 }
 
@@ -3129,16 +3359,33 @@ export interface GroupSeriesSchedulerProps extends Omit<
   startDate: OxDate;
   /** "4:00 PM – 5:30 PM". Rendered into the sentence and every row. */
   timeLabel?: string;
+  /** How long each session runs. */
   sessionMinutes?: number;
 
   /** Dates the group does not meet. Folded into the rule as EXDATE. */
   exclusions?: readonly SeriesExclusion[];
 
+  /**
+   * Who runs the group. Their availability constrains the series in the same way a provider's
+   * does.
+   */
   facilitators?: readonly string[];
+  /**
+   * Where it meets. A room is a resource with its own availability, and double-booking one is
+   * the most common group-scheduling failure.
+   */
   room?: { name: string; capacity?: number };
   /** In-person, telehealth, or both. Rendered; never inferred. */
   modality?: string;
+  /**
+   * How many places the group has. Shown against enrolment, because a group at capacity is a
+   * scheduling fact and not an error.
+   */
   capacity?: number;
+  /**
+   * Who is already enrolled. Counted against `capacity` and listed, so the reader can see who
+   * they are adding to.
+   */
   enrolled?: number;
 
   label?: string;

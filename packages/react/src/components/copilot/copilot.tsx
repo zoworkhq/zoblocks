@@ -73,11 +73,29 @@ import {
 import { cn } from "../../lib/utils";
 
 export interface CopilotProps extends UseCopilotOptions {
+  /**
+   * Prompts offered before the reader types. They are starting points, not commands — each
+   * still runs through its mode's contract.
+   */
   shortcuts?: readonly CopilotShortcut[];
+  /**
+   * ARIA role for the dock. Defaults to `complementary`, so the copilot is findable and
+   * skippable rather than an unnamed div.
+   */
   role?: string;
+  /** Where the dock sits. `inline` renders it in flow for a surface that has its own layout. */
   anchor?: "bottom-center" | "bottom-right" | "inline";
+  /** Applied to the dock's outer element. */
   className?: string;
+  /**
+   * Called when the reader chooses to put an answer into the note they are writing. Receives
+   * text; the host owns where it lands and what provenance it carries.
+   */
   onInsert?: (text: string) => void;
+  /**
+   * Called when a safety classifier escalates. The host runs its own protocol — this component
+   * never decides what happens next in a crisis.
+   */
   onRiskProtocol?: () => void;
 }
 
@@ -443,7 +461,20 @@ function ScopeStrip({
  * returns a stale range should mark the wrong words at worst, never throw away
  * the passage.
  */
-export function HighlightedPassage({ text, at }: { text: string; at?: readonly [number, number] }) {
+export interface HighlightedPassageProps {
+  /** The source passage, verbatim. Never re-flowed or truncated — a citation the reader cannot check against the original is not a citation. */
+  text: string;
+  /**
+   * Character offsets of the span the answer drew on, as `[start, end]`.
+   *
+   * Out-of-range offsets highlight nothing rather than throwing: a citation
+   * that points past the end of its own source is a bug in the caller, and
+   * silently marking the wrong sentence would be worse than marking none.
+   */
+  at?: readonly [number, number];
+}
+
+export function HighlightedPassage({ text, at }: HighlightedPassageProps) {
   if (!at) return <>{text}</>;
 
   const start = Math.max(0, Math.min(at[0], text.length));

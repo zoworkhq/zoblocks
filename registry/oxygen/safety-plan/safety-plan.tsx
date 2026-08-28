@@ -112,6 +112,10 @@ export interface SafetyPlanProps extends Omit<
   React.HTMLAttributes<HTMLDivElement>,
   "children" | "onChange"
 > {
+  /**
+   * The six Stanley-Brown steps, in order. The order is the intervention; a plan rendered out
+   * of sequence is a different document.
+   */
   steps: SafetyPlanSteps;
   /** ISO 8601. Shown so a reader knows how current the plan is. */
   revisedAt?: string;
@@ -125,7 +129,12 @@ export interface SafetyPlanProps extends Omit<
    * step is being worked on and none of them is the emergency.
    */
   pinCrisisStep?: boolean;
+  /**
+   * Where the plan's headings sit in the page outline. Set it to match the surrounding
+   * document rather than letting a plan start at h1 inside a chart.
+   */
   headingLevel?: AccordionHeadingLevel;
+  /** Row height and type scale. Inherited from the nearest density provider when omitted. */
   density?: AccordionDensity;
 }
 

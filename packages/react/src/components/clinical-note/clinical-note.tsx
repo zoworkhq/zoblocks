@@ -219,11 +219,16 @@ export type CommitKind = "draft" | "sign" | "addend";
 export interface ClinicalNoteProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "onChange"> {
   /** Who the note is about. Never optional — it is the wrong-patient mitigation. */
   subject: NoteSubject;
+  /**
+   * Who is writing. Distinct from `recordedBy` on the signature: the person composing and the
+   * person attesting are not always the same.
+   */
   author: NoteAuthor;
   /** Decides which sections exist and which of them block a signature. */
   noteType: NoteTypeName | NoteTypeDef;
   /** The document. Defaults to an empty note of `noteType`. */
   value?: PMNode;
+  /** Fired as the note is edited, with the origin of the edit preserved. */
   onChange?: (doc: PMNode) => void;
   /**
    * The instant the gate is evaluated against, from the host's clock.
@@ -446,12 +451,24 @@ export function SignGate({
   onCancel,
   onNavigate,
 }: {
+  /**
+   * What is standing between this note and a signature, each with a severity.
+   *
+   * Rendered in full rather than summarised: "3 issues" tells an author to
+   * hunt, and the point of the gate is that it already knows.
+   */
   findings: readonly Finding[];
+  /** Whether policy permits this author to sign at all. Separate from whether the findings currently allow it. */
   canSign: boolean;
+  /** The sentence being signed. Shown before the control, never after the decision. */
   attestation?: string;
+  /** Who is signing, and in what capacity. */
   author: NoteAuthor;
+  /** Fired with the ids of every finding the author acknowledged on the way through. Acknowledgement is part of the record, not a dismissal. */
   onSign?: (acknowledged: string[]) => void;
+  /** Fired when the author backs out of signing. The draft is untouched. */
   onCancel?: () => void;
+  /** Fired when the author jumps to the passage a finding is about. Without it a finding names a problem and offers no way to reach it. */
   onNavigate?: (finding: Finding) => void;
 }) {
   const [attested, setAttested] = React.useState(false);
@@ -620,10 +637,25 @@ export function ClinicalNoteReader({
   className,
   ...rest
 }: {
+  /** Who the note is about. Rendered so a reader can check the chart before believing the note. */
   subject: NoteSubject;
+  /** The note's heading, and the article's accessible name. */
   title: string;
+  /** The signed document. Read-only by construction — this component has no editing path at all. */
   doc: PMNode;
+  /**
+   * Signatures on the note, in order.
+   *
+   * A countersignature is another attestation rather than a second copy of the
+   * first, so each carries its own signer, capacity and time.
+   */
   attestations?: readonly Attestation[];
+  /**
+   * Addenda appended after signing.
+   *
+   * Never merged into the body: an addendum is a separate authored act, and
+   * folding it into the original text would rewrite what somebody signed.
+   */
   addenda?: readonly Addendum[];
 } & React.HTMLAttributes<HTMLElement>) {
   return (

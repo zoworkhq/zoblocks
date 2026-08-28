@@ -87,9 +87,14 @@ export interface ChartAccordionProps extends Omit<
   AccordionProps,
   "items" | "activeKey" | "defaultActiveKey" | "accordion" | "onChange"
 > {
+  /**
+   * The record's sections, in the order the house reads them. Each carries its own summary,
+   * severity and access rules.
+   */
   sections: readonly ChartSection[];
   /** Open on first render. */
   defaultOpenKeys?: readonly React.Key[];
+  /** Fired with the open sections whenever they change. */
   onChange?: (keys: React.Key[]) => void;
   /** Show "Expand all" and "Collapse all". On by default. */
   toolbar?: boolean;

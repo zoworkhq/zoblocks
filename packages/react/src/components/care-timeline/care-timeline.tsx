@@ -119,8 +119,20 @@ interface CareTimelineOwnProps extends Omit<
    */
   now: FhirDateTime;
 
+  /**
+   * How the chronology is laid out — a single rail, or split by source. Changes the reading
+   * order, so it is a content decision rather than a visual one.
+   */
   layout?: CareTimelineLayout;
+  /**
+   * What events are grouped by: day, encounter, or source. Ungrouped, a busy chart reads as a
+   * list of timestamps.
+   */
   group?: GroupBy;
+  /**
+   * When to collapse a run of similar events into one row, or `false` never to. Twelve vitals
+   * recorded in one hour are one event to a reader and twelve to a renderer.
+   */
   cluster?: ClusterOptions | false;
 
   /** What the reader had already seen. Never computed here. */
@@ -149,7 +161,15 @@ interface CareTimelineOwnProps extends Omit<
 
   /** Registers to show, controlled. Hidden events are counted in the sentence. */
   registers?: readonly TimelineRegister[];
+  /**
+   * Which registers are shown on first render — labs, medications, notes, encounters. The
+   * reader can change them; this is only where they start.
+   */
   defaultRegisters?: readonly TimelineRegister[];
+  /**
+   * Fired when the reader shows or hides a register. Worth persisting: a clinician's register
+   * selection is a working preference, not a one-off.
+   */
   onRegistersChange?: (registers: TimelineRegister[]) => void;
   /**
    * Kinds to show, controlled. No built-in UI: twenty-one toggles is not a
@@ -168,7 +188,15 @@ interface CareTimelineOwnProps extends Omit<
   /** Per-kind node marks. Decoration: the kind is always rendered as text too. */
   icons?: Partial<Record<string, React.ReactNode>>;
 
+  /**
+   * Fired with the chosen event. Without it the timeline is a read-only account, which is a
+   * legitimate way to use it.
+   */
   onSelect?: (event: TimelineEvent) => void;
+  /**
+   * Fired when the reader reaches the start of the loaded window. The component states how
+   * many events lie beyond the page rather than pretending the window is the record.
+   */
   onLoadOlder?: () => void;
   /**
    * Fires once per rendered coverage claim.
@@ -327,7 +355,10 @@ export function CareTimeline({
   className,
   style,
   ...rest
-}: CareTimelineProps & { ref?: React.Ref<HTMLElement> }) {
+}: CareTimelineProps & {
+  /** The scrolling region. Useful for restoring a reader's position when they return to a chart. */
+  ref?: React.Ref<HTMLElement>;
+}) {
   const locale = React.useMemo<TimelineLocale>(
     () => ({
       ...(audience === "patient" ? PATIENT_TIMELINE_LOCALE : DEFAULT_TIMELINE_LOCALE),

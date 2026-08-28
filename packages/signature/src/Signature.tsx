@@ -39,17 +39,45 @@ import { useLocale, type SignatureLocale } from "./locale";
 export interface SignatureProps {
   /** Supplied by `Form.Item`. Attached to the trigger so the label resolves. */
   id?: string;
+  /**
+   * The signature, controlled. A discriminated union over seven outcomes rather than `string |
+   * null`, because a refusal and an untouched field are different facts.
+   */
   value?: SignatureValue;
+  /** The starting signature, uncontrolled. Use for a form re-opened on an existing record. */
   defaultValue?: SignatureValue;
+  /**
+   * Fired whenever the outcome changes — including when somebody declines, which is a value
+   * and not an error.
+   */
   onChange?: (value: SignatureValue) => void;
 
   /** ISO 8601 from the server. The component never reads the clock. */
   now: string;
 
+  /**
+   * What signing this asserts: consent, attestation, witness, receipt. It selects the wording
+   * and it is recorded, because a signature with no stated meaning is not evidence of
+   * anything.
+   */
   meaning?: SignatureMeaning;
+  /**
+   * The sentence the signer is agreeing to, shown above the control. Required for
+   * `meaning="attestation"`; a signature over unstated words is not an attestation.
+   */
   attestation?: React.ReactNode;
+  /**
+   * Who or what is being signed for. Rendered so the signer can check it before signing, which
+   * is the entire point of showing it.
+   */
   subject?: Subject;
+  /** Who is signing, as far as the host already knows. Anything omitted is asked for. */
   signer?: Partial<Signer>;
+  /**
+   * The capacities this signer may sign in — clinician, patient, guardian, interpreter.
+   * Offered as a choice when there is more than one, because the capacity changes what the
+   * signature means.
+   */
   capacities?: Capacity[];
   /**
    * Which capture methods to offer.
@@ -63,17 +91,52 @@ export interface SignatureProps {
    * component has no business writing to a customer's app.
    */
   methods?: CaptureMethod[];
+  /**
+   * Which non-signing outcomes are offered. Removing `"declined"` makes a refusal
+   * unrecordable, which forces staff to either lie or abandon the form.
+   */
   outcomes?: Array<"declined" | "unable" | "verbal" | "on-paper">;
+  /**
+   * The person operating the device when the signer is not. Required for `unable` — an
+   * unwitnessed `unable` is a compile error.
+   */
   recordedBy?: Signer;
+  /**
+   * A hash of exactly what was signed. Without it the signature attests to a document nobody
+   * can later identify.
+   */
   documentHash?: string;
+  /**
+   * Record stroke timing and pressure alongside the image. Off by default: it is additional
+   * personal data and most workflows do not need it.
+   */
   captureBiometrics?: boolean;
 
+  /**
+   * Blocks every path including the refusals. Rarely right — if the form is not signable yet,
+   * say why rather than removing the ability to decline.
+   */
   disabled?: boolean;
+  /**
+   * Validation state from the surrounding form. Renders the field's error styling without
+   * inventing a message.
+   */
   status?: "error" | "warning";
+  /** The heading above the control. Also its accessible name. */
   title?: React.ReactNode;
+  /** A line under the title for the qualification the title cannot carry. */
   subtitle?: React.ReactNode;
+  /**
+   * Overrides for every generated string, including the seven outcome names. Supply it for any
+   * language that is not English.
+   */
   locale?: Partial<SignatureLocale>;
+  /**
+   * Each capture, change and refusal as a structured event. Timed by `now`, never by the
+   * browser.
+   */
   onAuditEvent?: (event: { type: string; at: string; detail?: string }) => void;
+  /** Applied to the outer element. */
   className?: string;
 }
 

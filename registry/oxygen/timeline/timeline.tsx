@@ -95,26 +95,54 @@ interface TimelineOwnProps extends Omit<
   React.HTMLAttributes<HTMLOListElement>,
   "className" | "style" | "children"
 > {
+  /**
+   * The events, in order. Ant Design's `items` API exactly — the difference is what this
+   * component refuses to infer from them.
+   */
   items?: readonly TimelineItemType[];
   /** `<Timeline.Item>` children, as antd v5 wrote them. Accepted for parity. */
   children?: React.ReactNode;
   /** Ant Design v6 resolves an unset value to `start`. So does this. */
   mode?: TimelineMode;
+  /** Horizontal or vertical. Ant Design's `tabPlacement`-style rename in v6. */
   orientation?: TimelineOrientation;
+  /**
+   * Rail treatment. Never used to imply a state: antd's Timeline dots a rail for whatever it
+   * decides is `current`, and on a clinical chronology a dotted rail reads as a data claim
+   * nobody authored.
+   */
   variant?: TimelineVariant;
   /** Distance to the centre of the node. A number is a ratio; a string is a length. */
   titleSpan?: string | number;
+  /**
+   * Newest first. Reverses the rendered order only — it does not change which item is treated
+   * as current, which is the bug this component exists not to reproduce.
+   */
   reverse?: boolean;
+  /** Ant Design's class prefix. Accepted for parity with an existing antd theme. */
   prefixCls?: string;
+  /** Applied to the root element, alongside the generated classes. */
   rootClassName?: string;
+  /** Applied to the list element. */
   className?: string;
+  /** Inline styles on the list element. */
   style?: React.CSSProperties;
+  /** Per-slot class names — rail, node, content, label. Ant Design v6's semantic-DOM API. */
   classNames?: Partial<Record<TimelineSlot, string>>;
+  /** Per-slot inline styles. The counterpart to `classNames`. */
   styles?: Partial<Record<TimelineSlot, React.CSSProperties>>;
 
-  /** @deprecated Ant Design v6 takes a pending item in `items`. Accepted for parity. */
+  /**
+   * A trailing "in progress" entry, as antd v5 wrote it.
+   *
+   * @deprecated Ant Design v6 takes a pending item in `items`. Accepted for parity.
+   */
   pending?: React.ReactNode;
-  /** @deprecated Ant Design v6 takes `items[].icon`. Accepted for parity. */
+  /**
+   * The icon for the pending entry, as antd v5 wrote it.
+   *
+   * @deprecated Ant Design v6 takes `items[].icon`. Accepted for parity.
+   */
   pendingDot?: React.ReactNode;
 }
 
@@ -239,7 +267,13 @@ function DefaultIcon() {
 const TimelineItem: React.FC<TimelineItemType> = () => null;
 TimelineItem.displayName = "Timeline.Item";
 
-function TimelineRoot({ ref, ...props }: TimelineProps & { ref?: React.Ref<HTMLOListElement> }) {
+function TimelineRoot({
+  ref,
+  ...props
+}: TimelineProps & {
+  /** The `<ol>` the timeline renders. It is a list, not a `<ul>` — antd's own docs say otherwise and its source does this. */
+  ref?: React.Ref<HTMLOListElement>;
+}) {
   const {
     items,
     children,

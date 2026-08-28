@@ -71,25 +71,72 @@ export interface TabsRootProps extends Omit<React.HTMLAttributes<HTMLDivElement>
    * wizard share one silhouette and need four different accessibility trees.
    */
   as: SemanticMode;
+  /**
+   * Visual skin. Eleven of them share one keyboard model and one accessibility tree, so this
+   * changes appearance and nothing else.
+   */
   variant?: TabVariant;
+  /** The selected tab, controlled. Pair with `onChange`. */
   value?: string;
+  /** The initially selected tab, uncontrolled. Defaults to the first enabled item. */
   defaultValue?: string;
+  /**
+   * Fired after a change commits. `meta.via` says what caused it — pointer, keyboard, hotkey,
+   * URL sync — which is what an audit trail needs and what a naive handler throws away.
+   */
   onChange?: (value: string, meta: { via: ChangeSource }) => void;
   /** Return false — or a promise of false — to veto. Strip goes inert while
    *  a promise is pending. */
   onBeforeChange?: BeforeChange;
+  /** Horizontal or vertical. Changes which arrow keys move selection, not merely the layout. */
   orientation?: Orientation;
+  /** Trigger height and type scale. The hit area never drops below the 24px floor at any size. */
   size?: TabSize;
+  /** How triggers divide the available width — natural, equal, or stretched to fill. */
   fill?: FillMode;
+  /**
+   * What happens when the triggers do not fit: scroll, wrap, or collapse into a menu. Never
+   * truncate — a tab you cannot reach is a tab that does not exist.
+   */
   overflow?: OverflowStrategy;
+  /**
+   * Whether arrowing to a tab selects it (`automatic`) or merely focuses it (`manual`). Use
+   * `manual` when selecting is expensive or destructive.
+   */
   activation?: Activation;
+  /**
+   * When panels enter the DOM: all at once, on first selection, or only while selected.
+   * `eager` costs bytes; `unmount` costs panel state.
+   */
   mount?: MountStrategy;
+  /**
+   * Restore each panel's scroll position when it is selected again. Off by default, because on
+   * a clinical surface returning to where somebody was is sometimes wrong.
+   */
   keepScroll?: boolean;
+  /**
+   * The mark showing which tab is selected — an underline, a pill, or none. Never the only
+   * cue: selection is also in the accessibility tree.
+   */
   indicator?: IndicatorKind;
+  /** How panels change. Respects `prefers-reduced-motion` regardless of what is set here. */
   transition?: TransitionKind;
+  /**
+   * Allows tabs to be added and closed, and supplies the handlers for it. Omit for a fixed
+   * strip.
+   */
   editable?: TabsEditable;
+  /**
+   * Mirror the selection into the URL — a query parameter or the hash — so a tab can be linked
+   * to and survives a reload.
+   */
   syncTo?: SyncTarget;
+  /** The parameter name used by `syncTo`. Required when two tab strips sync on one page. */
   syncKey?: string;
+  /**
+   * Whether a change replaces the history entry or pushes a new one. `push` makes Back step
+   * through tabs, which is usually not what a reader means by Back.
+   */
   syncHistory?: "replace" | "push";
   /**
    * Ctrl/Cmd + 1…9 to jump to a tab. Off by default: on Windows and Linux
@@ -104,7 +151,15 @@ export interface TabsRootProps extends Omit<React.HTMLAttributes<HTMLDivElement>
    * go reports "n of m" from whatever happens to be rendered.
    */
   virtualise?: boolean;
+  /**
+   * Overrides for every generated string — the overflow menu, the close affordance, the count
+   * announcements. Supply it for any language that is not English.
+   */
   locale?: Partial<TabsLocale>;
+  /**
+   * Selection changes as structured events, for hosts that must record which view a clinician
+   * was looking at. Pair with `now`.
+   */
   onAuditEvent?: (event: AuditEvent) => void;
   /**
    * Supplies the ISO timestamp on audit events. Omit it and events carry no

@@ -74,6 +74,7 @@ export interface ClinicalStatusProps extends Omit<
    * status; `affix` is a 3px row rule for grids past about forty rows.
    */
   shape?: StatusShape;
+  /** Row height and type scale. Inherited from the nearest density provider when omitted. */
   density?: StatusDensity;
   /** Which register the word is written in. */
   audience?: StatusAudience;
@@ -197,6 +198,7 @@ export const ClinicalStatus = React.forwardRef<HTMLElement, ClinicalStatusProps>
  */
 export interface StatusLegendProps extends React.HTMLAttributes<HTMLDListElement> {
   scale: ScaleName;
+  /** Row height and type scale. Inherited from the nearest density provider when omitted. */
   density?: StatusDensity;
   audience?: StatusAudience;
 }

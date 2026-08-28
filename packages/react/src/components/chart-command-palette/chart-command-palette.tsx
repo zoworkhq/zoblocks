@@ -76,6 +76,7 @@ export {
 } from "../../lib/palette";
 
 export interface ChartCommandPaletteProps {
+  /** Whether the palette is showing. Controlled, so the host owns the shortcut that summons it. */
   open: boolean;
   /**
    * Everything the palette may match.
@@ -86,7 +87,15 @@ export interface ChartCommandPaletteProps {
    * server.
    */
   items: readonly PaletteItem[];
+  /**
+   * The treatment relationship this search is bounded by. Every query is scoped to it, and
+   * searches it refuses are audited too.
+   */
   scope?: PatientScope;
+  /**
+   * The empty-field prompt. Say what can be typed — "Search, or start with a verb" — rather
+   * than "Ask anything", which promises a scope the palette will refuse.
+   */
   placeholder?: string;
   /** Runs an item. Only ever called for an outcome of `run`. */
   onRun?: (item: PaletteItem) => void;
@@ -95,7 +104,9 @@ export interface ChartCommandPaletteProps {
    * that matched nobody. The host writes the audit entry.
    */
   onSearchAudit?: (audit: SearchAudit) => void;
+  /** Fired on Escape, on backdrop click, and after a command runs. */
   onClose?: () => void;
+  /** Applied to the palette's outer element. */
   className?: string;
 }
 
