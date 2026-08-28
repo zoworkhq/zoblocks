@@ -127,9 +127,9 @@ export default function EnterprisePage() {
             </div>
 
             <p className="mt-6 max-w-2xl text-sm leading-relaxed text-graphite" data-reveal>
-              Accessibility is audited with axe-core on every commit, across 31 pages in three
-              themes, and the build fails on a violation. That check is the reason the number beside
-              it is worth anything.
+              Accessibility is audited with axe-core on every commit — every page of this site, in
+              three themes — and the build fails on a violation. That check is the reason the number
+              beside it is worth anything.
             </p>
           </div>
         </section>
