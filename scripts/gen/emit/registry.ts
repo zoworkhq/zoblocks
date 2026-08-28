@@ -579,6 +579,34 @@ function unresolvedImports(
           `${name}: ${file.target} imports ${specifier}, but nothing in its registryDependencies installs that file`,
         );
       }
+
+      /*
+       * Relative imports, which this check used to ignore entirely.
+       *
+       * The registry renames files as it installs them — `lib/result-value.ts`
+       * lands as `lib/oxygen-result-value.ts` — so a relative specifier that
+       * resolves in this monorepo can resolve to nothing in a consumer's
+       * project. That is exactly what shipped: `result-value` imported
+       * `./clinical-status`, whose file installs as `oxygen-clinical-status`,
+       * and `oxygen add result-value` produced a tree that did not compile.
+       *
+       * Every sibling in `registry/oxygen/lib` is already imported by its
+       * installed name through `@/lib/oxygen-*`. One file was not, the check
+       * only looked at `@/` specifiers, and nothing caught it. This closes
+       * that: inside the registry, a relative import across files is refused
+       * outright, because the installed layout is flat and renamed and there
+       * is no relative path that survives it.
+       */
+      for (const match of file.content.matchAll(/from "(\.\.?\/[^"]+)"/g)) {
+        const specifier = match[1] as string;
+        if (reported.has(specifier)) continue;
+        reported.add(specifier);
+        problems.push(
+          `${name}: ${file.target} imports "${specifier}" relatively. ` +
+            `Files are renamed on install, so a relative path resolves here and not in a ` +
+            `consumer's project — import it by its installed name instead, as "@/lib/oxygen-…".`,
+        );
+      }
     }
   }
 
