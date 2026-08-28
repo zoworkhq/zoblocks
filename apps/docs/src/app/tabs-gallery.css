@@ -23,15 +23,19 @@
 }
 
 /* ---- control bar ------------------------------------------------- */
+/* A rule, not a panel.
+
+   Eleven toggles inside a filled, bordered, rounded box read as a debug
+   toolbar bolted above the gallery — the loudest element on a page whose
+   subject is the components underneath it. The controls still work and still
+   group; they just stop announcing themselves. */
 .ox-gallery__bar {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.75rem 1.5rem;
+  gap: 0.6rem 2rem;
   align-items: center;
-  padding: 0.75rem 1rem;
-  border: 1px solid var(--color-rule);
-  border-radius: 0.875rem;
-  background: var(--color-paper-sunk);
+  padding: 0 0 0.9rem;
+  border-block-end: 1px solid var(--color-rule);
 }
 .ox-gallery__group {
   display: inline-flex;
@@ -204,10 +208,23 @@
      flex item whose content is a nowrap <code>. */
   min-inline-size: 0;
 }
+/* The prop annotation above a specimen, set below the specimen's own label.
+
+   It was the same size and nearly the same weight as the field label under it,
+   so `precision="year"` and "Date of birth" competed and the eye had to decide
+   which was the component. The annotation is scaffolding; it should be legible
+   and lose. */
 .ox-dt-demo-cap {
   font-family: var(--ox-font-mono, ui-monospace, monospace);
-  font-size: 0.6875rem;
-  letter-spacing: 0.02em;
+  font-size: 0.625rem;
+  letter-spacing: 0.04em;
+  /* Recede by scale and tracking, never by colour.
+
+     A first pass took this to graphite-soft at 0.75 opacity and axe caught it
+     at 4:1 against paper on 18 nodes — one step under AA. Smaller text needs
+     more contrast, not less, so dimming while shrinking was wrong twice. The
+     size drop alone puts the annotation behind the field label it sits above,
+     which was the whole point. */
   color: var(--ox-text-muted, var(--color-graphite));
 }
 
@@ -289,20 +306,15 @@
 .ox-demo__head {
   display: flex;
   flex-wrap: wrap;
-  align-items: center;
+  align-items: baseline;
   gap: 0.5rem;
-  padding: 0.6rem 0.85rem;
-  border-bottom: 1px solid var(--color-rule);
-  background: var(--color-paper-sunk);
+  padding: 0.9rem 1.25rem 0;
 }
 .ox-demo__id {
   font-family: var(--font-mono);
   font-size: 0.625rem;
   letter-spacing: 0.06em;
-  padding: 0.1rem 0.35rem;
-  border-radius: 0.3rem;
-  background: var(--color-ink);
-  color: var(--color-paper);
+  color: var(--color-graphite-soft);
 }
 .ox-demo__name {
   font-weight: 600;
@@ -316,21 +328,22 @@
 .ox-demo__tag {
   font-family: var(--font-mono);
   font-size: 0.625rem;
-  padding: 0.1rem 0.4rem;
-  border-radius: 999px;
-  border: 1px solid var(--color-rule);
-  color: var(--color-graphite);
+  color: var(--color-graphite-soft);
+}
+.ox-demo__tag + .ox-demo__tag::before {
+  content: "·";
+  margin-inline-end: 0.4rem;
+  color: var(--color-rule-strong);
 }
 .ox-demo__stage {
-  padding: 1.5rem 1.25rem;
+  padding: 1.75rem 1.25rem 2rem;
   background: var(--ox-bg);
   container-type: inline-size;
 }
 .ox-demo__note {
-  margin: 0;
-  padding: 0.75rem 0.85rem;
+  margin: 0 1.25rem;
+  padding: 0.85rem 0 1rem;
   border-top: 1px solid var(--color-rule);
-  background: var(--color-paper-sunk);
   font-size: 0.8125rem;
   line-height: 1.55;
   color: var(--color-graphite);
