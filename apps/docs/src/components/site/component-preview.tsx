@@ -126,10 +126,30 @@ import {
 import { plainDate, plainTime, sessionFrom, withSessionEnd } from "@/lib/oxygen-datetime";
 type Density = "patient" | "standard" | "clinical";
 
+/**
+ * One demonstrable state of a component.
+ *
+ * `render` has to stay here rather than move into `*.meta.ts` with the rest of
+ * the metadata: it returns JSX, and JSX is code. What did move is everything
+ * around it — `group` and the state's name are cross-checked against the
+ * component's declared `states[]` by `scripts/gen`, so a scenario cannot
+ * demonstrate a state the component does not claim to have.
+ */
 interface Scenario {
   id: string;
   label: string;
+  /**
+   * Why this state exists, in one or two sentences of clinical consequence.
+   *
+   * This is the sentence a clinical reviewer reads to decide whether the
+   * component is safe, and the passage an answer engine quotes. It is the most
+   * valuable text on the page and the only part of it no tool can generate.
+   */
   note: string;
+  /** Which band of the rail this sits in. Ungrouped scenarios fall under "States". */
+  group?: string;
+  /** The props that produce exactly what is on the stage. Copyable. */
+  code?: string;
   render: () => React.ReactNode;
 }
 
@@ -379,6 +399,57 @@ const WITHHELD_CONTEXT: ResolvedContext = {
  * invented values in a demo get screenshotted, and a plausible potassium with
  * no patient behind it is the kind of thing that ends up in a slide deck.
  */
+/**
+ * The record a persistent header sits above.
+ *
+ * ChartHeader's claim is that it stays legible over a scrolling chart and
+ * collapses to a safety bar rather than to a name. Neither half of that is
+ * visible when it floats alone on a card, so the record goes behind it —
+ * dimmed, because the component is the subject and the host is the context.
+ *
+ * `aria-hidden` on the host: it is decorative filler, and a screen-reader user
+ * being read a fake problem list learns nothing about the component.
+ */
+function RecordBehind({ children }: { children: React.ReactNode }) {
+  const rows: Array<[string, string]> = [
+    ["Potassium", "6.8 mmol/L · critical"],
+    ["Sodium", "139 mmol/L"],
+    ["Clozapine", "200 mg nocte · ANC due 18 Aug"],
+    ["Progress note", "14 Aug 2026 · A. Vance, MD"],
+    ["Creatinine", "88 µmol/L"],
+    ["Platelets", "212 ×10⁹/L"],
+  ];
+  return (
+    <div className="overflow-hidden rounded-xl border border-[var(--ox-border)] bg-[var(--ox-bg)]">
+      {children}
+      <div aria-hidden="true" className="pointer-events-none select-none px-4 py-3 opacity-40">
+        <div className="flex gap-4 border-b border-[var(--ox-border)] pb-2">
+          {["Summary", "Results", "Medications", "Notes"].map((tab, i) => (
+            <span
+              key={tab}
+              className={cn(
+                "text-xs",
+                i === 1 ? "text-[var(--ox-text)]" : "text-[var(--ox-text-muted)]",
+              )}
+            >
+              {tab}
+            </span>
+          ))}
+        </div>
+        {rows.map(([label, value]) => (
+          <p
+            key={label}
+            className="m-0 flex justify-between gap-6 border-b border-[var(--ox-border)] py-1.5 text-xs text-[var(--ox-text-muted)] last:border-b-0"
+          >
+            <span>{label}</span>
+            <span>{value}</span>
+          </p>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function HostChart({ children, tall }: { children: React.ReactNode; tall?: boolean }) {
   const bars = [
     ["82%", "58%", "68%"],
@@ -747,6 +818,16 @@ const RV_CORRECTED: ResultValueData = {
   superseded: { value: "<0.04", at: "14:22 today" },
   resultedAt: RV_RESULTED,
   notes: ["You viewed the prior value at 13:58"],
+};
+
+const RV_AI_EXTRACTED: ResultValueData = {
+  id: "bp-ai",
+  analyte: "Blood pressure",
+  value: 148,
+  unit: "mmHg",
+  provenance: "ai-extracted",
+  status: "final",
+  notes: ["From a scanned outside record. No clinician has confirmed it."],
 };
 
 const RV_METHOD_CHANGED: ResultValueData = {
@@ -1335,10 +1416,20 @@ function DtStage({ children }: { children: React.ReactNode }) {
 const SCENARIOS: Record<string, Scenario[]> = {
   /* ---- the date, time and session family --------------------------- */
 
+  /*
+   * Four bands rather than eleven flat tabs.
+   *
+   * DatePicker is one component with fourteen variants, and a flat strip of
+   * eleven made a reader scan every label to find the one about a session
+   * crossing midnight. The bands are the four jobs it does: getting a date in,
+   * picking one from a grid, timing a session, and rendering what the record
+   * already holds.
+   */
   "date-picker": [
     {
       id: "typed",
       label: "Eight keystrokes, no calendar",
+      group: "Entry",
       note: "Click into the field and type 08262026. Three bounded segments, one tab stop, and a segment that advances itself the moment no further digit could be valid — typing 9 in the month jumps on, typing 1 waits for a possible 12. That rule is what makes eight keystrokes enough, and it is why there is no calendar here at all: DatePicker is the one with a grid. Count what a clinician touches in a day and the calendar is the rare case; the common case is somebody who already knows the answer.",
       render: () => (
         <DtStage>
@@ -1349,6 +1440,7 @@ const SCENARIOS: Record<string, Scenario[]> = {
     {
       id: "tiers",
       label: "Three tiers, three behaviours",
+      group: "Entry",
       note: "The same component with three different rules about the future, because there is no correct default. A date of birth may never be in the future and blocks, assertively, with aria-invalid. Session documentation in the future is suspicious rather than impossible and warns — politely, and without marking the field invalid, because the value is legal. A retrospective date is ordinary and gets an advisory with no colour weight at all; blocking it is what teaches staff to date notes to today to get past the validator.",
       render: () => (
         <DtStage>
@@ -1376,6 +1468,7 @@ const SCENARIOS: Record<string, Scenario[]> = {
     {
       id: "grid",
       label: "One tab stop, and every cell named in full",
+      group: "Calendar",
       note: "Tab to the grid and move with the arrow keys; PageUp and PageDown change month, Shift with them changes year. Exactly one cell is reachable by Tab — forty-two tab stops is the most common accessibility failure in a date picker. And every cell is named as its whole date plus its state: “Wednesday, August 26, 2026, 8 times available”, not “26”. A cell in a grid has no column header in its accessible context, so a grid of bare numerals is navigable and useless.",
       render: () => (
         <DtStage>
@@ -1391,6 +1484,7 @@ const SCENARIOS: Record<string, Scenario[]> = {
     {
       id: "modes",
       label: "Range in two clicks, multiple with a cap",
+      group: "Calendar",
       note: "Range selection is two clicks and never a drag — WCAG 2.2 SC 2.5.7 asks that no function require one, and there is no drag path anywhere in the component. In multiple mode, clicking a selected date removes it: a remove control inside a 32px cell would be under the 24px target floor, and a second click is what people try first anyway.",
       render: () => (
         <DtStage>
@@ -1402,6 +1496,7 @@ const SCENARIOS: Record<string, Scenario[]> = {
     {
       id: "field-first",
       label: "The calendar most users never open",
+      group: "Entry",
       note: "Type into the field and the grid never appears; press the button and it does. That ordering is the whole design: for the four-fifths of healthcare date fields that are recall rather than choice, a popover is four clicks where eight keystrokes would do. Escape closes and keeps what was typed — an Escape that discards a half-entered date is the reason people stop using keyboards.",
       render: () => (
         <DtStage>
@@ -1417,6 +1512,7 @@ const SCENARIOS: Record<string, Scenario[]> = {
     {
       id: "ambiguity",
       label: "The 9 it will not resolve",
+      group: "Entry",
       note: "Type a bare 9 into the first field. The meridiem segment stays empty, the value stays incomplete, and the field asks. Every other time picker resolves this silently, and on some ward that turns a 9 PM discharge into a 9 AM one — twelve hours of a record being wrong with nothing on screen to suggest anybody guessed. The second field shows the interval as data: twenty minutes is as real as fifteen, and so is fifty-three.",
       render: () => (
         <DtStage>
@@ -1432,6 +1528,7 @@ const SCENARIOS: Record<string, Scenario[]> = {
     {
       id: "driver",
       label: "Which number is the one you set",
+      group: "Session",
       note: "Press a duration chip and the end moves, marked Derived. Type an end time instead and the duration recomputes — and the Held badge moves with it. Now move the start: hold the duration and the whole session slides, hold the end and it stretches. Both are correct, only one can be the default, and which one you got is information you would otherwise discover by making a mistake on a real appointment. That badge is the component.",
       render: () => (
         <DtStage>
@@ -1447,6 +1544,7 @@ const SCENARIOS: Record<string, Scenario[]> = {
     {
       id: "midnight",
       label: "Crossing midnight is a value",
+      group: "Session",
       note: "11:30 PM to 7:30 AM is a crisis-line shift and a residential handover, not a typo. Refusing it teaches staff to type the wrong date to get past the validator, which is how you lose the real data — so the day boundary is stated in the value instead. The second one is the guard: a start dragged past a held end is the only way to reach an absurd duration, and the component says so and offers the likeliest correction rather than quietly rounding it into range.",
       render: () => (
         <DtStage>
@@ -1466,6 +1564,7 @@ const SCENARIOS: Record<string, Scenario[]> = {
     {
       id: "age",
       label: "The age is the proof-read",
+      group: "The record",
       note: "Type 07181986. The age is not decoration: a transposed year is invisible in 07/18/1968 and screaming in “58 years old”, and it is the only error check this field has. Under two years it reads in months and under four weeks in days, because a paediatric chart that says “0 years old” for a four-month-old has discarded the only number that mattered. No calendar opens by default — and when one does, it opens on the year, because a date-of-birth calendar that opens on this month has decided the patient was born this month.",
       render: () => (
         <DtStage>
@@ -1477,6 +1576,7 @@ const SCENARIOS: Record<string, Scenario[]> = {
     {
       id: "partial-and-absent",
       label: "A year is a date, and nothing has a reason",
+      group: "The record",
       note: "FHIR permits YYYY and YYYY-MM for Patient.birthDate, because homeless services, unaccompanied minors and forensic intake all produce them — and coercing “born around 1962” to 1 January 1962 invents a fact every downstream system will read as precise, including the one calculating a dose. Absence is the same argument Switch makes for its third value: a form that cannot tell “no date of birth” from “nobody asked” is lying, and CONTENT.md forbids punctuating the difference away as an em dash.",
       render: () => (
         <DtStage>
@@ -1499,6 +1599,7 @@ const SCENARIOS: Record<string, Scenario[]> = {
     {
       id: "readout",
       label: "The record first, the reading aid second",
+      group: "The record",
       note: "“3 days after service” is an aid; the timestamp is the record, and a reviewer will ask. Anything a signature depends on prints its stored instant and its IANA zone, because “8:12 AM” on a countersignature is not a time until somebody says where — and it survives print, which is where a great many of these are actually read. The second time zone appears only when the zones differ: rendering “3:00 PM ET” to somebody already in Eastern Time is noise that teaches readers to stop reading zone labels.",
       render: () => (
         <DtStage>
@@ -1597,23 +1698,27 @@ const SCENARIOS: Record<string, Scenario[]> = {
       note: "The same header at both heights. Everything below the strip moves behind a disclosure rather than out of the DOM, so the content is one keystroke away for a screen-reader user and one click away for a sighted one — and the strip says exactly the same thing in both. Allergies, code status, isolation and the legal status appear in that order on every chart in the building. Expanded it wraps so nothing is clipped; collapsed it scrolls behind a fade, because a second line at 44px would move the content underneath at the moment the alerts are being read.",
       render: () => (
         <div style={{ display: "grid", gap: 18, maxInlineSize: 720 }}>
-          <ChartHeader
-            patient={CH_PATIENT}
-            identifiers={CH_IDENTIFIERS}
-            now={CH_NOW}
-            safety={CH_SAFETY}
-            program={{ name: "IOP", week: 3, of: 8 }}
-            encounters={CH_ENCOUNTERS}
-            selectedEncounterId="enc-1"
-            onSelectEncounter={() => {}}
-          />
-          <ChartHeader
-            patient={CH_PATIENT}
-            identifiers={CH_IDENTIFIERS}
-            now={CH_NOW}
-            safety={CH_SAFETY}
-            collapsed
-          />
+          <RecordBehind>
+            <ChartHeader
+              patient={CH_PATIENT}
+              identifiers={CH_IDENTIFIERS}
+              now={CH_NOW}
+              safety={CH_SAFETY}
+              program={{ name: "IOP", week: 3, of: 8 }}
+              encounters={CH_ENCOUNTERS}
+              selectedEncounterId="enc-1"
+              onSelectEncounter={() => {}}
+            />
+          </RecordBehind>
+          <RecordBehind>
+            <ChartHeader
+              patient={CH_PATIENT}
+              identifiers={CH_IDENTIFIERS}
+              now={CH_NOW}
+              safety={CH_SAFETY}
+              collapsed
+            />
+          </RecordBehind>
         </div>
       ),
     },
@@ -1991,93 +2096,171 @@ const SCENARIOS: Record<string, Scenario[]> = {
    * because the component takes the clock as a prop precisely so a demo, a
    * test and a ward workstation can each supply their own.
    */
+  /*
+   * Eighteen scenarios, one per declared state, in four bands.
+   *
+   * They were four before — "present values", "seven absences", "a correction",
+   * "in a grid" — each showing six or seven results at once. That is the right
+   * shape for an argument and the wrong one for a reference: a reader who wants
+   * to know how a cancelled test renders had to find it inside a stack of seven,
+   * and the fourteen states that were named in `states[]` but not demonstrated
+   * anywhere were invisible.
+   *
+   * `group` is what makes eighteen legible. The bands are the four kinds of
+   * thing a result can be, not four arbitrary tabs.
+   */
   "result-value": [
     {
-      id: "present",
-      label: "Present values",
-      note: "Six results, and none of them is just a number. A critical potassium carries its delta and how long ago it landed. A preliminary TSH says it has not been verified. A lithium level carries the qualification that decides whether 0.9 is therapeutic or low. A ferritin with no range says so, because a number with nothing highlighted beside it reads as normal.",
-      render: () => (
-        <div style={{ display: "grid", gap: 14, maxInlineSize: 560 }}>
-          {RV_PRESENT.map((row) => (
-            <ResultValue key={row.id} value={row} now={RV_NOW} />
-          ))}
-        </div>
-      ),
+      id: "final",
+      label: "Final, in range",
+      group: "Present",
+      note: "The ordinary case, and it still carries its range. A number shown without one asks the reader to remember the reference interval for every analyte on the screen — which is exactly the memory the interface exists to remove.",
+      code: `<ResultValue value={ analyte: "Sodium", value: 139, unit: "mmol/L",\n                      range: { low: 135, high: 145 }, status: "final" }}\n             now={serverTime} />`,
+      render: () => <ResultValue value={RV_PRESENT[0]!} now={RV_NOW} />,
     },
     {
-      id: "absence",
-      label: "Seven absences",
-      note: "An em dash is indistinguishable from a rendering bug, and it asks the reader to guess between answers with different next actions. Haemolysis raises potassium — rendering that as a blank beside a normal sodium invites the assumption that the potassium was normal too. Restricted is the one that is not a gap at all: a value exists and you may not see it.",
-      render: () => (
-        <div style={{ display: "grid", gap: 14, maxInlineSize: 560 }}>
-          {RV_ABSENT.map((row) => (
-            <ResultValue key={row.id} value={row} />
-          ))}
-        </div>
-      ),
+      id: "critical",
+      label: "Critical, with a delta",
+      group: "Present",
+      note: "The delta is the clinically relevant fact, not the value. A potassium of 6.8 that was 6.6 yesterday is a different problem from one that was 4.7 four hours ago, and only one of those is an emergency.",
+      code: `<ResultValue value={ analyte: "Potassium", value: 6.8, unit: "mmol/L",\n                      interpretation: "critical",\n                      range: { low: 3.5, high: 5.1 },\n                      prior: { value: 4.7, at: fourHoursAgo } }}\n             now={serverTime} />`,
+      render: () => <ResultValue value={RV_PRESENT[1]!} now={RV_NOW} />,
     },
     {
-      id: "correction",
-      label: "A correction",
-      note: "The troponin was under 0.04 at 13:58, when somebody read it and wrote it into a note. It is 0.09 now. A badge saying \u201ccorrected\u201d does not address that hazard; the old number with a line through it and the time it changed does. The delta below it is suppressed on the TSH, because the assay changed and two numbers from two scales subtracted from each other is not a delta.",
-      render: () => (
-        <div style={{ display: "grid", gap: 14, maxInlineSize: 560 }}>
-          <ResultValue value={RV_CORRECTED} now={RV_NOW} />
-          <ResultValue value={RV_METHOD_CHANGED} now={RV_NOW} />
-        </div>
-      ),
+      id: "preliminary",
+      label: "Preliminary — not verified",
+      group: "Present",
+      note: "A preliminary result rendered identically to a final one is the defect this component exists to prevent: the clinician acts on it, and the value changes at 04:00 when the laboratory verifies it.",
+      code: `<ResultValue value={ analyte: "TSH", value: 6.4, unit: "mIU/L",\n                      range: { low: 0.4, high: 4.0 },\n                      status: "preliminary" }}\n             now={serverTime} />`,
+      render: () => <ResultValue value={RV_PRESENT[2]!} now={RV_NOW} />,
+    },
+    {
+      id: "corrected",
+      label: "Corrected — old value shown",
+      group: "Present",
+      note: "A badge reading \u201ccorrected\u201d does not address the hazard. The hazard is that somebody read 0.04 at 13:58 and wrote it into a note, so the superseded number stays on screen with a line through it and the time it changed.",
+      code: `<ResultValue value={ analyte: "Troponin I", value: 0.09, unit: "ng/mL",\n                      status: "corrected",\n                      superseded: { value: "<0.04", at: "14:22 today" } }}\n             now={serverTime} />`,
+      render: () => <ResultValue value={RV_CORRECTED} now={RV_NOW} />,
+    },
+    {
+      id: "no-range",
+      label: "No reference range published",
+      group: "Qualified",
+      note: "A number with nothing highlighted beside it reads as normal. Where the laboratory published no interval, the component says so rather than letting the absence of a flag do the asserting for it.",
+      code: `<ResultValue value={ analyte: "Ferritin", value: 212, unit: "ng/mL",\n                      noRangeReason: "Lab supplied no range",\n                      status: "final" }} />`,
+      render: () => <ResultValue value={RV_PRESENT[4]!} />,
+    },
+    {
+      id: "qualified-range",
+      label: "A range needing qualification",
+      group: "Qualified",
+      note: "Whether 0.9 is therapeutic depends entirely on when the dose was given. The qualification is part of the result rather than a footnote to it, so it travels with the number instead of living in a tooltip.",
+      code: `<ResultValue value={ analyte: "Lithium level", value: 0.9, unit: "mmol/L",\n                      range: { low: 0.6, high: 1.2, appliesTo: "maintenance" },\n                      notes: ["12 h post-dose \u00b7 trough assumed"] }} />`,
+      render: () => <ResultValue value={RV_PRESENT[3]!} />,
+    },
+    {
+      id: "delta-suppressed",
+      label: "Delta suppressed — method changed",
+      group: "Qualified",
+      note: "Two numbers from two assays subtracted from each other is not a delta. Annotating a wrong number does not help, because an annotated wrong number still gets read as a number \u2014 so the delta disappears entirely.",
+      code: `<ResultValue value={ analyte: "TSH", value: 6.4, unit: "mIU/L",\n                      range: { low: 0.4, high: 4.0 },\n                      prior: { value: 3.1, at: earlier,\n                               differentMethod: true } }}\n             now={serverTime} />  // no delta is drawn`,
+      render: () => <ResultValue value={RV_METHOD_CHANGED} now={RV_NOW} />,
+    },
+    {
+      id: "patient-reported",
+      label: "Patient-reported",
+      group: "Qualified",
+      note: "A home reading and a clinic reading are different measurements with different error bars. The provenance travels with the value into the DOM, so it cannot be lost by a re-render or a copy-paste.",
+      code: `<ResultValue value={ analyte: "Home systolic", value: 148, unit: "mmHg",\n                      provenance: "patient-reported", status: "final" }} />`,
+      render: () => <ResultValue value={RV_PRESENT[5]!} />,
+    },
+    {
+      id: "ai-extracted",
+      label: "Extracted by a model",
+      group: "Qualified",
+      note: "The value may well be right. What the interface must not do is present it with the same authority as one a clinician entered, because nobody has yet checked it against the document it came from.",
+      code: `<ResultValue value={ analyte: "Blood pressure", value: 148, unit: "mmHg",\n                      provenance: "ai-extracted", status: "final" }} />`,
+      render: () => <ResultValue value={RV_AI_EXTRACTED} />,
+    },
+    {
+      id: "absent-not-ordered",
+      label: "Never ordered",
+      group: "Absent",
+      note: "A screening gap, not a negative screen. The difference decides whether anybody needs to do something, and an em dash decides nothing.",
+      code: `<ResultValue value={{ analyte: "\u2026", absent: "not-ordered" }} />`,
+      render: () => <ResultValue value={RV_ABSENT[0]!} />,
+    },
+    {
+      id: "absent-awaiting",
+      label: "Awaiting a result",
+      group: "Absent",
+      note: "In flight. The age matters \u2014 a draw from four hours ago and one from four minutes ago call for very different patience.",
+      code: `<ResultValue value={{ analyte: "\u2026", absent: "awaiting" }} />`,
+      render: () => <ResultValue value={RV_ABSENT[1]!} />,
+    },
+    {
+      id: "absent-cancelled",
+      label: "Cancelled",
+      group: "Absent",
+      note: "Somebody decided this was not needed. That is a fact about the record, and it is not the same as nobody having thought about it.",
+      code: `<ResultValue value={{ analyte: "\u2026", absent: "cancelled" }} />`,
+      render: () => <ResultValue value={RV_ABSENT[2]!} />,
+    },
+    {
+      id: "absent-specimen-problem",
+      label: "Specimen problem",
+      group: "Absent",
+      note: "No value will arrive from this draw. Haemolysis also raises potassium, so rendering this as a blank beside a normal sodium invites the assumption that the potassium was normal too.",
+      code: `<ResultValue value={{ analyte: "\u2026", absent: "specimen-problem" }} />`,
+      render: () => <ResultValue value={RV_ABSENT[3]!} />,
+    },
+    {
+      id: "absent-declined",
+      label: "Patient declined",
+      group: "Absent",
+      note: "The patient was asked and said no. That is a decision on the record with consequences of its own, not an omission for somebody to chase.",
+      code: `<ResultValue value={{ analyte: "\u2026", absent: "declined" }} />`,
+      render: () => <ResultValue value={RV_ABSENT[4]!} />,
+    },
+    {
+      id: "absent-masked",
+      label: "Restricted — a value exists",
+      group: "Absent",
+      note: "The one absence that is not a gap. A value exists and this reader may not see it, which is a different sentence from \u201cthere is nothing here\u201d and the only one of the seven with a next action.",
+      code: `<ResultValue value={{ analyte: "\u2026", absent: "masked" }} />`,
+      render: () => <ResultValue value={RV_ABSENT[5]!} />,
+    },
+    {
+      id: "absent-unknown",
+      label: "No value and no reason",
+      group: "Absent",
+      note: "The honest rendering of a feed that supplied neither. Guessing which of the other six this is would be the single most dangerous thing the component could do.",
+      code: `<ResultValue value={{ analyte: "\u2026", absent: "unknown" }} />`,
+      render: () => <ResultValue value={RV_ABSENT[6]!} />,
     },
     {
       id: "grid",
-      label: "In a grid",
-      note: "Compact, with the analyte hidden because the column header carries it — and tabular figures throughout, because a results column that does not line up cannot be scanned, which is the only way anybody reads forty rows of chemistry. The accessible name still opens with the analyte: a cell has no column header in its accessible context.",
+      label: "Compact, in a grid",
+      group: "Layout",
+      note: "At forty rows the analyte name is already in the column header, and repeating it costs the width the qualifier needs. Tabular figures keep the decimal points in a column so the eye can scan down them.",
+      code: `<ResultValue value={row} density="compact" hideAnalyte />`,
       render: () => (
-        <table style={{ borderCollapse: "collapse", fontSize: 13, minInlineSize: 400 }}>
-          <thead>
-            <tr>
-              {["Analyte", "Result"].map((h) => (
-                <th
-                  key={h}
-                  style={{
-                    padding: "4px 20px 10px 0",
-                    textAlign: "start",
-                    fontFamily: "var(--ox-font-mono, monospace)",
-                    fontSize: 10,
-                    letterSpacing: "0.08em",
-                    textTransform: "uppercase",
-                    fontWeight: 500,
-                    opacity: 0.55,
-                  }}
-                >
-                  {h}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {[...RV_PRESENT.slice(0, 4), RV_ABSENT[0]!].map((row) => (
-              <tr key={row.id}>
-                <td style={{ padding: "7px 20px 7px 0", verticalAlign: "top", opacity: 0.85 }}>
-                  {row.analyte}
-                </td>
-                <td style={{ padding: "7px 0", verticalAlign: "top" }}>
-                  <ResultValue value={row} now={RV_NOW} density="compact" hideAnalyte />
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <div style={{ display: "grid", gap: 2, maxInlineSize: 320 }}>
+          {RV_PRESENT.slice(0, 4).map((row) => (
+            <ResultValue key={row.id} value={row} density="compact" hideAnalyte />
+          ))}
+        </div>
       ),
     },
+    {
+      id: "interactive",
+      label: "Interactive — opens the report",
+      group: "Layout",
+      note: "Inert unless a handler is supplied. A value that looks clickable and is not is worse than one that never invited the click, so the affordance appears only when there is something behind it.",
+      code: `<ResultValue value={potassium}\n             onOpenReport={(v) => openSpecimenChain(v.id)}\n             now={serverTime} />`,
+      render: () => <ResultValue value={RV_PRESENT[1]!} now={RV_NOW} onOpenReport={() => {}} />,
+    },
   ],
-
-  /**
-   * Four demos, and the second is the component.
-   *
-   * Every other status chip in every other library looks fine in band one.
-   * The argument is what band two shows: the same chips with the hue removed,
-   * where the shape and the word are still carrying the state.
-   */
   "clinical-status": [
     {
       id: "vocabulary",
@@ -2231,10 +2414,16 @@ const SCENARIOS: Record<string, Scenario[]> = {
     },
   ],
 
+  /*
+   * Three bands. Identifying somebody, saying what is missing, and saying who
+   * may look — which are three different jobs the same component does, and the
+   * reason a flat list of seven read as seven unrelated screenshots.
+   */
   identity: [
     {
       id: "banner",
       label: "The banner",
+      group: "Identifying",
       note: 'The last surface a clinician reads before they act. Two identifiers because `context="action"` requires them at the type level; `08 Mar 1985` because `08/03/1985` is 3 August in Delhi and 8 March in Denver; SPCU rather than a bare “F”, because administrative gender is not a dosing fact and `Patient.gender` is not a renderable field at all.',
       render: () => (
         <InstrumentStage>
@@ -2245,6 +2434,7 @@ const SCENARIOS: Record<string, Scenario[]> = {
     {
       id: "worklist",
       label: "Two patients, one name",
+      group: "Identifying",
       note: "The pass no other component library ships. It reads what is actually on screen and adds the minimum that separates each collided row — full given name, then date of birth, then identifier — stopping at the first rung that works. Toggle it off to see what a ward list looks like without it.",
       render: () => (
         <InstrumentStage>
@@ -2255,6 +2445,7 @@ const SCENARIOS: Record<string, Scenario[]> = {
     {
       id: "states",
       label: "Four states, not one pill",
+      group: "Absence",
       note: "Deceased, inactive, merged and test come from four unrelated places in FHIR and mean four unrelated things. Collapsing them into one grey “Inactive” is how an automated appointment reminder reaches a bereaved family. The last row carries an NHS number that fails its check digit — a matching failure that has already happened, shown rather than hidden.",
       render: () => (
         <InstrumentStage>
@@ -2265,6 +2456,7 @@ const SCENARIOS: Record<string, Scenario[]> = {
     {
       id: "disclosure",
       label: "Who is looking",
+      group: "Access",
       note: "One resource, four audiences. Sensitivity categories stay behind an audited reveal below full disclosure — and they are withheld from the accessible name too, because naming them there would hand a screen-reader user the thing the reveal exists to record.",
       render: () => (
         <InstrumentStage>
@@ -2275,6 +2467,7 @@ const SCENARIOS: Record<string, Scenario[]> = {
     {
       id: "guard",
       label: "Wrong patient",
+      group: "Access",
       note: "The coupling that makes a banner a control rather than a heading. The form knows which patient it was opened for, the banner knows which chart is displayed, and the component refuses to let those disagree — silently or otherwise. Switch the chart and watch the order form withdraw.",
       render: () => (
         <InstrumentStage>
@@ -2285,6 +2478,7 @@ const SCENARIOS: Record<string, Scenario[]> = {
     {
       id: "verify",
       label: "Confirm before ordering",
+      group: "Identifying",
       note: "Adelman et al., 901,776 ordering sessions: a dismissible alert cut wrong-patient orders with an odds ratio of 0.84, and making the clinician re-enter the initials cut them with an odds ratio of 0.60. Everyone builds the first. Type AO.",
       render: () => (
         <InstrumentStage>
@@ -2295,6 +2489,7 @@ const SCENARIOS: Record<string, Scenario[]> = {
     {
       id: "absence",
       label: "Five kinds of missing",
+      group: "Absence",
       note: "Every design system collapses these into “show initials”. A photograph in the banner is associated with measurably fewer wrong-patient orders, so a silently missing one is a silently degraded safety control — and “no photo on record” and “we could not load the photo we have” are different facts.",
       render: () => (
         <InstrumentStage>
@@ -2304,10 +2499,18 @@ const SCENARIOS: Record<string, Scenario[]> = {
     },
   ],
 
+  /*
+   * Four bands, and the last two are the argument.
+   *
+   * "Grounding" is what the component does when it can answer; "Refusal" and
+   * "Safety" are what it does when it should not. Eleven flat tabs buried that
+   * distinction — which is the whole distinction between this and a chat box.
+   */
   copilot: [
     {
       id: "rest",
       label: "At rest",
+      group: "The surface",
       note: "A dock, not a floating div: role=complementary with a name, so it is findable and skippable. The placeholder does not say \u201cAsk anything\u201d \u2014 a copilot that promises a scope it will refuse has already lied once before the first question. Type a question and press Enter.",
       render: () => (
         <HostChart>
@@ -2318,6 +2521,7 @@ const SCENARIOS: Record<string, Scenario[]> = {
     {
       id: "sourced",
       label: "A sourced answer",
+      group: "Grounding",
       note: "Every claim is spanned and tied to the passage that supports it, and the passage is shown with the supporting sentence highlighted. Citations resolve during the stream rather than after it, so Show sources opens from cache \u2014 the design goal is narrow and unusual: make checking the answer cheaper than accepting it.",
       render: () => (
         <HostChart>
@@ -2328,6 +2532,7 @@ const SCENARIOS: Record<string, Scenario[]> = {
     {
       id: "multi-source",
       label: "Guideline and local policy",
+      group: "Grounding",
       note: "The common real shape: a national guideline for the strategy, the trust\u2019s own formulary for the agent. Each sentence carries its own marker, so a clinician can accept one and check the other. Open the reasoning disclosure to see what the model said it was doing \u2014 collapsed by default, because a visible chain of thought reads as evidence and is not evidence.",
       render: () => (
         <HostChart>
@@ -2338,6 +2543,7 @@ const SCENARIOS: Record<string, Scenario[]> = {
     {
       id: "uncited",
       label: "Unsupported",
+      group: "Refusal",
       note: "The same component, given an answer with no citation behind it. It is not hidden and not silently rendered as though it were sourced \u2014 the register drops to \u201cGeneral knowledge\u201d, the text is marked, and the badge says so. The failure this component exists to prevent is a confident sentence that nothing stands behind.",
       render: () => (
         <HostChart>
@@ -2348,6 +2554,7 @@ const SCENARIOS: Record<string, Scenario[]> = {
     {
       id: "dosing",
       label: "A dose in the answer",
+      group: "Grounding",
       note: "Any numeric dose is flagged for verification regardless of how well sourced it is, because a transcription error in a drug dose is the classic harm and one extra glance is cheap. In a mode that forbids dosing outright, the same answer is refused rather than flagged.",
       render: () => (
         <HostChart>
@@ -2358,6 +2565,7 @@ const SCENARIOS: Record<string, Scenario[]> = {
     {
       id: "scope",
       label: "Reading the chart",
+      group: "The surface",
       note: "The scope strip is the highest-value element here and the one nobody ships. It says who the copilot is reading, which categories it was given, and \u2014 the part everyone omits \u2014 what was withheld and why. A summary that silently excludes a 42 CFR Part 2 record has created a false belief that would not exist if the tool did not exist.",
       render: () => (
         <HostChart>
@@ -2368,6 +2576,7 @@ const SCENARIOS: Record<string, Scenario[]> = {
     {
       id: "refused",
       label: "Out of scope",
+      group: "Refusal",
       note: "Ask it something the active mode does not read \u2014 \u201cwhat are this patient\u2019s current medications\u201d in a reference-only mode \u2014 and it redirects rather than guessing. Over-refusal is a real failure that is almost never measured, so the refusal names the mode that would have answered instead of leaving a dead end.",
       render: () => (
         <HostChart>
@@ -2378,6 +2587,7 @@ const SCENARIOS: Record<string, Scenario[]> = {
     {
       id: "crisis",
       label: "Crisis",
+      group: "Safety",
       note: "Type something that discloses risk. A deterministic classifier runs before the model, reads the whole thread, and replaces the answer rather than annotating it \u2014 a hotline appended under a helpful answer is something people scroll past. The lines are resolved by locale: 988 works in the United States and nowhere else. It is tuned so clinical documentation \u2014 \u201cdenies SI\u201d, \u201cC-SSRS negative\u201d \u2014 does not escalate, which is what makes it usable in psychiatry at all.",
       render: () => (
         <HostChart>
@@ -2388,6 +2598,7 @@ const SCENARIOS: Record<string, Scenario[]> = {
     {
       id: "injection",
       label: "A hostile record",
+      group: "Safety",
       note: "The chart is not trusted input. This one contains an instruction aimed at the model rather than a clinician. Record content is fenced and never concatenated into the instruction channel, the instruction-shaped text is neutralised, and a record scoring as hostile blocks the exchange rather than being summarised.",
       render: () => (
         <HostChart>
@@ -2398,6 +2609,7 @@ const SCENARIOS: Record<string, Scenario[]> = {
     {
       id: "behavioral",
       label: "Between visits",
+      group: "The surface",
       note: "The behavioral health pack, and deliberately the least ambitious thing here. Instrument trends restated from what was documented \u2014 PHQ-9, GAD-7 \u2014 with no recommendation attached. It is clinician-facing only: Illinois, Nevada and Utah each regulate AI in mental health differently and Nevada prohibits it outright, so the patient-facing configuration throws rather than rendering.",
       render: () => (
         <HostChart>
@@ -2413,6 +2625,7 @@ const SCENARIOS: Record<string, Scenario[]> = {
     {
       id: "suppressed",
       label: "Suppressed",
+      group: "Refusal",
       note: "The most valuable thing this component does is disappear. Passed `suppressed`, it renders nothing at all \u2014 no dock, no dictation indicator, no keyboard listener. Each interruption during medication administration is associated with a measurable rise in clinical errors, and the FDA moved time-critical use under the criterion about independent review for the same reason.",
       render: () => (
         <HostChart>
@@ -3219,10 +3432,108 @@ const SCENARIOS: Record<string, Scenario[]> = {
 
 const DENSITIES: Density[] = ["patient", "standard", "clinical"];
 
-export function ComponentPreview({ name }: { name: string }) {
+/** Scenarios in rail order, grouped. Ungrouped ones fall under one heading. */
+function grouped(scenarios: Scenario[]): Array<{ group: string; items: Scenario[] }> {
+  const order: string[] = [];
+  const bucket = new Map<string, Scenario[]>();
+  for (const scenario of scenarios) {
+    const key = scenario.group ?? "States";
+    if (!bucket.has(key)) {
+      bucket.set(key, []);
+      order.push(key);
+    }
+    bucket.get(key)!.push(scenario);
+  }
+  return order.map((group) => ({ group, items: bucket.get(group)! }));
+}
+
+/**
+ * ComponentPreview — the state browser.
+ *
+ * One component on the stage, its states in a grouped rail beside it, and the
+ * reason the state exists directly under what it produces. Selecting a state
+ * moves the stage, the reason, the code and the URL together.
+ *
+ * The rail is vertical and grouped rather than a strip of tabs along the
+ * bottom, because a component with eighteen states wrapped that strip onto four
+ * lines and gave a reader no way to tell an absence from a layout variant. The
+ * grouping is the part that makes eighteen legible.
+ */
+export function ComponentPreview({
+  name,
+  states = [],
+}: {
+  name: string;
+  /**
+   * The component's declared states, used only when there is nothing live to
+   * browse yet. Where a preview exists the rail enumerates its states, and
+   * printing the same strings again underneath is noise — so the fallback
+   * lives here rather than in the page, next to the thing that knows whether
+   * it fired.
+   */
+  states?: readonly string[];
+}) {
   const scenarios = SCENARIOS[name];
   const [scenarioId, setScenarioId] = React.useState(scenarios?.[0]?.id ?? "");
   const [density, setDensity] = React.useState<Density>("standard");
+  const [copied, setCopied] = React.useState(false);
+
+  // Deep links. Read once on mount rather than through the router: this is a
+  // presentational selection, and pushing it through Next's router would
+  // re-render the whole route to move a radio button.
+  React.useEffect(() => {
+    if (!scenarios?.length) return;
+    const wanted = new URLSearchParams(window.location.search).get("state");
+    if (wanted && scenarios.some((item) => item.id === wanted)) setScenarioId(wanted);
+  }, [scenarios]);
+
+  const select = React.useCallback((id: string) => {
+    setScenarioId(id);
+    const url = new URL(window.location.href);
+    url.searchParams.set("state", id);
+    window.history.replaceState(null, "", url);
+  }, []);
+
+  /*
+   * Arrow keys move between states, as APG's tab pattern requires.
+   *
+   * The rail is one tab stop, not eighteen: with roving tabindex a keyboard
+   * user tabs onto the selected state and arrows through the rest, rather than
+   * pressing Tab eighteen times to reach the code panel underneath.
+   */
+  const onRailKeyDown = React.useCallback(
+    (event: React.KeyboardEvent<HTMLDivElement>) => {
+      const list = scenarios ?? [];
+      const delta =
+        event.key === "ArrowDown" || event.key === "ArrowRight"
+          ? 1
+          : event.key === "ArrowUp" || event.key === "ArrowLeft"
+            ? -1
+            : event.key === "Home"
+              ? -list.length
+              : event.key === "End"
+                ? list.length
+                : 0;
+      if (!delta) return;
+      event.preventDefault();
+
+      const current = list.findIndex((item) => item.id === scenarioId);
+      const next = Math.min(list.length - 1, Math.max(0, (current < 0 ? 0 : current) + delta));
+      const target = list[next];
+      if (!target) return;
+      select(target.id);
+      event.currentTarget
+        .querySelector<HTMLButtonElement>(`[data-state-id="${target.id}"]`)
+        ?.focus();
+    },
+    [scenarios, scenarioId, select],
+  );
+
+  React.useEffect(() => {
+    if (!copied) return;
+    const timer = window.setTimeout(() => setCopied(false), 1600);
+    return () => window.clearTimeout(timer);
+  }, [copied]);
 
   // Signature is the one component the site loads Ant Design for. Showing a
   // static mark instead would undercut its entire argument: the only way to
@@ -3231,19 +3542,40 @@ export function ComponentPreview({ name }: { name: string }) {
 
   if (!scenarios?.length) {
     return (
-      <div className="instrument instrument-demo flex items-center justify-center px-6 py-16">
-        <p className="text-sm text-panel-muted">Live preview coming with the next release.</p>
+      <div className="instrument instrument-demo px-6 py-10">
+        <p className="text-center text-sm text-panel-muted">
+          Live preview coming with the next release.
+        </p>
+        {states.length > 0 ? (
+          <>
+            <p className="eyebrow mt-8 text-center text-panel-muted/70">
+              States this component handles
+            </p>
+            <div className="mt-4 flex flex-wrap justify-center gap-2">
+              {states.map((state) => (
+                <span
+                  key={state}
+                  className="rounded-full border border-panel-rule px-2.5 py-1 text-xs text-panel-muted"
+                >
+                  {state}
+                </span>
+              ))}
+            </div>
+          </>
+        ) : null}
       </div>
     );
   }
 
-  const scenario = scenarios.find((s) => s.id === scenarioId) ?? scenarios[0]!;
+  const scenario = scenarios.find((item) => item.id === scenarioId) ?? scenarios[0]!;
+  const bands = grouped(scenarios);
 
   return (
     <div className="instrument instrument-demo">
       <InstrumentGlow />
 
-      <div className="relative flex items-center justify-between gap-4 border-b border-panel-rule px-4 py-2.5">
+      {/* Chrome ---------------------------------------------------------- */}
+      <div className="relative flex flex-wrap items-center justify-between gap-3 border-b border-panel-rule px-4 py-2.5">
         <div className="flex items-center gap-2.5">
           <span className="size-1.5 rounded-full bg-trace shadow-[0_0_8px_var(--color-trace)]" />
           <span className="eyebrow text-panel-muted">Live · real component</span>
@@ -3258,9 +3590,7 @@ export function ComponentPreview({ name }: { name: string }) {
               className={cn(
                 // min-h-6 is WCAG 2.5.8's floor. At 10px mono with py-1 these
                 // came out 23px — one pixel short, and a density switch is not
-                // inline text so no exception applies. inline-flex rather than
-                // extra padding so the label stays optically centred and the
-                // row height does not change.
+                // inline text so no exception applies.
                 "inline-flex min-h-6 items-center rounded-md px-2 py-1 font-mono text-[0.625rem] uppercase tracking-wider transition-colors duration-200",
                 density === item
                   ? "bg-panel-fg/10 text-panel-fg"
@@ -3273,44 +3603,154 @@ export function ComponentPreview({ name }: { name: string }) {
         </div>
       </div>
 
-      {/*
-        Keyed by scenario so switching tabs remounts the demo. Without it React
-        reconciles two different scenarios as the same component and their state
-        bleeds across — which for a loader means an advancing progress bar
-        carrying its value into a scenario that never set one.
-      */}
-      <div key={scenario.id} data-ox-density={density} className="relative p-4 sm:p-6">
-        {scenario.render()}
-      </div>
-
-      <div className="relative border-t border-panel-rule bg-panel/60 px-3 py-3 sm:px-4">
-        <div role="tablist" aria-label="Component state" className="flex flex-wrap gap-1.5">
-          {scenarios.map((item) => (
-            <button
-              key={item.id}
-              type="button"
-              role="tab"
-              aria-selected={item.id === scenario.id}
-              onClick={() => setScenarioId(item.id)}
-              className={cn(
-                "inline-flex min-h-6 items-center rounded-lg px-2.5 py-1.5 font-mono text-[0.6875rem] uppercase tracking-wider",
-                "transition-all duration-200 ease-[var(--ease-out-expo)]",
-                item.id === scenario.id
-                  ? "bg-trace/12 text-trace ring-1 ring-trace/35"
-                  : "text-panel-muted hover:bg-panel-fg/6 hover:text-panel-fg/85",
-              )}
-            >
-              {item.label}
-            </button>
+      <div className="relative grid lg:grid-cols-[15.5rem_minmax(0,1fr)]">
+        {/* Rail ---------------------------------------------------------- */}
+        <div
+          role="tablist"
+          aria-orientation="vertical"
+          aria-label={`${name} states`}
+          onKeyDown={onRailKeyDown}
+          /*
+            Short and scrollable on a phone, full height beside the stage on a
+            desktop. Eighteen states stacked above the component pushed it two
+            screens down on a 420px viewport — which is the same mistake the
+            page itself was making, one level in.
+          */
+          className="scroll-thin-dark max-h-[13rem] overflow-y-auto border-b border-panel-rule py-2 sm:max-h-[17rem] lg:max-h-[24rem] lg:border-b-0 lg:border-r"
+        >
+          {bands.map((band) => (
+            <div key={band.group}>
+              <p className="flex items-baseline gap-2 px-4 pb-1 pt-3 font-mono text-[0.625rem] uppercase tracking-[0.14em] text-panel-muted/70">
+                {band.group}
+                <span className="text-trace/80">{band.items.length}</span>
+              </p>
+              {band.items.map((item) => {
+                const active = item.id === scenario.id;
+                return (
+                  <button
+                    key={item.id}
+                    type="button"
+                    role="tab"
+                    id={`ox-state-${name}-${item.id}`}
+                    data-state-id={item.id}
+                    aria-selected={active}
+                    aria-controls={`ox-stage-${name}`}
+                    // Roving tabindex: the rail is one tab stop and the arrows
+                    // move within it, per the APG tab pattern.
+                    tabIndex={active ? 0 : -1}
+                    onClick={() => select(item.id)}
+                    className={cn(
+                      "flex min-h-6 w-full items-center gap-2.5 border-l-2 px-4 py-1.5 text-left text-[0.8125rem] leading-snug",
+                      "transition-colors duration-200",
+                      active
+                        ? "border-trace bg-panel-fg/6 font-medium text-panel-fg"
+                        : "border-transparent text-panel-muted hover:bg-panel-fg/4 hover:text-panel-fg/85",
+                    )}
+                  >
+                    <span
+                      aria-hidden="true"
+                      className={cn(
+                        "size-1.5 shrink-0 rounded-[2px]",
+                        active ? "bg-trace" : "bg-panel-muted/40",
+                      )}
+                    />
+                    {item.label}
+                  </button>
+                );
+              })}
+            </div>
           ))}
         </div>
-        <p
-          key={scenario.id}
-          className="animate-rail-settle mt-3 max-w-2xl text-[0.8125rem] leading-relaxed text-panel-muted"
-        >
-          {scenario.note}
-        </p>
+
+        {/* Stage --------------------------------------------------------- */}
+        <div className="flex min-w-0 flex-col">
+          {/*
+            Keyed by scenario so switching remounts the demo. Without it React
+            reconciles two different scenarios as the same component and their
+            state bleeds across — which for a loader means an advancing progress
+            bar carrying its value into a scenario that never set one.
+          */}
+          <div
+            key={scenario.id}
+            id={`ox-stage-${name}`}
+            role="tabpanel"
+            aria-labelledby={`ox-state-${name}-${scenario.id}`}
+            // Focusable because the panel can scroll and can contain nothing
+            // focusable of its own — WCAG 2.1.1.
+            tabIndex={0}
+            data-ox-density={density}
+            /*
+              Centred vertically, stretched horizontally.
+              
+              `items-center` on a row shrinks each child to its content width,
+              which narrowed the command palette's stage enough that its result
+              list started scrolling — and a scrollable region with no focusable
+              child is a WCAG 2.1.1 failure the audit caught. A column with the
+              default `stretch` gives the same visual centring without taking
+              width away from anything.
+            */
+            className="flex min-h-[13rem] flex-1 flex-col justify-center p-4 sm:p-6 lg:max-h-[24rem] lg:overflow-y-auto"
+          >
+            {scenario.render()}
+          </div>
+
+          <div className="animate-rail-settle border-t border-panel-rule bg-panel/60 px-4 py-3.5 sm:px-5">
+            <p className="eyebrow text-trace/85">Why this state exists</p>
+            <p className="mt-2 max-w-[68ch] text-[0.8125rem] leading-relaxed text-panel-muted">
+              {scenario.note}
+            </p>
+          </div>
+
+          {scenario.code ? (
+            <div className="border-t border-panel-rule">
+              <pre
+                tabIndex={0}
+                className="scroll-thin-dark overflow-x-auto px-4 py-3.5 font-mono text-[0.7rem] leading-relaxed text-panel-fg/90 sm:px-5"
+              >
+                <code>{scenario.code}</code>
+              </pre>
+              <div className="flex items-center gap-3 border-t border-panel-rule px-4 py-2 sm:px-5">
+                <span className="font-mono text-[0.625rem] uppercase tracking-wider text-panel-muted/70">
+                  ?state={scenario.id}
+                </span>
+                <span className="flex-1" />
+                <button
+                  type="button"
+                  onClick={() => {
+                    void navigator.clipboard
+                      ?.writeText(scenario.code ?? "")
+                      .then(() => setCopied(true));
+                  }}
+                  className="inline-flex min-h-6 items-center rounded-md border border-panel-rule px-2 py-1 font-mono text-[0.625rem] uppercase tracking-wider text-panel-muted transition-colors hover:border-trace/40 hover:text-panel-fg"
+                >
+                  {copied ? "Copied" : "Copy"}
+                </button>
+                {/* Announced rather than only shown: the label change is the
+                    only feedback a copy action gives, and a screen reader
+                    otherwise gets nothing at all. */}
+                <span aria-live="polite" className="sr-only">
+                  {copied ? "Example copied to clipboard" : ""}
+                </span>
+              </div>
+            </div>
+          ) : null}
+        </div>
       </div>
     </div>
   );
+}
+
+/* ------------------------------------------------------------------ */
+/* Home page                                                           */
+/* ------------------------------------------------------------------ */
+
+/**
+ * The copilot, answering, for the home page.
+ *
+ * Exported from here rather than rebuilt next door because the grounded
+ * stream is sixty lines of fixture and a second copy would drift. The home
+ * page shows one state; this file already owns the eleven it came from.
+ */
+export function CopilotHomeDemo() {
+  return <CopilotDemo events={GROUNDED_STREAM} />;
 }

@@ -336,6 +336,79 @@
   color: var(--color-graphite);
 }
 
+.ox-demo__note p {
+  margin: 0;
+}
+
+/* The deferred half of a note.
+
+   These paragraphs ran 60–90 words and sat permanently open under every
+   variant; six stacked read as a wall rather than as reasoning. The lead
+   sentence stays, the remainder moves in here, and nothing is deleted — this is
+   the most valuable writing on the site and it should be one click away, not
+   the first thing between a reader and the component. */
+.ox-demo__more {
+  margin-top: 0.5rem;
+}
+
+.ox-demo__more > summary {
+  cursor: pointer;
+  list-style: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-family: var(--font-jetbrains-mono), ui-monospace, monospace;
+  font-size: 0.625rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-graphite-soft);
+  /* 24px is the WCAG 2.5.8 target floor, and a one-line summary comes to 15. */
+  min-height: 1.5rem;
+  transition: color 0.2s;
+}
+
+.ox-demo__more > summary::-webkit-details-marker {
+  display: none;
+}
+
+.ox-demo__more > summary::before {
+  content: "+";
+  font-size: 0.85rem;
+  line-height: 1;
+  color: var(--color-oxygen);
+}
+
+.ox-demo__more[open] > summary::before {
+  content: "−";
+}
+
+.ox-demo__more > summary:hover {
+  color: var(--color-ink);
+}
+
+.ox-demo__more > summary:focus-visible {
+  outline: 2px solid var(--color-oxygen);
+  outline-offset: 3px;
+  border-radius: 3px;
+}
+
+.ox-demo__more > p {
+  margin-top: 0.5rem;
+  padding-left: 0.7rem;
+  border-left: 2px solid var(--color-rule);
+}
+
+/* Procurement prints these pages. A collapsed disclosure that prints collapsed
+   silently drops the argument from the copy somebody actually reads. */
+@media print {
+  .ox-demo__more > summary {
+    display: none;
+  }
+  .ox-demo__more > p {
+    display: block;
+  }
+}
+
 /* ---- furniture inside a demo -------------------------------------- */
 .ox-demo-panel {
   border: 1px dashed var(--ox-border);
