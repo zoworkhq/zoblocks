@@ -36,8 +36,12 @@ const BASE = process.argv[2] ?? "http://localhost:6001";
 const PAGES = [
   "/",
   "/components",
+  "/install",
   "/pro",
+  "/enterprise",
+  "/compare",
   "/showcase",
+  "/marketplace",
   ...CATALOG.map((component) => `/components/${component.name}`),
 ];
 const TAGS = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"];
