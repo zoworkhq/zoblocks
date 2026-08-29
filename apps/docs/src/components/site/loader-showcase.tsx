@@ -57,9 +57,7 @@ export function LoaderShowcase() {
           <span className="size-1.5 rounded-full bg-trace shadow-[0_0_8px_var(--color-trace)]" />
           <span className="eyebrow text-panel-muted">Live · the real components</span>
         </div>
-        <span className="eyebrow hidden text-panel-muted/70 sm:block">
-          svg + css · 0 dependencies
-        </span>
+        <span className="eyebrow hidden text-panel-muted sm:block">svg + css · 0 dependencies</span>
       </div>
 
       <div className="relative grid gap-px bg-panel-rule/60 sm:grid-cols-2 lg:grid-cols-5">

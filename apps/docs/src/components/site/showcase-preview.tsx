@@ -36,7 +36,7 @@ export function ShowcasePreview({
           <span className="size-1.5 rounded-full bg-trace shadow-[0_0_8px_var(--color-trace)]" />
           <span className="eyebrow text-panel-muted">Live composition · synthetic data</span>
         </div>
-        <span className="eyebrow hidden text-panel-muted/70 sm:block">{density} density</span>
+        <span className="eyebrow hidden text-panel-muted sm:block">{density} density</span>
       </div>
 
       <div data-ox-density={density} className="relative p-4 sm:p-5">

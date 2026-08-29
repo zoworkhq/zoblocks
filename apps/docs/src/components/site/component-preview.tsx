@@ -3548,7 +3548,7 @@ export function ComponentPreview({
         </p>
         {states.length > 0 ? (
           <>
-            <p className="eyebrow mt-8 text-center text-panel-muted/70">
+            <p className="eyebrow mt-8 text-center text-panel-muted">
               States this component handles
             </p>
             <div className="mt-4 flex flex-wrap justify-center gap-2">
@@ -3620,9 +3620,9 @@ export function ComponentPreview({
         >
           {bands.map((band) => (
             <div key={band.group}>
-              <p className="flex items-baseline gap-2 px-4 pb-1 pt-3 font-mono text-[0.625rem] uppercase tracking-[0.14em] text-panel-muted/70">
+              <p className="flex items-baseline gap-2 px-4 pb-1 pt-3 font-mono text-[0.625rem] uppercase tracking-[0.14em] text-panel-muted">
                 {band.group}
-                <span className="text-trace/80">{band.items.length}</span>
+                <span className="text-trace">{band.items.length}</span>
               </p>
               {band.items.map((item) => {
                 const active = item.id === scenario.id;
@@ -3695,7 +3695,7 @@ export function ComponentPreview({
           </div>
 
           <div className="animate-rail-settle border-t border-panel-rule bg-panel/60 px-4 py-3.5 sm:px-5">
-            <p className="eyebrow text-trace/85">Why this state exists</p>
+            <p className="eyebrow text-trace">Why this state exists</p>
             <p className="mt-2 max-w-[68ch] text-[0.8125rem] leading-relaxed text-panel-muted">
               {scenario.note}
             </p>
@@ -3710,7 +3710,7 @@ export function ComponentPreview({
                 <code>{scenario.code}</code>
               </pre>
               <div className="flex items-center gap-3 border-t border-panel-rule px-4 py-2 sm:px-5">
-                <span className="font-mono text-[0.625rem] uppercase tracking-wider text-panel-muted/70">
+                <span className="font-mono text-[0.625rem] uppercase tracking-wider text-panel-muted">
                   ?state={scenario.id}
                 </span>
                 <span className="flex-1" />

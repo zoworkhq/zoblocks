@@ -170,7 +170,7 @@ export function DataGridPreview() {
           <span className="size-1.5 rounded-full bg-trace" aria-hidden="true" />
           <span className="eyebrow text-panel-muted">Data Grid · in development</span>
         </div>
-        <span className="numeric hidden text-[0.6875rem] text-panel-muted/70 sm:block">
+        <span className="numeric hidden text-[0.6875rem] text-panel-muted sm:block">
           role=&quot;grid&quot;
         </span>
       </div>
