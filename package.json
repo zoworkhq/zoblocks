@@ -121,6 +121,6 @@
     "prosemirror-keymap": "^1.2.3",
     "prosemirror-model": "^1.25.1",
     "prosemirror-state": "^1.4.4",
-    "prosemirror-view": "^1.42.2"
+    "prosemirror-view": "^1.42.3"
   }
 }
