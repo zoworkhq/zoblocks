@@ -550,6 +550,8 @@ export function ChartContextMenu(props: ChartContextMenuProps) {
    * highlight the keyboard user had just been given.
    */
   const openRef = React.useRef<OpenState | null>(null);
+  /** Set by `close(true)`; consumed by the effect that puts focus back. */
+  const restoreFocusRef = React.useRef(false);
 
   /*
    * A disclosure that was offered and abandoned is still a disclosure, and it
@@ -612,7 +614,17 @@ export function ChartContextMenu(props: ChartContextMenuProps) {
       setActive(-1);
       setConfirming(null);
       setReasoning(null);
-      if (returnFocus) triggerRef.current?.focus?.();
+      /*
+       * Restored in an effect, not here.
+       *
+       * Calling `.focus()` synchronously looked right and lost a race under
+       * load: a passive focus effect from the placement render could still be
+       * pending, and React flushes it after this handler — so it moved focus
+       * back into a popup that was about to unmount, and the unmount dropped
+       * focus to `<body>`. It reproduced about one full-suite run in three and
+       * never in isolation, which is the worst kind of flake to inherit.
+       */
+      restoreFocusRef.current = returnFocus;
       onOpenChange?.(false, subject);
     },
     [actions, emitDisclosure, onOpenChange, subject],
@@ -849,6 +861,20 @@ export function ChartContextMenu(props: ChartContextMenuProps) {
      * once the placement lands is what actually arms the first verb.
      */
   }, [open, active, rows, confirming, reasoning, box]);
+
+  /*
+   * Focus goes back to the trigger once the popup is gone, and only then.
+   *
+   * Keyed on `open` becoming null rather than on unmount, so it runs after
+   * every effect the open menu owned — the ordering the synchronous version
+   * could not guarantee. The ref makes it one-shot: without it this would take
+   * focus on the initial mount, where `open` is null too.
+   */
+  React.useEffect(() => {
+    if (open || !restoreFocusRef.current) return;
+    restoreFocusRef.current = false;
+    triggerRef.current?.focus?.();
+  }, [open]);
 
   /* ---- running ----------------------------------------------------- */
 
