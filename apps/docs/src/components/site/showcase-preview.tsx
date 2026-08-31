@@ -14,7 +14,6 @@
  */
 
 import * as React from "react";
-import { InstrumentGlow } from "@/components/site/interactions";
 
 const COMPOSITIONS: Record<string, () => React.ReactNode> = {};
 
@@ -29,8 +28,6 @@ export function ShowcasePreview({
 
   return (
     <div className="instrument instrument-demo">
-      <InstrumentGlow />
-
       <div className="relative flex items-center justify-between gap-4 border-b border-panel-rule px-4 py-2.5">
         <div className="flex items-center gap-2.5">
           <span className="size-1.5 rounded-full bg-trace shadow-[0_0_8px_var(--color-trace)]" />

@@ -14,11 +14,13 @@
  * So everything is laid out at once, framed, with the prop that produced it
  * named on the frame.
  *
- * The control bar is the other half. Theme, density, direction and motion are
- * the four axes a design system is most often wrong on and the four nobody
- * checks by hand — and for this component each one is load-bearing rather than
- * decorative: density decides the hit area, direction decides which way the
- * thumb travels, and motion decides whether a failed write is perceptible.
+ * There was a control bar over this — theme, density, direction and motion, one
+ * click each, applied to every demo at once. It is gone, and what it proved has
+ * to be carried by the demos themselves: the RTL chapter sets `dir` on its own
+ * block rather than asking the reader to flip a global switch, and the theme
+ * follows the site's. Density and motion are no longer checkable from this page.
+ * That is a real loss of evidence, not a tidy-up, and it is written down here so
+ * the next person knows the bar was removed on purpose rather than never built.
  */
 
 import * as React from "react";
@@ -374,110 +376,28 @@ const CHAPTERS: Array<{ id: Chapter; label: string; blurb: string }> = [
   },
 ];
 
-const DENSITIES = ["patient", "standard", "clinical"] as const;
-
 /* ------------------------------------------------------------------ */
 
 export function SwitchGallery() {
   const [chapter, setChapter] = React.useState<Chapter>("anatomy");
   const [theme, setTheme] = React.useState<"light" | "dark" | "hc">("light");
-  const [density, setDensity] = React.useState<(typeof DENSITIES)[number]>("standard");
-  const [rtl, setRtl] = React.useState(false);
-  const [motion, setMotion] = React.useState(true);
-  const [themePinned, setThemePinned] = React.useState(false);
 
   // Follows the site theme until the reader pins one here — a page whose
   // argument is "the tokens carry the theme" must not open on light slabs in
   // a dark page.
   React.useEffect(() => {
-    if (themePinned) return;
     const root = document.documentElement;
     const sync = () => setTheme(root.classList.contains("dark") ? "dark" : "light");
     sync();
     const observer = new MutationObserver(sync);
     observer.observe(root, { attributes: true, attributeFilter: ["class"] });
     return () => observer.disconnect();
-  }, [themePinned]);
+  }, []);
 
   const active = CHAPTERS.find((item) => item.id === chapter) ?? CHAPTERS[0]!;
 
   return (
     <div className="ox-gallery">
-      <div className="ox-gallery__bar">
-        <div className="ox-gallery__group" role="group" aria-label="Component theme">
-          <span className="ox-gallery__legend">Theme</span>
-          {(["light", "dark", "hc"] as const).map((option) => (
-            <button
-              key={option}
-              type="button"
-              aria-pressed={theme === option}
-              onClick={() => {
-                setThemePinned(true);
-                setTheme(option);
-              }}
-              className="ox-gallery__switch"
-            >
-              {option}
-            </button>
-          ))}
-        </div>
-
-        <div className="ox-gallery__group" role="group" aria-label="Density">
-          <span className="ox-gallery__legend">Density</span>
-          {DENSITIES.map((option) => (
-            <button
-              key={option}
-              type="button"
-              aria-pressed={density === option}
-              onClick={() => setDensity(option)}
-              className="ox-gallery__switch"
-            >
-              {option}
-            </button>
-          ))}
-        </div>
-
-        <div className="ox-gallery__group" role="group" aria-label="Text direction">
-          <span className="ox-gallery__legend">Dir</span>
-          {(
-            [
-              ["ltr", false],
-              ["rtl", true],
-            ] as const
-          ).map(([label, value]) => (
-            <button
-              key={label}
-              type="button"
-              aria-pressed={rtl === value}
-              onClick={() => setRtl(value)}
-              className="ox-gallery__switch"
-            >
-              {label}
-            </button>
-          ))}
-        </div>
-
-        <div className="ox-gallery__group" role="group" aria-label="Motion">
-          <span className="ox-gallery__legend">Motion</span>
-          {(
-            [
-              ["on", true],
-              ["off", false],
-            ] as const
-          ).map(([label, value]) => (
-            <button
-              key={label}
-              type="button"
-              aria-pressed={motion === value}
-              onClick={() => setMotion(value)}
-              className="ox-gallery__switch"
-            >
-              {label}
-            </button>
-          ))}
-        </div>
-      </div>
-
       <div className="ox-gallery__chapters">
         <Tabs
           as="radiogroup"
@@ -490,13 +410,7 @@ export function SwitchGallery() {
         <p className="ox-gallery__blurb">{active.blurb}</p>
       </div>
 
-      <div
-        className="ox-gallery__stage"
-        data-ox-theme={theme === "hc" ? "high-contrast" : theme}
-        data-ox-density={density}
-        data-ox-motion={motion ? "on" : "off"}
-        dir={rtl ? "rtl" : "ltr"}
-      >
+      <div className="ox-gallery__stage" data-ox-theme={theme === "hc" ? "high-contrast" : theme}>
         {chapter === "anatomy" && (
           <div className="ox-gallery__grid">
             <Demo
@@ -1070,7 +984,7 @@ export function SwitchGallery() {
               name="Right to left"
               api="labelPlacement · logical properties"
               tags={["dir=rtl"]}
-              note="The thumb travels on inset-inline-start and labelPlacement is start/end rather than left/right, so nothing here is mirrored by hand. Flip the whole gallery with the Dir control above and watch every demo follow."
+              note="The thumb travels on inset-inline-start and labelPlacement is start/end rather than left/right, so nothing here is mirrored by hand. The third block sets dir=“rtl” on itself — nothing below it is mirrored by hand."
             >
               <Stack>
                 <Switch label="Label at the end (default)" stateLabels="yes-no" checked />

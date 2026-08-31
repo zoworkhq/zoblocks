@@ -3,10 +3,11 @@ import path from "node:path";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, ArrowUpRight, Check, CircleAlert, X } from "lucide-react";
+import { ArrowLeft, ArrowUpRight, CircleAlert } from "lucide-react";
 import type { Alternative, ComponentDoc, FrameworkRelation } from "@oxygenui-design/component-meta";
 import { CATALOG, STATUS_LABEL, getComponent } from "@/lib/catalog";
 import { SiteFooter, SiteHeader } from "@/components/site/chrome";
+import { PropsTable } from "@/components/site/props-table";
 import { ComponentPreview } from "@/components/site/component-preview";
 import { TabsGallery } from "@/components/site/tabs-gallery";
 import { CopilotGallery } from "@/components/site/copilot-gallery";
@@ -151,37 +152,6 @@ function breadcrumbData(component: ComponentDoc) {
 }
 
 /**
- * The accessibility section, as questions and answers.
- *
- * These are not written for the schema — they are already on the page, and they
- * were already answers to implicit questions: which keys move focus, what a
- * screen reader announces, what survives forced colours. Marking them up costs
- * no authoring and gives an answer engine the one structure it quotes verbatim.
- *
- * Returns `null` rather than an empty FAQPage when a component has no
- * accessibility notes. An FAQPage with zero questions is a structured-data
- * error, and emitting one on the components that need it least is a good way to
- * lose rich results on the ones that need it most.
- */
-function faqData(component: ComponentDoc) {
-  const notes = component.accessibility ?? [];
-  if (notes.length === 0) return null;
-
-  return {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    mainEntity: notes.slice(0, 10).map((note) => ({
-      "@type": "Question",
-      // The label is written as an assertion ("Every trigger is a real button"),
-      // so it is prefixed with the component to read as a question about this
-      // component rather than as a claim floating free of its subject.
-      name: `${component.title}: ${note.label}`,
-      acceptedAnswer: { "@type": "Answer", text: note.detail },
-    })),
-  };
-}
-
-/**
  * Read the component's source from the generated registry JSON rather than
  * from the .tsx file directly. The registry is what customers actually
  * receive, so documenting it guarantees the page can never show source that
@@ -298,7 +268,6 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
 
   const source = await readRegistrySource(name);
   const related = component.related.map(getComponent).filter(Boolean);
-  const faq = faqData(component);
   const weight = await readRegistryWeight(name);
 
   /*
@@ -349,9 +318,7 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
     ...(variants.length ? [{ id: "variants", label: "Variants" }] : []),
     ...(component.usage ? [{ id: "usage", label: "Usage & props" }] : []),
     ...(examples.length ? [{ id: "examples", label: "Examples" }] : []),
-    ...(component.guidance.use.length ? [{ id: "guidance", label: "Guidance" }] : []),
     ...(hasClinical ? [{ id: "clinical", label: "Clinical" }] : []),
-    ...(component.accessibility.length ? [{ id: "quality", label: "Quality" }] : []),
     ...(a11yChecks.length ? [{ id: "conformance", label: "Conformance" }] : []),
     ...(source ? [{ id: "source", label: "Source" }] : []),
     ...(related.length || alternatives.length || builtWith.length || usedIn.length
@@ -375,12 +342,6 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbData(component)) }}
         />
-        {faq ? (
-          <script
-            type="application/ld+json"
-            dangerouslySetInnerHTML={{ __html: JSON.stringify(faq) }}
-          />
-        ) : null}
 
         {/* Header ------------------------------------------------------- */}
         <section className="border-b border-rule">
@@ -728,16 +689,28 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
             <div className="mx-auto max-w-6xl section-minor px-5 sm:px-8">
               <SectionHeading eyebrow="Usage" title="Props are the FHIR resource." />
 
-              <div className="mt-8 grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)]">
-                <div data-reveal>
-                  <pre
-                    tabIndex={0}
-                    className="scroll-thin-dark overflow-x-auto rounded-2xl border border-panel-rule bg-panel p-5 font-mono text-[0.75rem] leading-relaxed text-panel-fg/90"
-                  >
-                    <code>{component.usage}</code>
-                  </pre>
+              {/*
+                The sample and its dependencies share the top row; the API takes
+                the full width underneath.
 
-                  <h3 className="mt-8 font-display text-sm font-semibold uppercase tracking-wide text-graphite">
+                Beside a 1.1fr column the description track measured 271px —
+                about 43 characters — so every sentence wrapped to three or four
+                lines and an 18-prop component ran to 1753px next to half a page
+                of nothing. The height was the measure, not the number of props.
+                The sample was clipping its own import path in the same column
+                (580px of code in 501px of box), which full width also fixes.
+              */}
+              <div className="mt-8 grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,14rem)] lg:items-start">
+                <pre
+                  data-reveal
+                  tabIndex={0}
+                  className="scroll-thin-dark overflow-x-auto rounded-2xl border border-panel-rule bg-panel p-5 font-mono text-[0.75rem] leading-relaxed text-panel-fg/90"
+                >
+                  <code>{component.usage}</code>
+                </pre>
+
+                <div data-reveal style={{ "--reveal-delay": "80ms" } as React.CSSProperties}>
+                  <h3 className="font-display text-sm font-semibold uppercase tracking-wide text-graphite">
                     Dependencies
                   </h3>
                   <ul className="mt-3 flex flex-wrap gap-2">
@@ -751,13 +724,14 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
                     ))}
                   </ul>
                 </div>
+              </div>
 
-                <div
-                  data-reveal
-                  style={{ "--reveal-delay": "80ms" } as React.CSSProperties}
-                  className="space-y-6"
-                >
-                  {/*
+              <div
+                data-reveal
+                style={{ "--reveal-delay": "120ms" } as React.CSSProperties}
+                className="mt-10 space-y-8"
+              >
+                {/*
                     One table per exported component, not one for the first.
 
                     The catalog has always carried `exports`; the page rendered
@@ -771,99 +745,22 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
                     union, so the intersection the checker can see is three
                     props and the whole API was missing from its own page.
                   */}
-                  {apiTables.map(({ name, props: exportProps }, tableIndex) => (
-                    <div key={name}>
-                      {apiTables.length > 1 && (
-                        <h3 className="mb-3 flex flex-wrap items-baseline gap-x-2 font-display text-sm font-semibold tracking-tight">
-                          <code className="numeric text-oxygen-deep">{name}</code>
-                          <span className="text-xs font-normal text-graphite-soft">
-                            {exportProps.length} {exportProps.length === 1 ? "prop" : "props"}
-                            {tableIndex === 0 && component.exports.length > 1
-                              ? " · the front door"
-                              : ""}
-                          </span>
-                        </h3>
-                      )}
-                      {/* A container that scrolls must be reachable by keyboard —
-                      WCAG 2.1.1. `tabIndex={0}` makes it focusable so arrow
-                      keys can pan it, and the group role plus label mean a
-                      screen-reader user is told what they have landed on rather
-                      than hearing an unnamed focus stop. This became a real
-                      violation the moment the props table started listing the
-                      full API instead of one prop. */}
-                      {/*
-                        A stacked list, not a table.
-
-                        It was a four-column table and it was clipping. Table
-                        layout gives a column the width its content asks for,
-                        and `variant` on DatePicker asks for eleven string
-                        literals — about 300 characters. The type column took
-                        the row and "What it does" was squeezed to roughly one
-                        character per line: a column of single letters running
-                        down the page, with a horizontal scrollbar under it.
-
-                        No column width can fix that, because the problem is
-                        that a TypeScript union and a sentence do not belong
-                        side by side. So the name stays in its own column and
-                        stays scannable, and the type and the description each
-                        get the full remaining width, stacked. Nothing clips,
-                        nothing scrolls sideways, and the scroll region that
-                        used to need `tabIndex={0}` to satisfy WCAG 2.1.1 is
-                        gone rather than patched.
-                      */}
-                      <dl className="divide-y divide-rule overflow-hidden rounded-2xl border border-rule bg-paper">
-                        {exportProps.map((prop) => (
-                          <div
-                            key={prop.name}
-                            className="grid gap-x-8 gap-y-2 px-5 py-4 sm:grid-cols-[minmax(8rem,13rem)_minmax(0,1fr)]"
-                          >
-                            {/* `min-w-0` on both tracks: without it a long
-                                union expands the grid track instead of
-                                wrapping inside it, which is the same bug the
-                                table had, one layout system later. */}
-                            <dt className="min-w-0">
-                              <span className="numeric break-words text-xs font-medium text-ink">
-                                {prop.name}
-                              </span>
-                              {prop.required ? (
-                                <span className="numeric ml-1.5 text-[0.5625rem] uppercase tracking-wider text-critical">
-                                  req
-                                </span>
-                              ) : null}
-                              {prop.default ? (
-                                <span className="numeric mt-1 block text-[0.6875rem] text-graphite-soft">
-                                  = {prop.default}
-                                </span>
-                              ) : null}
-                            </dt>
-
-                            <dd className="min-w-0">
-                              <p className="numeric break-words text-xs leading-relaxed text-oxygen-deep">
-                                {prop.type}
-                              </p>
-                              {/*
-                                An undocumented public prop is stated as one
-                                rather than left blank — a blank reads as
-                                "nothing to say about this". None are in that
-                                state today; the branch stays for the next
-                                prop somebody adds in a hurry.
-                              */}
-                              <p className="mt-2 max-w-prose text-xs leading-relaxed text-graphite">
-                                {prop.description ? (
-                                  prop.description
-                                ) : (
-                                  <span className="italic text-graphite-soft">
-                                    Not yet documented.
-                                  </span>
-                                )}
-                              </p>
-                            </dd>
-                          </div>
-                        ))}
-                      </dl>
-                    </div>
-                  ))}
-                </div>
+                {apiTables.map(({ name, props: exportProps }, tableIndex) => (
+                  <div key={name}>
+                    {apiTables.length > 1 && (
+                      <h3 className="mb-3 flex flex-wrap items-baseline gap-x-2 font-display text-sm font-semibold tracking-tight">
+                        <code className="numeric text-oxygen-deep">{name}</code>
+                        <span className="text-xs font-normal text-graphite-soft">
+                          {exportProps.length} {exportProps.length === 1 ? "prop" : "props"}
+                          {tableIndex === 0 && component.exports.length > 1
+                            ? " · the front door"
+                            : ""}
+                        </span>
+                      </h3>
+                    )}
+                    <PropsTable props={exportProps} label={name} />
+                  </div>
+                ))}
               </div>
             </div>
           </section>
@@ -932,39 +829,6 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
           </section>
         )}
 
-        {/* Guidance ----------------------------------------------------- */}
-        {(component.guidance.use.length > 0 || component.guidance.avoid.length > 0) && (
-          <section id="guidance" className="scroll-mt-24 border-b border-rule bg-paper-sunk/40">
-            <div className="mx-auto max-w-6xl section-minor px-5 sm:px-8">
-              <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
-                <SectionHeading eyebrow="Guidance" title="When to use it, and when not to." />
-                <p className="guidance-readout numeric shrink-0 text-xs text-graphite-soft">
-                  DECISION SURFACE /{" "}
-                  {component.guidance.use.length + component.guidance.avoid.length} RULES
-                </p>
-              </div>
-
-              <div className="guidance-board mt-10">
-                <GuidanceList
-                  title="Use it"
-                  label="Recommended context"
-                  items={component.guidance.use}
-                  icon={Check}
-                  tone="use"
-                />
-                <GuidanceList
-                  title="Don't"
-                  label="Guardrails"
-                  items={component.guidance.avoid}
-                  icon={X}
-                  tone="avoid"
-                  delay
-                />
-              </div>
-            </div>
-          </section>
-        )}
-
         {/* Clinical ----------------------------------------------------- */}
         {hasClinical && domain && (
           <section id="clinical" className="scroll-mt-24 border-b border-rule">
@@ -1012,79 +876,6 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
                   </p>
                 </div>
               )}
-            </div>
-          </section>
-        )}
-
-        {/* Accessibility & limitations ---------------------------------- */}
-        {(component.accessibility.length > 0 || component.limitations.length > 0) && (
-          <section id="quality" className="scroll-mt-24 border-b border-rule">
-            <div className="mx-auto max-w-6xl section-minor px-5 sm:px-8">
-              <SectionHeading
-                eyebrow="Quality"
-                title="What was tested, and what is still missing."
-              />
-
-              <div className="mt-8 grid gap-8 lg:grid-cols-2">
-                <dl className="space-y-5" data-reveal>
-                  {component.accessibility.map((item) => (
-                    <div key={item.label}>
-                      <dt className="font-display text-[0.9375rem] font-semibold tracking-tight">
-                        {item.label}
-                      </dt>
-                      <dd className="mt-1 text-sm leading-relaxed text-graphite">{item.detail}</dd>
-                    </div>
-                  ))}
-                </dl>
-
-                {component.limitations.length > 0 && (
-                  <div
-                    data-reveal
-                    style={{ "--reveal-delay": "80ms" } as React.CSSProperties}
-                    className="limitation-panel self-start"
-                  >
-                    <div className="limitation-panel__header">
-                      <div className="flex min-w-0 items-center gap-3">
-                        <span className="limitation-panel__signal" aria-hidden="true">
-                          <CircleAlert className="size-4" />
-                        </span>
-                        <div>
-                          <p className="limitation-panel__kicker numeric text-[0.625rem] text-graphite-soft">
-                            Open gaps
-                          </p>
-                          <h3 className="mt-1 font-display text-base font-semibold tracking-tight">
-                            Known limitations
-                          </h3>
-                        </div>
-                      </div>
-                      <span
-                        className="limitation-panel__count numeric"
-                        aria-label={`${component.limitations.length} known limitations`}
-                      >
-                        {String(component.limitations.length).padStart(2, "0")}
-                      </span>
-                    </div>
-                    {/* Stated plainly. An undocumented limitation becomes a
-                        bug report, and in this domain, sometimes worse. */}
-                    <ul className="limitation-list" aria-label="Known limitations">
-                      {component.limitations.map((limitation, index) => (
-                        <li
-                          key={limitation}
-                          className="limitation-item text-sm leading-relaxed text-graphite"
-                        >
-                          <span className="limitation-index numeric" aria-hidden="true">
-                            {String(index + 1).padStart(2, "0")}
-                          </span>
-                          <span className="limitation-marker" aria-hidden="true">
-                            ↳
-                          </span>
-                          <span>{limitation}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-              </div>
             </div>
           </section>
         )}
@@ -1310,55 +1101,5 @@ function Th({ children }: { children: React.ReactNode }) {
     >
       {children}
     </th>
-  );
-}
-
-function GuidanceList({
-  title,
-  label,
-  items,
-  icon: Icon,
-  tone,
-  delay = false,
-}: {
-  title: string;
-  label: string;
-  items: string[];
-  icon: React.ComponentType<{ className?: string }>;
-  tone: "use" | "avoid";
-  delay?: boolean;
-}) {
-  return (
-    <div
-      data-reveal
-      style={delay ? ({ "--reveal-delay": "80ms" } as React.CSSProperties) : undefined}
-      className={`guidance-column guidance-column--${tone}`}
-    >
-      <div className="guidance-column__header">
-        <div className="flex min-w-0 items-center gap-3">
-          <span className="guidance-column__marker" aria-hidden="true" />
-          <div>
-            <p className="guidance-kicker numeric text-[0.625rem] text-graphite-soft">{label}</p>
-            <h3 className="mt-1 font-display text-base font-semibold tracking-tight">{title}</h3>
-          </div>
-        </div>
-        <span className="guidance-count numeric" aria-label={`${items.length} guidance items`}>
-          {String(items.length).padStart(2, "0")}
-        </span>
-      </div>
-      <ul className="guidance-list" aria-label={`${title} guidance`}>
-        {items.map((item, index) => (
-          <li key={item} className="guidance-item text-sm leading-relaxed text-graphite">
-            <span className="guidance-index numeric" aria-hidden="true">
-              {String(index + 1).padStart(2, "0")}
-            </span>
-            <span className="guidance-icon" aria-hidden="true">
-              <Icon />
-            </span>
-            <span>{item}</span>
-          </li>
-        ))}
-      </ul>
-    </div>
   );
 }

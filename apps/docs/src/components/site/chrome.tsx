@@ -25,7 +25,6 @@ const NAV = [
   { href: "/showcase", label: "Showcase" },
   { href: "/marketplace", label: "Marketplace" },
   { href: "/pro", label: "Pro" },
-  { href: "/enterprise", label: "Enterprise" },
 ];
 
 /**
@@ -204,7 +203,6 @@ const FOOTER_LINKS = [
       { href: "/showcase", label: "Showcase" },
       { href: "/marketplace", label: "Marketplace" },
       { href: "/pro", label: "Pro" },
-      { href: "/enterprise", label: "Enterprise" },
       { href: "/compare", label: "Compare" },
     ],
   },

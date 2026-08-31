@@ -90,35 +90,28 @@ function Hero() {
               className="display-2xl enter-blur mt-6 text-balance"
               style={{ "--enter-delay": "180ms" } as React.CSSProperties}
             >
-              Healthcare UI that already knows what the data means.
+              The React design system for healthcare.
             </h1>
 
             {/*
-              The plain sentence, under the good one.
+              One supporting line, where there used to be a heading and two
+              paragraphs.
 
-              The H1 is the strongest line on the site and contains nothing
-              anybody searches for — which is a fair trade for a headline whose
-              job is to stop someone, but it left the page's most weighted
-              heading doing no discovery work at all. Rather than compromise the
-              H1, the searched terms get their own heading beneath it: "React",
-              "components", "FHIR", "healthcare". Two headings, two jobs.
+              The H2 existed because the old H1 — "Healthcare UI that already
+              knows what the data means" — contained nothing anybody searches
+              for, so "React", "components", "FHIR" and "healthcare" needed a
+              heading of their own beneath it. This H1 names the category
+              itself, so the second heading has no job left and the terms it was
+              carrying sit in the sentence below. The count is read from the
+              catalogue rather than typed, because a number in a headline is the
+              first thing to go stale.
             */}
-            <h2
-              className="enter mt-5 max-w-xl text-lg font-medium tracking-tight text-graphite"
-              style={{ "--enter-delay": "240ms" } as React.CSSProperties}
-            >
-              React components for healthcare interfaces, typed to FHIR R4.
-            </h2>
-
-            {/* Two sentences, not one compound. The licensing argument was
-                trailing behind an em dash on a 34-word opener; it is the second
-                thing a technical reader checks and deserves to stand alone. */}
             <p
               className="body-lg enter mt-6 max-w-xl text-pretty text-graphite"
-              style={{ "--enter-delay": "300ms" } as React.CSSProperties}
+              style={{ "--enter-delay": "240ms" } as React.CSSProperties}
             >
-              Built for the moments a healthcare interface is judged: the wait, the missing value,
-              the result nobody interpreted.
+              {CATALOG.length} accessible components typed to FHIR R4 — where a missing value, an
+              unrecorded one, and one nobody has read yet are three different things on screen.
             </p>
             <p
               className="body-lg enter mt-3 max-w-xl text-pretty text-graphite"
