@@ -59,7 +59,7 @@
   },
   "devDependencies": {
     "@oxygenui-design/tsconfig": "workspace:*",
-    "@types/node": "^22.10.2",
+    "@types/node": "^26.4.0",
     "@vitest/coverage-v8": "^4.1.10",
     "typescript": "^5.7.2",
     "vitest": "^4.1.10"
