@@ -549,6 +549,10 @@ export interface DisclosureProps extends Omit<AccordionProps, "items" | "accordi
   open?: boolean;
   /** Open on first render, uncontrolled. */
   defaultOpen?: boolean;
+  /**
+   * Fired when the section opens or closes, with the new state. For a gated section it fires
+   * only after the gate is satisfied — opening is an event, not a state change.
+   */
   onOpenChange?: (open: boolean) => void;
 }
 

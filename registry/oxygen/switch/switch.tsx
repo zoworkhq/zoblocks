@@ -209,8 +209,11 @@ function useHold(holdMs: number): HoldState {
 
 export interface SwitchSlots {
   thumb?: (state: { value: SwitchValue; phase: CommitPhase }) => React.ReactNode;
+  /** Replaces the rendered label. The accessible name still comes from `SwitchProps.label`. */
   label?: React.ReactNode;
+  /** Replaces the rendered description line. */
   description?: React.ReactNode;
+  /** Replaces the state word. It must still be a word — this slot is for changing the wording, not for removing it. */
   state?: (state: { value: SwitchValue; word: string }) => React.ReactNode;
 }
 
@@ -240,6 +243,7 @@ export interface SwitchProps extends Omit<
 
   /** `"unknown"` is Oxygen's widening. antd's `boolean` shape is unchanged. */
   checked?: SwitchValue;
+  /** Uncontrolled starting value. Ignored once `checked` is supplied. */
   defaultChecked?: SwitchValue;
   /** antd's signature exactly. Fires optimistically, before the commit resolves. */
   onChange?: (checked: boolean, event: React.SyntheticEvent) => void;
@@ -257,10 +261,13 @@ export interface SwitchProps extends Omit<
    * into a dead pixel for as long as the request takes.
    */
   loading?: boolean;
+  /** `"default"` or `"small"`, matching antd. Track and thumb scale together; the hit area does not drop below 24px in either. */
   size?: SwitchSize;
   /** Supplying either implies `appearance="labeled"`. */
   checkedChildren?: React.ReactNode;
+  /** The off-state word. Sized against `checkedChildren` so the track does not change width as it toggles. */
   unCheckedChildren?: React.ReactNode;
+  /** Focus on mount. Use only where the switch is the reason the surface opened — a confirmation sheet, not a settings list. */
   autoFocus?: boolean;
   /** antd's alias for `checked`, accepted by `Form.Item`. */
   value?: SwitchValue;
@@ -299,7 +306,9 @@ export interface SwitchProps extends Omit<
   error?: React.ReactNode;
   /** Minimum time in `pending`, so a fast write is perceptible rather than a flash. */
   minPendingMs?: number;
+  /** Milliseconds in `pending` before the commit is treated as slow. Announces rather than cancels: the write may still land. */
   slowAfter?: number;
+  /** Fired once when `slowAfter` elapses, so the host can surface its own "still saving" affordance. The switch stays interactive either way. */
   onSlow?: () => void;
   /** A switch that does not take effect until Save must say so. */
   commit?: "instant" | "deferred";
@@ -308,9 +317,11 @@ export interface SwitchProps extends Omit<
 
   /** What the record now holds. Differing from `checked` puts the control in `stale`. */
   serverValue?: SwitchValue;
+  /** Called from the `stale` affordance when the reader chooses whose value wins. Without it a stale switch states the conflict and offers no way out of it. */
   onResolveConflict?: (keep: "mine" | "theirs") => void;
   /** `false` queues the commit rather than sending it. */
   online?: boolean;
+  /** Who last changed the record, when, and through what. Rendered beside the control, because on a shared record the last writer is part of the value. */
   provenance?: { by: string; at: string; via?: string };
 
   /* ---- time-boxing ------------------------------------------------ */
@@ -319,41 +330,56 @@ export interface SwitchProps extends Omit<
   until?: string;
   /** Warn this long before `until`. */
   untilWarnMs?: number;
+  /** Fired once when `until` passes. The component never writes on expiry — it reports, and the host decides. */
   onExpire?: (at: string) => void;
 
   /* ---- availability ----------------------------------------------- */
 
+  /** The right prop for almost every unavailability: policy, permission, record state, a missing dependency. Unlike `disabled` it stays focusable and readable, and pairs with `lockedReason`. */
   readOnly?: boolean;
+  /** Why this reader cannot change it. A `readOnly` switch with no reason tells somebody they may not act without telling them who can. */
   lockedReason?: React.ReactNode;
 
   /* ---- meaning ---------------------------------------------------- */
 
+  /** Whether "on" is the safe answer (`"affirmative"`) or the consequential one (`"restrictive"`). Drives the state words and the confirmation defaults, never the hue alone. */
   tone?: SwitchTone;
+  /** The words for on and off. A preset name, or an override of individual labels. Never omit them to save space — the word is what survives greyscale. */
   stateLabels?: StateLabelPreset | Partial<StateLabels>;
   /** The word beside the control. */
   showState?: boolean;
+  /** Who is reading. Selects the register of every generated sentence: a clinician is told the clinical consequence, a patient is told what it means for them. */
   audience?: SwitchAudience;
 
   /* ---- confirmation ------------------------------------------------ */
 
+  /** How much friction an activation earns. Escalates from a press-and-hold to a second person's signature. `false` for anything reversible. */
   confirm?: "hold" | "dialog" | "attest" | "countersign" | false;
+  /** The words in the confirmation. `consequence` is required because a confirmation that does not name what will happen is a speed bump, not a check. */
   confirmCopy?: { title?: string; consequence: string; subject?: string };
   /** Hold duration in ms. 0 routes every activation to the dialog instead. */
   holdMs?: number;
+  /** Who else must sign, and in what capacity. Only meaningful with `confirm="countersign"`. */
   countersign?: CountersignRequirement;
   /** The consequence, rendered before the click rather than after the decision. */
   impact?: React.ReactNode[];
 
   /* ---- layout and composition -------------------------------------- */
 
+  /** The switch's accessible name and visible label. Supply it or an `aria-label`: a switch whose meaning lives only in a neighbouring table header is unusable by anyone not reading the table. */
   label?: React.ReactNode;
+  /** A second line under the label, for the qualification a label cannot carry. Associated with the control, so it is announced rather than merely nearby. */
   description?: React.ReactNode;
+  /** Which side the label sits on. `"start"` for a settings list where the labels should align; `"end"` inline. */
   labelPlacement?: "start" | "end";
+  /** Track treatment. Defaults to the plain track, or to `"labeled"` when `checkedChildren` is supplied. */
   appearance?: SwitchAppearance;
+  /** Replace individual internals — the thumb glyph, the state word, the lock affordance — without reimplementing the state machine around them. */
   slots?: SwitchSlots;
 
   /* ---- governance --------------------------------------------------- */
 
+  /** Every activation, confirmation, revert and expiry, as a structured event for the host's audit log. Requires `now`, because an audit entry timed by the browser is not evidence. */
   onAuditEvent?: (event: SwitchAuditEvent) => void;
   /** ISO 8601 from the server. Required alongside `onAuditEvent` and `until`. */
   now?: string;
@@ -1193,6 +1219,7 @@ export const SwitchField = React.forwardRef<HTMLDivElement, SwitchFieldProps>(fu
 /* ------------------------------------------------------------------ */
 
 export interface SwitchListProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "title"> {
+  /** The group's heading, and its accessible name. A list of switches with no name is a list of switches nobody can describe. */
   title?: React.ReactNode;
   /**
    * Counts for the summary line. `unknown` is reported separately and excluded
@@ -1203,6 +1230,7 @@ export interface SwitchListProps extends Omit<React.HTMLAttributes<HTMLDivElemen
   counts?: { on: number; total: number; unknown?: number };
   /** Who last changed anything in this group. The first question anyone asks. */
   provenance?: { by: string; at: string };
+  /** The switches. Rendered into a group with the heading above, so each one inherits the group's name rather than repeating it. */
   children?: React.ReactNode;
 }
 

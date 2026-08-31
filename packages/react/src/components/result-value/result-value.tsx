@@ -66,6 +66,11 @@ export {
 } from "../../lib/result-value";
 
 export interface ResultValueProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "children"> {
+  /**
+   * The result itself, already adapted from FHIR. Use `fromObservation()` rather than building
+   * it by hand — the adapter leaves undefined everything it cannot determine, which is what
+   * keeps a missing range from becoming an assumed one.
+   */
   value: ResultValueData;
   /**
    * ISO 8601, supplied by the host.
@@ -74,6 +79,7 @@ export interface ResultValueProps extends Omit<React.HTMLAttributes<HTMLDivEleme
    * result with no age is less misleading than one whose age is wrong.
    */
   now?: string;
+  /** Row height and type scale. Inherited from the nearest density provider when omitted. */
   density?: "compact" | "default";
   /** Hides the analyte name, for a grid whose column header already carries it. */
   hideAnalyte?: boolean;

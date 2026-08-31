@@ -69,7 +69,15 @@ export interface ProvenanceChipProps extends Base {
    * different moment. The host subscribes once and passes this down.
    */
   ledger?: ProvenanceLedger;
+  /**
+   * The resource this provenance is about. Used to link back to the record rather than to
+   * re-fetch it.
+   */
   resourceId?: string;
+  /**
+   * Which version was seen. Provenance for a value that has since changed is provenance for a
+   * different value.
+   */
   versionId?: string;
 
   /** ISO 8601, supplied by the host. No relative age is shown without it. */

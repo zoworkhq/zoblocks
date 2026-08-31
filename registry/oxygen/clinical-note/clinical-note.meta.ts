@@ -14,6 +14,8 @@ export default defineComponentMeta({
 
   summary:
     "A clinical note editor that records where every character came from, and refuses to let anyone sign what they have not read.",
+
+  tagline: "A note editor that records provenance and gates the signature.",
   description:
     "LOINC-coded sections, per-range provenance across six origins, a composable sign gate with three severities, and deterministic FHIR, XHTML and plain-text output. The engine ships as an npm package with no DOM; this item is the Tailwind skin over it.",
   rationale:

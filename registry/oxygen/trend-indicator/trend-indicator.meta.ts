@@ -11,6 +11,8 @@ export default defineComponentMeta({
 
   summary:
     "A sparkline that refuses to draw a trend it cannot justify — across an assay change, a unit change, or two points.",
+
+  tagline: "A sparkline that refuses to draw an unjustifiable trend.",
   description:
     "Breaks the line wherever comparability breaks and says why in words. Renders no trend below three comparable points. Takes the valence as a required prop, so a falling PHQ-9 reads as improvement and a falling eGFR does not, and carries the reliable-change threshold so a two-point move renders as noise.",
   rationale:

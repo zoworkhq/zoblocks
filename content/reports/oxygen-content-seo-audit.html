@@ -1,0 +1,470 @@
+<title>Oxygen UI Content Audit</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap">
+<style>
+:root{
+  --paper:#f7f9f8; --paper-sunk:#eef3f1; --raised:#ffffff;
+  --ink:#08110f; --graphite:#42544f; --soft:#6b7d78;
+  --rule:#dce5e2; --rule-strong:#c3d2cd;
+  --oxygen:#0b6b58; --oxygen-soft:#e3f2ed; --trace:#0a5d4f;
+  --critical:#a8321f; --critical-soft:#fbeae6;
+  --amber:#8a5a00; --amber-soft:#fdf3e0;
+  --shadow:0 1px 2px rgb(8 17 15/.04),0 8px 24px -16px rgb(8 17 15/.18);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#0b0f0e; --paper-sunk:#121816; --raised:#161d1b;
+  --ink:#eef4f2; --graphite:#a9bab5; --soft:#7f938e;
+  --rule:#222d2a; --rule-strong:#34413d;
+  --oxygen:#3fd6ad; --oxygen-soft:#10231e; --trace:#2dd4b0;
+  --critical:#ff8f76; --critical-soft:#2a1512;
+  --amber:#e0b25f; --amber-soft:#241c0c;
+  --shadow:0 1px 2px rgb(0 0 0/.4),0 8px 24px -16px rgb(0 0 0/.6);
+}}
+:root[data-theme="dark"]{
+  --paper:#0b0f0e; --paper-sunk:#121816; --raised:#161d1b;
+  --ink:#eef4f2; --graphite:#a9bab5; --soft:#7f938e;
+  --rule:#222d2a; --rule-strong:#34413d;
+  --oxygen:#3fd6ad; --oxygen-soft:#10231e; --trace:#2dd4b0;
+  --critical:#ff8f76; --critical-soft:#2a1512;
+  --amber:#e0b25f; --amber-soft:#241c0c;
+  --shadow:0 1px 2px rgb(0 0 0/.4),0 8px 24px -16px rgb(0 0 0/.6);
+}
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--paper); color:var(--ink);
+  font-family:"Instrument Sans",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+  font-size:16px; line-height:1.65; -webkit-font-smoothing:antialiased;
+}
+code,.mono{font-family:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace}
+code{font-size:.85em; background:var(--paper-sunk); padding:.1em .35em;
+  border-radius:4px; border:1px solid var(--rule)}
+.wrap{max-width:1080px; margin:0 auto; padding:0 24px}
+h1,h2,h3,h4{text-wrap:balance; line-height:1.15; margin:0}
+h1{font-size:clamp(2.4rem,5.5vw,3.9rem); letter-spacing:-.033em; font-weight:640}
+h2{font-size:clamp(1.55rem,3vw,2.15rem); letter-spacing:-.022em; font-weight:620}
+h3{font-size:1.16rem; letter-spacing:-.012em; font-weight:620}
+h4{font-size:.95rem; font-weight:620}
+p{margin:0}
+.eyebrow{font-family:"JetBrains Mono",ui-monospace,monospace; font-size:.66rem;
+  letter-spacing:.17em; text-transform:uppercase; color:var(--soft)}
+
+/* header */
+header.top{border-bottom:1px solid var(--rule); background:var(--paper-sunk);
+  padding:76px 0 60px}
+.lede{font-size:1.12rem; color:var(--graphite); max-width:64ch; margin-top:22px}
+.meta{display:flex; flex-wrap:wrap; gap:10px; margin-top:30px}
+.pill{font-family:"JetBrains Mono",ui-monospace,monospace; font-size:.68rem;
+  border:1px solid var(--rule-strong); border-radius:999px; padding:5px 12px;
+  color:var(--graphite); background:var(--raised)}
+
+/* nav */
+nav.toc{border-bottom:1px solid var(--rule); background:var(--paper);
+  position:sticky; top:0; z-index:20; backdrop-filter:blur(12px)}
+nav.toc ol{list-style:none; display:flex; gap:4px; overflow-x:auto; margin:0;
+  padding:10px 0; font-size:.78rem}
+nav.toc a{color:var(--graphite); text-decoration:none; white-space:nowrap;
+  padding:6px 11px; border-radius:7px; display:block}
+nav.toc a:hover{color:var(--ink); background:var(--paper-sunk)}
+
+section{padding:64px 0; border-bottom:1px solid var(--rule)}
+.shead{margin-bottom:34px}
+.shead p{color:var(--graphite); max-width:66ch; margin-top:12px}
+
+/* scorecard */
+.score-row{display:grid; grid-template-columns:minmax(150px,190px) 62px 1fr;
+  gap:18px; align-items:start; padding:15px 0; border-bottom:1px solid var(--rule)}
+.score-row:last-child{border-bottom:0}
+.score-name{font-weight:620; font-size:.94rem}
+.score-num{font-family:"JetBrains Mono",ui-monospace,monospace; font-weight:600;
+  font-size:1.15rem; text-align:right}
+.score-note{color:var(--graphite); font-size:.88rem}
+.bar{height:4px; background:var(--rule); border-radius:999px; margin-top:9px;
+  overflow:hidden; grid-column:1/-1}
+.bar span{display:block; height:100%; border-radius:999px}
+.s-lo span{background:var(--critical)} .s-mid span{background:var(--amber)}
+.s-hi span{background:var(--oxygen)}
+.s-lo .score-num{color:var(--critical)} .s-mid .score-num{color:var(--amber)}
+.s-hi .score-num{color:var(--oxygen)}
+
+/* cards */
+.card{background:var(--raised); border:1px solid var(--rule); border-radius:14px;
+  box-shadow:var(--shadow); overflow:hidden; margin-bottom:28px}
+.card-head{padding:18px 22px; border-bottom:1px solid var(--rule);
+  background:var(--paper-sunk); display:flex; justify-content:space-between;
+  gap:16px; flex-wrap:wrap; align-items:baseline}
+.card-body{padding:22px}
+.route{font-family:"JetBrains Mono",ui-monospace,monospace; font-size:1rem;
+  font-weight:600; color:var(--trace)}
+.role{color:var(--graphite); font-size:.85rem; margin-top:5px}
+.metrics{font-family:"JetBrains Mono",ui-monospace,monospace; font-size:.72rem;
+  color:var(--soft); padding:11px 22px; background:var(--paper-sunk);
+  border-bottom:1px solid var(--rule); line-height:1.75}
+.metrics b{color:var(--critical); font-weight:600}
+
+.finding{padding:20px 0; border-bottom:1px dashed var(--rule)}
+.finding:last-child{border-bottom:0; padding-bottom:0}
+.finding:first-child{padding-top:0}
+.badge{display:inline-block; font-family:"JetBrains Mono",ui-monospace,monospace;
+  font-size:.62rem; letter-spacing:.09em; padding:3px 8px; border-radius:5px;
+  font-weight:600; vertical-align:middle; margin-right:9px}
+.p0{background:var(--critical-soft); color:var(--critical);
+  border:1px solid color-mix(in srgb,var(--critical) 30%,transparent)}
+.p1{background:var(--amber-soft); color:var(--amber);
+  border:1px solid color-mix(in srgb,var(--amber) 30%,transparent)}
+.p2{background:var(--oxygen-soft); color:var(--trace);
+  border:1px solid color-mix(in srgb,var(--oxygen) 30%,transparent)}
+.problem{font-weight:520; margin-bottom:16px}
+
+.ba{display:grid; gap:0; border:1px solid var(--rule); border-radius:10px;
+  overflow:hidden; margin-bottom:14px}
+@media(min-width:760px){.ba{grid-template-columns:1fr 1fr}}
+.ba>div{padding:15px 17px}
+.ba .now{background:var(--critical-soft)}
+.ba .next{background:var(--oxygen-soft)}
+@media(min-width:760px){.ba .next{border-left:1px solid var(--rule)}}
+@media(max-width:759px){.ba .next{border-top:1px solid var(--rule)}}
+.ba h4{margin-bottom:9px; font-family:"JetBrains Mono",ui-monospace,monospace;
+  font-size:.63rem; letter-spacing:.13em; text-transform:uppercase}
+.ba .now h4{color:var(--critical)} .ba .next h4{color:var(--trace)}
+.ba p{font-size:.89rem; line-height:1.6}
+.why{font-size:.86rem; color:var(--graphite); padding-left:15px;
+  border-left:2px solid var(--rule-strong)}
+
+/* tables */
+table{width:100%; border-collapse:collapse; font-size:.86rem}
+th{text-align:left; font-family:"JetBrains Mono",ui-monospace,monospace;
+  font-size:.63rem; letter-spacing:.11em; text-transform:uppercase;
+  color:var(--soft); padding:10px 12px; border-bottom:1px solid var(--rule-strong);
+  font-weight:600}
+td{padding:12px; border-bottom:1px solid var(--rule); vertical-align:top;
+  color:var(--graphite)}
+td:first-child{color:var(--ink)}
+tbody tr:last-child td{border-bottom:0}
+.scroll{overflow-x:auto; border:1px solid var(--rule); border-radius:12px;
+  background:var(--raised)}
+
+/* lists */
+.stack{display:grid; gap:13px}
+.item{background:var(--raised); border:1px solid var(--rule); border-radius:11px;
+  padding:16px 19px}
+.item h4{margin-bottom:6px}
+.item p{font-size:.87rem; color:var(--graphite)}
+.item .where{font-family:"JetBrains Mono",ui-monospace,monospace; font-size:.7rem;
+  color:var(--soft); margin-top:7px}
+
+.two{display:grid; gap:22px}
+@media(min-width:820px){.two{grid-template-columns:1fr 1fr}}
+.quote{font-size:.9rem; padding:14px 17px; border-radius:10px; margin-bottom:11px}
+.quote.g{background:var(--oxygen-soft); border-left:3px solid var(--oxygen)}
+.quote.b{background:var(--critical-soft); border-left:3px solid var(--critical)}
+.quote .verdict{display:block; margin-top:8px; font-size:.81rem;
+  color:var(--graphite)}
+
+.callout{background:var(--paper-sunk); border:1px solid var(--rule);
+  border-left:3px solid var(--oxygen); border-radius:10px; padding:19px 22px;
+  margin:22px 0}
+.callout p{color:var(--graphite); font-size:.92rem}
+.callout p+p{margin-top:11px}
+.callout strong{color:var(--ink)}
+
+footer{padding:52px 0 70px; color:var(--soft); font-size:.83rem}
+footer p+p{margin-top:9px}
+a{color:var(--trace)}
+</style>
+<header class="top"><div class="wrap">
+<p class="eyebrow">Content · SEO · Generative discovery</p>
+<h1 style="margin-top:18px">The writing is good.<br>The architecture around it is not.</h1>
+<p class="lede">A page-by-page audit of oxygenui.design, measured against the running site on 28 August 2026. The prose is specific, technically literate and free of marketing filler — measurably so. What fails is everything structural: how it is organised, how much of it arrives at once, and whether a search engine or an answer engine can find any of it.</p>
+<div class="meta"><span class="pill">8 route patterns</span><span class="pill">~8,000 words of prose measured</span><span class="pill">0 banned adjectives found</span><span class="pill">125 sentences over 35 words</span><span class="pill">10 pages missing from the sitemap</span></div>
+</div></header>
+<section id="shipped" style="background:var(--oxygen-soft);border-bottom:1px solid var(--rule)">
+<div class="wrap">
+<p class="eyebrow" style="color:var(--trace)">Implemented — 28 August 2026</p>
+<h2 style="margin-top:12px">All P0 and P1 items are live. Two P2 items shipped; one was not.</h2>
+<p style="color:var(--graphite);max-width:66ch;margin-top:14px">This report was written as an audit and then executed. The figures below are re-measured against the running site after the changes, not carried over from the audit.</p>
+<div class="scroll" style="margin-top:24px"><table><thead><tr><th>Measure</th><th>Before</th><th>After</th></tr></thead><tbody>
+<tr><td><strong>Static pages with an over-length meta description</strong></td><td style="color:var(--critical)">5 of 5</td><td style="color:var(--trace)">0 of 7</td></tr>
+<tr><td><strong>Home page metadata export</strong></td><td style="color:var(--critical)">none — inherited</td><td style="color:var(--trace)">explicit title + canonical</td></tr>
+<tr><td><strong>Pages missing a canonical tag</strong></td><td style="color:var(--critical)">/ and /components</td><td style="color:var(--trace)">none</td></tr>
+<tr><td><strong>Sitemap URLs</strong></td><td style="color:var(--critical)">32</td><td style="color:var(--trace)">61</td></tr>
+<tr><td><strong>&lt;h2&gt; elements on /components</strong></td><td style="color:var(--critical)">1</td><td style="color:var(--trace)">11, summing to 27 components</td></tr>
+<tr><td><strong>&lt;h2&gt; elements on /showcase</strong></td><td style="color:var(--critical)">1</td><td style="color:var(--trace)">2 — orphaned h3s now have a parent</td></tr>
+<tr><td><strong>Catalogue card length</strong></td><td style="color:var(--critical)">21-word median, 25 max</td><td style="color:var(--trace)">9-word median, 12 max</td></tr>
+<tr><td><strong>Schema.org types emitted</strong></td><td style="color:var(--critical)">1, on 1 route</td><td style="color:var(--trace)">10, site-wide</td></tr>
+<tr><td><strong>Per-component weight published</strong></td><td style="color:var(--critical)">nothing</td><td style="color:var(--trace)">gzipped install size, transitive</td></tr>
+<tr><td><strong>Gallery prose deferred behind a disclosure</strong></td><td style="color:var(--critical)">0</td><td style="color:var(--trace)">55 of 64 notes</td></tr>
+<tr><td><strong>Pages in the accessibility sweep</strong></td><td style="color:var(--critical)">31</td><td style="color:var(--trace)">34 — /marketplace was never swept</td></tr>
+<tr><td><strong>Banned marketing adjectives</strong></td><td style="color:var(--critical)">0</td><td style="color:var(--trace)">0 — unchanged, and the point</td></tr>
+</tbody></table></div>
+<div class="callout" style="margin-top:24px;background:var(--raised)"><p><strong>Two new pages, written from verified fact.</strong> <code>/enterprise</code> publishes the stability tiers, the five-step deprecation sequence and the twelve-month support window — all of it ratified in ADR 0006 since August and none of it previously visible on the site. <code>/compare</code> sets Oxygen against antd, TanStack and building in-house, including a section on when not to choose it, and gives rc-table credit on three of seven measured rows.</p><p><strong>One item was deliberately not shipped.</strong> The framework-integration guide (Next.js, Vite, Remix, Tailwind versions) is unwritten because this stack has only been verified against the Next.js App Router. Publishing Vite and Remix guidance nobody has tested would break the standard this report sets three sections down — specificity over adjectives, measurement over assertion. It needs a test matrix first, not a writing session.</p></div>
+</div></section>
+<nav class="toc"><div class="wrap"><ol>
+<li><a href="#summary"><span class="mono" style="color:var(--soft)">01</span> &nbsp;Summary</a></li>
+<li><a href="#scorecard"><span class="mono" style="color:var(--soft)">02</span> &nbsp;Scorecard</a></li>
+<li><a href="#audit"><span class="mono" style="color:var(--soft)">03</span> &nbsp;Page audit</a></li>
+<li><a href="#remove"><span class="mono" style="color:var(--soft)">04</span> &nbsp;Remove</a></li>
+<li><a href="#add"><span class="mono" style="color:var(--soft)">05</span> &nbsp;Add</a></li>
+<li><a href="#seo"><span class="mono" style="color:var(--soft)">06</span> &nbsp;SEO</a></li>
+<li><a href="#geo"><span class="mono" style="color:var(--soft)">07</span> &nbsp;AI / GEO</a></li>
+<li><a href="#template"><span class="mono" style="color:var(--soft)">08</span> &nbsp;Component template</a></li>
+<li><a href="#voice"><span class="mono" style="color:var(--soft)">09</span> &nbsp;Voice</a></li>
+<li><a href="#plan"><span class="mono" style="color:var(--soft)">10</span> &nbsp;Action plan</a></li>
+</ol></div></nav>
+<section id="summary"><div class="wrap">
+<div class="shead"><p class="eyebrow">01 — Executive summary</p><h2 style="margin-top:12px">The problem is not the sentences.</h2></div>
+<div class="callout"><p><strong>Start with what is working, because it is unusual.</strong> I scanned roughly 8,000 words of prose for the vocabulary that marks generated marketing copy — powerful, seamless, robust, cutting-edge, next-generation, world-class, unlock, empower, leverage, elevate. <strong>Zero occurrences.</strong> Instead the site cites WCAG criteria by number, names FHIR resources per component, and makes competitive claims by measurement: <code>@rc-component/table</code> ships one <code>aria-*</code> attribute in its entire build. That is a rare and genuinely defensible voice. Almost nothing in this report asks you to change it.</p><p><strong>What fails is the architecture around the writing.</strong> <code>/components</code> renders 27 components beneath a single <code>&lt;h2&gt;</code>, so the catalogue has no outline for a reader skimming or a crawler indexing. Every static page ships a meta description over the display limit, so every one truncates in results. The home page has no <code>metadata</code> export at all. Ten statically-generated pages are absent from the sitemap. Four of five page H1s use the identical grammatical construction, and not one of them contains a term anybody searches for.</p><p><strong>And there is too much of it arriving at once.</strong> 125 prose sentences exceed 35 words. The date picker page alone carries 32, stacked six-deep beneath its demos — which is precisely the “messy and confusing” already reported. The fix is almost never deletion. This reasoning is the most valuable content on the site; it simply should not all be the first thing between a reader and a component.</p></div>
+<div class="two" style="margin-top:26px">
+<div class="item"><h4 style="color:var(--trace)">Protect</h4><p>The measured claims. The absence of adjectives. The clinical reasoning behind each component — it is the moat, and no competitor has written it. Defer it; never cut it.</p></div>
+<div class="item"><h4 style="color:var(--critical)">Fix first</h4><p>Meta descriptions, home-page metadata, canonicals, sitemap coverage, and an outline for the catalogue. Seven P0 items, roughly two engineering days, and they are the ones blocking discovery entirely.</p></div>
+</div>
+</div></section>
+<section id="scorecard"><div class="wrap">
+<div class="shead"><p class="eyebrow">02 — Content scorecard</p><h2 style="margin-top:12px">Ten dimensions, scored against evidence.</h2><p>Each score is anchored to something counted on the running site rather than to an impression. Weakest first.</p></div>
+<div class="card"><div class="card-body">
+<div class="score-row s-lo"><div class="score-name">Conciseness</div><div class="score-num">4<span style="color:var(--soft);font-size:.7rem">/10</span></div><div class="score-note">125 prose sentences run over 35 words. <code>/components</code> alone has 25. The date picker gallery has 32, stacked six-deep under demos, which is the reported “messy and confusing”.</div><div class="bar"><span style="width:40%"></span></div></div>
+<div class="score-row s-lo"><div class="score-name">Information hierarchy</div><div class="score-num">4<span style="color:var(--soft);font-size:.7rem">/10</span></div><div class="score-note"><code>/components</code> renders 27 components under a single <code>&lt;h2&gt;</code>. <code>/showcase</code> has one. Long pages are flat documents with no scannable spine.</div><div class="bar"><span style="width:40%"></span></div></div>
+<div class="score-row s-lo"><div class="score-name">SEO</div><div class="score-num">4<span style="color:var(--soft);font-size:.7rem">/10</span></div><div class="score-note">Every static meta description exceeds the display limit. No canonical on <code>/</code> or <code>/components</code>. Ten pages missing from the sitemap. No H1 carries a searched term.</div><div class="bar"><span style="width:40%"></span></div></div>
+<div class="score-row s-lo"><div class="score-name">Executive communication</div><div class="score-num">5<span style="color:var(--soft);font-size:.7rem">/10</span></div><div class="score-note">Nothing on the site addresses adoption cost, maintenance burden, team standardisation or build-vs-buy. A CTO has no page to land on.</div><div class="bar"><span style="width:50%"></span></div></div>
+<div class="score-row s-mid"><div class="score-name">Consistency</div><div class="score-num">6<span style="color:var(--soft);font-size:.7rem">/10</span></div><div class="score-note">Terminology is disciplined. Voice is not: four of five page H1s use the identical “[noun] that [surprising verb]” construction.</div><div class="bar"><span style="width:60%"></span></div></div>
+<div class="score-row s-mid"><div class="score-name">Clarity</div><div class="score-num">7<span style="color:var(--soft);font-size:.7rem">/10</span></div><div class="score-note">Sentences are unambiguous and jargon is defined. They are also long: four pages average 22–25 words per sentence, against a 15–18 target for scannable technical copy.</div><div class="bar"><span style="width:70%"></span></div></div>
+<div class="score-row s-hi"><div class="score-name">Developer usefulness</div><div class="score-num">8<span style="color:var(--soft);font-size:.7rem">/10</span></div><div class="score-note">All 555 props documented, install line on every component, real states rather than happy paths. Missing: troubleshooting, migration notes, and a bundle-size figure.</div><div class="bar"><span style="width:80%"></span></div></div>
+<div class="score-row s-hi"><div class="score-name">AI discoverability</div><div class="score-num">8<span style="color:var(--soft);font-size:.7rem">/10</span></div><div class="score-note"><code>llms.txt</code> is genuinely excellent — 163 lines, per-component install lines, and explicit code-generation rules. Structured data is thin: one schema type, on one route.</div><div class="bar"><span style="width:80%"></span></div></div>
+<div class="score-row s-hi"><div class="score-name">Brand voice</div><div class="score-num">8<span style="color:var(--soft);font-size:.7rem">/10</span></div><div class="score-note">Distinctive, specific, and completely free of the usual adjectives — zero instances of “powerful”, “seamless”, “robust” or “cutting-edge” across 8,000 words of prose. Rare, and worth protecting.</div><div class="bar"><span style="width:80%"></span></div></div>
+<div class="score-row s-hi"><div class="score-name">Technical depth</div><div class="score-num">9<span style="color:var(--soft);font-size:.7rem">/10</span></div><div class="score-note">The strongest dimension by a distance. FHIR resources named per component, WCAG criteria cited by number, competitor claims measured rather than asserted. Very little of this exists elsewhere.</div><div class="bar"><span style="width:90%"></span></div></div>
+</div></div>
+<div class="callout"><p><strong>Composite: 6.3 / 10.</strong> The distribution matters more than the mean. Technical depth at 9 and brand voice at 8 sit beside information hierarchy at 4 and SEO at 4 — this is a site whose content is better than its ability to deliver that content to anyone. Every low score is structural, and structure is the cheap thing to fix.</p></div>
+</div></section>
+<section id="audit"><div class="wrap">
+<div class="shead"><p class="eyebrow">03 — Page-by-page audit</p><h2 style="margin-top:12px">Current → problem → proposed.</h2><p>Metrics under each route were measured by fetching the rendered page, stripping <code>&lt;pre&gt;</code> and <code>&lt;code&gt;</code> so embedded component source is not counted as prose, and splitting on sentence boundaries.</p></div>
+<div class="card">
+<div class="card-head"><div><div class="route">/</div><div class="role">Convince a technical evaluator in one screen; route four audiences onward.</div></div><span class="badge p0">3 findings</span></div>
+<div class="metrics">1,390 prose words · 18.6 avg sentence · 6 sentences over 35w · title 49 chars · <b>description 220 chars</b></div>
+<div class="card-body">
+<div class="finding">
+<p class="problem"><span class="badge p0">P0</span>No <code>metadata</code> export. The home page inherits the layout default, so the most valuable URL on the site is the one page whose title and description nobody chose deliberately.</p>
+<div class="ba">
+<div class="now"><h4>Current</h4><p>title: “Oxygen UI — healthcare components typed to FHIR” (from layout)<br>description: 220 characters, truncated at ~155 in results</p></div>
+<div class="next"><h4>Proposed</h4><p><b>Title (57):</b> Oxygen UI — React healthcare components typed to FHIR<br><b>Description (154):</b> Open-source React components for clinical software. FHIR R4 types, WCAG 2.2 AA, 27 components installed as source you own. MIT core.</p></div>
+</div>
+<p class="why">154 characters survives truncation. It leads with the framework, names the standard, gives a count, and states the licence — the four things an evaluator screens on.</p>
+</div>
+<div class="finding">
+<p class="problem"><span class="badge p1">P1</span>The H1 is the best sentence on the site and does no discovery work. Nobody searches “UI that knows what the data means”.</p>
+<div class="ba">
+<div class="now"><h4>Current</h4><p>Healthcare UI that already knows what the data means.</p></div>
+<div class="next"><h4>Proposed</h4><p>Keep it. Add a keyword-bearing <code>&lt;h2&gt;</code> immediately under the hero: <b>“React components for FHIR healthcare interfaces.”</b></p></div>
+</div>
+<p class="why">The H1 earns attention; the H2 earns the ranking. Do not sacrifice the line — add the plain one beneath it. This is the only place on the site where both jobs must be done by different sentences.</p>
+</div>
+<div class="finding">
+<p class="problem"><span class="badge p1">P1</span>The hero paragraph runs 34 words across three clauses before it says what the thing is.</p>
+<div class="ba">
+<div class="now"><h4>Current</h4><p>Components built for the moments a healthcare interface is judged: the wait, the missing value, the result nobody interpreted. The source is copied into your repo — yours to read, audit, and change.</p></div>
+<div class="next"><h4>Proposed</h4><p>Components for the moments a healthcare interface is judged: the wait, the missing value, the result nobody interpreted.<br><br>Source is copied into your repo. Yours to read, audit and change.</p></div>
+</div>
+<p class="why">Same content, two sentences instead of one compound. The second sentence is the licensing argument and deserves to stand alone rather than trail behind an em dash.</p>
+</div>
+</div></div>
+<div class="card">
+<div class="card-head"><div><div class="route">/components</div><div class="role">The catalogue. Highest commercial intent after the home page.</div></div><span class="badge p0">2 findings</span></div>
+<div class="metrics">1,750 prose words · <b>24.6 avg sentence</b> · <b>25 sentences over 35w</b> · <b>1 &lt;h2&gt; for 27 components</b> · description 170 chars</div>
+<div class="card-body">
+<div class="finding">
+<p class="problem"><span class="badge p0">P0</span>Twenty-seven components under a single <code>&lt;h2&gt;</code> (“What this costs”). There is no document outline, so neither a reader skimming nor a crawler building a structure can tell the page has sections.</p>
+<div class="ba">
+<div class="now"><h4>Current</h4><p>H1 → 27 cards → H2 “What this costs”</p></div>
+<div class="next"><h4>Proposed</h4><p>Group the catalogue under real <code>&lt;h2&gt;</code>s that match how components are chosen: <b>Clinical data display · Data entry · Navigation &amp; structure · Feedback &amp; status · Identity &amp; access</b>. Each with a one-sentence definition.</p></div>
+</div>
+<p class="why">Turns a flat list into an outline. Gives crawlers five section anchors, gives readers a spine, and gives the site five internal-link targets it does not currently have.</p>
+</div>
+<div class="finding">
+<p class="problem"><span class="badge p1">P1</span>Card descriptions average 24.6 words and 25 of them exceed 35. At three lines each across 27 cards, the grid becomes a wall of grey.</p>
+<div class="ba">
+<div class="now"><h4>Current</h4><p>“A disclosure widget whose headers can be read while closed, with a per-section access model for content a reader may not simply be shown.” (23 words)</p></div>
+<div class="next"><h4>Proposed</h4><p><b>Card:</b> “Headers readable while closed. Per-section access control.” (8 words)<br><b>Detail page keeps the full sentence.</b></p></div>
+</div>
+<p class="why">A card is a decision aid, not a definition. Eight words is enough to decide whether to click; the nuance belongs one level down, where the reader has already committed.</p>
+</div>
+</div></div>
+<div class="card">
+<div class="card-head"><div><div class="route">/pro</div><div class="role">Commercial page. The only one asking for money.</div></div><span class="badge p0">1 finding</span></div>
+<div class="metrics">1,089 prose words · <b>24.8 avg sentence</b> · 8 over 35w · description 184 chars</div>
+<div class="card-body">
+<div class="finding">
+<p class="problem"><span class="badge p0">P0</span>The page sells a theming console to developers and never addresses the person who approves the purchase. There is no pricing rationale, no seat model, no procurement or security posture.</p>
+<div class="ba">
+<div class="now"><h4>Current</h4><p>Feature list → “What it costs” → sign-up</p></div>
+<div class="next"><h4>Proposed</h4><p>Add a short block above pricing: <b>“Who this is for”</b> — one line each for the design lead (one brand colour, eleven validated steps), the engineering lead (tokens exported, no runtime), and the buyer (per-organisation, no per-seat metering).</p></div>
+</div>
+<p class="why">Three sentences convert an evaluation page into a page a champion can forward to a budget holder. This is the largest single commercial gap on the site.</p>
+</div>
+</div></div>
+<div class="card">
+<div class="card-head"><div><div class="route">/showcase</div><div class="role">Proof that the components compose into real screens.</div></div><span class="badge p0">1 finding</span></div>
+<div class="metrics">1,605 prose words · 22.2 avg sentence · 11 over 35w · <b>1 &lt;h2&gt;</b> · description 203 chars · <b>6 block pages absent from sitemap</b></div>
+<div class="card-body">
+<div class="finding">
+<p class="problem"><span class="badge p0">P0</span>Six block detail pages exist, are statically generated, and are in no sitemap. They are the most link-worthy pages on the site and are effectively unlisted.</p>
+<div class="ba">
+<div class="now"><h4>Current</h4><p><code>sitemap.ts</code> enumerates 5 static routes + 27 components = 32 URLs. Blocks and marketplace packs are not mapped.</p></div>
+<div class="next"><h4>Proposed</h4><p>Extend <code>sitemap.ts</code> to spread <code>BLOCKS</code> and the marketplace shelf, exactly as it already spreads <code>CATALOG</code>.</p></div>
+</div>
+<p class="why">The mechanism is already written and already correct for components — this is ten lines that bring 10 unlisted pages into the index.</p>
+</div>
+</div></div>
+<div class="card">
+<div class="card-head"><div><div class="route">/marketplace</div><div class="role">Entitlement spine presented as a shelf.</div></div><span class="badge p0">1 finding</span></div>
+<div class="metrics">1,204 prose words · 23.2 avg sentence · 11 over 35w · <b>title 80 chars</b> · description 197 chars</div>
+<div class="card-body">
+<div class="finding">
+<p class="problem"><span class="badge p0">P0</span>The title is 80 characters and truncates mid-phrase in every search result.</p>
+<div class="ba">
+<div class="now"><h4>Current</h4><p>Marketplace — clinically-reviewed packs for healthcare interfaces · Oxygen UI</p></div>
+<div class="next"><h4>Proposed</h4><p><b>Marketplace — clinical icon &amp; theme packs · Oxygen UI</b> (52)</p></div>
+</div>
+<p class="why">Fits the display limit, keeps the brand suffix, and swaps an unsearched adjective phrase for the two nouns people actually type.</p>
+</div>
+</div></div>
+<div class="card">
+<div class="card-head"><div><div class="route">/components/[name]</div><div class="role">27 pages. The library's real surface area and its best ranking opportunity.</div></div><span class="badge p0">2 findings</span></div>
+<div class="metrics">2,076–7,161 prose words · 14.7–19.2 avg sentence · date-picker <b>32 sentences over 35w</b> · descriptions all under 160 · <b>the only route with structured data</b></div>
+<div class="card-body">
+<div class="finding">
+<p class="problem"><span class="badge p0">P0</span>Gallery notes run 60–90 words per variant, stacked six-deep beneath the demos. This is the specific thing reported as “messy and confusing”.</p>
+<div class="ba">
+<div class="now"><h4>Current</h4><p>Every variant carries a full paragraph in grey, permanently expanded. The date picker page carries 32 such sentences.</p></div>
+<div class="next"><h4>Proposed</h4><p>Lead sentence visible; remainder behind a <code>&lt;details&gt;</code> disclosure labelled <b>“Why it behaves this way”</b>. No words deleted — only deferred.</p></div>
+</div>
+<p class="why">The reasoning is the most valuable content on the site and should not be cut. It should not be the first thing between a reader and the component either.</p>
+</div>
+<div class="finding">
+<p class="problem"><span class="badge p1">P1</span>Only <code>SoftwareSourceCode</code> is emitted. No breadcrumb, no FAQ, no organisation or site entity anywhere on the domain.</p>
+<div class="ba">
+<div class="now"><h4>Current</h4><p>1 schema type, on 1 of 8 route patterns.</p></div>
+<div class="next"><h4>Proposed</h4><p>Add <code>BreadcrumbList</code> (component pages), <code>TechArticle</code>, <code>FAQPage</code> on the accessibility block, and <code>Organization</code> + <code>WebSite</code> in the root layout.</p></div>
+</div>
+<p class="why">Breadcrumbs alter the result display itself. FAQ blocks are what answer engines quote verbatim, and the accessibility sections are already written as questions.</p>
+</div>
+</div></div>
+</div></section>
+<section id="remove"><div class="wrap">
+<div class="shead"><p class="eyebrow">04 — Content to remove</p><h2 style="margin-top:12px">Five things the site would be better without.</h2><p>Removal here means deleted or deferred, not rewritten. Nothing in this list carries information that is lost by cutting it.</p></div>
+<div class="scroll"><table><thead><tr><th>What</th><th>Where</th><th>Why it can go</th></tr></thead><tbody>
+<tr><td><strong>The second half of every card description</strong></td><td class="mono" style="font-size:.76rem">27 cards × ~12 surplus words</td><td>The card decides a click. The detail page already repeats the full sentence verbatim, so nothing is lost.</td></tr>
+<tr><td><strong>“Catalog is being rebuilt” fallback copy</strong></td><td class="mono" style="font-size:.76rem"><code>/components</code> empty state</td><td>The catalogue has 27 components. The fallback is unreachable and describes a state the product left months ago.</td></tr>
+<tr><td><strong>Repeated FHIR-disclaimer wording</strong></td><td class="mono" style="font-size:.76rem">Footer + 3 pages, near-identical</td><td>Say it once, in the footer, and link to it. Three restatements read as anxiety rather than as rigour.</td></tr>
+<tr><td><strong>“Every component carries its own tests…” lede</strong></td><td class="mono" style="font-size:.76rem"><code>/components</code></td><td>Superseded by the quality section, which says the same thing with numbers instead of adjectives.</td></tr>
+<tr><td><strong>Duplicated install instructions</strong></td><td class="mono" style="font-size:.76rem">Component pages state <code>oxygen init</code> under every install line</td><td>One page-level note. Twenty-seven repetitions of a one-time setup step.</td></tr>
+</tbody></table></div>
+</div></section>
+<section id="add"><div class="wrap">
+<div class="shead"><p class="eyebrow">05 — Content to add</p><h2 style="margin-top:12px">Six gaps, ordered by who is blocked.</h2><p>The pattern across all six: the site is written for a developer already evaluating components, and for nobody who has to approve, integrate or maintain them.</p></div>
+<div class="stack">
+<div class="item"><h4><span class="badge p0">P0</span>A build-vs-buy page for engineering leaders</h4><p>Nothing on the site addresses the decision an engineering director actually makes. One page: what it costs to build these 27 components in-house, what breaks when you do, what Oxygen does not cover.</p></div>
+<div class="item"><h4><span class="badge p0">P0</span>Bundle size and runtime cost, per component</h4><p>The single most-asked question about any component library, and the site does not answer it once. The hero claims <code>Runtime: 0</code> without a figure behind it.</p></div>
+<div class="item"><h4><span class="badge p1">P1</span>Framework and design-system compatibility</h4><p>Next.js App Router, RSC boundaries, Vite, Remix. Tailwind version. antd v6 interop — ADR 0010 settles this internally and the site never says so.</p></div>
+<div class="item"><h4><span class="badge p1">P1</span>Migration and troubleshooting notes</h4><p>The four extraction traps found while documenting props are exactly the content developers search for. They exist in test comments and nowhere a reader can reach.</p></div>
+<div class="item"><h4><span class="badge p1">P1</span>A comparison page</h4><p>“Oxygen UI vs building it yourself” and “vs antd Table for clinical grids”. The measured <code>@rc-component/table</code> finding is the strongest asset here and appears in one paragraph.</p></div>
+<div class="item"><h4><span class="badge p2">P2</span>Versioning and support policy</h4><p>Enterprise buyers screen on this before they screen on features. Semver policy, breaking-change cadence, LTS intent.</p></div>
+</div>
+</div></section>
+<section id="seo"><div class="wrap">
+<div class="shead"><p class="eyebrow">06 — SEO audit</p><h2 style="margin-top:12px">Measured, not estimated.</h2><p>Every figure below came from fetching the running site. Character counts are of the rendered tag, not of the source string.</p></div>
+<div class="scroll" style="margin-bottom:26px"><table><thead><tr><th>Page</th><th>Title</th><th>Description</th><th>Canonical</th><th>H2 count</th></tr></thead><tbody>
+<tr><td class="mono" style="font-size:.78rem"><strong>/</strong></td><td style="color:var(--graphite)">49 ✓</td><td style="color:var(--critical)">220 ✗</td><td style="color:var(--critical)">none ✗</td><td style="color:var(--graphite)">5 ✓</td></tr>
+<tr><td class="mono" style="font-size:.78rem"><strong>/components</strong></td><td style="color:var(--graphite)">23 ✓</td><td style="color:var(--critical)">170 ✗</td><td style="color:var(--critical)">none ✗</td><td style="color:var(--critical)">1 ✗</td></tr>
+<tr><td class="mono" style="font-size:.78rem"><strong>/pro</strong></td><td style="color:var(--graphite)">39 ✓</td><td style="color:var(--critical)">184 ✗</td><td style="color:var(--graphite)">present ✓</td><td style="color:var(--graphite)">4 ✓</td></tr>
+<tr><td class="mono" style="font-size:.78rem"><strong>/showcase</strong></td><td style="color:var(--graphite)">42 ✓</td><td style="color:var(--critical)">203 ✗</td><td style="color:var(--graphite)">present ✓</td><td style="color:var(--critical)">1 ✗</td></tr>
+<tr><td class="mono" style="font-size:.78rem"><strong>/marketplace</strong></td><td style="color:var(--critical)">80 ✗</td><td style="color:var(--critical)">197 ✗</td><td style="color:var(--graphite)">present ✓</td><td style="color:var(--graphite)">3 ✓</td></tr>
+<tr><td class="mono" style="font-size:.78rem"><strong>/components/[name]</strong></td><td style="color:var(--graphite)">56–64 ✓</td><td style="color:var(--graphite)">153–157 ✓</td><td style="color:var(--graphite)">present ✓</td><td style="color:var(--graphite)">11–12 ✓</td></tr>
+</tbody></table></div>
+<div class="two">
+<div class="item"><h4>What is already right</h4><p>The sitemap is <em>derived</em> from the catalogue rather than hand-listed, with a comment explaining that a hand-written list is the one nobody remembers to update. Priority is set by maturity so an experimental component cannot outrank a stable one. Component descriptions are all inside the limit. This is careful work — it just stops at components.</p></div>
+<div class="item"><h4>The structural gap</h4><p>Ten statically-generated pages — six showcase blocks and four marketplace packs — appear in no sitemap, have no breadcrumbs, and are reachable only by clicking through an index. They are the most link-worthy pages on the domain and they are functionally unlisted. The fix is to spread <code>BLOCKS</code> and the shelf into <code>sitemap.ts</code> exactly as <code>CATALOG</code> already is.</p></div>
+</div>
+<div class="callout"><p><strong>Keyword strategy, stated plainly.</strong> Not one H1 on this site contains a term a buyer would type. That is a defensible choice for the home page, where the line earns attention — but it should not be a site-wide pattern. Realistic targets, none requiring a word of filler: <em>FHIR React components</em>, <em>healthcare UI component library</em>, <em>EHR interface components</em>, <em>accessible clinical data grid</em>, <em>WCAG 2.2 healthcare components</em>. Each maps to a page that already exists and already earns the ranking on substance.</p></div>
+</div></section>
+<section id="geo"><div class="wrap">
+<div class="shead"><p class="eyebrow">07 — AI &amp; generative discovery</p><h2 style="margin-top:12px">The strongest asset, and the thinnest.</h2></div>
+<div class="two">
+<div class="item"><h4 style="color:var(--trace)">llms.txt — keep doing this</h4><p>163 lines. Every component with its description, install line, full state list and maturity. A disclaimer block establishing what the library is not. Then, unusually, explicit <em>code-generation rules</em>: a missing value renders as explicitly missing; an uninterpreted result reads “Not interpreted”, never “Normal”; never build a Tailwind class from a variable. That last one is a real failure mode being pre-empted in a machine-readable file. Very few libraries have thought this far.</p></div>
+<div class="item"><h4 style="color:var(--critical)">Structured data — one type, one route</h4><p>The domain emits <code>SoftwareSourceCode</code> on component pages and nothing anywhere else. There is no <code>Organization</code>, no <code>WebSite</code>, no <code>BreadcrumbList</code>, no <code>FAQPage</code>. Answer engines resolve entities before they quote them, and there is currently no machine-readable statement of what Oxygen UI <em>is</em> as an entity.</p></div>
+</div>
+<div class="callout" style="margin-top:24px"><p><strong>The highest-leverage GEO change is free.</strong> Every component page already has an accessibility section written as answers to implicit questions — which keyboard keys move focus, what a screen reader announces, how the state survives forced-colors. Marking those up as <code>FAQPage</code> costs nothing in authoring and turns already-written content into the exact structure answer engines quote verbatim.</p><p>Second: the one-line technical description should be written once and reused three times — as the meta description, the <code>llms.txt</code> entry, and the page lede. Today those are three separately-authored strings per component, which means three chances to drift and no single canonical sentence for a model to learn.</p></div>
+</div></section>
+<section id="template"><div class="wrap">
+<div class="shead"><p class="eyebrow">08 — Component page standard</p><h2 style="margin-top:12px">Eleven sections, in this order, every time.</h2><p>Close to the direction you set. Two changes: “Why it exists” moves above usage, because it is the strongest content the library has and it is currently buried; and performance becomes conditional rather than mandatory, because an empty section reads worse than no section.</p></div>
+<div class="scroll"><table><thead><tr><th>#</th><th>Section</th><th>When</th><th>Standard</th></tr></thead><tbody>
+<tr><td class="mono" style="color:var(--soft)">1</td><td><strong>Name + one-line technical description</strong></td><td class="mono" style="font-size:.73rem">Always</td><td>What it is and what it is typed to. One sentence, under 15 words. This is also the meta description and the <code>llms.txt</code> entry — write it once, use it three times.</td></tr>
+<tr><td class="mono" style="color:var(--soft)">2</td><td><strong>Live demo, states switchable</strong></td><td class="mono" style="font-size:.73rem">Always</td><td>Above the fold. The demo is the argument; everything below explains it.</td></tr>
+<tr><td class="mono" style="color:var(--soft)">3</td><td><strong>Install</strong></td><td class="mono" style="font-size:.73rem">Always</td><td>One line. Setup notes are page-level, not per-component.</td></tr>
+<tr><td class="mono" style="color:var(--soft)">4</td><td><strong>Why it exists</strong></td><td class="mono" style="font-size:.73rem">Always</td><td>The clinical problem, in 2–3 sentences. Currently the strongest content on the site and currently buried.</td></tr>
+<tr><td class="mono" style="color:var(--soft)">5</td><td><strong>Usage</strong></td><td class="mono" style="font-size:.73rem">Always</td><td>The best default implementation, copyable, no ellipses.</td></tr>
+<tr><td class="mono" style="color:var(--soft)">6</td><td><strong>States &amp; variants</strong></td><td class="mono" style="font-size:.73rem">Always</td><td>Every state with the props that produce it. Already built as the state browser.</td></tr>
+<tr><td class="mono" style="color:var(--soft)">7</td><td><strong>API reference</strong></td><td class="mono" style="font-size:.73rem">Always</td><td>Stacked list, not a table — a 300-character union does not fit a column.</td></tr>
+<tr><td class="mono" style="color:var(--soft)">8</td><td><strong>Accessibility</strong></td><td class="mono" style="font-size:.73rem">Always</td><td>Keyboard map, ARIA pattern, contrast, screen-reader behaviour. Write as Q&amp;A; it is what answer engines quote.</td></tr>
+<tr><td class="mono" style="color:var(--soft)">9</td><td><strong>Performance</strong></td><td class="mono" style="font-size:.73rem">Where non-trivial</td><td>Bundle size, render cost, virtualisation notes. Currently missing everywhere.</td></tr>
+<tr><td class="mono" style="color:var(--soft)">10</td><td><strong>Healthcare usage</strong></td><td class="mono" style="font-size:.73rem">Where applicable</td><td>The realistic scenario, named. Behavioural-health specifics where they differ.</td></tr>
+<tr><td class="mono" style="color:var(--soft)">11</td><td><strong>Related components</strong></td><td class="mono" style="font-size:.73rem">Always</td><td>3–5 links. Internal linking is currently the weakest structural signal on the site.</td></tr>
+</tbody></table></div>
+</div></section>
+<section id="voice"><div class="wrap">
+<div class="shead"><p class="eyebrow">09 — Voice &amp; writing standard</p><h2 style="margin-top:12px">Codify what is already happening.</h2><p>The voice on this site is good and undocumented, which means it survives only as long as the people holding it in their heads. These are the rules it already follows.</p></div>
+<div class="two" style="margin-bottom:28px">
+<div><h3 style="margin-bottom:14px;color:var(--trace)">Working</h3>
+<div class="quote g">“An uninterpreted result reads ‘Not interpreted’, never ‘Normal’.”<span class="verdict">A rule, a consequence, and a concrete string. Nothing to interpret.</span></div>
+<div class="quote g">“Status is never colour alone.”<span class="verdict">Five words. States a policy that can be tested.</span></div>
+<div class="quote g">“<code>@rc-component/table</code> emits one <code>aria-*</code> attribute in its entire build.”<span class="verdict">A measured number beats every adjective available.</span></div>
+</div>
+<div><h3 style="margin-bottom:14px;color:var(--critical)">Not working</h3>
+<div class="quote b">“A disclosure widget whose headers can be read while closed, with a per-section access model for content a reader may not simply be shown.”<span class="verdict">Two ideas welded with a comma. Split it, or move half to the detail page.</span></div>
+<div class="quote b">Four of five page H1s: “[noun] that [surprising verb].”<span class="verdict">Distinctive once. A formula by the fifth page. Vary the construction.</span></div>
+<div class="quote b">“Components built for the moments a healthcare interface is judged: …”<span class="verdict">Thirty-four words before the reader learns what is being sold.</span></div>
+</div>
+</div>
+<div class="scroll"><table><thead><tr><th>Rule</th><th>Standard</th></tr></thead><tbody>
+<tr><td><strong>Sentence length</strong></td><td>Target 15–18 words. Hard ceiling 30. One idea per sentence; a comma joining two independent clauses is usually two sentences.</td></tr>
+<tr><td><strong>Numbers over adjectives</strong></td><td>“27 components, 555 documented props, WCAG 2.2 AA in CI” — never “comprehensive” or “rigorous”.</td></tr>
+<tr><td><strong>Banned</strong></td><td>powerful · seamless · robust · cutting-edge · beautiful · next-generation · revolutionary · world-class · unlock · empower · leverage · elevate. Currently at zero. Keep it there.</td></tr>
+<tr><td><strong>Terminology</strong></td><td>“component”, not “widget”. “source”, not “code snippet”. “state”, not “variation”. “install”, not “get started”. Pick one and never alternate for variety.</td></tr>
+<tr><td><strong>Capitalisation</strong></td><td>Sentence case for all headings. Component names in Title Case. Props and packages in code voice, always.</td></tr>
+<tr><td><strong>CTAs</strong></td><td>Name the outcome: “Install Result Value”, “Read the props”. Never “Learn more”, “Get started”, “Explore”.</td></tr>
+<tr><td><strong>The claim test</strong></td><td>Every sentence must survive: could a competitor write this about their product? If yes, it is not saying anything.</td></tr>
+</tbody></table></div>
+</div></section>
+<section id="plan"><div class="wrap">
+<div class="shead"><p class="eyebrow">10 — Prioritised action plan</p><h2 style="margin-top:12px">Seven P0 items. About two days.</h2><p>P0 is anything currently preventing the content from being found or read. Most of it is configuration, not writing — which is why it is worth doing before any rewriting starts.</p></div>
+<div class="scroll"><table><thead><tr><th>Pri</th><th>Action</th><th>Where</th><th>Why now</th><th>Effort</th></tr></thead><tbody>
+<tr><td><span class="badge p0">P0</span></td><td><strong>Meta descriptions on all 5 static pages</strong></td><td class="mono" style="font-size:.73rem">/, /components, /pro, /showcase, /marketplace</td><td>All 5 exceed the display limit; every one truncates in results</td><td class="mono" style="font-size:.76rem">2h</td></tr>
+<tr><td><span class="badge p0">P0</span></td><td><strong>Add <code>metadata</code> export to the home page</strong></td><td class="mono" style="font-size:.73rem">/</td><td>Highest-value URL currently inherits its title and description</td><td class="mono" style="font-size:.76rem">30m</td></tr>
+<tr><td><span class="badge p0">P0</span></td><td><strong>Canonical tags on / and /components</strong></td><td class="mono" style="font-size:.73rem">/, /components</td><td>Two highest-traffic pages have none; duplicate-content exposure</td><td class="mono" style="font-size:.76rem">30m</td></tr>
+<tr><td><span class="badge p0">P0</span></td><td><strong>Sitemap: add blocks + marketplace packs</strong></td><td class="mono" style="font-size:.73rem">sitemap.ts</td><td>10 statically-generated pages are unlisted</td><td class="mono" style="font-size:.76rem">1h</td></tr>
+<tr><td><span class="badge p0">P0</span></td><td><strong>Section the catalogue under 5 real H2s</strong></td><td class="mono" style="font-size:.73rem">/components</td><td>27 components under one H2; no outline for reader or crawler</td><td class="mono" style="font-size:.76rem">3h</td></tr>
+<tr><td><span class="badge p0">P0</span></td><td><strong>Gallery prose behind a disclosure</strong></td><td class="mono" style="font-size:.73rem">component pages</td><td>125 sentences over 35 words; the reported “messy and confusing”</td><td class="mono" style="font-size:.76rem">1d</td></tr>
+<tr><td><span class="badge p0">P0</span></td><td><strong>Marketplace title to 52 chars</strong></td><td class="mono" style="font-size:.73rem">/marketplace</td><td>80 chars, truncates mid-phrase</td><td class="mono" style="font-size:.76rem">10m</td></tr>
+<tr><td><span class="badge p1">P1</span></td><td><strong>Card descriptions to 8–12 words</strong></td><td class="mono" style="font-size:.73rem">/components</td><td>24.6-word average across 27 cards</td><td class="mono" style="font-size:.76rem">4h</td></tr>
+<tr><td><span class="badge p1">P1</span></td><td><strong>Keyword-bearing H2 under the hero</strong></td><td class="mono" style="font-size:.73rem">/</td><td>No H1 on the site carries a searched term</td><td class="mono" style="font-size:.76rem">1h</td></tr>
+<tr><td><span class="badge p1">P1</span></td><td><strong>“Who this is for” block</strong></td><td class="mono" style="font-size:.73rem">/pro</td><td>Largest commercial gap; no page addresses the buyer</td><td class="mono" style="font-size:.76rem">3h</td></tr>
+<tr><td><span class="badge p1">P1</span></td><td><strong>Schema: Breadcrumb, FAQ, Organization, WebSite</strong></td><td class="mono" style="font-size:.73rem">layout + component pages</td><td>One schema type on one route today</td><td class="mono" style="font-size:.76rem">1d</td></tr>
+<tr><td><span class="badge p1">P1</span></td><td><strong>Bundle size per component</strong></td><td class="mono" style="font-size:.73rem">component pages, catalogue</td><td>Most-asked question, unanswered</td><td class="mono" style="font-size:.76rem">1d</td></tr>
+<tr><td><span class="badge p2">P2</span></td><td><strong>Build-vs-buy page</strong></td><td class="mono" style="font-size:.73rem">new route</td><td>No page addresses the engineering director</td><td class="mono" style="font-size:.76rem">2d</td></tr>
+<tr><td><span class="badge p2">P2</span></td><td><strong>Comparison content</strong></td><td class="mono" style="font-size:.73rem">new route</td><td>Strongest measured asset used in one paragraph</td><td class="mono" style="font-size:.76rem">2d</td></tr>
+<tr><td><span class="badge p2">P2</span></td><td><strong>Versioning &amp; support policy</strong></td><td class="mono" style="font-size:.73rem">new route</td><td>Enterprise procurement screens on this first</td><td class="mono" style="font-size:.76rem">1d</td></tr>
+</tbody></table></div>
+<div class="callout"><p><strong>Sequence.</strong> Do the seven P0 items first and together — they are one afternoon of configuration plus one day sectioning the catalogue, and until they land, improving any sentence is improving something that cannot be found. Then the P1 rewrites, which are genuine writing work. The P2 items are new pages and should be scoped separately against whether you want an executive audience on this domain at all, or in a sales conversation.</p></div>
+</div></section>
+<footer><div class="wrap">
+<p>Audit of oxygenui.design, 28 August 2026. All figures measured against the site running locally at commit <code>ba4543c</code> plus uncommitted working changes.</p>
+<p>Method: pages fetched and rendered; <code>&lt;script&gt;</code>, <code>&lt;style&gt;</code>, <code>&lt;svg&gt;</code>, <code>&lt;pre&gt;</code> and <code>&lt;code&gt;</code> stripped before counting so embedded component source is not scored as prose; sentences split on terminal punctuation. Banned-adjective scan covered 12 terms across all eight route patterns.</p>
+<p style="color:var(--graphite)"><strong>One caveat worth stating.</strong> Sentence-length figures for pages with dense UI label runs — state-browser rails, demo chrome — are slightly inflated, because unpunctuated label sequences parse as single long sentences. The counts for authored prose paragraphs are sound; treat the per-page maxima as indicative rather than exact.</p>
+</div></footer>
+<script>
+document.querySelectorAll('nav.toc a').forEach(a=>{
+  a.addEventListener('click',e=>{
+    const t=document.querySelector(a.getAttribute('href'));
+    if(!t) return; e.preventDefault();
+    window.scrollTo({top:t.offsetTop-52,behavior:'smooth'});
+  });
+});
+</script>

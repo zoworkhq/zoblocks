@@ -75,7 +75,13 @@ const CRITICALITY_STEP: Record<Criticality, string> = {
 };
 
 export interface AllergyChipProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "children"> {
+  /**
+   * The AllergyIntolerance, already adapted. Carries `criticality` and `reaction.severity`
+   * separately, because they mean opposite things and merging them is the defect this
+   * component exists to prevent.
+   */
   record: AllergyRecord;
+  /** Row height and type scale. Inherited from the nearest density provider when omitted. */
   density?: "compact" | "default";
   /** Expands a substance into the class it implicates. Injected, never bundled. */
   expandClass?: ClassExpander;
@@ -199,6 +205,10 @@ export const AllergyChip = React.forwardRef<HTMLElement, AllergyChipProps>(funct
 /* ------------------------------------------------------------------ */
 
 export interface AllergyListProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "children"> {
+  /**
+   * The allergies, in the order they should be read. An empty array and a `null` mean
+   * different things — see `askLabel`.
+   */
   records?: readonly AllergyRecord[];
   /**
    * A no-known-allergies assertion.
@@ -208,11 +218,16 @@ export interface AllergyListProps extends Omit<React.HTMLAttributes<HTMLDivEleme
    * assertion — and it is the one that gets prescribed against.
    */
   noneKnown?: Partial<NoKnownAllergies>;
+  /** Row height and type scale. Inherited from the nearest density provider when omitted. */
   density?: "compact" | "default";
   expandClass?: ClassExpander;
   onOpenDetail?: (record: AllergyRecord) => void;
   /** Rendered inside the not-asked state. "Ask and record", typically. */
   onAsk?: () => void;
+  /**
+   * What to render when nobody has asked. "No known allergies" is a clinical assertion
+   * somebody made; an empty list is not, and the two must not look alike.
+   */
   askLabel?: string;
 }
 

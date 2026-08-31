@@ -26,7 +26,7 @@ export function DemoPlaceholder({
           <span className="size-1.5 rounded-full bg-panel-muted/60" aria-hidden="true" />
           <span className="eyebrow text-panel-muted">{label}</span>
         </div>
-        <span className="eyebrow hidden text-panel-muted/70 sm:block">catalog rebuilding</span>
+        <span className="eyebrow hidden text-panel-muted sm:block">catalog rebuilding</span>
       </div>
 
       <div className="flex items-center justify-center px-6 py-16">

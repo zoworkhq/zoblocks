@@ -11,6 +11,8 @@ export default defineComponentMeta({
 
   summary:
     "A command palette that understands clinical verbs, scopes every search to a treatment relationship, and audits the searches it refuses.",
+
+  tagline: "Clinical verbs, scoped to a treatment relationship.",
   description:
     "Actions rank above records, because a verb is usually what was meant. Patients outside your relationships are counted rather than named. Every patient search emits an audit event, including the ones that matched nobody, and a clinically significant action never runs on the first Enter.",
   rationale:

@@ -22,6 +22,7 @@
  */
 
 import * as React from "react";
+import { DemoNote } from "@/components/site/demo-note";
 import { Tabs } from "@oxygenui-design/tabs";
 import { Switch, SwitchField, SwitchList, type CommitPhase } from "@/registry/oxygen/switch/switch";
 import { cn } from "@/lib/utils";
@@ -62,7 +63,7 @@ function Demo({ id, name, api, tags, note, children, wide }: DemoProps) {
         ))}
       </figcaption>
       <div className={cn("ox-demo__stage", wide && "ox-demo__stage--wide")}>{children}</div>
-      <p className="ox-demo__note">{note}</p>
+      <DemoNote>{note}</DemoNote>
     </figure>
   );
 }

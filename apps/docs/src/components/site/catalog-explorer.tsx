@@ -24,7 +24,7 @@
  */
 
 import * as React from "react";
-import { Search, X } from "lucide-react";
+import { ChevronDown, Search, X } from "lucide-react";
 import type { ComponentDoc } from "@/lib/catalog";
 import { ComponentCard } from "@/components/site/component-card";
 import { cn } from "@/lib/utils";
@@ -139,6 +139,40 @@ export function CatalogExplorer({ catalog }: { catalog: readonly ComponentDoc[] 
     );
   }, [filtered, filtering]);
 
+  /*
+   * The catalogue, grouped.
+   *
+   * It used to render 27 cards as one flat grid under a single heading, which
+   * gave the page no outline at all — nothing for a reader to skim and nothing
+   * for a crawler to build a document structure from. The facets above were
+   * doing the categorising and leaving no trace in the markup.
+   *
+   * Grouping applies only to the unfiltered view. Once somebody has filtered,
+   * they have already said what they are looking for, and re-sorting their
+   * results into bands they did not ask for is the kind of help that gets in
+   * the way.
+   *
+   * A component may carry several categories; it appears once, under its first,
+   * so the bands partition the catalogue rather than overlapping it.
+   */
+  const bands = React.useMemo(() => {
+    if (filtering) return null;
+    const byName = new Map<string, ComponentDoc[]>();
+    for (const component of ordered) {
+      // The first category that maps to a band. "Clinical" maps to none, which
+      // is what keeps it from swallowing two thirds of the catalogue.
+      const primary =
+        component.categories.map((c) => BAND_OF.get(c)).find(Boolean) ??
+        BAND_ORDER[BAND_ORDER.length - 1]!.name;
+      if (!byName.has(primary)) byName.set(primary, []);
+      byName.get(primary)!.push(component);
+    }
+    return BAND_ORDER.filter((band) => byName.has(band.name)).map((band) => ({
+      ...band,
+      components: byName.get(band.name)!,
+    }));
+  }, [ordered, filtering]);
+
   const clear = () => {
     setTerm("");
     setCategory(null);
@@ -148,81 +182,140 @@ export function CatalogExplorer({ catalog }: { catalog: readonly ComponentDoc[] 
   return (
     <div>
       {/* ---- the controls ---------------------------------------- */}
+      {/*
+        One row, not a panel.
+
+        This was 186 pixels of sticky chrome: a search field, thirteen category
+        pills wrapping to two lines, and three stability pills, following the
+        reader down a long page and taking a third of a laptop viewport with it.
+
+        The counts were the stated reason for pills over a select — a select
+        hides them until it is opened. They are in the option labels instead, so
+        nothing is lost on opening, and the trigger carries the active one. A
+        native select rather than a custom popover: keyboard behaviour, mobile
+        pickers and typeahead all come free and none of them can be got subtly
+        wrong here.
+      */}
       <div
         className={cn(
-          // Sticks beneath the site header rather than under it. `--header-h`
-          // is defined in globals.css from the same number `chrome.tsx` uses.
-          "surface-2 sticky z-20 rounded-2xl p-4 backdrop-blur-md",
+          "surface-2 sticky z-20 flex flex-wrap items-center gap-2 rounded-xl px-2.5 py-2 backdrop-blur-md",
           "top-[calc(var(--header-h)+0.5rem)]",
         )}
       >
-        <div className="flex flex-wrap items-center gap-3">
-          <label className="relative flex min-w-[14rem] flex-1 items-center">
-            <Search
-              aria-hidden="true"
-              className="pointer-events-none absolute left-3 size-4 text-graphite-soft"
-            />
-            <span className="sr-only">Filter components</span>
-            <input
-              type="search"
-              value={term}
-              onChange={(event) => setTerm(event.target.value)}
-              placeholder="Filter — a name, a FHIR resource, “allergy”, “loader”…"
-              className={cn(
-                "w-full rounded-xl border border-rule bg-transparent py-2 pl-9 pr-3 text-sm",
-                "placeholder:text-graphite-soft",
-                "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1",
-                "focus-visible:outline-oxygen",
-              )}
-            />
-          </label>
-
-          <p
-            aria-live="polite"
-            className="numeric shrink-0 text-xs text-graphite-soft"
-            // Live, because filtering with the keyboard otherwise changes the
-            // whole page below the fold and says nothing about it.
-          >
-            {filtered.length} of {current.length}
-          </p>
-
-          {filtering ? (
-            <button
-              type="button"
-              onClick={clear}
-              className={cn(
-                "inline-flex shrink-0 items-center gap-1 rounded-lg border border-rule px-2.5 py-1.5",
-                "text-xs text-graphite transition-colors hover:border-oxygen/45 hover:text-ink",
-                "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2",
-                "focus-visible:outline-oxygen",
-              )}
-            >
-              <X aria-hidden="true" className="size-3" />
-              Clear
-            </button>
-          ) : null}
-        </div>
-
-        <div className="mt-3 flex flex-wrap gap-4">
-          <FacetGroup
-            legend="Category"
-            facets={categories}
-            selected={category}
-            onSelect={setCategory}
+        <label className="relative flex min-w-[12rem] flex-1 items-center">
+          <Search
+            aria-hidden="true"
+            className="pointer-events-none absolute left-2.5 size-3.5 text-graphite-soft"
           />
-          <FacetGroup legend="Stability" facets={statuses} selected={status} onSelect={setStatus} />
-        </div>
+          <span className="sr-only">Filter components</span>
+          <input
+            type="search"
+            value={term}
+            onChange={(event) => setTerm(event.target.value)}
+            placeholder="Filter components…"
+            className={cn(
+              "w-full rounded-lg border border-transparent bg-transparent py-1.5 pl-8 pr-2 text-sm",
+              "placeholder:text-graphite-soft",
+              "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1",
+              "focus-visible:outline-oxygen",
+            )}
+          />
+        </label>
+
+        <Picker
+          label="Category"
+          all={`All categories (${current.length})`}
+          facets={categories}
+          value={category}
+          onChange={setCategory}
+        />
+        <Picker
+          label="Stability"
+          all="Any stability"
+          facets={statuses}
+          value={status}
+          onChange={setStatus}
+        />
+
+        <p
+          aria-live="polite"
+          className="numeric shrink-0 px-1 text-xs text-graphite-soft"
+          // Live, because filtering with the keyboard otherwise changes the
+          // whole page below the fold and says nothing about it.
+        >
+          {filtered.length} of {current.length}
+        </p>
+
+        {filtering ? (
+          <button
+            type="button"
+            onClick={clear}
+            className={cn(
+              "inline-flex shrink-0 items-center gap-1 rounded-lg px-2 py-1.5",
+              "text-xs text-graphite transition-colors hover:text-ink",
+              "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2",
+              "focus-visible:outline-oxygen",
+            )}
+          >
+            <X aria-hidden="true" className="size-3" />
+            Clear
+          </button>
+        ) : null}
       </div>
 
       {/* ---- the grid --------------------------------------------- */}
-      {ordered.length ? (
+      {bands ? (
+        bands.map((band) => {
+          /*
+           * Slug, not just de-spaced.
+           *
+           * Replacing whitespace alone turned "Entry & forms" into
+           * `band-entry-&-forms`. That is legal in an id attribute and
+           * useless everywhere it matters: `querySelector("#band-entry-&-forms")`
+           * throws, and it cannot be linked as a fragment without escaping.
+           * Anything that is not a letter or a digit becomes a hyphen.
+           */
+          const id = `band-${band.name
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, "-")
+            .replace(/^-|-$/g, "")}`;
+          return (
+            <section
+              key={band.name}
+              aria-labelledby={id}
+              // Clears the sticky filter row, which is 52px once the facets
+              // moved into two selects. Without this a linked heading lands
+              // underneath the thing that scrolled it into view.
+              className="mt-16 scroll-mt-[calc(var(--header-h)+5rem)] first:mt-8"
+            >
+              <h2 id={id} className="display-sm">
+                {band.name}
+                <span className="numeric ml-3 align-middle text-sm font-normal text-graphite-soft">
+                  {band.components.length}
+                </span>
+              </h2>
+              <p className="mt-2 max-w-xl text-sm leading-relaxed text-graphite">{band.blurb}</p>
+              <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {band.components.map((component, index) => (
+                  <ComponentCard
+                    key={component.name}
+                    component={component}
+                    index={index}
+                    featured={FEATURED.includes(component.name)}
+                  />
+                ))}
+              </div>
+            </section>
+          );
+        })
+      ) : ordered.length ? (
         <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {ordered.map((component, index) => (
             <ComponentCard
               key={component.name}
               component={component}
               index={index}
-              featured={!filtering && FEATURED.includes(component.name)}
+              featured={false}
             />
           ))}
         </div>
@@ -252,58 +345,113 @@ export function CatalogExplorer({ catalog }: { catalog: readonly ComponentDoc[] 
 }
 
 /**
- * One row of facets.
+ * The bands, in reading order, each with the sentence that defines it.
  *
- * A group of toggle buttons rather than a `<select>`: the counts are the point,
- * and a select hides them until it is opened. `aria-pressed` rather than a
- * radiogroup, because clicking the selected facet clears it — which a radio
- * cannot express.
+ * Merged rather than one band per category. Banding straight on the category
+ * data produced ten headings for 27 components, six of which covered one or
+ * two cards — a display heading, a blurb and a single card, six times. That
+ * fragments the page rather than giving it an outline, which is the opposite
+ * of the point.
+ *
+ * These five cover 3 to 8 components each. A band is worth a heading when a
+ * reader could plausibly be looking for "one of those"; below about three it
+ * is a list with extra steps.
+ *
+ * "Clinical" is not a band. It is the first category on 15 of 26 components
+ * and describes 17, so it partitions nothing — the FHIR resource on each card
+ * already says which components are clinical.
  */
-function FacetGroup({
-  legend,
+const BAND_ORDER: ReadonlyArray<{ name: string; blurb: string; categories: readonly string[] }> = [
+  {
+    name: "Clinical data",
+    blurb: "Values, trends and model output, rendered so the qualifier travels with the number.",
+    categories: ["Data Display", "AI"],
+  },
+  {
+    name: "Entry & forms",
+    blurb: "Controls that write to the record, including the ones whose value has a third case.",
+    categories: ["Data Entry", "Forms"],
+  },
+  {
+    name: "Navigation & disclosure",
+    blurb: "Moving through a record, and showing content a reader may not simply be shown.",
+    categories: ["Navigation", "Disclosure"],
+  },
+  {
+    name: "Waiting & feedback",
+    blurb: "Five waits with different meanings, each with a designed still state.",
+    categories: ["Loaders", "Feedback"],
+  },
+  {
+    name: "Patterns & primitives",
+    blurb: "Whole surfaces, and the vocabulary the clinical components are built from.",
+    categories: ["Patterns", "Primitives", "Layout", "Documentation"],
+  },
+];
+
+/** Category → band, derived once from the table above. */
+const BAND_OF = new Map<string, string>(
+  BAND_ORDER.flatMap((band) => band.categories.map((c) => [c, band.name] as const)),
+);
+
+/**
+ * One filter, as a native select.
+ *
+ * The counts live in the option labels rather than on visible chips. That was
+ * the objection to a select — it hides them until it is opened — and putting
+ * them inside answers it: the trigger shows the active choice, opening shows
+ * every choice with its count, and the row stays one line high.
+ *
+ * Native rather than a custom listbox. Typeahead, Home and End, the mobile
+ * wheel and the platform's own focus ring all arrive correct, and a bespoke
+ * popover would be a new place to get the keyboard subtly wrong for no gain
+ * over what a `<select>` already does.
+ */
+function Picker({
+  label,
+  all,
   facets,
-  selected,
-  onSelect,
+  value,
+  onChange,
 }: {
-  legend: string;
+  label: string;
+  all: string;
   facets: Facet[];
-  selected: string | null;
-  onSelect: (value: string | null) => void;
+  value: string | null;
+  onChange: (next: string | null) => void;
 }) {
-  if (!facets.length) return null;
-
+  const id = `filter-${label.toLowerCase()}`;
   return (
-    <div className="flex min-w-0 flex-wrap items-center gap-1.5" role="group" aria-label={legend}>
-      <span className="axis-label mr-1 shrink-0">{legend}</span>
-      {facets.map((facet) => {
-        const active = selected === facet.id;
-        // Disabled, not hidden. A facet that vanishes when it stops matching
-        // teaches the reader the catalogue is smaller than it is.
-        const empty = facet.count === 0 && !active;
-
-        return (
-          <button
-            key={facet.id}
-            type="button"
-            aria-pressed={active}
-            disabled={empty}
-            onClick={() => onSelect(active ? null : facet.id)}
-            className={cn(
-              "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1",
-              "text-[0.6875rem] transition-colors",
-              "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2",
-              "focus-visible:outline-oxygen",
-              active
-                ? "border-oxygen/50 bg-oxygen/12 font-semibold text-oxygen-deep"
-                : "border-rule text-graphite hover:border-oxygen/40 hover:text-ink",
-              empty && "cursor-not-allowed opacity-40 hover:border-rule hover:text-graphite",
-            )}
-          >
-            {facet.label}
-            <span className="numeric text-[0.625rem] text-graphite-soft">{facet.count}</span>
-          </button>
-        );
-      })}
-    </div>
+    <span className="relative shrink-0">
+      <label htmlFor={id} className="sr-only">
+        {label}
+      </label>
+      <select
+        id={id}
+        value={value ?? ""}
+        onChange={(event) => onChange(event.target.value || null)}
+        className={cn(
+          "cursor-pointer appearance-none rounded-lg border border-rule bg-transparent",
+          "py-1.5 pl-2.5 pr-7 text-xs text-graphite transition-colors",
+          "hover:border-rule-strong hover:text-ink",
+          // The trigger reads as set rather than as empty once a filter is on,
+          // because the row is small enough that a changed word is easy to miss.
+          value && "border-oxygen/45 text-ink",
+          "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1",
+          "focus-visible:outline-oxygen",
+        )}
+      >
+        <option value="">{all}</option>
+        {facets.map((facet) => (
+          <option key={facet.id} value={facet.id}>
+            {facet.label} ({facet.count})
+          </option>
+        ))}
+      </select>
+      <ChevronDown
+        aria-hidden="true"
+        className="pointer-events-none absolute right-2 top-1/2 size-3 -translate-y-1/2 text-graphite-soft"
+      />
+    </span>
   );
 }

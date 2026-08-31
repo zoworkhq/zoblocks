@@ -75,27 +75,66 @@ type ContextProps =
   | {
       /** Navigation and read-only surfaces. One identifier is enough. */
       context: "navigation";
+      /** Which identifiers to show. Optional here; a worklist row is not a care action. */
       identifiers?: readonly IdentifierSpec[];
     }
   | {
       /** Anything that precedes a care action. Two identifiers, enforced. */
       context: "action" | "verification";
+      /**
+       * Two person-specific identifiers, enforced by the type.
+       *
+       * NPSG.01.01.01 asks for two before a care action, so supplying one is a
+       * compile error rather than a review comment — this is the whole reason
+       * `context` is a required prop.
+       */
       identifiers: TwoOrMore<IdentifierSpec>;
     };
 
 type SourceProps =
-  | { patient: Patient; loading?: never; error?: never }
-  | { patient?: never; loading: true; error?: never }
-  | { patient?: never; loading?: never; error: OperationOutcome | Error };
+  /**
+   * Exactly one of patient, loading or error — expressed in the type.
+   *
+   * A banner rendered with a patient *and* a loading flag has no correct
+   * output, and the states are mutually exclusive in reality, so they are made
+   * mutually exclusive here rather than resolved by precedence at runtime.
+   */
+  | {
+      /** The patient this chart is about. */
+      patient: Patient;
+      loading?: never;
+      error?: never;
+    }
+  | {
+      patient?: never;
+      /** The record has not arrived yet. Renders a placeholder that is unmistakably not a patient. */
+      loading: true;
+      error?: never;
+    }
+  | {
+      patient?: never;
+      loading?: never;
+      /**
+       * The record could not be fetched.
+       *
+       * Rendered as an explicit failure, never as an empty banner: a blank
+       * identity strip above a chart is indistinguishable from a patient with
+       * no name, and one of those is safe to act under.
+       */
+      error: OperationOutcome | Error;
+    };
 
 export type PatientBannerProps = ContextProps &
   SourceProps & {
+    /** Overrides the swatch key. Prefer a stable record id, so the same patient keeps the same colour across sessions. */
     identityKey?: string;
     /** Priority order. The container query drops from the tail. */
     fields?: Field[];
+    /** Where the patient physically is. Shown because it changes who is able to act. */
     ward?: string;
     /** Rendered at the end of the banner — actions belong to the application. */
     actions?: ReactNode;
+    /** Applied to the banner element. */
     className?: string;
     /** Fired when a user reveals a withheld field. The app writes the audit. */
     onReveal?: () => void;

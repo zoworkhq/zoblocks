@@ -11,6 +11,8 @@ export default defineComponentMeta({
 
   summary:
     "A risk score that cannot be displayed without its date, its drivers, and the fact that it is not a diagnosis.",
+
+  tagline: "A score with its date, its drivers, and its limits.",
   description:
     "The band leads and the numeral is demoted. Staleness is on the face rather than in a tooltip, an expired score offers recompute or acknowledge and no third option, and the not-a-diagnosis framing is a required prop rather than a convention.",
   rationale:

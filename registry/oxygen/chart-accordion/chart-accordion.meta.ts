@@ -10,6 +10,8 @@ export default defineComponentMeta({
 
   summary:
     "A record's sections with their headers composed to the house rules, so a severity can never reach the screen without the words that explain it.",
+
+  tagline: "Chart sections whose severity always arrives with its words.",
   description:
     "Accordion with a clinical summary vocabulary: a status paired with its severity, a count, and a timestamp at the precision the record holds. Adds an expand-all control that never opens a section the reader may not have.",
   rationale:

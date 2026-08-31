@@ -10,6 +10,8 @@ export default defineComponentMeta({
 
   summary:
     "A binary control for a record that is shared, asynchronous, and often missing the fact you are asking it about.",
+
+  tagline: "A binary control with a third value: nobody has said.",
   description:
     "Switch with three independent axes: the value the record holds, the phase of the write, and whether you may change it. Models the request and the outcome separately, so it never renders a state it cannot substantiate.",
   rationale:

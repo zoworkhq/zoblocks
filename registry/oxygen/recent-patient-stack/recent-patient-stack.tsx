@@ -93,7 +93,15 @@ export interface RecentPatientStackProps extends Omit<
   React.HTMLAttributes<HTMLDivElement>,
   "children" | "onSelect"
 > {
+  /**
+   * The open charts, most recent first. Each carries enough to tell two patients apart, which
+   * eleven identical browser tabs do not.
+   */
   charts: readonly OpenChart[];
+  /**
+   * Which chart is in front. The active patient has to be unmistakable — this is a
+   * wrong-patient control, not a tab bar.
+   */
   activeId?: string;
   /** ISO 8601 from the host. Decides whether returning re-asserts identity. */
   now?: string;
@@ -112,11 +120,13 @@ export interface RecentPatientStackProps extends Omit<
    * `confirm`. A `refuse` never reaches here.
    */
   onClose?: (chart: OpenChart) => void;
+  /** Fired when a chart is pinned, so it survives the recency ordering. */
   onPin?: (chart: OpenChart, pinned: boolean) => void;
   /** Keyboard reordering, the equivalent of a drag (WCAG 2.5.7). */
   onReorder?: (charts: OpenChart[]) => void;
   /** Start expanded, showing the panel rather than the avatar row. */
   expanded?: boolean;
+  /** Fired when the stack expands or collapses. */
   onExpandedChange?: (expanded: boolean) => void;
 }
 

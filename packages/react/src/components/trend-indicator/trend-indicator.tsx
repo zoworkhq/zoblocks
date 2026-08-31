@@ -59,9 +59,17 @@ export interface TrendIndicatorProps extends Omit<
   React.HTMLAttributes<HTMLDivElement>,
   "children"
 > {
+  /**
+   * The points, oldest first. A direction is drawn only when the units and the method match
+   * across them.
+   */
   series: TrendSeries;
   /** Caller's choice. Below 40px the line is dropped for the glyph and delta. */
   width?: number;
+  /**
+   * Drawing height in pixels. The sparkline scales to it; the labels do not, so very small
+   * heights lose the axis rather than the numbers.
+   */
   height?: number;
   /**
    * An element id holding the series as text.
@@ -71,6 +79,10 @@ export interface TrendIndicatorProps extends Omit<
    * is not true of a line somebody is about to act on.
    */
   describedBy?: string;
+  /**
+   * Fired when a point is chosen. Supplying it makes the points interactive; without it the
+   * trend is a picture.
+   */
   onSelectPoint?: (index: number, series: TrendSeries) => void;
 }
 

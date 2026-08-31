@@ -10,6 +10,8 @@ export default defineComponentMeta({
 
   summary:
     "Three rings expanding and fading from a soft core, paced at a resting breath rather than a spinner's tempo.",
+
+  tagline: "Three rings at a resting breath, not a spinner's tempo.",
   description:
     "Symbol-free loader cycling at roughly fifteen a minute, the rate of calm breathing. Carries no clinical imagery, so it suits any specialty, and its core accepts a customer's logo mark.",
   rationale:

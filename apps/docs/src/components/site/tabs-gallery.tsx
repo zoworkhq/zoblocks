@@ -16,6 +16,7 @@
  */
 
 import * as React from "react";
+import { DemoNote } from "@/components/site/demo-note";
 import { Tabs, type TabVariant } from "@oxygenui-design/tabs";
 import { cn } from "@/lib/utils";
 
@@ -185,7 +186,7 @@ function Demo({ id, name, api, tags, note, children, wide }: DemoProps) {
         ))}
       </figcaption>
       <div className={cn("ox-demo__stage", wide && "ox-demo__stage--wide")}>{children}</div>
-      <p className="ox-demo__note">{note}</p>
+      <DemoNote>{note}</DemoNote>
     </figure>
   );
 }

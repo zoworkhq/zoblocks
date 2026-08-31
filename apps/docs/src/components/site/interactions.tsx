@@ -62,7 +62,7 @@ export function InstallCommand({
         className,
       )}
     >
-      <span aria-hidden="true" className="select-none font-mono text-sm text-trace/70">
+      <span aria-hidden="true" className="select-none font-mono text-sm text-trace">
         $
       </span>
 

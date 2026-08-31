@@ -87,6 +87,8 @@ export interface ComponentDoc {
   };
 
   summary: string;
+  /** The card line, 8–12 words. Falls back to `summary` when absent. */
+  tagline?: string;
   description: string;
   rationale: string;
   categories: string[];

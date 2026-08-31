@@ -44,6 +44,8 @@ export default defineComponentMeta({
 
   summary:
     "An avatar, a chip and a patient banner — with the pass that keeps two patients who share a name apart on the same worklist.",
+
+  tagline: "An avatar, a chip and a patient banner that agree on identity.",
   description:
     "The banner is the last surface a clinician reads before they act, so it is built as a control rather than a heading: two person-specific identifiers before a care action are a compile error, `Patient.gender` is not a renderable field, and a form can refuse to submit when the chart on screen is not the chart it was opened for.",
   rationale:

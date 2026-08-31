@@ -1,0 +1,1914 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<meta name="color-scheme" content="light dark"/>
+<title>Component Documentation</title>
+<meta name="description" content="A rebuild of the Oxygen UI component documentation — an interactive state browser, a reordered page, a readable API table and a writing standard, with a five-phase plan."/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=IBM+Plex+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"/>
+<style>
+/* ============================================================ TOKENS ===== */
+:root {
+  /* Cool clinical paper. Deliberately not warm cream — the ground a chart is
+     printed on, faintly green, never beige. */
+  --ground:        #fafbfa;
+  --ground-sunk:   #f0f4f2;
+  --ground-raised: #ffffff;
+  --panel:         #0b1512;
+  --panel-raised:  #12201d;
+  --panel-rule:    #1e302c;
+  --panel-ink:     #e8f4f1;
+  --panel-soft:    #93a8a3;
+
+  --ink:      #0b1512;
+  --ink-2:    #33443f;
+  --ink-3:    #566762;   /* 4.5:1 on ground — may carry small text */
+  --ink-4:    #7d8f8a;   /* NON-TEXT ONLY: rules, ticks, disabled marks */
+
+  --accent:      #0e7c66;
+  --accent-deep: #0a5d4f;
+  --accent-wash: #e4f2ee;
+  --accent-lum:  #2dd4b0;
+
+  /* The critique voice. Burnt amber — analogous-distant from the teal, so a
+     flagged finding separates from an accent without a second brand colour. */
+  --signal:      #a84b14;
+  --signal-wash: #f8ece3;
+  --critical:    #b32222;
+  --positive:    #0e7c66;
+
+  --rule:        #dce4e1;
+  --rule-strong: #b7c5c0;
+  /* Control borders are user interface components and owe WCAG 1.4.11's 3:1.
+     The decorative hairline above does not, and forcing it there would draw a
+     box where a boundary is wanted. Two tokens, two jobs. */
+  --rule-control: #7d8f8a;
+
+  --shadow-overlay: 0 24px 60px -20px rgb(11 21 18 / 0.28);
+
+  --measure: 68ch;
+  --rail-w: 16.5rem;
+
+  --step--1: 0.8125rem;
+  --step-0:  1.0625rem;
+  --step-1:  1.25rem;
+  --step-2:  1.5625rem;
+  --step-3:  2.0625rem;
+  --step-4:  2.75rem;
+  --step-5:  3.75rem;
+
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground:        #08110f;
+    --ground-sunk:   #0d1a17;
+    --ground-raised: #101d1a;
+    --panel:         #050c0b;
+    --panel-raised:  #0e1a17;
+    --panel-rule:    #1c2c28;
+    --panel-ink:     #e8f4f1;
+    --panel-soft:    #8b9c98;
+
+    --ink:   #e9f3f0;
+    --ink-2: #b6c7c2;
+    --ink-3: #8ea19c;
+    --ink-4: #64766f;
+
+    --accent:      #2dd4b0;
+    --accent-deep: #6ee7c8;
+    --accent-wash: #0f2b25;
+    --accent-lum:  #2dd4b0;
+
+    --signal:      #e79a5c;
+    --signal-wash: #2a1a0f;
+    --critical:    #fb7185;
+
+    --rule:        #1d2b28;
+    --rule-strong: #33443f;
+    --rule-control: #5d7a72;
+
+    --shadow-overlay: 0 24px 60px -20px rgb(0 0 0 / 0.7);
+
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --ground:        #08110f;
+  --ground-sunk:   #0d1a17;
+  --ground-raised: #101d1a;
+  --panel:         #050c0b;
+  --panel-raised:  #0e1a17;
+  --panel-rule:    #1c2c28;
+  --panel-ink:     #e8f4f1;
+  --panel-soft:    #8b9c98;
+
+  --ink:   #e9f3f0;
+  --ink-2: #b6c7c2;
+  --ink-3: #8ea19c;
+  --ink-4: #64766f;
+
+  --accent:      #2dd4b0;
+  --accent-deep: #6ee7c8;
+  --accent-wash: #0f2b25;
+  --accent-lum:  #2dd4b0;
+
+  --signal:      #e79a5c;
+  --signal-wash: #2a1a0f;
+  --critical:    #fb7185;
+
+  --rule:        #1d2b28;
+  --rule-strong: #33443f;
+  --rule-control: #5d7a72;
+
+  --shadow-overlay: 0 24px 60px -20px rgb(0 0 0 / 0.7);
+
+  color-scheme: dark;
+}
+
+/* ============================================================== BASE ===== */
+*, *::before, *::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+
+body {
+  margin: 0;
+  background: var(--ground);
+  color: var(--ink);
+  font-family: "Newsreader", ui-serif, Georgia, "Times New Roman", serif;
+  font-size: var(--step-0);
+  line-height: 1.68;
+  font-optical-sizing: auto;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+h1, h2, h3, h4, .display, .u-label, .eyebrow {
+  font-family: "Archivo", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+h1, h2, h3, h4 { text-wrap: balance; margin: 0; line-height: 1.12; letter-spacing: -0.02em; font-weight: 600; }
+
+code, kbd, samp, pre, .mono, .num {
+  font-family: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-variant-ligatures: none;
+}
+.num { font-variant-numeric: tabular-nums; }
+
+a { color: var(--accent-deep); text-underline-offset: 0.18em; text-decoration-thickness: from-font; }
+a:hover { color: var(--accent); }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 3px; }
+
+p { margin: 0 0 1.05em; }
+p:last-child { margin-bottom: 0; }
+strong { font-weight: 650; color: var(--ink); }
+em { font-style: italic; }
+hr { border: 0; border-top: 1px solid var(--rule); margin: 2.5rem 0; }
+
+::selection { background: var(--accent-wash); color: var(--ink); }
+
+/* ============================================================ LAYOUT ===== */
+.shell { display: grid; grid-template-columns: var(--rail-w) minmax(0, 1fr); }
+@media (max-width: 1080px) { .shell { grid-template-columns: minmax(0, 1fr); } }
+
+/* ------------------------------------------------------------- rail ----- */
+.rail {
+  position: sticky; top: 0; align-self: start;
+  height: 100dvh; overflow-y: auto; overscroll-behavior: contain;
+  border-right: 1px solid var(--rule);
+  background: var(--ground-sunk);
+  padding: 1.5rem 0 2rem;
+  font-family: "Archivo", ui-sans-serif, system-ui, sans-serif;
+}
+@media (max-width: 1080px) { .rail { display: none; } }
+
+.rail-brand { display: flex; align-items: center; gap: 0.6rem; padding: 0 1.25rem 1rem; }
+.rail-mark { width: 30px; height: 17px; flex: none; color: var(--accent); }
+.rail-brand b { font-size: 0.9375rem; font-weight: 650; letter-spacing: -0.01em; }
+.rail-brand span { font-size: 0.625rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); display: block; font-weight: 500; }
+
+.rail-search { padding: 0 1.25rem 0.75rem; }
+.rail-search input {
+  width: 100%; font: inherit; font-size: 0.8125rem;
+  padding: 0.45rem 0.6rem; border-radius: 6px;
+  border: 1px solid var(--rule-control); background: var(--ground-raised); color: var(--ink);
+}
+.rail-search input::placeholder { color: var(--ink-3); }
+
+.rail nav { display: flex; flex-direction: column; }
+.rail-group {
+  padding: 1rem 1.25rem 0.35rem; font-size: 0.625rem; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--ink-3); font-weight: 600;
+}
+.rail a.rail-link {
+  display: grid; grid-template-columns: 1.9rem 1fr; align-items: baseline;
+  gap: 0.15rem; padding: 0.3rem 1.25rem; font-size: 0.8125rem; line-height: 1.35;
+  color: var(--ink-2); text-decoration: none; border-left: 2px solid transparent;
+  transition: color 0.15s var(--ease), border-color 0.15s var(--ease), background 0.15s var(--ease);
+}
+.rail a.rail-link:hover { color: var(--ink); background: color-mix(in oklab, var(--accent) 7%, transparent); }
+.rail a.rail-link[aria-current="true"] { color: var(--ink); border-left-color: var(--accent); font-weight: 600; background: color-mix(in oklab, var(--accent) 9%, transparent); }
+.rail-link .n { font-family: "IBM Plex Mono", monospace; font-size: 0.625rem; color: var(--ink-3); font-variant-numeric: tabular-nums; }
+.rail a.rail-link[aria-current="true"] .n { color: var(--accent-deep); }
+.rail-link.is-hidden { display: none; }
+
+/* ------------------------------------------------------------ column --- */
+.col { min-width: 0; }
+.wrap { max-width: 92rem; margin: 0 auto; padding: 0 clamp(1.15rem, 4vw, 4.5rem); }
+.reading { max-width: var(--measure); }
+
+section.sec { padding: clamp(3.5rem, 7vw, 6.5rem) 0; border-top: 1px solid var(--rule); scroll-margin-top: 1rem; }
+section.sec:first-of-type { border-top: 0; }
+
+.sec-head { display: flex; gap: 1.25rem; align-items: baseline; margin-bottom: 1.75rem; }
+.sec-num {
+  font-family: "IBM Plex Mono", monospace; font-size: 0.75rem; color: var(--accent-deep);
+  font-variant-numeric: tabular-nums; padding-top: 0.55rem; flex: none;
+  letter-spacing: 0.02em;
+}
+.sec-head h2 { font-size: var(--step-3); }
+.sec-head .kicker { font-size: 0.6875rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-3); font-weight: 600; margin-bottom: 0.5rem; display: block; }
+
+h3.sub {
+  font-size: var(--step-1); margin: 2.75rem 0 0.9rem;
+  padding-top: 0.9rem; border-top: 1px solid var(--rule);
+}
+h4.sub4 { font-size: 1rem; margin: 1.6rem 0 0.5rem; letter-spacing: -0.01em; }
+
+.lede { font-size: var(--step-1); line-height: 1.55; color: var(--ink-2); max-width: 62ch; }
+.lede strong { color: var(--ink); }
+
+/* =========================================================== PIECES ===== */
+.eyebrow { font-size: 0.6875rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-3); font-weight: 600; }
+
+.u-label {
+  font-size: 0.625rem; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--ink-3); font-weight: 600;
+}
+
+/* --- callout ------------------------------------------------------------ */
+.note {
+  border: 1px solid var(--rule); border-left: 2px solid var(--accent);
+  background: var(--ground-raised); border-radius: 0 10px 10px 0;
+  padding: 1.05rem 1.25rem; margin: 1.5rem 0; font-size: 0.9375rem;
+}
+.note.finding { border-left-color: var(--signal); }
+.note.risk { border-left-color: var(--critical); }
+.note .u-label { display: block; margin-bottom: 0.4rem; }
+.note.finding .u-label { color: var(--signal); }
+.note.risk .u-label { color: var(--critical); }
+
+/* --- data table --------------------------------------------------------- */
+.tw { overflow-x: auto; margin: 1.5rem 0; border: 1px solid var(--rule); border-radius: 10px; background: var(--ground-raised); }
+table { border-collapse: collapse; width: 100%; font-size: 0.875rem; min-width: 34rem; }
+table.wide { min-width: 52rem; }
+th, td { text-align: left; padding: 0.7rem 0.95rem; border-bottom: 1px solid var(--rule); vertical-align: top; }
+thead th {
+  font-family: "Archivo", sans-serif; font-size: 0.625rem; letter-spacing: 0.09em;
+  text-transform: uppercase; color: var(--ink-3); font-weight: 600;
+  background: var(--ground-sunk); position: sticky; top: 0; white-space: nowrap;
+}
+tbody tr:last-child td { border-bottom: 0; }
+tbody tr:hover { background: color-mix(in oklab, var(--accent) 4%, transparent); }
+td.num, th.num { font-family: "IBM Plex Mono", monospace; font-variant-numeric: tabular-nums; white-space: nowrap; }
+td b { font-weight: 650; }
+
+/* --- chips -------------------------------------------------------------- */
+.chip {
+  display: inline-flex; align-items: center; gap: 0.3rem; white-space: nowrap;
+  font-family: "IBM Plex Mono", monospace; font-size: 0.6875rem;
+  padding: 0.12rem 0.45rem; border-radius: 4px;
+  border: 1px solid var(--rule-strong); color: var(--ink-2); background: var(--ground-sunk);
+}
+.chip.good { color: var(--accent-deep); border-color: color-mix(in oklab, var(--accent) 40%, transparent); background: var(--accent-wash); }
+.chip.warn { color: var(--signal); border-color: color-mix(in oklab, var(--signal) 40%, transparent); background: var(--signal-wash); }
+.chip.bad  { color: var(--critical); border-color: color-mix(in oklab, var(--critical) 40%, transparent); background: color-mix(in oklab, var(--critical) 8%, transparent); }
+.chips { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+
+/* --- grid --------------------------------------------------------------- */
+.grid { display: grid; gap: 1rem; }
+.g2 { grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr)); }
+.g3 { grid-template-columns: repeat(auto-fit, minmax(min(100%, 15.5rem), 1fr)); }
+.g4 { grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr)); }
+
+.card {
+  border: 1px solid var(--rule); border-radius: 12px; padding: 1.15rem 1.25rem;
+  background: var(--ground-raised);
+}
+.card h4 { font-size: 0.9375rem; margin: 0.35rem 0 0.45rem; }
+.card p { font-size: 0.875rem; color: var(--ink-2); margin: 0; }
+.card .u-label { color: var(--accent-deep); }
+
+/* --- metric ------------------------------------------------------------- */
+.metric { border: 1px solid var(--rule); border-radius: 12px; padding: 1rem 1.1rem; background: var(--ground-raised); }
+.metric .v { font-family: "Archivo", sans-serif; font-size: var(--step-3); font-weight: 600; letter-spacing: -0.03em; line-height: 1; font-variant-numeric: tabular-nums; display: block; }
+.metric .k { font-size: 0.8125rem; color: var(--ink-3); margin-top: 0.4rem; display: block; line-height: 1.35; }
+.metric.is-signal .v { color: var(--signal); }
+.metric.is-good .v { color: var(--accent-deep); }
+
+/* --- code --------------------------------------------------------------- */
+pre.code {
+  background: var(--panel); color: var(--panel-ink); border-radius: 10px;
+  padding: 1rem 1.15rem; overflow-x: auto; font-size: 0.8125rem; line-height: 1.62;
+  margin: 1.25rem 0; border: 1px solid var(--panel-rule);
+}
+pre.code .c { color: var(--panel-soft); }
+pre.code .k { color: #7dd3fc; }
+pre.code .s { color: #86efac; }
+pre.code .f { color: var(--accent-lum); }
+:root[data-theme="dark"] pre.code, :root:not([data-theme="light"]) pre.code { }
+code.inline {
+  font-size: 0.85em; padding: 0.08em 0.34em; border-radius: 4px;
+  background: var(--ground-sunk); border: 1px solid var(--rule); color: var(--ink-2);
+}
+
+/* --- list --------------------------------------------------------------- */
+ul.tick, ul.plain { list-style: none; padding: 0; margin: 1rem 0; display: flex; flex-direction: column; gap: 0.55rem; }
+ul.tick li { padding-left: 1.5rem; position: relative; font-size: 0.9375rem; }
+ul.tick li::before {
+  content: ""; position: absolute; left: 0.15rem; top: 0.62em;
+  width: 0.5rem; height: 0.5rem; border-radius: 1px;
+  border: 1.5px solid var(--accent); background: transparent;
+}
+ul.tick.cross li::before { border-color: var(--critical); background: color-mix(in oklab, var(--critical) 18%, transparent); }
+ol.steps { padding-left: 1.2rem; margin: 1rem 0; display: flex; flex-direction: column; gap: 0.6rem; font-size: 0.9375rem; }
+ol.steps::marker { font-family: "IBM Plex Mono", monospace; }
+
+dl.kv { display: grid; grid-template-columns: minmax(7rem, auto) 1fr; gap: 0.45rem 1.1rem; margin: 1.1rem 0; font-size: 0.9375rem; }
+dl.kv dt { font-family: "Archivo", sans-serif; font-size: 0.75rem; letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink-3); font-weight: 600; padding-top: 0.28em; }
+dl.kv dd { margin: 0; }
+
+/* =========================================================== FIGURE ===== */
+figure.fig { margin: 2rem 0; }
+figure.fig figcaption {
+  font-size: 0.8125rem; color: var(--ink-3); margin-top: 0.7rem;
+  padding-left: 0.9rem; border-left: 2px solid var(--rule-strong); line-height: 1.5;
+}
+figure.fig figcaption b { color: var(--ink-2); font-weight: 650; }
+
+/* --- browser frame for mockups ------------------------------------------ */
+.frame {
+  border: 1px solid var(--rule-strong); border-radius: 14px; overflow: hidden;
+  background: var(--ground-raised); box-shadow: var(--shadow-overlay);
+}
+.frame-bar {
+  display: flex; align-items: center; gap: 0.55rem;
+  padding: 0.5rem 0.8rem; border-bottom: 1px solid var(--rule);
+  background: var(--ground-sunk);
+}
+.frame-dots { display: flex; gap: 0.3rem; }
+.frame-dots i { width: 0.5rem; height: 0.5rem; border-radius: 50%; background: var(--rule-strong); display: block; }
+.frame-url {
+  flex: 1; min-width: 0; font-family: "IBM Plex Mono", monospace; font-size: 0.6875rem;
+  color: var(--ink-3); background: var(--ground-raised); border: 1px solid var(--rule);
+  border-radius: 5px; padding: 0.18rem 0.55rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.frame-tag { font-family: "IBM Plex Mono", monospace; font-size: 0.625rem; color: var(--ink-3); flex: none; }
+.frame-body { overflow-x: auto; overflow-y: hidden; }
+/* Mockups are authored at their real width (1180px) and scaled to fit the
+   column, so a reader sees a whole page rather than a third of one. `zoom`
+   rather than `transform` because zoom reflows — a transform would leave the
+   frame the wrong height and the text would not stay selectable at the right
+   size. The toggle restores 1:1 and lets the frame scroll. */
+.frame-body > .mock { display: block; zoom: var(--mock-z, 1); }
+.frame-fit {
+  font: inherit; font-family: "IBM Plex Mono", monospace; font-size: 0.625rem;
+  letter-spacing: 0.06em; cursor: pointer; flex: none;
+  border: 1px solid var(--rule-control); background: var(--ground-raised); color: var(--ink-3);
+  border-radius: 5px; padding: 0.16rem 0.5rem;
+  transition: color 0.15s var(--ease), border-color 0.15s var(--ease);
+}
+.frame-fit:hover { color: var(--ink); border-color: var(--accent); }
+.frame-fit[aria-pressed="true"] { color: var(--accent-deep); border-color: var(--accent); }
+
+/* --- full-bleed direction band -----------------------------------------
+ * The first pass wrapped every mockup in identical fake browser chrome. With a
+ * constant frame the eye reads the frame, and five different designs inside one
+ * window all look like the same design. A direction now takes over the column:
+ * its own ground, edge to edge, no borrowed furniture.
+ * ---------------------------------------------------------------------- */
+.bleed { position: relative; width: 100%; overflow-x: auto; overscroll-behavior-x: contain; }
+.bleed > .mock { display: block; zoom: var(--mock-z, 1); margin: 0 auto; }
+.bleed-label {
+  display: flex; align-items: baseline; gap: 0.75rem; flex-wrap: wrap;
+  padding: 0.55rem clamp(1.15rem, 4vw, 4.5rem);
+  font-family: "IBM Plex Mono", monospace; font-size: 0.625rem; letter-spacing: 0.11em;
+  text-transform: uppercase; color: var(--ink-3);
+  border-block: 1px solid var(--rule);
+  background: var(--ground-sunk);
+}
+.bleed-label b { color: var(--ink-2); font-weight: 500; letter-spacing: 0.11em; }
+.bleed-label .sp { flex: 1; }
+.bleed-label .fit-btn {
+  font: inherit; cursor: pointer; letter-spacing: 0.09em;
+  border: 1px solid var(--rule-control); background: var(--ground-raised); color: var(--ink-3);
+  border-radius: 4px; padding: 0.1rem 0.45rem;
+}
+.bleed-label .fit-btn:hover { color: var(--ink); border-color: var(--accent); }
+.bleed-label .fit-btn[aria-pressed="true"] { color: var(--accent-deep); border-color: var(--accent); }
+
+/* --- scroll hint -------------------------------------------------------- */
+.scroll-hint { font-size: 0.6875rem; color: var(--ink-3); font-family: "IBM Plex Mono", monospace; margin-top: 0.45rem; }
+
+/* ============================================================ TOPBAR ===== */
+.topbar {
+  position: sticky; top: 0; z-index: 40;
+  display: flex; align-items: center; gap: 0.75rem;
+  padding: 0.55rem clamp(1.15rem, 4vw, 4.5rem);
+  border-bottom: 1px solid var(--rule);
+  background: color-mix(in oklab, var(--ground) 86%, transparent);
+  backdrop-filter: blur(14px);
+  font-family: "Archivo", sans-serif;
+}
+.topbar .tb-title { font-size: 0.8125rem; font-weight: 600; letter-spacing: -0.01em; white-space: nowrap; flex: none; }
+.topbar .tb-sec { font-size: 0.75rem; color: var(--ink-3); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.topbar .sp { flex: 1; }
+.tb-btn {
+  font: inherit; font-size: 0.75rem; cursor: pointer;
+  border: 1px solid var(--rule-control); background: var(--ground-raised); color: var(--ink-2);
+  border-radius: 7px; padding: 0.3rem 0.6rem; display: inline-flex; align-items: center; gap: 0.35rem;
+  transition: color 0.15s var(--ease), border-color 0.15s var(--ease);
+}
+.tb-btn:hover { color: var(--ink); border-color: var(--accent); }
+.tb-btn { white-space: nowrap; flex: none; }
+/* Below the rail breakpoint the bar carries a wordmark it does not have room
+   for alongside everything else. The section label is the one thing here that
+   changes as you read, so it is the one that stays. */
+@media (max-width: 30rem) {
+  .topbar { gap: 0.5rem; }
+  .topbar .tb-title { display: none; }
+  .tb-btn.tb-jump { display: none; }
+}
+.tb-mark { width: 26px; height: 15px; color: var(--accent); flex: none; }
+.tb-brand { display: none; align-items: center; gap: 0.5rem; }
+@media (max-width: 1080px) { .tb-brand { display: flex; } }
+
+.progress { position: fixed; top: 0; left: 0; height: 2px; background: var(--accent); z-index: 60; width: 0; transition: width 0.1s linear; }
+
+/* ============================================================== HERO ===== */
+.hero { padding: clamp(3rem, 8vw, 7rem) 0 clamp(2.5rem, 5vw, 4rem); position: relative; }
+.hero h1 { font-size: clamp(2.4rem, 6.2vw, 4.6rem); letter-spacing: -0.035em; font-weight: 620; max-width: 19ch; }
+.hero .lede { margin-top: 1.6rem; }
+.hero-meta {
+  display: flex; flex-wrap: wrap; gap: 0.5rem 1.6rem; margin-top: 2.5rem;
+  padding-top: 1.1rem; border-top: 1px solid var(--rule);
+  font-family: "IBM Plex Mono", monospace; font-size: 0.6875rem; color: var(--ink-3);
+}
+.hero-meta b { color: var(--ink-2); font-weight: 500; }
+
+/* --- contents ----------------------------------------------------------- */
+.toc { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr)); gap: 0 2rem; margin-top: 2.5rem; }
+.toc a {
+  display: grid; grid-template-columns: 2rem 1fr; gap: 0.3rem; align-items: baseline;
+  padding: 0.42rem 0; border-bottom: 1px solid var(--rule); text-decoration: none;
+  color: var(--ink-2); font-family: "Archivo", sans-serif; font-size: 0.8125rem;
+  transition: color 0.15s var(--ease), padding-left 0.2s var(--ease);
+}
+.toc a:hover { color: var(--accent-deep); padding-left: 0.25rem; }
+.toc a .n { font-family: "IBM Plex Mono", monospace; font-size: 0.6875rem; color: var(--ink-3); }
+
+/* ========================================================= DIRECTION ===== */
+.dir { margin: 2.5rem 0 0; border-top: 2px solid var(--ink); padding-top: 1.5rem; }
+.dir-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.85rem; margin-bottom: 0.5rem; }
+.dir-letter {
+  font-family: "Archivo", sans-serif; font-size: 0.75rem; font-weight: 700;
+  background: var(--ink); color: var(--ground); border-radius: 4px;
+  padding: 0.16rem 0.5rem; letter-spacing: 0.06em;
+}
+.dir-head h3 { font-size: var(--step-2); border: 0; margin: 0; padding: 0; }
+.dir-head .tag { font-family: "IBM Plex Mono", monospace; font-size: 0.75rem; color: var(--ink-3); }
+
+.dir-verdict { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr)); gap: 1rem; margin: 1.5rem 0; }
+.verdict-col { border: 1px solid var(--rule); border-radius: 10px; padding: 0.9rem 1rem; background: var(--ground-raised); }
+.verdict-col .u-label { display: block; margin-bottom: 0.5rem; }
+.verdict-col.for .u-label { color: var(--accent-deep); }
+.verdict-col.against .u-label { color: var(--signal); }
+.verdict-col ul { margin: 0; padding-left: 1.05rem; font-size: 0.875rem; display: flex; flex-direction: column; gap: 0.4rem; }
+
+/* --- swatches ----------------------------------------------------------- */
+.swatches { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 1rem 0; }
+.sw { border: 1px solid var(--rule); border-radius: 8px; overflow: hidden; width: 6.6rem; background: var(--ground-raised); }
+.sw i { display: block; height: 2.6rem; }
+.sw span { display: block; padding: 0.3rem 0.45rem; font-family: "IBM Plex Mono", monospace; font-size: 0.625rem; color: var(--ink-3); line-height: 1.4; }
+.sw span b { display: block; color: var(--ink-2); font-weight: 500; }
+
+/* --- type specimen ------------------------------------------------------ */
+.spec { border: 1px solid var(--rule); border-radius: 12px; overflow: hidden; margin: 1.25rem 0; }
+.spec-row { padding: 0.85rem 1.1rem; border-bottom: 1px solid var(--rule); display: flex; align-items: baseline; gap: 1rem; flex-wrap: wrap; }
+.spec-row:last-child { border-bottom: 0; }
+.spec-row .role { font-family: "IBM Plex Mono", monospace; font-size: 0.625rem; color: var(--ink-3); width: 7rem; flex: none; text-transform: uppercase; letter-spacing: 0.06em; }
+.spec-row .samp { min-width: 0; flex: 1; }
+
+/* ============================================================== TABS ===== */
+.tabs { margin: 1.5rem 0; }
+.tablist { display: flex; flex-wrap: wrap; gap: 0.3rem; border-bottom: 1px solid var(--rule); margin-bottom: 1.25rem; }
+.tablist button {
+  font: inherit; font-family: "Archivo", sans-serif; font-size: 0.8125rem; cursor: pointer;
+  background: none; border: 0; border-bottom: 2px solid transparent; color: var(--ink-3);
+  padding: 0.45rem 0.7rem; margin-bottom: -1px; transition: color 0.15s var(--ease), border-color 0.15s var(--ease);
+}
+.tablist button:hover { color: var(--ink); }
+.tablist button[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--accent); font-weight: 600; }
+.tabpanel[hidden] { display: none; }
+
+/* ========================================================== PRINT ======== */
+@media print {
+  .rail, .topbar, .progress, .tb-btn { display: none !important; }
+  .shell { grid-template-columns: 1fr; }
+  body { background: #fff; color: #000; font-size: 10.5pt; }
+  section.sec { break-inside: avoid-page; padding: 1.2rem 0; }
+  .frame { box-shadow: none; }
+  .frame-fit { display: none !important; }
+  .tabpanel[hidden] { display: block !important; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+
+
+.mock-ox{
+  --paper:#f7f9f8; --paper-sunk:#eef3f1; --rule:#dde5e2; --rule-strong:#c3d0cc;
+  --ink:#08110f; --graphite:#5a6b67; --graphite-soft:#5c6d68;
+  --oxygen:#10b995; --accent-text:#067662; --electric:#0b7285; --critical:#dc2626;
+  --cta:#067662; --cta-hover:#0a5d4f;
+  --panel:#08110f; --panel-raised:#0d1a18; --panel-rule:#1d302d;
+  --panel-fg:#e8f4f1; --panel-muted:#8b9c98; --trace:#2dd4b0; --critical-lum:#fb7185;
+  --ease:cubic-bezier(0.16,1,0.3,1);
+  background:var(--paper); color:var(--ink); width:1180px;
+  font-family:"Instrument Sans",system-ui,sans-serif; font-size:15px; line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+}
+.mock-ox.is-dark{
+  --paper:#080b10; --paper-sunk:#0d1219; --rule:#1d2733; --rule-strong:#2c3744;
+  --ink:#edf2f7; --graphite:#a2aebb; --graphite-soft:#8592a1;
+  --oxygen:#2dd4b0; --accent-text:#6ce7cb; --electric:#73d8ff; --critical:#fb7185;
+  --cta:#6ce7cb; --cta-hover:#a4f3df;
+  --panel:#151a21; --panel-raised:#1c232c; --panel-rule:#303b47;
+  --panel-fg:#edf2f7; --panel-muted:#96a3b3;
+}
+.mock-ox *{box-sizing:border-box;}
+.mock-ox .wrap{max-width:1072px;margin:0 auto;padding:0 32px;}
+
+/* type — the site's own scale */
+.mock-ox .display-2xl{font-size:60px;line-height:0.96;letter-spacing:-0.05em;font-weight:600;margin:0;}
+.mock-ox .display-lg{font-size:56px;line-height:1;letter-spacing:-0.035em;font-weight:600;margin:0;}
+.mock-ox .display-md{font-size:38px;line-height:1.04;letter-spacing:-0.035em;font-weight:600;margin:0;}
+.mock-ox .display-sm{font-size:30px;line-height:1.12;letter-spacing:-0.025em;font-weight:600;margin:0;}
+.mock-ox .lede{font-size:20px;line-height:1.55;color:var(--graphite);letter-spacing:-0.011em;}
+.mock-ox .eyebrow{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:11px;
+  letter-spacing:0.16em;text-transform:uppercase;font-weight:500;display:inline-flex;
+  align-items:center;gap:10px;color:var(--graphite);}
+.mock-ox .eyebrow::before{content:"";width:28px;height:1px;background:currentColor;opacity:.45;}
+.mock-ox .axis{font-family:"JetBrains Mono",monospace;font-size:10px;letter-spacing:0.18em;
+  text-transform:uppercase;color:var(--graphite-soft);font-variant-numeric:tabular-nums;}
+.mock-ox .numeric{font-family:"JetBrains Mono",monospace;font-variant-numeric:tabular-nums;}
+
+/* surfaces — the site's own */
+.mock-ox .surface-1{background:var(--paper);border:1px solid var(--rule);border-radius:16px;
+  box-shadow:0 1px 2px -1px rgb(2 20 17/.04);}
+.mock-ox .surface-2{background:var(--paper);border:1px solid var(--rule);border-radius:16px;
+  box-shadow:0 1px 2px -1px rgb(2 20 17/.05),0 8px 24px -12px rgb(2 20 17/.08);}
+.mock-ox .instrument{position:relative;background:var(--panel);border:1px solid var(--panel-rule);
+  border-radius:18px;overflow:hidden;color:var(--panel-fg);
+  box-shadow:0 0 0 1px rgb(255 255 255/.02) inset,0 30px 70px -24px rgb(0 0 0/.5),
+    0 8px 24px -12px rgb(0 0 0/.34);}
+.mock-ox .instrument::before{content:"";position:absolute;inset:0;pointer-events:none;
+  background-image:linear-gradient(to right,color-mix(in oklab,var(--oxygen) 5%,transparent) 1px,transparent 1px),
+    linear-gradient(to bottom,color-mix(in oklab,var(--oxygen) 5%,transparent) 1px,transparent 1px);
+  background-size:28px 28px;}
+
+/* header */
+.mock-ox .hd{height:64px;display:flex;align-items:center;gap:0;border-bottom:1px solid transparent;}
+.mock-ox .hd .in{max-width:1072px;margin:0 auto;padding:0 32px;width:100%;display:flex;align-items:center;gap:24px;}
+.mock-ox .wm{display:flex;align-items:center;gap:10px;font-weight:600;font-size:15px;letter-spacing:-0.02em;}
+.mock-ox .wm svg{color:var(--oxygen);}
+.mock-ox .wm .v{font-family:"JetBrains Mono",monospace;font-size:10px;color:var(--graphite-soft);
+  border:1px solid var(--rule);border-radius:4px;padding:1px 5px;}
+.mock-ox .hd nav{display:flex;gap:2px;margin-left:auto;}
+.mock-ox .hd nav a{font-size:14px;color:var(--graphite);text-decoration:none;padding:6px 12px;border-radius:8px;position:relative;}
+.mock-ox .hd nav a.on{color:var(--ink);}
+.mock-ox .hd nav a.on::after{content:"";position:absolute;left:12px;right:12px;bottom:-1px;height:1px;background:var(--oxygen);}
+.mock-ox .hd .sbox{display:flex;align-items:center;gap:8px;border:1px solid var(--rule);border-radius:9px;
+  padding:5px 10px;font-size:13px;color:var(--graphite-soft);margin-left:14px;}
+.mock-ox .btn{font-size:13.5px;font-weight:500;padding:7px 15px;border-radius:10px;
+  border:1px solid var(--rule-strong);color:var(--graphite);white-space:nowrap;}
+.mock-ox .btn.pri{background:var(--cta);border-color:var(--cta);color:var(--paper);font-weight:600;}
+.mock-ox .btn.ghost{border-color:transparent;}
+
+/* the improvement callout ribbon */
+.mock-ox .ribbon{display:flex;align-items:center;gap:10px;padding:7px 32px;
+  background:color-mix(in oklab,var(--oxygen) 12%,var(--paper));
+  border-bottom:1px solid color-mix(in oklab,var(--oxygen) 30%,var(--rule));
+  font-family:"JetBrains Mono",monospace;font-size:10px;letter-spacing:0.14em;
+  text-transform:uppercase;color:var(--accent-text);}
+.mock-ox .ribbon b{font-weight:500;}
+
+/* section rhythm */
+.mock-ox .sec{padding:96px 0;border-top:1px solid var(--rule);}
+.mock-ox .sec.sunk{background:var(--paper-sunk);}
+.mock-ox .sec.tight{padding:64px 0;}
+
+/* ============ the finished comparison ============ */
+.mock-ox .cmp{margin-top:44px;}
+.mock-ox .cmp-hd{display:flex;align-items:center;gap:14px;padding:11px 18px;
+  border-bottom:1px solid var(--panel-rule);position:relative;z-index:1;}
+.mock-ox .cmp-hd .t{font-family:"JetBrains Mono",monospace;font-size:10px;letter-spacing:0.16em;
+  text-transform:uppercase;color:var(--panel-muted);}
+.mock-ox .cmp-hd .sp{flex:1;}
+.mock-ox .cmp-hd .dot{width:6px;height:6px;border-radius:50%;background:var(--trace);display:inline-block;margin-right:7px;}
+.mock-ox .cmp-body{display:grid;grid-template-columns:1fr 1fr;position:relative;z-index:1;}
+.mock-ox .pane{padding:20px 20px 22px;}
+.mock-ox .pane + .pane{border-left:1px solid var(--panel-rule);}
+.mock-ox .pane-h{display:flex;align-items:baseline;gap:9px;margin-bottom:16px;}
+.mock-ox .pane-h b{font-size:14px;font-weight:600;color:var(--panel-fg);}
+.mock-ox .pane-h span{font-family:"JetBrains Mono",monospace;font-size:10px;color:var(--panel-muted);}
+.mock-ox .cr{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;
+  padding:11px 0;border-bottom:1px solid var(--panel-rule);}
+.mock-ox .cr:last-child{border-bottom:0;}
+.mock-ox .cr .lab{font-size:13px;color:var(--panel-muted);}
+.mock-ox .cr .lab b{color:var(--panel-fg);font-weight:500;display:block;}
+.mock-ox .cr .out{font-family:"JetBrains Mono",monospace;font-size:12.5px;text-align:right;white-space:nowrap;}
+.mock-ox .out.dash{color:#5c6d68;font-size:17px;}
+.mock-ox .out.wrong{color:var(--critical-lum);}
+.mock-ox .out.right{color:var(--trace);}
+.mock-ox .out.amber{color:#e0b355;}
+.mock-ox .defect{margin-top:14px;padding-top:13px;border-top:1px solid var(--panel-rule);
+  font-size:12px;line-height:1.5;color:var(--panel-muted);}
+.mock-ox .defect b{color:var(--critical-lum);font-weight:500;}
+.mock-ox .defect.ok b{color:var(--trace);}
+
+/* ============ evidence strip (replaces prose quality cards) ============ */
+.mock-ox .ev{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin-top:40px;
+  border:1px solid var(--rule);border-radius:16px;overflow:hidden;background:var(--paper);}
+.mock-ox .ev > div{padding:20px 22px 22px;border-right:1px solid var(--rule);}
+.mock-ox .ev > div:last-child{border-right:0;}
+.mock-ox .ev .v{font-size:34px;font-weight:600;letter-spacing:-0.04em;line-height:1;
+  font-variant-numeric:tabular-nums;font-family:"Instrument Sans",sans-serif;}
+.mock-ox .ev .k{font-size:13px;color:var(--graphite);margin-top:9px;line-height:1.45;}
+.mock-ox .ev .prove{margin-top:12px;padding-top:11px;border-top:1px solid var(--rule);
+  font-family:"JetBrains Mono",monospace;font-size:10px;letter-spacing:0.04em;color:var(--accent-text);}
+
+/* ============ workflow strip ============ */
+.mock-ox .flow{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:40px;}
+.mock-ox .flow .st{padding:18px 20px 20px;}
+.mock-ox .flow .n{font-family:"JetBrains Mono",monospace;font-size:10px;letter-spacing:0.16em;
+  text-transform:uppercase;color:var(--accent-text);}
+.mock-ox .flow [data-h="4"]{font-size:16px;font-weight:600;letter-spacing:-0.02em;margin:11px 0 7px;}
+.mock-ox .flow p{font-size:13px;color:var(--graphite);margin:0;line-height:1.5;}
+.mock-ox .flow .mini{margin-top:14px;border:1px solid var(--rule);border-radius:10px;
+  background:var(--paper-sunk);padding:10px 12px;font-size:12px;}
+.mock-ox .flow .mini .numeric{color:var(--critical);font-weight:600;}
+
+/* ============ six-card catalogue ============ */
+.mock-ox .cat6{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:40px;}
+.mock-ox .cc{overflow:hidden;display:flex;flex-direction:column;}
+.mock-ox .cc .art{padding:18px;background:var(--paper-sunk);border-bottom:1px solid var(--rule);min-height:112px;}
+.mock-ox .cc .meta{padding:15px 18px 17px;}
+.mock-ox .cc [data-h="4"]{font-size:15.5px;font-weight:600;letter-spacing:-0.018em;margin:0;}
+.mock-ox .cc .res{font-family:"JetBrains Mono",monospace;font-size:10.5px;color:var(--accent-text);margin-top:3px;}
+.mock-ox .cc p{font-size:12.5px;color:var(--graphite);margin:8px 0 0;line-height:1.5;}
+.mock-ox .cc .bar{display:flex;align-items:center;gap:8px;padding:9px 18px;border-top:1px solid var(--rule);}
+.mock-ox .cc .bar .s{font-family:"JetBrains Mono",monospace;font-size:9.5px;color:var(--graphite-soft);
+  letter-spacing:0.08em;text-transform:uppercase;}
+.mock-ox .cc .bar .add{margin-left:auto;font-family:"JetBrains Mono",monospace;font-size:10px;
+  border:1px solid var(--rule);border-radius:7px;padding:3px 8px;color:var(--graphite);}
+
+/* small clinical previews for the cards */
+.mock-ox .rv{border:1px solid var(--rule);border-radius:10px;background:var(--paper);padding:11px 13px;}
+.mock-ox .rv .t{display:flex;justify-content:space-between;align-items:baseline;font-size:12px;font-weight:600;}
+.mock-ox .rv .b{display:flex;align-items:flex-end;gap:6px;margin-top:6px;}
+.mock-ox .rv .b b{font-size:26px;font-weight:600;letter-spacing:-0.03em;line-height:1;color:var(--critical);
+  font-variant-numeric:tabular-nums;}
+.mock-ox .rv .m{font-family:"JetBrains Mono",monospace;font-size:9.5px;color:var(--graphite-soft);margin-top:7px;}
+.mock-ox .tag{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:600;
+  border-radius:6px;padding:2px 7px;border:1px solid;letter-spacing:0.02em;}
+.mock-ox .tag.crit{color:var(--critical);border-color:color-mix(in oklab,var(--critical) 35%,transparent);
+  background:color-mix(in oklab,var(--critical) 8%,transparent);}
+.mock-ox .tag.warn{color:#8a5a00;border-color:#e2cf9e;background:#fdf8ec;}
+.mock-ox .tag.mut{color:var(--graphite);border-color:var(--rule-strong);background:var(--paper-sunk);}
+.mock-ox .tag.ok{color:var(--accent-text);border-color:color-mix(in oklab,var(--oxygen) 40%,transparent);
+  background:color-mix(in oklab,var(--oxygen) 9%,transparent);}
+
+/* ============ the engagement band (new surface) ============ */
+.mock-ox .eng{position:relative;padding:56px 44px;}
+.mock-ox .eng .in{position:relative;z-index:1;}
+.mock-ox .eng [data-h="2"]{color:var(--panel-fg);}
+.mock-ox .eng p{color:var(--panel-muted);max-width:54ch;margin-top:16px;font-size:17px;line-height:1.6;}
+.mock-ox .eng .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:34px;}
+.mock-ox .eng .card{border:1px solid var(--panel-rule);border-radius:14px;padding:17px 18px;
+  background:color-mix(in oklab,var(--panel-raised) 70%,transparent);}
+.mock-ox .eng .card [data-h="4"]{font-size:15px;font-weight:600;margin:0 0 7px;color:var(--panel-fg);letter-spacing:-0.015em;}
+.mock-ox .eng .card p{font-size:12.5px;color:var(--panel-muted);margin:0;max-width:none;line-height:1.5;}
+.mock-ox .eng .who{display:flex;align-items:center;gap:14px;margin-top:32px;padding-top:24px;
+  border-top:1px solid var(--panel-rule);}
+.mock-ox .eng .who .av{width:44px;height:44px;border-radius:12px;background:var(--panel-raised);
+  border:1px solid var(--panel-rule);display:grid;place-items:center;font-weight:600;
+  color:var(--trace);font-size:14px;flex:none;}
+.mock-ox .eng .who .nm{font-size:15px;font-weight:600;color:var(--panel-fg);}
+.mock-ox .eng .who .ro{font-family:"JetBrains Mono",monospace;font-size:10px;letter-spacing:0.1em;
+  text-transform:uppercase;color:var(--panel-muted);margin-top:2px;}
+.mock-ox .eng .who .sp{flex:1;}
+.mock-ox .eng .btn{border-color:var(--panel-rule);color:var(--panel-fg);padding:10px 18px;}
+.mock-ox .eng .btn.pri{background:var(--trace);border-color:var(--trace);color:#04211b;}
+
+/* ============ patterns page ============ */
+.mock-ox .ph{padding:56px 0 40px;}
+.mock-ox .pgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;}
+.mock-ox .pc{padding:22px 24px 24px;}
+.mock-ox .pc .n{font-family:"JetBrains Mono",monospace;font-size:10px;letter-spacing:0.16em;
+  text-transform:uppercase;color:var(--graphite-soft);}
+.mock-ox .pc [data-h="3"]{font-size:21px;font-weight:600;letter-spacing:-0.025em;margin:10px 0 8px;}
+.mock-ox .pc p{font-size:13.5px;color:var(--graphite);margin:0;line-height:1.55;}
+.mock-ox .pc .uses{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px;padding-top:13px;border-top:1px solid var(--rule);}
+.mock-ox .pc .uses span{font-family:"JetBrains Mono",monospace;font-size:10px;border:1px solid var(--rule);
+  border-radius:6px;padding:2px 7px;color:var(--graphite);}
+
+/* ============ before / after chip ============ */
+.mock-ox .ba{display:inline-flex;align-items:center;gap:6px;font-family:"JetBrains Mono",monospace;
+  font-size:9.5px;letter-spacing:0.12em;text-transform:uppercase;padding:2px 8px;border-radius:6px;}
+.mock-ox .ba.before{background:color-mix(in oklab,var(--critical) 10%,transparent);color:var(--critical);
+  border:1px solid color-mix(in oklab,var(--critical) 30%,transparent);}
+.mock-ox .ba.after{background:color-mix(in oklab,var(--oxygen) 12%,transparent);color:var(--accent-text);
+  border:1px solid color-mix(in oklab,var(--oxygen) 35%,transparent);}
+
+/* placeholder reproduction, for the before shot */
+.mock-ox .placeholder{margin-top:40px;border:1px solid var(--rule);border-radius:16px;
+  background-image:linear-gradient(to right,var(--rule) 1px,transparent 1px),
+    linear-gradient(to bottom,var(--rule) 1px,transparent 1px);
+  background-size:26px 26px;background-color:var(--paper);}
+.mock-ox .placeholder .ph-hd{display:flex;justify-content:space-between;padding:10px 16px;
+  border-bottom:1px solid var(--rule);background:var(--paper);}
+.mock-ox .placeholder .ph-bd{padding:64px 20px;text-align:center;font-size:13px;color:var(--graphite);}
+
+/* ===================== state browser ===================== */
+.mock-ox .sb{border:1px solid var(--rule);border-radius:18px;overflow:hidden;background:var(--paper);
+  box-shadow:0 1px 2px -1px rgb(2 20 17/.05),0 8px 24px -12px rgb(2 20 17/.08);}
+.mock-ox .sb input{position:absolute;opacity:0;pointer-events:none;}
+.mock-ox .sb-top{display:flex;align-items:center;gap:12px;padding:11px 18px;
+  border-bottom:1px solid var(--rule);background:var(--paper-sunk);}
+.mock-ox .sb-top .t{font-size:13.5px;font-weight:600;letter-spacing:-0.015em;}
+.mock-ox .sb-top .sp{flex:1;}
+.mock-ox .seg{display:inline-flex;border:1px solid var(--rule);border-radius:9px;overflow:hidden;background:var(--paper);}
+.mock-ox .seg span{font-family:"JetBrains Mono",monospace;font-size:9.5px;letter-spacing:0.09em;
+  text-transform:uppercase;padding:5px 10px;color:var(--graphite);border-right:1px solid var(--rule);}
+.mock-ox .seg span:last-child{border-right:0;}
+.mock-ox .seg span.on{background:var(--ink);color:var(--paper);font-weight:600;}
+.mock-ox .sb-grid{display:grid;grid-template-columns:246px 1fr;min-height:430px;}
+
+/* the rail */
+.mock-ox .sb-rail{border-right:1px solid var(--rule);padding:10px 0 14px;overflow:hidden;}
+.mock-ox .sb-rail .g{padding:12px 16px 5px;font-family:"JetBrains Mono",monospace;font-size:9.5px;
+  letter-spacing:0.15em;text-transform:uppercase;color:var(--graphite-soft);}
+.mock-ox .sb-rail .g .c{color:var(--accent-text);}
+.mock-ox .sb-rail label{display:flex;align-items:center;gap:9px;padding:5px 16px;font-size:12.5px;
+  color:var(--graphite);cursor:pointer;border-left:2px solid transparent;line-height:1.35;}
+.mock-ox .sb-rail label:hover{background:var(--paper-sunk);color:var(--ink);}
+.mock-ox .sb-rail label i{width:6px;height:6px;border-radius:2px;background:var(--rule-strong);flex:none;}
+
+/* the stage */
+.mock-ox .sb-stage{position:relative;padding:0;display:flex;flex-direction:column;}
+.mock-ox .sb-panel{display:none;flex:1;flex-direction:column;}
+.mock-ox .sb-render{flex:1;display:grid;place-items:center;padding:38px 26px 30px;
+  background-image:radial-gradient(circle,var(--rule) 0.7px,transparent 0.7px);background-size:14px 14px;}
+.mock-ox .sb-why{padding:15px 22px;border-top:1px solid var(--rule);background:var(--paper-sunk);}
+.mock-ox .sb-why .k{font-family:"JetBrains Mono",monospace;font-size:9.5px;letter-spacing:0.14em;
+  text-transform:uppercase;color:var(--accent-text);}
+.mock-ox .sb-why p{margin:7px 0 0;font-size:14px;line-height:1.55;color:var(--ink);max-width:66ch;}
+.mock-ox .sb-code{border-top:1px solid var(--rule);background:var(--panel);color:var(--panel-fg);
+  padding:14px 20px;font-family:"JetBrains Mono",monospace;font-size:11.5px;line-height:1.7;
+  white-space:pre;overflow-x:auto;}
+.mock-ox .sb-code .c{color:var(--panel-muted);} .mock-ox .sb-code .s{color:#9fe0a8;}
+.mock-ox .sb-code .k{color:#7dd3fc;} .mock-ox .sb-code .p{color:#e8c07a;}
+.mock-ox .sb-foot{display:flex;align-items:center;gap:10px;padding:9px 20px;border-top:1px solid var(--panel-rule);
+  background:var(--panel);}
+.mock-ox .sb-foot .l{font-family:"JetBrains Mono",monospace;font-size:9.5px;letter-spacing:0.12em;
+  text-transform:uppercase;color:var(--panel-muted);}
+.mock-ox .sb-foot .sp{flex:1;}
+.mock-ox .sb-foot .cp{font-family:"JetBrains Mono",monospace;font-size:10px;border:1px solid var(--panel-rule);
+  border-radius:7px;padding:3px 9px;color:var(--panel-fg);}
+
+/* the rendered value */
+.mock-ox .rvx{border:1px solid var(--rule);border-radius:12px;background:var(--paper);padding:18px 20px;
+  min-width:340px;box-shadow:0 1px 2px -1px rgb(2 20 17/.05);}
+.mock-ox .rvx .an{font-size:14px;font-weight:600;letter-spacing:-0.015em;}
+.mock-ox .rvx .row{display:flex;align-items:flex-end;gap:9px;margin-top:9px;min-height:40px;}
+.mock-ox .rvx .row b{font-size:38px;font-weight:600;letter-spacing:-0.04em;line-height:1;
+  font-variant-numeric:tabular-nums;}
+.mock-ox .rvx .row .u{font-size:13px;color:var(--graphite);padding-bottom:5px;}
+.mock-ox .rvx .meta{font-family:"JetBrains Mono",monospace;font-size:10.5px;color:var(--graphite-soft);margin-top:11px;}
+.mock-ox .rvx .strike{text-decoration:line-through;color:var(--graphite-soft);font-weight:400;font-size:20px;
+  letter-spacing:-0.02em;}
+.mock-ox .cx{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;border-radius:7px;
+  padding:3px 9px;border:1px solid;margin-bottom:5px;letter-spacing:0.01em;}
+.mock-ox .cx.ok{color:var(--accent-text);border-color:color-mix(in oklab,var(--oxygen) 38%,transparent);
+  background:color-mix(in oklab,var(--oxygen) 9%,transparent);}
+.mock-ox .cx.crit{color:var(--critical);border-color:color-mix(in oklab,var(--critical) 34%,transparent);
+  background:color-mix(in oklab,var(--critical) 8%,transparent);}
+.mock-ox .cx.warn{color:#8a5a00;border-color:#e2cf9e;background:#fdf8ec;}
+.mock-ox .cx.mut{color:var(--graphite);border-color:var(--rule-strong);background:var(--paper-sunk);}
+.mock-ox .cx.restrict{color:#6b4e9e;border-color:#cdc0e6;background:#f5f2fb;}
+.mock-ox .cx.ai{color:#3f4fa8;border-color:#c2c9ec;background:#f1f3fc;}
+.mock-ox .absent{font-size:19px;font-weight:600;letter-spacing:-0.02em;color:var(--graphite);}
+
+/* ===================== page opening: before / after ===================== */
+.mock-ox .op{padding:34px 0 44px;}
+.mock-ox .op [data-h="1"]{font-size:52px;font-weight:600;letter-spacing:-0.045em;line-height:1;margin:0;}
+.mock-ox .op .badges{display:flex;align-items:center;gap:10px;margin-top:14px;}
+.mock-ox .op .badge{font-family:"JetBrains Mono",monospace;font-size:10px;letter-spacing:0.12em;
+  text-transform:uppercase;border:1px solid color-mix(in oklab,var(--oxygen) 30%,transparent);
+  background:color-mix(in oklab,var(--oxygen) 8%,transparent);color:var(--accent-text);
+  border-radius:999px;padding:3px 10px;}
+.mock-ox .op .res{font-family:"JetBrains Mono",monospace;font-size:12px;color:var(--accent-text);}
+.mock-ox .op .cat{font-size:12.5px;color:var(--graphite-soft);}
+.mock-ox .op .slab{font-size:17px;line-height:1.6;color:var(--graphite);max-width:74ch;margin-top:22px;}
+.mock-ox .op .install{display:flex;align-items:center;gap:10px;border:1px solid var(--rule);
+  background:var(--panel);color:var(--panel-fg);border-radius:12px;padding:11px 16px;margin-top:22px;
+  font-family:"JetBrains Mono",monospace;font-size:12.5px;max-width:520px;}
+.mock-ox .op .install .p{color:var(--trace);}
+.mock-ox .op .install .cp{margin-left:auto;font-size:10px;border:1px solid var(--panel-rule);
+  border-radius:6px;padding:2px 8px;color:var(--panel-muted);}
+.mock-ox .op .sum{font-size:20px;line-height:1.5;color:var(--graphite);max-width:60ch;margin-top:16px;
+  letter-spacing:-0.011em;}
+.mock-ox .op .lead{font-size:30px;line-height:1.22;letter-spacing:-0.03em;font-weight:600;
+  max-width:22ch;margin:0 0 16px;}
+.mock-ox .op .body{font-size:16px;line-height:1.65;color:var(--graphite);max-width:64ch;}
+.mock-ox .op .body p{margin:0 0 14px;}
+.mock-ox .op .body p:last-child{margin:0;}
+.mock-ox .rule-note{display:flex;gap:10px;align-items:baseline;margin-top:12px;
+  font-size:12.5px;color:var(--graphite);}
+
+/* ===================== props table ===================== */
+.mock-ox .pt{width:100%;border-collapse:collapse;font-size:13.5px;margin-top:16px;}
+.mock-ox .pt th{text-align:left;font-family:"JetBrains Mono",monospace;font-size:9.5px;letter-spacing:0.13em;
+  text-transform:uppercase;color:var(--graphite-soft);padding:9px 14px 9px 0;border-bottom:1px solid var(--rule-strong);}
+.mock-ox .pt td{padding:12px 14px 12px 0;border-bottom:1px solid var(--rule);vertical-align:top;color:var(--graphite);}
+.mock-ox .pt td:first-child{font-family:"JetBrains Mono",monospace;color:var(--ink);white-space:nowrap;font-size:13px;}
+.mock-ox .pt .ty{font-family:"JetBrains Mono",monospace;font-size:12px;color:var(--accent-text);white-space:nowrap;}
+.mock-ox .pt .req{font-family:"JetBrains Mono",monospace;font-size:9px;color:var(--critical);letter-spacing:0.08em;}
+.mock-ox .pt .slot{display:block;margin-top:6px;}
+.mock-ox .pt .slot b{color:var(--ink);font-weight:600;}
+.mock-ox .pt .missing{color:var(--critical);font-style:italic;}
+.mock-ox .pt tr.bad td{background:color-mix(in oklab,var(--critical) 4%,transparent);}
+
+/* ===================== page map ===================== */
+.mock-ox .map{display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid var(--rule);border-radius:16px;overflow:hidden;}
+.mock-ox .map > div{padding:0;}
+.mock-ox .map .mh{padding:12px 18px;border-bottom:1px solid var(--rule);background:var(--paper-sunk);
+  font-family:"JetBrains Mono",monospace;font-size:10px;letter-spacing:0.13em;text-transform:uppercase;color:var(--graphite-soft);}
+.mock-ox .map .col + .col{border-left:1px solid var(--rule);}
+.mock-ox .map .row{display:flex;align-items:center;gap:11px;padding:9px 18px;border-bottom:1px solid var(--rule);font-size:13px;}
+.mock-ox .map .row:last-child{border-bottom:0;}
+.mock-ox .map .row .n{font-family:"JetBrains Mono",monospace;font-size:10px;color:var(--graphite-soft);width:16px;flex:none;}
+.mock-ox .map .row .px{margin-left:auto;font-family:"JetBrains Mono",monospace;font-size:10.5px;color:var(--graphite-soft);}
+.mock-ox .map .row.hot{background:color-mix(in oklab,var(--critical) 5%,transparent);}
+.mock-ox .map .row.hot .px{color:var(--critical);font-weight:600;}
+.mock-ox .map .row.new{background:color-mix(in oklab,var(--oxygen) 7%,transparent);}
+.mock-ox .map .row.new .n{color:var(--accent-text);}
+.mock-ox .map .row.demo{font-weight:600;color:var(--ink);}
+
+/* ===================== writing before/after ===================== */
+.mock-ox .wr{display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid var(--rule);border-radius:16px;overflow:hidden;}
+.mock-ox .wr .c{padding:20px 22px 24px;}
+.mock-ox .wr .c + .c{border-left:1px solid var(--rule);}
+.mock-ox .wr .c.b{background:var(--paper-sunk);}
+.mock-ox .wr .lb{display:inline-flex;align-items:center;gap:6px;font-family:"JetBrains Mono",monospace;
+  font-size:9.5px;letter-spacing:0.13em;text-transform:uppercase;padding:2px 8px;border-radius:6px;margin-bottom:14px;}
+.mock-ox .wr .lb.before{background:color-mix(in oklab,var(--critical) 10%,transparent);color:var(--critical);
+  border:1px solid color-mix(in oklab,var(--critical) 28%,transparent);}
+.mock-ox .wr .lb.after{background:color-mix(in oklab,var(--oxygen) 11%,transparent);color:var(--accent-text);
+  border:1px solid color-mix(in oklab,var(--oxygen) 32%,transparent);}
+.mock-ox .wr p{font-size:14.5px;line-height:1.6;color:var(--graphite);margin:0 0 12px;}
+.mock-ox .wr p:last-child{margin:0;}
+.mock-ox .wr .lead{font-size:24px;line-height:1.24;letter-spacing:-0.028em;font-weight:600;color:var(--ink);margin:0 0 14px;}
+.mock-ox .wr .mono{font-family:"JetBrains Mono",monospace;font-size:13px;color:var(--ink);}
+.mock-ox .wr .slot{margin:0 0 10px;font-size:14px;line-height:1.55;}
+.mock-ox .wr .slot b{color:var(--ink);font-weight:600;}
+
+</style>
+</head>
+<body>
+<div class="progress" id="prog" aria-hidden="true"></div>
+<div class="shell">
+  <aside class="rail" aria-label="Sections">
+    <div class="rail-brand"><span class="rail-mark"><svg viewBox="0 0 34 19" fill="none" aria-hidden="true"><circle cx="10" cy="9.5" r="7.6" stroke="currentColor" stroke-width="2.2"/><circle cx="24" cy="9.5" r="7.6" stroke="currentColor" stroke-width="2.2"/></svg></span>
+      <div><b>Component docs</b><span>Oxygen UI · Aug 2026</span></div></div>
+    <div class="rail-search"><label class="u-label" for="rail-q" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);">Filter sections</label>
+      <input id="rail-q" type="search" placeholder="Filter sections…" autocomplete="off"/></div>
+    <nav aria-label="Report contents"><div class="rail-group">The problem</div><a class="rail-link" href="#s1" data-rail="1"><span class="n">01</span><span>Executive summary</span></a><a class="rail-link" href="#s2" data-rail="2"><span class="n">02</span><span>What actually happens on this page</span></a><a class="rail-link" href="#s3" data-rail="3"><span class="n">03</span><span>The audit</span></a><div class="rail-group">The demo</div><a class="rail-link" href="#s4" data-rail="4"><span class="n">04</span><span>The demo, redesigned</span></a><a class="rail-link" href="#s5" data-rail="5"><span class="n">05</span><span>Components that need a host</span></a><div class="rail-group">The page</div><a class="rail-link" href="#s6" data-rail="6"><span class="n">06</span><span>Page structure</span></a><a class="rail-link" href="#s7" data-rail="7"><span class="n">07</span><span>The API table</span></a><div class="rail-group">The words</div><a class="rail-link" href="#s8" data-rail="8"><span class="n">08</span><span>The writing standard</span></a><div class="rail-group">Shipping it</div><a class="rail-link" href="#s9" data-rail="9"><span class="n">09</span><span>Generate it, don't write it</span></a><a class="rail-link" href="#s10" data-rail="10"><span class="n">10</span><span>Implementation plan</span></a><a class="rail-link" href="#s11" data-rail="11"><span class="n">11</span><span>What I would not change</span></a></nav>
+  </aside>
+  <div class="col">
+    <div class="topbar">
+      <span class="tb-brand"><span class="tb-mark"><svg viewBox="0 0 34 19" fill="none" aria-hidden="true"><circle cx="10" cy="9.5" r="7.6" stroke="currentColor" stroke-width="2.2"/><circle cx="24" cy="9.5" r="7.6" stroke="currentColor" stroke-width="2.2"/></svg></span><span class="tb-title">Component docs</span></span>
+      <span class="tb-sec" id="tb-sec">01 · Executive summary</span>
+      <span class="sp"></span>
+      <button type="button" class="tb-btn" id="theme">Dark</button>
+      <a class="tb-btn tb-jump" href="#s10">Plan ↓</a>
+    </div>
+    <main id="main">
+      
+<div class="wrap">
+  <header class="hero">
+    <span class="eyebrow">Zowork · Oxygen UI · component documentation · August 2026</span>
+    <h1>The demo is the argument. Put it first.</h1>
+    <p class="lede">A rebuild of the component documentation — the demo, the page order, the API
+      table and the writing standard. Measured against the running site, drawn in its own design
+      language, and sequenced into five phases. The state browser in §4 is live in this document.</p>
+    <div class="hero-meta">
+      <span><b>11</b> sections</span><span><b>10</b> mockups</span>
+      <span><b>962 px</b> before the demo today</span><span><b>155/394</b> props undocumented</span>
+      <span>Measured at <b>ba4543c</b></span><span><b>27</b> components</span>
+    </div>
+    <nav class="toc" aria-label="Contents"><a href="#s1"><span class="n">01</span><span>Executive summary</span></a><a href="#s2"><span class="n">02</span><span>What actually happens on this page</span></a><a href="#s3"><span class="n">03</span><span>The audit</span></a><a href="#s4"><span class="n">04</span><span>The demo, redesigned</span></a><a href="#s5"><span class="n">05</span><span>Components that need a host</span></a><a href="#s6"><span class="n">06</span><span>Page structure</span></a><a href="#s7"><span class="n">07</span><span>The API table</span></a><a href="#s8"><span class="n">08</span><span>The writing standard</span></a><a href="#s9"><span class="n">09</span><span>Generate it, don't write it</span></a><a href="#s10"><span class="n">10</span><span>Implementation plan</span></a><a href="#s11"><span class="n">11</span><span>What I would not change</span></a></nav>
+  </header>
+</div>
+
+      <section class="sec" id="s1" aria-labelledby="h1"><div class="wrap"><div class="sec-head"><span class="sec-num">01</span><div><span class="kicker">Where this lands</span><h2 id="h1">Executive summary</h2></div></div>
+<div class="reading">
+<p class="lede">A component page has one job in a sales conversation: put the component on screen
+before the reader decides whether to keep reading. Today it takes <strong>962 pixels of prose</strong>
+to get there, and on the heaviest page <strong>1,187</strong>. That is the whole problem, and almost
+everything else on this list follows from it.</p>
+</div>
+
+<div class="grid g4" style="margin-top:1.75rem;">
+  <div class="metric is-signal"><span class="v">962</span><span class="k">pixels of prose before the first live component</span></div>
+  <div class="metric is-signal"><span class="v">42%</span><span class="k">of props have no description — 235 of 555</span></div>
+  <div class="metric is-signal"><span class="v">14/27</span><span class="k">components have no worked example at all</span></div>
+  <div class="metric is-signal"><span class="v">26,394</span><span class="k">pixels — the tallest component page</span></div>
+</div>
+
+<div class="reading">
+<h3 class="sub">The four findings that matter</h3>
+<ol class="steps">
+<li><strong>The demo is buried, and it is the thing that sells.</strong> A client reacts to a working
+  component in about two seconds. On every page today they meet a 160-word paragraph first — good
+  prose, wrong place.</li>
+<li><strong>The demo shows everything at once, so it shows nothing.</strong> Six results side by side,
+  four tabs, and then eighteen state names as a flat list of strings. There is no path through it and
+  no way to see the states that are named.</li>
+<li><strong>The API table is unreadable and, on more than two fifths of props, empty.</strong>
+  Descriptions are crammed into the name column. <b>235 of 555 props have no description</b> —
+  63 on <code class="inline">date-picker</code>, 25 on <code class="inline">switch</code>,
+  21 of <code class="inline">copilot</code>'s 24.</li>
+<li><strong>None of it is generated.</strong> <code class="inline">component-preview.tsx</code> is
+  3,316 hand-written lines. Every new component makes the file longer and the pages less alike.</li>
+</ol>
+
+<div class="note"><span class="u-label">The proposal in one line</span>
+<strong>Put a state browser at the top of every component page</strong> — one component on a calm
+stage, a rail of its states grouped by kind, and the reasoning and the code changing with the
+selection. It answers the demo problem, the eighteen-strings problem and the “what is this actually
+for” problem with one control, and §9 shows how to generate it from metadata that already exists.</div>
+
+<p>The writing does not need replacing. It needs <em>reshaping</em> — and one thing added that no
+competitor could write: a sentence per state saying what that state means clinically. §8 shows the
+before and after.</p>
+</div>
+</div></section>
+<section class="sec" id="s2" aria-labelledby="h2"><div class="wrap"><div class="sec-head"><span class="sec-num">02</span><div><span class="kicker">Be honest about the reader</span><h2 id="h2">What actually happens on this page</h2></div></div>
+<div class="reading">
+<p class="lede">Four people open a component page, and only one of them is going to read it. Designing
+for the reader who reads is how documentation gets long and unhelpful.</p>
+</div>
+
+<div class="tw"><table class="wide">
+<thead><tr><th style="width:16%">Who</th><th style="width:12%">Time here</th><th style="width:34%">What they do</th><th>What kills it</th></tr></thead>
+<tbody>
+<tr><td><b>The client</b><br/><span class="chip">in a demo call</span></td><td class="num">5–20 s</td>
+  <td>Looks. Decides whether this feels like software built by people who have seen a hospital.
+    Never scrolls past the first screen.</td>
+  <td>A paragraph. Any paragraph.</td></tr>
+<tr><td><b>The engineer</b></td><td class="num">2–10 min</td>
+  <td>Copies the install line, scans the props, finds the one example closest to their case,
+    leaves.</td>
+  <td>A props table with no descriptions; no example for their case.</td></tr>
+<tr><td><b>The clinical reviewer</b></td><td class="num">10–30 min</td>
+  <td>Reads the states and asks whether each one is handled correctly. This is the person who
+    approves or blocks adoption.</td>
+  <td>States listed as bare strings with no clinical meaning attached.</td></tr>
+<tr><td><b>The answer engine</b></td><td class="num">no JS</td>
+  <td>Quotes one passage. Usually “when to use it”, or a state definition.</td>
+  <td>Content that only exists after hydration.</td></tr>
+</tbody></table></div>
+
+<div class="reading">
+<div class="note finding"><span class="u-label">The reordering this implies</span>
+The current order — rationale, then preview, then variants, then usage — serves the reader who reads
+first and the reader who looks last. <strong>Invert it.</strong> The component goes at the top,
+because three of these four readers are looking rather than reading, and the fourth quotes a passage
+that works just as well below a demo as above one.</div>
+
+<p>This is not an argument for less prose. The rationale on
+<code class="inline">/components/result-value</code> is the best writing on the site and it should stay
+in full. It should stay in full <em>underneath the thing it is describing.</em></p>
+</div>
+</div></section>
+<section class="sec" id="s3" aria-labelledby="h3"><div class="wrap"><div class="sec-head"><span class="sec-num">03</span><div><span class="kicker">Measured, not asserted</span><h2 id="h3">The audit</h2></div></div>
+<div class="reading">
+<p class="lede">Every number here was taken from the running site at commit
+<code class="inline">ba4543c</code>, at a 1,440&nbsp;px viewport, or computed from
+<code class="inline">apps/docs/src/lib/generated/catalog.ts</code>.</p>
+
+<h3 class="sub">Page weight and the distance to the demo</h3>
+</div>
+
+<div class="tw"><table>
+<thead><tr><th>Page</th><th class="num">Total height</th><th class="num">Before the demo</th><th class="num">Largest section</th></tr></thead>
+<tbody>
+<tr><td><code class="inline">/components/date-picker</code></td><td class="num">26,394 px</td><td class="num">1,187 px</td><td class="num">15,145 px — 57%</td></tr>
+<tr><td><code class="inline">/components/result-value</code></td><td class="num">8,761 px</td><td class="num">962 px</td><td class="num">1,508 px — examples</td></tr>
+<tr><td><code class="inline">/components/copilot</code></td><td class="num">7,726 px</td><td class="num">836 px</td><td class="num">—</td></tr>
+</tbody></table></div>
+
+<div class="reading">
+<p>Date Picker is the outlier worth understanding: it has <strong>three props</strong> and
+<strong>fourteen variants</strong>, and one section runs to 15,145&nbsp;px. Nothing is wrong with the
+content; it is simply all rendered at once, in sequence, with no way to select. It is the same
+disease as the eighteen state strings, at four times the scale.</p>
+
+<h3 class="sub">Documentation completeness across the catalogue</h3>
+</div>
+
+<div class="grid g3" style="margin-top:1.25rem;">
+  <div class="card"><span class="u-label">Props</span><h4>235 of 555 undocumented</h4>
+    <p>42% of every public prop the page renders has no description at all. Worst:
+      <code class="inline">date-picker</code> 63/126, <code class="inline">switch</code> 25/48,
+      <code class="inline">tabs</code> 22/30, <code class="inline">copilot</code> 21/24,
+      <code class="inline">signature</code> 19/22.</p>
+    <p style="margin-top:0.6rem;font-size:0.8125rem;color:var(--ink-3);"><b>Corrected.</b> An earlier
+      draft said 155 of 394. That counted only each component's primary export; the page draws one
+      table per export, so the honest figure is the union.</p></div>
+  <div class="card"><span class="u-label">Examples</span><h4>14 of 27 have none</h4>
+    <p>Including every loader, <code class="inline">accordion</code>,
+      <code class="inline">care-timeline</code>, <code class="inline">clinical-note</code>,
+      <code class="inline">copilot</code>, <code class="inline">safety-plan</code> and
+      <code class="inline">switch</code> — several of them the most complex in the catalogue.</p></div>
+  <div class="card"><span class="u-label">Openings</span><h4>19 of 27 over 120 words</h4>
+    <p>Median rationale is 136 words in a single block; the longest is 199. This is not a
+      one-page problem, it is the house style.</p></div>
+</div>
+
+<div class="reading">
+<h3 class="sub">Three defects worth naming separately</h3>
+<ul class="tick cross">
+<li><strong>Fixture names are uppercased.</strong> <code class="inline">observationPotassiumCritical</code>
+  renders as <code class="inline">OBSERVATIONPOTASSIUMCRITICAL</code>. The camel case is the only thing
+  making those names readable, and a CSS <code class="inline">text-transform</code> removes it. Two call
+  sites in the page template.</li>
+<li><strong>The state list is inert.</strong> Eighteen state names are rendered as text with no way to
+  see any of them. The states are real, declared in metadata, and every one has a preview scenario
+  already written — they are simply not connected.</li>
+<li><strong>3,316 lines of hand-written demos.</strong> <code class="inline">component-preview.tsx</code>
+  holds one <code class="inline">SCENARIOS</code> map covering all 27 components. It is the reason the
+  pages differ from one another, and it grows with every component.</li>
+</ul>
+
+<div class="note"><span class="u-label">What the audit did not find</span>
+No console errors on a clean load, and no broken links. The page template is well-built — its
+problems are ordering, density and completeness rather than correctness.</div>
+
+<div class="note finding"><span class="u-label">A correction to this section</span>
+An earlier draft also claimed “no accessibility violations in the automated pass”. I had not run
+<code class="inline">pnpm a11y</code> when I wrote that — I had only checked the browser console,
+which is a different thing. The audit has since been run: <b>31 pages × 3 themes, zero violations</b>
+on the shipping template. It is stated here because a claim about accessibility made without running
+the check is exactly the kind of thing this catalogue's own standard forbids.</div>
+</div>
+</div></section>
+<section class="sec" id="s4" aria-labelledby="h4"><div class="wrap"><div class="sec-head"><span class="sec-num">04</span><div><span class="kicker">The part clients react to</span><h2 id="h4">The demo, redesigned</h2></div></div></div>
+<div class="wrap"><div class="reading">
+<p class="lede">One component on a calm stage. A rail of its states, grouped by what they are. Pick
+one and the stage, the reasoning and the code change together.</p>
+
+<p>This replaces three things at once: the six-results-at-once preview, the four unlabelled tabs, and
+the eighteen state names printed as a list nobody can act on. It is also the only demo shape that
+scales — a component with three states and one with eighteen get the same control.</p>
+</div></div>
+
+<div data-frame><div class="bleed-label"><b>The state browser</b><span>live in this document — no JavaScript</span><span class="sp"></span><button type="button" class="fit-btn" data-fit aria-pressed="true">FIT</button></div><div class="bleed">
+<div class="mock mock-ox">
+  <div class="wrap" style="padding-top:34px;padding-bottom:40px;">
+    <span class="eyebrow">Preview</span>
+    <div data-h="2" class="display-md" style="margin-top:14px;max-width:20ch;">Every state, one at a time.</div>
+    <p class="lede" style="margin-top:16px;max-width:60ch;">Eighteen states, grouped by what they
+      are. Pick one and the stage, the reasoning and the code all change together — and the URL
+      changes with them, so a colleague opens the state you were looking at.</p>
+    
+<style>.mock-ox .sb #oxs-0:checked ~ .sb-grid .sb-panel[data-i="0"]{display:flex;}
+.mock-ox .sb #oxs-0:checked ~ .sb-grid label[for="oxs-0"]{background:var(--paper-sunk);color:var(--ink);border-left-color:var(--oxygen);font-weight:600;}
+.mock-ox .sb #oxs-0:checked ~ .sb-grid label[for="oxs-0"] i{background:var(--oxygen);}
+.mock-ox .sb #oxs-1:checked ~ .sb-grid .sb-panel[data-i="1"]{display:flex;}
+.mock-ox .sb #oxs-1:checked ~ .sb-grid label[for="oxs-1"]{background:var(--paper-sunk);color:var(--ink);border-left-color:var(--oxygen);font-weight:600;}
+.mock-ox .sb #oxs-1:checked ~ .sb-grid label[for="oxs-1"] i{background:var(--oxygen);}
+.mock-ox .sb #oxs-2:checked ~ .sb-grid .sb-panel[data-i="2"]{display:flex;}
+.mock-ox .sb #oxs-2:checked ~ .sb-grid label[for="oxs-2"]{background:var(--paper-sunk);color:var(--ink);border-left-color:var(--oxygen);font-weight:600;}
+.mock-ox .sb #oxs-2:checked ~ .sb-grid label[for="oxs-2"] i{background:var(--oxygen);}
+.mock-ox .sb #oxs-3:checked ~ .sb-grid .sb-panel[data-i="3"]{display:flex;}
+.mock-ox .sb #oxs-3:checked ~ .sb-grid label[for="oxs-3"]{background:var(--paper-sunk);color:var(--ink);border-left-color:var(--oxygen);font-weight:600;}
+.mock-ox .sb #oxs-3:checked ~ .sb-grid label[for="oxs-3"] i{background:var(--oxygen);}
+.mock-ox .sb #oxs-4:checked ~ .sb-grid .sb-panel[data-i="4"]{display:flex;}
+.mock-ox .sb #oxs-4:checked ~ .sb-grid label[for="oxs-4"]{background:var(--paper-sunk);color:var(--ink);border-left-color:var(--oxygen);font-weight:600;}
+.mock-ox .sb #oxs-4:checked ~ .sb-grid label[for="oxs-4"] i{background:var(--oxygen);}
+.mock-ox .sb #oxs-5:checked ~ .sb-grid .sb-panel[data-i="5"]{display:flex;}
+.mock-ox .sb #oxs-5:checked ~ .sb-grid label[for="oxs-5"]{background:var(--paper-sunk);color:var(--ink);border-left-color:var(--oxygen);font-weight:600;}
+.mock-ox .sb #oxs-5:checked ~ .sb-grid label[for="oxs-5"] i{background:var(--oxygen);}
+.mock-ox .sb #oxs-6:checked ~ .sb-grid .sb-panel[data-i="6"]{display:flex;}
+.mock-ox .sb #oxs-6:checked ~ .sb-grid label[for="oxs-6"]{background:var(--paper-sunk);color:var(--ink);border-left-color:var(--oxygen);font-weight:600;}
+.mock-ox .sb #oxs-6:checked ~ .sb-grid label[for="oxs-6"] i{background:var(--oxygen);}
+.mock-ox .sb #oxs-7:checked ~ .sb-grid .sb-panel[data-i="7"]{display:flex;}
+.mock-ox .sb #oxs-7:checked ~ .sb-grid label[for="oxs-7"]{background:var(--paper-sunk);color:var(--ink);border-left-color:var(--oxygen);font-weight:600;}
+.mock-ox .sb #oxs-7:checked ~ .sb-grid label[for="oxs-7"] i{background:var(--oxygen);}
+.mock-ox .sb #oxs-8:checked ~ .sb-grid .sb-panel[data-i="8"]{display:flex;}
+.mock-ox .sb #oxs-8:checked ~ .sb-grid label[for="oxs-8"]{background:var(--paper-sunk);color:var(--ink);border-left-color:var(--oxygen);font-weight:600;}
+.mock-ox .sb #oxs-8:checked ~ .sb-grid label[for="oxs-8"] i{background:var(--oxygen);}
+.mock-ox .sb #oxs-9:checked ~ .sb-grid .sb-panel[data-i="9"]{display:flex;}
+.mock-ox .sb #oxs-9:checked ~ .sb-grid label[for="oxs-9"]{background:var(--paper-sunk);color:var(--ink);border-left-color:var(--oxygen);font-weight:600;}
+.mock-ox .sb #oxs-9:checked ~ .sb-grid label[for="oxs-9"] i{background:var(--oxygen);}
+.mock-ox .sb #oxs-10:checked ~ .sb-grid .sb-panel[data-i="10"]{display:flex;}
+.mock-ox .sb #oxs-10:checked ~ .sb-grid label[for="oxs-10"]{background:var(--paper-sunk);color:var(--ink);border-left-color:var(--oxygen);font-weight:600;}
+.mock-ox .sb #oxs-10:checked ~ .sb-grid label[for="oxs-10"] i{background:var(--oxygen);}
+.mock-ox .sb #oxs-11:checked ~ .sb-grid .sb-panel[data-i="11"]{display:flex;}
+.mock-ox .sb #oxs-11:checked ~ .sb-grid label[for="oxs-11"]{background:var(--paper-sunk);color:var(--ink);border-left-color:var(--oxygen);font-weight:600;}
+.mock-ox .sb #oxs-11:checked ~ .sb-grid label[for="oxs-11"] i{background:var(--oxygen);}
+.mock-ox .sb #oxs-12:checked ~ .sb-grid .sb-panel[data-i="12"]{display:flex;}
+.mock-ox .sb #oxs-12:checked ~ .sb-grid label[for="oxs-12"]{background:var(--paper-sunk);color:var(--ink);border-left-color:var(--oxygen);font-weight:600;}
+.mock-ox .sb #oxs-12:checked ~ .sb-grid label[for="oxs-12"] i{background:var(--oxygen);}
+.mock-ox .sb #oxs-13:checked ~ .sb-grid .sb-panel[data-i="13"]{display:flex;}
+.mock-ox .sb #oxs-13:checked ~ .sb-grid label[for="oxs-13"]{background:var(--paper-sunk);color:var(--ink);border-left-color:var(--oxygen);font-weight:600;}
+.mock-ox .sb #oxs-13:checked ~ .sb-grid label[for="oxs-13"] i{background:var(--oxygen);}
+.mock-ox .sb #oxs-14:checked ~ .sb-grid .sb-panel[data-i="14"]{display:flex;}
+.mock-ox .sb #oxs-14:checked ~ .sb-grid label[for="oxs-14"]{background:var(--paper-sunk);color:var(--ink);border-left-color:var(--oxygen);font-weight:600;}
+.mock-ox .sb #oxs-14:checked ~ .sb-grid label[for="oxs-14"] i{background:var(--oxygen);}
+.mock-ox .sb #oxs-15:checked ~ .sb-grid .sb-panel[data-i="15"]{display:flex;}
+.mock-ox .sb #oxs-15:checked ~ .sb-grid label[for="oxs-15"]{background:var(--paper-sunk);color:var(--ink);border-left-color:var(--oxygen);font-weight:600;}
+.mock-ox .sb #oxs-15:checked ~ .sb-grid label[for="oxs-15"] i{background:var(--oxygen);}
+.mock-ox .sb #oxs-16:checked ~ .sb-grid .sb-panel[data-i="16"]{display:flex;}
+.mock-ox .sb #oxs-16:checked ~ .sb-grid label[for="oxs-16"]{background:var(--paper-sunk);color:var(--ink);border-left-color:var(--oxygen);font-weight:600;}
+.mock-ox .sb #oxs-16:checked ~ .sb-grid label[for="oxs-16"] i{background:var(--oxygen);}
+.mock-ox .sb #oxs-17:checked ~ .sb-grid .sb-panel[data-i="17"]{display:flex;}
+.mock-ox .sb #oxs-17:checked ~ .sb-grid label[for="oxs-17"]{background:var(--paper-sunk);color:var(--ink);border-left-color:var(--oxygen);font-weight:600;}
+.mock-ox .sb #oxs-17:checked ~ .sb-grid label[for="oxs-17"] i{background:var(--oxygen);}</style>
+<div class="sb">
+  <input type="radio" name="ox-state" id="oxs-0"/><input type="radio" name="ox-state" id="oxs-1" checked/><input type="radio" name="ox-state" id="oxs-2"/><input type="radio" name="ox-state" id="oxs-3"/><input type="radio" name="ox-state" id="oxs-4"/><input type="radio" name="ox-state" id="oxs-5"/><input type="radio" name="ox-state" id="oxs-6"/><input type="radio" name="ox-state" id="oxs-7"/><input type="radio" name="ox-state" id="oxs-8"/><input type="radio" name="ox-state" id="oxs-9"/><input type="radio" name="ox-state" id="oxs-10"/><input type="radio" name="ox-state" id="oxs-11"/><input type="radio" name="ox-state" id="oxs-12"/><input type="radio" name="ox-state" id="oxs-13"/><input type="radio" name="ox-state" id="oxs-14"/><input type="radio" name="ox-state" id="oxs-15"/><input type="radio" name="ox-state" id="oxs-16"/><input type="radio" name="ox-state" id="oxs-17"/>
+  <div class="sb-top">
+    <span class="t">Result Value — every state, one at a time</span>
+    <span class="sp"></span>
+    <span class="seg"><span>Patient</span><span class="on">Standard</span><span>Clinical</span></span>
+    <span class="seg"><span class="on">Light</span><span>Dark</span><span>Forced</span></span>
+  </div>
+  <div class="sb-grid">
+    <div class="sb-rail"><div class="g">Present <span class="c">4</span></div><label for="oxs-0"><i></i>Final, in range</label><label for="oxs-1"><i></i>Critical, with a delta</label><label for="oxs-2"><i></i>Preliminary — not verified</label><label for="oxs-3"><i></i>Corrected — old value shown</label><div class="g">Qualified <span class="c">5</span></div><label for="oxs-4"><i></i>No reference range published</label><label for="oxs-5"><i></i>A range needing qualification</label><label for="oxs-6"><i></i>Delta suppressed — method changed</label><label for="oxs-7"><i></i>Patient-reported</label><label for="oxs-8"><i></i>Extracted by a model</label><div class="g">Absent <span class="c">7</span></div><label for="oxs-9"><i></i>Never ordered</label><label for="oxs-10"><i></i>Awaiting a result</label><label for="oxs-11"><i></i>Cancelled</label><label for="oxs-12"><i></i>Specimen problem</label><label for="oxs-13"><i></i>Patient declined</label><label for="oxs-14"><i></i>Restricted — a value exists</label><label for="oxs-15"><i></i>No value and no reason</label><div class="g">Layout <span class="c">2</span></div><label for="oxs-16"><i></i>Compact, in a grid</label><label for="oxs-17"><i></i>Interactive — opens the report</label></div>
+    <div class="sb-stage"><div class="sb-panel" data-i="0"><div class="sb-render"><div class="rvx"><div class="an">Sodium</div><div class="row"><span class="cx ok">Normal</span></div><div class="row"><b style="color:var(--ink)">139</b><span class="u">mmol/L</span></div><div class="meta">135–145 · final · 41 min ago</div></div></div><div class="sb-why"><span class="k">Why this state exists</span><p>The ordinary case. It still carries its range, because a number without one is a number the reader has to remember the range for.</p></div><div class="sb-code"><span class="p">value</span>={ analyte: "Sodium", value: 139, unit: "mmol/L",
+         range: { low: 135, high: 145 }, status: "final" }</div><div class="sb-foot"><span class="l">?state=final,-in-range</span><span class="sp"></span><span class="cp">Copy this example</span></div></div><div class="sb-panel" data-i="1"><div class="sb-render"><div class="rvx"><div class="an">Potassium</div><div class="row"><span class="cx crit">▲ Critical</span></div><div class="row"><b style="color:var(--critical)">6.8</b><span class="u">mmol/L</span></div><div class="meta">3.5–5.1 · ▲2.1 / 4 h · final</div></div></div><div class="sb-why"><span class="k">Why this state exists</span><p>The delta is the clinically relevant fact, not the value. A potassium of 6.8 that was 6.6 yesterday is a different problem from one that was 4.7 four hours ago.</p></div><div class="sb-code"><span class="p">value</span>={ analyte: "Potassium", value: 6.8, unit: "mmol/L",
+         range: { low: 3.5, high: 5.1 }, status: "final",
+         prior: { value: 4.7, at: "2026-08-12T06:00:00Z" } }</div><div class="sb-foot"><span class="l">?state=critical,-with-a-delta</span><span class="sp"></span><span class="cp">Copy this example</span></div></div><div class="sb-panel" data-i="2"><div class="sb-render"><div class="rvx"><div class="an">TSH</div><div class="row"><span class="cx warn">Preliminary</span></div><div class="row"><b style="color:var(--ink)">6.4</b><span class="u">mIU/L</span></div><div class="meta">0.4–4.0 · preliminary</div></div></div><div class="sb-why"><span class="k">Why this state exists</span><p>A preliminary result rendered identically to a final one is the defect this component exists to prevent: the clinician acts, and the value changes at 04:00.</p></div><div class="sb-code"><span class="p">value</span>={ analyte: "TSH", value: 6.4, unit: "mIU/L",
+         range: { low: 0.4, high: 4.0 }, status: "preliminary" }</div><div class="sb-foot"><span class="l">?state=preliminary-not-verified</span><span class="sp"></span><span class="cp">Copy this example</span></div></div><div class="sb-panel" data-i="3"><div class="sb-render"><div class="rvx"><div class="an">Troponin I</div><div class="row"><span class="cx warn">Corrected</span></div><div class="row"><b style="color:var(--ink)">0.09</b><span class="u">ng/mL</span><span class="strike">&lt;0.04</span></div><div class="meta">was <0.04 · corrected 14:22 today</div></div></div><div class="sb-why"><span class="k">Why this state exists</span><p>A badge saying “corrected” does not address the hazard. The hazard is that somebody read the old number an hour ago and wrote it into a note — so the old number stays on screen, struck through.</p></div><div class="sb-code"><span class="p">value</span>={ analyte: "Troponin I", value: 0.09, unit: "ng/mL",
+         status: "corrected",
+         superseded: { value: "&lt;0.04", at: "14:22 today" } }</div><div class="sb-foot"><span class="l">?state=corrected-old-value-show</span><span class="sp"></span><span class="cp">Copy this example</span></div></div><div class="sb-panel" data-i="4"><div class="sb-render"><div class="rvx"><div class="an">Ferritin</div><div class="row"><span class="cx mut">Not assessed</span></div><div class="row"><b style="color:var(--ink)">212</b><span class="u">ng/mL</span></div><div class="meta">lab supplied no range · not asserted normal</div></div></div><div class="sb-why"><span class="k">Why this state exists</span><p>A number with nothing highlighted beside it reads as normal. Where the laboratory published no range, the component says so rather than letting the absence of a flag do the asserting.</p></div><div class="sb-code"><span class="p">value</span>={ analyte: "Ferritin", value: 212, unit: "ng/mL",
+         status: "final" }  <span class="c">// no range → "not assessed"</span></div><div class="sb-foot"><span class="l">?state=no-reference-range-publi</span><span class="sp"></span><span class="cp">Copy this example</span></div></div><div class="sb-panel" data-i="5"><div class="sb-render"><div class="rvx"><div class="an">Lithium level</div><div class="row"><span class="cx ok">Normal</span></div><div class="row"><b style="color:var(--ink)">0.9</b><span class="u">mmol/L</span></div><div class="meta">0.6–1.2 maintenance · 12 h post-dose · trough assumed</div></div></div><div class="sb-why"><span class="k">Why this state exists</span><p>Whether 0.9 is therapeutic depends entirely on when the dose was given. The qualification is part of the result, not a footnote to it.</p></div><div class="sb-code"><span class="p">value</span>={ analyte: "Lithium level", value: 0.9, unit: "mmol/L",
+         range: { low: 0.6, high: 1.2, appliesTo: "maintenance" },
+         qualifier: "12 h post-dose · trough assumed" }</div><div class="sb-foot"><span class="l">?state=a-range-needing-qualific</span><span class="sp"></span><span class="cp">Copy this example</span></div></div><div class="sb-panel" data-i="6"><div class="sb-render"><div class="rvx"><div class="an">Ferritin</div><div class="row"><span class="cx warn">High</span></div><div class="row"><b style="color:var(--ink)">6.4</b><span class="u">mIU/L</span></div><div class="meta">0.4–4.0 · no delta drawn</div></div></div><div class="sb-why"><span class="k">Why this state exists</span><p>Two numbers from two assays subtracted from each other is not a delta. Annotating a wrong number does not help — an annotated wrong number still gets read as a number — so the delta disappears entirely.</p></div><div class="sb-code">prior: { value: 3.1, at: "2026-02-01T09:00:00Z",
+          differentMethod: true }  <span class="c">// → delta omitted</span></div><div class="sb-foot"><span class="l">?state=delta-suppressed-method-</span><span class="sp"></span><span class="cp">Copy this example</span></div></div><div class="sb-panel" data-i="7"><div class="sb-render"><div class="rvx"><div class="an">Home systolic</div><div class="row"><span class="cx mut">Not assessed</span></div><div class="row"><b style="color:var(--ink)">148</b><span class="u">mmHg</span></div><div class="meta">patient-reported · final</div></div></div><div class="sb-why"><span class="k">Why this state exists</span><p>A home reading and a clinic reading are different measurements with different error bars. The provenance travels with the value into the DOM so it cannot be lost in a re-render.</p></div><div class="sb-code"><span class="p">value</span>={ analyte: "Home systolic", value: 148, unit: "mmHg",
+         assertedBy: "patient" }</div><div class="sb-foot"><span class="l">?state=patient-reported</span><span class="sp"></span><span class="cp">Copy this example</span></div></div><div class="sb-panel" data-i="8"><div class="sb-render"><div class="rvx"><div class="an">Blood pressure</div><div class="row"><span class="cx ai">Unreviewed</span></div><div class="row"><b style="color:var(--ink)">128/76</b><span class="u"></span></div><div class="meta">extracted from note · no human has read it</div></div></div><div class="sb-why"><span class="k">Why this state exists</span><p>The value may well be right. What the interface must not do is present it with the same authority as one a clinician entered.</p></div><div class="sb-code"><span class="p">value</span>={ analyte: "Blood pressure", value: "128/76",
+         assertedBy: "model", reviewed: false }</div><div class="sb-foot"><span class="l">?state=extracted-by-a-model</span><span class="sp"></span><span class="cp">Copy this example</span></div></div><div class="sb-panel" data-i="9"><div class="sb-render"><div class="rvx"><div class="an">HbA1c</div><div class="row"><span class="cx mut">Not ordered</span></div><div class="row"><span class="absent">Never ordered</span></div><div class="meta">no specimen · nothing pending</div></div></div><div class="sb-why"><span class="k">Why this state exists</span><p>A screening gap, not a negative screen. The difference decides whether anyone needs to do anything.</p></div><div class="sb-code"><span class="p">value</span>={ analyte: "HbA1c", absent: "not-ordered" }</div><div class="sb-foot"><span class="l">?state=never-ordered</span><span class="sp"></span><span class="cp">Copy this example</span></div></div><div class="sb-panel" data-i="10"><div class="sb-render"><div class="rvx"><div class="an">Ferritin</div><div class="row"><span class="cx mut">Pending</span></div><div class="row"><span class="absent">Awaiting a result</span></div><div class="meta">collected 11:40 · 52 minutes ago</div></div></div><div class="sb-why"><span class="k">Why this state exists</span><p>In flight. The age matters — a draw from four hours ago and one from four minutes ago call for different patience.</p></div><div class="sb-code"><span class="p">value</span>={ analyte: "Ferritin", absent: "pending",
+         collectedAt: "2026-08-12T11:40:00Z" }</div><div class="sb-foot"><span class="l">?state=awaiting-a-result</span><span class="sp"></span><span class="cp">Copy this example</span></div></div><div class="sb-panel" data-i="11"><div class="sb-render"><div class="rvx"><div class="an">Magnesium</div><div class="row"><span class="cx mut">Cancelled</span></div><div class="row"><span class="absent">Cancelled</span></div><div class="meta">order withdrawn · no specimen taken</div></div></div><div class="sb-why"><span class="k">Why this state exists</span><p>Somebody decided this was not needed. That is a fact about the record, and it is not the same as nobody having thought about it.</p></div><div class="sb-code"><span class="p">value</span>={ analyte: "Magnesium", absent: "cancelled" }</div><div class="sb-foot"><span class="l">?state=cancelled</span><span class="sp"></span><span class="cp">Copy this example</span></div></div><div class="sb-panel" data-i="12"><div class="sb-render"><div class="rvx"><div class="an">Troponin I</div><div class="row"><span class="cx warn">Specimen problem</span></div><div class="row"><span class="absent">Specimen problem</span></div><div class="meta">haemolysed · recollection requested</div></div></div><div class="sb-why"><span class="k">Why this state exists</span><p>No value will arrive from this draw. Rendering it the same as “pending” would leave a clinician waiting for something that is never coming.</p></div><div class="sb-code"><span class="p">value</span>={ analyte: "Troponin I", absent: "specimen-problem",
+         absentDetail: "Haemolysed. Recollection requested." }</div><div class="sb-foot"><span class="l">?state=specimen-problem</span><span class="sp"></span><span class="cp">Copy this example</span></div></div><div class="sb-panel" data-i="13"><div class="sb-render"><div class="rvx"><div class="an">HIV screen</div><div class="row"><span class="cx mut">Declined</span></div><div class="row"><span class="absent">Patient declined</span></div><div class="meta">asked 09:12 · recorded</div></div></div><div class="sb-why"><span class="k">Why this state exists</span><p>The patient was asked and said no. That is a decision on the record with consequences, not an omission to be chased.</p></div><div class="sb-code"><span class="p">value</span>={ analyte: "HIV screen", absent: "declined",
+         askedAt: "2026-08-14T09:12:00Z" }</div><div class="sb-foot"><span class="l">?state=patient-declined</span><span class="sp"></span><span class="cp">Copy this example</span></div></div><div class="sb-panel" data-i="14"><div class="sb-render"><div class="rvx"><div class="an">Toxicology screen</div><div class="row"><span class="cx restrict">Restricted</span></div><div class="row"><span class="absent">Restricted</span></div><div class="meta">42 CFR Part 2 · segmented · request access</div></div></div><div class="sb-why"><span class="k">Why this state exists</span><p>The one absence that is not a gap. A value exists and this reader may not see it — which is a different sentence from “there is nothing here”, and the only one of the seven with a next action.</p></div><div class="sb-code"><span class="p">value</span>={ analyte: "Toxicology screen", absent: "masked",
+         basis: "42-cfr-part-2" }</div><div class="sb-foot"><span class="l">?state=restricted-a-value-exist</span><span class="sp"></span><span class="cp">Copy this example</span></div></div><div class="sb-panel" data-i="15"><div class="sb-render"><div class="rvx"><div class="an">Vitamin D</div><div class="row"><span class="cx mut">Unknown</span></div><div class="row"><span class="absent">No value and no reason</span></div><div class="meta">the feed supplied neither · stated as such</div></div></div><div class="sb-why"><span class="k">Why this state exists</span><p>The honest rendering of a feed that gave you nothing. Guessing which of the other six this is would be the single most dangerous thing the component could do.</p></div><div class="sb-code"><span class="p">value</span>={ analyte: "Vitamin D", absent: "unknown" }</div><div class="sb-foot"><span class="l">?state=no-value-and-no-reason</span><span class="sp"></span><span class="cp">Copy this example</span></div></div><div class="sb-panel" data-i="16"><div class="sb-render"><div class="rvx"><div class="an">Sodium</div><div class="row"><span class="cx crit">Critical</span></div><div class="row"><b style="color:var(--critical)">6.8</b><span class="u"></span></div><div class="meta">analyte hidden · column carries it</div></div></div><div class="sb-why"><span class="k">Why this state exists</span><p>At forty rows the analyte name is already in the column header. Repeating it costs the width that the qualifier needs.</p></div><div class="sb-code"><span class="p">density</span>="compact" hideAnalyte</div><div class="sb-foot"><span class="l">?state=compact,-in-a-grid</span><span class="sp"></span><span class="cp">Copy this example</span></div></div><div class="sb-panel" data-i="17"><div class="sb-render"><div class="rvx"><div class="an">Sodium</div><div class="row"><span class="cx ok">Final</span></div><div class="row"><b style="color:var(--ink)">139</b><span class="u">mmol/L</span></div><div class="meta">button · opens the specimen chain</div></div></div><div class="sb-why"><span class="k">Why this state exists</span><p>Inert unless a handler is supplied. A value that looks clickable and is not is worse than one that never invited the click.</p></div><div class="sb-code"><span class="p">onOpenReport</span>={(v) =&gt; openSpecimenChain(v.id)}</div><div class="sb-foot"><span class="l">?state=interactive-opens-the-re</span><span class="sp"></span><span class="cp">Copy this example</span></div></div></div>
+  </div>
+</div>
+
+    <p style="margin-top:14px;font-size:13px;color:var(--graphite);">
+      <span class="ba after">Try it</span> &nbsp;The rail on the left is live in this report — the
+      whole control is radio inputs and sibling selectors, no JavaScript.</p>
+  </div>
+</div>
+</div></div>
+
+<div class="wrap"><div class="reading">
+<h3 class="sub">Why this shape and not a playground</h3>
+<p>A props playground — the Mantine model — lets a reader assemble any combination, most of which are
+not interesting and some of which are not reachable. A state browser is the inverse: it shows the
+combinations the <em>team</em> considers worth understanding, each one named, each one with a reason.
+For a clinical library that is the right trade, because the value is in knowing which states exist at
+all.</p>
+
+<div class="grid g3" style="margin-top:1.5rem;">
+  <div class="card"><span class="u-label">01</span><h4>The URL carries the state</h4>
+    <p><code class="inline">?state=restricted</code>. A colleague opens exactly what you were looking at,
+      and a support answer can link to a state rather than describe it.</p></div>
+  <div class="card"><span class="u-label">02</span><h4>The code is the selection</h4>
+    <p>The panel shows the props that produce what is on screen — not a generic snippet. Copy gives
+      you a working example of that state, not of the component in general.</p></div>
+  <div class="card"><span class="u-label">03</span><h4>The reasoning travels with it</h4>
+    <p>One sentence saying why the state exists. This is the content a clinical reviewer is actually
+      reading for, and it currently exists nowhere on the site.</p></div>
+</div>
+
+<div class="note"><span class="u-label">Cost, honestly</span>
+The control itself is small — radio inputs and sibling selectors, no JavaScript, as demonstrated
+above. The real cost is <strong>writing 312 state sentences</strong>, one per state across the
+catalogue. At the quality shown here that is perhaps three focused days, and it is the highest-value
+writing available to this product.</div>
+</div></div>
+</section>
+<section class="sec" id="s5" aria-labelledby="h5"><div class="wrap"><div class="sec-head"><span class="sec-num">05</span><div><span class="kicker">Not every component is a value</span><h2 id="h5">Components that need a host</h2></div></div></div>
+<div class="wrap"><div class="reading">
+<p class="lede">Nine of the twenty-seven are surfaces rather than values — ChartHeader, CareTimeline,
+RecentPatientStack, ChartCommandPalette, Copilot, ClinicalNote, SafetyPlan, ChartAccordion,
+Accordion. A surface floating on a swatch demonstrates nothing.</p>
+</div></div>
+
+<div data-frame><div class="bleed-label"><b>Composite demo — the component in a host record</b><span>host drawn at 42%</span><span class="sp"></span><button type="button" class="fit-btn" data-fit aria-pressed="true">FIT</button></div><div class="bleed">
+<div class="mock mock-ox">
+  <div class="wrap" style="padding-top:34px;padding-bottom:40px;">
+    <span class="eyebrow">Preview · composite components</span>
+    <div data-h="2" class="display-md" style="margin-top:14px;max-width:22ch;">Some components only make sense inside something.</div>
+    <p class="lede" style="margin-top:16px;max-width:62ch;">A chart header floating on a swatch tells
+      you nothing. Nine of the twenty-seven components are surfaces rather than values, and they need
+      a second demo mode: the component in a host chart, with the host drawn faintly so the component
+      is unmistakable.</p>
+
+    <div class="sb" style="margin-top:26px;">
+      <div class="sb-top"><span class="t">Chart Header — in a host record</span>
+        <span class="sp"></span>
+        <span class="seg"><span class="on">In context</span><span>Isolated</span></span>
+        <span class="seg"><span class="on">Expanded</span><span>Collapsed</span><span>Safety bar</span></span></div>
+      <div style="padding:22px;background:var(--paper-sunk);">
+        <div style="border:1px solid var(--rule);border-radius:12px;background:var(--paper);overflow:hidden;">
+          <!-- the component, at full strength -->
+          <div style="padding:14px 18px;border-bottom:2px solid var(--oxygen);background:var(--paper);">
+            <div style="display:flex;align-items:center;gap:12px;">
+              <span style="width:38px;height:38px;border-radius:9px;background:var(--paper-sunk);
+                display:grid;place-items:center;font-weight:600;font-size:13px;color:var(--graphite);">AO</span>
+              <div><b style="font-size:15px;">Okonkwo, Adaeze</b>
+                <div class="axis" style="margin-top:2px;">MRN 4471902 · DOB 1974-03-11 · 52y</div></div>
+              <span style="margin-left:auto;display:flex;gap:7px;">
+                <span class="cx crit" style="margin:0">⚠ Penicillin</span>
+                <span class="cx mut" style="margin:0">DNR</span></span>
+            </div>
+          </div>
+          <!-- the host, faint -->
+          <div style="opacity:.42;pointer-events:none;">
+            <div style="display:flex;gap:0;border-bottom:1px solid var(--rule);">
+              <span style="padding:8px 14px;font-size:12px;border-right:1px solid var(--rule);">Summary</span>
+              <span style="padding:8px 14px;font-size:12px;border-right:1px solid var(--rule);">Results</span>
+              <span style="padding:8px 14px;font-size:12px;border-right:1px solid var(--rule);">Medications</span>
+              <span style="padding:8px 14px;font-size:12px;">Notes</span></div>
+            <div style="padding:16px 18px;font-size:12.5px;color:var(--graphite);line-height:1.9;">
+              Potassium 6.8 mmol/L · Sodium 139 · Creatinine 88 · Platelets 212<br/>
+              Progress note — 14 Aug 2026 · A. Vance, MD<br/>
+              Clozapine 200 mg nocte · ANC due 18 Aug</div>
+          </div>
+        </div>
+      </div>
+      <div class="sb-why"><span class="k">Why in context</span>
+        <p>The header's whole job is to stay legible above a scrolling record and collapse to a safety
+          bar rather than to a name. Neither claim is visible when it floats alone on a card.</p></div>
+    </div>
+    <p style="margin-top:14px;font-size:13px;color:var(--graphite);">
+      <span class="ba after">Proposed</span> &nbsp;The host is drawn at 42% so the eye goes to the
+      component. One toggle returns it to isolation for anyone who wants the component alone.</p>
+  </div>
+</div>
+</div></div>
+
+<div class="wrap"><div class="reading">
+<p style="margin-top:1.5rem;">The rule: <strong>if a component's claim is about how it behaves inside
+something else, the demo has to contain the something else.</strong> ChartHeader's claim is that it
+stays legible above a scrolling record and collapses to a safety bar rather than to a name. Neither
+half of that is visible in isolation.</p>
+
+<p>Drawing the host at reduced opacity keeps the eye on the component while making the context legible.
+An <em>Isolated</em> toggle returns the component alone for anyone who wants to inspect it — the two
+modes cost one boolean.</p>
+
+<div class="note finding"><span class="u-label">This is already half-built</span>
+<code class="inline">component-preview.tsx</code> already contains <code class="inline">HostChart</code>,
+<code class="inline">AppBehind</code> and <code class="inline">InstrumentStage</code> wrappers doing
+exactly this for a handful of components. The work is not inventing the pattern — it is making it a
+declared property of the component rather than a decision taken per demo.</div>
+</div></div>
+</section>
+<section class="sec" id="s6" aria-labelledby="h6"><div class="wrap"><div class="sec-head"><span class="sec-num">06</span><div><span class="kicker">Same content, better order</span><h2 id="h6">Page structure</h2></div></div></div>
+<div class="wrap"><div class="reading">
+<p class="lede">Two sections are renamed, one is added, and the rest is reordering and compression.
+No prose is deleted.</p>
+</div></div>
+
+<div data-frame><div class="bleed-label"><b>Section order and weight</b><span>measured at 1,440 px</span><span class="sp"></span><button type="button" class="fit-btn" data-fit aria-pressed="true">FIT</button></div><div class="bleed">
+<div class="mock mock-ox">
+  <div class="wrap" style="padding-top:30px;padding-bottom:38px;">
+    <span class="eyebrow">Structure</span>
+    <div data-h="2" class="display-md" style="margin-top:14px;max-width:22ch;">The demo moves up. Everything else keeps its content.</div>
+    <p class="lede" style="margin-top:16px;max-width:60ch;">Measured from
+      <code>/components/result-value</code> at 1,440&nbsp;px. Only two sections are renamed and one is
+      added; the rest is reordering and compression.</p>
+    <div class="map" style="margin-top:26px;">
+      <div class="col"><div class="mh">Shipping today · 8,761 px</div><div class="row  hot"><span class="n">01</span><span>Intro — title, badges, 160-word rationale, FHIR note, install</span><span class="px">962 px</span></div><div class="row demo"><span class="n">02</span><span>Preview</span><span class="px">1,015 px</span></div><div class="row "><span class="n">03</span><span>Variants</span><span class="px">441 px</span></div><div class="row "><span class="n">04</span><span>Usage &amp; props</span><span class="px">694 px</span></div><div class="row "><span class="n">05</span><span>Examples</span><span class="px">1,508 px</span></div><div class="row "><span class="n">06</span><span>Guidance</span><span class="px">702 px</span></div><div class="row "><span class="n">07</span><span>Clinical</span><span class="px">626 px</span></div><div class="row "><span class="n">08</span><span>Quality</span><span class="px">861 px</span></div><div class="row "><span class="n">09</span><span>Conformance</span><span class="px">885 px</span></div><div class="row "><span class="n">10</span><span>Related</span><span class="px">735 px</span></div></div>
+      <div class="col"><div class="mh">Proposed · about 5,400 px</div><div class="row "><span class="n">01</span><span>Header — title, one-line summary, install</span><span class="px">~280 px</span></div><div class="row demo"><span class="n">02</span><span>Demo — the state browser</span><span class="px">~640 px</span></div><div class="row "><span class="n">03</span><span>Why it exists — lead line, then three paragraphs</span><span class="px">~420 px</span></div><div class="row "><span class="n">04</span><span>API — props, four columns</span><span class="px">~700 px</span></div><div class="row "><span class="n">05</span><span>Examples — worked, copyable</span><span class="px">~900 px</span></div><div class="row "><span class="n">06</span><span>Guidance — when to use, when not to</span><span class="px">~520 px</span></div><div class="row "><span class="n">07</span><span>Clinical — FHIR mapping and safety rules</span><span class="px">~560 px</span></div><div class="row new"><span class="n">08</span><span>Accessibility — keyboard map and the tree it emits</span><span class="px">~600 px</span></div><div class="row "><span class="n">09</span><span>Source — exactly what lands in your repository</span><span class="px">~420 px</span></div><div class="row "><span class="n">10</span><span>Related</span><span class="px">~340 px</span></div></div>
+    </div>
+    <p style="margin-top:18px;font-size:13px;color:var(--graphite);">
+      Green marks the one genuinely new section. The 962&nbsp;px intro becomes about 280&nbsp;px
+      above the demo and about 420&nbsp;px below it — the prose is not cut, it is moved and given a
+      lead line.</p>
+  </div>
+</div>
+</div></div>
+
+<div class="wrap"><div class="reading">
+<h3 class="sub">The three changes that produce most of the saving</h3>
+<ol class="steps">
+<li><strong>The opening splits.</strong> The title, a one-line summary and the install command go
+  above the demo — about 280&nbsp;px. The rationale moves below it and gains a lead line.
+  Nothing is cut.</li>
+<li><strong>Variants folds into the demo.</strong> A variant <em>is</em> a state, and the state
+  browser already has a rail for them. On Date Picker this is the difference between a 15,145&nbsp;px
+  section and a 640&nbsp;px control.</li>
+<li><strong>Quality and Conformance merge into Accessibility.</strong> They are currently two sections
+  making adjacent claims. One section that names the keyboard map, the roles emitted and the test that
+  asserts each claim is stronger than two that circle it.</li>
+</ol>
+</div></div>
+
+<div data-frame><div class="bleed-label"><b>Page opening — shipping today</b><span>962 px before the component</span><span class="sp"></span><button type="button" class="fit-btn" data-fit aria-pressed="true">FIT</button></div><div class="bleed">
+<div class="mock mock-ox">
+  <div class="hd"><div class="in"><span class="wm"><svg viewBox="0 0 34 19" width="27" height="15" fill="none" aria-hidden="true"><circle cx="10" cy="9.5" r="7.5" stroke="currentColor" stroke-width="2.4"/><circle cx="24" cy="9.5" r="7.5" stroke="currentColor" stroke-width="2.4"/></svg> Oxygen UI <span class="v">v0.1.0</span></span><nav><a class="on" href="#">Components</a><a class="" href="#">Showcase</a><a class="" href="#">Marketplace</a><a class="" href="#">Pro</a></nav><span class="sbox">⌕ Search <span class="numeric" style="font-size:10px">⌘K</span></span><span class="btn ghost">Sign in</span><span class="btn pri">Sign up</span></div></div>
+  <div class="wrap op">
+    <div class="axis" style="margin-bottom:16px;">← All components</div>
+    <div data-h="1">Result Value</div>
+    <div class="badges"><span class="badge">Stable</span>
+      <span class="res">Observation ↗</span><span class="cat">Clinical · Data Display</span></div>
+    <p class="slab">The most dangerous component in healthcare software is the one that renders a
+      number, because every one of its failures looks perfect on screen. A preliminary result
+      rendered identically to a final one: the clinician acts, and the value changes at 04:00. A
+      result with no reference range rendered as though it were normal, because nothing was
+      highlighted. A corrected result that silently replaced the value somebody read an hour ago and
+      wrote into a note. An absent value rendered as an em dash, indistinguishable from a rendering
+      bug, a cancelled test, a haemolysed specimen and a patient who declined the draw. None of the
+      four is a styling problem and none is fixed by a nicer table. Each needs a shape: status is
+      never implicit, an absent range is stated rather than left blank, a correction carries the old
+      number with a line through it because the hazard is the reader's memory of it, and absence is
+      seven sentences.</p>
+    <div class="rule-note"><span class="axis" style="flex:none;">Observation</span>
+      <span>value[x], dataAbsentReason, status, interpretation, referenceRange including appliesTo,
+        and note. DataAbsentReason renders as seven distinct states rather than one blank.</span></div>
+    <div class="install"><span class="p">$</span> npx @oxygenui-design/cli add result-value<span class="cp">COPY</span></div>
+    <p style="margin-top:34px;font-size:13px;color:var(--graphite);">
+      <span class="ba before">Shipping today</span> &nbsp;962 px before the first live component.
+      160 words in one block. A client scrolls past two screens of prose before seeing anything.</p>
+  </div>
+</div>
+</div></div>
+<div data-frame><div class="bleed-label"><b>Page opening — proposed</b><span>component at about 380 px</span><span class="sp"></span><button type="button" class="fit-btn" data-fit aria-pressed="true">FIT</button></div><div class="bleed">
+<div class="mock mock-ox">
+  <div class="hd"><div class="in"><span class="wm"><svg viewBox="0 0 34 19" width="27" height="15" fill="none" aria-hidden="true"><circle cx="10" cy="9.5" r="7.5" stroke="currentColor" stroke-width="2.4"/><circle cx="24" cy="9.5" r="7.5" stroke="currentColor" stroke-width="2.4"/></svg> Oxygen UI <span class="v">v0.1.0</span></span><nav><a class="on" href="#">Components</a><a class="" href="#">Patterns</a><a class="" href="#">Showcase</a><a class="" href="#">Architecture</a><a class="" href="#">Enterprise</a></nav><span class="sbox">⌕ Search <span class="numeric" style="font-size:10px">⌘K</span></span><span class="btn pri">Talk to an engineer</span></div></div>
+  <div class="wrap op">
+    <div class="axis" style="margin-bottom:16px;">← All components &nbsp;·&nbsp; Clinical values</div>
+    <div data-h="1">Result Value</div>
+    <div class="badges"><span class="badge">Stable</span>
+      <span class="res">Observation ↗</span><span class="cat">18 states · 5 props · since 0.1.0</span></div>
+    <p class="sum">One observation, rendered so the four ways a number can lie to you are all
+      impossible.</p>
+    <div class="install"><span class="p">$</span> npx @oxygenui-design/cli add result-value<span class="cp">COPY</span></div>
+  </div>
+
+  <div class="wrap" style="padding-bottom:40px;">
+    <div class="sb" style="margin-top:8px;">
+      <div class="sb-top"><span class="t">Live — every state, one at a time</span>
+        <span class="sp"></span>
+        <span class="seg"><span>Patient</span><span class="on">Standard</span><span>Clinical</span></span></div>
+      <div class="sb-grid" style="min-height:300px;">
+        <div class="sb-rail">
+          <div class="g">Present <span class="c">4</span></div>
+          <label style="border-left-color:var(--oxygen);background:var(--paper-sunk);color:var(--ink);font-weight:600;"><i style="background:var(--oxygen)"></i>Critical, with a delta</label>
+          <label><i></i>Final, in range</label>
+          <label><i></i>Preliminary — not verified</label>
+          <div class="g">Absent <span class="c">7</span></div>
+          <label><i></i>Restricted — a value exists</label>
+          <label><i></i>Specimen problem</label>
+        </div>
+        <div class="sb-stage"><div class="sb-panel" style="display:flex;">
+          <div class="sb-render"><div class="rvx"><div class="an">Potassium</div><div class="row"><span class="cx crit">▲ Critical</span></div><div class="row"><b style="color:var(--critical)">6.8</b><span class="u">mmol/L</span></div><div class="meta">3.5–5.1 · ▲2.1 / 4 h · final</div></div></div>
+          <div class="sb-why"><span class="k">Why this state exists</span>
+            <p>The delta is the clinically relevant fact, not the value. A potassium of 6.8 that was 6.6 yesterday is a different problem from one that was 4.7 four hours ago.</p></div>
+        </div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap" style="padding-bottom:46px;">
+    <p class="lead">Every one of its failures looks perfect on screen.</p>
+    <div class="body">
+      <p>That is what makes a result component dangerous. A preliminary value rendered like a final
+        one — the clinician acts, and the number changes at 04:00. A result with no reference range,
+        reading as normal because nothing was highlighted. A correction that silently replaced what
+        somebody wrote into a note an hour ago. An em dash standing in for a rendering bug, a
+        cancelled test, a haemolysed specimen and a patient who declined.</p>
+      <p>None of the four is a styling problem, and none is fixed by a nicer table.</p>
+    </div>
+    <p style="margin-top:30px;font-size:13px;color:var(--graphite);">
+      <span class="ba after">Proposed</span> &nbsp;The component is on screen at about 380 px. The
+      argument keeps every word — it moves below the demo and gains a lead line.</p>
+  </div>
+</div>
+</div></div>
+</section>
+<section class="sec" id="s7" aria-labelledby="h7"><div class="wrap"><div class="sec-head"><span class="sec-num">07</span><div><span class="kicker">Where the engineer lands</span><h2 id="h7">The API table</h2></div></div></div>
+<div class="wrap"><div class="reading">
+<p class="lede">The table has two problems and they compound: the description shares a cell with the
+prop name, and on 39% of props there is no description to put anywhere.</p>
+</div></div>
+
+<div data-frame><div class="bleed-label"><b>API table — shipping today</b><span>description inside the name cell</span><span class="sp"></span><button type="button" class="fit-btn" data-fit aria-pressed="true">FIT</button></div><div class="bleed">
+<div class="mock mock-ox">
+  <div class="wrap" style="padding-top:30px;padding-bottom:38px;">
+    <span class="eyebrow">Usage</span>
+    <div data-h="2" class="display-md" style="margin-top:14px;">Props are the FHIR resource.</div>
+    <table class="pt">
+      <thead><tr><th style="width:24%">Prop</th><th style="width:30%">Type</th><th>Default</th></tr></thead>
+      <tbody>
+        <tr><td>value</td><td class="ty">ResultValueData</td><td>—</td></tr>
+        <tr><td>density</td><td class="ty">'compact' | 'default'</td><td>"default"</td></tr>
+        <tr><td>hideAnalyte<span class="slot">Hides the analyte name, for a grid whose column header already carries it.</span></td>
+          <td class="ty">boolean</td><td>false</td></tr>
+        <tr><td>now<span class="slot">ISO 8601, supplied by the host. Without it no relative time is rendered at all — which is correct. A result with no age is less misleading than one whose age is wrong.</span></td>
+          <td class="ty">string</td><td>—</td></tr>
+        <tr><td>onOpenReport<span class="slot">Opens the specimen chain. Makes the value a button; inert without it.</span></td>
+          <td class="ty">((value: ResultValueData) =&gt; void)</td><td>—</td></tr>
+      </tbody>
+    </table>
+    <p style="margin-top:22px;font-size:13px;color:var(--graphite);">
+      <span class="ba before">Shipping today</span> &nbsp;The description is crammed into the name
+      cell, so the column widths fight each other. Two of five props have no description at all —
+      across the catalogue it is <b>155 of 394</b>.</p>
+  </div>
+</div>
+</div></div>
+<div data-frame><div class="bleed-label"><b>API table — proposed</b><span>four columns, one fixed shape</span><span class="sp"></span><button type="button" class="fit-btn" data-fit aria-pressed="true">FIT</button></div><div class="bleed">
+<div class="mock mock-ox">
+  <div class="wrap" style="padding-top:30px;padding-bottom:38px;">
+    <span class="eyebrow">API</span>
+    <div data-h="2" class="display-md" style="margin-top:14px;">Props are the FHIR resource.</div>
+    <p class="lede" style="margin-top:14px;max-width:58ch;">Five props. Two are required, and one of
+      those is required only in a state you can reach.</p>
+    <table class="pt">
+      <thead><tr><th style="width:20%">Prop</th><th style="width:24%">Type</th><th style="width:11%">Default</th><th>What it does</th></tr></thead>
+      <tbody>
+        <tr><td>value <span class="req">REQ</span></td><td class="ty">ResultValueData</td><td>—</td>
+          <td><b style="color:var(--ink)">The result itself, already adapted from FHIR.</b>
+            <span class="slot">Use <code>fromObservation()</code> rather than building it by hand — the
+              adapter leaves undefined everything it cannot determine, which is what keeps a missing
+              range from becoming an assumed one.</span></td></tr>
+        <tr><td>now <span class="req">REQ*</span></td><td class="ty">string</td><td>—</td>
+          <td><b style="color:var(--ink)">The host's clock, not the component's.</b>
+            <span class="slot"><b>If you omit it</b> no relative time is rendered at all.
+              <b>Why that is right:</b> a relative time computed at render silently ages on a ward
+              workstation left open all shift. A result with no age is less misleading than one whose
+              age is wrong.</span></td></tr>
+        <tr><td>density</td><td class="ty">"compact" | "default"</td><td class="ty">"default"</td>
+          <td><b style="color:var(--ink)">Row height and type scale.</b>
+            <span class="slot">Use <code>compact</code> from about forty rows. Inherited from the
+              nearest density provider when omitted.</span></td></tr>
+        <tr><td>hideAnalyte</td><td class="ty">boolean</td><td class="ty">false</td>
+          <td><b style="color:var(--ink)">Drops the analyte name.</b>
+            <span class="slot">For a grid whose column header already carries it. Has no effect
+              outside <code>compact</code>.</span></td></tr>
+        <tr><td>onOpenReport</td><td class="ty">(v: ResultValueData) =&gt; void</td><td>—</td>
+          <td><b style="color:var(--ink)">Opens the specimen chain.</b>
+            <span class="slot">Supplying it makes the value a button. <b>If you omit it</b> the value
+              is inert — deliberately, because a value that looks clickable and is not is worse than
+              one that never invited the click.</span></td></tr>
+      </tbody>
+    </table>
+    <p style="margin-top:22px;font-size:13px;color:var(--graphite);">
+      <span class="ba after">Proposed</span> &nbsp;Four fixed columns, description in its own.
+      Every entry follows one shape — <b>what it does</b>, then <b>if you omit it</b>, then <b>why</b> —
+      so forty props can be scanned without reading forty paragraphs. <code>REQ*</code> marks a prop
+      required only in a reachable state.</p>
+  </div>
+</div>
+</div></div>
+
+<div class="wrap"><div class="reading">
+<h3 class="sub">The fixed shape</h3>
+<p>Every prop description follows the same three slots, in the same order. That is what makes forty
+props scannable — a reader learns the shape once and then reads only the slot they need.</p>
+<dl class="kv">
+<dt>What it does</dt><dd>One sentence, bolded. Present on every prop without exception.</dd>
+<dt>If you omit it</dt><dd>The actual behaviour. Present on every optional prop.</dd>
+<dt>Why</dt><dd>Only where the default is surprising or the constraint is a safety decision. Absent
+  more often than present, which is what keeps it worth reading.</dd>
+</dl>
+
+<div class="note"><span class="u-label">One new column, worth its width</span>
+For clinical components, a <strong>harm-if-wrong</strong> grade — the artefact a VP of engineering
+screenshots into an internal slide. Most of the input already exists in
+<code class="inline">domain.safety</code>; what it needs is a per-prop link.</div>
+
+<h3 class="sub">And the 155 missing descriptions</h3>
+<p>These cannot be generated, and they should not be. But they can be <em>required</em>: a public prop
+with no doc comment should fail <code class="inline">pnpm gen --strict</code> the same way a component
+without a story already does. Turn the gate on with a grandfathered allowlist, and the list shrinks
+instead of growing.</p>
+</div></div>
+</section>
+<section class="sec" id="s8" aria-labelledby="h8"><div class="wrap"><div class="sec-head"><span class="sec-num">08</span><div><span class="kicker">The part that cannot be generated</span><h2 id="h8">The writing standard</h2></div></div></div>
+<div class="wrap"><div class="reading">
+<p class="lede">The prose on this site is better than the prose on any competitor's. It is also,
+consistently, in the wrong shape — long where it should be layered, and absent exactly where it would
+be most valuable.</p>
+
+<p>Three rules, each shown against real copy from the shipping site.</p>
+
+<h3 class="sub">Rule 1 — lead with the claim, then enumerate</h3>
+<p>Nineteen of twenty-seven openings are over 120 words in one block. The fix is not to cut them; it
+is to lift the load-bearing sentence out and let the rest breathe underneath.</p>
+</div></div>
+
+<div data-frame><div class="bleed-label"><b>Writing — the opening</b><span>same words, three moves</span><span class="sp"></span><button type="button" class="fit-btn" data-fit aria-pressed="true">FIT</button></div><div class="bleed">
+<div class="mock mock-ox">
+  <div class="wrap" style="padding-top:26px;padding-bottom:32px;">
+    <span class="eyebrow">The opening</span>
+    <p class="lede" style="margin-top:12px;max-width:64ch;font-size:16px;">One 160-word slab. The best sentence in the product is buried in the middle of it.</p>
+    <div class="wr" style="margin-top:20px;">
+      <div class="c b"><span class="lb before">Shipping today</span><p>The most dangerous component in healthcare software is the one that renders a number, because every one of its failures looks perfect on screen. A preliminary result rendered identically to a final one: the clinician acts, and the value changes at 04:00. A result with no reference range rendered as though it were normal, because nothing was highlighted. A corrected result that silently replaced the value somebody read an hour ago and wrote into a note. An absent value rendered as an em dash, indistinguishable from a rendering bug, a cancelled test, a haemolysed specimen and a patient who declined the draw. None of the four is a styling problem and none is fixed by a nicer table. Each needs a shape: status is never implicit, an absent range is stated rather than left blank, a correction carries the old number with a line through it because the hazard is the reader's memory of it, and absence is seven sentences.</p></div>
+      <div class="c"><span class="lb after">Proposed</span><p class="lead">Every one of its failures looks perfect on screen.</p><p>That is what makes a result component dangerous. A preliminary value rendered like a final one — the clinician acts, and the number changes at 04:00. A result with no reference range, reading as normal because nothing was highlighted. A correction that silently replaced what somebody wrote into a note an hour ago. An em dash standing in for a rendering bug, a cancelled test, a haemolysed specimen and a patient who declined.</p><p>None of the four is a styling problem, and none is fixed by a nicer table.</p></div>
+    </div>
+    <p style="margin-top:14px;font-size:13px;color:var(--graphite);max-width:74ch;">
+      <b style="color:var(--ink);">Why.</b> Same words, three moves. The claim is lifted out and set at display size, because it is the sentence a reader will quote. The enumeration keeps its rhythm but loses the semicolon pile-up. And the conclusion gets its own line, where it lands.</p>
+  </div>
+</div>
+</div></div>
+
+<div class="wrap"><div class="reading">
+<h3 class="sub">Rule 2 — every prop, three slots, same order</h3>
+<p>Good prose in a bad container. The same words, put into fixed slots, become scannable.</p>
+</div></div>
+
+<div data-frame><div class="bleed-label"><b>Writing — a prop description</b><span>good prose, bad container</span><span class="sp"></span><button type="button" class="fit-btn" data-fit aria-pressed="true">FIT</button></div><div class="bleed">
+<div class="mock mock-ox">
+  <div class="wrap" style="padding-top:26px;padding-bottom:32px;">
+    <span class="eyebrow">A prop description</span>
+    <p class="lede" style="margin-top:12px;max-width:64ch;font-size:16px;">Two of five props on this component have no description at all; across the catalogue it is 155 of 394.</p>
+    <div class="wr" style="margin-top:20px;">
+      <div class="c b"><span class="lb before">Shipping today</span><p class="mono">now</p><p>ISO 8601, supplied by the host. Without it no relative time is rendered at all — which is correct. A result with no age is less misleading than one whose age is wrong.</p></div>
+      <div class="c"><span class="lb after">Proposed</span><p class="mono" style="margin-bottom:12px;">now — the host's clock, not the component's</p><p class="slot"><b>What it does.</b> Supplies the reference time that relative ages are computed against.</p><p class="slot"><b>If you omit it.</b> No relative time is rendered at all.</p><p class="slot"><b>Why that is the right default.</b> A relative time computed at render silently ages on a ward workstation left open all shift. A result with no age is less misleading than one whose age is wrong.</p></div>
+    </div>
+    <p style="margin-top:14px;font-size:13px;color:var(--graphite);max-width:74ch;">
+      <b style="color:var(--ink);">Why.</b> The original is good writing in the wrong shape. Three fixed slots — what it does, what happens if you omit it, why — mean a reader can scan forty props and find the one fact they need without reading forty paragraphs.</p>
+  </div>
+</div>
+</div></div>
+
+<div class="wrap"><div class="reading">
+<h3 class="sub">Rule 3 — every state earns a sentence</h3>
+<p>This is the one that is genuinely missing rather than misshapen, and it is the most valuable
+writing this product can produce.</p>
+</div></div>
+
+<div data-frame><div class="bleed-label"><b>Writing — a state</b><span>the sentence that is missing entirely</span><span class="sp"></span><button type="button" class="fit-btn" data-fit aria-pressed="true">FIT</button></div><div class="bleed">
+<div class="mock mock-ox">
+  <div class="wrap" style="padding-top:26px;padding-bottom:32px;">
+    <span class="eyebrow">A state</span>
+    <p class="lede" style="margin-top:12px;max-width:64ch;font-size:16px;">Eighteen states are listed as bare strings. None says what it means clinically.</p>
+    <div class="wr" style="margin-top:20px;">
+      <div class="c b"><span class="lb before">Shipping today</span><p>Absent — restricted, and a value exists</p></div>
+      <div class="c"><span class="lb after">Proposed</span><p class="mono" style="margin-bottom:12px;">Restricted — a value exists</p><p>The one absence that is not a gap. A value exists and this reader may not see it — which is a different sentence from “there is nothing here”, and the only one of the seven with a next action.</p></div>
+    </div>
+    <p style="margin-top:14px;font-size:13px;color:var(--graphite);max-width:74ch;">
+      <b style="color:var(--ink);">Why.</b> This is the highest-value writing missing from the site. It is what a clinical reviewer reads to decide whether the component is safe, it is what an AI answer engine quotes, and no general-purpose library can write it.</p>
+  </div>
+</div>
+</div></div>
+
+<div class="wrap"><div class="reading">
+<h3 class="sub">The voice, which should not change</h3>
+<p>Short declaratives. Concrete clinical nouns. No hedging, no marketing verbs, and a willingness to
+say what the component <em>refuses</em> to do. <em>“An annotated wrong number still gets read as a
+number.”</em> — that sentence does more work than a paragraph of features, and it is already on the
+site.</p>
+
+<div class="grid g2" style="margin-top:1.5rem;">
+  <div class="card"><span class="u-label">Keep doing</span>
+    <h4>Naming the hazard, not the feature</h4>
+    <p>“The hazard is the reader's memory of it.” Every safety claim on this site is framed as the
+      specific bad outcome it prevents. That is what a clinical reviewer is scanning for.</p></div>
+  <div class="card"><span class="u-label">Stop doing</span>
+    <h4>Stacking four hazards into one sentence</h4>
+    <p>The rhythm is excellent and the density defeats it. One hazard per sentence; the list is
+      already doing the accumulating.</p></div>
+</div>
+
+<div class="note"><span class="u-label">A house rule worth writing down</span>
+<strong>Nothing on a component page may claim a behaviour that no test asserts.</strong> The site
+already lives by this; making it explicit is what lets the accessibility section print a test name
+beside every claim, which is the single most credible thing a documentation page can do.</div>
+</div></div>
+</section>
+<section class="sec" id="s9" aria-labelledby="h9"><div class="wrap"><div class="sec-head"><span class="sec-num">09</span><div><span class="kicker">So it stays fixed</span><h2 id="h9">Generate it, don't write it</h2></div></div>
+<div class="reading">
+<p class="lede">Everything above is undone within a year if the pages stay hand-written. The
+machinery to prevent that is already half-built.</p>
+
+<div class="note"><span class="u-label">What already exists</span>
+<code class="inline">packages/component-meta</code> validates a schema with Zod.
+<code class="inline">scripts/gen/</code> emits six artefacts and <code class="inline">pnpm gen --check</code>
+fails CI when they are stale. Props are already extracted from TypeScript rather than written by hand.
+Every state in the state browser above is already declared in <code class="inline">*.meta.ts</code>.</div>
+
+<h3 class="sub">What the schema needs added</h3>
+</div>
+
+<div class="tw"><table class="wide">
+<thead><tr><th style="width:22%">Field</th><th style="width:14%">Shape</th><th style="width:34%">Feeds</th><th>Gate</th></tr></thead>
+<tbody>
+<tr><td><code class="inline">states[].why</code></td><td class="num">string</td>
+  <td>The sentence under the state browser stage</td><td class="num">required on stable → fail</td></tr>
+<tr><td><code class="inline">states[].group</code></td><td class="num">enum</td>
+  <td>The rail's grouping — present / qualified / absent / layout</td><td class="num">required → fail</td></tr>
+<tr><td><code class="inline">states[].code</code></td><td class="num">string</td>
+  <td>The code panel, and the copy action</td><td class="num">must typecheck → fail</td></tr>
+<tr><td><code class="inline">preview.host</code></td><td class="num">"none" | "chart" | "app"</td>
+  <td>Whether the demo draws a host surface behind the component (§5)</td><td class="num">default "none"</td></tr>
+<tr><td><code class="inline">props[].summary</code></td><td class="num">string</td>
+  <td>The bolded first slot in the API table</td><td class="num">required → fail</td></tr>
+<tr><td><code class="inline">props[].onOmit</code></td><td class="num">string?</td>
+  <td>The “if you omit it” slot</td><td class="num">required when optional</td></tr>
+<tr><td><code class="inline">props[].harm</code></td><td class="num">1 | 2 | 3</td>
+  <td>The harm-if-wrong column on clinical components</td><td class="num">required when clinical</td></tr>
+</tbody></table></div>
+
+<div class="reading">
+<h3 class="sub">And what to delete</h3>
+<p><code class="inline">component-preview.tsx</code>'s <code class="inline">SCENARIOS</code> map — about
+1,900 of its 3,316 lines — becomes data in each component's own metadata file. The fixture constants
+above it mostly move to <code class="inline">@oxygenui-design/fixtures</code>, where several of them
+already have twins.</p>
+
+<div class="note risk"><span class="u-label">The assumption this rests on</span>
+Every consistency guarantee here depends on pages being generated and never hand-written. The first
+component that wants a bespoke section will test it, and the correct answer is to add a schema field
+rather than a page. If that discipline does not hold, most of this stops paying for itself — so it is
+worth naming an owner for the schema before the first exception is requested.</div>
+</div>
+</div></section>
+<section class="sec" id="s10" aria-labelledby="h10"><div class="wrap"><div class="sec-head"><span class="sec-num">10</span><div><span class="kicker">Sequence and cost</span><h2 id="h10">Implementation plan</h2></div></div>
+<div class="reading">
+<p class="lede">Five phases. The first is three days and fixes the thing a client sees. Nothing after
+phase two requires a design decision.</p>
+</div>
+
+<div class="tw"><table class="wide">
+<thead><tr><th style="width:8%">Phase</th><th style="width:26%">Work</th><th style="width:38%">Produces</th><th style="width:12%">Blocks on</th><th>Effort</th></tr></thead>
+<tbody>
+<tr><td class="num"><b>0</b><br/><span class="chip bad">now</span></td>
+  <td>Remove <code class="inline">text-transform: uppercase</code> from fixture names and example
+    labels. Split the opening: summary and install above, rationale below.</td>
+  <td>Fixture names become readable. The demo moves from 962&nbsp;px to roughly 380&nbsp;px on every
+    page at once, with no new components.</td>
+  <td class="num">—</td><td class="num">3 days</td></tr>
+<tr><td class="num"><b>1</b></td>
+  <td>Build the state browser against ResultValue. Wire it to the existing
+    <code class="inline">states[]</code> and the existing preview scenarios.</td>
+  <td>One page that is right. The control, the URL state, the code panel and the copy action.</td>
+  <td class="num">—</td><td class="num">1 week</td></tr>
+<tr><td class="num"><b>2</b></td>
+  <td>Extend the schema with the seven fields in §9. Add <code class="inline">preview.host</code> and
+    the composite demo mode.</td>
+  <td>The browser is fed by metadata rather than by a hand-written map. Composite components get a
+    host surface.</td>
+  <td class="num">phase 1</td><td class="num">2 weeks</td></tr>
+<tr><td class="num"><b>3</b><br/><span class="chip warn">writing</span></td>
+  <td>Write 312 state sentences and 155 missing prop descriptions. Reshape 27 openings to the
+    lead-then-enumerate rule.</td>
+  <td>The content that makes the demo worth looking at. This is the phase that cannot be
+    parallelised or generated.</td>
+  <td class="num">phase 2</td><td class="num">2–3 weeks</td></tr>
+<tr><td class="num"><b>4</b></td>
+  <td>Turn on the gates: required prop summary, required state <code class="inline">why</code>,
+    examples that must typecheck. Grandfather the existing gaps and let the allowlist shrink.</td>
+  <td>It stays fixed. A new component cannot merge under-documented.</td>
+  <td class="num">phase 3</td><td class="num">1 week</td></tr>
+</tbody></table></div>
+
+<div class="reading">
+<div class="note finding"><span class="u-label">The honest bottleneck</span>
+Phase 3 is writing, and it is roughly half the total effort. There is no tool that produces
+<em>“the one absence that is not a gap”</em> — that sentence requires somebody who knows what 42 CFR
+Part 2 does. Budget it as authorship rather than as documentation, and it is the best-value work on
+this plan: it is simultaneously the demo content, the clinical review material, and the passages an
+answer engine will quote.</div>
+
+<h3 class="sub">What to do first, concretely</h3>
+<ol class="steps">
+<li>Delete two <code class="inline">uppercase</code> classes in
+  <code class="inline">app/components/[name]/page.tsx</code> (lines ~650 and ~866). Fixture names become
+  legible on every page immediately.</li>
+<li>Move <code class="inline">{component.rationale}</code> below the preview section and add
+  <code class="inline">{component.summary}</code> above it. One file, and it is the whole of phase 0's
+  visible benefit.</li>
+<li>Pick ResultValue for the state browser prototype — it has 18 states across all four groups, so
+  anything that works there works everywhere.</li>
+</ol>
+</div>
+</div></section>
+<section class="sec" id="s11" aria-labelledby="h11"><div class="wrap"><div class="sec-head"><span class="sec-num">11</span><div><span class="kicker">Do not touch</span><h2 id="h11">What I would not change</h2></div></div>
+<div class="reading">
+<p class="lede">A list of things that are already right, because the fastest way to lose them is a
+redesign that does not know they were decided.</p>
+
+<ul class="tick">
+<li><strong>Anchored sections that never unmount.</strong> They look like tabs and behave like
+  anchors, which keeps find-in-page, deep links and crawlers working. This is a deliberate decision
+  recorded in the codebase and it is correct.</li>
+<li><strong>Props extracted from TypeScript.</strong> A hand-written prop table drifts silently and
+  is then worse than none. The extraction is the reason the types and the docs cannot disagree.</li>
+<li><strong>Structured data serialised from the same metadata the page renders.</strong> A rich result
+  describing a component page that says something else would be worse than no rich result — the code
+  comment saying so should be preserved along with the behaviour.</li>
+<li><strong>The <code class="inline">.instrument</code> bezel around live demos.</strong> It reads as
+  hardware, it is consistent across the site, and the state browser is designed to sit inside it.</li>
+<li><strong>The clinical fixtures.</strong> Okonkwo, Marsh, Boateng, Adeyemi — plausible, diverse,
+  and over-representing the hard states. Every demo in this report reuses them rather than inventing
+  new ones.</li>
+<li><strong>The voice.</strong> §8 reshapes it and adds to it. It does not rewrite it, and neither
+  should anyone else.</li>
+</ul>
+
+<hr/>
+<p style="color:var(--ink-3);font-size:0.875rem;">Measurements taken from the running site at commit
+<code class="inline">ba4543c</code> on 28 August 2026, at a 1,440&nbsp;px viewport. Catalogue counts
+computed from <code class="inline">apps/docs/src/lib/generated/catalog.ts</code> — 27 components, 394
+props, 312 states. The state browser in §4 is live in this document: the rail is radio inputs and
+sibling selectors, no JavaScript, which is also how it is proposed to ship.</p>
+</div>
+</div></section>
+    </main>
+  </div>
+</div>
+<script>
+(function () {
+  var root = document.documentElement;
+
+  /* progress + scrollspy ------------------------------------------------ */
+  var bar = document.getElementById('prog');
+  var links = Array.prototype.slice.call(document.querySelectorAll('[data-rail]'));
+  var secs = links.map(function (a) { return document.getElementById('s' + a.dataset.rail); });
+  var label = document.getElementById('tb-sec');
+  var ticking = false;
+
+  function paint() {
+    ticking = false;
+    var h = document.documentElement.scrollHeight - window.innerHeight;
+    if (bar) bar.style.width = (h > 0 ? (window.scrollY / h) * 100 : 0) + '%';
+    var i = 0;
+    for (var k = 0; k < secs.length; k++) {
+      if (secs[k] && secs[k].getBoundingClientRect().top <= 120) i = k;
+    }
+    links.forEach(function (a, k) {
+      if (k === i) { a.setAttribute('aria-current', 'true'); }
+      else { a.removeAttribute('aria-current'); }
+    });
+    if (label && links[i]) label.textContent = links[i].textContent.replace(/^(\d\d)/, '$1 · ');
+  }
+  function onScroll() { if (!ticking) { ticking = true; requestAnimationFrame(paint); } }
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', onScroll, { passive: true });
+  paint();
+
+  /* rail filter --------------------------------------------------------- */
+  var q = document.getElementById('rail-q');
+  if (q) {
+    q.addEventListener('input', function () {
+      var v = q.value.trim().toLowerCase();
+      links.forEach(function (a) {
+        a.classList.toggle('is-hidden', v !== '' && a.textContent.toLowerCase().indexOf(v) === -1);
+      });
+    });
+  }
+
+  /* theme --------------------------------------------------------------- */
+  var btn = document.getElementById('theme');
+  function stored() { try { return localStorage.getItem('ox-report-theme'); } catch (e) { return null; } }
+  var pref = stored();
+  if (pref === 'dark' || pref === 'light') root.setAttribute('data-theme', pref);
+  function isDark() {
+    var t = root.getAttribute('data-theme');
+    if (t) return t === 'dark';
+    return window.matchMedia('(prefers-color-scheme: dark)').matches;
+  }
+  function syncBtn() { if (btn) btn.textContent = isDark() ? 'Light' : 'Dark'; }
+  syncBtn();
+  if (btn) {
+    btn.addEventListener('click', function () {
+      var next = isDark() ? 'light' : 'dark';
+      root.setAttribute('data-theme', next);
+      try { localStorage.setItem('ox-report-theme', next); } catch (e) {}
+      syncBtn();
+    });
+  }
+
+  /* fit mockups to the column ------------------------------------------- */
+  var frames = Array.prototype.slice.call(document.querySelectorAll('[data-frame]'));
+  function fitOne(f) {
+    var body = f.querySelector('.frame-body') || f.querySelector('.bleed');
+    var mock = body && body.firstElementChild;
+    var btn = f.querySelector('[data-fit]');
+    if (!body || !mock) return;
+    if (btn && btn.getAttribute('aria-pressed') === 'false') {
+      mock.style.removeProperty('--mock-z');
+      return;
+    }
+    /* offsetWidth is measured at zoom 1, so clear before measuring */
+    mock.style.removeProperty('--mock-z');
+    var natural = mock.offsetWidth;
+    var avail = body.clientWidth;
+    if (!natural || !avail) return;
+    var z = Math.min(1, avail / natural);
+    if (z < 1) mock.style.setProperty('--mock-z', z.toFixed(4));
+  }
+  function fitAll() { frames.forEach(fitOne); }
+  frames.forEach(function (f) {
+    var btn = f.querySelector('[data-fit]');
+    if (!btn) return;
+    btn.addEventListener('click', function () {
+      var on = btn.getAttribute('aria-pressed') === 'true';
+      btn.setAttribute('aria-pressed', on ? 'false' : 'true');
+      btn.textContent = on ? '1:1' : 'FIT';
+      fitOne(f);
+    });
+  });
+  fitAll();
+  /* A ResizeObserver on each frame body rather than a window resize listener:
+     the container can go from zero width to real width without the window ever
+     resizing (a hidden pane, a lazily-laid-out tab), and a window listener
+     never fires for that. Observing the container covers both cases. */
+  if (window.ResizeObserver) {
+    var ro = new ResizeObserver(function (entries) {
+      entries.forEach(function (en) {
+        var f = en.target.closest ? en.target.closest('[data-frame]') : null;
+        if (f) fitOne(f);
+      });
+    });
+    frames.forEach(function (f) {
+      var b = f.querySelector('.frame-body') || f.querySelector('.bleed');
+      if (b) ro.observe(b);
+    });
+  } else {
+    var fitTimer;
+    window.addEventListener('resize', function () {
+      clearTimeout(fitTimer);
+      fitTimer = setTimeout(fitAll, 120);
+    }, { passive: true });
+  }
+  if (document.fonts && document.fonts.ready) { document.fonts.ready.then(fitAll); }
+  window.addEventListener('beforeprint', function () {
+    frames.forEach(function (f) {
+      var m = f.querySelector('.frame-body > *') || f.querySelector('.bleed > *');
+      if (m) m.style.removeProperty('--mock-z');
+    });
+  });
+
+  /* tabs ---------------------------------------------------------------- */
+  Array.prototype.forEach.call(document.querySelectorAll('[data-tabs]'), function (wrap) {
+    var tabs = Array.prototype.slice.call(wrap.querySelectorAll('[role="tab"]'));
+    function select(i) {
+      tabs.forEach(function (t, k) {
+        var on = k === i;
+        t.setAttribute('aria-selected', on ? 'true' : 'false');
+        t.tabIndex = on ? 0 : -1;
+        var p = document.getElementById(t.getAttribute('aria-controls'));
+        if (!p) return;
+        if (on) {
+          p.removeAttribute('hidden');
+          /* A hidden panel measures zero, so it was skipped on load. Fit it now
+             that it has a width, or it opens at 1:1 and scrolls sideways. */
+          Array.prototype.forEach.call(p.querySelectorAll('[data-frame]'), fitOne);
+        } else {
+          p.setAttribute('hidden', '');
+        }
+      });
+    }
+    tabs.forEach(function (t, i) {
+      t.tabIndex = t.getAttribute('aria-selected') === 'true' ? 0 : -1;
+      t.addEventListener('click', function () { select(i); });
+      t.addEventListener('keydown', function (e) {
+        var d = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
+        if (!d) return;
+        e.preventDefault();
+        var n = (i + d + tabs.length) % tabs.length;
+        select(n); tabs[n].focus();
+      });
+    });
+  });
+})();
+</script>
+
+</body>
+</html>

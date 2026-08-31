@@ -25,6 +25,8 @@ export default defineComponentMeta({
 
   summary:
     "A floating clinical copilot: a dock above the chart that takes a question and opens into a sourced, auditable thread.",
+
+  tagline: "A chart dock that answers with sources and an audit trail.",
   description:
     "Model-agnostic clinical assistant with mode-level scope contracts, inline source attribution, a deterministic crisis interrupt, and FHIR audit output. The engine and the accessibility behaviour ship as npm packages; this item is the Tailwind skin over them.",
   rationale:

@@ -11,6 +11,8 @@ export default defineComponentMeta({
 
   summary:
     "A multi-chart workspace that makes the active patient unmistakable, because the alternative is eleven identical browser tabs.",
+
+  tagline: "A multi-chart workspace where the active patient is unmistakable.",
   description:
     "Each open chart gets a hue derived from its id, so it is the same colour in every session. Two charts whose names look alike both grow an identifier. Per-chart badges carry the unfinished work, closing is graded rather than binary, and returning after fifteen minutes away re-asserts who the chart belongs to.",
   rationale:

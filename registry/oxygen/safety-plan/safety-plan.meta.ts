@@ -10,6 +10,8 @@ export default defineComponentMeta({
 
   summary:
     "The six steps of the Stanley-Brown Safety Planning Intervention, in order, with the crisis step rendered open and uncloseable.",
+
+  tagline: "Stanley-Brown, six steps, with the crisis step always open.",
   description:
     "A patient-facing safety plan: warning signs, coping, distraction, people to ask, professionals and agencies, and means restriction. The crisis step cannot be collapsed, empty steps say they are unfinished rather than disappearing, and the wording is a patient catalog throughout.",
   rationale:

@@ -55,6 +55,11 @@ export {
 } from "@/lib/oxygen-risk";
 
 export interface RiskIndicatorProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "children"> {
+  /**
+   * The RiskAssessment, with its drivers and the date it was computed. A score cannot render
+   * without them — it is a statistical estimate, not a diagnosis, and undated it is not even
+   * that.
+   */
   assessment: RiskAssessment;
   /** ISO 8601, supplied by the host. The component never reads a clock. */
   now: string;
@@ -68,6 +73,7 @@ export interface RiskIndicatorProps extends Omit<React.HTMLAttributes<HTMLDivEle
   notADiagnosis: string;
   /** How many drivers to show on the face. The rest live in the explanation. */
   driverCount?: number;
+  /** Row height and type scale. Inherited from the nearest density provider when omitted. */
   density?: "compact" | "default";
   /** Opens the model card. See the DSI source-attribute record. */
   onOpenModel?: (assessment: RiskAssessment) => void;
@@ -78,6 +84,10 @@ export interface RiskIndicatorProps extends Omit<React.HTMLAttributes<HTMLDivEle
    * the acknowledgement is the host's to record.
    */
   onAcknowledge?: (assessment: RiskAssessment) => void;
+  /**
+   * Fired when the reader asks for a fresh score. Without it a stale score says it is stale
+   * and offers nothing to do about it.
+   */
   onRecompute?: (assessment: RiskAssessment) => void;
 }
 

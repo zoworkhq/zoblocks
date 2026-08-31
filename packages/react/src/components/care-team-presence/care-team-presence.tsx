@@ -100,6 +100,10 @@ function initials(display: string): string {
 /* ------------------------------------------------------------------ */
 
 export interface PresenceChipProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "children"> {
+  /**
+   * The person and their current state — available, in session, signed out, off shift — with
+   * whoever is covering for them.
+   */
   presence: Presence;
   /** ISO 8601, supplied by the host. Needed for the degraded state's age. */
   now?: string;
@@ -210,9 +214,18 @@ export const PresenceChip = React.forwardRef<HTMLDivElement, PresenceChipProps>(
 /* ------------------------------------------------------------------ */
 
 export interface CoverageCardProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "children"> {
+  /**
+   * Who is covering, and when. Overlaps and gaps are both drawn: a gap in coverage is the fact
+   * a reader is looking for.
+   */
   windows: readonly CoverageWindow[];
   now: string;
+  /**
+   * Who to reach when the primary does not answer. Rendered before it is needed rather than
+   * found during an escalation.
+   */
   backup?: Clinician;
+  /** Fired when the reader pages somebody. The component never contacts anyone itself. */
   onPage?: (clinician: Clinician) => void;
 }
 
@@ -318,11 +331,20 @@ export interface ChartCoPresenceProps extends Omit<
   React.HTMLAttributes<HTMLDivElement>,
   "children"
 > {
+  /**
+   * Who else has this chart open right now. Two people writing the same note is a merge nobody
+   * wins.
+   */
   others: readonly ChartPresence[];
   now?: string;
   /** Opens the other person's draft, read-only. */
   onOpenTheirs?: (other: ChartPresence) => void;
+  /** Fired when the reader asks the current editor to hand over. */
   onRequestHandoff?: (other: ChartPresence) => void;
+  /**
+   * Fired when the reader chooses to write their own addendum instead of waiting. The honest
+   * alternative to a silent overwrite.
+   */
   onSeparateAddendum?: (other: ChartPresence) => void;
 }
 

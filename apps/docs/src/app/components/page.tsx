@@ -8,9 +8,10 @@ import { SiteFooter, SiteHeader } from "@/components/site/chrome";
 import { InstallCommand, RevealRoot } from "@/components/site/interactions";
 
 export const metadata: Metadata = {
-  title: "Components",
+  title: "Components — React healthcare UI library",
   description:
-    "Every Oxygen UI component, with a live preview and the exact install line on each card. Free and MIT licensed, installed one at a time, with the states a demo would skip.",
+    "27 React components for clinical software, typed to FHIR R4. Live preview and install line on every card. MIT licensed, installed one at a time.",
+  alternates: { canonical: "/components" },
 };
 
 export default function ComponentsPage() {
@@ -95,9 +96,23 @@ export default function ComponentsPage() {
 
         <section className="bg-paper-sunk/40">
           <div className="mx-auto max-w-6xl section-minor px-5 sm:px-8">
+            {/*
+              The guard stays; the sentence does not.
+
+              "The catalog is being rebuilt from scratch" described a real state
+              months ago and describes nothing now — 27 components ship. An
+              empty catalogue today would mean the generated module failed to
+              build, which is a broken deploy rather than a product phase, so
+              the copy says that instead of reassuring a reader about a
+              migration that finished.
+            */}
             {CATALOG.length === 0 ? (
               <p className="max-w-xl rounded-2xl border border-dashed border-rule px-6 py-8 text-sm leading-relaxed text-graphite">
-                The catalog is being rebuilt from scratch. Components appear here as each one ships.
+                The catalogue failed to load. This is a build fault, not an empty library —{" "}
+                <a className="underline" href="https://github.com/zoworkhq/oxygenui/issues">
+                  please report it
+                </a>
+                .
               </p>
             ) : (
               <CatalogExplorer catalog={CATALOG} />

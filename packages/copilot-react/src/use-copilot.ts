@@ -46,15 +46,50 @@ import {
 import { useAnnouncer, type Announcer, type AnnouncementMode } from "./use-announcer.js";
 
 export interface UseCopilotOptions {
+  /**
+   * Where answers come from. Targets your endpoint, never a model vendor — there is no
+   * `apiKey` prop and no way to add one.
+   */
   readonly provider: CopilotProvider;
+  /**
+   * The scope contracts. Each declares what it may read, what tools it may call, what it may
+   * output and what risk it carries — enforced in code rather than described in a prompt.
+   */
   readonly modes: readonly CopilotMode[];
+  /** Which mode opens first. Defaults to the first in `modes`. */
   readonly initialModeId?: string;
+  /**
+   * Resolves what the copilot may see for this reader and this patient, returning a redacted
+   * view — so a mode cannot widen its own scope.
+   */
   readonly context?: CopilotContextResolver;
+  /**
+   * The patient this session is about, as a FHIR reference. Stamped on every audit event; a
+   * question asked with no subject is not attributable to a chart.
+   */
   readonly subject?: Reference;
+  /** BCP 47 tag for generated strings and crisis-line selection. */
   readonly locale?: string;
+  /**
+   * Safety checks run over the reader's question and the model's answer before either is
+   * shown. Crisis detection routes to `crisisLines` rather than to a model.
+   */
   readonly classifiers?: SafetyClassifiers;
+  /**
+   * Every question, answer, citation, refusal and escalation as a FHIR AuditEvent. This is the
+   * record that makes the feature defensible; without it the host has an unlogged clinical
+   * assistant.
+   */
   readonly onAudit?: AuditSink;
+  /**
+   * Latency, token counts and refusal reasons, for operating the thing. Deliberately separate
+   * from `onAudit`, which is the clinical record.
+   */
   readonly onTelemetry?: TelemetrySink;
+  /**
+   * Who is asking, and in what role. Decides what `context` resolves and is stamped on every
+   * audit event.
+   */
   readonly actor?: Actor;
   /**
    * Law 5, and the FDA's time-critical clause in criterion 4. When true the
@@ -63,10 +98,19 @@ export interface UseCopilotOptions {
   readonly suppressed?: boolean;
   /** Which surface this is. `patient` throws for every built-in mode. */
   readonly surface?: "clinician" | "patient";
+  /**
+   * How streamed answers reach assistive technology. Token-by-token is unreadable, so the
+   * default announces at sentence boundaries.
+   */
   readonly announcementMode?: AnnouncementMode;
+  /**
+   * Crisis resources by region. Rendered directly and never generated, because a hallucinated
+   * helpline number is the worst output this component could produce.
+   */
   readonly crisisLines?: Readonly<Record<string, readonly CrisisLine[]>>;
   /** Injected for tests. Defaults to real implementations. */
   readonly now?: () => string;
+  /** Injected for tests, so ids are deterministic in snapshots. Defaults to a real generator. */
   readonly newId?: () => string;
 }
 

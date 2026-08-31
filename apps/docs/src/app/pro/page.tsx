@@ -26,7 +26,7 @@ import { StageGate, VisionFilters } from "@/components/pro/stages";
 export const metadata: Metadata = {
   title: "Pro — the Oxygen console",
   description:
-    "A theming console for behavioral health. One brand colour becomes eleven validated steps, a failing theme cannot be published, and every publish ships a stylesheet pinned to a version.",
+    "A theming console for behavioral health. One brand colour becomes eleven contrast-validated steps, and a theme that fails the gate cannot be published.",
   alternates: { canonical: "/pro" },
 };
 
@@ -157,6 +157,53 @@ export default function ProPage() {
             </div>
             <div data-reveal>
               <FeatureBrowser />
+            </div>
+          </div>
+        </section>
+
+        {/* --------------------------------------------------- who it is for */}
+        {/*
+          The page sold a console to the person who would operate it and said
+          nothing to the person who signs for it.
+
+          That was the largest commercial gap on the site: an engineer could
+          evaluate this page and had nothing to forward. Three roles, one
+          sentence each, immediately above the price — because the question a
+          budget holder asks is not what the console does, it is who on their
+          team stops doing something manually.
+        */}
+        <section className="border-b border-rule" id="who">
+          <div className="mx-auto max-w-6xl section-minor px-5 sm:px-8">
+            <h2 className="display-sm text-balance" data-reveal>
+              Who this is for.
+            </h2>
+            <div
+              className="mt-8 grid gap-px overflow-hidden rounded-2xl border border-rule bg-rule md:grid-cols-3"
+              data-reveal
+            >
+              {[
+                {
+                  role: "Design lead",
+                  line: "One brand colour becomes eleven contrast-validated steps. No more hand-picking hex values and hoping.",
+                  proof: "11 steps · every pair checked",
+                },
+                {
+                  role: "Engineering lead",
+                  line: "Publishes a versioned stylesheet. No runtime, no theme provider, no second source of truth in the app.",
+                  proof: "0 runtime dependencies",
+                },
+                {
+                  role: "Whoever signs for it",
+                  line: "Priced per organisation, not per seat. Adding a designer does not change the invoice.",
+                  proof: "No per-seat metering",
+                },
+              ].map((item) => (
+                <div key={item.role} className="bg-paper p-6">
+                  <p className="eyebrow text-graphite">{item.role}</p>
+                  <p className="mt-3 text-sm leading-relaxed text-ink">{item.line}</p>
+                  <p className="numeric mt-4 text-xs text-oxygen-deep">{item.proof}</p>
+                </div>
+              ))}
             </div>
           </div>
         </section>

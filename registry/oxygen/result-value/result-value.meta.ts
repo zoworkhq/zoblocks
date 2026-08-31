@@ -11,6 +11,8 @@ export default defineComponentMeta({
 
   summary:
     "A single observation rendered so that the four ways a number can lie to you are all impossible.",
+
+  tagline: "One observation, rendered so the number cannot mislead.",
   description:
     "Value, unit and interpretation on one line, qualifiers on a second only when they exist. Seven distinct absence reasons instead of an em dash, a stated interpretation that always beats a derived one, a reference range that says so when there isn't one, and a correction that shows the superseded value rather than a badge.",
   rationale:

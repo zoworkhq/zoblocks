@@ -1,5 +1,7 @@
 import type { MetadataRoute } from "next";
+import { BLOCKS } from "@/lib/blocks";
 import { CATALOG } from "@/lib/catalog";
+import { shelf } from "@/lib/marketplace";
 
 /**
  * The sitemap, derived from the catalog rather than listed by hand.
@@ -17,12 +19,40 @@ const SITE = "https://oxygenui.design";
 const STATIC_ROUTES: ReadonlyArray<{ path: string; priority: number }> = [
   { path: "", priority: 1 },
   { path: "/components", priority: 0.9 },
+  { path: "/install", priority: 0.8 },
   { path: "/showcase", priority: 0.7 },
   { path: "/pro", priority: 0.7 },
+  { path: "/enterprise", priority: 0.7 },
+  { path: "/compare", priority: 0.6 },
   { path: "/marketplace", priority: 0.6 },
 ];
 
-export default function sitemap(): MetadataRoute.Sitemap {
+/*
+ * Async, because the marketplace shelf is.
+ *
+ * The component half of this file was already right — derived, not hand-listed,
+ * with priority set by maturity. It just stopped at components: six showcase
+ * blocks and four marketplace packs are statically generated, reachable only by
+ * clicking through an index, and appeared in no sitemap at all. They are among
+ * the most link-worthy pages on the domain and were effectively unlisted.
+ *
+ * `shelf()` can fail — it reaches for a catalogue the console owns. A sitemap
+ * that throws is a sitemap that 500s, so a failure drops the packs and keeps
+ * every other URL rather than taking the whole file down with it.
+ */
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const packs = await shelf()
+    .then((items) =>
+      items.map((item) => ({
+        url: `${SITE}/marketplace/${item.slug}`,
+        changeFrequency: "monthly" as const,
+        priority: 0.5,
+      })),
+    )
+    // A sitemap that throws is a sitemap that 500s. Losing the packs is worth
+    // keeping the other 57 URLs indexable.
+    .catch<MetadataRoute.Sitemap>(() => []);
+
   return [
     ...STATIC_ROUTES.map((route) => ({
       url: `${SITE}${route.path}`,
@@ -37,5 +67,14 @@ export default function sitemap(): MetadataRoute.Sitemap {
       // the least representative page in the library.
       priority: component.status === "stable" ? 0.8 : 0.5,
     })),
+    // Blocks are whole screens rather than parts, which makes them the pages a
+    // reader is most likely to land on from a search for a clinical interface
+    // rather than for a control. They rank above individual components.
+    ...BLOCKS.map((block) => ({
+      url: `${SITE}/showcase/${block.slug}`,
+      changeFrequency: "monthly" as const,
+      priority: 0.7,
+    })),
+    ...packs,
   ];
 }

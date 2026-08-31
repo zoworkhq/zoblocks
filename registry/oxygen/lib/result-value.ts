@@ -23,8 +23,18 @@
  * that knows what an `Observation` is.
  */
 
-import type { ScaleName, StepOf } from "./clinical-status";
-import { fromInterpretation, fromObservationStatus } from "./clinical-status";
+/*
+ * The alias, not a relative path.
+ *
+ * This file installs as `lib/oxygen-result-value.ts` and its sibling installs
+ * as `lib/oxygen-clinical-status.ts` — the registry renames both. A relative
+ * `./clinical-status` resolves here in the monorepo and resolves to nothing in
+ * a consumer's project, so `oxygen add result-value` produced a tree that did
+ * not compile. Every other file in this directory already imports its siblings
+ * by the installed name; this one did not.
+ */
+import type { ScaleName, StepOf } from "@/lib/oxygen-clinical-status";
+import { fromInterpretation, fromObservationStatus } from "@/lib/oxygen-clinical-status";
 
 /* ------------------------------------------------------------------ */
 /* Absence                                                             */

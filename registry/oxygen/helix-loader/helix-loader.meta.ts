@@ -10,6 +10,8 @@ export default defineComponentMeta({
 
   summary:
     "Two strands of dots turning on a slow sine. For the parts of a product that are laboratory rather than bedside.",
+
+  tagline: "Two strands on a slow sine. For the laboratory.",
   description:
     "Loader for genomics, pathology, and diagnostics surfaces. Depth comes from scale and opacity rather than a 3D transform, so the strands cross convincingly while staying cheap to composite.",
   rationale:

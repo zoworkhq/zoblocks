@@ -74,6 +74,32 @@ export async function generateMetadata({
  * whole domain's rich results withdrawn. `TechArticle` was the other
  * candidate and describes the prose rather than the thing the prose is about.
  */
+/**
+ * Split a rationale into its lead sentence and the rest.
+ *
+ * The first sentence of every rationale in this catalogue is the claim — the
+ * line a reader quotes — and the remainder is the evidence for it. Setting the
+ * claim at heading size and the evidence as body turns a 160-word block into
+ * something with a shape, without editing a word of it.
+ *
+ * Deliberately conservative: it splits only on a period followed by whitespace
+ * and something that can open a sentence, and only when the lead lands between
+ * 40 and 220 characters. A rationale that opens with "Dr. Vance" or with one
+ * very long sentence keeps its whole text as the lead, which reads exactly as
+ * it does today rather than wrongly.
+ *
+ * Measured against all 27 rationales in the catalogue: 26 split, with a median
+ * lead of 110 characters and a longest of 196. The one that does not —
+ * `clinical-status` — opens with a genuinely long sentence and is correct to
+ * keep it whole. The backtick in the lookahead is not decoration: `allergy-chip`
+ * opens its second sentence with `criticality`.
+ */
+function leadOf(rationale: string): { lead: string; rest: string } {
+  const match = /^(.{40,220}?[.?!])\s+(?=[A-Z(“"`])/.exec(rationale);
+  if (!match) return { lead: rationale, rest: "" };
+  return { lead: match[1]!, rest: rationale.slice(match[0].length).trim() };
+}
+
 function structuredData(component: ComponentDoc) {
   const seo = component.seo;
   return {
@@ -93,11 +119,138 @@ function structuredData(component: ComponentDoc) {
 }
 
 /**
+ * The trail, for the result page rather than for this one.
+ *
+ * There are no visible breadcrumbs on this site and this does not add any — the
+ * header already carries "All components" and a second trail above the title
+ * would be furniture. What was missing is the machine-readable version, which
+ * changes how the result itself is drawn: without it a component page shows a
+ * bare URL under the title, and with it, the path.
+ */
+function breadcrumbData(component: ComponentDoc) {
+  const slug = component.seo?.slug ?? component.name;
+  return {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Oxygen UI", item: "https://oxygenui.design" },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "Components",
+        item: "https://oxygenui.design/components",
+      },
+      {
+        "@type": "ListItem",
+        position: 3,
+        name: component.title,
+        item: `https://oxygenui.design/components/${slug}`,
+      },
+    ],
+  };
+}
+
+/**
+ * The accessibility section, as questions and answers.
+ *
+ * These are not written for the schema — they are already on the page, and they
+ * were already answers to implicit questions: which keys move focus, what a
+ * screen reader announces, what survives forced colours. Marking them up costs
+ * no authoring and gives an answer engine the one structure it quotes verbatim.
+ *
+ * Returns `null` rather than an empty FAQPage when a component has no
+ * accessibility notes. An FAQPage with zero questions is a structured-data
+ * error, and emitting one on the components that need it least is a good way to
+ * lose rich results on the ones that need it most.
+ */
+function faqData(component: ComponentDoc) {
+  const notes = component.accessibility ?? [];
+  if (notes.length === 0) return null;
+
+  return {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: notes.slice(0, 10).map((note) => ({
+      "@type": "Question",
+      // The label is written as an assertion ("Every trigger is a real button"),
+      // so it is prefixed with the component to read as a question about this
+      // component rather than as a claim floating free of its subject.
+      name: `${component.title}: ${note.label}`,
+      acceptedAnswer: { "@type": "Answer", text: note.detail },
+    })),
+  };
+}
+
+/**
  * Read the component's source from the generated registry JSON rather than
  * from the .tsx file directly. The registry is what customers actually
  * receive, so documenting it guarantees the page can never show source that
  * differs from what `oxygen add` installs.
  */
+/**
+ * What this component weighs, gzipped, including everything installed with it.
+ *
+ * "How big is it" is the most common question asked of any component library
+ * and this site did not answer it once — the hero claimed `Runtime: 0` with no
+ * figure anywhere behind it.
+ *
+ * The walk over `registryDependencies` is the whole point. A first version
+ * measured only the component's own file and reported Date Picker at 3.0 KB,
+ * which is true of `date-picker.tsx` and badly false about installing it: the
+ * control is a thin switch over `datetime-core`, and `oxygen add date-picker`
+ * copies that too. A number that shrinks the more work you move into a shared
+ * module is worse than no number.
+ *
+ * It is the gzipped size of the source the CLI copies — a ceiling, not a bundle
+ * delta. Nothing is imported from a package at runtime, so there is no bundle
+ * to measure; the code lands in your app and is minified, tree-shaken and
+ * deduplicated with everything around it. Labelled "installed", never "bundle
+ * size", because those are different claims.
+ */
+async function readRegistryWeight(
+  name: string,
+): Promise<{ gzip: number; files: number; shared: number } | undefined> {
+  const dir = path.join(process.cwd(), "public", "r");
+
+  const read = async (id: string) => {
+    try {
+      return JSON.parse(await readFile(path.join(dir, `${id}.json`), "utf8"));
+    } catch {
+      return undefined;
+    }
+  };
+
+  const root = await read(name);
+  if (!root) return undefined;
+
+  // Breadth-first with a seen set: `utils` and `tokens` are depended on by
+  // nearly everything, and counting them once per path would inflate a
+  // component with four dependencies into one with eleven.
+  const seen = new Set<string>([name]);
+  const queue: string[] = [...(root.registryDependencies ?? [])];
+  const bodies: string[] = (root.files ?? []).map((f: { content?: string }) => f.content ?? "");
+  let files = (root.files ?? []).length;
+  let shared = 0;
+
+  while (queue.length) {
+    const id = queue.shift()!;
+    if (seen.has(id)) continue;
+    seen.add(id);
+    const item = await read(id);
+    if (!item) continue;
+    shared += 1;
+    files += (item.files ?? []).length;
+    for (const f of item.files ?? []) bodies.push(f.content ?? "");
+    queue.push(...(item.registryDependencies ?? []));
+  }
+
+  const body = bodies.join("");
+  if (!body) return undefined;
+
+  const { gzipSync } = await import("node:zlib");
+  return { gzip: gzipSync(Buffer.from(body)).byteLength, files, shared };
+}
+
 async function readRegistrySource(name: string): Promise<string | undefined> {
   try {
     const file = path.join(process.cwd(), "public", "r", `${name}.json`);
@@ -145,6 +298,8 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
 
   const source = await readRegistrySource(name);
   const related = component.related.map(getComponent).filter(Boolean);
+  const faq = faqData(component);
+  const weight = await readRegistryWeight(name);
 
   /*
    * Every entry here is conditional on the section it points at, `related`
@@ -189,6 +344,7 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
 
   const railSections: RailSection[] = [
     { id: "preview", label: "Preview" },
+    { id: "why", label: "Why it exists" },
     ...(playable ? [{ id: "playground", label: "Playground" }] : []),
     ...(variants.length ? [{ id: "variants", label: "Variants" }] : []),
     ...(component.usage ? [{ id: "usage", label: "Usage & props" }] : []),
@@ -215,6 +371,16 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
           // says something else is worse than no rich result.
           dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData(component)) }}
         />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbData(component)) }}
+        />
+        {faq ? (
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(faq) }}
+          />
+        ) : null}
 
         {/* Header ------------------------------------------------------- */}
         <section className="border-b border-rule">
@@ -253,30 +419,40 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
               <span className="text-graphite-soft">{component.categories.join(" · ")}</span>
             </p>
 
-            <p className="lede mt-6 max-w-3xl text-pretty">{component.rationale}</p>
-
             {/*
-              Which elements the component reads, and what it does with them.
-              Visible text rather than a `title` tooltip: this is the detail an
-              integrator checks their own feed against, and a tooltip is
-              unreachable by keyboard, invisible on touch, and unsearchable.
+              The summary goes here; the rationale goes below the preview.
 
-              Six components wrote these notes before the schema had a field
-              for them — zod dropped the key and nothing said so, which is why
-              the page showed a bare resource name for a year.
+              Three of the four people who open this page are looking rather
+              than reading, and the fourth quotes a passage that works as well
+              under a demo as over one. Leading with the rationale put the
+              component 962px down the page — past the fold on every laptop —
+              so a client in a demo call met a paragraph instead of the product.
+              The prose is not cut; it is moved and given a lead line.
             */}
-            {component.fhir.some((resource) => resource.note) ? (
-              <dl className="mt-6 max-w-3xl space-y-2 border-l-2 border-rule pl-4 text-sm">
-                {component.fhir
-                  .filter((resource) => resource.note)
-                  .map((resource) => (
-                    <div key={resource.url} className="flex flex-wrap gap-x-2">
-                      <dt className="numeric font-medium text-ink">{resource.name}</dt>
-                      <dd className="flex-1 text-graphite">{resource.note}</dd>
-                    </div>
-                  ))}
-              </dl>
-            ) : null}
+            <p className="lede mt-6 max-w-3xl text-pretty">{component.summary}</p>
+
+            {/* Facts a reader scans for before deciding to read anything. */}
+            <p className="numeric mt-4 flex flex-wrap items-center gap-x-3 gap-y-1 text-[0.6875rem] uppercase tracking-wide text-graphite-soft">
+              <span>{component.states.length} states</span>
+              <span aria-hidden="true">·</span>
+              <span>{component.props.length} props</span>
+              {weight ? (
+                <>
+                  <span aria-hidden="true">·</span>
+                  <span
+                    title={`Gzipped source copied by \`oxygen add\`: ${weight.files} files across this component and ${weight.shared} shared registry modules. A ceiling, not a bundle delta.`}
+                  >
+                    {(weight.gzip / 1024).toFixed(1)} KB installed
+                  </span>
+                </>
+              ) : null}
+              {component.since ? (
+                <>
+                  <span aria-hidden="true">·</span>
+                  <span>since {component.since}</span>
+                </>
+              ) : null}
+            </p>
 
             <div className="mt-8 max-w-2xl">
               {/*
@@ -358,20 +534,16 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
               {component.name === "switch" ? (
                 <SwitchGallery />
               ) : (
-                <ComponentPreview name={component.name} />
+                <ComponentPreview name={component.name} states={component.states} />
               )}
             </div>
 
-            <div className="mt-6 flex flex-wrap gap-2" data-reveal>
-              {component.states.map((state) => (
-                <span
-                  key={state}
-                  className="rounded-full border border-rule bg-paper px-2.5 py-1 text-xs text-graphite"
-                >
-                  {state}
-                </span>
-              ))}
-            </div>
+            {/*
+              The declared states are rendered by the preview itself, which is
+              the only place that knows whether it had scenarios to show. Two
+              lists of the same eighteen strings, one under the other, was the
+              shape this page had before.
+            */}
           </div>
 
           {/*
@@ -442,6 +614,50 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
               </div>
             </div>
           )}
+        </section>
+
+        {/* Why it exists ------------------------------------------------ */}
+        {/*
+          The rationale, under the thing it is describing.
+
+          It keeps every word it had at the top of the page. What it gains is a
+          lead line: the first sentence is lifted to display size because it is
+          the sentence a reader quotes, and the remainder reads as argument
+          rather than as a wall. `leadOf` splits on the first sentence boundary
+          and falls back to the whole string when there is no clean one.
+        */}
+        <section id="why" className="scroll-mt-24 border-b border-rule">
+          <div className="mx-auto max-w-6xl section-minor px-5 sm:px-8">
+            <SectionHeading eyebrow="Why it exists" title={leadOf(component.rationale).lead} />
+            {leadOf(component.rationale).rest ? (
+              <p
+                className="mt-6 max-w-3xl text-pretty text-[1.0625rem] leading-relaxed text-graphite"
+                data-reveal
+              >
+                {leadOf(component.rationale).rest}
+              </p>
+            ) : null}
+
+            {/* Which elements the component reads, and what it does with them.
+                Visible text rather than a `title` tooltip: this is the detail an
+                integrator checks their own feed against, and a tooltip is
+                unreachable by keyboard, invisible on touch, and unsearchable. */}
+            {component.fhir.some((resource) => resource.note) ? (
+              <dl
+                className="mt-8 max-w-3xl space-y-2 border-l-2 border-rule pl-4 text-sm"
+                data-reveal
+              >
+                {component.fhir
+                  .filter((resource) => resource.note)
+                  .map((resource) => (
+                    <div key={resource.url} className="flex flex-wrap gap-x-2">
+                      <dt className="numeric font-medium text-ink">{resource.name}</dt>
+                      <dd className="flex-1 text-graphite">{resource.note}</dd>
+                    </div>
+                  ))}
+              </dl>
+            ) : null}
+          </div>
         </section>
 
         {/* Playground --------------------------------------------------- */}
@@ -575,45 +791,76 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
                       than hearing an unnamed focus stop. This became a real
                       violation the moment the props table started listing the
                       full API instead of one prop. */}
-                      <div
-                        className="scroll-thin overflow-x-auto rounded-2xl border border-rule bg-paper"
-                        tabIndex={0}
-                        role="group"
-                        aria-label={`${name} props — scrollable table`}
-                      >
-                        <table className="w-full border-collapse text-sm">
-                          <caption className="sr-only">{name} props</caption>
-                          <thead>
-                            <tr className="border-b border-rule bg-paper-sunk">
-                              <Th>Prop</Th>
-                              <Th>Type</Th>
-                              <Th>Default</Th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {exportProps.map((prop) => (
-                              <tr key={prop.name} className="border-b border-rule last:border-b-0">
-                                <td className="px-4 py-3 align-top">
-                                  <span className="numeric text-xs font-medium text-ink">
-                                    {prop.name}
+                      {/*
+                        A stacked list, not a table.
+
+                        It was a four-column table and it was clipping. Table
+                        layout gives a column the width its content asks for,
+                        and `variant` on DatePicker asks for eleven string
+                        literals — about 300 characters. The type column took
+                        the row and "What it does" was squeezed to roughly one
+                        character per line: a column of single letters running
+                        down the page, with a horizontal scrollbar under it.
+
+                        No column width can fix that, because the problem is
+                        that a TypeScript union and a sentence do not belong
+                        side by side. So the name stays in its own column and
+                        stays scannable, and the type and the description each
+                        get the full remaining width, stacked. Nothing clips,
+                        nothing scrolls sideways, and the scroll region that
+                        used to need `tabIndex={0}` to satisfy WCAG 2.1.1 is
+                        gone rather than patched.
+                      */}
+                      <dl className="divide-y divide-rule overflow-hidden rounded-2xl border border-rule bg-paper">
+                        {exportProps.map((prop) => (
+                          <div
+                            key={prop.name}
+                            className="grid gap-x-8 gap-y-2 px-5 py-4 sm:grid-cols-[minmax(8rem,13rem)_minmax(0,1fr)]"
+                          >
+                            {/* `min-w-0` on both tracks: without it a long
+                                union expands the grid track instead of
+                                wrapping inside it, which is the same bug the
+                                table had, one layout system later. */}
+                            <dt className="min-w-0">
+                              <span className="numeric break-words text-xs font-medium text-ink">
+                                {prop.name}
+                              </span>
+                              {prop.required ? (
+                                <span className="numeric ml-1.5 text-[0.5625rem] uppercase tracking-wider text-critical">
+                                  req
+                                </span>
+                              ) : null}
+                              {prop.default ? (
+                                <span className="numeric mt-1 block text-[0.6875rem] text-graphite-soft">
+                                  = {prop.default}
+                                </span>
+                              ) : null}
+                            </dt>
+
+                            <dd className="min-w-0">
+                              <p className="numeric break-words text-xs leading-relaxed text-oxygen-deep">
+                                {prop.type}
+                              </p>
+                              {/*
+                                An undocumented public prop is stated as one
+                                rather than left blank — a blank reads as
+                                "nothing to say about this". None are in that
+                                state today; the branch stays for the next
+                                prop somebody adds in a hurry.
+                              */}
+                              <p className="mt-2 max-w-prose text-xs leading-relaxed text-graphite">
+                                {prop.description ? (
+                                  prop.description
+                                ) : (
+                                  <span className="italic text-graphite-soft">
+                                    Not yet documented.
                                   </span>
-                                  <p className="mt-1 text-xs leading-relaxed text-graphite">
-                                    {prop.description}
-                                  </p>
-                                </td>
-                                <td className="px-4 py-3 align-top">
-                                  <span className="numeric text-xs text-oxygen-deep">
-                                    {prop.type}
-                                  </span>
-                                </td>
-                                <td className="numeric px-4 py-3 align-top text-xs text-graphite-soft">
-                                  {prop.default ?? "—"}
-                                </td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      </div>
+                                )}
+                              </p>
+                            </dd>
+                          </div>
+                        ))}
+                      </dl>
                     </div>
                   ))}
                 </div>
@@ -626,14 +873,27 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
         {examples.length > 0 && (
           <section id="examples" className="scroll-mt-24 border-b border-rule bg-paper-sunk/40">
             <div className="mx-auto max-w-6xl section-minor px-5 sm:px-8">
-              <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
-                <SectionHeading eyebrow="Examples" title="The cases worth copying." />
-                {(component.fixtures ?? []).length > 0 && (
-                  <p className="numeric shrink-0 text-xs text-graphite-soft">
-                    DATA / {(component.fixtures ?? []).join(", ")}
-                  </p>
-                )}
-              </div>
+              <SectionHeading eyebrow="Examples" title="The cases worth copying." />
+              {/*
+                Under the heading rather than beside it.
+
+                These are identifiers, not a caption: seven of them set in mono
+                are wider than the heading they were sharing a row with, and
+                `shrink-0` on a flex row meant the heading gave up its width
+                instead — "The cases worth copying." broke to one word a line.
+                They also keep their camel case now, because uppercasing
+                `observationPotassiumCritical` is what made it unreadable.
+              */}
+              {(component.fixtures ?? []).length > 0 && (
+                <p className="mt-4 flex flex-wrap items-baseline gap-x-2 gap-y-1 text-xs text-graphite-soft">
+                  <span className="numeric uppercase tracking-wide">Data</span>
+                  {(component.fixtures ?? []).map((fixture) => (
+                    <code key={fixture} className="font-mono tracking-normal">
+                      {fixture}
+                    </code>
+                  ))}
+                </p>
+              )}
 
               <div className="mt-8 space-y-8">
                 {examples.map((example, index) => (
@@ -646,10 +906,14 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
                       <h3 className="font-display text-lg font-semibold tracking-tight">
                         {example.title}
                       </h3>
+                      {/* No `uppercase` here. These are identifiers a reader
+                          types, and the camel case is the only thing making
+                          `observationPotassiumCritical` legible — uppercasing it
+                          produces OBSERVATIONPOTASSIUMCRITICAL, which is a wall. */}
                       {example.fixture && (
-                        <span className="numeric text-[0.625rem] uppercase tracking-wide text-graphite-soft">
+                        <code className="font-mono text-[0.6875rem] tracking-normal text-graphite-soft">
                           {example.fixture}
-                        </span>
+                        </code>
                       )}
                     </div>
                     <p className="mt-2 max-w-3xl text-sm leading-relaxed text-graphite">
