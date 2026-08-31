@@ -79,6 +79,9 @@
    Shipped as styles/oxygen-palette.css by `palette-core`. */
 @import "../../../../registry/oxygen/lib/palette.css";
 
+/* ChartContextMenu. Shipped as styles/oxygen-menu.css by `menu-core`. */
+@import "../../../../registry/oxygen/lib/menu.css";
+
 /* The rail, the coverage footer and the two-column register split. Shipped as
    styles/oxygen-timeline.css by the `timeline-core` registry item, carrying
    Timeline and CareTimeline between them.

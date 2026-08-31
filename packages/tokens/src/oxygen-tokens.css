@@ -512,6 +512,13 @@
   --ox-datetime-gap: var(--ox-density-gap);
   --ox-datetime-font: var(--ox-density-font);
   --ox-datetime-duration: var(--ox-density-duration);
+  --ox-menu-bg: var(--ox-surface-overlay);
+  --ox-menu-border: var(--ox-border);
+  --ox-menu-subject-bg: var(--ox-bg-muted);
+  --ox-menu-subject-border: var(--ox-border);
+  --ox-menu-row-hover-bg: var(--ox-bg-muted);
+  --ox-menu-sep: var(--ox-border);
+  --ox-menu-radius: var(--ox-radius-lg);
 }
 
   /* Brand — northwind ---------------------------------------------------
@@ -861,6 +868,13 @@
   --ox-datetime-chip-on-bg: var(--ox-accent);
   --ox-datetime-chip-on-fg: var(--ox-text-on-accent);
   --ox-datetime-cell-radius: var(--ox-radius-sm);
+  --ox-menu-bg: var(--ox-surface-overlay);
+  --ox-menu-border: var(--ox-border);
+  --ox-menu-subject-bg: var(--ox-bg-muted);
+  --ox-menu-subject-border: var(--ox-border);
+  --ox-menu-row-hover-bg: var(--ox-bg-muted);
+  --ox-menu-sep: var(--ox-border);
+  --ox-menu-radius: var(--ox-radius-lg);
 }
 
 /* dark
@@ -1104,6 +1118,13 @@
   --ox-datetime-chip-on-bg: var(--ox-accent);
   --ox-datetime-chip-on-fg: var(--ox-text-on-accent);
   --ox-datetime-cell-radius: var(--ox-radius-sm);
+  --ox-menu-bg: var(--ox-surface-overlay);
+  --ox-menu-border: var(--ox-border);
+  --ox-menu-subject-bg: var(--ox-bg-muted);
+  --ox-menu-subject-border: var(--ox-border);
+  --ox-menu-row-hover-bg: var(--ox-bg-muted);
+  --ox-menu-sep: var(--ox-border);
+  --ox-menu-radius: var(--ox-radius-lg);
 }
 
 /* high-contrast
@@ -1346,6 +1367,13 @@
   --ox-datetime-chip-on-bg: var(--ox-accent);
   --ox-datetime-chip-on-fg: var(--ox-text-on-accent);
   --ox-datetime-cell-radius: var(--ox-radius-sm);
+  --ox-menu-bg: var(--ox-surface-overlay);
+  --ox-menu-border: var(--ox-border);
+  --ox-menu-subject-bg: var(--ox-bg-muted);
+  --ox-menu-subject-border: var(--ox-border);
+  --ox-menu-row-hover-bg: var(--ox-bg-muted);
+  --ox-menu-sep: var(--ox-border);
+  --ox-menu-radius: var(--ox-radius-lg);
 }
 
 /* Reduced motion. Clinical surfaces must remain fully usable without it. */

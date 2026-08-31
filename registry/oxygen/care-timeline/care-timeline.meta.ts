@@ -107,6 +107,7 @@ export default defineComponentMeta({
     "accordion",
     "result-value",
     "date-picker",
+    "chart-context-menu",
   ],
 
   dependencies: ["clsx", "tailwind-merge"],

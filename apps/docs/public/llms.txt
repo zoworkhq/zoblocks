@@ -90,6 +90,11 @@ Rules that matter when generating code with these components:
   fhir: Patient, Task
   states: Empty, before anything is typed, Actions ranked above records, A verb waiting for its argument, A significant action, first Enter, An action that cannot run, Out-of-scope patients, counted, Break-glass unavailable to this role, Nothing matches, Grouped results, Keyboard navigation, Frequency weighting, Every match named, with no scope
   status: stable
+- [Chart Context Menu](https://oxygenui.design/components/chart-context-menu): A context menu that names what it is about before it offers to change it, ranks verbs by consequence, and counts the actions it withholds.
+  install: npx @oxygenui-design/cli add chart-context-menu
+  fhir: Patient, MedicationRequest, Observation, DocumentReference, AuditEvent
+  states: Routine actions only, A recorded action, saying what it writes, A clinical action, first activation, A clinical action, second step, A disclosure, reasons offered, Unavailable, with the reason in place, Withheld by policy, counted, An availability check still pending, A masked subject, A multiple selection, Checkbox and radio view state, A submenu, This record supports no actions, Every action withheld from this role
+  status: beta
 - [Chart Header](https://oxygenui.design/components/chart-header): Persistent patient context that collapses to a safety bar rather than to a name, and never renders administrative gender beside a dose.
   install: npx @oxygenui-design/cli add chart-header
   fhir: Patient, Encounter, EpisodeOfCare

@@ -60,6 +60,7 @@ import { PresenceChip } from "@/registry/oxygen/care-team-presence/care-team-pre
 import { ChartHeader } from "@/registry/oxygen/chart-header/chart-header";
 import { RecentPatientStack } from "@/registry/oxygen/recent-patient-stack/recent-patient-stack";
 import { ChartCommandPalette } from "@/registry/oxygen/chart-command-palette/chart-command-palette";
+import { ContextMenuArt } from "@/components/site/context-menu-demo";
 import { IdentityProvider, PatientChip, IdentitySet } from "@oxygenui-design/identity";
 import { STATUS_LABEL, type ComponentDoc } from "@/lib/catalog";
 import { AcquireAction, PriceTag } from "@/components/site/acquire";
@@ -329,6 +330,7 @@ const PREVIEW: Record<string, (featured: boolean) => React.ReactNode> = {
    * sit in — `contain: layout paint` makes the stage its containing block —
    * rather than letting it cover the page it is being read on.
    */
+  "chart-context-menu": (featured) => <ContextMenuArt featured={featured} />,
   "chart-command-palette": (featured) => (
     <div
       style={{
