@@ -25,7 +25,6 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 
 import { LoaderShowcase } from "@/components/site/loader-showcase";
-import { CopilotHomeDemo } from "@/components/site/component-preview";
 import { SignatureDrawing } from "@/components/site/signature-showcase";
 import { LiveSwitch } from "@/components/site/switch-gallery";
 import { Tabs } from "@oxygenui-design/tabs";
@@ -272,15 +271,6 @@ const FEATURED: readonly Featured[] = [
     facts: ["14 variants", "8 keystrokes, no calendar", "RFC 5545 recurrence"],
     demo: () => <DateDemo />,
   },
-  {
-    slug: "copilot",
-    name: "Copilot",
-    resource: "AuditEvent",
-    claim:
-      "It answers with its sources attached, names what it was not allowed to read, and refuses rather than guesses.",
-    facts: ["12 states", "Cites or declines", "Every read audited"],
-    demo: () => <CopilotHomeDemo />,
-  },
 ];
 
 /* ------------------------------------------------------------------ */
@@ -391,7 +381,7 @@ export function HomeFeatured({ total }: { total: number }) {
             The library
           </p>
           <h2 className="display-lg mt-4 text-balance" data-reveal>
-            Six components, at the size you would actually use them.
+            Five components, at the size you would actually use them.
           </h2>
           <p className="lede mt-5 max-w-2xl text-pretty" data-reveal>
             Every one below is the real component, running. Operate it — type into the date field,

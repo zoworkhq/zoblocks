@@ -17,9 +17,12 @@ import { InstallCommand, RevealRoot } from "@/components/site/interactions";
 import { SectionRail, type RailSection } from "@/components/site/section-rail";
 import { Playground } from "@/components/site/playground";
 import { hasPlayground } from "@/components/site/playground-registry";
+import { isReady } from "@/lib/readiness";
 
 export function generateStaticParams() {
-  return CATALOG.map((component) => ({ name: component.name }));
+  return CATALOG.filter((component) => isReady(component.name)).map((component) => ({
+    name: component.name,
+  }));
 }
 
 export async function generateMetadata({
@@ -29,7 +32,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { name } = await params;
   const component = getComponent(name);
-  if (!component) return {};
+  if (!component || !isReady(name)) return {};
 
   /*
    * An authored title wins over the derived one.
@@ -264,10 +267,16 @@ function frameworkNote(component: ComponentDoc): string {
 export default async function ComponentPage({ params }: { params: Promise<{ name: string }> }) {
   const { name } = await params;
   const component = getComponent(name);
-  if (!component) notFound();
+  if (!component || !isReady(name)) notFound();
 
   const source = await readRegistrySource(name);
-  const related = component.related.map(getComponent).filter(Boolean);
+  /*
+   * Related and alternative links point at pages; an unfinished component has
+   * none, so it is dropped rather than rendered as a link into a 404.
+   */
+  const related = component.related
+    .map(getComponent)
+    .filter((entry) => Boolean(entry) && isReady(entry!.name));
   const weight = await readRegistryWeight(name);
 
   /*
@@ -982,7 +991,8 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
               {alternatives.length > 0 && (
                 <ul className="mt-6 space-y-2" data-reveal>
                   {alternatives.map((alternative: Alternative) => {
-                    const target = getComponent(alternative.ref);
+                    const found = getComponent(alternative.ref);
+                    const target = found && isReady(found.name) ? found : undefined;
                     return (
                       <li key={alternative.ref} className="text-sm leading-relaxed text-graphite">
                         Use{" "}
@@ -1054,7 +1064,13 @@ function SectionHeading({ eyebrow, title }: { eyebrow: string; title: string }) 
   );
 }
 
-/** A labelled row of links to other components, or nothing when empty. */
+/**
+ * A labelled row of other components, or nothing when empty.
+ *
+ * Built-with and used-in name real relationships, so an unfinished component
+ * is still worth naming — it is part of how this one is put together. It just
+ * is not a link, because there is no page behind it yet.
+ */
 function ComponentLinks({ label, names }: { label: string; names: readonly string[] }) {
   if (!names.length) return null;
   return (
@@ -1065,14 +1081,19 @@ function ComponentLinks({ label, names }: { label: string; names: readonly strin
       <dd className="mt-1 flex flex-wrap gap-x-3 gap-y-1 text-sm text-graphite">
         {names.map((name) => {
           const target = getComponent(name);
-          return (
+          const label = target?.title ?? name;
+          return isReady(name) ? (
             <Link
               key={name}
               href={`/components/${name}`}
               className="underline decoration-rule-strong underline-offset-4 hover:text-ink hover:decoration-oxygen"
             >
-              {target?.title ?? name}
+              {label}
             </Link>
+          ) : (
+            <span key={name} className="text-graphite-soft">
+              {label}
+            </span>
           );
         })}
       </dd>

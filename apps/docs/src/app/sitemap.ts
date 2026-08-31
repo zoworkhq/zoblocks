@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 import { BLOCKS } from "@/lib/blocks";
 import { CATALOG } from "@/lib/catalog";
+import { isReady } from "@/lib/readiness";
 import { shelf } from "@/lib/marketplace";
 
 /**
@@ -58,7 +59,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "weekly" as const,
       priority: route.priority,
     })),
-    ...CATALOG.map((component) => ({
+    ...CATALOG.filter((component) => isReady(component.name)).map((component) => ({
       url: `${SITE}/components/${component.seo?.slug ?? component.name}`,
       changeFrequency: "monthly" as const,
       // Stable components are the ones worth landing on. An experimental

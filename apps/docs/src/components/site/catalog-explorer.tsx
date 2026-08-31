@@ -28,17 +28,7 @@ import { ChevronDown, Search, X } from "lucide-react";
 import type { ComponentDoc } from "@/lib/catalog";
 import { ComponentCard } from "@/components/site/component-card";
 import { cn } from "@/lib/utils";
-
-/**
- * The lead cells.
- *
- * Two, and they carry the argument rather than the alphabet: the signature
- * wait, and the component that refuses to render a trend it cannot justify.
- * They lose their span as soon as a filter is on — a "start here" cell inside
- * a filtered result set is a recommendation about a question the reader has
- * already narrowed past.
- */
-const FEATURED = ["pulse-loader", "trend-indicator"];
+import { isReady, readyRank } from "@/lib/readiness";
 
 type Facet = { id: string; label: string; count: number };
 
@@ -122,21 +112,16 @@ export function CatalogExplorer({ catalog }: { catalog: readonly ComponentDoc[] 
   const filtering = Boolean(term || category || status);
 
   /*
-   * Featured cells lead only in the unfiltered view.
+   * Finished components lead, in the order `readiness.ts` declares.
    *
-   * They are also interleaved rather than stacked: two double-width cells side
-   * by side is a banner, and a banner at the top of a catalogue is the thing
-   * readers scroll past to reach the catalogue.
+   * This replaced a pair of double-width "Start here" cells interleaved into
+   * the grid. One of them was Trend Indicator, which is not finished — a
+   * banner recommending a card that cannot be opened. The sequence carries the
+   * emphasis now, so nothing needs to span two columns to earn attention.
    */
   const ordered = React.useMemo(() => {
     if (filtering) return filtered;
-    const featured = FEATURED.map((name) => filtered.find((c) => c.name === name)).filter(
-      (c): c is ComponentDoc => Boolean(c),
-    );
-    const rest = filtered.filter((component) => !FEATURED.includes(component.name));
-    return [featured[0], rest[0], featured[1], rest[1], ...rest.slice(2)].filter(
-      (c): c is ComponentDoc => Boolean(c),
-    );
+    return [...filtered].sort((a, b) => readyRank(a.name) - readyRank(b.name));
   }, [filtered, filtering]);
 
   /*
@@ -157,20 +142,21 @@ export function CatalogExplorer({ catalog }: { catalog: readonly ComponentDoc[] 
    */
   const bands = React.useMemo(() => {
     if (filtering) return null;
-    const byName = new Map<string, ComponentDoc[]>();
-    for (const component of ordered) {
-      // The first category that maps to a band. "Clinical" maps to none, which
-      // is what keeps it from swallowing two thirds of the catalogue.
-      const primary =
-        component.categories.map((c) => BAND_OF.get(c)).find(Boolean) ??
-        BAND_ORDER[BAND_ORDER.length - 1]!.name;
-      if (!byName.has(primary)) byName.set(primary, []);
-      byName.get(primary)!.push(component);
-    }
-    return BAND_ORDER.filter((band) => byName.has(band.name)).map((band) => ({
-      ...band,
-      components: byName.get(band.name)!,
-    }));
+    const ready = ordered.filter((component) => isReady(component.name));
+    const soon = ordered.filter((component) => !isReady(component.name));
+    return [
+      ready.length && {
+        name: "Available now",
+        blurb: "Finished, documented, and installable one at a time.",
+        components: ready,
+      },
+      soon.length && {
+        name: "Coming soon",
+        blurb:
+          "Announced rather than hidden. These are in the catalogue so the shape of the library is honest, but they have no page to open yet.",
+        components: soon,
+      },
+    ].filter(Boolean) as Array<{ name: string; blurb: string; components: ComponentDoc[] }>;
   }, [ordered, filtering]);
 
   const clear = () => {
@@ -301,7 +287,7 @@ export function CatalogExplorer({ catalog }: { catalog: readonly ComponentDoc[] 
                     key={component.name}
                     component={component}
                     index={index}
-                    featured={FEATURED.includes(component.name)}
+                    featured={false}
                   />
                 ))}
               </div>
@@ -343,56 +329,6 @@ export function CatalogExplorer({ catalog }: { catalog: readonly ComponentDoc[] 
     </div>
   );
 }
-
-/**
- * The bands, in reading order, each with the sentence that defines it.
- *
- * Merged rather than one band per category. Banding straight on the category
- * data produced ten headings for 27 components, six of which covered one or
- * two cards — a display heading, a blurb and a single card, six times. That
- * fragments the page rather than giving it an outline, which is the opposite
- * of the point.
- *
- * These five cover 3 to 8 components each. A band is worth a heading when a
- * reader could plausibly be looking for "one of those"; below about three it
- * is a list with extra steps.
- *
- * "Clinical" is not a band. It is the first category on 15 of 26 components
- * and describes 17, so it partitions nothing — the FHIR resource on each card
- * already says which components are clinical.
- */
-const BAND_ORDER: ReadonlyArray<{ name: string; blurb: string; categories: readonly string[] }> = [
-  {
-    name: "Clinical data",
-    blurb: "Values, trends and model output, rendered so the qualifier travels with the number.",
-    categories: ["Data Display", "AI"],
-  },
-  {
-    name: "Entry & forms",
-    blurb: "Controls that write to the record, including the ones whose value has a third case.",
-    categories: ["Data Entry", "Forms"],
-  },
-  {
-    name: "Navigation & disclosure",
-    blurb: "Moving through a record, and showing content a reader may not simply be shown.",
-    categories: ["Navigation", "Disclosure"],
-  },
-  {
-    name: "Waiting & feedback",
-    blurb: "Five waits with different meanings, each with a designed still state.",
-    categories: ["Loaders", "Feedback"],
-  },
-  {
-    name: "Patterns & primitives",
-    blurb: "Whole surfaces, and the vocabulary the clinical components are built from.",
-    categories: ["Patterns", "Primitives", "Layout", "Documentation"],
-  },
-];
-
-/** Category → band, derived once from the table above. */
-const BAND_OF = new Map<string, string>(
-  BAND_ORDER.flatMap((band) => band.categories.map((c) => [c, band.name] as const)),
-);
 
 /**
  * One filter, as a native select.

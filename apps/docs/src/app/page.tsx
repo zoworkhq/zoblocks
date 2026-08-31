@@ -90,7 +90,7 @@ function Hero() {
               className="display-2xl enter-blur mt-6 text-balance"
               style={{ "--enter-delay": "180ms" } as React.CSSProperties}
             >
-              The React design system for healthcare.
+              The design system for healthcare.
             </h1>
 
             {/*
@@ -101,10 +101,14 @@ function Hero() {
               knows what the data means" — contained nothing anybody searches
               for, so "React", "components", "FHIR" and "healthcare" needed a
               heading of their own beneath it. This H1 names the category
-              itself, so the second heading has no job left and the terms it was
-              carrying sit in the sentence below. The count is read from the
-              catalogue rather than typed, because a number in a headline is the
-              first thing to go stale.
+              itself, so the second heading has no job left.
+
+              "React" is deliberately not said in the hero. It is still in the
+              page title and the meta description, which is where it was doing
+              the discovery work — a headline is not where a framework name
+              earns its place. The count is read from the catalogue rather than
+              typed, because a number in a headline is the first thing to go
+              stale.
             */}
             <p
               className="body-lg enter mt-6 max-w-xl text-pretty text-graphite"
@@ -120,7 +124,16 @@ function Hero() {
               Source is copied into your repo. Yours to read, audit and change.
             </p>
             <div
-              className="enter mt-8 flex max-w-2xl flex-col gap-3 sm:flex-row sm:items-center"
+              /*
+                Stacked at every width, not just on a phone.
+                
+                Side by side, the command and the button split a 490px column
+                and the command's own box came out at 281px — its code area
+                138px against the 344px the line actually needs. The hero's
+                primary proof read "npx @oxygenui-des…" with the rest behind a
+                scrollbar. Its own row gives it the full column.
+              */
+              className="enter mt-8 flex max-w-2xl flex-col items-start gap-3"
               style={{ "--enter-delay": "390ms" } as React.CSSProperties}
             >
               <InstallCommand

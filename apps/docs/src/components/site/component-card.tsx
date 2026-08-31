@@ -64,6 +64,7 @@ import { IdentityProvider, PatientChip, IdentitySet } from "@oxygenui-design/ide
 import { STATUS_LABEL, type ComponentDoc } from "@/lib/catalog";
 import { AcquireAction, PriceTag } from "@/components/site/acquire";
 import { cn } from "@/lib/utils";
+import { isReady } from "@/lib/readiness";
 
 import { DateField } from "@/registry/oxygen/date-picker/date-picker";
 import { plainDate } from "@/lib/oxygen-datetime";
@@ -991,6 +992,7 @@ export function ComponentCard({
   featured?: boolean;
 }) {
   const preview = PREVIEW[component.name];
+  const ready = isReady(component.name);
 
   return (
     /*
@@ -1016,8 +1018,10 @@ export function ComponentCard({
       data-ox-component-card={component.name}
       style={{ "--reveal-delay": `${(index % 3) * 70}ms` } as React.CSSProperties}
       className={cn(
-        "surface-2 lift group relative flex flex-col overflow-hidden rounded-2xl",
-        "focus-within:border-oxygen/45 hover:border-oxygen/45",
+        "surface-2 group relative flex flex-col overflow-hidden rounded-2xl",
+        ready
+          ? "lift focus-within:border-oxygen/45 hover:border-oxygen/45"
+          : "focus-within:border-oxygen/45",
         // Span only at 3 columns. At 2 columns a span-2 cell after an odd number
         // of standard cards leaves an empty grid slot.
         featured ? "p-6 lg:col-span-2" : "p-5",
@@ -1037,20 +1041,30 @@ export function ComponentCard({
             featured ? "text-xl" : "text-base",
           )}
         >
-          <Link
-            href={`/components/${component.name}`}
-            className="after:absolute after:inset-0 after:content-[''] focus-visible:outline-none"
-          >
-            {component.title}
-          </Link>
+          {/*
+            The overlay is what makes the whole card clickable, so an unfinished
+            component drops the link rather than styling one to look inert: a
+            disabled anchor is still focusable, still announced as a link, and
+            still followed by a keyboard user.
+          */}
+          {ready ? (
+            <Link
+              href={`/components/${component.name}`}
+              className="after:absolute after:inset-0 after:content-[''] focus-visible:outline-none"
+            >
+              {component.title}
+            </Link>
+          ) : (
+            component.title
+          )}
         </h3>
         <span
           className={cn(
             "shrink-0 rounded-full border px-2 py-0.5 font-mono text-[0.625rem] uppercase tracking-wider",
-            STATUS_STYLE[component.status],
+            ready ? STATUS_STYLE[component.status] : "border-rule text-graphite-soft",
           )}
         >
-          {STATUS_LABEL[component.status]}
+          {ready ? STATUS_LABEL[component.status] : "Coming soon"}
         </span>
       </div>
 

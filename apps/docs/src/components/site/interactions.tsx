@@ -66,11 +66,26 @@ export function InstallCommand({
         $
       </span>
 
+      {/*
+        It wraps rather than scrolls.
+
+        `whitespace-nowrap` with `overflow-x-auto` meant a command wider than
+        its box was simply not shown: at 1024px the homepage hero rendered
+        "npx @oxygenui-des…" of a 344px line in 279px, and on a phone less than
+        three quarters of it. A scrollbar is not a disclosure — the reader has
+        to discover there is more and then drag for it, and the thing hidden is
+        the one instruction the page is asking them to run.
+
+        These commands break at spaces, so wrapping lands between arguments
+        rather than mid-token. `tabIndex` went with the overflow: it was there
+        because a scrollable region must be reachable by keyboard (WCAG 2.1.1),
+        and a non-scrolling, non-interactive element carrying a tab stop is one
+        press between the reader and the Copy button for nothing.
+      */}
       <code
-        tabIndex={0}
         aria-label={`Install command: ${command}`}
         className={cn(
-          "scroll-hidden min-w-0 flex-1 overflow-x-auto whitespace-nowrap font-mono text-panel-fg/95",
+          "min-w-0 flex-1 break-words font-mono text-panel-fg/95",
           size === "lg" ? "text-[0.8125rem] sm:text-sm" : "text-xs",
         )}
       >
