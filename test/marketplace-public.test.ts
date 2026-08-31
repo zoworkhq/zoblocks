@@ -169,6 +169,13 @@ describe("what happens when the app is not there", () => {
    * "measures nothing on a pack nobody has built" and "ships a version and
    * files for everything it calls published". Repeating half of that here was
    * always redundant; what was missing is the claim the switch actually makes.
+   *
+   * The two meanings have since been given two fields, because sharing one was
+   * not only a test problem: `PackPreview` reads `comingSoon` to choose between
+   * a pack's file manifest and a "nothing built yet" motif, so forcing it true
+   * made two shipped packs advertise themselves as unbuilt on the open shelf.
+   * `purchasable` carries the shop's answer now, and the assertion below asks
+   * it rather than asking the field that describes the pack.
    */
   it("offers no purchase path at all while selling is closed", async () => {
     respondWith({ items: [] });
@@ -183,14 +190,16 @@ describe("what happens when the app is not there", () => {
         expect(item.comingSoon, `${item.slug} disagrees with its publishedAt`).toBe(
           item.publishedAt === null,
         );
+        expect(item.purchasable, `${item.slug} is built but still unbuyable`).toBe(
+          !item.comingSoon,
+        );
       }
       return;
     }
 
-    // One field, because the listing, the detail page and the pack preview all
-    // read this one field to decide whether to draw a buy control — and before
-    // the switch they disagreed.
-    expect(items.filter((item) => !item.comingSoon)).toEqual([]);
+    // Named rather than counted: one buy control on a shop that cannot take
+    // money is the whole defect, and the slug is what makes it findable.
+    expect(items.filter((item) => item.purchasable).map((item) => item.slug)).toEqual([]);
   });
 
   it("still announces a pack the console has never published", async () => {
@@ -204,6 +213,29 @@ describe("what happens when the app is not there", () => {
     expect(unpublished.length).toBeGreaterThan(0);
     for (const item of unpublished) {
       expect(item.comingSoon, `${item.slug} is unpublished but not announced`).toBe(true);
+    }
+  });
+
+  /*
+   * Closing the till must not make the shelf lie about the stock.
+   *
+   * `PackPreview` asks `comingSoon` to choose between a pack's file manifest
+   * and a "nothing built yet" motif, and it asks *after* artwork and swatches.
+   * So while the switch forced that field true, it downgraded exactly the built
+   * packs that ship neither — `vitals-flowsheet` and `messy-fixtures` — and both
+   * advertised themselves on the open shelf as unbuilt while their files sat in
+   * this repository.
+   */
+  it("still says what a built pack contains while the shop is shut", async () => {
+    respondWith({ items: [] });
+    const built = (await shelf()).filter((item) => !item.comingSoon);
+
+    expect(built.length).toBeGreaterThan(0);
+    for (const item of built) {
+      expect(item.version, `${item.slug} is built at v0`).toBeGreaterThan(0);
+      expect(item.filePaths.length, `${item.slug} shows no manifest`).toBeGreaterThan(0);
+      // And still not for sale. That is the half the switch gets to decide.
+      expect(item.purchasable, `${item.slug} is purchasable`).toBe(false);
     }
   });
 
