@@ -212,8 +212,25 @@ export function SignatureDemo() {
         currentColor on real SVG rather than a canvas bitmap — a stored
         signature captured in light mode stays legible here.
       */}
+      {/*
+        Held back until the theme is known, rather than painted twice.
+
+        Two systems colour this subtree: antd's algorithm, which is JS and
+        cannot be right until an effect runs, and the site's own tokens, which
+        are CSS and are right immediately. Before hydration they disagree, and
+        no static default fixes it — defaulting light put near-black antd text
+        on a dark panel, and painting the surface white put near-white token
+        text on white at 1.13:1. Either way one half is unreadable.
+
+        `invisible` reserves the layout and declines to paint the disagreement.
+        The surface underneath is CSS-driven, so the panel is the right colour
+        throughout, and the content appears once it is correct.
+      */}
       <div
-        className={cn("relative p-4 sm:p-6", dark && "bg-[#141414]")}
+        className={cn(
+          "signature-antd-surface relative p-4 sm:p-6",
+          hydrated ? "visible" : "invisible",
+        )}
         style={dark ? { colorScheme: "dark" } : undefined}
       >
         {/*

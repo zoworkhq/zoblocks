@@ -461,3 +461,36 @@ test.describe("visual regression", () => {
     await expect(dialog).toHaveScreenshot("signature-dialog.png");
   });
 });
+
+/* ==================================================================== */
+/* The pre-hydration paint                                              */
+/* ==================================================================== */
+
+/**
+ * antd is themed by an algorithm passed in React, so the demo cannot know the
+ * site's theme until an effect runs — while the `dark` class is set by a
+ * blocking script before first paint. In that window the two disagree, and the
+ * demo used to paint the disagreement: antd's light palette, near-black text,
+ * over a wrapper with no background of its own, so it inherited the dark
+ * instrument panel behind it. Black on black, and permanently so in any tab
+ * that never paints and therefore never runs the effect.
+ *
+ * Scripting off is the closest reproduction of that paint. The surface must be
+ * held back rather than shown in the wrong palette, and it must still reserve
+ * its space so nothing jumps when it arrives.
+ */
+test.describe("pre-hydration", () => {
+  test.use({ javaScriptEnabled: false });
+
+  test("@vrt the antd surface is not painted before the theme is known", async ({ page }) => {
+    await page.goto(PAGE);
+
+    const surface = page.locator(".signature-antd-surface");
+    await expect(surface).toHaveCount(1);
+    await expect(surface).toHaveCSS("visibility", "hidden");
+
+    // Hidden, not removed: the space stays reserved.
+    const height = await surface.evaluate((el) => el.getBoundingClientRect().height);
+    expect(height).toBeGreaterThan(0);
+  });
+});

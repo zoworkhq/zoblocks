@@ -1381,6 +1381,28 @@ html:not(.dark) .signal-status {
  * Deliberately reads as hardware: inset rule, faint grid, its own light.
  * ------------------------------------------------------------------------ */
 
+/*
+ * The antd surface inside the signature demo.
+ *
+ * In CSS rather than in the component, because it has to be right before React
+ * is. antd is themed by an algorithm passed in JS, which `useSiteTheme` cannot
+ * report until an effect runs, while the `dark` class is set by a blocking
+ * script before first paint. Painting this from the JS boolean left the surface
+ * transparent for the whole of that window, so antd's light palette — near-black
+ * text — sat on the dark instrument panel behind it. Black on black until
+ * hydration caught up, and indefinitely in a tab that never paints.
+ *
+ * Keyed off `.dark` like the rest of the site, so it is right at first paint and
+ * agrees with the algorithm once the effect lands.
+ */
+.signature-antd-surface {
+  background: #ffffff;
+}
+
+.dark .signature-antd-surface {
+  background: #141414;
+}
+
 .instrument {
   position: relative;
   background: var(--color-panel);
