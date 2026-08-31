@@ -15,7 +15,7 @@
     "@oxygenui-design/tokens": "workspace:*"
   },
   "devDependencies": {
-    "@angular/common": "^22.1.2",
+    "@angular/common": "^22.1.4",
     "@angular/compiler": "^22.1.2",
     "@angular/core": "^22.1.2",
     "@angular/platform-browser": "^22.1.2",
