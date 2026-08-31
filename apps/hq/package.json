@@ -17,7 +17,7 @@
     "@oxygenui-design/tokens": "workspace:*",
     "bcryptjs": "^3.0.2",
     "clsx": "^2.1.1",
-    "lucide-react": "^0.468.0",
+    "lucide-react": "^1.34.0",
     "mongodb": "^7.4.0",
     "next": "^16.3.1",
     "react": "^19.0.0",
