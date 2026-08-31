@@ -17,6 +17,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   APP,
   KIND_LABEL,
+  SELLING_OPEN,
   buyHref,
   catalogue,
   findItem,
@@ -151,17 +152,58 @@ describe("what happens when the app is not there", () => {
     }
   });
 
-  it("refuses a purchase path for anything announced", async () => {
+  /*
+   * `comingSoon` came to mean two things, and this test was asserting the one
+   * it no longer means.
+   *
+   * It used to mean "never built", and the version, file-count and
+   * contrast-pair assertions that lived here followed from that. `SELLING_OPEN`
+   * gave it a second meaning — "not purchasable" — and set it on *every* item,
+   * so five packs that are built, versioned and merely unbuyable started
+   * reading as packs claiming measurements they had not earned. The suite went
+   * red on a change that was correct.
+   *
+   * The unbuilt claim has a better home and already lives there:
+   * `marketplace-catalogue.test.ts` asserts it in both directions against the
+   * raw preview data, where `comingSoon` still means only the one thing —
+   * "measures nothing on a pack nobody has built" and "ships a version and
+   * files for everything it calls published". Repeating half of that here was
+   * always redundant; what was missing is the claim the switch actually makes.
+   */
+  it("offers no purchase path at all while selling is closed", async () => {
     respondWith({ items: [] });
-    const announced = (await shelf()).filter((item) => item.comingSoon);
+    const items = await shelf();
+    expect(items.length).toBeGreaterThan(0);
 
-    expect(announced.length).toBeGreaterThan(0);
-    // No version, no files, and nothing measured — because nothing has been
-    // built to measure.
-    for (const item of announced) {
-      expect(item.version).toBe(0);
-      expect(item.files).toBe(0);
-      expect(item.provenance.accessibility.contrastPairs.total).toBe(0);
+    if (SELLING_OPEN) {
+      // The switch's own promise for the day it flips: every path goes back to
+      // reading each item's `publishedAt`. Asserted rather than assumed, so
+      // flipping it cannot quietly leave the shelf announcing everything.
+      for (const item of items) {
+        expect(item.comingSoon, `${item.slug} disagrees with its publishedAt`).toBe(
+          item.publishedAt === null,
+        );
+      }
+      return;
+    }
+
+    // One field, because the listing, the detail page and the pack preview all
+    // read this one field to decide whether to draw a buy control — and before
+    // the switch they disagreed.
+    expect(items.filter((item) => !item.comingSoon)).toEqual([]);
+  });
+
+  it("still announces a pack the console has never published", async () => {
+    respondWith({ items: [] });
+    // `publishedAt` is the field the switch does not touch, so it stays the
+    // honest record of what exists. This is the half of the old assertion that
+    // survives both settings.
+    const items = await shelf();
+    const unpublished = items.filter((item) => item.publishedAt === null);
+
+    expect(unpublished.length).toBeGreaterThan(0);
+    for (const item of unpublished) {
+      expect(item.comingSoon, `${item.slug} is unpublished but not announced`).toBe(true);
     }
   });
 
