@@ -48,15 +48,13 @@ export default async function MarketplacePage() {
               Artwork that knows what an empty field means.
             </h1>
             <p className="lede mt-6 max-w-2xl text-pretty" data-reveal>
-              Stock illustration draws one empty state and calls it <em>nothing to see here</em>. In
-              a clinical record an empty allergy list is at least three different facts — nobody
-              asked, somebody asked and recorded none, or you are not allowed to see it — and they
-              demand three different things of whoever is reading the screen.
+              Stock illustration draws one empty state and calls it <em>nothing to see here</em>. An
+              empty allergy list is three facts — nobody asked, asked and none found, or you may not
+              see it — and each needs a different drawing.
             </p>
             <p className="mt-4 max-w-2xl text-pretty text-graphite" data-reveal>
-              Every published item states what was checked: contrast pairs measured, forced colours
-              verified, and — the part a safety officer reads first — what it explicitly does not
-              claim.
+              Every item states what was checked: contrast pairs, forced colours, and what it does
+              not claim.
             </p>
             {/*
               Said here rather than left to be inferred from a missing block.
@@ -65,16 +63,14 @@ export default async function MarketplacePage() {
               out on the item page has been let down by this one.
             */}
             <p className="mt-3 max-w-2xl text-pretty text-sm text-graphite-soft" data-reveal>
-              Clinical review is not yet in place. No pack below has been reviewed by a registered
-              clinician, and none of them says otherwise — the field stays empty until there is a
-              name and a registration to put in it.
+              No pack has been reviewed by a registered clinician yet, and none claims otherwise.
             </p>
           </div>
         </section>
 
         <section className="border-b border-rule">
           <div className="mx-auto max-w-6xl section-major px-5 sm:px-8">
-            {ready.length === 0 ? (
+            {items.length === 0 ? (
               /*
                * Only reachable if the console answers with an empty catalogue.
                * The unreachable case has a floor now — see `shelf()`.
@@ -86,36 +82,40 @@ export default async function MarketplacePage() {
                 </p>
               </div>
             ) : (
-              <>
-                <div className="flex flex-wrap items-baseline justify-between gap-3" data-reveal>
-                  <h2 className="display-sm">Available now</h2>
-                  <p className="numeric text-xs text-graphite-soft">
-                    {ready.length} pack{ready.length === 1 ? "" : "s"} · perpetual licence
-                  </p>
-                </div>
+              ready.length > 0 && (
+                <>
+                  <div className="flex flex-wrap items-baseline justify-between gap-3" data-reveal>
+                    <h2 className="display-sm">Available now</h2>
+                    <p className="numeric text-xs text-graphite-soft">
+                      {ready.length} pack{ready.length === 1 ? "" : "s"} · perpetual licence
+                    </p>
+                  </div>
 
-                <ul className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-                  {ready.map((item, index) => (
-                    <PackCard key={item.slug} item={item} index={index} />
-                  ))}
-                </ul>
-              </>
+                  <ul className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                    {ready.map((item, index) => (
+                      <PackCard key={item.slug} item={item} index={index} />
+                    ))}
+                  </ul>
+                </>
+              )
             )}
 
             {announced.length > 0 && (
               <>
                 <div
-                  className="mt-16 flex flex-wrap items-baseline justify-between gap-3"
+                  className={
+                    (ready.length > 0 ? "mt-16 " : "") +
+                    "flex flex-wrap items-baseline justify-between gap-3"
+                  }
                   data-reveal
                 >
-                  <h2 className="display-sm">In production</h2>
+                  <h2 className="display-sm">Coming soon</h2>
                   <p className="numeric text-xs text-graphite-soft">{announced.length} announced</p>
                 </div>
                 <p className="body-sm mt-2 max-w-2xl text-graphite" data-reveal>
-                  Announced rather than hidden. A team deciding whether to build a results grid
-                  themselves deserves to know one is coming — and an empty catalogue makes a
-                  specialist look like a hobby. These carry a price and nothing else: no version, no
-                  files, and no measurements, because nothing has been built to measure.
+                  Announced rather than hidden — a team deciding whether to build one of these
+                  themselves deserves to know it is coming. Nothing is on sale yet: the price is
+                  what a pack will cost, not an offer.
                 </p>
 
                 <ul className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
@@ -133,12 +133,11 @@ export default async function MarketplacePage() {
             <div className="surface flex flex-wrap items-center justify-between gap-6 px-7 py-7">
               <div className="max-w-xl">
                 <h2 className="font-display text-xl font-semibold tracking-[-0.015em]">
-                  Buying happens in the app
+                  Buying will happen in the app
                 </h2>
                 <p className="body-sm mt-2 text-graphite">
-                  A purchase belongs to an organisation rather than to the person who paid, so it
-                  needs one to belong to. Packs are perpetual, install into a theme draft, and
-                  nothing reaches a running application until somebody publishes it.
+                  A purchase belongs to an organisation, not to the person who paid. Packs will be
+                  perpetual and install into a theme draft. Nothing can be bought yet.
                 </p>
               </div>
               <a
@@ -187,7 +186,7 @@ function PackCard({ item, index }: { item: ShelfItem; index: number }) {
           <p className="eyebrow text-graphite-soft">{KIND_LABEL[item.kind]}</p>
           {item.comingSoon ? (
             <span className="rounded-full border border-rule px-2 py-0.5 font-mono text-[0.5625rem] uppercase tracking-wider text-graphite-soft">
-              In production
+              Coming soon
             </span>
           ) : null}
         </div>
@@ -223,7 +222,23 @@ function PackCard({ item, index }: { item: ShelfItem; index: number }) {
           </div>
 
           {item.comingSoon ? (
-            <span className="body-xs text-graphite-soft">Not yet purchasable</span>
+            /* A disabled button rather than a line of text: the slot holds a
+               control on a purchasable pack, and a label where a button was
+               reads as a missing button. `disabled` is what says the action
+               exists and is unavailable — to a screen reader as well as to the
+               eye. No `z-10` here, unlike the buy link: nothing to click means
+               the title's overlay should keep the whole card pointing at the
+               detail page. */
+            <button
+              type="button"
+              disabled
+              className={
+                "inline-flex cursor-not-allowed items-center gap-1.5 rounded-lg border border-rule " +
+                "bg-paper-sunk px-2.5 py-1.5 text-[0.6875rem] font-semibold text-graphite-soft"
+              }
+            >
+              Coming soon
+            </button>
           ) : (
             <a
               href={buyHref(item.slug)}

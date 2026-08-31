@@ -12,11 +12,12 @@
  * So everything here is the shipped component. Type into it, arrow through it,
  * flip it to RTL, and read the announced names in a screen reader.
  *
- * The control bar is the point of the page. Theme, density and direction are
- * the three axes a design system is most often wrong on, and the three nobody
- * checks by hand — so they are one click each, applied to every demo at once.
- * Density in particular: this component claims a 24px target floor at clinical
- * density, and that claim is falsifiable from this bar in two clicks.
+ * There was a control bar over this — theme, density and direction, one click
+ * each, applied to every demo at once. It is gone. The "Theme × density"
+ * chapter still renders every combination side by side, which is where the 24px
+ * target floor at clinical density can still be measured; direction is no longer
+ * checkable from this page. That is a real loss of evidence rather than a
+ * tidy-up, and it is recorded here so it is not mistaken for an oversight.
  */
 
 import * as React from "react";
@@ -685,12 +686,12 @@ function DstDemo() {
 }
 
 /*
- * The compact variants side by side, at whatever the bar is set to.
+ * The compact variants side by side.
  *
  * Six rather than fourteen: the scheduler, the slot grid and the two series
  * surfaces are compositions the width of a page, and stacking them here would
  * make this a second copy of the gallery rather than a comparison. They are
- * held to the same bar in their own chapters — switch the density and go back.
+ * shown in their own chapters instead.
  */
 const COMPACT_VARIANTS: Array<{ variant: DatePickerVariant; render: () => React.ReactNode }> = [
   {
@@ -816,9 +817,6 @@ const CHAPTERS: Array<{ id: Chapter; label: string; blurb: string }> = [
 export function DatePickerGallery() {
   const [chapter, setChapter] = React.useState<Chapter>("fields");
   const [theme, setTheme] = React.useState<"light" | "dark" | "hc">("light");
-  const [density, setDensity] = React.useState<(typeof DENSITIES)[number]>("standard");
-  const [rtl, setRtl] = React.useState(false);
-  const [motion, setMotion] = React.useState(true);
 
   /*
    * The demo theme starts at whatever the site is showing, and follows it
@@ -830,98 +828,21 @@ export function DatePickerGallery() {
    * `hc` is only ever a deliberate choice: the site has no high-contrast mode
    * to follow, so it is never selected automatically.
    */
-  const [themePinned, setThemePinned] = React.useState(false);
 
   React.useEffect(() => {
-    if (themePinned) return;
     const root = document.documentElement;
     const sync = () => setTheme(root.classList.contains("dark") ? "dark" : "light");
     sync();
     const observer = new MutationObserver(sync);
     observer.observe(root, { attributes: true, attributeFilter: ["class"] });
     return () => observer.disconnect();
-  }, [themePinned]);
+  }, []);
 
   const active = CHAPTERS.find((item) => item.id === chapter) ?? CHAPTERS[0]!;
 
   return (
     <div className="ox-gallery">
       {/* Control bar — the three axes nobody checks by hand, one click each. */}
-      <div className="ox-gallery__bar">
-        <div className="ox-gallery__group" role="group" aria-label="Component theme">
-          <span className="ox-gallery__legend">Theme</span>
-          {(["light", "dark", "hc"] as const).map((option) => (
-            <button
-              key={option}
-              type="button"
-              aria-pressed={theme === option}
-              onClick={() => {
-                setThemePinned(true);
-                setTheme(option);
-              }}
-              className="ox-gallery__switch"
-            >
-              {option}
-            </button>
-          ))}
-        </div>
-
-        <div className="ox-gallery__group" role="group" aria-label="Density">
-          <span className="ox-gallery__legend">Density</span>
-          {DENSITIES.map((option) => (
-            <button
-              key={option}
-              type="button"
-              aria-pressed={density === option}
-              onClick={() => setDensity(option)}
-              className="ox-gallery__switch"
-            >
-              {option}
-            </button>
-          ))}
-        </div>
-
-        <div className="ox-gallery__group" role="group" aria-label="Text direction">
-          <span className="ox-gallery__legend">Dir</span>
-          {(
-            [
-              ["ltr", false],
-              ["rtl", true],
-            ] as const
-          ).map(([label, value]) => (
-            <button
-              key={label}
-              type="button"
-              aria-pressed={rtl === value}
-              onClick={() => setRtl(value)}
-              className="ox-gallery__switch"
-            >
-              {label}
-            </button>
-          ))}
-        </div>
-
-        <div className="ox-gallery__group" role="group" aria-label="Motion">
-          <span className="ox-gallery__legend">Motion</span>
-          {(
-            [
-              ["on", true],
-              ["off", false],
-            ] as const
-          ).map(([label, value]) => (
-            <button
-              key={label}
-              type="button"
-              aria-pressed={motion === value}
-              onClick={() => setMotion(value)}
-              className="ox-gallery__switch"
-            >
-              {label}
-            </button>
-          ))}
-        </div>
-      </div>
-
       {/* Chapter navigation. A radiogroup, not a tablist: these are seven
           filters over one stage, and the stage is not a panel any one of
           them owns. */}
@@ -943,13 +864,7 @@ export function DatePickerGallery() {
         <p className="ox-gallery__blurb">{active.blurb}</p>
       </div>
 
-      <div
-        className="ox-gallery__stage"
-        data-ox-theme={theme === "hc" ? "high-contrast" : theme}
-        data-ox-density={density}
-        data-ox-motion={motion ? "on" : "off"}
-        dir={rtl ? "rtl" : "ltr"}
-      >
+      <div className="ox-gallery__stage" data-ox-theme={theme === "hc" ? "high-contrast" : theme}>
         {chapter === "fields" ? (
           <div className="ox-gallery__grid">
             <Demo
@@ -1204,7 +1119,7 @@ export function DatePickerGallery() {
               name="Density and direction, across the family"
               api="data-ox-density · dir"
               tags={["target ≥ 24px", "RTL"]}
-              note="Switch the bar above to clinical density and measure anything here: type shrinks, gaps tighten, and no interactive element goes under 24px — the WCAG 2.2 SC 2.5.8 floor, held by the segments as well as the buttons, which is where it is usually lost. Clinical density tightens the ink and never the target, because a mis-tap on a calendar cell is clinically consequential in a way it is not on a marketing site. Then switch to RTL: the grid mirrors and the digits do not, because dir=“ltr” is pinned on the field itself. Letting the segments inherit RTL renders 26/08/2026 as 2026/08/26, which is plausible, and is the wrong date. The six compact variants are here; the scheduler and the series surfaces are the width of a page and are held to the same bar in their own chapters."
+              note="The six compact variants, side by side. Clinical density tightens the ink and never the target: no interactive element goes under 24px — the WCAG 2.2 SC 2.5.8 floor, held by the segments as well as the buttons, which is where it is usually lost. A mis-tap on a calendar cell is clinically consequential in a way it is not on a marketing site. The Theme × density chapter renders every combination if you want to measure it. dir=“ltr” stays pinned on the field itself, because letting the segments inherit RTL renders 26/08/2026 as 2026/08/26 — plausible, and the wrong date. The scheduler and the series surfaces are the width of a page and get their own chapters."
               wide
             >
               <TargetDemo />

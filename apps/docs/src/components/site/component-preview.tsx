@@ -100,7 +100,6 @@ import {
   type ResolvedContext,
   type Source,
 } from "@oxygenui-design/copilot-core";
-import { InstrumentGlow } from "@/components/site/interactions";
 import { ContextMenuStage } from "@/components/site/context-menu-demo";
 import { SignatureDemo } from "@/components/site/signature-demo";
 import {
@@ -3593,8 +3592,6 @@ export function ComponentPreview({
 
   return (
     <div className="instrument instrument-demo">
-      <InstrumentGlow />
-
       {/* Chrome ---------------------------------------------------------- */}
       <div className="relative flex flex-wrap items-center justify-between gap-3 border-b border-panel-rule px-4 py-2.5">
         <div className="flex items-center gap-2.5">

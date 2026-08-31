@@ -29,27 +29,7 @@
    toolbar bolted above the gallery — the loudest element on a page whose
    subject is the components underneath it. The controls still work and still
    group; they just stop announcing themselves. */
-.ox-gallery__bar {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.6rem 2rem;
-  align-items: center;
-  padding: 0 0 0.9rem;
-  border-block-end: 1px solid var(--color-rule);
-}
-.ox-gallery__group {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-}
-.ox-gallery__legend {
-  font-family: var(--font-mono);
-  font-size: 0.625rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--color-graphite);
-  margin-inline-end: 0.15rem;
-}
+
 .ox-gallery__switch {
   font-family: var(--font-mono);
   font-size: 0.6875rem;

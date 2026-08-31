@@ -219,46 +219,6 @@ export function RevealRoot({ children }: { children: React.ReactNode }) {
 }
 
 // ---------------------------------------------------------------------------
-// Instrument glow
-// ---------------------------------------------------------------------------
-
-/**
- * Writes pointer position into CSS custom properties so the bezel can light
- * under the cursor. Pointer-only and passive — no effect on touch, and none
- * at all under reduced motion.
- */
-export function InstrumentGlow() {
-  const ref = React.useRef<HTMLDivElement>(null);
-
-  React.useEffect(() => {
-    const node = ref.current;
-    const panel = node?.parentElement;
-    if (!node || !panel) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-
-    let frame = 0;
-
-    function onMove(event: PointerEvent) {
-      if (event.pointerType !== "mouse") return;
-      cancelAnimationFrame(frame);
-      frame = requestAnimationFrame(() => {
-        const rect = panel!.getBoundingClientRect();
-        node!.style.setProperty("--glow-x", `${event.clientX - rect.left}px`);
-        node!.style.setProperty("--glow-y", `${event.clientY - rect.top}px`);
-      });
-    }
-
-    panel.addEventListener("pointermove", onMove, { passive: true });
-    return () => {
-      panel.removeEventListener("pointermove", onMove);
-      cancelAnimationFrame(frame);
-    };
-  }, []);
-
-  return <div ref={ref} className="instrument-glow" aria-hidden="true" />;
-}
-
-// ---------------------------------------------------------------------------
 // Counter
 // ---------------------------------------------------------------------------
 

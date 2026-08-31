@@ -227,24 +227,6 @@ function SignatureHomeDemo() {
 
 const FEATURED: readonly Featured[] = [
   {
-    slug: "copilot",
-    name: "Copilot",
-    resource: "AuditEvent",
-    claim:
-      "It answers with its sources attached, names what it was not allowed to read, and refuses rather than guesses.",
-    facts: ["12 states", "Cites or declines", "Every read audited"],
-    demo: () => <CopilotHomeDemo />,
-  },
-  {
-    slug: "date-picker",
-    name: "Date & time",
-    resource: "Period",
-    claim:
-      "Fourteen variants on one contract — and a bare 9 in a time field is asked about rather than resolved into a twelve-hour error.",
-    facts: ["14 variants", "8 keystrokes, no calendar", "RFC 5545 recurrence"],
-    demo: () => <DateDemo />,
-  },
-  {
     slug: "signature",
     name: "Signature",
     resource: "Provenance",
@@ -254,13 +236,14 @@ const FEATURED: readonly Featured[] = [
     demo: () => <SignatureHomeDemo />,
   },
   {
-    slug: "switch",
-    name: "Switch",
-    resource: "Flag",
+    slug: "pulse-loader",
+    name: "Loaders",
+    resource: "—",
     claim:
-      "Three values, not two: on, off, and nobody has said. The commit is visible, reversible, and survives a conflict.",
-    facts: ["25 props", "Third value: unknown", "Optimistic with rollback"],
-    demo: () => <SwitchDemo />,
+      "Five waits with different meanings, each with a designed reduced-motion state rather than a spinner that simply stops.",
+    facts: ["5 loaders", "Reduced motion designed", "Announced, not silent"],
+    demo: () => <LoaderShowcase />,
+    bare: true,
   },
   {
     slug: "tabs",
@@ -272,14 +255,31 @@ const FEATURED: readonly Featured[] = [
     demo: () => <TabsDemo />,
   },
   {
-    slug: "pulse-loader",
-    name: "Loaders",
-    resource: "—",
+    slug: "switch",
+    name: "Switch",
+    resource: "Flag",
     claim:
-      "Five waits with different meanings, each with a designed reduced-motion state rather than a spinner that simply stops.",
-    facts: ["5 loaders", "Reduced motion designed", "Announced, not silent"],
-    demo: () => <LoaderShowcase />,
-    bare: true,
+      "Three values, not two: on, off, and nobody has said. The commit is visible, reversible, and survives a conflict.",
+    facts: ["25 props", "Third value: unknown", "Optimistic with rollback"],
+    demo: () => <SwitchDemo />,
+  },
+  {
+    slug: "date-picker",
+    name: "Date & time",
+    resource: "Period",
+    claim:
+      "Fourteen variants on one contract — and a bare 9 in a time field is asked about rather than resolved into a twelve-hour error.",
+    facts: ["14 variants", "8 keystrokes, no calendar", "RFC 5545 recurrence"],
+    demo: () => <DateDemo />,
+  },
+  {
+    slug: "copilot",
+    name: "Copilot",
+    resource: "AuditEvent",
+    claim:
+      "It answers with its sources attached, names what it was not allowed to read, and refuses rather than guesses.",
+    facts: ["12 states", "Cites or declines", "Every read audited"],
+    demo: () => <CopilotHomeDemo />,
   },
 ];
 

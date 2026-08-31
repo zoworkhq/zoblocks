@@ -214,22 +214,43 @@ function withoutClinicalReview(provenance: Provenance): Provenance {
  * fetch has failed and the storefront has rendered its empty state since the
  * day it shipped.
  */
+/**
+ * Nothing on the shelf is for sale yet.
+ *
+ * Checkout, entitlement and delivery all live in the console, and none of it
+ * is open: `app.oxygenui.design` has no DNS record, so every buy control on
+ * this site has been a link to a door that does not open. Until it does, the
+ * storefront announces rather than sells.
+ *
+ * One switch here rather than a `comingSoon` guard added page by page, because
+ * the listing, the detail page and anything else reading `shelf()` must not be
+ * able to disagree about what is purchasable — the detail page was already
+ * offering a buy CTA for packs the listing called unpurchasable. Flip this to
+ * `true` when the console can take money and every path returns to using each
+ * item's own `publishedAt`.
+ */
+export const SELLING_OPEN = false;
+
 export async function shelf(): Promise<ShelfItem[]> {
   const live = await catalogue();
-  if (live.length === 0) return fromPreview();
+  const items: ShelfItem[] =
+    live.length === 0
+      ? fromPreview()
+      : live.map((item) => {
+          const local = ARTWORK.get(item.slug);
+          return {
+            ...item,
+            provenance: withoutClinicalReview(item.provenance),
+            comingSoon: item.publishedAt === null,
+            filePaths: local?.files ?? [],
+            art: local?.art ?? [],
+            swatches: local?.swatches ?? [],
+            source: "console",
+          };
+        });
 
-  return live.map((item) => {
-    const local = ARTWORK.get(item.slug);
-    return {
-      ...item,
-      provenance: withoutClinicalReview(item.provenance),
-      comingSoon: item.publishedAt === null,
-      filePaths: local?.files ?? [],
-      art: local?.art ?? [],
-      swatches: local?.swatches ?? [],
-      source: "console",
-    };
-  });
+  if (SELLING_OPEN) return items;
+  return items.map((item) => ({ ...item, comingSoon: true }));
 }
 
 export async function findItem(slug: string): Promise<ShelfItem | undefined> {

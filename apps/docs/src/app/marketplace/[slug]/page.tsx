@@ -89,22 +89,39 @@ export default async function MarketplaceItemPage({
               <span className="tabular font-mono text-2xl font-semibold">
                 {priceLabel(item.price)}
               </span>
+              {item.comingSoon ? (
+                <span className="rounded-full border border-rule px-2.5 py-1 font-mono text-[0.625rem] uppercase tracking-wider text-graphite-soft">
+                  Coming soon
+                </span>
+              ) : null}
               <span className="body-sm text-graphite">
-                one-time · the whole organisation · perpetual
+                {item.comingSoon
+                  ? "what it will cost · not yet on sale"
+                  : "one-time · the whole organisation · perpetual"}
               </span>
             </div>
 
             <div className="mt-6 flex flex-wrap gap-3" data-reveal>
-              <a
-                href={buyHref(item.slug)}
-                className="group inline-flex items-center gap-2 rounded-xl bg-cta px-5 py-3.5 text-sm font-medium text-paper transition-all duration-300 ease-[var(--ease-out-expo)] hover:-translate-y-0.5 hover:bg-cta-hover"
-              >
-                Buy in the app
-                <ArrowUpRight
-                  aria-hidden="true"
-                  className="size-4 transition-transform duration-300 ease-[var(--ease-out-expo)] group-hover:translate-x-0.5"
-                />
-              </a>
+              {item.comingSoon ? (
+                <button
+                  type="button"
+                  disabled
+                  className="inline-flex cursor-not-allowed items-center gap-2 rounded-xl border border-rule bg-paper-sunk px-5 py-3.5 text-sm font-medium text-graphite-soft"
+                >
+                  Coming soon
+                </button>
+              ) : (
+                <a
+                  href={buyHref(item.slug)}
+                  className="group inline-flex items-center gap-2 rounded-xl bg-cta px-5 py-3.5 text-sm font-medium text-paper transition-all duration-300 ease-[var(--ease-out-expo)] hover:-translate-y-0.5 hover:bg-cta-hover"
+                >
+                  Buy in the app
+                  <ArrowUpRight
+                    aria-hidden="true"
+                    className="size-4 transition-transform duration-300 ease-[var(--ease-out-expo)] group-hover:translate-x-0.5"
+                  />
+                </a>
+              )}
               <Link
                 href="/pro"
                 className="inline-flex items-center gap-2 rounded-xl border border-rule px-5 py-3.5 text-sm font-medium text-ink transition-all duration-300 ease-[var(--ease-out-expo)] hover:-translate-y-0.5 hover:border-oxygen/40"

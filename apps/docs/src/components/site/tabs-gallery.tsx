@@ -9,10 +9,11 @@
  * than missing. So everything here is the real package: click it, arrow
  * through it, flip it to RTL, and read the announced names in a screen reader.
  *
- * The control bar is the point of the whole page. Theme, density and direction
- * are the three axes a design system is most often wrong on, and they are the
- * three nobody checks by hand — so they are one click each, applied to every
- * demo at once.
+ * There was a control bar over this — theme, density and direction, one click
+ * each, applied to every demo at once. It is gone. The "Theme × density"
+ * chapter still renders every combination at once, so that claim is still
+ * checkable here; direction is not, and that is a real loss of evidence rather
+ * than a tidy-up.
  */
 
 import * as React from "react";
@@ -1022,9 +1023,6 @@ const CHAPTERS: Array<{ id: Chapter; label: string; blurb: string }> = [
 export function TabsGallery() {
   const [chapter, setChapter] = React.useState<Chapter>("gallery");
   const [theme, setTheme] = React.useState<"light" | "dark" | "hc">("light");
-  const [density, setDensity] = React.useState<(typeof DENSITIES)[number]>("standard");
-  const [rtl, setRtl] = React.useState(false);
-  const [motion, setMotion] = React.useState(true);
 
   /*
    * The demo theme starts at whatever the site is showing, and keeps following
@@ -1040,10 +1038,8 @@ export function TabsGallery() {
    * `hc` is only ever a deliberate choice, so it is never selected here — the
    * site has no high-contrast mode to follow.
    */
-  const [themePinned, setThemePinned] = React.useState(false);
 
   React.useEffect(() => {
-    if (themePinned) return;
     const root = document.documentElement;
     const sync = () => setTheme(root.classList.contains("dark") ? "dark" : "light");
     sync();
@@ -1053,88 +1049,13 @@ export function TabsGallery() {
     const observer = new MutationObserver(sync);
     observer.observe(root, { attributes: true, attributeFilter: ["class"] });
     return () => observer.disconnect();
-  }, [themePinned]);
+  }, []);
 
   const active = CHAPTERS.find((item) => item.id === chapter) ?? CHAPTERS[0]!;
 
   return (
     <div className="ox-gallery">
       {/* Control bar — the three axes nobody checks by hand, one click each. */}
-      <div className="ox-gallery__bar">
-        <div className="ox-gallery__group" role="group" aria-label="Component theme">
-          <span className="ox-gallery__legend">Theme</span>
-          {(["light", "dark", "hc"] as const).map((option) => (
-            <button
-              key={option}
-              type="button"
-              aria-pressed={theme === option}
-              onClick={() => {
-                setThemePinned(true);
-                setTheme(option);
-              }}
-              className="ox-gallery__switch"
-            >
-              {option}
-            </button>
-          ))}
-        </div>
-
-        <div className="ox-gallery__group" role="group" aria-label="Density">
-          <span className="ox-gallery__legend">Density</span>
-          {DENSITIES.map((option) => (
-            <button
-              key={option}
-              type="button"
-              aria-pressed={density === option}
-              onClick={() => setDensity(option)}
-              className="ox-gallery__switch"
-            >
-              {option}
-            </button>
-          ))}
-        </div>
-
-        <div className="ox-gallery__group" role="group" aria-label="Text direction">
-          <span className="ox-gallery__legend">Dir</span>
-          {(
-            [
-              ["ltr", false],
-              ["rtl", true],
-            ] as const
-          ).map(([label, value]) => (
-            <button
-              key={label}
-              type="button"
-              aria-pressed={rtl === value}
-              onClick={() => setRtl(value)}
-              className="ox-gallery__switch"
-            >
-              {label}
-            </button>
-          ))}
-        </div>
-
-        <div className="ox-gallery__group" role="group" aria-label="Motion">
-          <span className="ox-gallery__legend">Motion</span>
-          {(
-            [
-              ["on", true],
-              ["off", false],
-            ] as const
-          ).map(([label, value]) => (
-            <button
-              key={label}
-              type="button"
-              aria-pressed={motion === value}
-              onClick={() => setMotion(value)}
-              className="ox-gallery__switch"
-            >
-              {label}
-            </button>
-          ))}
-        </div>
-      </div>
-
       {/* Chapter navigation — itself a tablist, built from the component. */}
       <div className="ox-gallery__chapters">
         <Tabs
@@ -1148,13 +1069,7 @@ export function TabsGallery() {
         <p className="ox-gallery__blurb">{active.blurb}</p>
       </div>
 
-      <div
-        className="ox-gallery__stage"
-        data-ox-theme={theme === "hc" ? "high-contrast" : theme}
-        data-ox-density={density}
-        data-ox-motion={motion ? "on" : "off"}
-        dir={rtl ? "rtl" : "ltr"}
-      >
+      <div className="ox-gallery__stage" data-ox-theme={theme === "hc" ? "high-contrast" : theme}>
         {chapter === "gallery" ? (
           <div className="ox-gallery__grid">
             <Demo

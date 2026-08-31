@@ -253,12 +253,6 @@ export default function ComparePage() {
                   className="size-4 transition-transform duration-300 ease-[var(--ease-out-expo)] group-hover:translate-x-0.5"
                 />
               </Link>
-              <Link
-                href="/enterprise"
-                className="inline-flex items-center gap-2 rounded-xl border border-rule bg-paper px-5 py-3 text-sm font-medium text-ink transition-colors duration-200 hover:border-oxygen/40"
-              >
-                Stability and support
-              </Link>
             </div>
           </div>
         </section>

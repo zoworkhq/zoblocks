@@ -27,7 +27,6 @@ import {
   type SignedValue,
 } from "@oxygenui-design/signature";
 import "@oxygenui-design/signature/styles.css";
-import { InstrumentGlow } from "@/components/site/interactions";
 import { SignatureDrawing, StrokeAnatomy } from "@/components/site/signature-showcase";
 import { cn } from "@/lib/utils";
 
@@ -161,8 +160,6 @@ export function SignatureDemo() {
 
   return (
     <div className="instrument instrument-demo" data-hydrated={hydrated || undefined}>
-      <InstrumentGlow />
-
       {/*
         The signature writes itself, at the speed it was written.
 
