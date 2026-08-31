@@ -100,6 +100,7 @@ import {
   type ResolvedContext,
   type Source,
 } from "@oxygenui-design/copilot-core";
+import { ContextMenuStage } from "@/components/site/context-menu-demo";
 import { SignatureDemo } from "@/components/site/signature-demo";
 import {
   IdentityAbsenceDemo,
@@ -1612,6 +1613,26 @@ const SCENARIOS: Record<string, Scenario[]> = {
   ],
 
   /** Two demos: what it counts, and what it will not run on one keystroke. */
+  "chart-context-menu": [
+    {
+      id: "subject",
+      label: "It names what it is about",
+      note: "Right-click any row. The menu opens with a header naming the record, so the first thing under the pointer is never a verb — one decision closing two holes at once: the wrong-patient check, and the click-through that lands on whatever was under the cursor. The header is also what names the popup for a screen reader, so both audiences get the check from one element. There is no prop that removes it.",
+      render: () => <ContextMenuStage />,
+    },
+    {
+      id: "consequence",
+      label: "Consequence is a rank, not a boolean",
+      note: "Four tiers, and the tier decides the interaction rather than the colour. Copy runs on the click. “Add a note to the MAR” runs too, but says what it writes and who reads it before you choose it. Discontinue takes a second step, drawn under the row inside the menu rather than in a modal that would take the keyboard away. “Reveal Part 2 content” takes a recorded reason — and writes its audit record the moment the reasons are offered, including if you press Escape instead of answering.",
+      render: () => <ContextMenuStage />,
+    },
+    {
+      id: "withheld",
+      label: "Withheld is counted, masked stays masked",
+      note: "The medication row hides one action from a registered nurse and says so at the bottom of the menu — a reader who does not see that count concludes the record supports nothing else. The third row is restricted: its menu reads “Restricted record” and will not resolve the name the list was hiding, because the menu may say less than its trigger and never more. The potassium's portal release is blocked with the reason in place rather than removed.",
+      render: () => <ContextMenuStage />,
+    },
+  ],
   "chart-command-palette": [
     {
       id: "counted",

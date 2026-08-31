@@ -26,6 +26,7 @@ export * from "./components/care-team-presence/care-team-presence";
 export * from "./components/care-timeline/care-timeline";
 export * from "./components/chart-accordion/chart-accordion";
 export * from "./components/chart-command-palette/chart-command-palette";
+export * from "./components/chart-context-menu/chart-context-menu";
 export * from "./components/chart-header/chart-header";
 export * from "./components/clinical-status/clinical-status";
 export * from "./components/copilot/copilot";

@@ -33,6 +33,9 @@
       "@/components/oxygen/chart-command-palette": [
         "../../registry/oxygen/chart-command-palette/chart-command-palette.tsx"
       ],
+      "@/components/oxygen/chart-context-menu": [
+        "../../registry/oxygen/chart-context-menu/chart-context-menu.tsx"
+      ],
       "@/components/oxygen/chart-header": [
         "../../registry/oxygen/chart-header/chart-header.tsx"
       ],
@@ -116,6 +119,9 @@
       ],
       "@/lib/oxygen-loader": [
         "../../registry/oxygen/lib/loader.tsx"
+      ],
+      "@/lib/oxygen-menu": [
+        "../../registry/oxygen/lib/menu.ts"
       ],
       "@/lib/oxygen-palette": [
         "../../registry/oxygen/lib/palette.ts"

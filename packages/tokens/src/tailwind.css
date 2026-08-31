@@ -296,4 +296,11 @@
   --spacing-ox-datetime-target: var(--ox-datetime-target);
   --spacing-ox-datetime-gap: var(--ox-datetime-gap);
   --spacing-ox-datetime-font: var(--ox-datetime-font);
+  --color-ox-menu-bg: var(--ox-menu-bg);
+  --color-ox-menu-border: var(--ox-menu-border);
+  --color-ox-menu-subject-bg: var(--ox-menu-subject-bg);
+  --color-ox-menu-subject-border: var(--ox-menu-subject-border);
+  --color-ox-menu-row-hover-bg: var(--ox-menu-row-hover-bg);
+  --color-ox-menu-sep: var(--ox-menu-sep);
+  --spacing-ox-menu-radius: var(--ox-menu-radius);
 }
