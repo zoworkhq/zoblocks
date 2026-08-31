@@ -770,7 +770,7 @@
       "name": "date-picker",
       "type": "oxygen:component",
       "title": "Date Picker",
-      "description": "Fourteen presentations of one value space, one keyboard model and one accessibility contract. `variant` picks the surface; the parts are separately testable components underneath.",
+      "description": "Sixteen presentations of one value space, one keyboard model and one accessibility contract. `variant` picks the surface; the parts are separately testable components underneath.",
       "categories": [
         "clinical",
         "forms"

@@ -3,7 +3,7 @@
 /**
  * The date gallery — every variant of the temporal control, live.
  *
- * The component's whole claim is that fourteen presentations share one value
+ * The component's whole claim is that sixteen presentations share one value
  * space, one keyboard model and one accessibility contract. A claim about
  * sameness cannot be shown with one example, and it cannot be shown with
  * screenshots at all: that the calendar and the session triple and the slot
@@ -29,11 +29,13 @@ import {
   Calendar,
   ClinicalDateTime,
   DateField,
+  DateRangeField,
   GroupSeriesScheduler,
   RecurrenceField,
   RecurringSeriesScheduler,
   SessionTimeField,
   TimeField,
+  TimeRangeField,
   TimeSlotGrid,
   relativeDateOptions,
   timeGrid,
@@ -42,6 +44,7 @@ import {
 import {
   addCalendarDays,
   classifyLocalTime,
+  dateRangePresets,
   formatPlainDate,
   plainDate,
   plainTime,
@@ -49,6 +52,7 @@ import {
   withSessionEnd,
   type OxDate,
   type OxTime,
+  type OxTimeRange,
 } from "@/lib/oxygen-datetime";
 import { buildSlots, type AvailabilitySet, type Slot } from "@/lib/oxygen-availability";
 import { THERAPY_CADENCES, type OccurrenceVerdict } from "@/lib/oxygen-recurrence";
@@ -261,20 +265,10 @@ function PickerDemo() {
         onChange={setValue}
         unavailable={clinicClosed}
         load={dayLoad}
-        calendarFooter={
-          <div className="ox-dt-demo-chips">
-            {relativeDateOptions(TODAY).map((option) => (
-              <button
-                key={option.id}
-                type="button"
-                className="ox-dt-demo-chip"
-                onClick={() => setValue(option.date)}
-              >
-                {option.label}
-              </button>
-            ))}
-          </div>
-        }
+        calendarShortcuts={DATE_SHORTCUTS}
+        calendarShowCustom
+        calendarHints
+        calendarCommit="explicit"
       />
       <Caption>value = {value ? formatPlainDate(value, "iso") : "null"}</Caption>
     </div>
@@ -339,9 +333,13 @@ function CalendarDemo() {
     <Calendar
       now={TODAY}
       defaultValue={TODAY}
-      defaultMonth={{ y: 2026, m: 9 }}
+      defaultMonth={{ y: 2026, m: 8 }}
       load={dayLoad}
       unavailable={clinicClosed}
+      shortcuts={DATE_SHORTCUTS}
+      showCustomPreset
+      hints
+      commit="explicit"
     />
   );
 }
@@ -351,9 +349,15 @@ function RangeDemo() {
   return (
     <Calendar
       mode="range"
+      months={2}
+      weekStart={1}
       now={TODAY}
       defaultMonth={{ y: 2026, m: 9 }}
       unavailable={clinicClosed}
+      presets={RANGE_PRESETS}
+      showCustomPreset
+      hints
+      commit="explicit"
     />
   );
 }
@@ -366,7 +370,95 @@ function MultipleDemo() {
       now={TODAY}
       defaultMonth={{ y: 2026, m: 9 }}
       unavailable={clinicClosed}
+      shortcuts={DATE_SHORTCUTS}
+      showCustomPreset
+      hints
+      commit="explicit"
     />
+  );
+}
+
+/** The named periods this page offers. Data, translated and trimmed by the host. */
+const RANGE_PRESETS = dateRangePresets(TODAY, { weekStart: 1 });
+
+/** The single-date half of the same rail. Also data, also the host's to trim. */
+const DATE_SHORTCUTS = relativeDateOptions(TODAY);
+
+/** c4 — the range panel: two months, a preset rail, and an explicit commit. */
+function RangePanelDemo() {
+  return (
+    <Calendar
+      mode="range"
+      months={2}
+      commit="explicit"
+      hints
+      weekStart={1}
+      presets={RANGE_PRESETS}
+      showCustomPreset
+      now={TODAY}
+      defaultMonth={{ y: 2026, m: 8 }}
+      defaultRange={{ start: plainDate(2026, 8, 17), end: plainDate(2026, 9, 17) }}
+    />
+  );
+}
+
+/** c5 — the range as a field: both ends typed, the panel as the fallback. */
+function DateRangeFieldDemo() {
+  const [range, setRange] = React.useState<{ start: OxDate | null; end: OxDate | null }>({
+    start: plainDate(2026, 8, 24),
+    end: plainDate(2026, 9, 11),
+  });
+  return (
+    <div className="ox-dt-demo-col">
+      <DateRangeField
+        label="Authorisation window"
+        now={TODAY}
+        weekStart={1}
+        months={2}
+        showSpan
+        hints
+        presets={RANGE_PRESETS}
+        showCustomPreset
+        maxSpanDays={90}
+        value={range}
+        onChange={setRange}
+        hint="Both ends are typeable. The calendar is the fallback, not the main road."
+      />
+      <DateRangeField
+        label="Reporting period"
+        now={TODAY}
+        weekStart={1}
+        months={2}
+        showSpan
+        defaultValue={{ start: plainDate(2026, 9, 20), end: plainDate(2026, 9, 4) }}
+      />
+    </div>
+  );
+}
+
+/** t2 — a time range, picked from two columns or typed into two halves. */
+function TimeRangeDemo() {
+  const [range, setRange] = React.useState<OxTimeRange>({
+    start: plainTime(7, 0),
+    end: plainTime(10, 0),
+  });
+  return (
+    <div className="ox-dt-demo-col">
+      <TimeRangeField
+        label="Time range"
+        stepMinutes={60}
+        minDurationMinutes={30}
+        maxDurationMinutes={480}
+        value={range}
+        onChange={setRange}
+      />
+      <TimeRangeField
+        label="Night shift"
+        stepMinutes={30}
+        allowOvernight
+        defaultValue={{ start: plainTime(22, 0), end: plainTime(6, 30) }}
+      />
+    </div>
   );
 }
 
@@ -375,13 +467,28 @@ function BirthDateDemo() {
   return (
     <Row>
       <Labelled what="Adult">
-        <BirthDateField now={TODAY} defaultValue={plainDate(1986, 7, 18)} />
+        <BirthDateField
+          calendarHints
+          calendarCommit="explicit"
+          now={TODAY}
+          defaultValue={plainDate(1986, 7, 18)}
+        />
       </Labelled>
       <Labelled what="Under two years">
-        <BirthDateField now={TODAY} defaultValue={plainDate(2026, 4, 20)} />
+        <BirthDateField
+          calendarHints
+          calendarCommit="explicit"
+          now={TODAY}
+          defaultValue={plainDate(2026, 4, 20)}
+        />
       </Labelled>
       <Labelled what="Under four weeks">
-        <BirthDateField now={TODAY} defaultValue={plainDate(2026, 8, 9)} />
+        <BirthDateField
+          calendarHints
+          calendarCommit="explicit"
+          now={TODAY}
+          defaultValue={plainDate(2026, 8, 9)}
+        />
       </Labelled>
     </Row>
   );
@@ -392,6 +499,8 @@ function BirthDatePartialDemo() {
     <Row>
       <Labelled what='precision="year"'>
         <BirthDateField
+          calendarHints
+          calendarCommit="explicit"
           now={TODAY}
           allowEstimated
           allowAbsent
@@ -401,6 +510,8 @@ function BirthDatePartialDemo() {
       </Labelled>
       <Labelled what="allowAbsent">
         <BirthDateField
+          calendarHints
+          calendarCommit="explicit"
           now={TODAY}
           allowAbsent
           absentReason="asked-declined"
@@ -701,7 +812,14 @@ const COMPACT_VARIANTS: Array<{ variant: DatePickerVariant; render: () => React.
   { variant: "field", render: () => <DateField label="Field" now={TODAY} defaultValue={TODAY} /> },
   {
     variant: "birth-date",
-    render: () => <BirthDateField now={TODAY} defaultValue={plainDate(1986, 7, 18)} />,
+    render: () => (
+      <BirthDateField
+        calendarHints
+        calendarCommit="explicit"
+        now={TODAY}
+        defaultValue={plainDate(1986, 7, 18)}
+      />
+    ),
   },
   { variant: "time", render: () => <TimeField label="Time" defaultValue={plainTime(14, 5)} /> },
   {
@@ -872,7 +990,7 @@ export function DatePickerGallery() {
               name="Picker"
               api='variant="picker" · showCalendar'
               tags={["default", "antd parity"]}
-              note="The default, and the one everybody means by “date picker”: a typed field with a calendar behind a button. Type 09022026 without opening anything; then press the button and the grid appears on September, with the closed days struck and the open-slot count under each numeral. Escape closes and keeps what was typed — an Escape that discards a half-entered date is the reason people stop using keyboards. The footer chips are the host's, not the component's: “Next Monday” is a scheduling convention, and a component that ships one has decided what your clinic's week looks like."
+              note="The default, and the one everybody means by “date picker”: a typed field with a calendar behind a button. Type 09022026 without opening anything; then press the button and the grid appears on September, with the closed days struck and the open-slot count under each numeral. Escape closes and keeps what was typed — an Escape that discards a half-entered date is the reason people stop using keyboards. The rail down the side is the host's, not the component's: “Next Monday” is a scheduling convention, and a component that ships one has decided what your clinic's week looks like. It is `relativeDateOptions(now)`, passed in, and Custom is pressed the moment the reader picks a day the rail cannot name."
             >
               <PickerDemo />
             </Demo>
@@ -948,9 +1066,9 @@ export function DatePickerGallery() {
             <Demo
               id="c1"
               name="Calendar"
-              api='variant="calendar"'
+              api='variant="calendar" · shortcuts · hints'
               tags={["role=grid", "roving tabstop"]}
-              note="Tab to the grid and move with the arrow keys; PageUp and PageDown change month, Shift with them changes year. Exactly one cell is reachable by Tab — forty-two tab stops is the most common accessibility failure in a date picker, and a calendar opened on a month containing no focus date has none at all, which is the same bug from the other side. Every cell is named as its whole date plus its state: “Wednesday, 26 August 2026, 8 times available”, not “26”. A cell in a grid has no column header in its accessible context, so a grid of bare numerals is navigable and useless."
+              note="Tab to the grid and move with the arrow keys; PageUp and PageDown change month, Shift with them changes year — which is what the legend under it exists to tell somebody who would otherwise never find out. Exactly one cell is reachable by Tab — forty-two tab stops is the most common accessibility failure in a date picker, and a calendar opened on a month containing no focus date has none at all, which is the same bug from the other side. Every cell is named as its whole date plus its state: “Wednesday, 26 August 2026, 8 times available”, not “26”. A cell in a grid has no column header in its accessible context, so a grid of bare numerals is navigable and useless."
             >
               <CalendarDemo />
             </Demo>
@@ -958,9 +1076,10 @@ export function DatePickerGallery() {
             <Demo
               id="c2"
               name="Range"
-              api='variant="range"'
+              api='variant="range" · months={2} · presets'
               tags={["two clicks", "SC 2.5.7"]}
               note="Two clicks, and there is no drag path anywhere in the component — WCAG 2.2 SC 2.5.7 asks that no function require a drag, and a drag across a month boundary is a hostile gesture on a touchscreen at the best of times. The second click completes the range regardless of direction: clicking backwards swaps the ends rather than refusing, because a user who clicked the later date first has told you both ends and does not need to be corrected."
+              wide
             >
               <RangeDemo />
             </Demo>
@@ -968,11 +1087,33 @@ export function DatePickerGallery() {
             <Demo
               id="c3"
               name="Multiple"
-              api='variant="multiple" maxDates={4}'
+              api='variant="multiple" maxDates={4} · shortcuts'
               tags={["capped", "click to remove"]}
-              note="Several dates that are not a range — the make-up sessions after a missed fortnight, the three days a form is being backfilled for. Clicking a selected date removes it: a remove control inside a 32px cell would sit under the 24px target floor, and a second click is what people try first anyway. The cap is refused silently at the boundary rather than dialogued, because a modal that says “you may only pick four” after the fourth click is a worse teacher than a fifth click that simply does nothing."
+              note="Several dates that are not a range — the make-up sessions after a missed fortnight, the three days a form is being backfilled for. Clicking a selected date removes it: a remove control inside a 32px cell would sit under the 24px target floor, and a second click is what people try first anyway. The cap is refused silently at the boundary rather than dialogued, because a modal that says “you may only pick four” after the fourth click is a worse teacher than a fifth click that simply does nothing. The rail toggles rather than replaces here, because that is what every other press in this mode does."
             >
               <MultipleDemo />
+            </Demo>
+
+            <Demo
+              id="c4"
+              name="Range panel"
+              api={'months={2} · presets · commit="explicit"'}
+              tags={["two months", "named periods", "Cancel/Done"]}
+              note="Most ranges cross a month boundary, and choosing an end you cannot see is how a range picker ends up needing three attempts — so the panel shows two contiguous months with one set of controls paging both. Two buttons in the same dialog both announced as “Previous month” would be a riddle, so the previous control sits on the first month and the next on the last, and the interior heading keeps its centre with a spacer that is not a button. The rail is data: `dateRangePresets(now)` is the general set, and a host drops what its field has no use for rather than working around seven periods somebody else chose. Custom is pressed whenever the selection matches none of them, so a reader who built their own range can still read their own state. Nothing reaches the host until Done — a range is built by two clicks and the first is often wrong, and a parent that has already been told about a half-built range has already filtered a report on one nobody chose."
+              wide
+            >
+              <RangePanelDemo />
+            </Demo>
+
+            <Demo
+              id="c5"
+              name="Range field"
+              api='variant="date-range" · showSpan · maxSpanDays'
+              tags={["two tab stops", "day count", "proof-read"]}
+              note="One shell, two typed halves and an arrow. Two bordered boxes with an arrow between them read as two questions; a reader answering “when does this start and end” is answering one. The halves stay two tab stops on purpose — the single-tab-stop rule is per field, and arrowing through six segments to reach the end date is past the point where you can tell which half you are in. The day count is inclusive of both ends, because an authorisation from the 1st to the 7th is seven days of care rather than six, and it is the field's own proof-read: a transposed month is invisible in 03/07 – 07/07 and unmissable as “123 days”. The second field is deliberately backwards — an end before its start is an error rather than a silent swap, because the swap is only obviously right when a calendar made both clicks."
+              wide
+            >
+              <DateRangeFieldDemo />
             </Demo>
           </div>
         ) : null}
@@ -1014,6 +1155,17 @@ export function DatePickerGallery() {
                 durationPresets={BEHAVIORAL_HEALTH_DURATIONS}
                 bands={BANDS}
               />
+            </Demo>
+
+            <Demo
+              id="s4"
+              name="Time range"
+              api='variant="time-range" · stepMinutes · allowOvernight'
+              tags={["two columns", "filtered end", "derived length"]}
+              note="A day at half-hour steps is forty-eight times and therefore over a thousand possible spans, so a single list of spans is unreadable. Two columns is the shape the question actually has. The end column is filtered rather than merely ordered: every time that cannot be an end — before the start, shorter than the minimum, longer than the maximum — is struck and says why, because offering a time that will be rejected on commit is how a booking form teaches people to distrust it. The badge is the proof-read: a start typed as PM when the reader meant AM is invisible in 7:00 → 10:00 and unmissable as a negative span. The second field is a night shift, which is a real shift — refusing 22:00 to 06:30 corrupts the data the refusal was protecting — so it is accepted, and the next-day crossing is said in words rather than wrapped in silence."
+              wide
+            >
+              <TimeRangeDemo />
             </Demo>
           </div>
         ) : null}

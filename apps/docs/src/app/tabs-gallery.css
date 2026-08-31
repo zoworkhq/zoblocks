@@ -208,26 +208,6 @@
   color: var(--ox-text-muted, var(--color-graphite));
 }
 
-.ox-dt-demo-chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.25rem;
-}
-.ox-dt-demo-chip {
-  min-block-size: 1.75rem;
-  border: 1px solid var(--ox-border, currentColor);
-  border-radius: 999px;
-  background: var(--ox-surface, transparent);
-  padding-inline: 0.625rem;
-  font-size: 0.75rem;
-  color: var(--ox-text, inherit);
-  cursor: pointer;
-}
-.ox-dt-demo-chip:hover {
-  border-color: var(--ox-accent, currentColor);
-  color: var(--ox-accent, inherit);
-}
-
 .ox-dt-demo-list {
   display: grid;
   gap: 0.5rem;

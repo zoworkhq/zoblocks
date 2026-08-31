@@ -3,11 +3,11 @@
 /**
  * The parts of the date, time and session system.
  *
- * Eleven presentations of one temporal contract, in one module rather than
- * eleven catalogue entries. That is a product decision and worth stating:
+ * Thirteen presentations of one temporal contract, in one module rather than
+ * thirteen catalogue entries. That is a product decision and worth stating:
  * a clinician does not shop for a "birth date field", they reach for the date
- * control and need it to behave differently in eleven places. Tabs made the
- * same call for the same reason — one component, eleven skins, one keyboard
+ * control and need it to behave differently in a dozen places. Tabs made the
+ * same call for the same reason — one component, many skins, one keyboard
  * model — and splitting it would have hidden the argument that the skins are
  * the same component.
  *
@@ -31,13 +31,16 @@ import {
   formatPlainDate,
   isSameDate,
   isValidDate,
+  matchRangePreset,
   minutesOfTime,
   parseClockTime,
   parseDateDigits,
   plainDate,
   plainTime,
+  rangeDayCount,
   sessionFrom,
   timeFromMinutes,
+  timeRangeMinutes,
   WEEKDAY_ABBREVIATIONS,
   WEEKDAY_NAMES,
   weekdayOf,
@@ -45,6 +48,8 @@ import {
   withSessionEnd,
   withSessionStart,
   type DateOrder,
+  type DateRangePreset,
+  type DateShortcut,
   type DurationBand,
   type DurationPreset,
   type MonthRef,
@@ -53,12 +58,15 @@ import {
   type OxPartialDate,
   type OxTemporal,
   type OxTime,
+  type OxTimeRange,
   type SessionInterval,
   type TemporalAbsence,
 } from "@/lib/oxygen-datetime";
 import {
   CalendarGlyph,
   CalendarGrid,
+  ChevronGlyph,
+  ClockGlyph,
   dateSegments,
   FieldMessage,
   LockGlyph,
@@ -299,6 +307,27 @@ export interface DateFieldProps extends Omit<
   weekStart?: number;
   /** Rendered under the popover grid — relative-date chips, a clear action. */
   calendarFooter?: React.ReactNode;
+  /**
+   * Named dates down the side of the popover calendar — "Today", "Next Monday".
+   *
+   * A rail rather than a row of chips under the grid, because it is a second
+   * way into the same answer and belongs beside the grid rather than after it.
+   * `relativeDateOptions(now)` is the general set; drop what your field has no
+   * use for. "Tomorrow" on a date of service is noise.
+   */
+  calendarShortcuts?: readonly DateShortcut[];
+  /** Offers "Custom" above the rail, pressed when the value matches nothing in it. */
+  calendarShowCustom?: boolean;
+  /** Shows the arrow-key legend under the popover grid. */
+  calendarHints?: boolean;
+  /** Months shown side by side in the popover calendar. */
+  calendarMonths?: number;
+  /**
+   * Whether the popover reports a day the moment it is clicked, or holds it
+   * behind Cancel and Done. `immediate` by default: one click is the whole
+   * answer for a single date, and a second press to confirm it is a press.
+   */
+  calendarCommit?: "immediate" | "explicit";
 }
 
 interface FieldNotice {
@@ -414,6 +443,11 @@ export const DateField = React.forwardRef<HTMLDivElement, DateFieldProps>(
       load,
       weekStart,
       calendarFooter,
+      calendarShortcuts,
+      calendarShowCustom,
+      calendarHints,
+      calendarMonths,
+      calendarCommit,
       id,
       className,
       ...rest
@@ -522,11 +556,17 @@ export const DateField = React.forwardRef<HTMLDivElement, DateFieldProps>(
                   handleSegments(dateToSegments(next));
                   dismiss();
                 }}
+                onCancel={dismiss}
+                commit={calendarCommit}
+                months={calendarMonths}
                 now={now ?? null}
                 min={min}
                 max={max}
                 unavailable={unavailable}
                 load={load}
+                shortcuts={calendarShortcuts}
+                showCustomPreset={calendarShowCustom}
+                hints={calendarHints}
                 weekStart={weekStart}
                 footer={calendarFooter}
               />
@@ -603,11 +643,22 @@ export interface CalendarProps extends Omit<
 
   /** The selected range, controlled. Only meaningful in `mode="range"`. */
   range?: DateRangeValue | null;
+  /**
+   * The range on first render, uncontrolled. Pass this or `range`, never both.
+   *
+   * `value` has had `defaultValue` since the beginning and the other two modes
+   * did not, which made an uncontrolled range or multi-date calendar unable to
+   * open on anything but empty — a filter that remembers last month's period
+   * had to be controlled for no other reason.
+   */
+  defaultRange?: DateRangeValue | null;
   /** Fired when a range completes — on the second click, not the first. */
   onRangeChange?: (range: DateRangeValue) => void;
 
   /** The selected dates, controlled. Only meaningful in `mode="multiple"`. */
   dates?: OxDate[];
+  /** The dates on first render, uncontrolled. Pass this or `dates`, never both. */
+  defaultDates?: OxDate[];
   /** Fired whenever the multiple-selection set changes. */
   onDatesChange?: (dates: OxDate[]) => void;
   /** Cap for `mode="multiple"`. Further dates are refused, never dialogued. */
@@ -625,6 +676,13 @@ export interface CalendarProps extends Omit<
    * into view.
    */
   onMonthChange?: (month: MonthRef) => void;
+
+  /**
+   * How many months to show at once, 1–4. Two is what a range wants: most
+   * ranges cross a month boundary, and choosing an end you cannot see is how
+   * a range picker ends up needing three attempts.
+   */
+  months?: number;
 
   /**
    * The day marked "today". Required to mark one — the component reads no
@@ -647,6 +705,70 @@ export interface CalendarProps extends Omit<
   unavailable?: (date: OxDate) => string | null;
   /** Open-slot count under the numeral, so density is visible before a click. */
   load?: (date: OxDate) => number | null;
+
+  /**
+   * Named periods down the side — "This month", "Last week".
+   *
+   * Data rather than a boolean, because the right seven periods for a billing
+   * report and for an authorisation window are not the same seven, and a
+   * component that decides is a component every host has to work around.
+   * `dateRangePresets(now)` is the general set; drop what does not apply.
+   * Only meaningful in `mode="range"`.
+   */
+  presets?: readonly DateRangePreset[];
+  /**
+   * Named single dates down the side — "Today", "Next Monday".
+   *
+   * The single-date half of the same rail, for `mode="single"` and
+   * `mode="multiple"`; `range` reads `presets` instead. Data for the same
+   * reason: "Next Monday" is a scheduling convention, and a component that
+   * ships one has decided what your clinic's week looks like.
+   * `relativeDateOptions(now)` is the general set.
+   *
+   * In `multiple` a shortcut toggles rather than replaces, because that is
+   * what every other press in that mode does.
+   */
+  shortcuts?: readonly DateShortcut[];
+  /**
+   * Offers a "Custom" entry above the rail, pressed whenever the selection
+   * matches nothing in it. Without it a reader who has built their own
+   * selection sees a rail with nothing selected and no way to read their own
+   * state.
+   *
+   * Pressing it clears the selection, so the next click in the grid starts
+   * fresh. That is what "I will pick my own" means here, and it is the only
+   * reading that leaves the rail and the grid agreeing about the state.
+   */
+  showCustomPreset?: boolean;
+
+  /**
+   * When the selection reaches the host.
+   *
+   * `immediate` — the default and the existing behaviour — reports every
+   * click. `explicit` holds a draft behind Cancel and Done, which is what a
+   * range wants: a mis-clicked start is corrected by clicking again, and a
+   * parent that has already been told about it has already filtered a report
+   * on a range nobody chose.
+   */
+  commit?: "immediate" | "explicit";
+  /** Fired when an `explicit` calendar is dismissed without committing. */
+  onCancel?: () => void;
+  /** Fired after Done, with the value that was committed. */
+  onCommit?: () => void;
+  /** The word on the dismissing action. Translate it; do not leave it English. */
+  cancelLabel?: string;
+  /** The word on the committing action. */
+  doneLabel?: string;
+
+  /**
+   * Shows the arrow-key legend in the footer.
+   *
+   * `aria-hidden`, deliberately: a screen-reader user is told how to drive a
+   * grid by the grid, and repeating it in the footer is one more thing to
+   * page past. It is a discoverability aid for people who can see it and
+   * would otherwise never learn the calendar has a keyboard.
+   */
+  hints?: boolean;
 
   /** 0 = Sunday. From `Intl.Locale.getWeekInfo`, never hardcoded. */
   weekStart?: number;
@@ -674,6 +796,25 @@ export interface CalendarProps extends Omit<
   footer?: React.ReactNode;
 }
 
+/** The arrow-key legend. Decoration for the eye; the grid speaks for itself. */
+function KeyboardHints() {
+  return (
+    <div className="ox-dt-cal__hints" aria-hidden="true">
+      <span className="ox-dt-cal__hint">
+        <kbd>→</kbd>
+        <kbd>←</kbd>
+        <kbd>↑</kbd>
+        <kbd>↓</kbd>
+        navigate
+      </span>
+      <span className="ox-dt-cal__hint">
+        <kbd>↵</kbd>
+        select
+      </span>
+    </div>
+  );
+}
+
 export const Calendar = React.forwardRef<HTMLDivElement, CalendarProps>(
   function Calendar(props, ref) {
     const {
@@ -682,18 +823,30 @@ export const Calendar = React.forwardRef<HTMLDivElement, CalendarProps>(
       defaultValue = null,
       onChange,
       range: controlledRange,
+      defaultRange,
       onRangeChange,
       dates: controlledDates,
+      defaultDates,
       onDatesChange,
       maxDates,
       month: controlledMonth,
       defaultMonth,
       onMonthChange,
+      months = 1,
       now = null,
       min,
       max,
       unavailable,
       load,
+      presets,
+      shortcuts,
+      showCustomPreset,
+      commit = "immediate",
+      onCancel,
+      onCommit,
+      cancelLabel = "Cancel",
+      doneLabel = "Done",
+      hints,
       weekStart = 0,
       weekdayLabels,
       weekdayNames,
@@ -705,14 +858,64 @@ export const Calendar = React.forwardRef<HTMLDivElement, CalendarProps>(
       ...rest
     } = props;
 
-    const [value, setValue] = useTemporalValue(controlledValue, defaultValue);
-    const [range, setRange] = useTemporalValue<DateRangeValue>(controlledRange ?? undefined, {
-      start: null,
-      end: null,
-    });
-    const [dates, setDates] = useTemporalValue<OxDate[]>(controlledDates, []);
+    const explicit = commit === "explicit";
 
-    const anchor = value ?? range?.start ?? dates[0] ?? now ?? null;
+    const [value, setValue] = useTemporalValue(controlledValue, defaultValue);
+    const [range, setRange] = useTemporalValue<DateRangeValue>(
+      controlledRange ?? undefined,
+      defaultRange ?? { start: null, end: null },
+    );
+    const [dates, setDates] = useTemporalValue<OxDate[]>(controlledDates, defaultDates ?? []);
+
+    /*
+     * The draft an `explicit` calendar edits.
+     *
+     * Held separately rather than by suppressing the callbacks, because the
+     * grid has to redraw the band as the reader builds it — a draft that is
+     * only in the parent is a draft the parent has already been told about,
+     * which is the thing Cancel exists to prevent. Reset whenever the
+     * committed value changes underneath, so reopening a panel starts from
+     * what is actually selected rather than from an abandoned edit.
+     */
+    const committedKey = `${dateKey(value)}|${dateKey(range?.start)}|${dateKey(range?.end)}|${dates.map(dateKey).join(",")}`;
+    const [draft, setDraft] = React.useState(() => ({ value, range, dates, key: committedKey }));
+    const live = explicit && draft.key === committedKey ? draft : { value, range, dates };
+    if (explicit && draft.key !== committedKey) {
+      // Render-phase reset of state derived from props — the pattern React
+      // documents for exactly this, and cheaper than an effect that would
+      // paint the abandoned draft for one frame first.
+      setDraft({ value, range, dates, key: committedKey });
+    }
+
+    const writeValue = (next: OxDate | null) => {
+      if (explicit) {
+        setDraft((was) => ({ ...was, value: next }));
+        return;
+      }
+      setValue(next);
+      onChange?.(next);
+    };
+
+    const writeRange = (next: DateRangeValue) => {
+      if (explicit) {
+        setDraft((was) => ({ ...was, range: next }));
+        return;
+      }
+      setRange(next);
+      onRangeChange?.(next);
+    };
+
+    const writeDates = (next: OxDate[]) => {
+      if (explicit) {
+        setDraft((was) => ({ ...was, dates: next }));
+        return;
+      }
+      setDates(next);
+      onDatesChange?.(next);
+    };
+
+    const anchor =
+      live.value ?? live.range?.start ?? live.dates[0] ?? value ?? range?.start ?? now ?? null;
     const [month, setMonth] = useTemporalValue<MonthRef>(
       controlledMonth,
       defaultMonth ?? (anchor ? { y: anchor.y, m: anchor.m } : { y: 2026, m: 1 }),
@@ -734,52 +937,210 @@ export const Calendar = React.forwardRef<HTMLDivElement, CalendarProps>(
 
     const handleSelect = (date: OxDate) => {
       if (mode === "range") {
+        const current = live.range;
         const next: DateRangeValue =
-          !range?.start || range.end
+          !current?.start || current.end
             ? { start: date, end: null }
-            : compareDates(date, range.start) < 0
-              ? { start: date, end: range.start }
-              : { start: range.start, end: date };
-        setRange(next);
-        onRangeChange?.(next);
+            : compareDates(date, current.start) < 0
+              ? { start: date, end: current.start }
+              : { start: current.start, end: date };
+        writeRange(next);
         return;
       }
 
       if (mode === "multiple") {
-        const at = dates.findIndex((existing) => isSameDate(existing, date));
+        const at = live.dates.findIndex((existing) => isSameDate(existing, date));
         let next: OxDate[];
         if (at > -1) {
           // Clicking a selected date removes it. A remove control inside a 32px
           // cell would be under the target floor, and a second click is what
           // people try first anyway.
-          next = [...dates.slice(0, at), ...dates.slice(at + 1)];
+          next = [...live.dates.slice(0, at), ...live.dates.slice(at + 1)];
         } else {
-          if (maxDates != null && dates.length >= maxDates) return;
-          next = [...dates, date].sort((a, b) => compareDates(a, b));
+          if (maxDates != null && live.dates.length >= maxDates) return;
+          next = [...live.dates, date].sort((a, b) => compareDates(a, b));
         }
-        setDates(next);
-        onDatesChange?.(next);
+        writeDates(next);
         return;
       }
 
-      setValue(date);
-      onChange?.(date);
+      writeValue(date);
     };
+
+    /** Brings a rail choice into view. A period you cannot see is a period you have to trust. */
+    const revealMonth = (date: OxDate) => {
+      const next = { y: date.y, m: date.m };
+      setMonth(next);
+      onMonthChange?.(next);
+    };
+
+    const applyPreset = (preset: DateRangePreset) => {
+      writeRange({ start: preset.start, end: preset.end });
+      revealMonth(preset.start);
+    };
+
+    const applyShortcut = (shortcut: DateShortcut) => {
+      if (mode === "multiple") {
+        // A shortcut toggles rather than replaces, because that is what every
+        // other press in this mode does.
+        handleSelect(shortcut.date);
+      } else {
+        writeValue(shortcut.date);
+      }
+      revealMonth(shortcut.date);
+    };
+
+    const activePreset = presets ? matchRangePreset(live.range, presets) : null;
+    const activeShortcut =
+      shortcuts?.find((shortcut) =>
+        mode === "multiple"
+          ? live.dates.some((date) => isSameDate(date, shortcut.date))
+          : isSameDate(live.value, shortcut.date),
+      ) ?? null;
+
+    const railed = mode === "range" ? Boolean(presets?.length) : Boolean(shortcuts?.length);
+    /*
+     * "Custom" is pressed when the reader has a selection the rail cannot
+     * name — not when they have none at all. An empty calendar has not been
+     * customised; it has not been answered.
+     */
+    const hasSelection =
+      mode === "range"
+        ? Boolean(live.range?.start)
+        : mode === "multiple"
+          ? live.dates.length > 0
+          : live.value != null;
+    const custom = Boolean(
+      showCustomPreset && railed && hasSelection && !activePreset && !activeShortcut,
+    );
+
+    const clearSelection = () => {
+      if (mode === "range") writeRange({ start: null, end: null });
+      else if (mode === "multiple") writeDates([]);
+      else writeValue(null);
+    };
+
+    const rail = railed ? (
+      <div
+        className="ox-dt-cal__rail"
+        role="group"
+        aria-label={mode === "range" ? "Named periods" : "Named dates"}
+      >
+        {showCustomPreset ? (
+          <button
+            type="button"
+            className={cn("ox-dt-cal__preset", custom && "ox-dt-cal__preset--on")}
+            aria-pressed={custom}
+            onClick={clearSelection}
+          >
+            Custom
+          </button>
+        ) : null}
+        {mode === "range"
+          ? presets?.map((preset) => (
+              <button
+                key={preset.id}
+                type="button"
+                className={cn(
+                  "ox-dt-cal__preset",
+                  activePreset?.id === preset.id && "ox-dt-cal__preset--on",
+                )}
+                aria-pressed={activePreset?.id === preset.id}
+                onClick={() => applyPreset(preset)}
+              >
+                {preset.label}
+              </button>
+            ))
+          : shortcuts?.map((shortcut) => {
+              const on =
+                mode === "multiple"
+                  ? live.dates.some((date) => isSameDate(date, shortcut.date))
+                  : isSameDate(live.value, shortcut.date);
+              return (
+                <button
+                  key={shortcut.id}
+                  type="button"
+                  className={cn("ox-dt-cal__preset", on && "ox-dt-cal__preset--on")}
+                  aria-pressed={on}
+                  onClick={() => applyShortcut(shortcut)}
+                >
+                  {shortcut.label}
+                </button>
+              );
+            })}
+      </div>
+    ) : null;
+
+    /** Whether Done has something whole to commit. */
+    const completable =
+      mode === "range"
+        ? Boolean(live.range?.start && live.range?.end)
+        : mode === "multiple"
+          ? live.dates.length > 0
+          : live.value != null;
+
+    const commitNow = () => {
+      if (!completable) return;
+      if (mode === "range" && live.range) {
+        setRange(live.range);
+        onRangeChange?.(live.range);
+      } else if (mode === "multiple") {
+        setDates(live.dates);
+        onDatesChange?.(live.dates);
+      } else {
+        setValue(live.value ?? null);
+        onChange?.(live.value ?? null);
+      }
+      onCommit?.();
+    };
+
+    const cancelNow = () => {
+      setDraft({ value, range, dates, key: committedKey });
+      onCancel?.();
+    };
+
+    const actions = explicit ? (
+      <div className="ox-dt-cal__actions">
+        <button type="button" className="ox-dt-cal__action" onClick={cancelNow}>
+          {cancelLabel}
+        </button>
+        <button
+          type="button"
+          className="ox-dt-cal__action ox-dt-cal__action--primary"
+          disabled={!completable}
+          onClick={commitNow}
+        >
+          {doneLabel}
+        </button>
+      </div>
+    ) : null;
+
+    const foot =
+      footer || hints || actions ? (
+        <>
+          {hints ? <KeyboardHints /> : null}
+          {footer}
+          {actions}
+        </>
+      ) : null;
 
     return (
       <div ref={ref} data-ox-calendar={mode} className={cn(className)} {...rest}>
         <CalendarGrid
           mode={mode}
-          value={value}
-          range={range}
-          dates={dates}
+          value={live.value}
+          range={live.range}
+          dates={live.dates}
           month={month}
+          months={months}
           onMonth={(next) => {
             setMonth(next);
             onMonthChange?.(next);
           }}
           onSelect={handleSelect}
           today={now}
+          min={min}
+          max={max}
           unavailable={isUnavailable}
           load={load}
           weekStart={weekStart}
@@ -788,7 +1149,8 @@ export const Calendar = React.forwardRef<HTMLDivElement, CalendarProps>(
           monthNames={monthNames}
           monthLabel={monthLabel}
           fluid={fluid}
-          footer={footer}
+          footer={foot}
+          aside={rail}
         />
       </div>
     );
@@ -808,9 +1170,7 @@ Calendar.displayName = "Calendar";
  * "next Tuesday" also resolves "nxt tues" to *something*, and a silent wrong
  * answer in a clinical date field is worse than no shortcut at all.
  */
-export function relativeDateOptions(
-  now: OxDate,
-): Array<{ id: string; label: string; date: OxDate }> {
+export function relativeDateOptions(now: OxDate): DateShortcut[] {
   // Sunday is 0, so the distance to the next Monday is (8 - weekday) mod 7 —
   // and 0 means today is Monday, which should offer the Monday after.
   const toNextMonday = (8 - weekdayOf(now)) % 7 || 7;
@@ -821,6 +1181,398 @@ export function relativeDateOptions(
     { id: "two-weeks", label: "In 2 weeks", date: addCalendarDays(now, 14) },
   ];
 }
+
+/* ================================================================== */
+/* date-range-field
+/* ================================================================== */
+
+/**
+ * DateRangeField — a span of days, as one field.
+ *
+ *     <DateRangeField now={today} value={range} onChange={setRange} />
+ *     <DateRangeField months={2} presets={dateRangePresets(today)} showCustomPreset />
+ *
+ * Two typed halves in one shell, and a two-month calendar behind them. Three
+ * details are the whole component.
+ *
+ * **Both ends are typeable.** A range is still mostly recall — an
+ * authorisation window, a reporting period, a leave of absence — and eight
+ * keystrokes per end beats paging a grid. The calendar is the fallback it is
+ * everywhere else in this family, not the main road.
+ *
+ * **Two months, because ranges cross month boundaries.** Choosing an end you
+ * cannot see is how a range picker ends up needing three attempts, and the
+ * band drawn between two months is the only thing that shows a reader what
+ * they have actually selected.
+ *
+ * **The panel commits explicitly.** A range is built by two clicks, and the
+ * first one is often wrong. `commit="immediate"` reports each click, which
+ * means a parent has already filtered its report on a half-built range that
+ * nobody chose. Cancel and Done exist so a mis-click costs a click.
+ */
+
+export interface DateRangeFieldProps extends Omit<
+  React.HTMLAttributes<HTMLDivElement>,
+  "onChange" | "defaultValue" | "children"
+> {
+  /** Controlled value. Either end may be null; an incomplete range is a legal state. */
+  value?: DateRangeValue | null;
+  /** Uncontrolled initial value. Pass this or `value`, never both. */
+  defaultValue?: DateRangeValue | null;
+  /** Fired when either end changes — by typing, by the calendar, or by a preset. */
+  onChange?: (range: DateRangeValue) => void;
+
+  /** Today, supplied by the host. Nothing here reads a clock. */
+  now?: OxDate;
+  /** Segment order. Match the locale, not the developer's. */
+  order?: DateOrder;
+  /** Earliest selectable date, inclusive. */
+  min?: OxDate;
+  /** Latest selectable date, inclusive. */
+  max?: OxDate;
+  /** The reason a date cannot be chosen, or null. Spoken, not just dimmed. */
+  unavailable?: (date: OxDate) => string | null;
+  /** Open-slot count under each numeral. */
+  load?: (date: OxDate) => number | null;
+
+  /** Named periods down the side of the panel. `dateRangePresets(now)` is the general set. */
+  presets?: readonly DateRangePreset[];
+  /** Offers "Custom", pressed whenever the selection matches no preset. */
+  showCustomPreset?: boolean;
+  /** Months shown side by side in the panel. Two by default, which is what a range wants. */
+  months?: number;
+  /** Shows the arrow-key legend under the panel's grid. */
+  hints?: boolean;
+  /** When the panel reports its selection. `explicit` by default — see above. */
+  commit?: "immediate" | "explicit";
+
+  /**
+   * Shows the day count beside the value.
+   *
+   * Inclusive of both ends, because a range of service from the 1st to the 7th
+   * is seven days of care. It is the field's own proof-read: a transposed
+   * month is invisible in 03/07 – 07/07 and screaming in "123 days".
+   */
+  showSpan?: boolean;
+  /** Refuses — with a spoken reason — any range longer than this many days. */
+  maxSpanDays?: number;
+  /** Refuses any range shorter than this many days. */
+  minSpanDays?: number;
+
+  label?: string;
+  /** Accessible name for the start half. Both halves need one; "Date" twice is a riddle. */
+  startLabel?: string;
+  /** Accessible name for the end half. */
+  endLabel?: string;
+  optional?: boolean;
+  required?: boolean;
+  /** An advisory shown under the field when there is nothing more urgent to say. */
+  hint?: string;
+  /** A host-supplied error. Outranks everything the field works out for itself. */
+  error?: string;
+  disabled?: boolean;
+  readOnly?: boolean;
+  invalid?: boolean;
+  /** Posts `${name}-start` and `${name}-end` as ISO dates in a plain HTML form. */
+  name?: string;
+  /** 0 = Sunday. From `Intl.Locale.getWeekInfo`, never hardcoded. */
+  weekStart?: number;
+  /** Offers the calendar panel. On by default. */
+  showCalendar?: boolean;
+}
+
+const EMPTY_RANGE: DateRangeValue = { start: null, end: null };
+
+/** An arrow between the two halves, not a hyphen. A hyphen inside a date reads as a separator. */
+function RangeArrow() {
+  return (
+    <span className="ox-dt-range__arrow" aria-hidden="true">
+      <svg
+        viewBox="0 0 24 24"
+        width="14"
+        height="14"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <path d="M4 12h15m-5.5-5.5L19 12l-5.5 5.5" />
+      </svg>
+    </span>
+  );
+}
+
+export const DateRangeField = React.forwardRef<HTMLDivElement, DateRangeFieldProps>(
+  function DateRangeField(props, ref) {
+    const {
+      value: controlled,
+      defaultValue = null,
+      onChange,
+      now,
+      order = "MDY",
+      min,
+      max,
+      unavailable,
+      load,
+      presets,
+      showCustomPreset,
+      months = 2,
+      hints,
+      commit = "explicit",
+      showSpan,
+      maxSpanDays,
+      minSpanDays,
+      label,
+      startLabel = "Start date",
+      endLabel = "End date",
+      optional,
+      required,
+      hint,
+      error,
+      disabled,
+      readOnly,
+      invalid,
+      name,
+      weekStart = 0,
+      showCalendar = true,
+      id,
+      className,
+      ...rest
+    } = props;
+
+    const [range, setRange] = useTemporalValue<DateRangeValue>(
+      controlled ?? undefined,
+      defaultValue ?? EMPTY_RANGE,
+    );
+    const [startSegments, setStartSegments] = React.useState<SegmentValues>(() =>
+      dateToSegments(range.start),
+    );
+    const [endSegments, setEndSegments] = React.useState<SegmentValues>(() =>
+      dateToSegments(range.end),
+    );
+    const [open, setOpen] = React.useState(false);
+    const startHandle = React.useRef<SegmentedFieldHandle>(null);
+
+    // The same reconciliation the single field does, over both halves at once:
+    // sync from a value this field did not itself produce, and never mid-entry.
+    const markEmitted = useValueSync(`${dateKey(range.start)}|${dateKey(range.end)}`, () => {
+      setStartSegments(dateToSegments(range.start));
+      setEndSegments(dateToSegments(range.end));
+    });
+
+    const reactId = React.useId();
+    const fieldId = id ?? `${reactId}-range`;
+    const messageId = `${reactId}-message`;
+
+    const write = (next: DateRangeValue) => {
+      markEmitted(`${dateKey(next.start)}|${dateKey(next.end)}`);
+      setRange(next);
+      onChange?.(next);
+    };
+
+    const handleHalf = (which: "start" | "end", segments: SegmentValues) => {
+      if (which === "start") setStartSegments(segments);
+      else setEndSegments(segments);
+      const parsed = segmentsToDate(segments);
+      const current = which === "start" ? range.start : range.end;
+      if (parsed === null && current === null) return;
+      if (parsed && current && compareDates(parsed, current) === 0) return;
+      write(which === "start" ? { ...range, start: parsed } : { ...range, end: parsed });
+    };
+
+    const dismiss = React.useCallback(() => {
+      setOpen(false);
+      startHandle.current?.focusSegment(0);
+    }, []);
+
+    /*
+     * What the field knows about its own value.
+     *
+     * The ordering check is first and is an error: a range whose end precedes
+     * its start is not a span, and every downstream consumer of it will
+     * either throw or silently return nothing. The span checks are errors too
+     * — a host that states a maximum has a reason — and the day count is an
+     * advisory that is always shown, because it is the reader's proof-read.
+     */
+    const days = rangeDayCount(range);
+    // `rangeDayCount` sorts its ends, which is right for a bound check and
+    // wrong for a badge: "17 days" beside a range that runs backwards reads as
+    // a value the field has accepted.
+    const ordered = Boolean(range.start && range.end && compareDates(range.end, range.start) >= 0);
+    const notice: FieldNotice | null = error
+      ? { tone: "error", invalid: true, text: error }
+      : range.start && range.end && compareDates(range.end, range.start) < 0
+        ? {
+            tone: "error",
+            invalid: true,
+            text: "The end date is before the start date.",
+          }
+        : days != null && maxSpanDays != null && days > maxSpanDays
+          ? {
+              tone: "error",
+              invalid: true,
+              text: `Choose a range of ${maxSpanDays} days or fewer. This one is ${days}.`,
+            }
+          : days != null && minSpanDays != null && days < minSpanDays
+            ? {
+                tone: "error",
+                invalid: true,
+                text: `Choose a range of at least ${minSpanDays} days. This one is ${days}.`,
+              }
+            : null;
+
+    const isInvalid = invalid || notice?.invalid || false;
+    const describedBy = notice || hint ? messageId : undefined;
+    const withCalendar = showCalendar && !disabled && !readOnly;
+
+    return (
+      <div
+        ref={ref}
+        data-ox-date-range={range.start && range.end ? "set" : "empty"}
+        className={cn("ox-dt-stack", className)}
+        {...rest}
+      >
+        {label ? (
+          <span className="ox-dt-label" id={`${fieldId}-label`}>
+            {label}
+            {required ? (
+              <span className="ox-dt-label__required" aria-hidden="true">
+                *
+              </span>
+            ) : null}
+            {optional ? <span className="ox-dt-label__optional">Optional</span> : null}
+          </span>
+        ) : null}
+
+        <div className={withCalendar ? "ox-dt-anchor" : undefined}>
+          {/*
+            One shell, two tab stops.
+            The single-tab-stop rule is per field, and a range is two fields:
+            collapsing them would mean arrowing through six segments to reach
+            the end date, past the point where the reader can tell which half
+            they are in.
+          */}
+          <div
+            className={cn(
+              "ox-dt-range",
+              isInvalid && "ox-dt-range--invalid",
+              disabled && "ox-dt-range--disabled",
+              readOnly && "ox-dt-range--readonly",
+            )}
+          >
+            <SegmentedField
+              ref={startHandle}
+              id={fieldId}
+              bare
+              segments={dateSegments(order)}
+              values={startSegments}
+              onValues={(next) => handleHalf("start", next)}
+              label={startLabel}
+              invalid={isInvalid}
+              disabled={disabled}
+              readOnly={readOnly}
+              describedBy={describedBy}
+              onPasteText={(text) => {
+                const parsed = parseDateDigits(text, { order });
+                if (parsed) handleHalf("start", dateToSegments(parsed));
+              }}
+            />
+
+            <RangeArrow />
+
+            <SegmentedField
+              bare
+              segments={dateSegments(order)}
+              values={endSegments}
+              onValues={(next) => handleHalf("end", next)}
+              label={endLabel}
+              invalid={isInvalid}
+              disabled={disabled}
+              readOnly={readOnly}
+              describedBy={describedBy}
+              onPasteText={(text) => {
+                const parsed = parseDateDigits(text, { order });
+                if (parsed) handleHalf("end", dateToSegments(parsed));
+              }}
+            />
+
+            {showSpan && ordered && days != null && days > 0 ? (
+              <span className="ox-dt-range__span">{`${days} day${days === 1 ? "" : "s"}`}</span>
+            ) : null}
+
+            {withCalendar ? (
+              <button
+                type="button"
+                className="ox-dt-field__trigger ox-dt-range__trigger"
+                aria-label="Choose from calendar"
+                aria-haspopup="dialog"
+                aria-expanded={open}
+                onClick={() => setOpen((was) => !was)}
+              >
+                <CalendarGlyph />
+              </button>
+            ) : null}
+          </div>
+
+          {withCalendar ? (
+            <TemporalPopover open={open} onDismiss={dismiss} label={label ?? "Choose a date range"}>
+              <Calendar
+                mode="range"
+                months={months}
+                range={range}
+                onRangeChange={(next) => {
+                  write(next);
+                  if (commit === "explicit") dismiss();
+                }}
+                onCancel={dismiss}
+                commit={commit}
+                now={now ?? null}
+                min={min}
+                max={max}
+                unavailable={unavailable}
+                load={load}
+                presets={presets}
+                showCustomPreset={showCustomPreset}
+                hints={hints}
+                weekStart={weekStart}
+              />
+            </TemporalPopover>
+          ) : null}
+        </div>
+
+        {/* ISO in the form body, always. A locale-formatted date in a POST is a
+          bug in somebody else's parser six months from now. */}
+        {name ? (
+          <>
+            <input
+              type="hidden"
+              name={`${name}-start`}
+              value={range.start ? formatPlainDate(range.start, "iso") : ""}
+            />
+            <input
+              type="hidden"
+              name={`${name}-end`}
+              value={range.end ? formatPlainDate(range.end, "iso") : ""}
+            />
+          </>
+        ) : null}
+
+        {notice ? (
+          <FieldMessage id={messageId} tone={notice.tone}>
+            {notice.text}
+          </FieldMessage>
+        ) : hint ? (
+          <FieldMessage id={messageId} tone="hint">
+            {hint}
+          </FieldMessage>
+        ) : null}
+      </div>
+    );
+  },
+);
+
+DateRangeField.displayName = "DateRangeField";
 
 /* ================================================================== */
 /* time-field
@@ -1144,6 +1896,601 @@ export function timeGrid(fromMinutes: number, toMinutes: number, everyMinutes: n
   for (let m = fromMinutes; m <= toMinutes; m += everyMinutes) out.push(m);
   return out;
 }
+
+/* ================================================================== */
+/* time-range-field
+/* ================================================================== */
+
+/**
+ * TimeRangeField — a start time, an end time, and the length between them.
+ *
+ *     <TimeRangeField value={range} onChange={setRange} />
+ *     <TimeRangeField stepMinutes={15} minDurationMinutes={30} allowOvernight />
+ *
+ * Two typed halves in one shell, a duration badge that updates as they change,
+ * and two columns of offered times behind the clock button.
+ *
+ * **Why two columns rather than one list of spans.** A day has forty-eight
+ * half-hours and therefore over a thousand spans, and a single list of them is
+ * unreadable. Two columns is the shape the question actually has: when does it
+ * start, and when does it end.
+ *
+ * **The end column is filtered, not merely ordered.** Every time that cannot
+ * be an end — before the start, or shorter than the minimum, or longer than
+ * the maximum — is disabled with the reason spoken, the same treatment an
+ * unavailable calendar day gets. Offering a time that will be rejected on
+ * commit is how a booking form teaches people to distrust it.
+ *
+ * **The duration is derived and always shown.** It is the reader's proof-read:
+ * a start typed as PM when they meant AM is invisible in `7:00 → 10:00` and
+ * unmissable as `-9h`.
+ */
+
+export interface TimeRangeFieldProps extends Omit<
+  React.HTMLAttributes<HTMLDivElement>,
+  "onChange" | "defaultValue" | "children"
+> {
+  /** Controlled value. Either end may be null. */
+  value?: OxTimeRange | null;
+  /** Uncontrolled initial value. Pass this or `value`, never both. */
+  defaultValue?: OxTimeRange | null;
+  /** Fired when either end changes. */
+  onChange?: (range: OxTimeRange) => void;
+
+  /** 24-hour display. The stored value is 24-hour either way. */
+  hour24?: boolean;
+
+  /** First time offered in the columns, in minutes from midnight. */
+  fromMinutes?: number;
+  /** Last time offered, in minutes from midnight. */
+  toMinutes?: number;
+  /** The interval between offered times. 30 by default; 15 for a clinic that books quarters. */
+  stepMinutes?: number;
+
+  /** The shortest span that may be chosen. */
+  minDurationMinutes?: number;
+  /** The longest span that may be chosen. */
+  maxDurationMinutes?: number;
+  /**
+   * Lets the end precede the start, meaning the next day.
+   *
+   * A night shift is 22:00 to 06:00 and refusing it corrupts the data the
+   * refusal was protecting. Off by default, because an appointment that ends
+   * before it starts is almost always a typo.
+   */
+  allowOvernight?: boolean;
+
+  /** When the panel reports its selection. `explicit` by default. */
+  commit?: "immediate" | "explicit";
+  /** Shows the derived length beside the value. On by default — it is the proof-read. */
+  showDuration?: boolean;
+
+  label?: string;
+  /** Accessible name and column heading for the start half. */
+  startLabel?: string;
+  /** Accessible name and column heading for the end half. */
+  endLabel?: string;
+  optional?: boolean;
+  required?: boolean;
+  /** An advisory shown under the field when there is nothing more urgent to say. */
+  hint?: string;
+  /** A host-supplied error. Outranks anything the field works out for itself. */
+  error?: string;
+  disabled?: boolean;
+  readOnly?: boolean;
+  invalid?: boolean;
+  /** Posts `${name}-start` and `${name}-end` as 24-hour HH:MM in a plain HTML form. */
+  name?: string;
+  /** Offers the two-column panel. On by default. */
+  showPanel?: boolean;
+  /** The word on the dismissing action. Translate it; do not leave it English. */
+  cancelLabel?: string;
+  /** The word on the committing action. */
+  doneLabel?: string;
+}
+
+const EMPTY_TIME_RANGE: OxTimeRange = { start: null, end: null };
+
+/** `HH:MM`, for a form body. Never the locale rendering. */
+function isoTime(time: OxTime | null): string {
+  if (!time) return "";
+  return `${String(time.h).padStart(2, "0")}:${String(time.mi).padStart(2, "0")}`;
+}
+
+/**
+ * One column of offered times.
+ *
+ * A listbox with a roving tabstop rather than forty-eight tab stops. Selection
+ * is a deliberate act — arrows move, Enter or a click chooses — because
+ * selection-follows-focus in a committed field means arrowing past 3 PM books
+ * 3 PM.
+ */
+function TimeColumn(props: {
+  heading: string;
+  minutes: readonly number[];
+  selected: number | null;
+  hour24: boolean;
+  reasonFor?: (minutes: number) => string | null;
+  onSelect: (minutes: number) => void;
+}) {
+  const { heading, minutes, selected, hour24, reasonFor, onSelect } = props;
+  const headingId = React.useId();
+  const listRef = React.useRef<HTMLDivElement>(null);
+  const [active, setActive] = React.useState<number | null>(null);
+  const shouldRefocus = React.useRef(false);
+
+  // The tabstop resolves against what is on screen, the same rule the calendar
+  // grid follows: a column whose selection has been filtered away by a new
+  // start time would otherwise have no way in from the keyboard.
+  const focusMinutes =
+    active != null && minutes.includes(active)
+      ? active
+      : selected != null && minutes.includes(selected)
+        ? selected
+        : (minutes.find((m) => !reasonFor?.(m)) ?? minutes[0] ?? null);
+
+  React.useEffect(() => {
+    if (!shouldRefocus.current) return;
+    shouldRefocus.current = false;
+    listRef.current?.querySelector<HTMLButtonElement>('[data-ox-dt-active="true"]')?.focus();
+  });
+
+  // The selected option is scrolled to on open. A column that opens at
+  // midnight when 3 PM is chosen has hidden the answer inside itself.
+  // Feature-detected: jsdom has no layout and therefore no `scrollIntoView`,
+  // and a convenience must never be the reason a field fails to mount.
+  React.useEffect(() => {
+    const node = listRef.current?.querySelector<HTMLElement>('[aria-selected="true"]');
+    if (typeof node?.scrollIntoView === "function") node.scrollIntoView({ block: "center" });
+  }, []);
+
+  const move = (delta: number) => {
+    if (focusMinutes == null) return;
+    const at = minutes.indexOf(focusMinutes);
+    const next = minutes[Math.min(minutes.length - 1, Math.max(0, at + delta))];
+    if (next == null) return;
+    setActive(next);
+    shouldRefocus.current = true;
+  };
+
+  const onKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    switch (event.key) {
+      case "ArrowDown":
+        move(1);
+        break;
+      case "ArrowUp":
+        move(-1);
+        break;
+      case "Home":
+        setActive(minutes[0] ?? null);
+        shouldRefocus.current = true;
+        break;
+      case "End":
+        setActive(minutes[minutes.length - 1] ?? null);
+        shouldRefocus.current = true;
+        break;
+      case "PageDown":
+        move(5);
+        break;
+      case "PageUp":
+        move(-5);
+        break;
+      default:
+        return;
+    }
+    event.preventDefault();
+  };
+
+  return (
+    <div className="ox-dt-timecol">
+      <div className="ox-dt-timecol__head" id={headingId}>
+        {heading}
+      </div>
+      <div
+        ref={listRef}
+        role="listbox"
+        aria-labelledby={headingId}
+        className="ox-dt-timecol__list"
+        onKeyDown={onKeyDown}
+      >
+        {minutes.map((value) => {
+          const reason = reasonFor?.(value) ?? null;
+          const time = timeFromMinutes(value).time;
+          const text = formatClockTime(time, { hour24 });
+          const isSelected = value === selected;
+          return (
+            <button
+              key={value}
+              type="button"
+              role="option"
+              aria-selected={isSelected}
+              aria-disabled={reason ? true : undefined}
+              aria-label={reason ? `${text}, unavailable, ${reason}` : text}
+              title={reason ?? undefined}
+              tabIndex={value === focusMinutes ? 0 : -1}
+              data-ox-dt-active={value === focusMinutes ? "true" : undefined}
+              className={cn("ox-dt-timeopt", reason && "ox-dt-timeopt--blocked")}
+              onClick={() => {
+                if (reason) return;
+                setActive(value);
+                onSelect(value);
+              }}
+            >
+              {text}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+export const TimeRangeField = React.forwardRef<HTMLDivElement, TimeRangeFieldProps>(
+  function TimeRangeField(props, ref) {
+    const {
+      value: controlled,
+      defaultValue = null,
+      onChange,
+      hour24 = false,
+      fromMinutes = 0,
+      toMinutes = 1425,
+      stepMinutes = 30,
+      minDurationMinutes,
+      maxDurationMinutes,
+      allowOvernight = false,
+      commit = "explicit",
+      showDuration = true,
+      label,
+      startLabel = "Start time",
+      endLabel = "End time",
+      optional,
+      required,
+      hint,
+      error,
+      disabled,
+      readOnly,
+      invalid,
+      name,
+      showPanel = true,
+      cancelLabel = "Cancel",
+      doneLabel = "Done",
+      id,
+      className,
+      ...rest
+    } = props;
+
+    const [range, setRange] = useTemporalValue<OxTimeRange>(
+      controlled ?? undefined,
+      defaultValue ?? EMPTY_TIME_RANGE,
+    );
+    const [startSegments, setStartSegments] = React.useState<SegmentValues>(() =>
+      timeToSegments(range.start, hour24),
+    );
+    const [endSegments, setEndSegments] = React.useState<SegmentValues>(() =>
+      timeToSegments(range.end, hour24),
+    );
+    const [open, setOpen] = React.useState(false);
+    const [draft, setDraft] = React.useState<OxTimeRange>(range);
+    const startHandle = React.useRef<SegmentedFieldHandle>(null);
+
+    const markEmitted = useValueSync(`${timeKey(range.start)}|${timeKey(range.end)}`, () => {
+      setStartSegments(timeToSegments(range.start, hour24));
+      setEndSegments(timeToSegments(range.end, hour24));
+    });
+
+    const reactId = React.useId();
+    const fieldId = id ?? `${reactId}-time-range`;
+    const messageId = `${reactId}-message`;
+
+    const write = (next: OxTimeRange) => {
+      markEmitted(`${timeKey(next.start)}|${timeKey(next.end)}`);
+      setRange(next);
+      onChange?.(next);
+    };
+
+    const handleHalf = (which: "start" | "end", segments: SegmentValues) => {
+      if (which === "start") setStartSegments(segments);
+      else setEndSegments(segments);
+      const parsed = segmentsToTime(segments, { hour24 });
+      const current = which === "start" ? range.start : range.end;
+      if (parsed === null && current === null) return;
+      if (parsed && current && minutesOfTime(parsed) === minutesOfTime(current)) return;
+      write(which === "start" ? { ...range, start: parsed } : { ...range, end: parsed });
+    };
+
+    /**
+     * A pasted time, into one half.
+     *
+     * The meridiem is dropped when the paste was ambiguous, which leaves the
+     * half incomplete rather than resolved — the same refusal `TimeField`
+     * makes, and for the same reason: a bare `9` guessed as morning turns a
+     * 9 PM discharge into a 9 AM one.
+     */
+    const pasteInto = (which: "start" | "end", text: string) => {
+      const parsed = parseClockTime(text, { hour24 });
+      if (!parsed) return;
+      const next = timeToSegments(parsed.time, hour24);
+      if (parsed.ambiguous) next.ap = null;
+      handleHalf(which, next);
+    };
+
+    const dismiss = React.useCallback(() => {
+      setOpen(false);
+      startHandle.current?.focusSegment(0);
+    }, []);
+
+    const options = React.useMemo(
+      () => timeGrid(fromMinutes, toMinutes, stepMinutes),
+      [fromMinutes, toMinutes, stepMinutes],
+    );
+
+    // The panel edits a draft when the commit is explicit, so Cancel has
+    // something to restore and the field behind it does not flicker through
+    // every intermediate pair.
+    const panelRange = commit === "explicit" && open ? draft : range;
+
+    const startMinutes = panelRange.start ? minutesOfTime(panelRange.start) : null;
+    const endMinutes = panelRange.end ? minutesOfTime(panelRange.end) : null;
+
+    /**
+     * Why a time cannot end a range that begins at `from`, or null.
+     *
+     * The start is a parameter rather than a closure over the current one,
+     * because the one caller that matters asks about a start the field does
+     * not have yet: choosing a new start has to judge the existing end against
+     * that new start, and judging it against the old one keeps a 10 AM end
+     * under a 2 PM start.
+     */
+    const reasonForEnd = React.useCallback(
+      (candidate: number, from: number | null): string | null => {
+        if (from == null) return null;
+        const span = candidate - from;
+        const length = span > 0 ? span : allowOvernight ? span + 1440 : span;
+        if (length <= 0) return "before the start time";
+        if (minDurationMinutes != null && length < minDurationMinutes) {
+          return `shorter than ${formatDuration(minDurationMinutes)}`;
+        }
+        if (maxDurationMinutes != null && length > maxDurationMinutes) {
+          return `longer than ${formatDuration(maxDurationMinutes)}`;
+        }
+        return null;
+      },
+      [allowOvernight, minDurationMinutes, maxDurationMinutes],
+    );
+
+    /** The same question, about the start currently in the panel. */
+    const endReason = React.useCallback(
+      (candidate: number): string | null => reasonForEnd(candidate, startMinutes),
+      [reasonForEnd, startMinutes],
+    );
+
+    const setPanelRange = (next: OxTimeRange) => {
+      if (commit === "explicit") setDraft(next);
+      else write(next);
+    };
+
+    const duration = timeRangeMinutes(range, { allowOvernight });
+    const valueStart = range.start ? minutesOfTime(range.start) : null;
+    const valueEnd = range.end ? minutesOfTime(range.end) : null;
+    const overnight =
+      allowOvernight &&
+      valueStart != null &&
+      valueEnd != null &&
+      valueEnd <= valueStart &&
+      duration != null &&
+      duration > 0;
+
+    const notice: FieldNotice | null = error
+      ? { tone: "error", invalid: true, text: error }
+      : duration != null && duration <= 0
+        ? {
+            tone: "error",
+            invalid: true,
+            text: allowOvernight
+              ? "Choose an end time. This span is empty."
+              : "The end time is before the start time. Turn on overnight spans if that is what you meant.",
+          }
+        : duration != null && minDurationMinutes != null && duration < minDurationMinutes
+          ? {
+              tone: "error",
+              invalid: true,
+              text: `This span is ${formatDuration(duration)}. The shortest allowed is ${formatDuration(minDurationMinutes)}.`,
+            }
+          : duration != null && maxDurationMinutes != null && duration > maxDurationMinutes
+            ? {
+                tone: "error",
+                invalid: true,
+                text: `This span is ${formatDuration(duration)}. The longest allowed is ${formatDuration(maxDurationMinutes)}.`,
+              }
+            : overnight
+              ? {
+                  tone: "hint",
+                  invalid: false,
+                  // Legal, unusual, and worth saying once. A night shift is
+                  // ordinary and the reader must not be told they erred.
+                  text: `Ends the next day, ${formatDuration(duration ?? 0)} later.`,
+                }
+              : null;
+
+    const isInvalid = invalid || notice?.invalid || false;
+    const describedBy = notice || hint ? messageId : undefined;
+    const withPanel = showPanel && !disabled && !readOnly;
+
+    return (
+      <div
+        ref={ref}
+        data-ox-time-range={range.start && range.end ? "set" : "empty"}
+        className={cn("ox-dt-stack", className)}
+        {...rest}
+      >
+        {label ? (
+          <span className="ox-dt-label" id={`${fieldId}-label`}>
+            {label}
+            {required ? (
+              <span className="ox-dt-label__required" aria-hidden="true">
+                *
+              </span>
+            ) : null}
+            {optional ? <span className="ox-dt-label__optional">Optional</span> : null}
+          </span>
+        ) : null}
+
+        <div className={withPanel ? "ox-dt-anchor" : undefined}>
+          <div
+            className={cn(
+              "ox-dt-range",
+              isInvalid && "ox-dt-range--invalid",
+              disabled && "ox-dt-range--disabled",
+              readOnly && "ox-dt-range--readonly",
+            )}
+          >
+            <span className="ox-dt-range__glyph" aria-hidden="true">
+              <ClockGlyph />
+            </span>
+
+            <SegmentedField
+              ref={startHandle}
+              id={fieldId}
+              bare
+              segments={timeSegments({ hour24 })}
+              values={startSegments}
+              onValues={(next) => handleHalf("start", next)}
+              label={startLabel}
+              separator=":"
+              invalid={isInvalid}
+              disabled={disabled}
+              readOnly={readOnly}
+              describedBy={describedBy}
+              onPasteText={(text) => pasteInto("start", text)}
+            />
+
+            <RangeArrow />
+
+            <SegmentedField
+              bare
+              segments={timeSegments({ hour24 })}
+              values={endSegments}
+              onValues={(next) => handleHalf("end", next)}
+              label={endLabel}
+              separator=":"
+              invalid={isInvalid}
+              disabled={disabled}
+              readOnly={readOnly}
+              describedBy={describedBy}
+              onPasteText={(text) => pasteInto("end", text)}
+            />
+
+            {showDuration && duration != null && duration > 0 ? (
+              <span className="ox-dt-range__span">
+                {formatDuration(duration, { compact: true })}
+              </span>
+            ) : null}
+
+            {withPanel ? (
+              <button
+                type="button"
+                className="ox-dt-field__trigger ox-dt-range__trigger"
+                aria-label="Choose from a list of times"
+                aria-haspopup="dialog"
+                aria-expanded={open}
+                onClick={() => {
+                  setDraft(range);
+                  setOpen((was) => !was);
+                }}
+              >
+                <ChevronGlyph direction="down" />
+              </button>
+            ) : null}
+          </div>
+
+          {withPanel ? (
+            <TemporalPopover open={open} onDismiss={dismiss} label={label ?? "Choose a time range"}>
+              <div className="ox-dt-timerange">
+                <div className="ox-dt-timerange__cols">
+                  <TimeColumn
+                    heading={startLabel}
+                    minutes={options}
+                    selected={panelRange.start ? minutesOfTime(panelRange.start) : null}
+                    hour24={hour24}
+                    onSelect={(value) => {
+                      // Moving the start past the end drops the end rather
+                      // than silently dragging it: which one the reader meant
+                      // to move is not knowable, and inventing an answer is
+                      // how a picker books the wrong hour.
+                      const keepEnd =
+                        endMinutes != null && reasonForEnd(endMinutes, value) === null;
+                      setPanelRange({
+                        start: timeFromMinutes(value).time,
+                        end: keepEnd ? panelRange.end : null,
+                      });
+                    }}
+                  />
+                  <TimeColumn
+                    heading={endLabel}
+                    minutes={options}
+                    selected={endMinutes}
+                    hour24={hour24}
+                    reasonFor={endReason}
+                    onSelect={(value) =>
+                      setPanelRange({ ...panelRange, end: timeFromMinutes(value).time })
+                    }
+                  />
+                </div>
+
+                {commit === "explicit" ? (
+                  <div className="ox-dt-cal__foot">
+                    <div className="ox-dt-cal__actions">
+                      <button
+                        type="button"
+                        className="ox-dt-cal__action"
+                        onClick={() => {
+                          setDraft(range);
+                          dismiss();
+                        }}
+                      >
+                        {cancelLabel}
+                      </button>
+                      <button
+                        type="button"
+                        className="ox-dt-cal__action ox-dt-cal__action--primary"
+                        disabled={!draft.start || !draft.end}
+                        onClick={() => {
+                          write(draft);
+                          dismiss();
+                        }}
+                      >
+                        {doneLabel}
+                      </button>
+                    </div>
+                  </div>
+                ) : null}
+              </div>
+            </TemporalPopover>
+          ) : null}
+        </div>
+
+        {name ? (
+          <>
+            <input type="hidden" name={`${name}-start`} value={isoTime(range.start)} />
+            <input type="hidden" name={`${name}-end`} value={isoTime(range.end)} />
+          </>
+        ) : null}
+
+        {notice ? (
+          <FieldMessage id={messageId} tone={notice.tone}>
+            {notice.text}
+          </FieldMessage>
+        ) : hint ? (
+          <FieldMessage id={messageId} tone="hint">
+            {hint}
+          </FieldMessage>
+        ) : null}
+      </div>
+    );
+  },
+);
+
+TimeRangeField.displayName = "TimeRangeField";
 
 /* ================================================================== */
 /* session-time-field
@@ -1608,6 +2955,19 @@ export interface BirthDateFieldProps extends Omit<
   error?: React.ReactNode;
   /** Hide the age readout. Rarely right — it is the field's own error check. */
   hideAge?: boolean;
+  /**
+   * Shows the arrow-key legend under the popover grid.
+   *
+   * Worth more here than anywhere else in this family: a birth date is the one
+   * calendar a reader may genuinely have to travel four hundred months in, and
+   * Shift+PageUp is the difference between that and one press.
+   */
+  calendarHints?: boolean;
+  /**
+   * Whether the popover reports a day the moment it is clicked, or holds it
+   * behind Cancel and Done. `immediate` by default.
+   */
+  calendarCommit?: "immediate" | "explicit";
 
   /**
    * Removes the field from the tab order entirely. Prefer `readOnly` for anything the reader
@@ -1661,6 +3021,8 @@ export const BirthDateField = React.forwardRef<HTMLDivElement, BirthDateFieldPro
       hint,
       error,
       hideAge,
+      calendarHints,
+      calendarCommit,
       disabled,
       readOnly,
       name,
@@ -1821,16 +3183,25 @@ export const BirthDateField = React.forwardRef<HTMLDivElement, BirthDateFieldPro
               onDismiss={() => setOpen(false)}
               label="Choose a year of birth"
             >
-              <CalendarGrid
-                mode="single"
+              {/*
+                No rail here, and the absence is the point: there is no
+                "Today" for a date of birth, and a shortcut nobody can use is a
+                row between the reader and the year they came for. The legend
+                stays, because the reason this calendar exists at all is that
+                somebody is going to have to travel four hundred months.
+              */}
+              <Calendar
                 value={full}
                 month={month}
-                onMonth={setMonth}
-                onSelect={(date) => {
-                  commitSegments(dateToSegments(date));
+                onMonthChange={setMonth}
+                onChange={(date) => {
+                  if (date) commitSegments(dateToSegments(date));
                   setOpen(false);
                 }}
-                today={now}
+                onCancel={() => setOpen(false)}
+                commit={calendarCommit}
+                hints={calendarHints}
+                now={now}
                 unavailable={(date) => (compareDates(date, now) > 0 ? "in the future" : null)}
               />
             </TemporalPopover>

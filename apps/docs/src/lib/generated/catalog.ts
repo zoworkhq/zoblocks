@@ -5387,10 +5387,10 @@ export const CATALOG: ComponentDoc[] = [
     "since": "0.5.0",
     "layer": "clinical",
     "distribution": "registry",
-    "summary": "One temporal control with fourteen variants: field, calendar, birth date, session, slots, recurrence and the read-only record.",
-    "tagline": "One temporal control, fourteen variants, one value space.",
-    "description": "Fourteen presentations of one value space, one keyboard model and one accessibility contract. `variant` picks the surface; the parts are separately testable components underneath.",
-    "rationale": "A clinician does not shop for a \"birth date field\". They reach for the date control, and it has to behave differently in fourteen places: a service date they already know, an appointment they have to be shown, a birth date that wants an age beside it, a session that is three numbers with two degrees of freedom, a course of treatment that is a rule rather than a date, and a signed timestamp that is a legal instrument. Splitting those into fourteen catalogue entries hides the thing that makes them a system — that every one shares a value space, a keyboard model and an accessibility contract — and it makes a reader choose between components before they have understood the choice. The deeper reason is that healthcare temporal input is four distinct jobs, not one: recall (the user knows the value), choose (the system knows the options), construct (the value is a structure with derived members) and witness (the value is an assertion about the past). Every general-purpose picker builds only for choose, which is the rarest of the four in an electronic record, and that inversion is why EHR date fields are the way they are.",
+    "summary": "One temporal control with sixteen variants: field, calendar, date and time ranges, birth date, session, slots, recurrence and the read-only record.",
+    "tagline": "One temporal control, sixteen variants, one value space.",
+    "description": "Sixteen presentations of one value space, one keyboard model and one accessibility contract. `variant` picks the surface; the parts are separately testable components underneath.",
+    "rationale": "A clinician does not shop for a \"birth date field\". They reach for the date control, and it has to behave differently in sixteen places: a service date they already know, an appointment they have to be shown, a birth date that wants an age beside it, a session that is three numbers with two degrees of freedom, a course of treatment that is a rule rather than a date, and a signed timestamp that is a legal instrument. Splitting those into sixteen catalogue entries hides the thing that makes them a system — that every one shares a value space, a keyboard model and an accessibility contract — and it makes a reader choose between components before they have understood the choice. The deeper reason is that healthcare temporal input is four distinct jobs, not one: recall (the user knows the value), choose (the system knows the options), construct (the value is a structure with derived members) and witness (the value is an assertion about the past). Every general-purpose picker builds only for choose, which is the rarest of the four in an electronic record, and that inversion is why EHR date fields are the way they are.",
     "categories": [
       "Clinical",
       "Forms"
@@ -5429,10 +5429,12 @@ export const CATALOG: ComponentDoc[] = [
       "Field — no popover at all",
       "Calendar — inline month grid",
       "Range — two clicks, never a drag",
+      "Date range — both ends typed, two months behind them, named periods down the side",
       "Multiple dates — capped, click again to remove",
       "Birth date — age, partial dates, stated absence",
       "Time — and the ambiguity it refuses to resolve",
       "Session — start, end, duration, visible driver",
+      "Time range — two columns, a filtered end, a derived length",
       "Slots — grouped, counted, four states",
       "Scheduler — provider, date and time on one surface",
       "Recurrence — the rule in words",
@@ -5443,20 +5445,20 @@ export const CATALOG: ComponentDoc[] = [
     "props": [
       {
         "name": "defaultValue",
-        "type": "string | number | BirthDateValue | OxTime | SessionInterval | RecurrenceRule | readonly string[]",
-        "description": "Uncontrolled initial value. Pass this **or** `value`, never both. There is deliberately no runtime warning: ADR 0009 forbids component source writing to the console at all, because a component that logs is one error-reporting integration away from putting a date of birth in a third party's index. When both are passed, `value` wins — the ordinary React contract. Uncontrolled initial value. Pass this or `value`, never both; `value` wins if you pass both.",
+        "type": "string | number | DateRangeValue | BirthDateValue | OxTime | SessionInterval | OxTimeRange | RecurrenceRule | readonly string[]",
+        "description": "Uncontrolled initial value. Pass this **or** `value`, never both. There is deliberately no runtime warning: ADR 0009 forbids component source writing to the console at all, because a component that logs is one error-reporting integration away from putting a date of birth in a third party's index. When both are passed, `value` wins — the ordinary React contract. Uncontrolled initial value. Pass this or `value`, never both; `value` wins if you pass both. Uncontrolled initial value. Pass this or `value`, never both.",
         "required": false
       },
       {
         "name": "onChange",
-        "type": "((value: OxDate | null) => void) | ((value: OxDate | null) => void) | ((value: BirthDateValue) => void) | ((value: OxTime | null) => void) | ((value: SessionInterval) => void) | React.ChangeEventHandler<HTMLDivElement, Element> | ((rule: RecurrenceRule) => void) | React.ChangeEventHandler<HTMLElement, Element>",
-        "description": "Fired on every complete, valid date, and with `null` when the field is cleared. Never fired mid-typing. Fired when a single date is chosen. Only meaningful in `mode=\"single\"`. Fired with the whole birth-date value, which carries its precision and any absence reason alongside the date. Fired on every complete time, and with `null` when cleared. Fired whenever start, end or duration changes. The interval is always internally consistent when it fires. Fired with the recurrence rule whenever any part of it changes.",
+        "type": "((value: OxDate | null) => void) | ((value: OxDate | null) => void) | ((range: DateRangeValue) => void) | ((value: BirthDateValue) => void) | ((value: OxTime | null) => void) | ((value: SessionInterval) => void) | ((range: OxTimeRange) => void) | React.ChangeEventHandler<HTMLDivElement, Element> | ((rule: RecurrenceRule) => void) | React.ChangeEventHandler<HTMLElement, Element>",
+        "description": "Fired on every complete, valid date, and with `null` when the field is cleared. Never fired mid-typing. Fired when a single date is chosen. Only meaningful in `mode=\"single\"`. Fired when either end changes — by typing, by the calendar, or by a preset. Fired with the whole birth-date value, which carries its precision and any absence reason alongside the date. Fired on every complete time, and with `null` when cleared. Fired whenever start, end or duration changes. The interval is always internally consistent when it fires. Fired when either end changes. Fired with the recurrence rule whenever any part of it changes.",
         "required": false
       },
       {
         "name": "variant",
-        "type": "'picker' | 'field' | 'calendar' | 'range' | 'multiple' | 'birth-date' | 'time' | 'session' | 'slots' | 'scheduler' | 'recurrence' | 'series' | 'group' | 'readout'",
-        "description": "Which of the fourteen temporal controls to render. Defaults to the date field. A month grid. `range` is two clicks, `multiple` is a capped set. A date of birth, with its own precision and absence handling. A time of day, with optional organisation presets. A start, an end and a derived duration that may cross midnight. A grid of bookable times. Provider, date and slot, resolved together. A recurrence rule, expressed in words and emitted as RRULE. A recurring series with its conflicts resolved one occurrence at a time. A recurring group with capacity, facilitators and a room. The read-only record rendering. Not an input.",
+        "type": "'picker' | 'field' | 'calendar' | 'range' | 'multiple' | 'date-range' | 'birth-date' | 'time' | 'session' | 'time-range' | 'slots' | 'scheduler' | 'recurrence' | 'series' | 'group' | 'readout'",
+        "description": "Which of the sixteen temporal controls to render. Defaults to the date field. A month grid. `range` is two clicks, `multiple` is a capped set. A span of days: two typeable ends, a two-month panel, named periods. A date of birth, with its own precision and absence handling. A time of day, with optional organisation presets. A start, an end and a derived duration that may cross midnight. A start time, an end time, and a derived length. A grid of bookable times. Provider, date and slot, resolved together. A recurrence rule, expressed in words and emitted as RRULE. A recurring series with its conflicts resolved one occurrence at a time. A recurring group with capacity, facilitators and a room. The read-only record rendering. Not an input.",
         "required": false
       }
     ],
@@ -5466,20 +5468,20 @@ export const CATALOG: ComponentDoc[] = [
         "props": [
           {
             "name": "defaultValue",
-            "type": "string | number | BirthDateValue | OxTime | SessionInterval | RecurrenceRule | readonly string[]",
-            "description": "Uncontrolled initial value. Pass this **or** `value`, never both. There is deliberately no runtime warning: ADR 0009 forbids component source writing to the console at all, because a component that logs is one error-reporting integration away from putting a date of birth in a third party's index. When both are passed, `value` wins — the ordinary React contract. Uncontrolled initial value. Pass this or `value`, never both; `value` wins if you pass both.",
+            "type": "string | number | DateRangeValue | BirthDateValue | OxTime | SessionInterval | OxTimeRange | RecurrenceRule | readonly string[]",
+            "description": "Uncontrolled initial value. Pass this **or** `value`, never both. There is deliberately no runtime warning: ADR 0009 forbids component source writing to the console at all, because a component that logs is one error-reporting integration away from putting a date of birth in a third party's index. When both are passed, `value` wins — the ordinary React contract. Uncontrolled initial value. Pass this or `value`, never both; `value` wins if you pass both. Uncontrolled initial value. Pass this or `value`, never both.",
             "required": false
           },
           {
             "name": "onChange",
-            "type": "((value: OxDate | null) => void) | ((value: OxDate | null) => void) | ((value: BirthDateValue) => void) | ((value: OxTime | null) => void) | ((value: SessionInterval) => void) | React.ChangeEventHandler<HTMLDivElement, Element> | ((rule: RecurrenceRule) => void) | React.ChangeEventHandler<HTMLElement, Element>",
-            "description": "Fired on every complete, valid date, and with `null` when the field is cleared. Never fired mid-typing. Fired when a single date is chosen. Only meaningful in `mode=\"single\"`. Fired with the whole birth-date value, which carries its precision and any absence reason alongside the date. Fired on every complete time, and with `null` when cleared. Fired whenever start, end or duration changes. The interval is always internally consistent when it fires. Fired with the recurrence rule whenever any part of it changes.",
+            "type": "((value: OxDate | null) => void) | ((value: OxDate | null) => void) | ((range: DateRangeValue) => void) | ((value: BirthDateValue) => void) | ((value: OxTime | null) => void) | ((value: SessionInterval) => void) | ((range: OxTimeRange) => void) | React.ChangeEventHandler<HTMLDivElement, Element> | ((rule: RecurrenceRule) => void) | React.ChangeEventHandler<HTMLElement, Element>",
+            "description": "Fired on every complete, valid date, and with `null` when the field is cleared. Never fired mid-typing. Fired when a single date is chosen. Only meaningful in `mode=\"single\"`. Fired when either end changes — by typing, by the calendar, or by a preset. Fired with the whole birth-date value, which carries its precision and any absence reason alongside the date. Fired on every complete time, and with `null` when cleared. Fired whenever start, end or duration changes. The interval is always internally consistent when it fires. Fired when either end changes. Fired with the recurrence rule whenever any part of it changes.",
             "required": false
           },
           {
             "name": "variant",
-            "type": "'picker' | 'field' | 'calendar' | 'range' | 'multiple' | 'birth-date' | 'time' | 'session' | 'slots' | 'scheduler' | 'recurrence' | 'series' | 'group' | 'readout'",
-            "description": "Which of the fourteen temporal controls to render. Defaults to the date field. A month grid. `range` is two clicks, `multiple` is a capped set. A date of birth, with its own precision and absence handling. A time of day, with optional organisation presets. A start, an end and a derived duration that may cross midnight. A grid of bookable times. Provider, date and slot, resolved together. A recurrence rule, expressed in words and emitted as RRULE. A recurring series with its conflicts resolved one occurrence at a time. A recurring group with capacity, facilitators and a room. The read-only record rendering. Not an input.",
+            "type": "'picker' | 'field' | 'calendar' | 'range' | 'multiple' | 'date-range' | 'birth-date' | 'time' | 'session' | 'time-range' | 'slots' | 'scheduler' | 'recurrence' | 'series' | 'group' | 'readout'",
+            "description": "Which of the sixteen temporal controls to render. Defaults to the date field. A month grid. `range` is two clicks, `multiple` is a capped set. A span of days: two typeable ends, a two-month panel, named periods. A date of birth, with its own precision and absence handling. A time of day, with optional organisation presets. A start, an end and a derived duration that may cross midnight. A start time, an end time, and a derived length. A grid of bookable times. Provider, date and slot, resolved together. A recurrence rule, expressed in words and emitted as RRULE. A recurring series with its conflicts resolved one occurrence at a time. A recurring group with capacity, facilitators and a room. The read-only record rendering. Not an input.",
             "required": false
           }
         ]
@@ -5488,9 +5490,39 @@ export const CATALOG: ComponentDoc[] = [
         "name": "DateField",
         "props": [
           {
+            "name": "calendarCommit",
+            "type": "'immediate' | 'explicit'",
+            "description": "Whether the popover reports a day the moment it is clicked, or holds it behind Cancel and Done. `immediate` by default: one click is the whole answer for a single date, and a second press to confirm it is a press.",
+            "required": false
+          },
+          {
             "name": "calendarFooter",
             "type": "React.ReactNode",
             "description": "Rendered under the popover grid — relative-date chips, a clear action.",
+            "required": false
+          },
+          {
+            "name": "calendarHints",
+            "type": "boolean",
+            "description": "Shows the arrow-key legend under the popover grid.",
+            "required": false
+          },
+          {
+            "name": "calendarMonths",
+            "type": "number",
+            "description": "Months shown side by side in the popover calendar.",
+            "required": false
+          },
+          {
+            "name": "calendarShortcuts",
+            "type": "readonly DateShortcut[]",
+            "description": "Named dates down the side of the popover calendar — \"Today\", \"Next Monday\". A rail rather than a row of chips under the grid, because it is a second way into the same answer and belongs beside the grid rather than after it. `relativeDateOptions(now)` is the general set; drop what your field has no use for. \"Tomorrow\" on a date of service is noise.",
+            "required": false
+          },
+          {
+            "name": "calendarShowCustom",
+            "type": "boolean",
+            "description": "Offers \"Custom\" above the rail, pressed when the value matches nothing in it.",
             "required": false
           },
           {
@@ -5643,9 +5675,27 @@ export const CATALOG: ComponentDoc[] = [
         "name": "Calendar",
         "props": [
           {
+            "name": "cancelLabel",
+            "type": "string",
+            "description": "The word on the dismissing action. Translate it; do not leave it English.",
+            "required": false
+          },
+          {
+            "name": "commit",
+            "type": "'immediate' | 'explicit'",
+            "description": "When the selection reaches the host. `immediate` — the default and the existing behaviour — reports every click. `explicit` holds a draft behind Cancel and Done, which is what a range wants: a mis-clicked start is corrected by clicking again, and a parent that has already been told about it has already filtered a report on a range nobody chose.",
+            "required": false
+          },
+          {
             "name": "dates",
             "type": "OxDate[]",
             "description": "The selected dates, controlled. Only meaningful in `mode=\"multiple\"`.",
+            "required": false
+          },
+          {
+            "name": "defaultDates",
+            "type": "OxDate[]",
+            "description": "The dates on first render, uncontrolled. Pass this or `dates`, never both.",
             "required": false
           },
           {
@@ -5655,9 +5705,21 @@ export const CATALOG: ComponentDoc[] = [
             "required": false
           },
           {
+            "name": "defaultRange",
+            "type": "DateRangeValue | null",
+            "description": "The range on first render, uncontrolled. Pass this or `range`, never both. `value` has had `defaultValue` since the beginning and the other two modes did not, which made an uncontrolled range or multi-date calendar unable to open on anything but empty — a filter that remembers last month's period had to be controlled for no other reason.",
+            "required": false
+          },
+          {
             "name": "defaultValue",
             "type": "OxDate | null",
             "description": "Uncontrolled initial value. Pass this or `value`, never both; `value` wins if you pass both.",
+            "required": false
+          },
+          {
+            "name": "doneLabel",
+            "type": "string",
+            "description": "The word on the committing action.",
             "required": false
           },
           {
@@ -5670,6 +5732,12 @@ export const CATALOG: ComponentDoc[] = [
             "name": "footer",
             "type": "React.ReactNode",
             "description": "Rendered under the grid — relative-date chips, a clear action.",
+            "required": false
+          },
+          {
+            "name": "hints",
+            "type": "boolean",
+            "description": "Shows the arrow-key legend in the footer. `aria-hidden`, deliberately: a screen-reader user is told how to drive a grid by the grid, and repeating it in the footer is one more thing to page past. It is a discoverability aid for people who can see it and would otherwise never learn the calendar has a keyboard.",
             "required": false
           },
           {
@@ -5721,15 +5789,33 @@ export const CATALOG: ComponentDoc[] = [
             "required": false
           },
           {
+            "name": "months",
+            "type": "number",
+            "description": "How many months to show at once, 1–4. Two is what a range wants: most ranges cross a month boundary, and choosing an end you cannot see is how a range picker ends up needing three attempts.",
+            "required": false
+          },
+          {
             "name": "now",
             "type": "OxDate | null",
             "description": "The day marked \"today\". Required to mark one — the component reads no clock, so a calendar without `now` simply has no today, which is correct for a historical picker and deliberate everywhere else.",
             "required": false
           },
           {
+            "name": "onCancel",
+            "type": "(() => void)",
+            "description": "Fired when an `explicit` calendar is dismissed without committing.",
+            "required": false
+          },
+          {
             "name": "onChange",
             "type": "((value: OxDate | null) => void)",
             "description": "Fired when a single date is chosen. Only meaningful in `mode=\"single\"`.",
+            "required": false
+          },
+          {
+            "name": "onCommit",
+            "type": "(() => void)",
+            "description": "Fired after Done, with the value that was committed.",
             "required": false
           },
           {
@@ -5751,9 +5837,27 @@ export const CATALOG: ComponentDoc[] = [
             "required": false
           },
           {
+            "name": "presets",
+            "type": "readonly DateRangePreset[]",
+            "description": "Named periods down the side — \"This month\", \"Last week\". Data rather than a boolean, because the right seven periods for a billing report and for an authorisation window are not the same seven, and a component that decides is a component every host has to work around. `dateRangePresets(now)` is the general set; drop what does not apply. Only meaningful in `mode=\"range\"`.",
+            "required": false
+          },
+          {
             "name": "range",
             "type": "DateRangeValue | null",
             "description": "The selected range, controlled. Only meaningful in `mode=\"range\"`.",
+            "required": false
+          },
+          {
+            "name": "shortcuts",
+            "type": "readonly DateShortcut[]",
+            "description": "Named single dates down the side — \"Today\", \"Next Monday\". The single-date half of the same rail, for `mode=\"single\"` and `mode=\"multiple\"`; `range` reads `presets` instead. Data for the same reason: \"Next Monday\" is a scheduling convention, and a component that ships one has decided what your clinic's week looks like. `relativeDateOptions(now)` is the general set. In `multiple` a shortcut toggles rather than replaces, because that is what every other press in that mode does.",
+            "required": false
+          },
+          {
+            "name": "showCustomPreset",
+            "type": "boolean",
+            "description": "Offers a \"Custom\" entry above the rail, pressed whenever the selection matches nothing in it. Without it a reader who has built their own selection sees a rail with nothing selected and no way to read their own state. Pressing it clears the selection, so the next click in the grid starts fresh. That is what \"I will pick my own\" means here, and it is the only reading that leaves the rail and the grid agreeing about the state.",
             "required": false
           },
           {
@@ -5778,6 +5882,191 @@ export const CATALOG: ComponentDoc[] = [
             "name": "weekdayNames",
             "type": "readonly string[]",
             "description": "Full weekday names, used in each cell's accessible name. Supply both these and `weekdayLabels` for any language that is not English.",
+            "required": false
+          },
+          {
+            "name": "weekStart",
+            "type": "number",
+            "description": "0 = Sunday. From `Intl.Locale.getWeekInfo`, never hardcoded.",
+            "required": false
+          }
+        ]
+      },
+      {
+        "name": "DateRangeField",
+        "props": [
+          {
+            "name": "commit",
+            "type": "'immediate' | 'explicit'",
+            "description": "When the panel reports its selection. `explicit` by default — see above.",
+            "required": false
+          },
+          {
+            "name": "defaultValue",
+            "type": "DateRangeValue | null",
+            "description": "Uncontrolled initial value. Pass this or `value`, never both.",
+            "required": false
+          },
+          {
+            "name": "disabled",
+            "type": "boolean",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "endLabel",
+            "type": "string",
+            "description": "Accessible name for the end half.",
+            "required": false
+          },
+          {
+            "name": "error",
+            "type": "string",
+            "description": "A host-supplied error. Outranks everything the field works out for itself.",
+            "required": false
+          },
+          {
+            "name": "hint",
+            "type": "string",
+            "description": "An advisory shown under the field when there is nothing more urgent to say.",
+            "required": false
+          },
+          {
+            "name": "hints",
+            "type": "boolean",
+            "description": "Shows the arrow-key legend under the panel's grid.",
+            "required": false
+          },
+          {
+            "name": "invalid",
+            "type": "boolean",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "label",
+            "type": "string",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "load",
+            "type": "((date: OxDate) => number | null)",
+            "description": "Open-slot count under each numeral.",
+            "required": false
+          },
+          {
+            "name": "max",
+            "type": "OxDate",
+            "description": "Latest selectable date, inclusive.",
+            "required": false
+          },
+          {
+            "name": "maxSpanDays",
+            "type": "number",
+            "description": "Refuses — with a spoken reason — any range longer than this many days.",
+            "required": false
+          },
+          {
+            "name": "min",
+            "type": "OxDate",
+            "description": "Earliest selectable date, inclusive.",
+            "required": false
+          },
+          {
+            "name": "minSpanDays",
+            "type": "number",
+            "description": "Refuses any range shorter than this many days.",
+            "required": false
+          },
+          {
+            "name": "months",
+            "type": "number",
+            "description": "Months shown side by side in the panel. Two by default, which is what a range wants.",
+            "required": false
+          },
+          {
+            "name": "name",
+            "type": "string",
+            "description": "Posts `${name}-start` and `${name}-end` as ISO dates in a plain HTML form.",
+            "required": false
+          },
+          {
+            "name": "now",
+            "type": "OxDate",
+            "description": "Today, supplied by the host. Nothing here reads a clock.",
+            "required": false
+          },
+          {
+            "name": "onChange",
+            "type": "((range: DateRangeValue) => void)",
+            "description": "Fired when either end changes — by typing, by the calendar, or by a preset.",
+            "required": false
+          },
+          {
+            "name": "optional",
+            "type": "boolean",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "order",
+            "type": "DateOrder",
+            "description": "Segment order. Match the locale, not the developer's.",
+            "required": false
+          },
+          {
+            "name": "presets",
+            "type": "readonly DateRangePreset[]",
+            "description": "Named periods down the side of the panel. `dateRangePresets(now)` is the general set.",
+            "required": false
+          },
+          {
+            "name": "readOnly",
+            "type": "boolean",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "required",
+            "type": "boolean",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "showCalendar",
+            "type": "boolean",
+            "description": "Offers the calendar panel. On by default.",
+            "required": false
+          },
+          {
+            "name": "showCustomPreset",
+            "type": "boolean",
+            "description": "Offers \"Custom\", pressed whenever the selection matches no preset.",
+            "required": false
+          },
+          {
+            "name": "showSpan",
+            "type": "boolean",
+            "description": "Shows the day count beside the value. Inclusive of both ends, because a range of service from the 1st to the 7th is seven days of care. It is the field's own proof-read: a transposed month is invisible in 03/07 – 07/07 and screaming in \"123 days\".",
+            "required": false
+          },
+          {
+            "name": "startLabel",
+            "type": "string",
+            "description": "Accessible name for the start half. Both halves need one; \"Date\" twice is a riddle.",
+            "required": false
+          },
+          {
+            "name": "unavailable",
+            "type": "((date: OxDate) => string | null)",
+            "description": "The reason a date cannot be chosen, or null. Spoken, not just dimmed.",
+            "required": false
+          },
+          {
+            "name": "value",
+            "type": "DateRangeValue | null",
+            "description": "Controlled value. Either end may be null; an incomplete range is a legal state.",
             "required": false
           },
           {
@@ -5897,6 +6186,167 @@ export const CATALOG: ComponentDoc[] = [
             "name": "value",
             "type": "OxTime | null",
             "description": "Controlled value. Pass `null` for empty, never `undefined`.",
+            "required": false
+          }
+        ]
+      },
+      {
+        "name": "TimeRangeField",
+        "props": [
+          {
+            "name": "allowOvernight",
+            "type": "boolean",
+            "description": "Lets the end precede the start, meaning the next day. A night shift is 22:00 to 06:00 and refusing it corrupts the data the refusal was protecting. Off by default, because an appointment that ends before it starts is almost always a typo.",
+            "required": false
+          },
+          {
+            "name": "cancelLabel",
+            "type": "string",
+            "description": "The word on the dismissing action. Translate it; do not leave it English.",
+            "required": false
+          },
+          {
+            "name": "commit",
+            "type": "'immediate' | 'explicit'",
+            "description": "When the panel reports its selection. `explicit` by default.",
+            "required": false
+          },
+          {
+            "name": "defaultValue",
+            "type": "OxTimeRange | null",
+            "description": "Uncontrolled initial value. Pass this or `value`, never both.",
+            "required": false
+          },
+          {
+            "name": "disabled",
+            "type": "boolean",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "doneLabel",
+            "type": "string",
+            "description": "The word on the committing action.",
+            "required": false
+          },
+          {
+            "name": "endLabel",
+            "type": "string",
+            "description": "Accessible name and column heading for the end half.",
+            "required": false
+          },
+          {
+            "name": "error",
+            "type": "string",
+            "description": "A host-supplied error. Outranks anything the field works out for itself.",
+            "required": false
+          },
+          {
+            "name": "fromMinutes",
+            "type": "number",
+            "description": "First time offered in the columns, in minutes from midnight.",
+            "required": false
+          },
+          {
+            "name": "hint",
+            "type": "string",
+            "description": "An advisory shown under the field when there is nothing more urgent to say.",
+            "required": false
+          },
+          {
+            "name": "hour24",
+            "type": "boolean",
+            "description": "24-hour display. The stored value is 24-hour either way.",
+            "required": false
+          },
+          {
+            "name": "invalid",
+            "type": "boolean",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "label",
+            "type": "string",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "maxDurationMinutes",
+            "type": "number",
+            "description": "The longest span that may be chosen.",
+            "required": false
+          },
+          {
+            "name": "minDurationMinutes",
+            "type": "number",
+            "description": "The shortest span that may be chosen.",
+            "required": false
+          },
+          {
+            "name": "name",
+            "type": "string",
+            "description": "Posts `${name}-start` and `${name}-end` as 24-hour HH:MM in a plain HTML form.",
+            "required": false
+          },
+          {
+            "name": "onChange",
+            "type": "((range: OxTimeRange) => void)",
+            "description": "Fired when either end changes.",
+            "required": false
+          },
+          {
+            "name": "optional",
+            "type": "boolean",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "readOnly",
+            "type": "boolean",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "required",
+            "type": "boolean",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "showDuration",
+            "type": "boolean",
+            "description": "Shows the derived length beside the value. On by default — it is the proof-read.",
+            "required": false
+          },
+          {
+            "name": "showPanel",
+            "type": "boolean",
+            "description": "Offers the two-column panel. On by default.",
+            "required": false
+          },
+          {
+            "name": "startLabel",
+            "type": "string",
+            "description": "Accessible name and column heading for the start half.",
+            "required": false
+          },
+          {
+            "name": "stepMinutes",
+            "type": "number",
+            "description": "The interval between offered times. 30 by default; 15 for a clinic that books quarters.",
+            "required": false
+          },
+          {
+            "name": "toMinutes",
+            "type": "number",
+            "description": "Last time offered, in minutes from midnight.",
+            "required": false
+          },
+          {
+            "name": "value",
+            "type": "OxTimeRange | null",
+            "description": "Controlled value. Either end may be null.",
             "required": false
           }
         ]
@@ -6033,6 +6483,18 @@ export const CATALOG: ComponentDoc[] = [
             "name": "allowEstimated",
             "type": "boolean",
             "description": "Offers \"Exact date unknown\", which switches the field to year only.",
+            "required": false
+          },
+          {
+            "name": "calendarCommit",
+            "type": "'immediate' | 'explicit'",
+            "description": "Whether the popover reports a day the moment it is clicked, or holds it behind Cancel and Done. `immediate` by default.",
+            "required": false
+          },
+          {
+            "name": "calendarHints",
+            "type": "boolean",
+            "description": "Shows the arrow-key legend under the popover grid. Worth more here than anywhere else in this family: a birth date is the one calendar a reader may genuinely have to travel four hundred months in, and Shift+PageUp is the difference between that and one press.",
             "required": false
           },
           {
@@ -6626,6 +7088,8 @@ export const CATALOG: ComponentDoc[] = [
         "variant=\"field\" for a date the user already knows — service date, admission, assessment. Four-fifths of healthcare date fields are this, and a popover there is four clicks where eight keystrokes would do.",
         "variant=\"picker\" where they may need to see a month to answer, and as the drop-in for an existing antd DatePicker.",
         "variant=\"birth-date\" at every registration and intake. The age readout is the field's own error check, not decoration.",
+        "variant=\"date-range\" for a span of days somebody has to state — an authorisation window, a leave of absence, a reporting period. Two months, because most ranges cross a month boundary, and presets, because most range answers have a name.",
+        "variant=\"time-range\" where a start and an end have to agree and neither is derived from a duration. Reach for \"session\" instead wherever the length is the thing the organisation cares about, because that is the variant that shows which member is held.",
         "variant=\"session\" wherever a session, shift or block has a start, an end and a length that have to agree.",
         "variant=\"slots\" or \"scheduler\" only where the system knows the options and the user cannot — that is the one job in the four that needs availability at all.",
         "With now passed from the server, so the field and the page agree about which day it is."
@@ -6634,7 +7098,9 @@ export const CATALOG: ComponentDoc[] = [
         "Reaching for the scheduler variants on a documentation form. A clinician entering a session timestamp should not load, see, or tab through the machinery required to schedule a twelve-week series.",
         "futurePolicy=\"block\" as a reflex. A discharge date can legitimately be in the future, and blocking it teaches staff to enter a wrong date to get past the validator.",
         "Using the band readout to recommend a code. The component reports which band a value falls in; choosing a code is a human act and a compliance question.",
-        "Hiding the held/derived badge on the session variant. That returns the component to the defect it was built to fix."
+        "Hiding the held/derived badge on the session variant. That returns the component to the defect it was built to fix.",
+        "commit=\"immediate\" on a range panel whose parent refetches. Every click is reported, so a mis-clicked start filters a report on a range nobody chose.",
+        "Shipping the general preset set unedited. `dateRangePresets` is a starting point: \"This year\" on a two-week authorisation window is noise, and seven periods nobody uses is seven rows between the reader and the two they do."
       ]
     },
     "accessibility": [
@@ -6653,6 +7119,10 @@ export const CATALOG: ComponentDoc[] = [
       {
         "label": "Three message tiers, three ARIA treatments",
         "detail": "An error is role=\"alert\", assertive, and sets aria-invalid. A conflict is a legal value colliding with other state: role=\"status\", polite, not invalid. An advisory is polite and toneless — a clinician documenting last Friday's session must not be told they have made a mistake."
+      },
+      {
+        "label": "One tabstop across two months, not one per month",
+        "detail": "Two adjacent panels overlap by up to a fortnight, so the adjacent-month days are not drawn at all when more than one month is shown. Drawing them gives the same date two cells, both matching the focus date, which is where a second tabstop comes from. For the same reason there is one previous and one next control for the whole window rather than one pair per month."
       },
       {
         "label": "Colour is never the only channel",
@@ -6676,6 +7146,7 @@ export const CATALOG: ComponentDoc[] = [
       "Ant Design's prop names are not implemented, and ADR 0010 requires the divergences be named: there is no picker, showTime, allowClear, status or DatePicker.RangePicker, and antd's disabledDate and format are spelled unavailable and order. The reasons differ. unavailable returns the reason a day cannot be chosen rather than a boolean, because that reason is spoken and shown, and a boolean cannot carry it. picker=\"week\" and picker=\"quarter\" have no healthcare workflow we have found, and a stub rendering a day grid would be worse than an honest absence. The rest is unbuilt rather than rejected. A migration from antd is not yet one changed import line.",
       "Recurrence implements a named RFC 5545 subset — DAILY, WEEKLY, MONTHLY with INTERVAL, BYDAY, BYSETPOS, BYMONTHDAY, COUNT, UNTIL and EXDATE. Anything else is refused and rendered read-only with its original string, rather than silently mis-expanded.",
       "Nothing here fetches, holds, or books. Availability arrives as data with an age and every transition is reported through a callback — ADR 0009 forbids the network in component source, and the host is the only party that can reconcile a rejection anyway.",
+      "The range panel commits explicitly by default and the inline calendar does not. `Calendar` keeps `commit=\"immediate\"` so no existing use changes behaviour; `DateRangeField` opts into `explicit` because a range is two clicks and the first is often wrong. A host that wants one rule everywhere has to say so on both.",
       "Non-Gregorian calendar input is not supported. Intl will format a Hijri or Buddhist date today, but a grid whose months have variable length and a year field with a different epoch is a project rather than a flag.",
       "Duration bands and session presets ship empty. A fifty-three-minute session is a fact about somebody's payer contract rather than about therapy, and asserting a code would be clinical decision support, which ADR 0009 prohibits."
     ],
@@ -6695,6 +7166,8 @@ export const CATALOG: ComponentDoc[] = [
       "healthcare date time picker",
       "appointment scheduler react",
       "session time picker",
+      "react date range picker",
+      "time range picker react",
       "date of birth input",
       "recurrence rule builder react"
     ],
@@ -6777,6 +7250,14 @@ export const CATALOG: ComponentDoc[] = [
         }
       },
       {
+        "id": "date-range",
+        "label": "Date range",
+        "description": "Two typeable ends in one shell, two contiguous months behind them, and named periods down the side.",
+        "args": {
+          "variant": "date-range"
+        }
+      },
+      {
         "id": "multiple",
         "label": "Multiple dates",
         "description": "Capped; clicking a selected date removes it.",
@@ -6806,6 +7287,14 @@ export const CATALOG: ComponentDoc[] = [
         "description": "Start, end and duration, with the held member always marked.",
         "args": {
           "variant": "session"
+        }
+      },
+      {
+        "id": "time-range",
+        "label": "Time range",
+        "description": "A start, an end and the length between them. The end column is filtered, not merely ordered.",
+        "args": {
+          "variant": "time-range"
         }
       },
       {
@@ -6867,10 +7356,12 @@ export const CATALOG: ComponentDoc[] = [
           "field",
           "calendar",
           "range",
+          "date-range",
           "multiple",
           "birth-date",
           "time",
           "session",
+          "time-range",
           "slots",
           "scheduler",
           "recurrence",
@@ -6983,7 +7474,7 @@ export const CATALOG: ComponentDoc[] = [
     "seo": {
       "slug": "date-picker",
       "title": "Date Picker — accessible React healthcare control",
-      "description": "A React date picker for healthcare: fourteen variants over one value space — field, calendar, birth date with live age, sessions, slots and recurrence.",
+      "description": "A React date picker for healthcare: sixteen variants over one value space — fields, calendars, date and time ranges, birth dates, sessions and recurrence.",
       "primaryKeyword": "react healthcare date picker",
       "secondaryKeywords": [
         "accessible date picker react",
