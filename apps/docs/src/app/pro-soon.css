@@ -1,0 +1,417 @@
+/* ===========================================================================
+ * The Pro holding page.
+ *
+ * Scoped under `.soon`. Pro is out of the first release, and the design
+ * problem is that "coming soon" usually says *nothing here yet* — which is the
+ * one thing that is not true. The console is built and the gate works.
+ *
+ * So the page keeps its own argument and holds it a step short: the gate's
+ * four real steps, three ticking over and `Publish` left open. Two shapes
+ * rather than two colours carry that state, so it survives a greyscale print
+ * and a red-green deficiency.
+ *
+ * Every animation sits inside `prefers-reduced-motion: no-preference`, which
+ * makes the *composed* picture the default rather than a frozen first frame.
+ * Dark is keyed to `.dark`, as everywhere else on this site.
+ * =========================================================================== */
+
+.soon {
+  --s-ease: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.soon .soonFrame {
+  position: relative;
+  overflow: hidden;
+  border-bottom: 1px solid var(--site-rule);
+}
+
+/* ---------- the page underneath, out of focus ---------- */
+.soon .soonBehind {
+  position: absolute;
+  inset: 0;
+  padding: 4rem 1.25rem 0;
+  filter: blur(7px) saturate(0.72);
+  opacity: 0.5;
+  transform: scale(1.03);
+  user-select: none;
+  pointer-events: none;
+}
+.dark .soon .soonBehind {
+  opacity: 0.42;
+}
+.soon .soonBehindInner {
+  max-width: 68rem;
+  margin: 0 auto;
+}
+.soon .soonBehindHead {
+  margin: 1.25rem 0 0;
+  max-width: 20ch;
+  font-family: var(--font-display, ui-sans-serif, system-ui, sans-serif);
+  font-size: clamp(2rem, 4.4vw, 3.5rem);
+  line-height: 1;
+  letter-spacing: -0.035em;
+  font-weight: 600;
+}
+.soon .soonBehindBody {
+  margin: 1.5rem 0 0;
+  max-width: 34rem;
+  font-size: 1.0625rem;
+  line-height: 1.6;
+  color: var(--site-graphite);
+}
+.soon .soonBehindBtns {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 2rem;
+}
+.soon .soonBehindBtns span {
+  height: 3rem;
+  width: 12rem;
+  border-radius: 0.75rem;
+  background: var(--site-cta);
+}
+.soon .soonBehindBtns span + span {
+  width: 7rem;
+  background: transparent;
+  border: 1px solid var(--site-rule-strong);
+}
+
+.soon .soonScrim {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    120% 90% at 50% 42%,
+    color-mix(in oklab, var(--site-paper) 55%, transparent) 0%,
+    color-mix(in oklab, var(--site-paper) 88%, transparent) 55%,
+    var(--site-paper) 100%
+  );
+}
+
+/* ---------- the panel ---------- */
+.soon .soonStack {
+  position: relative;
+  min-height: min(46rem, 82vh);
+  display: grid;
+  place-items: center;
+  padding: clamp(2.5rem, 7vw, 5rem) 1.25rem;
+}
+
+.soon .soonPanel {
+  position: relative;
+  width: min(48rem, 100%);
+  background: var(--site-panel);
+  border: 1px solid var(--site-panel-rule);
+  border-radius: 20px;
+  padding: clamp(1.75rem, 4vw, 3rem);
+  color: var(--site-panel-fg);
+  overflow: hidden;
+  box-shadow:
+    0 1px 0 color-mix(in oklab, #fff 8%, transparent) inset,
+    0 30px 80px -20px rgb(8 17 15 / 0.45),
+    0 8px 24px -12px rgb(8 17 15 / 0.3);
+}
+
+/* The console's own grid paper, faint enough to be texture. */
+.soon .soonPanel::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(
+      to right,
+      color-mix(in oklab, var(--site-trace) 6%, transparent) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      to bottom,
+      color-mix(in oklab, var(--site-trace) 6%, transparent) 1px,
+      transparent 1px
+    );
+  background-size: 28px 28px;
+  mask-image: radial-gradient(90% 70% at 50% 40%, #000 0%, transparent 78%);
+  pointer-events: none;
+}
+.soon .soonPanel > * {
+  position: relative;
+}
+
+.soon .soonEyebrow {
+  margin: 0;
+  color: var(--site-trace);
+}
+
+.soon .soonHead {
+  margin: 1.25rem 0 0;
+  font-family: var(--font-display, ui-sans-serif, system-ui, sans-serif);
+  font-size: clamp(2.25rem, 6.5vw, 4rem);
+  line-height: 0.98;
+  letter-spacing: -0.04em;
+  font-weight: 600;
+}
+.soon .soonCh {
+  display: inline-block;
+}
+
+.soon .soonLede {
+  margin: 1.5rem 0 0;
+  max-width: 42ch;
+  font-size: 0.9375rem;
+  line-height: 1.65;
+  color: var(--site-panel-muted);
+}
+
+/* ---------- the gate ---------- */
+.soon .soonGate {
+  margin: 2rem 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  background: var(--site-panel-rule);
+  border: 1px solid var(--site-panel-rule);
+  border-radius: 12px;
+  overflow: hidden;
+}
+.soon .soonStep {
+  background: var(--site-panel-raised);
+  padding: 0.9rem 0.85rem 1rem;
+}
+.soon .soonStepK {
+  display: block;
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 0.625rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--site-panel-muted);
+}
+.soon .soonStepV {
+  margin-top: 0.5rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+/*
+ * Done is a filled dot, outstanding is a hollow ring — a difference in shape,
+ * not only in colour. Resting state is the finished one: three done, one open.
+ */
+.soon .soonDot {
+  width: 0.75rem;
+  height: 0.75rem;
+  flex: none;
+  display: grid;
+  place-items: center;
+  color: var(--site-trace);
+}
+.soon .soonDot::before {
+  content: "";
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 999px;
+  background: currentColor;
+}
+.soon .soonStep[data-pending] {
+  background: color-mix(in oklab, var(--site-trace) 7%, var(--site-panel-raised));
+}
+.soon .soonStep[data-pending] .soonStepV {
+  color: var(--site-trace);
+}
+.soon .soonStep[data-pending] .soonDot::before {
+  width: 0.75rem;
+  height: 0.75rem;
+  background: none;
+  border: 1.5px solid currentColor;
+}
+
+/* The validation sweep is motion and nothing else. Under reduced motion a
+   parked gradient band would read as a rendering fault, so it is not drawn. */
+.soon .soonSweep {
+  display: none;
+}
+
+/* ---------- actions ---------- */
+.soon .soonActions {
+  margin-top: 2rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  align-items: center;
+}
+.soon .soonCta {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 12px;
+  padding: 0.8rem 1.1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  background: var(--site-trace);
+  color: #04120f;
+  text-decoration: none;
+  transition:
+    transform 0.3s var(--s-ease),
+    filter 0.3s var(--s-ease);
+}
+.soon .soonCta:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.06);
+}
+.soon .soonGhost {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  border-radius: 12px;
+  border: 1px solid transparent;
+  padding: 0.8rem 1rem;
+  font-size: 0.875rem;
+  color: var(--site-panel-muted);
+  text-decoration: none;
+  transition:
+    color 0.25s var(--s-ease),
+    border-color 0.25s var(--s-ease);
+}
+.soon .soonGhost:hover {
+  color: var(--site-panel-fg);
+  border-color: var(--site-panel-rule);
+}
+.soon .soonGhost svg {
+  transition: transform 0.3s var(--s-ease);
+}
+.soon .soonGhost:hover svg {
+  transform: translateX(2px);
+}
+.soon .soonNote {
+  margin: 1.1rem 0 0;
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 0.6875rem;
+  letter-spacing: 0.06em;
+  color: var(--site-panel-muted);
+}
+
+@media (max-width: 640px) {
+  .soon .soonGate {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .soon .soonCta,
+  .soon .soonGhost {
+    justify-content: center;
+    width: 100%;
+  }
+}
+
+/* ===========================================================================
+ * Motion. Everything below is additive — remove it and the picture above is
+ * already the finished one.
+ * ======================================================================== */
+@media (prefers-reduced-motion: no-preference) {
+  .soon .soonPanel {
+    animation: soon-panel 900ms var(--s-ease) both;
+  }
+  @keyframes soon-panel {
+    from {
+      opacity: 0;
+      transform: translateY(18px) scale(0.985);
+      filter: blur(6px);
+    }
+  }
+
+  .soon .soonCh {
+    animation: soon-ch 900ms var(--s-ease) both;
+    animation-delay: calc(var(--i) * 45ms + 320ms);
+  }
+  @keyframes soon-ch {
+    from {
+      opacity: 0;
+      transform: translateY(0.5em) rotate(3deg);
+      filter: blur(10px);
+    }
+  }
+
+  .soon .soonLede,
+  .soon .soonGate {
+    animation: soon-up 800ms var(--s-ease) 760ms both;
+  }
+  .soon .soonActions {
+    animation: soon-up 800ms var(--s-ease) 900ms both;
+  }
+  .soon .soonNote {
+    animation: soon-up 800ms var(--s-ease) 1050ms both;
+  }
+  @keyframes soon-up {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+  }
+
+  /* The three settled steps tick over in sequence, then hold. */
+  .soon .soonStep:nth-child(1) .soonDot {
+    animation: soon-tick 7s var(--s-ease) 0.4s infinite;
+  }
+  .soon .soonStep:nth-child(2) .soonDot {
+    animation: soon-tick 7s var(--s-ease) 1s infinite;
+  }
+  .soon .soonStep:nth-child(3) .soonDot {
+    animation: soon-tick 7s var(--s-ease) 1.6s infinite;
+  }
+  @keyframes soon-tick {
+    0%,
+    4% {
+      color: var(--site-panel-muted);
+    }
+    10%,
+    92% {
+      color: var(--site-trace);
+    }
+    100% {
+      color: var(--site-panel-muted);
+    }
+  }
+
+  .soon .soonStep[data-pending] .soonDot::before {
+    animation: soon-breathe 2.4s ease-in-out infinite;
+  }
+  @keyframes soon-breathe {
+    0%,
+    100% {
+      box-shadow: 0 0 0 0 color-mix(in oklab, var(--site-trace) 50%, transparent);
+    }
+    65% {
+      box-shadow: 0 0 0 6px transparent;
+    }
+  }
+
+  .soon .soonSweep {
+    display: block;
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+    border-radius: inherit;
+  }
+  .soon .soonSweep i {
+    position: absolute;
+    left: -20%;
+    top: 0;
+    bottom: 0;
+    width: 32%;
+    background: linear-gradient(
+      100deg,
+      transparent,
+      color-mix(in oklab, var(--site-trace) 11%, transparent),
+      transparent
+    );
+    animation: soon-sweep 7s cubic-bezier(0.45, 0, 0.2, 1) infinite;
+  }
+  @keyframes soon-sweep {
+    0% {
+      transform: translateX(0);
+    }
+    55%,
+    100% {
+      transform: translateX(420%);
+    }
+  }
+}

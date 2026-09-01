@@ -1,308 +1,148 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-import { TIERS } from "@/lib/offerings";
-import { PRO_FEATURES } from "@/lib/pro-features";
-import { signInHref, signUpHref } from "@/lib/app";
 import { SiteFooter, SiteHeader } from "@/components/site/chrome";
-import { RevealRoot } from "@/components/site/interactions";
-import { FeatureBrowser } from "@/components/pro/feature-browser";
-import { Stage } from "@/components/pro/stage-map";
-import { StageGate, VisionFilters } from "@/components/pro/stages";
 
 /**
- * Pro.
+ * Pro — the holding page.
  *
- * The page this replaces sold Team and Enterprise with a waitlist and six
- * bullet points. Pro is not a tier we are going to build — it is the
- * application already running at app.oxygenui.design, and a page listing what
- * a shipped product *will* do is weaker than one showing it doing it.
+ * The console is built and the contrast gate works; it is simply not in the
+ * first release. That distinction is the whole design. A blank "coming soon"
+ * says *nothing here yet*, which is the one thing that is not true, and the
+ * page it replaces — ten animated glances, a feature browser and a tier table
+ * — sells a console nobody can reach and takes payment decisions with it.
  *
- * So the argument is made by ten glances rather than by adjectives, and the
- * tier table moves below them: Enterprise is a real conversation, but it is
- * not the first thing this page should say.
+ * So the page keeps its own argument and holds it one step short. The gate's
+ * four steps are the console's real pipeline; three tick over in sequence and
+ * `Publish` stays a hollow ring. Done and pending are two *shapes* rather than
+ * two colours, so the state survives a greyscale print and a red-green
+ * deficiency — the same rule the components are held to.
+ *
+ * The page it replaces is still here, whole, in `console-page.tsx`.
  */
 
 export const metadata: Metadata = {
-  title: "Pro — the Oxygen console",
+  title: "Pro — coming soon",
   description:
-    "A theming console for behavioral health. One brand colour becomes eleven contrast-validated steps, and a theme that fails the gate cannot be published.",
+    "The Oxygen theming console is built and gated, and not in the first release. The 27 open-source components are.",
   alternates: { canonical: "/pro" },
 };
 
+const HEADLINE = "Coming soon";
+
+/** The console's real pipeline. Only the last one is outstanding. */
+const STEPS: { step: string; label: string; pending?: boolean }[] = [
+  { step: "01", label: "Brand colour" },
+  { step: "02", label: "Eleven steps" },
+  { step: "03", label: "Contrast gate" },
+  { step: "04", label: "Publish", pending: true },
+];
+
+/*
+ * No waitlist exists to post to, and a field that swallows an address is worse
+ * than no field. `hello@zowork.com` is the address the showcase page already
+ * uses for the same reason.
+ */
+const NOTIFY_HREF =
+  "mailto:hello@zowork.com?subject=" + encodeURIComponent("Notify me when Oxygen Pro ships");
+
 export default function ProPage() {
   return (
-    <RevealRoot>
+    <>
       <SiteHeader />
-      <VisionFilters />
 
-      <main id="main" className="oxp">
-        {/* ---------------------------------------------------------- hero */}
-        <section className="border-b border-rule">
-          <div className="mx-auto grid max-w-6xl section-major gap-10 px-5 sm:px-8 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] lg:items-center lg:gap-16">
-            <div>
-              <p className="eyebrow eyebrow-rule text-oxygen-deep" data-reveal>
-                Oxygen Pro
-              </p>
-              <h1 className="display-lg mt-5 text-balance" data-reveal>
+      <main id="main" className="soon">
+        <section className="soonFrame">
+          {/*
+            The page underneath, out of focus. Decoration — it carries no
+            information the reader is expected to recover, so it is hidden
+            from the accessibility tree rather than read out blurred.
+          */}
+          <div className="soonBehind" aria-hidden="true">
+            <div className="soonBehindInner">
+              <p className="eyebrow text-oxygen-deep">Oxygen Pro</p>
+              <p className="soonBehindHead">
                 Your brand, through a gate that will not let it fail.
-              </h1>
-              <p className="body-lg mt-6 max-w-xl text-pretty text-graphite" data-reveal>
+              </p>
+              <p className="soonBehindBody">
                 A theming console for behavioral health. Set one brand colour, get eleven validated
-                steps. Publish only what passes contrast. Ship a stylesheet pinned to a version, so
-                an edit here cannot change a running application until somebody moves the pin.
+                steps. Publish only what passes contrast.
               </p>
-
-              <div className="mt-8 flex flex-wrap gap-3" data-reveal>
-                <a
-                  href={signUpHref}
-                  className="group inline-flex items-center gap-2 rounded-xl bg-cta px-5 py-3.5 text-sm font-medium text-paper transition-all duration-300 ease-[var(--ease-out-expo)] hover:-translate-y-0.5 hover:bg-cta-hover"
-                >
-                  Create an organisation
-                  <ArrowRight
-                    aria-hidden="true"
-                    className="size-4 transition-transform duration-300 ease-[var(--ease-out-expo)] group-hover:translate-x-0.5"
-                  />
-                </a>
-                <a
-                  href={signInHref}
-                  className="inline-flex items-center gap-2 rounded-xl border border-rule px-5 py-3.5 text-sm font-medium text-ink transition-all duration-300 ease-[var(--ease-out-expo)] hover:-translate-y-0.5 hover:border-oxygen/40"
-                >
-                  Sign in
-                </a>
+              <div className="soonBehindBtns">
+                <span />
+                <span />
               </div>
-              <p className="mt-4 text-xs text-graphite-soft" data-reveal>
-                Free while in preview · no card · the marketplace is the paid part
-              </p>
-            </div>
-
-            <div className="fStage seen" style={{ height: 200 }} data-reveal="right">
-              <StageGate />
             </div>
           </div>
-        </section>
+          <div className="soonScrim" aria-hidden="true" />
 
-        {/* --------------------------------------------------------- proof */}
-        <section className="border-b border-rule bg-paper-sunk/30">
-          <div className="mx-auto grid max-w-6xl grid-cols-1 gap-px overflow-hidden px-5 sm:grid-cols-3 sm:px-8">
-            {(
-              [
-                ["11", "token steps from one colour"],
-                ["3", "tiers: reference, semantic, component"],
-                ["0", "failing themes can reach production"],
-              ] as const
-            ).map(([k, v]) => (
-              <div key={v} className="py-7 sm:px-6 sm:first:pl-0" data-reveal>
-                <div className="numeric text-2xl font-semibold tracking-tight">{k}</div>
-                <div className="mt-1 text-xs text-graphite-soft">{v}</div>
+          <div className="soonStack">
+            <div className="soonPanel">
+              {/* The validation sweep, crossing the panel the way it crosses a theme. */}
+              <div className="soonSweep" aria-hidden="true">
+                <i />
               </div>
-            ))}
-          </div>
-        </section>
 
-        {/* ------------------------------------------------------- glances */}
-        <section className="border-b border-rule">
-          <div className="mx-auto max-w-6xl section-minor px-5 sm:px-8">
-            <div className="max-w-2xl">
-              <p className="axis-label" data-reveal>
-                Ten features
-              </p>
-              <h2 className="display-sm mt-3 text-balance" data-reveal>
-                Each one shown in about four seconds.
-              </h2>
-              <p className="mt-4 text-pretty leading-relaxed text-graphite" data-reveal>
-                Not screenshots and not recordings — markup, so each one themes with the page,
-                scales without artefacts and rests on its finished frame if you have asked for
-                reduced motion.
-              </p>
-            </div>
+              <p className="eyebrow eyebrow-rule soonEyebrow">Oxygen Pro</p>
+              {/*
+                One span per letter is what staggers the entrance, and eleven
+                single-character nodes are not a heading — so the whole run is
+                hidden from the accessibility tree and `aria-label` supplies
+                the name.
 
-            <div className="glances mt-9">
-              {PRO_FEATURES.map((f, i) => (
-                <article
-                  key={f.id}
-                  className="glance"
-                  data-reveal
-                  style={{ ["--enter-delay" as string]: `${(i % 3) * 60}ms` }}
-                >
-                  <div className="stage seen">
-                    <Stage id={f.id} />
-                  </div>
-                  <div className="gBody">
-                    <h3>{f.title}</h3>
-                    <p>{f.body}</p>
-                    <p className="gWhere">{f.where}</p>
-                  </div>
-                </article>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* ------------------------------------------------ feature browser */}
-        <section className="border-b border-rule bg-paper-sunk/30">
-          <div className="mx-auto max-w-6xl section-minor px-5 sm:px-8">
-            <div className="mb-6 flex flex-wrap items-baseline justify-between gap-4">
-              <div>
-                <h2 className="display-sm text-balance" data-reveal>
-                  Everything in the console
-                </h2>
-                <p className="mt-2 text-sm text-graphite" data-reveal>
-                  One stage, switched by tab. Pick a feature and watch it happen.
-                </p>
-              </div>
-              <span className="chip" data-reveal>
-                {PRO_FEATURES.length} features
-              </span>
-            </div>
-            <div data-reveal>
-              <FeatureBrowser />
-            </div>
-          </div>
-        </section>
-
-        {/* --------------------------------------------------- who it is for */}
-        {/*
-          The page sold a console to the person who would operate it and said
-          nothing to the person who signs for it.
-
-          That was the largest commercial gap on the site: an engineer could
-          evaluate this page and had nothing to forward. Three roles, one
-          sentence each, immediately above the price — because the question a
-          budget holder asks is not what the console does, it is who on their
-          team stops doing something manually.
-        */}
-        <section className="border-b border-rule" id="who">
-          <div className="mx-auto max-w-6xl section-minor px-5 sm:px-8">
-            <h2 className="display-sm text-balance" data-reveal>
-              Who this is for.
-            </h2>
-            <div
-              className="mt-8 grid gap-px overflow-hidden rounded-2xl border border-rule bg-rule md:grid-cols-3"
-              data-reveal
-            >
-              {[
-                {
-                  role: "Design lead",
-                  line: "One brand colour becomes eleven contrast-validated steps. No more hand-picking hex values and hoping.",
-                  proof: "11 steps · every pair checked",
-                },
-                {
-                  role: "Engineering lead",
-                  line: "Publishes a versioned stylesheet. No runtime, no theme provider, no second source of truth in the app.",
-                  proof: "0 runtime dependencies",
-                },
-                {
-                  role: "Whoever signs for it",
-                  line: "Priced per organisation, not per seat. Adding a designer does not change the invoice.",
-                  proof: "No per-seat metering",
-                },
-              ].map((item) => (
-                <div key={item.role} className="bg-paper p-6">
-                  <p className="eyebrow text-graphite">{item.role}</p>
-                  <p className="mt-3 text-sm leading-relaxed text-ink">{item.line}</p>
-                  <p className="numeric mt-4 text-xs text-oxygen-deep">{item.proof}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* ------------------------------------------------------- pricing */}
-        <section className="border-b border-rule" id="pricing">
-          <div className="mx-auto max-w-6xl section-minor px-5 sm:px-8">
-            <div className="mb-7 flex flex-wrap items-baseline justify-between gap-4">
-              <div className="max-w-2xl">
-                <h2 className="display-sm text-balance" data-reveal>
-                  What it costs
-                </h2>
-                <p className="mt-3 text-pretty leading-relaxed text-graphite" data-reveal>
-                  The console is free while it is in preview. The marketplace is the part that
-                  charges today — and the tier that used to sit in the middle is gone rather than
-                  quietly still on the page.
-                </p>
-              </div>
-              <span className="chip" data-reveal>
-                no card to start
-              </span>
-            </div>
-
-            <div className="tiers">
-              {TIERS.map((tier, i) => (
-                <div
-                  key={tier.name}
-                  className="tier"
-                  data-reveal
-                  style={{ ["--enter-delay" as string]: `${i * 55}ms` }}
-                  {...(tier.featured ? { "data-featured": "" } : {})}
-                >
-                  <div className="tn">
-                    <b>{tier.name}</b>
-                    {tier.featured ? <span className="badge">buyable today</span> : null}
-                    {tier.href === "#waitlist" ? (
-                      <span className="badge" style={{ color: "var(--site-graphite-soft)" }}>
-                        waitlist
+                The first attempt used a visually-hidden copy of the string
+                instead, which reads correctly but leaves `ComingsoonComing
+                soon` in `textContent` — what a reader gets when they select
+                the headline and copy it. The word space is a real text node
+                for the same reason: an empty spacer span would make the copy
+                read `Comingsoon`.
+              */}
+              <h1 className="soonHead" aria-label={HEADLINE}>
+                <span aria-hidden="true">
+                  {HEADLINE.split("").map((c, i) =>
+                    c === " " ? (
+                      " "
+                    ) : (
+                      <span key={`${c}${i}`} className="soonCh" style={{ ["--i" as string]: i }}>
+                        {c}
                       </span>
-                    ) : null}
-                  </div>
-                  <div className="pr">
-                    <span className="amt">{tier.price}</span>
-                    {tier.cadence ? <span className="cad">{tier.cadence}</span> : null}
-                  </div>
-                  <p className="sm">{tier.summary}</p>
-                  <ul>
-                    {tier.features.map((f) => (
-                      <li key={f}>{f}</li>
-                    ))}
-                  </ul>
-                  {tier.href.startsWith("/") ? (
-                    <Link href={tier.href} className="tcta">
-                      {tier.cta}
-                    </Link>
-                  ) : (
-                    <a href={tier.href} className="tcta">
-                      {tier.cta}
-                    </a>
+                    ),
                   )}
-                  {tier.note ? <p className="tnote">{tier.note}</p> : null}
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
+                </span>
+              </h1>
+              <p className="soonLede">
+                Built, gated, and not in the first release. The open components are.
+              </p>
 
-        {/* ------------------------------------------------------ the way in */}
-        <section>
-          <div className="mx-auto max-w-6xl section-minor px-5 sm:px-8">
-            <div className="authBand" data-reveal>
-              <div>
-                <h2>Create an organisation, or sign back in.</h2>
-                <p>
-                  Themes, members and purchases belong to an organisation rather than a person, so
-                  the first account creates one. Signing up puts you in a pending state until an
-                  administrator approves you — on a new organisation that is you, immediately.
-                </p>
-              </div>
-              <div className="authBtns">
-                <a
-                  href={signUpHref}
-                  className="inline-flex items-center gap-2 rounded-xl bg-cta px-5 py-3 text-sm font-medium text-paper transition-colors duration-200 hover:bg-cta-hover"
-                >
-                  Create an organisation
+              <ol className="soonGate">
+                {STEPS.map(({ step, label, pending }) => (
+                  <li key={step} className="soonStep" {...(pending ? { "data-pending": "" } : {})}>
+                    <span className="soonStepK">Step {step}</span>
+                    <span className="soonStepV">
+                      <i className="soonDot" aria-hidden="true" />
+                      {label}
+                      <span className="sr-only">{pending ? " — not yet" : " — done"}</span>
+                    </span>
+                  </li>
+                ))}
+              </ol>
+
+              <div className="soonActions">
+                <a href={NOTIFY_HREF} className="soonCta">
+                  Email me when it ships
                 </a>
-                <a
-                  href={signInHref}
-                  className="inline-flex items-center gap-2 rounded-xl border border-rule-strong px-5 py-3 text-sm font-medium text-ink transition-colors duration-200 hover:bg-paper"
-                >
-                  Sign in
-                </a>
+                <Link href="/components" className="soonGhost">
+                  Browse the open components
+                  <ArrowRight aria-hidden="true" className="size-4" />
+                </Link>
               </div>
+              <p className="soonNote">Free · no card · the components ship today</p>
             </div>
           </div>
         </section>
       </main>
 
       <SiteFooter />
-    </RevealRoot>
+    </>
   );
 }

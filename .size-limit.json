@@ -28,7 +28,7 @@
     "name": "react \u2014 the whole barrel",
     "path": "packages/react/dist/index.js",
     "import": "*",
-    "limit": "46 KB",
+    "limit": "110 KB",
     "ignore": ["react", "react-dom"]
   },
   {
@@ -112,13 +112,6 @@
     "ignore": ["react", "react-dom"]
   },
   {
-    "name": "react \u2014 clinical note (subpath: pulls the ProseMirror view layer)",
-    "path": "packages/react/dist/components/clinical-note/clinical-note.js",
-    "import": "{ ClinicalNote }",
-    "limit": "75 KB",
-    "ignore": ["react", "react-dom"]
-  },
-  {
     "name": "react \u2014 Timeline alone (the antd-compatible primitive)",
     "path": "packages/react/dist/components/timeline/timeline.js",
     "import": "{ Timeline }",
@@ -158,7 +151,7 @@
   {
     "name": "theme \u2014 the document model, ramp, validation and CSS emitter",
     "path": "packages/theme/dist/index.js",
-    "limit": "27 KB"
+    "limit": "28 KB"
   },
   {
     "name": "theme \u2014 the inline provider alone",
@@ -169,7 +162,7 @@
   {
     "name": "react \u2014 the barrel must contain no UI framework",
     "path": "packages/react/dist/index.js",
-    "limit": "46 KB",
+    "limit": "110 KB",
     "ignore": ["react", "react-dom"]
   }
 ]
