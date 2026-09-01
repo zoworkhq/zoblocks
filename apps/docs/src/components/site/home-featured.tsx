@@ -262,6 +262,7 @@ function ContextMenuDemo() {
         setStage(node);
       }}
       className="relative w-full pb-64"
+      data-ox-menu-stage=""
     >
       <p className="numeric mb-3 text-xs text-graphite-soft">
         {still

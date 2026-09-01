@@ -1111,12 +1111,29 @@ export function ChartContextMenu(props: ChartContextMenuProps) {
      */
     const onScroll = () => setTick((value) => value + 1);
     const onResize = () => close(false);
+    /*
+     * Escape, for the menu nothing is focused inside.
+     *
+     * The panel's own handler owns the focused case and does it better — one
+     * level at a time, submenu first. This is only for `autoFocus={false}`,
+     * where the popup is open and the reader's focus never entered it, so a
+     * key pressed at the document would otherwise reach nothing and the menu
+     * would have no keyboard dismissal at all.
+     */
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key !== "Escape") return;
+      if (panelRef.current?.contains(document.activeElement)) return;
+      if (subPanelRef.current?.contains(document.activeElement)) return;
+      close(false);
+    };
 
     document.addEventListener("mousedown", onPointer);
+    document.addEventListener("keydown", onKey);
     window.addEventListener("resize", onResize);
     window.addEventListener("scroll", onScroll, true);
     return () => {
       document.removeEventListener("mousedown", onPointer);
+      document.removeEventListener("keydown", onKey);
       window.removeEventListener("resize", onResize);
       window.removeEventListener("scroll", onScroll, true);
     };

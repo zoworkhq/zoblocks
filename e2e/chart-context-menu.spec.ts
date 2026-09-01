@@ -297,3 +297,67 @@ test.describe("@a11y a submenu is a menu, not a chevron", () => {
     ).toBeFocused();
   });
 });
+
+/**
+ * The home page opens the menu inside a bounded stage rather than the page.
+ *
+ * That is a different placement path: `container` rebases the popup out of
+ * viewport coordinates and clamps it to the pane the host nominated. It has
+ * its own failure — a menu opened from the last row used to lose the withheld
+ * count off the bottom, which is the one line that must never be the one that
+ * goes missing, because a count of what is hidden is the only evidence the
+ * reader gets that anything is.
+ *
+ * Kept here, next to the viewport cases, because the two clamps are one piece
+ * of code and a change to either lands in the same hunk. A hand-resolved merge
+ * between them is what prompted this test.
+ */
+test.describe("@a11y clamped to a container, not the viewport", () => {
+  /*
+   * Reduced motion stops the demo's own cycle, which otherwise opens and
+   * dismisses menus on a timer underneath the test. The rows stay real
+   * triggers either way — the cycle drives them, it does not replace them —
+   * so this measures the same placement code a reader's right-click reaches.
+   */
+  test.use({ contextOptions: { reducedMotion: "reduce" } });
+
+  test("every row's menu stays inside the stage, withheld count included", async ({ page }) => {
+    await page.goto("/");
+    await page.waitForLoadState("networkidle");
+
+    const stage = page.locator("[data-ox-menu-stage]");
+    await expect(stage).toBeVisible();
+    const rows = stage.locator("[data-ox-menu]");
+    await expect(rows).toHaveCount(3);
+
+    for (let index = 0; index < 3; index += 1) {
+      // Bottom-right of the row: the corner a downward menu cannot open from.
+      await rows.nth(index).scrollIntoViewIfNeeded();
+      const box = (await rows.nth(index).boundingBox())!;
+      await page.mouse.click(box.x + box.width - 40, box.y + box.height - 4, {
+        button: "right",
+      });
+
+      const menu = page.locator(".ox-menu").first();
+      await expect(menu).toBeVisible();
+      await expect(menu.getByText(/\d+ hidden/)).toBeVisible();
+
+      const fits = await page.evaluate(() => {
+        const m = document.querySelector(".ox-menu")!.getBoundingClientRect();
+        const s = document.querySelector("[data-ox-menu-stage]")!.getBoundingClientRect();
+        return {
+          over: [s.top - m.top, m.bottom - s.bottom, s.left - m.left, m.right - s.right].map(
+            Math.round,
+          ),
+        };
+      });
+      expect(
+        fits.over.every((px) => px <= 1),
+        `row ${index} spills: ${fits.over}`,
+      ).toBe(true);
+
+      await page.keyboard.press("Escape");
+      await expect(menu).toHaveCount(0);
+    }
+  });
+});
