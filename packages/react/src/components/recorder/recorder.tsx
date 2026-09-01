@@ -55,14 +55,22 @@ import {
   RecorderFrame,
   RecorderTell,
   paintLane,
+  useLaneBars,
   useRecorderSignal,
   type RecorderArt,
   type RecorderMotion,
 } from "../../lib/recorder";
 
+import { cn } from "../../lib/utils";
+
 export type { RecorderArt, RecorderMotion };
 
-/** Bars in each capture lane. Stable, so React never reconciles them. */
+/**
+ * Fallback bar counts, used until the lane has been measured once.
+ *
+ * The real count comes from `useLaneBars`, because a fixed count is right at
+ * exactly one width and leaves dead lane at every other.
+ */
 const LANE_BARS: Readonly<Record<RecorderArt, number>> = {
   pulse: 0,
   bars: 72,
@@ -154,6 +162,22 @@ export interface RecorderProps extends Omit<React.HTMLAttributes<HTMLDivElement>
   readonly onStop?: () => void;
   /** Stop and insert, for Strip — the dictation equivalent of stop-and-attach. */
   readonly onSend?: () => void;
+  /** Drop a marker at the current position. */
+  readonly onMark?: () => void;
+  /**
+   * Strike the last `strikeWindowMs` from the record.
+   *
+   * Mid-consultation a patient says something and asks for it not to be
+   * recorded. Every ambient scribe on the market answers that with "stop and
+   * start again", which loses the consultation's continuity at exactly the
+   * moment nobody wants to operate a UI. The component only RAISES this — the
+   * host zeroes the samples, writes the audit record, and hands back a struck
+   * marker so the gap stays visible on the timeline. A removal a reader cannot
+   * see is a removal nobody can audit.
+   */
+  readonly onStrike?: () => void;
+  /** How much a strike removes. Thirty seconds by default. */
+  readonly strikeWindowMs?: number;
   /**
    * The live state of the capture track — `readyState` and `muted`.
    *
@@ -251,6 +275,9 @@ export function Recorder({
   onPause,
   onStop,
   onSend,
+  onMark,
+  onStrike,
+  strikeWindowMs = 30_000,
   track = null,
   autoGainControl,
   silenceBudgetMs,
@@ -263,6 +290,7 @@ export function Recorder({
 }: RecorderProps): React.JSX.Element {
   const capturing = phase === "recording";
   const laneRef = React.useRef<HTMLDivElement | null>(null);
+  const laneBars = useLaneBars(laneRef, LANE_BARS[variant] || LANE_BARS.bars);
   const [frame, setFrame] = React.useState<SignalFrame | null>(null);
 
   /*
@@ -365,15 +393,25 @@ export function Recorder({
           phase={phase}
           elapsed={elapsed}
           frame={frame}
+          bars={laneBars}
           device={device}
           context={context}
           onPause={onPause}
           onStop={onStop}
+          onMark={onMark}
+          onStrike={onStrike}
+          strikeWindowMs={strikeWindowMs}
         />
       ) : null}
 
       {variant === "strip" ? (
-        <StripArt laneRef={laneRef} elapsed={elapsed} context={context} onSend={onSend} />
+        <StripArt
+          laneRef={laneRef}
+          bars={laneBars}
+          elapsed={elapsed}
+          context={context}
+          onSend={onSend}
+        />
       ) : null}
 
       {variant === "duet" ? (
@@ -443,19 +481,27 @@ function BarsArt({
   phase,
   elapsed,
   frame,
+  bars,
   device,
   context,
   onPause,
   onStop,
+  onMark,
+  onStrike,
+  strikeWindowMs = 30_000,
 }: {
   readonly laneRef: React.RefObject<HTMLDivElement | null>;
   readonly phase: RecorderPhase;
   readonly elapsed: number;
   readonly frame: SignalFrame | null;
+  readonly bars: number;
   readonly device: RecorderDevice | null;
   readonly context?: string;
   readonly onPause?: () => void;
   readonly onStop?: () => void;
+  readonly onMark?: () => void;
+  readonly onStrike?: () => void;
+  readonly strikeWindowMs?: number;
 }): React.JSX.Element {
   return (
     <>
@@ -467,7 +513,7 @@ function BarsArt({
       </div>
       <div className="ox-rec-pane">
         <div className="ox-rec-lane" ref={laneRef}>
-          <RecorderBars count={LANE_BARS.bars} />
+          <RecorderBars count={bars} />
         </div>
       </div>
       <div className="ox-rec-row">
@@ -486,6 +532,16 @@ function BarsArt({
               Pause
             </RecorderButton>
           ) : null}
+          {onMark !== undefined ? (
+            <RecorderButton icon="flag" onClick={onMark}>
+              Mark
+            </RecorderButton>
+          ) : null}
+          {onStrike !== undefined ? (
+            <RecorderButton icon="alert" onClick={onStrike}>
+              Strike {Math.round(strikeWindowMs / 1000)}&nbsp;s
+            </RecorderButton>
+          ) : null}
           {onStop !== undefined ? (
             <RecorderButton icon="square" primary onClick={onStop}>
               Stop &amp; attach
@@ -499,11 +555,13 @@ function BarsArt({
 
 function StripArt({
   laneRef,
+  bars,
   elapsed,
   context,
   onSend,
 }: {
   readonly laneRef: React.RefObject<HTMLDivElement | null>;
+  readonly bars: number;
   readonly elapsed: number;
   readonly context?: string;
   readonly onSend?: () => void;
@@ -517,7 +575,7 @@ function StripArt({
           <RecorderIcon name="mic" size={18} />
         </span>
         <div className="ox-rec-lane" ref={laneRef}>
-          <RecorderBars count={LANE_BARS.strip} />
+          <RecorderBars count={bars} />
         </div>
         <span className="ox-rec-clock">{recorderClockShort(elapsed)}</span>
         {onSend !== undefined ? (
@@ -773,3 +831,138 @@ function describeLevel(frame: SignalFrame | null): string {
 
 export const RECORDER_ARTS: readonly RecorderArt[] = ["pulse", "bars", "strip", "duet", "stream"];
 export { RECORDER_PHASES };
+
+/* ==================================================================== *
+ *  RecorderDisposition — the companion, not a sixth art.
+ * ==================================================================== */
+
+/**
+ * Where the recording actually is.
+ *
+ * A companion rather than a variant: it has no waveform and no transport, so
+ * counting it as an art would be counting a status strip as a renderer. It sits
+ * beside a recorder, or replaces it once capture has finished.
+ *
+ * Four states after `stop`, each of which can fail on its own and each of which
+ * is rendered. The first is the one every thin `MediaRecorder` wrapper skips —
+ * **held**: captured, on this device, not yet anywhere else. A tick at that
+ * moment is a falsehood about a legal record.
+ */
+export interface RecorderDispositionProps extends React.HTMLAttributes<HTMLDivElement> {
+  /** Where the bytes are. The component renders this; the host moves them. */
+  readonly disposition: RecorderDisposition;
+  /** Length of the take, for the "captured" step's readout. */
+  readonly durationMs?: number;
+  /** Recogniser language, for the "transcribed" step. */
+  readonly language?: string;
+  /** What the transcript is attached to once it is ready. */
+  readonly attachedTo?: string;
+  /** Offered on `failed`, and only then — a retry that cannot retry is a lie. */
+  readonly onRetry?: () => void;
+}
+
+const DISPOSITION_STEPS = ["Captured", "Uploaded", "Transcribed", "Attached"] as const;
+
+const DISPOSITION_INDEX: Readonly<Record<RecorderDisposition["state"], number>> = {
+  held: 0,
+  uploading: 1,
+  queued: 1,
+  transcribing: 2,
+  ready: 3,
+  failed: 1,
+};
+
+function megabytes(bytes: number): string {
+  return `${(bytes / 1_000_000).toFixed(1)} MB`;
+}
+
+export function RecorderDispositionStrip({
+  disposition,
+  durationMs = 0,
+  language = "en-GB",
+  attachedTo = "encounter",
+  onRetry,
+  className,
+  ...rest
+}: RecorderDispositionProps): React.JSX.Element {
+  const { state, bytes, sent } = disposition;
+  const active = DISPOSITION_INDEX[state];
+  /*
+   * Floor, not round, and it has to match faults.ts.
+   *
+   * 8.9 of 14.2 MB is 62.67%. Rounding calls that 63 and the fault banner —
+   * which floors — calls it 62, so the same recording reports two different
+   * numbers depending on which surface you happen to be looking at. Beyond the
+   * inconsistency, flooring is the honest direction: it never claims more bytes
+   * are on the server than actually are.
+   */
+  const percent = bytes > 0 ? Math.min(100, Math.floor((sent / bytes) * 100)) : 0;
+
+  // One sentence per state, and each says what is TRUE of the audio right now
+  // rather than how far along a bar has crept.
+  const note =
+    state === "held"
+      ? `Held on this device. ${megabytes(bytes)}, not yet uploaded.`
+      : state === "uploading"
+        ? `Uploading — ${megabytes(sent)} of ${megabytes(bytes)}. Resumes if the connection drops.`
+        : state === "queued"
+          ? "Queued. The audio is on the server and waiting its turn."
+          : state === "transcribing"
+            ? "Transcribing. The audio is safe; this step can be retried."
+            : state === "ready"
+              ? `Ready. Transcript attached to the ${attachedTo}.`
+              : (disposition.error ?? "Upload failed.");
+
+  const values = [
+    durationMs > 0 ? `${recorderClockShort(durationMs)} · ${megabytes(bytes)}` : megabytes(bytes),
+    state === "failed" ? `stalled at ${percent}%` : "resumable",
+    language,
+    attachedTo,
+  ];
+
+  return (
+    <div
+      className={cn("ox-rec", "ox-rec-stack", className)}
+      data-ox-recorder="disposition"
+      data-state={state}
+      {...rest}
+    >
+      <ol className="ox-rec-steps">
+        {DISPOSITION_STEPS.map((step, index) => (
+          <li
+            key={step}
+            className="ox-rec-step"
+            data-done={index < active ? "true" : "false"}
+            data-live={index === active ? "true" : "false"}
+            data-failed={index === active && state === "failed" ? "true" : "false"}
+          >
+            <span className="ox-rec-step-name">{step}</span>
+            <span className="ox-rec-step-value">{values[index]}</span>
+          </li>
+        ))}
+      </ol>
+
+      {/* Hatched while held: there is no progress to report, because nothing
+          is moving. A bar creeping forward would be inventing one. */}
+      <div className="ox-rec-track" data-indeterminate={state === "held" ? "true" : "false"}>
+        <div
+          className="ox-rec-track-fill"
+          style={{ width: `${state === "ready" ? 100 : percent}%` }}
+        />
+      </div>
+
+      <div className="ox-rec-row">
+        <span className="ox-rec-meta" role={state === "failed" ? "alert" : undefined}>
+          {note}
+        </span>
+        {state === "failed" && onRetry !== undefined ? (
+          <RecorderButton primary onClick={onRetry}>
+            Retry from {percent}%
+          </RecorderButton>
+        ) : (
+          <span className="ox-rec-meta">{state === "ready" ? "done" : `${percent}%`}</span>
+        )}
+      </div>
+    </div>
+  );
+}

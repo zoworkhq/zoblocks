@@ -13,9 +13,9 @@ export default defineComponentMeta({
 
   tagline: "It cannot lie about whether it is listening.",
   description:
-    "Record, review and transcribe clinical audio: ambient documentation, dictation, voice messaging and transcript playback. Five arts — pulse, bars, strip, duet and stream — over one engine, with the level meter driven by an AnalyserNode rather than a timer, a silence budget, and thirteen distinct device faults.",
+    "Ambient documentation, dictation, voice messaging and transcript review. Five arts — pulse, bars, strip, duet, stream — over one engine, with an analyser-driven meter, a silence budget and thirteen device faults.",
   rationale:
-    "Every voice-recorder interface on the web animates on a timer, and in a consulting room that is a failure mode with a victim: an operating-system mute, a Bluetooth profile switch and a silently substituted device all produce frames of digital silence arriving on schedule, and a timer-driven waveform cannot distinguish that from a room where nobody is speaking. This one draws only what the analyser reports, so silence renders at true zero and a muted microphone stops the art dead — and then the surface says which of the thirteen faults it is, because a flat waveform and a quiet room look identical and only one of them costs you the consultation. The engine is a separate zero-dependency package: a team already running wavesurfer should import the model rather than install the renderer.",
+    "Every voice recorder on the web animates on a timer. An OS mute, a Bluetooth profile switch and a swapped device all deliver digital silence on schedule, and a timer cannot tell that from a quiet room. This one draws only what the analyser reports, then names which of the thirteen faults it is.",
 
   categories: ["Media", "Clinical"],
   fhir: [],
@@ -37,27 +37,27 @@ export default defineComponentMeta({
     {
       label: "The timer is polled, never pushed",
       detail:
-        "role=timer, which is an aria-live=off region by default. Making it polite announces a number every second for twenty minutes, and is the commonest accessibility defect in audio UI.",
+        "role=timer, an aria-live=off region. Polite would announce a number every second for twenty minutes.",
     },
     {
       label: "Announced on transitions, not continuously",
       detail:
-        "One status region carries phase changes — recording started, paused, held and not yet uploaded — as a single sentence each, with a slow heartbeat between them. Crossing the silence budget is the one assertive announcement, because it is the failure the component exists to prevent.",
+        "One status region carries phase changes, a sentence each. Crossing the silence budget is the only assertive announcement.",
     },
     {
       label: "The waveform is hidden; the transcript is the equivalent",
       detail:
-        "The art is a picture of a number that is already announced, so it is aria-hidden. Where a transcript exists the stream art renders it alongside rather than instead, and that is what a screen-reader user reads in place of the wave.",
+        "The art is aria-hidden: it pictures a number already announced. Where a transcript exists, Stream is what a screen reader reads instead.",
     },
     {
       label: "Motion is replaced by a number, not removed",
       detail:
-        "Under reduced motion the scroll stops and the meter does not: translation is what triggers vestibular symptoms, a bar changing height in place does not. A live dBFS readout and a tabular elapsed timer carry what the scroll was carrying. The motion prop is an explicit mechanism, because WCAG 2.2.2's essential exception does not apply once a conforming alternative exists — and the still state is that alternative.",
+        "The scroll stops; the meter does not. A dBFS readout and a tabular timer carry what the scroll carried. `motion` is the WCAG 2.2.2 mechanism.",
     },
     {
       label: "Non-text contrast is solved against the pane",
       detail:
-        "Played and unplayed fills cannot both reach 3:1 against each other and against the pane on one hue ramp. The unplayed fill is solved against the pane, and the boundary is carried by a region wash and the playhead rather than by fill colour.",
+        "Played and unplayed cannot both clear 3:1 on one ramp. Unplayed is solved against the pane; the boundary is a wash plus the playhead.",
     },
   ],
 

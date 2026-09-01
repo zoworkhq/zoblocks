@@ -15,7 +15,7 @@
 
 import * as React from "react";
 import { PageLoader, PulseLoader } from "@/registry/oxygen/pulse-loader/pulse-loader";
-import { Recorder } from "@/registry/oxygen/recorder/recorder";
+import { Recorder, RecorderDispositionStrip } from "@/registry/oxygen/recorder/recorder";
 import { RhythmLoader } from "@/registry/oxygen/rhythm-loader/rhythm-loader";
 import { BreathLoader } from "@/registry/oxygen/breath-loader/breath-loader";
 import { HelixLoader } from "@/registry/oxygen/helix-loader/helix-loader";
@@ -1543,6 +1543,121 @@ function RecLive({
   );
 }
 
+/**
+ * The Console composition — the brief's flagship figure.
+ *
+ * Not a component: the whole point of calling it a composition is that it is
+ * `bars` with the host's own regions around it. What a host supplies is exactly
+ * what is here — a consent tag, participants, a sensitivity badge, a disclosure
+ * footer — and none of it is invented by the recorder.
+ */
+function RecConsole() {
+  const [markers, setMarkers] = React.useState<
+    Array<{ id: string; at: number; label: string; struck?: boolean }>
+  >([]);
+  const stamp = React.useRef(0);
+
+  return (
+    <div className="w-full overflow-hidden rounded-xl border border-rule bg-panel">
+      <div className="flex flex-wrap items-center gap-2 border-b border-rule bg-paper-sunk px-3 py-2">
+        <span className="ox-rec-tell">Recording</span>
+        <span className="rounded border border-rule px-1.5 py-0.5 font-mono text-[0.6rem] uppercase tracking-wider text-panel-muted">
+          Consent 09:11
+        </span>
+        <span className="rounded border border-rule px-1.5 py-0.5 font-mono text-[0.6rem] uppercase tracking-wider text-panel-muted">
+          42 CFR Part 2
+        </span>
+        <span className="ms-auto font-mono text-[0.6rem] uppercase tracking-wider text-panel-muted">
+          3 in room · Jabra Link 380
+        </span>
+      </div>
+      <div className="p-3">
+        <RecLive
+          switchable
+          variant="bars"
+          device={REC_JABRA}
+          expectedDevice={REC_JABRA}
+          context="Encounter · Room 4"
+          markers={markers}
+          onPause={() => {}}
+          onStop={() => {}}
+          onMark={() => {
+            stamp.current += 1;
+            setMarkers((m) => [
+              ...m,
+              {
+                id: `m${stamp.current}`,
+                at: Math.min(0.95, 0.15 + m.length * 0.18),
+                label: "Mark",
+              },
+            ]);
+          }}
+          onStrike={() => {
+            stamp.current += 1;
+            setMarkers((m) => [
+              ...m,
+              {
+                id: `s${stamp.current}`,
+                at: Math.min(0.95, 0.2 + m.length * 0.18),
+                label: "Struck 0:30",
+                struck: true,
+              },
+            ]);
+          }}
+        />
+      </div>
+      <p className="border-t border-rule bg-paper-sunk px-3 py-2 text-[0.7rem] text-panel-muted">
+        Audio stays in-region. Transcription is on-premise for Part 2 records. Retention 30 days,
+        then transcript only.
+      </p>
+    </div>
+  );
+}
+
+/** The four post-stop states, steppable rather than on a loop. */
+function RecDispositionCycle() {
+  const STATES = [
+    { state: "held" as const, bytes: 14_200_000, sent: 0 },
+    { state: "uploading" as const, bytes: 14_200_000, sent: 8_900_000 },
+    { state: "transcribing" as const, bytes: 14_200_000, sent: 14_200_000 },
+    { state: "ready" as const, bytes: 14_200_000, sent: 14_200_000 },
+    {
+      state: "failed" as const,
+      bytes: 14_200_000,
+      sent: 8_900_000,
+      error: "Network dropped at 62%.",
+    },
+  ];
+  const [i, setI] = React.useState(0);
+  return (
+    <div className="flex w-full flex-col gap-3">
+      <div className="flex flex-wrap gap-1.5">
+        {STATES.map((s, index) => (
+          <button
+            key={s.state}
+            type="button"
+            onClick={() => setI(index)}
+            aria-pressed={i === index}
+            className={[
+              "rounded-lg px-2.5 py-1 font-mono text-[0.6875rem] uppercase tracking-wider transition-colors",
+              i === index
+                ? "bg-trace/12 text-trace ring-1 ring-trace/35"
+                : "text-panel-muted hover:bg-panel-fg/6 hover:text-panel-fg/85",
+            ].join(" ")}
+          >
+            {s.state}
+          </button>
+        ))}
+      </div>
+      <RecorderDispositionStrip
+        disposition={STATES[i]!}
+        durationMs={252_000}
+        onRetry={() => setI(1)}
+      />
+    </div>
+  );
+}
+
 function RecStage({ children }: { children: React.ReactNode }) {
   return <div className="w-full max-w-xl">{children}</div>;
 }
@@ -1605,7 +1720,7 @@ const SCENARIOS: Record<string, Scenario[]> = {
       id: "recording",
       label: "Capturing",
       group: "Capture",
-      note: "The workhorse, and the argument. Peak buckets at 30 Hz, newest at the right, older buckets falling off a masked left edge — the lane appears to scroll because the data moves, not because a transform is animating. Take the signal away with the switch above and it stops, because nothing here owns a clock. The centre hairline is true zero, so a bar touching it means the recogniser is receiving nothing rather than that the room is quiet at a decorative minimum.",
+      note: "The workhorse, and the argument. Peak buckets at 30 Hz, newest at the right. Take the signal away with the switch above and it stops, because nothing here owns a clock. The centre hairline is true zero, so a bar touching it means nothing is arriving.",
       render: () => (
         <RecStage>
           <RecLive
@@ -1621,10 +1736,32 @@ const SCENARIOS: Record<string, Scenario[]> = {
       ),
     },
     {
+      id: "console",
+      label: "The full encounter surface",
+      group: "Capture",
+      note: "Consent, participants, device, level, markers and mid-session redaction, assembled. A composition rather than a sixth art — bars with the host regions filled in. Also the only view that shows the whole argument at once.",
+      render: () => (
+        <RecStage>
+          <RecConsole />
+        </RecStage>
+      ),
+    },
+    {
+      id: "disposition",
+      label: "Where the recording is",
+      group: "When it is lying",
+      note: "The companion strip. While held there is no progress bar, because nothing is moving and a bar creeping forward would invent it. A failed upload resumes by byte range rather than re-sending 14 MB.",
+      render: () => (
+        <RecStage>
+          <RecDispositionCycle />
+        </RecStage>
+      ),
+    },
+    {
       id: "single-control",
       label: "One control, at 44px",
       group: "Capture",
-      note: "Pulse answers both questions at once: is it recording (the dot, and its shape) and is it hearing me (the rings). It is the only art that keeps a real level meter at thumb size, which is what a patient-facing surface or a phone actually needs — every other art drops the meter or the transport when the width goes.",
+      note: "Is it recording (the dot, and its shape) and is it hearing me (the rings) — one control, both answers. The only art that keeps a real level meter at thumb size, which is what a phone or a patient-facing surface needs.",
       render: () => (
         <RecStage>
           <RecLive variant="pulse" />
@@ -1635,7 +1772,7 @@ const SCENARIOS: Record<string, Scenario[]> = {
       id: "dictation",
       label: "Inline dictation",
       group: "Capture",
-      note: "Forty pixels tall, lives inside a note field or a composer toolbar, and still carries a real level meter rather than a static microphone glyph. It is the variant that will be instantiated most often and looked at least, which is exactly why it is not an afterthought — and it is the one art that must refuse to mount for a restricted recording, because a control this quiet is not where a disclosure should begin.",
+      note: "Forty pixels tall, inside a note field, and still a real level meter rather than a static glyph. The variant instantiated most and looked at least. It refuses to mount for a restricted recording: a control this quiet is not where a disclosure begins.",
       render: () => (
         <RecStage>
           <RecLive variant="strip" context="History of presenting complaint" onSend={() => {}} />
@@ -1646,7 +1783,7 @@ const SCENARIOS: Record<string, Scenario[]> = {
       id: "wrong-device",
       label: "Recording the wrong microphone",
       group: "When it is lying",
-      note: "A clinician wearing a headset while the laptop microphone is live produces plausible room tone, and every one of the thirteen detectors passes on the signal. This is the failure with no signal-level defence at all: it is caught by comparing the device delivering audio against the device that was chosen, and it is why the name is rendered rather than filed in a settings panel.",
+      note: "A headset user with the laptop mic live produces plausible room tone, and every one of the thirteen detectors passes. Caught by comparing the delivering device against the chosen one — which is why the name is rendered, not filed in a settings panel.",
       render: () => (
         <RecStage>
           <RecLive variant="bars" device={REC_BUILTIN} expectedDevice={REC_JABRA} />
@@ -1657,7 +1794,7 @@ const SCENARIOS: Record<string, Scenario[]> = {
       id: "no-consent",
       label: "Armed, with no basis recorded",
       group: "When it is lying",
-      note: "`armed` is not `idle`: permission is granted and the device is chosen, but nothing is captured and no basis is recorded. Most implementations collapse those two states and then have nowhere to put consent. The engine refuses the armed-to-recording edge rather than trusting a button handler, and the component states the refusal rather than disabling a control silently.",
+      note: "`armed` is not `idle`: permission granted, device chosen, nothing captured, no basis recorded. Most implementations collapse the two and then have nowhere to put consent. The engine refuses the edge; the surface says so.",
       render: () => (
         <RecStage>
           <Recorder variant="bars" phase="armed" consent={null} />
@@ -1668,7 +1805,7 @@ const SCENARIOS: Record<string, Scenario[]> = {
       id: "held",
       label: "Captured, but not sent",
       group: "When it is lying",
-      note: "The state every thin MediaRecorder wrapper skips: the bytes exist, they are on this device, and nobody else has them. A tick at this moment would be a falsehood about a legal record. The retry resumes by byte range, because a 14 MB re-upload on a clinic connection is a minute nobody has.",
+      note: "The state every thin MediaRecorder wrapper skips. The bytes exist, on this device, and nobody else has them. A tick here would be a falsehood about a legal record.",
       render: () => (
         <RecStage>
           <Recorder
@@ -1683,7 +1820,7 @@ const SCENARIOS: Record<string, Scenario[]> = {
       id: "duet",
       label: "Who spoke when",
       group: "Reviewing a take",
-      note: "The same Float32Array as the recorder, read by index instead of appended to — but the axis carries the speaker. Clinician above the line, patient below, so talk-time balance reads without reading anything, and that is a real consultation-quality measure rather than a decoration. Position is the channel, not colour: the two accents sit within about 2:1 of each other in luminance, and a hue-only distinction is one this system forbids.",
+      note: "The recorder's array read by index instead of appended to — but the axis carries the speaker. Talk-time balance reads without reading anything. Position is the channel, not colour: the two accents sit within 2:1 in luminance.",
       render: () => (
         <RecStage>
           <Recorder
@@ -1704,7 +1841,7 @@ const SCENARIOS: Record<string, Scenario[]> = {
       id: "duet-no-speakers",
       label: "Without diarisation",
       group: "Reviewing a take",
-      note: "Where the ingest pipeline supplies peaks but no speaker byte, the art collapses to a single rail and says so. It does not guess: a wrongly attributed rail is worse than no attribution, because a reader who believes the axis will read a patient's words as the clinician's.",
+      note: "Peaks but no speaker byte: one rail, and it says so. It does not guess — a reader who trusts the axis would read the patient's words as the clinician's.",
       render: () => (
         <RecStage>
           <Recorder
@@ -1722,7 +1859,7 @@ const SCENARIOS: Record<string, Scenario[]> = {
       id: "transcript",
       label: "Live transcript",
       group: "Transcript",
-      note: "The accessible equivalent of every waveform on this page: a screen-reader user cannot see a level meter, so where a transcript exists it is rendered alongside rather than instead. The last token is drawn as a guess because the recogniser may still take it back — committing an interim result and then rewriting it is how a transcript loses a clinician in the first thirty seconds.",
+      note: "The accessible equivalent of every waveform here. The last token is drawn as a guess because the recogniser may take it back; committing an interim result and rewriting it loses a clinician in thirty seconds.",
       render: () => (
         <RecStage>
           <Recorder variant="stream" phase="recording" turns={REC_TURNS} />

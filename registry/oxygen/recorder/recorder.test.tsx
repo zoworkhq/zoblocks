@@ -1,6 +1,6 @@
 import { render } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import { Recorder, RECORDER_ARTS } from "./recorder";
+import { Recorder, RecorderDispositionStrip, RECORDER_ARTS } from "./recorder";
 
 const JABRA = { deviceId: "jabra", label: "Jabra Link 380" };
 const BUILTIN = { deviceId: "builtin", label: "MacBook Pro Microphone" };
@@ -276,5 +276,92 @@ describe("Recorder — motion", () => {
     // once a conforming alternative exists — the still state is that alternative.
     const view = render(<Recorder variant="bars" phase="recording" motion="reduced" />);
     expect(root(view.container)?.dataset.motion).toBe("reduced");
+  });
+});
+
+describe("RecorderDispositionStrip — the companion", () => {
+  const BYTES = 14_200_000;
+
+  it("draws no progress while held, because nothing is moving", () => {
+    // A bar creeping forward here would be inventing progress that does not
+    // exist. Held is a resting state that can last for days.
+    const view = render(
+      <RecorderDispositionStrip disposition={{ state: "held", bytes: BYTES, sent: 0 }} />,
+    );
+    const track = view.container.querySelector(".ox-rec-track");
+    expect(track?.getAttribute("data-indeterminate")).toBe("true");
+    expect(view.getByText(/not yet uploaded/i)).toBeInTheDocument();
+  });
+
+  it("reports upload progress against the real byte count", () => {
+    const view = render(
+      <RecorderDispositionStrip
+        disposition={{ state: "uploading", bytes: BYTES, sent: 8_900_000 }}
+      />,
+    );
+    expect(view.getByText(/8\.9 MB of 14\.2 MB/)).toBeInTheDocument();
+    expect(view.getByText(/Resumes if the connection drops/i)).toBeInTheDocument();
+  });
+
+  it("says the audio is safe while the recogniser works", () => {
+    // The distinction that stops a pipeline discarding the expensive artefact
+    // because the cheap one broke.
+    const view = render(
+      <RecorderDispositionStrip
+        disposition={{ state: "transcribing", bytes: BYTES, sent: BYTES }}
+      />,
+    );
+    expect(view.getByText(/audio is safe/i)).toBeInTheDocument();
+  });
+
+  it("offers a retry only when there is something to retry, and resumes by byte", () => {
+    const bare = render(
+      <RecorderDispositionStrip
+        disposition={{ state: "held", bytes: BYTES, sent: 0 }}
+        onRetry={() => {}}
+      />,
+    );
+    expect(bare.queryByRole("button", { name: /retry/i })).toBeNull();
+    bare.unmount();
+
+    const failed = render(
+      <RecorderDispositionStrip
+        disposition={{ state: "failed", bytes: BYTES, sent: 8_900_000, error: "Network dropped." }}
+        onRetry={() => {}}
+      />,
+    );
+    // 8.9 of 14.2 is 62%: a retry that restarts at zero costs a minute nobody
+    // has on a clinic connection.
+    expect(failed.getByRole("button", { name: /Retry from 62%/i })).toBeInTheDocument();
+    expect(failed.getByRole("alert").textContent).toContain("Network dropped.");
+  });
+
+  it("marks the failed step rather than only colouring the bar", () => {
+    const view = render(
+      <RecorderDispositionStrip disposition={{ state: "failed", bytes: BYTES, sent: 100 }} />,
+    );
+    expect(view.container.querySelectorAll('[data-failed="true"]')).toHaveLength(1);
+  });
+});
+
+describe("Recorder — mid-session redaction", () => {
+  it("offers strike and mark only when the host can act on them", () => {
+    const bare = render(<Recorder variant="bars" phase="recording" />);
+    expect(bare.queryByRole("button", { name: /strike/i })).toBeNull();
+    bare.unmount();
+
+    const wired = render(
+      <Recorder variant="bars" phase="recording" onMark={() => {}} onStrike={() => {}} />,
+    );
+    expect(wired.getByRole("button", { name: /mark/i })).toBeInTheDocument();
+    // The window is named on the control, so nobody has to guess how much goes.
+    expect(wired.getByRole("button", { name: /strike 30/i })).toBeInTheDocument();
+  });
+
+  it("names the configured strike window", () => {
+    const view = render(
+      <Recorder variant="bars" phase="recording" onStrike={() => {}} strikeWindowMs={15_000} />,
+    );
+    expect(view.getByRole("button", { name: /strike 15/i })).toBeInTheDocument();
   });
 });

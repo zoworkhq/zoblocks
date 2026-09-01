@@ -69,6 +69,16 @@ test.describe("visual regression", () => {
     await expect(page.locator(".ox-rec-markbar")).toHaveScreenshot("recorder-markers.png");
   });
 
+  test("@vrt the disposition strip is visually stable", async ({ page }) => {
+    await page.goto(RECORDER);
+    await settle(page);
+    await scenario(page, "Where the recording is");
+    // No waveform and no transport, so nothing here has a clock either.
+    const strip = page.locator('[data-ox-recorder="disposition"]').first();
+    await expect(strip).toBeVisible();
+    await expect(strip).toHaveScreenshot("recorder-disposition-held.png");
+  });
+
   test("@vrt the transcript art is visually stable", async ({ page }) => {
     await page.goto(RECORDER);
     await settle(page);

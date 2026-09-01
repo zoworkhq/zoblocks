@@ -142,6 +142,45 @@ export function paintLane(lane: HTMLElement | null, read: (index: number) => num
   }
 }
 
+/**
+ * How many bars fit, measured rather than assumed.
+ *
+ * A fixed count is wrong at every width but one. The lane is `flex-end`, and a
+ * bar is capped at `--ox-recorder-bar-w` so it stays a bar rather than becoming
+ * a block — so 72 bars span about 360px however wide the pane is, and on a
+ * 550px pane that leaves 190px of empty lane on the left. It does not read as
+ * "no data yet". It reads as broken.
+ *
+ * Deriving the count from the measured width fixes it at every width, and it
+ * also fixes the thing behind it: the lane is a WINDOW ONTO TIME, so a wider
+ * pane should show more seconds, not the same seconds further apart.
+ */
+export function useLaneBars(ref: React.RefObject<HTMLElement | null>, fallback = 72): number {
+  const [count, setCount] = React.useState(fallback);
+
+  React.useEffect(() => {
+    const node = ref.current;
+    if (node === null || typeof ResizeObserver === "undefined") return;
+
+    const measure = (): void => {
+      const style = getComputedStyle(node);
+      const barW = Number.parseFloat(style.getPropertyValue("--_bar-w")) || 3;
+      const gap = Number.parseFloat(style.columnGap) || 2;
+      const width = node.clientWidth;
+      if (width <= 0) return;
+      const next = Math.max(8, Math.min(512, Math.floor((width + gap) / (barW + gap))));
+      setCount((current) => (current === next ? current : next));
+    };
+
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [ref]);
+
+  return count;
+}
+
 /* -------------------------------------------------------------- the chrome */
 
 export interface RecorderFrameProps extends React.HTMLAttributes<HTMLDivElement> {

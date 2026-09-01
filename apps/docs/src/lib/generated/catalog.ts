@@ -9364,8 +9364,8 @@ export const CATALOG: ComponentDoc[] = [
     "distribution": "registry",
     "summary": "A capture surface that cannot lie about whether it is listening. Five arts over one signal engine, and thirteen failure modes it can tell apart.",
     "tagline": "It cannot lie about whether it is listening.",
-    "description": "Record, review and transcribe clinical audio: ambient documentation, dictation, voice messaging and transcript playback. Five arts — pulse, bars, strip, duet and stream — over one engine, with the level meter driven by an AnalyserNode rather than a timer, a silence budget, and thirteen distinct device faults.",
-    "rationale": "Every voice-recorder interface on the web animates on a timer, and in a consulting room that is a failure mode with a victim: an operating-system mute, a Bluetooth profile switch and a silently substituted device all produce frames of digital silence arriving on schedule, and a timer-driven waveform cannot distinguish that from a room where nobody is speaking. This one draws only what the analyser reports, so silence renders at true zero and a muted microphone stops the art dead — and then the surface says which of the thirteen faults it is, because a flat waveform and a quiet room look identical and only one of them costs you the consultation. The engine is a separate zero-dependency package: a team already running wavesurfer should import the model rather than install the renderer.",
+    "description": "Ambient documentation, dictation, voice messaging and transcript review. Five arts — pulse, bars, strip, duet, stream — over one engine, with an analyser-driven meter, a silence budget and thirteen device faults.",
+    "rationale": "Every voice recorder on the web animates on a timer. An OS mute, a Bluetooth profile switch and a swapped device all deliver digital silence on schedule, and a timer cannot tell that from a quiet room. This one draws only what the analyser reports, then names which of the thirteen faults it is.",
     "categories": [
       "Media",
       "Clinical"
@@ -9465,6 +9465,12 @@ export const CATALOG: ComponentDoc[] = [
         "required": false
       },
       {
+        "name": "onMark",
+        "type": "(() => void)",
+        "description": "Drop a marker at the current position.",
+        "required": false
+      },
+      {
         "name": "onPause",
         "type": "(() => void)",
         "description": "Suspend capture without ending the take. A control that is missing because the host passed no handler is hidden rather than disabled: a dead button is a promise the surface cannot keep.",
@@ -9480,6 +9486,12 @@ export const CATALOG: ComponentDoc[] = [
         "name": "onStop",
         "type": "(() => void)",
         "description": "End the take and hand it to the host. The primary action on the capture arts.",
+        "required": false
+      },
+      {
+        "name": "onStrike",
+        "type": "(() => void)",
+        "description": "Strike the last `strikeWindowMs` from the record. Mid-consultation a patient says something and asks for it not to be recorded. Every ambient scribe on the market answers that with \"stop and start again\", which loses the consultation's continuity at exactly the moment nobody wants to operate a UI. The component only RAISES this — the host zeroes the samples, writes the audit record, and hands back a struck marker so the gap stays visible on the timeline. A removal a reader cannot see is a removal nobody can audit.",
         "required": false
       },
       {
@@ -9536,6 +9548,13 @@ export const CATALOG: ComponentDoc[] = [
         "description": "One byte of speaker per bucket. Without it Duet renders a single rail.",
         "required": false,
         "default": "null"
+      },
+      {
+        "name": "strikeWindowMs",
+        "type": "number",
+        "description": "How much a strike removes. Thirty seconds by default.",
+        "required": false,
+        "default": "30_000"
       },
       {
         "name": "title",
@@ -9651,6 +9670,12 @@ export const CATALOG: ComponentDoc[] = [
             "required": false
           },
           {
+            "name": "onMark",
+            "type": "(() => void)",
+            "description": "Drop a marker at the current position.",
+            "required": false
+          },
+          {
             "name": "onPause",
             "type": "(() => void)",
             "description": "Suspend capture without ending the take. A control that is missing because the host passed no handler is hidden rather than disabled: a dead button is a promise the surface cannot keep.",
@@ -9666,6 +9691,12 @@ export const CATALOG: ComponentDoc[] = [
             "name": "onStop",
             "type": "(() => void)",
             "description": "End the take and hand it to the host. The primary action on the capture arts.",
+            "required": false
+          },
+          {
+            "name": "onStrike",
+            "type": "(() => void)",
+            "description": "Strike the last `strikeWindowMs` from the record. Mid-consultation a patient says something and asks for it not to be recorded. Every ambient scribe on the market answers that with \"stop and start again\", which loses the consultation's continuity at exactly the moment nobody wants to operate a UI. The component only RAISES this — the host zeroes the samples, writes the audit record, and hands back a struck marker so the gap stays visible on the timeline. A removal a reader cannot see is a removal nobody can audit.",
             "required": false
           },
           {
@@ -9724,6 +9755,13 @@ export const CATALOG: ComponentDoc[] = [
             "default": "null"
           },
           {
+            "name": "strikeWindowMs",
+            "type": "number",
+            "description": "How much a strike removes. Thirty seconds by default.",
+            "required": false,
+            "default": "30_000"
+          },
+          {
             "name": "title",
             "type": "string",
             "description": "What the take IS — \"Consultation — 14 Aug, 09:12\". The playback header carries this rather than the speaker names, because the names are already on the axis; printing them twice spends the one line a reviewer reads first on something the picture already says.",
@@ -9752,6 +9790,45 @@ export const CATALOG: ComponentDoc[] = [
           }
         ],
         "extendsType": "Omit<React.HTMLAttributes<HTMLDivElement>, \"onChange\">"
+      },
+      {
+        "name": "RecorderDispositionStrip",
+        "props": [
+          {
+            "name": "disposition",
+            "type": "RecorderDisposition",
+            "description": "Where the bytes are. The component renders this; the host moves them.",
+            "required": true
+          },
+          {
+            "name": "attachedTo",
+            "type": "string",
+            "description": "What the transcript is attached to once it is ready.",
+            "required": false,
+            "default": "\"encounter\""
+          },
+          {
+            "name": "durationMs",
+            "type": "number",
+            "description": "Length of the take, for the \"captured\" step's readout.",
+            "required": false,
+            "default": "0"
+          },
+          {
+            "name": "language",
+            "type": "string",
+            "description": "Recogniser language, for the \"transcribed\" step.",
+            "required": false,
+            "default": "\"en-GB\""
+          },
+          {
+            "name": "onRetry",
+            "type": "(() => void)",
+            "description": "Offered on `failed`, and only then — a retry that cannot retry is a lie.",
+            "required": false
+          }
+        ],
+        "extendsType": "React.HTMLAttributes<HTMLDivElement>"
       }
     ],
     "usage": "import { Recorder } from \"@/components/oxygen/recorder\";\n\n// Ambient capture. The host owns getUserMedia; the component owns the truth\n// about what is arriving.\n<Recorder\n  variant=\"bars\"\n  phase=\"recording\"\n  source={analyser}\n  device={{ deviceId: \"jabra\", label: \"Jabra Link 380\" }}\n  expectedDevice={{ deviceId: \"jabra\", label: \"Jabra Link 380\" }}\n  onFault={(fault) => fault && report(fault.code)}\n/>\n\n// Reviewing the take. Peaks and speakers come from the ingest sidecar.\n<Recorder\n  variant=\"duet\"\n  phase=\"ready\"\n  peaks={peaks}\n  speakers={speakers}\n  position={0.44}\n  durationMs={754_000}\n  speakerLabels={[\"Dr Okafor\", \"Patient\"]}\n/>",
@@ -9770,23 +9847,23 @@ export const CATALOG: ComponentDoc[] = [
     "accessibility": [
       {
         "label": "The timer is polled, never pushed",
-        "detail": "role=timer, which is an aria-live=off region by default. Making it polite announces a number every second for twenty minutes, and is the commonest accessibility defect in audio UI."
+        "detail": "role=timer, an aria-live=off region. Polite would announce a number every second for twenty minutes."
       },
       {
         "label": "Announced on transitions, not continuously",
-        "detail": "One status region carries phase changes — recording started, paused, held and not yet uploaded — as a single sentence each, with a slow heartbeat between them. Crossing the silence budget is the one assertive announcement, because it is the failure the component exists to prevent."
+        "detail": "One status region carries phase changes, a sentence each. Crossing the silence budget is the only assertive announcement."
       },
       {
         "label": "The waveform is hidden; the transcript is the equivalent",
-        "detail": "The art is a picture of a number that is already announced, so it is aria-hidden. Where a transcript exists the stream art renders it alongside rather than instead, and that is what a screen-reader user reads in place of the wave."
+        "detail": "The art is aria-hidden: it pictures a number already announced. Where a transcript exists, Stream is what a screen reader reads instead."
       },
       {
         "label": "Motion is replaced by a number, not removed",
-        "detail": "Under reduced motion the scroll stops and the meter does not: translation is what triggers vestibular symptoms, a bar changing height in place does not. A live dBFS readout and a tabular elapsed timer carry what the scroll was carrying. The motion prop is an explicit mechanism, because WCAG 2.2.2's essential exception does not apply once a conforming alternative exists — and the still state is that alternative."
+        "detail": "The scroll stops; the meter does not. A dBFS readout and a tabular timer carry what the scroll carried. `motion` is the WCAG 2.2.2 mechanism."
       },
       {
         "label": "Non-text contrast is solved against the pane",
-        "detail": "Played and unplayed fills cannot both reach 3:1 against each other and against the pane on one hue ramp. The unplayed fill is solved against the pane, and the boundary is carried by a region wash and the playhead rather than by fill colour."
+        "detail": "Played and unplayed cannot both clear 3:1 on one ramp. Unplayed is solved against the pane; the boundary is a wash plus the playhead."
       }
     ],
     "limitations": [
