@@ -107,11 +107,7 @@ export interface RecorderConsent {
  * the scope note in the build spec.
  */
 export type ConsentVerdict =
-  | "resolved"
-  | "absent"
-  | "incomplete"
-  | "not-all-parties"
-  | "not-required";
+  "resolved" | "absent" | "incomplete" | "not-all-parties" | "not-required";
 
 /** How much the recording discloses, which changes behaviour and not only a badge. */
 export type RecorderSensitivity = "routine" | "confidential" | "restricted";

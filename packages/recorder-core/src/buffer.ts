@@ -163,7 +163,9 @@ export class PeakBuffer {
     this.peaks[slot] = Number.isFinite(peak) ? Math.min(1, Math.max(0, peak)) : 0;
     if (this.speakerLane !== null) {
       const id = Math.trunc(speaker);
-      this.speakerLane[slot] = Number.isFinite(id) ? Math.min(255, Math.max(0, id)) : SPEAKER_UNKNOWN;
+      this.speakerLane[slot] = Number.isFinite(id)
+        ? Math.min(255, Math.max(0, id))
+        : SPEAKER_UNKNOWN;
     }
     this.total += 1;
   }

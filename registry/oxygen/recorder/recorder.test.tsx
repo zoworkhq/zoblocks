@@ -100,7 +100,13 @@ describe("Recorder — disposition", () => {
 describe("Recorder — Duet folds the speaker onto the axis", () => {
   it("draws two rails when diarisation is present", () => {
     const view = render(
-      <Recorder variant="duet" peaks={PEAKS} speakers={SPEAKERS} position={0.5} durationMs={60_000} />,
+      <Recorder
+        variant="duet"
+        peaks={PEAKS}
+        speakers={SPEAKERS}
+        position={0.5}
+        durationMs={60_000}
+      />,
     );
     expect(view.container.querySelectorAll("[data-rail]")).toHaveLength(4); // 2 rails + 2 keys
     expect(view.container.querySelector('[data-rail="b"]')).not.toBeNull();
@@ -119,7 +125,13 @@ describe("Recorder — Duet folds the speaker onto the axis", () => {
     // Played and unplayed cannot both be 3:1 against each other and against
     // the pane on one ramp, so the boundary is a wash plus the playhead.
     const view = render(
-      <Recorder variant="duet" peaks={PEAKS} speakers={SPEAKERS} position={0.25} durationMs={60_000} />,
+      <Recorder
+        variant="duet"
+        peaks={PEAKS}
+        speakers={SPEAKERS}
+        position={0.25}
+        durationMs={60_000}
+      />,
     );
     const wash = view.container.querySelector<HTMLElement>(".ox-rec-played");
     const head = view.container.querySelector<HTMLElement>(".ox-rec-head");
@@ -129,7 +141,13 @@ describe("Recorder — Duet folds the speaker onto the axis", () => {
 
   it("reports talk-time balance, because the diarisation is already there", () => {
     const view = render(
-      <Recorder variant="duet" peaks={PEAKS} speakers={SPEAKERS} position={1} durationMs={60_000} />,
+      <Recorder
+        variant="duet"
+        peaks={PEAKS}
+        speakers={SPEAKERS}
+        position={1}
+        durationMs={60_000}
+      />,
     );
     expect(view.getByText(/\d+% \/ \d+%/)).toBeInTheDocument();
   });
@@ -141,7 +159,14 @@ describe("Recorder — the transcript is the accessible waveform", () => {
       <Recorder
         variant="stream"
         phase="recording"
-        turns={[{ id: "1", speaker: "Patient", words: "I have to stop halfway which I", interim: "never" }]}
+        turns={[
+          {
+            id: "1",
+            speaker: "Patient",
+            words: "I have to stop halfway which I",
+            interim: "never",
+          },
+        ]}
       />,
     );
     const interim = view.container.querySelector(".ox-rec-interim");

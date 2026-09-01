@@ -743,8 +743,7 @@
   cursor: pointer;
   background: var(--ox-bg, #fff);
   border: 1px solid var(--ox-border-strong, #d2dbd8);
-  box-shadow: 0 0 0 calc(4px + var(--_lv) * 9px)
-    color-mix(in oklab, var(--_wave) 20%, transparent);
+  box-shadow: 0 0 0 calc(4px + var(--_lv) * 9px) color-mix(in oklab, var(--_wave) 20%, transparent);
   transition: box-shadow 90ms linear;
 }
 .ox-rec-pulse .ox-rec-btn > span {

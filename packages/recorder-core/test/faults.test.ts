@@ -103,9 +103,7 @@ describe("detectFaults — the four that are byte-identical at the signal layer"
   });
 
   it("6 — a profile switch is caught by the sample rate, not the level", () => {
-    const found = detectFaults(
-      healthy({ sampleRate: 16_000, baselineSampleRate: 48_000 }),
-    );
+    const found = detectFaults(healthy({ sampleRate: 16_000, baselineSampleRate: 48_000 }));
     // The meter is still moving; nothing in `frame` betrays this.
     expect(found.map((f) => f.code)).toContain("route-changed");
     expect(found[0]?.audioIntact).toBe(true);
@@ -200,9 +198,7 @@ describe("detectFaults — the device and the document", () => {
 
 describe("detectFaults — after the capture", () => {
   it("10 — a full disk stops cleanly and keeps what exists", () => {
-    const found = detectFaults(
-      healthy({ phase: "held", storageError: "QuotaExceededError" }),
-    );
+    const found = detectFaults(healthy({ phase: "held", storageError: "QuotaExceededError" }));
     expect(found[0]?.code).toBe("storage-full");
     expect(found[0]?.audioIntact).toBe(true);
   });
@@ -266,9 +262,7 @@ describe("detectFaults — ordering and helpers", () => {
     ).toBe(true);
     // Device lost is a fault, but it is not capturing-nothing: it has stopped.
     expect(
-      isCapturingNothing(
-        detectFaults(healthy({ track: { readyState: "ended", muted: false } })),
-      ),
+      isCapturingNothing(detectFaults(healthy({ track: { readyState: "ended", muted: false } }))),
     ).toBe(false);
   });
 

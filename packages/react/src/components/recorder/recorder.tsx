@@ -215,9 +215,7 @@ export function Recorder({
         if (lane !== null) {
           // index 0 is the newest bucket; the buffer indexes oldest-first.
           const end = history.length - 1;
-          paintLane(lane, (index: number) =>
-            index <= end ? history.at(end - index) : 0,
-          );
+          paintLane(lane, (index: number) => (index <= end ? history.at(end - index) : 0));
         }
 
         sinceEmit.current += 1;
@@ -275,26 +273,18 @@ export function Recorder({
       {blockedByConsent(phase, consent) ? (
         <div className="ox-rec-fault" data-severity="critical" role="alert">
           <span>
-            <b>Consent not recorded.</b> Recording cannot start. Capture the basis, or start
-            an unrecorded encounter.
+            <b>Consent not recorded.</b> Recording cannot start. Capture the basis, or start an
+            unrecorded encounter.
           </span>
         </div>
       ) : (
         <RecorderFaultBanner fault={fault} />
       )}
 
-      {variant === "pulse" ? (
-        <PulseArt phase={phase} elapsed={elapsed} frame={frame} />
-      ) : null}
+      {variant === "pulse" ? <PulseArt phase={phase} elapsed={elapsed} frame={frame} /> : null}
 
       {variant === "bars" ? (
-        <BarsArt
-          laneRef={laneRef}
-          phase={phase}
-          elapsed={elapsed}
-          frame={frame}
-          device={device}
-        />
+        <BarsArt laneRef={laneRef} phase={phase} elapsed={elapsed} frame={frame} device={device} />
       ) : null}
 
       {variant === "strip" ? <StripArt laneRef={laneRef} elapsed={elapsed} /> : null}
@@ -456,7 +446,11 @@ function DuetArt({
         <i
           key={i}
           data-played={i <= cut ? "true" : "false"}
-          style={{ "--_h": mine ? visualGain(values[i] as number).toFixed(3) : "0" } as React.CSSProperties}
+          style={
+            {
+              "--_h": mine ? visualGain(values[i] as number).toFixed(3) : "0",
+            } as React.CSSProperties
+          }
         />
       );
     });
@@ -464,7 +458,9 @@ function DuetArt({
   return (
     <>
       <div className="ox-rec-row">
-        <span className="ox-rec-meta">{split ? labels.join(" · ") : "Single rail — no diarisation"}</span>
+        <span className="ox-rec-meta">
+          {split ? labels.join(" · ") : "Single rail — no diarisation"}
+        </span>
         <span className="ox-rec-clock">
           {recorderClockShort(played * durationMs)} / {recorderClockShort(durationMs)}
         </span>

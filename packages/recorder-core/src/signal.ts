@@ -39,7 +39,7 @@ import type { SignalFrame, TimeDomainSource } from "./types";
  */
 const ZERO_EPSILON = 1e-6;
 /** Absorbs the last-bit error in `elapsedMs` so a boundary landed on exactly
-  * is counted as reached. Far below one bucket, far above float64 noise. */
+ * is counted as reached. Far below one bucket, far above float64 noise. */
 const BUCKET_EPSILON = 1e-9;
 
 /** dBFS reported for digital silence. Real silence is -Infinity; nobody can read that. */
@@ -164,7 +164,8 @@ export function createSignal(options: SignalOptions = {}): Signal {
   const frameSize = options.frameSize ?? 2048;
   const maxStepMs = options.maxStepMs ?? 60_000;
 
-  if (!(release > 0)) throw new RangeError(`createSignal: release must be positive, got ${release}`);
+  if (!(release > 0))
+    throw new RangeError(`createSignal: release must be positive, got ${release}`);
   if (floor < 0 || floor >= 1) throw new RangeError(`createSignal: floor must be in [0, 1)`);
 
   let source: TimeDomainSource | null = options.source ?? null;

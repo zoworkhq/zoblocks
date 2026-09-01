@@ -17,7 +17,7 @@ Five arts selected by a `variant` prop: **pulse, bars, strip, duet, stream**.
 The load-bearing claim, and the thing that must never be compromised for
 convenience: **the art is a pure function of the signal.** No timer, no phase,
 no clock of its own. If the analyser reports nothing, nothing moves — and then
-the surface must *say* it is not capturing, because a flat waveform and a quiet
+the surface must _say_ it is not capturing, because a flat waveform and a quiet
 room look identical and have opposite consequences.
 
 ---
@@ -28,6 +28,7 @@ Each step must leave `main`-quality work on the branch. A run that stops after
 step 3 must be useful, not wreckage. Push after each step; do not batch.
 
 ### 1. `packages/recorder-core` — the engine
+
 Mirror `packages/tabs-core` exactly for layout: `package.json`, `tsconfig.json`,
 `vitest.config.ts`, `src/`, `test/`, `README.md`. Zero runtime dependencies
 (ADR 0009, ENGINEERING.md §2.5). No React. No DOM types in the public API.
@@ -55,37 +56,42 @@ attack is instant and the release hits 1/e at 180 ms), the bucket rate, the
 machine's illegal transitions, and the silence budget.
 
 ### 2. The thirteen fault detectors
+
 §11 of the brief, each with a test that simulates it. Rows 3, 4, 6 and 7 produce
-**byte-identical** signal output and are separated by *device state* — so this
+**byte-identical** signal output and are separated by _device state_ — so this
 listens to `devicechange` and the track lifecycle, not only the analyser.
 **Row 7 (wrong device selected) has no signal-level defence at all**; the API
 must therefore surface the device name as a first-class, always-rendered value.
 This step is unglamorous and it is the actual product. Do not let it slip.
 
 ### 3. `registry/oxygen/lib/recorder.ts` + `recorder.css`
+
 The shared frame and stylesheet, following `registry/oxygen/lib/loader.tsx` and
 `loader.css` as the closest precedent.
 
 ### 4. The five arts + `<Recorder>`
+
 Read the brief's §04 markup and §14 API. Below 280 px, `bars` reports itself as
 `strip` — the same self-demotion `pulse-loader` already does below 40 px.
 
 **Duet is the differentiated one.** The waveform's axis carries the speaker —
 clinician above the line, patient below — not lanes underneath. It needs peaks
-*and* one speaker byte per bucket. Where diarisation is absent it must collapse
+_and_ one speaker byte per bucket. Where diarisation is absent it must collapse
 to a single rail rather than guess: a wrongly attributed rail is worse than no
 attribution.
 
 Two things from the brief that a reasonable engineer will get wrong:
+
 - **The transport does not grey out when muted.** The recording is still
   running and the file is still growing. Greying the record dot says "not
-  recording", which is false. Only the *signal* greys.
+  recording", which is false. Only the _signal_ greys.
 - **The played/unplayed boundary is not carried by fill colour.** §10 shows the
   two requirements have no common solution on one hue ramp. Unplayed is solved
   to 3:1 against the pane; the boundary is a tinted region wash plus the
   playhead. Colour is redundancy.
 
 ### 5. The seven gates
+
 `pnpm gen:strict` and the root tests fail on any of these. All seven, or the
 step is not done:
 

@@ -80,10 +80,7 @@ export const RECORDER_TRANSITIONS: Readonly<
 
 /** Why a `send` did not move the machine. */
 export type RefusalReason =
-  | "no-such-edge"
-  | "consent-absent"
-  | "consent-incomplete"
-  | "consent-not-all-parties";
+  "no-such-edge" | "consent-absent" | "consent-incomplete" | "consent-not-all-parties";
 
 export interface TransitionResult {
   /** Whether the machine moved. */
