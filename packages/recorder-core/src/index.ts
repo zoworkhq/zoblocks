@@ -122,6 +122,7 @@ export {
   describeSilence,
   recorderClock,
   recorderClockShort,
+  recorderTimecode,
   recorderStatusWord,
   type SilenceLevel,
   type SilenceOptions,

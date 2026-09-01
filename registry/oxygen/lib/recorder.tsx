@@ -233,6 +233,74 @@ export function RecorderBars({ count }: { readonly count: number }): React.JSX.E
   );
 }
 
+/* ------------------------------------------------------------------- icons */
+
+/**
+ * Lucide geometry: a 24px grid, 2px stroke, round caps and joins.
+ *
+ * Inlined rather than imported so the registry copy has no icon dependency —
+ * a customer installing `recorder` should not also be installing an icon
+ * library to see a microphone.
+ */
+export type RecorderIconName = "mic" | "mic-off" | "pause" | "square" | "send" | "alert" | "flag";
+
+const ICON_PATHS: Readonly<Record<RecorderIconName, string>> = {
+  mic: "M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3ZM19 10v2a7 7 0 0 1-14 0v-2M12 19v3",
+  "mic-off":
+    "m2 2 20 20M9 9v3a3 3 0 0 0 5.1 2.1M15 9.3V5a3 3 0 0 0-5.7-1.3M19 10v2a7 7 0 0 1-.6 2.8M5 10v2a7 7 0 0 0 12 5M12 19v3",
+  pause: "M7 4v16M17 4v16",
+  square: "M7 7h10v10H7z",
+  send: "m22 2-7 20-4-9-9-4ZM22 2 11 13",
+  alert:
+    "M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0ZM12 9v4M12 17h.01",
+  flag: "M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1ZM4 22v-7",
+};
+
+export function RecorderIcon({
+  name,
+  size = 14,
+}: {
+  readonly name: RecorderIconName;
+  readonly size?: number;
+}): React.JSX.Element {
+  return (
+    <svg
+      className="ox-rec-icon"
+      viewBox="0 0 24 24"
+      width={size}
+      height={size}
+      aria-hidden="true"
+      focusable="false"
+    >
+      <path d={ICON_PATHS[name]} />
+    </svg>
+  );
+}
+
+/**
+ * A transport control.
+ *
+ * `data-primary` rather than a colour prop: the stylesheet decides what the
+ * primary action looks like, so a host retheming the recorder does not have to
+ * find every button that hard-coded an accent.
+ */
+export function RecorderButton({
+  icon,
+  children,
+  primary = false,
+  ...rest
+}: React.ButtonHTMLAttributes<HTMLButtonElement> & {
+  readonly icon?: RecorderIconName;
+  readonly primary?: boolean;
+}): React.JSX.Element {
+  return (
+    <button type="button" className="ox-rec-btn-sm" data-primary={primary} {...rest}>
+      {icon !== undefined ? <RecorderIcon name={icon} /> : null}
+      {children}
+    </button>
+  );
+}
+
 /* ------------------------------------------------------------------ helpers */
 
 export function useFaults(observation: FaultObservation): {

@@ -1415,44 +1415,132 @@ function DtStage({ children }: { children: React.ReactNode }) {
 }
 
 /**
- * A synthetic microphone for the previews.
+ * A synthetic microphone for the previews, and the switch that takes it away.
  *
  * This is NOT the defect the component argues against. The defect is art that
  * moves with no source behind it; here there is a source, it is declared, and
  * the component reads it exactly as it would read an AnalyserNode. The clock
  * lives in the source — as it does in a real microphone — and the art still has
- * none, which is the whole point: unmount the source and the lane goes flat.
+ * none, which is the whole point: change the source and the art follows,
+ * including all the way to nothing.
  *
- * A docs page cannot ask for microphone permission, and a preview that faked
- * the waveform instead would be demonstrating the failure on the component's
- * own documentation.
+ * A docs page cannot ask for microphone permission, and faking the waveform
+ * instead would demonstrate the failure on the component's own documentation.
  */
-function makeRecDemoSource(): { getFloatTimeDomainData: (target: Float32Array) => void } {
+type RecSignalMode = "speech" | "quiet" | "muted" | "lost";
+
+const REC_MODES: ReadonlyArray<{ id: RecSignalMode; label: string; note: string }> = [
+  { id: "speech", label: "Speech", note: "Someone is talking. The lane fills, the level moves." },
+  {
+    id: "quiet",
+    label: "Quiet room",
+    note: "Room tone, a few dB above the floor. This is what an OPEN microphone in an empty room looks like — not silence.",
+  },
+  {
+    id: "muted",
+    label: "Microphone muted",
+    note: "Digital silence, arriving on schedule. A timer-driven waveform is identical here to the one above; this one stops, and then says which fault it is.",
+  },
+  {
+    id: "lost",
+    label: "Device unplugged",
+    note: "The track ended. Not silence — absence. The recording so far is intact and is held, which is the distinction that keeps a pipeline from throwing away the expensive artefact.",
+  },
+];
+
+function makeRecDemoSource(modeRef: { current: RecSignalMode }) {
   let t = 0;
   return {
     getFloatTimeDomainData(target: Float32Array) {
       t += 1 / 60;
-      // Speech shape: a phrase, then a breath. 4.6 Hz syllables under a
-      // 1.3 Hz word envelope — the rates ordinary speech actually runs at.
-      const phrase = (t % 4.3) / 4.3;
-      const gate = phrase < 0.8 ? 1 : 0;
-      const syllable = 0.5 + 0.5 * Math.sin(2 * Math.PI * 4.6 * t);
-      const word = 0.52 + 0.48 * Math.sin(2 * Math.PI * 1.31 * t + 1.7);
-      const level = Math.min(1, gate * (0.16 + 0.84 * syllable ** 1.4 * word) + 0.03);
+      const mode = modeRef.current;
+      let level = 0;
+      if (mode === "speech") {
+        // A phrase, then a breath. 4.6 Hz syllables under a 1.3 Hz word
+        // envelope — the rates ordinary speech actually runs at.
+        const phrase = (t % 4.3) / 4.3;
+        const gate = phrase < 0.8 ? 1 : 0;
+        const syllable = 0.5 + 0.5 * Math.sin(2 * Math.PI * 4.6 * t);
+        const word = 0.52 + 0.48 * Math.sin(2 * Math.PI * 1.31 * t + 1.7);
+        level = Math.min(1, gate * (0.16 + 0.84 * syllable ** 1.4 * word) + 0.03);
+      } else if (mode === "quiet") {
+        level = 0.03 + 0.02 * Math.abs(Math.sin(t * 5.3));
+      }
+      // muted and lost both report exactly nothing, which is the point: they
+      // are separated by the TRACK, never by the signal.
       target[0] = level;
       for (let i = 1; i < target.length; i += 1) target[i] = 0;
     },
   };
 }
 
-function useRecDemoSource() {
-  return React.useMemo(makeRecDemoSource, []);
-}
+/**
+ * A capture art wired to the demo source, with the switch above it.
+ *
+ * The switch is the argument in §01 made operable: mute the microphone and
+ * watch which parts of the surface admit it.
+ */
+function RecLive({
+  switchable = false,
+  ...props
+}: Omit<React.ComponentProps<typeof Recorder>, "source" | "phase" | "track"> & {
+  switchable?: boolean;
+}) {
+  const [mode, setMode] = React.useState<RecSignalMode>("speech");
+  const modeRef = React.useRef<RecSignalMode>(mode);
+  modeRef.current = mode;
+  const source = React.useMemo(() => makeRecDemoSource(modeRef), []);
 
-/** A capture art wired to the declared demo source above. */
-function RecLive(props: Omit<React.ComponentProps<typeof Recorder>, "source" | "phase">) {
-  const source = useRecDemoSource();
-  return <Recorder {...props} phase="recording" source={source} />;
+  const track = React.useMemo(
+    () => ({
+      readyState: mode === "lost" ? ("ended" as const) : ("live" as const),
+      muted: mode === "muted",
+    }),
+    [mode],
+  );
+
+  const active = REC_MODES.find((m) => m.id === mode) ?? REC_MODES[0];
+
+  if (!switchable) {
+    return <Recorder {...props} phase="recording" source={source} track={track} />;
+  }
+
+  return (
+    <div className="flex w-full flex-col gap-3">
+      <div className="flex flex-wrap items-center gap-2">
+        <span className="font-mono text-[0.62rem] uppercase tracking-[0.14em] text-panel-muted">
+          Signal
+        </span>
+        {REC_MODES.map((m) => (
+          <button
+            key={m.id}
+            type="button"
+            onClick={() => setMode(m.id)}
+            aria-pressed={m.id === mode}
+            className={[
+              "rounded-lg px-2.5 py-1 font-mono text-[0.6875rem] uppercase tracking-wider transition-colors",
+              m.id === mode
+                ? "bg-trace/12 text-trace ring-1 ring-trace/35"
+                : "text-panel-muted hover:bg-panel-fg/6 hover:text-panel-fg/85",
+            ].join(" ")}
+          >
+            {m.label}
+          </button>
+        ))}
+      </div>
+      <Recorder
+        {...props}
+        phase={mode === "lost" ? "held" : "recording"}
+        source={source}
+        track={track}
+        /* Three seconds rather than the twenty a real capture uses: a reader
+           pressing "muted" should not have to wait out a clinical budget to
+           see what the component does about it. */
+        silenceBudgetMs={3000}
+      />
+      <p className="max-w-prose text-xs text-panel-muted">{active?.note}</p>
+    </div>
+  );
 }
 
 function RecStage({ children }: { children: React.ReactNode }) {
@@ -1478,6 +1566,12 @@ const REC_PEAKS = Float32Array.from({ length: 180 }, (_, i) => {
 const REC_SPEAKERS = Uint8Array.from({ length: 180 }, (_, i) =>
   Math.floor(i / 26) % 2 === 0 ? 0 : 1,
 );
+
+const REC_MARKERS = [
+  { id: "exam", at: 0.31, label: "Exam" },
+  { id: "plan", at: 0.58, label: "Plan" },
+  { id: "struck", at: 0.79, label: "Struck 0:22", struck: true, span: 0.03 },
+];
 
 const REC_TURNS = [
   { id: "1", speaker: "Dr Okafor", words: "And how long has the breathlessness been going on for" },
@@ -1511,10 +1605,18 @@ const SCENARIOS: Record<string, Scenario[]> = {
       id: "recording",
       label: "Capturing",
       group: "Capture",
-      note: "The workhorse. Peak buckets at 30 Hz, newest at the right, older buckets falling off a masked left edge — the lane appears to scroll because the data moves, not because a transform is animating. The centre hairline is true zero, so a bar touching it means the recogniser is receiving nothing rather than that the room is quiet at a decorative minimum. The device name sits in the footer permanently, which is the only defence against the one fault that has none.",
+      note: "The workhorse, and the argument. Peak buckets at 30 Hz, newest at the right, older buckets falling off a masked left edge — the lane appears to scroll because the data moves, not because a transform is animating. Take the signal away with the switch above and it stops, because nothing here owns a clock. The centre hairline is true zero, so a bar touching it means the recogniser is receiving nothing rather than that the room is quiet at a decorative minimum.",
       render: () => (
         <RecStage>
-          <RecLive variant="bars" device={REC_JABRA} expectedDevice={REC_JABRA} />
+          <RecLive
+            switchable
+            variant="bars"
+            device={REC_JABRA}
+            expectedDevice={REC_JABRA}
+            context="Encounter · Room 4"
+            onPause={() => {}}
+            onStop={() => {}}
+          />
         </RecStage>
       ),
     },
@@ -1536,7 +1638,7 @@ const SCENARIOS: Record<string, Scenario[]> = {
       note: "Forty pixels tall, lives inside a note field or a composer toolbar, and still carries a real level meter rather than a static microphone glyph. It is the variant that will be instantiated most often and looked at least, which is exactly why it is not an afterthought — and it is the one art that must refuse to mount for a restricted recording, because a control this quiet is not where a disclosure should begin.",
       render: () => (
         <RecStage>
-          <RecLive variant="strip" />
+          <RecLive variant="strip" context="History of presenting complaint" onSend={() => {}} />
         </RecStage>
       ),
     },
@@ -1592,6 +1694,8 @@ const SCENARIOS: Record<string, Scenario[]> = {
             position={0.44}
             durationMs={754_000}
             speakerLabels={["Dr Okafor", "Patient"]}
+            title="Consultation — 14 Aug, 09:12"
+            markers={REC_MARKERS}
           />
         </RecStage>
       ),

@@ -25,6 +25,7 @@ import {
   primaryFault,
   recorderClock,
   recorderClockShort,
+  recorderTimecode,
   toDbfs,
   visualGain,
   type RecorderConsent,
@@ -35,10 +36,13 @@ import {
   type RecorderSensitivity,
   type SignalFrame,
   type TimeDomainSource,
+  type TrackObservation,
 } from "@oxygenui-design/recorder-core";
 
 import {
   RecorderBars,
+  RecorderButton,
+  RecorderIcon,
   RecorderFaultBanner,
   RecorderFrame,
   RecorderTell,
@@ -109,6 +113,57 @@ export interface RecorderProps extends Omit<React.HTMLAttributes<HTMLDivElement>
   readonly disposition?: RecorderDisposition | null;
   /** Names for the two Duet rails, above the axis and below it. */
   readonly speakerLabels?: readonly [string, string];
+  /**
+   * What the take IS — "Consultation — 14 Aug, 09:12".
+   *
+   * The playback header carries this rather than the speaker names, because
+   * the names are already on the axis; printing them twice spends the one line
+   * a reviewer reads first on something the picture already says.
+   */
+  readonly title?: string;
+  /**
+   * Moments somebody marked, and spans struck from the record.
+   *
+   * A struck span stays on the timeline as a hatched gap rather than being
+   * removed: a removal a reader cannot see is a removal nobody can audit, and
+   * an audio file with an invisible splice is worse evidence than one with a
+   * labelled hole.
+   */
+  readonly markers?: readonly RecorderMarker[];
+  /**
+   * Where the capture is happening, in the host's own words — "Encounter ·
+   * Room 4", or the field a dictation is going into. Rendered beside the
+   * device name, never instead of it.
+   */
+  readonly context?: string;
+  /**
+   * Suspend capture without ending the take. A control that is missing because
+   * the host passed no handler is hidden rather than disabled: a dead button is
+   * a promise the surface cannot keep.
+   */
+  readonly onPause?: () => void;
+  /** End the take and hand it to the host. The primary action on the capture arts. */
+  readonly onStop?: () => void;
+  /** Stop and insert, for Strip — the dictation equivalent of stop-and-attach. */
+  readonly onSend?: () => void;
+  /**
+   * The live state of the capture track — `readyState` and `muted`.
+   *
+   * This is what separates the four faults that are byte-identical at the
+   * signal layer. An OS mute, a headset mute, a device that ended and a device
+   * that was swapped all deliver near-silence on schedule; only the track and
+   * the device tell them apart, which is why the component asks for them rather
+   * than trying to read them out of the waveform.
+   */
+  readonly track?: TrackObservation | null;
+  /**
+   * Whether the browser is applying automatic gain control.
+   *
+   * With AGC on, the meter reports the browser's opinion of the room rather
+   * than the room. Nothing is broken, so this surfaces as information — but it
+   * has to surface, or the meter looks perfect under every condition.
+   */
+  readonly autoGainControl?: boolean;
   /** Milliseconds below the voice floor before the component escalates. */
   readonly silenceBudgetMs?: number;
   /**
@@ -126,6 +181,17 @@ export interface RecorderProps extends Omit<React.HTMLAttributes<HTMLDivElement>
    * by code, so a fault that persists across frames reports once.
    */
   readonly onFault?: (fault: RecorderFault | null) => void;
+}
+
+export interface RecorderMarker {
+  readonly id: string;
+  /** 0–1 along the take. */
+  readonly at: number;
+  readonly label: string;
+  /** A struck span is drawn as a removal, not omitted. */
+  readonly struck?: boolean;
+  /** How much was struck, 0–1 of the take. Only meaningful when `struck`. */
+  readonly span?: number;
 }
 
 export interface RecorderTurn {
@@ -171,6 +237,14 @@ export function Recorder({
   sensitivity = "routine",
   disposition = null,
   speakerLabels = ["Clinician", "Patient"],
+  title,
+  markers = [],
+  context,
+  onPause,
+  onStop,
+  onSend,
+  track = null,
+  autoGainControl,
   silenceBudgetMs,
   motion = "auto",
   label = "Recorder",
@@ -224,9 +298,11 @@ export function Recorder({
   const faults = detectFaults({
     phase,
     frame: frame ?? REST_FRAME,
+    track,
     device,
     expectedDevice,
     disposition,
+    autoGainControl,
     silenceBudgetMs,
   });
   const fault = primaryFault(faults);
@@ -276,10 +352,21 @@ export function Recorder({
       {variant === "pulse" ? <PulseArt phase={phase} elapsed={elapsed} frame={frame} /> : null}
 
       {variant === "bars" ? (
-        <BarsArt laneRef={laneRef} phase={phase} elapsed={elapsed} frame={frame} device={device} />
+        <BarsArt
+          laneRef={laneRef}
+          phase={phase}
+          elapsed={elapsed}
+          frame={frame}
+          device={device}
+          context={context}
+          onPause={onPause}
+          onStop={onStop}
+        />
       ) : null}
 
-      {variant === "strip" ? <StripArt laneRef={laneRef} elapsed={elapsed} /> : null}
+      {variant === "strip" ? (
+        <StripArt laneRef={laneRef} elapsed={elapsed} context={context} onSend={onSend} />
+      ) : null}
 
       {variant === "duet" ? (
         <DuetArt
@@ -288,6 +375,8 @@ export function Recorder({
           position={position}
           durationMs={durationMs}
           labels={speakerLabels}
+          title={title}
+          markers={markers}
         />
       ) : null}
 
@@ -302,10 +391,12 @@ function PulseArt({
   phase,
   elapsed,
   frame,
+  onStop,
 }: {
   readonly phase: RecorderPhase;
   readonly elapsed: number;
   readonly frame: SignalFrame | null;
+  readonly onStop?: () => void;
 }): React.JSX.Element {
   const capturing = phase === "recording";
   return (
@@ -319,15 +410,19 @@ function PulseArt({
           type="button"
           className="ox-rec-btn"
           data-mode={capturing ? "stop" : "record"}
-          aria-label={capturing ? "Stop recording" : "Start recording"}
+          aria-label={capturing ? "Stop recording and attach" : "Start recording"}
+          onClick={onStop}
         >
           <span />
         </button>
       </div>
       <div className="ox-rec-row" style={{ justifyContent: "center" }}>
         {capturing ? <RecorderTell label="Rec" /> : null}
+        {/* A timecode, not a clock. With one control and no lane, the frames
+            field is the only thing on screen still moving — it is the evidence
+            that the machine is advancing. */}
         <span className="ox-rec-clock" data-size="lg">
-          {recorderClock(elapsed)}
+          {recorderTimecode(elapsed)}
         </span>
         <span className="ox-rec-meta">{describeLevel(frame)}</span>
       </div>
@@ -341,12 +436,18 @@ function BarsArt({
   elapsed,
   frame,
   device,
+  context,
+  onPause,
+  onStop,
 }: {
   readonly laneRef: React.RefObject<HTMLDivElement | null>;
   readonly phase: RecorderPhase;
   readonly elapsed: number;
   readonly frame: SignalFrame | null;
   readonly device: RecorderDevice | null;
+  readonly context?: string;
+  readonly onPause?: () => void;
+  readonly onStop?: () => void;
 }): React.JSX.Element {
   return (
     <>
@@ -362,10 +463,27 @@ function BarsArt({
         </div>
       </div>
       <div className="ox-rec-row">
-        {/* Permanently rendered, never behind a hover or a settings panel:
-            §11 row 7 has no signal-level defence and this is the only one. */}
-        <span className="ox-rec-meta">{device?.label ?? "No input device"}</span>
-        <span className="ox-rec-meta">{describeLevel(frame)}</span>
+        {/* The device name is permanent, never behind a hover or a settings
+            panel: §11 row 7 has no signal-level defence and this is the only
+            one there is. The context sits beside it rather than replacing it. */}
+        <span className="ox-rec-meta">
+          {context !== undefined ? `${context} · ` : ""}
+          {device?.label ?? "No input device"}
+          {" · "}
+          {describeLevel(frame)}
+        </span>
+        <span className="ox-rec-transport">
+          {onPause !== undefined ? (
+            <RecorderButton icon="pause" onClick={onPause}>
+              Pause
+            </RecorderButton>
+          ) : null}
+          {onStop !== undefined ? (
+            <RecorderButton icon="square" primary onClick={onStop}>
+              Stop &amp; attach
+            </RecorderButton>
+          ) : null}
+        </span>
       </div>
     </>
   );
@@ -374,17 +492,43 @@ function BarsArt({
 function StripArt({
   laneRef,
   elapsed,
+  context,
+  onSend,
 }: {
   readonly laneRef: React.RefObject<HTMLDivElement | null>;
   readonly elapsed: number;
+  readonly context?: string;
+  readonly onSend?: () => void;
 }): React.JSX.Element {
   return (
-    <div className="ox-rec-bar">
-      <div className="ox-rec-lane" ref={laneRef}>
-        <RecorderBars count={LANE_BARS.strip} />
+    <>
+      <div className="ox-rec-bar">
+        {/* A real glyph rather than a dot: at 40px the microphone is the only
+            thing telling a reader what this strip is before it moves. */}
+        <span className="ox-rec-mic">
+          <RecorderIcon name="mic" size={18} />
+        </span>
+        <div className="ox-rec-lane" ref={laneRef}>
+          <RecorderBars count={LANE_BARS.strip} />
+        </div>
+        <span className="ox-rec-clock">{recorderClockShort(elapsed)}</span>
+        {onSend !== undefined ? (
+          <button
+            type="button"
+            className="ox-rec-send"
+            aria-label="Stop and insert"
+            onClick={onSend}
+          >
+            <RecorderIcon name="send" />
+          </button>
+        ) : null}
       </div>
-      <span className="ox-rec-clock">{recorderClockShort(elapsed)}</span>
-    </div>
+      {context !== undefined ? (
+        <p className="ox-rec-meta ox-rec-context">
+          Dictating into <strong>{context}</strong> · Esc discards
+        </p>
+      ) : null}
+    </>
   );
 }
 
@@ -407,12 +551,16 @@ function DuetArt({
   position,
   durationMs,
   labels,
+  title,
+  markers,
 }: {
   readonly peaks: Float32Array | null;
   readonly speakers: Uint8Array | null;
   readonly position: number;
   readonly durationMs: number;
   readonly labels: readonly [string, string];
+  readonly title?: string;
+  readonly markers: readonly RecorderMarker[];
 }): React.JSX.Element {
   const values = peaks ?? EMPTY_PEAKS;
   const played = Math.max(0, Math.min(1, position));
@@ -431,6 +579,26 @@ function DuetArt({
     return voiced === 0 ? null : Math.round((a / voiced) * 100);
   }, [values, speakers]);
 
+  /*
+   * Struck spans, resolved to bucket indices once rather than per bar.
+   * A removal a reader cannot see is a removal nobody can audit, so a struck
+   * span stays on BOTH rails as a hatched gap: hatching one side only would
+   * read as one person having been edited out of the conversation.
+   */
+  const struck = React.useMemo(() => {
+    const flags = new Uint8Array(values.length);
+    for (const marker of markers) {
+      if (marker.struck !== true) continue;
+      const from = Math.max(0, Math.floor(marker.at * values.length));
+      const to = Math.min(
+        values.length,
+        Math.ceil((marker.at + (marker.span ?? 0.02)) * values.length),
+      );
+      for (let i = from; i < to; i += 1) flags[i] = 1;
+    }
+    return flags;
+  }, [values.length, markers]);
+
   const rail = (which: 0 | 1): React.JSX.Element[] =>
     Array.from({ length: values.length }, (_, i) => {
       const mine = !split || speakers?.[i] === which;
@@ -438,6 +606,7 @@ function DuetArt({
         <i
           key={i}
           data-played={i <= cut ? "true" : "false"}
+          data-struck={struck[i] === 1 ? "true" : "false"}
           style={
             {
               "--_h": mine ? visualGain(values[i] as number).toFixed(3) : "0",
@@ -450,13 +619,30 @@ function DuetArt({
   return (
     <>
       <div className="ox-rec-row">
-        <span className="ox-rec-meta">
-          {split ? labels.join(" · ") : "Single rail — no diarisation"}
-        </span>
+        {/* The take's own name, not the speakers — they are already on the
+            axis, and printing them twice spends the one line a reviewer reads
+            first on something the picture already says. */}
+        <b className="ox-rec-title">{title ?? "Recording"}</b>
         <span className="ox-rec-clock">
-          {recorderClockShort(played * durationMs)} / {recorderClockShort(durationMs)}
+          {takeClock(played * durationMs)} / {takeClock(durationMs)}
         </span>
       </div>
+      {!split ? <span className="ox-rec-meta">Single rail — no diarisation</span> : null}
+      {markers.length > 0 ? (
+        <div className="ox-rec-markbar">
+          {markers.map((marker) => (
+            <span
+              key={marker.id}
+              className="ox-rec-mark"
+              data-struck={marker.struck === true ? "true" : "false"}
+              style={{ left: `${Math.max(0, Math.min(1, marker.at)) * 100}%` }}
+            >
+              <span>{marker.label}</span>
+              <i />
+            </span>
+          ))}
+        </div>
+      ) : null}
       <div className="ox-rec-pane">
         <div className="ox-rec-played" style={{ width: `${played * 100}%` }} />
         <div className="ox-rec-rails">
@@ -525,6 +711,19 @@ function StreamArt({
           </div>
         ))}
       </div>
+      {stalled ? (
+        <div className="ox-rec-fault" data-severity="warn" role="status">
+          <RecorderIcon name="alert" />
+          <span>
+            <b>Transcript stalled.</b> The audio is still being written to disk — the recogniser is
+            behind, not the recorder.
+          </span>
+        </div>
+      ) : null}
+      <p className="ox-rec-meta ox-rec-context">
+        Interim tokens are drawn as guesses. Nothing is committed until the recogniser stops
+        revising it.
+      </p>
     </div>
   );
 }
@@ -546,6 +745,18 @@ const REST_FRAME: SignalFrame = {
   bucket: null,
   closed: [],
 };
+
+/**
+ * `05:31`, and `1:02:03` past the hour.
+ *
+ * A playback readout sits beside a duration it is counting toward, so the two
+ * must be the same width — `5:31 / 12:34` jitters as the minute rolls over,
+ * where `05:31 / 12:34` does not. The capture clock pads for the same reason.
+ */
+function takeClock(ms: number): string {
+  const full = recorderClock(ms);
+  return full.startsWith("00:") ? full.slice(3) : full;
+}
 
 function describeLevel(frame: SignalFrame | null): string {
   if (frame === null || frame.level <= 0) return "no input";

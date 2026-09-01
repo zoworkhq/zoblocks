@@ -52,6 +52,11 @@
 .ox-rec-clock[data-size="lg"] {
   font-size: 1.375rem;
 }
+.ox-rec-title {
+  font-size: 0.84375rem;
+  font-weight: 600;
+  color: var(--ox-text, currentColor);
+}
 .ox-rec-meta {
   font-size: var(--ox-text-xs, 0.8125rem);
   color: var(--ox-text-muted, currentColor);
@@ -420,6 +425,18 @@
   z-index: 3;
   pointer-events: none;
 }
+/* The head carries a dot. A bare 2px rule reads as a divider between two
+   halves of the waveform; the dot makes it a position in a take. */
+.ox-rec-duet .ox-rec-head::before {
+  content: "";
+  position: absolute;
+  top: -4px;
+  left: -3px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--ox-text, currentColor);
+}
 .ox-rec-duet .ox-rec-who {
   position: absolute;
   z-index: 2;
@@ -507,6 +524,143 @@
 .ox-rec-stream[data-stalled="true"] .ox-rec-log {
   border-color: var(--ox-alert-warning-border, #f5ce7a);
   background: var(--ox-alert-warning-bg, #fffaeb);
+}
+
+/* ------------------------------------------------------------------ icons */
+
+.ox-rec-icon {
+  flex: 0 0 auto;
+  display: block;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* ------------------------------------------------------------- transport */
+
+.ox-rec-transport {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex: 0 0 auto;
+}
+.ox-rec-btn-sm {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 24px;
+  padding: 0 9px;
+  border-radius: var(--_radius);
+  border: 1px solid var(--ox-border-strong, #d2dbd8);
+  background: var(--ox-bg, #fff);
+  color: var(--ox-text-muted, currentColor);
+  font: inherit;
+  font-size: 0.75rem;
+  white-space: nowrap;
+  cursor: pointer;
+}
+/* The primary action is decided by the stylesheet, not by a colour prop, so a
+   host retheming the recorder does not have to find every button that
+   hard-coded an accent. */
+.ox-rec-btn-sm[data-primary="true"] {
+  color: var(--ox-accent, currentColor);
+  border-color: var(--ox-accent-border, currentColor);
+  background: var(--ox-accent-subtle, transparent);
+}
+.ox-rec-btn-sm:focus-visible {
+  outline: 2px solid var(--ox-accent, currentColor);
+  outline-offset: 2px;
+}
+
+/* ------------------------------------------------------------ strip extras */
+
+.ox-rec-strip .ox-rec-mic {
+  display: grid;
+  place-items: center;
+  color: var(--_rec);
+  flex: 0 0 auto;
+}
+.ox-rec-send {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  border: 0;
+  cursor: pointer;
+  background: var(--ox-accent, currentColor);
+  color: var(--ox-text-on-accent, #fff);
+}
+.ox-rec-send:focus-visible {
+  outline: 2px solid var(--ox-accent, currentColor);
+  outline-offset: 2px;
+}
+.ox-rec[data-fault="critical"] .ox-rec-send {
+  background: var(--_wave-off);
+}
+.ox-rec-context {
+  margin: 0;
+}
+
+/* --------------------------------------------------------- duet markers */
+
+/**
+ * Markers get their own lane.
+ *
+ * Inside the waveform they would either cover the signal or be covered by it,
+ * and a marker a clinician placed mid-consultation is not decoration that can
+ * afford to lose.
+ */
+.ox-rec-duet .ox-rec-markbar {
+  position: relative;
+  height: 22px;
+}
+.ox-rec-duet .ox-rec-markbar::after {
+  content: "";
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  bottom: 0;
+  height: 1px;
+  background: var(--ox-border, #e4eae8);
+}
+.ox-rec-duet .ox-rec-mark {
+  position: absolute;
+  bottom: 0;
+  translate: -50% 0;
+  display: grid;
+  justify-items: center;
+}
+.ox-rec-duet .ox-rec-mark > span {
+  font-size: 0.59375rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  line-height: 14px;
+  white-space: nowrap;
+  padding: 0 4px;
+  border-radius: 3px;
+  color: var(--ox-alert-warning-fg, #93370d);
+  background: var(--ox-alert-warning-bg, #fffaeb);
+  border: 1px solid var(--ox-alert-warning-border, #f5ce7a);
+}
+.ox-rec-duet .ox-rec-mark > i {
+  display: block;
+  width: 1px;
+  height: 6px;
+  background: var(--ox-alert-warning-border, #f5ce7a);
+}
+/* A struck span is a removal, and it is drawn as one. */
+.ox-rec-duet .ox-rec-mark[data-struck="true"] > span {
+  color: var(--ox-alert-critical-fg, #912018);
+  background: var(--ox-alert-critical-bg, #fef3f2);
+  border-color: var(--ox-alert-critical-border, #f5b5ae);
+}
+.ox-rec-duet .ox-rec-mark[data-struck="true"] > i {
+  background: var(--ox-alert-critical-border, #f5b5ae);
 }
 
 /* ------------------------------------------------------- reduced motion */

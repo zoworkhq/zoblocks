@@ -32,6 +32,12 @@ const SPEAKERS = Uint8Array.from({ length: TAKE_N }, (_, i) =>
   Math.floor(i / 26) % 2 === 0 ? 0 : 1,
 );
 
+const MARKERS = [
+  { id: "exam", at: 0.31, label: "Exam" },
+  { id: "plan", at: 0.58, label: "Plan" },
+  { id: "struck", at: 0.79, label: "Struck 0:22", struck: true, span: 0.03 },
+];
+
 const TURNS = [
   { id: "1", speaker: "Dr Okafor", words: "And how long has the breathlessness been going on for" },
   { id: "2", speaker: "Patient", words: "Maybe three weeks now It is worse going up the stairs" },
@@ -50,12 +56,19 @@ type Story = StoryObj<typeof Recorder>;
 export const Recording: Story = {
   name: "Recording",
   parameters: { state: "Recording" },
-  args: { variant: "bars", phase: "recording" },
+  args: {
+    variant: "bars",
+    phase: "recording",
+    context: "Encounter · Room 4",
+    onPause: () => {},
+    onStop: () => {},
+  },
   play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
     // The device name is rendered permanently rather than behind a hover:
-    // §11 row 7 is the one fault with no signal-level defence at all.
-    await expect(canvas.getByText(JABRA.label)).toBeInTheDocument();
+    // §11 row 7 is the one fault with no signal-level defence at all. It shares
+    // a line with the context and the level, so match the line.
+    const line = canvasElement.querySelector(".ox-rec-meta");
+    await expect(line?.textContent).toContain(JABRA.label);
   },
 };
 
@@ -122,6 +135,8 @@ export const PlaybackWithSpeakers: Story = {
     position: 0.44,
     durationMs: 754_000,
     speakerLabels: ["Dr Okafor", "Patient"],
+    title: "Consultation — 14 Aug, 09:12",
+    markers: MARKERS,
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
@@ -165,7 +180,12 @@ export const LiveTranscript: Story = {
 export const InlineDictation: Story = {
   name: "Inline dictation",
   parameters: { state: "Inline dictation" },
-  args: { variant: "strip", phase: "recording" },
+  args: {
+    variant: "strip",
+    phase: "recording",
+    context: "History of presenting complaint",
+    onSend: () => {},
+  },
 };
 
 export const SingleControl: Story = {
