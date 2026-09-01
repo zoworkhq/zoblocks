@@ -1,0 +1,955 @@
+<!doctype html>
+<html lang="en" data-variant="a" data-theme="light">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>/pro — coming soon overlay</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      /* =====================================================================
+       * Tokens — lifted from apps/docs/src/app/globals.css so the mockup can
+       * be judged in the colours it would actually ship in.
+       * ================================================================== */
+      :root {
+        --paper: #f7f9f8;
+        --paper-sunk: #eef3f1;
+        --rule: #dde5e2;
+        --rule-strong: #c3d0cc;
+        --ink: #08110f;
+        --graphite: #5a6b67;
+        --graphite-soft: #5c6d68;
+        --oxygen: #10b995;
+        --accent-text: #067662;
+        --cta: #067662;
+
+        --panel: #08110f;
+        --panel-raised: #0d1a18;
+        --panel-rule: #1d302d;
+        --panel-fg: #e8f4f1;
+        --panel-muted: #8b9c98;
+        --trace: #2dd4b0;
+
+        --font-sans: "Instrument Sans", ui-sans-serif, system-ui, sans-serif;
+        --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+        --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+        --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+      }
+
+      html[data-theme="dark"] {
+        --paper: #080b10;
+        --paper-sunk: #0d1219;
+        --rule: #1d2733;
+        --rule-strong: #2c3744;
+        --ink: #edf2f7;
+        --graphite: #a2aebb;
+        --graphite-soft: #8592a1;
+        --oxygen: #2dd4b0;
+        --accent-text: #6ce7cb;
+        --cta: #6ce7cb;
+
+        --panel: #151a21;
+        --panel-raised: #1c232c;
+        --panel-rule: #303b47;
+        --panel-fg: #edf2f7;
+        --panel-muted: #96a3b3;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        background: var(--paper);
+        color: var(--ink);
+        font-family: var(--font-sans);
+        -webkit-font-smoothing: antialiased;
+      }
+
+      /* =====================================================================
+       * Mockup chrome — not part of the design. Lets you flip concepts.
+       * ================================================================== */
+      .mockbar {
+        position: fixed;
+        inset: 0 0 auto 0;
+        z-index: 100;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.6rem 1rem;
+        background: color-mix(in oklab, var(--paper) 82%, transparent);
+        backdrop-filter: blur(14px);
+        border-bottom: 1px solid var(--rule);
+        font-family: var(--font-mono);
+        font-size: 0.6875rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+      .mockbar b {
+        color: var(--graphite);
+        font-weight: 500;
+      }
+      .mockbar .sp {
+        flex: 1;
+      }
+      .mockbar button {
+        font: inherit;
+        letter-spacing: inherit;
+        text-transform: inherit;
+        cursor: pointer;
+        padding: 0.4rem 0.7rem;
+        border-radius: 0.5rem;
+        border: 1px solid var(--rule-strong);
+        background: transparent;
+        color: var(--graphite);
+        transition: all 200ms var(--ease-out-expo);
+      }
+      .mockbar button:hover {
+        color: var(--ink);
+        border-color: var(--oxygen);
+      }
+      .mockbar button[aria-pressed="true"] {
+        background: var(--ink);
+        border-color: var(--ink);
+        color: var(--paper);
+      }
+
+      /* =====================================================================
+       * The frame — blurred /pro page behind, overlay on top.
+       * ================================================================== */
+      .frame {
+        position: relative;
+        min-height: 100vh;
+        padding-top: 3rem;
+        overflow: hidden;
+      }
+
+      /* --- the page underneath, exactly as it is today, out of focus ------ */
+      .behind {
+        position: absolute;
+        inset: 0;
+        padding: 5rem 1.5rem 0;
+        filter: blur(7px) saturate(0.72);
+        opacity: 0.5;
+        transform: scale(1.03);
+        user-select: none;
+        pointer-events: none;
+      }
+      html[data-theme="dark"] .behind {
+        opacity: 0.42;
+      }
+      .behind-inner {
+        max-width: 68rem;
+        margin: 0 auto;
+      }
+      .behind .eyebrow {
+        font-family: var(--font-mono);
+        font-size: 0.6875rem;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--accent-text);
+      }
+      .behind h1 {
+        font-size: clamp(2rem, 4.4vw, 3.5rem);
+        line-height: 1;
+        letter-spacing: -0.035em;
+        font-weight: 600;
+        margin: 1.25rem 0 0;
+        max-width: 20ch;
+      }
+      .behind p {
+        margin: 1.5rem 0 0;
+        max-width: 34rem;
+        font-size: 1.0625rem;
+        line-height: 1.6;
+        color: var(--graphite);
+      }
+      .behind .btns {
+        display: flex;
+        gap: 0.75rem;
+        margin-top: 2rem;
+      }
+      .behind .btn {
+        height: 3rem;
+        width: 12rem;
+        border-radius: 0.75rem;
+        background: var(--cta);
+      }
+      .behind .btn.ghost {
+        background: transparent;
+        border: 1px solid var(--rule-strong);
+        width: 7rem;
+      }
+      .behind .stats {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1px;
+        margin-top: 3.5rem;
+        padding-top: 2rem;
+        border-top: 1px solid var(--rule);
+      }
+      .behind .stats div b {
+        font-family: var(--font-mono);
+        font-size: 1.5rem;
+      }
+      .behind .stats div span {
+        display: block;
+        font-size: 0.75rem;
+        color: var(--graphite-soft);
+        margin-top: 0.35rem;
+      }
+
+      /* --- the scrim ------------------------------------------------------ */
+      .scrim {
+        position: absolute;
+        inset: 0;
+        background:
+          radial-gradient(
+            120% 90% at 50% 42%,
+            color-mix(in oklab, var(--paper) 55%, transparent) 0%,
+            color-mix(in oklab, var(--paper) 88%, transparent) 55%,
+            var(--paper) 100%
+          );
+      }
+
+      /* =====================================================================
+       * The overlay panel — the dark instrument the whole site sets into the
+       * page. A shut console should look like a console.
+       * ================================================================== */
+      .stack {
+        position: relative;
+        min-height: calc(100vh - 3rem);
+        display: grid;
+        place-items: center;
+        padding: 3rem 1.25rem 4rem;
+      }
+
+      .panel {
+        position: relative;
+        width: min(48rem, 100%);
+        background: var(--panel);
+        border: 1px solid var(--panel-rule);
+        border-radius: 1.25rem;
+        padding: clamp(1.75rem, 4vw, 3rem);
+        color: var(--panel-fg);
+        overflow: hidden;
+        box-shadow:
+          0 1px 0 color-mix(in oklab, #fff 8%, transparent) inset,
+          0 30px 80px -20px rgba(8, 17, 15, 0.45),
+          0 8px 24px -12px rgba(8, 17, 15, 0.3);
+        animation: panel-in 900ms var(--ease-out-expo) both;
+      }
+
+      @keyframes panel-in {
+        from {
+          opacity: 0;
+          transform: translateY(18px) scale(0.985);
+          filter: blur(6px);
+        }
+      }
+
+      /* Grid paper, very faint — the console's own background. */
+      .panel::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background-image:
+          linear-gradient(to right, color-mix(in oklab, var(--trace) 6%, transparent) 1px, transparent 1px),
+          linear-gradient(to bottom, color-mix(in oklab, var(--trace) 6%, transparent) 1px, transparent 1px);
+        background-size: 28px 28px;
+        mask-image: radial-gradient(90% 70% at 50% 40%, #000 0%, transparent 78%);
+        pointer-events: none;
+      }
+
+      .panel > * {
+        position: relative;
+      }
+
+      .eyebrow-rule {
+        display: flex;
+        width: fit-content;
+        align-items: center;
+        gap: 0.625rem;
+        font-family: var(--font-mono);
+        font-size: 0.6875rem;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        font-weight: 500;
+        color: var(--trace);
+      }
+      .eyebrow-rule::before {
+        content: "";
+        width: 1.75rem;
+        height: 1px;
+        background: currentColor;
+        opacity: 0.45;
+      }
+
+      .lede {
+        margin: 1.5rem 0 0;
+        max-width: 40ch;
+        font-size: 0.9375rem;
+        line-height: 1.65;
+        color: var(--panel-muted);
+      }
+
+      /* --- the headline, animated ---------------------------------------- */
+      .head {
+        margin: 1.25rem 0 0;
+        font-size: clamp(2.25rem, 6.5vw, 4rem);
+        line-height: 0.98;
+        letter-spacing: -0.04em;
+        font-weight: 600;
+      }
+      .head .ch {
+        display: inline-block;
+        animation: ch-in 900ms var(--ease-out-expo) both;
+        animation-delay: calc(var(--i) * 45ms + 320ms);
+      }
+      .head .sp {
+        display: inline-block;
+        width: 0.28em;
+      }
+      @keyframes ch-in {
+        from {
+          opacity: 0;
+          transform: translateY(0.5em) rotate(3deg);
+          filter: blur(10px);
+        }
+      }
+
+      /* --- actions -------------------------------------------------------- */
+      .actions {
+        margin-top: 2rem;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.6rem;
+        align-items: center;
+        animation: fade-up 800ms var(--ease-out-expo) 900ms both;
+      }
+      @keyframes fade-up {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+      }
+      .field {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: var(--panel-raised);
+        border: 1px solid var(--panel-rule);
+        border-radius: 0.75rem;
+        padding: 0.25rem 0.25rem 0.25rem 0.9rem;
+        transition: border-color 220ms var(--ease-out-expo);
+      }
+      .field:focus-within {
+        border-color: var(--trace);
+      }
+      .field input {
+        font: inherit;
+        font-size: 0.875rem;
+        background: none;
+        border: 0;
+        outline: none;
+        color: var(--panel-fg);
+        width: 14rem;
+        padding: 0.6rem 0;
+      }
+      .field input::placeholder {
+        color: var(--panel-muted);
+      }
+      .field button {
+        font: inherit;
+        font-size: 0.8125rem;
+        font-weight: 500;
+        cursor: pointer;
+        border: 0;
+        border-radius: 0.55rem;
+        padding: 0.6rem 0.9rem;
+        background: var(--trace);
+        color: #04120f;
+        transition: transform 260ms var(--ease-out-expo);
+      }
+      .field button:hover {
+        transform: translateY(-1px);
+      }
+      .ghost-link {
+        font-size: 0.8125rem;
+        color: var(--panel-muted);
+        text-decoration: none;
+        padding: 0.7rem 0.9rem;
+        border-radius: 0.6rem;
+        border: 1px solid transparent;
+        transition: all 220ms var(--ease-out-expo);
+      }
+      .ghost-link:hover {
+        color: var(--panel-fg);
+        border-color: var(--panel-rule);
+      }
+      .footnote {
+        margin: 1.1rem 0 0;
+        font-family: var(--font-mono);
+        font-size: 0.6875rem;
+        letter-spacing: 0.06em;
+        color: var(--panel-muted);
+        animation: fade-up 800ms var(--ease-out-expo) 1050ms both;
+      }
+
+      /* =====================================================================
+       * A — THE GATE. The page's own argument, held one step from done.
+       * ================================================================== */
+      .gate {
+        margin-top: 2rem;
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1px;
+        background: var(--panel-rule);
+        border-radius: 0.75rem;
+        overflow: hidden;
+        border: 1px solid var(--panel-rule);
+      }
+      .gate .step {
+        background: var(--panel-raised);
+        padding: 0.9rem 0.85rem 1rem;
+        position: relative;
+      }
+      .gate .step .k {
+        font-family: var(--font-mono);
+        font-size: 0.625rem;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--panel-muted);
+      }
+      .gate .step .v {
+        margin-top: 0.5rem;
+        font-size: 0.8125rem;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+      }
+      /* Done reads as a tick; pending reads as a hollow ring. Two shapes, so
+         the state survives a greyscale print and a red-green deficiency. */
+      .gate .dot {
+        width: 0.75rem;
+        height: 0.75rem;
+        flex: none;
+        display: grid;
+        place-items: center;
+        color: var(--panel-muted);
+      }
+      .gate .dot::before {
+        content: "";
+        width: 0.5rem;
+        height: 0.5rem;
+        border-radius: 999px;
+        background: currentColor;
+      }
+      /* Steps tick over in sequence, then the last one holds pending. */
+      .gate .step:nth-child(1) .dot {
+        animation: tick 7s var(--ease-out-expo) 0.4s infinite;
+      }
+      .gate .step:nth-child(2) .dot {
+        animation: tick 7s var(--ease-out-expo) 1s infinite;
+      }
+      .gate .step:nth-child(3) .dot {
+        animation: tick 7s var(--ease-out-expo) 1.6s infinite;
+      }
+      @keyframes tick {
+        0%,
+        4% {
+          color: var(--panel-muted);
+        }
+        10%,
+        92% {
+          color: var(--trace);
+        }
+        100% {
+          color: var(--panel-muted);
+        }
+      }
+      .gate .step.pending {
+        background: color-mix(in oklab, var(--trace) 7%, var(--panel-raised));
+      }
+      .gate .step.pending .v {
+        color: var(--trace);
+      }
+      .gate .step.pending .dot {
+        color: var(--trace);
+      }
+      .gate .step.pending .dot::before {
+        width: 0.75rem;
+        height: 0.75rem;
+        background: none;
+        border: 1.5px solid currentColor;
+        animation: breathe 2.4s ease-in-out infinite;
+      }
+      @keyframes breathe {
+        0%,
+        100% {
+          box-shadow: 0 0 0 0 color-mix(in oklab, var(--trace) 50%, transparent);
+        }
+        65% {
+          box-shadow: 0 0 0 6px transparent;
+        }
+      }
+      /* The validation sweep — a scanline crossing the whole panel. */
+      .sweep {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        overflow: hidden;
+        border-radius: inherit;
+      }
+      .sweep i {
+        position: absolute;
+        left: -20%;
+        top: 0;
+        bottom: 0;
+        width: 32%;
+        background: linear-gradient(
+          100deg,
+          transparent,
+          color-mix(in oklab, var(--trace) 11%, transparent),
+          transparent
+        );
+        animation: sweep 7s cubic-bezier(0.45, 0, 0.2, 1) infinite;
+      }
+      @keyframes sweep {
+        0% {
+          transform: translateX(0);
+        }
+        55%,
+        100% {
+          transform: translateX(420%);
+        }
+      }
+
+      /* =====================================================================
+       * B — THE RAMP. One colour becoming eleven steps, dealt in, and the
+       * headline coloured by the ramp it just built.
+       * ================================================================== */
+      .ramp {
+        margin-top: 2rem;
+        display: grid;
+        grid-template-columns: repeat(11, 1fr);
+        gap: 0.3rem;
+      }
+      .ramp span {
+        height: 3.25rem;
+        border-radius: 0.4rem;
+        background: var(--c);
+        transform-origin: 50% 100%;
+        animation: deal 6s var(--ease-spring) infinite;
+        animation-delay: calc(var(--i) * 90ms);
+        position: relative;
+      }
+      .ramp span::after {
+        content: attr(data-n);
+        position: absolute;
+        inset: auto 0 -1.4rem 0;
+        text-align: center;
+        font-family: var(--font-mono);
+        font-size: 0.5625rem;
+        color: var(--panel-muted);
+      }
+      @keyframes deal {
+        0% {
+          opacity: 0;
+          transform: translateY(14px) scaleY(0.35);
+        }
+        12%,
+        78% {
+          opacity: 1;
+          transform: none;
+        }
+        94%,
+        100% {
+          opacity: 0;
+          transform: translateY(14px) scaleY(0.35);
+        }
+      }
+      .head.gradient {
+        background: linear-gradient(
+          100deg,
+          var(--panel-fg) 0%,
+          var(--panel-fg) 34%,
+          var(--trace) 50%,
+          var(--panel-fg) 66%,
+          var(--panel-fg) 100%
+        );
+        background-size: 280% 100%;
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        animation: shimmer 6s linear infinite;
+      }
+      @keyframes shimmer {
+        from {
+          background-position: 180% 0;
+        }
+        to {
+          background-position: -100% 0;
+        }
+      }
+
+      /* =====================================================================
+       * C — THE TRACE. Oxygen, read the way a ward reads it.
+       * ================================================================== */
+      .trace-wrap {
+        position: relative;
+        margin-top: 2rem;
+        height: 6.5rem;
+        border-radius: 0.75rem;
+        border: 1px solid var(--panel-rule);
+        background: var(--panel-raised);
+        overflow: hidden;
+      }
+      .trace-wrap svg {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+      }
+      .trace-wrap path {
+        fill: none;
+        stroke: var(--trace);
+        stroke-width: 2;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        stroke-dasharray: 1200;
+        stroke-dashoffset: 1200;
+        animation: draw 5s linear infinite;
+        filter: drop-shadow(0 0 6px color-mix(in oklab, var(--trace) 45%, transparent));
+      }
+      @keyframes draw {
+        0% {
+          stroke-dashoffset: 1200;
+        }
+        70%,
+        100% {
+          stroke-dashoffset: 0;
+        }
+      }
+      .trace-wrap .read {
+        position: absolute;
+        right: 0.9rem;
+        top: 0.75rem;
+        text-align: right;
+        font-family: var(--font-mono);
+      }
+      .trace-wrap .read b {
+        display: block;
+        font-size: 1.5rem;
+        font-weight: 500;
+        color: var(--trace);
+        font-variant-numeric: tabular-nums;
+      }
+      .trace-wrap .read span {
+        font-size: 0.5625rem;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--panel-muted);
+      }
+      .glow {
+        position: absolute;
+        z-index: 0;
+        left: 50%;
+        top: 62%;
+        width: 40rem;
+        height: 26rem;
+        translate: -50% -50%;
+        border-radius: 999px;
+        background: radial-gradient(
+          ellipse,
+          color-mix(in oklab, var(--trace) 26%, transparent),
+          transparent 66%
+        );
+        animation: breathe-glow 6s ease-in-out infinite;
+        pointer-events: none;
+      }
+      @keyframes breathe-glow {
+        0%,
+        100% {
+          opacity: 0.5;
+          transform: scale(0.94);
+        }
+        50% {
+          opacity: 1;
+          transform: scale(1.06);
+        }
+      }
+
+      /* --- variant switching ---------------------------------------------- */
+      .frame {
+        display: none;
+      }
+      html[data-variant="a"] #fa,
+      html[data-variant="b"] #fb,
+      html[data-variant="c"] #fc {
+        display: block;
+      }
+
+      @media (max-width: 640px) {
+        .gate {
+          grid-template-columns: repeat(2, 1fr);
+        }
+        .field input {
+          width: 100%;
+        }
+        .field {
+          width: 100%;
+        }
+      }
+
+      /* Reduced motion: every loop rests on its finished frame. */
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          animation-duration: 0.001ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.001ms !important;
+        }
+        .trace-wrap path {
+          stroke-dashoffset: 0;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="mockbar">
+      <b>/pro coming soon</b>
+      <span class="sp"></span>
+      <button data-v="a" aria-pressed="true">A · gate</button>
+      <button data-v="b" aria-pressed="false">B · ramp</button>
+      <button data-v="c" aria-pressed="false">C · trace</button>
+      <button id="theme">dark</button>
+    </div>
+
+    <!-- ==================== A · THE GATE ==================== -->
+    <section class="frame" id="fa">
+      <div class="behind">
+        <div class="behind-inner">
+          <p class="eyebrow">Oxygen Pro</p>
+          <h1>Your brand, through a gate that will not let it fail.</h1>
+          <p>
+            A theming console for behavioral health. Set one brand colour, get eleven validated
+            steps. Publish only what passes contrast.
+          </p>
+          <div class="btns">
+            <div class="btn"></div>
+            <div class="btn ghost"></div>
+          </div>
+          <div class="stats">
+            <div><b>11</b><span>token steps from one colour</span></div>
+            <div><b>3</b><span>tiers: reference, semantic, component</span></div>
+            <div><b>0</b><span>failing themes can reach production</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="scrim"></div>
+
+      <div class="stack">
+        <div class="panel">
+          <div class="sweep"><i></i></div>
+          <p class="eyebrow-rule">Oxygen Pro</p>
+          <h2 class="head" data-split>Coming soon</h2>
+          <p class="lede">
+            Built, gated, and not in the first release. The open components
+            are.
+          </p>
+
+          <div class="gate">
+            <div class="step">
+              <div class="k">Step 01</div>
+              <div class="v"><i class="dot"></i>Brand colour</div>
+            </div>
+            <div class="step">
+              <div class="k">Step 02</div>
+              <div class="v"><i class="dot"></i>Eleven steps</div>
+            </div>
+            <div class="step">
+              <div class="k">Step 03</div>
+              <div class="v"><i class="dot"></i>Contrast gate</div>
+            </div>
+            <div class="step pending">
+              <div class="k">Step 04</div>
+              <div class="v"><i class="dot"></i>Publish</div>
+            </div>
+          </div>
+
+          <div class="actions">
+            <form class="field" onsubmit="return false">
+              <input type="email" placeholder="you@clinic.org" aria-label="Email" />
+              <button type="submit">Notify me</button>
+            </form>
+            <a class="ghost-link" href="#">Browse 27 open components →</a>
+          </div>
+          <p class="footnote">Free · no card · we email once</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== B · THE RAMP ==================== -->
+    <section class="frame" id="fb">
+      <div class="behind">
+        <div class="behind-inner">
+          <p class="eyebrow">Oxygen Pro</p>
+          <h1>Your brand, through a gate that will not let it fail.</h1>
+          <p>
+            A theming console for behavioral health. Set one brand colour, get eleven validated
+            steps. Publish only what passes contrast.
+          </p>
+          <div class="btns">
+            <div class="btn"></div>
+            <div class="btn ghost"></div>
+          </div>
+          <div class="stats">
+            <div><b>11</b><span>token steps from one colour</span></div>
+            <div><b>3</b><span>tiers: reference, semantic, component</span></div>
+            <div><b>0</b><span>failing themes can reach production</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="scrim"></div>
+
+      <div class="stack">
+        <div class="panel">
+          <p class="eyebrow-rule">Oxygen Pro</p>
+          <h2 class="head gradient">Coming soon</h2>
+          <p class="lede">
+            One colour, eleven validated steps. The console that does it ships
+            after the open components.
+          </p>
+
+          <div class="ramp" id="ramp"></div>
+
+          <div class="actions" style="margin-top: 3rem">
+            <form class="field" onsubmit="return false">
+              <input type="email" placeholder="you@clinic.org" aria-label="Email" />
+              <button type="submit">Notify me</button>
+            </form>
+            <a class="ghost-link" href="#">Browse 27 open components →</a>
+          </div>
+          <p class="footnote">Free · no card · we email once</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== C · THE TRACE ==================== -->
+    <section class="frame" id="fc">
+      <div class="behind">
+        <div class="behind-inner">
+          <p class="eyebrow">Oxygen Pro</p>
+          <h1>Your brand, through a gate that will not let it fail.</h1>
+          <p>
+            A theming console for behavioral health. Set one brand colour, get eleven validated
+            steps. Publish only what passes contrast.
+          </p>
+          <div class="btns">
+            <div class="btn"></div>
+            <div class="btn ghost"></div>
+          </div>
+          <div class="stats">
+            <div><b>11</b><span>token steps from one colour</span></div>
+            <div><b>3</b><span>tiers: reference, semantic, component</span></div>
+            <div><b>0</b><span>failing themes can reach production</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="scrim"></div>
+
+      <div class="stack">
+        <div class="panel">
+          <div class="glow"></div>
+          <p class="eyebrow-rule">Oxygen Pro</p>
+          <h2 class="head" data-split>Coming soon</h2>
+          <p class="lede">
+            Alive, monitored, and next. It joins the release after the open
+            components land.
+          </p>
+
+          <div class="trace-wrap">
+            <svg viewBox="0 0 600 100" preserveAspectRatio="none" aria-hidden="true">
+              <path
+                d="M0,64 L92,64 L104,64 L116,40 L128,86 L140,20 L152,64 L250,64 L262,64 L274,44 L286,80 L298,26 L310,64 L430,64 L442,64 L454,46 L466,78 L478,30 L490,64 L600,64"
+              />
+            </svg>
+            <div class="read"><b>98%</b><span>oxygen</span></div>
+          </div>
+
+          <div class="actions">
+            <form class="field" onsubmit="return false">
+              <input type="email" placeholder="you@clinic.org" aria-label="Email" />
+              <button type="submit">Notify me</button>
+            </form>
+            <a class="ghost-link" href="#">Browse 27 open components →</a>
+          </div>
+          <p class="footnote">Free · no card · we email once</p>
+        </div>
+      </div>
+    </section>
+
+    <script>
+      // Split the headline into per-letter spans for the staggered entrance.
+      for (const el of document.querySelectorAll("[data-split]")) {
+        const text = el.textContent.trim();
+        el.textContent = "";
+        text.split("").forEach((c, i) => {
+          const s = document.createElement("span");
+          s.className = c === " " ? "sp" : "ch";
+          s.style.setProperty("--i", i);
+          s.textContent = c === " " ? "" : c;
+          el.append(s);
+        });
+      }
+
+      // Eleven steps of one hue — what the console actually produces.
+      const RAMP = [
+        ["#eafaf5", "50"],
+        ["#c6f1e5", "100"],
+        ["#9be7d4", "200"],
+        ["#6cdcc1", "300"],
+        ["#3fd0ad", "400"],
+        ["#10b995", "500"],
+        ["#0d9c7e", "600"],
+        ["#0a7f67", "700"],
+        ["#086651", "800"],
+        ["#064e3e", "900"],
+        ["#04372c", "950"],
+      ];
+      const ramp = document.getElementById("ramp");
+      RAMP.forEach(([c, n], i) => {
+        const s = document.createElement("span");
+        s.style.setProperty("--c", c);
+        s.style.setProperty("--i", i);
+        s.dataset.n = n;
+        ramp.append(s);
+      });
+
+      // Mockup chrome only.
+      const root = document.documentElement;
+      for (const b of document.querySelectorAll("[data-v]")) {
+        b.addEventListener("click", () => {
+          root.dataset.variant = b.dataset.v;
+          for (const o of document.querySelectorAll("[data-v]"))
+            o.setAttribute("aria-pressed", String(o === b));
+        });
+      }
+      const t = document.getElementById("theme");
+      t.addEventListener("click", () => {
+        const dark = root.dataset.theme === "dark";
+        root.dataset.theme = dark ? "light" : "dark";
+        t.textContent = dark ? "dark" : "light";
+      });
+    </script>
+  </body>
+</html>

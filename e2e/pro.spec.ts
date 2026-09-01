@@ -1,12 +1,15 @@
 /**
- * The Pro page.
+ * The Pro holding page.
  *
- * The page's argument is that Pro is a product rather than a promise, and the
- * glances are how it argues. So the things worth a browser here are the ones
- * that would quietly stop being true: that every stage actually renders, that
- * the two doors into the console point at the console, and that a reader who
- * has asked for reduced motion still gets a finished picture rather than a
- * frozen first frame.
+ * Pro is out of the first release, so `/pro` no longer sells the console. The
+ * things worth a browser here are the ones a later edit would quietly break:
+ * that the gate still reads three-done-one-open rather than four of anything,
+ * that the state is carried by something other than colour, that the two ways
+ * off the page still lead somewhere, and that a reader who has asked for
+ * reduced motion gets the composed picture instead of a frozen first frame.
+ *
+ * The spec that tested the console page is in this file's history; it comes
+ * back with `console-page.tsx`.
  */
 
 import { expect, test, type Page } from "@playwright/test";
@@ -30,96 +33,119 @@ async function audit(page: Page) {
   return result.violations;
 }
 
-/** Reveal is an IntersectionObserver fade; auditing mid-fade measures a
+/** The entrance is a staggered fade; auditing mid-fade measures a
     half-transparent element and reports a phantom contrast failure. */
 async function settle(page: Page) {
-  await page.waitForTimeout(600);
+  await page.waitForTimeout(1600);
 }
 
-test.describe("the Pro page @a11y", () => {
-  test("renders a glance for every feature", async ({ page }) => {
+test.describe("the Pro holding page @a11y", () => {
+  test("holds the gate one step short", async ({ page }) => {
     await page.goto("/pro");
-    await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Coming soon");
 
-    // Ten features, ten stages. An empty stage is the failure mode: the map is
-    // keyed by a union so it cannot happen at compile time, but a CSS rename
-    // could still leave the box blank.
-    await expect(page.locator(".oxp .glance")).toHaveCount(10);
-    const empties = await page.locator(".oxp .glance .stage:empty").count();
-    expect(empties, "a glance stage rendered nothing").toBe(0);
-  });
-
-  test("the feature browser switches stage and keeps one tab selected", async ({ page }) => {
-    await page.goto("/pro");
-    const tabs = page.locator(".oxp .fTabs button");
-    await expect(tabs).toHaveCount(10);
-    await expect(page.locator('.oxp .fTabs button[aria-selected="true"]')).toHaveCount(1);
-
-    await tabs.nth(3).click();
-    await expect(tabs.nth(3)).toHaveAttribute("aria-selected", "true");
-    await expect(page.locator('.oxp .fTabs button[aria-selected="true"]')).toHaveCount(1);
-    await expect(page.locator(".oxp .fPane .fStage")).toBeVisible();
+    // Four steps, exactly one of them outstanding. Both halves matter: four
+    // ticks would say the console shipped, and four rings would say none of it
+    // is built — the page exists to say neither.
+    await expect(page.locator(".soon .soonStep")).toHaveCount(4);
+    await expect(page.locator(".soon .soonStep[data-pending]")).toHaveCount(1);
+    await expect(page.locator(".soon .soonStep[data-pending]")).toContainText("Publish");
   });
 
   /**
-   * Both doors, in both places they appear. Asserted on the pathname rather
-   * than the host, because the console's address is configuration.
+   * The state is a difference in shape, not only in colour, so it survives a
+   * greyscale print and a red-green deficiency. Asserted on the rendered
+   * marker: settled steps paint a filled disc, the outstanding one a ring.
    */
-  test("sign up and sign in reach the console", async ({ page }) => {
+  test("done and outstanding differ by more than colour", async ({ page }) => {
     await page.goto("/pro");
-    for (const [name, path] of [
-      ["Create an organisation", "/signup"],
-      ["Sign in", "/login"],
-    ] as const) {
-      const links = page.locator("main").getByRole("link", { name, exact: true });
-      expect(await links.count(), `${name} appears at least twice`).toBeGreaterThanOrEqual(2);
-      const href = await links.first().getAttribute("href");
-      expect(new URL(href!).pathname).toBe(path);
-    }
-  });
-
-  test("prices are the ones the tier table actually holds", async ({ page }) => {
-    await page.goto("/pro");
-    const tiers = page.locator(".oxp .tier");
-    await expect(tiers).toHaveCount(4);
-    // Scoped to the tier's own name: "Marketplace" also appears inside Team's
-    // feature list ("Everything in Core and the marketplace"), so an unscoped
-    // filter matches two cards. The first run of this file failed on that.
-    await expect(
-      tiers.filter({ has: page.locator("b", { hasText: /^Marketplace$/ }) }),
-    ).toHaveAttribute("data-featured", "");
-    for (const price of ["Free", "From $120", "$799", "Custom"]) {
-      await expect(page.locator(".oxp .tier .amt").filter({ hasText: price })).toHaveCount(1);
+    const borders = await page.evaluate(() =>
+      [...document.querySelectorAll(".soon .soonStep")].map((step) => {
+        const marker = getComputedStyle(step.querySelector(".soonDot")!, "::before");
+        return {
+          pending: step.hasAttribute("data-pending"),
+          border: parseFloat(marker.borderTopWidth) || 0,
+          background: marker.backgroundColor,
+        };
+      }),
+    );
+    expect(borders).toHaveLength(4);
+    for (const { pending, border, background } of borders) {
+      if (pending) {
+        expect(border, "the outstanding step should be a ring").toBeGreaterThan(0);
+        expect(background).toMatch(/rgba\(0, 0, 0, 0\)|transparent/);
+      } else {
+        expect(border, "a settled step should be a filled disc").toBe(0);
+        expect(background).not.toMatch(/rgba\(0, 0, 0, 0\)|transparent/);
+      }
     }
   });
 
   /**
-   * The claim in the copy, tested. Every animation is declared inside
-   * `prefers-reduced-motion: no-preference`, so opting out must leave a
-   * composed stage — not a gate resting open, which would state the opposite
-   * of the feature it exists to demonstrate.
+   * Per-letter spans are the animation's mechanism, and both the readings they
+   * can corrupt are asserted here. The first build hid the letters and added a
+   * visually-hidden copy for the name — correct to a screen reader, and it put
+   * `ComingsoonComing soon` on the clipboard.
    */
-  test("reduced motion leaves the stages composed, not blank", async ({ page }) => {
+  test("the headline reads as one line, spoken and copied", async ({ page }) => {
+    await page.goto("/pro");
+    const h1 = page.getByRole("heading", { level: 1 });
+    await expect(h1).toHaveText("Coming soon");
+    expect(await h1.evaluate((h) => h.getAttribute("aria-label"))).toBe("Coming soon");
+    // Eleven letters, and not one of them offered to the accessibility tree.
+    expect(await page.locator(".soon .soonHead .soonCh").count()).toBe(10);
+    expect(
+      await h1.evaluate((h) =>
+        [...h.querySelectorAll(".soonCh")].every((n) => n.closest("[aria-hidden='true']") !== null),
+      ),
+      "a headline letter was left in the accessibility tree",
+    ).toBe(true);
+  });
+
+  test("both ways off the page lead somewhere", async ({ page }) => {
+    await page.goto("/pro");
+    const notify = page.locator("main").getByRole("link", { name: /email me when it ships/i });
+    await expect(notify).toHaveAttribute("href", /^mailto:[^@]+@[^@]+\./);
+
+    const components = page.locator("main").getByRole("link", { name: /browse the open/i });
+    await expect(components).toHaveAttribute("href", "/components");
+    await components.click();
+    await expect(page).toHaveURL(/\/components$/);
+  });
+
+  /**
+   * Every animation is declared inside `prefers-reduced-motion: no-preference`,
+   * so opting out must leave the composed picture — a gate that still reads
+   * three-done-one-open, not a blank panel or a first frame.
+   */
+  test("reduced motion leaves the page composed, not blank", async ({ page }) => {
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.goto("/pro");
     await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
 
     const running = await page.evaluate(
       () =>
-        [...document.querySelectorAll(".oxp .stage *, .oxp .fStage *")].filter(
+        [...document.querySelectorAll(".soon *")].filter(
           (n) => getComputedStyle(n).animationName !== "none",
         ).length,
     );
     expect(running, "an animation ran under reduced motion").toBe(0);
 
-    // and the stages are still drawn
-    const painted = await page.evaluate(
-      () =>
-        [...document.querySelectorAll(".oxp .glance .stage")].filter(
-          (n) => n.getBoundingClientRect().height > 40 && n.children.length > 0,
-        ).length,
-    );
-    expect(painted).toBe(10);
+    // The panel is drawn, the headline is legible and the gate still reads.
+    const composed = await page.evaluate(() => {
+      const panel = document.querySelector(".soon .soonPanel")!;
+      const head = document.querySelector(".soon .soonHead")!;
+      return {
+        panelHeight: panel.getBoundingClientRect().height,
+        headOpacity: getComputedStyle(head).opacity,
+        letters: [...document.querySelectorAll(".soon .soonCh")].every(
+          (n) => getComputedStyle(n).opacity === "1",
+        ),
+      };
+    });
+    expect(composed.panelHeight).toBeGreaterThan(200);
+    expect(composed.headOpacity).toBe("1");
+    expect(composed.letters, "a headline letter stayed transparent").toBe(true);
   });
 
   test("does not scroll sideways at 320px", async ({ page }) => {
