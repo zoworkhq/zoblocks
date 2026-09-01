@@ -1413,6 +1413,47 @@ function DtStage({ children }: { children: React.ReactNode }) {
   return <div className="flex flex-wrap items-start gap-8">{children}</div>;
 }
 
+/**
+ * A synthetic microphone for the previews.
+ *
+ * This is NOT the defect the component argues against. The defect is art that
+ * moves with no source behind it; here there is a source, it is declared, and
+ * the component reads it exactly as it would read an AnalyserNode. The clock
+ * lives in the source — as it does in a real microphone — and the art still has
+ * none, which is the whole point: unmount the source and the lane goes flat.
+ *
+ * A docs page cannot ask for microphone permission, and a preview that faked
+ * the waveform instead would be demonstrating the failure on the component's
+ * own documentation.
+ */
+function makeRecDemoSource(): { getFloatTimeDomainData: (target: Float32Array) => void } {
+  let t = 0;
+  return {
+    getFloatTimeDomainData(target: Float32Array) {
+      t += 1 / 60;
+      // Speech shape: a phrase, then a breath. 4.6 Hz syllables under a
+      // 1.3 Hz word envelope — the rates ordinary speech actually runs at.
+      const phrase = (t % 4.3) / 4.3;
+      const gate = phrase < 0.8 ? 1 : 0;
+      const syllable = 0.5 + 0.5 * Math.sin(2 * Math.PI * 4.6 * t);
+      const word = 0.52 + 0.48 * Math.sin(2 * Math.PI * 1.31 * t + 1.7);
+      const level = Math.min(1, gate * (0.16 + 0.84 * syllable ** 1.4 * word) + 0.03);
+      target[0] = level;
+      for (let i = 1; i < target.length; i += 1) target[i] = 0;
+    },
+  };
+}
+
+function useRecDemoSource() {
+  return React.useMemo(makeRecDemoSource, []);
+}
+
+/** A capture art wired to the declared demo source above. */
+function RecLive(props: Omit<React.ComponentProps<typeof Recorder>, "source" | "phase">) {
+  const source = useRecDemoSource();
+  return <Recorder {...props} phase="recording" source={source} />;
+}
+
 function RecStage({ children }: { children: React.ReactNode }) {
   return <div className="w-full max-w-xl">{children}</div>;
 }
@@ -1472,7 +1513,7 @@ const SCENARIOS: Record<string, Scenario[]> = {
       note: "The workhorse. Peak buckets at 30 Hz, newest at the right, older buckets falling off a masked left edge — the lane appears to scroll because the data moves, not because a transform is animating. The centre hairline is true zero, so a bar touching it means the recogniser is receiving nothing rather than that the room is quiet at a decorative minimum. The device name sits in the footer permanently, which is the only defence against the one fault that has none.",
       render: () => (
         <RecStage>
-          <Recorder variant="bars" phase="recording" device={REC_JABRA} expectedDevice={REC_JABRA} />
+          <RecLive variant="bars" device={REC_JABRA} expectedDevice={REC_JABRA} />
         </RecStage>
       ),
     },
@@ -1483,7 +1524,7 @@ const SCENARIOS: Record<string, Scenario[]> = {
       note: "Pulse answers both questions at once: is it recording (the dot, and its shape) and is it hearing me (the rings). It is the only art that keeps a real level meter at thumb size, which is what a patient-facing surface or a phone actually needs — every other art drops the meter or the transport when the width goes.",
       render: () => (
         <RecStage>
-          <Recorder variant="pulse" phase="recording" />
+          <RecLive variant="pulse" />
         </RecStage>
       ),
     },
@@ -1494,7 +1535,7 @@ const SCENARIOS: Record<string, Scenario[]> = {
       note: "Forty pixels tall, lives inside a note field or a composer toolbar, and still carries a real level meter rather than a static microphone glyph. It is the variant that will be instantiated most often and looked at least, which is exactly why it is not an afterthought — and it is the one art that must refuse to mount for a restricted recording, because a control this quiet is not where a disclosure should begin.",
       render: () => (
         <RecStage>
-          <Recorder variant="strip" phase="recording" />
+          <RecLive variant="strip" />
         </RecStage>
       ),
     },
@@ -1505,12 +1546,7 @@ const SCENARIOS: Record<string, Scenario[]> = {
       note: "A clinician wearing a headset while the laptop microphone is live produces plausible room tone, and every one of the thirteen detectors passes on the signal. This is the failure with no signal-level defence at all: it is caught by comparing the device delivering audio against the device that was chosen, and it is why the name is rendered rather than filed in a settings panel.",
       render: () => (
         <RecStage>
-          <Recorder
-            variant="bars"
-            phase="recording"
-            device={REC_BUILTIN}
-            expectedDevice={REC_JABRA}
-          />
+          <RecLive variant="bars" device={REC_BUILTIN} expectedDevice={REC_JABRA} />
         </RecStage>
       ),
     },

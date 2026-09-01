@@ -26,6 +26,7 @@
 import * as React from "react";
 import {
   RECORDER_PHASES,
+  PeakBuffer,
   detectFaults,
   isConsentResolved,
   resolveConsent,
@@ -190,6 +191,15 @@ export function Recorder({
   const laneRef = React.useRef<HTMLDivElement | null>(null);
   const [frame, setFrame] = React.useState<SignalFrame | null>(null);
 
+  /*
+   * The lane is a rolling window over the buckets, not a picture of the
+   * current frame. `frame.closed` holds only the buckets that closed on this
+   * pass — usually none, sometimes one — so reading the lane from it fills the
+   * newest few bars and leaves the rest at the current level, which looks like
+   * a meter smeared sideways rather than like a history.
+   */
+  const history = React.useMemo(() => new PeakBuffer(), []);
+
   // A gate rather than a timer: it is fed the same deltas as the loop, so a
   // paused loop emits nothing instead of continuing to fire.
   const sinceEmit = React.useRef(0);
@@ -199,8 +209,16 @@ export function Recorder({
     running: capturing,
     onFrame: React.useCallback(
       (next: SignalFrame) => {
+        for (const bucket of next.closed) history.push(bucket);
+
         const lane = laneRef.current;
-        if (lane !== null) paintLane(lane, (index: number) => readBucket(next, index));
+        if (lane !== null) {
+          // index 0 is the newest bucket; the buffer indexes oldest-first.
+          const end = history.length - 1;
+          paintLane(lane, (index: number) =>
+            index <= end ? history.at(end - index) : 0,
+          );
+        }
 
         sinceEmit.current += 1;
         if (sinceEmit.current >= 6) {
@@ -209,7 +227,7 @@ export function Recorder({
           onLevel?.(next);
         }
       },
-      [onLevel],
+      [onLevel, history],
     ),
   });
 
@@ -540,13 +558,6 @@ const REST_FRAME: SignalFrame = {
   bucket: null,
   closed: [],
 };
-
-function readBucket(frame: SignalFrame, index: number): number {
-  const closed = frame.closed;
-  if (closed.length === 0) return frame.level;
-  const at = closed.length - 1 - index;
-  return at >= 0 ? (closed[at] as number) : frame.level;
-}
 
 function describeLevel(frame: SignalFrame | null): string {
   if (frame === null || frame.level <= 0) return "no input";

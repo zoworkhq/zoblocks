@@ -28,6 +28,7 @@ export const READY_ORDER: readonly string[] = [
   "date-picker",
   "clinical-status",
   "accordion",
+  "recorder",
 ];
 
 const READY = new Set(READY_ORDER);
