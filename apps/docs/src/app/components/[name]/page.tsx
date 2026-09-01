@@ -554,7 +554,7 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
           {component.name === "date-picker" && (
             <div className="mx-auto max-w-[92rem] px-5 pb-[clamp(2.75rem,5vw,4.5rem)] sm:px-8">
               <div data-reveal>
-                <SectionHeading eyebrow="Gallery" title="Fourteen variants, one contract — live." />
+                <SectionHeading eyebrow="Gallery" title="Sixteen variants, one contract — live." />
                 <div className="mt-8">
                   <DatePickerGallery />
                 </div>

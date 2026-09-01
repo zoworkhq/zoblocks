@@ -120,11 +120,19 @@ import {
   Calendar,
   ClinicalDateTime,
   DateField,
+  DateRangeField,
   SessionTimeField,
   TimeField,
+  TimeRangeField,
   timeGrid,
 } from "@/registry/oxygen/date-picker/date-picker";
-import { plainDate, plainTime, sessionFrom, withSessionEnd } from "@/lib/oxygen-datetime";
+import {
+  dateRangePresets,
+  plainDate,
+  plainTime,
+  sessionFrom,
+  withSessionEnd,
+} from "@/lib/oxygen-datetime";
 type Density = "patient" | "standard" | "clinical";
 
 /**
@@ -1700,7 +1708,7 @@ const SCENARIOS: Record<string, Scenario[]> = {
   /*
    * Four bands rather than eleven flat tabs.
    *
-   * DatePicker is one component with fourteen variants, and a flat strip of
+   * DatePicker is one component with sixteen variants, and a flat strip of
    * eleven made a reader scan every label to find the one about a session
    * crossing midnight. The bands are the four jobs it does: getting a date in,
    * picking one from a grid, timing a session, and rendering what the record
@@ -1928,11 +1936,46 @@ const SCENARIOS: Record<string, Scenario[]> = {
       id: "modes",
       label: "Range in two clicks, multiple with a cap",
       group: "Calendar",
-      note: "Range selection is two clicks and never a drag — WCAG 2.2 SC 2.5.7 asks that no function require one, and there is no drag path anywhere in the component. In multiple mode, clicking a selected date removes it: a remove control inside a 32px cell would be under the 24px target floor, and a second click is what people try first anyway.",
+      note: "Range selection is two clicks and never a drag — WCAG 2.2 SC 2.5.7 asks that no function require one, and there is no drag path anywhere in the component. Two months, because most ranges cross a boundary and choosing an end you cannot see is how a range picker ends up needing three attempts; the rail is data the host supplies, so nobody is stuck with seven periods somebody else chose. In multiple mode, clicking a selected date removes it: a remove control inside a 32px cell would be under the 24px target floor, and a second click is what people try first anyway.",
       render: () => (
         <DtStage>
-          <Calendar mode="range" now={DT_TODAY} defaultMonth={{ y: 2026, m: 9 }} />
+          <Calendar
+            mode="range"
+            months={2}
+            weekStart={1}
+            hints
+            presets={dateRangePresets(DT_TODAY, { weekStart: 1 })}
+            showCustomPreset
+            now={DT_TODAY}
+            defaultMonth={{ y: 2026, m: 8 }}
+            defaultRange={{ start: plainDate(2026, 8, 17), end: plainDate(2026, 9, 11) }}
+          />
           <Calendar mode="multiple" maxDates={4} now={DT_TODAY} defaultMonth={{ y: 2026, m: 9 }} />
+        </DtStage>
+      ),
+    },
+    {
+      id: "ranges",
+      label: "A span, and the length it works out to",
+      group: "Entry",
+      note: "Both ends are typeable in one shell, because a range is still mostly recall — an authorisation window, a reporting period, a leave of absence — and eight keystrokes per end beats paging a grid. The badge is the field's own proof-read: a transposed month is invisible in 03/07 – 07/07 and unmissable as a day count, and a start typed as PM when the reader meant AM is unmissable as a negative span. The day count includes both ends, because service from the 1st to the 7th is seven days of care rather than six.",
+      render: () => (
+        <DtStage>
+          <DateRangeField
+            label="Authorisation window"
+            now={DT_TODAY}
+            weekStart={1}
+            showSpan
+            presets={dateRangePresets(DT_TODAY, { weekStart: 1 })}
+            showCustomPreset
+            defaultValue={{ start: plainDate(2026, 8, 24), end: plainDate(2026, 9, 11) }}
+          />
+          <TimeRangeField
+            label="Night shift"
+            stepMinutes={30}
+            allowOvernight
+            defaultValue={{ start: plainTime(22, 0), end: plainTime(6, 30) }}
+          />
         </DtStage>
       ),
     },
