@@ -224,6 +224,31 @@ function InstrumentStage({ children }: { children: React.ReactNode }) {
   return <div className="rounded-xl">{children}</div>;
 }
 
+/**
+ * The small mono caption that names a row inside a preview.
+ *
+ * One object rather than the three identical inline copies it replaces, because
+ * all three carried `opacity: 0.55` and all three failed together: 10px text at
+ * 4.08:1 on the panel, eight nodes on `/components/clinical-status`. Opacity is
+ * the whole reason — it composites the inherited ink toward whatever is behind
+ * it, so the colour is decided by the surface rather than chosen, and no token
+ * change can reach it. The repository's rule from the date/time work is the one
+ * that applies: non-disabled dimmed text takes the muted ink, never a tone that
+ * happens to land above the floor in the theme it was eyeballed in.
+ *
+ * `--ox-text-muted` is gated against `bg`, `surface` and `bg-subtle` in all
+ * three themes (7.24:1 at worst, in light) — a caption on any of them is
+ * covered by a measurement that already exists.
+ */
+const PREVIEW_CAPTION: React.CSSProperties = {
+  margin: 0,
+  fontFamily: "var(--ox-font-mono, monospace)",
+  fontSize: 10,
+  letterSpacing: "0.08em",
+  textTransform: "uppercase",
+  color: "var(--ox-text-muted)",
+};
+
 const CHART_ITEMS: AccordionItem[] = [
   {
     key: "risk",
@@ -2776,18 +2801,7 @@ const SCENARIOS: Record<string, Scenario[]> = {
         <div style={{ display: "grid", gap: 18 }}>
           {SCALE_NAMES.map((name: ScaleName) => (
             <div key={name} style={{ display: "grid", gap: 6 }}>
-              <p
-                style={{
-                  margin: 0,
-                  fontFamily: "var(--ox-font-mono, monospace)",
-                  fontSize: 10,
-                  letterSpacing: "0.08em",
-                  textTransform: "uppercase",
-                  opacity: 0.55,
-                }}
-              >
-                {SCALES[name].label}
-              </p>
+              <p style={PREVIEW_CAPTION}>{SCALES[name].label}</p>
               <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
                 {SCALES[name].steps.map((step: StatusStep) => (
                   <ClinicalStatus key={step.id} scale={name} step={step.id} />
@@ -2806,18 +2820,7 @@ const SCENARIOS: Record<string, Scenario[]> = {
         <div style={{ display: "grid", gap: 14 }}>
           {[false, true].map((flat) => (
             <div key={String(flat)} style={{ display: "grid", gap: 6 }}>
-              <p
-                style={{
-                  margin: 0,
-                  fontFamily: "var(--ox-font-mono, monospace)",
-                  fontSize: 10,
-                  letterSpacing: "0.08em",
-                  textTransform: "uppercase",
-                  opacity: 0.55,
-                }}
-              >
-                {flat ? "Desaturated" : "In colour"}
-              </p>
+              <p style={PREVIEW_CAPTION}>{flat ? "Desaturated" : "In colour"}</p>
               <div
                 style={{
                   display: "flex",
@@ -2894,18 +2897,7 @@ const SCENARIOS: Record<string, Scenario[]> = {
         <div style={{ display: "grid", gap: 14 }}>
           {(["clinician", "patient"] as const).map((audience) => (
             <div key={audience} style={{ display: "grid", gap: 6 }}>
-              <p
-                style={{
-                  margin: 0,
-                  fontFamily: "var(--ox-font-mono, monospace)",
-                  fontSize: 10,
-                  letterSpacing: "0.08em",
-                  textTransform: "uppercase",
-                  opacity: 0.55,
-                }}
-              >
-                {audience}
-              </p>
+              <p style={PREVIEW_CAPTION}>{audience}</p>
               <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
                 <ClinicalStatus scale="result-status" step="entered-in-error" audience={audience} />
                 <ClinicalStatus scale="result-status" step="preliminary" audience={audience} />
