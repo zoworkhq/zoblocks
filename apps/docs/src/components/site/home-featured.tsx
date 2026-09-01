@@ -29,11 +29,12 @@ import { SignatureDrawing } from "@/components/site/signature-showcase";
 import { LiveSwitch } from "@/components/site/switch-gallery";
 import { Tabs } from "@oxygenui-design/tabs";
 import {
-  BEHAVIORAL_HEALTH_DURATIONS,
-  DateField,
+  DateRangeField,
   SessionTimeField,
+  TimeRangeField,
+  BEHAVIORAL_HEALTH_DURATIONS,
 } from "@/registry/oxygen/date-picker/date-picker";
-import { plainDate, plainTime, sessionFrom } from "@/lib/oxygen-datetime";
+import { dateRangePresets, plainDate, plainTime, sessionFrom } from "@/lib/oxygen-datetime";
 import {
   ChartContextMenu,
   type ChartMenuAction,
@@ -414,15 +415,33 @@ function DateDemo() {
   /*
     Flex with `items-start`, not a two-column grid.
 
-    The grid stretched both cells to the height of the taller one, and
-    DateField distributes its own label and input across whatever height it is
-    given — so "Date of service" floated about 150px above its own field, with
-    an empty column beside a dense one. Each field takes its natural width
-    here, both start at the top, and they wrap rather than squeeze.
+    The grid stretched both cells to the height of the taller one, and each
+    field distributes its own label and input across whatever height it is
+    given — so a label floated about 150px above its own field, with an empty
+    column beside a dense one. Each takes its natural width here, both start at
+    the top, and they wrap rather than squeeze.
+
+    All three fields carry a derived member — a day count, a length, a held
+    end — because that is the one thing this family does that a date input
+    does not, and a card with room for three fields should spend it saying so
+    rather than showing the same field three times.
   */
   return (
-    <div className="flex w-full flex-wrap items-start gap-x-12 gap-y-8">
-      <DateField label="Date of service" now={TODAY} defaultValue={plainDate(2026, 8, 21)} />
+    <div className="flex w-full flex-wrap items-start gap-x-10 gap-y-8">
+      <DateRangeField
+        label="Authorisation window"
+        now={TODAY}
+        weekStart={1}
+        showSpan
+        presets={dateRangePresets(TODAY, { weekStart: 1 })}
+        showCustomPreset
+        defaultValue={{ start: plainDate(2026, 8, 24), end: plainDate(2026, 9, 11) }}
+      />
+      <TimeRangeField
+        label="Time range"
+        stepMinutes={60}
+        defaultValue={{ start: plainTime(7, 0), end: plainTime(10, 0) }}
+      />
       <SessionTimeField
         label="Individual therapy"
         defaultValue={sessionFrom(plainTime(14, 0), 50)}
@@ -542,8 +561,8 @@ const FEATURED: readonly Featured[] = [
     name: "Date & time",
     resource: "Period",
     claim:
-      "Fourteen variants on one contract — and a bare 9 in a time field is asked about rather than resolved into a twelve-hour error.",
-    facts: ["14 variants", "8 keystrokes, no calendar", "RFC 5545 recurrence"],
+      "Sixteen variants on one contract — a range is two clicks with the preview between them, and a bare 9 in a time field is asked about rather than resolved into a twelve-hour error.",
+    facts: ["16 variants", "8 keystrokes, no calendar", "Every span says its length"],
     demo: () => <DateDemo />,
   },
 ];

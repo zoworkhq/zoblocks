@@ -6,7 +6,7 @@
  * The galleries were reported as "messy and confusing", and the measurement
  * agreed: 125 prose sentences across the site run over 35 words, and the date
  * picker page carries 32 of them — a 60-to-90 word paragraph under every one of
- * fourteen variants, all permanently expanded. Six of those stacked is a wall,
+ * sixteen variants, all permanently expanded. Six of those stacked is a wall,
  * and the component the reader came for is somewhere behind it.
  *
  * The fix is deferral rather than deletion. This reasoning is the most valuable

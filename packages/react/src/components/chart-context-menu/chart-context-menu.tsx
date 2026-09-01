@@ -305,6 +305,32 @@ interface Placement {
   maxHeight: number;
 }
 
+/**
+ * A placement reduced to the values that actually render.
+ *
+ * `place()` builds a fresh object every call, and `setBox` compares by
+ * reference — so an identical placement still re-rendered and re-committed.
+ * That cost a second render on every open, because the pass runs twice by
+ * design (once synchronously, once in the rAF that measures the real height),
+ * and one per event during a scroll, which fires dozens.
+ *
+ * Feeding this through the updater below lets React bail out of the render
+ * entirely when nothing moved. It is a string rather than a field-by-field
+ * comparison because `top` and `bottom` are each present or absent depending
+ * on which edge the menu is anchored by, and six short-circuits would be six
+ * branches to keep covered for no gain.
+ */
+function placementKey(placement: Placement): string {
+  const { top, bottom, left, origin, maxHeight } = placement;
+  return `${top}|${bottom}|${left}|${origin}|${maxHeight}`;
+}
+
+/** `setBox` argument that keeps the previous object when the menu has not moved. */
+function keepIfUnmoved(next: Placement) {
+  return (previous: Placement | null): Placement =>
+    previous && placementKey(previous) === placementKey(next) ? previous : next;
+}
+
 function clamp(value: number, low: number, high: number): number {
   return Math.min(Math.max(value, low), high);
 }
@@ -1029,27 +1055,31 @@ export function ChartContextMenu(props: ChartContextMenuProps) {
          *
          * Only the offset is clamped. `maxHeight` stays the viewport's, so this
          * cannot re-enter the loop that measuring a height while capping it
-         * caused.
+         * caused. Clamping needs a top edge, so a flipped menu is resolved out
+         * of its bottom anchor here — inside a container the anchor was only
+         * ever a way to avoid measuring, and we have measured.
          */
         const pad = EDGE_PAD;
         const viewportTop =
           next.top === undefined ? window.innerHeight - (next.bottom ?? 0) - h : next.top;
-        setBox({
-          top: clamp(
-            viewportTop - box.top + contained.scrollTop,
-            pad,
-            Math.max(pad, contained.clientHeight - h - pad),
-          ),
-          left: clamp(
-            next.left - box.left + contained.scrollLeft,
-            pad,
-            Math.max(pad, contained.clientWidth - w - pad),
-          ),
-          origin: next.origin,
-          maxHeight: next.maxHeight,
-        });
+        setBox(
+          keepIfUnmoved({
+            top: clamp(
+              viewportTop - box.top + contained.scrollTop,
+              pad,
+              Math.max(pad, contained.clientHeight - h - pad),
+            ),
+            left: clamp(
+              next.left - box.left + contained.scrollLeft,
+              pad,
+              Math.max(pad, contained.clientWidth - w - pad),
+            ),
+            origin: next.origin,
+            maxHeight: next.maxHeight,
+          }),
+        );
       } else {
-        setBox(next);
+        setBox(keepIfUnmoved(next));
       }
     };
 
@@ -1750,18 +1780,22 @@ function Submenu(props: {
     if (!panel || !rect) return;
     const next = placeBeside(rect, panel.offsetWidth);
     if (!contained) {
-      setBox(next);
+      setBox(keepIfUnmoved(next));
       return;
     }
     const host = contained.getBoundingClientRect();
-    setBox({
-      ...(next.top === undefined
-        ? { bottom: host.bottom - (window.innerHeight - (next.bottom ?? 0)) - contained.scrollTop }
-        : { top: next.top - host.top + contained.scrollTop }),
-      left: next.left - host.left + contained.scrollLeft,
-      origin: next.origin,
-      maxHeight: next.maxHeight,
-    });
+    setBox(
+      keepIfUnmoved({
+        ...(next.top === undefined
+          ? {
+              bottom: host.bottom - (window.innerHeight - (next.bottom ?? 0)) - contained.scrollTop,
+            }
+          : { top: next.top - host.top + contained.scrollTop }),
+        left: next.left - host.left + contained.scrollLeft,
+        origin: next.origin,
+        maxHeight: next.maxHeight,
+      }),
+    );
   }, [anchorEl, contained, tick, items.length]);
 
   React.useEffect(() => {

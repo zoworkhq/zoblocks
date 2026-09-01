@@ -909,120 +909,121 @@ function usePrefersReducedMotion(): boolean {
 }
 
 /* ------------------------------------------------------------------ */
-/* The self-driving demo                                              */
+/* The anatomy tour                                                   */
 /* ------------------------------------------------------------------ */
 
-/** One beat of the script: find a target, do something to it, hold. */
-interface Beat {
-  /** What to aim at. Returns null when the DOM has moved on; the beat is skipped. */
+/**
+ * One annotation: a part of the rendered component, and what it is for.
+ *
+ * `find` is a selector against the live DOM rather than a coordinate, and
+ * `body` is handed the element it found — so a note about the accessible name
+ * quotes the name the component actually rendered, and a note about target
+ * size prints the size that element actually measures. An annotation that
+ * asserted either from memory would go on saying it after it stopped being
+ * true, which is the failure mode this whole page exists to avoid.
+ */
+interface Annotation {
+  id: string;
+  title: string;
   find: (root: HTMLElement) => HTMLElement | null;
-  act: "hover" | "press";
-  /** How long to rest after acting, in milliseconds. */
-  hold: number;
-  /** Said aloud under the demo, so the point is legible without watching. */
-  say?: string;
+  body: (el: HTMLElement | null) => string;
 }
 
-const cellNamed = (prefix: string) => (root: HTMLElement) =>
-  [...root.querySelectorAll<HTMLElement>('[role="gridcell"]')].find((cell) =>
-    (cell.getAttribute("aria-label") ?? "").startsWith(prefix),
-  ) ?? null;
+const first = (selector: string) => (root: HTMLElement) =>
+  root.querySelector<HTMLElement>(selector);
 
-const railNamed = (label: string) => (root: HTMLElement) =>
-  [...root.querySelectorAll<HTMLElement>(".ox-dt-cal__preset")].find(
-    (button) => button.textContent?.trim() === label,
-  ) ?? null;
-
-const actionNamed = (label: string) => (root: HTMLElement) =>
-  [...root.querySelectorAll<HTMLElement>(".ox-dt-cal__action")].find(
-    (button) => button.textContent?.trim() === label,
-  ) ?? null;
-
-/**
- * The script.
- *
- * Written as the sequence a person would actually perform, because the point
- * is not that the component moves — it is that a range is two clicks with a
- * preview between them, that the preview crosses a month boundary, and that
- * nothing reaches the host until Done. Each of those is a sentence in the
- * prose elsewhere on this page; here they happen.
- */
-const SCRIPT: Beat[] = [
-  { find: railNamed("Custom"), act: "press", hold: 700, say: "Custom clears the selection." },
-  { find: cellNamed("Monday, August 17"), act: "hover", hold: 420 },
+const ANNOTATIONS: Annotation[] = [
   {
-    find: cellNamed("Monday, August 17"),
-    act: "press",
-    hold: 520,
-    say: "One click sets the start.",
-  },
-  { find: cellNamed("Friday, August 21"), act: "hover", hold: 260 },
-  { find: cellNamed("Wednesday, August 26"), act: "hover", hold: 260 },
-  { find: cellNamed("Monday, August 31"), act: "hover", hold: 260 },
-  {
-    find: cellNamed("Saturday, September 5"),
-    act: "hover",
-    hold: 320,
-    say: "The preview follows the pointer, across the month boundary.",
+    id: "tabstop",
+    title: "One tab stop, not forty-two",
+    find: first('[role="gridcell"][tabindex="0"]'),
+    body: () =>
+      `Exactly one cell in the whole panel is reachable by Tab — this one. The rest sit at tabindex minus one and move under the arrow keys. Forty-two focusable cells is the commonest accessibility failure in a date picker, and a calendar opened on a month with no focus date has none at all, which is the same bug from the other side.`,
   },
   {
-    find: cellNamed("Friday, September 11"),
-    act: "press",
-    hold: 900,
-    say: "The second click completes it. Nothing has reached the host yet.",
+    id: "named",
+    title: "Named in full, not by numeral",
+    find: first(".ox-dt-cal__day--in-range:not(.ox-dt-cal__day--selected)"),
+    body: (el) =>
+      `A screen reader announces this cell as “${el?.getAttribute("aria-label") ?? "…"}”. A cell in a grid has no column header in its accessible context, so a grid of bare numerals is navigable and useless.`,
   },
   {
-    find: railNamed("This month"),
-    act: "press",
-    hold: 1000,
-    say: "A named period is one press, and the window moves to it.",
+    id: "caps",
+    title: "The band is capped at every week",
+    find: first(".ox-dt-cal__day--week-hi"),
+    body: () =>
+      "The band runs unbroken across a week and breaks between them, so it is capped here as well as at the two ends of the range. Left uncapped, a selection reads as one slab rather than as a set of weeks — and the columns close up while the rows open out precisely to make that difference visible.",
   },
   {
-    find: actionNamed("Done"),
-    act: "press",
-    hold: 1100,
-    say: "Done is where the range is finally reported.",
+    id: "rail",
+    title: "The rail is data, not a feature",
+    find: first(".ox-dt-cal__preset"),
+    body: () =>
+      "Named periods come from the host: `dateRangePresets(now)` is a starting point, not a default. The right seven periods for a billing report and for an authorisation window are not the same seven, and a component that decides is one every host has to work around.",
+  },
+  {
+    id: "commit",
+    title: "Nothing leaves until Done",
+    find: first(".ox-dt-cal__action--primary"),
+    body: () =>
+      "A range is two clicks and the first is often wrong. Every click above redraws the panel and none of them reaches your state — a parent already told about a half-built range has already filtered a report on a range nobody chose.",
+  },
+  {
+    id: "target",
+    title: "24px, measured rather than claimed",
+    find: (root) =>
+      root.querySelector<HTMLElement>(".ox-dt-cal__day--today") ??
+      root.querySelector<HTMLElement>(".ox-dt-cal__day"),
+    body: (el) => {
+      const box = el?.getBoundingClientRect();
+      const size = box ? `${Math.round(box.width)} × ${Math.round(box.height)}` : "…";
+      return `This cell measures ${size} px right now, in your browser. Every interactive element here clears the 24px floor of WCAG 2.2 SC 2.5.8 at every density — clinical density tightens the type and the gaps and never the target, because a mis-tap on a calendar cell is consequential in a way it is not on a marketing site.`;
+    },
   },
 ];
 
 /**
- * Drives the real component through real events.
+ * The component, held still, while the explanation moves.
  *
- * Nothing here fakes state: it dispatches `mouseover` and `click` at the same
- * cells a pointer would reach, so what plays is the component's own behaviour
- * rather than a recording of it. A script that set React state directly would
- * keep working after the behaviour it claims to show had broken.
+ * The other direction we built drove the picker through a range selection with
+ * a drawn cursor. This one is the opposite trade and the more useful one here:
+ * a reader on a documentation page can already see what clicking does, and
+ * what they cannot see is why any of it is shaped the way it is. So the panel
+ * does not move at all, and the annotations arrive one at a time over the part
+ * they describe.
  *
- * Three rules it keeps, in order of how much they matter.
- *
- * **It stops the moment somebody touches it.** An animation that fights the
- * reader for control of the thing they are trying to try is worse than no
- * animation.
- *
- * **It never starts under `prefers-reduced-motion`.** Not slowed — not
- * started. The reader presses Play if they want it.
- *
- * **It has a visible pause.** WCAG 2.2.2: anything that moves for more than
- * five seconds needs a way to stop it, and a loop is more than five seconds.
+ * **The list is the content; the halo is decoration.** Every note is a real
+ * button in a real ordered list, so with the tour paused — or with no
+ * JavaScript, or under a screen reader — the whole thing reads as six labelled
+ * paragraphs about a calendar. The floating bubble repeats the active one for
+ * the eye and is `aria-hidden`, so nobody hears it twice. Pressing any note
+ * jumps to it, which is what makes this usable without ever playing it.
  */
-function AutoplayDemo() {
+function AnatomyDemo() {
   const stageRef = React.useRef<HTMLDivElement>(null);
-  const cursorRef = React.useRef<HTMLSpanElement>(null);
+  const pickRef = React.useRef<HTMLDivElement>(null);
+  const [at, setAt] = React.useState(0);
   const [playing, setPlaying] = React.useState(false);
-  const [beat, setBeat] = React.useState(0);
-  const [pressed, setPressed] = React.useState(false);
+  const [box, setBox] = React.useState<{ t: number; l: number; w: number; h: number } | null>(null);
+  /*
+   * Every note's text, resolved against the rendered panel.
+   *
+   * Resolving only the active one left the other five reading their
+   * null-element fallback — the note about the accessible name literally said
+   * "…" until its turn came round. They are all real sentences about a real
+   * panel, or none of them are.
+   */
+  const [bodies, setBodies] = React.useState<string[]>(() => ANNOTATIONS.map((n) => n.body(null)));
   const reduced = usePrefersReducedMotion();
 
-  // Autoplay only once the demo is on screen, and only where motion is
-  // welcome. A gallery that starts animating in a chapter nobody has scrolled
-  // to is spending the reader's attention somewhere they are not looking.
+  // Autoplay only once it is on screen and only where motion is welcome.
   const [seen, setSeen] = React.useState(false);
   React.useEffect(() => {
     const node = stageRef.current;
     if (!node || typeof IntersectionObserver === "undefined") return undefined;
     const observer = new IntersectionObserver(
       (entries) => entries.forEach((entry) => entry.isIntersecting && setSeen(true)),
-      { threshold: 0.4 },
+      { threshold: 0.35 },
     );
     observer.observe(node);
     return () => observer.disconnect();
@@ -1032,104 +1033,114 @@ function AutoplayDemo() {
     if (seen && !reduced) setPlaying(true);
   }, [seen, reduced]);
 
+  /*
+   * Measure after paint, and re-measure on resize.
+   *
+   * The halo is positioned from the target's real rect rather than from a
+   * hard-coded offset, so it stays on its cell when the panel reflows, the
+   * density changes, or the reader zooms. A layout effect rather than an
+   * effect: measuring after the browser has painted the old position shows one
+   * frame of the halo in the wrong place.
+   */
+  React.useLayoutEffect(() => {
+    const place = () => {
+      /*
+       * Measured against the panel, which is the halo's offset parent.
+       *
+       * Measuring against the outer stage put every halo a whole cell to the
+       * right: the stage centres the panel inside itself, so the two origins
+       * differ by that centring gap. The numbers agreed with each other and
+       * were both wrong, which is why this was only visible in a screenshot.
+       */
+      const root = pickRef.current;
+      const note = ANNOTATIONS[at];
+      if (!root || !note) return;
+      setBodies(ANNOTATIONS.map((n) => n.body(n.find(root))));
+      const el = note.find(root);
+      if (!el) return setBox(null);
+      const base = root.getBoundingClientRect();
+      const r = el.getBoundingClientRect();
+      setBox({ t: r.top - base.top, l: r.left - base.left, w: r.width, h: r.height });
+    };
+    place();
+    window.addEventListener("resize", place);
+    return () => window.removeEventListener("resize", place);
+  }, [at]);
+
   React.useEffect(() => {
     if (!playing) return undefined;
-    const root = stageRef.current;
-    if (!root) return undefined;
+    const hold = reduced ? 900 : 4200;
+    const timer = setTimeout(() => setAt((n) => (n + 1) % ANNOTATIONS.length), hold);
+    return () => clearTimeout(timer);
+  }, [playing, at, reduced]);
 
-    const current = SCRIPT[beat % SCRIPT.length];
-    const target = current?.find(root) ?? null;
-
-    // The cursor travels first, then the event fires where it landed — so what
-    // the reader sees and what the component receives are the same place.
-
-    if (target && cursorRef.current) {
-      const box = root.getBoundingClientRect();
-      const spot = target.getBoundingClientRect();
-      cursorRef.current.style.translate = `${spot.left - box.left + spot.width / 2}px ${
-        spot.top - box.top + spot.height / 2
-      }px`;
-    }
-
-    const travel = 380;
-    const fire = setTimeout(() => {
-      if (!target) return;
-      if (current?.act === "press") {
-        setPressed(true);
-        setTimeout(() => setPressed(false), 220);
-        target.click();
-      } else {
-        // React maps `onMouseEnter` from a bubbling `mouseover`, so this is the
-        // event a real pointer would have produced.
-        target.dispatchEvent(new MouseEvent("mouseover", { bubbles: true }));
-      }
-    }, travel);
-
-    const advance = setTimeout(() => setBeat((n) => n + 1), travel + (current?.hold ?? 400));
-    return () => {
-      clearTimeout(fire);
-      clearTimeout(advance);
-    };
-  }, [playing, beat]);
-
-  // Any real input wins. `pointerdown` rather than `click`, so the handover
-  // happens before the component sees the press rather than after it.
-  const yieldToReader = () => setPlaying(false);
-
-  /*
-   * The last thing said, not the last beat's `say`.
-   *
-   * Most beats are pointer travel and have nothing to add, so reading `say`
-   * directly blanks the line every second or two and the narration reads as
-   * broken rather than quiet. A sentence stands until the next one replaces
-   * it, which is also what makes the `aria-live` region worth having.
-   */
-  const said = React.useRef("");
-  const step = SCRIPT[beat % SCRIPT.length];
-  if (step?.say) said.current = step.say;
-  const caption = said.current;
+  const active = ANNOTATIONS[at];
 
   return (
-    <div className="ox-dt-auto">
-      <div className="ox-dt-auto__bar">
+    <div className="ox-dt-tour">
+      <div className="ox-dt-tour__bar">
         <button
           type="button"
-          className="ox-dt-auto__toggle"
+          className="ox-dt-tour__toggle"
           aria-pressed={playing}
           onClick={() => setPlaying((was) => !was)}
         >
           {playing ? "Pause" : "Play"}
         </button>
-        {/* Polite, so the sentence lands after the change it describes rather
-            than interrupting a reader mid-cell. */}
-        <p className="ox-dt-auto__say" aria-live="polite">
-          {playing ? (caption ?? " ") : "Paused — the calendar is yours."}
+        <p className="ox-dt-tour__count">
+          {at + 1} of {ANNOTATIONS.length} · {active?.title}
         </p>
       </div>
 
-      <div
-        ref={stageRef}
-        className="ox-dt-auto__stage"
-        onPointerDown={yieldToReader}
-        onKeyDownCapture={yieldToReader}
-      >
-        <Calendar
-          mode="range"
-          months={2}
-          weekStart={1}
-          commit="explicit"
-          hints
-          presets={RANGE_PRESETS}
-          showCustomPreset
-          now={TODAY}
-          defaultMonth={{ y: 2026, m: 8 }}
-        />
-        <span
-          ref={cursorRef}
-          aria-hidden="true"
-          className={cn("ox-dt-auto__cursor", pressed && "ox-dt-auto__cursor--press")}
-          data-ox-hidden={playing ? undefined : "true"}
-        />
+      <div className="ox-dt-tour__stage" ref={stageRef}>
+        {/* The panel itself, and it never changes. A completed range is the
+            state that has something to point at in every direction: two
+            endpoints, a band, week caps, a pressed preset and a live Done. */}
+        <div className="ox-dt-tour__pick" ref={pickRef} onPointerDown={() => setPlaying(false)}>
+          <Calendar
+            mode="range"
+            months={2}
+            weekStart={1}
+            commit="explicit"
+            hints
+            presets={RANGE_PRESETS}
+            showCustomPreset
+            now={TODAY}
+            defaultMonth={{ y: 2026, m: 8 }}
+            defaultRange={{ start: plainDate(2026, 8, 17), end: plainDate(2026, 9, 11) }}
+          />
+
+          {box ? (
+            <span
+              className="ox-dt-tour__halo"
+              aria-hidden="true"
+              style={{
+                transform: `translate(${box.l - 4}px, ${box.t - 4}px)`,
+                width: box.w + 8,
+                height: box.h + 8,
+              }}
+            />
+          ) : null}
+        </div>
+
+        <ol className="ox-dt-tour__list">
+          {ANNOTATIONS.map((note, index) => (
+            <li key={note.id}>
+              <button
+                type="button"
+                className={cn("ox-dt-tour__note", index === at && "ox-dt-tour__note--on")}
+                aria-current={index === at ? "true" : undefined}
+                onClick={() => {
+                  setPlaying(false);
+                  setAt(index);
+                }}
+              >
+                <span className="ox-dt-tour__title">{note.title}</span>
+                <span className="ox-dt-tour__body">{bodies[index]}</span>
+              </button>
+            </li>
+          ))}
+        </ol>
       </div>
     </div>
   );
@@ -1313,13 +1324,13 @@ export function DatePickerGallery() {
           <div className="ox-gallery__grid">
             <Demo
               id="c0"
-              name="Watch it work"
+              name="Why it is shaped like this"
               api='mode="range" · months={2} · presets · commit="explicit"'
-              tags={["autoplays", "yields on touch", "stops under reduced motion"]}
-              note="This drives the real component with real events — `mouseover` and `click` at the same cells a pointer would reach — rather than replaying a recording of it, so if the behaviour it shows ever broke, the demo would break with it. It stops the instant you touch the calendar, because an animation that fights the reader for the control they are trying to try is worse than no animation at all; it never starts under `prefers-reduced-motion`, and Pause is a real button rather than a hover affordance, which is what WCAG 2.2.2 asks of anything that moves for more than five seconds."
+              tags={["annotated", "reads paused", "stops under reduced motion"]}
+              note="The panel below is the shipped component and it never moves; the explanation does. Each note is measured off the real DOM rather than written from memory — the accessible name is the name that element actually carries, and the target size is the size it actually is in your browser right now, so a note cannot go on being true after the thing it describes has changed. The list is the content and the halo is decoration: every note is a real button, so paused, unscripted, or through a screen reader this reads as six labelled paragraphs about a calendar. Press any of them to jump there; it never starts under `prefers-reduced-motion`, and Pause is a real button, which is what WCAG 2.2.2 asks of anything that moves for more than five seconds."
               wide
             >
-              <AutoplayDemo />
+              <AnatomyDemo />
             </Demo>
 
             <Demo
