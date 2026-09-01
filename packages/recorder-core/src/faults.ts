@@ -18,12 +18,7 @@
  */
 
 import { DEFAULT_SILENCE_BUDGET_MS } from "./motion";
-import type {
-  RecorderDevice,
-  RecorderDisposition,
-  RecorderPhase,
-  SignalFrame,
-} from "./types";
+import type { RecorderDevice, RecorderDisposition, RecorderPhase, SignalFrame } from "./types";
 
 /** The thirteen, in the order §11 lists them. */
 export const RECORDER_FAULTS = [
@@ -254,12 +249,7 @@ export function detectFaults(observation: FaultObservation): readonly RecorderFa
      There is no signal-level defence: room tone from the laptop is room tone.
      The only real defence is the device name rendered permanently, which is
      why `device` is a first-class value and not a settings-panel detail. */
-  if (
-    holdsAudio &&
-    expectedDevice &&
-    device &&
-    device.deviceId !== expectedDevice.deviceId
-  ) {
+  if (holdsAudio && expectedDevice && device && device.deviceId !== expectedDevice.deviceId) {
     found.push({
       code: "device-suspect",
       severity: "warn",
@@ -324,9 +314,7 @@ export function detectFaults(observation: FaultObservation): readonly RecorderFa
       severity: "warn",
       capturing: false,
       audioIntact: true,
-      message: disposition.error
-        ? `Upload failed: ${disposition.error}`
-        : "Upload failed.",
+      message: disposition.error ? `Upload failed: ${disposition.error}` : "Upload failed.",
       // Resumable by byte range: a 14 MB re-upload on a clinic connection is
       // a minute nobody has.
       fix: `The recording is held on this device. Retrying resumes from ${pct}%.`,

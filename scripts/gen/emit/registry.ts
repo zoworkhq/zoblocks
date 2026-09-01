@@ -363,6 +363,27 @@ const SUPPORT_ITEMS: BuildableItem[] = [
     ],
   },
   {
+    name: "menu-core",
+    type: "oxygen:lib",
+    title: "Context menu core",
+    description:
+      "The resolver behind ChartContextMenu: the subject line a masked row may not exceed, four consequence tiers with the field each one makes mandatory, availability that distinguishes pending from refused from withheld, the withheld count, the bulk demotion, and the disclosure record produced on every path including the abandoned one. Installed automatically with ChartContextMenu.",
+    dependencies: [] as string[],
+    registryDependencies: [] as string[],
+    files: [
+      {
+        path: "registry/oxygen/lib/menu.ts",
+        type: "oxygen:lib",
+        target: "lib/oxygen-menu.ts",
+      },
+      {
+        path: "registry/oxygen/lib/menu.css",
+        type: "oxygen:style",
+        target: "styles/oxygen-menu.css",
+      },
+    ],
+  },
+  {
     name: "switch-core",
     type: "oxygen:lib",
     title: "Switch core",

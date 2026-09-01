@@ -31,8 +31,8 @@ export const revalidate = 600;
 
 export default async function MarketplacePage() {
   const items = await shelf();
-  const ready = items.filter((item) => !item.comingSoon);
-  const announced = items.filter((item) => item.comingSoon);
+  const ready = items.filter((item) => item.purchasable);
+  const announced = items.filter((item) => !item.purchasable);
 
   return (
     <RevealRoot>
@@ -166,8 +166,13 @@ export default async function MarketplacePage() {
  * An article rather than one big link, because a published pack carries two
  * destinations — the detail page, and the console where it is actually bought.
  * The title owns the card through an overlay; the buy control sits above it.
- * An announced pack has one destination and no purchase: every path refuses
- * them, here as in the console.
+ * A pack nobody can buy has one destination and no purchase: every path
+ * refuses it, here as in the console.
+ *
+ * The card asks two different questions. Whether it can be bought — the badge
+ * and the control — is `purchasable`. Whether it exists to be described — its
+ * preview and its file count — is `comingSoon`. A shut shop is not a reason to
+ * show a finished pack as a placeholder.
  */
 function PackCard({ item, index }: { item: ShelfItem; index: number }) {
   return (
@@ -184,11 +189,11 @@ function PackCard({ item, index }: { item: ShelfItem; index: number }) {
       >
         <div className="flex items-baseline justify-between gap-3">
           <p className="eyebrow text-graphite-soft">{KIND_LABEL[item.kind]}</p>
-          {item.comingSoon ? (
+          {item.purchasable ? null : (
             <span className="rounded-full border border-rule px-2 py-0.5 font-mono text-[0.5625rem] uppercase tracking-wider text-graphite-soft">
               Coming soon
             </span>
-          ) : null}
+          )}
         </div>
 
         <h3 className="mt-3 font-display text-lg font-semibold tracking-[-0.015em]">
@@ -221,7 +226,7 @@ function PackCard({ item, index }: { item: ShelfItem; index: number }) {
             )}
           </div>
 
-          {item.comingSoon ? (
+          {!item.purchasable ? (
             /* A disabled button rather than a line of text: the slot holds a
                control on a purchasable pack, and a label where a button was
                reads as a missing button. `disabled` is what says the action

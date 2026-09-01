@@ -83,10 +83,7 @@ export function useRecorderSignal(options: UseRecorderSignalOptions = {}): {
   const onFrameRef = React.useRef(onFrame);
   onFrameRef.current = onFrame;
 
-  const signal = React.useMemo(
-    () => createSignal({ release, floor }),
-    [release, floor],
-  );
+  const signal = React.useMemo(() => createSignal({ release, floor }), [release, floor]);
 
   React.useEffect(() => {
     signal.setSource(source);
@@ -165,7 +162,16 @@ export interface RecorderFrameProps extends React.HTMLAttributes<HTMLDivElement>
  */
 export const RecorderFrame = React.forwardRef<HTMLDivElement, RecorderFrameProps>(
   function RecorderFrame(
-    { art, motion = "auto", hasSignal = true, fault = null, innerRef, className, children, ...rest },
+    {
+      art,
+      motion = "auto",
+      hasSignal = true,
+      fault = null,
+      innerRef,
+      className,
+      children,
+      ...rest
+    },
     ref,
   ) {
     return (
@@ -185,7 +191,11 @@ export const RecorderFrame = React.forwardRef<HTMLDivElement, RecorderFrameProps
 );
 
 /** The record tell. Present whenever capture is running — see recorder.css. */
-export function RecorderTell({ label = "Recording" }: { readonly label?: string }): React.JSX.Element {
+export function RecorderTell({
+  label = "Recording",
+}: {
+  readonly label?: string;
+}): React.JSX.Element {
   return <span className="ox-rec-tell">{label}</span>;
 }
 
@@ -213,10 +223,7 @@ export function RecorderFaultBanner({
 
 /** Fixed-width bars for a lane. Count is stable, so React never reconciles them. */
 export function RecorderBars({ count }: { readonly count: number }): React.JSX.Element {
-  const bars = React.useMemo(
-    () => Array.from({ length: count }, (_, index) => index),
-    [count],
-  );
+  const bars = React.useMemo(() => Array.from({ length: count }, (_, index) => index), [count]);
   return (
     <>
       {bars.map((index) => (

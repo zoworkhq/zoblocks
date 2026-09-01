@@ -20,8 +20,10 @@ import {
   ClinicalDateTime,
   DateField,
   DatePicker,
+  DateRangeField,
   SessionTimeField,
   TimeField,
+  TimeRangeField,
   AppointmentScheduler,
   Calendar,
   GroupSeriesScheduler,
@@ -37,9 +39,22 @@ import { ClockGlyph } from "@/lib/oxygen-datetime-field";
 import { buildSlots, type AvailabilitySet } from "@/lib/oxygen-availability";
 import {
   compareDates,
+  dateRangePresets,
+  endOfMonth,
+  endOfWeek,
+  endOfYear,
+  formatDuration,
+  matchRangePreset,
+  normalizeDateRange,
   plainDate,
   plainTime,
+  rangeContains,
+  rangeDayCount,
   sessionFrom,
+  startOfMonth,
+  startOfWeek,
+  startOfYear,
+  timeRangeMinutes,
   toIsoDate,
   withSessionEnd,
   type OxDate,
@@ -1084,7 +1099,7 @@ describe("month and year panes", () => {
     const { container } = render(
       <DatePicker variant="calendar" now={TODAY} defaultMonth={{ y: 2026, m: 9 }} />,
     );
-    const title = within(container).getByRole("button", { name: /Choose month and year/ });
+    const title = within(container).getByRole("button", { name: /choose month and year/i });
     expect(title.getAttribute("aria-expanded")).toBe("false");
 
     fireEvent.click(title);
@@ -1097,7 +1112,7 @@ describe("month and year panes", () => {
     expect(container.textContent).toContain("2024");
 
     // Pressing the title again closes the pane rather than cycling it.
-    const reopened = within(container).getByRole("button", { name: /Choose month and year/ });
+    const reopened = within(container).getByRole("button", { name: /choose month and year/i });
     fireEvent.click(reopened);
     fireEvent.click(reopened);
     expect(reopened.getAttribute("aria-expanded")).toBe("false");
@@ -2347,7 +2362,7 @@ describe("the arms a demo never reaches", () => {
     const { container } = render(
       <Calendar now={TODAY} defaultMonth={{ y: 2026, m: 9 }} monthNames={months} />,
     );
-    fireEvent.click(within(container).getByRole("button", { name: /Choose month and year/ }));
+    fireEvent.click(within(container).getByRole("button", { name: /choose month and year/i }));
     expect(within(container).getByRole("button", { name: "Abr" })).toBeTruthy();
   });
 
@@ -2797,5 +2812,896 @@ describe("duration chips without an organisation's bands", () => {
     // A band is a fact about somebody's payer contract. With none supplied the
     // component asserts nothing rather than guessing a code.
     expect(container.querySelector(".ox-dt-chip__code")).toBeNull();
+  });
+});
+
+/* ------------------------------------------------------------------ */
+/* Calendar periods and range algebra                                 */
+/* ------------------------------------------------------------------ */
+
+describe("calendar periods", () => {
+  it("starts a week where the locale says it does", () => {
+    // Wednesday 26 August 2026.
+    expect(toIsoDate(startOfWeek(TODAY, 0))).toBe("2026-08-23");
+    expect(toIsoDate(startOfWeek(TODAY, 1))).toBe("2026-08-24");
+    expect(toIsoDate(endOfWeek(TODAY, 0))).toBe("2026-08-29");
+    expect(toIsoDate(endOfWeek(TODAY, 1))).toBe("2026-08-30");
+  });
+
+  it("keeps a day that is already the first of its week", () => {
+    const sunday = plainDate(2026, 8, 23);
+    expect(toIsoDate(startOfWeek(sunday, 0))).toBe("2026-08-23");
+    const monday = plainDate(2026, 8, 24);
+    expect(toIsoDate(startOfWeek(monday, 1))).toBe("2026-08-24");
+  });
+
+  it("ends a month on its real last day, leap years included", () => {
+    expect(toIsoDate(endOfMonth(plainDate(2026, 2, 3)))).toBe("2026-02-28");
+    expect(toIsoDate(endOfMonth(plainDate(2028, 2, 3)))).toBe("2028-02-29");
+    expect(toIsoDate(startOfMonth(plainDate(2026, 8, 26)))).toBe("2026-08-01");
+    expect(toIsoDate(startOfYear(TODAY))).toBe("2026-01-01");
+    expect(toIsoDate(endOfYear(TODAY))).toBe("2026-12-31");
+  });
+});
+
+describe("the range algebra", () => {
+  it("counts both ends, because a span of service includes the day it ends", () => {
+    // An authorisation from the 1st to the 7th is seven days of care. The
+    // exclusive convention belongs to timestamps, and mixing the two bills a
+    // week of treatment as six days.
+    expect(rangeDayCount({ start: plainDate(2026, 8, 1), end: plainDate(2026, 8, 7) })).toBe(7);
+    expect(rangeDayCount({ start: TODAY, end: TODAY })).toBe(1);
+    expect(rangeDayCount({ start: TODAY, end: null })).toBeNull();
+  });
+
+  it("sorts the ends whichever way round they arrive", () => {
+    const backwards = { start: plainDate(2026, 9, 20), end: plainDate(2026, 9, 4) };
+    expect(toIsoDate(normalizeDateRange(backwards).start!)).toBe("2026-09-04");
+    expect(rangeDayCount(backwards)).toBe(17);
+    expect(rangeContains(backwards, plainDate(2026, 9, 10))).toBe(true);
+    expect(rangeContains(backwards, plainDate(2026, 9, 21))).toBe(false);
+  });
+
+  it("derives every preset from the injected now, and never from a clock", () => {
+    const presets = dateRangePresets(TODAY, { weekStart: 1 });
+    const by = (id: string) => presets.find((p) => p.id === id)!;
+    expect(toIsoDate(by("today").start)).toBe("2026-08-26");
+    expect(toIsoDate(by("yesterday").end)).toBe("2026-08-25");
+    expect(toIsoDate(by("this-week").start)).toBe("2026-08-24");
+    // Last week ends the day before this week starts — not seven days back
+    // from today, which would overlap the current week by four days.
+    expect(toIsoDate(by("last-week").start)).toBe("2026-08-17");
+    expect(toIsoDate(by("last-week").end)).toBe("2026-08-23");
+    expect(toIsoDate(by("this-month").end)).toBe("2026-08-31");
+    expect(toIsoDate(by("last-month").start)).toBe("2026-07-01");
+    expect(toIsoDate(by("last-month").end)).toBe("2026-07-31");
+    expect(toIsoDate(by("this-year").end)).toBe("2026-12-31");
+
+    // Same input, same output. This is what makes the whole surface testable
+    // and the gallery renderable in March.
+    expect(dateRangePresets(TODAY, { weekStart: 1 })).toEqual(presets);
+  });
+
+  it("recognises the preset a range matches, and reports none when it matches none", () => {
+    const presets = dateRangePresets(TODAY, { weekStart: 1 });
+    const thisMonth = presets.find((p) => p.id === "this-month")!;
+    expect(matchRangePreset({ start: thisMonth.start, end: thisMonth.end }, presets)?.id).toBe(
+      "this-month",
+    );
+    expect(
+      matchRangePreset({ start: plainDate(2026, 8, 3), end: plainDate(2026, 8, 9) }, presets),
+    ).toBeNull();
+    expect(matchRangePreset({ start: TODAY, end: null }, presets)).toBeNull();
+  });
+});
+
+describe("time ranges and durations", () => {
+  it("reports a negative span rather than clamping it to nothing", () => {
+    // The clamp destroys the information the field needs to say "ends before
+    // it starts" and offer a correction.
+    expect(timeRangeMinutes({ start: plainTime(10, 0), end: plainTime(7, 0) })).toBe(-180);
+    expect(
+      timeRangeMinutes(
+        { start: plainTime(22, 0), end: plainTime(6, 30) },
+        { allowOvernight: true },
+      ),
+    ).toBe(510);
+    expect(timeRangeMinutes({ start: plainTime(7, 0), end: plainTime(10, 0) })).toBe(180);
+    expect(timeRangeMinutes({ start: null, end: plainTime(10, 0) })).toBeNull();
+  });
+
+  it("spells a duration out, and abbreviates it only for a badge", () => {
+    expect(formatDuration(180)).toBe("3 hr");
+    expect(formatDuration(180, { compact: true })).toBe("3h");
+    expect(formatDuration(90, { compact: true })).toBe("1h 30m");
+    expect(formatDuration(45, { compact: true })).toBe("45m");
+  });
+});
+
+/* ------------------------------------------------------------------ */
+/* The multi-month calendar                                           */
+/* ------------------------------------------------------------------ */
+
+describe("two months at once", () => {
+  it("shows contiguous months, one grid each", () => {
+    const { container } = render(
+      <Calendar mode="range" months={2} now={TODAY} defaultMonth={{ y: 2026, m: 8 }} />,
+    );
+    const grids = within(container).getAllByRole("grid");
+    expect(grids.length).toBe(2);
+    expect(grids[0]!.getAttribute("aria-label")).toBe("August 2026");
+    expect(grids[1]!.getAttribute("aria-label")).toBe("September 2026");
+  });
+
+  it("keeps exactly one tabstop across the whole window", () => {
+    // Forty-two focusable cells is the most common accessibility failure in a
+    // date picker; two panels is eighty-four chances to make it.
+    const { container } = render(
+      <Calendar mode="range" months={2} now={TODAY} defaultMonth={{ y: 2026, m: 8 }} />,
+    );
+    expect(container.querySelectorAll('[role="gridcell"][tabindex="0"]').length).toBe(1);
+  });
+
+  it("hides the adjacent-month days, so no date is drawn twice", () => {
+    // Two adjacent panels overlap by up to a fortnight. Drawing the overlap
+    // twice gives the same date two cells, both matching the focus date, which
+    // is where the second tabstop comes from.
+    const { container } = render(
+      <Calendar mode="range" months={2} now={TODAY} defaultMonth={{ y: 2026, m: 8 }} />,
+    );
+    const names = [...container.querySelectorAll('[role="gridcell"][aria-label]')].map((cell) =>
+      cell.getAttribute("aria-label"),
+    );
+    expect(names.length).toBe(new Set(names).size);
+    expect(container.querySelectorAll(".ox-dt-cal__day--outside").length).toBe(0);
+
+    // One month keeps them: a single grid with holes at both ends reads as
+    // broken, and there is nothing to collide with.
+    const single = render(<Calendar now={TODAY} defaultMonth={{ y: 2026, m: 8 }} />);
+    expect(single.container.querySelectorAll(".ox-dt-cal__day--outside").length).toBeGreaterThan(0);
+  });
+
+  it("offers one control per direction, not one per month", () => {
+    const { container } = render(
+      <Calendar mode="range" months={2} now={TODAY} defaultMonth={{ y: 2026, m: 8 }} />,
+    );
+    const named = (pattern: RegExp) =>
+      [...container.querySelectorAll("button")].filter((b) =>
+        pattern.test(b.getAttribute("aria-label") ?? ""),
+      );
+    // Two buttons both announced "Previous month" and both doing the same
+    // thing is a riddle for anybody reading the dialog through its names.
+    expect(named(/previous/i).length).toBe(1);
+    expect(named(/next/i).length).toBe(1);
+  });
+
+  it("names each heading with the month it opens, so the visible text is in the name", () => {
+    // SC 2.5.3: the accessible name has to contain the visible label. "Choose
+    // month and year" alone contains none of "September 2026".
+    const { container } = render(
+      <Calendar months={2} now={TODAY} defaultMonth={{ y: 2026, m: 8 }} />,
+    );
+    expect(
+      within(container).getByRole("button", { name: /September 2026.*choose month and year/i }),
+    ).toBeTruthy();
+  });
+
+  it("pages the window by one month, keeping the pair contiguous", () => {
+    const { container } = render(
+      <Calendar months={2} now={TODAY} defaultMonth={{ y: 2026, m: 8 }} />,
+    );
+    fireEvent.click(within(container).getByRole("button", { name: /next/i }));
+    const grids = within(container).getAllByRole("grid");
+    expect(grids[0]!.getAttribute("aria-label")).toBe("September 2026");
+    expect(grids[1]!.getAttribute("aria-label")).toBe("October 2026");
+  });
+
+  it("survives paging without remounting the control that paged it", () => {
+    // Keying a panel by the month it shows destroys the button that was
+    // clicked, dropping focus to the body and detaching any grid a keyboard
+    // sequence was in the middle of.
+    const { container } = render(
+      <Calendar months={2} now={TODAY} defaultMonth={{ y: 2026, m: 8 }} />,
+    );
+    const next = within(container).getByRole("button", { name: /next/i });
+    fireEvent.click(next);
+    fireEvent.click(next);
+    expect(next.isConnected).toBe(true);
+    expect(within(container).getAllByRole("grid")[0]!.getAttribute("aria-label")).toBe(
+      "October 2026",
+    );
+  });
+
+  it("stops the header controls at min and max rather than paging past them", () => {
+    // A bounded calendar that still pages to 1823 enforces its limits only
+    // once somebody clicks a day.
+    const { container } = render(
+      <Calendar
+        now={TODAY}
+        defaultMonth={{ y: 2026, m: 8 }}
+        min={plainDate(2026, 8, 1)}
+        max={plainDate(2026, 9, 30)}
+      />,
+    );
+    const prev = within(container).getByRole("button", { name: /previous/i });
+    const next = within(container).getByRole("button", { name: /next/i });
+    expect(prev.getAttribute("aria-disabled")).toBe("true");
+    fireEvent.click(prev);
+    expect(within(container).getByRole("grid").getAttribute("aria-label")).toBe("August 2026");
+    fireEvent.click(next);
+    expect(next.getAttribute("aria-disabled")).toBe("true");
+    fireEvent.click(next);
+    expect(within(container).getByRole("grid").getAttribute("aria-label")).toBe("September 2026");
+  });
+});
+
+describe("the range band", () => {
+  const bandOf = (container: HTMLElement) =>
+    [...container.querySelectorAll(".ox-dt-cal__day--in-range")].map((n) =>
+      n.getAttribute("aria-label"),
+    );
+
+  it("covers the whole span, endpoints included", () => {
+    // A band that starts a cell late reads as though the day it bounds were
+    // outside the range it bounds.
+    const { container } = render(
+      <Calendar
+        mode="range"
+        now={TODAY}
+        defaultMonth={{ y: 2026, m: 8 }}
+        range={{ start: plainDate(2026, 8, 10), end: plainDate(2026, 8, 14) }}
+      />,
+    );
+    expect(bandOf(container).length).toBe(5);
+    expect(container.querySelectorAll(".ox-dt-cal__day--range-lo").length).toBe(1);
+    expect(container.querySelectorAll(".ox-dt-cal__day--range-hi").length).toBe(1);
+  });
+
+  it("caps the band at every week boundary, not only at the ends of the range", () => {
+    const { container } = render(
+      <Calendar
+        mode="range"
+        weekStart={1}
+        now={TODAY}
+        defaultMonth={{ y: 2026, m: 8 }}
+        range={{ start: plainDate(2026, 8, 3), end: plainDate(2026, 8, 23) }}
+      />,
+    );
+    // Three whole Monday-to-Sunday weeks: each row is capped at both ends.
+    expect(container.querySelectorAll(".ox-dt-cal__day--week-lo").length).toBe(3);
+    expect(container.querySelectorAll(".ox-dt-cal__day--week-hi").length).toBe(3);
+  });
+
+  it("names every cell by its part in the range", () => {
+    const { container } = render(
+      <Calendar
+        mode="range"
+        now={TODAY}
+        defaultMonth={{ y: 2026, m: 8 }}
+        range={{ start: plainDate(2026, 8, 10), end: plainDate(2026, 8, 12) }}
+      />,
+    );
+    expect(
+      within(container).getByRole("gridcell", { name: /start of the selected range/ }),
+    ).toBeTruthy();
+    expect(
+      within(container).getByRole("gridcell", { name: /end of the selected range/ }),
+    ).toBeTruthy();
+    expect(
+      within(container).getByRole("gridcell", { name: /within the selected range/ }),
+    ).toBeTruthy();
+  });
+
+  it("draws the band across a month boundary", () => {
+    const { container } = render(
+      <Calendar
+        mode="range"
+        months={2}
+        now={TODAY}
+        defaultMonth={{ y: 2026, m: 8 }}
+        range={{ start: plainDate(2026, 8, 30), end: plainDate(2026, 9, 2) }}
+      />,
+    );
+    expect(bandOf(container).length).toBe(4);
+  });
+});
+
+describe("named periods down the side", () => {
+  const PRESETS = dateRangePresets(TODAY, { weekStart: 1 });
+
+  it("takes a whole range in one press, and moves the window to it", () => {
+    const onRangeChange = vi.fn();
+    const { container } = render(
+      <Calendar
+        mode="range"
+        months={2}
+        weekStart={1}
+        now={TODAY}
+        presets={PRESETS}
+        defaultMonth={{ y: 2026, m: 8 }}
+        onRangeChange={onRangeChange}
+      />,
+    );
+    fireEvent.click(within(container).getByRole("button", { name: "Last month" }));
+    expect(onRangeChange).toHaveBeenCalledWith({
+      start: plainDate(2026, 7, 1),
+      end: plainDate(2026, 7, 31),
+    });
+    // The window follows: a preset that selects a month you cannot see has
+    // told you nothing.
+    expect(within(container).getAllByRole("grid")[0]!.getAttribute("aria-label")).toBe("July 2026");
+  });
+
+  it("presses the preset the current range matches, and Custom when none does", () => {
+    const thisMonth = PRESETS.find((p) => p.id === "this-month")!;
+    const { container, rerender } = render(
+      <Calendar
+        mode="range"
+        now={TODAY}
+        presets={PRESETS}
+        showCustomPreset
+        range={{ start: thisMonth.start, end: thisMonth.end }}
+      />,
+    );
+    expect(
+      within(container).getByRole("button", { name: "This month" }).getAttribute("aria-pressed"),
+    ).toBe("true");
+    expect(
+      within(container).getByRole("button", { name: "Custom" }).getAttribute("aria-pressed"),
+    ).toBe("false");
+
+    rerender(
+      <Calendar
+        mode="range"
+        now={TODAY}
+        presets={PRESETS}
+        showCustomPreset
+        range={{ start: plainDate(2026, 8, 3), end: plainDate(2026, 8, 9) }}
+      />,
+    );
+    // A reader who built their own range must still be able to read their own
+    // state; a rail with nothing pressed says the selection is nothing.
+    expect(
+      within(container).getByRole("button", { name: "Custom" }).getAttribute("aria-pressed"),
+    ).toBe("true");
+  });
+
+  it("offers no rail at all outside range mode", () => {
+    const { container } = render(<Calendar now={TODAY} presets={PRESETS} />);
+    expect(container.querySelector(".ox-dt-cal__rail")).toBeNull();
+  });
+});
+
+describe("named dates down the side", () => {
+  const SHORTCUTS = relativeDateOptions(TODAY);
+
+  it("takes a single date in one press, and moves the window to it", () => {
+    const onChange = vi.fn();
+    const { container } = render(
+      <Calendar
+        now={TODAY}
+        defaultMonth={{ y: 2026, m: 8 }}
+        shortcuts={SHORTCUTS}
+        onChange={onChange}
+      />,
+    );
+    fireEvent.click(within(container).getByRole("button", { name: "In 2 weeks" }));
+    expect(onChange).toHaveBeenCalledWith(plainDate(2026, 9, 9));
+    // A shortcut that selects a month you cannot see has told you nothing.
+    expect(within(container).getByRole("grid").getAttribute("aria-label")).toBe("September 2026");
+  });
+
+  it("toggles rather than replaces in multiple mode", () => {
+    // Every other press in this mode toggles; a rail that replaced the whole
+    // set would be the one control that behaved differently.
+    const onDatesChange = vi.fn();
+    const { container } = render(
+      <Calendar
+        mode="multiple"
+        now={TODAY}
+        defaultMonth={{ y: 2026, m: 8 }}
+        shortcuts={SHORTCUTS}
+        defaultDates={[plainDate(2026, 8, 4)]}
+        onDatesChange={onDatesChange}
+      />,
+    );
+    const today = within(container).getByRole("button", { name: "Today" });
+    fireEvent.click(today);
+    expect(onDatesChange).toHaveBeenLastCalledWith([plainDate(2026, 8, 4), TODAY]);
+    expect(today.getAttribute("aria-pressed")).toBe("true");
+    fireEvent.click(today);
+    expect(onDatesChange).toHaveBeenLastCalledWith([plainDate(2026, 8, 4)]);
+  });
+
+  it("presses the shortcut the value matches", () => {
+    const { container } = render(
+      <Calendar now={TODAY} defaultMonth={{ y: 2026, m: 8 }} shortcuts={SHORTCUTS} value={TODAY} />,
+    );
+    expect(
+      within(container).getByRole("button", { name: "Today" }).getAttribute("aria-pressed"),
+    ).toBe("true");
+    expect(
+      within(container).getByRole("button", { name: "Tomorrow" }).getAttribute("aria-pressed"),
+    ).toBe("false");
+  });
+
+  it("presses Custom only once there is a selection the rail cannot name", () => {
+    // An empty calendar has not been customised; it has not been answered.
+    const empty = render(
+      <Calendar
+        now={TODAY}
+        defaultMonth={{ y: 2026, m: 8 }}
+        shortcuts={SHORTCUTS}
+        showCustomPreset
+      />,
+    );
+    expect(
+      within(empty.container).getByRole("button", { name: "Custom" }).getAttribute("aria-pressed"),
+    ).toBe("false");
+
+    const named = render(
+      <Calendar
+        now={TODAY}
+        defaultMonth={{ y: 2026, m: 8 }}
+        shortcuts={SHORTCUTS}
+        showCustomPreset
+        value={TODAY}
+      />,
+    );
+    expect(
+      within(named.container).getByRole("button", { name: "Custom" }).getAttribute("aria-pressed"),
+    ).toBe("false");
+
+    const own = render(
+      <Calendar
+        now={TODAY}
+        defaultMonth={{ y: 2026, m: 8 }}
+        shortcuts={SHORTCUTS}
+        showCustomPreset
+        value={plainDate(2026, 8, 4)}
+      />,
+    );
+    expect(
+      within(own.container).getByRole("button", { name: "Custom" }).getAttribute("aria-pressed"),
+    ).toBe("true");
+  });
+
+  it("names the rail for what it holds", () => {
+    const dates = render(<Calendar now={TODAY} shortcuts={SHORTCUTS} />);
+    expect(within(dates.container).getByRole("group", { name: "Named dates" })).toBeTruthy();
+    const periods = render(<Calendar mode="range" now={TODAY} presets={dateRangePresets(TODAY)} />);
+    expect(within(periods.container).getByRole("group", { name: "Named periods" })).toBeTruthy();
+  });
+
+  it("reaches the popover calendar through the field", () => {
+    const onChange = vi.fn();
+    render(
+      <DateField
+        label="Appointment date"
+        showCalendar
+        now={TODAY}
+        calendarShortcuts={SHORTCUTS}
+        calendarHints
+        onChange={onChange}
+      />,
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Choose from calendar" }));
+    const panel = screen.getByRole("dialog", { name: "Appointment date" });
+    expect(panel.querySelector(".ox-dt-cal__hints")).toBeTruthy();
+    fireEvent.click(within(panel).getByRole("button", { name: "Next Monday" }));
+    expect(onChange).toHaveBeenCalledWith(plainDate(2026, 8, 31));
+  });
+
+  it("gives a birth date the legend and no rail", () => {
+    // There is no "Today" for a date of birth, and a shortcut nobody can use
+    // is a row between the reader and the year they came for.
+    render(<BirthDateField calendarHints now={TODAY} />);
+    fireEvent.click(screen.getByRole("button", { name: /calendar/i }));
+    const panel = screen.getByRole("dialog");
+    expect(panel.querySelector(".ox-dt-cal__hints")).toBeTruthy();
+    expect(panel.querySelector(".ox-dt-cal__rail")).toBeNull();
+  });
+});
+
+describe("committing a range explicitly", () => {
+  it("tells the host nothing until Done", () => {
+    // A range is built by two clicks and the first is often wrong. A parent
+    // told about the half-built one has already filtered a report on a range
+    // nobody chose.
+    const onRangeChange = vi.fn();
+    const { container } = render(
+      <Calendar
+        mode="range"
+        commit="explicit"
+        now={TODAY}
+        defaultMonth={{ y: 2026, m: 8 }}
+        onRangeChange={onRangeChange}
+      />,
+    );
+    const day = (n: number) =>
+      within(container).getByRole("gridcell", { name: new RegExp(`August ${n}, 2026`) });
+
+    fireEvent.click(day(10));
+    expect(onRangeChange).not.toHaveBeenCalled();
+    // The draft is still drawn, or there is nothing to correct.
+    expect(container.querySelectorAll(".ox-dt-cal__day--selected").length).toBe(1);
+
+    fireEvent.click(day(14));
+    expect(onRangeChange).not.toHaveBeenCalled();
+
+    fireEvent.click(within(container).getByRole("button", { name: "Done" }));
+    expect(onRangeChange).toHaveBeenCalledWith({
+      start: plainDate(2026, 8, 10),
+      end: plainDate(2026, 8, 14),
+    });
+  });
+
+  it("keeps Done unpressable until the range is whole", () => {
+    const { container } = render(
+      <Calendar mode="range" commit="explicit" now={TODAY} defaultMonth={{ y: 2026, m: 8 }} />,
+    );
+    const done = within(container).getByRole("button", { name: "Done" }) as HTMLButtonElement;
+    expect(done.disabled).toBe(true);
+    fireEvent.click(within(container).getByRole("gridcell", { name: /August 10, 2026/ }));
+    // One end is not a range.
+    expect(done.disabled).toBe(true);
+    fireEvent.click(within(container).getByRole("gridcell", { name: /August 14, 2026/ }));
+    expect(done.disabled).toBe(false);
+  });
+
+  it("throws the draft away on Cancel", () => {
+    const onCancel = vi.fn();
+    const onRangeChange = vi.fn();
+    const { container } = render(
+      <Calendar
+        mode="range"
+        commit="explicit"
+        now={TODAY}
+        defaultMonth={{ y: 2026, m: 8 }}
+        onCancel={onCancel}
+        onRangeChange={onRangeChange}
+      />,
+    );
+    fireEvent.click(within(container).getByRole("gridcell", { name: /August 10, 2026/ }));
+    fireEvent.click(within(container).getByRole("button", { name: "Cancel" }));
+    expect(onCancel).toHaveBeenCalled();
+    expect(onRangeChange).not.toHaveBeenCalled();
+    expect(container.querySelectorAll(".ox-dt-cal__day--selected").length).toBe(0);
+  });
+
+  it("reports every click when the commit is immediate, which stays the default", () => {
+    const onRangeChange = vi.fn();
+    const { container } = render(
+      <Calendar
+        mode="range"
+        now={TODAY}
+        defaultMonth={{ y: 2026, m: 8 }}
+        onRangeChange={onRangeChange}
+      />,
+    );
+    fireEvent.click(within(container).getByRole("gridcell", { name: /August 10, 2026/ }));
+    expect(onRangeChange).toHaveBeenCalledTimes(1);
+    expect(container.querySelector(".ox-dt-cal__action")).toBeNull();
+  });
+
+  it("opens on an uncontrolled range and set of dates", () => {
+    const range = render(
+      <Calendar
+        mode="range"
+        now={TODAY}
+        defaultMonth={{ y: 2026, m: 8 }}
+        defaultRange={{ start: plainDate(2026, 8, 10), end: plainDate(2026, 8, 12) }}
+      />,
+    );
+    expect(range.container.querySelectorAll(".ox-dt-cal__day--in-range").length).toBe(3);
+
+    const dates = render(
+      <Calendar
+        mode="multiple"
+        now={TODAY}
+        defaultMonth={{ y: 2026, m: 8 }}
+        defaultDates={[plainDate(2026, 8, 4), plainDate(2026, 8, 9)]}
+      />,
+    );
+    expect(dates.container.querySelectorAll(".ox-dt-cal__day--selected").length).toBe(2);
+  });
+});
+
+describe("the keyboard legend", () => {
+  it("is drawn for the eye and hidden from the announcement", () => {
+    // A screen-reader user is told how to drive a grid by the grid. Repeating
+    // it in the footer is one more thing to page past.
+    const { container } = render(<Calendar now={TODAY} hints />);
+    const hints = container.querySelector(".ox-dt-cal__hints");
+    expect(hints).toBeTruthy();
+    expect(hints!.getAttribute("aria-hidden")).toBe("true");
+    expect(
+      render(<Calendar now={TODAY} />).container.querySelector(".ox-dt-cal__hints"),
+    ).toBeNull();
+  });
+});
+
+/* ------------------------------------------------------------------ */
+/* The date range field                                               */
+/* ------------------------------------------------------------------ */
+
+describe("the date range field", () => {
+  it("is one shell holding two named fields", () => {
+    const { container } = render(<DateRangeField label="Authorisation window" now={TODAY} />);
+    const groups = [...container.querySelectorAll(".ox-dt-field")];
+    expect(groups.length).toBe(2);
+    // "Date" twice is a riddle: a reader arriving at the second half has no
+    // way to know which end they are in.
+    expect(groups.map((g) => g.getAttribute("aria-label"))).toEqual(["Start date", "End date"]);
+  });
+
+  it("emits a range as each half is typed", async () => {
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    const { container } = render(<DateRangeField now={TODAY} onChange={onChange} />);
+    const [start] = [...container.querySelectorAll<HTMLElement>(".ox-dt-field")];
+    start!.focus();
+    await user.keyboard("08102026");
+    expect(onChange).toHaveBeenLastCalledWith({ start: plainDate(2026, 8, 10), end: null });
+  });
+
+  it("counts the span inclusively, and refuses to count a backwards one", () => {
+    const ordered = render(
+      <DateRangeField
+        now={TODAY}
+        showSpan
+        defaultValue={{ start: plainDate(2026, 8, 1), end: plainDate(2026, 8, 7) }}
+      />,
+    );
+    expect(ordered.container.querySelector(".ox-dt-range__span")?.textContent).toBe("7 days");
+
+    const backwards = render(
+      <DateRangeField
+        now={TODAY}
+        showSpan
+        defaultValue={{ start: plainDate(2026, 9, 20), end: plainDate(2026, 9, 4) }}
+      />,
+    );
+    // "17 days" beside a range that runs backwards reads as a value the field
+    // has accepted.
+    expect(backwards.container.querySelector(".ox-dt-range__span")).toBeNull();
+  });
+
+  it("blocks a backwards range assertively and marks the field invalid", () => {
+    const { container } = render(
+      <DateRangeField
+        now={TODAY}
+        defaultValue={{ start: plainDate(2026, 9, 20), end: plainDate(2026, 9, 4) }}
+      />,
+    );
+    const alert = within(container).getByRole("alert");
+    expect(alert.textContent).toMatch(/end date is before the start date/i);
+    for (const field of container.querySelectorAll(".ox-dt-field")) {
+      expect(field.getAttribute("aria-invalid")).toBe("true");
+    }
+  });
+
+  it("says how long a refused span actually is", () => {
+    // A bound stated without the measurement is a rule the reader has to
+    // reverse-engineer by trying again.
+    const { container } = render(
+      <DateRangeField
+        now={TODAY}
+        maxSpanDays={30}
+        defaultValue={{ start: plainDate(2026, 8, 1), end: plainDate(2026, 9, 30) }}
+      />,
+    );
+    expect(within(container).getByRole("alert").textContent).toMatch(/30 days or fewer.*61/);
+
+    const tooShort = render(
+      <DateRangeField
+        now={TODAY}
+        minSpanDays={7}
+        defaultValue={{ start: plainDate(2026, 8, 1), end: plainDate(2026, 8, 3) }}
+      />,
+    );
+    expect(within(tooShort.container).getByRole("alert").textContent).toMatch(/at least 7 days/);
+  });
+
+  it("posts both ends as ISO, never as the locale rendering", () => {
+    const { container } = render(
+      <DateRangeField
+        name="auth"
+        now={TODAY}
+        defaultValue={{ start: plainDate(2026, 8, 1), end: plainDate(2026, 9, 30) }}
+      />,
+    );
+    const inputs = [...container.querySelectorAll<HTMLInputElement>('input[type="hidden"]')];
+    expect(inputs.map((i) => [i.name, i.value])).toEqual([
+      ["auth-start", "2026-08-01"],
+      ["auth-end", "2026-09-30"],
+    ]);
+  });
+
+  it("opens a two-month panel with its rail, and commits on Done", () => {
+    const onChange = vi.fn();
+    render(
+      <DateRangeField
+        label="Reporting period"
+        now={TODAY}
+        weekStart={1}
+        presets={dateRangePresets(TODAY, { weekStart: 1 })}
+        onChange={onChange}
+      />,
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Choose from calendar" }));
+    const panel = screen.getByRole("dialog", { name: "Reporting period" });
+    expect(within(panel).getAllByRole("grid").length).toBe(2);
+
+    fireEvent.click(within(panel).getByRole("button", { name: "Last month" }));
+    // The rail edits the draft; nothing reaches the host until Done.
+    expect(onChange).not.toHaveBeenCalled();
+    fireEvent.click(within(panel).getByRole("button", { name: "Done" }));
+    expect(onChange).toHaveBeenCalledWith({
+      start: plainDate(2026, 7, 1),
+      end: plainDate(2026, 7, 31),
+    });
+  });
+});
+
+/* ------------------------------------------------------------------ */
+/* The time range field                                               */
+/* ------------------------------------------------------------------ */
+
+describe("the time range field", () => {
+  const RANGE = { start: plainTime(7, 0), end: plainTime(10, 0) };
+
+  it("derives the length and keeps it beside the value", () => {
+    // A start typed as PM when the reader meant AM is invisible in
+    // 7:00 -> 10:00 and unmissable as a length.
+    const { container } = render(<TimeRangeField label="Time range" defaultValue={RANGE} />);
+    expect(container.querySelector(".ox-dt-range__span")?.textContent).toBe("3h");
+  });
+
+  it("refuses an end before its start, and says what would allow it", () => {
+    const { container } = render(
+      <TimeRangeField defaultValue={{ start: plainTime(10, 0), end: plainTime(7, 0) }} />,
+    );
+    expect(within(container).getByRole("alert").textContent).toMatch(/overnight/i);
+  });
+
+  it("accepts a night shift and states the crossing in words", () => {
+    // Refusing 22:00 to 06:30 teaches staff to type the wrong time to get
+    // past the validator, which is how the real data is lost.
+    const { container } = render(
+      <TimeRangeField
+        allowOvernight
+        defaultValue={{ start: plainTime(22, 0), end: plainTime(6, 30) }}
+      />,
+    );
+    expect(container.querySelector(".ox-dt-range__span")?.textContent).toBe("8h 30m");
+    const note = within(container).getByRole("status");
+    expect(note.textContent).toMatch(/next day/i);
+    // Legal and unusual is an advisory, never an error.
+    expect(container.querySelector('[role="alert"]')).toBeNull();
+  });
+
+  it("reports a span outside the stated bounds with the measurement in it", () => {
+    const tooLong = render(<TimeRangeField maxDurationMinutes={60} defaultValue={RANGE} />);
+    expect(within(tooLong.container).getByRole("alert").textContent).toMatch(/3 hr.*1 hr/);
+    const tooShort = render(
+      <TimeRangeField
+        minDurationMinutes={60}
+        defaultValue={{ start: plainTime(7, 0), end: plainTime(7, 30) }}
+      />,
+    );
+    expect(within(tooShort.container).getByRole("alert").textContent).toMatch(/30 min.*1 hr/);
+  });
+
+  it("offers two columns and strikes every end that cannot be one", () => {
+    render(<TimeRangeField label="Time range" stepMinutes={60} defaultValue={RANGE} />);
+    fireEvent.click(screen.getByRole("button", { name: "Choose from a list of times" }));
+    const panel = screen.getByRole("dialog", { name: "Time range" });
+    const [starts, ends] = within(panel).getAllByRole("listbox");
+    expect(
+      starts!.getAttribute("aria-label") ?? within(panel).getAllByRole("listbox").length,
+    ).toBeTruthy();
+    expect(within(starts!).getAllByRole("option").length).toBe(24);
+
+    // Offering a time that will be rejected on commit is how a booking form
+    // teaches people to distrust it.
+    const blocked = within(ends!)
+      .getAllByRole("option")
+      .filter((o) => o.getAttribute("aria-disabled") === "true");
+    expect(blocked.length).toBe(8);
+    expect(blocked[0]!.getAttribute("aria-label")).toMatch(/unavailable, before the start time/);
+  });
+
+  it("keeps one tabstop per column", () => {
+    render(<TimeRangeField label="Time range" defaultValue={RANGE} />);
+    fireEvent.click(screen.getByRole("button", { name: "Choose from a list of times" }));
+    for (const list of within(screen.getByRole("dialog")).getAllByRole("listbox")) {
+      expect(list.querySelectorAll('[tabindex="0"]').length).toBe(1);
+    }
+  });
+
+  it("drops an end the new start has invalidated rather than dragging it", () => {
+    // Which of the two the reader meant to move is not knowable, and inventing
+    // an answer is how a picker books the wrong hour.
+    const onChange = vi.fn();
+    render(
+      <TimeRangeField
+        label="Time range"
+        stepMinutes={60}
+        commit="immediate"
+        defaultValue={RANGE}
+        onChange={onChange}
+      />,
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Choose from a list of times" }));
+    const [starts] = within(screen.getByRole("dialog")).getAllByRole("listbox");
+    fireEvent.click(within(starts!).getByRole("option", { name: "2:00 PM" }));
+    expect(onChange).toHaveBeenLastCalledWith({ start: plainTime(14, 0), end: null });
+  });
+
+  it("holds the panel's edits behind Done, and throws them away on Cancel", () => {
+    const onChange = vi.fn();
+    render(
+      <TimeRangeField
+        label="Time range"
+        stepMinutes={60}
+        defaultValue={RANGE}
+        onChange={onChange}
+      />,
+    );
+    const open = () =>
+      fireEvent.click(screen.getByRole("button", { name: "Choose from a list of times" }));
+
+    open();
+    let panel = screen.getByRole("dialog");
+    fireEvent.click(
+      within(within(panel).getAllByRole("listbox")[1]!).getByRole("option", { name: "1:00 PM" }),
+    );
+    expect(onChange).not.toHaveBeenCalled();
+    fireEvent.click(within(panel).getByRole("button", { name: "Cancel" }));
+    expect(onChange).not.toHaveBeenCalled();
+
+    open();
+    panel = screen.getByRole("dialog");
+    fireEvent.click(
+      within(within(panel).getAllByRole("listbox")[1]!).getByRole("option", { name: "1:00 PM" }),
+    );
+    fireEvent.click(within(panel).getByRole("button", { name: "Done" }));
+    expect(onChange).toHaveBeenCalledWith({ start: plainTime(7, 0), end: plainTime(13, 0) });
+  });
+
+  it("posts both ends as 24-hour HH:MM", () => {
+    const { container } = render(<TimeRangeField name="shift" defaultValue={RANGE} />);
+    const inputs = [...container.querySelectorAll<HTMLInputElement>('input[type="hidden"]')];
+    expect(inputs.map((i) => [i.name, i.value])).toEqual([
+      ["shift-start", "07:00"],
+      ["shift-end", "10:00"],
+    ]);
+  });
+
+  it("will not resolve a bare hour it was handed", async () => {
+    // The same refusal TimeField makes: a bare 9 guessed as morning turns a
+    // 9 PM discharge into a 9 AM one.
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    const { container } = render(<TimeRangeField onChange={onChange} />);
+    const [start] = [...container.querySelectorAll<HTMLElement>(".ox-dt-field")];
+    start!.focus();
+    await user.paste("9");
+    expect(onChange).not.toHaveBeenCalled();
+  });
+});
+
+/* ------------------------------------------------------------------ */
+/* The two new variants reach their parts                              */
+/* ------------------------------------------------------------------ */
+
+describe("the range variants", () => {
+  it("dispatches date-range and time-range to their own fields", () => {
+    const dates = render(<DatePicker variant="date-range" label="Window" now={TODAY} />);
+    expect(dates.container.querySelector("[data-ox-date-range]")).toBeTruthy();
+
+    const times = render(<DatePicker variant="time-range" label="Shift" />);
+    expect(times.container.querySelector("[data-ox-time-range]")).toBeTruthy();
   });
 });

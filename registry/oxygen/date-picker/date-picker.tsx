@@ -1,20 +1,21 @@
 "use client";
 
 /**
- * DatePicker — one temporal control, fourteen variants.
+ * DatePicker — one temporal control, sixteen variants.
  *
  *     <DatePicker variant="picker"     label="Appointment date" now={today} />
  *     <DatePicker variant="birth-date" now={today} allowEstimated allowAbsent />
  *     <DatePicker variant="session"    durationPresets={org.presets} />
  *     <DatePicker variant="slots"      set={availability} now={now} />
+ *     <DatePicker variant="date-range" months={2} presets={dateRangePresets(today)} />
  *
- * **Why one component rather than eleven.** A clinician does not shop for a
+ * **Why one component rather than sixteen.** A clinician does not shop for a
  * "birth date field". They reach for the date control, and it needs to behave
- * differently in fourteen places: a service date they already know, an
+ * differently in sixteen places: a service date they already know, an
  * appointment they have to be shown, a birth date that wants an age beside it,
  * a session that is three numbers with two degrees of freedom, a course of
  * treatment that is a rule rather than a date, and a signed timestamp that is
- * a legal instrument. Splitting those into fourteen catalogue entries hides
+ * a legal instrument. Splitting those into sixteen catalogue entries hides
  * the thing that makes them a system — that every one of them shares a value
  * space, a keyboard model and an accessibility contract. Tabs made the same
  * call for the same reason.
@@ -40,22 +41,26 @@ import {
   Calendar,
   ClinicalDateTime,
   DateField,
+  DateRangeField,
   GroupSeriesScheduler,
   RecurrenceField,
   RecurringSeriesScheduler,
   SessionTimeField,
   TimeField,
+  TimeRangeField,
   TimeSlotGrid,
   type AppointmentSchedulerProps,
   type BirthDateFieldProps,
   type CalendarProps,
   type ClinicalDateTimeProps,
   type DateFieldProps,
+  type DateRangeFieldProps,
   type GroupSeriesSchedulerProps,
   type RecurrenceFieldProps,
   type RecurringSeriesSchedulerProps,
   type SessionTimeFieldProps,
   type TimeFieldProps,
+  type TimeRangeFieldProps,
   type TimeSlotGridProps,
 } from "@/lib/oxygen-datetime-parts";
 
@@ -73,6 +78,8 @@ export type DatePickerVariant =
   | "calendar"
   /** Two clicks, never a drag. */
   | "range"
+  /** Both ends typeable, two months behind them, named periods down the side. */
+  | "date-range"
   /** Several dates, capped, click-again to remove. */
   | "multiple"
   /** Age beside it, partial dates, absence with a reason. */
@@ -81,6 +88,8 @@ export type DatePickerVariant =
   | "time"
   /** Start, end and duration, with a visible driver. */
   | "session"
+  /** A start time, an end time, and the length between them. */
+  | "time-range"
   /** Availability as a grid, grouped and counted. */
   | "slots"
   /** Provider, date and time on one surface. */
@@ -97,7 +106,7 @@ export type DatePickerVariant =
 /** Every variant carries the same clock contract: nothing reads the wall clock. */
 export interface DatePickerCommonProps {
   /**
-   * Which of the fourteen temporal controls to render. They share one contract and one
+   * Which of the sixteen temporal controls to render. They share one contract and one
    * keyboard model; this picks the surface.
    */
   variant?: DatePickerVariant;
@@ -116,13 +125,17 @@ export interface DatePickerCommonProps {
  */
 export type DatePickerProps =
   | ({
-      /** Which of the fourteen temporal controls to render. Defaults to the date field. */
+      /** Which of the sixteen temporal controls to render. Defaults to the date field. */
       variant?: "picker" | "field";
     } & DateFieldProps & { showCalendar?: boolean })
   | ({
       /** A month grid. `range` is two clicks, `multiple` is a capped set. */
       variant: "calendar" | "range" | "multiple";
     } & CalendarProps)
+  | ({
+      /** A span of days: two typeable ends, a two-month panel, named periods. */
+      variant: "date-range";
+    } & DateRangeFieldProps)
   | ({
       /** A date of birth, with its own precision and absence handling. */
       variant: "birth-date";
@@ -135,6 +148,10 @@ export type DatePickerProps =
       /** A start, an end and a derived duration that may cross midnight. */
       variant: "session";
     } & SessionTimeFieldProps)
+  | ({
+      /** A start time, an end time, and a derived length. */
+      variant: "time-range";
+    } & TimeRangeFieldProps)
   | ({
       /** A grid of bookable times. */
       variant: "slots";
@@ -164,8 +181,8 @@ export type DatePickerProps =
  * The front door.
  *
  * Deliberately a dispatch and nothing else: every behaviour lives in the part
- * it belongs to, so this file cannot become the place where eleven variants
- * quietly grow eleven different answers to what Escape does.
+ * it belongs to, so this file cannot become the place where sixteen variants
+ * quietly grow sixteen different answers to what Escape does.
  */
 export function DatePicker(props: DatePickerProps) {
   switch (props.variant) {
@@ -175,6 +192,10 @@ export function DatePicker(props: DatePickerProps) {
       return <Calendar {...(props as CalendarProps)} mode="range" />;
     case "multiple":
       return <Calendar {...(props as CalendarProps)} mode="multiple" />;
+    case "date-range":
+      return <DateRangeField {...(props as DateRangeFieldProps)} />;
+    case "time-range":
+      return <TimeRangeField {...(props as TimeRangeFieldProps)} />;
     case "birth-date":
       return <BirthDateField {...(props as BirthDateFieldProps)} />;
     case "time":
@@ -217,11 +238,13 @@ export {
   Calendar,
   ClinicalDateTime,
   DateField,
+  DateRangeField,
   GroupSeriesScheduler,
   RecurrenceField,
   RecurringSeriesScheduler,
   SessionTimeField,
   TimeField,
+  TimeRangeField,
   TimeSlotGrid,
   BEHAVIORAL_HEALTH_DURATIONS,
   dateToSegments,
@@ -239,6 +262,7 @@ export {
   type CalendarProps,
   type ClinicalDateTimeProps,
   type DateFieldProps,
+  type DateRangeFieldProps,
   type DayLoad,
   type GroupSeriesSchedulerProps,
   type RecurrenceEnd,
@@ -250,5 +274,6 @@ export {
   type SessionTimeFieldProps,
   type TemporalPolicy,
   type TimeFieldProps,
+  type TimeRangeFieldProps,
   type TimeSlotGridProps,
 } from "@/lib/oxygen-datetime-parts";

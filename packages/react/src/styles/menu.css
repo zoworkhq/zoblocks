@@ -1,0 +1,668 @@
+/**
+ * ChartContextMenu — a popup whose first row is not a verb.
+ *
+ * Three things here are load-bearing rather than decorative.
+ *
+ * The subject header is a *surface*, not a row: it must read as inert in
+ * every theme, including forced-colours mode where its background is thrown
+ * away — so it carries a border as well as a tint.
+ *
+ * The confirmation and reason strips are drawn *under the row they belong to*
+ * rather than replacing the list. Rows above them do not move, so the pointer
+ * is still over the verb it chose when the second step appears.
+ *
+ * A pending row is a placeholder at its final height. Every alternative —
+ * omitting it, appending it later, collapsing it to zero — moves the rows
+ * below it under a pointer that is already in flight.
+ */
+
+.ox-menu {
+  /*
+   * Fixed, and portalled into `<body>`. Viewport coordinates are what a
+   * pointer event gives you, and translating them into some ancestor's
+   * coordinate space is one `overflow: hidden` away from a menu clipped by
+   * the pane it opened in.
+   */
+  position: fixed;
+  z-index: 60;
+  /*
+   * Three rows: the subject, the list, the withheld count. Only the middle one
+   * scrolls, so a long menu never scrolls its own subject out of view — which
+   * would defeat the whole point of having one.
+   */
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  min-inline-size: 15.75rem;
+  max-inline-size: 20rem;
+  border: 1px solid var(--ox-menu-border, var(--ox-border, #e2e8f0));
+  border-radius: var(--ox-menu-radius, var(--ox-radius-lg, 8px));
+  background: var(--ox-menu-bg, var(--ox-surface-overlay, var(--ox-surface, #ffffff)));
+  color: var(--ox-text, inherit);
+  box-shadow: var(--ox-shadow-lg, 0 12px 32px rgb(0 0 0 / 0.18));
+  font-family: var(--ox-font-sans, inherit);
+  font-size: var(--ox-text-sm, 0.875rem);
+  /* Set from the quadrant the menu opened into, so the entrance reads as
+     coming *from* the click rather than as a panel arriving from nowhere. */
+  transform-origin: var(--ox-menu-origin, top left);
+  animation: ox-menu-in var(--ox-duration-fast, 140ms) var(--ox-ease, cubic-bezier(0.16, 1, 0.3, 1))
+    both;
+}
+
+/*
+ * Portalled into something other than `<body>` — a contained pane, a docs
+ * card, a test canvas. The container is the offset parent, so the coordinates
+ * the component computes are rebased and the popup is absolute rather than
+ * fixed. The container needs a positioning context of its own.
+ */
+.ox-menu[data-ox-contained] {
+  position: absolute;
+}
+
+@keyframes ox-menu-in {
+  from {
+    opacity: 0;
+    transform: scale(0.97) translateY(-2px);
+  }
+}
+
+.ox-menu:focus {
+  /* The popup takes focus on open so Escape and the arrow keys have a target.
+     It is not itself an interactive control, and a ring around the whole
+     surface reads as an error state. Rows carry the visible focus. */
+  outline: none;
+}
+
+/* ---------------------------------------------------------------- */
+/* The subject. Always first, never interactive.                     */
+/* ---------------------------------------------------------------- */
+
+.ox-menu__subject {
+  display: grid;
+  grid-template-columns: 1.5rem minmax(0, 1fr);
+  gap: 0.5rem;
+  align-items: center;
+  padding: 0.625rem 0.75rem;
+  border-block-end: 1px solid var(--ox-menu-subject-border, var(--ox-border, #e2e8f0));
+  border-start-start-radius: inherit;
+  border-start-end-radius: inherit;
+  background: var(--ox-menu-subject-bg, var(--ox-bg-muted, #f1f5f9));
+  cursor: default;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.ox-menu__avatar {
+  display: grid;
+  place-items: center;
+  inline-size: 1.5rem;
+  block-size: 1.5rem;
+  border: 1px solid var(--ox-border, #e2e8f0);
+  border-radius: 50%;
+  background: var(--ox-surface, #ffffff);
+  color: var(--ox-text-muted, #64748b);
+  font-size: var(--ox-text-2xs, 0.625rem);
+  font-weight: 600;
+}
+
+.ox-menu__who {
+  display: block;
+  overflow: hidden;
+  font-size: var(--ox-text-xs, 0.75rem);
+  font-weight: 600;
+  line-height: 1.35;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ox-menu__what {
+  display: block;
+  overflow: hidden;
+  color: var(--ox-text-subtle, #94a3b8);
+  font-size: var(--ox-text-2xs, 0.6875rem);
+  line-height: 1.35;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* A masked header is standing in for a record it may not describe, and it
+   should look like it is doing that rather than like a name that is short. */
+.ox-menu__subject[data-ox-masked] .ox-menu__who {
+  color: var(--ox-status-restricted, var(--ox-text-muted, #64748b));
+  font-style: italic;
+}
+
+/* ---------------------------------------------------------------- */
+/* Structure                                                         */
+/* ---------------------------------------------------------------- */
+
+.ox-menu__list {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding-block: 0.25rem;
+}
+
+.ox-menu__group {
+  padding: 0.5rem 0.75rem 0.125rem;
+  color: var(--ox-text-subtle, #94a3b8);
+  font-size: var(--ox-text-2xs, 0.625rem);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.ox-menu__separator {
+  block-size: 1px;
+  margin-block: 0.25rem;
+  border: 0;
+  background: var(--ox-menu-sep, var(--ox-border, #e2e8f0));
+}
+
+/* ---------------------------------------------------------------- */
+/* Rows                                                              */
+/* ---------------------------------------------------------------- */
+
+.ox-menu__item {
+  display: grid;
+  grid-template-columns: 1rem minmax(0, 1fr) auto;
+  gap: 0.5rem;
+  align-items: center;
+  /*
+   * 1.875rem = 30px, comfortably above the 24px floor WCAG 2.2 SC 2.5.8 sets
+   * for a pointer target. `max()` with the density floor rather than a bare
+   * value, so a denser profile cannot take it under the criterion.
+   */
+  min-block-size: max(1.875rem, var(--ox-density-target-floor, 1.5rem));
+  padding: 0.375rem 0.75rem;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: var(--ox-text-sm, 0.8125rem);
+  text-align: start;
+  cursor: pointer;
+}
+
+.ox-menu__item:hover,
+.ox-menu__item[data-ox-active] {
+  background: var(--ox-menu-row-hover-bg, var(--ox-bg-muted, #f1f5f9));
+}
+
+.ox-menu__item:focus-visible {
+  outline: 2px solid var(--ox-focus-ring, var(--ox-accent, #1677ff));
+  outline-offset: -2px;
+}
+
+.ox-menu__icon {
+  display: grid;
+  place-items: center;
+  inline-size: 1rem;
+  block-size: 1rem;
+  color: var(--ox-text-subtle, #94a3b8);
+}
+
+.ox-menu__label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ox-menu__shortcut {
+  color: var(--ox-text-subtle, #94a3b8);
+  font-family: var(--ox-font-mono, ui-monospace, monospace);
+  font-size: var(--ox-text-2xs, 0.6875rem);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/*
+ * The second line: what a recorded action writes, or why a blocked one
+ * cannot run. Both are shown; neither is a `title` attribute, because a
+ * tooltip is not available to the person using a keyboard, and this is
+ * exactly the text that person needs most.
+ */
+.ox-menu__note {
+  grid-column: 2 / -1;
+  margin-block-start: 0.0625rem;
+  color: var(--ox-text-muted, #64748b);
+  font-size: var(--ox-text-2xs, 0.6875rem);
+  line-height: 1.4;
+  white-space: normal;
+}
+
+.ox-menu__chevron {
+  color: var(--ox-text-subtle, #94a3b8);
+}
+
+/* ---- tiers ------------------------------------------------------ */
+/*
+ * Colour is the last thing carrying the tier, never the only one: each row
+ * also has a glyph, a band position and — above `routine` — a sentence. All
+ * four hues resolve through semantic tokens that already exist and are
+ * already in the contrast gate, so no new colour pair enters the system.
+ */
+
+.ox-menu__item[data-ox-tier="documented"] .ox-menu__icon {
+  color: var(--ox-accent, #0e7c66);
+}
+
+.ox-menu__item[data-ox-tier="clinical"] .ox-menu__icon {
+  color: var(--ox-status-high, #b45309);
+}
+
+.ox-menu__item[data-ox-tier="disclosive"] .ox-menu__icon,
+.ox-menu__item[data-ox-tier="disclosive"] .ox-menu__label {
+  color: var(--ox-status-restricted, #7c3aed);
+}
+
+.ox-menu__item[data-ox-tier="clinical"]:hover,
+.ox-menu__item[data-ox-tier="clinical"][data-ox-active] {
+  background: var(--ox-status-high-bg, #fffbeb);
+}
+
+.ox-menu__item[data-ox-tier="disclosive"]:hover,
+.ox-menu__item[data-ox-tier="disclosive"][data-ox-active] {
+  background: var(--ox-status-restricted-bg, #f5f3ff);
+}
+
+/* ---- unavailable ------------------------------------------------ */
+/*
+ * `aria-disabled`, not `disabled`: the row stays reachable so a keyboard user
+ * can read the reason. A row that is skipped is hidden from them and left on
+ * screen for everyone else.
+ */
+
+.ox-menu__item[aria-disabled="true"] {
+  cursor: not-allowed;
+}
+
+.ox-menu__item[aria-disabled="true"] .ox-menu__label {
+  color: var(--ox-text-subtle, #94a3b8);
+  text-decoration: line-through;
+  text-decoration-thickness: 1px;
+}
+
+.ox-menu__item[aria-disabled="true"] .ox-menu__icon {
+  color: var(--ox-text-subtle, #94a3b8);
+}
+
+.ox-menu__item[aria-disabled="true"]:hover {
+  background: transparent;
+}
+
+.ox-menu__item[aria-disabled="true"][data-ox-active] {
+  /* Still shows where the highlight is — it is reachable, so it must be
+     visible when reached. Fainter than a runnable row. */
+  background: var(--ox-bg-subtle, #f8fafc);
+}
+
+/* ---- pending ---------------------------------------------------- */
+
+.ox-menu__item[data-ox-pending] {
+  cursor: progress;
+}
+
+.ox-menu__skeleton {
+  grid-column: 2;
+  inline-size: 62%;
+  block-size: 0.5625rem;
+  border-radius: 3px;
+  background: linear-gradient(
+    90deg,
+    var(--ox-bg-muted, #f1f5f9) 25%,
+    var(--ox-bg-subtle, #f8fafc) 37%,
+    var(--ox-bg-muted, #f1f5f9) 63%
+  );
+  background-size: 400% 100%;
+  animation: ox-menu-skeleton var(--ox-duration-skeleton-loop, 1.4s) ease infinite;
+}
+
+@keyframes ox-menu-skeleton {
+  from {
+    background-position: 100% 50%;
+  }
+
+  to {
+    background-position: 0 50%;
+  }
+}
+
+/* ---------------------------------------------------------------- */
+/* The withheld count. A row inside the menu, not a footnote under it.*/
+/* ---------------------------------------------------------------- */
+
+.ox-menu__withheld {
+  display: grid;
+  margin: 0.125rem 0 0;
+  grid-template-columns: 1rem minmax(0, 1fr);
+  gap: 0.5rem;
+  align-items: start;
+  padding: 0.4375rem 0.75rem 0.5rem;
+  border-block-start: 1px solid var(--ox-menu-sep, var(--ox-border, #e2e8f0));
+  color: var(--ox-text-muted, #64748b);
+  font-size: var(--ox-text-2xs, 0.6875rem);
+  line-height: 1.45;
+}
+
+.ox-menu__withheld .ox-menu__icon {
+  margin-block-start: 0.0625rem;
+}
+
+/* The two empty states, which read differently on purpose. */
+.ox-menu__empty {
+  margin: 0;
+  padding: 0.625rem 0.75rem;
+  color: var(--ox-text-muted, #64748b);
+  font-size: var(--ox-text-2xs, 0.6875rem);
+  line-height: 1.45;
+}
+
+/* ---------------------------------------------------------------- */
+/* Step two                                                          */
+/* ---------------------------------------------------------------- */
+
+.ox-menu__confirm {
+  margin: 0.1875rem 0.375rem;
+  padding: 0.5625rem 0.625rem;
+  border: 1px solid var(--ox-status-high-border, #fcd34d);
+  border-radius: var(--ox-radius, 6px);
+  background: var(--ox-status-high-bg, #fffbeb);
+  color: var(--ox-text, inherit);
+  font-size: var(--ox-text-xs, 0.75rem);
+  line-height: 1.5;
+}
+
+.ox-menu__prompt {
+  margin: 0;
+  font-weight: 600;
+}
+
+.ox-menu__bulk-prompt {
+  margin: 0.25rem 0 0;
+  color: var(--ox-text-muted, #64748b);
+}
+
+.ox-menu__actions {
+  display: flex;
+  gap: 0.375rem;
+  margin-block-start: 0.5rem;
+}
+
+.ox-menu__button {
+  min-block-size: max(1.5rem, var(--ox-density-target-floor, 1.5rem));
+  padding-inline: 0.5625rem;
+  border: 1px solid var(--ox-border-strong, #cbd5e1);
+  border-radius: var(--ox-radius-sm, 4px);
+  background: var(--ox-surface, #ffffff);
+  color: inherit;
+  font: inherit;
+  font-size: var(--ox-text-2xs, 0.6875rem);
+  cursor: pointer;
+}
+
+.ox-menu__button[data-ox-primary] {
+  border-color: var(--ox-accent, #0e7c66);
+  background: var(--ox-accent, #0e7c66);
+  color: var(--ox-text-on-accent, #ffffff);
+  font-weight: 600;
+}
+
+.ox-menu__button:focus-visible {
+  outline: 2px solid var(--ox-focus-ring, var(--ox-accent, #1677ff));
+  outline-offset: 1px;
+}
+
+/* ---- the reason list -------------------------------------------- */
+
+.ox-menu__reasons {
+  margin: 0.1875rem 0.375rem;
+  padding: 0.5625rem 0.625rem;
+  border: 1px solid var(--ox-status-restricted-border, #ddd6fe);
+  border-radius: var(--ox-radius, 6px);
+  background: var(--ox-status-restricted-bg, #f5f3ff);
+}
+
+.ox-menu__reasons-head {
+  margin: 0 0 0.4375rem;
+  color: var(--ox-text-muted, #64748b);
+  font-size: var(--ox-text-2xs, 0.6875rem);
+  line-height: 1.45;
+}
+
+.ox-menu__reasons-head strong {
+  color: var(--ox-status-restricted, #6d28d9);
+}
+
+.ox-menu__reason {
+  display: grid;
+  grid-template-columns: 0.8125rem minmax(0, 1fr);
+  gap: 0.5rem;
+  align-items: start;
+  inline-size: 100%;
+  min-block-size: max(1.5rem, var(--ox-density-target-floor, 1.5rem));
+  padding: 0.3125rem 0.375rem;
+  border: 0;
+  border-radius: var(--ox-radius-sm, 4px);
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: var(--ox-text-xs, 0.75rem);
+  text-align: start;
+  cursor: pointer;
+}
+
+.ox-menu__reason:hover,
+.ox-menu__reason[data-ox-active] {
+  background: var(--ox-surface, #ffffff);
+}
+
+.ox-menu__reason:focus-visible {
+  outline: 2px solid var(--ox-focus-ring, var(--ox-accent, #1677ff));
+  outline-offset: -1px;
+}
+
+.ox-menu__reasons-foot {
+  margin: 0.4375rem 0 0;
+  color: var(--ox-text-muted, #64748b);
+  font-size: var(--ox-text-2xs, 0.625rem);
+  line-height: 1.45;
+}
+
+/* ---- indicators -------------------------------------------------- */
+
+.ox-menu__indicator {
+  display: grid;
+  place-items: center;
+  inline-size: 0.8125rem;
+  block-size: 0.8125rem;
+  border: 1.5px solid var(--ox-border-strong, #cbd5e1);
+  border-radius: 3px;
+  color: transparent;
+}
+
+.ox-menu__indicator[data-ox-shape="radio"] {
+  border-radius: 50%;
+}
+
+.ox-menu__item[aria-checked="true"] .ox-menu__indicator {
+  border-color: var(--ox-accent, #0e7c66);
+  background: var(--ox-accent, #0e7c66);
+  color: var(--ox-text-on-accent, #ffffff);
+}
+
+.ox-menu__item[aria-checked="true"] .ox-menu__indicator[data-ox-shape="radio"] {
+  background: var(--ox-surface, #ffffff);
+  box-shadow:
+    inset 0 0 0 2.5px var(--ox-surface, #ffffff),
+    inset 0 0 0 0.5rem var(--ox-accent, #0e7c66);
+}
+
+/* The live region. Rendered, never seen; an empty one announces nothing, so
+   the component writes content into it rather than leaving it blank. */
+.ox-menu__live {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* ---------------------------------------------------------------- */
+/* Presentations                                                     */
+/* ---------------------------------------------------------------- */
+
+.ox-menu__backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 59;
+  background: rgb(0 0 0 / 0.35);
+}
+
+.ox-menu--sheet {
+  position: fixed;
+  inset-inline: 0;
+  inset-block-end: 0;
+  max-inline-size: none;
+  min-inline-size: 0;
+  padding-block-end: 0.5rem;
+  border-inline: 0;
+  border-block-end: 0;
+  border-start-start-radius: 1rem;
+  border-start-end-radius: 1rem;
+  animation: ox-menu-up var(--ox-duration, 180ms) var(--ox-ease, cubic-bezier(0.16, 1, 0.3, 1)) both;
+}
+
+@keyframes ox-menu-up {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+}
+
+.ox-menu--sheet .ox-menu__subject {
+  border-radius: 0;
+}
+
+/*
+ * 2.75rem = 44px. Not because 24px would fail the criterion — it would pass —
+ * but because the sheet exists for a finger on a tablet at a bedside, and the
+ * floor is a floor rather than a target.
+ */
+.ox-menu--sheet .ox-menu__item {
+  min-block-size: 2.75rem;
+  padding-inline: 1rem;
+}
+
+.ox-menu--sheet .ox-menu__list {
+  padding-block-end: 0.5rem;
+}
+
+.ox-menu--sheet .ox-menu__group,
+.ox-menu--sheet .ox-menu__withheld,
+.ox-menu--sheet .ox-menu__subject,
+.ox-menu--sheet .ox-menu__empty {
+  padding-inline: 1rem;
+}
+
+.ox-menu__grip {
+  inline-size: 2.125rem;
+  block-size: 0.25rem;
+  margin: 0.5rem auto 0.125rem;
+  border-radius: 2px;
+  background: var(--ox-border-strong, #cbd5e1);
+}
+
+.ox-menu--anchored {
+  min-inline-size: 14.75rem;
+}
+
+/*
+ * A child menu.
+ *
+ * Narrower and with no subject header: the parent's header already named the
+ * record, and repeating it beside itself would read as a second subject rather
+ * than the same one. `z-index` is one above the parent so a child that overlaps
+ * it paints on top; both are portalled siblings, so DOM order alone would not
+ * settle it.
+ */
+.ox-menu--sub {
+  z-index: 61;
+  min-inline-size: 11rem;
+  max-inline-size: 16rem;
+  padding-block: 0;
+}
+
+/* ---- density ----------------------------------------------------- */
+
+.ox-menu[data-ox-density="compact"] .ox-menu__item {
+  min-block-size: max(1.625rem, var(--ox-density-target-floor, 1.5rem));
+  padding-block: 0.25rem;
+  padding-inline: 0.625rem;
+}
+
+.ox-menu[data-ox-density="compact"] .ox-menu__subject {
+  padding: 0.5rem 0.625rem;
+}
+
+/* ---------------------------------------------------------------- */
+/* Reduced motion, forced colours, print                             */
+/* ---------------------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .ox-menu,
+  .ox-menu--sheet {
+    animation: none;
+  }
+
+  /*
+   * A *designed* still state rather than a paused sweep. A shimmer frozen
+   * mid-gradient looks like a component that failed; a dashed rule looks like
+   * a row that is waiting, which is what it is.
+   */
+  .ox-menu__skeleton {
+    border: 1px dashed var(--ox-border-strong, #cbd5e1);
+    background: none;
+    animation: none;
+  }
+}
+
+@media (forced-colors: active) {
+  .ox-menu {
+    border: 1px solid CanvasText;
+  }
+
+  /* The tint is discarded here, and the tint is what made the header read as
+     inert. The border is what survives. */
+  .ox-menu__subject {
+    border-block-end: 1px solid CanvasText;
+  }
+
+  .ox-menu__item[data-ox-active] {
+    background: Highlight;
+    color: HighlightText;
+    forced-color-adjust: none;
+  }
+
+  .ox-menu__item[aria-disabled="true"] .ox-menu__label {
+    color: GrayText;
+  }
+
+  .ox-menu__confirm,
+  .ox-menu__reasons {
+    border: 1px solid CanvasText;
+  }
+
+  .ox-menu__separator {
+    background: CanvasText;
+  }
+}
+
+/* A menu is a way of doing something. There is nothing to print. */
+@media print {
+  .ox-menu,
+  .ox-menu__backdrop {
+    display: none;
+  }
+}

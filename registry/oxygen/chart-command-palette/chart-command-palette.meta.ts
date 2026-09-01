@@ -89,7 +89,7 @@ export default defineComponentMeta({
     "The matcher is deliberately about sixty lines. It does not do transposition or phonetic matching, so a genuine typo in a patient's name will miss — which is the safer failure for a component whose other job is to not over-report people.",
   ],
 
-  related: ["recent-patient-stack", "chart-header"],
+  related: ["recent-patient-stack", "chart-header", "chart-context-menu"],
 
   dependencies: ["clsx", "tailwind-merge"],
   registryDependencies: ["utils", "tokens", "palette-core"],

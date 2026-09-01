@@ -743,8 +743,7 @@
   cursor: pointer;
   background: var(--ox-bg, #fff);
   border: 1px solid var(--ox-border-strong, #d2dbd8);
-  box-shadow: 0 0 0 calc(4px + var(--_lv) * 9px)
-    color-mix(in oklab, var(--_wave) 20%, transparent);
+  box-shadow: 0 0 0 calc(4px + var(--_lv) * 9px) color-mix(in oklab, var(--_wave) 20%, transparent);
   transition: box-shadow 90ms linear;
 }
 .ox-rec-pulse .ox-rec-btn > span {
@@ -6266,6 +6265,676 @@ button.ox-prov:focus-visible,
   }
 }
 
+/* ---- registry/oxygen/lib/menu.css ---- */
+/**
+ * ChartContextMenu — a popup whose first row is not a verb.
+ *
+ * Three things here are load-bearing rather than decorative.
+ *
+ * The subject header is a *surface*, not a row: it must read as inert in
+ * every theme, including forced-colours mode where its background is thrown
+ * away — so it carries a border as well as a tint.
+ *
+ * The confirmation and reason strips are drawn *under the row they belong to*
+ * rather than replacing the list. Rows above them do not move, so the pointer
+ * is still over the verb it chose when the second step appears.
+ *
+ * A pending row is a placeholder at its final height. Every alternative —
+ * omitting it, appending it later, collapsing it to zero — moves the rows
+ * below it under a pointer that is already in flight.
+ */
+
+.ox-menu {
+  /*
+   * Fixed, and portalled into `<body>`. Viewport coordinates are what a
+   * pointer event gives you, and translating them into some ancestor's
+   * coordinate space is one `overflow: hidden` away from a menu clipped by
+   * the pane it opened in.
+   */
+  position: fixed;
+  z-index: 60;
+  /*
+   * Three rows: the subject, the list, the withheld count. Only the middle one
+   * scrolls, so a long menu never scrolls its own subject out of view — which
+   * would defeat the whole point of having one.
+   */
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  min-inline-size: 15.75rem;
+  max-inline-size: 20rem;
+  border: 1px solid var(--ox-menu-border, var(--ox-border, #e2e8f0));
+  border-radius: var(--ox-menu-radius, var(--ox-radius-lg, 8px));
+  background: var(--ox-menu-bg, var(--ox-surface-overlay, var(--ox-surface, #ffffff)));
+  color: var(--ox-text, inherit);
+  box-shadow: var(--ox-shadow-lg, 0 12px 32px rgb(0 0 0 / 0.18));
+  font-family: var(--ox-font-sans, inherit);
+  font-size: var(--ox-text-sm, 0.875rem);
+  /* Set from the quadrant the menu opened into, so the entrance reads as
+     coming *from* the click rather than as a panel arriving from nowhere. */
+  transform-origin: var(--ox-menu-origin, top left);
+  animation: ox-menu-in var(--ox-duration-fast, 140ms) var(--ox-ease, cubic-bezier(0.16, 1, 0.3, 1))
+    both;
+}
+
+/*
+ * Portalled into something other than `<body>` — a contained pane, a docs
+ * card, a test canvas. The container is the offset parent, so the coordinates
+ * the component computes are rebased and the popup is absolute rather than
+ * fixed. The container needs a positioning context of its own.
+ */
+.ox-menu[data-ox-contained] {
+  position: absolute;
+}
+
+@keyframes ox-menu-in {
+  from {
+    opacity: 0;
+    transform: scale(0.97) translateY(-2px);
+  }
+}
+
+.ox-menu:focus {
+  /* The popup takes focus on open so Escape and the arrow keys have a target.
+     It is not itself an interactive control, and a ring around the whole
+     surface reads as an error state. Rows carry the visible focus. */
+  outline: none;
+}
+
+/* ---------------------------------------------------------------- */
+/* The subject. Always first, never interactive.                     */
+/* ---------------------------------------------------------------- */
+
+.ox-menu__subject {
+  display: grid;
+  grid-template-columns: 1.5rem minmax(0, 1fr);
+  gap: 0.5rem;
+  align-items: center;
+  padding: 0.625rem 0.75rem;
+  border-block-end: 1px solid var(--ox-menu-subject-border, var(--ox-border, #e2e8f0));
+  border-start-start-radius: inherit;
+  border-start-end-radius: inherit;
+  background: var(--ox-menu-subject-bg, var(--ox-bg-muted, #f1f5f9));
+  cursor: default;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.ox-menu__avatar {
+  display: grid;
+  place-items: center;
+  inline-size: 1.5rem;
+  block-size: 1.5rem;
+  border: 1px solid var(--ox-border, #e2e8f0);
+  border-radius: 50%;
+  background: var(--ox-surface, #ffffff);
+  color: var(--ox-text-muted, #64748b);
+  font-size: var(--ox-text-2xs, 0.625rem);
+  font-weight: 600;
+}
+
+.ox-menu__who {
+  display: block;
+  overflow: hidden;
+  font-size: var(--ox-text-xs, 0.75rem);
+  font-weight: 600;
+  line-height: 1.35;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ox-menu__what {
+  display: block;
+  overflow: hidden;
+  color: var(--ox-text-subtle, #94a3b8);
+  font-size: var(--ox-text-2xs, 0.6875rem);
+  line-height: 1.35;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* A masked header is standing in for a record it may not describe, and it
+   should look like it is doing that rather than like a name that is short. */
+.ox-menu__subject[data-ox-masked] .ox-menu__who {
+  color: var(--ox-status-restricted, var(--ox-text-muted, #64748b));
+  font-style: italic;
+}
+
+/* ---------------------------------------------------------------- */
+/* Structure                                                         */
+/* ---------------------------------------------------------------- */
+
+.ox-menu__list {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding-block: 0.25rem;
+}
+
+.ox-menu__group {
+  padding: 0.5rem 0.75rem 0.125rem;
+  color: var(--ox-text-subtle, #94a3b8);
+  font-size: var(--ox-text-2xs, 0.625rem);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.ox-menu__separator {
+  block-size: 1px;
+  margin-block: 0.25rem;
+  border: 0;
+  background: var(--ox-menu-sep, var(--ox-border, #e2e8f0));
+}
+
+/* ---------------------------------------------------------------- */
+/* Rows                                                              */
+/* ---------------------------------------------------------------- */
+
+.ox-menu__item {
+  display: grid;
+  grid-template-columns: 1rem minmax(0, 1fr) auto;
+  gap: 0.5rem;
+  align-items: center;
+  /*
+   * 1.875rem = 30px, comfortably above the 24px floor WCAG 2.2 SC 2.5.8 sets
+   * for a pointer target. `max()` with the density floor rather than a bare
+   * value, so a denser profile cannot take it under the criterion.
+   */
+  min-block-size: max(1.875rem, var(--ox-density-target-floor, 1.5rem));
+  padding: 0.375rem 0.75rem;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: var(--ox-text-sm, 0.8125rem);
+  text-align: start;
+  cursor: pointer;
+}
+
+.ox-menu__item:hover,
+.ox-menu__item[data-ox-active] {
+  background: var(--ox-menu-row-hover-bg, var(--ox-bg-muted, #f1f5f9));
+}
+
+.ox-menu__item:focus-visible {
+  outline: 2px solid var(--ox-focus-ring, var(--ox-accent, #1677ff));
+  outline-offset: -2px;
+}
+
+.ox-menu__icon {
+  display: grid;
+  place-items: center;
+  inline-size: 1rem;
+  block-size: 1rem;
+  color: var(--ox-text-subtle, #94a3b8);
+}
+
+.ox-menu__label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ox-menu__shortcut {
+  color: var(--ox-text-subtle, #94a3b8);
+  font-family: var(--ox-font-mono, ui-monospace, monospace);
+  font-size: var(--ox-text-2xs, 0.6875rem);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/*
+ * The second line: what a recorded action writes, or why a blocked one
+ * cannot run. Both are shown; neither is a `title` attribute, because a
+ * tooltip is not available to the person using a keyboard, and this is
+ * exactly the text that person needs most.
+ */
+.ox-menu__note {
+  grid-column: 2 / -1;
+  margin-block-start: 0.0625rem;
+  color: var(--ox-text-muted, #64748b);
+  font-size: var(--ox-text-2xs, 0.6875rem);
+  line-height: 1.4;
+  white-space: normal;
+}
+
+.ox-menu__chevron {
+  color: var(--ox-text-subtle, #94a3b8);
+}
+
+/* ---- tiers ------------------------------------------------------ */
+/*
+ * Colour is the last thing carrying the tier, never the only one: each row
+ * also has a glyph, a band position and — above `routine` — a sentence. All
+ * four hues resolve through semantic tokens that already exist and are
+ * already in the contrast gate, so no new colour pair enters the system.
+ */
+
+.ox-menu__item[data-ox-tier="documented"] .ox-menu__icon {
+  color: var(--ox-accent, #0e7c66);
+}
+
+.ox-menu__item[data-ox-tier="clinical"] .ox-menu__icon {
+  color: var(--ox-status-high, #b45309);
+}
+
+.ox-menu__item[data-ox-tier="disclosive"] .ox-menu__icon,
+.ox-menu__item[data-ox-tier="disclosive"] .ox-menu__label {
+  color: var(--ox-status-restricted, #7c3aed);
+}
+
+.ox-menu__item[data-ox-tier="clinical"]:hover,
+.ox-menu__item[data-ox-tier="clinical"][data-ox-active] {
+  background: var(--ox-status-high-bg, #fffbeb);
+}
+
+.ox-menu__item[data-ox-tier="disclosive"]:hover,
+.ox-menu__item[data-ox-tier="disclosive"][data-ox-active] {
+  background: var(--ox-status-restricted-bg, #f5f3ff);
+}
+
+/* ---- unavailable ------------------------------------------------ */
+/*
+ * `aria-disabled`, not `disabled`: the row stays reachable so a keyboard user
+ * can read the reason. A row that is skipped is hidden from them and left on
+ * screen for everyone else.
+ */
+
+.ox-menu__item[aria-disabled="true"] {
+  cursor: not-allowed;
+}
+
+.ox-menu__item[aria-disabled="true"] .ox-menu__label {
+  color: var(--ox-text-subtle, #94a3b8);
+  text-decoration: line-through;
+  text-decoration-thickness: 1px;
+}
+
+.ox-menu__item[aria-disabled="true"] .ox-menu__icon {
+  color: var(--ox-text-subtle, #94a3b8);
+}
+
+.ox-menu__item[aria-disabled="true"]:hover {
+  background: transparent;
+}
+
+.ox-menu__item[aria-disabled="true"][data-ox-active] {
+  /* Still shows where the highlight is — it is reachable, so it must be
+     visible when reached. Fainter than a runnable row. */
+  background: var(--ox-bg-subtle, #f8fafc);
+}
+
+/* ---- pending ---------------------------------------------------- */
+
+.ox-menu__item[data-ox-pending] {
+  cursor: progress;
+}
+
+.ox-menu__skeleton {
+  grid-column: 2;
+  inline-size: 62%;
+  block-size: 0.5625rem;
+  border-radius: 3px;
+  background: linear-gradient(
+    90deg,
+    var(--ox-bg-muted, #f1f5f9) 25%,
+    var(--ox-bg-subtle, #f8fafc) 37%,
+    var(--ox-bg-muted, #f1f5f9) 63%
+  );
+  background-size: 400% 100%;
+  animation: ox-menu-skeleton var(--ox-duration-skeleton-loop, 1.4s) ease infinite;
+}
+
+@keyframes ox-menu-skeleton {
+  from {
+    background-position: 100% 50%;
+  }
+
+  to {
+    background-position: 0 50%;
+  }
+}
+
+/* ---------------------------------------------------------------- */
+/* The withheld count. A row inside the menu, not a footnote under it.*/
+/* ---------------------------------------------------------------- */
+
+.ox-menu__withheld {
+  display: grid;
+  margin: 0.125rem 0 0;
+  grid-template-columns: 1rem minmax(0, 1fr);
+  gap: 0.5rem;
+  align-items: start;
+  padding: 0.4375rem 0.75rem 0.5rem;
+  border-block-start: 1px solid var(--ox-menu-sep, var(--ox-border, #e2e8f0));
+  color: var(--ox-text-muted, #64748b);
+  font-size: var(--ox-text-2xs, 0.6875rem);
+  line-height: 1.45;
+}
+
+.ox-menu__withheld .ox-menu__icon {
+  margin-block-start: 0.0625rem;
+}
+
+/* The two empty states, which read differently on purpose. */
+.ox-menu__empty {
+  margin: 0;
+  padding: 0.625rem 0.75rem;
+  color: var(--ox-text-muted, #64748b);
+  font-size: var(--ox-text-2xs, 0.6875rem);
+  line-height: 1.45;
+}
+
+/* ---------------------------------------------------------------- */
+/* Step two                                                          */
+/* ---------------------------------------------------------------- */
+
+.ox-menu__confirm {
+  margin: 0.1875rem 0.375rem;
+  padding: 0.5625rem 0.625rem;
+  border: 1px solid var(--ox-status-high-border, #fcd34d);
+  border-radius: var(--ox-radius, 6px);
+  background: var(--ox-status-high-bg, #fffbeb);
+  color: var(--ox-text, inherit);
+  font-size: var(--ox-text-xs, 0.75rem);
+  line-height: 1.5;
+}
+
+.ox-menu__prompt {
+  margin: 0;
+  font-weight: 600;
+}
+
+.ox-menu__bulk-prompt {
+  margin: 0.25rem 0 0;
+  color: var(--ox-text-muted, #64748b);
+}
+
+.ox-menu__actions {
+  display: flex;
+  gap: 0.375rem;
+  margin-block-start: 0.5rem;
+}
+
+.ox-menu__button {
+  min-block-size: max(1.5rem, var(--ox-density-target-floor, 1.5rem));
+  padding-inline: 0.5625rem;
+  border: 1px solid var(--ox-border-strong, #cbd5e1);
+  border-radius: var(--ox-radius-sm, 4px);
+  background: var(--ox-surface, #ffffff);
+  color: inherit;
+  font: inherit;
+  font-size: var(--ox-text-2xs, 0.6875rem);
+  cursor: pointer;
+}
+
+.ox-menu__button[data-ox-primary] {
+  border-color: var(--ox-accent, #0e7c66);
+  background: var(--ox-accent, #0e7c66);
+  color: var(--ox-text-on-accent, #ffffff);
+  font-weight: 600;
+}
+
+.ox-menu__button:focus-visible {
+  outline: 2px solid var(--ox-focus-ring, var(--ox-accent, #1677ff));
+  outline-offset: 1px;
+}
+
+/* ---- the reason list -------------------------------------------- */
+
+.ox-menu__reasons {
+  margin: 0.1875rem 0.375rem;
+  padding: 0.5625rem 0.625rem;
+  border: 1px solid var(--ox-status-restricted-border, #ddd6fe);
+  border-radius: var(--ox-radius, 6px);
+  background: var(--ox-status-restricted-bg, #f5f3ff);
+}
+
+.ox-menu__reasons-head {
+  margin: 0 0 0.4375rem;
+  color: var(--ox-text-muted, #64748b);
+  font-size: var(--ox-text-2xs, 0.6875rem);
+  line-height: 1.45;
+}
+
+.ox-menu__reasons-head strong {
+  color: var(--ox-status-restricted, #6d28d9);
+}
+
+.ox-menu__reason {
+  display: grid;
+  grid-template-columns: 0.8125rem minmax(0, 1fr);
+  gap: 0.5rem;
+  align-items: start;
+  inline-size: 100%;
+  min-block-size: max(1.5rem, var(--ox-density-target-floor, 1.5rem));
+  padding: 0.3125rem 0.375rem;
+  border: 0;
+  border-radius: var(--ox-radius-sm, 4px);
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: var(--ox-text-xs, 0.75rem);
+  text-align: start;
+  cursor: pointer;
+}
+
+.ox-menu__reason:hover,
+.ox-menu__reason[data-ox-active] {
+  background: var(--ox-surface, #ffffff);
+}
+
+.ox-menu__reason:focus-visible {
+  outline: 2px solid var(--ox-focus-ring, var(--ox-accent, #1677ff));
+  outline-offset: -1px;
+}
+
+.ox-menu__reasons-foot {
+  margin: 0.4375rem 0 0;
+  color: var(--ox-text-muted, #64748b);
+  font-size: var(--ox-text-2xs, 0.625rem);
+  line-height: 1.45;
+}
+
+/* ---- indicators -------------------------------------------------- */
+
+.ox-menu__indicator {
+  display: grid;
+  place-items: center;
+  inline-size: 0.8125rem;
+  block-size: 0.8125rem;
+  border: 1.5px solid var(--ox-border-strong, #cbd5e1);
+  border-radius: 3px;
+  color: transparent;
+}
+
+.ox-menu__indicator[data-ox-shape="radio"] {
+  border-radius: 50%;
+}
+
+.ox-menu__item[aria-checked="true"] .ox-menu__indicator {
+  border-color: var(--ox-accent, #0e7c66);
+  background: var(--ox-accent, #0e7c66);
+  color: var(--ox-text-on-accent, #ffffff);
+}
+
+.ox-menu__item[aria-checked="true"] .ox-menu__indicator[data-ox-shape="radio"] {
+  background: var(--ox-surface, #ffffff);
+  box-shadow:
+    inset 0 0 0 2.5px var(--ox-surface, #ffffff),
+    inset 0 0 0 0.5rem var(--ox-accent, #0e7c66);
+}
+
+/* The live region. Rendered, never seen; an empty one announces nothing, so
+   the component writes content into it rather than leaving it blank. */
+.ox-menu__live {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* ---------------------------------------------------------------- */
+/* Presentations                                                     */
+/* ---------------------------------------------------------------- */
+
+.ox-menu__backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 59;
+  background: rgb(0 0 0 / 0.35);
+}
+
+.ox-menu--sheet {
+  position: fixed;
+  inset-inline: 0;
+  inset-block-end: 0;
+  max-inline-size: none;
+  min-inline-size: 0;
+  padding-block-end: 0.5rem;
+  border-inline: 0;
+  border-block-end: 0;
+  border-start-start-radius: 1rem;
+  border-start-end-radius: 1rem;
+  animation: ox-menu-up var(--ox-duration, 180ms) var(--ox-ease, cubic-bezier(0.16, 1, 0.3, 1)) both;
+}
+
+@keyframes ox-menu-up {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+}
+
+.ox-menu--sheet .ox-menu__subject {
+  border-radius: 0;
+}
+
+/*
+ * 2.75rem = 44px. Not because 24px would fail the criterion — it would pass —
+ * but because the sheet exists for a finger on a tablet at a bedside, and the
+ * floor is a floor rather than a target.
+ */
+.ox-menu--sheet .ox-menu__item {
+  min-block-size: 2.75rem;
+  padding-inline: 1rem;
+}
+
+.ox-menu--sheet .ox-menu__list {
+  padding-block-end: 0.5rem;
+}
+
+.ox-menu--sheet .ox-menu__group,
+.ox-menu--sheet .ox-menu__withheld,
+.ox-menu--sheet .ox-menu__subject,
+.ox-menu--sheet .ox-menu__empty {
+  padding-inline: 1rem;
+}
+
+.ox-menu__grip {
+  inline-size: 2.125rem;
+  block-size: 0.25rem;
+  margin: 0.5rem auto 0.125rem;
+  border-radius: 2px;
+  background: var(--ox-border-strong, #cbd5e1);
+}
+
+.ox-menu--anchored {
+  min-inline-size: 14.75rem;
+}
+
+/*
+ * A child menu.
+ *
+ * Narrower and with no subject header: the parent's header already named the
+ * record, and repeating it beside itself would read as a second subject rather
+ * than the same one. `z-index` is one above the parent so a child that overlaps
+ * it paints on top; both are portalled siblings, so DOM order alone would not
+ * settle it.
+ */
+.ox-menu--sub {
+  z-index: 61;
+  min-inline-size: 11rem;
+  max-inline-size: 16rem;
+  padding-block: 0;
+}
+
+/* ---- density ----------------------------------------------------- */
+
+.ox-menu[data-ox-density="compact"] .ox-menu__item {
+  min-block-size: max(1.625rem, var(--ox-density-target-floor, 1.5rem));
+  padding-block: 0.25rem;
+  padding-inline: 0.625rem;
+}
+
+.ox-menu[data-ox-density="compact"] .ox-menu__subject {
+  padding: 0.5rem 0.625rem;
+}
+
+/* ---------------------------------------------------------------- */
+/* Reduced motion, forced colours, print                             */
+/* ---------------------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .ox-menu,
+  .ox-menu--sheet {
+    animation: none;
+  }
+
+  /*
+   * A *designed* still state rather than a paused sweep. A shimmer frozen
+   * mid-gradient looks like a component that failed; a dashed rule looks like
+   * a row that is waiting, which is what it is.
+   */
+  .ox-menu__skeleton {
+    border: 1px dashed var(--ox-border-strong, #cbd5e1);
+    background: none;
+    animation: none;
+  }
+}
+
+@media (forced-colors: active) {
+  .ox-menu {
+    border: 1px solid CanvasText;
+  }
+
+  /* The tint is discarded here, and the tint is what made the header read as
+     inert. The border is what survives. */
+  .ox-menu__subject {
+    border-block-end: 1px solid CanvasText;
+  }
+
+  .ox-menu__item[data-ox-active] {
+    background: Highlight;
+    color: HighlightText;
+    forced-color-adjust: none;
+  }
+
+  .ox-menu__item[aria-disabled="true"] .ox-menu__label {
+    color: GrayText;
+  }
+
+  .ox-menu__confirm,
+  .ox-menu__reasons {
+    border: 1px solid CanvasText;
+  }
+
+  .ox-menu__separator {
+    background: CanvasText;
+  }
+}
+
+/* A menu is a way of doing something. There is nothing to print. */
+@media print {
+  .ox-menu,
+  .ox-menu__backdrop {
+    display: none;
+  }
+}
+
 /* ---- registry/oxygen/lib/datetime.css ---- */
 /**
  * Date, time and session — the shared stylesheet.
@@ -6341,6 +7010,25 @@ button.ox-prov:focus-visible,
   background: var(--ox-bg-muted, #f1f5f9);
   color: var(--ox-text-muted, #64748b);
   cursor: not-allowed;
+}
+
+/*
+ * One half of a shell that owns the box.
+ *
+ * The focus ring goes with the border: two rings inside one outline is two
+ * controls, and the shell already draws the one that says where focus is.
+ * `min-block-size` goes too, so the shell rather than its halves sets the
+ * height of the row.
+ */
+.ox-dt-field--bare,
+.ox-dt-field--bare:hover,
+.ox-dt-field--bare:focus-visible,
+.ox-dt-field--bare:focus-within {
+  min-block-size: 0;
+  padding: 0;
+  border-color: transparent;
+  background: transparent;
+  box-shadow: none;
 }
 
 /*
@@ -6522,14 +7210,103 @@ button.ox-prov:focus-visible,
 /* ------------------------------------------------------------------ */
 
 .ox-dt-cal {
-  inline-size: 15.75rem;
+  display: flex;
+  align-items: stretch;
+  /* Shrink to the months it draws. A block-level flex container fills its
+     parent, which stretched a two-month panel across a 1,300px stage and put
+     twelve hundred pixels between the rail and the grid it belongs to. */
+  inline-size: fit-content;
   font-family: var(--ox-font-sans, inherit);
   user-select: none;
   -webkit-user-select: none;
 }
 
-.ox-dt-cal--fluid {
+.ox-dt-cal__body {
+  display: flex;
+  flex-direction: column;
+  min-inline-size: 0;
+  flex: 1;
+}
+
+.ox-dt-cal__months {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.25rem;
+}
+
+.ox-dt-cal__month {
+  inline-size: 15.75rem;
+  flex: none;
+}
+
+.ox-dt-cal--fluid,
+.ox-dt-cal--fluid .ox-dt-cal__month {
   inline-size: 100%;
+}
+
+.ox-dt-cal--fluid .ox-dt-cal__month {
+  flex: 1;
+  min-inline-size: 0;
+}
+
+/*
+ * The named-period rail.
+ *
+ * A separator rather than a fill: the rail is a second way into the same
+ * selection, not a different surface, and a filled panel beside a white grid
+ * reads as two controls that happen to be adjacent.
+ */
+.ox-dt-cal__aside {
+  flex: none;
+  padding-inline-end: 0.75rem;
+  margin-inline-end: 0.75rem;
+  border-inline-end: 1px solid var(--ox-border, #e2e8f0);
+}
+
+.ox-dt-cal__rail {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  min-inline-size: 7.5rem;
+  max-block-size: 20rem;
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+
+.ox-dt-cal__preset {
+  display: flex;
+  align-items: center;
+  min-block-size: var(--ox-density-target-floor, 1.5rem);
+  padding-block: 0.375rem;
+  padding-inline: 0.625rem;
+  border: 0;
+  border-radius: var(--ox-radius-sm, 0.25rem);
+  background: none;
+  color: var(--ox-text, inherit);
+  font: inherit;
+  font-size: var(--ox-datetime-font, var(--ox-text-sm, 0.875rem));
+  text-align: start;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background-color var(--ox-duration-fast, 90ms) var(--ox-ease, ease),
+    color var(--ox-duration-fast, 90ms) var(--ox-ease, ease);
+}
+
+.ox-dt-cal__preset:hover {
+  background: var(--ox-datetime-cell-hover-bg, #f1f5f9);
+}
+
+.ox-dt-cal__preset:focus-visible {
+  outline: 2px solid var(--ox-field-border-focus, #2563eb);
+  outline-offset: -2px;
+}
+
+/* Weight as well as fill, so the chosen period survives greyscale. */
+.ox-dt-cal__preset--on {
+  background: var(--ox-datetime-cell-hover-bg, #f1f5f9);
+  color: var(--ox-text, inherit);
+  font-weight: 600;
 }
 
 .ox-dt-cal__head {
@@ -6560,6 +7337,13 @@ button.ox-prov:focus-visible,
     color var(--ox-datetime-duration, 150ms) var(--ox-ease, ease);
 }
 
+/* Holds the title centred on an interior month, which has no control of its
+   own on that side. Not a button, so it is not in the tab order and not a
+   second thing announced as "Previous month". */
+.ox-dt-cal__nav--spacer {
+  pointer-events: none;
+}
+
 .ox-dt-cal__title {
   font-size: var(--ox-text-sm, 0.875rem);
   font-weight: 600;
@@ -6572,15 +7356,25 @@ button.ox-prov:focus-visible,
   color: var(--ox-text, inherit);
 }
 
+.ox-dt-cal__nav--spacer:hover {
+  background: none;
+}
+
 .ox-dt-cal__nav:focus-visible,
 .ox-dt-cal__title:focus-visible {
   outline: 2px solid var(--ox-field-border-focus, #2563eb);
   outline-offset: 1px;
 }
 
+/* Kept reachable and announced rather than removed: a control that vanishes at
+   the boundary tells the reader nothing about why they cannot go further. */
 .ox-dt-cal__nav[aria-disabled="true"] {
   color: var(--ox-text-subtle, #94a3b8);
-  pointer-events: none;
+  cursor: default;
+}
+
+.ox-dt-cal__nav[aria-disabled="true"]:hover {
+  background: none;
 }
 
 /* A chevron still points the way it was drawn; the mirror is not free. */
@@ -6599,11 +7393,17 @@ button.ox-prov:focus-visible,
  * parent, and a flat forty-nine-cell grid satisfies neither — axe reports both
  * as critical. Rows-as-grids avoids `display: contents`, which would keep the
  * flat layout but still carries accessibility-tree caveats in some engines.
+ *
+ * No column gap, deliberately. A range band drawn cell by cell across a 1px
+ * gap is a dashed stripe rather than a band, and the alternative — painting
+ * the band on a pseudo-element that bleeds over the gap — collides with the
+ * two pseudo-elements a cell already spends on the today dot and the
+ * unavailable strike. Closing the gap also widens the pointer target, which
+ * is the direction WCAG 2.2 SC 2.5.8 wants it to move.
  */
 .ox-dt-cal__row {
   display: grid;
   grid-template-columns: repeat(7, minmax(0, 1fr));
-  gap: 1px;
 }
 
 .ox-dt-cal__weekday {
@@ -6656,6 +7456,13 @@ button.ox-prov:focus-visible,
   z-index: 1;
 }
 
+/* Holds a column open where a month has no day. Not a button, not a target,
+   and never announced as one. */
+.ox-dt-cal__blank {
+  block-size: var(--ox-datetime-cell-size, 2rem);
+  min-block-size: 1.5rem;
+}
+
 .ox-dt-cal__day--outside {
   color: var(--ox-datetime-cell-muted-fg, #64748b);
 }
@@ -6696,26 +7503,51 @@ button.ox-prov:focus-visible,
   background: currentColor;
 }
 
-.ox-dt-cal__day--selected {
-  background: var(--ox-datetime-cell-selected-bg, #2563eb);
-  color: var(--ox-datetime-cell-selected-fg, #fff);
-  font-weight: 500;
-}
-
+/*
+ * The band, then the chip.
+ *
+ * Every day of the span carries the band — the ends included, because a band
+ * that starts a cell late reads as though the day it bounds were outside the
+ * range it bounds. Square in the middle so adjacent cells join; capped at the
+ * ends of the range and at the ends of each week, because the band breaks
+ * across rows and an uncapped break looks like a rendering fault.
+ */
 .ox-dt-cal__day--in-range {
   border-radius: 0;
   background: var(--ox-datetime-cell-range-bg, #dbeafe);
   color: var(--ox-datetime-cell-range-fg, inherit);
 }
 
-.ox-dt-cal__day--range-start {
+/* The half-built range, while the second end is still being pointed at. */
+.ox-dt-cal__day--previewed {
+  background: color-mix(in srgb, var(--ox-datetime-cell-range-bg, #dbeafe) 65%, transparent);
+}
+
+.ox-dt-cal__day--in-range:hover {
+  background: var(--ox-datetime-cell-range-bg, #dbeafe);
+}
+
+.ox-dt-cal__day--range-lo,
+.ox-dt-cal__day--week-lo {
   border-start-start-radius: var(--ox-datetime-cell-radius, 0.25rem);
   border-end-start-radius: var(--ox-datetime-cell-radius, 0.25rem);
 }
 
-.ox-dt-cal__day--range-end {
+.ox-dt-cal__day--range-hi,
+.ox-dt-cal__day--week-hi {
   border-start-end-radius: var(--ox-datetime-cell-radius, 0.25rem);
   border-end-end-radius: var(--ox-datetime-cell-radius, 0.25rem);
+}
+
+/* Drawn over the band, and fully rounded: the endpoints of a range are the two
+   days the reader actually chose, and they are read as chips rather than as a
+   darker part of the band. */
+.ox-dt-cal__day--selected,
+.ox-dt-cal__day--selected:hover {
+  border-radius: var(--ox-datetime-cell-radius, 0.25rem);
+  background: var(--ox-datetime-cell-selected-bg, #2563eb);
+  color: var(--ox-datetime-cell-selected-fg, #fff);
+  font-weight: 500;
 }
 
 /* Availability density under the numeral: how much is open, before a click
@@ -6738,14 +7570,124 @@ button.ox-prov:focus-visible,
   background: currentColor;
 }
 
+/*
+ * The footer wraps to the grid; it never widens it.
+ *
+ * The panel sizes to the months it draws, and a legend plus two buttons is
+ * wider than one month — so as a normal flex item the footer set the width and
+ * stretched a single-month calendar half a screen wide. `inline-size: 0` with
+ * a percentage minimum is the standard way to say "take the width you are
+ * given, contribute none of your own": the percentage resolves against a width
+ * still being computed, so it is treated as auto for intrinsic sizing and the
+ * row simply wraps instead.
+ */
 .ox-dt-cal__foot {
   display: flex;
   align-items: center;
-  gap: 0.25rem;
+  gap: 0.5rem;
   flex-wrap: wrap;
-  margin-block-start: 0.5rem;
-  padding-block-start: 0.5rem;
+  inline-size: 0;
+  min-inline-size: 100%;
+  margin-block-start: 0.75rem;
+  padding-block-start: 0.75rem;
   border-block-start: 1px solid var(--ox-border, #e2e8f0);
+}
+
+/*
+ * The keyboard legend.
+ *
+ * `aria-hidden` in the markup: a screen-reader user is told how to drive a
+ * grid by the grid itself, and this is here for the much larger group of
+ * sighted keyboard users who would otherwise never find out the calendar has
+ * arrow keys at all.
+ */
+.ox-dt-cal__hints {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  font-size: var(--ox-text-xs, 0.75rem);
+  color: var(--ox-text-muted, #64748b);
+}
+
+.ox-dt-cal__hint {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.ox-dt-cal__hint kbd {
+  display: inline-grid;
+  place-items: center;
+  min-inline-size: 1.25rem;
+  block-size: 1.25rem;
+  padding-inline: 0.1875rem;
+  border: 1px solid var(--ox-border, #e2e8f0);
+  border-radius: var(--ox-radius-sm, 0.25rem);
+  background: var(--ox-surface, #fff);
+  color: var(--ox-text-muted, #64748b);
+  font: inherit;
+  font-size: var(--ox-text-2xs, 0.6875rem);
+  line-height: 1;
+}
+
+/* Pushed to the far end of the footer, so a reader's eye goes hints → value →
+   commit and the primary action sits where every dialog in the system puts it. */
+.ox-dt-cal__actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-inline-start: auto;
+}
+
+.ox-dt-cal__action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-block-size: var(--ox-density-target-floor, 1.5rem);
+  padding-block: 0.375rem;
+  padding-inline: 0.875rem;
+  border: 1px solid var(--ox-border, #e2e8f0);
+  border-radius: var(--ox-radius, 0.375rem);
+  background: var(--ox-surface, #fff);
+  color: var(--ox-text, inherit);
+  font: inherit;
+  font-size: var(--ox-datetime-font, var(--ox-text-sm, 0.875rem));
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    background-color var(--ox-duration-fast, 90ms) var(--ox-ease, ease),
+    border-color var(--ox-duration-fast, 90ms) var(--ox-ease, ease);
+}
+
+.ox-dt-cal__action:hover {
+  background: var(--ox-datetime-cell-hover-bg, #f1f5f9);
+}
+
+.ox-dt-cal__action:focus-visible {
+  outline: 2px solid var(--ox-field-border-focus, #2563eb);
+  outline-offset: 1px;
+}
+
+.ox-dt-cal__action--primary {
+  border-color: var(--ox-datetime-cell-selected-bg, #2563eb);
+  background: var(--ox-datetime-cell-selected-bg, #2563eb);
+  color: var(--ox-datetime-cell-selected-fg, #fff);
+}
+
+.ox-dt-cal__action--primary:hover {
+  background: var(--ox-accent-hover, #1d4ed8);
+  border-color: var(--ox-accent-hover, #1d4ed8);
+}
+
+/* Disabled rather than hidden: Done exists from the moment the panel opens, and
+   a button that appears once the range is whole moves the footer under the
+   reader's pointer at the exact moment they are reaching for it. */
+.ox-dt-cal__action[disabled] {
+  border-color: var(--ox-border, #e2e8f0);
+  background: var(--ox-bg-muted, #f1f5f9);
+  color: var(--ox-text-muted, #64748b);
+  cursor: not-allowed;
 }
 
 /*
@@ -6789,6 +7731,229 @@ button.ox-prov:focus-visible,
 .ox-dt-cal__pane button:focus-visible {
   outline: 2px solid var(--ox-field-border-focus, #2563eb);
   outline-offset: 1px;
+}
+
+/* ------------------------------------------------------------------ */
+/* The range shell — two halves, one field                            */
+/* ------------------------------------------------------------------ */
+
+/*
+ * One box holding two segmented halves, an arrow and a derived badge.
+ *
+ * The border, the hover and the focus ring live here rather than on the
+ * halves: two bordered boxes with an arrow between them read as two questions,
+ * and a reader answering "when does this start and end" is answering one.
+ * The halves stay two tab stops, because the single-tab-stop rule is per
+ * field and arrowing through six segments to reach the end date is worse than
+ * one extra Tab.
+ */
+.ox-dt-range {
+  /* `inline-flex`, exactly as `.ox-dt-field` is: the shell sizes to the value
+     it holds, and stretches only where a grid or flex parent asks it to. A
+     block-level flex box filled a 1,300px stage with one date range. */
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  min-block-size: var(--ox-datetime-target, 2.75rem);
+  padding-block: var(--ox-field-pad-y, 0.375rem);
+  padding-inline: var(--ox-field-pad-x, 0.625rem);
+  border: 1px solid var(--ox-field-border, #94a3b8);
+  border-radius: var(--ox-field-radius, 0.375rem);
+  background: var(--ox-field-bg, #fff);
+  color: var(--ox-field-fg, inherit);
+  font-family: var(--ox-font-sans, inherit);
+  font-size: var(--ox-datetime-font, var(--ox-text-sm, 0.875rem));
+  font-variant-numeric: tabular-nums;
+  transition:
+    border-color var(--ox-datetime-duration, 150ms) var(--ox-ease, ease),
+    box-shadow var(--ox-datetime-duration, 150ms) var(--ox-ease, ease);
+}
+
+.ox-dt-range:hover {
+  border-color: var(--ox-border-strong, #64748b);
+}
+
+.ox-dt-range:focus-within {
+  outline: none;
+  border-color: var(--ox-field-border-focus, #2563eb);
+  box-shadow: 0 0 0 3px var(--ox-focus-ring, rgb(37 99 235 / 0.35));
+}
+
+.ox-dt-range--invalid {
+  border-color: var(--ox-field-border-invalid, #b91c1c);
+}
+
+.ox-dt-range--readonly {
+  border-color: transparent;
+  background: transparent;
+  padding-inline: 0;
+}
+
+.ox-dt-range--disabled {
+  border-color: var(--ox-border, #e2e8f0);
+  background: var(--ox-bg-muted, #f1f5f9);
+  color: var(--ox-text-muted, #64748b);
+  cursor: not-allowed;
+}
+
+.ox-dt-range__glyph {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  color: var(--ox-text-muted, #64748b);
+}
+
+/*
+ * An arrow, not a hyphen or an en dash. A dash between two dates that already
+ * contain slashes is one more separator in a row of separators; an arrow says
+ * which end is which, and mirrors correctly in an RTL layout.
+ */
+.ox-dt-range__arrow {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  padding-inline: 0.125rem;
+  color: var(--ox-text-muted, #64748b);
+}
+
+[dir="rtl"] .ox-dt-range__arrow svg {
+  scale: -1 1;
+}
+
+/*
+ * The derived member, beside the value that produced it.
+ *
+ * A badge rather than a message row: the day count and the duration are
+ * proof-reads, read in the same glance as the value, and a line of helper text
+ * under the field is a glance away. It carries no interaction and no colour
+ * weight — it is a fact about what has been entered, not a verdict on it.
+ */
+.ox-dt-range__span {
+  display: inline-flex;
+  align-items: center;
+  flex: none;
+  margin-inline-start: auto;
+  padding-block: 0.125rem;
+  padding-inline: 0.375rem;
+  border-radius: var(--ox-radius-sm, 0.25rem);
+  background: var(--ox-datetime-duration-bg, #f1f5f9);
+  color: var(--ox-text-muted, #64748b);
+  font-size: var(--ox-text-xs, 0.75rem);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+/* The badge already claimed the free space; the trigger sits after it. */
+.ox-dt-range__span + .ox-dt-range__trigger,
+.ox-dt-range__trigger {
+  margin-inline-start: auto;
+}
+
+.ox-dt-range__span + .ox-dt-range__trigger {
+  margin-inline-start: 0;
+}
+
+/* ------------------------------------------------------------------ */
+/* The time-range panel — two columns of offered times                */
+/* ------------------------------------------------------------------ */
+
+.ox-dt-timerange {
+  display: flex;
+  flex-direction: column;
+  min-inline-size: 17rem;
+}
+
+.ox-dt-timerange__cols {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+/* A rule between the columns rather than a gap: they are two halves of one
+   question, and a gap wide enough to read as a separator is wide enough to
+   read as two panels. */
+.ox-dt-timecol + .ox-dt-timecol {
+  padding-inline-start: 0.5rem;
+  margin-inline-start: 0.5rem;
+  border-inline-start: 1px solid var(--ox-border, #e2e8f0);
+}
+
+.ox-dt-timecol {
+  display: flex;
+  flex-direction: column;
+  min-inline-size: 0;
+}
+
+.ox-dt-timecol__head {
+  padding-block-end: 0.375rem;
+  padding-inline: 0.5rem;
+  font-size: var(--ox-text-xs, 0.75rem);
+  font-weight: 600;
+  color: var(--ox-text-muted, #64748b);
+}
+
+/*
+ * Capped and scrolled.
+ *
+ * A day at half-hour steps is forty-eight options and a panel that renders
+ * them all is taller than most viewports — which puts the commit buttons off
+ * screen, and SC 2.4.11 then has the popover hiding the field that opened it.
+ */
+.ox-dt-timecol__list {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  max-block-size: 15rem;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+}
+
+.ox-dt-timeopt {
+  display: flex;
+  align-items: center;
+  min-block-size: var(--ox-density-target-floor, 1.5rem);
+  padding-block: 0.375rem;
+  padding-inline: 0.5rem;
+  border: 0;
+  border-radius: var(--ox-radius-sm, 0.25rem);
+  background: none;
+  color: var(--ox-text, inherit);
+  font: inherit;
+  font-size: var(--ox-datetime-font, var(--ox-text-sm, 0.875rem));
+  font-variant-numeric: tabular-nums;
+  text-align: start;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background-color var(--ox-duration-fast, 90ms) var(--ox-ease, ease),
+    color var(--ox-duration-fast, 90ms) var(--ox-ease, ease);
+}
+
+.ox-dt-timeopt:hover {
+  background: var(--ox-datetime-cell-hover-bg, #f1f5f9);
+}
+
+.ox-dt-timeopt:focus-visible {
+  outline: 2px solid var(--ox-field-border-focus, #2563eb);
+  outline-offset: -2px;
+}
+
+/* Weight as well as fill: the chosen time has to survive greyscale, and a
+   grey pill on a white column is the first thing a monochrome print loses. */
+.ox-dt-timeopt[aria-selected="true"] {
+  background: var(--ox-datetime-cell-hover-bg, #f1f5f9);
+  font-weight: 600;
+}
+
+/*
+ * A time that cannot end this range. Struck as well as dimmed, the same second
+ * channel an unavailable calendar day gets, and the reason is in the
+ * accessible name rather than in a tone of grey.
+ */
+.ox-dt-timeopt--blocked {
+  color: var(--ox-datetime-cell-muted-fg, #64748b);
+  text-decoration: line-through;
+  pointer-events: none;
 }
 
 /* ------------------------------------------------------------------ */
@@ -7085,6 +8250,9 @@ button.ox-prov:focus-visible,
   .ox-dt-cal__nav,
   .ox-dt-cal__title,
   .ox-dt-cal__day,
+  .ox-dt-cal__preset,
+  .ox-dt-cal__action,
+  .ox-dt-timeopt,
   .ox-dt-chip {
     transition-duration: 1ms;
   }
@@ -7102,11 +8270,29 @@ button.ox-prov:focus-visible,
 @media (forced-colors: active) {
   .ox-dt-cal__day--selected,
   .ox-dt-cal__pane button[aria-pressed="true"],
+  .ox-dt-cal__preset--on,
+  .ox-dt-cal__action--primary,
+  .ox-dt-timeopt[aria-selected="true"],
   .ox-dt-chip[aria-pressed="true"],
   .ox-dt-field__seg--active {
     background: Highlight;
     color: HighlightText;
     forced-color-adjust: none;
+  }
+
+  /*
+   * The band survives as an outline. Forced colors strips the fill, and a
+   * range whose only channel was that fill becomes two chips with nothing
+   * between them — which is a different range.
+   */
+  .ox-dt-cal__day--in-range {
+    outline: 1px solid Highlight;
+    outline-offset: -1px;
+  }
+
+  .ox-dt-cal__nav[aria-disabled="true"],
+  .ox-dt-cal__action[disabled] {
+    color: GrayText;
   }
 
   .ox-dt-cal__day--unavailable::after {
