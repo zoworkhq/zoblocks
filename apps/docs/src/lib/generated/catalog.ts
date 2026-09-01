@@ -3062,6 +3062,12 @@ export const CATALOG: ComponentDoc[] = [
         "required": true
       },
       {
+        "name": "autoFocus",
+        "type": "boolean",
+        "description": "Whether opening moves focus into the menu. Defaults to `true`. Set `false` only for a menu the reader did not summon — a demo that opens itself, a product tour, a walkthrough. Such a menu renders and reads normally but leaves the caret alone; on a page that opens one every few seconds the alternative is focus jumping under the reader and a screen reader announcing a menu nobody asked for. A prop rather than sniffing `event.isTrusted`, which was the first attempt: that inferred intent from whether a human dispatched the event, so the component behaved one way in tests and another in production — which is the property a test exists to rule out.",
+        "required": false
+      },
+      {
         "name": "className",
         "type": "string",
         "description": "Applied to the popup.",
@@ -3155,6 +3161,12 @@ export const CATALOG: ComponentDoc[] = [
             "type": "MenuSubject",
             "description": "What was right-clicked. Required, and there is no prop that suppresses the header it produces: a configurable safety feature is one that is off in the codebase that needed it most.",
             "required": true
+          },
+          {
+            "name": "autoFocus",
+            "type": "boolean",
+            "description": "Whether opening moves focus into the menu. Defaults to `true`. Set `false` only for a menu the reader did not summon — a demo that opens itself, a product tour, a walkthrough. Such a menu renders and reads normally but leaves the caret alone; on a page that opens one every few seconds the alternative is focus jumping under the reader and a screen reader announcing a menu nobody asked for. A prop rather than sniffing `event.isTrusted`, which was the first attempt: that inferred intent from whether a human dispatched the event, so the component behaved one way in tests and another in production — which is the property a test exists to rule out.",
+            "required": false
           },
           {
             "name": "className",

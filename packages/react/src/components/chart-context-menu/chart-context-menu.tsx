@@ -216,6 +216,21 @@ export interface ChartContextMenuProps {
    */
   onOpenChange?: (open: boolean, subject: MenuSubject) => void;
   /**
+   * Whether opening moves focus into the menu. Defaults to `true`.
+   *
+   * Set `false` only for a menu the reader did not summon — a demo that opens
+   * itself, a product tour, a walkthrough. Such a menu renders and reads
+   * normally but leaves the caret alone; on a page that opens one every few
+   * seconds the alternative is focus jumping under the reader and a screen
+   * reader announcing a menu nobody asked for.
+   *
+   * A prop rather than sniffing `event.isTrusted`, which was the first attempt:
+   * that inferred intent from whether a human dispatched the event, so the
+   * component behaved one way in tests and another in production — which is
+   * the property a test exists to rule out.
+   */
+  autoFocus?: boolean;
+  /**
    * Where the popup is portalled. Defaults to `document.body`.
    *
    * Worth setting when the surrounding page scopes theme, density or `dir` on
@@ -715,6 +730,7 @@ export function ChartContextMenu(props: ChartContextMenuProps) {
     onDisclose,
     onBlocked,
     onOpenChange,
+    autoFocus = true,
     container,
     disabled = false,
     children,
@@ -982,6 +998,8 @@ export function ChartContextMenu(props: ChartContextMenuProps) {
       const panel = panelRef.current;
       if (!panel) return;
       const w = panel.offsetWidth;
+      /* Only used to clamp inside a container — never to size the menu. */
+      const h = panel.offsetHeight;
       const rect = triggerRef.current?.getBoundingClientRect?.();
       if (!rect) return;
       const next = open.point
@@ -999,14 +1017,34 @@ export function ChartContextMenu(props: ChartContextMenuProps) {
        */
       if (contained) {
         const box = contained.getBoundingClientRect();
+        /*
+         * Clamped to the container, not to the viewport.
+         *
+         * `placeAtPoint` works in viewport terms because that is what a pointer
+         * event gives you — but a host that portals into a bounded pane has told
+         * us the pane is the boundary, and the viewport has nothing to do with
+         * what clips. On the home page a menu opened from the third row of a
+         * worklist lost its withheld count off the bottom of the stage, which is
+         * the one row that must never be the one that goes missing.
+         *
+         * Only the offset is clamped. `maxHeight` stays the viewport's, so this
+         * cannot re-enter the loop that measuring a height while capping it
+         * caused.
+         */
+        const pad = EDGE_PAD;
+        const viewportTop =
+          next.top === undefined ? window.innerHeight - (next.bottom ?? 0) - h : next.top;
         setBox({
-          ...(next.top === undefined
-            ? {
-                bottom:
-                  box.bottom - (window.innerHeight - (next.bottom ?? 0)) - contained.scrollTop,
-              }
-            : { top: next.top - box.top + contained.scrollTop }),
-          left: next.left - box.left + contained.scrollLeft,
+          top: clamp(
+            viewportTop - box.top + contained.scrollTop,
+            pad,
+            Math.max(pad, contained.clientHeight - h - pad),
+          ),
+          left: clamp(
+            next.left - box.left + contained.scrollLeft,
+            pad,
+            Math.max(pad, contained.clientWidth - w - pad),
+          ),
           origin: next.origin,
           maxHeight: next.maxHeight,
         });
@@ -1065,6 +1103,8 @@ export function ChartContextMenu(props: ChartContextMenuProps) {
      * unreachable. jsdom did not reproduce it; Chromium did, first try.
      */
     if (sub?.fromKeyboard) return;
+    /* A menu the reader did not summon does not take their focus. */
+    if (!autoFocus) return;
     /*
      * `preventScroll`, and it is load-bearing rather than tidy.
      *
@@ -1090,7 +1130,7 @@ export function ChartContextMenu(props: ChartContextMenuProps) {
      * the call succeeded silently and focus stayed on the trigger. Re-running
      * once the placement lands is what actually arms the first verb.
      */
-  }, [open, active, rows, confirming, reasoning, box, sub]);
+  }, [open, active, rows, confirming, reasoning, box, sub, autoFocus]);
 
   /*
    * Focus goes back to the trigger once the popup is gone, and only then.

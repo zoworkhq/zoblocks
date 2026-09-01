@@ -34,6 +34,11 @@ import {
   SessionTimeField,
 } from "@/registry/oxygen/date-picker/date-picker";
 import { plainDate, plainTime, sessionFrom } from "@/lib/oxygen-datetime";
+import {
+  ChartContextMenu,
+  type ChartMenuAction,
+  type MenuSubject,
+} from "@/registry/oxygen/chart-context-menu/chart-context-menu";
 
 /** Frozen so the demo says the same thing tomorrow. */
 const TODAY = plainDate(2026, 8, 26);
@@ -66,6 +71,267 @@ interface Featured {
    * A frame around a frame is not emphasis, it is noise.
    */
   bare?: boolean;
+}
+
+/* ------------------------------------------------------------------ */
+
+/** Synthetic. No real person, no real MRN. */
+const WORKLIST: readonly (MenuSubject & { at: string })[] = [
+  {
+    resource: "Patient",
+    id: "pt-3319",
+    label: "Aluel Okonkwo",
+    detail: "MRN 44-2871 · 34y",
+    plural: "patients",
+    at: "10:30",
+  },
+  {
+    resource: "Patient",
+    id: "pt-3320",
+    label: "Chidi Nwosu",
+    detail: "MRN 44-9013 · 41y",
+    plural: "patients",
+    at: "11:00",
+  },
+  {
+    resource: "Patient",
+    id: "pt-3321",
+    label: "Ama Boateng",
+    detail: "MRN 44-7755 · 29y",
+    plural: "patients",
+    at: "11:30",
+  },
+];
+
+const WORKLIST_ACTIONS: readonly ChartMenuAction[] = [
+  { id: "open", label: "Open chart", tier: "routine", shortcut: "↵" },
+  { id: "mrn", label: "Copy MRN", tier: "routine" },
+  {
+    id: "mine",
+    label: "Add to my patients",
+    tier: "documented",
+    applies: ["Patient"],
+    records: "Creates a treatment relationship. It is what scopes your searches.",
+  },
+  {
+    id: "noshow",
+    label: "Document a no-show",
+    tier: "clinical",
+    applies: ["Patient"],
+    confirm: "Records a missed appointment on today's encounter.",
+    confirmVerb: "Document no-show",
+  },
+  {
+    id: "glass",
+    label: "Break-glass open",
+    tier: "disclosive",
+    applies: ["Patient"],
+    reasons: ["Medical emergency", "Covering clinician"],
+    availability: { status: "withheld" },
+  },
+];
+
+const NURSE = { role: "a registered nurse", breakGlass: true } as const;
+
+/**
+ * The context menu, opening where a reader can see what it lands on.
+ *
+ * A pointer crosses the worklist, right-clicks, and the menu blooms with the
+ * subject header under the cursor — then does it again on a different patient,
+ * so the header visibly changes. That is the whole claim, and it is the one
+ * thing a static image cannot make.
+ *
+ * Three things keep an auto-playing demo from being a nuisance:
+ *
+ *   `autoFocus={false}`, so the menu renders without taking focus. A reader
+ *   mid-page keeps their caret, and a screen reader is not handed a menu
+ *   nobody asked for.
+ *
+ *   It runs only while on screen. An `IntersectionObserver` stops the loop
+ *   when the section is scrolled past, so the page is not animating three
+ *   viewports away.
+ *
+ *   `prefers-reduced-motion` gets one menu, open, still. Not a paused
+ *   animation — a designed rest state, which is what the loaders in this same
+ *   section already promise.
+ *
+ * The rows are real triggers. Right-click one yourself and you get the real
+ * thing, focus and keyboard included.
+ */
+function ContextMenuDemo() {
+  const stageRef = React.useRef<HTMLDivElement | null>(null);
+  const rowRefs = React.useRef(new Map<string, HTMLDivElement | null>());
+  const [stage, setStage] = React.useState<HTMLDivElement | null>(null);
+  const [active, setActive] = React.useState(0);
+  const [cursor, setCursor] = React.useState<{ x: number; y: number } | null>(null);
+  const [still, setStill] = React.useState(false);
+
+  React.useEffect(() => {
+    const reduced =
+      typeof window !== "undefined" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduced) {
+      setStill(true);
+      return undefined;
+    }
+
+    const host = stageRef.current;
+    if (!host) return undefined;
+
+    let timers: number[] = [];
+    let index = 0;
+    let running = false;
+
+    const clear = () => {
+      timers.forEach((t) => window.clearTimeout(t));
+      timers = [];
+    };
+
+    const beat = () => {
+      const row = rowRefs.current.get(WORKLIST[index]!.id);
+      const box = host.getBoundingClientRect();
+      const rb = row?.getBoundingClientRect();
+      if (!row || !rb) return;
+
+      setActive(index);
+      setCursor({ x: rb.left - box.left + 132, y: rb.top - box.top + 18 });
+
+      timers.push(
+        window.setTimeout(() => {
+          /*
+           * A real event on a real trigger — the component's own path rather
+           * than a back door, so what a reader watches is what a right-click
+           * does.
+           */
+          row.dispatchEvent(
+            new MouseEvent("contextmenu", {
+              bubbles: true,
+              clientX: rb.left + 132,
+              clientY: rb.top + 18,
+            }),
+          );
+        }, 700),
+      );
+
+      timers.push(
+        window.setTimeout(() => {
+          // Dismissal listens on the down-event, which is also how a reader closes it.
+          document.dispatchEvent(new MouseEvent("mousedown", { bubbles: true }));
+          index = (index + 1) % WORKLIST.length;
+          timers.push(window.setTimeout(beat, 500));
+        }, 3600),
+      );
+    };
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry?.isIntersecting) {
+          if (!running) {
+            running = true;
+            timers.push(window.setTimeout(beat, 400));
+          }
+        } else if (running) {
+          running = false;
+          clear();
+          document.dispatchEvent(new MouseEvent("mousedown", { bubbles: true }));
+        }
+      },
+      { threshold: 0.35 },
+    );
+    observer.observe(host);
+
+    return () => {
+      observer.disconnect();
+      clear();
+    };
+  }, []);
+
+  return (
+    /*
+     * The portal target is this wrapper, not the rows box.
+     *
+     * The rows box clips — it has to, or the first and last rows lose their
+     * rounded corners — so a menu portalled into it lost everything below the
+     * second item, including the withheld count. The wrapper does not clip and
+     * carries the room the menu opens into.
+     */
+    <div
+      ref={(node) => {
+        stageRef.current = node;
+        setStage(node);
+      }}
+      className="relative w-full pb-64"
+    >
+      <p className="numeric mb-3 text-xs text-graphite-soft">
+        {still
+          ? "Right-click a row — the menu names it before it offers to change it."
+          : "Right-click a row yourself. The header is what the pointer lands on."}
+      </p>
+
+      <div className="overflow-hidden rounded-xl border border-rule bg-paper">
+        {WORKLIST.map((person, index) => (
+          <ChartContextMenu
+            key={person.id}
+            subject={person}
+            actions={WORKLIST_ACTIONS as ChartMenuAction[]}
+            policy={NURSE}
+            presentation="popup"
+            container={stage}
+            autoFocus={false}
+            now="2026-08-26T10:12:00-04:00"
+            onRun={() => {}}
+          >
+            {(trigger) => (
+              <div
+                {...trigger}
+                ref={(node) => {
+                  if (node) rowRefs.current.set(person.id, node);
+                  else rowRefs.current.delete(person.id);
+                }}
+                className={`flex select-none items-center gap-3 px-4 py-3 text-left transition-colors duration-200 ${
+                  index > 0 ? "border-t border-rule" : ""
+                } ${active === index ? "bg-paper-sunk" : ""}`}
+              >
+                <span className="min-w-0 flex-1">
+                  <span className="block truncate text-sm font-medium text-ink">
+                    {person.label}
+                  </span>
+                  <span className="numeric block truncate text-xs text-graphite-soft">
+                    {person.detail}
+                  </span>
+                </span>
+                <span className="numeric shrink-0 text-xs text-graphite-soft">{person.at}</span>
+              </div>
+            )}
+          </ChartContextMenu>
+        ))}
+      </div>
+
+      {cursor && !still ? (
+        <span
+          aria-hidden="true"
+          data-ox-demo-cursor=""
+          /* Above `.ox-menu`, which sits at z-index 60. A pointer drawn under
+             the thing it just opened is a pointer nobody can see. */
+          /* `left-0 top-0` is not decoration: an absolutely positioned element with
+             neither offset keeps its *static* position as the origin, so the
+             translate started from wherever the span would have flowed — 215px
+             below the row it was meant to point at. */
+          className="pointer-events-none absolute left-0 top-0 z-[70] transition-transform duration-700 ease-[cubic-bezier(0.5,0,0.2,1)]"
+          style={{ transform: `translate(${cursor.x}px, ${cursor.y}px)` }}
+        >
+          <svg width="16" height="16" viewBox="0 0 16 16" className="drop-shadow">
+            <path
+              d="M2 1.5 12.5 8.6 8 9.4l2.3 4.6-1.9.9L6.1 10 3 12.6Z"
+              fill="var(--color-paper)"
+              stroke="var(--color-ink)"
+              strokeWidth="1.2"
+            />
+          </svg>
+        </span>
+      ) : null}
+    </div>
+  );
 }
 
 /* ------------------------------------------------------------------ */
@@ -245,6 +511,15 @@ const FEATURED: readonly Featured[] = [
     bare: true,
   },
   {
+    slug: "chart-context-menu",
+    name: "Context menu",
+    resource: "Patient",
+    claim:
+      "It names the record before it offers to change it, so the first thing under the pointer is never a verb.",
+    facts: ["15 props", "4 consequence tiers", "Withheld is counted, not hidden"],
+    demo: () => <ContextMenuDemo />,
+  },
+  {
     slug: "tabs",
     name: "Tabs",
     resource: "—",
@@ -381,11 +656,11 @@ export function HomeFeatured({ total }: { total: number }) {
             The library
           </p>
           <h2 className="display-lg mt-4 text-balance" data-reveal>
-            Five components, at the size you would actually use them.
+            Six components, at the size you would actually use them.
           </h2>
           <p className="lede mt-5 max-w-2xl text-pretty" data-reveal>
-            Every one below is the real component, running. Operate it — type into the date field,
-            throw the switch, ask the copilot a question. Nothing here is a screenshot.
+            Every one below is the real component, running. Operate it — right-click a patient, type
+            into the date field, throw the switch. Nothing here is a screenshot.
           </p>
         </div>
 
