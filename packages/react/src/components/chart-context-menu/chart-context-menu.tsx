@@ -56,6 +56,7 @@ import {
   matchFirstLetter,
   nextIndex,
   resolveMenu,
+  type ActionTier,
   type DisclosureRecord,
   type MenuAction,
   type MenuOutcome,
@@ -483,6 +484,163 @@ function Chevron() {
     </svg>
   );
 }
+
+function Pen() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      width="13"
+      height="13"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M17 3.5a2.1 2.1 0 0 1 3 3L7.5 19 3 20.5 4.5 16Z" />
+    </svg>
+  );
+}
+
+function Alert() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      width="13"
+      height="13"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M12 3.2 1.8 20.8h20.4z" />
+      <path d="M12 9.5v5M12 17.8v.01" />
+    </svg>
+  );
+}
+
+function Key() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      width="13"
+      height="13"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <circle cx="7.5" cy="15.5" r="4" />
+      <path d="m10.4 12.6 8-8M16.5 6.5l2 2M14 9l2 2" />
+    </svg>
+  );
+}
+
+/**
+ * The mark a tier wears when the host supplies no icon of its own.
+ *
+ * `routine` deliberately has none. A glyph on every row would be decoration;
+ * a glyph on the rows that cost something is signal, and the empty slot keeps
+ * every label starting at the same x, which is what the fixed column was for.
+ *
+ * This exists because the first version left the column to the host, and a
+ * host that passed no icons — the docs demo among them — got no glyph and no
+ * hue, since the tier colour is carried on the glyph. `Discontinue` and
+ * `Copy as text` rendered identically, which made this component's own
+ * SC 1.4.1 claim ("a glyph, a band position and a word as well as a hue")
+ * false wherever anyone actually used it.
+ */
+const TIER_GLYPH: Record<ActionTier, React.ReactNode> = {
+  routine: null,
+  documented: <Pen />,
+  clinical: <Alert />,
+  disclosive: <Key />,
+};
+
+function Pill() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      width="12"
+      height="12"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="m10.5 20.5-7-7a5 5 0 0 1 7-7l7 7a5 5 0 0 1-7 7Z" />
+      <path d="m7 10 7 7" />
+    </svg>
+  );
+}
+
+function Flask() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      width="12"
+      height="12"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M9 3v6.5L3.6 18A2 2 0 0 0 5.3 21h13.4a2 2 0 0 0 1.7-3L15 9.5V3" />
+      <path d="M7.5 3h9M6.2 15h11.6" />
+    </svg>
+  );
+}
+
+function Doc() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      width="12"
+      height="12"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8Z" />
+      <path d="M14 3v5h5M9 13h6M9 17h4" />
+    </svg>
+  );
+}
+
+/**
+ * What the subject header wears when the subject is not a person.
+ *
+ * Initials are a person's affordance and spell nonsense on anything else, but
+ * the first fix — a single letter from the resource word — reads as an avatar
+ * for somebody called "M". A glyph says "medication" the way initials say
+ * "person", and both are the same 24px circle.
+ */
+const SUBJECT_GLYPH: Record<string, React.ReactNode> = {
+  MedicationRequest: <Pill />,
+  MedicationStatement: <Pill />,
+  Observation: <Flask />,
+  DiagnosticReport: <Flask />,
+  DocumentReference: <Doc />,
+  AllergyIntolerance: <Alert />,
+  Condition: <Doc />,
+  Encounter: <Doc />,
+  Task: <Doc />,
+  CarePlan: <Doc />,
+  ServiceRequest: <Doc />,
+  Immunization: <Pill />,
+};
 
 function Lock() {
   return (
@@ -1172,12 +1330,13 @@ export function ChartContextMenu(props: ChartContextMenuProps) {
           ) : subject.resource === "Patient" || subject.resource === "Practitioner" ? (
             initialsOf(resolved.subject.who)
           ) : (
-            /*
-             * A type letter, not initials. "LM" for "Lisinopril 10 mg" spells
-             * nothing, and an empty bordered circle reads as a missing avatar
-             * rather than as a medication.
-             */
-            (RESOURCE_WORD[subject.resource] ?? subject.resource).charAt(0).toUpperCase()
+            (SUBJECT_GLYPH[subject.resource] ?? (
+              /* Anything the map does not know still gets its type's initial
+                 rather than an empty circle. */
+              <span>
+                {(RESOURCE_WORD[subject.resource] ?? subject.resource).charAt(0).toUpperCase()}
+              </span>
+            ))
           )}
         </span>
         <span>
@@ -1284,7 +1443,7 @@ export function ChartContextMenu(props: ChartContextMenuProps) {
                         {action.kind === "checkbox" ? <Check /> : null}
                       </span>
                     ) : (
-                      <Glyph>{action.icon}</Glyph>
+                      <Glyph>{action.icon ?? TIER_GLYPH[tier]}</Glyph>
                     )}
 
                     {pending ? (

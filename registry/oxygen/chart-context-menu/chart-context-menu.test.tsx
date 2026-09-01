@@ -957,3 +957,106 @@ describe("a row with children is not a command", () => {
     ).toContain("nothing in it");
   });
 });
+
+/* ------------------------------------------------------------------ */
+/* The tier has to be visible without the host's help                  */
+/* ------------------------------------------------------------------ */
+
+/*
+ * `meta.a11yChecks` claims for SC 1.4.1 that every tier carries "a glyph, a
+ * band position and a word as well as a hue". It did not. The tier colour is
+ * painted on the icon slot, and the icon was entirely the host's to supply —
+ * so a host that passed none, the docs demo among them, got a menu where
+ * `Discontinue` and `Copy as text` were typographically identical and the only
+ * difference was which side of a rule they sat on. The claim was true of the
+ * CSS and false of every actual menu.
+ */
+describe("consequence is visible even when the host supplies no icons", () => {
+  const bare: ChartMenuAction[] = [
+    { id: "copy", label: "Copy", tier: "routine" },
+    {
+      id: "note",
+      label: "Note it",
+      tier: "documented",
+      applies: ["MedicationRequest"],
+      records: "Writes.",
+    },
+    {
+      id: "stop",
+      label: "Stop it",
+      tier: "clinical",
+      applies: ["MedicationRequest"],
+      confirm: "Stops it.",
+    },
+    {
+      id: "reveal",
+      label: "Reveal",
+      tier: "disclosive",
+      applies: ["MedicationRequest"],
+      reasons: ["Care"],
+    },
+  ];
+
+  async function open() {
+    const user = userEvent.setup();
+    render(<Row actions={bare} />);
+    await user.pointer({ keys: "[MouseRight]", target: screen.getByTestId("row") });
+    return within(await screen.findByRole("menu"));
+  }
+
+  it("draws a mark on every row that costs something", async () => {
+    const menu = await open();
+    for (const name of [/Note it/, /Stop it/, /Reveal/]) {
+      const row = menu.getByRole("menuitem", { name });
+      const icon = row.querySelector(".ox-menu__icon");
+      expect(icon?.querySelector("svg"), `${name} has no glyph`).toBeTruthy();
+    }
+  });
+
+  it("leaves a routine row unmarked, so the mark means something", async () => {
+    const menu = await open();
+    const row = menu.getByRole("menuitem", { name: /Copy/ });
+    expect(row.querySelector(".ox-menu__icon svg")).toBeNull();
+    // The slot is still there, so every label starts at the same x.
+    expect(row.querySelector(".ox-menu__icon")).toBeTruthy();
+  });
+
+  it("lets the host's own icon win", async () => {
+    const user = userEvent.setup();
+    render(<Row actions={[{ ...bare[2]!, icon: <svg data-testid="host-icon" /> }]} />);
+    await user.pointer({ keys: "[MouseRight]", target: screen.getByTestId("row") });
+    const menu = within(await screen.findByRole("menu"));
+    expect(menu.getByTestId("host-icon")).toBeTruthy();
+  });
+
+  it("names the subject's kind with a glyph rather than a stray initial", async () => {
+    const user = userEvent.setup();
+    render(<Row actions={bare} />);
+    await user.pointer({ keys: "[MouseRight]", target: screen.getByTestId("row") });
+    const menu = await screen.findByRole("menu");
+    const avatar = menu.querySelector(".ox-menu__avatar");
+    // A medication is not a person, and "M" in a circle reads as one.
+    expect(avatar?.querySelector("svg")).toBeTruthy();
+    expect(avatar?.textContent).toBe("");
+  });
+
+  it("still shows initials for a person", async () => {
+    const user = userEvent.setup();
+    render(
+      <ChartContextMenu
+        subject={{ resource: "Patient", id: "p1", label: "Aluel Okonkwo" }}
+        actions={[bare[0]!]}
+        now={NOW}
+      >
+        {(t) => (
+          <div {...t} data-testid="row">
+            row
+          </div>
+        )}
+      </ChartContextMenu>,
+    );
+    await user.pointer({ keys: "[MouseRight]", target: screen.getByTestId("row") });
+    const menu = await screen.findByRole("menu");
+    expect(menu.querySelector(".ox-menu__avatar")?.textContent).toBe("AO");
+  });
+});

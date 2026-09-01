@@ -3279,7 +3279,7 @@ export const CATALOG: ComponentDoc[] = [
       },
       {
         "label": "The tier is never carried by colour alone",
-        "detail": "Each tier has a glyph, a band position and — above routine — a sentence. In forced-colours mode the tints are discarded and the bands, the strike-through, the lock and the wording all survive."
+        "detail": "Each tier above routine has a glyph the component supplies itself, a band position and a sentence. The glyph is not the host's to forget: the tier hue is painted on it, so leaving the slot empty would take the colour with it and leave a discontinue looking exactly like a copy. A host icon overrides it; routine keeps an empty slot so every label starts at the same x. In forced-colours mode the tints are discarded and the glyphs, the bands, the strike-through, the lock and the wording all survive."
       }
     ],
     "limitations": [
@@ -3474,7 +3474,7 @@ export const CATALOG: ComponentDoc[] = [
         "wcag": "1.4.1",
         "name": "Use of colour",
         "status": "pass",
-        "how": "Every tier carries a glyph, a band position and a word. Unavailable is struck through and states its reason; withheld carries a lock and a sentence.",
+        "how": "Every tier above routine carries a glyph supplied by the component, a band position and a word. Unavailable is struck through and states its reason; withheld carries a lock and a sentence. Asserted with the host supplying no icons at all, which is how the claim was false before.",
         "evidence": "chart-context-menu.test.tsx"
       },
       {
