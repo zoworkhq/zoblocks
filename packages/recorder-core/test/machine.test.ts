@@ -274,6 +274,22 @@ describe("observation", () => {
     expect(machine.refusal("disarm")).toBeNull();
   });
 
+  it("holds the basis it was given, and hands the same object back", () => {
+    // The machine never authors consent, only holds it — and a host renders
+    // its provenance line ("recorded by X at Y") straight off this. Returning
+    // a copy would quietly break an identity check in a memoised component.
+    const machine = createRecorderMachine({ consent: RESOLVED });
+    expect(machine.consent).toBe(RESOLVED);
+
+    const later: RecorderConsent = { ...RESOLVED, recordedBy: "practitioner/bell" };
+    machine.setConsent(later);
+    expect(machine.consent).toBe(later);
+
+    machine.setConsent(null);
+    expect(machine.consent).toBeNull();
+    expect(machine.consentVerdict).toBe("absent");
+  });
+
   it("starts wherever the host says, for the controlled form", () => {
     const machine = createRecorderMachine({ phase: "held" });
     expect(machine.phase).toBe("held");
