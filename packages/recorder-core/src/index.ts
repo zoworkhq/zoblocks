@@ -97,6 +97,18 @@ export {
 } from "./machine";
 
 export {
+  RECORDER_FAULTS,
+  detectFaults,
+  isCapturingNothing,
+  primaryFault,
+  type FaultObservation,
+  type RecorderFault,
+  type RecorderFaultCode,
+  type RecorderFaultSeverity,
+  type TrackObservation,
+} from "./faults";
+
+export {
   isConsentResolved,
   resolveConsent,
   uncoveredParticipants,
