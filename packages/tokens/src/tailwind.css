@@ -73,6 +73,9 @@
   --color-ox-status-provisional: var(--ox-status-provisional);
   --color-ox-status-provisional-bg: var(--ox-status-provisional-bg);
   --color-ox-status-provisional-border: var(--ox-status-provisional-border);
+  --color-ox-status-recording: var(--ox-status-recording);
+  --color-ox-status-recording-bg: var(--ox-status-recording-bg);
+  --color-ox-status-recording-border: var(--ox-status-recording-border);
   --color-ox-flag-restricted: var(--ox-flag-restricted);
   --color-ox-flag-restricted-bg: var(--ox-flag-restricted-bg);
   --color-ox-flag-provisional: var(--ox-flag-provisional);
@@ -296,4 +299,14 @@
   --spacing-ox-datetime-target: var(--ox-datetime-target);
   --spacing-ox-datetime-gap: var(--ox-datetime-gap);
   --spacing-ox-datetime-font: var(--ox-datetime-font);
+  --color-ox-recorder-rec: var(--ox-recorder-rec);
+  --color-ox-recorder-rec-soft: var(--ox-recorder-rec-soft);
+  --color-ox-recorder-rec-line: var(--ox-recorder-rec-line);
+  --color-ox-recorder-rec-ink: var(--ox-recorder-rec-ink);
+  --color-ox-recorder-wave: var(--ox-recorder-wave);
+  --color-ox-recorder-wave-off: var(--ox-recorder-wave-off);
+  --color-ox-recorder-pane: var(--ox-recorder-pane);
+  --spacing-ox-recorder-lane-h: var(--ox-recorder-lane-h);
+  --spacing-ox-recorder-bar-w: var(--ox-recorder-bar-w);
+  --spacing-ox-recorder-bar-gap: var(--ox-recorder-bar-gap);
 }

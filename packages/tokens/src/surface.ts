@@ -13,7 +13,7 @@
  * change, because customers style against these names. The manifest is
  * committed so that change shows up as a reviewable diff.
  *
- * 328 tokens across 28 components:
+ * 338 tokens across 29 components:
  *
  *   switch          55
  *   tabs            44
@@ -26,6 +26,7 @@
  *   chart           11
  *   copilot         10
  *   loader          10
+ *   recorder        10
  *   timeline         9
  *   cs               8
  *   nav              8
@@ -44,7 +45,7 @@
  *   risk             1
  *   stack            1
  *
- * `bridgeable: false` (87 tokens) marks the ones resolving to clinical
+ * `bridgeable: false` (91 tokens) marks the ones resolving to clinical
  * status or an identity flag. A host framework's `colorError` is not our
  * `status.critical`: ours carries a validated contrast floor and a 60° hue
  * separation from `status.low`, so the direction of an abnormal result
@@ -2161,6 +2162,103 @@ export const TOKEN_SURFACE: readonly SurfaceEntry[] = [
     "bridgeable": true
   },
   {
+    "name": "--ox-recorder-bar-gap",
+    "component": "recorder",
+    "source": "packages/tokens/tokens/component.json",
+    "kind": "dimension",
+    "frameworks": [],
+    "fallback": true,
+    "bridgeable": true
+  },
+  {
+    "name": "--ox-recorder-bar-w",
+    "component": "recorder",
+    "source": "packages/tokens/tokens/component.json",
+    "kind": "dimension",
+    "frameworks": [],
+    "fallback": true,
+    "bridgeable": true
+  },
+  {
+    "name": "--ox-recorder-lane-h",
+    "component": "recorder",
+    "source": "packages/tokens/tokens/component.json",
+    "kind": "dimension",
+    "frameworks": [],
+    "fallback": true,
+    "bridgeable": true
+  },
+  {
+    "name": "--ox-recorder-pane",
+    "component": "recorder",
+    "source": "packages/tokens/tokens/component.json",
+    "kind": "color",
+    "semantic": "--ox-bg-muted",
+    "frameworks": [],
+    "fallback": true,
+    "bridgeable": true
+  },
+  {
+    "name": "--ox-recorder-rec",
+    "component": "recorder",
+    "source": "packages/tokens/tokens/component.json",
+    "kind": "color",
+    "semantic": "--ox-status-recording",
+    "frameworks": [],
+    "fallback": true,
+    "bridgeable": false
+  },
+  {
+    "name": "--ox-recorder-rec-ink",
+    "component": "recorder",
+    "source": "packages/tokens/tokens/component.json",
+    "kind": "color",
+    "semantic": "--ox-status-critical",
+    "frameworks": [],
+    "fallback": true,
+    "bridgeable": false
+  },
+  {
+    "name": "--ox-recorder-rec-line",
+    "component": "recorder",
+    "source": "packages/tokens/tokens/component.json",
+    "kind": "color",
+    "semantic": "--ox-status-recording-border",
+    "frameworks": [],
+    "fallback": true,
+    "bridgeable": false
+  },
+  {
+    "name": "--ox-recorder-rec-soft",
+    "component": "recorder",
+    "source": "packages/tokens/tokens/component.json",
+    "kind": "color",
+    "semantic": "--ox-status-recording-bg",
+    "frameworks": [],
+    "fallback": true,
+    "bridgeable": false
+  },
+  {
+    "name": "--ox-recorder-wave",
+    "component": "recorder",
+    "source": "packages/tokens/tokens/component.json",
+    "kind": "color",
+    "semantic": "--ox-accent",
+    "frameworks": [],
+    "fallback": true,
+    "bridgeable": true
+  },
+  {
+    "name": "--ox-recorder-wave-off",
+    "component": "recorder",
+    "source": "packages/tokens/tokens/component.json",
+    "kind": "color",
+    "semantic": "--ox-text-muted",
+    "frameworks": [],
+    "fallback": true,
+    "bridgeable": true
+  },
+  {
     "name": "--ox-risk-figure",
     "component": "risk",
     "source": "packages/tokens/tokens/component.json",
@@ -3436,6 +3534,7 @@ export const SURFACE_COMPONENTS: readonly string[] = [
   "presence",
   "prov",
   "range",
+  "recorder",
   "risk",
   "rv",
   "stack",
@@ -3591,6 +3690,12 @@ export const BRIDGEABLE: readonly string[] = [
   "--ox-range-height",
   "--ox-range-marker",
   "--ox-range-track",
+  "--ox-recorder-bar-gap",
+  "--ox-recorder-bar-w",
+  "--ox-recorder-lane-h",
+  "--ox-recorder-pane",
+  "--ox-recorder-wave",
+  "--ox-recorder-wave-off",
   "--ox-risk-figure",
   "--ox-rv-gap",
   "--ox-rv-value-compact",
@@ -3758,6 +3863,10 @@ export const NOT_BRIDGEABLE: readonly string[] = [
   "--ox-range-band",
   "--ox-range-band-border",
   "--ox-range-marker-abnormal",
+  "--ox-recorder-rec",
+  "--ox-recorder-rec-ink",
+  "--ox-recorder-rec-line",
+  "--ox-recorder-rec-soft",
   "--ox-switch-error-fg",
   "--ox-switch-hold-ring",
   "--ox-switch-impact-bg",
@@ -3814,6 +3923,9 @@ export const CLINICAL_SEMANTIC: readonly string[] = [
   "--ox-status-provisional",
   "--ox-status-provisional-bg",
   "--ox-status-provisional-border",
+  "--ox-status-recording",
+  "--ox-status-recording-bg",
+  "--ox-status-recording-border",
   "--ox-status-restricted",
   "--ox-status-restricted-bg",
   "--ox-status-restricted-border",

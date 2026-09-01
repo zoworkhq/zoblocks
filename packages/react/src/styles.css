@@ -487,6 +487,580 @@
   }
 }
 
+/* ---- registry/oxygen/lib/recorder.css ---- */
+/**
+ * Recorder — the stylesheet behind all five arts.
+ *
+ * Every class here is namespaced `ox-rec-`, which is ownership rather than
+ * tidiness: `test/css-namespace.test.ts` fails if two components claim one
+ * class, and `PatientChip` once silently wore Accordion's `.ox-chip` skin on
+ * every page that loaded both.
+ *
+ * Two rules the arts below all obey, both from §01 of the brief:
+ *
+ *   1. **Nothing here animates on a timer.** There is exactly one keyframe
+ *      animation in this file — the record tell — and it is the one element
+ *      whose job is to say "capture is running", which is true whether or not
+ *      audio is arriving. Every other moving thing is a custom property the
+ *      signal writes. Take the signal away and the art stops, because there is
+ *      nothing left to move it.
+ *   2. **Silence is drawn at true zero.** The centre hairline is real. A bar
+ *      that touches it means the recogniser is receiving nothing, so no bar
+ *      has a decorative minimum height.
+ */
+
+.ox-rec {
+  --_lv: 0;
+  --_pk: 0;
+  --_wave: var(--ox-recorder-wave, var(--ox-accent, currentColor));
+  --_wave-off: var(--ox-recorder-wave-off, var(--ox-text-muted, #828d89));
+  --_rec: var(--ox-recorder-rec, #d1453b);
+  --_rec-soft: var(--ox-recorder-rec-soft, #fdeeec);
+  --_rec-line: var(--ox-recorder-rec-line, #f3b7b1);
+  --_rec-ink: var(--ox-recorder-rec-ink, #a32d25);
+  --_pane: var(--ox-recorder-pane, var(--ox-bg-muted, #f1f4f4));
+  --_lane-h: var(--ox-recorder-lane-h, 68px);
+  --_bar-w: var(--ox-recorder-bar-w, 3px);
+  --_bar-gap: var(--ox-recorder-bar-gap, 2px);
+  --_radius: var(--ox-radius, 6px);
+
+  display: grid;
+  gap: 12px;
+  color: var(--ox-text, currentColor);
+  font-family: var(--ox-font-sans, inherit);
+  font-size: var(--ox-text-sm, 0.875rem);
+}
+
+/* ------------------------------------------------------------------ shared */
+
+.ox-rec-clock {
+  font-family: var(--ox-font-mono, ui-monospace, monospace);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+  font-weight: 500;
+}
+.ox-rec-clock[data-size="lg"] {
+  font-size: 1.375rem;
+}
+.ox-rec-meta {
+  font-size: var(--ox-text-xs, 0.8125rem);
+  color: var(--ox-text-muted, currentColor);
+}
+.ox-rec-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+/**
+ * The record tell — the one looping animation in the file.
+ *
+ * It reports that CAPTURE IS RUNNING, which stays true when the microphone is
+ * muted: the file is still growing and it is filling with silence. Greying it
+ * out under a mute would say "not recording", which is false, and is the exact
+ * inversion of the mistake this component exists to prevent. Under a fault the
+ * tell escalates to critical and keeps beating.
+ */
+.ox-rec-tell {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 9px 2px 7px;
+  border-radius: 999px;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--_rec-ink);
+  background: var(--_rec-soft);
+  border: 1px solid var(--_rec-line);
+}
+.ox-rec-tell::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--_rec);
+  flex: 0 0 auto;
+  animation: ox-rec-breathe 2s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+}
+@keyframes ox-rec-breathe {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 color-mix(in oklab, var(--_rec) 50%, transparent);
+  }
+  70% {
+    box-shadow: 0 0 0 6px transparent;
+  }
+}
+.ox-rec[data-fault="critical"] .ox-rec-tell {
+  color: var(--ox-alert-critical-fg, #912018);
+  background: var(--ox-alert-critical-bg, #fef3f2);
+  border-color: var(--ox-alert-critical-border, #f5b5ae);
+}
+
+/* The fault banner. Never a generic "no audio": §11 gives each its own line. */
+.ox-rec-fault {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 7px 11px;
+  border-radius: var(--_radius);
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  border: 1px solid var(--ox-alert-critical-border, #f5b5ae);
+  background: var(--ox-alert-critical-bg, #fef3f2);
+  color: var(--ox-alert-critical-fg, #912018);
+}
+.ox-rec-fault[data-severity="warn"] {
+  border-color: var(--ox-alert-warning-border, #f5ce7a);
+  background: var(--ox-alert-warning-bg, #fffaeb);
+  color: var(--ox-alert-warning-fg, #93370d);
+}
+.ox-rec-fault[data-severity="info"] {
+  border-color: var(--ox-border, #e4eae8);
+  background: var(--_pane);
+  color: var(--ox-text-muted, currentColor);
+}
+.ox-rec-fault b {
+  font-weight: 600;
+}
+
+/* --------------------------------------------------------------- the lanes */
+
+.ox-rec-pane {
+  position: relative;
+  padding: 0 12px;
+  background: var(--_pane);
+  border: 1px solid var(--ox-border, #e4eae8);
+  border-radius: var(--_radius);
+  display: grid;
+  align-items: center;
+  min-height: calc(var(--_lane-h) + 24px);
+}
+/* True zero, drawn. A bar touching this line is receiving nothing. */
+.ox-rec-pane::after {
+  content: "";
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  top: 50%;
+  height: 1px;
+  background: var(--ox-border-strong, #d2dbd8);
+  opacity: 0.7;
+}
+.ox-rec[data-fault="critical"] .ox-rec-pane {
+  border-color: var(--ox-alert-critical-border, #f5b5ae);
+  background: var(--ox-alert-critical-bg, #fef3f2);
+}
+
+.ox-rec-lane {
+  position: relative;
+  z-index: 1;
+  height: var(--_lane-h);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--_bar-gap);
+  /* The fade is what makes the lane read as ARRIVING. The data moves; nothing
+     here is translating, so there is no animation to stop. */
+  mask-image: linear-gradient(90deg, transparent, #000 14%, #000 100%);
+}
+.ox-rec-lane > i {
+  --_h: 0.02;
+  --_now: 0;
+  display: block;
+  flex: 1 1 0;
+  min-width: 2px;
+  max-width: var(--_bar-w);
+  height: calc(4px + (100% - 4px) * var(--_h));
+  border-radius: 999px;
+  background: linear-gradient(
+    180deg,
+    color-mix(in oklab, var(--_wave) 62%, transparent) 0%,
+    var(--_wave) 32%,
+    var(--_wave) 68%,
+    color-mix(in oklab, var(--_wave) 62%, transparent) 100%
+  );
+  opacity: calc(0.88 + 0.12 * var(--_now));
+}
+/* No signal: the bars are already at zero on their own arithmetic. This makes
+   the surface SAY so, because a flat waveform and a quiet room look identical
+   and only one of them is a fault. */
+.ox-rec[data-signal="none"] .ox-rec-lane > i {
+  background: var(--_wave-off);
+}
+
+/* ------------------------------------------------------------------- pulse */
+
+.ox-rec-pulse {
+  justify-items: center;
+}
+.ox-rec-pulse .ox-rec-stage {
+  position: relative;
+  width: 132px;
+  height: 132px;
+  display: grid;
+  place-items: center;
+}
+.ox-rec-pulse .ox-rec-ring {
+  position: absolute;
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  border: 2px solid var(--_wave);
+  opacity: calc(0.62 - var(--_lv) * 0.3);
+  scale: calc(1 + var(--_lv) * 0.72);
+}
+/* The slow ring is the peak hold: a ceiling to read the fast ring against.
+   Without it the eye has no reference and a drop in level reads as nothing. */
+.ox-rec-pulse .ox-rec-ring[data-ring="hold"] {
+  border-width: 1px;
+  border-color: color-mix(in oklab, var(--_wave) 62%, transparent);
+  opacity: 0.34;
+  scale: calc(1 + var(--_pk) * 0.78);
+}
+.ox-rec-pulse .ox-rec-ring[data-ring="glow"] {
+  border: 0;
+  background: radial-gradient(
+    circle,
+    color-mix(in oklab, var(--_wave) 42%, transparent) 38%,
+    transparent 72%
+  );
+  opacity: calc(0.3 + var(--_lv) * 0.7);
+  scale: calc(1 + var(--_lv) * 0.3);
+}
+.ox-rec-pulse .ox-rec-btn {
+  position: relative;
+  z-index: 2;
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  background: var(--ox-bg, #fff);
+  border: 1px solid var(--ox-border-strong, #d2dbd8);
+  box-shadow: 0 0 0 calc(4px + var(--_lv) * 9px)
+    color-mix(in oklab, var(--_wave) 20%, transparent);
+  transition: box-shadow 90ms linear;
+}
+.ox-rec-pulse .ox-rec-btn > span {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--_rec);
+}
+.ox-rec-pulse .ox-rec-btn[data-mode="stop"] > span {
+  width: 26px;
+  height: 26px;
+  border-radius: 7px;
+}
+/* Sonar. One ring per detected onset — never on a loop, so a muted microphone
+   produces no rings while a ring already in flight still completes, because it
+   is the decay of a real event. */
+.ox-rec-pulse .ox-rec-sonar {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+.ox-rec-pulse .ox-rec-ripple {
+  --_amp: 1;
+  position: absolute;
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  border: 1.5px solid var(--_wave);
+  opacity: 0;
+  animation: ox-rec-ripple 1150ms cubic-bezier(0.16, 0.9, 0.3, 1) both;
+}
+@keyframes ox-rec-ripple {
+  0% {
+    scale: 1;
+    opacity: calc(0.42 * var(--_amp));
+  }
+  100% {
+    scale: calc(1 + 0.62 * var(--_amp));
+    opacity: 0;
+  }
+}
+
+/* ------------------------------------------------------------------- strip */
+
+.ox-rec-strip .ox-rec-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 40px;
+  padding: 0 6px 0 12px;
+  background: var(--ox-bg, #fff);
+  border: 1px solid var(--ox-border-strong, #d2dbd8);
+  border-radius: 999px;
+  max-width: 440px;
+}
+.ox-rec-strip .ox-rec-lane {
+  height: 20px;
+  mask-image: none;
+  flex: 1 1 auto;
+}
+.ox-rec-strip .ox-rec-lane > i {
+  max-width: 3px;
+  height: calc(3px + 17px * var(--_h));
+}
+/* Strip has no room for a banner, so the control itself escalates. */
+.ox-rec-strip[data-fault="critical"] .ox-rec-bar,
+.ox-rec[data-fault="critical"] .ox-rec-strip .ox-rec-bar {
+  border-color: var(--ox-alert-critical-border, #f5b5ae);
+  background: var(--ox-alert-critical-bg, #fef3f2);
+}
+
+/* -------------------------------------------------------------------- duet */
+
+/**
+ * The axis carries the speaker: clinician above the line, patient below.
+ *
+ * POSITION is the channel, not colour — accent and info sit within about
+ * 2:1 of each other in luminance, and a hue-only distinction is what
+ * DESIGN.md forbids. The lightness step and the key dots are redundancy.
+ */
+.ox-rec-duet .ox-rec-pane {
+  min-height: 104px;
+}
+.ox-rec-duet .ox-rec-rails {
+  position: absolute;
+  inset: 8px 10px;
+}
+.ox-rec-duet .ox-rec-rail {
+  position: absolute;
+  left: 0;
+  right: 0;
+  display: flex;
+  gap: 1px;
+}
+.ox-rec-duet .ox-rec-rail[data-rail="a"] {
+  top: 0;
+  bottom: 50%;
+  align-items: flex-end;
+}
+.ox-rec-duet .ox-rec-rail[data-rail="b"] {
+  top: 50%;
+  bottom: 0;
+  align-items: flex-start;
+}
+.ox-rec-duet .ox-rec-rail > i {
+  --_h: 0;
+  display: block;
+  flex: 1 1 0;
+  min-width: 1px;
+  height: calc(100% * var(--_h));
+  border-radius: 1.5px;
+  background: var(--_wave-off);
+}
+.ox-rec-duet .ox-rec-rail[data-rail="a"] > i[data-played="true"] {
+  background: var(--_wave);
+}
+.ox-rec-duet .ox-rec-rail[data-rail="b"] > i[data-played="true"] {
+  background: color-mix(in oklab, var(--ox-alert-info-fg, #175cd3) 58%, var(--ox-bg, #fff));
+}
+/* A struck span stays on the timeline as a hatched gap rather than being
+   removed: a removal a reader cannot see is one nobody can audit. */
+.ox-rec-duet .ox-rec-rail > i[data-struck="true"] {
+  background: repeating-linear-gradient(
+    135deg,
+    var(--ox-alert-critical-border, #f5b5ae) 0 2px,
+    transparent 2px 4px
+  );
+}
+.ox-rec-duet .ox-rec-axis {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 1px;
+  background: var(--ox-border-strong, #d2dbd8);
+  z-index: 1;
+}
+/**
+ * The played region is marked by AREA, not by per-bar colour.
+ *
+ * Two bar colours cannot be 3:1 against each other and 3:1 against the pane at
+ * the same time — solve one and the other lands at about 1.5:1, on the same
+ * ramp, every time. So the unplayed fill is solved against the pane and the
+ * boundary is carried by this wash and by the playhead.
+ */
+.ox-rec-duet .ox-rec-played {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 0;
+  z-index: 0;
+  background: color-mix(in oklab, var(--_wave) 13%, transparent);
+  border-inline-end: 1px solid color-mix(in oklab, var(--_wave) 40%, transparent);
+  border-radius: var(--_radius) 0 0 var(--_radius);
+}
+.ox-rec-duet .ox-rec-head {
+  position: absolute;
+  top: 4px;
+  bottom: 4px;
+  width: 2px;
+  border-radius: 2px;
+  background: var(--ox-text, currentColor);
+  z-index: 3;
+  pointer-events: none;
+}
+.ox-rec-duet .ox-rec-who {
+  position: absolute;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.59375rem;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  line-height: 1;
+  padding: 2px 5px;
+  border-radius: 3px;
+  background: var(--_pane);
+}
+.ox-rec-duet .ox-rec-who::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+.ox-rec-duet .ox-rec-who[data-rail="a"] {
+  top: 3px;
+  inset-inline-start: 0;
+  color: var(--ox-accent, #075244);
+}
+.ox-rec-duet .ox-rec-who[data-rail="b"] {
+  bottom: 3px;
+  inset-inline-start: 0;
+  color: var(--ox-alert-info-fg, #1849a9);
+}
+/* Talk-time balance. Free, because the diarisation is already in the take. */
+.ox-rec-duet .ox-rec-balance {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+  align-items: center;
+}
+.ox-rec-duet .ox-rec-balance-track {
+  height: 6px;
+  border-radius: 3px;
+  overflow: hidden;
+  background: color-mix(in oklab, var(--ox-alert-info-fg, #175cd3) 55%, transparent);
+}
+.ox-rec-duet .ox-rec-balance-fill {
+  height: 100%;
+  background: var(--_wave);
+  border-radius: 3px 0 0 3px;
+}
+
+/* ------------------------------------------------------------------ stream */
+
+.ox-rec-stream .ox-rec-log {
+  display: grid;
+  gap: 10px;
+  min-height: 132px;
+  align-content: end;
+  padding: 12px;
+  background: var(--_pane);
+  border: 1px solid var(--ox-border, #e4eae8);
+  border-radius: var(--_radius);
+}
+.ox-rec-stream .ox-rec-turn > b {
+  display: block;
+  font-size: 0.65625rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ox-text-muted, currentColor);
+  margin-bottom: 2px;
+}
+.ox-rec-stream .ox-rec-words {
+  margin: 0;
+  font-size: 0.84375rem;
+  line-height: 1.6;
+}
+/* An interim token is a guess the recogniser may take back, so it is drawn as
+   a guess. Committing it and then rewriting it is how a transcript loses a
+   clinician in the first thirty seconds. */
+.ox-rec-stream .ox-rec-interim {
+  color: var(--ox-text-muted, currentColor);
+  font-style: italic;
+}
+.ox-rec-stream[data-stalled="true"] .ox-rec-log {
+  border-color: var(--ox-alert-warning-border, #f5ce7a);
+  background: var(--ox-alert-warning-bg, #fffaeb);
+}
+
+/* ------------------------------------------------------- reduced motion */
+
+/**
+ * Every other Oxygen component can simply stop. This one cannot: the movement
+ * is carrying the only evidence that the microphone is open. So the scroll
+ * stops, the meter does not, and what the scroll was carrying comes back as a
+ * number — a substitution, not a removal.
+ *
+ * This is also why the component ships an explicit `motion` prop rather than
+ * relying on the media query alone: WCAG 2.2.2 wants a mechanism, and §09 of
+ * the brief argues the "essential" exception does not apply precisely because
+ * the still state below proves the information can be carried another way.
+ */
+@media (prefers-reduced-motion: reduce) {
+  .ox-rec:not([data-motion="full"]) .ox-rec-tell::before,
+  .ox-rec:not([data-motion="full"]) .ox-rec-ripple {
+    animation: none;
+  }
+  .ox-rec:not([data-motion="full"]) .ox-rec-tell::before {
+    box-shadow: 0 0 0 3px color-mix(in oklab, var(--_rec) 28%, transparent);
+  }
+  .ox-rec:not([data-motion="full"]) .ox-rec-ripple {
+    display: none;
+  }
+}
+.ox-rec[data-motion="reduced"] .ox-rec-tell::before {
+  animation: none;
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--_rec) 28%, transparent);
+}
+.ox-rec[data-motion="reduced"] .ox-rec-ripple {
+  display: none;
+}
+
+/* --------------------------------------------------------- forced colours */
+
+@media (forced-colors: active) {
+  .ox-rec-lane > i,
+  .ox-rec-rail > i {
+    background: CanvasText;
+  }
+  .ox-rec-pane {
+    border-color: CanvasText;
+  }
+  .ox-rec-fault {
+    border-color: CanvasText;
+  }
+}
+
+/* Visually hidden, still announced. An empty live region announces nothing. */
+.ox-rec-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
 /* ---- registry/oxygen/lib/accordion.css ---- */
 /**
  * Oxygen accordion — structure, motion, and the three states that are not decoration.

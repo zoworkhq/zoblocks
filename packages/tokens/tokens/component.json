@@ -1,7 +1,7 @@
 {
-  "$description": "Component tier — the override surface.\n\nEvery token here resolves to a semantic token, never to a primitive. That is enforced by the build, not by review: a component token pointing at {ref.red.700} would silently ignore a brand override on exactly the value a brand most needs to control.\n\nWhy this tier exists at all, and why it matters more here than it would at a platform vendor: Oxygen ships source into the customer's repository. Without an override point, 'customise the badge' means 'edit the copied file', and an edited file can never receive an upstream fix. Every fork is a component that silently stops being maintained. This tier is what keeps customisation and the upgrade channel compatible.\n\nBecause these resolve to semantic tokens, they follow light, dark and high-contrast automatically. A component token needs a per-theme value only when it must break from the semantic it normally tracks — which so far, nothing does.",
+  "$description": "Component tier \u2014 the override surface.\n\nEvery token here resolves to a semantic token, never to a primitive. That is enforced by the build, not by review: a component token pointing at {ref.red.700} would silently ignore a brand override on exactly the value a brand most needs to control.\n\nWhy this tier exists at all, and why it matters more here than it would at a platform vendor: Oxygen ships source into the customer's repository. Without an override point, 'customise the badge' means 'edit the copied file', and an edited file can never receive an upstream fix. Every fork is a component that silently stops being maintained. This tier is what keeps customisation and the upgrade channel compatible.\n\nBecause these resolve to semantic tokens, they follow light, dark and high-contrast automatically. A component token needs a per-theme value only when it must break from the semantic it normally tracks \u2014 which so far, nothing does.",
   "badge": {
-    "$description": "StatusBadge. The shared severity chip — critical must read identically on a lab result, a medication and an allergy, which is why every component routes severity through this one set rather than styling its own.",
+    "$description": "StatusBadge. The shared severity chip \u2014 critical must read identically on a lab result, a medication and an allergy, which is why every component routes severity through this one set rather than styling its own.",
     "$type": "color",
     "critical-fg": {
       "$value": "{status.critical}"
@@ -54,7 +54,7 @@
     }
   },
   "accordion": {
-    "$description": "Accordion / Disclosure. Two groups here are load-bearing rather than decorative. The severity rail is the only signal that survives a collapsed section, so it routes through the same status set as StatusBadge — critical must read identically on a lab result, a medication, and a chart section. And restricted is drawn from flag.*, not from the status scale, because it describes the record's legal standing rather than a measurement; rendering it as merely disabled would tell a reader the section is unavailable when it is actually withheld.",
+    "$description": "Accordion / Disclosure. Two groups here are load-bearing rather than decorative. The severity rail is the only signal that survives a collapsed section, so it routes through the same status set as StatusBadge \u2014 critical must read identically on a lab result, a medication, and a chart section. And restricted is drawn from flag.*, not from the status scale, because it describes the record's legal standing rather than a measurement; rendering it as merely disabled would tell a reader the section is unavailable when it is actually withheld.",
     "$type": "color",
     "header-bg": {
       "$value": "{bg-muted}"
@@ -150,7 +150,7 @@
     }
   },
   "alert": {
-    "$description": "AlertBanner. Severity tiers are an interruption budget — only critical may take focus. The tokens are separate from badge so a product can make an inline badge quiet without also making a critical interruption quiet.",
+    "$description": "AlertBanner. Severity tiers are an interruption budget \u2014 only critical may take focus. The tokens are separate from badge so a product can make an inline badge quiet without also making a critical interruption quiet.",
     "$type": "color",
     "critical-fg": {
       "$value": "{status.critical}"
@@ -193,7 +193,7 @@
     }
   },
   "value": {
-    "$description": "ClinicalValue. The unit is deliberately a separate colour from the number — it is context, not the reading — but both live in one element so they cannot drift apart under truncation or wrapping.",
+    "$description": "ClinicalValue. The unit is deliberately a separate colour from the number \u2014 it is context, not the reading \u2014 but both live in one element so they cannot drift apart under truncation or wrapping.",
     "$type": "color",
     "fg": {
       "$value": "{text}"
@@ -268,7 +268,7 @@
     }
   },
   "surface-card": {
-    "$description": "Shared by every card-shaped clinical component — medication, appointment, coverage. One set rather than three so a customer restyling 'cards' changes cards, not one of them.",
+    "$description": "Shared by every card-shaped clinical component \u2014 medication, appointment, coverage. One set rather than three so a customer restyling 'cards' changes cards, not one of them.",
     "$type": "color",
     "bg": {
       "$value": "{surface}"
@@ -294,7 +294,7 @@
     }
   },
   "field": {
-    "$description": "Shared by every input — dose, quantity, ratio, identifier, and the questionnaire renderer's controls. Invalid is a border-and-text change rather than a background wash, so it survives forced-colors mode.",
+    "$description": "Shared by every input \u2014 dose, quantity, ratio, identifier, and the questionnaire renderer's controls. Invalid is a border-and-text change rather than a background wash, so it survives forced-colors mode.",
     "$type": "color",
     "bg": {
       "$value": "{surface}"
@@ -344,11 +344,11 @@
     }
   },
   "switch": {
-    "$description": "Switch — the binary control, and the override surface for its geometry as well as its colour.\n\nTwo things here are unusual and deliberate.\n\n`target-min` is the hit area, and it is a SEPARATE token from `track-w`/`track-h`. That decoupling is what lets a 26x14px switch sit in a dense flowsheet row while keeping a 44px target: shrinking the pill must never shrink the target, because a mis-tap on a clinical flag is not a cosmetic defect.\n\n`track-off-bg` resolves to {border-strong} rather than a light grey. The off track IS the control's boundary, so SC 1.4.11 asks for 3:1 against the page — and the conventional rgba(0,0,0,0.25) treatment lands near 1.9:1. The pair is in the contrast gate.\n\nOn/off track luminance is close enough that colour alone cannot carry the state, which is why the component renders thumb position, a thumb glyph and a text state word as well. These tokens are the fourth signal, never the first.",
+    "$description": "Switch \u2014 the binary control, and the override surface for its geometry as well as its colour.\n\nTwo things here are unusual and deliberate.\n\n`target-min` is the hit area, and it is a SEPARATE token from `track-w`/`track-h`. That decoupling is what lets a 26x14px switch sit in a dense flowsheet row while keeping a 44px target: shrinking the pill must never shrink the target, because a mis-tap on a clinical flag is not a cosmetic defect.\n\n`track-off-bg` resolves to {border-strong} rather than a light grey. The off track IS the control's boundary, so SC 1.4.11 asks for 3:1 against the page \u2014 and the conventional rgba(0,0,0,0.25) treatment lands near 1.9:1. The pair is in the contrast gate.\n\nOn/off track luminance is close enough that colour alone cannot carry the state, which is why the component renders thumb position, a thumb glyph and a text state word as well. These tokens are the fourth signal, never the first.",
     "$type": "color",
     "track-off-bg": {
       "$value": "{border-strong}",
-      "$description": "Also the control's boundary — see the group description."
+      "$description": "Also the control's boundary \u2014 see the group description."
     },
     "track-off-border": {
       "$value": "{border-strong}"
@@ -367,15 +367,15 @@
     },
     "track-caution-bg": {
       "$value": "{status.high}",
-      "$description": "tone=\"caution\" — an on-state that removes a safety net reads amber, not brand green."
+      "$description": "tone=\"caution\" \u2014 an on-state that removes a safety net reads amber, not brand green."
     },
     "track-critical-bg": {
       "$value": "{status.critical}",
-      "$description": "tone=\"critical\" — an on-state that suppresses a clinical check."
+      "$description": "tone=\"critical\" \u2014 an on-state that suppresses a clinical check."
     },
     "track-neutral-bg": {
       "$value": "{text-muted}",
-      "$description": "tone=\"neutral\" — a view preference with no clinical direction."
+      "$description": "tone=\"neutral\" \u2014 a view preference with no clinical direction."
     },
     "thumb-bg": {
       "$value": "{surface}"
@@ -394,7 +394,7 @@
     },
     "label-off-fg": {
       "$value": "{text-on-fill}",
-      "$description": "The off track is {border-strong}, not the accent — a mid-grey in every theme. This pointed at {text-on-accent}, which follows the accent, and the dark accent is light: the off word rendered #071014 on #5d6c7e at 3.57:1 and shipped."
+      "$description": "The off track is {border-strong}, not the accent \u2014 a mid-grey in every theme. This pointed at {text-on-accent}, which follows the accent, and the dark accent is light: the off word rendered #071014 on #5d6c7e at 3.57:1 and shipped."
     },
     "state-fg": {
       "$value": "{text-muted}"
@@ -502,7 +502,7 @@
     "target-min": {
       "$type": "dimension",
       "$value": "{density.target}",
-      "$description": "The hit area — see the group description. Decoupled from track-w/track-h on purpose."
+      "$description": "The hit area \u2014 see the group description. Decoupled from track-w/track-h on purpose."
     },
     "label-font": {
       "$type": "dimension",
@@ -530,7 +530,7 @@
     "hold-ms": {
       "$type": "duration",
       "$value": "600ms",
-      "$description": "Hold-to-confirm duration. A host may set this to 0ms to disable the hold entirely in favour of the dialog path — holding is a timed input and SC 2.2.1 applies, so it must be removable without a fork."
+      "$description": "Hold-to-confirm duration. A host may set this to 0ms to disable the hold entirely in favour of the dialog path \u2014 holding is a timed input and SC 2.2.1 applies, so it must be removable without a fork."
     }
   },
   "chart": {
@@ -604,7 +604,7 @@
     }
   },
   "cs": {
-    "$description": "ClinicalStatus. Two chip heights and the glyph size, exposed as tokens because density is the one thing a host reasonably re-scales — a ward workstation runs denser than a tablet at the bedside. The tones are not here: they route through the shared status family so that critical reads identically on a chip, a rail and a row.",
+    "$description": "ClinicalStatus. Two chip heights and the glyph size, exposed as tokens because density is the one thing a host reasonably re-scales \u2014 a ward workstation runs denser than a tablet at the bedside. The tones are not here: they route through the shared status family so that critical reads identically on a chip, a rail and a row.",
     "$type": "dimension",
     "height-default": {
       "$value": "1.625rem"
@@ -620,7 +620,7 @@
     }
   },
   "rv": {
-    "$description": "ResultValue. The two value sizes, exposed because a results grid and a chart panel want different ones and the difference is not density in general — it is how large a number has to be before a clinician trusts they read it correctly.",
+    "$description": "ResultValue. The two value sizes, exposed because a results grid and a chart panel want different ones and the difference is not density in general \u2014 it is how large a number has to be before a clinician trusts they read it correctly.",
     "$type": "dimension",
     "value-default": {
       "$value": "1.0625rem"
@@ -637,14 +637,14 @@
     }
   },
   "presence": {
-    "$description": "CareTeamPresence. One token: the avatar diameter. Exposed because presence sits beside a patient's name in a header on one screen and inside a co-presence stack on another, and the ring geometry is drawn relative to it — scaling the avatar is the supported way to move between the two without forking the stylesheet.",
+    "$description": "CareTeamPresence. One token: the avatar diameter. Exposed because presence sits beside a patient's name in a header on one screen and inside a co-presence stack on another, and the ring geometry is drawn relative to it \u2014 scaling the avatar is the supported way to move between the two without forking the stylesheet.",
     "$type": "dimension",
     "avatar": {
       "$value": "1.75rem"
     }
   },
   "chart-header": {
-    "$description": "ChartHeader. One token: the tone bar on a safety fact. It is a colour rather than a dimension because the strip's whole restraint is that the bar is the only coloured pixel in the row — a deployment that wants a house palette for severity changes this and nothing else, and cannot accidentally turn six facts into six filled chips.",
+    "$description": "ChartHeader. One token: the tone bar on a safety fact. It is a colour rather than a dimension because the strip's whole restraint is that the bar is the only coloured pixel in the row \u2014 a deployment that wants a house palette for severity changes this and nothing else, and cannot accidentally turn six facts into six filled chips.",
     "$type": "color",
     "tone": {
       "$value": "{text-muted}"
@@ -658,7 +658,7 @@
     }
   },
   "datetime": {
-    "$description": "DateField, Calendar, DatePicker, BirthDateField, TimeField, SessionTimeField and ClinicalDateTime.\n\nThe input chrome is deliberately absent: these components spend the shared `field.*` tokens, so a date field and a dose field cannot drift apart in a customer's theme. What is here is the surface a calendar and a session triple add on top — the grid cell, the selected and range fills, and the held/derived pair.\n\n`held` is the one that carries meaning rather than decoration. Start, end and duration are three values with two degrees of freedom, and which one the user asserted has to be visible or the next edit is a surprise. It resolves to the accent family because it marks the value the user owns, not a status.",
+    "$description": "DateField, Calendar, DatePicker, BirthDateField, TimeField, SessionTimeField and ClinicalDateTime.\n\nThe input chrome is deliberately absent: these components spend the shared `field.*` tokens, so a date field and a dose field cannot drift apart in a customer's theme. What is here is the surface a calendar and a session triple add on top \u2014 the grid cell, the selected and range fills, and the held/derived pair.\n\n`held` is the one that carries meaning rather than decoration. Start, end and duration are three values with two degrees of freedom, and which one the user asserted has to be visible or the next edit is a surprise. It resolves to the accent family because it marks the value the user owns, not a status.",
     "$type": "color",
     "cell-fg": {
       "$value": "{text}"
@@ -751,6 +751,46 @@
     "duration": {
       "$type": "duration",
       "$value": "{density.duration}"
+    }
+  },
+  "recorder": {
+    "$description": "Recorder. Every value here resolves through a semantic token so a brand override reaches it; `rec` routes to status.recording, which exists so the capture tell is not the same red as an alarm.",
+    "$type": "color",
+    "rec": {
+      "$value": "{status.recording}"
+    },
+    "rec-soft": {
+      "$value": "{status.recording-bg}"
+    },
+    "rec-line": {
+      "$value": "{status.recording-border}"
+    },
+    "rec-ink": {
+      "$value": "{status.critical}",
+      "$description": "The tell's LABEL, not its dot. Text owes 4.5:1 and the recording red is tuned for a dot, so the label borrows the darker critical step rather than failing quietly at 10px."
+    },
+    "wave": {
+      "$value": "{accent}"
+    },
+    "wave-off": {
+      "$value": "{text-muted}",
+      "$description": "The unplayed half of a take is the shape a reader aims at before clicking, so it is solved against the pane rather than faded toward it. text-muted already carries small text on this ground, which is a stricter bar than the 3:1 a non-text mark owes."
+    },
+    "pane": {
+      "$value": "{bg-muted}"
+    },
+    "lane-h": {
+      "$type": "dimension",
+      "$value": "68px",
+      "$description": "Lane height. Below about 40px the peak buckets stop being readable as a shape and the art should fall back to strip."
+    },
+    "bar-w": {
+      "$type": "dimension",
+      "$value": "3px"
+    },
+    "bar-gap": {
+      "$type": "dimension",
+      "$value": "2px"
     }
   }
 }

@@ -1,0 +1,64 @@
+{
+  "name": "@oxygenui-design/recorder-core",
+  "version": "0.1.0",
+  "description": "The signal engine behind Oxygen's Recorder. A peak envelope with instant attack and a 180 ms release, 30 Hz peak buckets, and the eleven-phase capture machine with the consent edge enforced in the engine — no React, no DOM, no dependencies.",
+  "license": "MIT",
+  "homepage": "https://oxygenui.design/components/recorder",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zoworkhq/oxygenui.git",
+    "directory": "packages/recorder-core"
+  },
+  "keywords": [
+    "recorder",
+    "waveform",
+    "audio",
+    "level-meter",
+    "peak-meter",
+    "analyser",
+    "headless",
+    "accessibility",
+    "wcag",
+    "healthcare"
+  ],
+  "type": "module",
+  "sideEffects": false,
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "src",
+    "!src/**/*.test.ts"
+  ],
+  "engines": {
+    "node": ">=20.11.0"
+  },
+  "publishConfig": {
+    "access": "public",
+    "main": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "exports": {
+      ".": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "./package.json": "./package.json"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage"
+  },
+  "devDependencies": {
+    "@oxygenui-design/tsconfig": "workspace:*",
+    "@vitest/coverage-v8": "^4.1.10",
+    "typescript": "^5.7.2",
+    "vitest": "^4.1.10"
+  }
+}

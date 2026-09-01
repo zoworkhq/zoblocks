@@ -39,6 +39,7 @@ export const WORKSPACE_ALIASES: Record<string, string[]> = {
   // project by the Oxygen CLI under lib/, and imported by that path. They
   // resolve here the same way component specifiers do.
   "@/lib/oxygen-loader": ["./registry/oxygen/lib/loader.tsx"],
+  "@/lib/oxygen-recorder": ["./registry/oxygen/lib/recorder.tsx"],
   "@/lib/oxygen-accordion": ["./registry/oxygen/lib/accordion-core.tsx"],
   "@/lib/oxygen-switch": ["./registry/oxygen/lib/switch.tsx"],
   "@/lib/oxygen-clinical-note": ["./registry/oxygen/lib/clinical-note.tsx"],

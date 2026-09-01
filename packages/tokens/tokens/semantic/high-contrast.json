@@ -1,5 +1,5 @@
 {
-  "$description": "Semantic tier, high-contrast theme.\n\nTargets 7:1 rather than the 4.5:1 the default theme clears, and does it by removing tint rather than deepening it. Every status surface is plain white with a border in the status colour — a pale wash behind dark text is the first thing to disappear for a low-vision reader, so this theme spends its contrast budget on the text and the border instead.\n\nThis is a value set over the same key space, not a parallel stylesheet. That is the whole reason the tier exists: high-contrast support is data, not a fork.",
+  "$description": "Semantic tier, high-contrast theme.\n\nTargets 7:1 rather than the 4.5:1 the default theme clears, and does it by removing tint rather than deepening it. Every status surface is plain white with a border in the status colour \u2014 a pale wash behind dark text is the first thing to disappear for a low-vision reader, so this theme spends its contrast budget on the text and the border instead.\n\nThis is a value set over the same key space, not a parallel stylesheet. That is the whole reason the tier exists: high-contrast support is data, not a fork.",
   "bg": {
     "$type": "color",
     "$value": "{ref.white}"
@@ -53,7 +53,7 @@
   "text-on-fill": {
     "$type": "color",
     "$value": "{ref.white}",
-    "$description": "A label on a filled neutral — the Switch's off track, which is {border-strong} in every theme and therefore a mid-grey in every theme. Separate from text-on-accent because that one follows the accent, and the dark accent is light: pointing the off label at it put #071014 on #5d6c7e at 3.57:1. White clears AA on border-strong in all three themes, and the pair is in the contrast gate so it stays that way."
+    "$description": "A label on a filled neutral \u2014 the Switch's off track, which is {border-strong} in every theme and therefore a mid-grey in every theme. Separate from text-on-accent because that one follows the accent, and the dark accent is light: pointing the off label at it put #071014 on #5d6c7e at 3.57:1. White clears AA on border-strong in all three themes, and the pair is in the contrast gate so it stays that way."
   },
   "accent": {
     "$type": "color",
@@ -143,6 +143,16 @@
     },
     "provisional-border": {
       "$value": "{ref.hc.provisional}"
+    },
+    "recording": {
+      "$value": "{ref.hc.critical}",
+      "$description": "Collapses onto critical. Forced colours removes the hue room the separation depends on, and inventing a second red here would be decoration the mode exists to strip."
+    },
+    "recording-bg": {
+      "$value": "{ref.white}"
+    },
+    "recording-border": {
+      "$value": "{ref.hc.critical}"
     }
   },
   "flag": {
@@ -161,7 +171,7 @@
     }
   },
   "swatch": {
-    "$description": "Decoration is the first thing to give up its contrast budget. In this theme every swatch collapses to the same near-black on white — an avatar tint is not information, and six pale hues competing with the text is a cost with no return.",
+    "$description": "Decoration is the first thing to give up its contrast budget. In this theme every swatch collapses to the same near-black on white \u2014 an avatar tint is not information, and six pale hues competing with the text is a cost with no return.",
     "$type": "color",
     "1": {
       "$value": "{ref.hc.text-muted}"

@@ -78,6 +78,9 @@ importers:
       '@oxygenui-design/identity':
         specifier: workspace:*
         version: link:packages/identity
+      '@oxygenui-design/recorder-core':
+        specifier: workspace:*
+        version: link:packages/recorder-core
       '@oxygenui-design/theme':
         specifier: workspace:*
         version: link:packages/theme
@@ -1157,6 +1160,21 @@ importers:
       react-dom:
         specifier: ^19.0.0
         version: 19.2.8(react@19.2.8)
+      typescript:
+        specifier: ^5.7.2
+        version: 5.9.3
+      vitest:
+        specifier: ^4.1.10
+        version: 4.1.10(@types/node@22.20.1)(@vitest/coverage-v8@4.1.10)(jsdom@30.0.1)(vite@8.2.1(@types/node@22.20.1)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.12)(yaml@2.9.0))
+
+  packages/recorder-core:
+    devDependencies:
+      '@oxygenui-design/tsconfig':
+        specifier: workspace:*
+        version: link:../tsconfig
+      '@vitest/coverage-v8':
+        specifier: ^4.1.10
+        version: 4.1.10(vitest@4.1.10)
       typescript:
         specifier: ^5.7.2
         version: 5.9.3
@@ -3508,8 +3526,8 @@ packages:
     resolution: {integrity: sha512-kWWXztvZ5SBQV+eRgKFeh8q5sLuZY2+8WUIzlxWVTg+oGwY14qylx1KbKzHd8P6ZYkAg0xyIDU9JMHhyJMZ1jw==}
     engines: {node: '>=10'}
 
-  chromedriver@152.0.1:
-    resolution: {integrity: sha512-8zet2yPAFOSlYxUIcQ/1yOOC1xP4ooPZiKFRdlJhFawBKvlZIHDU6qv4LDOfPEw1yXbyu+tQTzbL0Vfb+vHdQQ==}
+  chromedriver@152.0.2:
+    resolution: {integrity: sha512-w/trjzSjQC8vHHwl4e+WXBGPRN3XnrsY14q/FdxCY8GtTUIlB+wH1gn/Kz3CHpdmbsouUEGal6E8bjEEz72pZg==}
     engines: {node: '>=22'}
     hasBin: true
 
@@ -5691,7 +5709,7 @@ snapshots:
     dependencies:
       '@axe-core/webdriverjs': 4.12.1(selenium-webdriver@4.44.0)
       axe-core: 4.12.1
-      chromedriver: 152.0.1
+      chromedriver: 152.0.2
       colors: 1.4.0
       commander: 9.5.0
       dotenv: 17.4.2
@@ -7755,7 +7773,7 @@ snapshots:
 
   char-regex@1.0.2: {}
 
-  chromedriver@152.0.1:
+  chromedriver@152.0.2:
     dependencies:
       '@testim/chrome-version': 1.1.4
       adm-zip: 0.6.0

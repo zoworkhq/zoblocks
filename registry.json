@@ -21,6 +21,32 @@
       ]
     },
     {
+      "name": "recorder-core",
+      "type": "oxygen:lib",
+      "title": "Recorder core",
+      "description": "Signal path, peak buffer, capture machine and the thirteen fault detectors behind Recorder. Installed automatically with the recorder.",
+      "dependencies": [
+        "clsx",
+        "tailwind-merge",
+        "@oxygenui-design/recorder-core"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "files": [
+        {
+          "path": "registry/oxygen/lib/recorder.tsx",
+          "type": "oxygen:lib",
+          "target": "lib/oxygen-recorder.tsx"
+        },
+        {
+          "path": "registry/oxygen/lib/recorder.css",
+          "type": "oxygen:file",
+          "target": "styles/oxygen-recorder.css"
+        }
+      ]
+    },
+    {
       "name": "loader-core",
       "type": "oxygen:lib",
       "title": "Loader core",
@@ -876,6 +902,33 @@
           "path": "registry/oxygen/recent-patient-stack/recent-patient-stack.tsx",
           "type": "oxygen:component",
           "target": "components/oxygen/recent-patient-stack.tsx"
+        }
+      ]
+    },
+    {
+      "name": "recorder",
+      "type": "oxygen:component",
+      "title": "Recorder",
+      "description": "Record, review and transcribe clinical audio: ambient documentation, dictation, voice messaging and transcript playback. Five arts — pulse, bars, strip, duet and stream — over one engine, with the level meter driven by an AnalyserNode rather than a timer, a silence budget, and thirteen distinct device faults.",
+      "categories": [
+        "media",
+        "clinical"
+      ],
+      "dependencies": [
+        "clsx",
+        "tailwind-merge",
+        "@oxygenui-design/recorder-core"
+      ],
+      "registryDependencies": [
+        "utils",
+        "tokens",
+        "recorder-core"
+      ],
+      "files": [
+        {
+          "path": "registry/oxygen/recorder/recorder.tsx",
+          "type": "oxygen:component",
+          "target": "components/oxygen/recorder.tsx"
         }
       ]
     },

@@ -258,6 +258,9 @@
   --ox-status-provisional: var(--ox-ref-cyan-700);
   --ox-status-provisional-bg: var(--ox-ref-cyan-50);
   --ox-status-provisional-border: var(--ox-ref-cyan-200);
+  --ox-status-recording: var(--ox-ref-red-600);
+  --ox-status-recording-bg: var(--ox-ref-red-50);
+  --ox-status-recording-border: var(--ox-ref-red-200);
   --ox-flag-restricted: var(--ox-ref-violet-600);
   --ox-flag-restricted-bg: var(--ox-ref-violet-50);
   --ox-flag-provisional: var(--ox-ref-amber-700);
@@ -512,6 +515,16 @@
   --ox-datetime-gap: var(--ox-density-gap);
   --ox-datetime-font: var(--ox-density-font);
   --ox-datetime-duration: var(--ox-density-duration);
+  --ox-recorder-rec: var(--ox-status-recording);
+  --ox-recorder-rec-soft: var(--ox-status-recording-bg);
+  --ox-recorder-rec-line: var(--ox-status-recording-border);
+  --ox-recorder-rec-ink: var(--ox-status-critical);
+  --ox-recorder-wave: var(--ox-accent);
+  --ox-recorder-wave-off: var(--ox-text-muted);
+  --ox-recorder-pane: var(--ox-bg-muted);
+  --ox-recorder-lane-h: 68px;
+  --ox-recorder-bar-w: 3px;
+  --ox-recorder-bar-gap: 2px;
 }
 
   /* Brand — northwind ---------------------------------------------------
@@ -666,6 +679,9 @@
   --ox-status-provisional: var(--ox-ref-cyan-700);
   --ox-status-provisional-bg: var(--ox-ref-cyan-50);
   --ox-status-provisional-border: var(--ox-ref-cyan-200);
+  --ox-status-recording: var(--ox-ref-red-600);
+  --ox-status-recording-bg: var(--ox-ref-red-50);
+  --ox-status-recording-border: var(--ox-ref-red-200);
   --ox-flag-restricted: var(--ox-ref-violet-600);
   --ox-flag-restricted-bg: var(--ox-ref-violet-50);
   --ox-flag-provisional: var(--ox-ref-amber-700);
@@ -861,6 +877,13 @@
   --ox-datetime-chip-on-bg: var(--ox-accent);
   --ox-datetime-chip-on-fg: var(--ox-text-on-accent);
   --ox-datetime-cell-radius: var(--ox-radius-sm);
+  --ox-recorder-rec: var(--ox-status-recording);
+  --ox-recorder-rec-soft: var(--ox-status-recording-bg);
+  --ox-recorder-rec-line: var(--ox-status-recording-border);
+  --ox-recorder-rec-ink: var(--ox-status-critical);
+  --ox-recorder-wave: var(--ox-accent);
+  --ox-recorder-wave-off: var(--ox-text-muted);
+  --ox-recorder-pane: var(--ox-bg-muted);
 }
 
 /* dark
@@ -909,6 +932,9 @@
   --ox-status-provisional: var(--ox-ref-cyan-300);
   --ox-status-provisional-bg: var(--ox-ref-tint-provisional-bg);
   --ox-status-provisional-border: var(--ox-ref-tint-provisional-border);
+  --ox-status-recording: var(--ox-ref-red-500);
+  --ox-status-recording-bg: var(--ox-ref-tint-critical-bg);
+  --ox-status-recording-border: var(--ox-ref-tint-critical-border);
   --ox-flag-restricted: var(--ox-ref-violet-300);
   --ox-flag-restricted-bg: var(--ox-ref-violet-950);
   --ox-flag-provisional: var(--ox-ref-amber-400);
@@ -1104,6 +1130,13 @@
   --ox-datetime-chip-on-bg: var(--ox-accent);
   --ox-datetime-chip-on-fg: var(--ox-text-on-accent);
   --ox-datetime-cell-radius: var(--ox-radius-sm);
+  --ox-recorder-rec: var(--ox-status-recording);
+  --ox-recorder-rec-soft: var(--ox-status-recording-bg);
+  --ox-recorder-rec-line: var(--ox-status-recording-border);
+  --ox-recorder-rec-ink: var(--ox-status-critical);
+  --ox-recorder-wave: var(--ox-accent);
+  --ox-recorder-wave-off: var(--ox-text-muted);
+  --ox-recorder-pane: var(--ox-bg-muted);
 }
 
 /* high-contrast
@@ -1151,6 +1184,9 @@
   --ox-status-provisional: var(--ox-ref-hc-provisional);
   --ox-status-provisional-bg: var(--ox-ref-white);
   --ox-status-provisional-border: var(--ox-ref-hc-provisional);
+  --ox-status-recording: var(--ox-ref-hc-critical);
+  --ox-status-recording-bg: var(--ox-ref-white);
+  --ox-status-recording-border: var(--ox-ref-hc-critical);
   --ox-flag-restricted: var(--ox-ref-hc-restricted);
   --ox-flag-restricted-bg: var(--ox-ref-white);
   --ox-flag-provisional: var(--ox-ref-hc-high);
@@ -1346,6 +1382,13 @@
   --ox-datetime-chip-on-bg: var(--ox-accent);
   --ox-datetime-chip-on-fg: var(--ox-text-on-accent);
   --ox-datetime-cell-radius: var(--ox-radius-sm);
+  --ox-recorder-rec: var(--ox-status-recording);
+  --ox-recorder-rec-soft: var(--ox-status-recording-bg);
+  --ox-recorder-rec-line: var(--ox-status-recording-border);
+  --ox-recorder-rec-ink: var(--ox-status-critical);
+  --ox-recorder-wave: var(--ox-accent);
+  --ox-recorder-wave-off: var(--ox-text-muted);
+  --ox-recorder-pane: var(--ox-bg-muted);
 }
 
 /* Reduced motion. Clinical surfaces must remain fully usable without it. */

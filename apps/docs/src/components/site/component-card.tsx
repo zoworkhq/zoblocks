@@ -66,6 +66,7 @@ import { AcquireAction, PriceTag } from "@/components/site/acquire";
 import { cn } from "@/lib/utils";
 import { isReady } from "@/lib/readiness";
 
+import { Recorder } from "@/registry/oxygen/recorder/recorder";
 import { DateField } from "@/registry/oxygen/date-picker/date-picker";
 import { plainDate } from "@/lib/oxygen-datetime";
 /**
@@ -233,6 +234,23 @@ const FEATURED_ART = 184;
 
 const DT_TODAY = plainDate(2026, 8, 26);
 
+/**
+ * A deterministic take for the Recorder card.
+ *
+ * Generated rather than sampled, and generated from a formula rather than a
+ * random seed, so the card is byte-identical between runs and a visual
+ * regression means something changed rather than that the noise moved.
+ */
+const REC_PEAKS = Float32Array.from({ length: 180 }, (_, i) => {
+  const t = i / 12;
+  const phrase = (t % 3.9) / 3.9 < 0.82 ? 1 : 0.06;
+  const syllable = 0.5 + 0.5 * Math.sin(2 * Math.PI * 4.4 * t);
+  return Math.min(1, phrase * (0.2 + 0.8 * syllable ** 1.3));
+});
+const REC_SPEAKERS = Uint8Array.from({ length: 180 }, (_, i) =>
+  Math.floor(i / 26) % 2 === 0 ? 0 : 1,
+);
+
 const PREVIEW: Record<string, (featured: boolean) => React.ReactNode> = {
   /* One card for the whole family. It shows the field with its calendar
      because that is the variant a reader reaches for first, and the card is
@@ -244,6 +262,25 @@ const PREVIEW: Record<string, (featured: boolean) => React.ReactNode> = {
       now={DT_TODAY}
       defaultValue={DT_TODAY}
       showRelative
+    />
+  ),
+  /*
+   * The card shows Duet rather than a live meter.
+   *
+   * A capture art on a card would have to animate with no signal behind it,
+   * which is the exact thing this component exists to argue against — and a
+   * card cannot ask for a microphone. Duet is a rendered take: it is honest
+   * standing still, and it is the art nobody else ships.
+   */
+  recorder: (featured) => (
+    <Recorder
+      variant="duet"
+      phase="ready"
+      peaks={REC_PEAKS}
+      speakers={REC_SPEAKERS}
+      position={featured ? 0.44 : 0.36}
+      durationMs={754_000}
+      speakerLabels={["Dr Okafor", "Patient"]}
     />
   ),
   "pulse-loader": (featured) => (
