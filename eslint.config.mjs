@@ -32,6 +32,14 @@ export default tseslint.config(
        * the machine where the work is being done.
        */
       ".claude/worktrees/**",
+      /*
+       * Brief generators. `content/briefs/<name>/*.js` are standalone browser
+       * scripts inlined into a design document by a Python build — not library
+       * source, not bundled, and not typed. Linting them as if they were reports
+       * `window is not defined` on prose. The Python and the Markdown beside
+       * them are already outside eslint's reach; this puts the JS with them.
+       */
+      "content/briefs/**/*.js",
       // Generated. Lint the generator, not its output.
       "apps/docs/src/lib/generated/**",
       "apps/docs/public/**",

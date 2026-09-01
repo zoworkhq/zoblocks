@@ -1,0 +1,974 @@
+/* ==================================================================== */
+/* CONTEXT MENU mockup primitives.                                      */
+/* Real antd v6 token values, same discipline as the other briefs: what */
+/* you are judging is the proposal in Ant Design, not a teal impression */
+/* of it. Everything below is inside `.antd`.                           */
+/* ==================================================================== */
+
+/* The surface you right-click on — a chart row, a worklist row.        */
+.rows {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border: 1px solid var(--a-border-2);
+  border-radius: var(--a-radius);
+  overflow: hidden;
+}
+.rows > li {
+  border-bottom: 1px solid var(--a-border-2);
+}
+.rows > li:last-child {
+  border-bottom: 0;
+}
+.rw {
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+  padding: 9px 12px;
+  font-size: 13px;
+  color: var(--a-text);
+  background: var(--a-bg);
+  cursor: default;
+  -webkit-user-select: none;
+  user-select: none;
+  position: relative;
+}
+.rw:hover {
+  background: var(--a-fill-3);
+}
+.rw.sel {
+  background: var(--a-primary-bg);
+  box-shadow: inset 2px 0 0 var(--a-primary);
+}
+.rw.armed {
+  background: var(--a-fill-2);
+  box-shadow: inset 0 0 0 1px var(--a-primary-border);
+}
+.rw .glyph {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--a-fill-3);
+  color: var(--a-text-3);
+}
+.rw .glyph.med {
+  background: var(--a-primary-bg);
+  color: var(--a-primary);
+}
+.rw .glyph.obs {
+  background: var(--a-cyan-bg);
+  color: #08979c;
+}
+.rw .glyph.doc {
+  background: var(--a-fill-3);
+  color: var(--a-text-2);
+}
+.rw .glyph.alg {
+  background: var(--a-error-bg);
+  color: var(--a-error);
+}
+.rw .glyph.pat {
+  background: var(--a-purple-bg);
+  color: var(--a-purple);
+}
+.rw .nm {
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.rw .dt {
+  font-size: 12px;
+  color: var(--a-text-3);
+  margin-top: 1px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.rw .rt {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--a-text-3);
+  font-variant-numeric: tabular-nums;
+}
+.rw .more {
+  width: 24px;
+  height: 24px;
+  border-radius: var(--a-radius-sm);
+  display: grid;
+  place-items: center;
+  color: var(--a-text-3);
+  border: 1px solid transparent;
+  background: transparent;
+  cursor: pointer;
+}
+.rw .more:hover,
+.rw .more[aria-expanded="true"] {
+  background: var(--a-fill-2);
+  color: var(--a-text);
+}
+.rw:focus-visible {
+  outline: 2px solid var(--a-primary);
+  outline-offset: -2px;
+}
+.rw.masked .nm {
+  color: var(--a-text-3);
+  font-style: italic;
+  font-weight: 400;
+}
+
+.hint {
+  font-size: 12px;
+  color: var(--a-text-3);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 2px 0;
+  flex-wrap: wrap;
+}
+.kbd {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  line-height: 1;
+  padding: 3px 5px;
+  border: 1px solid var(--a-border);
+  border-bottom-width: 2px;
+  border-radius: 4px;
+  background: var(--a-bg);
+  color: var(--a-text-2);
+  white-space: nowrap;
+}
+
+/* The menu itself --------------------------------------------------- */
+.cmwrap {
+  position: relative;
+}
+.cm {
+  position: absolute;
+  z-index: 30;
+  min-width: 252px;
+  max-width: 320px;
+  background: var(--a-bg);
+  border-radius: var(--a-radius-lg);
+  box-shadow: var(--a-shadow);
+  border: 1px solid var(--a-border-2);
+  padding: 0 0 4px;
+  font-size: 13px;
+  color: var(--a-text);
+  transform-origin: var(--cm-origin, top left);
+  animation: cm-in 140ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+@keyframes cm-in {
+  from {
+    opacity: 0;
+    transform: scale(0.97) translateY(-2px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cm {
+    animation: none;
+  }
+}
+
+/* Region 1 — the subject. Never interactive, always first, always
+     rendered. It is the wrong-patient check and the safe landing zone. */
+.cm-subject {
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr);
+  gap: 9px;
+  align-items: center;
+  padding: 10px 12px;
+  background: var(--a-fill-3);
+  border-bottom: 1px solid var(--a-border-2);
+  border-radius: var(--a-radius-lg) var(--a-radius-lg) 0 0;
+  cursor: default;
+}
+.cm-subject .av {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--a-bg);
+  border: 1px solid var(--a-border);
+  color: var(--a-text-2);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+.cm-subject .who {
+  font-weight: 600;
+  font-size: 12.5px;
+  line-height: 1.35;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.cm-subject .what {
+  font-size: 11.5px;
+  color: var(--a-text-3);
+  line-height: 1.35;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.cm-subject.masked .who {
+  color: var(--a-text-2);
+  font-style: italic;
+}
+.cm-subject.bulk .av {
+  background: var(--a-primary-bg);
+  border-color: var(--a-primary-border);
+  color: var(--a-primary);
+}
+
+.cm-group {
+  font-size: 10.5px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: var(--a-text-3);
+  padding: 9px 12px 3px;
+}
+.cm-sep {
+  height: 1px;
+  background: var(--a-border-2);
+  margin: 4px 0;
+}
+
+.cm-item {
+  display: grid;
+  grid-template-columns: 16px minmax(0, 1fr) auto;
+  gap: 9px;
+  align-items: center;
+  padding: 6px 12px;
+  min-height: 30px;
+  cursor: pointer;
+  color: var(--a-text);
+  border: 0;
+  background: transparent;
+  width: 100%;
+  text-align: start;
+  font: inherit;
+}
+.cm-item .ic {
+  color: var(--a-text-3);
+}
+.cm-item .lb {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.cm-item .sc {
+  font-size: 11px;
+  color: var(--a-text-4);
+  font-family: var(--font-mono);
+  white-space: nowrap;
+}
+.cm-item:hover,
+.cm-item.hot {
+  background: var(--a-fill-3);
+}
+.cm-item.hot .ic {
+  color: var(--a-text-2);
+}
+.cm-item:focus-visible {
+  outline: 2px solid var(--a-primary);
+  outline-offset: -2px;
+}
+.cm-item .sub {
+  grid-column: 2 / -1;
+  font-size: 11.5px;
+  color: var(--a-text-3);
+  line-height: 1.4;
+  margin-top: 1px;
+}
+
+/* Tier treatment. Never colour alone: each carries a glyph and a word. */
+.cm-item.t-documented .ic {
+  color: #08979c;
+}
+.cm-item.t-clinical .ic {
+  color: #d48806;
+}
+.cm-item.t-disclosive .ic {
+  color: var(--a-error);
+}
+.cm-item.t-clinical.hot {
+  background: var(--a-warning-bg);
+}
+.cm-item.t-disclosive.hot {
+  background: var(--a-error-bg);
+}
+.cm-item.t-disclosive .lb {
+  color: var(--a-error);
+}
+
+.cm-item[aria-disabled="true"] {
+  cursor: not-allowed;
+}
+.cm-item[aria-disabled="true"] .lb {
+  color: var(--a-text-4);
+  text-decoration: line-through;
+  text-decoration-thickness: 1px;
+}
+.cm-item[aria-disabled="true"] .ic {
+  color: var(--a-text-4);
+}
+.cm-item[aria-disabled="true"]:hover {
+  background: transparent;
+}
+.cm-item[aria-disabled="true"] .sub {
+  color: var(--a-text-3);
+}
+
+/* Pending. Holds its final position; never appended after the fact.    */
+.cm-item.pending {
+  cursor: progress;
+}
+.cm-item.pending .lb {
+  color: var(--a-text-4);
+}
+.cm-item.pending .bar {
+  grid-column: 2;
+  height: 9px;
+  border-radius: 3px;
+  width: 62%;
+  background: linear-gradient(90deg, var(--a-fill-2) 25%, var(--a-fill-3) 37%, var(--a-fill-2) 63%);
+  background-size: 400% 100%;
+  animation: cm-sk 1.4s ease infinite;
+}
+@keyframes cm-sk {
+  0% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0 50%;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cm-item.pending .bar {
+    animation: none;
+    background: none;
+    border: 1px dashed var(--a-border);
+  }
+}
+
+/* The withheld count. A row inside the menu, not a footnote under it.  */
+.cm-withheld {
+  display: grid;
+  grid-template-columns: 16px 1fr;
+  gap: 9px;
+  align-items: start;
+  padding: 7px 12px 8px;
+  margin-top: 2px;
+  border-top: 1px solid var(--a-border-2);
+  font-size: 11.5px;
+  color: var(--a-text-3);
+  line-height: 1.45;
+}
+.cm-withheld .i {
+  color: var(--a-text-4);
+  margin-top: 1px;
+}
+
+/* Step two: the confirm strip for tier="clinical".                    */
+.cm-confirm {
+  margin: 3px 6px;
+  padding: 9px 10px;
+  border-radius: var(--a-radius);
+  background: var(--a-warning-bg);
+  border: 1px solid var(--a-warning-border);
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--a-text);
+}
+.cm-confirm b {
+  font-weight: 600;
+}
+.cm-confirm .acts {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+}
+.cm-confirm.bad {
+  background: var(--a-error-bg);
+  border-color: var(--a-error-border);
+}
+
+/* Step two: the reason list for tier="disclosive".                    */
+.cm-reasons {
+  margin: 3px 6px 2px;
+  padding: 9px 10px;
+  border-radius: var(--a-radius);
+  background: var(--a-error-bg);
+  border: 1px solid var(--a-error-border);
+}
+.cm-reasons .hd {
+  font-size: 11.5px;
+  color: var(--a-text-2);
+  margin-bottom: 7px;
+  line-height: 1.45;
+}
+.cm-reasons .hd b {
+  color: var(--a-error);
+}
+.cm-reason {
+  display: grid;
+  grid-template-columns: 13px 1fr;
+  gap: 8px;
+  align-items: start;
+  padding: 5px 6px;
+  border-radius: var(--a-radius-sm);
+  font-size: 12px;
+  cursor: pointer;
+  border: 0;
+  background: transparent;
+  width: 100%;
+  text-align: start;
+  color: var(--a-text);
+  font-family: inherit;
+}
+.cm-reason:hover,
+.cm-reason.hot {
+  background: rgb(255 255 255 / 0.65);
+}
+.cm-reason .rd {
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  border: 1.5px solid var(--a-border);
+  margin-top: 2px;
+}
+.cm-reason.on .rd {
+  border-color: var(--a-error);
+  box-shadow:
+    inset 0 0 0 2.5px var(--a-bg),
+    inset 0 0 0 9px var(--a-error);
+}
+.cm-reasons .foot {
+  font-size: 11px;
+  color: var(--a-text-3);
+  margin-top: 7px;
+  line-height: 1.45;
+}
+
+/* Checkbox / radio items — view state only, never a clinical act.      */
+.cm-item .box {
+  width: 13px;
+  height: 13px;
+  border-radius: 3px;
+  border: 1.5px solid var(--a-border);
+  display: grid;
+  place-items: center;
+  color: transparent;
+}
+.cm-item.on .box {
+  background: var(--a-primary);
+  border-color: var(--a-primary);
+  color: #fff;
+}
+.cm-item .rd {
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  border: 1.5px solid var(--a-border);
+}
+.cm-item.on .rd {
+  border-color: var(--a-primary);
+  box-shadow:
+    inset 0 0 0 2.5px var(--a-bg),
+    inset 0 0 0 9px var(--a-primary);
+}
+
+/* Submenu ----------------------------------------------------------- */
+.cm-item .chev {
+  color: var(--a-text-4);
+}
+.cm.sub {
+  position: absolute;
+}
+
+/* Ran / result toast inside the figure ------------------------------ */
+.cm-out {
+  margin-top: 10px;
+  font-size: 12.5px;
+  color: var(--a-text-2);
+  min-height: 20px;
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+  line-height: 1.5;
+}
+.cm-out .i {
+  margin-top: 2px;
+  flex: 0 0 auto;
+}
+.cm-out.ok {
+  color: #389e0d;
+}
+.cm-out.warn {
+  color: #d48806;
+}
+.cm-out.err {
+  color: var(--a-error);
+}
+.cm-out code {
+  font-size: 11.5px;
+}
+
+/* The audit strip — what the host is handed. Monospace on purpose:    */
+/* it is a record, not prose.                                          */
+.cm-audit {
+  margin-top: 10px;
+  border: 1px dashed var(--a-border);
+  border-radius: var(--a-radius);
+  background: var(--a-fill-3);
+  padding: 8px 10px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 1.6;
+  color: var(--a-text-2);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.cm-audit .k {
+  color: var(--a-text-4);
+}
+
+/* Touch sheet presentation ------------------------------------------ */
+.sheetbox {
+  position: relative;
+  overflow: hidden;
+  border-radius: 18px;
+  background: var(--a-bg-layout);
+  border: 1px solid var(--a-border);
+}
+.sheetbox .scrim {
+  position: absolute;
+  inset: 0;
+  background: rgb(0 0 0 / 0.35);
+}
+.cm.sheet {
+  position: absolute;
+  inset-inline: 0;
+  inset-block-end: 0;
+  max-width: none;
+  min-width: 0;
+  border-radius: 16px 16px 0 0;
+  padding-bottom: 8px;
+  animation: cm-up 180ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+@keyframes cm-up {
+  from {
+    transform: translateY(14px);
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cm.sheet {
+    animation: none;
+  }
+}
+.cm.sheet .grip {
+  width: 34px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--a-border);
+  margin: 8px auto 2px;
+}
+.cm.sheet .cm-subject {
+  border-radius: 0;
+}
+.cm.sheet .cm-item {
+  min-height: 44px;
+  padding: 9px 16px;
+}
+.cm.sheet .cm-group,
+.cm.sheet .cm-withheld {
+  padding-inline: 16px;
+}
+
+/* Anchored (the ⋯ button path) -------------------------------------- */
+.cm.anchored {
+  min-width: 236px;
+}
+
+/* Density ----------------------------------------------------------- */
+.cm.compact .cm-item {
+  min-height: 26px;
+  padding: 4px 10px;
+}
+.cm.compact .cm-subject {
+  padding: 8px 10px;
+}
+
+/* Forced colours. Nothing here may depend on a background surviving.   */
+@media (forced-colors: active) {
+  .cm {
+    border: 1px solid CanvasText;
+  }
+  .cm-subject {
+    border-bottom: 1px solid CanvasText;
+  }
+  .cm-item.hot {
+    background: Highlight;
+    color: HighlightText;
+    forced-color-adjust: none;
+  }
+  .cm-item[aria-disabled="true"] .lb {
+    color: GrayText;
+  }
+  .cm-item .ic {
+    forced-color-adjust: auto;
+  }
+  .cm-confirm,
+  .cm-reasons {
+    border: 1px solid CanvasText;
+  }
+}
+
+/* Report chrome specific to this brief -------------------------------*/
+.figtabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+.figtab {
+  font-size: 12px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  cursor: pointer;
+  border: 1px solid var(--a-border);
+  background: var(--a-bg);
+  color: var(--a-text-2);
+  font-family: inherit;
+}
+.figtab[aria-pressed="true"] {
+  border-color: var(--a-primary);
+  background: var(--a-primary-bg);
+  color: var(--a-primary);
+}
+.figtab:focus-visible {
+  outline: 2px solid var(--a-primary);
+  outline-offset: 2px;
+}
+
+.tiers {
+  display: grid;
+  gap: 0;
+  border: 1px solid var(--rule);
+  border-radius: 12px;
+  overflow: hidden;
+  margin: 1.5rem 0;
+  background: var(--surface);
+}
+.tiers > div {
+  display: grid;
+  grid-template-columns: 8.5rem 1fr;
+  gap: 1rem;
+  padding: 1rem 1.15rem;
+  border-bottom: 1px solid var(--rule);
+}
+.tiers > div:last-child {
+  border-bottom: 0;
+}
+.tiers .t {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+.tiers .t small {
+  display: block;
+  font-family: var(--font-body);
+  font-size: 0.72rem;
+  font-weight: 400;
+  color: var(--muted);
+  margin-top: 0.25rem;
+  letter-spacing: 0;
+}
+.tiers .d {
+  color: var(--ink-2);
+  font-size: 0.9rem;
+}
+.tiers .d b {
+  color: var(--ink);
+}
+.tiers .t.routine {
+  color: var(--muted);
+}
+.tiers .t.documented {
+  color: var(--accent-ink);
+}
+.tiers .t.clinical {
+  color: var(--warn);
+}
+.tiers .t.disclosive {
+  color: var(--bad);
+}
+
+.states {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+.state {
+  border: 1px solid var(--rule);
+  border-radius: 12px;
+  background: var(--surface);
+  overflow: hidden;
+}
+.state .h {
+  padding: 0.6rem 0.85rem;
+  border-bottom: 1px solid var(--rule);
+  font-size: 0.78rem;
+  font-weight: 600;
+  display: flex;
+  gap: 0.5rem;
+  align-items: baseline;
+}
+.state .h .n {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  color: var(--accent);
+}
+.state .b {
+  padding: 0.9rem 0.85rem;
+  background: var(--surface-2);
+  display: grid;
+  place-items: start center;
+  min-height: 130px;
+}
+.state .b .cm {
+  position: static;
+  animation: none;
+  box-shadow: none;
+  border: 1px solid var(--a-border);
+}
+
+.compare {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+.compare > div {
+  border: 1px solid var(--rule);
+  border-radius: 12px;
+  padding: 1.1rem 1.2rem;
+  background: var(--surface);
+}
+.compare .lbl {
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+}
+.compare .bad-h .lbl {
+  color: var(--bad);
+}
+.compare .ok-h .lbl {
+  color: var(--ok);
+}
+.compare.two > .bad-h {
+  border-color: var(--bad-rule);
+}
+.compare.two > .ok-h {
+  border-color: var(--ok-rule);
+}
+
+.qa {
+  border-inline-start: 3px solid var(--rule-2);
+  padding-inline-start: 1.1rem;
+  margin: 1.5rem 0;
+}
+.qa > div {
+  margin-bottom: 1.25rem;
+}
+.qa > div:last-child {
+  margin-bottom: 0;
+}
+.qa .q {
+  font-weight: 600;
+  margin-bottom: 0.3rem;
+}
+.qa .q .n {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--accent);
+  margin-inline-end: 0.5rem;
+}
+.qa .a {
+  color: var(--ink-2);
+  font-size: 0.92rem;
+}
+.qa .a b {
+  color: var(--ink);
+}
+
+/* ==================================================================== */
+/* IN-SITU MOCKUP — an EHR screen, so the component can be judged where */
+/* it will actually live rather than on a white card.                   */
+/* ==================================================================== */
+.app {
+  display: grid;
+  grid-template-columns: 52px minmax(0, 1fr);
+  background: var(--a-bg-layout);
+  border: 1px solid var(--a-border);
+  border-radius: 10px;
+  overflow: hidden;
+  min-width: 720px;
+  box-shadow: var(--a-shadow);
+}
+.app-rail {
+  background: #001529;
+  display: grid;
+  align-content: start;
+  gap: 4px;
+  padding: 10px 0;
+}
+.app-rail .ri {
+  width: 36px;
+  height: 36px;
+  margin: 0 auto;
+  border-radius: var(--a-radius);
+  display: grid;
+  place-items: center;
+  color: rgb(255 255 255 / 0.6);
+}
+.app-rail .ri.on {
+  background: var(--a-primary);
+  color: #fff;
+}
+.app-main {
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr);
+  background: var(--a-bg);
+  min-width: 0;
+}
+
+.banner {
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+  padding: 11px 16px;
+  border-bottom: 1px solid var(--a-border-2);
+}
+.banner .pav {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--a-purple-bg);
+  color: var(--a-purple);
+  display: grid;
+  place-items: center;
+  font-weight: 600;
+  font-size: 13px;
+}
+.banner .pn {
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+.banner .pm {
+  font-size: 12px;
+  color: var(--a-text-3);
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 2px;
+}
+.banner .flags {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.tabstrip {
+  display: flex;
+  gap: 2px;
+  padding: 0 16px;
+  border-bottom: 1px solid var(--a-border-2);
+}
+.tabstrip .tb {
+  font-size: 13px;
+  padding: 9px 12px;
+  color: var(--a-text-2);
+  border-bottom: 2px solid transparent;
+  white-space: nowrap;
+}
+.tabstrip .tb.on {
+  color: var(--a-primary);
+  border-bottom-color: var(--a-primary);
+  font-weight: 500;
+}
+
+.panes {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+  gap: 0;
+  min-height: 0;
+}
+.panes > div {
+  padding: 14px 16px;
+  min-width: 0;
+}
+.panes > div + div {
+  border-inline-start: 1px solid var(--a-border-2);
+  background: var(--a-bg-layout);
+}
+.pane-h {
+  font-size: 11px;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: var(--a-text-3);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.pane-h .n {
+  font-weight: 400;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--a-text-4);
+  font-variant-numeric: tabular-nums;
+}
+.panes .rows + .pane-h {
+  margin-top: 18px;
+}
+
+.appwrap {
+  overflow-x: auto;
+}
+@media (max-width: 820px) {
+  .panes {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .panes > div + div {
+    border-inline-start: 0;
+    border-top: 1px solid var(--a-border-2);
+  }
+}
+
+/* A long URL inside inline <code> is the only thing that pushed this
+     document past 375px. `anywhere` rather than `break-word` because
+     break-word will not break a token that has no break opportunity. */
+p code,
+li code,
+td code,
+figcaption code,
+.d code,
+.a code {
+  overflow-wrap: anywhere;
+}

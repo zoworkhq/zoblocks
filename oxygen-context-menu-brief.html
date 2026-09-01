@@ -3,81 +3,54 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <meta name="description" content="A healthcare-grade context menu for EHR and behavioral-health interfaces: the subject header as a wrong-patient check, consequence as a four-tier rank, disclosure auditing, and fifteen live interactive figures driven by the proposed core." />
 <style>
-
-  /* ------------------------------------------------------------------ */
-  /* Document tokens — Oxygen's own identity, shared with the other      */
-  /* component briefs so the set reads as one series.                    */
-  /* The mockups further down deliberately do NOT use these: they use    */
-  /* Ant Design v6's real token values, so what you are judging is antd, */
-  /* not a teal impression of it.                                        */
-  /* ------------------------------------------------------------------ */
-  :root {
-    --paper: #f6faf8;
-    --surface: #ffffff;
-    --surface-2: #eef4f2;
-    --ink: #0e1c19;
-    --ink-2: #33473f;
-    --muted: #5d716b;
-    --rule: #d8e4df;
-    --rule-2: #c3d3cd;
-    --accent: #059478;
-    --accent-2: #0bb08f;
-    --accent-soft: #e6f7f1;
-    --accent-ink: #045b4b;
-    --stage: #0b1716;
-    --stage-rule: #1c3230;
-    --warn: #b7791f;
-    --warn-soft: #fbf3e0;
-    --warn-rule: #e4c98a;
-    --bad: #b4423a;
-    --bad-soft: #fbeceb;
-    --bad-rule: #e8b5b0;
-    --ok: #1f8f5f;
-    --ok-soft: #e6f6ee;
-    --ok-rule: #a9dcc3;
-    --code-bg: #0f1e1c;
-    --code-fg: #d9ece6;
-    --code-k: #7ee0cd;
-    --code-s: #f2c98a;
-    --code-c: #7f9c94;
-    --shadow: 0 1px 2px rgb(14 28 25 / 0.06), 0 8px 24px -12px rgb(14 28 25 / 0.18);
-    --font-display: "Avenir Next", "Segoe UI Variable Display", "Helvetica Neue", ui-sans-serif, system-ui, sans-serif;
-    --font-body: -apple-system, BlinkMacSystemFont, "Segoe UI Variable Text", "Segoe UI", ui-sans-serif, system-ui, sans-serif;
-    --font-mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
-    color-scheme: light;
-  }
-  @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) {
-      --paper: #0b1514;
-      --surface: #101d1b;
-      --surface-2: #142522;
-      --ink: #e7f2ee;
-      --ink-2: #c3d6d0;
-      --muted: #93aca5;
-      --rule: #1f312e;
-      --rule-2: #2c423e;
-      --accent: #5fe0c9;
-      --accent-2: #8aeedd;
-      --accent-soft: #10302b;
-      --accent-ink: #b8f3e7;
-      --stage: #070f0e;
-      --stage-rule: #1a2d2b;
-      --warn: #e2b04a;
-      --warn-soft: #2a2410;
-      --warn-rule: #4d4020;
-      --bad: #f0928a;
-      --bad-soft: #2c1614;
-      --bad-rule: #552a26;
-      --ok: #5fd39a;
-      --ok-soft: #10281d;
-      --ok-rule: #23503a;
-      --code-bg: #0a1413;
-      --code-fg: #d9ece6;
-      --shadow: 0 1px 2px rgb(0 0 0 / 0.4), 0 10px 30px -14px rgb(0 0 0 / 0.6);
-      color-scheme: dark;
-    }
-  }
-  :root[data-theme="dark"] {
+/* ------------------------------------------------------------------ */
+/* Document tokens — Oxygen's own identity, shared with the other      */
+/* component briefs so the set reads as one series.                    */
+/* The mockups further down deliberately do NOT use these: they use    */
+/* Ant Design v6's real token values, so what you are judging is antd, */
+/* not a teal impression of it.                                        */
+/* ------------------------------------------------------------------ */
+:root {
+  --paper: #f6faf8;
+  --surface: #ffffff;
+  --surface-2: #eef4f2;
+  --ink: #0e1c19;
+  --ink-2: #33473f;
+  --muted: #5d716b;
+  --rule: #d8e4df;
+  --rule-2: #c3d3cd;
+  --accent: #059478;
+  --accent-2: #0bb08f;
+  --accent-soft: #e6f7f1;
+  --accent-ink: #045b4b;
+  --stage: #0b1716;
+  --stage-rule: #1c3230;
+  --warn: #b7791f;
+  --warn-soft: #fbf3e0;
+  --warn-rule: #e4c98a;
+  --bad: #b4423a;
+  --bad-soft: #fbeceb;
+  --bad-rule: #e8b5b0;
+  --ok: #1f8f5f;
+  --ok-soft: #e6f6ee;
+  --ok-rule: #a9dcc3;
+  --code-bg: #0f1e1c;
+  --code-fg: #d9ece6;
+  --code-k: #7ee0cd;
+  --code-s: #f2c98a;
+  --code-c: #7f9c94;
+  --shadow: 0 1px 2px rgb(14 28 25 / 0.06), 0 8px 24px -12px rgb(14 28 25 / 0.18);
+  --font-display:
+    "Avenir Next", "Segoe UI Variable Display", "Helvetica Neue", ui-sans-serif, system-ui,
+    sans-serif;
+  --font-body:
+    -apple-system, BlinkMacSystemFont, "Segoe UI Variable Text", "Segoe UI", ui-sans-serif,
+    system-ui, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
     --paper: #0b1514;
     --surface: #101d1b;
     --surface-2: #142522;
@@ -106,635 +79,1931 @@
     --shadow: 0 1px 2px rgb(0 0 0 / 0.4), 0 10px 30px -14px rgb(0 0 0 / 0.6);
     color-scheme: dark;
   }
+}
+:root[data-theme="dark"] {
+  --paper: #0b1514;
+  --surface: #101d1b;
+  --surface-2: #142522;
+  --ink: #e7f2ee;
+  --ink-2: #c3d6d0;
+  --muted: #93aca5;
+  --rule: #1f312e;
+  --rule-2: #2c423e;
+  --accent: #5fe0c9;
+  --accent-2: #8aeedd;
+  --accent-soft: #10302b;
+  --accent-ink: #b8f3e7;
+  --stage: #070f0e;
+  --stage-rule: #1a2d2b;
+  --warn: #e2b04a;
+  --warn-soft: #2a2410;
+  --warn-rule: #4d4020;
+  --bad: #f0928a;
+  --bad-soft: #2c1614;
+  --bad-rule: #552a26;
+  --ok: #5fd39a;
+  --ok-soft: #10281d;
+  --ok-rule: #23503a;
+  --code-bg: #0a1413;
+  --code-fg: #d9ece6;
+  --shadow: 0 1px 2px rgb(0 0 0 / 0.4), 0 10px 30px -14px rgb(0 0 0 / 0.6);
+  color-scheme: dark;
+}
 
-  * { box-sizing: border-box; }
-  html { scroll-behavior: smooth; }
-  body {
-    margin: 0;
-    background: var(--paper);
-    color: var(--ink);
-    font-family: var(--font-body);
-    font-size: 16px;
-    line-height: 1.6;
-    -webkit-font-smoothing: antialiased;
+* {
+  box-sizing: border-box;
+}
+html {
+  scroll-behavior: smooth;
+}
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
   }
-  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
-  a { color: var(--accent-ink); text-decoration-color: color-mix(in oklab, var(--accent) 50%, transparent); text-underline-offset: 3px; }
-  a:hover { text-decoration-color: var(--accent); }
-  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
-  h1, h2, h3, h4 { font-family: var(--font-display); letter-spacing: -0.015em; text-wrap: balance; margin: 0; }
-  h1 { font-size: clamp(2.2rem, 4.5vw, 3.4rem); line-height: 1.05; font-weight: 600; }
-  h2 { font-size: 1.75rem; line-height: 1.2; font-weight: 600; }
-  h3 { font-size: 1.2rem; line-height: 1.3; font-weight: 600; margin-top: 2rem; }
-  h4 { font-size: 1rem; line-height: 1.35; font-weight: 600; }
-  p { margin: 0 0 1rem; }
-  ul, ol { margin: 0 0 1rem; padding-inline-start: 1.35rem; }
-  li { margin-bottom: 0.4rem; }
-  li::marker { color: var(--accent); }
-  strong { font-weight: 600; color: var(--ink); }
-  code { font-family: var(--font-mono); font-size: 0.86em; background: var(--surface-2); padding: 0.1em 0.35em; border-radius: 4px; }
+}
+a {
+  color: var(--accent-ink);
+  text-decoration-color: color-mix(in oklab, var(--accent) 50%, transparent);
+  text-underline-offset: 3px;
+}
+a:hover {
+  text-decoration-color: var(--accent);
+}
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-display);
+  letter-spacing: -0.015em;
+  text-wrap: balance;
+  margin: 0;
+}
+h1 {
+  font-size: clamp(2.2rem, 4.5vw, 3.4rem);
+  line-height: 1.05;
+  font-weight: 600;
+}
+h2 {
+  font-size: 1.75rem;
+  line-height: 1.2;
+  font-weight: 600;
+}
+h3 {
+  font-size: 1.2rem;
+  line-height: 1.3;
+  font-weight: 600;
+  margin-top: 2rem;
+}
+h4 {
+  font-size: 1rem;
+  line-height: 1.35;
+  font-weight: 600;
+}
+p {
+  margin: 0 0 1rem;
+}
+ul,
+ol {
+  margin: 0 0 1rem;
+  padding-inline-start: 1.35rem;
+}
+li {
+  margin-bottom: 0.4rem;
+}
+li::marker {
+  color: var(--accent);
+}
+strong {
+  font-weight: 600;
+  color: var(--ink);
+}
+code {
+  font-family: var(--font-mono);
+  font-size: 0.86em;
+  background: var(--surface-2);
+  padding: 0.1em 0.35em;
+  border-radius: 4px;
+}
 
-  .wrap { max-width: 1180px; margin: 0 auto; padding: 0 clamp(1rem, 4vw, 2.5rem); }
-  .prose { max-width: 68ch; }
+.wrap {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 0 clamp(1rem, 4vw, 2.5rem);
+}
+.prose {
+  max-width: 68ch;
+}
 
-  header.hero {
-    padding: clamp(3rem, 9vw, 6.5rem) 0 clamp(2rem, 5vw, 3.5rem);
-    border-bottom: 1px solid var(--rule);
-    background:
-      radial-gradient(1100px 420px at 12% -12%, color-mix(in oklab, var(--accent) 11%, transparent), transparent 62%),
-      var(--paper);
-  }
-  .eyebrow {
-    font-family: var(--font-mono);
-    font-size: 0.72rem;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
-    color: var(--accent-ink);
-    margin-bottom: 1.1rem;
-  }
-  .hero .lede { font-size: clamp(1.05rem, 2vw, 1.3rem); color: var(--ink-2); max-width: 62ch; margin-top: 1.25rem; }
-  .hero-meta { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: 2rem; }
-  .pill {
-    font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.05em;
-    padding: 0.35rem 0.7rem; border-radius: 999px;
-    border: 1px solid var(--rule-2); background: var(--surface); color: var(--muted);
-  }
-  .pill.on { border-color: color-mix(in oklab, var(--accent) 45%, transparent); background: var(--accent-soft); color: var(--accent-ink); }
+header.hero {
+  padding: clamp(3rem, 9vw, 6.5rem) 0 clamp(2rem, 5vw, 3.5rem);
+  border-bottom: 1px solid var(--rule);
+  background:
+    radial-gradient(
+      1100px 420px at 12% -12%,
+      color-mix(in oklab, var(--accent) 11%, transparent),
+      transparent 62%
+    ),
+    var(--paper);
+}
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--accent-ink);
+  margin-bottom: 1.1rem;
+}
+.hero .lede {
+  font-size: clamp(1.05rem, 2vw, 1.3rem);
+  color: var(--ink-2);
+  max-width: 62ch;
+  margin-top: 1.25rem;
+}
+.hero-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-top: 2rem;
+}
+.pill {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.05em;
+  padding: 0.35rem 0.7rem;
+  border-radius: 999px;
+  border: 1px solid var(--rule-2);
+  background: var(--surface);
+  color: var(--muted);
+}
+.pill.on {
+  border-color: color-mix(in oklab, var(--accent) 45%, transparent);
+  background: var(--accent-soft);
+  color: var(--accent-ink);
+}
 
-  nav.toc { border-bottom: 1px solid var(--rule); background: var(--surface); position: sticky; top: 0; z-index: 40; }
-  nav.toc .wrap { display: flex; gap: 0.25rem; overflow-x: auto; padding-block: 0.5rem; scrollbar-width: thin; }
-  nav.toc a {
-    flex: 0 0 auto; font-size: 0.8rem; padding: 0.35rem 0.65rem; border-radius: 6px;
-    color: var(--muted); text-decoration: none; white-space: nowrap;
-  }
-  nav.toc a:hover { background: var(--surface-2); color: var(--ink); }
+nav.toc {
+  border-bottom: 1px solid var(--rule);
+  background: var(--surface);
+  position: sticky;
+  top: 0;
+  z-index: 40;
+}
+nav.toc .wrap {
+  display: flex;
+  gap: 0.25rem;
+  overflow-x: auto;
+  padding-block: 0.5rem;
+  scrollbar-width: thin;
+}
+nav.toc a {
+  flex: 0 0 auto;
+  font-size: 0.8rem;
+  padding: 0.35rem 0.65rem;
+  border-radius: 6px;
+  color: var(--muted);
+  text-decoration: none;
+  white-space: nowrap;
+}
+nav.toc a:hover {
+  background: var(--surface-2);
+  color: var(--ink);
+}
 
-  section { padding: clamp(2.75rem, 6vw, 4.5rem) 0; border-bottom: 1px solid var(--rule); scroll-margin-top: 3.5rem; }
-  section > .wrap > .sec-head { margin-bottom: 2rem; }
-  .sec-num {
-    font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.14em;
-    color: var(--accent); text-transform: uppercase; display: block; margin-bottom: 0.5rem;
-  }
-  .sec-head p { color: var(--ink-2); max-width: 66ch; margin-top: 0.75rem; }
+section {
+  padding: clamp(2.75rem, 6vw, 4.5rem) 0;
+  border-bottom: 1px solid var(--rule);
+  scroll-margin-top: 3.5rem;
+}
+section > .wrap > .sec-head {
+  margin-bottom: 2rem;
+}
+.sec-num {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  color: var(--accent);
+  text-transform: uppercase;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+.sec-head p {
+  color: var(--ink-2);
+  max-width: 66ch;
+  margin-top: 0.75rem;
+}
 
-  .grid { display: grid; gap: 1rem; }
-  .g2 { grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
-  .g3 { grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); }
-  .g4 { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
+.grid {
+  display: grid;
+  gap: 1rem;
+}
+.g2 {
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+}
+.g3 {
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+}
+.g4 {
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+}
 
-  .card {
-    background: var(--surface); border: 1px solid var(--rule);
-    border-radius: 12px; padding: 1.25rem 1.35rem; box-shadow: var(--shadow);
-  }
-  .card h4 { margin-bottom: 0.5rem; }
-  .card p:last-child, .card ul:last-child { margin-bottom: 0; }
-  .card .k { font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); display: block; margin-bottom: 0.4rem; }
+.card {
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: 12px;
+  padding: 1.25rem 1.35rem;
+  box-shadow: var(--shadow);
+}
+.card h4 {
+  margin-bottom: 0.5rem;
+}
+.card p:last-child,
+.card ul:last-child {
+  margin-bottom: 0;
+}
+.card .k {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  display: block;
+  margin-bottom: 0.4rem;
+}
 
-  .note {
-    border-inline-start: 3px solid var(--accent);
-    background: var(--accent-soft); color: var(--accent-ink);
-    padding: 1rem 1.15rem; border-radius: 0 10px 10px 0; margin: 1.5rem 0;
-  }
-  .note.warn { border-color: var(--warn); background: var(--warn-soft); color: var(--ink); }
-  .note.bad { border-color: var(--bad); background: var(--bad-soft); color: var(--ink); }
-  .note.ok { border-color: var(--ok); background: var(--ok-soft); color: var(--ink); }
-  .note p:last-child { margin-bottom: 0; }
-  .note .lbl { font-family: var(--font-mono); font-size: 0.68rem; letter-spacing: 0.12em; text-transform: uppercase; display: block; margin-bottom: 0.4rem; opacity: 0.85; }
+.note {
+  border-inline-start: 3px solid var(--accent);
+  background: var(--accent-soft);
+  color: var(--accent-ink);
+  padding: 1rem 1.15rem;
+  border-radius: 0 10px 10px 0;
+  margin: 1.5rem 0;
+}
+.note.warn {
+  border-color: var(--warn);
+  background: var(--warn-soft);
+  color: var(--ink);
+}
+.note.bad {
+  border-color: var(--bad);
+  background: var(--bad-soft);
+  color: var(--ink);
+}
+.note.ok {
+  border-color: var(--ok);
+  background: var(--ok-soft);
+  color: var(--ink);
+}
+.note p:last-child {
+  margin-bottom: 0;
+}
+.note .lbl {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  display: block;
+  margin-bottom: 0.4rem;
+  opacity: 0.85;
+}
 
-  .tw { overflow-x: auto; border: 1px solid var(--rule); border-radius: 12px; background: var(--surface); margin: 1.5rem 0; }
-  table { border-collapse: collapse; width: 100%; font-size: 0.88rem; min-width: 560px; }
-  th, td { text-align: start; padding: 0.7rem 0.9rem; border-bottom: 1px solid var(--rule); vertical-align: top; }
-  th { font-family: var(--font-mono); font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); background: var(--surface-2); position: sticky; top: 0; }
-  tr:last-child td { border-bottom: 0; }
-  td code { white-space: nowrap; }
-  .num { font-variant-numeric: tabular-nums; }
-  .yes { color: var(--ok); font-weight: 600; }
-  .no { color: var(--bad); font-weight: 600; }
-  .meh { color: var(--warn); font-weight: 600; }
+.tw {
+  overflow-x: auto;
+  border: 1px solid var(--rule);
+  border-radius: 12px;
+  background: var(--surface);
+  margin: 1.5rem 0;
+}
+table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 0.88rem;
+  min-width: 560px;
+}
+th,
+td {
+  text-align: start;
+  padding: 0.7rem 0.9rem;
+  border-bottom: 1px solid var(--rule);
+  vertical-align: top;
+}
+th {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  background: var(--surface-2);
+  position: sticky;
+  top: 0;
+}
+tr:last-child td {
+  border-bottom: 0;
+}
+td code {
+  white-space: nowrap;
+}
+.num {
+  font-variant-numeric: tabular-nums;
+}
+.yes {
+  color: var(--ok);
+  font-weight: 600;
+}
+.no {
+  color: var(--bad);
+  font-weight: 600;
+}
+.meh {
+  color: var(--warn);
+  font-weight: 600;
+}
 
-  pre {
-    background: var(--code-bg); color: var(--code-fg); border-radius: 12px;
-    padding: 1.1rem 1.25rem; overflow-x: auto; font-family: var(--font-mono);
-    font-size: 0.8rem; line-height: 1.65; margin: 1.25rem 0; border: 1px solid var(--stage-rule);
-  }
-  pre code { background: none; padding: 0; font-size: inherit; color: inherit; }
-  .c-k { color: var(--code-k); }
-  .c-s { color: var(--code-s); }
-  .c-c { color: var(--code-c); font-style: italic; }
+pre {
+  background: var(--code-bg);
+  color: var(--code-fg);
+  border-radius: 12px;
+  padding: 1.1rem 1.25rem;
+  overflow-x: auto;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  line-height: 1.65;
+  margin: 1.25rem 0;
+  border: 1px solid var(--stage-rule);
+}
+pre code {
+  background: none;
+  padding: 0;
+  font-size: inherit;
+  color: inherit;
+}
+.c-k {
+  color: var(--code-k);
+}
+.c-s {
+  color: var(--code-s);
+}
+.c-c {
+  color: var(--code-c);
+  font-style: italic;
+}
 
-  figure { margin: 1.75rem 0; }
-  figcaption {
-    font-size: 0.82rem; color: var(--muted); margin-top: 0.75rem;
-    padding-inline-start: 0.9rem; border-inline-start: 2px solid var(--rule-2);
-  }
-  figcaption b { color: var(--ink-2); font-weight: 600; }
-  .stage {
-    background: linear-gradient(var(--surface-2) 0 0) padding-box, var(--surface);
-    border: 1px solid var(--rule); border-radius: 14px;
-    padding: clamp(1rem, 3vw, 2rem); overflow-x: auto;
-  }
+figure {
+  margin: 1.75rem 0;
+}
+figcaption {
+  font-size: 0.82rem;
+  color: var(--muted);
+  margin-top: 0.75rem;
+  padding-inline-start: 0.9rem;
+  border-inline-start: 2px solid var(--rule-2);
+}
+figcaption b {
+  color: var(--ink-2);
+  font-weight: 600;
+}
+.stage {
+  background:
+    linear-gradient(var(--surface-2) 0 0) padding-box,
+    var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: 14px;
+  padding: clamp(1rem, 3vw, 2rem);
+  overflow-x: auto;
+}
 
-  /* ------------------------------------------------------------------ */
-  /* ANT DESIGN mockup primitives — real antd v6 default token values.   */
-  /* Kept in their own namespace so the document's teal never leaks in.  */
-  /* ------------------------------------------------------------------ */
-  .antd {
-    --a-primary: #1677ff;
-    --a-primary-bg: #e6f4ff;
-    --a-primary-border: #91caff;
-    --a-success: #52c41a;
-    --a-success-bg: #f6ffed;
-    --a-success-border: #b7eb8f;
-    --a-warning: #faad14;
-    --a-warning-bg: #fffbe6;
-    --a-warning-border: #ffe58f;
-    --a-error: #ff4d4f;
-    --a-error-bg: #fff2f0;
-    --a-error-border: #ffccc7;
-    --a-purple: #722ed1;
-    --a-purple-bg: #f9f0ff;
-    --a-purple-border: #d3adf7;
-    --a-cyan: #13c2c2;
-    --a-cyan-bg: #e6fffb;
-    --a-cyan-border: #87e8de;
-    --a-magenta: #eb2f96;
-    --a-magenta-bg: #fff0f6;
-    --a-magenta-border: #ffadd2;
-    --a-text: rgba(0, 0, 0, 0.88);
-    --a-text-2: rgba(0, 0, 0, 0.65);
-    --a-text-3: rgba(0, 0, 0, 0.45);
-    --a-text-4: rgba(0, 0, 0, 0.25);
-    --a-border: #d9d9d9;
-    --a-border-2: #f0f0f0;
-    --a-bg: #ffffff;
-    --a-bg-layout: #f5f5f5;
-    --a-fill-3: rgba(0, 0, 0, 0.04);
-    --a-fill-2: rgba(0, 0, 0, 0.06);
-    --a-radius: 6px;
-    --a-radius-lg: 8px;
-    --a-radius-sm: 4px;
-    --a-h: 32px;
-    --a-h-sm: 24px;
-    --a-shadow: 0 6px 16px 0 rgb(0 0 0 / 0.08), 0 3px 6px -4px rgb(0 0 0 / 0.12), 0 9px 28px 8px rgb(0 0 0 / 0.05);
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
-    font-size: 14px;
-    line-height: 1.5714;
-    color: var(--a-text);
-  }
-  .antd code {
-    background: var(--a-fill-3); color: var(--a-text);
-    border: 1px solid var(--a-border-2); border-radius: var(--a-radius-sm);
-    padding: 1px 5px; font-size: 12px;
-  }
-  .a-card {
-    background: var(--a-bg); border-radius: var(--a-radius-lg);
-    box-shadow: var(--a-shadow); width: 100%; max-width: 560px; margin: 0 auto;
-  }
-  .a-card.wide { max-width: 860px; }
-  .a-card.xwide { max-width: 1040px; }
-  .a-card.pins { overflow: visible; }
-  .a-card-head {
-    display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem;
-    padding: 16px 20px; border-bottom: 1px solid var(--a-border-2);
-  }
-  .a-card-title { font-size: 16px; font-weight: 600; line-height: 1.5; color: var(--a-text); }
-  .a-card-sub { font-size: 12px; color: var(--a-text-3); margin-top: 2px; }
-  .a-card-body { padding: 16px 20px; }
-  .a-card-body.flush { padding: 0; }
-  .a-card-foot {
-    display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap;
-    padding: 11px 20px; border-top: 1px solid var(--a-border-2);
-    font-size: 12px; color: var(--a-text-3);
-  }
-  .a-btn {
-    display: inline-flex; align-items: center; justify-content: center; gap: 6px;
-    height: var(--a-h); padding: 0 15px; border-radius: var(--a-radius);
-    border: 1px solid var(--a-border); background: var(--a-bg); color: var(--a-text);
-    font-size: 14px; font-weight: 400; white-space: nowrap;
-  }
-  .a-btn.primary { background: var(--a-primary); border-color: var(--a-primary); color: #fff; }
-  .a-btn.text { border-color: transparent; background: transparent; color: var(--a-text-2); }
-  .a-btn.link { border-color: transparent; background: transparent; color: var(--a-primary); padding: 0; height: auto; }
-  .a-btn.sm { height: var(--a-h-sm); padding: 0 9px; font-size: 12px; }
-  .a-btn.on { color: var(--a-primary); border-color: var(--a-primary); background: var(--a-primary-bg); }
-  .a-alert {
-    display: flex; gap: 8px; align-items: flex-start;
-    padding: 9px 12px; border-radius: var(--a-radius); font-size: 13px;
-    border: 1px solid var(--a-primary-border); background: var(--a-primary-bg); color: var(--a-text);
-  }
-  .a-alert.warning { border-color: var(--a-warning-border); background: var(--a-warning-bg); }
-  .a-alert.error { border-color: var(--a-error-border); background: var(--a-error-bg); }
-  .a-alert .ic { flex: 0 0 auto; margin-top: 2px; }
-  .a-alert b { font-weight: 600; }
-  .a-tag {
-    display: inline-flex; align-items: center; gap: 4px; height: 20px; padding: 0 6px;
-    font-size: 11px; line-height: 18px; border-radius: var(--a-radius-sm);
-    border: 1px solid var(--a-border); background: var(--a-fill-3); color: var(--a-text-2);
-    white-space: nowrap;
-  }
-  .a-tag.blue { border-color: var(--a-primary-border); background: var(--a-primary-bg); color: var(--a-primary); }
-  .a-tag.green { border-color: var(--a-success-border); background: var(--a-success-bg); color: #389e0d; }
-  .a-tag.gold { border-color: var(--a-warning-border); background: var(--a-warning-bg); color: #d48806; }
-  .a-tag.red { border-color: var(--a-error-border); background: var(--a-error-bg); color: var(--a-error); }
-  .a-tag.purple { border-color: var(--a-purple-border); background: var(--a-purple-bg); color: var(--a-purple); }
-  .a-tag.cyan { border-color: var(--a-cyan-border); background: var(--a-cyan-bg); color: #08979c; }
-  .a-tag.magenta { border-color: var(--a-magenta-border); background: var(--a-magenta-bg); color: #c41d7f; }
-  .a-tag.plain { border-color: var(--a-border-2); background: transparent; color: var(--a-text-3); }
+/* ------------------------------------------------------------------ */
+/* ANT DESIGN mockup primitives — real antd v6 default token values.   */
+/* Kept in their own namespace so the document's teal never leaks in.  */
+/* ------------------------------------------------------------------ */
+.antd {
+  --a-primary: #1677ff;
+  --a-primary-bg: #e6f4ff;
+  --a-primary-border: #91caff;
+  --a-success: #52c41a;
+  --a-success-bg: #f6ffed;
+  --a-success-border: #b7eb8f;
+  --a-warning: #faad14;
+  --a-warning-bg: #fffbe6;
+  --a-warning-border: #ffe58f;
+  --a-error: #ff4d4f;
+  --a-error-bg: #fff2f0;
+  --a-error-border: #ffccc7;
+  --a-purple: #722ed1;
+  --a-purple-bg: #f9f0ff;
+  --a-purple-border: #d3adf7;
+  --a-cyan: #13c2c2;
+  --a-cyan-bg: #e6fffb;
+  --a-cyan-border: #87e8de;
+  --a-magenta: #eb2f96;
+  --a-magenta-bg: #fff0f6;
+  --a-magenta-border: #ffadd2;
+  --a-text: rgba(0, 0, 0, 0.88);
+  --a-text-2: rgba(0, 0, 0, 0.65);
+  --a-text-3: rgba(0, 0, 0, 0.45);
+  --a-text-4: rgba(0, 0, 0, 0.25);
+  --a-border: #d9d9d9;
+  --a-border-2: #f0f0f0;
+  --a-bg: #ffffff;
+  --a-bg-layout: #f5f5f5;
+  --a-fill-3: rgba(0, 0, 0, 0.04);
+  --a-fill-2: rgba(0, 0, 0, 0.06);
+  --a-radius: 6px;
+  --a-radius-lg: 8px;
+  --a-radius-sm: 4px;
+  --a-h: 32px;
+  --a-h-sm: 24px;
+  --a-shadow:
+    0 6px 16px 0 rgb(0 0 0 / 0.08), 0 3px 6px -4px rgb(0 0 0 / 0.12),
+    0 9px 28px 8px rgb(0 0 0 / 0.05);
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans",
+    sans-serif;
+  font-size: 14px;
+  line-height: 1.5714;
+  color: var(--a-text);
+}
+.antd code {
+  background: var(--a-fill-3);
+  color: var(--a-text);
+  border: 1px solid var(--a-border-2);
+  border-radius: var(--a-radius-sm);
+  padding: 1px 5px;
+  font-size: 12px;
+}
+.a-card {
+  background: var(--a-bg);
+  border-radius: var(--a-radius-lg);
+  box-shadow: var(--a-shadow);
+  width: 100%;
+  max-width: 560px;
+  margin: 0 auto;
+}
+.a-card.wide {
+  max-width: 860px;
+}
+.a-card.xwide {
+  max-width: 1040px;
+}
+.a-card.pins {
+  overflow: visible;
+}
+.a-card-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--a-border-2);
+}
+.a-card-title {
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.5;
+  color: var(--a-text);
+}
+.a-card-sub {
+  font-size: 12px;
+  color: var(--a-text-3);
+  margin-top: 2px;
+}
+.a-card-body {
+  padding: 16px 20px;
+}
+.a-card-body.flush {
+  padding: 0;
+}
+.a-card-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 11px 20px;
+  border-top: 1px solid var(--a-border-2);
+  font-size: 12px;
+  color: var(--a-text-3);
+}
+.a-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: var(--a-h);
+  padding: 0 15px;
+  border-radius: var(--a-radius);
+  border: 1px solid var(--a-border);
+  background: var(--a-bg);
+  color: var(--a-text);
+  font-size: 14px;
+  font-weight: 400;
+  white-space: nowrap;
+}
+.a-btn.primary {
+  background: var(--a-primary);
+  border-color: var(--a-primary);
+  color: #fff;
+}
+.a-btn.text {
+  border-color: transparent;
+  background: transparent;
+  color: var(--a-text-2);
+}
+.a-btn.link {
+  border-color: transparent;
+  background: transparent;
+  color: var(--a-primary);
+  padding: 0;
+  height: auto;
+}
+.a-btn.sm {
+  height: var(--a-h-sm);
+  padding: 0 9px;
+  font-size: 12px;
+}
+.a-btn.on {
+  color: var(--a-primary);
+  border-color: var(--a-primary);
+  background: var(--a-primary-bg);
+}
+.a-alert {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  padding: 9px 12px;
+  border-radius: var(--a-radius);
+  font-size: 13px;
+  border: 1px solid var(--a-primary-border);
+  background: var(--a-primary-bg);
+  color: var(--a-text);
+}
+.a-alert.warning {
+  border-color: var(--a-warning-border);
+  background: var(--a-warning-bg);
+}
+.a-alert.error {
+  border-color: var(--a-error-border);
+  background: var(--a-error-bg);
+}
+.a-alert .ic {
+  flex: 0 0 auto;
+  margin-top: 2px;
+}
+.a-alert b {
+  font-weight: 600;
+}
+.a-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 20px;
+  padding: 0 6px;
+  font-size: 11px;
+  line-height: 18px;
+  border-radius: var(--a-radius-sm);
+  border: 1px solid var(--a-border);
+  background: var(--a-fill-3);
+  color: var(--a-text-2);
+  white-space: nowrap;
+}
+.a-tag.blue {
+  border-color: var(--a-primary-border);
+  background: var(--a-primary-bg);
+  color: var(--a-primary);
+}
+.a-tag.green {
+  border-color: var(--a-success-border);
+  background: var(--a-success-bg);
+  color: #389e0d;
+}
+.a-tag.gold {
+  border-color: var(--a-warning-border);
+  background: var(--a-warning-bg);
+  color: #d48806;
+}
+.a-tag.red {
+  border-color: var(--a-error-border);
+  background: var(--a-error-bg);
+  color: var(--a-error);
+}
+.a-tag.purple {
+  border-color: var(--a-purple-border);
+  background: var(--a-purple-bg);
+  color: var(--a-purple);
+}
+.a-tag.cyan {
+  border-color: var(--a-cyan-border);
+  background: var(--a-cyan-bg);
+  color: #08979c;
+}
+.a-tag.magenta {
+  border-color: var(--a-magenta-border);
+  background: var(--a-magenta-bg);
+  color: #c41d7f;
+}
+.a-tag.plain {
+  border-color: var(--a-border-2);
+  background: transparent;
+  color: var(--a-text-3);
+}
 
-  /* ------------------------------------------------------------------ */
-  /* Icons — Lucide geometry: 24px grid, 2px stroke, round caps.         */
-  /* ------------------------------------------------------------------ */
-  .i {
-    width: 16px; height: 16px; flex: 0 0 auto; display: block;
-    fill: none; stroke: currentColor; stroke-width: 2;
-    stroke-linecap: round; stroke-linejoin: round;
-    vector-effect: non-scaling-stroke;
+/* ------------------------------------------------------------------ */
+/* Icons — Lucide geometry: 24px grid, 2px stroke, round caps.         */
+/* ------------------------------------------------------------------ */
+.i {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 auto;
+  display: block;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+.i-14 {
+  width: 14px;
+  height: 14px;
+  stroke-width: 2.15;
+}
+.i-18 {
+  width: 18px;
+  height: 18px;
+  stroke-width: 1.9;
+}
+.i-20 {
+  width: 20px;
+  height: 20px;
+  stroke-width: 1.85;
+}
+
+/* ------------------------------------------------------------------ */
+/* Annotation pins — anchored to the element they describe.            */
+/* ------------------------------------------------------------------ */
+.rel {
+  position: relative;
+}
+.pin {
+  position: absolute;
+  z-index: 6;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  display: grid;
+  place-items: center;
+  line-height: 1;
+  box-shadow:
+    0 0 0 2px var(--a-bg),
+    0 0 0 3.5px color-mix(in oklab, var(--accent) 40%, transparent);
+}
+.pin.bad {
+  background: var(--bad);
+  box-shadow:
+    0 0 0 2px var(--a-bg),
+    0 0 0 3.5px color-mix(in oklab, var(--bad) 40%, transparent);
+}
+.pin-tl {
+  top: -10px;
+  inset-inline-start: -10px;
+}
+.pin-tr {
+  top: -10px;
+  inset-inline-end: -10px;
+}
+.pin-bl {
+  bottom: -10px;
+  inset-inline-start: -10px;
+}
+.pin-br {
+  bottom: -10px;
+  inset-inline-end: -10px;
+}
+.pin-l {
+  top: 50%;
+  inset-inline-start: -10px;
+  transform: translateY(-50%);
+}
+.pin-r {
+  top: 50%;
+  inset-inline-end: -10px;
+  transform: translateY(-50%);
+}
+
+.anno-key {
+  margin-top: 1.5rem;
+  display: grid;
+  gap: 0.6rem;
+  padding: 0;
+}
+.anno-key li {
+  display: flex;
+  gap: 0.65rem;
+  align-items: flex-start;
+  font-size: 0.88rem;
+  color: var(--ink-2);
+  list-style: none;
+  margin: 0;
+}
+.anno-key .n {
+  flex: 0 0 auto;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  display: grid;
+  place-items: center;
+  margin-top: 2px;
+}
+.anno-key .n.bad {
+  background: var(--bad);
+}
+
+.feat {
+  display: grid;
+  gap: 0;
+  border: 1px solid var(--rule);
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--surface);
+  margin: 1.5rem 0;
+}
+.feat > div {
+  display: grid;
+  grid-template-columns: 2.5rem 1fr;
+  gap: 0.9rem;
+  padding: 0.85rem 1.1rem;
+  border-bottom: 1px solid var(--rule);
+}
+.feat > div:last-child {
+  border-bottom: 0;
+}
+.feat .n {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--muted);
+  padding-top: 0.15rem;
+}
+.feat .t {
+  font-weight: 600;
+  margin-bottom: 0.15rem;
+}
+.feat .d {
+  font-size: 0.9rem;
+  color: var(--ink-2);
+}
+.badge {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+  margin-inline-start: 0.5rem;
+  vertical-align: 0.1em;
+  white-space: nowrap;
+}
+.badge.v1 {
+  background: var(--accent-soft);
+  color: var(--accent-ink);
+  border: 1px solid color-mix(in oklab, var(--accent) 35%, transparent);
+}
+.badge.v2 {
+  background: var(--surface-2);
+  color: var(--muted);
+  border: 1px solid var(--rule-2);
+}
+.badge.host {
+  background: var(--warn-soft);
+  color: var(--warn);
+  border: 1px solid var(--warn-rule);
+}
+.badge.never {
+  background: var(--bad-soft);
+  color: var(--bad);
+  border: 1px solid var(--bad-rule);
+}
+.grp-h {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin: 2rem 0 0.5rem;
+}
+
+.phases {
+  display: grid;
+  gap: 1rem;
+}
+.phase {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 1.1rem;
+}
+.phase .prail {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  justify-items: center;
+}
+.phase .dot {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--accent-soft);
+  border: 2px solid var(--accent);
+  color: var(--accent-ink);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  display: grid;
+  place-items: center;
+}
+.phase .pline {
+  width: 2px;
+  background: var(--rule);
+  margin-top: 4px;
+  min-height: 1rem;
+}
+.phase:last-child .pline {
+  display: none;
+}
+.phase .body {
+  padding-bottom: 1.25rem;
+}
+.phase .body h4 {
+  margin-bottom: 0.3rem;
+}
+.phase .meta {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 0.5rem;
+}
+
+.layers {
+  display: grid;
+  gap: 0;
+  border: 1px solid var(--rule);
+  border-radius: 12px;
+  overflow: hidden;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+}
+.layers > div {
+  padding: 0.85rem 1.1rem;
+  border-bottom: 1px solid var(--rule);
+  background: var(--surface);
+  display: grid;
+  grid-template-columns: 5.5rem 1fr;
+  gap: 1rem;
+  align-items: baseline;
+}
+.layers > div:last-child {
+  border-bottom: 0;
+}
+.layers .l {
+  color: var(--accent);
+  font-weight: 700;
+}
+.layers .d {
+  color: var(--ink-2);
+  font-family: var(--font-body);
+  font-size: 0.88rem;
+}
+
+footer {
+  padding: 3rem 0 4rem;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+footer .wrap > div + div {
+  margin-top: 0.5rem;
+}
+
+@media (max-width: 760px) {
+  .tl-reg {
+    grid-template-columns: 1fr;
   }
-  .i-14 { width: 14px; height: 14px; stroke-width: 2.15; }
-  .i-18 { width: 18px; height: 18px; stroke-width: 1.9; }
-  .i-20 { width: 20px; height: 20px; stroke-width: 1.85; }
-
-  /* ------------------------------------------------------------------ */
-  /* Annotation pins — anchored to the element they describe.            */
-  /* ------------------------------------------------------------------ */
-  .rel { position: relative; }
-  .pin {
-    position: absolute; z-index: 6;
-    width: 20px; height: 20px; border-radius: 50%;
-    background: var(--accent); color: #fff;
-    font-family: var(--font-mono); font-size: 10px; font-weight: 700;
-    display: grid; place-items: center; line-height: 1;
-    box-shadow: 0 0 0 2px var(--a-bg), 0 0 0 3.5px color-mix(in oklab, var(--accent) 40%, transparent);
+  .tl-reg .spine,
+  .tl-reg .mid,
+  .tl-reg .col-h.r {
+    display: none;
   }
-  .pin.bad { background: var(--bad); box-shadow: 0 0 0 2px var(--a-bg), 0 0 0 3.5px color-mix(in oklab, var(--bad) 40%, transparent); }
-  .pin-tl { top: -10px; inset-inline-start: -10px; }
-  .pin-tr { top: -10px; inset-inline-end: -10px; }
-  .pin-bl { bottom: -10px; inset-inline-start: -10px; }
-  .pin-br { bottom: -10px; inset-inline-end: -10px; }
-  .pin-l  { top: 50%; inset-inline-start: -10px; transform: translateY(-50%); }
-  .pin-r  { top: 50%; inset-inline-end: -10px; transform: translateY(-50%); }
-
-  .anno-key { margin-top: 1.5rem; display: grid; gap: 0.6rem; padding: 0; }
-  .anno-key li { display: flex; gap: 0.65rem; align-items: flex-start; font-size: 0.88rem; color: var(--ink-2); list-style: none; margin: 0; }
-  .anno-key .n {
-    flex: 0 0 auto; width: 20px; height: 20px; border-radius: 50%;
-    background: var(--accent); color: #fff; font-family: var(--font-mono);
-    font-size: 10px; font-weight: 700; display: grid; place-items: center; margin-top: 2px;
+  .tl-reg .ev,
+  .tl-reg .ev.l,
+  .tl-reg .ev.r {
+    grid-column: 1;
+    text-align: start;
   }
-  .anno-key .n.bad { background: var(--bad); }
-
-  .feat { display: grid; gap: 0; border: 1px solid var(--rule); border-radius: 12px; overflow: hidden; background: var(--surface); margin: 1.5rem 0; }
-  .feat > div { display: grid; grid-template-columns: 2.5rem 1fr; gap: 0.9rem; padding: 0.85rem 1.1rem; border-bottom: 1px solid var(--rule); }
-  .feat > div:last-child { border-bottom: 0; }
-  .feat .n { font-family: var(--font-mono); font-size: 0.75rem; color: var(--muted); padding-top: 0.15rem; }
-  .feat .t { font-weight: 600; margin-bottom: 0.15rem; }
-  .feat .d { font-size: 0.9rem; color: var(--ink-2); }
-  .badge { font-family: var(--font-mono); font-size: 0.62rem; letter-spacing: 0.08em; text-transform: uppercase; padding: 0.1rem 0.4rem; border-radius: 4px; margin-inline-start: 0.5rem; vertical-align: 0.1em; white-space: nowrap; }
-  .badge.v1 { background: var(--accent-soft); color: var(--accent-ink); border: 1px solid color-mix(in oklab, var(--accent) 35%, transparent); }
-  .badge.v2 { background: var(--surface-2); color: var(--muted); border: 1px solid var(--rule-2); }
-  .badge.host { background: var(--warn-soft); color: var(--warn); border: 1px solid var(--warn-rule); }
-  .badge.never { background: var(--bad-soft); color: var(--bad); border: 1px solid var(--bad-rule); }
-  .grp-h { font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); margin: 2rem 0 0.5rem; }
-
-  .phases { display: grid; gap: 1rem; }
-  .phase { display: grid; grid-template-columns: auto 1fr; gap: 1.1rem; }
-  .phase .prail { display: grid; grid-template-rows: auto 1fr; justify-items: center; }
-  .phase .dot { width: 30px; height: 30px; border-radius: 50%; background: var(--accent-soft); border: 2px solid var(--accent); color: var(--accent-ink); font-family: var(--font-mono); font-size: 0.72rem; font-weight: 700; display: grid; place-items: center; }
-  .phase .pline { width: 2px; background: var(--rule); margin-top: 4px; min-height: 1rem; }
-  .phase:last-child .pline { display: none; }
-  .phase .body { padding-bottom: 1.25rem; }
-  .phase .body h4 { margin-bottom: 0.3rem; }
-  .phase .meta { font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.5rem; }
-
-  .layers { display: grid; gap: 0; border: 1px solid var(--rule); border-radius: 12px; overflow: hidden; font-family: var(--font-mono); font-size: 0.8rem; }
-  .layers > div { padding: 0.85rem 1.1rem; border-bottom: 1px solid var(--rule); background: var(--surface); display: grid; grid-template-columns: 5.5rem 1fr; gap: 1rem; align-items: baseline; }
-  .layers > div:last-child { border-bottom: 0; }
-  .layers .l { color: var(--accent); font-weight: 700; }
-  .layers .d { color: var(--ink-2); font-family: var(--font-body); font-size: 0.88rem; }
-
-  footer { padding: 3rem 0 4rem; color: var(--muted); font-size: 0.85rem; }
-  footer .wrap > div + div { margin-top: 0.5rem; }
-
-  @media (max-width: 760px) {
-    .tl-reg { grid-template-columns: 1fr; }
-    .tl-reg .spine, .tl-reg .mid, .tl-reg .col-h.r { display: none; }
-    .tl-reg .ev, .tl-reg .ev.l, .tl-reg .ev.r { grid-column: 1; text-align: start; }
+}
+@media print {
+  nav.toc {
+    display: none;
   }
-  @media print {
-    nav.toc { display: none; }
-    section { break-inside: avoid; }
+  section {
+    break-inside: avoid;
   }
+}
 
+/* ==================================================================== */
+/* CONTEXT MENU mockup primitives.                                      */
+/* Real antd v6 token values, same discipline as the other briefs: what */
+/* you are judging is the proposal in Ant Design, not a teal impression */
+/* of it. Everything below is inside `.antd`.                           */
+/* ==================================================================== */
 
-  /* ==================================================================== */
-  /* CONTEXT MENU mockup primitives.                                      */
-  /* Real antd v6 token values, same discipline as the other briefs: what */
-  /* you are judging is the proposal in Ant Design, not a teal impression */
-  /* of it. Everything below is inside `.antd`.                           */
-  /* ==================================================================== */
+/* The surface you right-click on — a chart row, a worklist row.        */
+.rows {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border: 1px solid var(--a-border-2);
+  border-radius: var(--a-radius);
+  overflow: hidden;
+}
+.rows > li {
+  border-bottom: 1px solid var(--a-border-2);
+}
+.rows > li:last-child {
+  border-bottom: 0;
+}
+.rw {
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+  padding: 9px 12px;
+  font-size: 13px;
+  color: var(--a-text);
+  background: var(--a-bg);
+  cursor: default;
+  -webkit-user-select: none;
+  user-select: none;
+  position: relative;
+}
+.rw:hover {
+  background: var(--a-fill-3);
+}
+.rw.sel {
+  background: var(--a-primary-bg);
+  box-shadow: inset 2px 0 0 var(--a-primary);
+}
+.rw.armed {
+  background: var(--a-fill-2);
+  box-shadow: inset 0 0 0 1px var(--a-primary-border);
+}
+.rw .glyph {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--a-fill-3);
+  color: var(--a-text-3);
+}
+.rw .glyph.med {
+  background: var(--a-primary-bg);
+  color: var(--a-primary);
+}
+.rw .glyph.obs {
+  background: var(--a-cyan-bg);
+  color: #08979c;
+}
+.rw .glyph.doc {
+  background: var(--a-fill-3);
+  color: var(--a-text-2);
+}
+.rw .glyph.alg {
+  background: var(--a-error-bg);
+  color: var(--a-error);
+}
+.rw .glyph.pat {
+  background: var(--a-purple-bg);
+  color: var(--a-purple);
+}
+.rw .nm {
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.rw .dt {
+  font-size: 12px;
+  color: var(--a-text-3);
+  margin-top: 1px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.rw .rt {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--a-text-3);
+  font-variant-numeric: tabular-nums;
+}
+.rw .more {
+  width: 24px;
+  height: 24px;
+  border-radius: var(--a-radius-sm);
+  display: grid;
+  place-items: center;
+  color: var(--a-text-3);
+  border: 1px solid transparent;
+  background: transparent;
+  cursor: pointer;
+}
+.rw .more:hover,
+.rw .more[aria-expanded="true"] {
+  background: var(--a-fill-2);
+  color: var(--a-text);
+}
+.rw:focus-visible {
+  outline: 2px solid var(--a-primary);
+  outline-offset: -2px;
+}
+.rw.masked .nm {
+  color: var(--a-text-3);
+  font-style: italic;
+  font-weight: 400;
+}
 
-  /* The surface you right-click on — a chart row, a worklist row.        */
-  .rows { list-style: none; margin: 0; padding: 0; border: 1px solid var(--a-border-2); border-radius: var(--a-radius); overflow: hidden; }
-  .rows > li { border-bottom: 1px solid var(--a-border-2); }
-  .rows > li:last-child { border-bottom: 0; }
-  .rw {
-    display: grid; grid-template-columns: 22px minmax(0, 1fr) auto; gap: 10px; align-items: center;
-    padding: 9px 12px; font-size: 13px; color: var(--a-text); background: var(--a-bg);
-    cursor: default; -webkit-user-select: none; user-select: none; position: relative;
+.hint {
+  font-size: 12px;
+  color: var(--a-text-3);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 2px 0;
+  flex-wrap: wrap;
+}
+.kbd {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  line-height: 1;
+  padding: 3px 5px;
+  border: 1px solid var(--a-border);
+  border-bottom-width: 2px;
+  border-radius: 4px;
+  background: var(--a-bg);
+  color: var(--a-text-2);
+  white-space: nowrap;
+}
+
+/* The menu itself --------------------------------------------------- */
+.cmwrap {
+  position: relative;
+}
+.cm {
+  position: absolute;
+  z-index: 30;
+  min-width: 252px;
+  max-width: 320px;
+  background: var(--a-bg);
+  border-radius: var(--a-radius-lg);
+  box-shadow: var(--a-shadow);
+  border: 1px solid var(--a-border-2);
+  padding: 0 0 4px;
+  font-size: 13px;
+  color: var(--a-text);
+  transform-origin: var(--cm-origin, top left);
+  animation: cm-in 140ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+@keyframes cm-in {
+  from {
+    opacity: 0;
+    transform: scale(0.97) translateY(-2px);
   }
-  .rw:hover { background: var(--a-fill-3); }
-  .rw.sel { background: var(--a-primary-bg); box-shadow: inset 2px 0 0 var(--a-primary); }
-  .rw.armed { background: var(--a-fill-2); box-shadow: inset 0 0 0 1px var(--a-primary-border); }
-  .rw .glyph { width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; background: var(--a-fill-3); color: var(--a-text-3); }
-  .rw .glyph.med { background: var(--a-primary-bg); color: var(--a-primary); }
-  .rw .glyph.obs { background: var(--a-cyan-bg); color: #08979c; }
-  .rw .glyph.doc { background: var(--a-fill-3); color: var(--a-text-2); }
-  .rw .glyph.alg { background: var(--a-error-bg); color: var(--a-error); }
-  .rw .glyph.pat { background: var(--a-purple-bg); color: var(--a-purple); }
-  .rw .nm { font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .rw .dt { font-size: 12px; color: var(--a-text-3); margin-top: 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .rw .rt { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--a-text-3); font-variant-numeric: tabular-nums; }
-  .rw .more {
-    width: 24px; height: 24px; border-radius: var(--a-radius-sm); display: grid; place-items: center;
-    color: var(--a-text-3); border: 1px solid transparent; background: transparent; cursor: pointer;
-  }
-  .rw .more:hover, .rw .more[aria-expanded="true"] { background: var(--a-fill-2); color: var(--a-text); }
-  .rw:focus-visible { outline: 2px solid var(--a-primary); outline-offset: -2px; }
-  .rw.masked .nm { color: var(--a-text-3); font-style: italic; font-weight: 400; }
-
-  .hint {
-    font-size: 12px; color: var(--a-text-3); display: flex; align-items: center; gap: 6px;
-    padding: 8px 2px 0; flex-wrap: wrap;
-  }
-  .kbd {
-    font-family: var(--font-mono); font-size: 10.5px; line-height: 1; padding: 3px 5px;
-    border: 1px solid var(--a-border); border-bottom-width: 2px; border-radius: 4px;
-    background: var(--a-bg); color: var(--a-text-2); white-space: nowrap;
-  }
-
-  /* The menu itself --------------------------------------------------- */
-  .cmwrap { position: relative; }
+}
+@media (prefers-reduced-motion: reduce) {
   .cm {
-    position: absolute; z-index: 30; min-width: 252px; max-width: 320px;
-    background: var(--a-bg); border-radius: var(--a-radius-lg);
-    box-shadow: var(--a-shadow); border: 1px solid var(--a-border-2);
-    padding: 0 0 4px; font-size: 13px; color: var(--a-text);
-    transform-origin: var(--cm-origin, top left);
-    animation: cm-in 140ms cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation: none;
   }
-  @keyframes cm-in { from { opacity: 0; transform: scale(0.97) translateY(-2px); } }
-  @media (prefers-reduced-motion: reduce) { .cm { animation: none; } }
+}
 
-  /* Region 1 — the subject. Never interactive, always first, always
+/* Region 1 — the subject. Never interactive, always first, always
      rendered. It is the wrong-patient check and the safe landing zone. */
-  .cm-subject {
-    display: grid; grid-template-columns: 24px minmax(0, 1fr); gap: 9px; align-items: center;
-    padding: 10px 12px; background: var(--a-fill-3);
-    border-bottom: 1px solid var(--a-border-2);
-    border-radius: var(--a-radius-lg) var(--a-radius-lg) 0 0;
-    cursor: default;
+.cm-subject {
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr);
+  gap: 9px;
+  align-items: center;
+  padding: 10px 12px;
+  background: var(--a-fill-3);
+  border-bottom: 1px solid var(--a-border-2);
+  border-radius: var(--a-radius-lg) var(--a-radius-lg) 0 0;
+  cursor: default;
+}
+.cm-subject .av {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--a-bg);
+  border: 1px solid var(--a-border);
+  color: var(--a-text-2);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+.cm-subject .who {
+  font-weight: 600;
+  font-size: 12.5px;
+  line-height: 1.35;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.cm-subject .what {
+  font-size: 11.5px;
+  color: var(--a-text-3);
+  line-height: 1.35;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.cm-subject.masked .who {
+  color: var(--a-text-2);
+  font-style: italic;
+}
+.cm-subject.bulk .av {
+  background: var(--a-primary-bg);
+  border-color: var(--a-primary-border);
+  color: var(--a-primary);
+}
+
+.cm-group {
+  font-size: 10.5px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: var(--a-text-3);
+  padding: 9px 12px 3px;
+}
+.cm-sep {
+  height: 1px;
+  background: var(--a-border-2);
+  margin: 4px 0;
+}
+
+.cm-item {
+  display: grid;
+  grid-template-columns: 16px minmax(0, 1fr) auto;
+  gap: 9px;
+  align-items: center;
+  padding: 6px 12px;
+  min-height: 30px;
+  cursor: pointer;
+  color: var(--a-text);
+  border: 0;
+  background: transparent;
+  width: 100%;
+  text-align: start;
+  font: inherit;
+}
+.cm-item .ic {
+  color: var(--a-text-3);
+}
+.cm-item .lb {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.cm-item .sc {
+  font-size: 11px;
+  color: var(--a-text-4);
+  font-family: var(--font-mono);
+  white-space: nowrap;
+}
+.cm-item:hover,
+.cm-item.hot {
+  background: var(--a-fill-3);
+}
+.cm-item.hot .ic {
+  color: var(--a-text-2);
+}
+.cm-item:focus-visible {
+  outline: 2px solid var(--a-primary);
+  outline-offset: -2px;
+}
+.cm-item .sub {
+  grid-column: 2 / -1;
+  font-size: 11.5px;
+  color: var(--a-text-3);
+  line-height: 1.4;
+  margin-top: 1px;
+}
+
+/* Tier treatment. Never colour alone: each carries a glyph and a word. */
+.cm-item.t-documented .ic {
+  color: #08979c;
+}
+.cm-item.t-clinical .ic {
+  color: #d48806;
+}
+.cm-item.t-disclosive .ic {
+  color: var(--a-error);
+}
+.cm-item.t-clinical.hot {
+  background: var(--a-warning-bg);
+}
+.cm-item.t-disclosive.hot {
+  background: var(--a-error-bg);
+}
+.cm-item.t-disclosive .lb {
+  color: var(--a-error);
+}
+
+.cm-item[aria-disabled="true"] {
+  cursor: not-allowed;
+}
+.cm-item[aria-disabled="true"] .lb {
+  color: var(--a-text-4);
+  text-decoration: line-through;
+  text-decoration-thickness: 1px;
+}
+.cm-item[aria-disabled="true"] .ic {
+  color: var(--a-text-4);
+}
+.cm-item[aria-disabled="true"]:hover {
+  background: transparent;
+}
+.cm-item[aria-disabled="true"] .sub {
+  color: var(--a-text-3);
+}
+
+/* Pending. Holds its final position; never appended after the fact.    */
+.cm-item.pending {
+  cursor: progress;
+}
+.cm-item.pending .lb {
+  color: var(--a-text-4);
+}
+.cm-item.pending .bar {
+  grid-column: 2;
+  height: 9px;
+  border-radius: 3px;
+  width: 62%;
+  background: linear-gradient(90deg, var(--a-fill-2) 25%, var(--a-fill-3) 37%, var(--a-fill-2) 63%);
+  background-size: 400% 100%;
+  animation: cm-sk 1.4s ease infinite;
+}
+@keyframes cm-sk {
+  0% {
+    background-position: 100% 50%;
   }
-  .cm-subject .av {
-    width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center;
-    background: var(--a-bg); border: 1px solid var(--a-border); color: var(--a-text-2);
-    font-size: 10px; font-weight: 600; letter-spacing: 0.02em;
+  100% {
+    background-position: 0 50%;
   }
-  .cm-subject .who { font-weight: 600; font-size: 12.5px; line-height: 1.35; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .cm-subject .what { font-size: 11.5px; color: var(--a-text-3); line-height: 1.35; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .cm-subject.masked .who { color: var(--a-text-2); font-style: italic; }
-  .cm-subject.bulk .av { background: var(--a-primary-bg); border-color: var(--a-primary-border); color: var(--a-primary); }
-
-  .cm-group {
-    font-size: 10.5px; letter-spacing: 0.06em; text-transform: uppercase; font-weight: 600;
-    color: var(--a-text-3); padding: 9px 12px 3px;
-  }
-  .cm-sep { height: 1px; background: var(--a-border-2); margin: 4px 0; }
-
-  .cm-item {
-    display: grid; grid-template-columns: 16px minmax(0, 1fr) auto; gap: 9px; align-items: center;
-    padding: 6px 12px; min-height: 30px; cursor: pointer; color: var(--a-text);
-    border: 0; background: transparent; width: 100%; text-align: start; font: inherit;
-  }
-  .cm-item .ic { color: var(--a-text-3); }
-  .cm-item .lb { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .cm-item .sc { font-size: 11px; color: var(--a-text-4); font-family: var(--font-mono); white-space: nowrap; }
-  .cm-item:hover, .cm-item.hot { background: var(--a-fill-3); }
-  .cm-item.hot .ic { color: var(--a-text-2); }
-  .cm-item:focus-visible { outline: 2px solid var(--a-primary); outline-offset: -2px; }
-  .cm-item .sub { grid-column: 2 / -1; font-size: 11.5px; color: var(--a-text-3); line-height: 1.4; margin-top: 1px; }
-
-  /* Tier treatment. Never colour alone: each carries a glyph and a word. */
-  .cm-item.t-documented .ic { color: #08979c; }
-  .cm-item.t-clinical  .ic { color: #d48806; }
-  .cm-item.t-disclosive .ic { color: var(--a-error); }
-  .cm-item.t-clinical.hot  { background: var(--a-warning-bg); }
-  .cm-item.t-disclosive.hot { background: var(--a-error-bg); }
-  .cm-item.t-disclosive .lb { color: var(--a-error); }
-
-  .cm-item[aria-disabled="true"] { cursor: not-allowed; }
-  .cm-item[aria-disabled="true"] .lb { color: var(--a-text-4); text-decoration: line-through; text-decoration-thickness: 1px; }
-  .cm-item[aria-disabled="true"] .ic { color: var(--a-text-4); }
-  .cm-item[aria-disabled="true"]:hover { background: transparent; }
-  .cm-item[aria-disabled="true"] .sub { color: var(--a-text-3); }
-
-  /* Pending. Holds its final position; never appended after the fact.    */
-  .cm-item.pending { cursor: progress; }
-  .cm-item.pending .lb { color: var(--a-text-4); }
+}
+@media (prefers-reduced-motion: reduce) {
   .cm-item.pending .bar {
-    grid-column: 2; height: 9px; border-radius: 3px; width: 62%;
-    background: linear-gradient(90deg, var(--a-fill-2) 25%, var(--a-fill-3) 37%, var(--a-fill-2) 63%);
-    background-size: 400% 100%; animation: cm-sk 1.4s ease infinite;
+    animation: none;
+    background: none;
+    border: 1px dashed var(--a-border);
   }
-  @keyframes cm-sk { 0% { background-position: 100% 50%; } 100% { background-position: 0 50%; } }
-  @media (prefers-reduced-motion: reduce) {
-    .cm-item.pending .bar { animation: none; background: none; border: 1px dashed var(--a-border); }
+}
+
+/* The withheld count. A row inside the menu, not a footnote under it.  */
+.cm-withheld {
+  display: grid;
+  grid-template-columns: 16px 1fr;
+  gap: 9px;
+  align-items: start;
+  padding: 7px 12px 8px;
+  margin-top: 2px;
+  border-top: 1px solid var(--a-border-2);
+  font-size: 11.5px;
+  color: var(--a-text-3);
+  line-height: 1.45;
+}
+.cm-withheld .i {
+  color: var(--a-text-4);
+  margin-top: 1px;
+}
+
+/* Step two: the confirm strip for tier="clinical".                    */
+.cm-confirm {
+  margin: 3px 6px;
+  padding: 9px 10px;
+  border-radius: var(--a-radius);
+  background: var(--a-warning-bg);
+  border: 1px solid var(--a-warning-border);
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--a-text);
+}
+.cm-confirm b {
+  font-weight: 600;
+}
+.cm-confirm .acts {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+}
+.cm-confirm.bad {
+  background: var(--a-error-bg);
+  border-color: var(--a-error-border);
+}
+
+/* Step two: the reason list for tier="disclosive".                    */
+.cm-reasons {
+  margin: 3px 6px 2px;
+  padding: 9px 10px;
+  border-radius: var(--a-radius);
+  background: var(--a-error-bg);
+  border: 1px solid var(--a-error-border);
+}
+.cm-reasons .hd {
+  font-size: 11.5px;
+  color: var(--a-text-2);
+  margin-bottom: 7px;
+  line-height: 1.45;
+}
+.cm-reasons .hd b {
+  color: var(--a-error);
+}
+.cm-reason {
+  display: grid;
+  grid-template-columns: 13px 1fr;
+  gap: 8px;
+  align-items: start;
+  padding: 5px 6px;
+  border-radius: var(--a-radius-sm);
+  font-size: 12px;
+  cursor: pointer;
+  border: 0;
+  background: transparent;
+  width: 100%;
+  text-align: start;
+  color: var(--a-text);
+  font-family: inherit;
+}
+.cm-reason:hover,
+.cm-reason.hot {
+  background: rgb(255 255 255 / 0.65);
+}
+.cm-reason .rd {
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  border: 1.5px solid var(--a-border);
+  margin-top: 2px;
+}
+.cm-reason.on .rd {
+  border-color: var(--a-error);
+  box-shadow:
+    inset 0 0 0 2.5px var(--a-bg),
+    inset 0 0 0 9px var(--a-error);
+}
+.cm-reasons .foot {
+  font-size: 11px;
+  color: var(--a-text-3);
+  margin-top: 7px;
+  line-height: 1.45;
+}
+
+/* Checkbox / radio items — view state only, never a clinical act.      */
+.cm-item .box {
+  width: 13px;
+  height: 13px;
+  border-radius: 3px;
+  border: 1.5px solid var(--a-border);
+  display: grid;
+  place-items: center;
+  color: transparent;
+}
+.cm-item.on .box {
+  background: var(--a-primary);
+  border-color: var(--a-primary);
+  color: #fff;
+}
+.cm-item .rd {
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  border: 1.5px solid var(--a-border);
+}
+.cm-item.on .rd {
+  border-color: var(--a-primary);
+  box-shadow:
+    inset 0 0 0 2.5px var(--a-bg),
+    inset 0 0 0 9px var(--a-primary);
+}
+
+/* Submenu ----------------------------------------------------------- */
+.cm-item .chev {
+  color: var(--a-text-4);
+}
+.cm.sub {
+  position: absolute;
+}
+
+/* Ran / result toast inside the figure ------------------------------ */
+.cm-out {
+  margin-top: 10px;
+  font-size: 12.5px;
+  color: var(--a-text-2);
+  min-height: 20px;
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+  line-height: 1.5;
+}
+.cm-out .i {
+  margin-top: 2px;
+  flex: 0 0 auto;
+}
+.cm-out.ok {
+  color: #389e0d;
+}
+.cm-out.warn {
+  color: #d48806;
+}
+.cm-out.err {
+  color: var(--a-error);
+}
+.cm-out code {
+  font-size: 11.5px;
+}
+
+/* The audit strip — what the host is handed. Monospace on purpose:    */
+/* it is a record, not prose.                                          */
+.cm-audit {
+  margin-top: 10px;
+  border: 1px dashed var(--a-border);
+  border-radius: var(--a-radius);
+  background: var(--a-fill-3);
+  padding: 8px 10px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 1.6;
+  color: var(--a-text-2);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.cm-audit .k {
+  color: var(--a-text-4);
+}
+
+/* Touch sheet presentation ------------------------------------------ */
+.sheetbox {
+  position: relative;
+  overflow: hidden;
+  border-radius: 18px;
+  background: var(--a-bg-layout);
+  border: 1px solid var(--a-border);
+}
+.sheetbox .scrim {
+  position: absolute;
+  inset: 0;
+  background: rgb(0 0 0 / 0.35);
+}
+.cm.sheet {
+  position: absolute;
+  inset-inline: 0;
+  inset-block-end: 0;
+  max-width: none;
+  min-width: 0;
+  border-radius: 16px 16px 0 0;
+  padding-bottom: 8px;
+  animation: cm-up 180ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+@keyframes cm-up {
+  from {
+    transform: translateY(14px);
+    opacity: 0;
   }
-
-  /* The withheld count. A row inside the menu, not a footnote under it.  */
-  .cm-withheld {
-    display: grid; grid-template-columns: 16px 1fr; gap: 9px; align-items: start;
-    padding: 7px 12px 8px; margin-top: 2px;
-    border-top: 1px solid var(--a-border-2);
-    font-size: 11.5px; color: var(--a-text-3); line-height: 1.45;
-  }
-  .cm-withheld .i { color: var(--a-text-4); margin-top: 1px; }
-
-  /* Step two: the confirm strip for tier="clinical".                    */
-  .cm-confirm {
-    margin: 3px 6px; padding: 9px 10px; border-radius: var(--a-radius);
-    background: var(--a-warning-bg); border: 1px solid var(--a-warning-border);
-    font-size: 12px; line-height: 1.5; color: var(--a-text);
-  }
-  .cm-confirm b { font-weight: 600; }
-  .cm-confirm .acts { display: flex; gap: 6px; margin-top: 8px; }
-  .cm-confirm.bad { background: var(--a-error-bg); border-color: var(--a-error-border); }
-
-  /* Step two: the reason list for tier="disclosive".                    */
-  .cm-reasons { margin: 3px 6px 2px; padding: 9px 10px; border-radius: var(--a-radius); background: var(--a-error-bg); border: 1px solid var(--a-error-border); }
-  .cm-reasons .hd { font-size: 11.5px; color: var(--a-text-2); margin-bottom: 7px; line-height: 1.45; }
-  .cm-reasons .hd b { color: var(--a-error); }
-  .cm-reason {
-    display: grid; grid-template-columns: 13px 1fr; gap: 8px; align-items: start;
-    padding: 5px 6px; border-radius: var(--a-radius-sm); font-size: 12px; cursor: pointer;
-    border: 0; background: transparent; width: 100%; text-align: start; color: var(--a-text); font-family: inherit;
-  }
-  .cm-reason:hover, .cm-reason.hot { background: rgb(255 255 255 / 0.65); }
-  .cm-reason .rd { width: 13px; height: 13px; border-radius: 50%; border: 1.5px solid var(--a-border); margin-top: 2px; }
-  .cm-reason.on .rd { border-color: var(--a-error); box-shadow: inset 0 0 0 2.5px var(--a-bg), inset 0 0 0 9px var(--a-error); }
-  .cm-reasons .foot { font-size: 11px; color: var(--a-text-3); margin-top: 7px; line-height: 1.45; }
-
-  /* Checkbox / radio items — view state only, never a clinical act.      */
-  .cm-item .box {
-    width: 13px; height: 13px; border-radius: 3px; border: 1.5px solid var(--a-border);
-    display: grid; place-items: center; color: transparent;
-  }
-  .cm-item.on .box { background: var(--a-primary); border-color: var(--a-primary); color: #fff; }
-  .cm-item .rd { width: 13px; height: 13px; border-radius: 50%; border: 1.5px solid var(--a-border); }
-  .cm-item.on .rd { border-color: var(--a-primary); box-shadow: inset 0 0 0 2.5px var(--a-bg), inset 0 0 0 9px var(--a-primary); }
-
-  /* Submenu ----------------------------------------------------------- */
-  .cm-item .chev { color: var(--a-text-4); }
-  .cm.sub { position: absolute; }
-
-  /* Ran / result toast inside the figure ------------------------------ */
-  .cm-out {
-    margin-top: 10px; font-size: 12.5px; color: var(--a-text-2); min-height: 20px;
-    display: flex; align-items: flex-start; gap: 7px; line-height: 1.5;
-  }
-  .cm-out .i { margin-top: 2px; flex: 0 0 auto; }
-  .cm-out.ok { color: #389e0d; }
-  .cm-out.warn { color: #d48806; }
-  .cm-out.err { color: var(--a-error); }
-  .cm-out code { font-size: 11.5px; }
-
-  /* The audit strip — what the host is handed. Monospace on purpose:    */
-  /* it is a record, not prose.                                          */
-  .cm-audit {
-    margin-top: 10px; border: 1px dashed var(--a-border); border-radius: var(--a-radius);
-    background: var(--a-fill-3); padding: 8px 10px;
-    font-family: var(--font-mono); font-size: 11px; line-height: 1.6; color: var(--a-text-2);
-    white-space: pre-wrap; word-break: break-word;
-  }
-  .cm-audit .k { color: var(--a-text-4); }
-
-  /* Touch sheet presentation ------------------------------------------ */
-  .sheetbox { position: relative; overflow: hidden; border-radius: 18px; background: var(--a-bg-layout); border: 1px solid var(--a-border); }
-  .sheetbox .scrim { position: absolute; inset: 0; background: rgb(0 0 0 / 0.35); }
+}
+@media (prefers-reduced-motion: reduce) {
   .cm.sheet {
-    position: absolute; inset-inline: 0; inset-block-end: 0; max-width: none; min-width: 0;
-    border-radius: 16px 16px 0 0; padding-bottom: 8px;
-    animation: cm-up 180ms cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation: none;
   }
-  @keyframes cm-up { from { transform: translateY(14px); opacity: 0; } }
-  @media (prefers-reduced-motion: reduce) { .cm.sheet { animation: none; } }
-  .cm.sheet .grip { width: 34px; height: 4px; border-radius: 2px; background: var(--a-border); margin: 8px auto 2px; }
-  .cm.sheet .cm-subject { border-radius: 0; }
-  .cm.sheet .cm-item { min-height: 44px; padding: 9px 16px; }
-  .cm.sheet .cm-group, .cm.sheet .cm-withheld { padding-inline: 16px; }
+}
+.cm.sheet .grip {
+  width: 34px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--a-border);
+  margin: 8px auto 2px;
+}
+.cm.sheet .cm-subject {
+  border-radius: 0;
+}
+.cm.sheet .cm-item {
+  min-height: 44px;
+  padding: 9px 16px;
+}
+.cm.sheet .cm-group,
+.cm.sheet .cm-withheld {
+  padding-inline: 16px;
+}
 
-  /* Anchored (the ⋯ button path) -------------------------------------- */
-  .cm.anchored { min-width: 236px; }
+/* Anchored (the ⋯ button path) -------------------------------------- */
+.cm.anchored {
+  min-width: 236px;
+}
 
-  /* Density ----------------------------------------------------------- */
-  .cm.compact .cm-item { min-height: 26px; padding: 4px 10px; }
-  .cm.compact .cm-subject { padding: 8px 10px; }
+/* Density ----------------------------------------------------------- */
+.cm.compact .cm-item {
+  min-height: 26px;
+  padding: 4px 10px;
+}
+.cm.compact .cm-subject {
+  padding: 8px 10px;
+}
 
-  /* Forced colours. Nothing here may depend on a background surviving.   */
-  @media (forced-colors: active) {
-    .cm { border: 1px solid CanvasText; }
-    .cm-subject { border-bottom: 1px solid CanvasText; }
-    .cm-item.hot { background: Highlight; color: HighlightText; forced-color-adjust: none; }
-    .cm-item[aria-disabled="true"] .lb { color: GrayText; }
-    .cm-item .ic { forced-color-adjust: auto; }
-    .cm-confirm, .cm-reasons { border: 1px solid CanvasText; }
+/* Forced colours. Nothing here may depend on a background surviving.   */
+@media (forced-colors: active) {
+  .cm {
+    border: 1px solid CanvasText;
   }
-
-  /* Report chrome specific to this brief -------------------------------*/
-  .figtabs { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
-  .figtab {
-    font-size: 12px; padding: 4px 10px; border-radius: 999px; cursor: pointer;
-    border: 1px solid var(--a-border); background: var(--a-bg); color: var(--a-text-2); font-family: inherit;
+  .cm-subject {
+    border-bottom: 1px solid CanvasText;
   }
-  .figtab[aria-pressed="true"] { border-color: var(--a-primary); background: var(--a-primary-bg); color: var(--a-primary); }
-  .figtab:focus-visible { outline: 2px solid var(--a-primary); outline-offset: 2px; }
-
-  .tiers { display: grid; gap: 0; border: 1px solid var(--rule); border-radius: 12px; overflow: hidden; margin: 1.5rem 0; background: var(--surface); }
-  .tiers > div { display: grid; grid-template-columns: 8.5rem 1fr; gap: 1rem; padding: 1rem 1.15rem; border-bottom: 1px solid var(--rule); }
-  .tiers > div:last-child { border-bottom: 0; }
-  .tiers .t { font-family: var(--font-mono); font-size: 0.78rem; font-weight: 700; }
-  .tiers .t small { display: block; font-family: var(--font-body); font-size: 0.72rem; font-weight: 400; color: var(--muted); margin-top: 0.25rem; letter-spacing: 0; }
-  .tiers .d { color: var(--ink-2); font-size: 0.9rem; }
-  .tiers .d b { color: var(--ink); }
-  .tiers .t.routine { color: var(--muted); }
-  .tiers .t.documented { color: var(--accent-ink); }
-  .tiers .t.clinical { color: var(--warn); }
-  .tiers .t.disclosive { color: var(--bad); }
-
-  .states { display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); gap: 1rem; margin: 1.5rem 0; }
-  .state { border: 1px solid var(--rule); border-radius: 12px; background: var(--surface); overflow: hidden; }
-  .state .h { padding: 0.6rem 0.85rem; border-bottom: 1px solid var(--rule); font-size: 0.78rem; font-weight: 600; display: flex; gap: 0.5rem; align-items: baseline; }
-  .state .h .n { font-family: var(--font-mono); font-size: 0.68rem; color: var(--accent); }
-  .state .b { padding: 0.9rem 0.85rem; background: var(--surface-2); display: grid; place-items: start center; min-height: 130px; }
-  .state .b .cm { position: static; animation: none; box-shadow: none; border: 1px solid var(--a-border); }
-
-  .compare { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin: 1.5rem 0; }
-  .compare > div { border: 1px solid var(--rule); border-radius: 12px; padding: 1.1rem 1.2rem; background: var(--surface); }
-  .compare .lbl { font-family: var(--font-mono); font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 0.5rem; }
-  .compare .bad-h .lbl { color: var(--bad); }
-  .compare .ok-h .lbl { color: var(--ok); }
-  .compare.two > .bad-h { border-color: var(--bad-rule); }
-  .compare.two > .ok-h { border-color: var(--ok-rule); }
-
-  .qa { border-inline-start: 3px solid var(--rule-2); padding-inline-start: 1.1rem; margin: 1.5rem 0; }
-  .qa > div { margin-bottom: 1.25rem; }
-  .qa > div:last-child { margin-bottom: 0; }
-  .qa .q { font-weight: 600; margin-bottom: 0.3rem; }
-  .qa .q .n { font-family: var(--font-mono); font-size: 0.72rem; color: var(--accent); margin-inline-end: 0.5rem; }
-  .qa .a { color: var(--ink-2); font-size: 0.92rem; }
-  .qa .a b { color: var(--ink); }
-
-  /* ==================================================================== */
-  /* IN-SITU MOCKUP — an EHR screen, so the component can be judged where */
-  /* it will actually live rather than on a white card.                   */
-  /* ==================================================================== */
-  .app {
-    display: grid; grid-template-columns: 52px minmax(0, 1fr);
-    background: var(--a-bg-layout); border: 1px solid var(--a-border);
-    border-radius: 10px; overflow: hidden; min-width: 720px;
-    box-shadow: var(--a-shadow);
+  .cm-item.hot {
+    background: Highlight;
+    color: HighlightText;
+    forced-color-adjust: none;
   }
-  .app-rail { background: #001529; display: grid; align-content: start; gap: 4px; padding: 10px 0; }
-  .app-rail .ri {
-    width: 36px; height: 36px; margin: 0 auto; border-radius: var(--a-radius);
-    display: grid; place-items: center; color: rgb(255 255 255 / 0.6);
+  .cm-item[aria-disabled="true"] .lb {
+    color: GrayText;
   }
-  .app-rail .ri.on { background: var(--a-primary); color: #fff; }
-  .app-main { display: grid; grid-template-rows: auto auto minmax(0, 1fr); background: var(--a-bg); min-width: 0; }
+  .cm-item .ic {
+    forced-color-adjust: auto;
+  }
+  .cm-confirm,
+  .cm-reasons {
+    border: 1px solid CanvasText;
+  }
+}
 
-  .banner { display: grid; grid-template-columns: 40px minmax(0,1fr) auto; gap: 12px; align-items: center; padding: 11px 16px; border-bottom: 1px solid var(--a-border-2); }
-  .banner .pav { width: 40px; height: 40px; border-radius: 50%; background: var(--a-purple-bg); color: var(--a-purple); display: grid; place-items: center; font-weight: 600; font-size: 13px; }
-  .banner .pn { font-size: 15px; font-weight: 600; line-height: 1.3; }
-  .banner .pm { font-size: 12px; color: var(--a-text-3); display: flex; gap: 8px; flex-wrap: wrap; margin-top: 2px; }
-  .banner .flags { display: flex; gap: 6px; flex-wrap: wrap; }
+/* Report chrome specific to this brief -------------------------------*/
+.figtabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+.figtab {
+  font-size: 12px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  cursor: pointer;
+  border: 1px solid var(--a-border);
+  background: var(--a-bg);
+  color: var(--a-text-2);
+  font-family: inherit;
+}
+.figtab[aria-pressed="true"] {
+  border-color: var(--a-primary);
+  background: var(--a-primary-bg);
+  color: var(--a-primary);
+}
+.figtab:focus-visible {
+  outline: 2px solid var(--a-primary);
+  outline-offset: 2px;
+}
 
-  .tabstrip { display: flex; gap: 2px; padding: 0 16px; border-bottom: 1px solid var(--a-border-2); }
-  .tabstrip .tb { font-size: 13px; padding: 9px 12px; color: var(--a-text-2); border-bottom: 2px solid transparent; white-space: nowrap; }
-  .tabstrip .tb.on { color: var(--a-primary); border-bottom-color: var(--a-primary); font-weight: 500; }
+.tiers {
+  display: grid;
+  gap: 0;
+  border: 1px solid var(--rule);
+  border-radius: 12px;
+  overflow: hidden;
+  margin: 1.5rem 0;
+  background: var(--surface);
+}
+.tiers > div {
+  display: grid;
+  grid-template-columns: 8.5rem 1fr;
+  gap: 1rem;
+  padding: 1rem 1.15rem;
+  border-bottom: 1px solid var(--rule);
+}
+.tiers > div:last-child {
+  border-bottom: 0;
+}
+.tiers .t {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+.tiers .t small {
+  display: block;
+  font-family: var(--font-body);
+  font-size: 0.72rem;
+  font-weight: 400;
+  color: var(--muted);
+  margin-top: 0.25rem;
+  letter-spacing: 0;
+}
+.tiers .d {
+  color: var(--ink-2);
+  font-size: 0.9rem;
+}
+.tiers .d b {
+  color: var(--ink);
+}
+.tiers .t.routine {
+  color: var(--muted);
+}
+.tiers .t.documented {
+  color: var(--accent-ink);
+}
+.tiers .t.clinical {
+  color: var(--warn);
+}
+.tiers .t.disclosive {
+  color: var(--bad);
+}
 
-  .panes { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 0; min-height: 0; }
-  .panes > div { padding: 14px 16px; min-width: 0; }
-  .panes > div + div { border-inline-start: 1px solid var(--a-border-2); background: var(--a-bg-layout); }
-  .pane-h { font-size: 11px; letter-spacing: 0.07em; text-transform: uppercase; font-weight: 600; color: var(--a-text-3); display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-  .pane-h .n { font-weight: 400; letter-spacing: 0; text-transform: none; color: var(--a-text-4); font-variant-numeric: tabular-nums; }
-  .panes .rows + .pane-h { margin-top: 18px; }
+.states {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+.state {
+  border: 1px solid var(--rule);
+  border-radius: 12px;
+  background: var(--surface);
+  overflow: hidden;
+}
+.state .h {
+  padding: 0.6rem 0.85rem;
+  border-bottom: 1px solid var(--rule);
+  font-size: 0.78rem;
+  font-weight: 600;
+  display: flex;
+  gap: 0.5rem;
+  align-items: baseline;
+}
+.state .h .n {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  color: var(--accent);
+}
+.state .b {
+  padding: 0.9rem 0.85rem;
+  background: var(--surface-2);
+  display: grid;
+  place-items: start center;
+  min-height: 130px;
+}
+.state .b .cm {
+  position: static;
+  animation: none;
+  box-shadow: none;
+  border: 1px solid var(--a-border);
+}
 
-  .appwrap { overflow-x: auto; }
-  @media (max-width: 820px) { .panes { grid-template-columns: minmax(0,1fr); } .panes > div + div { border-inline-start: 0; border-top: 1px solid var(--a-border-2); } }
+.compare {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+.compare > div {
+  border: 1px solid var(--rule);
+  border-radius: 12px;
+  padding: 1.1rem 1.2rem;
+  background: var(--surface);
+}
+.compare .lbl {
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+}
+.compare .bad-h .lbl {
+  color: var(--bad);
+}
+.compare .ok-h .lbl {
+  color: var(--ok);
+}
+.compare.two > .bad-h {
+  border-color: var(--bad-rule);
+}
+.compare.two > .ok-h {
+  border-color: var(--ok-rule);
+}
 
-  /* A long URL inside inline <code> is the only thing that pushed this
+.qa {
+  border-inline-start: 3px solid var(--rule-2);
+  padding-inline-start: 1.1rem;
+  margin: 1.5rem 0;
+}
+.qa > div {
+  margin-bottom: 1.25rem;
+}
+.qa > div:last-child {
+  margin-bottom: 0;
+}
+.qa .q {
+  font-weight: 600;
+  margin-bottom: 0.3rem;
+}
+.qa .q .n {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--accent);
+  margin-inline-end: 0.5rem;
+}
+.qa .a {
+  color: var(--ink-2);
+  font-size: 0.92rem;
+}
+.qa .a b {
+  color: var(--ink);
+}
+
+/* ==================================================================== */
+/* IN-SITU MOCKUP — an EHR screen, so the component can be judged where */
+/* it will actually live rather than on a white card.                   */
+/* ==================================================================== */
+.app {
+  display: grid;
+  grid-template-columns: 52px minmax(0, 1fr);
+  background: var(--a-bg-layout);
+  border: 1px solid var(--a-border);
+  border-radius: 10px;
+  overflow: hidden;
+  min-width: 720px;
+  box-shadow: var(--a-shadow);
+}
+.app-rail {
+  background: #001529;
+  display: grid;
+  align-content: start;
+  gap: 4px;
+  padding: 10px 0;
+}
+.app-rail .ri {
+  width: 36px;
+  height: 36px;
+  margin: 0 auto;
+  border-radius: var(--a-radius);
+  display: grid;
+  place-items: center;
+  color: rgb(255 255 255 / 0.6);
+}
+.app-rail .ri.on {
+  background: var(--a-primary);
+  color: #fff;
+}
+.app-main {
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr);
+  background: var(--a-bg);
+  min-width: 0;
+}
+
+.banner {
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+  padding: 11px 16px;
+  border-bottom: 1px solid var(--a-border-2);
+}
+.banner .pav {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--a-purple-bg);
+  color: var(--a-purple);
+  display: grid;
+  place-items: center;
+  font-weight: 600;
+  font-size: 13px;
+}
+.banner .pn {
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+.banner .pm {
+  font-size: 12px;
+  color: var(--a-text-3);
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 2px;
+}
+.banner .flags {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.tabstrip {
+  display: flex;
+  gap: 2px;
+  padding: 0 16px;
+  border-bottom: 1px solid var(--a-border-2);
+}
+.tabstrip .tb {
+  font-size: 13px;
+  padding: 9px 12px;
+  color: var(--a-text-2);
+  border-bottom: 2px solid transparent;
+  white-space: nowrap;
+}
+.tabstrip .tb.on {
+  color: var(--a-primary);
+  border-bottom-color: var(--a-primary);
+  font-weight: 500;
+}
+
+.panes {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+  gap: 0;
+  min-height: 0;
+}
+.panes > div {
+  padding: 14px 16px;
+  min-width: 0;
+}
+.panes > div + div {
+  border-inline-start: 1px solid var(--a-border-2);
+  background: var(--a-bg-layout);
+}
+.pane-h {
+  font-size: 11px;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: var(--a-text-3);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.pane-h .n {
+  font-weight: 400;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--a-text-4);
+  font-variant-numeric: tabular-nums;
+}
+.panes .rows + .pane-h {
+  margin-top: 18px;
+}
+
+.appwrap {
+  overflow-x: auto;
+}
+@media (max-width: 820px) {
+  .panes {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .panes > div + div {
+    border-inline-start: 0;
+    border-top: 1px solid var(--a-border-2);
+  }
+}
+
+/* A long URL inside inline <code> is the only thing that pushed this
      document past 375px. `anywhere` rather than `break-word` because
      break-word will not break a token that has no break opportunity. */
-  p code, li code, td code, figcaption code, .d code, .a code { overflow-wrap: anywhere; }
+p code,
+li code,
+td code,
+figcaption code,
+.d code,
+.a code {
+  overflow-wrap: anywhere;
+}
 
 </style>
 
@@ -784,6 +2053,7 @@
         <a href="#testing">Testing</a>
         <a href="#plan">Implementation plan</a>
         <a href="#decisions">Decisions & questions</a>
+        <a href="#shipped">What shipped differently</a>
         <a href="#sources">Sources</a>
   </div>
 </nav>
@@ -1541,7 +2811,7 @@
             <thead><tr><th>SC</th><th>Name</th><th>How</th></tr></thead>
             <tbody>
               <tr><td><code>2.1.1</code></td><td>Keyboard</td><td><b>Shift+F10 and the Menu key open the menu</b>, handled explicitly rather than relying on the browser's synthesised <code>contextmenu</code> event — Chrome and Firefox fire it, Safari does not. Then ↓ ↑ Home End, Enter/Space, Escape, and typeahead on the first letter.</td></tr>
-              <tr><td><code>4.1.2</code></td><td>Name, role, value</td><td><code>role="menu"</code> named by the subject header; <code>menuitem</code> / <code>menuitemcheckbox</code> / <code>menuitemradio</code> with <code>aria-checked</code>; <code>aria-haspopup="menu"</code> and <code>aria-expanded</code> on the trigger; <code>aria-disabled</code> rather than <code>disabled</code>, so the row stays reachable and its reason stays readable.</td></tr>
+              <tr><td><code>4.1.2</code></td><td>Name, role, value</td><td><code>role="menu"</code> named by the subject header; <code>menuitem</code> / <code>menuitemcheckbox</code> / <code>menuitemradio</code> with <code>aria-checked</code>; <code>aria-haspopup="menu"</code> on the trigger, with <code>role="button"</code> as an overridable default — and deliberately <b>not</b> <code>aria-expanded</code>, which axe rejects on a generic element and treats as conditional on a table row (see §21); <code>aria-disabled</code> rather than <code>disabled</code>, so the row stays reachable and its reason stays readable.</td></tr>
               <tr><td><code>2.4.3</code></td><td>Focus order</td><td>Focus enters the menu on a keyboard open and <b>returns to the trigger on every close path</b> — Escape, running an item, clicking away, an external close. A test asserts all four, because this is the failure that strands the user the feature was built for.</td></tr>
               <tr><td><code>2.4.11</code></td><td>Focus not obscured (min)</td><td>The <code>anchored</code> presentation offsets so the ⋯ button is not covered when focus returns to it. In a scrolling pane, closing scrolls the trigger back into view if the pane moved under the open menu.</td></tr>
               <tr><td><code>2.5.2</code></td><td>Pointer cancellation</td><td>Opening happens on the <code>contextmenu</code> event; <b>activation happens on the up-event</b>. Pressing down on <code>Discontinue</code> and dragging off it does nothing. On touch, the long-press opens; it never activates.</td></tr>
@@ -2198,10 +3468,62 @@
 
       </div>
     </section>
+    <section id="shipped">
+      <div class="wrap">
+        <div class="sec-head">
+          <span class="sec-num">§21 — What shipped differently</span>
+          <h2>What the build changed about this document</h2>
+          <p>The component shipped on 31 August 2026. Everything below is
+  different from what this brief proposed, and each was found by running the
+  thing rather than by reading it. Recorded here so the brief stays a document
+  you can trust rather than a snapshot of what we believed on the Monday.</p>
+        </div>
+
+        <div class="tw">
+          <table>
+            <thead><tr><th>§</th><th>The brief said</th><th>What shipped, and why</th></tr></thead>
+            <tbody>
+              <tr><td>13</td><td><code>aria-expanded</code> on the trigger.</td><td><b>Dropped.</b> Axe rejects it on a generic element and treats it as conditional on a <code>&lt;tr&gt;</code>. Wrong on the merits too: a transient popup is not content belonging to the row. A submenu trigger does carry it, where <code>menuitem</code> supports it and it is true.</td></tr>
+              <tr><td>16</td><td><code>toPaletteItems</code> imports <code>PaletteItem</code>, so <code>menu-core</code> depends on <code>palette-core</code>.</td><td><b>Structural typing instead.</b> The import would make every install pull the palette core and its stylesheet for a type that erases at compile time.</td></tr>
+              <tr><td>6</td><td>The tier's colour rides on the host's icon.</td><td><b>The component supplies the glyph.</b> A host that passed none got no glyph, and with no glyph nothing for the hue to land on — a discontinue rendered identically to a copy. A host icon overrides it; <code>routine</code> stays unmarked so the mark means something.</td></tr>
+              <tr><td>12</td><td>Submenus get an intent delay; the safe triangle is v2.</td><td><b>A rule replaced the geometry.</b> An open child closes when the pointer reaches a <em>different row</em>, not when it leaves the trigger — so crossing the gap between the popups closes nothing, which is what the triangle exists to protect.</td></tr>
+              <tr><td>14</td><td>The menu closes on scroll, a moved point being meaningless.</td><td><b>It follows instead.</b> The point is an offset <em>inside the trigger</em>, so the menu tracks its row. Closing also fired whenever a browser scrolled a row into view a frame before the click that opened it.</td></tr>
+              <tr><td>11</td><td>A flipped menu is placed by subtracting its height.</td><td><b>Anchored by its bottom edge.</b> Subtracting a height that <code>maxHeight</code> was also capping is a feedback loop; it settled differently each frame and put the cursor over a verb about one time in three.</td></tr>
+              <tr><td>10</td><td>The bulk header's second line is the subject's <code>detail</code>.</td><td><b>A separate <code>bulkDetail</code>.</b> The fallback printed one patient's MRN at the top of a menu whose whole job is to count rather than name.</td></tr>
+              <tr><td>16</td><td>—</td><td><b>Props the brief did not have:</b> <code>container</code>, so the popup works inside a contained pane; <code>bulkDetail</code>; and <code>data-ox-menu</code> on the trigger.</td></tr>
+              <tr><td>18</td><td>Zero axe violations per story.</td><td><b>True, and it caught two claims made here.</b> The geometry claim needs a real browser — jsdom reports every box as zero — so it lives in an <code>@a11y</code> Playwright suite across three engines.</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="note bad">
+          <span class="lbl">The one that should not have needed a browser</span>
+          <p><strong>The submenu was a decoration for three days.</strong> It drew a chevron and
+            set <code>aria-haspopup="menu"</code>, then ran the row as a command: choosing "Trend"
+            called <code>onRun("trend")</code> and closed the menu. The children were never
+            rendered. <code>meta.limitations</code> described an intent delay that did not exist,
+            and the story asserted the attribute and passed against the absence.</p>
+          <p><b>The lesson outlives this component:</b> conformance checks metadata completeness,
+            not behaviour — it read 18/18 throughout. A story that asserts an attribute proves the
+            attribute, never the capability. Of every declared state, ask whether its story makes
+            the feature <em>do</em> something.</p>
+        </div>
+
+        <div class="note">
+          <span class="lbl">Rebuilding this document</span>
+          <p>The generator is at <code>content/briefs/chart-context-menu/</code>. Edit the prose
+            and run <code>python3 build.py</code>; it writes the HTML at the repo root and
+            hard-fails on an unsubstituted token. It lived in an ephemeral scratchpad until now,
+            which is why this section exists — for three days the only way to correct the document
+            was to rewrite it.</p>
+        </div>
+
+      </div>
+    </section>
     <section id="sources">
       <div class="wrap">
         <div class="sec-head">
-          <span class="sec-num">§21 — Sources</span>
+          <span class="sec-num">§22 — Sources</span>
           <h2>Where the external claims came from</h2>
           <p>Checked against a primary or peer-reviewed document in August 2026. Everything in
   this report that is not in this table is argument, and is written as argument.</p>
@@ -2432,8 +3754,14 @@
       if (!appliesTo(a, subject)) continue;
 
       var av = availabilityOf(a);
-      if (av.status === "withheld") { withheld++; continue; }
-      if (policy.permitted && policy.permitted.indexOf(a.id) === -1) { withheld++; continue; }
+      if (av.status === "withheld") {
+        withheld++;
+        continue;
+      }
+      if (policy.permitted && policy.permitted.indexOf(a.id) === -1) {
+        withheld++;
+        continue;
+      }
 
       /* Bulk: shown with the reason, never removed. A verb that vanishes
          on a multiple selection teaches somebody it does not exist. */
@@ -2458,10 +3786,14 @@
       if (!bands[b].length) continue;
       /* Inside a band, honour the author's `group` labels in first-seen
          order. A band with a single unnamed group renders no heading. */
-      var order = [], byName = {};
+      var order = [],
+        byName = {};
       for (var k = 0; k < bands[b].length; k++) {
         var name = bands[b][k].action.group || "";
-        if (!byName[name]) { byName[name] = []; order.push(name); }
+        if (!byName[name]) {
+          byName[name] = [];
+          order.push(name);
+        }
         byName[name].push(bands[b][k]);
       }
       for (var o = 0; o < order.length; o++) {
@@ -2542,7 +3874,12 @@
         return { kind: "reason", reasons: action.reasons || [], prompt: action.confirm || null };
       }
       if (!state.reason) {
-        return { kind: "reason", reasons: action.reasons || [], prompt: action.confirm || null, waiting: true };
+        return {
+          kind: "reason",
+          reasons: action.reasons || [],
+          prompt: action.confirm || null,
+          waiting: true,
+        };
       }
       return { kind: "run", reason: state.reason };
     }
@@ -2600,7 +3937,8 @@
    * computed once rather than in two places that will disagree.
    */
   function bulkPartition(actions, subject) {
-    var allowed = [], single = [];
+    var allowed = [],
+      single = [];
     for (var i = 0; i < actions.length; i++) {
       if (!appliesTo(actions[i], subject)) continue;
       (actions[i].bulk === "allowed" ? allowed : single).push(actions[i]);
@@ -2626,25 +3964,47 @@
     var out = [];
     var seen = {};
     for (var i = 0; i < actions.length; i++) {
-      var a = actions[i], t = tierOf(a);
+      var a = actions[i],
+        t = tierOf(a);
       if (seen[a.id]) out.push('Duplicate action id "' + a.id + '".');
       seen[a.id] = true;
 
       var need = TIER_RULE[t].requires;
       if (need && !a[need]) {
-        out.push('`' + a.id + '` is tier="' + t + '" and has no `' + need + '`. ' + REQ_WHY[need]);
+        out.push("`" + a.id + '` is tier="' + t + '" and has no `' + need + "`. " + REQ_WHY[need]);
       }
       if (need === "reasons" && a.reasons && !a.reasons.length) {
-        out.push('`' + a.id + '` offers an empty reason list, which is a disclosure with no recorded justification.');
+        out.push(
+          "`" +
+            a.id +
+            "` offers an empty reason list, which is a disclosure with no recorded justification.",
+        );
       }
       if (t !== "routine" && (!a.applies || !a.applies.length)) {
-        out.push('`' + a.id + '` is tier="' + t + '" with no `applies`, so it will be offered on every resource in the chart.');
+        out.push(
+          "`" +
+            a.id +
+            '` is tier="' +
+            t +
+            '" with no `applies`, so it will be offered on every resource in the chart.',
+        );
       }
       if (t === "clinical" && a.bulk === "allowed" && !a.bulkConfirm) {
-        out.push('`' + a.id + '` is bulk-safe and clinical but has no `bulkConfirm`, so twelve patients would be confirmed with a sentence written for one.');
+        out.push(
+          "`" +
+            a.id +
+            "` is bulk-safe and clinical but has no `bulkConfirm`, so twelve patients would be confirmed with a sentence written for one.",
+        );
       }
       if (a.kind === "checkbox" || a.kind === "radio") {
-        if (t !== "routine") out.push('`' + a.id + '` is a ' + a.kind + ' above tier="routine". A toggle is view state; it may not be a clinical act.');
+        if (t !== "routine")
+          out.push(
+            "`" +
+              a.id +
+              "` is a " +
+              a.kind +
+              ' above tier="routine". A toggle is view state; it may not be a clinical act.',
+          );
       }
     }
     return out;
@@ -2674,8 +4034,14 @@
     var i = from;
     for (var n = 0; n < rows.length; n++) {
       i += delta;
-      if (i < 0) { if (!loop) return from; i = rows.length - 1; }
-      if (i >= rows.length) { if (!loop) return from; i = 0; }
+      if (i < 0) {
+        if (!loop) return from;
+        i = rows.length - 1;
+      }
+      if (i >= rows.length) {
+        if (!loop) return from;
+        i = 0;
+      }
       var av = availabilityOf(rows[i].action);
       if (av.status === "pending") continue;
       return i;
@@ -2732,16 +4098,20 @@
 
   var IC = {
     pill: '<path d="m10.5 20.5-7-7a5 5 0 0 1 7-7l7 7a5 5 0 0 1-7 7Z"/><path d="m7 10 7 7"/>',
-    flask: '<path d="M9 3v6.5L3.6 18A2 2 0 0 0 5.3 21h13.4a2 2 0 0 0 1.7-3L15 9.5V3"/><path d="M7.5 3h9M6.2 15h11.6"/>',
+    flask:
+      '<path d="M9 3v6.5L3.6 18A2 2 0 0 0 5.3 21h13.4a2 2 0 0 0 1.7-3L15 9.5V3"/><path d="M7.5 3h9M6.2 15h11.6"/>',
     doc: '<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8Z"/><path d="M14 3v5h5M9 13h6M9 17h4"/>',
     alert: '<path d="M12 3.4 1.9 20.6h20.2z"/><path d="M12 9.6v5M12 17.9v.01"/>',
     user: '<circle cx="12" cy="8" r="3.6"/><path d="M4.5 20.2a7.5 7.5 0 0 1 15 0"/>',
-    users: '<circle cx="9" cy="8" r="3.4"/><path d="M2.6 20a6.4 6.4 0 0 1 12.8 0"/><path d="M16.5 5.2a3.4 3.4 0 0 1 0 5.6M18 20a6.4 6.4 0 0 0-2-4.6"/>',
+    users:
+      '<circle cx="9" cy="8" r="3.4"/><path d="M2.6 20a6.4 6.4 0 0 1 12.8 0"/><path d="M16.5 5.2a3.4 3.4 0 0 1 0 5.6M18 20a6.4 6.4 0 0 0-2-4.6"/>',
     copy: '<rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>',
     open: '<path d="M15 3h6v6M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>',
     pen: '<path d="M17 3.5a2.1 2.1 0 0 1 3 3L7.5 19 3 20.5 4.5 16Z"/>',
-    print: '<path d="M6 9V3h12v6"/><rect x="3" y="9" width="18" height="7" rx="2"/><path d="M6 14h12v7H6z"/>',
-    share: '<circle cx="18" cy="5" r="2.6"/><circle cx="6" cy="12" r="2.6"/><circle cx="18" cy="19" r="2.6"/><path d="m8.3 10.8 7.4-4.3M8.3 13.2l7.4 4.3"/>',
+    print:
+      '<path d="M6 9V3h12v6"/><rect x="3" y="9" width="18" height="7" rx="2"/><path d="M6 14h12v7H6z"/>',
+    share:
+      '<circle cx="18" cy="5" r="2.6"/><circle cx="6" cy="12" r="2.6"/><circle cx="18" cy="19" r="2.6"/><path d="m8.3 10.8 7.4-4.3M8.3 13.2l7.4 4.3"/>',
     trash: '<path d="M4 6h16M9 6V4h6v2M6 6l1 14h10l1-14"/>',
     eye: '<path d="M2 12s3.8-6.5 10-6.5S22 12 22 12s-3.8 6.5-10 6.5S2 12 2 12Z"/><circle cx="12" cy="12" r="2.8"/>',
     key: '<circle cx="7.5" cy="15.5" r="4"/><path d="m10.4 12.6 8-8M16.5 6.5l2 2M14 9l2 2"/>',
@@ -2753,14 +4123,16 @@
     info: '<circle cx="12" cy="12" r="9"/><path d="M12 11v5.5M12 7.8v.01"/>',
     plus: '<path d="M12 5v14M5 12h14"/>',
     bell: '<path d="M18 9a6 6 0 1 0-12 0c0 5-2 6-2 6h16s-2-1-2-6Z"/><path d="M10.3 20a2 2 0 0 0 3.4 0"/>',
-    phone: '<path d="M6.6 3h3l1.5 4-2.2 1.4a12 12 0 0 0 5.7 5.7L16 11.9l4 1.5v3a2 2 0 0 1-2.2 2A17 17 0 0 1 3 6.2 2 2 0 0 1 5 4Z"/>',
+    phone:
+      '<path d="M6.6 3h3l1.5 4-2.2 1.4a12 12 0 0 0 5.7 5.7L16 11.9l4 1.5v3a2 2 0 0 1-2.2 2A17 17 0 0 1 3 6.2 2 2 0 0 1 5 4Z"/>',
     cal: '<rect x="3" y="4.5" width="18" height="16" rx="2"/><path d="M3 9.5h18M8 2.5v4M16 2.5v4"/>',
     shield: '<path d="M12 3 4.5 6v6c0 4.6 3.1 7.9 7.5 9 4.4-1.1 7.5-4.4 7.5-9V6Z"/>',
     dots: '<circle cx="5" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="19" cy="12" r="1.3"/>',
     ban: '<circle cx="12" cy="12" r="9"/><path d="m5.6 5.6 12.8 12.8"/>',
     undo: '<path d="M3 8h11a5.5 5.5 0 0 1 0 11H8"/><path d="m6.5 4.5-3.5 3.5 3.5 3.5"/>',
     flag: '<path d="M5 21V4M5 4h11l-1.5 3.5L16 11H5"/>',
-    heart: '<path d="M12 20s-7.5-4.6-7.5-9.6A4.4 4.4 0 0 1 12 7.6a4.4 4.4 0 0 1 7.5 2.8C19.5 15.4 12 20 12 20Z"/>',
+    heart:
+      '<path d="M12 20s-7.5-4.6-7.5-9.6A4.4 4.4 0 0 1 12 7.6a4.4 4.4 0 0 1 7.5 2.8C19.5 15.4 12 20 12 20Z"/>',
     note: '<rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/>',
     stop: '<circle cx="12" cy="12" r="9"/><path d="M9 9h6v6H9z"/>',
     sort: '<path d="M7 4v16M7 20l-3-3M7 20l3-3M17 20V4M17 4l-3 3M17 4l3 3"/>',
@@ -2793,7 +4165,10 @@
   U.RESOURCE_ICON = RESOURCE_ICON;
 
   function initials(name) {
-    var p = String(name).replace(/[^A-Za-z ]/g, " ").trim().split(/\s+/);
+    var p = String(name)
+      .replace(/[^A-Za-z ]/g, " ")
+      .trim()
+      .split(/\s+/);
     if (!p[0]) return "··";
     return (p[0][0] + (p.length > 1 ? p[p.length - 1][0] : "")).toUpperCase();
   }
@@ -2801,14 +4176,19 @@
   /* Figure mounting. Each figure is a function of a root element; the
      builder emits an empty <div data-fig="id"> and this fills it. */
   var FIGS = {};
-  U.mount = function (id, fn) { FIGS[id] = fn; };
+  U.mount = function (id, fn) {
+    FIGS[id] = fn;
+  };
   U.boot = function () {
     var nodes = document.querySelectorAll("[data-fig]");
     for (var i = 0; i < nodes.length; i++) {
       var id = nodes[i].getAttribute("data-fig");
       if (FIGS[id]) {
-        try { FIGS[id](nodes[i]); }
-        catch (e) { nodes[i].appendChild(h("div", "cm-out err", "Figure " + id + " failed: " + e.message)); }
+        try {
+          FIGS[id](nodes[i]);
+        } catch (e) {
+          nodes[i].appendChild(h("div", "cm-out err", "Figure " + id + " failed: " + e.message));
+        }
       }
     }
   };
@@ -2827,9 +4207,13 @@
   function renderMenu(opts) {
     var resolved = opts.resolved;
     var state = { confirming: null, reasoning: null, reason: null, hot: -1 };
-    var el = h("div", "cm" + (opts.presentation === "sheet" ? " sheet" : "") +
-                        (opts.presentation === "anchored" ? " anchored" : "") +
-                        (opts.compact ? " compact" : ""));
+    var el = h(
+      "div",
+      "cm" +
+        (opts.presentation === "sheet" ? " sheet" : "") +
+        (opts.presentation === "anchored" ? " anchored" : "") +
+        (opts.compact ? " compact" : ""),
+    );
     el.setAttribute("role", "menu");
     el.setAttribute("tabindex", "-1");
     /*
@@ -2838,7 +4222,7 @@
      * any item. One element does the wrong-patient check for both
      * audiences. See §13.
      */
-    var headId = "cm-subj-" + (SEQ++);
+    var headId = "cm-subj-" + SEQ++;
     el.setAttribute("aria-labelledby", headId);
     var rows = [];
 
@@ -2857,10 +4241,15 @@
       /* Initials are a person's affordance. On a medication they spell
          nonsense ("LM" for "Lisinopril 10 mg"), so every other resource
          gets its own glyph — which is also the one the row was using. */
-      if (s.bulk > 1) av.appendChild(ico(opts.subject && opts.subject.resource === "Patient" ? "users" : "doc", "i-14"));
+      if (s.bulk > 1)
+        av.appendChild(
+          ico(opts.subject && opts.subject.resource === "Patient" ? "users" : "doc", "i-14"),
+        );
       else if (s.masked) av.appendChild(ico("lock", "i-14"));
-      else if (opts.subject && opts.subject.resource === "Patient") av.textContent = initials(s.who);
-      else av.appendChild(ico(RESOURCE_ICON[opts.subject && opts.subject.resource] || "doc", "i-14"));
+      else if (opts.subject && opts.subject.resource === "Patient")
+        av.textContent = initials(s.who);
+      else
+        av.appendChild(ico(RESOURCE_ICON[opts.subject && opts.subject.resource] || "doc", "i-14"));
       head.appendChild(av);
       var col = h("div");
       col.appendChild(h("div", "who", s.who));
@@ -2882,10 +4271,15 @@
       if (!resolved.sections.length) {
         var none = h("div", "cm-withheld");
         none.appendChild(ico("info", "i-14"));
-        none.appendChild(h("div", null,
-          resolved.withheld
-            ? "No action on this record is available to you."
-            : "This record supports no actions."));
+        none.appendChild(
+          h(
+            "div",
+            null,
+            resolved.withheld
+              ? "No action on this record is available to you."
+              : "This record supports no actions.",
+          ),
+        );
         el.appendChild(none);
       }
 
@@ -2900,21 +4294,38 @@
     }
 
     function drawRow(row, idx) {
-      var a = row.action, avl = row.availability;
+      var a = row.action,
+        avl = row.availability;
       var pending = avl.status === "pending";
       var blocked = avl.status === "unavailable";
-      var r = h("div", "cm-item t-" + row.tier + (pending ? " pending" : "") +
-                       (state.hot === idx ? " hot" : "") + (a.checked ? " on" : ""));
-      r.setAttribute("role", a.kind === "checkbox" ? "menuitemcheckbox"
-                          : a.kind === "radio" ? "menuitemradio" : "menuitem");
+      var r = h(
+        "div",
+        "cm-item t-" +
+          row.tier +
+          (pending ? " pending" : "") +
+          (state.hot === idx ? " hot" : "") +
+          (a.checked ? " on" : ""),
+      );
+      r.setAttribute(
+        "role",
+        a.kind === "checkbox"
+          ? "menuitemcheckbox"
+          : a.kind === "radio"
+            ? "menuitemradio"
+            : "menuitem",
+      );
       r.setAttribute("tabindex", state.hot === idx ? "0" : "-1");
       if (blocked || pending) r.setAttribute("aria-disabled", "true");
-      if (a.kind === "checkbox" || a.kind === "radio") r.setAttribute("aria-checked", a.checked ? "true" : "false");
+      if (a.kind === "checkbox" || a.kind === "radio")
+        r.setAttribute("aria-checked", a.checked ? "true" : "false");
       if (a.submenu) r.setAttribute("aria-haspopup", "menu");
 
-      if (a.kind === "checkbox") { var bx = h("div", "box"); bx.appendChild(ico("check", "i-14")); r.appendChild(bx); }
-      else if (a.kind === "radio") r.appendChild(h("div", "rd"));
-      else r.appendChild(ico(pending ? "hourglass" : (a.icon || "info"), "i-14 ic"));
+      if (a.kind === "checkbox") {
+        var bx = h("div", "box");
+        bx.appendChild(ico("check", "i-14"));
+        r.appendChild(bx);
+      } else if (a.kind === "radio") r.appendChild(h("div", "rd"));
+      else r.appendChild(ico(pending ? "hourglass" : a.icon || "info", "i-14 ic"));
 
       if (pending) {
         r.appendChild(h("div", "bar"));
@@ -2935,8 +4346,14 @@
       else if (row.tier === "documented" && a.records) sub = a.records;
       if (sub) r.appendChild(h("div", "sub", sub));
 
-      r.addEventListener("mouseenter", function () { state.hot = idx; paintHot(); });
-      r.addEventListener("click", function (ev) { ev.stopPropagation(); choose(row, idx); });
+      r.addEventListener("mouseenter", function () {
+        state.hot = idx;
+        paintHot();
+      });
+      r.addEventListener("click", function (ev) {
+        ev.stopPropagation();
+        choose(row, idx);
+      });
       el.appendChild(r);
       rows.push({ el: r, row: row, idx: idx });
 
@@ -2953,7 +4370,8 @@
       var p = h("div");
       p.appendChild(h("b", null, out.prompt));
       box.appendChild(p);
-      if (resolved.bulk > 1 && a.bulkConfirm) box.appendChild(h("div", null, a.bulkConfirm.replace("{n}", resolved.bulk)));
+      if (resolved.bulk > 1 && a.bulkConfirm)
+        box.appendChild(h("div", null, a.bulkConfirm.replace("{n}", resolved.bulk)));
       var acts = h("div", "acts");
       var go = h("button", "a-btn sm primary", out.verb);
       go.type = "button";
@@ -2963,8 +4381,13 @@
       });
       var no = h("button", "a-btn sm", "Keep");
       no.type = "button";
-      no.addEventListener("click", function (ev) { ev.stopPropagation(); state.confirming = null; draw(); });
-      acts.appendChild(go); acts.appendChild(no);
+      no.addEventListener("click", function (ev) {
+        ev.stopPropagation();
+        state.confirming = null;
+        draw();
+      });
+      acts.appendChild(go);
+      acts.appendChild(no);
       box.appendChild(acts);
       return box;
     }
@@ -2972,7 +4395,9 @@
     function reasonStrip(a) {
       var box = h("div", "cm-reasons");
       var hd = h("div", "hd");
-      hd.appendChild(document.createTextNode("This reveals data you are not currently entitled to. "));
+      hd.appendChild(
+        document.createTextNode("This reveals data you are not currently entitled to. "),
+      );
       hd.appendChild(h("b", null, "Record a reason."));
       box.appendChild(hd);
       (a.reasons || []).forEach(function (reason) {
@@ -2995,36 +4420,66 @@
     function choose(row, idx) {
       var a = row.action;
       var out = M.actionOutcome(a, state);
-      if (out.kind === "blocked") { opts.onOut && opts.onOut(out, a); return; }
+      if (out.kind === "blocked") {
+        opts.onOut && opts.onOut(out, a);
+        return;
+      }
       if (out.kind === "confirm") {
-        state.confirming = a.id; state.reasoning = null; state.hot = idx; draw();
+        state.confirming = a.id;
+        state.reasoning = null;
+        state.hot = idx;
+        draw();
         opts.onOut && opts.onOut({ kind: "step", text: "Step 2 of 2 — " + out.prompt }, a);
         return;
       }
       if (out.kind === "reason") {
-        state.reasoning = a.id; state.confirming = null; state.reason = null; state.hot = idx; draw();
+        state.reasoning = a.id;
+        state.confirming = null;
+        state.reason = null;
+        state.hot = idx;
+        draw();
         /* The record is made when the list is *offered*, not when it is
            answered. See `disclosureRecord`. */
-        opts.onAudit && opts.onAudit(M.disclosureRecord(a, opts.subject, {
-          now: M.NOW, outcome: "offered", breakGlass: !!(opts.policy && opts.policy.breakGlass),
-        }));
+        opts.onAudit &&
+          opts.onAudit(
+            M.disclosureRecord(a, opts.subject, {
+              now: M.NOW,
+              outcome: "offered",
+              breakGlass: !!(opts.policy && opts.policy.breakGlass),
+            }),
+          );
         return;
       }
       run(a, out);
     }
 
     function run(a, out) {
-      if (a.kind === "checkbox") { a.checked = !a.checked; draw(); opts.onOut && opts.onOut({ kind: "toggle", text: a.label + (a.checked ? " — on" : " — off") }, a); return; }
+      if (a.kind === "checkbox") {
+        a.checked = !a.checked;
+        draw();
+        opts.onOut &&
+          opts.onOut({ kind: "toggle", text: a.label + (a.checked ? " — on" : " — off") }, a);
+        return;
+      }
       if (a.kind === "radio") {
-        rows.forEach(function (r) { if (r.row.action.radioGroup === a.radioGroup) r.row.action.checked = false; });
-        a.checked = true; draw();
-        opts.onOut && opts.onOut({ kind: "toggle", text: a.label }, a); return;
+        rows.forEach(function (r) {
+          if (r.row.action.radioGroup === a.radioGroup) r.row.action.checked = false;
+        });
+        a.checked = true;
+        draw();
+        opts.onOut && opts.onOut({ kind: "toggle", text: a.label }, a);
+        return;
       }
       if (out.reason) {
-        opts.onAudit && opts.onAudit(M.disclosureRecord(a, opts.subject, {
-          now: M.NOW, outcome: "disclosed", reason: out.reason,
-          breakGlass: !!(opts.policy && opts.policy.breakGlass),
-        }));
+        opts.onAudit &&
+          opts.onAudit(
+            M.disclosureRecord(a, opts.subject, {
+              now: M.NOW,
+              outcome: "disclosed",
+              reason: out.reason,
+              breakGlass: !!(opts.policy && opts.policy.breakGlass),
+            }),
+          );
       }
       opts.onRun && opts.onRun(a, out);
       opts.close && opts.close();
@@ -3039,30 +4494,45 @@
 
     /* Keyboard. The model lives in the core; this is the binding. */
     el.addEventListener("keydown", function (e) {
-      var flat = rows.map(function (r) { return r.row; });
+      var flat = rows.map(function (r) {
+        return r.row;
+      });
       if (e.key === "ArrowDown" || e.key === "ArrowUp") {
         e.preventDefault();
         state.hot = M.nextIndex(flat, state.hot, e.key === "ArrowDown" ? 1 : -1, true);
         paintHot();
         if (rows[state.hot]) rows[state.hot].el.focus();
-      } else if (e.key === "Home") { e.preventDefault(); state.hot = M.nextIndex(flat, -1, 1, false); paintHot(); rows[state.hot] && rows[state.hot].el.focus(); }
-      else if (e.key === "End") { e.preventDefault(); state.hot = M.nextIndex(flat, flat.length, -1, false); paintHot(); rows[state.hot] && rows[state.hot].el.focus(); }
-      else if (e.key === "Enter" || e.key === " ") {
-        if (rows[state.hot]) { e.preventDefault(); choose(rows[state.hot].row, state.hot); }
+      } else if (e.key === "Home") {
+        e.preventDefault();
+        state.hot = M.nextIndex(flat, -1, 1, false);
+        paintHot();
+        rows[state.hot] && rows[state.hot].el.focus();
+      } else if (e.key === "End") {
+        e.preventDefault();
+        state.hot = M.nextIndex(flat, flat.length, -1, false);
+        paintHot();
+        rows[state.hot] && rows[state.hot].el.focus();
+      } else if (e.key === "Enter" || e.key === " ") {
+        if (rows[state.hot]) {
+          e.preventDefault();
+          choose(rows[state.hot].row, state.hot);
+        }
       } else if (e.key === "Escape") {
         e.preventDefault();
         /* Escape out of a disclosure that was offered and abandoned is
            still a disclosure event, and it is recorded. */
         if (state.reasoning) {
           var a = findAction(state.reasoning);
-          opts.onAudit && opts.onAudit(M.disclosureRecord(a, opts.subject, { now: M.NOW, outcome: "abandoned" }));
+          opts.onAudit &&
+            opts.onAudit(M.disclosureRecord(a, opts.subject, { now: M.NOW, outcome: "abandoned" }));
         }
         opts.close && opts.close();
       }
     });
 
     function findAction(id) {
-      for (var i = 0; i < rows.length; i++) if (rows[i].row.action.id === id) return rows[i].row.action;
+      for (var i = 0; i < rows.length; i++)
+        if (rows[i].row.action.id === id) return rows[i].row.action;
       return null;
     }
 
@@ -3070,7 +4540,9 @@
     return {
       el: el,
       focusFirst: function () {
-        var flat = rows.map(function (r) { return r.row; });
+        var flat = rows.map(function (r) {
+          return r.row;
+        });
         state.hot = M.nextIndex(flat, -1, 1, false);
         paintHot();
         rows[state.hot] ? rows[state.hot].el.focus() : el.focus();
@@ -3090,11 +4562,16 @@
     var wrap = h("div", "cmwrap");
     var live = h("div", "sr");
     live.setAttribute("aria-live", "polite");
-    live.style.cssText = "position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap";
+    live.style.cssText =
+      "position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap";
     var open = null;
 
     function close() {
-      if (open) { open.node.remove(); open.trigger && open.trigger.classList.remove("armed"); open = null; }
+      if (open) {
+        open.node.remove();
+        open.trigger && open.trigger.classList.remove("armed");
+        open = null;
+      }
     }
     U.closeAll = close;
 
@@ -3102,11 +4579,18 @@
       close();
       var resolved = M.resolveMenu(subject, actions, policy);
       var m = renderMenu({
-        resolved: resolved, subject: subject, policy: policy,
+        resolved: resolved,
+        subject: subject,
+        policy: policy,
         presentation: presentation || cfg.presentation || "popup",
         compact: cfg.compact,
-        onRun: cfg.onRun, onOut: cfg.onOut, onAudit: cfg.onAudit,
-        close: function () { close(); trigger && trigger.focus && trigger.focus(); },
+        onRun: cfg.onRun,
+        onOut: cfg.onOut,
+        onAudit: cfg.onAudit,
+        close: function () {
+          close();
+          trigger && trigger.focus && trigger.focus();
+        },
       });
       if ((presentation || cfg.presentation) !== "sheet") {
         m.el.style.left = x + "px";
@@ -3117,8 +4601,12 @@
       trigger && trigger.classList.add("armed");
       /* Keyboard-opened menus take the highlight immediately; pointer
          ones do not, so the first row is not armed under a moving mouse. */
-      if (presentation === "keyboard") m.focusFirst(); else m.el.focus();
-      live.textContent = resolved.count + " actions for " + resolved.subject.who +
+      if (presentation === "keyboard") m.focusFirst();
+      else m.el.focus();
+      live.textContent =
+        resolved.count +
+        " actions for " +
+        resolved.subject.who +
         (resolved.withheld ? ", " + resolved.withheld + " hidden" : "");
       return m;
     }
@@ -3126,7 +4614,9 @@
     wrap.close = close;
     wrap.appendChild(live);
 
-    document.addEventListener("click", function (e) { if (open && !open.node.contains(e.target)) close(); });
+    document.addEventListener("click", function (e) {
+      if (open && !open.node.contains(e.target)) close();
+    });
     /*
      * Close on resize rather than reposition. A popup anchored to a
      * pointer position that no longer exists is a menu about a click that
@@ -3151,7 +4641,8 @@
     r.appendChild(g);
     var mid = h("div");
     mid.appendChild(h("div", "nm", cfg.subject.masked ? "Restricted record" : cfg.subject.label));
-    if (cfg.subject.detail && !cfg.subject.masked) mid.appendChild(h("div", "dt", cfg.subject.detail));
+    if (cfg.subject.detail && !cfg.subject.masked)
+      mid.appendChild(h("div", "dt", cfg.subject.detail));
     if (cfg.subject.masked) mid.appendChild(h("div", "dt", "42 CFR Part 2 · not disclosed"));
     r.appendChild(mid);
     var rt = h("div", "rt");
@@ -3163,8 +4654,17 @@
     more.appendChild(ico("dots", "i-14"));
     more.addEventListener("click", function (e) {
       e.stopPropagation();
-      var b = more.getBoundingClientRect(), w = host.getBoundingClientRect();
-      host.openAt(cfg.subject, cfg.actions, cfg.policy, b.left - w.left - 210, b.bottom - w.top + 4, more, "anchored");
+      var b = more.getBoundingClientRect(),
+        w = host.getBoundingClientRect();
+      host.openAt(
+        cfg.subject,
+        cfg.actions,
+        cfg.policy,
+        b.left - w.left - 210,
+        b.bottom - w.top + 4,
+        more,
+        "anchored",
+      );
     });
     rt.appendChild(more);
     r.appendChild(rt);
@@ -3181,7 +4681,14 @@
        * puts it inside the header's fill instead. Visually indeterminate;
        * measurably different.
        */
-      host.openAt(cfg.subject, cfg.actions, cfg.policy, e.clientX - w.left - 3, e.clientY - w.top - 3, r);
+      host.openAt(
+        cfg.subject,
+        cfg.actions,
+        cfg.policy,
+        e.clientX - w.left - 3,
+        e.clientY - w.top - 3,
+        r,
+      );
     });
     /* Shift+F10 and the Menu key. Chrome and Firefox fire `contextmenu`
        for both; Safari fires neither, so they are handled explicitly —
@@ -3189,8 +4696,17 @@
     r.addEventListener("keydown", function (e) {
       if (e.key === "ContextMenu" || (e.shiftKey && e.key === "F10")) {
         e.preventDefault();
-        var b = r.getBoundingClientRect(), w = host.getBoundingClientRect();
-        host.openAt(cfg.subject, cfg.actions, cfg.policy, b.left - w.left + 24, b.bottom - w.top - 6, r, "keyboard");
+        var b = r.getBoundingClientRect(),
+          w = host.getBoundingClientRect();
+        host.openAt(
+          cfg.subject,
+          cfg.actions,
+          cfg.policy,
+          b.left - w.left + 24,
+          b.bottom - w.top - 6,
+          r,
+          "keyboard",
+        );
       }
     });
     li.appendChild(r);
@@ -3203,7 +4719,12 @@
     n.say = function (kind, text) {
       n.className = "cm-out " + (kind || "");
       n.textContent = "";
-      n.appendChild(ico(kind === "err" ? "ban" : kind === "warn" ? "alert" : kind === "ok" ? "check" : "info", "i-14"));
+      n.appendChild(
+        ico(
+          kind === "err" ? "ban" : kind === "warn" ? "alert" : kind === "ok" ? "check" : "info",
+          "i-14",
+        ),
+      );
       n.appendChild(h("div", null, text));
     };
     n.say("", "Right-click a row. Or focus one and press Shift+F10.");
@@ -3216,15 +4737,32 @@
     n.write = function (rec) {
       if (!rec) return;
       n.hidden = false;
-      n.textContent = "onDisclose({\n" +
-        '  at: "' + rec.at + '",\n' +
-        '  action: "' + rec.action + '",\n' +
-        "  subject: { resource: \"" + rec.subject.resource + "\", id: \"" + rec.subject.id + "\" },\n" +
+      n.textContent =
+        "onDisclose({\n" +
+        '  at: "' +
+        rec.at +
+        '",\n' +
+        '  action: "' +
+        rec.action +
+        '",\n' +
+        '  subject: { resource: "' +
+        rec.subject.resource +
+        '", id: "' +
+        rec.subject.id +
+        '" },\n' +
         "  subjectNamed: false,   // never the label\n" +
-        "  masked: " + rec.masked + ",\n" +
-        '  reason: ' + (rec.reason ? '"' + rec.reason + '"' : "null") + ",\n" +
-        '  outcome: "' + rec.outcome + '",\n' +
-        "  breakGlass: " + rec.breakGlass + ",\n})";
+        "  masked: " +
+        rec.masked +
+        ",\n" +
+        "  reason: " +
+        (rec.reason ? '"' + rec.reason + '"' : "null") +
+        ",\n" +
+        '  outcome: "' +
+        rec.outcome +
+        '",\n' +
+        "  breakGlass: " +
+        rec.breakGlass +
+        ",\n})";
     };
     return n;
   };
@@ -3261,7 +4799,9 @@
       b.type = "button";
       b.setAttribute("aria-pressed", i === 0 ? "true" : "false");
       b.addEventListener("click", function () {
-        btns.forEach(function (x) { x.setAttribute("aria-pressed", "false"); });
+        btns.forEach(function (x) {
+          x.setAttribute("aria-pressed", "false");
+        });
         b.setAttribute("aria-pressed", "true");
         onPick(it, i);
       });
@@ -3287,14 +4827,18 @@
   var D = {};
   Ox.data = D;
 
-  function A(o) { return o; }
+  function A(o) {
+    return o;
+  }
 
   /* ---------------------------------------------------------------- */
   /* MedicationRequest                                                 */
   /* ---------------------------------------------------------------- */
   D.medSubject = {
-    resource: "MedicationRequest", id: "mr-4471",
-    label: "Lisinopril 10 mg", detail: "Oral · daily · started 4 Mar 2026",
+    resource: "MedicationRequest",
+    id: "mr-4471",
+    label: "Lisinopril 10 mg",
+    detail: "Oral · daily · started 4 Mar 2026",
   };
 
   D.medActions = function () {
@@ -3303,33 +4847,60 @@
       A({ id: "copy", label: "Copy as text", tier: "routine", icon: "copy", shortcut: "⌘C" }),
       A({ id: "hist", label: "Administration history", tier: "routine", icon: "clock" }),
       A({
-        id: "mar", label: "Add a note to the MAR", tier: "documented", icon: "pen",
+        id: "mar",
+        label: "Add a note to the MAR",
+        tier: "documented",
+        icon: "pen",
         applies: ["MedicationRequest"],
         records: "Writes a note on the medication record. Nursing sees it at the next round.",
       }),
       A({
-        id: "pharm", label: "Flag for pharmacy review", tier: "documented", icon: "flag",
+        id: "pharm",
+        label: "Flag for pharmacy review",
+        tier: "documented",
+        icon: "flag",
         applies: ["MedicationRequest"],
         records: "Creates a Task for pharmacy. It appears in their queue with your name on it.",
       }),
       A({
-        id: "hold", label: "Hold until reviewed", tier: "clinical", icon: "stop",
-        applies: ["MedicationRequest"], confirm: "Holds every remaining dose until a prescriber releases it.",
+        id: "hold",
+        label: "Hold until reviewed",
+        tier: "clinical",
+        icon: "stop",
+        applies: ["MedicationRequest"],
+        confirm: "Holds every remaining dose until a prescriber releases it.",
         confirmVerb: "Hold doses",
       }),
       A({
-        id: "dc", label: "Discontinue", tier: "clinical", icon: "ban",
+        id: "dc",
+        label: "Discontinue",
+        tier: "clinical",
+        icon: "ban",
         applies: ["MedicationRequest"],
         confirm: "The next scheduled dose is 14:00 today. Discontinuing stops it.",
         confirmVerb: "Discontinue",
       }),
       A({
-        id: "renew", label: "Renew for 90 days", tier: "clinical", icon: "undo",
-        applies: ["MedicationRequest"], confirm: "Issues a new order in your name.",
-        availability: { status: "unavailable", reason: "Prescriber role required — you are signed in as a registered nurse" },
+        id: "renew",
+        label: "Renew for 90 days",
+        tier: "clinical",
+        icon: "undo",
+        applies: ["MedicationRequest"],
+        confirm: "Issues a new order in your name.",
+        availability: {
+          status: "unavailable",
+          reason: "Prescriber role required — you are signed in as a registered nurse",
+        },
       }),
-      A({ id: "delete", label: "Delete order", tier: "clinical", icon: "trash", confirm: "x",
-          applies: ["MedicationRequest"], availability: { status: "withheld" } }),
+      A({
+        id: "delete",
+        label: "Delete order",
+        tier: "clinical",
+        icon: "trash",
+        confirm: "x",
+        applies: ["MedicationRequest"],
+        availability: { status: "withheld" },
+      }),
     ];
   };
 
@@ -3337,8 +4908,10 @@
   /* Observation — a critical result, still preliminary                */
   /* ---------------------------------------------------------------- */
   D.obsSubject = {
-    resource: "Observation", id: "obs-8812",
-    label: "Potassium 6.8 mmol/L", detail: "Critical high · preliminary · 09:12 today",
+    resource: "Observation",
+    id: "obs-8812",
+    label: "Potassium 6.8 mmol/L",
+    detail: "Critical high · preliminary · 09:12 today",
   };
 
   D.obsActions = function () {
@@ -3346,7 +4919,10 @@
       A({ id: "open", label: "Open result", tier: "routine", icon: "open", shortcut: "↵" }),
       A({ id: "range", label: "Show reference range", tier: "routine", icon: "info" }),
       A({
-        id: "trend", label: "Trend", tier: "routine", icon: "sort",
+        id: "trend",
+        label: "Trend",
+        tier: "routine",
+        icon: "sort",
         submenu: [
           A({ id: "t7", label: "Last 7 days", tier: "routine" }),
           A({ id: "t30", label: "Last 30 days", tier: "routine" }),
@@ -3354,23 +4930,43 @@
         ],
       }),
       A({
-        id: "portal", label: "Release to patient portal", tier: "documented", icon: "share",
-        applies: ["Observation"], records: "Publishes the value to the patient's portal immediately.",
-        availability: { status: "unavailable", reason: "Preliminary results are not released. This one has not been verified by the lab." },
-      }),
-      A({
-        id: "annot", label: "Annotate result", tier: "documented", icon: "pen",
-        applies: ["Observation"], records: "Attaches a comment to the result. Everyone who opens it sees it.",
-      }),
-      A({
-        id: "ack", label: "Acknowledge critical result", tier: "clinical", icon: "check",
+        id: "portal",
+        label: "Release to patient portal",
+        tier: "documented",
+        icon: "share",
         applies: ["Observation"],
-        confirm: "Acknowledgement is recorded against your name and stops the escalation page due at 09:42.",
+        records: "Publishes the value to the patient's portal immediately.",
+        availability: {
+          status: "unavailable",
+          reason:
+            "Preliminary results are not released. This one has not been verified by the lab.",
+        },
+      }),
+      A({
+        id: "annot",
+        label: "Annotate result",
+        tier: "documented",
+        icon: "pen",
+        applies: ["Observation"],
+        records: "Attaches a comment to the result. Everyone who opens it sees it.",
+      }),
+      A({
+        id: "ack",
+        label: "Acknowledge critical result",
+        tier: "clinical",
+        icon: "check",
+        applies: ["Observation"],
+        confirm:
+          "Acknowledgement is recorded against your name and stops the escalation page due at 09:42.",
         confirmVerb: "Acknowledge",
       }),
       A({
-        id: "recheck", label: "Order a repeat now", tier: "clinical", icon: "flask",
-        applies: ["Observation"], confirm: "Places a STAT potassium in your name.",
+        id: "recheck",
+        label: "Order a repeat now",
+        tier: "clinical",
+        icon: "flask",
+        applies: ["Observation"],
+        confirm: "Places a STAT potassium in your name.",
         confirmVerb: "Order STAT repeat",
         availability: { status: "unavailable", reason: "Prescriber role required" },
       }),
@@ -3381,8 +4977,10 @@
   /* DocumentReference — a signed progress note                        */
   /* ---------------------------------------------------------------- */
   D.docSubject = {
-    resource: "DocumentReference", id: "doc-2290",
-    label: "Progress note — 28 Aug", detail: "Signed by K. Mbeki, LCSW · 42 CFR Part 2",
+    resource: "DocumentReference",
+    id: "doc-2290",
+    label: "Progress note — 28 Aug",
+    detail: "Signed by K. Mbeki, LCSW · 42 CFR Part 2",
   };
 
   D.docActions = function () {
@@ -3390,24 +4988,37 @@
       A({ id: "open", label: "Open note", tier: "routine", icon: "open", shortcut: "↵" }),
       A({ id: "print", label: "Print", tier: "routine", icon: "print", shortcut: "⌘P" }),
       A({
-        id: "adden", label: "Add an addendum", tier: "documented", icon: "pen",
+        id: "adden",
+        label: "Add an addendum",
+        tier: "documented",
+        icon: "pen",
         applies: ["DocumentReference"],
         records: "Appended and timestamped. The original text is never altered.",
       }),
       A({
-        id: "amend", label: "Amend", tier: "clinical", icon: "note",
+        id: "amend",
+        label: "Amend",
+        tier: "clinical",
+        icon: "note",
         applies: ["DocumentReference"],
         confirm: "An amendment supersedes the signed note. Both versions stay in the legal record.",
         confirmVerb: "Amend note",
       }),
       A({
-        id: "retract", label: "Retract note", tier: "clinical", icon: "undo",
+        id: "retract",
+        label: "Retract note",
+        tier: "clinical",
+        icon: "undo",
         applies: ["DocumentReference"],
-        confirm: "A retracted note remains in the legal record with a retraction stamp. It is not deleted.",
+        confirm:
+          "A retracted note remains in the legal record with a retraction stamp. It is not deleted.",
         confirmVerb: "Retract",
       }),
       A({
-        id: "part2", label: "Reveal Part 2 content", tier: "disclosive", icon: "key",
+        id: "part2",
+        label: "Reveal Part 2 content",
+        tier: "disclosive",
+        icon: "key",
         applies: ["DocumentReference"],
         reasons: [
           "Treatment of this patient",
@@ -3417,10 +5028,16 @@
         ],
       }),
       A({
-        id: "share", label: "Send outside the organisation", tier: "disclosive", icon: "share",
+        id: "share",
+        label: "Send outside the organisation",
+        tier: "disclosive",
+        icon: "share",
         applies: ["DocumentReference"],
         reasons: ["Written patient consent on file", "Court order", "Medical emergency"],
-        availability: { status: "unavailable", reason: "No consent on file for external disclosure" },
+        availability: {
+          status: "unavailable",
+          reason: "No consent on file for external disclosure",
+        },
       }),
     ];
   };
@@ -3429,43 +5046,75 @@
   /* Patient — a worklist row                                          */
   /* ---------------------------------------------------------------- */
   D.patSubject = {
-    resource: "Patient", id: "pt-3319",
-    label: "Aluel Okonkwo", detail: "MRN 44-2871 · 34y · Intake 10:30",
+    resource: "Patient",
+    id: "pt-3319",
+    label: "Aluel Okonkwo",
+    detail: "MRN 44-2871 · 34y · Intake 10:30",
     plural: "patients",
   };
 
   D.patActions = function (opts) {
     opts = opts || {};
     return [
-      A({ id: "open", label: "Open chart", tier: "routine", icon: "open", shortcut: "↵", bulk: "single" }),
+      A({
+        id: "open",
+        label: "Open chart",
+        tier: "routine",
+        icon: "open",
+        shortcut: "↵",
+        bulk: "single",
+      }),
       A({ id: "mrn", label: "Copy MRN", tier: "routine", icon: "copy", bulk: "allowed" }),
       A({ id: "call", label: "Call from the clinic line", tier: "routine", icon: "phone" }),
       A({
-        id: "mine", label: "Add to my patients", tier: "documented", icon: "plus",
-        applies: ["Patient"], bulk: "allowed",
+        id: "mine",
+        label: "Add to my patients",
+        tier: "documented",
+        icon: "plus",
+        applies: ["Patient"],
+        bulk: "allowed",
         records: "Creates a treatment relationship. It is what scopes your searches.",
       }),
       A({
-        id: "collateral", label: "Log a collateral contact", tier: "documented", icon: "users",
+        id: "collateral",
+        label: "Log a collateral contact",
+        tier: "documented",
+        icon: "users",
         applies: ["Patient"],
         records: "Recorded on the encounter and billable under the collateral code.",
       }),
       A({
-        id: "msg", label: "Send a secure message", tier: "documented", icon: "bell",
-        applies: ["Patient"], records: "Delivered to the portal inbox.",
-        availability: opts.pending ? { status: "pending" }
-          : { status: "unavailable", reason: "No portal account — enrolment was declined at intake" },
+        id: "msg",
+        label: "Send a secure message",
+        tier: "documented",
+        icon: "bell",
+        applies: ["Patient"],
+        records: "Delivered to the portal inbox.",
+        availability: opts.pending
+          ? { status: "pending" }
+          : {
+              status: "unavailable",
+              reason: "No portal account — enrolment was declined at intake",
+            },
       }),
       A({
-        id: "noshow", label: "Document a no-show", tier: "clinical", icon: "cal",
+        id: "noshow",
+        label: "Document a no-show",
+        tier: "clinical",
+        icon: "cal",
         applies: ["Patient"],
-        confirm: "Records a missed appointment on today's encounter. Three of these trigger the discharge protocol.",
+        confirm:
+          "Records a missed appointment on today's encounter. Three of these trigger the discharge protocol.",
         confirmVerb: "Document no-show",
         bulk: opts.bulkNoShow ? "allowed" : "single",
-        bulkConfirm: "This records a no-show on {n} patients. Each is written separately and each can fail separately.",
+        bulkConfirm:
+          "This records a no-show on {n} patients. Each is written separately and each can fail separately.",
       }),
       A({
-        id: "glass", label: "Break-glass open", tier: "disclosive", icon: "key",
+        id: "glass",
+        label: "Break-glass open",
+        tier: "disclosive",
+        icon: "key",
         applies: ["Patient"],
         reasons: ["Medical emergency", "Covering clinician", "Patient explicitly asked me to look"],
       }),
@@ -3476,8 +5125,10 @@
   /* AllergyIntolerance                                                */
   /* ---------------------------------------------------------------- */
   D.algSubject = {
-    resource: "AllergyIntolerance", id: "alg-771",
-    label: "Penicillin", detail: "Anaphylaxis · confirmed · reported by patient 2019",
+    resource: "AllergyIntolerance",
+    id: "alg-771",
+    label: "Penicillin",
+    detail: "Anaphylaxis · confirmed · reported by patient 2019",
   };
 
   D.algActions = function () {
@@ -3485,18 +5136,27 @@
       A({ id: "open", label: "Open allergy", tier: "routine", icon: "open" }),
       A({ id: "copy", label: "Copy", tier: "routine", icon: "copy" }),
       A({
-        id: "detail", label: "Add reaction detail", tier: "documented", icon: "pen",
+        id: "detail",
+        label: "Add reaction detail",
+        tier: "documented",
+        icon: "pen",
         applies: ["AllergyIntolerance"],
         records: "Appears on the allergy list and in every interaction check from now on.",
       }),
       A({
-        id: "downgrade", label: "Downgrade to intolerance", tier: "clinical", icon: "sort",
+        id: "downgrade",
+        label: "Downgrade to intolerance",
+        tier: "clinical",
+        icon: "sort",
         applies: ["AllergyIntolerance"],
         confirm: "An intolerance does not block a penicillin order. An anaphylaxis does.",
         confirmVerb: "Downgrade",
       }),
       A({
-        id: "err", label: "Mark entered in error", tier: "clinical", icon: "ban",
+        id: "err",
+        label: "Mark entered in error",
+        tier: "clinical",
+        icon: "ban",
         applies: ["AllergyIntolerance"],
         confirm: "Removes penicillin from interaction checking for every future order.",
         confirmVerb: "Mark in error",
@@ -3507,28 +5167,103 @@
   /* ---------------------------------------------------------------- */
   /* View state — a checkbox / radio menu. Never above tier="routine".  */
   /* ---------------------------------------------------------------- */
-  D.viewSubject = { resource: "Encounter", id: "col-vitals", label: "Vitals column", detail: "Flowsheet · 08:00–20:00" };
+  D.viewSubject = {
+    resource: "Encounter",
+    id: "col-vitals",
+    label: "Vitals column",
+    detail: "Flowsheet · 08:00–20:00",
+  };
 
   D.viewActions = function () {
     return [
-      A({ id: "pin", label: "Pin this column", tier: "routine", icon: "flag", kind: "checkbox", checked: true }),
-      A({ id: "abn", label: "Abnormal values only", tier: "routine", icon: "filter", kind: "checkbox", checked: false }),
-      A({ id: "d-comfy", label: "Comfortable", tier: "routine", kind: "radio", radioGroup: "density", checked: true, group: "Density" }),
-      A({ id: "d-compact", label: "Compact", tier: "routine", kind: "radio", radioGroup: "density", checked: false, group: "Density" }),
-      A({ id: "d-tiny", label: "Dense", tier: "routine", kind: "radio", radioGroup: "density", checked: false, group: "Density" }),
-      A({ id: "export", label: "Export visible range", tier: "documented", icon: "share",
-          applies: ["Encounter"], records: "Writes an export record naming you, the range and the row count." }),
+      A({
+        id: "pin",
+        label: "Pin this column",
+        tier: "routine",
+        icon: "flag",
+        kind: "checkbox",
+        checked: true,
+      }),
+      A({
+        id: "abn",
+        label: "Abnormal values only",
+        tier: "routine",
+        icon: "filter",
+        kind: "checkbox",
+        checked: false,
+      }),
+      A({
+        id: "d-comfy",
+        label: "Comfortable",
+        tier: "routine",
+        kind: "radio",
+        radioGroup: "density",
+        checked: true,
+        group: "Density",
+      }),
+      A({
+        id: "d-compact",
+        label: "Compact",
+        tier: "routine",
+        kind: "radio",
+        radioGroup: "density",
+        checked: false,
+        group: "Density",
+      }),
+      A({
+        id: "d-tiny",
+        label: "Dense",
+        tier: "routine",
+        kind: "radio",
+        radioGroup: "density",
+        checked: false,
+        group: "Density",
+      }),
+      A({
+        id: "export",
+        label: "Export visible range",
+        tier: "documented",
+        icon: "share",
+        applies: ["Encounter"],
+        records: "Writes an export record naming you, the range and the row count.",
+      }),
     ];
   };
 
   /* A deliberately wrong action list, for the validator figure. */
   D.badActions = [
     { id: "dc", label: "Discontinue", tier: "clinical" },
-    { id: "reveal", label: "Reveal restricted note", tier: "disclosive", reasons: [], applies: ["DocumentReference"] },
+    {
+      id: "reveal",
+      label: "Reveal restricted note",
+      tier: "disclosive",
+      reasons: [],
+      applies: ["DocumentReference"],
+    },
     { id: "sign", label: "Sign and file", tier: "documented", applies: ["DocumentReference"] },
-    { id: "dc", label: "Stop medication", tier: "clinical", confirm: "Stops it.", applies: ["MedicationRequest"] },
-    { id: "bulkdc", label: "Discontinue all", tier: "clinical", confirm: "Stops them.", applies: ["MedicationRequest"], bulk: "allowed" },
-    { id: "lock", label: "Lock the chart", tier: "clinical", kind: "checkbox", confirm: "Locks it.", applies: ["Patient"] },
+    {
+      id: "dc",
+      label: "Stop medication",
+      tier: "clinical",
+      confirm: "Stops it.",
+      applies: ["MedicationRequest"],
+    },
+    {
+      id: "bulkdc",
+      label: "Discontinue all",
+      tier: "clinical",
+      confirm: "Stops them.",
+      applies: ["MedicationRequest"],
+      bulk: "allowed",
+    },
+    {
+      id: "lock",
+      label: "Lock the chart",
+      tier: "clinical",
+      kind: "checkbox",
+      confirm: "Locks it.",
+      applies: ["Patient"],
+    },
   ];
 })(window.Ox);
 
@@ -3545,7 +5280,11 @@
    ===================================================================== */
 (function (Ox) {
   "use strict";
-  var M = Ox.menu, U = Ox.ui, D = Ox.data, h = U.h, ico = U.ico;
+  var M = Ox.menu,
+    U = Ox.ui,
+    D = Ox.data,
+    h = U.h,
+    ico = U.ico;
 
   var POLICY = { role: "a registered nurse", breakGlass: true };
 
@@ -3584,7 +5323,9 @@
 
   function tabs(items, on) {
     var t = h("div", "tabstrip");
-    items.forEach(function (x, i) { t.appendChild(h("div", "tb" + (i === on ? " on" : ""), x)); });
+    items.forEach(function (x, i) {
+      t.appendChild(h("div", "tb" + (i === on ? " on" : ""), x));
+    });
     return t;
   }
 
@@ -3600,32 +5341,48 @@
   /* ---------------------------------------------------------------- */
   U.mount("mock-chart", function (root) {
     var out = U.out();
-    out.say("", "Right-click any row in either pane. Every menu below is a different resource type.");
+    out.say(
+      "",
+      "Right-click any row in either pane. Every menu below is a different resource type.",
+    );
     var audit = U.audit();
 
     var host = U.Surface({
       policy: POLICY,
       onRun: function (a, o) {
-        out.say(a.tier === "clinical" || a.tier === "disclosive" ? "warn" : "ok",
-          a.label + " — onRun(\"" + a.id + "\")" + (o && o.reason ? " · reason: " + o.reason : ""));
+        out.say(
+          a.tier === "clinical" || a.tier === "disclosive" ? "warn" : "ok",
+          a.label + ' — onRun("' + a.id + '")' + (o && o.reason ? " · reason: " + o.reason : ""),
+        );
       },
       onOut: function (o) {
         if (o.kind === "blocked") out.say("err", "Blocked — " + o.reason);
         else if (o.kind === "step") out.say("warn", o.text);
         else out.say("ok", o.text);
       },
-      onAudit: function (r) { audit.write(r); },
+      onAudit: function (r) {
+        audit.write(r);
+      },
     });
 
     var app = h("div", "app");
     app.appendChild(rail(3));
     var main = h("div", "app-main");
-    main.appendChild(banner({
-      initials: "AO", name: "Aluel Okonkwo",
-      meta: ["MRN 44-2871", "34y", "F", "Bed 4W-12", "Admitted 27 Aug"],
-      flags: [["Penicillin — anaphylaxis", "red"], ["Part 2 record", "purple"], ["Falls risk", "gold"]],
-    }));
-    main.appendChild(tabs(["Summary", "Orders", "Results", "Medications", "Notes", "Flowsheet"], 3));
+    main.appendChild(
+      banner({
+        initials: "AO",
+        name: "Aluel Okonkwo",
+        meta: ["MRN 44-2871", "34y", "F", "Bed 4W-12", "Admitted 27 Aug"],
+        flags: [
+          ["Penicillin — anaphylaxis", "red"],
+          ["Part 2 record", "purple"],
+          ["Falls risk", "gold"],
+        ],
+      }),
+    );
+    main.appendChild(
+      tabs(["Summary", "Orders", "Results", "Medications", "Notes", "Flowsheet"], 3),
+    );
 
     var panes = h("div", "panes");
 
@@ -3639,27 +5396,68 @@
       ["Clozapine 200 mg", "Oral · nightly · ANC monitoring due", "22:00", "mr-4501"],
       ["Enoxaparin 40 mg", "Subcut · daily · VTE prophylaxis", "20:00", "mr-4510"],
     ].forEach(function (m) {
-      meds.appendChild(U.row({
-        subject: { resource: "MedicationRequest", id: m[3], label: m[0], detail: m[1] },
-        actions: D.medActions(), glyph: "med", icon: "pill", right: m[2], policy: POLICY,
-      }, host));
+      meds.appendChild(
+        U.row(
+          {
+            subject: { resource: "MedicationRequest", id: m[3], label: m[0], detail: m[1] },
+            actions: D.medActions(),
+            glyph: "med",
+            icon: "pill",
+            right: m[2],
+            policy: POLICY,
+          },
+          host,
+        ),
+      );
     });
     left.appendChild(meds);
 
     left.appendChild(paneHead("Results", "today"));
     var res = h("ul", "rows");
-    res.appendChild(U.row({
-      subject: D.obsSubject, actions: D.obsActions(), glyph: "obs", icon: "flask",
-      right: "09:12", policy: POLICY,
-    }, host));
-    res.appendChild(U.row({
-      subject: { resource: "Observation", id: "obs-8813", label: "Creatinine 1.4 mg/dL", detail: "High · final · 09:12 today" },
-      actions: D.obsActions(), glyph: "obs", icon: "flask", right: "09:12", policy: POLICY,
-    }, host));
-    res.appendChild(U.row({
-      subject: D.algSubject, actions: D.algActions(), glyph: "alg", icon: "alert",
-      right: "2019", policy: POLICY,
-    }, host));
+    res.appendChild(
+      U.row(
+        {
+          subject: D.obsSubject,
+          actions: D.obsActions(),
+          glyph: "obs",
+          icon: "flask",
+          right: "09:12",
+          policy: POLICY,
+        },
+        host,
+      ),
+    );
+    res.appendChild(
+      U.row(
+        {
+          subject: {
+            resource: "Observation",
+            id: "obs-8813",
+            label: "Creatinine 1.4 mg/dL",
+            detail: "High · final · 09:12 today",
+          },
+          actions: D.obsActions(),
+          glyph: "obs",
+          icon: "flask",
+          right: "09:12",
+          policy: POLICY,
+        },
+        host,
+      ),
+    );
+    res.appendChild(
+      U.row(
+        {
+          subject: D.algSubject,
+          actions: D.algActions(),
+          glyph: "alg",
+          icon: "alert",
+          right: "2019",
+          policy: POLICY,
+        },
+        host,
+      ),
+    );
     left.appendChild(res);
     panes.appendChild(left);
 
@@ -3667,27 +5465,82 @@
     var right = h("div");
     right.appendChild(paneHead("Notes", "4 this admission"));
     var notes = h("ul", "rows");
-    notes.appendChild(U.row({
-      subject: D.docSubject, actions: D.docActions(), glyph: "doc", icon: "doc",
-      right: "28 Aug", policy: POLICY,
-    }, host));
-    notes.appendChild(U.row({
-      subject: { resource: "DocumentReference", id: "doc-9911", label: "Group therapy note", detail: "Signed by R. Adeyemi, LPC", masked: true },
-      actions: D.docActions(), glyph: "doc", icon: "lock", right: "Restricted", policy: POLICY,
-    }, host));
-    notes.appendChild(U.row({
-      subject: { resource: "DocumentReference", id: "doc-9915", label: "Nursing admission note", detail: "Signed by J. Oyelaran, RN" },
-      actions: D.docActions(), glyph: "doc", icon: "doc", right: "27 Aug", policy: POLICY,
-    }, host));
+    notes.appendChild(
+      U.row(
+        {
+          subject: D.docSubject,
+          actions: D.docActions(),
+          glyph: "doc",
+          icon: "doc",
+          right: "28 Aug",
+          policy: POLICY,
+        },
+        host,
+      ),
+    );
+    notes.appendChild(
+      U.row(
+        {
+          subject: {
+            resource: "DocumentReference",
+            id: "doc-9911",
+            label: "Group therapy note",
+            detail: "Signed by R. Adeyemi, LPC",
+            masked: true,
+          },
+          actions: D.docActions(),
+          glyph: "doc",
+          icon: "lock",
+          right: "Restricted",
+          policy: POLICY,
+        },
+        host,
+      ),
+    );
+    notes.appendChild(
+      U.row(
+        {
+          subject: {
+            resource: "DocumentReference",
+            id: "doc-9915",
+            label: "Nursing admission note",
+            detail: "Signed by J. Oyelaran, RN",
+          },
+          actions: D.docActions(),
+          glyph: "doc",
+          icon: "doc",
+          right: "27 Aug",
+          policy: POLICY,
+        },
+        host,
+      ),
+    );
     right.appendChild(notes);
 
     right.appendChild(paneHead("Care team", "on shift"));
     var team = h("ul", "rows");
-    [["J. Oyelaran, RN", "Primary nurse · until 19:00"], ["Dr K. Mbeki", "Attending · paged 09:14"]].forEach(function (p, i) {
-      team.appendChild(U.row({
-        subject: { resource: "Patient", id: "prac-" + i, label: p[0], detail: p[1], plural: "people" },
-        actions: D.patActions().slice(0, 5), glyph: "pat", icon: "user", policy: POLICY,
-      }, host));
+    [
+      ["J. Oyelaran, RN", "Primary nurse · until 19:00"],
+      ["Dr K. Mbeki", "Attending · paged 09:14"],
+    ].forEach(function (p, i) {
+      team.appendChild(
+        U.row(
+          {
+            subject: {
+              resource: "Patient",
+              id: "prac-" + i,
+              label: p[0],
+              detail: p[1],
+              plural: "people",
+            },
+            actions: D.patActions().slice(0, 5),
+            glyph: "pat",
+            icon: "user",
+            policy: POLICY,
+          },
+          host,
+        ),
+      );
     });
     right.appendChild(team);
     panes.appendChild(right);
@@ -3699,9 +5552,11 @@
     scroller.appendChild(app);
     host.insertBefore(scroller, host.firstChild);
     root.appendChild(host);
-    root.appendChild(U.hint([
-      "Six resource types, one action array, one component. The restricted note is the second row on the right — its menu will not name it.",
-    ]));
+    root.appendChild(
+      U.hint([
+        "Six resource types, one action array, one component. The restricted note is the second row on the right — its menu will not name it.",
+      ]),
+    );
     root.appendChild(out);
     root.appendChild(audit);
   });
@@ -3716,8 +5571,10 @@
     var host = U.Surface({
       policy: POLICY,
       onRun: function (a, o) {
-        out.say(a.tier === "clinical" || a.tier === "disclosive" ? "warn" : "ok",
-          a.label + " — onRun(\"" + a.id + "\")");
+        out.say(
+          a.tier === "clinical" || a.tier === "disclosive" ? "warn" : "ok",
+          a.label + ' — onRun("' + a.id + '")',
+        );
       },
       onOut: function (o) {
         if (o.kind === "blocked") out.say("err", "Blocked — " + o.reason);
@@ -3731,7 +5588,9 @@
     var main = h("div", "app-main");
 
     var b = h("div", "banner");
-    var av = h("div", "pav"); av.appendChild(ico("cal", "i-18")); b.appendChild(av);
+    var av = h("div", "pav");
+    av.appendChild(ico("cal", "i-18"));
+    b.appendChild(av);
     var mid = h("div");
     mid.appendChild(h("div", "pn", "Monday 31 August — intensive outpatient"));
     var m = h("div", "pm");
@@ -3739,7 +5598,8 @@
       if (i) m.appendChild(h("span", null, "·"));
       m.appendChild(h("span", null, t));
     });
-    mid.appendChild(m); b.appendChild(mid);
+    mid.appendChild(m);
+    b.appendChild(mid);
     var f = h("div", "flags");
     f.appendChild(h("span", "a-tag blue", "Group 10:30"));
     f.appendChild(h("span", "a-tag plain", "2 no-shows last week"));
@@ -3747,27 +5607,58 @@
     main.appendChild(b);
     main.appendChild(tabs(["My day", "Group roster", "Follow-ups", "Unsigned notes"], 0));
 
-    var pane = h("div"); pane.style.padding = "14px 16px";
+    var pane = h("div");
+    pane.style.padding = "14px 16px";
     pane.appendChild(paneHead("Scheduled", "9"));
     var ul = h("ul", "rows");
 
     var selected = [
-      { resource: "Patient", id: "pt-3319", label: "Aluel Okonkwo", detail: "MRN 44-2871 · 34y · IOP session 3 of 12", plural: "patients" },
-      { resource: "Patient", id: "pt-3320", label: "Chidi Nwosu", detail: "MRN 44-9013 · 41y · IOP session 7 of 12", plural: "patients" },
-      { resource: "Patient", id: "pt-3321", label: "Ama Boateng", detail: "MRN 44-7755 · 29y · IOP session 1 of 12", plural: "patients" },
+      {
+        resource: "Patient",
+        id: "pt-3319",
+        label: "Aluel Okonkwo",
+        detail: "MRN 44-2871 · 34y · IOP session 3 of 12",
+        plural: "patients",
+      },
+      {
+        resource: "Patient",
+        id: "pt-3320",
+        label: "Chidi Nwosu",
+        detail: "MRN 44-9013 · 41y · IOP session 7 of 12",
+        plural: "patients",
+      },
+      {
+        resource: "Patient",
+        id: "pt-3321",
+        label: "Ama Boateng",
+        detail: "MRN 44-7755 · 29y · IOP session 1 of 12",
+        plural: "patients",
+      },
     ];
     var bulkSubject = Object.assign({}, selected[0], {
-      also: [{ resource: "Patient", id: "pt-3320" }, { resource: "Patient", id: "pt-3321" }],
+      also: [
+        { resource: "Patient", id: "pt-3320" },
+        { resource: "Patient", id: "pt-3321" },
+      ],
       plural: "patients",
       bulkDetail: "IOP group · 10:30",
     });
 
     selected.forEach(function (s, i) {
-      ul.appendChild(U.row({
-        subject: bulkSubject, actions: D.patActions({ bulkNoShow: true }),
-        glyph: "pat", icon: "user", right: ["10:30", "10:30", "10:30"][i],
-        selected: true, policy: POLICY,
-      }, host));
+      ul.appendChild(
+        U.row(
+          {
+            subject: bulkSubject,
+            actions: D.patActions({ bulkNoShow: true }),
+            glyph: "pat",
+            icon: "user",
+            right: ["10:30", "10:30", "10:30"][i],
+            selected: true,
+            policy: POLICY,
+          },
+          host,
+        ),
+      );
       /* the row shows its own name; the menu counts the selection */
       var last = ul.lastChild.querySelector(".nm");
       last.textContent = s.label;
@@ -3781,14 +5672,26 @@
       ["Tomas Ruiz", "MRN 44-3388 · 38y · Medication review", "13:30"],
     ].forEach(function (p) {
       var masked = p[0] === "Restricted record";
-      ul.appendChild(U.row({
-        subject: {
-          resource: "Patient", id: "pt-" + p[2].replace(":", ""), label: p[0], detail: p[1],
-          masked: masked, plural: "patients",
-        },
-        actions: D.patActions(), glyph: "pat", icon: masked ? "lock" : "user",
-        right: p[2], policy: POLICY,
-      }, host));
+      ul.appendChild(
+        U.row(
+          {
+            subject: {
+              resource: "Patient",
+              id: "pt-" + p[2].replace(":", ""),
+              label: p[0],
+              detail: p[1],
+              masked: masked,
+              plural: "patients",
+            },
+            actions: D.patActions(),
+            glyph: "pat",
+            icon: masked ? "lock" : "user",
+            right: p[2],
+            policy: POLICY,
+          },
+          host,
+        ),
+      );
     });
 
     pane.appendChild(ul);
@@ -3799,9 +5702,11 @@
     scroller.appendChild(app);
     host.insertBefore(scroller, host.firstChild);
     root.appendChild(host);
-    root.appendChild(U.hint([
-      "The three highlighted rows are one selection. Right-clicking any of them opens the bulk menu — the header counts, it does not list.",
-    ]));
+    root.appendChild(
+      U.hint([
+        "The three highlighted rows are one selection. Right-clicking any of them opens the bulk menu — the header counts, it does not list.",
+      ]),
+    );
     root.appendChild(out);
   });
 })(window.Ox);
@@ -3814,7 +5719,11 @@
    ===================================================================== */
 (function (Ox) {
   "use strict";
-  var M = Ox.menu, U = Ox.ui, D = Ox.data, h = U.h, ico = U.ico;
+  var M = Ox.menu,
+    U = Ox.ui,
+    D = Ox.data,
+    h = U.h,
+    ico = U.ico;
 
   /* A card with right-clickable rows, an output line and an audit strip. */
   function surface(root, cfg) {
@@ -3826,20 +5735,29 @@
       compact: cfg.compact,
       policy: cfg.policy,
       onRun: function (a, o) {
-        out.say(a.tier === "clinical" || a.tier === "disclosive" ? "warn" : "ok",
-          "onRun(\"" + a.id + '") — ' + a.label +
-          (o && o.records ? " · " + o.records : "") +
-          (o && o.reason ? " · reason: " + o.reason : ""));
+        out.say(
+          a.tier === "clinical" || a.tier === "disclosive" ? "warn" : "ok",
+          'onRun("' +
+            a.id +
+            '") — ' +
+            a.label +
+            (o && o.records ? " · " + o.records : "") +
+            (o && o.reason ? " · reason: " + o.reason : ""),
+        );
       },
       onOut: function (o, a) {
         if (o.kind === "blocked") out.say("err", "Blocked — " + o.reason);
         else if (o.kind === "step") out.say("warn", o.text);
         else out.say("ok", o.text);
       },
-      onAudit: function (rec) { audit.write(rec); },
+      onAudit: function (rec) {
+        audit.write(rec);
+      },
     });
     var ul = h("ul", "rows");
-    cfg.rows.forEach(function (r) { ul.appendChild(U.row(r, host)); });
+    cfg.rows.forEach(function (r) {
+      ul.appendChild(U.row(r, host));
+    });
     host.insertBefore(ul, host.firstChild);
     c.body.appendChild(host);
     if (cfg.hint) c.body.appendChild(U.hint(cfg.hint));
@@ -3851,10 +5769,16 @@
   U.surface = surface;
 
   function medRow(extra) {
-    return Object.assign({
-      subject: D.medSubject, actions: D.medActions(), glyph: "med", icon: "pill",
-      right: "14:00",
-    }, extra || {});
+    return Object.assign(
+      {
+        subject: D.medSubject,
+        actions: D.medActions(),
+        glyph: "med",
+        icon: "pill",
+        right: "14:00",
+      },
+      extra || {},
+    );
   }
 
   /* ---------------------------------------------------------------- 1 */
@@ -3900,17 +5824,49 @@
       rows: [
         medRow({ policy: { role: "a registered nurse", breakGlass: true } }),
         {
-          subject: { resource: "MedicationRequest", id: "mr-4488", label: "Sertraline 50 mg", detail: "Oral · daily · started 12 Jan 2026" },
-          actions: D.medActions(), glyph: "med", icon: "pill", right: "08:00",
+          subject: {
+            resource: "MedicationRequest",
+            id: "mr-4488",
+            label: "Sertraline 50 mg",
+            detail: "Oral · daily · started 12 Jan 2026",
+          },
+          actions: D.medActions(),
+          glyph: "med",
+          icon: "pill",
+          right: "08:00",
           policy: { role: "a registered nurse", breakGlass: true },
         },
         {
-          subject: { resource: "MedicationRequest", id: "mr-4501", label: "Clozapine 200 mg", detail: "Oral · nightly · ANC monitoring due" },
-          actions: D.medActions(), glyph: "med", icon: "pill", right: "22:00",
+          subject: {
+            resource: "MedicationRequest",
+            id: "mr-4501",
+            label: "Clozapine 200 mg",
+            detail: "Oral · nightly · ANC monitoring due",
+          },
+          actions: D.medActions(),
+          glyph: "med",
+          icon: "pill",
+          right: "22:00",
           policy: { role: "a registered nurse", breakGlass: true },
         },
       ],
-      hint: ["Try ", "@Right click", " on a row, or focus one and press ", "@Shift", " + ", "@F10", ". Then ", "@↓", " ", "@↑", " ", "@↵", " ", "@Esc", "."],
+      hint: [
+        "Try ",
+        "@Right click",
+        " on a row, or focus one and press ",
+        "@Shift",
+        " + ",
+        "@F10",
+        ". Then ",
+        "@↓",
+        " ",
+        "@↑",
+        " ",
+        "@↵",
+        " ",
+        "@Esc",
+        ".",
+      ],
     });
   });
 
@@ -3921,14 +5877,27 @@
       title: "One record, four kinds of consequence",
       sub: "Potassium 6.8 mmol/L · critical · preliminary",
       policy: { role: "a registered nurse" },
-      rows: [{
-        subject: D.obsSubject, actions: D.obsActions(), glyph: "obs", icon: "flask",
-        right: "09:12", policy: { role: "a registered nurse" },
-      }, {
-        subject: D.docSubject, actions: D.docActions(), glyph: "doc", icon: "doc",
-        right: "28 Aug", policy: { role: "a registered nurse" },
-      }],
-      hint: ["Acknowledge takes a second step. Reveal takes a reason — and writes the record either way."],
+      rows: [
+        {
+          subject: D.obsSubject,
+          actions: D.obsActions(),
+          glyph: "obs",
+          icon: "flask",
+          right: "09:12",
+          policy: { role: "a registered nurse" },
+        },
+        {
+          subject: D.docSubject,
+          actions: D.docActions(),
+          glyph: "doc",
+          icon: "doc",
+          right: "28 Aug",
+          policy: { role: "a registered nurse" },
+        },
+      ],
+      hint: [
+        "Acknowledge takes a second step. Reveal takes a reason — and writes the record either way.",
+      ],
     });
   });
 
@@ -3936,12 +5905,44 @@
   /* Six nouns, six menus.                                              */
   U.mount("subjects", function (root) {
     var sets = [
-      { label: "Medication", subject: D.medSubject, actions: D.medActions, glyph: "med", icon: "pill" },
-      { label: "Result", subject: D.obsSubject, actions: D.obsActions, glyph: "obs", icon: "flask" },
+      {
+        label: "Medication",
+        subject: D.medSubject,
+        actions: D.medActions,
+        glyph: "med",
+        icon: "pill",
+      },
+      {
+        label: "Result",
+        subject: D.obsSubject,
+        actions: D.obsActions,
+        glyph: "obs",
+        icon: "flask",
+      },
       { label: "Note", subject: D.docSubject, actions: D.docActions, glyph: "doc", icon: "doc" },
-      { label: "Patient", subject: D.patSubject, actions: function () { return D.patActions(); }, glyph: "pat", icon: "user" },
-      { label: "Allergy", subject: D.algSubject, actions: D.algActions, glyph: "alg", icon: "alert" },
-      { label: "View state", subject: D.viewSubject, actions: D.viewActions, glyph: "doc", icon: "filter" },
+      {
+        label: "Patient",
+        subject: D.patSubject,
+        actions: function () {
+          return D.patActions();
+        },
+        glyph: "pat",
+        icon: "user",
+      },
+      {
+        label: "Allergy",
+        subject: D.algSubject,
+        actions: D.algActions,
+        glyph: "alg",
+        icon: "alert",
+      },
+      {
+        label: "View state",
+        subject: D.viewSubject,
+        actions: D.viewActions,
+        glyph: "doc",
+        icon: "filter",
+      },
     ];
     var slot = h("div");
     function paint(set) {
@@ -3950,10 +5951,15 @@
         title: set.label,
         sub: set.subject.resource + " · " + set.subject.id,
         policy: { role: "a registered nurse" },
-        rows: [{
-          subject: set.subject, actions: set.actions(), glyph: set.glyph, icon: set.icon,
-          policy: { role: "a registered nurse" },
-        }],
+        rows: [
+          {
+            subject: set.subject,
+            actions: set.actions(),
+            glyph: set.glyph,
+            icon: set.icon,
+            policy: { role: "a registered nurse" },
+          },
+        ],
         audit: false,
       });
     }
@@ -3970,16 +5976,30 @@
     /* ---- the wrong way: append when the check resolves -------------- */
     var badBox = h("div");
     var badCard = U.card("Resolved late, appended", "what every menu does today", "");
-    var badHost = U.Surface({ onRun: function (a) { badOut.say("err", "Ran: " + a.label + " — and it was not what the pointer was aiming at."); } });
+    var badHost = U.Surface({
+      onRun: function (a) {
+        badOut.say("err", "Ran: " + a.label + " — and it was not what the pointer was aiming at.");
+      },
+    });
     var badOut = U.out();
     badOut.say("", "Open the menu, then wait one second without moving.");
     var badActs = D.patActions({});
-    var badVisible = badActs.filter(function (a) { return a.id !== "noshow" && a.id !== "glass"; });
+    var badVisible = badActs.filter(function (a) {
+      return a.id !== "noshow" && a.id !== "glass";
+    });
     var badUl = h("ul", "rows");
-    badUl.appendChild(U.row({
-      subject: D.patSubject, actions: badVisible, glyph: "pat", icon: "user",
-      policy: {},
-    }, badHost));
+    badUl.appendChild(
+      U.row(
+        {
+          subject: D.patSubject,
+          actions: badVisible,
+          glyph: "pat",
+          icon: "user",
+          policy: {},
+        },
+        badHost,
+      ),
+    );
     badHost.insertBefore(badUl, badHost.firstChild);
     /* Patch: after 900ms, re-open with the full list — which is exactly
        the defect. The row under the pointer changes identity. */
@@ -4011,12 +6031,21 @@
     var okOut = U.out();
     okOut.say("", "Open the menu, then wait. Nothing moves.");
     var okHost = U.Surface({
-      onRun: function (a) { okOut.say("ok", "Ran: " + a.label); },
-      onOut: function (o) { if (o.kind === "blocked") okOut.say("err", "Blocked — " + o.reason); },
+      onRun: function (a) {
+        okOut.say("ok", "Ran: " + a.label);
+      },
+      onOut: function (o) {
+        if (o.kind === "blocked") okOut.say("err", "Blocked — " + o.reason);
+      },
     });
     var okActs = D.patActions({ pending: true });
     var okUl = h("ul", "rows");
-    okUl.appendChild(U.row({ subject: D.patSubject, actions: okActs, glyph: "pat", icon: "user", policy: {} }, okHost));
+    okUl.appendChild(
+      U.row(
+        { subject: D.patSubject, actions: okActs, glyph: "pat", icon: "user", policy: {} },
+        okHost,
+      ),
+    );
     okHost.insertBefore(okUl, okHost.firstChild);
     okUl.addEventListener("contextmenu", function () {
       setTimeout(function () {
@@ -4031,7 +6060,10 @@
         pend.setAttribute("aria-disabled", "true");
         var sub = pend.querySelector(".sub");
         if (sub) sub.textContent = "No portal account — enrolment was declined at intake";
-        okOut.say("ok", "The check resolved in place. The row is the same height and the same row.");
+        okOut.say(
+          "ok",
+          "The check resolved in place. The row is the same height and the same row.",
+        );
       }, 900);
     });
     okCard.body.appendChild(okHost);
@@ -4055,30 +6087,52 @@
     var arow = h("li");
     var rr = h("div", "rw");
     rr.tabIndex = 0;
-    var g = h("div", "glyph pat"); g.appendChild(ico("user", "i-14")); rr.appendChild(g);
+    var g = h("div", "glyph pat");
+    g.appendChild(ico("user", "i-14"));
+    rr.appendChild(g);
     var mid = h("div");
     mid.appendChild(h("div", "nm", "Aluel Okonkwo"));
     mid.appendChild(h("div", "dt", "MRN 44-2871 · 34y · Intake 10:30"));
-    rr.appendChild(mid); rr.appendChild(h("div", "rt"));
-    arow.appendChild(rr); aul.appendChild(arow);
+    rr.appendChild(mid);
+    rr.appendChild(h("div", "rt"));
+    arow.appendChild(rr);
+    aul.appendChild(arow);
     /* two more rows, so the wrong-row problem is available to be made */
-    [["Chidi Nwosu", "MRN 44-9013 · 41y · Intake 11:00"], ["Ama Boateng", "MRN 44-7755 · 29y · Intake 11:30"]].forEach(function (p) {
-      var li = h("li"); var r2 = h("div", "rw"); r2.tabIndex = 0;
-      var g2 = h("div", "glyph pat"); g2.appendChild(ico("user", "i-14")); r2.appendChild(g2);
-      var m2 = h("div"); m2.appendChild(h("div", "nm", p[0])); m2.appendChild(h("div", "dt", p[1])); r2.appendChild(m2);
-      r2.appendChild(h("div", "rt")); li.appendChild(r2); aul.appendChild(li);
+    [
+      ["Chidi Nwosu", "MRN 44-9013 · 41y · Intake 11:00"],
+      ["Ama Boateng", "MRN 44-7755 · 29y · Intake 11:30"],
+    ].forEach(function (p) {
+      var li = h("li");
+      var r2 = h("div", "rw");
+      r2.tabIndex = 0;
+      var g2 = h("div", "glyph pat");
+      g2.appendChild(ico("user", "i-14"));
+      r2.appendChild(g2);
+      var m2 = h("div");
+      m2.appendChild(h("div", "nm", p[0]));
+      m2.appendChild(h("div", "dt", p[1]));
+      r2.appendChild(m2);
+      r2.appendChild(h("div", "rt"));
+      li.appendChild(r2);
+      aul.appendChild(li);
     });
     ahost.appendChild(aul);
     var aout = U.out();
     aout.say("", "Right-click any row.");
     aul.addEventListener("contextmenu", function (e) {
       e.preventDefault();
-      var old = ahost.querySelector(".cm"); if (old) old.remove();
+      var old = ahost.querySelector(".cm");
+      if (old) old.remove();
       var w = ahost.getBoundingClientRect();
       var cm = h("div", "cm");
       cm.setAttribute("role", "menu");
-      [["Open", "open", ""], ["Copy", "copy", ""], ["Add to my patients", "plus", ""],
-       ["Document a no-show", "cal", ""], ["Break-glass open", "key", "destructive"]].forEach(function (it) {
+      [
+        ["Open", "open", ""],
+        ["Copy", "copy", ""],
+        ["Add to my patients", "plus", ""],
+        ["Document a no-show", "cal", ""],
+        ["Break-glass open", "key", "destructive"],
+      ].forEach(function (it) {
         var r = h("div", "cm-item" + (it[2] ? " t-disclosive" : " t-routine"));
         r.setAttribute("role", "menuitem");
         r.appendChild(ico(it[1], "i-14 ic"));
@@ -4087,17 +6141,23 @@
         r.addEventListener("click", function (ev) {
           ev.stopPropagation();
           cm.remove();
-          aout.say(it[2] || it[0].indexOf("no-show") > -1 ? "err" : "",
-            it[0] + " — ran immediately. Which patient was that?");
+          aout.say(
+            it[2] || it[0].indexOf("no-show") > -1 ? "err" : "",
+            it[0] + " — ran immediately. Which patient was that?",
+          );
         });
         cm.appendChild(r);
       });
-      cm.style.left = (e.clientX - w.left) + "px";
-      cm.style.top = (e.clientY - w.top) + "px";
+      cm.style.left = e.clientX - w.left + "px";
+      cm.style.top = e.clientY - w.top + "px";
       ahost.appendChild(cm);
     });
-    document.addEventListener("click", function () { var o = ahost.querySelector(".cm"); if (o) o.remove(); });
-    ac.body.appendChild(ahost); ac.body.appendChild(aout);
+    document.addEventListener("click", function () {
+      var o = ahost.querySelector(".cm");
+      if (o) o.remove();
+    });
+    ac.body.appendChild(ahost);
+    ac.body.appendChild(aout);
     a.appendChild(ac.node);
 
     var b = h("div");
@@ -4106,14 +6166,45 @@
       sub: "same three rows, same verbs",
       policy: { role: "a registered nurse" },
       rows: [
-        { subject: D.patSubject, actions: D.patActions(), glyph: "pat", icon: "user", policy: { role: "a registered nurse" } },
-        { subject: { resource: "Patient", id: "pt-3320", label: "Chidi Nwosu", detail: "MRN 44-9013 · 41y · Intake 11:00", plural: "patients" }, actions: D.patActions(), glyph: "pat", icon: "user", policy: { role: "a registered nurse" } },
-        { subject: { resource: "Patient", id: "pt-3321", label: "Ama Boateng", detail: "MRN 44-7755 · 29y · Intake 11:30", plural: "patients" }, actions: D.patActions(), glyph: "pat", icon: "user", policy: { role: "a registered nurse" } },
+        {
+          subject: D.patSubject,
+          actions: D.patActions(),
+          glyph: "pat",
+          icon: "user",
+          policy: { role: "a registered nurse" },
+        },
+        {
+          subject: {
+            resource: "Patient",
+            id: "pt-3320",
+            label: "Chidi Nwosu",
+            detail: "MRN 44-9013 · 41y · Intake 11:00",
+            plural: "patients",
+          },
+          actions: D.patActions(),
+          glyph: "pat",
+          icon: "user",
+          policy: { role: "a registered nurse" },
+        },
+        {
+          subject: {
+            resource: "Patient",
+            id: "pt-3321",
+            label: "Ama Boateng",
+            detail: "MRN 44-7755 · 29y · Intake 11:30",
+            plural: "patients",
+          },
+          actions: D.patActions(),
+          glyph: "pat",
+          icon: "user",
+          policy: { role: "a registered nurse" },
+        },
       ],
       audit: false,
     });
 
-    wrapper.appendChild(a); wrapper.appendChild(b);
+    wrapper.appendChild(a);
+    wrapper.appendChild(b);
     root.appendChild(wrapper);
   });
 
@@ -4123,23 +6214,60 @@
       title: "A Part 2 note, and the record the menu makes",
       sub: "Right-click · choose Reveal Part 2 content · then close it without answering",
       policy: { role: "a registered nurse", breakGlass: true },
-      rows: [{ subject: D.docSubject, actions: D.docActions(), glyph: "doc", icon: "doc", right: "28 Aug", policy: { role: "a registered nurse", breakGlass: true } }],
-      hint: ["The record is written when the reason list is ", "@offered", " — not when it is answered."],
+      rows: [
+        {
+          subject: D.docSubject,
+          actions: D.docActions(),
+          glyph: "doc",
+          icon: "doc",
+          right: "28 Aug",
+          policy: { role: "a registered nurse", breakGlass: true },
+        },
+      ],
+      hint: [
+        "The record is written when the reason list is ",
+        "@offered",
+        " — not when it is answered.",
+      ],
     });
   });
 
   /* ---------------------------------------------------------------- 8 */
   U.mount("masked", function (root) {
-    var masked = { resource: "DocumentReference", id: "doc-9911", label: "Group therapy note — Nwosu, C.", detail: "Signed by R. Adeyemi, LPC", masked: true };
+    var masked = {
+      resource: "DocumentReference",
+      id: "doc-9911",
+      label: "Group therapy note — Nwosu, C.",
+      detail: "Signed by R. Adeyemi, LPC",
+      masked: true,
+    };
     surface(root, {
       title: "A masked row makes a masked menu",
       sub: "The component may not resolve what the surface was hiding",
       policy: { role: "a registered nurse", breakGlass: true },
       rows: [
-        { subject: masked, actions: D.docActions(), glyph: "doc", icon: "lock", right: "Restricted", policy: { role: "a registered nurse", breakGlass: true } },
-        { subject: D.docSubject, actions: D.docActions(), glyph: "doc", icon: "doc", right: "28 Aug", policy: { role: "a registered nurse", breakGlass: true } },
+        {
+          subject: masked,
+          actions: D.docActions(),
+          glyph: "doc",
+          icon: "lock",
+          right: "Restricted",
+          policy: { role: "a registered nurse", breakGlass: true },
+        },
+        {
+          subject: D.docSubject,
+          actions: D.docActions(),
+          glyph: "doc",
+          icon: "doc",
+          right: "28 Aug",
+          policy: { role: "a registered nurse", breakGlass: true },
+        },
       ],
-      hint: ["The first row's menu says ", "@Restricted record", ". The second names its note. Same component, same props shape."],
+      hint: [
+        "The first row's menu says ",
+        "@Restricted record",
+        ". The second names its note. Same component, same props shape.",
+      ],
     });
   });
 
@@ -4152,12 +6280,22 @@
       title: "12 patients selected",
       sub: "Right-click the selection",
       policy: { role: "a registered nurse" },
-      rows: [{
-        subject: bulkSubject, actions: D.patActions({ bulkNoShow: true }),
-        glyph: "pat", icon: "users", right: "12 selected", selected: true,
-        policy: { role: "a registered nurse" },
-      }],
-      hint: ["Verbs that are not bulk-safe stay in the list, disabled, with the reason. ", "@Document a no-show", " is bulk-safe here — and its confirmation is written for twelve, not for one."],
+      rows: [
+        {
+          subject: bulkSubject,
+          actions: D.patActions({ bulkNoShow: true }),
+          glyph: "pat",
+          icon: "users",
+          right: "12 selected",
+          selected: true,
+          policy: { role: "a registered nurse" },
+        },
+      ],
+      hint: [
+        "Verbs that are not bulk-safe stay in the list, disabled, with the reason. ",
+        "@Document a no-show",
+        " is bulk-safe here — and its confirmation is written for twelve, not for one.",
+      ],
       audit: false,
     });
   });
@@ -4166,9 +6304,21 @@
   U.mount("present", function (root) {
     var slot = h("div");
     var modes = [
-      { label: "Pointer popup", mode: "popup", note: "Opens at the cursor. The subject header is the first thing under it." },
-      { label: "Anchored to ⋯", mode: "anchored", note: "The discoverable path. A right-click-only feature is a feature most people never find." },
-      { label: "Touch sheet", mode: "sheet", note: "Long-press below 40rem. Pinned to the bottom edge, because the finger is covering wherever it pressed." },
+      {
+        label: "Pointer popup",
+        mode: "popup",
+        note: "Opens at the cursor. The subject header is the first thing under it.",
+      },
+      {
+        label: "Anchored to ⋯",
+        mode: "anchored",
+        note: "The discoverable path. A right-click-only feature is a feature most people never find.",
+      },
+      {
+        label: "Touch sheet",
+        mode: "sheet",
+        note: "Long-press below 40rem. Pinned to the bottom edge, because the finger is covering wherever it pressed.",
+      },
     ];
     function paint(m) {
       slot.textContent = "";
@@ -4178,9 +6328,34 @@
         var inner = h("div");
         inner.style.cssText = "padding:14px";
         var ul = h("ul", "rows");
-        var host = U.Surface({ presentation: "sheet", onRun: function (a) { o.say("ok", "Ran: " + a.label); } });
-        [D.patSubject, { resource: "Patient", id: "pt-3320", label: "Chidi Nwosu", detail: "MRN 44-9013 · 41y", plural: "patients" }].forEach(function (s) {
-          ul.appendChild(U.row({ subject: s, actions: D.patActions(), glyph: "pat", icon: "user", policy: { role: "a registered nurse" } }, host));
+        var host = U.Surface({
+          presentation: "sheet",
+          onRun: function (a) {
+            o.say("ok", "Ran: " + a.label);
+          },
+        });
+        [
+          D.patSubject,
+          {
+            resource: "Patient",
+            id: "pt-3320",
+            label: "Chidi Nwosu",
+            detail: "MRN 44-9013 · 41y",
+            plural: "patients",
+          },
+        ].forEach(function (s) {
+          ul.appendChild(
+            U.row(
+              {
+                subject: s,
+                actions: D.patActions(),
+                glyph: "pat",
+                icon: "user",
+                policy: { role: "a registered nurse" },
+              },
+              host,
+            ),
+          );
         });
         host.insertBefore(ul, host.firstChild);
         host.style.cssText = "position:absolute;inset:0;padding:14px";
@@ -4192,10 +6367,19 @@
         return;
       }
       surface(slot, {
-        title: m.label, sub: m.mode === "anchored" ? "click the ⋯ button" : "right-click the row",
+        title: m.label,
+        sub: m.mode === "anchored" ? "click the ⋯ button" : "right-click the row",
         presentation: m.mode,
         policy: { role: "a registered nurse" },
-        rows: [{ subject: D.patSubject, actions: D.patActions(), glyph: "pat", icon: "user", policy: { role: "a registered nurse" } }],
+        rows: [
+          {
+            subject: D.patSubject,
+            actions: D.patActions(),
+            glyph: "pat",
+            icon: "user",
+            policy: { role: "a registered nurse" },
+          },
+        ],
         hint: [m.note],
         audit: false,
       });
@@ -4211,35 +6395,83 @@
     log.hidden = false;
     log.textContent = "Focus the row below (Tab), then press Shift+F10.";
     var lines = [];
-    function say(s) { lines.push(s); if (lines.length > 7) lines.shift(); log.textContent = lines.join("\n"); }
+    function say(s) {
+      lines.push(s);
+      if (lines.length > 7) lines.shift();
+      log.textContent = lines.join("\n");
+    }
     var s = surface(root, {
       title: "No pointer required",
       sub: "Tab to the row · Shift+F10 or the Menu key · arrows · Enter · Escape",
       policy: { role: "a registered nurse" },
-      rows: [{ subject: D.medSubject, actions: D.medActions(), glyph: "med", icon: "pill", right: "14:00", policy: { role: "a registered nurse", breakGlass: true } }],
+      rows: [
+        {
+          subject: D.medSubject,
+          actions: D.medActions(),
+          glyph: "med",
+          icon: "pill",
+          right: "14:00",
+          policy: { role: "a registered nurse", breakGlass: true },
+        },
+      ],
       audit: false,
     });
     s.body.appendChild(log);
-    s.host.addEventListener("keydown", function (e) {
-      var k = e.shiftKey && e.key === "F10" ? "Shift+F10" : e.key;
-      if (["ArrowDown", "ArrowUp", "Enter", "Escape", "Home", "End", "Shift+F10", "ContextMenu", " "].indexOf(k) > -1) {
-        say(k + "  →  " + (k === "Shift+F10" || k === "ContextMenu"
-          ? "menu opens, highlight on the first verb (never on the subject)"
-          : k === "Escape" ? "closes; focus returns to the row"
-          : k === "Enter" || k === " " ? "activates — or advances a two-step action to step 2"
-          : "moves the highlight, skipping rows still being checked"));
-      }
-    }, true);
+    s.host.addEventListener(
+      "keydown",
+      function (e) {
+        var k = e.shiftKey && e.key === "F10" ? "Shift+F10" : e.key;
+        if (
+          [
+            "ArrowDown",
+            "ArrowUp",
+            "Enter",
+            "Escape",
+            "Home",
+            "End",
+            "Shift+F10",
+            "ContextMenu",
+            " ",
+          ].indexOf(k) > -1
+        ) {
+          say(
+            k +
+              "  →  " +
+              (k === "Shift+F10" || k === "ContextMenu"
+                ? "menu opens, highlight on the first verb (never on the subject)"
+                : k === "Escape"
+                  ? "closes; focus returns to the row"
+                  : k === "Enter" || k === " "
+                    ? "activates — or advances a two-step action to step 2"
+                    : "moves the highlight, skipping rows still being checked"),
+          );
+        }
+      },
+      true,
+    );
   });
 
   /* --------------------------------------------------------------- 12 */
   U.mount("viewstate", function (root) {
     surface(root, {
       title: "View state is not a clinical act",
-      sub: "Checkboxes and radios stay at tier=\"routine\" — the validator refuses anything else",
+      sub: 'Checkboxes and radios stay at tier="routine" — the validator refuses anything else',
       policy: {},
-      rows: [{ subject: D.viewSubject, actions: D.viewActions(), glyph: "doc", icon: "filter", right: "Flowsheet", policy: {} }],
-      hint: ["Toggles do not close the menu. ", "@Export visible range", " does, because it writes a record."],
+      rows: [
+        {
+          subject: D.viewSubject,
+          actions: D.viewActions(),
+          glyph: "doc",
+          icon: "filter",
+          right: "Flowsheet",
+          policy: {},
+        },
+      ],
+      hint: [
+        "Toggles do not close the menu. ",
+        "@Export visible range",
+        " does, because it writes a record.",
+      ],
       audit: false,
     });
   });
@@ -4257,31 +6489,113 @@
       return m.el;
     }
     var cases = [
-      ["Routine only", function () { return mk(D.medSubject, D.medActions().slice(0, 3), {}); }],
-      ["A recorded action", function () { return mk(D.medSubject, D.medActions().slice(3, 5), {}); }],
-      ["Clinical, step 1", function () { return mk(D.medSubject, [D.medActions()[6]], {}); }],
-      ["Clinical, step 2", function () {
-        return mk(D.medSubject, [D.medActions()[6]], {}, function (m) { m.state.confirming = "dc"; m.redraw(); });
-      }],
-      ["Disclosure, reasons", function () {
-        return mk(D.docSubject, [D.docActions()[5]], {}, function (m) { m.state.reasoning = "part2"; m.redraw(); });
-      }],
-      ["Unavailable, with reason", function () { return mk(D.obsSubject, [D.obsActions()[3]], {}); }],
-      ["Withheld, counted", function () { return mk(D.medSubject, D.medActions(), pol); }],
-      ["Pending", function () { return mk(D.patSubject, D.patActions({ pending: true }).slice(5, 6), {}); }],
-      ["Masked subject", function () {
-        return mk({ resource: "DocumentReference", id: "d1", label: "Group note — Nwosu, C.", masked: true }, D.docActions().slice(0, 3), {});
-      }],
-      ["Bulk selection", function () {
-        var s = Object.assign({}, D.patSubject, { also: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11], plural: "patients" });
-        return mk(s, D.patActions({ bulkNoShow: true }).slice(0, 4), {});
-      }],
-      ["Checkbox and radio", function () { return mk(D.viewSubject, D.viewActions().slice(0, 5), {}); }],
-      ["Submenu", function () { return mk(D.obsSubject, D.obsActions().slice(0, 3), {}); }],
-      ["Nothing available", function () { return mk(D.medSubject, [], { role: "a scheduling clerk" }); }],
-      ["Everything withheld", function () {
-        return mk(D.medSubject, D.medActions(), { permitted: [], role: "a scheduling clerk", breakGlass: true });
-      }],
+      [
+        "Routine only",
+        function () {
+          return mk(D.medSubject, D.medActions().slice(0, 3), {});
+        },
+      ],
+      [
+        "A recorded action",
+        function () {
+          return mk(D.medSubject, D.medActions().slice(3, 5), {});
+        },
+      ],
+      [
+        "Clinical, step 1",
+        function () {
+          return mk(D.medSubject, [D.medActions()[6]], {});
+        },
+      ],
+      [
+        "Clinical, step 2",
+        function () {
+          return mk(D.medSubject, [D.medActions()[6]], {}, function (m) {
+            m.state.confirming = "dc";
+            m.redraw();
+          });
+        },
+      ],
+      [
+        "Disclosure, reasons",
+        function () {
+          return mk(D.docSubject, [D.docActions()[5]], {}, function (m) {
+            m.state.reasoning = "part2";
+            m.redraw();
+          });
+        },
+      ],
+      [
+        "Unavailable, with reason",
+        function () {
+          return mk(D.obsSubject, [D.obsActions()[3]], {});
+        },
+      ],
+      [
+        "Withheld, counted",
+        function () {
+          return mk(D.medSubject, D.medActions(), pol);
+        },
+      ],
+      [
+        "Pending",
+        function () {
+          return mk(D.patSubject, D.patActions({ pending: true }).slice(5, 6), {});
+        },
+      ],
+      [
+        "Masked subject",
+        function () {
+          return mk(
+            {
+              resource: "DocumentReference",
+              id: "d1",
+              label: "Group note — Nwosu, C.",
+              masked: true,
+            },
+            D.docActions().slice(0, 3),
+            {},
+          );
+        },
+      ],
+      [
+        "Bulk selection",
+        function () {
+          var s = Object.assign({}, D.patSubject, {
+            also: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
+            plural: "patients",
+          });
+          return mk(s, D.patActions({ bulkNoShow: true }).slice(0, 4), {});
+        },
+      ],
+      [
+        "Checkbox and radio",
+        function () {
+          return mk(D.viewSubject, D.viewActions().slice(0, 5), {});
+        },
+      ],
+      [
+        "Submenu",
+        function () {
+          return mk(D.obsSubject, D.obsActions().slice(0, 3), {});
+        },
+      ],
+      [
+        "Nothing available",
+        function () {
+          return mk(D.medSubject, [], { role: "a scheduling clerk" });
+        },
+      ],
+      [
+        "Everything withheld",
+        function () {
+          return mk(D.medSubject, D.medActions(), {
+            permitted: [],
+            role: "a scheduling clerk",
+            breakGlass: true,
+          });
+        },
+      ],
     ];
     var grid = h("div", "states");
     cases.forEach(function (c, i) {
@@ -4291,7 +6605,11 @@
       hd.appendChild(h("span", null, c[0]));
       box.appendChild(hd);
       var b = h("div", "b");
-      try { b.appendChild(c[1]()); } catch (e) { b.appendChild(h("div", null, e.message)); }
+      try {
+        b.appendChild(c[1]());
+      } catch (e) {
+        b.appendChild(h("div", null, e.message));
+      }
       box.appendChild(b);
       grid.appendChild(box);
     });
@@ -4306,10 +6624,16 @@
     code.textContent =
       "$ pnpm lint\n\n" +
       "registry/oxygen/chart-context-menu/demo-actions.ts\n" +
-      problems.map(function (p, i) {
-        return "  " + (i + 1) + ":  oxygen/context-menu-actions  " + p;
-      }).join("\n") +
-      "\n\n✖ " + problems.length + " problems (" + problems.length + " errors, 0 warnings)";
+      problems
+        .map(function (p, i) {
+          return "  " + (i + 1) + ":  oxygen/context-menu-actions  " + p;
+        })
+        .join("\n") +
+      "\n\n✖ " +
+      problems.length +
+      " problems (" +
+      problems.length +
+      " errors, 0 warnings)";
     pre.appendChild(code);
     root.appendChild(pre);
   });
@@ -4319,16 +6643,35 @@
   U.mount("density", function (root) {
     var slot = h("div");
     var opts = [
-      { label: "Comfortable", compact: false, note: "30px rows. The default, and what a bedside tablet gets." },
-      { label: "Compact", compact: true, note: "26px rows — still above the 24px floor WCAG 2.2 SC 2.5.8 sets for a pointer target." },
+      {
+        label: "Comfortable",
+        compact: false,
+        note: "30px rows. The default, and what a bedside tablet gets.",
+      },
+      {
+        label: "Compact",
+        compact: true,
+        note: "26px rows — still above the 24px floor WCAG 2.2 SC 2.5.8 sets for a pointer target.",
+      },
     ];
     function paint(o) {
       slot.textContent = "";
       surface(slot, {
-        title: o.label, sub: "right-click the row", compact: o.compact,
+        title: o.label,
+        sub: "right-click the row",
+        compact: o.compact,
         policy: { role: "a registered nurse" },
-        rows: [{ subject: D.medSubject, actions: D.medActions(), glyph: "med", icon: "pill", policy: { role: "a registered nurse", breakGlass: true } }],
-        hint: [o.note], audit: false,
+        rows: [
+          {
+            subject: D.medSubject,
+            actions: D.medActions(),
+            glyph: "med",
+            icon: "pill",
+            policy: { role: "a registered nurse", breakGlass: true },
+          },
+        ],
+        hint: [o.note],
+        audit: false,
       });
     }
     root.appendChild(U.tabs(opts, paint));
