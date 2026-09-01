@@ -657,7 +657,7 @@
       "name": "chart-context-menu",
       "type": "oxygen:component",
       "title": "Chart Context Menu",
-      "description": "Every menu opens with a non-interactive header naming the record under the pointer, so the first thing under the pointer is never a verb. Four consequence tiers decide the interaction rather than the colour: run; run and say what was written; take a second step inside the menu; take a recorded reason. A masked row produces a masked header, and a disclosure is audited on every path.",
+      "description": "Every menu opens with a header naming the record, so the first thing under the pointer is never a verb. Four consequence tiers decide the interaction, not the colour. A masked row makes a masked header, and a disclosure is audited on every path.",
       "categories": [
         "clinical",
         "navigation"
