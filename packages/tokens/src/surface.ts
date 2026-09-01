@@ -13,7 +13,7 @@
  * change, because customers style against these names. The manifest is
  * committed so that change shows up as a reviewable diff.
  *
- * 338 tokens across 29 components:
+ * 345 tokens across 30 components:
  *
  *   switch          55
  *   tabs            44
@@ -30,6 +30,7 @@
  *   timeline         9
  *   cs               8
  *   nav              8
+ *   menu             7
  *   range            6
  *   surface-card     6
  *   avatar           4
@@ -1986,6 +1987,76 @@ export const TOKEN_SURFACE: readonly SurfaceEntry[] = [
     "bridgeable": true
   },
   {
+    "name": "--ox-menu-bg",
+    "component": "menu",
+    "source": "packages/tokens/tokens/component.json",
+    "kind": "color",
+    "semantic": "--ox-surface-overlay",
+    "frameworks": [],
+    "fallback": true,
+    "bridgeable": true
+  },
+  {
+    "name": "--ox-menu-border",
+    "component": "menu",
+    "source": "packages/tokens/tokens/component.json",
+    "kind": "color",
+    "semantic": "--ox-border",
+    "frameworks": [],
+    "fallback": true,
+    "bridgeable": true
+  },
+  {
+    "name": "--ox-menu-radius",
+    "component": "menu",
+    "source": "packages/tokens/tokens/component.json",
+    "kind": "dimension",
+    "semantic": "--ox-radius-lg",
+    "frameworks": [],
+    "fallback": true,
+    "bridgeable": true
+  },
+  {
+    "name": "--ox-menu-row-hover-bg",
+    "component": "menu",
+    "source": "packages/tokens/tokens/component.json",
+    "kind": "color",
+    "semantic": "--ox-bg-muted",
+    "frameworks": [],
+    "fallback": true,
+    "bridgeable": true
+  },
+  {
+    "name": "--ox-menu-sep",
+    "component": "menu",
+    "source": "packages/tokens/tokens/component.json",
+    "kind": "color",
+    "semantic": "--ox-border",
+    "frameworks": [],
+    "fallback": true,
+    "bridgeable": true
+  },
+  {
+    "name": "--ox-menu-subject-bg",
+    "component": "menu",
+    "source": "packages/tokens/tokens/component.json",
+    "kind": "color",
+    "semantic": "--ox-bg-muted",
+    "frameworks": [],
+    "fallback": true,
+    "bridgeable": true
+  },
+  {
+    "name": "--ox-menu-subject-border",
+    "component": "menu",
+    "source": "packages/tokens/tokens/component.json",
+    "kind": "color",
+    "semantic": "--ox-border",
+    "frameworks": [],
+    "fallback": true,
+    "bridgeable": true
+  },
+  {
     "name": "--ox-nav-bg",
     "component": "nav",
     "source": "packages/tokens/tokens/component.json",
@@ -3529,6 +3600,7 @@ export const SURFACE_COMPONENTS: readonly string[] = [
   "datetime",
   "field",
   "loader",
+  "menu",
   "nav",
   "patient-chip",
   "presence",
@@ -3676,6 +3748,13 @@ export const BRIDGEABLE: readonly string[] = [
   "--ox-loader-stroke",
   "--ox-loader-track",
   "--ox-loader-z",
+  "--ox-menu-bg",
+  "--ox-menu-border",
+  "--ox-menu-radius",
+  "--ox-menu-row-hover-bg",
+  "--ox-menu-sep",
+  "--ox-menu-subject-bg",
+  "--ox-menu-subject-border",
   "--ox-nav-bg",
   "--ox-nav-bg-current",
   "--ox-nav-bg-hover",

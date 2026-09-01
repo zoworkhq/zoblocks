@@ -262,6 +262,186 @@ export function addBusinessDays(from: OxDate, n: number, options: BusinessDayOpt
 }
 
 /* ------------------------------------------------------------------ */
+/* Calendar periods                                                   */
+/* ------------------------------------------------------------------ */
+
+/**
+ * The first day of the week `date` falls in.
+ *
+ * `weekStart` is a locale fact — `Intl.Locale.getWeekInfo().firstDay` — and
+ * never a constant here, because "this week" is Sunday-to-Saturday in the
+ * United States, Monday-to-Sunday across most of Europe, and Saturday-to-Friday
+ * in much of the Middle East. A preset that quietly means the wrong seven days
+ * is worse than no preset: it is a report that is off by two days and looks
+ * right.
+ */
+export function startOfWeek(date: OxDate, weekStart = 0): OxDate {
+  const into = (((weekdayOf(date) - weekStart) % 7) + 7) % 7;
+  return addCalendarDays(date, -into);
+}
+
+/** The last day of the week `date` falls in. */
+export function endOfWeek(date: OxDate, weekStart = 0): OxDate {
+  return addCalendarDays(startOfWeek(date, weekStart), 6);
+}
+
+/** The first of the month `date` falls in. */
+export function startOfMonth(date: OxDate): OxDate {
+  return plainDate(date.y, date.m, 1);
+}
+
+/** The last day of the month `date` falls in — February aware, leap aware. */
+export function endOfMonth(date: OxDate): OxDate {
+  return plainDate(date.y, date.m, daysInMonth(date.y, date.m));
+}
+
+/** 1 January of the year `date` falls in. */
+export function startOfYear(date: OxDate): OxDate {
+  return plainDate(date.y, 1, 1);
+}
+
+/** 31 December of the year `date` falls in. */
+export function endOfYear(date: OxDate): OxDate {
+  return plainDate(date.y, 12, 31);
+}
+
+/* ------------------------------------------------------------------ */
+/* Date ranges                                                        */
+/* ------------------------------------------------------------------ */
+
+/** A closed interval of whole days. Both ends are inclusive and selectable. */
+export interface OxDateRange {
+  start: OxDate | null;
+  end: OxDate | null;
+}
+
+/**
+ * Both ends in ascending order, whichever way round they were given.
+ *
+ * A range is built by two clicks and the second one is often earlier than the
+ * first. Sorting at the boundary rather than at every read is what keeps
+ * `rangeContains` and the band painter from each having their own opinion
+ * about which end is which.
+ */
+export function normalizeDateRange(range: OxDateRange): OxDateRange {
+  const { start, end } = range;
+  if (!start || !end) return range;
+  return compareDates(start, end) <= 0 ? range : { start: end, end: start };
+}
+
+/** Whether a range has both ends. An incomplete range is a legal state, not an error. */
+export function isCompleteRange(range: OxDateRange | null | undefined): boolean {
+  return Boolean(range?.start && range?.end);
+}
+
+/**
+ * Days in a range, counting both ends.
+ *
+ * Inclusive because a date range in healthcare is a span of service — an
+ * authorisation from the 1st to the 7th is seven days of care, not six. The
+ * exclusive convention belongs to timestamps, and mixing the two is how a
+ * week of treatment gets billed as six days.
+ */
+export function rangeDayCount(range: OxDateRange): number | null {
+  const { start, end } = normalizeDateRange(range);
+  if (!start || !end) return null;
+  return toEpochDay(end) - toEpochDay(start) + 1;
+}
+
+/** Whether a date falls inside a range, both ends included. */
+export function rangeContains(range: OxDateRange, date: OxDate): boolean {
+  const { start, end } = normalizeDateRange(range);
+  if (!start || !end) return false;
+  return compareDates(date, start) >= 0 && compareDates(date, end) <= 0;
+}
+
+/** Whether two ranges describe the same two days. */
+export function isSameRange(
+  a: OxDateRange | null | undefined,
+  b: OxDateRange | null | undefined,
+): boolean {
+  const left = a ? normalizeDateRange(a) : null;
+  const right = b ? normalizeDateRange(b) : null;
+  return isSameDate(left?.start, right?.start) && isSameDate(left?.end, right?.end);
+}
+
+/**
+ * A named single date a reader can take in one press.
+ *
+ * The single-date counterpart of `DateRangePreset`, and the shape
+ * `relativeDateOptions` already returns. Named as a type so a calendar's rail
+ * can accept either without the host having to reverse-engineer the object.
+ */
+export interface DateShortcut {
+  id: string;
+  label: string;
+  date: OxDate;
+}
+
+/** A named range a reader can take in one press. */
+export interface DateRangePreset {
+  id: string;
+  label: string;
+  start: OxDate;
+  end: OxDate;
+}
+
+/**
+ * The seven named periods that answer most range questions.
+ *
+ * Exported as data rather than rendered inside the calendar, for the same
+ * reason as `relativeDateOptions`: a host drops the ones its field has no use
+ * for — "This year" on a two-week authorisation window is noise — and
+ * translates the words without forking the component.
+ *
+ * Every preset is derived from the `now` the host supplies. Nothing here reads
+ * a clock, so "This month" is deterministic and a calendar renders identically
+ * in March and in August, which is what makes the whole surface testable.
+ */
+export function dateRangePresets(
+  now: OxDate,
+  options: { weekStart?: number } = {},
+): DateRangePreset[] {
+  const weekStart = options.weekStart ?? 0;
+  const yesterday = addCalendarDays(now, -1);
+  const lastWeekDay = addCalendarDays(startOfWeek(now, weekStart), -1);
+  const lastMonthDay = addCalendarDays(startOfMonth(now), -1);
+  return [
+    { id: "today", label: "Today", start: now, end: now },
+    { id: "yesterday", label: "Yesterday", start: yesterday, end: yesterday },
+    {
+      id: "this-week",
+      label: "This week",
+      start: startOfWeek(now, weekStart),
+      end: endOfWeek(now, weekStart),
+    },
+    {
+      id: "last-week",
+      label: "Last week",
+      start: startOfWeek(lastWeekDay, weekStart),
+      end: lastWeekDay,
+    },
+    { id: "this-month", label: "This month", start: startOfMonth(now), end: endOfMonth(now) },
+    {
+      id: "last-month",
+      label: "Last month",
+      start: startOfMonth(lastMonthDay),
+      end: lastMonthDay,
+    },
+    { id: "this-year", label: "This year", start: startOfYear(now), end: endOfYear(now) },
+  ];
+}
+
+/** The preset a range currently matches, or null when the reader built their own. */
+export function matchRangePreset(
+  range: OxDateRange | null | undefined,
+  presets: readonly DateRangePreset[],
+): DateRangePreset | null {
+  if (!range?.start || !range.end) return null;
+  return presets.find((preset) => isSameRange(range, preset)) ?? null;
+}
+
+/* ------------------------------------------------------------------ */
 /* Times and durations                                                */
 /* ------------------------------------------------------------------ */
 
@@ -420,14 +600,65 @@ export function formatClockTime(t: OxTime, options: ClockFormatOptions = {}): st
   return `${hour}:${pad2(t.mi)}${seconds} ${t.h < 12 ? "AM" : "PM"}`;
 }
 
+export interface DurationFormatOptions {
+  /**
+   * "3h", "45m", "1h 30m" — for a badge sitting inside a field, where the
+   * words do not fit and the reader already knows they are looking at a length.
+   * Everywhere a duration stands on its own, spell it: `hr` and `min` survive
+   * being read aloud, and `1h 30m` does not.
+   */
+  compact?: boolean;
+}
+
 /** "53 min", "1 hr", "1 hr 30 min" — the words a schedule actually uses. */
-export function formatDuration(minutes: number): string {
+export function formatDuration(minutes: number, options: DurationFormatOptions = {}): string {
   const negative = minutes < 0;
   const total = Math.abs(Math.round(minutes));
   const h = Math.floor(total / 60);
   const m = total % 60;
-  const body = h === 0 ? `${m} min` : m === 0 ? `${h} hr` : `${h} hr ${m} min`;
+  const body = options.compact
+    ? h === 0
+      ? `${m}m`
+      : m === 0
+        ? `${h}h`
+        : `${h}h ${m}m`
+    : h === 0
+      ? `${m} min`
+      : m === 0
+        ? `${h} hr`
+        : `${h} hr ${m} min`;
   return negative ? `-${body}` : body;
+}
+
+/* ------------------------------------------------------------------ */
+/* Time ranges                                                        */
+/* ------------------------------------------------------------------ */
+
+/** A start and an end time of day. Both ends are the times themselves, not a duration. */
+export interface OxTimeRange {
+  start: OxTime | null;
+  end: OxTime | null;
+}
+
+/**
+ * The length of a time range in minutes, or null while it is incomplete.
+ *
+ * An end that is earlier than its start is an overnight span when the caller
+ * allows one — a night shift, an inpatient observation window — and a negative
+ * number when it does not. Returning the negative rather than clamping to zero
+ * is deliberate: the field reports "ends before it starts" and offers a
+ * correction, which is information a clamp destroys.
+ */
+export function timeRangeMinutes(
+  range: OxTimeRange,
+  options: { allowOvernight?: boolean } = {},
+): number | null {
+  const { start, end } = range;
+  if (!start || !end) return null;
+  const span = minutesOfTime(end) - minutesOfTime(start);
+  if (span > 0) return span;
+  if (span === 0) return options.allowOvernight ? 1440 : 0;
+  return options.allowOvernight ? span + 1440 : span;
 }
 
 /**

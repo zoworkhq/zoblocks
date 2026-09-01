@@ -7,8 +7,8 @@
  *
  * `parameters.state` ties each story to a state declared in
  * date-picker.meta.ts, and the build asserts the two agree in both directions.
- * With fourteen variants that check is the spine of the component: the claim
- * is that all fourteen share one value space, one keyboard model and one
+ * With sixteen variants that check is the spine of the component: the claim
+ * is that all sixteen share one value space, one keyboard model and one
  * accessibility contract, and a variant with no fixture is a claim nobody can
  * check.
  *
@@ -20,7 +20,7 @@
 import type { Meta, StoryObj } from "@oxygenui-design/component-meta";
 import { expect, userEvent, within } from "../../../test/story-kit";
 import { buildSlots, type AvailabilitySet } from "@/lib/oxygen-availability";
-import { plainDate, plainTime, sessionFrom } from "@/lib/oxygen-datetime";
+import { dateRangePresets, plainDate, plainTime, sessionFrom } from "@/lib/oxygen-datetime";
 import { DatePicker } from "./date-picker";
 
 const TODAY = plainDate(2026, 8, 26);
@@ -206,6 +206,43 @@ export const Range: Story = {
   },
 };
 
+export const DateRange: Story = {
+  name: "Date range — two months, named periods, an explicit commit",
+  parameters: {
+    state: "Date range — both ends typed, two months behind them, named periods down the side",
+  },
+  args: {
+    variant: "date-range",
+    label: "Authorisation window",
+    now: TODAY,
+    weekStart: 1,
+    showSpan: true,
+    hints: true,
+    showCustomPreset: true,
+    presets: dateRangePresets(TODAY, { weekStart: 1 }),
+    defaultValue: { start: plainDate(2026, 8, 24), end: plainDate(2026, 9, 11) },
+  },
+  play: async ({ canvasElement }) => {
+    // Two tab stops, because the single-tab-stop rule is per field and a range
+    // is two fields. Six segments to reach the end date is past the point
+    // where a reader can tell which half they are in.
+    const halves = canvasElement.querySelectorAll('.ox-dt-field[tabindex="0"]');
+    expect(halves).toHaveLength(2);
+
+    // Inclusive of both ends: 24 August to 11 September is nineteen days of
+    // authorisation, not eighteen.
+    expect(canvasElement.textContent).toContain("19 days");
+
+    const trigger = within(canvasElement).getByRole("button", { name: "Choose from calendar" });
+    await userEvent.click(trigger);
+    const panel = document.querySelector('[role="dialog"]') as HTMLElement;
+    expect(panel).toBeTruthy();
+    // Two contiguous months, one previous control and one next for the pair.
+    expect(panel.querySelectorAll('[role="grid"]')).toHaveLength(2);
+    expect(within(panel).getAllByRole("button", { name: /previous/i })).toHaveLength(1);
+  },
+};
+
 export const Multiple: Story = {
   name: "Multiple — capped, click again to remove",
   parameters: { state: "Multiple dates — capped, click again to remove" },
@@ -238,6 +275,41 @@ export const Session: Story = {
     // rendered rather than inferred. The badge is never colour alone.
     expect(canvasElement.textContent).toContain("Held");
     expect(canvasElement.textContent).toContain("Derived");
+  },
+};
+
+export const TimeRange: Story = {
+  name: "Time range — two columns, and an end that is filtered",
+  parameters: { state: "Time range — two columns, a filtered end, a derived length" },
+  args: {
+    variant: "time-range",
+    label: "Time range",
+    stepMinutes: 60,
+    minDurationMinutes: 30,
+    defaultValue: { start: plainTime(7, 0), end: plainTime(10, 0) },
+  },
+  play: async ({ canvasElement }) => {
+    // The derived length is the reader's proof-read: a start typed as PM when
+    // they meant AM is invisible in 7:00 to 10:00 and unmissable as a length.
+    expect(canvasElement.textContent).toContain("3h");
+
+    const trigger = within(canvasElement).getByRole("button", {
+      name: "Choose from a list of times",
+    });
+    await userEvent.click(trigger);
+    const panel = document.querySelector('[role="dialog"]') as HTMLElement;
+    const lists = within(panel).getAllByRole("listbox");
+    expect(lists).toHaveLength(2);
+
+    // Offering a time that will be rejected on commit is how a booking form
+    // teaches people to distrust it.
+    const [, ends] = lists;
+    const blocked = within(ends as HTMLElement)
+      .getAllByRole("option")
+      .filter((option) => option.getAttribute("aria-disabled") === "true");
+    expect(blocked.length).toBeGreaterThan(0);
+    const [first] = blocked;
+    expect(first?.getAttribute("aria-label")).toContain("before the start time");
   },
 };
 

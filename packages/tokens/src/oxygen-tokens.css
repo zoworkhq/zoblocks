@@ -525,6 +525,13 @@
   --ox-recorder-lane-h: 68px;
   --ox-recorder-bar-w: 3px;
   --ox-recorder-bar-gap: 2px;
+  --ox-menu-bg: var(--ox-surface-overlay);
+  --ox-menu-border: var(--ox-border);
+  --ox-menu-subject-bg: var(--ox-bg-muted);
+  --ox-menu-subject-border: var(--ox-border);
+  --ox-menu-row-hover-bg: var(--ox-bg-muted);
+  --ox-menu-sep: var(--ox-border);
+  --ox-menu-radius: var(--ox-radius-lg);
 }
 
   /* Brand — northwind ---------------------------------------------------
@@ -884,6 +891,13 @@
   --ox-recorder-wave: var(--ox-accent);
   --ox-recorder-wave-off: var(--ox-text-muted);
   --ox-recorder-pane: var(--ox-bg-muted);
+  --ox-menu-bg: var(--ox-surface-overlay);
+  --ox-menu-border: var(--ox-border);
+  --ox-menu-subject-bg: var(--ox-bg-muted);
+  --ox-menu-subject-border: var(--ox-border);
+  --ox-menu-row-hover-bg: var(--ox-bg-muted);
+  --ox-menu-sep: var(--ox-border);
+  --ox-menu-radius: var(--ox-radius-lg);
 }
 
 /* dark
@@ -1137,6 +1151,13 @@
   --ox-recorder-wave: var(--ox-accent);
   --ox-recorder-wave-off: var(--ox-text-muted);
   --ox-recorder-pane: var(--ox-bg-muted);
+  --ox-menu-bg: var(--ox-surface-overlay);
+  --ox-menu-border: var(--ox-border);
+  --ox-menu-subject-bg: var(--ox-bg-muted);
+  --ox-menu-subject-border: var(--ox-border);
+  --ox-menu-row-hover-bg: var(--ox-bg-muted);
+  --ox-menu-sep: var(--ox-border);
+  --ox-menu-radius: var(--ox-radius-lg);
 }
 
 /* high-contrast
@@ -1389,6 +1410,13 @@
   --ox-recorder-wave: var(--ox-accent);
   --ox-recorder-wave-off: var(--ox-text-muted);
   --ox-recorder-pane: var(--ox-bg-muted);
+  --ox-menu-bg: var(--ox-surface-overlay);
+  --ox-menu-border: var(--ox-border);
+  --ox-menu-subject-bg: var(--ox-bg-muted);
+  --ox-menu-subject-border: var(--ox-border);
+  --ox-menu-row-hover-bg: var(--ox-bg-muted);
+  --ox-menu-sep: var(--ox-border);
+  --ox-menu-radius: var(--ox-radius-lg);
 }
 
 /* Reduced motion. Clinical surfaces must remain fully usable without it. */

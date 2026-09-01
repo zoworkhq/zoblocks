@@ -340,6 +340,24 @@
       ]
     },
     {
+      "name": "menu-core",
+      "type": "oxygen:lib",
+      "title": "Context menu core",
+      "description": "The resolver behind ChartContextMenu: the subject line a masked row may not exceed, four consequence tiers with the field each one makes mandatory, availability that distinguishes pending from refused from withheld, the withheld count, the bulk demotion, and the disclosure record produced on every path including the abandoned one. Installed automatically with ChartContextMenu.",
+      "files": [
+        {
+          "path": "registry/oxygen/lib/menu.ts",
+          "type": "oxygen:lib",
+          "target": "lib/oxygen-menu.ts"
+        },
+        {
+          "path": "registry/oxygen/lib/menu.css",
+          "type": "oxygen:style",
+          "target": "styles/oxygen-menu.css"
+        }
+      ]
+    },
+    {
       "name": "switch-core",
       "type": "oxygen:lib",
       "title": "Switch core",
@@ -636,6 +654,32 @@
       ]
     },
     {
+      "name": "chart-context-menu",
+      "type": "oxygen:component",
+      "title": "Chart Context Menu",
+      "description": "Every menu opens with a non-interactive header naming the record under the pointer, so the first thing under the pointer is never a verb. Four consequence tiers decide the interaction rather than the colour: run; run and say what was written; take a second step inside the menu; take a recorded reason. A masked row produces a masked header, and a disclosure is audited on every path.",
+      "categories": [
+        "clinical",
+        "navigation"
+      ],
+      "dependencies": [
+        "clsx",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "utils",
+        "tokens",
+        "menu-core"
+      ],
+      "files": [
+        {
+          "path": "registry/oxygen/chart-context-menu/chart-context-menu.tsx",
+          "type": "oxygen:component",
+          "target": "components/oxygen/chart-context-menu.tsx"
+        }
+      ]
+    },
+    {
       "name": "chart-header",
       "type": "oxygen:component",
       "title": "Chart Header",
@@ -752,7 +796,7 @@
       "name": "date-picker",
       "type": "oxygen:component",
       "title": "Date Picker",
-      "description": "Fourteen presentations of one value space, one keyboard model and one accessibility contract. `variant` picks the surface; the parts are separately testable components underneath.",
+      "description": "Sixteen presentations of one value space, one keyboard model and one accessibility contract. `variant` picks the surface; the parts are separately testable components underneath.",
       "categories": [
         "clinical",
         "forms"

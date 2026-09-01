@@ -10,18 +10,18 @@ export default defineComponentMeta({
   layer: "clinical",
 
   summary:
-    "One temporal control with fourteen variants: field, calendar, birth date, session, slots, recurrence and the read-only record.",
+    "One temporal control with sixteen variants: field, calendar, date and time ranges, birth date, session, slots, recurrence and the read-only record.",
 
-  tagline: "One temporal control, fourteen variants, one value space.",
+  tagline: "One temporal control, sixteen variants, one value space.",
   description:
-    "Fourteen presentations of one value space, one keyboard model and one accessibility contract. `variant` picks the surface; the parts are separately testable components underneath.",
+    "Sixteen presentations of one value space, one keyboard model and one accessibility contract. `variant` picks the surface; the parts are separately testable components underneath.",
   rationale:
-    'A clinician does not shop for a "birth date field". They reach for the date control, and it has to behave differently in fourteen places: a service date they already know, an appointment they have to be shown, a birth date that wants an age beside it, a session that is three numbers with two degrees of freedom, a course of treatment that is a rule rather than a date, and a signed timestamp that is a legal instrument. Splitting those into fourteen catalogue entries hides the thing that makes them a system — that every one shares a value space, a keyboard model and an accessibility contract — and it makes a reader choose between components before they have understood the choice. The deeper reason is that healthcare temporal input is four distinct jobs, not one: recall (the user knows the value), choose (the system knows the options), construct (the value is a structure with derived members) and witness (the value is an assertion about the past). Every general-purpose picker builds only for choose, which is the rarest of the four in an electronic record, and that inversion is why EHR date fields are the way they are.',
+    'A clinician does not shop for a "birth date field". They reach for the date control, and it has to behave differently in sixteen places: a service date they already know, an appointment they have to be shown, a birth date that wants an age beside it, a session that is three numbers with two degrees of freedom, a course of treatment that is a rule rather than a date, and a signed timestamp that is a legal instrument. Splitting those into sixteen catalogue entries hides the thing that makes them a system — that every one shares a value space, a keyboard model and an accessibility contract — and it makes a reader choose between components before they have understood the choice. The deeper reason is that healthcare temporal input is four distinct jobs, not one: recall (the user knows the value), choose (the system knows the options), construct (the value is a structure with derived members) and witness (the value is an assertion about the past). Every general-purpose picker builds only for choose, which is the rarest of the four in an electronic record, and that inversion is why EHR date fields are the way they are.',
 
   /*
-   * The dispatch is one file and the fourteen variants are another.
+   * The dispatch is one file and the sixteen variants are another.
    *
-   * Without this the props table is the *intersection* of fourteen prop
+   * Without this the props table is the *intersection* of sixteen prop
    * interfaces — `variant`, `value`, `onChange` — and a reader looking for
    * `set`, `providers` or `durationPresets` finds nothing at all.
    */
@@ -62,10 +62,12 @@ export default defineComponentMeta({
     "Field — no popover at all",
     "Calendar — inline month grid",
     "Range — two clicks, never a drag",
+    "Date range — both ends typed, two months behind them, named periods down the side",
     "Multiple dates — capped, click again to remove",
     "Birth date — age, partial dates, stated absence",
     "Time — and the ambiguity it refuses to resolve",
     "Session — start, end, duration, visible driver",
+    "Time range — two columns, a filtered end, a derived length",
     "Slots — grouped, counted, four states",
     "Scheduler — provider, date and time on one surface",
     "Recurrence — the rule in words",
@@ -96,6 +98,11 @@ export default defineComponentMeta({
         'An error is role="alert", assertive, and sets aria-invalid. A conflict is a legal value colliding with other state: role="status", polite, not invalid. An advisory is polite and toneless — a clinician documenting last Friday\'s session must not be told they have made a mistake.',
     },
     {
+      label: "One tabstop across two months, not one per month",
+      detail:
+        "Two adjacent panels overlap by up to a fortnight, so the adjacent-month days are not drawn at all when more than one month is shown. Drawing them gives the same date two cells, both matching the focus date, which is where a second tabstop comes from. For the same reason there is one previous and one next control for the whole window rather than one pair per month.",
+    },
+    {
       label: "Colour is never the only channel",
       detail:
         "Today is a dot as well as a weight, an unavailable day is struck as well as dimmed, and a held session member carries a lock glyph and the word Held beside its tint. All three survive greyscale, forced-colors and a red-green deficiency.",
@@ -122,6 +129,7 @@ export default defineComponentMeta({
     'Ant Design\'s prop names are not implemented, and ADR 0010 requires the divergences be named: there is no picker, showTime, allowClear, status or DatePicker.RangePicker, and antd\'s disabledDate and format are spelled unavailable and order. The reasons differ. unavailable returns the reason a day cannot be chosen rather than a boolean, because that reason is spoken and shown, and a boolean cannot carry it. picker="week" and picker="quarter" have no healthcare workflow we have found, and a stub rendering a day grid would be worse than an honest absence. The rest is unbuilt rather than rejected. A migration from antd is not yet one changed import line.',
     "Recurrence implements a named RFC 5545 subset — DAILY, WEEKLY, MONTHLY with INTERVAL, BYDAY, BYSETPOS, BYMONTHDAY, COUNT, UNTIL and EXDATE. Anything else is refused and rendered read-only with its original string, rather than silently mis-expanded.",
     "Nothing here fetches, holds, or books. Availability arrives as data with an age and every transition is reported through a callback — ADR 0009 forbids the network in component source, and the host is the only party that can reconcile a rejection anyway.",
+    'The range panel commits explicitly by default and the inline calendar does not. `Calendar` keeps `commit="immediate"` so no existing use changes behaviour; `DateRangeField` opts into `explicit` because a range is two clicks and the first is often wrong. A host that wants one rule everywhere has to say so on both.',
     "Non-Gregorian calendar input is not supported. Intl will format a Hijri or Buddhist date today, but a grid whose months have variable length and a year field with a different epoch is a project rather than a flag.",
     "Duration bands and session presets ship empty. A fifty-three-minute session is a fact about somebody's payer contract rather than about therapy, and asserting a code would be clinical decision support, which ADR 0009 prohibits.",
   ],
@@ -151,6 +159,8 @@ import { SessionTimeField } from "@/components/oxygen/date-picker";`,
       'variant="field" for a date the user already knows — service date, admission, assessment. Four-fifths of healthcare date fields are this, and a popover there is four clicks where eight keystrokes would do.',
       'variant="picker" where they may need to see a month to answer, and as the drop-in for an existing antd DatePicker.',
       'variant="birth-date" at every registration and intake. The age readout is the field\'s own error check, not decoration.',
+      'variant="date-range" for a span of days somebody has to state — an authorisation window, a leave of absence, a reporting period. Two months, because most ranges cross a month boundary, and presets, because most range answers have a name.',
+      'variant="time-range" where a start and an end have to agree and neither is derived from a duration. Reach for "session" instead wherever the length is the thing the organisation cares about, because that is the variant that shows which member is held.',
       'variant="session" wherever a session, shift or block has a start, an end and a length that have to agree.',
       'variant="slots" or "scheduler" only where the system knows the options and the user cannot — that is the one job in the four that needs availability at all.',
       "With now passed from the server, so the field and the page agree about which day it is.",
@@ -160,6 +170,8 @@ import { SessionTimeField } from "@/components/oxygen/date-picker";`,
       'futurePolicy="block" as a reflex. A discharge date can legitimately be in the future, and blocking it teaches staff to enter a wrong date to get past the validator.',
       "Using the band readout to recommend a code. The component reports which band a value falls in; choosing a code is a human act and a compliance question.",
       "Hiding the held/derived badge on the session variant. That returns the component to the defect it was built to fix.",
+      'commit="immediate" on a range panel whose parent refetches. Every click is reported, so a mis-clicked start filters a report on a range nobody chose.',
+      'Shipping the general preset set unedited. `dateRangePresets` is a starting point: "This year" on a two-week authorisation window is noise, and seven periods nobody uses is seven rows between the reader and the two they do.',
     ],
   },
 
@@ -184,6 +196,8 @@ import { SessionTimeField } from "@/components/oxygen/date-picker";`,
     "healthcare date time picker",
     "appointment scheduler react",
     "session time picker",
+    "react date range picker",
+    "time range picker react",
     "date of birth input",
     "recurrence rule builder react",
   ],
@@ -229,6 +243,13 @@ import { SessionTimeField } from "@/components/oxygen/date-picker";`,
       args: { variant: "range" },
     },
     {
+      id: "date-range",
+      label: "Date range",
+      description:
+        "Two typeable ends in one shell, two contiguous months behind them, and named periods down the side.",
+      args: { variant: "date-range" },
+    },
+    {
       id: "multiple",
       label: "Multiple dates",
       description: "Capped; clicking a selected date removes it.",
@@ -251,6 +272,13 @@ import { SessionTimeField } from "@/components/oxygen/date-picker";`,
       label: "Session",
       description: "Start, end and duration, with the held member always marked.",
       args: { variant: "session" },
+    },
+    {
+      id: "time-range",
+      label: "Time range",
+      description:
+        "A start, an end and the length between them. The end column is filtered, not merely ordered.",
+      args: { variant: "time-range" },
     },
     {
       id: "slots",
@@ -300,10 +328,12 @@ import { SessionTimeField } from "@/components/oxygen/date-picker";`,
         "field",
         "calendar",
         "range",
+        "date-range",
         "multiple",
         "birth-date",
         "time",
         "session",
+        "time-range",
         "slots",
         "scheduler",
         "recurrence",
@@ -450,7 +480,7 @@ import { SessionTimeField } from "@/components/oxygen/date-picker";`,
     slug: "date-picker",
     title: "Date Picker — accessible React healthcare control",
     description:
-      "A React date picker for healthcare: fourteen variants over one value space — field, calendar, birth date with live age, sessions, slots and recurrence.",
+      "A React date picker for healthcare: sixteen variants over one value space — fields, calendars, date and time ranges, birth dates, sessions and recurrence.",
     primaryKeyword: "react healthcare date picker",
     secondaryKeywords: [
       "accessible date picker react",

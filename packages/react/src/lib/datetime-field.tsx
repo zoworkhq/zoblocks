@@ -235,6 +235,15 @@ export interface SegmentedFieldProps {
   invalid?: boolean;
   disabled?: boolean;
   readOnly?: boolean;
+  /**
+   * Drops the border, the background and the focus ring.
+   *
+   * For a field that is one half of a larger shell — a range's start beside
+   * its end — where the box and the ring belong to the shell. Two bordered
+   * boxes with an arrow between them read as two questions; one box with two
+   * values in it reads as the one question it is.
+   */
+  bare?: boolean;
   /** Renders a trigger button at the end — the calendar or clock affordance. */
   trigger?: { icon: React.ReactNode; label: string; expanded?: boolean; onPress: () => void };
   /**
@@ -271,6 +280,7 @@ export const SegmentedField = React.forwardRef<SegmentedFieldHandle, SegmentedFi
       invalid,
       disabled,
       readOnly,
+      bare,
       trigger,
       onPasteText,
       describedBy,
@@ -453,6 +463,7 @@ export const SegmentedField = React.forwardRef<SegmentedFieldHandle, SegmentedFi
           invalid && "ox-dt-field--invalid",
           disabled && "ox-dt-field--disabled",
           readOnly && "ox-dt-field--readonly",
+          bare && "ox-dt-field--bare",
           className,
         )}
         onFocus={() => {
@@ -659,15 +670,40 @@ export interface CalendarGridProps {
   value?: OxDate | null;
   range?: DateRangeValue | null;
   dates?: OxDate[];
+  /** The leftmost month on screen. With `months > 1` the rest follow it. */
   month: MonthRef;
   onMonth: (month: MonthRef) => void;
   onSelect: (date: OxDate) => void;
+  /**
+   * How many months to show side by side.
+   *
+   * Two is the number a range picker wants: most ranges cross a month
+   * boundary, and in a single grid that means picking a start, paging, and
+   * losing sight of the end you were aiming at. The months stay contiguous —
+   * one set of controls pages the whole window — because a band drawn across
+   * June and September would be a lie about what is selected.
+   */
+  months?: number;
   /** The day marked "today". Required: nothing here reads the clock. */
   today?: OxDate | null;
   /** Returns the reason a date is unavailable, or null. The reason is spoken. */
   unavailable?: (date: OxDate) => string | null;
   /** Open-slot count under the numeral, so density is visible before a click. */
   load?: (date: OxDate) => number | null;
+  /**
+   * Renders the leading and trailing days of the adjacent months.
+   *
+   * Defaults to true for one month and **false for more than one**, which is
+   * not a stylistic choice: two adjacent panels overlap by up to a fortnight,
+   * so the same date is drawn twice, both copies match the focus date, and the
+   * grid grows a second tabstop — the exact failure this component's own
+   * documentation calls the most common one in a date picker.
+   */
+  showOutsideDays?: boolean;
+  /** Earliest month reachable by the header controls. */
+  min?: OxDate;
+  /** Latest month reachable by the header controls. */
+  max?: OxDate;
   weekStart?: number;
   /** Locale narrow weekday labels. Two-letter or one, whatever the locale uses. */
   weekdayLabels?: readonly string[];
@@ -677,8 +713,21 @@ export interface CalendarGridProps {
   fluid?: boolean;
   /** Rendered under the grid — relative-date chips, a clear button. */
   footer?: React.ReactNode;
+  /** Rendered beside the grid — the named-period rail. */
+  aside?: React.ReactNode;
   maxSelectable?: number;
   className?: string;
+}
+
+/** Months between two `MonthRef`s, signed. */
+function monthDistance(from: MonthRef, to: MonthRef): number {
+  return (to.y - from.y) * 12 + (to.m - from.m);
+}
+
+/** `n` months on from a `MonthRef`. */
+function shiftMonth(month: MonthRef, n: number): MonthRef {
+  const total = month.y * 12 + (month.m - 1) + n;
+  return { y: Math.floor(total / 12), m: (((total % 12) + 12) % 12) + 1 };
 }
 
 export function CalendarGrid(props: CalendarGridProps) {
@@ -690,9 +739,13 @@ export function CalendarGrid(props: CalendarGridProps) {
     month,
     onMonth,
     onSelect,
+    months: monthCountProp = 1,
+    showOutsideDays,
     today = null,
     unavailable,
     load,
+    min,
+    max,
     weekStart = 0,
     weekdayLabels,
     weekdayNames = WEEKDAY_NAMES,
@@ -700,14 +753,35 @@ export function CalendarGrid(props: CalendarGridProps) {
     monthNames = MONTH_NAMES,
     fluid,
     footer,
+    aside,
     className,
   } = props;
 
+  const monthCount = Math.max(1, Math.min(4, Math.round(monthCountProp)));
+  const showOutside = showOutsideDays ?? monthCount === 1;
+
   const [pane, setPane] = React.useState<"days" | "months" | "years">("days");
+  // Which panel opened the month/year pane, so choosing March from the second
+  // panel puts March in the second panel rather than the first.
+  const [paneIndex, setPaneIndex] = React.useState(0);
   const [focusDate, setFocusDate] = React.useState<OxDate | null>(null);
   const [hover, setHover] = React.useState<OxDate | null>(null);
   const gridRef = React.useRef<HTMLDivElement>(null);
   const shouldRefocus = React.useRef(false);
+
+  const shown = React.useMemo(
+    () => Array.from({ length: monthCount }, (_, i) => shiftMonth(month, i)),
+    [month, monthCount],
+  );
+
+  /** Whether a date falls in one of the months currently on screen. */
+  const isShown = React.useCallback(
+    (date: OxDate) => {
+      const offset = monthDistance(month, { y: date.y, m: date.m });
+      return offset >= 0 && offset < monthCount;
+    },
+    [month, monthCount],
+  );
 
   /**
    * A grid with no tabstop is a grid no keyboard can enter.
@@ -715,19 +789,20 @@ export function CalendarGrid(props: CalendarGridProps) {
    * The natural default for focus is today, so any calendar opened on another
    * month — a range starting in September, a birth date in 1986 — rendered
    * forty-two cells at tabindex -1 and was unreachable. Resolving against the
-   * month actually displayed is the fix, and it is why this is derived rather
-   * than stored.
+   * months actually displayed is the fix, and it is why this is derived rather
+   * than stored. With two months on screen the window is two months wide, so
+   * a focus date in either of them is kept rather than thrown away.
    */
   const effectiveFocus = React.useMemo<OxDate>(() => {
     const candidate = focusDate ?? value ?? range?.start ?? dates[0] ?? today;
-    if (candidate && candidate.y === month.y && candidate.m === month.m) return candidate;
+    if (candidate && isShown(candidate)) return candidate;
     const total = daysInMonth(month.y, month.m);
     for (let day = 1; day <= total; day += 1) {
       const date = { kind: "date" as const, y: month.y, m: month.m, d: day };
       if (!unavailable?.(date)) return date;
     }
     return { kind: "date", y: month.y, m: month.m, d: 1 };
-  }, [focusDate, value, range, dates, today, month, unavailable]);
+  }, [focusDate, value, range, dates, today, month, unavailable, isShown]);
 
   React.useEffect(() => {
     if (!shouldRefocus.current) return;
@@ -735,21 +810,42 @@ export function CalendarGrid(props: CalendarGridProps) {
     gridRef.current?.querySelector<HTMLButtonElement>('[data-ox-dt-focus="true"]')?.focus();
   });
 
-  const cells = React.useMemo(() => buildMonthGrid(month, weekStart), [month, weekStart]);
-  const weeks = React.useMemo(
-    () => Array.from({ length: 6 }, (_, i) => cells.slice(i * 7, i * 7 + 7)),
-    [cells],
-  );
   const order = React.useMemo(() => weekdayOrder(weekStart), [weekStart]);
 
+  /*
+   * Where the header controls stop.
+   *
+   * A bounded calendar that still pages to 1823 is a control whose limits are
+   * enforced only once you try to click a day. The bound is expressed on the
+   * month rather than the day, so the last reachable window always contains
+   * `max` and never sits past it.
+   */
+  const minMonth = min ? { y: min.y, m: min.m } : null;
+  const maxMonth = max ? shiftMonth({ y: max.y, m: max.m }, -(monthCount - 1)) : null;
+  const atMin = minMonth ? monthDistance(minMonth, month) <= 0 : false;
+  const atMax = maxMonth ? monthDistance(month, maxMonth) <= 0 : false;
+
   const step = (delta: number) => {
-    const total = month.y * 12 + (month.m - 1) + delta;
-    onMonth({ y: Math.floor(total / 12), m: (((total % 12) + 12) % 12) + 1 });
+    let next = shiftMonth(month, delta);
+    if (minMonth && monthDistance(minMonth, next) < 0) next = minMonth;
+    if (maxMonth && monthDistance(next, maxMonth) < 0) next = maxMonth;
+    onMonth(next);
+  };
+
+  /** Pages the window by the least it takes to bring `date` into view. */
+  const revealMonth = (date: OxDate) => {
+    const offset = monthDistance(month, { y: date.y, m: date.m });
+    if (offset >= 0 && offset < monthCount) return;
+    onMonth(
+      offset < 0
+        ? { y: date.y, m: date.m }
+        : shiftMonth({ y: date.y, m: date.m }, -(monthCount - 1)),
+    );
   };
 
   const moveFocus = (next: OxDate) => {
     setFocusDate(next);
-    if (next.y !== month.y || next.m !== month.m) onMonth({ y: next.y, m: next.m });
+    revealMonth(next);
     shouldRefocus.current = true;
   };
 
@@ -808,20 +904,27 @@ export function CalendarGrid(props: CalendarGridProps) {
       : { lo: other, hi: range.start, provisional: !range.end };
   }, [mode, range, hover]);
 
-  function renderCell(cell: CalendarCell) {
+  function renderCell(cell: CalendarCell, position: number) {
     const reason = unavailable?.(cell.date) ?? null;
     const selected = isSelected(cell.date);
     const focused = isSameDate(cell.date, effectiveFocus);
-    const inRange =
+    const inRange = Boolean(
       rangeBounds &&
       compareDates(cell.date, rangeBounds.lo) >= 0 &&
-      compareDates(cell.date, rangeBounds.hi) <= 0;
+      compareDates(cell.date, rangeBounds.hi) <= 0,
+    );
+    const isLo = inRange && isSameDate(cell.date, rangeBounds?.lo);
+    const isHi = inRange && isSameDate(cell.date, rangeBounds?.hi);
     const openings = reason ? null : (load?.(cell.date) ?? null);
 
     // The accessible name is the whole date plus its state. A cell
     // named "14" is navigable and useless: a screen-reader user has no
     // column header in scope and no way to know which month they are in.
     let name = formatPlainDate(cell.date, "full");
+    if (isLo && isHi) name += ", the only day in the selected range";
+    else if (isLo) name += ", start of the selected range";
+    else if (isHi) name += ", end of the selected range";
+    else if (inRange) name += ", within the selected range";
     if (reason) name += `, unavailable, ${reason}`;
     if (openings != null) {
       name +=
@@ -845,9 +948,21 @@ export function CalendarGrid(props: CalendarGridProps) {
           reason && "ox-dt-cal__day--unavailable",
           isSameDate(cell.date, today) && "ox-dt-cal__day--today",
           selected && "ox-dt-cal__day--selected",
-          inRange && !selected && "ox-dt-cal__day--in-range",
-          inRange && isSameDate(cell.date, rangeBounds?.lo) && "ox-dt-cal__day--range-start",
-          inRange && isSameDate(cell.date, rangeBounds?.hi) && "ox-dt-cal__day--range-end",
+          /*
+           * The band covers the whole span, endpoints included, and the
+           * selected chip is drawn on top of it. Excluding the endpoints —
+           * which is what this did — leaves the band starting a cell late at
+           * each end and reading as though the first and last day were not in
+           * the range they bound.
+           */
+          inRange && "ox-dt-cal__day--in-range",
+          rangeBounds?.provisional && inRange && "ox-dt-cal__day--previewed",
+          isLo && "ox-dt-cal__day--range-lo",
+          isHi && "ox-dt-cal__day--range-hi",
+          // The band breaks at the end of every week, so it needs a cap there
+          // as well as at the ends of the range itself.
+          inRange && position === 0 && "ox-dt-cal__day--week-lo",
+          inRange && position === 6 && "ox-dt-cal__day--week-hi",
         )}
         onClick={() => {
           if (reason) return;
@@ -868,109 +983,196 @@ export function CalendarGrid(props: CalendarGridProps) {
     );
   }
 
-  const title = monthLabel ? monthLabel(month) : `${monthNames[month.m - 1]} ${month.y}`;
+  const titleOf = (ref: MonthRef) =>
+    monthLabel ? monthLabel(ref) : `${monthNames[ref.m - 1]} ${ref.y}`;
 
-  return (
-    <div className={cn("ox-dt-cal", fluid && "ox-dt-cal--fluid", className)}>
+  function renderHead(ref: MonthRef, index: number) {
+    // One control per direction across the whole window. Two buttons both
+    // named "Previous month" doing the same thing is a riddle for anybody
+    // reading the dialog through its accessible names.
+    const first = index === 0;
+    const last = index === monthCount - 1;
+    return (
       <div className="ox-dt-cal__head">
-        <button
-          type="button"
-          className="ox-dt-cal__nav"
-          aria-label="Previous month"
-          onClick={() => step(-1)}
-        >
-          <ChevronGlyph direction="left" />
-        </button>
+        {first ? (
+          <button
+            type="button"
+            className="ox-dt-cal__nav"
+            aria-label={monthCount > 1 ? "Previous months" : "Previous month"}
+            aria-disabled={atMin || undefined}
+            onClick={() => {
+              if (!atMin) step(-1);
+            }}
+          >
+            <ChevronGlyph direction="left" />
+          </button>
+        ) : (
+          <span className="ox-dt-cal__nav ox-dt-cal__nav--spacer" aria-hidden="true" />
+        )}
         <button
           type="button"
           className="ox-dt-cal__title"
-          aria-label="Choose month and year"
-          aria-expanded={pane !== "days"}
-          onClick={() => setPane(pane === "days" ? "months" : "days")}
+          aria-label={`${titleOf(ref)} — choose month and year`}
+          aria-expanded={pane !== "days" && paneIndex === index}
+          onClick={() => {
+            setPaneIndex(index);
+            setPane(pane === "days" || paneIndex !== index ? "months" : "days");
+          }}
         >
-          {title}
+          {titleOf(ref)}
           <ChevronGlyph direction="down" />
         </button>
-        <button
-          type="button"
-          className="ox-dt-cal__nav"
-          aria-label="Next month"
-          onClick={() => step(1)}
-        >
-          <ChevronGlyph direction="right" />
-        </button>
+        {last ? (
+          <button
+            type="button"
+            className="ox-dt-cal__nav"
+            aria-label={monthCount > 1 ? "Next months" : "Next month"}
+            aria-disabled={atMax || undefined}
+            onClick={() => {
+              if (!atMax) step(1);
+            }}
+          >
+            <ChevronGlyph direction="right" />
+          </button>
+        ) : (
+          <span className="ox-dt-cal__nav ox-dt-cal__nav--spacer" aria-hidden="true" />
+        )}
       </div>
+    );
+  }
 
-      {pane === "days" ? (
-        <div
-          ref={gridRef}
-          role="grid"
-          aria-label={title}
-          aria-multiselectable={mode === "multiple" || undefined}
-          className="ox-dt-cal__grid"
-          onKeyDown={onGridKeyDown}
-        >
-          {/* A real row. `role="grid"` requires row children and
-              `columnheader` requires a row parent — axe is right about both,
-              and a flat seven-column grid satisfies neither. Each row is its
-              own CSS grid rather than using `display: contents`, which avoids
-              the accessibility-tree caveats that technique still carries. */}
-          <div role="row" className="ox-dt-cal__row">
-            {order.map((weekday, position) => (
-              <div
-                key={`wd-${position}`}
-                role="columnheader"
-                aria-label={weekdayNames[weekday]}
-                className="ox-dt-cal__weekday"
-              >
-                {weekdayLabels
-                  ? weekdayLabels[weekday]
-                  : (WEEKDAY_ABBREVIATIONS[weekday] ?? "").slice(0, 1)}
+  function renderMonth(ref: MonthRef, index: number) {
+    const cells = buildMonthGrid(ref, weekStart);
+    const weeks = Array.from({ length: 6 }, (_, i) => cells.slice(i * 7, i * 7 + 7));
+    const title = titleOf(ref);
+    const paneOpen = pane !== "days" && paneIndex === index;
+
+    /*
+     * Keyed by position, never by the month it happens to show.
+     *
+     * A key of `${y}-${m}` remounts the whole panel on every page — which
+     * destroys the very button that was clicked to page it, dropping focus to
+     * the body, and detaches the grid a keyboard handler was mid-sequence in.
+     * The panels are positional; only their contents change.
+     */
+    return (
+      <div className="ox-dt-cal__month" key={`panel-${index}`}>
+        {renderHead(ref, index)}
+
+        {!paneOpen ? (
+          <div
+            role="grid"
+            aria-label={title}
+            aria-multiselectable={mode === "multiple" || undefined}
+            className="ox-dt-cal__grid"
+          >
+            {/* A real row. `role="grid"` requires row children and
+                `columnheader` requires a row parent — axe is right about both,
+                and a flat seven-column grid satisfies neither. Each row is its
+                own CSS grid rather than using `display: contents`, which avoids
+                the accessibility-tree caveats that technique still carries. */}
+            <div role="row" className="ox-dt-cal__row">
+              {order.map((weekday, position) => (
+                <div
+                  key={`wd-${position}`}
+                  role="columnheader"
+                  aria-label={weekdayNames[weekday]}
+                  className="ox-dt-cal__weekday"
+                >
+                  {/*
+                    Two letters, not one. Tuesday and Thursday are both "T" and
+                    Saturday and Sunday are both "S", so a single-letter header
+                    row leaves four of seven columns unnamed for anybody
+                    reading it rather than counting from the left. `Intl`'s own
+                    narrow weekday names have the same collision, which is why
+                    this is a deliberate choice rather than a default taken.
+                  */}
+                  {weekdayLabels
+                    ? weekdayLabels[weekday]
+                    : (WEEKDAY_ABBREVIATIONS[weekday] ?? "").slice(0, 2)}
+                </div>
+              ))}
+            </div>
+
+            {weeks.map((week, weekIndex) => (
+              <div role="row" className="ox-dt-cal__row" key={`week-${weekIndex}`}>
+                {week.map((cell, position) =>
+                  showOutside || cell.inMonth ? (
+                    renderCell(cell, position)
+                  ) : (
+                    // The cell still exists, so the row keeps seven columns and
+                    // the weekday headers stay over the right days. It is just
+                    // not a date, here.
+                    <div
+                      key={formatPlainDate(cell.date, "iso")}
+                      role="gridcell"
+                      className="ox-dt-cal__blank"
+                    />
+                  ),
+                )}
               </div>
             ))}
           </div>
+        ) : pane === "months" ? (
+          <div className="ox-dt-cal__pane" role="group" aria-label="Month">
+            {MONTH_ABBREVIATIONS.map((name, position) => (
+              <button
+                key={name}
+                type="button"
+                aria-pressed={position + 1 === ref.m}
+                onClick={() => {
+                  // The chosen month lands in the panel it was chosen from.
+                  onMonth(shiftMonth({ y: ref.y, m: position + 1 }, -index));
+                  setPane("years");
+                }}
+              >
+                {monthNames === MONTH_NAMES ? name : monthNames[position]}
+              </button>
+            ))}
+          </div>
+        ) : (
+          <div className="ox-dt-cal__pane ox-dt-cal__pane--years" role="group" aria-label="Year">
+            {Array.from({ length: 25 }, (_, i) => ref.y + 4 - i).map((year) => (
+              <button
+                key={year}
+                type="button"
+                aria-pressed={year === ref.y}
+                onClick={() => {
+                  onMonth(shiftMonth({ y: year, m: ref.m }, -index));
+                  setPane("days");
+                }}
+              >
+                {year}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  }
 
-          {weeks.map((week, index) => (
-            <div role="row" className="ox-dt-cal__row" key={`week-${index}`}>
-              {week.map((cell) => renderCell(cell))}
-            </div>
-          ))}
-        </div>
-      ) : pane === "months" ? (
-        <div className="ox-dt-cal__pane" role="group" aria-label="Month">
-          {MONTH_ABBREVIATIONS.map((name, position) => (
-            <button
-              key={name}
-              type="button"
-              aria-pressed={position + 1 === month.m}
-              onClick={() => {
-                onMonth({ y: month.y, m: position + 1 });
-                setPane("years");
-              }}
-            >
-              {monthNames === MONTH_NAMES ? name : monthNames[position]}
-            </button>
-          ))}
-        </div>
-      ) : (
-        <div className="ox-dt-cal__pane ox-dt-cal__pane--years" role="group" aria-label="Year">
-          {Array.from({ length: 25 }, (_, i) => month.y + 4 - i).map((year) => (
-            <button
-              key={year}
-              type="button"
-              aria-pressed={year === month.y}
-              onClick={() => {
-                onMonth({ y: year, m: month.m });
-                setPane("days");
-              }}
-            >
-              {year}
-            </button>
-          ))}
-        </div>
+  return (
+    <div
+      className={cn(
+        "ox-dt-cal",
+        fluid && "ox-dt-cal--fluid",
+        monthCount > 1 && "ox-dt-cal--multi",
+        aside && "ox-dt-cal--railed",
+        className,
       )}
+    >
+      {aside ? <div className="ox-dt-cal__aside">{aside}</div> : null}
 
-      {footer ? <div className="ox-dt-cal__foot">{footer}</div> : null}
+      <div className="ox-dt-cal__body">
+        {/* One keyboard handler for the whole window: arrowing off the end of
+            June has to land in July, and a handler per grid would stop at the
+            boundary the reader is trying to cross. */}
+        <div ref={gridRef} className="ox-dt-cal__months" onKeyDown={onGridKeyDown}>
+          {shown.map((ref, index) => renderMonth(ref, index))}
+        </div>
+
+        {footer ? <div className="ox-dt-cal__foot">{footer}</div> : null}
+      </div>
     </div>
   );
 }

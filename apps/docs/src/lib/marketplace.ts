@@ -99,8 +99,22 @@ export async function catalogue(): Promise<MarketItem[]> {
  * one a reader is looking at rather than presenting both as live.
  */
 export interface ShelfItem extends MarketItem {
-  /** Announced rather than published. Priced, and no purchase path. */
+  /**
+   * Announced rather than built. Nothing exists to download yet.
+   *
+   * This is a fact about the pack, not about the shop, and the two came apart
+   * the moment selling closed shelf-wide — see `SELLING_OPEN`. Ask
+   * `purchasable` before offering a buy path; ask this one before claiming a
+   * pack has files, a version or a measurement.
+   */
   comingSoon: boolean;
+  /**
+   * Whether a reader can actually buy it today.
+   *
+   * False for everything while `SELLING_OPEN` is false, including packs that
+   * are finished and measured.
+   */
+  purchasable: boolean;
   /** Every file the pack ships. Empty for an announced item, which ships none. */
   filePaths: string[];
   /** A real sample of the pack's own artwork, where it ships any. */
@@ -110,10 +124,13 @@ export interface ShelfItem extends MarketItem {
   source: "console" | "preview";
 }
 
+/** A shelf item before the shop's answer is attached to it. */
+type ShelfEntry = Omit<ShelfItem, "purchasable">;
+
 /** The date the seed publishes these under, so both halves agree on it. */
 const PREVIEW_PUBLISHED = "2026-08-14T09:12:03.000Z";
 
-function fromPreview(): ShelfItem[] {
+function fromPreview(): ShelfEntry[] {
   return PREVIEW_CATALOGUE.map((item) => ({
     slug: item.slug,
     kind: item.kind,
@@ -225,15 +242,24 @@ function withoutClinicalReview(provenance: Provenance): Provenance {
  * One switch here rather than a `comingSoon` guard added page by page, because
  * the listing, the detail page and anything else reading `shelf()` must not be
  * able to disagree about what is purchasable — the detail page was already
- * offering a buy CTA for packs the listing called unpurchasable. Flip this to
- * `true` when the console can take money and every path returns to using each
- * item's own `publishedAt`.
+ * offering a buy CTA for packs the listing called unpurchasable.
+ *
+ * It sets `purchasable`, not `comingSoon`. Forcing `comingSoon` was the first
+ * attempt and it overloaded the field with a second meaning: `comingSoon` had
+ * said "nothing has been built" since the catalogue existed, and the preview
+ * reads it to decide between a pack's file manifest and a placeholder motif.
+ * With it forced true, `vitals-flowsheet` and `messy-fixtures` — both shipped,
+ * both with files — advertised themselves on the open shelf as unbuilt. The
+ * shop being shut is not a claim about what the packs contain.
+ *
+ * Flip this to `true` when the console can take money. Nothing else needs to
+ * move: every buy path already asks `purchasable`.
  */
 export const SELLING_OPEN = false;
 
 export async function shelf(): Promise<ShelfItem[]> {
   const live = await catalogue();
-  const items: ShelfItem[] =
+  const items: ShelfEntry[] =
     live.length === 0
       ? fromPreview()
       : live.map((item) => {
@@ -249,8 +275,12 @@ export async function shelf(): Promise<ShelfItem[]> {
           };
         });
 
-  if (SELLING_OPEN) return items;
-  return items.map((item) => ({ ...item, comingSoon: true }));
+  // Two questions, answered separately: does the pack exist, and can it be
+  // bought. Only the second one is closed shelf-wide.
+  return items.map((item) => ({
+    ...item,
+    purchasable: SELLING_OPEN && !item.comingSoon,
+  }));
 }
 
 export async function findItem(slug: string): Promise<ShelfItem | undefined> {

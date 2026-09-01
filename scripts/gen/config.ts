@@ -47,6 +47,7 @@ export const SUPPORT_ITEM_NAMES: ReadonlySet<string> = new Set([
   "chart-header-core",
   "workspace-core",
   "palette-core",
+  "menu-core",
   "timeline-core",
   "timeline-fhir",
   "datetime-core",

@@ -90,6 +90,11 @@ Rules that matter when generating code with these components:
   fhir: Patient, Task
   states: Empty, before anything is typed, Actions ranked above records, A verb waiting for its argument, A significant action, first Enter, An action that cannot run, Out-of-scope patients, counted, Break-glass unavailable to this role, Nothing matches, Grouped results, Keyboard navigation, Frequency weighting, Every match named, with no scope
   status: stable
+- [Chart Context Menu](https://oxygenui.design/components/chart-context-menu): A context menu that names what it is about before it offers to change it, ranks verbs by consequence, and counts the actions it withholds.
+  install: npx @oxygenui-design/cli add chart-context-menu
+  fhir: Patient, MedicationRequest, Observation, DocumentReference, AuditEvent
+  states: Routine actions only, A recorded action, saying what it writes, A clinical action, first activation, A clinical action, second step, A disclosure, reasons offered, Unavailable, with the reason in place, Withheld by policy, counted, An availability check still pending, A masked subject, A multiple selection, Checkbox and radio view state, A submenu, open beside its row, This record supports no actions, Every action withheld from this role
+  status: beta
 - [Chart Header](https://oxygenui.design/components/chart-header): Persistent patient context that collapses to a safety bar rather than to a name, and never renders administrative gender beside a dose.
   install: npx @oxygenui-design/cli add chart-header
   fhir: Patient, Encounter, EpisodeOfCare
@@ -100,10 +105,10 @@ Rules that matter when generating code with these components:
   fhir: Composition, DocumentReference, Provenance, Narrative
   states: Empty draft, In progress, Origins ribbon, Unreviewed AI, Copied forward, Unfilled blanks, Stale pulled value, Gate blocking, Gate clear, Offline draft, Save failed, Signed, Signed with addendum, Awaiting countersignature
   status: experimental
-- [Date Picker](https://oxygenui.design/components/date-picker): One temporal control with fourteen variants: field, calendar, birth date, session, slots, recurrence and the read-only record.
+- [Date Picker](https://oxygenui.design/components/date-picker): One temporal control with sixteen variants: field, calendar, date and time ranges, birth date, session, slots, recurrence and the read-only record.
   install: npx @oxygenui-design/cli add date-picker
   fhir: Patient, Slot, Schedule, PractitionerRole, Timing
-  states: Picker — field with a calendar behind a button, Field — no popover at all, Calendar — inline month grid, Range — two clicks, never a drag, Multiple dates — capped, click again to remove, Birth date — age, partial dates, stated absence, Time — and the ambiguity it refuses to resolve, Session — start, end, duration, visible driver, Slots — grouped, counted, four states, Scheduler — provider, date and time on one surface, Recurrence — the rule in words, Series — conflicts resolved before anything is written, Group — the room, the roster and the real count, Read-only — the record a reviewer sees
+  states: Picker — field with a calendar behind a button, Field — no popover at all, Calendar — inline month grid, Range — two clicks, never a drag, Date range — both ends typed, two months behind them, named periods down the side, Multiple dates — capped, click again to remove, Birth date — age, partial dates, stated absence, Time — and the ambiguity it refuses to resolve, Session — start, end, duration, visible driver, Time range — two columns, a filtered end, a derived length, Slots — grouped, counted, four states, Scheduler — provider, date and time on one surface, Recurrence — the rule in words, Series — conflicts resolved before anything is written, Group — the room, the roster and the real count, Read-only — the record a reviewer sees
   status: beta
 - [Provenance Chip](https://oxygenui.design/components/provenance-chip): Where a value came from, how it got here, and how much of it a human has actually looked at.
   install: npx @oxygenui-design/cli add provenance-chip

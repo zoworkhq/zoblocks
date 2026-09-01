@@ -89,20 +89,20 @@ export default async function MarketplaceItemPage({
               <span className="tabular font-mono text-2xl font-semibold">
                 {priceLabel(item.price)}
               </span>
-              {item.comingSoon ? (
+              {item.purchasable ? null : (
                 <span className="rounded-full border border-rule px-2.5 py-1 font-mono text-[0.625rem] uppercase tracking-wider text-graphite-soft">
                   Coming soon
                 </span>
-              ) : null}
+              )}
               <span className="body-sm text-graphite">
-                {item.comingSoon
-                  ? "what it will cost · not yet on sale"
-                  : "one-time · the whole organisation · perpetual"}
+                {item.purchasable
+                  ? "one-time · the whole organisation · perpetual"
+                  : "what it will cost · not yet on sale"}
               </span>
             </div>
 
             <div className="mt-6 flex flex-wrap gap-3" data-reveal>
-              {item.comingSoon ? (
+              {!item.purchasable ? (
                 <button
                   type="button"
                   disabled

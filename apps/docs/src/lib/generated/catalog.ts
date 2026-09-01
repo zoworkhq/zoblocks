@@ -2168,7 +2168,8 @@ export const CATALOG: ComponentDoc[] = [
       "clinical-note",
       "accordion",
       "result-value",
-      "date-picker"
+      "date-picker",
+      "chart-context-menu"
     ],
     "dependencies": [
       "clsx",
@@ -2759,7 +2760,8 @@ export const CATALOG: ComponentDoc[] = [
     ],
     "related": [
       "recent-patient-stack",
-      "chart-header"
+      "chart-header",
+      "chart-context-menu"
     ],
     "dependencies": [
       "clsx",
@@ -2975,6 +2977,595 @@ export const CATALOG: ComponentDoc[] = [
         {
           "ref": "recent-patient-stack",
           "when": "the chart you want is already open"
+        }
+      ]
+    }
+  },
+  {
+    "name": "chart-context-menu",
+    "title": "Chart Context Menu",
+    "tier": "free",
+    "status": "beta",
+    "since": "0.5.0",
+    "layer": "clinical",
+    "distribution": "registry",
+    "summary": "A context menu that names what it is about before it offers to change it, ranks verbs by consequence, and counts the actions it withholds.",
+    "tagline": "Names its subject before it offers to change it.",
+    "description": "Every menu opens with a non-interactive header naming the record under the pointer, so the first thing under the pointer is never a verb. Four consequence tiers decide the interaction rather than the colour: run; run and say what was written; take a second step inside the menu; take a recorded reason. A masked row produces a masked header, and a disclosure is audited on every path.",
+    "rationale": "A context menu is the shortest path in a clinical interface to an irreversible act, and it opens on top of the row that said whose act it was. An observational study of EHR multitasking named invisible patient identifiers as a wrong-patient-selection risk, and clinicians in it described controls close enough together that a click lands in the wrong place — a context menu is the most adjacent control surface in the interface and it covers its own subject by construction. The mechanics of a popup are solved elsewhere and solved well. What is not modelled anywhere is what the menu is about: which verbs belong on this noun, which this person may run, what each one costs, and what happens to the ones they may not see. That is the component; the popup is the cheap half.",
+    "categories": [
+      "Clinical",
+      "Navigation"
+    ],
+    "fhir": [
+      {
+        "name": "Patient",
+        "url": "https://hl7.org/fhir/R4/patient.html",
+        "note": "The subject of a worklist menu, and the only resource whose header shows initials. A masked patient row yields a header that reads 'Restricted record' and nothing more."
+      },
+      {
+        "name": "MedicationRequest",
+        "url": "https://hl7.org/fhir/R4/medicationrequest.html",
+        "note": "Discontinue, hold and renew are the verbs that made the clinical tier necessary — each one has to name what it stops and when."
+      },
+      {
+        "name": "Observation",
+        "url": "https://hl7.org/fhir/R4/observation.html",
+        "note": "Acknowledging a critical result stops an escalation, so the confirmation states the time. A preliminary result cannot be released, and the reason is the row rather than a tooltip."
+      },
+      {
+        "name": "DocumentReference",
+        "url": "https://hl7.org/fhir/R4/documentreference.html",
+        "note": "Addendum, amendment and retraction are three different legal acts that most interfaces render as one Edit. Revealing 42 CFR Part 2 content is the disclosive tier's reference case."
+      },
+      {
+        "name": "AuditEvent",
+        "url": "https://hl7.org/fhir/R4/auditevent.html",
+        "note": "The shape onDisclose produces maps onto AuditEvent, but the component never writes one — it has no actor and no session. It never carries the subject's label either, because an audit line with a patient's name in it has made the disclosure a second time."
+      }
+    ],
+    "resource": "Patient",
+    "resourceUrl": "https://hl7.org/fhir/R4/patient.html",
+    "states": [
+      "Routine actions only",
+      "A recorded action, saying what it writes",
+      "A clinical action, first activation",
+      "A clinical action, second step",
+      "A disclosure, reasons offered",
+      "Unavailable, with the reason in place",
+      "Withheld by policy, counted",
+      "An availability check still pending",
+      "A masked subject",
+      "A multiple selection",
+      "Checkbox and radio view state",
+      "A submenu, open beside its row",
+      "This record supports no actions",
+      "Every action withheld from this role"
+    ],
+    "props": [
+      {
+        "name": "actions",
+        "type": "readonly ChartMenuAction[]",
+        "description": "Every verb the surface offers. One flat array; `applies` does the routing, so nothing at the call site needs to know what a `MedicationRequest` is.",
+        "required": true
+      },
+      {
+        "name": "children",
+        "type": "(trigger: MenuTriggerProps) => React.ReactNode",
+        "description": "A render function, not an element. See the note at the top of this file.",
+        "required": true
+      },
+      {
+        "name": "subject",
+        "type": "MenuSubject",
+        "description": "What was right-clicked. Required, and there is no prop that suppresses the header it produces: a configurable safety feature is one that is off in the codebase that needed it most.",
+        "required": true
+      },
+      {
+        "name": "className",
+        "type": "string",
+        "description": "Applied to the popup.",
+        "required": false
+      },
+      {
+        "name": "container",
+        "type": "HTMLElement | null",
+        "description": "Where the popup is portalled. Defaults to `document.body`. Worth setting when the surrounding page scopes theme, density or `dir` on an element the menu should stay inside, or when a test wants the popup in the same tree it is auditing.",
+        "required": false
+      },
+      {
+        "name": "density",
+        "type": "'compact' | 'comfortable'",
+        "description": "Overrides the inherited density scope.",
+        "required": false
+      },
+      {
+        "name": "disabled",
+        "type": "boolean",
+        "description": "Lets the browser's own context menu through — the right behaviour over selected text.",
+        "required": false
+      },
+      {
+        "name": "now",
+        "type": "string",
+        "description": "An ISO instant for the disclosure record. Required whenever any action is `disclosive`: the record needs a timestamp and a component may not read the clock (ENGINEERING.md §9).",
+        "required": false
+      },
+      {
+        "name": "onBlocked",
+        "type": "((action: ChartMenuAction, reason: string) => void)",
+        "description": "A blocked verb was chosen. Worth wiring: repeated blocks are a permissions problem.",
+        "required": false
+      },
+      {
+        "name": "onDisclose",
+        "type": "((record: DisclosureRecord) => void)",
+        "description": "The disclosure record, on all three outcomes. The component makes it; the host keeps it, because the host is the only thing that knows the actor.",
+        "required": false
+      },
+      {
+        "name": "onOpenChange",
+        "type": "((open: boolean, subject: MenuSubject) => void)",
+        "description": "The menu opened or closed. For hosts that pause a poll, dismiss a hover card, or count how often the right-click path is actually used — which is the measurement that says whether the ⋯ button is the product.",
+        "required": false
+      },
+      {
+        "name": "onRun",
+        "type": "((action: ChartMenuAction, subject: MenuSubject, outcome: MenuOutcome) => void)",
+        "description": "Runs an action. Only ever called for an outcome of `run`. Receives the whole subject, `also` included, so a host writes and reports per subject rather than pretending twelve writes are one boolean.",
+        "required": false
+      },
+      {
+        "name": "onToggle",
+        "type": "((action: ChartMenuAction, checked: boolean) => void)",
+        "description": "A toggle changed. Separate from `onRun`, because view state is not an act.",
+        "required": false
+      },
+      {
+        "name": "policy",
+        "type": "MenuPolicy",
+        "description": "Who is asking. Without one, nothing is withheld — correct for a demo and wrong for a chart.",
+        "required": false
+      },
+      {
+        "name": "presentation",
+        "type": "MenuPresentation",
+        "description": "How the menu is drawn. `auto` — the default — picks the bottom sheet on a coarse pointer or below 40rem and the pointer popup everywhere else, which is the choice a host almost never wants to make itself.",
+        "required": false
+      }
+    ],
+    "exports": [
+      {
+        "name": "ChartContextMenu",
+        "props": [
+          {
+            "name": "actions",
+            "type": "readonly ChartMenuAction[]",
+            "description": "Every verb the surface offers. One flat array; `applies` does the routing, so nothing at the call site needs to know what a `MedicationRequest` is.",
+            "required": true
+          },
+          {
+            "name": "children",
+            "type": "(trigger: MenuTriggerProps) => React.ReactNode",
+            "description": "A render function, not an element. See the note at the top of this file.",
+            "required": true
+          },
+          {
+            "name": "subject",
+            "type": "MenuSubject",
+            "description": "What was right-clicked. Required, and there is no prop that suppresses the header it produces: a configurable safety feature is one that is off in the codebase that needed it most.",
+            "required": true
+          },
+          {
+            "name": "className",
+            "type": "string",
+            "description": "Applied to the popup.",
+            "required": false
+          },
+          {
+            "name": "container",
+            "type": "HTMLElement | null",
+            "description": "Where the popup is portalled. Defaults to `document.body`. Worth setting when the surrounding page scopes theme, density or `dir` on an element the menu should stay inside, or when a test wants the popup in the same tree it is auditing.",
+            "required": false
+          },
+          {
+            "name": "density",
+            "type": "'compact' | 'comfortable'",
+            "description": "Overrides the inherited density scope.",
+            "required": false
+          },
+          {
+            "name": "disabled",
+            "type": "boolean",
+            "description": "Lets the browser's own context menu through — the right behaviour over selected text.",
+            "required": false
+          },
+          {
+            "name": "now",
+            "type": "string",
+            "description": "An ISO instant for the disclosure record. Required whenever any action is `disclosive`: the record needs a timestamp and a component may not read the clock (ENGINEERING.md §9).",
+            "required": false
+          },
+          {
+            "name": "onBlocked",
+            "type": "((action: ChartMenuAction, reason: string) => void)",
+            "description": "A blocked verb was chosen. Worth wiring: repeated blocks are a permissions problem.",
+            "required": false
+          },
+          {
+            "name": "onDisclose",
+            "type": "((record: DisclosureRecord) => void)",
+            "description": "The disclosure record, on all three outcomes. The component makes it; the host keeps it, because the host is the only thing that knows the actor.",
+            "required": false
+          },
+          {
+            "name": "onOpenChange",
+            "type": "((open: boolean, subject: MenuSubject) => void)",
+            "description": "The menu opened or closed. For hosts that pause a poll, dismiss a hover card, or count how often the right-click path is actually used — which is the measurement that says whether the ⋯ button is the product.",
+            "required": false
+          },
+          {
+            "name": "onRun",
+            "type": "((action: ChartMenuAction, subject: MenuSubject, outcome: MenuOutcome) => void)",
+            "description": "Runs an action. Only ever called for an outcome of `run`. Receives the whole subject, `also` included, so a host writes and reports per subject rather than pretending twelve writes are one boolean.",
+            "required": false
+          },
+          {
+            "name": "onToggle",
+            "type": "((action: ChartMenuAction, checked: boolean) => void)",
+            "description": "A toggle changed. Separate from `onRun`, because view state is not an act.",
+            "required": false
+          },
+          {
+            "name": "policy",
+            "type": "MenuPolicy",
+            "description": "Who is asking. Without one, nothing is withheld — correct for a demo and wrong for a chart.",
+            "required": false
+          },
+          {
+            "name": "presentation",
+            "type": "MenuPresentation",
+            "description": "How the menu is drawn. `auto` — the default — picks the bottom sheet on a coarse pointer or below 40rem and the pointer popup everywhere else, which is the choice a host almost never wants to make itself.",
+            "required": false
+          }
+        ]
+      }
+    ],
+    "usage": "import { ChartContextMenu } from \"@/components/oxygen/chart-context-menu\";\nimport \"@/styles/oxygen-menu.css\";\n\n<ChartContextMenu\n  subject={{\n    resource: \"MedicationRequest\",\n    id: order.id,\n    label: \"Lisinopril 10 mg\",\n    detail: \"Oral · daily · started 4 Mar 2026\",\n    masked: row.restricted,\n  }}\n  actions={medicationActions}\n  policy={{ role: \"a registered nurse\", permitted, breakGlass: true }}\n  now={serverTime}\n  onRun={(action, subject) => dispatch(action.id, subject)}\n  onDisclose={(record) => audit.write(\"disclosure\", record)}\n>\n  {(trigger) => <tr {...trigger}>{cells}</tr>}\n</ChartContextMenu>",
+    "guidance": {
+      "use": [
+        "On any row that already identifies a record — a medication, a result, a note, a patient in a worklist. The subject header is only honest if the row it came from was.",
+        "With a policy. Without one nothing is withheld, which is right for a demo and wrong for a chart.",
+        "With `onDisclose` wired before the first disclosive action is added. The component produces the record either way; nothing will keep it.",
+        "With `now` set from server time whenever any action is disclosive — the record needs a timestamp and the component may not read a clock.",
+        "Alongside a visible ⋯ affordance. A menu reachable only by a secondary click is one most people never find, and `presentation=\"anchored\"` is the same menu from a button."
+      ],
+      "avoid": [
+        "As the only way to reach an action. It is the fast path for people who already know the verb, not the only path.",
+        "With `applies` omitted above `tier: \"routine\"`, which offers a discontinue on every resource in the chart.",
+        "With a confirmation delegated to a modal. A modal moves focus off the surface and takes the keyboard away from the person who was using it.",
+        "With a preview of the record's value in a submenu. A floating layer showing PHI is a disclosure surface during a screen-share, a screenshot and a recording — if the value is worth showing, the row already shows it.",
+        "On a selection, with a disclosive action marked `bulk: \"allowed\"`. Twelve records with one justification is not a record a privacy officer accepts, and the validator refuses it."
+      ]
+    },
+    "accessibility": [
+      {
+        "label": "The menu's accessible name is its subject",
+        "detail": "The subject header is role=\"presentation\" and unreachable, and the popup carries aria-labelledby pointing at it — so a screen reader announces \"Aluel Okonkwo, MRN 44-2871, menu, 8 items\" before any item. A sighted reader gets the wrong-patient check by reading it; a screen-reader user gets it in the role announcement. One element, both audiences."
+      },
+      {
+        "label": "Shift+F10 and the Menu key open it",
+        "detail": "Handled explicitly rather than relying on the browser synthesising a contextmenu event: Chrome and Firefox do, Safari does not, and a menu reachable only by a secondary click fails SC 2.1.1 outright. The trigger props carry tabIndex and a default role for the same reason."
+      },
+      {
+        "label": "Unavailable rows stay reachable and say why",
+        "detail": "aria-disabled rather than disabled, with the reason rendered as text rather than as a title attribute — a tooltip is unavailable to the person using a keyboard, and that is exactly the person who needs the reason."
+      },
+      {
+        "label": "Rows still being checked are skipped, not activated",
+        "detail": "nextIndex passes over a pending row, so a fast Enter cannot land on an answer that has not arrived. The row keeps its position and its height throughout, so nothing moves when the answer does arrive."
+      },
+      {
+        "label": "Focus returns to the trigger on every close path",
+        "detail": "Escape, running an item, and Tab all restore focus to the element that opened the menu. Clicking away deliberately does not, because moving focus on a click elsewhere is what strands a reader mid-page."
+      },
+      {
+        "label": "The withheld count is a row, not a footnote",
+        "detail": "It sits inside the menu above the bottom edge. A reader who does not see it concludes the record supports nothing else, which is the one wrong conclusion available."
+      },
+      {
+        "label": "Activation is on the up-event",
+        "detail": "SC 2.5.2. Opening happens on contextmenu; running happens on click. Pressing down on Discontinue and dragging off it does nothing, and a long press on touch opens the menu without ever activating a row."
+      },
+      {
+        "label": "The tier is never carried by colour alone",
+        "detail": "Each tier has a glyph, a band position and — above routine — a sentence. In forced-colours mode the tints are discarded and the bands, the strike-through, the lock and the wording all survive."
+      }
+    ],
+    "limitations": [
+      "The trigger announces aria-haspopup but never aria-expanded. Axe rejects the latter on a generic element and treats it as conditional on a table row, and it is wrong on the merits anyway — a transient popup is not content belonging to the row, and announcing every row of a worklist as collapsed is a claim about structure that is not true.",
+      "Submenus have a 100ms hover intent and no safe triangle. Instead of geometry, an open child closes when the pointer reaches a *different* row rather than when it leaves the trigger — so crossing the gap between the two menus closes nothing, which is the case a safe triangle exists to protect. validateActions still refuses anything above tier=\"routine\" inside one, because the cost of an accidental close has to stay \"move the mouse again\" rather than a mis-click on whatever the pointer crossed.",
+      "Type-ahead matches the first letter only. A full buffer competes with the shortcuts the menu displays, and the ambiguity is worse than the omission.",
+      "The menu follows its trigger on scroll and closes on a viewport resize. Following is right because the popup is anchored to a place inside the row rather than to a viewport coordinate; closing on resize is right because a rotation reflows the layout the placement was computed against, and there is no correct place to put a stale popup.",
+      "Break-glass is signalled, never performed. The component says an override exists, takes the reason and reports it; the step-up authentication and the incident report behind it are a separate surface with their own consent and their own record.",
+      "The disclosure record is produced, not written. The component knows the action and the subject; it does not know the actor or the session, and a component that guessed at either would be worse than one that hands the host a partial record to complete.",
+      "Strings are English and are not routed through @oxygenui/intl. That is true of every registry component today and is the same open question for all of them; the package channel is where it will be answered."
+    ],
+    "related": [
+      "chart-command-palette",
+      "care-timeline"
+    ],
+    "dependencies": [
+      "clsx",
+      "tailwind-merge"
+    ],
+    "install": "npx @oxygenui-design/cli add chart-context-menu",
+    "technicalName": "ChartContextMenu",
+    "aliases": [
+      "context menu",
+      "right click menu",
+      "action menu",
+      "row actions",
+      "overflow menu",
+      "dropdown menu"
+    ],
+    "tags": [
+      "navigation",
+      "overlay",
+      "keyboard-first",
+      "themeable",
+      "headless"
+    ],
+    "uxGuidelines": {
+      "do": [
+        "Write `confirm` with the specifics: “the next scheduled dose is 14:00 today” rather than “this cannot be undone”.",
+        "Write `records` from the reader's side: “creates a Task for pharmacy; it appears in their queue with your name on it”, not “saved”.",
+        "Let the resolver place the separators. Consequence sorts to the bottom, so a discontinue cannot end up adjacent to a copy no matter what order the array is in.",
+        "Keep toggles at `tier: \"routine\"`. Pinning a column and discontinuing a drug are not the same kind of act and must not look like one.",
+        "Give a bulk-safe clinical action a `bulkConfirm`. Confirming twelve no-shows with a sentence written for one is a confirmation nobody read."
+      ],
+      "dont": [
+        "Do not hide an action this person cannot run. The count teaches them something exists; the silence teaches them it does not.",
+        "Do not resolve a name the row was masking. The menu may say less than its trigger; it may never say more.",
+        "Do not append actions when an async check resolves. The row's place is reserved from the first paint, because a menu that grows has moved a destructive verb under a pointer aiming at something else.",
+        "Do not reorder by frequency. This is the opposite of the command palette, deliberately: there you typed and are reading, here you have muscle memory and a pointer in flight.",
+        "Do not suppress the disclosure record when the reader backs out. In a privacy review the abandoned ones are the interesting ones."
+      ]
+    },
+    "domain": {
+      "industries": [
+        "healthcare",
+        "behavioral-health"
+      ],
+      "clinicalContext": "The four tiers came out of asking what a chart actually distinguishes. `documented` exists because “this writes something other clinicians will read” is the most common surprise in an EHR and costs one line of copy to remove. `disclosive` exists because break-glass and 42 CFR Part 2 reveals are a different kind of act from anything else in a menu: HIPAA does not name break-glass, but 45 CFR §164.312(a)(2)(ii) requires an emergency access procedure, and every implementation of one takes a documented reason before the record opens.",
+      "workflows": [
+        "documentation",
+        "medication",
+        "care-coordination",
+        "assessment"
+      ],
+      "phi": {
+        "handles": true,
+        "notes": "The subject header renders whatever the trigger row rendered, and refuses to render more when the row was masked. The disclosure record deliberately carries resource and id but never the label, because an audit line with a patient's name in it has made the disclosure a second time to a wider audience."
+      },
+      "auditable": true,
+      "permissions": [
+        "chart.read",
+        "audit.write"
+      ],
+      "terminology": [
+        "FHIR"
+      ]
+    },
+    "variants": [
+      {
+        "id": "popup",
+        "label": "Pointer popup",
+        "description": "Opened at the cursor, with the subject header as the safe landing. The corner sits three pixels behind the pointer, because with it exactly on the cursor an 8px radius leaves the pointer outside the menu shape.",
+        "args": {
+          "presentation": "popup"
+        }
+      },
+      {
+        "id": "anchored",
+        "label": "Anchored to a button",
+        "description": "The discoverable path, aligned to the ⋯ trigger and offset so it does not cover the control focus returns to.",
+        "args": {
+          "presentation": "anchored"
+        }
+      },
+      {
+        "id": "sheet",
+        "label": "Touch sheet",
+        "description": "Long press below 40rem or on a coarse pointer. Pinned to the bottom edge rather than floating at the finger, with 44px rows, and cancelled by a scroll or a 10px drift.",
+        "args": {
+          "presentation": "sheet"
+        }
+      }
+    ],
+    "controls": [
+      {
+        "prop": "presentation",
+        "control": "select",
+        "label": "Presentation",
+        "options": [
+          "auto",
+          "popup",
+          "anchored",
+          "sheet"
+        ],
+        "defaultValue": "auto"
+      },
+      {
+        "prop": "density",
+        "control": "select",
+        "label": "Density",
+        "options": [
+          "comfortable",
+          "compact"
+        ]
+      },
+      {
+        "prop": "disabled",
+        "control": "switch",
+        "label": "Disabled",
+        "defaultValue": false
+      },
+      {
+        "prop": "onRun",
+        "control": "event",
+        "label": "onRun"
+      },
+      {
+        "prop": "onDisclose",
+        "control": "event",
+        "label": "onDisclose"
+      },
+      {
+        "prop": "onBlocked",
+        "control": "event",
+        "label": "onBlocked"
+      }
+    ],
+    "a11yChecks": [
+      {
+        "wcag": "2.1.1",
+        "name": "Keyboard",
+        "status": "pass",
+        "how": "Shift+F10 and the Menu key open the menu from a focused trigger; arrows, Home, End, first-letter type-ahead, Enter, Space and Escape drive it. Nothing needs a pointer.",
+        "evidence": "chart-context-menu.test.tsx"
+      },
+      {
+        "wcag": "4.1.2",
+        "name": "Name, role, value",
+        "status": "pass",
+        "how": "role=\"menu\" named by the subject header through aria-labelledby; menuitem, menuitemcheckbox and menuitemradio with aria-checked; aria-haspopup=\"menu\" on the trigger, with role=\"button\" as a default a host can override; aria-disabled rather than disabled so a blocked row keeps its name and its reason.",
+        "evidence": "chart-context-menu.test.tsx"
+      },
+      {
+        "wcag": "2.4.3",
+        "name": "Focus order",
+        "status": "pass",
+        "how": "Focus enters the popup on open and returns to the trigger on Escape, on running an item, and on Tab. A test asserts all three, because this is the failure that strands the keyboard user the feature was built for.",
+        "evidence": "chart-context-menu.test.tsx"
+      },
+      {
+        "wcag": "2.4.11",
+        "name": "Focus not obscured (minimum)",
+        "status": "pass",
+        "how": "The anchored presentation flips above the trigger when there is not room below, so the control focus returns to is never underneath the menu.",
+        "evidence": "chart-context-menu.test.tsx"
+      },
+      {
+        "wcag": "2.5.2",
+        "name": "Pointer cancellation",
+        "status": "pass",
+        "how": "Opening is on contextmenu; activation is on click, which is the up-event. A long press opens the sheet and never activates a row, and it is cancelled by a 10px drift.",
+        "evidence": "chart-context-menu.test.tsx"
+      },
+      {
+        "wcag": "2.5.8",
+        "name": "Target size (minimum)",
+        "status": "pass",
+        "how": "Rows are 30px comfortable and 26px compact, both expressed as max() against the density floor so no density profile can take them under 24px. The touch sheet uses 44px.",
+        "evidence": "menu.css"
+      },
+      {
+        "wcag": "1.4.1",
+        "name": "Use of colour",
+        "status": "pass",
+        "how": "Every tier carries a glyph, a band position and a word. Unavailable is struck through and states its reason; withheld carries a lock and a sentence.",
+        "evidence": "chart-context-menu.test.tsx"
+      },
+      {
+        "wcag": "4.1.3",
+        "name": "Status messages",
+        "status": "pass",
+        "how": "A polite live region announces the action count and the withheld count on open. When nothing is withheld the clause is absent rather than read as \"0 hidden\".",
+        "evidence": "chart-context-menu.test.tsx"
+      },
+      {
+        "wcag": "3.3.4",
+        "name": "Error prevention",
+        "status": "pass",
+        "how": "Clinical and disclosive actions take a second deliberate step, drawn inside the menu under the row it belongs to. The confirm control is labelled with the verb rather than OK, and Keep is always available.",
+        "evidence": "chart-context-menu.test.tsx"
+      },
+      {
+        "wcag": "1.4.10",
+        "name": "Reflow",
+        "status": "pass",
+        "how": "Below 40rem, and on any coarse pointer, the menu becomes a bottom sheet with 44px rows and the subject header pinned above the list.",
+        "evidence": "menu.css"
+      }
+    ],
+    "examples": [
+      {
+        "id": "subject",
+        "title": "The subject header is the safe landing",
+        "description": "The menu opens with a non-interactive header naming the record under the pointer, so the first thing under the pointer is never a verb — one decision closing two holes at once, the wrong-patient check and the accidental click-through. There is no prop that removes it, because a configurable safety feature is one that is off in the codebase that needed it most.",
+        "fixture": "patientRoutine",
+        "code": "describeSubject({ resource: \"MedicationRequest\", id: \"m1\",\n                  label: \"Lisinopril 10 mg\", detail: \"Oral · daily\" });\n// → { who: \"Lisinopril 10 mg\", what: \"Oral · daily\", masked: false, bulk: 1 }\n\ndescribeSubject({ ...subject, masked: true });\n// → { who: \"Restricted record\", what: \"Medication\", masked: true, bulk: 1 }"
+      },
+      {
+        "id": "tiers",
+        "title": "Consequence is a rank, not a boolean",
+        "description": "Four tiers, and the tier decides the interaction rather than the colour. A routine action runs on the click; a recorded one runs and says what it wrote before it is chosen; a clinical one takes a second step inside the menu; a disclosure takes a reason. The bands lay out in that order with a rule between them, so a discontinue can never end up adjacent to a copy no matter how the array was written.",
+        "fixture": "patientRoutine",
+        "code": "actionOutcome(discontinue);\n// → { kind: \"confirm\", prompt: \"The next dose is 14:00 today…\", verb: \"Discontinue\" }\n\nactionOutcome(discontinue, { confirming: \"dc\" });   // → { kind: \"run\" }\nactionOutcome(preliminary);\n// → { kind: \"blocked\", reason: \"Preliminary results are not released\" }"
+      },
+      {
+        "id": "withheld",
+        "title": "Withheld is counted, never hidden",
+        "description": "Policy removes the verb from the list and leaves a number in its place, as a row inside the menu rather than a footnote under it. It is the same rule the command palette applies to patients outside your treatment relationships, down to the sentence shape: a reader who does not see the count concludes the record supports nothing else, which is the one wrong conclusion available.",
+        "fixture": "patientRestricted",
+        "code": "resolveMenu(subject, actions, { permitted: [\"open\", \"copy\"] }).withheld;  // → 3\n\ndescribeHiddenActions(3, { role: \"a registered nurse\", breakGlass: true });\n// → \"3 further actions on this record, hidden for a registered nurse — break-glass required\""
+      },
+      {
+        "id": "disclosure",
+        "title": "The record is made when the reasons are offered",
+        "description": "A disclosure emits its audit record the moment the reason list is drawn, again when a reason is chosen, and again with outcome \"abandoned\" if the reader closes the menu instead. That symmetry is the point: in a privacy review the abandoned ones are the interesting ones. Note what is not in the record — the subject's label never appears, because an audit line carrying a patient's name into a log with a wider readership than the chart has made the disclosure a second time.",
+        "fixture": "patientRestricted",
+        "code": "disclosureRecord(revealPart2, subject, { now, outcome: \"offered\" });\n// → { at: now, action: \"part2\", subject: { resource, id },\n//     subjectNamed: false, masked: false, reason: null,\n//     outcome: \"offered\", breakGlass: true }"
+      },
+      {
+        "id": "pending",
+        "title": "A menu that never moves under the cursor",
+        "description": "An entitlement check that has not come back renders as a placeholder at the row's final height, in its final position — never appended when the answer arrives. Every EHR has async checks behind its menus, and the obvious implementation renders what it knows and appends the rest, which moves rows under a pointer already in flight. The arrow keys skip a pending row too, so a fast Enter cannot land on an answer that has not arrived.",
+        "fixture": "patientRoutine",
+        "code": "nextIndex(rows, 0, 1);        // skips the row whose status is \"pending\"\nactionOutcome(stillChecking);\n// → { kind: \"blocked\", reason: \"Still checking whether this can run\" }"
+      }
+    ],
+    "fixtures": [
+      "patientRoutine",
+      "patientRestricted"
+    ],
+    "seo": {
+      "slug": "chart-context-menu",
+      "title": "Chart Context Menu — React healthcare row actions",
+      "description": "A React context menu for clinical apps: it names the record before offering to change it, ranks verbs by consequence, and counts the actions it withholds.",
+      "primaryKeyword": "react healthcare context menu",
+      "secondaryKeywords": [
+        "clinical right click menu",
+        "ehr row actions component",
+        "break glass menu react",
+        "destructive action confirmation menu"
+      ],
+      "searchIntent": "informational",
+      "ogImage": "generated"
+    },
+    "relationships": {
+      "builtWith": [],
+      "usedIn": [],
+      "patterns": [
+        "chart-review",
+        "care-coordination",
+        "documentation"
+      ],
+      "alternatives": [
+        {
+          "ref": "chart-command-palette",
+          "when": "the reader knows the verb's name but not which row it lives on"
         }
       ]
     }
@@ -4797,10 +5388,10 @@ export const CATALOG: ComponentDoc[] = [
     "since": "0.5.0",
     "layer": "clinical",
     "distribution": "registry",
-    "summary": "One temporal control with fourteen variants: field, calendar, birth date, session, slots, recurrence and the read-only record.",
-    "tagline": "One temporal control, fourteen variants, one value space.",
-    "description": "Fourteen presentations of one value space, one keyboard model and one accessibility contract. `variant` picks the surface; the parts are separately testable components underneath.",
-    "rationale": "A clinician does not shop for a \"birth date field\". They reach for the date control, and it has to behave differently in fourteen places: a service date they already know, an appointment they have to be shown, a birth date that wants an age beside it, a session that is three numbers with two degrees of freedom, a course of treatment that is a rule rather than a date, and a signed timestamp that is a legal instrument. Splitting those into fourteen catalogue entries hides the thing that makes them a system — that every one shares a value space, a keyboard model and an accessibility contract — and it makes a reader choose between components before they have understood the choice. The deeper reason is that healthcare temporal input is four distinct jobs, not one: recall (the user knows the value), choose (the system knows the options), construct (the value is a structure with derived members) and witness (the value is an assertion about the past). Every general-purpose picker builds only for choose, which is the rarest of the four in an electronic record, and that inversion is why EHR date fields are the way they are.",
+    "summary": "One temporal control with sixteen variants: field, calendar, date and time ranges, birth date, session, slots, recurrence and the read-only record.",
+    "tagline": "One temporal control, sixteen variants, one value space.",
+    "description": "Sixteen presentations of one value space, one keyboard model and one accessibility contract. `variant` picks the surface; the parts are separately testable components underneath.",
+    "rationale": "A clinician does not shop for a \"birth date field\". They reach for the date control, and it has to behave differently in sixteen places: a service date they already know, an appointment they have to be shown, a birth date that wants an age beside it, a session that is three numbers with two degrees of freedom, a course of treatment that is a rule rather than a date, and a signed timestamp that is a legal instrument. Splitting those into sixteen catalogue entries hides the thing that makes them a system — that every one shares a value space, a keyboard model and an accessibility contract — and it makes a reader choose between components before they have understood the choice. The deeper reason is that healthcare temporal input is four distinct jobs, not one: recall (the user knows the value), choose (the system knows the options), construct (the value is a structure with derived members) and witness (the value is an assertion about the past). Every general-purpose picker builds only for choose, which is the rarest of the four in an electronic record, and that inversion is why EHR date fields are the way they are.",
     "categories": [
       "Clinical",
       "Forms"
@@ -4839,10 +5430,12 @@ export const CATALOG: ComponentDoc[] = [
       "Field — no popover at all",
       "Calendar — inline month grid",
       "Range — two clicks, never a drag",
+      "Date range — both ends typed, two months behind them, named periods down the side",
       "Multiple dates — capped, click again to remove",
       "Birth date — age, partial dates, stated absence",
       "Time — and the ambiguity it refuses to resolve",
       "Session — start, end, duration, visible driver",
+      "Time range — two columns, a filtered end, a derived length",
       "Slots — grouped, counted, four states",
       "Scheduler — provider, date and time on one surface",
       "Recurrence — the rule in words",
@@ -4853,20 +5446,20 @@ export const CATALOG: ComponentDoc[] = [
     "props": [
       {
         "name": "defaultValue",
-        "type": "string | number | BirthDateValue | OxTime | SessionInterval | RecurrenceRule | readonly string[]",
-        "description": "Uncontrolled initial value. Pass this **or** `value`, never both. There is deliberately no runtime warning: ADR 0009 forbids component source writing to the console at all, because a component that logs is one error-reporting integration away from putting a date of birth in a third party's index. When both are passed, `value` wins — the ordinary React contract. Uncontrolled initial value. Pass this or `value`, never both; `value` wins if you pass both.",
+        "type": "string | number | DateRangeValue | BirthDateValue | OxTime | SessionInterval | OxTimeRange | RecurrenceRule | readonly string[]",
+        "description": "Uncontrolled initial value. Pass this **or** `value`, never both. There is deliberately no runtime warning: ADR 0009 forbids component source writing to the console at all, because a component that logs is one error-reporting integration away from putting a date of birth in a third party's index. When both are passed, `value` wins — the ordinary React contract. Uncontrolled initial value. Pass this or `value`, never both; `value` wins if you pass both. Uncontrolled initial value. Pass this or `value`, never both.",
         "required": false
       },
       {
         "name": "onChange",
-        "type": "((value: OxDate | null) => void) | ((value: OxDate | null) => void) | ((value: BirthDateValue) => void) | ((value: OxTime | null) => void) | ((value: SessionInterval) => void) | React.ChangeEventHandler<HTMLDivElement, Element> | ((rule: RecurrenceRule) => void) | React.ChangeEventHandler<HTMLElement, Element>",
-        "description": "Fired on every complete, valid date, and with `null` when the field is cleared. Never fired mid-typing. Fired when a single date is chosen. Only meaningful in `mode=\"single\"`. Fired with the whole birth-date value, which carries its precision and any absence reason alongside the date. Fired on every complete time, and with `null` when cleared. Fired whenever start, end or duration changes. The interval is always internally consistent when it fires. Fired with the recurrence rule whenever any part of it changes.",
+        "type": "((value: OxDate | null) => void) | ((value: OxDate | null) => void) | ((range: DateRangeValue) => void) | ((value: BirthDateValue) => void) | ((value: OxTime | null) => void) | ((value: SessionInterval) => void) | ((range: OxTimeRange) => void) | React.ChangeEventHandler<HTMLDivElement, Element> | ((rule: RecurrenceRule) => void) | React.ChangeEventHandler<HTMLElement, Element>",
+        "description": "Fired on every complete, valid date, and with `null` when the field is cleared. Never fired mid-typing. Fired when a single date is chosen. Only meaningful in `mode=\"single\"`. Fired when either end changes — by typing, by the calendar, or by a preset. Fired with the whole birth-date value, which carries its precision and any absence reason alongside the date. Fired on every complete time, and with `null` when cleared. Fired whenever start, end or duration changes. The interval is always internally consistent when it fires. Fired when either end changes. Fired with the recurrence rule whenever any part of it changes.",
         "required": false
       },
       {
         "name": "variant",
-        "type": "'picker' | 'field' | 'calendar' | 'range' | 'multiple' | 'birth-date' | 'time' | 'session' | 'slots' | 'scheduler' | 'recurrence' | 'series' | 'group' | 'readout'",
-        "description": "Which of the fourteen temporal controls to render. Defaults to the date field. A month grid. `range` is two clicks, `multiple` is a capped set. A date of birth, with its own precision and absence handling. A time of day, with optional organisation presets. A start, an end and a derived duration that may cross midnight. A grid of bookable times. Provider, date and slot, resolved together. A recurrence rule, expressed in words and emitted as RRULE. A recurring series with its conflicts resolved one occurrence at a time. A recurring group with capacity, facilitators and a room. The read-only record rendering. Not an input.",
+        "type": "'picker' | 'field' | 'calendar' | 'range' | 'multiple' | 'date-range' | 'birth-date' | 'time' | 'session' | 'time-range' | 'slots' | 'scheduler' | 'recurrence' | 'series' | 'group' | 'readout'",
+        "description": "Which of the sixteen temporal controls to render. Defaults to the date field. A month grid. `range` is two clicks, `multiple` is a capped set. A span of days: two typeable ends, a two-month panel, named periods. A date of birth, with its own precision and absence handling. A time of day, with optional organisation presets. A start, an end and a derived duration that may cross midnight. A start time, an end time, and a derived length. A grid of bookable times. Provider, date and slot, resolved together. A recurrence rule, expressed in words and emitted as RRULE. A recurring series with its conflicts resolved one occurrence at a time. A recurring group with capacity, facilitators and a room. The read-only record rendering. Not an input.",
         "required": false
       }
     ],
@@ -4876,20 +5469,20 @@ export const CATALOG: ComponentDoc[] = [
         "props": [
           {
             "name": "defaultValue",
-            "type": "string | number | BirthDateValue | OxTime | SessionInterval | RecurrenceRule | readonly string[]",
-            "description": "Uncontrolled initial value. Pass this **or** `value`, never both. There is deliberately no runtime warning: ADR 0009 forbids component source writing to the console at all, because a component that logs is one error-reporting integration away from putting a date of birth in a third party's index. When both are passed, `value` wins — the ordinary React contract. Uncontrolled initial value. Pass this or `value`, never both; `value` wins if you pass both.",
+            "type": "string | number | DateRangeValue | BirthDateValue | OxTime | SessionInterval | OxTimeRange | RecurrenceRule | readonly string[]",
+            "description": "Uncontrolled initial value. Pass this **or** `value`, never both. There is deliberately no runtime warning: ADR 0009 forbids component source writing to the console at all, because a component that logs is one error-reporting integration away from putting a date of birth in a third party's index. When both are passed, `value` wins — the ordinary React contract. Uncontrolled initial value. Pass this or `value`, never both; `value` wins if you pass both. Uncontrolled initial value. Pass this or `value`, never both.",
             "required": false
           },
           {
             "name": "onChange",
-            "type": "((value: OxDate | null) => void) | ((value: OxDate | null) => void) | ((value: BirthDateValue) => void) | ((value: OxTime | null) => void) | ((value: SessionInterval) => void) | React.ChangeEventHandler<HTMLDivElement, Element> | ((rule: RecurrenceRule) => void) | React.ChangeEventHandler<HTMLElement, Element>",
-            "description": "Fired on every complete, valid date, and with `null` when the field is cleared. Never fired mid-typing. Fired when a single date is chosen. Only meaningful in `mode=\"single\"`. Fired with the whole birth-date value, which carries its precision and any absence reason alongside the date. Fired on every complete time, and with `null` when cleared. Fired whenever start, end or duration changes. The interval is always internally consistent when it fires. Fired with the recurrence rule whenever any part of it changes.",
+            "type": "((value: OxDate | null) => void) | ((value: OxDate | null) => void) | ((range: DateRangeValue) => void) | ((value: BirthDateValue) => void) | ((value: OxTime | null) => void) | ((value: SessionInterval) => void) | ((range: OxTimeRange) => void) | React.ChangeEventHandler<HTMLDivElement, Element> | ((rule: RecurrenceRule) => void) | React.ChangeEventHandler<HTMLElement, Element>",
+            "description": "Fired on every complete, valid date, and with `null` when the field is cleared. Never fired mid-typing. Fired when a single date is chosen. Only meaningful in `mode=\"single\"`. Fired when either end changes — by typing, by the calendar, or by a preset. Fired with the whole birth-date value, which carries its precision and any absence reason alongside the date. Fired on every complete time, and with `null` when cleared. Fired whenever start, end or duration changes. The interval is always internally consistent when it fires. Fired when either end changes. Fired with the recurrence rule whenever any part of it changes.",
             "required": false
           },
           {
             "name": "variant",
-            "type": "'picker' | 'field' | 'calendar' | 'range' | 'multiple' | 'birth-date' | 'time' | 'session' | 'slots' | 'scheduler' | 'recurrence' | 'series' | 'group' | 'readout'",
-            "description": "Which of the fourteen temporal controls to render. Defaults to the date field. A month grid. `range` is two clicks, `multiple` is a capped set. A date of birth, with its own precision and absence handling. A time of day, with optional organisation presets. A start, an end and a derived duration that may cross midnight. A grid of bookable times. Provider, date and slot, resolved together. A recurrence rule, expressed in words and emitted as RRULE. A recurring series with its conflicts resolved one occurrence at a time. A recurring group with capacity, facilitators and a room. The read-only record rendering. Not an input.",
+            "type": "'picker' | 'field' | 'calendar' | 'range' | 'multiple' | 'date-range' | 'birth-date' | 'time' | 'session' | 'time-range' | 'slots' | 'scheduler' | 'recurrence' | 'series' | 'group' | 'readout'",
+            "description": "Which of the sixteen temporal controls to render. Defaults to the date field. A month grid. `range` is two clicks, `multiple` is a capped set. A span of days: two typeable ends, a two-month panel, named periods. A date of birth, with its own precision and absence handling. A time of day, with optional organisation presets. A start, an end and a derived duration that may cross midnight. A start time, an end time, and a derived length. A grid of bookable times. Provider, date and slot, resolved together. A recurrence rule, expressed in words and emitted as RRULE. A recurring series with its conflicts resolved one occurrence at a time. A recurring group with capacity, facilitators and a room. The read-only record rendering. Not an input.",
             "required": false
           }
         ]
@@ -4898,9 +5491,39 @@ export const CATALOG: ComponentDoc[] = [
         "name": "DateField",
         "props": [
           {
+            "name": "calendarCommit",
+            "type": "'immediate' | 'explicit'",
+            "description": "Whether the popover reports a day the moment it is clicked, or holds it behind Cancel and Done. `immediate` by default: one click is the whole answer for a single date, and a second press to confirm it is a press.",
+            "required": false
+          },
+          {
             "name": "calendarFooter",
             "type": "React.ReactNode",
             "description": "Rendered under the popover grid — relative-date chips, a clear action.",
+            "required": false
+          },
+          {
+            "name": "calendarHints",
+            "type": "boolean",
+            "description": "Shows the arrow-key legend under the popover grid.",
+            "required": false
+          },
+          {
+            "name": "calendarMonths",
+            "type": "number",
+            "description": "Months shown side by side in the popover calendar.",
+            "required": false
+          },
+          {
+            "name": "calendarShortcuts",
+            "type": "readonly DateShortcut[]",
+            "description": "Named dates down the side of the popover calendar — \"Today\", \"Next Monday\". A rail rather than a row of chips under the grid, because it is a second way into the same answer and belongs beside the grid rather than after it. `relativeDateOptions(now)` is the general set; drop what your field has no use for. \"Tomorrow\" on a date of service is noise.",
+            "required": false
+          },
+          {
+            "name": "calendarShowCustom",
+            "type": "boolean",
+            "description": "Offers \"Custom\" above the rail, pressed when the value matches nothing in it.",
             "required": false
           },
           {
@@ -5053,9 +5676,27 @@ export const CATALOG: ComponentDoc[] = [
         "name": "Calendar",
         "props": [
           {
+            "name": "cancelLabel",
+            "type": "string",
+            "description": "The word on the dismissing action. Translate it; do not leave it English.",
+            "required": false
+          },
+          {
+            "name": "commit",
+            "type": "'immediate' | 'explicit'",
+            "description": "When the selection reaches the host. `immediate` — the default and the existing behaviour — reports every click. `explicit` holds a draft behind Cancel and Done, which is what a range wants: a mis-clicked start is corrected by clicking again, and a parent that has already been told about it has already filtered a report on a range nobody chose.",
+            "required": false
+          },
+          {
             "name": "dates",
             "type": "OxDate[]",
             "description": "The selected dates, controlled. Only meaningful in `mode=\"multiple\"`.",
+            "required": false
+          },
+          {
+            "name": "defaultDates",
+            "type": "OxDate[]",
+            "description": "The dates on first render, uncontrolled. Pass this or `dates`, never both.",
             "required": false
           },
           {
@@ -5065,9 +5706,21 @@ export const CATALOG: ComponentDoc[] = [
             "required": false
           },
           {
+            "name": "defaultRange",
+            "type": "DateRangeValue | null",
+            "description": "The range on first render, uncontrolled. Pass this or `range`, never both. `value` has had `defaultValue` since the beginning and the other two modes did not, which made an uncontrolled range or multi-date calendar unable to open on anything but empty — a filter that remembers last month's period had to be controlled for no other reason.",
+            "required": false
+          },
+          {
             "name": "defaultValue",
             "type": "OxDate | null",
             "description": "Uncontrolled initial value. Pass this or `value`, never both; `value` wins if you pass both.",
+            "required": false
+          },
+          {
+            "name": "doneLabel",
+            "type": "string",
+            "description": "The word on the committing action.",
             "required": false
           },
           {
@@ -5080,6 +5733,12 @@ export const CATALOG: ComponentDoc[] = [
             "name": "footer",
             "type": "React.ReactNode",
             "description": "Rendered under the grid — relative-date chips, a clear action.",
+            "required": false
+          },
+          {
+            "name": "hints",
+            "type": "boolean",
+            "description": "Shows the arrow-key legend in the footer. `aria-hidden`, deliberately: a screen-reader user is told how to drive a grid by the grid, and repeating it in the footer is one more thing to page past. It is a discoverability aid for people who can see it and would otherwise never learn the calendar has a keyboard.",
             "required": false
           },
           {
@@ -5131,15 +5790,33 @@ export const CATALOG: ComponentDoc[] = [
             "required": false
           },
           {
+            "name": "months",
+            "type": "number",
+            "description": "How many months to show at once, 1–4. Two is what a range wants: most ranges cross a month boundary, and choosing an end you cannot see is how a range picker ends up needing three attempts.",
+            "required": false
+          },
+          {
             "name": "now",
             "type": "OxDate | null",
             "description": "The day marked \"today\". Required to mark one — the component reads no clock, so a calendar without `now` simply has no today, which is correct for a historical picker and deliberate everywhere else.",
             "required": false
           },
           {
+            "name": "onCancel",
+            "type": "(() => void)",
+            "description": "Fired when an `explicit` calendar is dismissed without committing.",
+            "required": false
+          },
+          {
             "name": "onChange",
             "type": "((value: OxDate | null) => void)",
             "description": "Fired when a single date is chosen. Only meaningful in `mode=\"single\"`.",
+            "required": false
+          },
+          {
+            "name": "onCommit",
+            "type": "(() => void)",
+            "description": "Fired after Done, with the value that was committed.",
             "required": false
           },
           {
@@ -5161,9 +5838,27 @@ export const CATALOG: ComponentDoc[] = [
             "required": false
           },
           {
+            "name": "presets",
+            "type": "readonly DateRangePreset[]",
+            "description": "Named periods down the side — \"This month\", \"Last week\". Data rather than a boolean, because the right seven periods for a billing report and for an authorisation window are not the same seven, and a component that decides is a component every host has to work around. `dateRangePresets(now)` is the general set; drop what does not apply. Only meaningful in `mode=\"range\"`.",
+            "required": false
+          },
+          {
             "name": "range",
             "type": "DateRangeValue | null",
             "description": "The selected range, controlled. Only meaningful in `mode=\"range\"`.",
+            "required": false
+          },
+          {
+            "name": "shortcuts",
+            "type": "readonly DateShortcut[]",
+            "description": "Named single dates down the side — \"Today\", \"Next Monday\". The single-date half of the same rail, for `mode=\"single\"` and `mode=\"multiple\"`; `range` reads `presets` instead. Data for the same reason: \"Next Monday\" is a scheduling convention, and a component that ships one has decided what your clinic's week looks like. `relativeDateOptions(now)` is the general set. In `multiple` a shortcut toggles rather than replaces, because that is what every other press in that mode does.",
+            "required": false
+          },
+          {
+            "name": "showCustomPreset",
+            "type": "boolean",
+            "description": "Offers a \"Custom\" entry above the rail, pressed whenever the selection matches nothing in it. Without it a reader who has built their own selection sees a rail with nothing selected and no way to read their own state. Pressing it clears the selection, so the next click in the grid starts fresh. That is what \"I will pick my own\" means here, and it is the only reading that leaves the rail and the grid agreeing about the state.",
             "required": false
           },
           {
@@ -5188,6 +5883,191 @@ export const CATALOG: ComponentDoc[] = [
             "name": "weekdayNames",
             "type": "readonly string[]",
             "description": "Full weekday names, used in each cell's accessible name. Supply both these and `weekdayLabels` for any language that is not English.",
+            "required": false
+          },
+          {
+            "name": "weekStart",
+            "type": "number",
+            "description": "0 = Sunday. From `Intl.Locale.getWeekInfo`, never hardcoded.",
+            "required": false
+          }
+        ]
+      },
+      {
+        "name": "DateRangeField",
+        "props": [
+          {
+            "name": "commit",
+            "type": "'immediate' | 'explicit'",
+            "description": "When the panel reports its selection. `explicit` by default — see above.",
+            "required": false
+          },
+          {
+            "name": "defaultValue",
+            "type": "DateRangeValue | null",
+            "description": "Uncontrolled initial value. Pass this or `value`, never both.",
+            "required": false
+          },
+          {
+            "name": "disabled",
+            "type": "boolean",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "endLabel",
+            "type": "string",
+            "description": "Accessible name for the end half.",
+            "required": false
+          },
+          {
+            "name": "error",
+            "type": "string",
+            "description": "A host-supplied error. Outranks everything the field works out for itself.",
+            "required": false
+          },
+          {
+            "name": "hint",
+            "type": "string",
+            "description": "An advisory shown under the field when there is nothing more urgent to say.",
+            "required": false
+          },
+          {
+            "name": "hints",
+            "type": "boolean",
+            "description": "Shows the arrow-key legend under the panel's grid.",
+            "required": false
+          },
+          {
+            "name": "invalid",
+            "type": "boolean",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "label",
+            "type": "string",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "load",
+            "type": "((date: OxDate) => number | null)",
+            "description": "Open-slot count under each numeral.",
+            "required": false
+          },
+          {
+            "name": "max",
+            "type": "OxDate",
+            "description": "Latest selectable date, inclusive.",
+            "required": false
+          },
+          {
+            "name": "maxSpanDays",
+            "type": "number",
+            "description": "Refuses — with a spoken reason — any range longer than this many days.",
+            "required": false
+          },
+          {
+            "name": "min",
+            "type": "OxDate",
+            "description": "Earliest selectable date, inclusive.",
+            "required": false
+          },
+          {
+            "name": "minSpanDays",
+            "type": "number",
+            "description": "Refuses any range shorter than this many days.",
+            "required": false
+          },
+          {
+            "name": "months",
+            "type": "number",
+            "description": "Months shown side by side in the panel. Two by default, which is what a range wants.",
+            "required": false
+          },
+          {
+            "name": "name",
+            "type": "string",
+            "description": "Posts `${name}-start` and `${name}-end` as ISO dates in a plain HTML form.",
+            "required": false
+          },
+          {
+            "name": "now",
+            "type": "OxDate",
+            "description": "Today, supplied by the host. Nothing here reads a clock.",
+            "required": false
+          },
+          {
+            "name": "onChange",
+            "type": "((range: DateRangeValue) => void)",
+            "description": "Fired when either end changes — by typing, by the calendar, or by a preset.",
+            "required": false
+          },
+          {
+            "name": "optional",
+            "type": "boolean",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "order",
+            "type": "DateOrder",
+            "description": "Segment order. Match the locale, not the developer's.",
+            "required": false
+          },
+          {
+            "name": "presets",
+            "type": "readonly DateRangePreset[]",
+            "description": "Named periods down the side of the panel. `dateRangePresets(now)` is the general set.",
+            "required": false
+          },
+          {
+            "name": "readOnly",
+            "type": "boolean",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "required",
+            "type": "boolean",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "showCalendar",
+            "type": "boolean",
+            "description": "Offers the calendar panel. On by default.",
+            "required": false
+          },
+          {
+            "name": "showCustomPreset",
+            "type": "boolean",
+            "description": "Offers \"Custom\", pressed whenever the selection matches no preset.",
+            "required": false
+          },
+          {
+            "name": "showSpan",
+            "type": "boolean",
+            "description": "Shows the day count beside the value. Inclusive of both ends, because a range of service from the 1st to the 7th is seven days of care. It is the field's own proof-read: a transposed month is invisible in 03/07 – 07/07 and screaming in \"123 days\".",
+            "required": false
+          },
+          {
+            "name": "startLabel",
+            "type": "string",
+            "description": "Accessible name for the start half. Both halves need one; \"Date\" twice is a riddle.",
+            "required": false
+          },
+          {
+            "name": "unavailable",
+            "type": "((date: OxDate) => string | null)",
+            "description": "The reason a date cannot be chosen, or null. Spoken, not just dimmed.",
+            "required": false
+          },
+          {
+            "name": "value",
+            "type": "DateRangeValue | null",
+            "description": "Controlled value. Either end may be null; an incomplete range is a legal state.",
             "required": false
           },
           {
@@ -5307,6 +6187,167 @@ export const CATALOG: ComponentDoc[] = [
             "name": "value",
             "type": "OxTime | null",
             "description": "Controlled value. Pass `null` for empty, never `undefined`.",
+            "required": false
+          }
+        ]
+      },
+      {
+        "name": "TimeRangeField",
+        "props": [
+          {
+            "name": "allowOvernight",
+            "type": "boolean",
+            "description": "Lets the end precede the start, meaning the next day. A night shift is 22:00 to 06:00 and refusing it corrupts the data the refusal was protecting. Off by default, because an appointment that ends before it starts is almost always a typo.",
+            "required": false
+          },
+          {
+            "name": "cancelLabel",
+            "type": "string",
+            "description": "The word on the dismissing action. Translate it; do not leave it English.",
+            "required": false
+          },
+          {
+            "name": "commit",
+            "type": "'immediate' | 'explicit'",
+            "description": "When the panel reports its selection. `explicit` by default.",
+            "required": false
+          },
+          {
+            "name": "defaultValue",
+            "type": "OxTimeRange | null",
+            "description": "Uncontrolled initial value. Pass this or `value`, never both.",
+            "required": false
+          },
+          {
+            "name": "disabled",
+            "type": "boolean",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "doneLabel",
+            "type": "string",
+            "description": "The word on the committing action.",
+            "required": false
+          },
+          {
+            "name": "endLabel",
+            "type": "string",
+            "description": "Accessible name and column heading for the end half.",
+            "required": false
+          },
+          {
+            "name": "error",
+            "type": "string",
+            "description": "A host-supplied error. Outranks anything the field works out for itself.",
+            "required": false
+          },
+          {
+            "name": "fromMinutes",
+            "type": "number",
+            "description": "First time offered in the columns, in minutes from midnight.",
+            "required": false
+          },
+          {
+            "name": "hint",
+            "type": "string",
+            "description": "An advisory shown under the field when there is nothing more urgent to say.",
+            "required": false
+          },
+          {
+            "name": "hour24",
+            "type": "boolean",
+            "description": "24-hour display. The stored value is 24-hour either way.",
+            "required": false
+          },
+          {
+            "name": "invalid",
+            "type": "boolean",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "label",
+            "type": "string",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "maxDurationMinutes",
+            "type": "number",
+            "description": "The longest span that may be chosen.",
+            "required": false
+          },
+          {
+            "name": "minDurationMinutes",
+            "type": "number",
+            "description": "The shortest span that may be chosen.",
+            "required": false
+          },
+          {
+            "name": "name",
+            "type": "string",
+            "description": "Posts `${name}-start` and `${name}-end` as 24-hour HH:MM in a plain HTML form.",
+            "required": false
+          },
+          {
+            "name": "onChange",
+            "type": "((range: OxTimeRange) => void)",
+            "description": "Fired when either end changes.",
+            "required": false
+          },
+          {
+            "name": "optional",
+            "type": "boolean",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "readOnly",
+            "type": "boolean",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "required",
+            "type": "boolean",
+            "description": "",
+            "required": false
+          },
+          {
+            "name": "showDuration",
+            "type": "boolean",
+            "description": "Shows the derived length beside the value. On by default — it is the proof-read.",
+            "required": false
+          },
+          {
+            "name": "showPanel",
+            "type": "boolean",
+            "description": "Offers the two-column panel. On by default.",
+            "required": false
+          },
+          {
+            "name": "startLabel",
+            "type": "string",
+            "description": "Accessible name and column heading for the start half.",
+            "required": false
+          },
+          {
+            "name": "stepMinutes",
+            "type": "number",
+            "description": "The interval between offered times. 30 by default; 15 for a clinic that books quarters.",
+            "required": false
+          },
+          {
+            "name": "toMinutes",
+            "type": "number",
+            "description": "Last time offered, in minutes from midnight.",
+            "required": false
+          },
+          {
+            "name": "value",
+            "type": "OxTimeRange | null",
+            "description": "Controlled value. Either end may be null.",
             "required": false
           }
         ]
@@ -5443,6 +6484,18 @@ export const CATALOG: ComponentDoc[] = [
             "name": "allowEstimated",
             "type": "boolean",
             "description": "Offers \"Exact date unknown\", which switches the field to year only.",
+            "required": false
+          },
+          {
+            "name": "calendarCommit",
+            "type": "'immediate' | 'explicit'",
+            "description": "Whether the popover reports a day the moment it is clicked, or holds it behind Cancel and Done. `immediate` by default.",
+            "required": false
+          },
+          {
+            "name": "calendarHints",
+            "type": "boolean",
+            "description": "Shows the arrow-key legend under the popover grid. Worth more here than anywhere else in this family: a birth date is the one calendar a reader may genuinely have to travel four hundred months in, and Shift+PageUp is the difference between that and one press.",
             "required": false
           },
           {
@@ -6036,6 +7089,8 @@ export const CATALOG: ComponentDoc[] = [
         "variant=\"field\" for a date the user already knows — service date, admission, assessment. Four-fifths of healthcare date fields are this, and a popover there is four clicks where eight keystrokes would do.",
         "variant=\"picker\" where they may need to see a month to answer, and as the drop-in for an existing antd DatePicker.",
         "variant=\"birth-date\" at every registration and intake. The age readout is the field's own error check, not decoration.",
+        "variant=\"date-range\" for a span of days somebody has to state — an authorisation window, a leave of absence, a reporting period. Two months, because most ranges cross a month boundary, and presets, because most range answers have a name.",
+        "variant=\"time-range\" where a start and an end have to agree and neither is derived from a duration. Reach for \"session\" instead wherever the length is the thing the organisation cares about, because that is the variant that shows which member is held.",
         "variant=\"session\" wherever a session, shift or block has a start, an end and a length that have to agree.",
         "variant=\"slots\" or \"scheduler\" only where the system knows the options and the user cannot — that is the one job in the four that needs availability at all.",
         "With now passed from the server, so the field and the page agree about which day it is."
@@ -6044,7 +7099,9 @@ export const CATALOG: ComponentDoc[] = [
         "Reaching for the scheduler variants on a documentation form. A clinician entering a session timestamp should not load, see, or tab through the machinery required to schedule a twelve-week series.",
         "futurePolicy=\"block\" as a reflex. A discharge date can legitimately be in the future, and blocking it teaches staff to enter a wrong date to get past the validator.",
         "Using the band readout to recommend a code. The component reports which band a value falls in; choosing a code is a human act and a compliance question.",
-        "Hiding the held/derived badge on the session variant. That returns the component to the defect it was built to fix."
+        "Hiding the held/derived badge on the session variant. That returns the component to the defect it was built to fix.",
+        "commit=\"immediate\" on a range panel whose parent refetches. Every click is reported, so a mis-clicked start filters a report on a range nobody chose.",
+        "Shipping the general preset set unedited. `dateRangePresets` is a starting point: \"This year\" on a two-week authorisation window is noise, and seven periods nobody uses is seven rows between the reader and the two they do."
       ]
     },
     "accessibility": [
@@ -6063,6 +7120,10 @@ export const CATALOG: ComponentDoc[] = [
       {
         "label": "Three message tiers, three ARIA treatments",
         "detail": "An error is role=\"alert\", assertive, and sets aria-invalid. A conflict is a legal value colliding with other state: role=\"status\", polite, not invalid. An advisory is polite and toneless — a clinician documenting last Friday's session must not be told they have made a mistake."
+      },
+      {
+        "label": "One tabstop across two months, not one per month",
+        "detail": "Two adjacent panels overlap by up to a fortnight, so the adjacent-month days are not drawn at all when more than one month is shown. Drawing them gives the same date two cells, both matching the focus date, which is where a second tabstop comes from. For the same reason there is one previous and one next control for the whole window rather than one pair per month."
       },
       {
         "label": "Colour is never the only channel",
@@ -6086,6 +7147,7 @@ export const CATALOG: ComponentDoc[] = [
       "Ant Design's prop names are not implemented, and ADR 0010 requires the divergences be named: there is no picker, showTime, allowClear, status or DatePicker.RangePicker, and antd's disabledDate and format are spelled unavailable and order. The reasons differ. unavailable returns the reason a day cannot be chosen rather than a boolean, because that reason is spoken and shown, and a boolean cannot carry it. picker=\"week\" and picker=\"quarter\" have no healthcare workflow we have found, and a stub rendering a day grid would be worse than an honest absence. The rest is unbuilt rather than rejected. A migration from antd is not yet one changed import line.",
       "Recurrence implements a named RFC 5545 subset — DAILY, WEEKLY, MONTHLY with INTERVAL, BYDAY, BYSETPOS, BYMONTHDAY, COUNT, UNTIL and EXDATE. Anything else is refused and rendered read-only with its original string, rather than silently mis-expanded.",
       "Nothing here fetches, holds, or books. Availability arrives as data with an age and every transition is reported through a callback — ADR 0009 forbids the network in component source, and the host is the only party that can reconcile a rejection anyway.",
+      "The range panel commits explicitly by default and the inline calendar does not. `Calendar` keeps `commit=\"immediate\"` so no existing use changes behaviour; `DateRangeField` opts into `explicit` because a range is two clicks and the first is often wrong. A host that wants one rule everywhere has to say so on both.",
       "Non-Gregorian calendar input is not supported. Intl will format a Hijri or Buddhist date today, but a grid whose months have variable length and a year field with a different epoch is a project rather than a flag.",
       "Duration bands and session presets ship empty. A fifty-three-minute session is a fact about somebody's payer contract rather than about therapy, and asserting a code would be clinical decision support, which ADR 0009 prohibits."
     ],
@@ -6105,6 +7167,8 @@ export const CATALOG: ComponentDoc[] = [
       "healthcare date time picker",
       "appointment scheduler react",
       "session time picker",
+      "react date range picker",
+      "time range picker react",
       "date of birth input",
       "recurrence rule builder react"
     ],
@@ -6187,6 +7251,14 @@ export const CATALOG: ComponentDoc[] = [
         }
       },
       {
+        "id": "date-range",
+        "label": "Date range",
+        "description": "Two typeable ends in one shell, two contiguous months behind them, and named periods down the side.",
+        "args": {
+          "variant": "date-range"
+        }
+      },
+      {
         "id": "multiple",
         "label": "Multiple dates",
         "description": "Capped; clicking a selected date removes it.",
@@ -6216,6 +7288,14 @@ export const CATALOG: ComponentDoc[] = [
         "description": "Start, end and duration, with the held member always marked.",
         "args": {
           "variant": "session"
+        }
+      },
+      {
+        "id": "time-range",
+        "label": "Time range",
+        "description": "A start, an end and the length between them. The end column is filtered, not merely ordered.",
+        "args": {
+          "variant": "time-range"
         }
       },
       {
@@ -6277,10 +7357,12 @@ export const CATALOG: ComponentDoc[] = [
           "field",
           "calendar",
           "range",
+          "date-range",
           "multiple",
           "birth-date",
           "time",
           "session",
+          "time-range",
           "slots",
           "scheduler",
           "recurrence",
@@ -6393,7 +7475,7 @@ export const CATALOG: ComponentDoc[] = [
     "seo": {
       "slug": "date-picker",
       "title": "Date Picker — accessible React healthcare control",
-      "description": "A React date picker for healthcare: fourteen variants over one value space — field, calendar, birth date with live age, sessions, slots and recurrence.",
+      "description": "A React date picker for healthcare: sixteen variants over one value space — fields, calendars, date and time ranges, birth dates, sessions and recurrence.",
       "primaryKeyword": "react healthcare date picker",
       "secondaryKeywords": [
         "accessible date picker react",

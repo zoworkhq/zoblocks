@@ -792,5 +792,31 @@
       "$type": "dimension",
       "$value": "2px"
     }
+  },
+  "menu": {
+    "$description": "ChartContextMenu. Structural only: the four consequence tiers resolve through the existing status ramp (text-muted, accent, status-high, status-restricted), so no new colour pair enters the contrast gate. The subject header is a surface rather than a row and must read as inert in every theme \u2014 in forced-colors its background is discarded, which is why it carries a border as well as a tint.",
+    "$type": "color",
+    "bg": {
+      "$value": "{surface-overlay}"
+    },
+    "border": {
+      "$value": "{border}"
+    },
+    "subject-bg": {
+      "$value": "{bg-muted}"
+    },
+    "subject-border": {
+      "$value": "{border}"
+    },
+    "row-hover-bg": {
+      "$value": "{bg-muted}"
+    },
+    "sep": {
+      "$value": "{border}"
+    },
+    "radius": {
+      "$type": "dimension",
+      "$value": "{radius-lg}"
+    }
   }
 }
