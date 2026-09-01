@@ -1519,7 +1519,7 @@ export const TOKEN_SURFACE: readonly SurfaceEntry[] = [
     "component": "datetime",
     "source": "packages/tokens/tokens/component.json",
     "kind": "dimension",
-    "semantic": "--ox-radius-sm",
+    "semantic": "--ox-radius",
     "frameworks": [],
     "fallback": true,
     "bridgeable": true

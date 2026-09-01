@@ -888,6 +888,253 @@ function MatrixCell({
   );
 }
 
+/**
+ * The reader's motion preference, watched rather than sampled once.
+ *
+ * Read in an effect so the server and the first client pass agree — starting
+ * from `true` would flash the still state on every visit, and starting from a
+ * `matchMedia` read during render is a hydration mismatch.
+ */
+function usePrefersReducedMotion(): boolean {
+  const [reduced, setReduced] = React.useState(false);
+  React.useEffect(() => {
+    if (typeof window === "undefined" || !window.matchMedia) return undefined;
+    const query = window.matchMedia("(prefers-reduced-motion: reduce)");
+    setReduced(query.matches);
+    const listener = (event: MediaQueryListEvent) => setReduced(event.matches);
+    query.addEventListener("change", listener);
+    return () => query.removeEventListener("change", listener);
+  }, []);
+  return reduced;
+}
+
+/* ------------------------------------------------------------------ */
+/* The self-driving demo                                              */
+/* ------------------------------------------------------------------ */
+
+/** One beat of the script: find a target, do something to it, hold. */
+interface Beat {
+  /** What to aim at. Returns null when the DOM has moved on; the beat is skipped. */
+  find: (root: HTMLElement) => HTMLElement | null;
+  act: "hover" | "press";
+  /** How long to rest after acting, in milliseconds. */
+  hold: number;
+  /** Said aloud under the demo, so the point is legible without watching. */
+  say?: string;
+}
+
+const cellNamed = (prefix: string) => (root: HTMLElement) =>
+  [...root.querySelectorAll<HTMLElement>('[role="gridcell"]')].find((cell) =>
+    (cell.getAttribute("aria-label") ?? "").startsWith(prefix),
+  ) ?? null;
+
+const railNamed = (label: string) => (root: HTMLElement) =>
+  [...root.querySelectorAll<HTMLElement>(".ox-dt-cal__preset")].find(
+    (button) => button.textContent?.trim() === label,
+  ) ?? null;
+
+const actionNamed = (label: string) => (root: HTMLElement) =>
+  [...root.querySelectorAll<HTMLElement>(".ox-dt-cal__action")].find(
+    (button) => button.textContent?.trim() === label,
+  ) ?? null;
+
+/**
+ * The script.
+ *
+ * Written as the sequence a person would actually perform, because the point
+ * is not that the component moves — it is that a range is two clicks with a
+ * preview between them, that the preview crosses a month boundary, and that
+ * nothing reaches the host until Done. Each of those is a sentence in the
+ * prose elsewhere on this page; here they happen.
+ */
+const SCRIPT: Beat[] = [
+  { find: railNamed("Custom"), act: "press", hold: 700, say: "Custom clears the selection." },
+  { find: cellNamed("Monday, August 17"), act: "hover", hold: 420 },
+  {
+    find: cellNamed("Monday, August 17"),
+    act: "press",
+    hold: 520,
+    say: "One click sets the start.",
+  },
+  { find: cellNamed("Friday, August 21"), act: "hover", hold: 260 },
+  { find: cellNamed("Wednesday, August 26"), act: "hover", hold: 260 },
+  { find: cellNamed("Monday, August 31"), act: "hover", hold: 260 },
+  {
+    find: cellNamed("Saturday, September 5"),
+    act: "hover",
+    hold: 320,
+    say: "The preview follows the pointer, across the month boundary.",
+  },
+  {
+    find: cellNamed("Friday, September 11"),
+    act: "press",
+    hold: 900,
+    say: "The second click completes it. Nothing has reached the host yet.",
+  },
+  {
+    find: railNamed("This month"),
+    act: "press",
+    hold: 1000,
+    say: "A named period is one press, and the window moves to it.",
+  },
+  {
+    find: actionNamed("Done"),
+    act: "press",
+    hold: 1100,
+    say: "Done is where the range is finally reported.",
+  },
+];
+
+/**
+ * Drives the real component through real events.
+ *
+ * Nothing here fakes state: it dispatches `mouseover` and `click` at the same
+ * cells a pointer would reach, so what plays is the component's own behaviour
+ * rather than a recording of it. A script that set React state directly would
+ * keep working after the behaviour it claims to show had broken.
+ *
+ * Three rules it keeps, in order of how much they matter.
+ *
+ * **It stops the moment somebody touches it.** An animation that fights the
+ * reader for control of the thing they are trying to try is worse than no
+ * animation.
+ *
+ * **It never starts under `prefers-reduced-motion`.** Not slowed — not
+ * started. The reader presses Play if they want it.
+ *
+ * **It has a visible pause.** WCAG 2.2.2: anything that moves for more than
+ * five seconds needs a way to stop it, and a loop is more than five seconds.
+ */
+function AutoplayDemo() {
+  const stageRef = React.useRef<HTMLDivElement>(null);
+  const cursorRef = React.useRef<HTMLSpanElement>(null);
+  const [playing, setPlaying] = React.useState(false);
+  const [beat, setBeat] = React.useState(0);
+  const [pressed, setPressed] = React.useState(false);
+  const reduced = usePrefersReducedMotion();
+
+  // Autoplay only once the demo is on screen, and only where motion is
+  // welcome. A gallery that starts animating in a chapter nobody has scrolled
+  // to is spending the reader's attention somewhere they are not looking.
+  const [seen, setSeen] = React.useState(false);
+  React.useEffect(() => {
+    const node = stageRef.current;
+    if (!node || typeof IntersectionObserver === "undefined") return undefined;
+    const observer = new IntersectionObserver(
+      (entries) => entries.forEach((entry) => entry.isIntersecting && setSeen(true)),
+      { threshold: 0.4 },
+    );
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, []);
+
+  React.useEffect(() => {
+    if (seen && !reduced) setPlaying(true);
+  }, [seen, reduced]);
+
+  React.useEffect(() => {
+    if (!playing) return undefined;
+    const root = stageRef.current;
+    if (!root) return undefined;
+
+    const current = SCRIPT[beat % SCRIPT.length];
+    const target = current?.find(root) ?? null;
+
+    // The cursor travels first, then the event fires where it landed — so what
+    // the reader sees and what the component receives are the same place.
+
+    if (target && cursorRef.current) {
+      const box = root.getBoundingClientRect();
+      const spot = target.getBoundingClientRect();
+      cursorRef.current.style.translate = `${spot.left - box.left + spot.width / 2}px ${
+        spot.top - box.top + spot.height / 2
+      }px`;
+    }
+
+    const travel = 380;
+    const fire = setTimeout(() => {
+      if (!target) return;
+      if (current?.act === "press") {
+        setPressed(true);
+        setTimeout(() => setPressed(false), 220);
+        target.click();
+      } else {
+        // React maps `onMouseEnter` from a bubbling `mouseover`, so this is the
+        // event a real pointer would have produced.
+        target.dispatchEvent(new MouseEvent("mouseover", { bubbles: true }));
+      }
+    }, travel);
+
+    const advance = setTimeout(() => setBeat((n) => n + 1), travel + (current?.hold ?? 400));
+    return () => {
+      clearTimeout(fire);
+      clearTimeout(advance);
+    };
+  }, [playing, beat]);
+
+  // Any real input wins. `pointerdown` rather than `click`, so the handover
+  // happens before the component sees the press rather than after it.
+  const yieldToReader = () => setPlaying(false);
+
+  /*
+   * The last thing said, not the last beat's `say`.
+   *
+   * Most beats are pointer travel and have nothing to add, so reading `say`
+   * directly blanks the line every second or two and the narration reads as
+   * broken rather than quiet. A sentence stands until the next one replaces
+   * it, which is also what makes the `aria-live` region worth having.
+   */
+  const said = React.useRef("");
+  const step = SCRIPT[beat % SCRIPT.length];
+  if (step?.say) said.current = step.say;
+  const caption = said.current;
+
+  return (
+    <div className="ox-dt-auto">
+      <div className="ox-dt-auto__bar">
+        <button
+          type="button"
+          className="ox-dt-auto__toggle"
+          aria-pressed={playing}
+          onClick={() => setPlaying((was) => !was)}
+        >
+          {playing ? "Pause" : "Play"}
+        </button>
+        {/* Polite, so the sentence lands after the change it describes rather
+            than interrupting a reader mid-cell. */}
+        <p className="ox-dt-auto__say" aria-live="polite">
+          {playing ? (caption ?? " ") : "Paused — the calendar is yours."}
+        </p>
+      </div>
+
+      <div
+        ref={stageRef}
+        className="ox-dt-auto__stage"
+        onPointerDown={yieldToReader}
+        onKeyDownCapture={yieldToReader}
+      >
+        <Calendar
+          mode="range"
+          months={2}
+          weekStart={1}
+          commit="explicit"
+          hints
+          presets={RANGE_PRESETS}
+          showCustomPreset
+          now={TODAY}
+          defaultMonth={{ y: 2026, m: 8 }}
+        />
+        <span
+          ref={cursorRef}
+          aria-hidden="true"
+          className={cn("ox-dt-auto__cursor", pressed && "ox-dt-auto__cursor--press")}
+          data-ox-hidden={playing ? undefined : "true"}
+        />
+      </div>
+    </div>
+  );
+}
+
 /* ------------------------------------------------------------------ */
 /* The gallery                                                         */
 /* ------------------------------------------------------------------ */
@@ -1033,6 +1280,7 @@ export function DatePickerGallery() {
               api="precision · allowEstimated · allowAbsent"
               tags={["FHIR", "third value"]}
               note="FHIR permits YYYY and YYYY-MM for Patient.birthDate, because homeless services, unaccompanied minors and forensic intake all produce them — and coercing “born around 1962” to 1 January 1962 invents a fact every downstream system reads as precise, including the one calculating a dose. Absence is the same argument Switch makes for its third value: a form that cannot tell “no date of birth recorded” from “nobody asked” is lying about what it knows, and the reason travels with the value rather than being punctuated away as an em dash."
+              wide
             >
               <BirthDatePartialDemo />
             </Demo>
@@ -1064,6 +1312,17 @@ export function DatePickerGallery() {
         {chapter === "calendars" ? (
           <div className="ox-gallery__grid">
             <Demo
+              id="c0"
+              name="Watch it work"
+              api='mode="range" · months={2} · presets · commit="explicit"'
+              tags={["autoplays", "yields on touch", "stops under reduced motion"]}
+              note="This drives the real component with real events — `mouseover` and `click` at the same cells a pointer would reach — rather than replaying a recording of it, so if the behaviour it shows ever broke, the demo would break with it. It stops the instant you touch the calendar, because an animation that fights the reader for the control they are trying to try is worse than no animation at all; it never starts under `prefers-reduced-motion`, and Pause is a real button rather than a hover affordance, which is what WCAG 2.2.2 asks of anything that moves for more than five seconds."
+              wide
+            >
+              <AutoplayDemo />
+            </Demo>
+
+            <Demo
               id="c1"
               name="Calendar"
               api='variant="calendar" · shortcuts · hints'
@@ -1075,6 +1334,16 @@ export function DatePickerGallery() {
 
             <Demo
               id="c2"
+              name="Multiple"
+              api='variant="multiple" maxDates={4} · shortcuts'
+              tags={["capped", "click to remove"]}
+              note="Several dates that are not a range — the make-up sessions after a missed fortnight, the three days a form is being backfilled for. Clicking a selected date removes it: a remove control inside a 32px cell would sit under the 24px target floor, and a second click is what people try first anyway. The cap is refused silently at the boundary rather than dialogued, because a modal that says “you may only pick four” after the fourth click is a worse teacher than a fifth click that simply does nothing. The rail toggles rather than replaces here, because that is what every other press in this mode does."
+            >
+              <MultipleDemo />
+            </Demo>
+
+            <Demo
+              id="c3"
               name="Range"
               api='variant="range" · months={2} · presets'
               tags={["two clicks", "SC 2.5.7"]}
@@ -1082,16 +1351,6 @@ export function DatePickerGallery() {
               wide
             >
               <RangeDemo />
-            </Demo>
-
-            <Demo
-              id="c3"
-              name="Multiple"
-              api='variant="multiple" maxDates={4} · shortcuts'
-              tags={["capped", "click to remove"]}
-              note="Several dates that are not a range — the make-up sessions after a missed fortnight, the three days a form is being backfilled for. Clicking a selected date removes it: a remove control inside a 32px cell would sit under the 24px target floor, and a second click is what people try first anyway. The cap is refused silently at the boundary rather than dialogued, because a modal that says “you may only pick four” after the fourth click is a worse teacher than a fifth click that simply does nothing. The rail toggles rather than replaces here, because that is what every other press in this mode does."
-            >
-              <MultipleDemo />
             </Demo>
 
             <Demo
@@ -1148,6 +1407,7 @@ export function DatePickerGallery() {
               api="bands={org.thresholds}"
               tags={["no CDS"]}
               note="The band under the duration reads from the array above this demo, and the component ships that array empty. A fifty-three-minute session is a fact about somebody's payer contract rather than about therapy, and a library asserting a billing code from a duration would be clinical decision support — which ADR 0009 prohibits outright, and which would be wrong in most of the jurisdictions this ships into. The same argument covers the duration presets: BEHAVIORAL_HEALTH_DURATIONS is an exported convenience, not a default."
+              wide
             >
               <SessionTimeField
                 label="Documentation time"

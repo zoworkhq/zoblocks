@@ -509,8 +509,8 @@
   --ox-datetime-chip-border: var(--ox-border);
   --ox-datetime-chip-on-bg: var(--ox-accent);
   --ox-datetime-chip-on-fg: var(--ox-text-on-accent);
-  --ox-datetime-cell-size: 2rem;
-  --ox-datetime-cell-radius: var(--ox-radius-sm);
+  --ox-datetime-cell-size: 2.25rem;
+  --ox-datetime-cell-radius: var(--ox-radius);
   --ox-datetime-target: var(--ox-density-target);
   --ox-datetime-gap: var(--ox-density-gap);
   --ox-datetime-font: var(--ox-density-font);
@@ -883,7 +883,7 @@
   --ox-datetime-chip-border: var(--ox-border);
   --ox-datetime-chip-on-bg: var(--ox-accent);
   --ox-datetime-chip-on-fg: var(--ox-text-on-accent);
-  --ox-datetime-cell-radius: var(--ox-radius-sm);
+  --ox-datetime-cell-radius: var(--ox-radius);
   --ox-recorder-rec: var(--ox-status-recording);
   --ox-recorder-rec-soft: var(--ox-status-recording-bg);
   --ox-recorder-rec-line: var(--ox-status-recording-border);
@@ -1143,7 +1143,7 @@
   --ox-datetime-chip-border: var(--ox-border);
   --ox-datetime-chip-on-bg: var(--ox-accent);
   --ox-datetime-chip-on-fg: var(--ox-text-on-accent);
-  --ox-datetime-cell-radius: var(--ox-radius-sm);
+  --ox-datetime-cell-radius: var(--ox-radius);
   --ox-recorder-rec: var(--ox-status-recording);
   --ox-recorder-rec-soft: var(--ox-status-recording-bg);
   --ox-recorder-rec-line: var(--ox-status-recording-border);
@@ -1402,7 +1402,7 @@
   --ox-datetime-chip-border: var(--ox-border);
   --ox-datetime-chip-on-bg: var(--ox-accent);
   --ox-datetime-chip-on-fg: var(--ox-text-on-accent);
-  --ox-datetime-cell-radius: var(--ox-radius-sm);
+  --ox-datetime-cell-radius: var(--ox-radius);
   --ox-recorder-rec: var(--ox-status-recording);
   --ox-recorder-rec-soft: var(--ox-status-recording-bg);
   --ox-recorder-rec-line: var(--ox-status-recording-border);
