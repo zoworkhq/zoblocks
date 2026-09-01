@@ -7329,7 +7329,29 @@ button.ox-prov:focus-visible,
 
 .ox-dt-field__sep {
   color: var(--ox-text-muted, #64748b);
-  padding-inline: 0.0625rem;
+  padding-inline: 0;
+}
+
+/*
+ * The digits lean on their separator.
+ *
+ * Every segment is held at the 24px target floor whatever it contains, so two
+ * digits set at 13px leave a few pixels of slack on each side and `9:30`
+ * renders as `9 : 30` — three things rather than one time. Leaning the
+ * outermost segments inward closes the gap around the colon and moves the
+ * slack to the ends of the run, where nothing has to be read across it. A
+ * zero-width separator was tried first and is worse: it centres on the
+ * boundary between two segments whose slack differs, so a one-digit hour
+ * pushes the colon off-centre and it ends up touching the minute.
+ */
+.ox-dt-field__seg--end {
+  justify-content: flex-end;
+  padding-inline-end: 0;
+}
+
+.ox-dt-field__seg--start {
+  justify-content: flex-start;
+  padding-inline-start: 0;
 }
 
 .ox-dt-field__trigger {
@@ -7475,11 +7497,11 @@ button.ox-prov:focus-visible,
 .ox-dt-cal__months {
   display: flex;
   align-items: flex-start;
-  gap: 1.25rem;
+  gap: 1.75rem;
 }
 
 .ox-dt-cal__month {
-  inline-size: 15.75rem;
+  inline-size: 17.5rem;
   flex: none;
 }
 
@@ -7502,8 +7524,8 @@ button.ox-prov:focus-visible,
  */
 .ox-dt-cal__aside {
   flex: none;
-  padding-inline-end: 0.75rem;
-  margin-inline-end: 0.75rem;
+  padding-inline-end: 1rem;
+  margin-inline-end: 1rem;
   border-inline-end: 1px solid var(--ox-border, #e2e8f0);
 }
 
@@ -7511,7 +7533,7 @@ button.ox-prov:focus-visible,
   display: flex;
   flex-direction: column;
   gap: 0.125rem;
-  min-inline-size: 7.5rem;
+  min-inline-size: 8.5rem;
   max-block-size: 20rem;
   overflow-y: auto;
   scrollbar-width: thin;
@@ -7521,10 +7543,10 @@ button.ox-prov:focus-visible,
   display: flex;
   align-items: center;
   min-block-size: var(--ox-density-target-floor, 1.5rem);
-  padding-block: 0.375rem;
-  padding-inline: 0.625rem;
+  padding-block: 0.5rem;
+  padding-inline: 0.75rem;
   border: 0;
-  border-radius: var(--ox-radius-sm, 0.25rem);
+  border-radius: var(--ox-radius, 0.5rem);
   background: none;
   color: var(--ox-text, inherit);
   font: inherit;
@@ -7558,7 +7580,7 @@ button.ox-prov:focus-visible,
   align-items: center;
   justify-content: space-between;
   gap: 0.25rem;
-  margin-block-end: 0.5rem;
+  margin-block-end: 0.75rem;
 }
 
 .ox-dt-cal__nav,
@@ -7567,13 +7589,15 @@ button.ox-prov:focus-visible,
   align-items: center;
   justify-content: center;
   gap: 0.25rem;
-  min-inline-size: 1.5rem;
-  block-size: 1.5rem;
+  min-inline-size: 1.75rem;
+  block-size: 1.75rem;
   padding-inline: 0.25rem;
   border: 0;
-  border-radius: 0.125rem;
+  border-radius: var(--ox-radius, 0.5rem);
   background: none;
-  color: var(--ox-text-muted, #64748b);
+  /* Full-strength ink. A paging control drawn at the weight of secondary text
+     reads as decoration, and it is the only way out of the month on screen. */
+  color: var(--ox-text, inherit);
   font: inherit;
   cursor: pointer;
   transition:
@@ -7581,15 +7605,15 @@ button.ox-prov:focus-visible,
     color var(--ox-datetime-duration, 150ms) var(--ox-ease, ease);
 }
 
-/* Holds the title centred on an interior month, which has no control of its
-   own on that side. Not a button, so it is not in the tab order and not a
-   second thing announced as "Previous month". */
-.ox-dt-cal__nav--spacer {
-  pointer-events: none;
+/* The bound is on the window, so every copy of the control shows it. */
+.ox-dt-cal__nav[data-ox-dt-blocked="true"] {
+  color: var(--ox-text-subtle, #94a3b8);
+  cursor: default;
 }
 
 .ox-dt-cal__title {
-  font-size: var(--ox-text-sm, 0.875rem);
+  padding-inline: 0.5rem;
+  font-size: var(--ox-text-base, 1rem);
   font-weight: 600;
   color: var(--ox-text, inherit);
 }
@@ -7600,10 +7624,6 @@ button.ox-prov:focus-visible,
   color: var(--ox-text, inherit);
 }
 
-.ox-dt-cal__nav--spacer:hover {
-  background: none;
-}
-
 .ox-dt-cal__nav:focus-visible,
 .ox-dt-cal__title:focus-visible {
   outline: 2px solid var(--ox-field-border-focus, #2563eb);
@@ -7612,12 +7632,7 @@ button.ox-prov:focus-visible,
 
 /* Kept reachable and announced rather than removed: a control that vanishes at
    the boundary tells the reader nothing about why they cannot go further. */
-.ox-dt-cal__nav[aria-disabled="true"] {
-  color: var(--ox-text-subtle, #94a3b8);
-  cursor: default;
-}
-
-.ox-dt-cal__nav[aria-disabled="true"]:hover {
+.ox-dt-cal__nav[data-ox-dt-blocked="true"]:hover {
   background: none;
 }
 
@@ -7626,9 +7641,16 @@ button.ox-prov:focus-visible,
   scale: -1 1;
 }
 
+/*
+ * Row gap, not cell gap.
+ *
+ * The band has to run unbroken across a week and break cleanly between them,
+ * so the columns close up and the rows open out. A 1px row gap made every
+ * week's band touch the next and the whole selection read as one slab.
+ */
 .ox-dt-cal__grid {
   display: grid;
-  gap: 1px;
+  gap: 0.25rem;
 }
 
 /*
@@ -7650,14 +7672,21 @@ button.ox-prov:focus-visible,
   grid-template-columns: repeat(7, minmax(0, 1fr));
 }
 
+/*
+ * "Mo Tu We", not "MO TU WE".
+ *
+ * Two letters set in caps with tracking read as an abbreviation of something
+ * else — a code, a column key — rather than as the day they name. Sentence
+ * case is also what the rest of this system labels with, and a header row is
+ * not the place to make an exception.
+ */
 .ox-dt-cal__weekday {
   display: grid;
   place-items: center;
-  block-size: 1.375rem;
-  font-size: var(--ox-text-2xs, 0.6875rem);
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  block-size: 1.5rem;
+  margin-block-end: 0.25rem;
+  font-size: var(--ox-text-xs, 0.75rem);
+  font-weight: 500;
   color: var(--ox-datetime-weekday-fg, #64748b);
 }
 
@@ -7672,10 +7701,10 @@ button.ox-prov:focus-visible,
   position: relative;
   display: grid;
   place-items: center;
-  block-size: var(--ox-datetime-cell-size, 2rem);
+  block-size: var(--ox-datetime-cell-size, 2.25rem);
   min-block-size: 1.5rem;
   border: 0;
-  border-radius: var(--ox-datetime-cell-radius, 0.25rem);
+  border-radius: var(--ox-datetime-cell-radius, 0.5rem);
   background: none;
   color: var(--ox-datetime-cell-fg, inherit);
   font: inherit;
@@ -7889,10 +7918,10 @@ button.ox-prov:focus-visible,
   align-items: center;
   justify-content: center;
   min-block-size: var(--ox-density-target-floor, 1.5rem);
-  padding-block: 0.375rem;
-  padding-inline: 0.875rem;
+  padding-block: 0.5rem;
+  padding-inline: 1.125rem;
   border: 1px solid var(--ox-border, #e2e8f0);
-  border-radius: var(--ox-radius, 0.375rem);
+  border-radius: var(--ox-radius, 0.5rem);
   background: var(--ox-surface, #fff);
   color: var(--ox-text, inherit);
   font: inherit;
@@ -8156,10 +8185,10 @@ button.ox-prov:focus-visible,
   display: flex;
   align-items: center;
   min-block-size: var(--ox-density-target-floor, 1.5rem);
-  padding-block: 0.375rem;
-  padding-inline: 0.5rem;
+  padding-block: 0.5rem;
+  padding-inline: 0.75rem;
   border: 0;
-  border-radius: var(--ox-radius-sm, 0.25rem);
+  border-radius: var(--ox-radius, 0.5rem);
   background: none;
   color: var(--ox-text, inherit);
   font: inherit;
@@ -8222,9 +8251,9 @@ button.ox-prov:focus-visible,
 .ox-dt-pop {
   position: fixed;
   z-index: 40;
-  padding: 0.75rem;
+  padding: 1rem;
   border: 1px solid var(--ox-datetime-popover-border, #e2e8f0);
-  border-radius: var(--ox-radius-lg, 0.75rem);
+  border-radius: var(--ox-radius-xl, 1rem);
   background: var(--ox-datetime-popover-bg, #fff);
   /* Stated, not inherited. The panel is portalled into <body>, so it no longer
      picks up the ink of the field it belongs to — and a panel that takes its

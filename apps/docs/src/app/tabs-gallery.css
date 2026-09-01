@@ -300,6 +300,19 @@
   background: var(--ox-bg);
   container-type: inline-size;
 }
+
+/*
+ * A panel centres; a field does not.
+ *
+ * A calendar is a fixed-width surface, so on a full-width stage it left-aligns
+ * against six hundred pixels of nothing and reads as a layout that has come
+ * apart. Form fields keep their left edge, because that is where a form puts
+ * them and a centred input is the thing that would look wrong.
+ */
+.ox-demo__stage > [data-ox-calendar] {
+  display: flex;
+  justify-content: center;
+}
 .ox-demo__note {
   margin: 0 1.25rem;
   padding: 0.85rem 0 1rem;
@@ -666,4 +679,113 @@
   --ox-density-pad-y: 0.25rem;
   --ox-density-font: 0.8125rem;
   --ox-density-target: 1.875rem;
+}
+
+/* ------------------------------------------------------------------ */
+/* The self-driving date demo                                          */
+/* ------------------------------------------------------------------ */
+
+.ox-dt-auto {
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+}
+
+/* Centred over the calendar it drives, and laid out so the button never moves
+   as the sentence beside it changes length. */
+.ox-dt-auto__bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  min-block-size: 2rem;
+}
+
+.ox-dt-auto__toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-inline-size: 4.5rem;
+  min-block-size: 2rem;
+  padding-inline: 0.875rem;
+  border: 1px solid var(--color-rule);
+  border-radius: var(--ox-radius, 0.5rem);
+  background: var(--ox-surface);
+  color: var(--ox-text);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.ox-dt-auto__toggle:hover {
+  background: var(--ox-bg-muted);
+}
+
+.ox-dt-auto__toggle:focus-visible {
+  outline: 2px solid var(--ox-field-border-focus);
+  outline-offset: 2px;
+}
+
+/* Reserves its line whether or not there is a sentence in it, so the calendar
+   below never steps up and down as the script talks. */
+.ox-dt-auto__say {
+  margin: 0;
+  inline-size: min(30rem, 60vw);
+  min-block-size: 1.25rem;
+  font-size: 0.8125rem;
+  line-height: 1.25rem;
+  color: var(--color-graphite);
+}
+
+.ox-dt-auto__stage {
+  position: relative;
+  display: flex;
+  justify-content: center;
+}
+
+/*
+ * The pointer the script is holding.
+ *
+ * Drawn rather than simulated: there is no way to move the real cursor, and a
+ * reader watching cells light up with nothing to attribute it to reads the
+ * component as glitching rather than as being driven. `translate` is animated
+ * rather than `left`/`top` so the travel stays on the compositor.
+ */
+.ox-dt-auto__cursor {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-start: 0;
+  inline-size: 1.125rem;
+  block-size: 1.125rem;
+  margin-block-start: -0.5rem;
+  margin-inline-start: -0.5rem;
+  border: 2px solid var(--ox-accent);
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--ox-accent) 22%, transparent);
+  pointer-events: none;
+  transition:
+    translate 360ms cubic-bezier(0.32, 0.72, 0, 1),
+    scale 180ms ease,
+    opacity 200ms ease;
+}
+
+.ox-dt-auto__cursor--press {
+  scale: 0.62;
+}
+
+.ox-dt-auto__cursor[data-ox-hidden="true"] {
+  opacity: 0;
+}
+
+/*
+ * Under reduced motion the cursor does not travel — it is placed.
+ *
+ * The demo does not autoplay here at all, so this only applies to a reader who
+ * pressed Play deliberately, and having asked for it they still should not be
+ * given three hundred milliseconds of sliding.
+ */
+@media (prefers-reduced-motion: reduce) {
+  .ox-dt-auto__cursor {
+    transition-duration: 1ms;
+  }
 }

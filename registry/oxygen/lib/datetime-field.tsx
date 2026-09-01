@@ -122,6 +122,14 @@ export interface FieldSegment {
   /** Renders a value that is not a number, e.g. AM/PM. */
   format?: (value: number) => string;
   /**
+   * Which edge of its box the digits sit against.
+   *
+   * The box is held at the 24px target floor whatever it contains, so centred
+   * digits leave slack on both sides and a time reads as `9 : 30`. Set by
+   * `timeSegments` rather than by callers.
+   */
+  align?: "center" | "start" | "end";
+  /**
    * A ceiling that depends on the other segments.
    *
    * The day is the only one that needs it, and it is the reason the whole
@@ -178,6 +186,17 @@ export function timeSegments(
     max: options.hour24 ? 23 : 12,
     placeholder: "--",
     label: "Hour",
+    /*
+     * `7:00 AM`, not `07:00 AM`.
+     *
+     * A padded hour is right on a 24-hour clock, where `07:00` and `17:00` are
+     * the same width and the leading zero is part of the notation. On a
+     * twelve-hour clock nobody writes it, and it makes the field disagree with
+     * every other rendering of the same time in this system — `formatClockTime`
+     * has never padded it, so a picker showing `07:00 AM` above a list showing
+     * `7:00 AM` looked like two different values.
+     */
+    ...(options.hour24 ? {} : { format: (value: number) => String(value) }),
   };
   const minute: FieldSegment = {
     key: "mi",
@@ -210,6 +229,14 @@ export function timeSegments(
   const parts = [hour, minute];
   if (options.showSecond) parts.push(second);
   if (!options.hour24) parts.push(meridiem);
+
+  // The run of numbers leans inward: the first against the colon after it, the
+  // last against the colon before it. Anything between keeps its centre,
+  // because it has separators on both sides and no one side to lean on.
+  const numeric = options.showSecond ? [hour, minute, second] : [hour, minute];
+  const last = numeric[numeric.length - 1];
+  if (numeric[0]) numeric[0].align = "end";
+  if (last && last !== numeric[0]) last.align = "start";
   return parts;
 }
 
@@ -516,6 +543,8 @@ export const SegmentedField = React.forwardRef<SegmentedFieldHandle, SegmentedFi
                 className={cn(
                   "ox-dt-field__seg",
                   segment.wide && "ox-dt-field__seg--year",
+                  segment.align === "end" && "ox-dt-field__seg--end",
+                  segment.align === "start" && "ox-dt-field__seg--start",
                   value == null && !buffered && "ox-dt-field__seg--empty",
                   active && "ox-dt-field__seg--active",
                 )}
@@ -978,29 +1007,57 @@ export function CalendarGrid(props: CalendarGridProps) {
   const titleOf = (ref: MonthRef) =>
     monthLabel ? monthLabel(ref) : `${monthNames[ref.m - 1]} ${ref.y}`;
 
+  /**
+   * A paging control.
+   *
+   * Every month draws both chevrons, because a header with one arrow reads as
+   * a month that can only be left in one direction. They all page the whole
+   * window, so months stay contiguous — a band drawn across June and September
+   * would be a lie about what is selected.
+   *
+   * Only the outermost pair is a real control. The rest are the same button
+   * repeated, so they are taken out of the tab order and out of the
+   * accessibility tree entirely: four buttons announced as "Previous months",
+   * all doing one thing, is four times the work for one action. `aria-hidden`
+   * on a focusable element would be a violation, which is why `tabIndex` goes
+   * with it rather than instead of it.
+   */
+  function navButton(direction: "left" | "right", index: number) {
+    const back = direction === "left";
+    const primary = back ? index === 0 : index === monthCount - 1;
+    const blocked = back ? atMin : atMax;
+    return (
+      <button
+        type="button"
+        className="ox-dt-cal__nav"
+        aria-label={
+          primary
+            ? monthCount > 1
+              ? back
+                ? "Previous months"
+                : "Next months"
+              : back
+                ? "Previous month"
+                : "Next month"
+            : undefined
+        }
+        aria-hidden={primary ? undefined : true}
+        tabIndex={primary ? undefined : -1}
+        aria-disabled={primary && blocked ? true : undefined}
+        data-ox-dt-blocked={blocked ? "true" : undefined}
+        onClick={() => {
+          if (!blocked) step(back ? -1 : 1);
+        }}
+      >
+        <ChevronGlyph direction={direction} />
+      </button>
+    );
+  }
+
   function renderHead(ref: MonthRef, index: number) {
-    // One control per direction across the whole window. Two buttons both
-    // named "Previous month" doing the same thing is a riddle for anybody
-    // reading the dialog through its accessible names.
-    const first = index === 0;
-    const last = index === monthCount - 1;
     return (
       <div className="ox-dt-cal__head">
-        {first ? (
-          <button
-            type="button"
-            className="ox-dt-cal__nav"
-            aria-label={monthCount > 1 ? "Previous months" : "Previous month"}
-            aria-disabled={atMin || undefined}
-            onClick={() => {
-              if (!atMin) step(-1);
-            }}
-          >
-            <ChevronGlyph direction="left" />
-          </button>
-        ) : (
-          <span className="ox-dt-cal__nav ox-dt-cal__nav--spacer" aria-hidden="true" />
-        )}
+        {navButton("left", index)}
         <button
           type="button"
           className="ox-dt-cal__title"
@@ -1014,21 +1071,7 @@ export function CalendarGrid(props: CalendarGridProps) {
           {titleOf(ref)}
           <ChevronGlyph direction="down" />
         </button>
-        {last ? (
-          <button
-            type="button"
-            className="ox-dt-cal__nav"
-            aria-label={monthCount > 1 ? "Next months" : "Next month"}
-            aria-disabled={atMax || undefined}
-            onClick={() => {
-              if (!atMax) step(1);
-            }}
-          >
-            <ChevronGlyph direction="right" />
-          </button>
-        ) : (
-          <span className="ox-dt-cal__nav ox-dt-cal__nav--spacer" aria-hidden="true" />
-        )}
+        {navButton("right", index)}
       </div>
     );
   }

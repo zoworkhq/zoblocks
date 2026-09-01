@@ -728,12 +728,12 @@
     },
     "cell-size": {
       "$type": "dimension",
-      "$value": "2rem",
+      "$value": "2.25rem",
       "$description": "The visible cell. The hit area is the whole grid track and is floored at the density target, so clinical density tightens the type and the gaps and never the target."
     },
     "cell-radius": {
       "$type": "dimension",
-      "$value": "{radius-sm}"
+      "$value": "{radius}"
     },
     "target": {
       "$type": "dimension",
