@@ -19,7 +19,7 @@
  */
 
 import {
-  BUCKET_MS,
+  BUCKET_HZ,
   PEAK_HOLD_PER_FRAME,
   REFERENCE_FRAME_MS,
   RELEASE_MS,
@@ -38,6 +38,9 @@ import type { SignalFrame, TimeDomainSource } from "./types";
  * rather than papered over at every call site.
  */
 const ZERO_EPSILON = 1e-6;
+/** Absorbs the last-bit error in `elapsedMs` so a boundary landed on exactly
+  * is counted as reached. Far below one bucket, far above float64 noise. */
+const BUCKET_EPSILON = 1e-9;
 
 /** dBFS reported for digital silence. Real silence is -Infinity; nobody can read that. */
 export const DBFS_FLOOR = -100;
@@ -173,7 +176,7 @@ export function createSignal(options: SignalOptions = {}): Signal {
   let elapsedMs = 0;
   let buckets = 0;
   let bucketPeak = 0;
-  let bucketMs = 0;
+  let bucketIndex = 0;
   let lastDeltaMs = 0;
   let frame: SignalFrame = REST;
 
@@ -212,10 +215,26 @@ export function createSignal(options: SignalOptions = {}): Signal {
     elapsedMs += dt;
 
     if (envelope > bucketPeak) bucketPeak = envelope;
-    bucketMs += dt;
+
+    // Bucket boundaries come off the absolute elapsed time and the rate, never
+    // off a running remainder against BUCKET_MS.
+    //
+    // `BUCKET_MS` is `1000 / 30`, which is not representable: it stores as
+    // 33.333333333333336, a hair ABOVE the true value. Subtracting it from a
+    // remainder therefore leaves a deficit, and at exact multiples that deficit
+    // swallows a whole bucket — a single `step(BUCKET_MS * 3)` closed two
+    // buckets rather than three, because 3 × BUCKET_MS rounds to 100.0 while
+    // three subtractions need 100.00000000000001. The error also compounds, so
+    // a long recording drifts off the grid it is supposed to define.
+    //
+    // Multiplying by the rate before dividing keeps the comparison on integers
+    // and makes the count a pure function of elapsed time, which is what §07 of
+    // the brief requires: the same buckets on a 60 Hz laptop and a 120 Hz
+    // tablet, and the same buckets whatever the frame cadence in between.
+    const nextBucket = Math.floor((elapsedMs * BUCKET_HZ) / 1000 + BUCKET_EPSILON);
     let closed: number[] | readonly number[] = NO_BUCKETS;
-    while (bucketMs >= BUCKET_MS) {
-      bucketMs -= BUCKET_MS;
+    while (bucketIndex < nextBucket) {
+      bucketIndex += 1;
       if (closed === NO_BUCKETS) closed = [];
       (closed as number[]).push(bucketPeak);
       buckets += 1;
@@ -272,7 +291,7 @@ export function createSignal(options: SignalOptions = {}): Signal {
       elapsedMs = 0;
       buckets = 0;
       bucketPeak = 0;
-      bucketMs = 0;
+      bucketIndex = 0;
       lastDeltaMs = 0;
       frame = REST;
     },

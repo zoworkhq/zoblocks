@@ -38,7 +38,11 @@ function fakeSource(initial = 0): TimeDomainSource & { level: number } {
 describe("framePeak", () => {
   it("takes the maximum magnitude, not the mean", () => {
     const samples = new Float32Array([0, 0, 0, 0, -0.8, 0, 0, 0]);
-    expect(framePeak(samples)).toBeCloseTo(0.8, 10);
+    // The literal is stored as Float32 and comes back as 0.800000011920929.
+    // Asserting to 5e-11 would be asserting that Float32Array is lossless,
+    // which no correct implementation can satisfy; 6 places is the ceiling
+    // single precision actually offers.
+    expect(framePeak(samples)).toBeCloseTo(0.8, 6);
   });
 
   it("reports exact zero for digital silence", () => {
@@ -240,7 +244,8 @@ describe("createSignal — no source", () => {
     const signal = createSignal();
     signal.step(16);
     signal.setSource(fakeSource(0.6));
-    expect(signal.step(16).level).toBeCloseTo(0.6, 10);
+    // Same Float32 round-trip as above; 6 places is the honest ceiling.
+    expect(signal.step(16).level).toBeCloseTo(0.6, 6);
   });
 });
 
