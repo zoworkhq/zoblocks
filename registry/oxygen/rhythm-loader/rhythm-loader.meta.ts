@@ -58,7 +58,7 @@ export default defineComponentMeta({
     "Requires styles/oxygen-loader.css, installed with loader-core.",
     "A single fixed complex. It does not vary, and it is not clinical data.",
   ],
-  related: ["pulse-loader", "breath-loader", "infusion-loader", "helix-loader"],
+  related: ["pulse-loader", "breath-loader", "infusion-loader", "helix-loader", "recorder"],
 
   dependencies: ["clsx", "tailwind-merge"],
   registryDependencies: ["utils", "tokens", "loader-core"],

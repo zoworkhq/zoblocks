@@ -15,6 +15,7 @@
 
 import * as React from "react";
 import { PageLoader, PulseLoader } from "@/registry/oxygen/pulse-loader/pulse-loader";
+import { Recorder } from "@/registry/oxygen/recorder/recorder";
 import { RhythmLoader } from "@/registry/oxygen/rhythm-loader/rhythm-loader";
 import { BreathLoader } from "@/registry/oxygen/breath-loader/breath-loader";
 import { HelixLoader } from "@/registry/oxygen/helix-loader/helix-loader";
@@ -1412,6 +1413,36 @@ function DtStage({ children }: { children: React.ReactNode }) {
   return <div className="flex flex-wrap items-start gap-8">{children}</div>;
 }
 
+function RecStage({ children }: { children: React.ReactNode }) {
+  return <div className="w-full max-w-xl">{children}</div>;
+}
+
+const REC_JABRA = { deviceId: "jabra", label: "Jabra Link 380" };
+const REC_BUILTIN = { deviceId: "builtin", label: "MacBook Pro Microphone" };
+
+/**
+ * A deterministic take.
+ *
+ * Generated from a formula rather than a random seed, so the previews are
+ * byte-identical between runs and a visual regression means something changed
+ * rather than that the noise moved.
+ */
+const REC_PEAKS = Float32Array.from({ length: 180 }, (_, i) => {
+  const t = i / 12;
+  const phrase = (t % 3.9) / 3.9 < 0.82 ? 1 : 0.06;
+  const syllable = 0.5 + 0.5 * Math.sin(2 * Math.PI * 4.4 * t);
+  return Math.min(1, phrase * (0.2 + 0.8 * syllable ** 1.3));
+});
+const REC_SPEAKERS = Uint8Array.from({ length: 180 }, (_, i) =>
+  Math.floor(i / 26) % 2 === 0 ? 0 : 1,
+);
+
+const REC_TURNS = [
+  { id: "1", speaker: "Dr Okafor", words: "And how long has the breathlessness been going on for" },
+  { id: "2", speaker: "Patient", words: "Maybe three weeks now It is worse going up the stairs" },
+  { id: "3", speaker: "Patient", words: "I have to stop halfway which I", interim: "never" },
+];
+
 const SCENARIOS: Record<string, Scenario[]> = {
   /* ---- the date, time and session family --------------------------- */
 
@@ -1424,6 +1455,141 @@ const SCENARIOS: Record<string, Scenario[]> = {
    * picking one from a grid, timing a session, and rendering what the record
    * already holds.
    */
+  /*
+   * Four bands: what capture looks like, what it looks like when it is
+   * lying, what a finished take looks like, and the transcript.
+   *
+   * Every scenario below is driven by props rather than by a microphone. A
+   * docs page cannot ask for one, and a preview that animated without a
+   * signal behind it would be the exact defect this component exists to
+   * prevent — demonstrated, on its own documentation.
+   */
+  recorder: [
+    {
+      id: "recording",
+      label: "Capturing",
+      group: "Capture",
+      note: "The workhorse. Peak buckets at 30 Hz, newest at the right, older buckets falling off a masked left edge — the lane appears to scroll because the data moves, not because a transform is animating. The centre hairline is true zero, so a bar touching it means the recogniser is receiving nothing rather than that the room is quiet at a decorative minimum. The device name sits in the footer permanently, which is the only defence against the one fault that has none.",
+      render: () => (
+        <RecStage>
+          <Recorder variant="bars" phase="recording" device={REC_JABRA} expectedDevice={REC_JABRA} />
+        </RecStage>
+      ),
+    },
+    {
+      id: "single-control",
+      label: "One control, at 44px",
+      group: "Capture",
+      note: "Pulse answers both questions at once: is it recording (the dot, and its shape) and is it hearing me (the rings). It is the only art that keeps a real level meter at thumb size, which is what a patient-facing surface or a phone actually needs — every other art drops the meter or the transport when the width goes.",
+      render: () => (
+        <RecStage>
+          <Recorder variant="pulse" phase="recording" />
+        </RecStage>
+      ),
+    },
+    {
+      id: "dictation",
+      label: "Inline dictation",
+      group: "Capture",
+      note: "Forty pixels tall, lives inside a note field or a composer toolbar, and still carries a real level meter rather than a static microphone glyph. It is the variant that will be instantiated most often and looked at least, which is exactly why it is not an afterthought — and it is the one art that must refuse to mount for a restricted recording, because a control this quiet is not where a disclosure should begin.",
+      render: () => (
+        <RecStage>
+          <Recorder variant="strip" phase="recording" />
+        </RecStage>
+      ),
+    },
+    {
+      id: "wrong-device",
+      label: "Recording the wrong microphone",
+      group: "When it is lying",
+      note: "A clinician wearing a headset while the laptop microphone is live produces plausible room tone, and every one of the thirteen detectors passes on the signal. This is the failure with no signal-level defence at all: it is caught by comparing the device delivering audio against the device that was chosen, and it is why the name is rendered rather than filed in a settings panel.",
+      render: () => (
+        <RecStage>
+          <Recorder
+            variant="bars"
+            phase="recording"
+            device={REC_BUILTIN}
+            expectedDevice={REC_JABRA}
+          />
+        </RecStage>
+      ),
+    },
+    {
+      id: "no-consent",
+      label: "Armed, with no basis recorded",
+      group: "When it is lying",
+      note: "`armed` is not `idle`: permission is granted and the device is chosen, but nothing is captured and no basis is recorded. Most implementations collapse those two states and then have nowhere to put consent. The engine refuses the armed-to-recording edge rather than trusting a button handler, and the component states the refusal rather than disabling a control silently.",
+      render: () => (
+        <RecStage>
+          <Recorder variant="bars" phase="armed" consent={null} />
+        </RecStage>
+      ),
+    },
+    {
+      id: "held",
+      label: "Captured, but not sent",
+      group: "When it is lying",
+      note: "The state every thin MediaRecorder wrapper skips: the bytes exist, they are on this device, and nobody else has them. A tick at this moment would be a falsehood about a legal record. The retry resumes by byte range, because a 14 MB re-upload on a clinic connection is a minute nobody has.",
+      render: () => (
+        <RecStage>
+          <Recorder
+            variant="bars"
+            phase="held"
+            disposition={{ state: "failed", bytes: 14_200_000, sent: 8_900_000, error: "network" }}
+          />
+        </RecStage>
+      ),
+    },
+    {
+      id: "duet",
+      label: "Who spoke when",
+      group: "Reviewing a take",
+      note: "The same Float32Array as the recorder, read by index instead of appended to — but the axis carries the speaker. Clinician above the line, patient below, so talk-time balance reads without reading anything, and that is a real consultation-quality measure rather than a decoration. Position is the channel, not colour: the two accents sit within about 2:1 of each other in luminance, and a hue-only distinction is one this system forbids.",
+      render: () => (
+        <RecStage>
+          <Recorder
+            variant="duet"
+            phase="ready"
+            peaks={REC_PEAKS}
+            speakers={REC_SPEAKERS}
+            position={0.44}
+            durationMs={754_000}
+            speakerLabels={["Dr Okafor", "Patient"]}
+          />
+        </RecStage>
+      ),
+    },
+    {
+      id: "duet-no-speakers",
+      label: "Without diarisation",
+      group: "Reviewing a take",
+      note: "Where the ingest pipeline supplies peaks but no speaker byte, the art collapses to a single rail and says so. It does not guess: a wrongly attributed rail is worse than no attribution, because a reader who believes the axis will read a patient's words as the clinician's.",
+      render: () => (
+        <RecStage>
+          <Recorder
+            variant="duet"
+            phase="ready"
+            peaks={REC_PEAKS}
+            speakers={null}
+            position={0.3}
+            durationMs={754_000}
+          />
+        </RecStage>
+      ),
+    },
+    {
+      id: "transcript",
+      label: "Live transcript",
+      group: "Transcript",
+      note: "The accessible equivalent of every waveform on this page: a screen-reader user cannot see a level meter, so where a transcript exists it is rendered alongside rather than instead. The last token is drawn as a guess because the recogniser may still take it back — committing an interim result and then rewriting it is how a transcript loses a clinician in the first thirty seconds.",
+      render: () => (
+        <RecStage>
+          <Recorder variant="stream" phase="recording" turns={REC_TURNS} />
+        </RecStage>
+      ),
+    },
+  ],
+
   "date-picker": [
     {
       id: "typed",

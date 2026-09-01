@@ -69,7 +69,7 @@ export default defineComponentMeta({
     "Requires styles/oxygen-loader.css, installed with loader-core. Without it the loader renders as a static mark rather than an animated one.",
     "One cardiac rhythm. It does not depict arrhythmia, and it must never be read as a patient's actual rate.",
   ],
-  related: ["rhythm-loader", "breath-loader", "infusion-loader", "helix-loader"],
+  related: ["rhythm-loader", "breath-loader", "infusion-loader", "helix-loader", "recorder"],
 
   dependencies: ["clsx", "tailwind-merge"],
   registryDependencies: ["utils", "tokens", "loader-core", "rhythm-loader"],

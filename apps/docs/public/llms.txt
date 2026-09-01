@@ -148,6 +148,10 @@ Rules that matter when generating code with these components:
   fhir: AuditEvent, Provenance, QuestionnaireResponse
   states: Rest, Mode tray, Shortcuts, Dictating, Streaming, Grounded answer, General-knowledge answer, Sources open, Refused, Crisis, Error, Suppressed
   status: experimental
+- [Recorder](https://oxygenui.design/components/recorder): A capture surface that cannot lie about whether it is listening. Five arts over one signal engine, and thirteen failure modes it can tell apart.
+  install: npx @oxygenui-design/cli add recorder
+  states: Recording, Armed, awaiting consent, Microphone muted, Device lost, Held, not yet uploaded, Playback with speakers, Playback without diarisation, Live transcript, Inline dictation, Single control
+  status: beta
 
 ## Block
 

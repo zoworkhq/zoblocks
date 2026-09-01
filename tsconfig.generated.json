@@ -63,6 +63,9 @@
       "@/components/oxygen/recent-patient-stack": [
         "./registry/oxygen/recent-patient-stack/recent-patient-stack.tsx"
       ],
+      "@/components/oxygen/recorder": [
+        "./registry/oxygen/recorder/recorder.tsx"
+      ],
       "@/components/oxygen/result-value": [
         "./registry/oxygen/result-value/result-value.tsx"
       ],

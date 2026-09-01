@@ -45,6 +45,8 @@ function rewriteImports(source: string, fromDepth: number): string {
       .replace(/(["'])@\/lib\/utils\1/g, `"${up}lib/utils"`)
       // The loader core.
       .replace(/(["'])@\/lib\/oxygen-loader\1/g, `"${up}lib/loader"`)
+      // The recorder core: the React binding over @oxygenui-design/recorder-core.
+      .replace(/(["'])@\/lib\/oxygen-recorder\1/g, `"${up}lib/recorder"`)
       // The accordion core.
       .replace(/(["'])@\/lib\/oxygen-accordion\1/g, `"${up}lib/accordion-core"`)
       // The switch core.
@@ -115,6 +117,7 @@ export async function emitReactPackage(
   for (const [file, target, depth] of [
     ["lib/utils.ts", "lib/utils.ts", 1],
     ["lib/loader.tsx", "lib/loader.tsx", 1],
+    ["lib/recorder.tsx", "lib/recorder.tsx", 1],
     ["lib/accordion-core.tsx", "lib/accordion-core.tsx", 1],
     ["lib/switch.tsx", "lib/switch.tsx", 1],
     ["lib/clinical-note.tsx", "lib/clinical-note.tsx", 1],

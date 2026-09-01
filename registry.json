@@ -906,6 +906,33 @@
       ]
     },
     {
+      "name": "recorder",
+      "type": "oxygen:component",
+      "title": "Recorder",
+      "description": "Record, review and transcribe clinical audio: ambient documentation, dictation, voice messaging and transcript playback. Five arts — pulse, bars, strip, duet and stream — over one engine, with the level meter driven by an AnalyserNode rather than a timer, a silence budget, and thirteen distinct device faults.",
+      "categories": [
+        "media",
+        "clinical"
+      ],
+      "dependencies": [
+        "clsx",
+        "tailwind-merge",
+        "@oxygenui-design/recorder-core"
+      ],
+      "registryDependencies": [
+        "utils",
+        "tokens",
+        "recorder-core"
+      ],
+      "files": [
+        {
+          "path": "registry/oxygen/recorder/recorder.tsx",
+          "type": "oxygen:component",
+          "target": "components/oxygen/recorder.tsx"
+        }
+      ]
+    },
+    {
       "name": "result-value",
       "type": "oxygen:component",
       "title": "Result Value",
