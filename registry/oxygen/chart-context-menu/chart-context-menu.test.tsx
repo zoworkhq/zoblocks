@@ -835,3 +835,125 @@ describe("the two empty states, which read differently on purpose", () => {
     );
   });
 });
+
+/* ------------------------------------------------------------------ */
+/* Submenus                                                            */
+/* ------------------------------------------------------------------ */
+
+/*
+ * These exist because the first version of this component shipped `submenu` as
+ * a decoration: it drew a chevron, set `aria-haspopup="menu"`, and then ran the
+ * *parent* as a command. The story asserted the ARIA attribute and passed, and
+ * `meta.limitations` described an intent delay that was not there — a
+ * capability declared, documented and absent. So the first assertion below is
+ * the one that matters: choosing a row with children must not call `onRun`.
+ */
+
+const trendActions: ChartMenuAction[] = [
+  { id: "open", label: "Open result", tier: "routine" },
+  {
+    id: "trend",
+    label: "Trend",
+    tier: "routine",
+    submenu: [
+      { id: "t7", label: "Last 7 days", tier: "routine" },
+      { id: "t30", label: "Last 30 days", tier: "routine" },
+    ],
+  },
+];
+
+describe("a row with children is not a command", () => {
+  it("returns a submenu outcome rather than run", () => {
+    const trend = trendActions[1];
+    expect(actionOutcome(trend!)).toMatchObject({ kind: "submenu" });
+  });
+
+  it("does not call onRun when the trigger is chosen", async () => {
+    const user = userEvent.setup();
+    const onRun = vi.fn();
+    render(<Row actions={trendActions} onRun={onRun} />);
+    await user.pointer({ keys: "[MouseRight]", target: screen.getByTestId("row") });
+    await user.click(await screen.findByRole("menuitem", { name: /Trend/ }));
+
+    expect(onRun).not.toHaveBeenCalled();
+    // And the parent stays open — a submenu that closed its parent would be a
+    // menu you cannot get back to.
+    expect(screen.getAllByRole("menu").length).toBe(2);
+  });
+
+  it("renders the children, named by the row that owns them", async () => {
+    const user = userEvent.setup();
+    render(<Row actions={trendActions} />);
+    await user.pointer({ keys: "[MouseRight]", target: screen.getByTestId("row") });
+    await user.click(await screen.findByRole("menuitem", { name: /Trend/ }));
+
+    const child = screen.getAllByRole("menu")[1];
+    expect(within(child!).getByRole("menuitem", { name: "Last 7 days" })).toBeTruthy();
+    const labelledBy = child!.getAttribute("aria-labelledby");
+    expect(document.getElementById(labelledBy!)?.textContent).toContain("Trend");
+  });
+
+  it("says on the trigger whether its menu is open", async () => {
+    const user = userEvent.setup();
+    render(<Row actions={trendActions} />);
+    await user.pointer({ keys: "[MouseRight]", target: screen.getByTestId("row") });
+    const trigger = await screen.findByRole("menuitem", { name: /Trend/ });
+    expect(trigger.getAttribute("aria-expanded")).toBe("false");
+    await user.click(trigger);
+    expect(trigger.getAttribute("aria-expanded")).toBe("true");
+  });
+
+  it("runs a child and closes everything", async () => {
+    const user = userEvent.setup();
+    const onRun = vi.fn();
+    render(<Row actions={trendActions} onRun={onRun} />);
+    await user.pointer({ keys: "[MouseRight]", target: screen.getByTestId("row") });
+    await user.click(await screen.findByRole("menuitem", { name: /Trend/ }));
+    await user.click(screen.getByRole("menuitem", { name: "Last 30 days" }));
+
+    expect(onRun).toHaveBeenCalledTimes(1);
+    expect(onRun.mock.calls[0]![0].id).toBe("t30");
+    expect(screen.queryByRole("menu")).toBeNull();
+  });
+
+  it("opens on ArrowRight and closes on ArrowLeft, one level at a time", async () => {
+    const user = userEvent.setup();
+    render(<Row actions={trendActions} />);
+    screen.getByTestId("row").focus();
+    await user.keyboard("{Shift>}{F10}{/Shift}");
+    await screen.findByRole("menu");
+
+    await user.keyboard("{ArrowDown}");
+    expect(document.activeElement?.textContent).toContain("Trend");
+    await user.keyboard("{ArrowRight}");
+    expect(screen.getAllByRole("menu").length).toBe(2);
+    // A keyboard open is a commitment, so it takes focus.
+    expect(document.activeElement?.textContent).toContain("Last 7 days");
+
+    await user.keyboard("{ArrowLeft}");
+    expect(screen.getAllByRole("menu").length).toBe(1);
+    expect(document.activeElement?.textContent).toContain("Trend");
+  });
+
+  it("closes the child on Escape and leaves the parent open", async () => {
+    const user = userEvent.setup();
+    render(<Row actions={trendActions} />);
+    screen.getByTestId("row").focus();
+    await user.keyboard("{Shift>}{F10}{/Shift}");
+    await screen.findByRole("menu");
+    await user.keyboard("{ArrowDown}{ArrowRight}");
+    expect(screen.getAllByRole("menu").length).toBe(2);
+
+    await user.keyboard("{Escape}");
+    expect(screen.getAllByRole("menu").length).toBe(1);
+    // A second Escape takes the parent down, not both at once.
+    await user.keyboard("{Escape}");
+    expect(screen.queryByRole("menu")).toBeNull();
+  });
+
+  it("refuses an empty submenu at author time", () => {
+    expect(
+      validateActions([{ id: "x", label: "Trend", tier: "routine", submenu: [] }]).join(" "),
+    ).toContain("nothing in it");
+  });
+});

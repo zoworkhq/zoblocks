@@ -60,7 +60,7 @@ export default defineComponentMeta({
     "A masked subject",
     "A multiple selection",
     "Checkbox and radio view state",
-    "A submenu",
+    "A submenu, open beside its row",
     "This record supports no actions",
     "Every action withheld from this role",
   ],
@@ -110,7 +110,7 @@ export default defineComponentMeta({
 
   limitations: [
     "The trigger announces aria-haspopup but never aria-expanded. Axe rejects the latter on a generic element and treats it as conditional on a table row, and it is wrong on the merits anyway — a transient popup is not content belonging to the row, and announcing every row of a worklist as collapsed is a claim about structure that is not true.",
-    'Submenus have an intent delay but no safe triangle, so a diagonal sweep toward a submenu can close it. That is why validateActions refuses anything above tier="routine" inside one: the cost of an accidental close on a routine action is another mouse movement, and on a clinical one it is a mis-click on whatever the pointer crossed.',
+    'Submenus have a 100ms hover intent and no safe triangle. Instead of geometry, an open child closes when the pointer reaches a *different* row rather than when it leaves the trigger — so crossing the gap between the two menus closes nothing, which is the case a safe triangle exists to protect. validateActions still refuses anything above tier="routine" inside one, because the cost of an accidental close has to stay "move the mouse again" rather than a mis-click on whatever the pointer crossed.',
     "Type-ahead matches the first letter only. A full buffer competes with the shortcuts the menu displays, and the ambiguity is worse than the omission.",
     "The menu follows its trigger on scroll and closes on a viewport resize. Following is right because the popup is anchored to a place inside the row rather than to a viewport coordinate; closing on resize is right because a rotation reflows the layout the placement was computed against, and there is no correct place to put a stale popup.",
     "Break-glass is signalled, never performed. The component says an override exists, takes the reason and reports it; the step-up authentication and the incident report behind it are a separate surface with their own consent and their own record.",

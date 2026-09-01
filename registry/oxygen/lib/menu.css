@@ -578,6 +578,22 @@
   min-inline-size: 14.75rem;
 }
 
+/*
+ * A child menu.
+ *
+ * Narrower and with no subject header: the parent's header already named the
+ * record, and repeating it beside itself would read as a second subject rather
+ * than the same one. `z-index` is one above the parent so a child that overlaps
+ * it paints on top; both are portalled siblings, so DOM order alone would not
+ * settle it.
+ */
+.ox-menu--sub {
+  z-index: 61;
+  min-inline-size: 11rem;
+  max-inline-size: 16rem;
+  padding-block: 0;
+}
+
 /* ---- density ----------------------------------------------------- */
 
 .ox-menu[data-ox-density="compact"] .ox-menu__item {

@@ -97,6 +97,16 @@ const RESULT_ACTIONS: ChartMenuAction[] = [
   { id: "open", label: "Open result", tier: "routine", shortcut: "↵" },
   { id: "range", label: "Show reference range", tier: "routine" },
   {
+    id: "trend",
+    label: "Trend",
+    tier: "routine",
+    submenu: [
+      { id: "t7", label: "Last 7 days", tier: "routine" },
+      { id: "t30", label: "Last 30 days", tier: "routine" },
+      { id: "t365", label: "Last year", tier: "routine" },
+    ],
+  },
+  {
     id: "portal",
     label: "Release to patient portal",
     tier: "documented",

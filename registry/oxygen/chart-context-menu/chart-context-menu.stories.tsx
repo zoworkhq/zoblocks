@@ -437,8 +437,8 @@ export const ViewState: Story = {
 };
 
 export const Submenu: Story = {
-  name: "A submenu",
-  parameters: { state: "A submenu" },
+  name: "A submenu, open beside its row",
+  parameters: { state: "A submenu, open beside its row" },
   render: renderRow,
   args: {
     subject: {
@@ -465,6 +465,20 @@ export const Submenu: Story = {
     const menu = await openByPointer(canvasElement);
     const trend = within(menu).getByRole("menuitem", { name: /Trend/ });
     expect(trend.getAttribute("aria-haspopup")).toBe("menu");
+    expect(trend.getAttribute("aria-expanded")).toBe("false");
+
+    /*
+     * Opened, not merely announced. The first version of this story asserted
+     * `aria-haspopup` and nothing else, and passed for a component whose
+     * submenu did not exist — the row ran as a command and the children were
+     * never rendered.
+     */
+    await userEvent.click(trend);
+    const menus = within(canvasElement).getAllByRole("menu");
+    expect(menus).toHaveLength(2);
+    const child = menus.at(-1) ?? canvasElement;
+    expect(within(child).getByRole("menuitem", { name: "Last 7 days" })).toBeTruthy();
+    expect(trend.getAttribute("aria-expanded")).toBe("true");
   },
 };
 

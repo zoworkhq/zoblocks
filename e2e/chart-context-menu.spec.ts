@@ -210,3 +210,90 @@ test.describe("@a11y consequence is reachable but never adjacent", () => {
     await expect(row).toBeFocused();
   });
 });
+
+test.describe("@a11y a submenu is a menu, not a chevron", () => {
+  /*
+   * This shipped as a decoration: a chevron, `aria-haspopup="menu"`, and a
+   * click that ran the parent as a command. jsdom could have caught that much,
+   * and the unit suite now does. What it could not catch is the part that is
+   * geometry and portals — whether the child lands beside its row, whether it
+   * stays inside the viewport, and whether the outside-click listener treats a
+   * second portal as "outside" and dismisses everything before the click that
+   * would have run the item. The last one was real.
+   */
+  test.beforeEach(async ({ page }) => {
+    await page.goto(PAGE);
+    await page.waitForLoadState("networkidle");
+  });
+
+  test("opens beside its row and runs a child", async ({ page }) => {
+    // The result row: "Trend" is the only submenu on the page.
+    await page.locator("[data-ox-menu]").nth(1).click({ button: "right" });
+
+    const parent = page.locator(".ox-menu").first();
+    const trigger = parent.getByRole("menuitem", { name: /Trend/ });
+    await expect(trigger).toHaveAttribute("aria-expanded", "false");
+    await trigger.click();
+
+    const child = page.locator(".ox-menu--sub");
+    await expect(child).toBeVisible();
+    await expect(trigger).toHaveAttribute("aria-expanded", "true");
+
+    // Beside, not on top of, and fully on screen.
+    const p = await parent.boundingBox();
+    const c = await child.boundingBox();
+    expect(c!.x + c!.width <= p!.x + 2 || c!.x >= p!.x + p!.width - 6).toBeTruthy();
+    await expect(child).toBeInViewport();
+
+    // The one jsdom nearly missed: the child is a separate portal, so a click
+    // inside it must not read as a click away.
+    await child.getByRole("menuitem", { name: "Last 30 days" }).click();
+    await expect(page.locator(".ox-menu")).toHaveCount(0);
+  });
+
+  test("opens on hover after an intent delay, and survives the gap between menus", async ({
+    page,
+  }) => {
+    await page.locator("[data-ox-menu]").nth(1).click({ button: "right" });
+    const parent = page.locator(".ox-menu").first();
+    const trigger = parent.getByRole("menuitem", { name: /Trend/ });
+
+    await trigger.hover();
+    const child = page.locator(".ox-menu--sub");
+    await expect(child).toBeVisible();
+
+    // Crossing from the trigger into the child passes over dead space between
+    // the two popups. Without a safe triangle that is where a naive close
+    // timer kills it; here nothing closes until a different row is reached.
+    await child.getByRole("menuitem", { name: "Last 7 days" }).hover();
+    await expect(child).toBeVisible();
+
+    // Reaching a different row is what closes it.
+    await parent.getByRole("menuitem", { name: /Open result/ }).hover();
+    await expect(child).toHaveCount(0);
+    await expect(parent).toBeVisible();
+  });
+
+  test("ArrowRight opens it, ArrowLeft gives the row back", async ({ page }) => {
+    const row = page.locator("[data-ox-menu]").nth(1);
+    await row.focus();
+    await page.keyboard.press("Shift+F10");
+    await expect(page.locator(".ox-menu").first()).toBeVisible();
+
+    await page.keyboard.press("ArrowDown");
+    await page.keyboard.press("ArrowDown");
+    await expect(
+      page.locator(".ox-menu").first().getByRole("menuitem", { name: /Trend/ }),
+    ).toBeFocused();
+
+    await page.keyboard.press("ArrowRight");
+    await expect(page.locator(".ox-menu--sub")).toBeVisible();
+    await expect(page.getByRole("menuitem", { name: "Last 7 days" })).toBeFocused();
+
+    await page.keyboard.press("ArrowLeft");
+    await expect(page.locator(".ox-menu--sub")).toHaveCount(0);
+    await expect(
+      page.locator(".ox-menu").first().getByRole("menuitem", { name: /Trend/ }),
+    ).toBeFocused();
+  });
+});

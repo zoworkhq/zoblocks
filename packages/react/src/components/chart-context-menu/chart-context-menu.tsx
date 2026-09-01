@@ -257,6 +257,16 @@ const EDGE_PAD = 8;
  */
 const MIN_DROP = 180;
 
+/**
+ * How long a pointer must rest on a submenu trigger before it opens.
+ *
+ * The same 100ms Base UI uses. There is no safe triangle in v1, so the
+ * mitigation for a diagonal sweep is not geometry but a rule: an open submenu
+ * closes when the pointer reaches a *different row*, not when it leaves this
+ * one. Crossing the gap between the two menus therefore closes nothing.
+ */
+const SUBMENU_DELAY = 100;
+
 /** Long-press duration for a touch trigger, and how far a finger may drift. */
 const LONG_PRESS_MS = 500;
 const LONG_PRESS_SLOP = 10;
@@ -360,6 +370,37 @@ function placeAtRect(rect: DOMRect, width: number): Placement {
         maxHeight: Math.max(MIN_DROP, above - 4),
       }
     : { top: rect.bottom + 4, left, origin: "top left", maxHeight: Math.max(MIN_DROP, below - 4) };
+}
+
+/**
+ * Where a child menu goes: beside its parent row, flipping to the other side
+ * when there is no room, and anchored by its bottom edge when there is not
+ * room below — the same reason the parent flips that way.
+ */
+function placeBeside(rect: DOMRect, width: number): Placement {
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+
+  let left = rect.right - 4;
+  let originX = "left";
+  if (left + width > vw - EDGE_PAD) {
+    left = rect.left - width + 4;
+    originX = "right";
+  }
+  const clampedLeft = clamp(left, EDGE_PAD, Math.max(EDGE_PAD, vw - width - EDGE_PAD));
+
+  /* Align the child's first row with the row that opened it. */
+  const top = rect.top - 4;
+  const below = vh - top - EDGE_PAD;
+  if (below >= MIN_DROP) {
+    return { top, left: clampedLeft, origin: `top ${originX}`, maxHeight: below };
+  }
+  return {
+    bottom: EDGE_PAD,
+    left: clampedLeft,
+    origin: `bottom ${originX}`,
+    maxHeight: Math.max(MIN_DROP, vh - EDGE_PAD * 2),
+  };
 }
 
 /**
@@ -530,6 +571,8 @@ export function ChartContextMenu(props: ChartContextMenuProps) {
   const [announcement, setAnnouncement] = React.useState("");
   /** Bumped to re-run placement when an anchored menu's element has moved. */
   const [tick, setTick] = React.useState(0);
+  /** The open child menu: the id of the row that owns it, and how it was opened. */
+  const [sub, setSub] = React.useState<{ id: string; fromKeyboard: boolean } | null>(null);
 
   /*
    * `useId`, not a constant. The panel is portalled into `<body>`, so two
@@ -548,6 +591,17 @@ export function ChartContextMenu(props: ChartContextMenuProps) {
    */
   const rowRefs = React.useRef(new Map<string, HTMLDivElement | null>());
   const pressRef = React.useRef<{ timer: number; x: number; y: number } | null>(null);
+  /** The hover-intent timer for a submenu trigger. */
+  const subTimerRef = React.useRef<number | null>(null);
+  /**
+   * The child menu's own element.
+   *
+   * The child is a second portal, so it is not inside `panelRef` — and the
+   * outside-click listener therefore treated a click on one of its items as a
+   * click away, dismissing everything on `mousedown` before the `click` that
+   * would have run it. Every submenu item was inert.
+   */
+  const subPanelRef = React.useRef<HTMLElement | null>(null);
   /**
    * The open state, readable synchronously.
    *
@@ -820,6 +874,7 @@ export function ChartContextMenu(props: ChartContextMenuProps) {
     const onPointer = (event: MouseEvent) => {
       const target = event.target as Node;
       if (panelRef.current?.contains(target)) return;
+      if (subPanelRef.current?.contains(target)) return;
       close(false);
     };
     /*
@@ -843,6 +898,15 @@ export function ChartContextMenu(props: ChartContextMenuProps) {
 
   React.useEffect(() => {
     if (!open) return;
+    /*
+     * Stand down while a keyboard-opened child has focus.
+     *
+     * React runs a child's effects before its parent's, so opening a submenu
+     * ran the child's focus effect and then this one — and this one won,
+     * putting focus back on the trigger row while the child sat open and
+     * unreachable. jsdom did not reproduce it; Chromium did, first try.
+     */
+    if (sub?.fromKeyboard) return;
     /*
      * `preventScroll`, and it is load-bearing rather than tidy.
      *
@@ -868,7 +932,7 @@ export function ChartContextMenu(props: ChartContextMenuProps) {
      * the call succeeded silently and focus stayed on the trigger. Re-running
      * once the placement lands is what actually arms the first verb.
      */
-  }, [open, active, rows, confirming, reasoning, box]);
+  }, [open, active, rows, confirming, reasoning, box, sub]);
 
   /*
    * Focus goes back to the trigger once the popup is gone, and only then.
@@ -883,6 +947,34 @@ export function ChartContextMenu(props: ChartContextMenuProps) {
     restoreFocusRef.current = false;
     triggerRef.current?.focus?.();
   }, [open]);
+
+  const cancelSubTimer = React.useCallback(() => {
+    if (subTimerRef.current !== null) {
+      window.clearTimeout(subTimerRef.current);
+      subTimerRef.current = null;
+    }
+  }, []);
+
+  const closeSub = React.useCallback(
+    (returnFocus: boolean) => {
+      cancelSubTimer();
+      setSub((current) => {
+        if (current && returnFocus) {
+          rowRefs.current.get(current.id)?.focus?.({ preventScroll: true });
+        }
+        return null;
+      });
+    },
+    [cancelSubTimer],
+  );
+
+  /* Closing the whole menu closes the child with it. */
+  React.useEffect(() => {
+    if (!open) {
+      cancelSubTimer();
+      setSub(null);
+    }
+  }, [open, cancelSubTimer]);
 
   /* ---- running ----------------------------------------------------- */
 
@@ -915,6 +1007,16 @@ export function ChartContextMenu(props: ChartContextMenuProps) {
         onToggle?.(action, !action.checked);
         return;
       }
+      if (outcome.kind === "submenu") {
+        /*
+         * A click, Enter or ArrowRight is a commitment, so it takes focus.
+         * Hover opens through `armSub` instead and deliberately does not.
+         */
+        cancelSubTimer();
+        setActive(index);
+        setSub({ id: action.id, fromKeyboard: true });
+        return;
+      }
       if (outcome.kind === "confirm") {
         setConfirming(action.id);
         setReasoning(null);
@@ -932,7 +1034,16 @@ export function ChartContextMenu(props: ChartContextMenuProps) {
       }
       runAction(action, outcome);
     },
-    [confirming, reasoning, resolved.bulk, onBlocked, onToggle, emitDisclosure, runAction],
+    [
+      confirming,
+      reasoning,
+      resolved.bulk,
+      onBlocked,
+      onToggle,
+      emitDisclosure,
+      runAction,
+      cancelSubTimer,
+    ],
   );
 
   /* ---- keyboard ---------------------------------------------------- */
@@ -952,6 +1063,22 @@ export function ChartContextMenu(props: ChartContextMenuProps) {
         event.preventDefault();
         setActive(nextIndex(rows, rows.length, -1, false));
         return;
+      case "ArrowRight": {
+        /* Only meaningful on a row that has children; otherwise it is a no-op
+           rather than a caret move, because there is no text to move through. */
+        const row = active >= 0 ? rows[active] : undefined;
+        if (row?.action.submenu?.length) {
+          event.preventDefault();
+          choose(row, active);
+        }
+        return;
+      }
+      case "ArrowLeft":
+        if (sub) {
+          event.preventDefault();
+          closeSub(true);
+        }
+        return;
       case "Enter":
       case " ": {
         const row = active >= 0 ? rows[active] : undefined;
@@ -964,7 +1091,10 @@ export function ChartContextMenu(props: ChartContextMenuProps) {
       case "Escape":
         event.preventDefault();
         event.stopPropagation();
-        close();
+        /* One level at a time — Base UI's `closeParentOnEsc: false`, and the
+           behaviour every desktop menu has. */
+        if (sub) closeSub(true);
+        else close();
         return;
       case "Tab":
         // A menu is not a place to Tab through. Closing keeps the tab order
@@ -987,6 +1117,11 @@ export function ChartContextMenu(props: ChartContextMenuProps) {
   if (!open || !mounted) return <>{children(trigger)}</>;
 
   const isSheet = open.presentation === "sheet";
+  /*
+   * Looked up from the *resolved* rows rather than from `actions`, so a child
+   * cannot outlive a parent the policy withheld or a bulk selection disabled.
+   */
+  const subAction = sub ? (rows.find((row) => row.action.id === sub.id)?.action ?? null) : null;
   let flat = -1;
 
   const panel = (
@@ -1089,6 +1224,7 @@ export function ChartContextMenu(props: ChartContextMenuProps) {
                       if (node) rowRefs.current.set(action.id, node);
                       else rowRefs.current.delete(action.id);
                     }}
+                    id={action.submenu?.length ? `${subjectId}-${action.id}` : undefined}
                     role={
                       action.kind === "checkbox"
                         ? "menuitemcheckbox"
@@ -1102,9 +1238,38 @@ export function ChartContextMenu(props: ChartContextMenuProps) {
                     {...(pending ? { "data-ox-pending": "" } : {})}
                     {...(active === index ? { "data-ox-active": "" } : {})}
                     {...(toggle ? { "aria-checked": Boolean(action.checked) } : {})}
-                    {...(action.submenu ? { "aria-haspopup": "menu" as const } : {})}
+                    {...(action.submenu?.length
+                      ? {
+                          "aria-haspopup": "menu" as const,
+                          /* Allowed on `menuitem`, unlike on the generic
+                             trigger element — and here it is true: this row
+                             really does own a menu that opens and closes. */
+                          "aria-expanded": sub?.id === action.id,
+                        }
+                      : {})}
                     {...(pending || blocked ? { "aria-disabled": true } : {})}
-                    onMouseEnter={() => setActive(index)}
+                    onMouseEnter={(event) => {
+                      setActive(index);
+                      cancelSubTimer();
+                      if (action.submenu?.length) {
+                        if (sub?.id === action.id) return;
+                        const target = event.currentTarget;
+                        subTimerRef.current = window.setTimeout(() => {
+                          subTimerRef.current = null;
+                          /* Hover has committed to nothing, so this does not
+                             take focus — see the note on `Submenu`. */
+                          if (target.isConnected) setSub({ id: action.id, fromKeyboard: false });
+                        }, SUBMENU_DELAY);
+                        return;
+                      }
+                      /*
+                       * Reaching a *different* row is what closes an open
+                       * child, rather than leaving the trigger. Without a safe
+                       * triangle that is the difference between a diagonal
+                       * sweep working and a menu that shuts under the pointer.
+                       */
+                      if (sub) closeSub(false);
+                    }}
                     onClick={(event) => {
                       event.stopPropagation();
                       choose(row, index);
@@ -1128,7 +1293,7 @@ export function ChartContextMenu(props: ChartContextMenuProps) {
                       <span className="ox-menu__label">{action.label}</span>
                     )}
 
-                    {action.submenu ? (
+                    {action.submenu?.length ? (
                       <Chevron />
                     ) : (
                       <span className="ox-menu__shortcut">{action.shortcut ?? ""}</span>
@@ -1199,6 +1364,31 @@ export function ChartContextMenu(props: ChartContextMenuProps) {
         </>,
         container ?? document.body,
       )}
+      {subAction ? (
+        <Submenu
+          key={subAction.id}
+          parent={subAction}
+          anchorEl={rowRefs.current.get(subAction.id) ?? null}
+          contained={contained}
+          container={container ?? null}
+          labelledBy={`${subjectId}-${subAction.id}`}
+          autoFocus={sub?.fromKeyboard ?? false}
+          compact={density === "compact"}
+          scope={scopeOf(triggerRef.current)}
+          tick={tick}
+          onRun={(item) => {
+            /* A child item is a routine action by construction, so it runs and
+               takes the whole menu down with it. */
+            onRun?.(item, subject, { kind: "run" });
+            close();
+          }}
+          onDismiss={closeSub}
+          onPointerEnter={cancelSubTimer}
+          registerPanel={(node) => {
+            subPanelRef.current = node;
+          }}
+        />
+      ) : null}
     </>
   );
 }
@@ -1292,4 +1482,190 @@ function ReasonList(props: { action: ChartMenuAction; onPick: (reason: string) =
       </p>
     </div>
   );
+}
+
+/* ------------------------------------------------------------------ */
+/* Submenu                                                            */
+/* ------------------------------------------------------------------ */
+
+/**
+ * A child menu, beside the row that owns it.
+ *
+ * Routine actions only — `validateActions` refuses anything above that inside
+ * a submenu, because without a safe triangle a diagonal sweep can close one
+ * mid-flight and the cost of that has to stay "move the mouse again" rather
+ * than "you discontinued something".
+ *
+ * It does not take focus when a pointer opened it. A hover has committed to
+ * nothing yet, and moving focus out of the parent list would throw away the
+ * keyboard user's place in it. Opening by click, Enter or ArrowRight does take
+ * focus, because those are commitments.
+ */
+function Submenu(props: {
+  parent: ChartMenuAction;
+  anchorEl: HTMLElement | null;
+  contained: HTMLElement | null;
+  container: HTMLElement | null;
+  labelledBy: string;
+  autoFocus: boolean;
+  compact?: boolean;
+  scope: Record<string, string>;
+  tick: number;
+  onRun: (action: ChartMenuAction) => void;
+  onDismiss: (returnFocus: boolean) => void;
+  onPointerEnter: () => void;
+  /** Hands the parent this panel, so its outside-click check can see it. */
+  registerPanel: (node: HTMLElement | null) => void;
+}) {
+  const {
+    parent,
+    anchorEl,
+    contained,
+    container,
+    labelledBy,
+    autoFocus,
+    compact,
+    scope,
+    tick,
+    onRun,
+    onDismiss,
+    onPointerEnter,
+    registerPanel,
+  } = props;
+
+  /*
+   * Memoised because `?? []` mints a new array whenever `submenu` is absent,
+   * and this list is an effect dependency — an unstable identity would re-run
+   * the focus effect on every render of the parent, which is once per scroll
+   * event while the menu is open.
+   */
+  const items = React.useMemo(() => parent.submenu ?? [], [parent.submenu]);
+  const panelRef = React.useRef<HTMLDivElement>(null);
+  const rowRefs = React.useRef(new Map<string, HTMLDivElement | null>());
+  const [box, setBox] = React.useState<Placement | null>(null);
+  const [active, setActive] = React.useState(autoFocus ? 0 : -1);
+
+  React.useLayoutEffect(() => {
+    const panel = panelRef.current;
+    const rect = anchorEl?.getBoundingClientRect?.();
+    if (!panel || !rect) return;
+    const next = placeBeside(rect, panel.offsetWidth);
+    if (!contained) {
+      setBox(next);
+      return;
+    }
+    const host = contained.getBoundingClientRect();
+    setBox({
+      ...(next.top === undefined
+        ? { bottom: host.bottom - (window.innerHeight - (next.bottom ?? 0)) - contained.scrollTop }
+        : { top: next.top - host.top + contained.scrollTop }),
+      left: next.left - host.left + contained.scrollLeft,
+      origin: next.origin,
+      maxHeight: next.maxHeight,
+    });
+  }, [anchorEl, contained, tick, items.length]);
+
+  React.useEffect(() => {
+    if (!autoFocus) return;
+    const id = items[active]?.id;
+    const node = id ? rowRefs.current.get(id) : undefined;
+    if (node && document.activeElement !== node) node.focus({ preventScroll: true });
+  }, [autoFocus, active, items, box]);
+
+  const move = (delta: 1 | -1) =>
+    setActive((current) => {
+      if (items.length === 0) return -1;
+      const next = current + delta;
+      return next < 0 ? items.length - 1 : next >= items.length ? 0 : next;
+    });
+
+  React.useEffect(() => () => registerPanel(null), [registerPanel]);
+
+  const panel = (
+    <div
+      ref={(node) => {
+        panelRef.current = node;
+        registerPanel(node);
+      }}
+      role="menu"
+      tabIndex={-1}
+      aria-labelledby={labelledBy}
+      aria-orientation="vertical"
+      className={cn("ox-menu", "ox-menu--sub")}
+      data-ox-submenu=""
+      style={
+        box
+          ? ({
+              ...(box.top === undefined ? { bottom: box.bottom } : { top: box.top }),
+              left: box.left,
+              maxBlockSize: box.maxHeight,
+              "--ox-menu-origin": box.origin,
+            } as unknown as React.CSSProperties)
+          : ({ visibility: "hidden", top: 0, left: 0 } as React.CSSProperties)
+      }
+      onMouseEnter={onPointerEnter}
+      onKeyDown={(event) => {
+        /*
+         * Stopped here rather than allowed to bubble: the parent panel is
+         * still mounted and still listening, and without this every arrow key
+         * moved both highlights at once.
+         */
+        switch (event.key) {
+          case "ArrowDown":
+          case "ArrowUp":
+            event.preventDefault();
+            event.stopPropagation();
+            move(event.key === "ArrowDown" ? 1 : -1);
+            return;
+          case "ArrowLeft":
+          case "Escape":
+            /* Closes the child only, and hands the parent back its row. */
+            event.preventDefault();
+            event.stopPropagation();
+            onDismiss(true);
+            return;
+          case "Enter":
+          case " ": {
+            const item = items[active];
+            if (!item) return;
+            event.preventDefault();
+            event.stopPropagation();
+            onRun(item);
+            return;
+          }
+          default:
+        }
+      }}
+      {...scope}
+      {...(compact ? { "data-ox-density": "compact" } : {})}
+    >
+      <div className="ox-menu__list">
+        {items.map((item, index) => (
+          <div
+            key={item.id}
+            ref={(node) => {
+              if (node) rowRefs.current.set(item.id, node);
+              else rowRefs.current.delete(item.id);
+            }}
+            role="menuitem"
+            tabIndex={active === index ? 0 : -1}
+            className="ox-menu__item"
+            data-ox-tier="routine"
+            {...(active === index ? { "data-ox-active": "" } : {})}
+            onMouseEnter={() => setActive(index)}
+            onClick={(event) => {
+              event.stopPropagation();
+              onRun(item);
+            }}
+          >
+            <Glyph>{item.icon}</Glyph>
+            <span className="ox-menu__label">{item.label}</span>
+            <span className="ox-menu__shortcut">{item.shortcut ?? ""}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+
+  return createPortal(panel, container ?? document.body);
 }

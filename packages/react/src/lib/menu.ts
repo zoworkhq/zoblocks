@@ -484,6 +484,16 @@ export type MenuOutcome =
   | { kind: "confirm"; prompt: string; verb: string; bulkPrompt?: string }
   | { kind: "reason"; reasons: readonly string[]; waiting: boolean }
   | { kind: "toggle" }
+  /**
+   * Opens a child menu rather than doing anything.
+   *
+   * A submenu trigger used to fall through to `run`, so choosing "Trend" fired
+   * `onRun("trend")` and closed the menu — a verb the host never wrote,
+   * reported as if the reader had asked for it. The decision belongs here for
+   * the same reason every other one does: the binding should not be the thing
+   * that knows a row with children is not a command.
+   */
+  | { kind: "submenu"; items: readonly MenuAction[] }
   | { kind: "blocked"; reason: string };
 
 /**
@@ -509,6 +519,16 @@ export function actionOutcome(action: MenuAction, ladder: MenuLadder = {}, bulk 
   }
 
   const tier = tierOf(action);
+
+  /*
+   * A row with children is never a command, whatever else is on it. Checked
+   * before the toggle and before the tier ladders: `validateActions` already
+   * refuses anything above `routine` inside a submenu, so nothing consequential
+   * can hide behind one.
+   */
+  if (action.submenu && action.submenu.length > 0) {
+    return { kind: "submenu", items: action.submenu };
+  }
 
   /*
    * A toggle short-circuits every ladder. `validateActions` refuses a toggle
@@ -705,6 +725,11 @@ export function validateActions(actions: readonly MenuAction[]): string[] {
           `\`${action.id}\` is a radio with no \`radioGroup\`, so nothing turns off when it turns on.`,
         );
       }
+    }
+    if (action.submenu && action.submenu.length === 0) {
+      problems.push(
+        `\`${action.id}\` declares an empty submenu, so it renders a chevron promising a menu with nothing in it.`,
+      );
     }
     if (action.submenu && action.submenu.length > 0) {
       for (const child of action.submenu) {
