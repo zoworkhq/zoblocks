@@ -42,6 +42,33 @@ export function recorderClock(ms: number): string {
   return `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
 }
 
+/**
+ * `00:04:12:07` — hours, minutes, seconds and FRAMES.
+ *
+ * The frames field is what makes this a timecode rather than a clock, and it is
+ * why Pulse uses it: a capture surface with a single control has nowhere else to
+ * show that the machine is still advancing, so the last pair moving is the only
+ * evidence on screen that anything is happening.
+ *
+ * 25 fps by default because that is what the two broadcast standards a European
+ * clinic is likely to receive material in both use, and because a non-integer
+ * rate (29.97) would need drop-frame arithmetic to stay honest over an hour —
+ * which is a correctness problem nobody wants inside a recorder.
+ *
+ * The hours field is never dropped. A readout that grows a column mid-take
+ * shifts every digit beside it, which is the thing tabular-nums exists to
+ * prevent.
+ */
+export function recorderTimecode(ms: number, fps: number = 25): string {
+  const safe = Math.max(0, ms);
+  const total = Math.floor(safe / 1000);
+  const hours = Math.floor(total / 3600);
+  const minutes = Math.floor((total % 3600) / 60);
+  const seconds = total % 60;
+  const frames = Math.min(fps - 1, Math.floor(((safe % 1000) / 1000) * fps));
+  return `${pad(hours)}:${pad(minutes)}:${pad(seconds)}:${pad(frames)}`;
+}
+
 /** `4:12`, or `1:04:12` past the hour. The inline form, for Strip and Duet. */
 export function recorderClockShort(ms: number): string {
   const total = Math.max(0, Math.floor(ms / 1000));

@@ -248,6 +248,10 @@ const REC_PEAKS = Float32Array.from({ length: 180 }, (_, i) => {
   const syllable = 0.5 + 0.5 * Math.sin(2 * Math.PI * 4.4 * t);
   return Math.min(1, phrase * (0.2 + 0.8 * syllable ** 1.3));
 });
+const REC_CARD_MARKERS = [
+  { id: "exam", at: 0.31, label: "Exam" },
+  { id: "struck", at: 0.79, label: "Struck 0:22", struck: true, span: 0.03 },
+];
 const REC_SPEAKERS = Uint8Array.from({ length: 180 }, (_, i) =>
   Math.floor(i / 26) % 2 === 0 ? 0 : 1,
 );
@@ -282,6 +286,8 @@ const PREVIEW: Record<string, (featured: boolean) => React.ReactNode> = {
       position={featured ? 0.44 : 0.36}
       durationMs={754_000}
       speakerLabels={["Dr Okafor", "Patient"]}
+      title="Consultation — 14 Aug, 09:12"
+      markers={featured ? REC_CARD_MARKERS : undefined}
     />
   ),
   "pulse-loader": (featured) => (

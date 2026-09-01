@@ -59,8 +59,14 @@ describe("Recorder — the device is rendered permanently", () => {
     // §11 row 7 is the one fault with no signal-level defence: room tone from
     // the laptop microphone is room tone, and every detector passes. The name
     // on screen is the only defence there is.
-    const view = render(<Recorder variant="bars" phase="recording" device={JABRA} />);
-    expect(view.getByText(JABRA.label)).toBeInTheDocument();
+    const view = render(
+      <Recorder variant="bars" phase="recording" device={JABRA} context="Encounter · Room 4" />,
+    );
+    // The name sits in one line with the context and the level, so match the
+    // line rather than a lone text node.
+    const line = view.container.querySelector(".ox-rec-meta");
+    expect(line?.textContent).toContain(JABRA.label);
+    expect(line?.textContent).toContain("Encounter · Room 4");
   });
 
   it("raises a fault when the device is not the one that was chosen", () => {
@@ -77,6 +83,96 @@ describe("Recorder — the device is rendered permanently", () => {
       <Recorder variant="bars" phase="recording" device={JABRA} expectedDevice={JABRA} />,
     );
     expect(view.queryByRole("alert")).toBeNull();
+  });
+});
+
+describe("Recorder — the transport", () => {
+  it("hides a control it has no handler for rather than disabling it", () => {
+    const bare = render(<Recorder variant="bars" phase="recording" />);
+    expect(bare.queryByRole("button", { name: /pause/i })).toBeNull();
+    bare.unmount();
+
+    const wired = render(
+      <Recorder variant="bars" phase="recording" onPause={() => {}} onStop={() => {}} />,
+    );
+    expect(wired.getByRole("button", { name: /pause/i })).toBeInTheDocument();
+    expect(wired.getByRole("button", { name: /stop & attach/i })).toBeInTheDocument();
+  });
+
+  it("gives Strip a microphone and a send control", () => {
+    const view = render(
+      <Recorder
+        variant="strip"
+        phase="recording"
+        context="History of presenting complaint"
+        onSend={() => {}}
+      />,
+    );
+    expect(view.container.querySelector(".ox-rec-mic")).not.toBeNull();
+    expect(view.getByRole("button", { name: /stop and insert/i })).toBeInTheDocument();
+    expect(view.getByText(/History of presenting complaint/)).toBeInTheDocument();
+  });
+
+  it("shows a full timecode on Pulse, frames included", () => {
+    // With one control and no lane, the frames field is the only thing on
+    // screen still moving.
+    const view = render(<Recorder variant="pulse" phase="recording" />);
+    expect(view.container.querySelector(".ox-rec-clock")?.textContent).toMatch(
+      /^\d{2}:\d{2}:\d{2}:\d{2}$/,
+    );
+  });
+});
+
+describe("Recorder — markers", () => {
+  it("draws a struck span on BOTH rails, not just one", () => {
+    // Hatching one side only would read as one person having been edited out
+    // of the conversation.
+    const view = render(
+      <Recorder
+        variant="duet"
+        peaks={PEAKS}
+        speakers={SPEAKERS}
+        position={1}
+        durationMs={60_000}
+        markers={[{ id: "s", at: 0.5, label: "Struck 0:22", struck: true, span: 0.1 }]}
+      />,
+    );
+    const up = view.container.querySelectorAll('[data-rail="a"] > i[data-struck="true"]');
+    const down = view.container.querySelectorAll('[data-rail="b"] > i[data-struck="true"]');
+    expect(up.length).toBeGreaterThan(0);
+    expect(up.length).toBe(down.length);
+  });
+
+  it("labels a struck marker differently from an ordinary one", () => {
+    const view = render(
+      <Recorder
+        variant="duet"
+        peaks={PEAKS}
+        speakers={SPEAKERS}
+        position={0.5}
+        durationMs={60_000}
+        markers={[
+          { id: "e", at: 0.31, label: "Exam" },
+          { id: "s", at: 0.79, label: "Struck 0:22", struck: true },
+        ]}
+      />,
+    );
+    const marks = [...view.container.querySelectorAll(".ox-rec-mark")];
+    expect(marks).toHaveLength(2);
+    expect(marks.filter((m) => (m as HTMLElement).dataset.struck === "true")).toHaveLength(1);
+  });
+
+  it("renders no marker lane when there are no markers", () => {
+    const view = render(
+      <Recorder
+        variant="duet"
+        peaks={PEAKS}
+        speakers={SPEAKERS}
+        position={0.5}
+        durationMs={60_000}
+      />,
+    );
+    expect(view.container.querySelector(".ox-rec-markbar")).toBeNull();
   });
 });
 

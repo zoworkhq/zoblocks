@@ -9385,11 +9385,23 @@ export const CATALOG: ComponentDoc[] = [
     ],
     "props": [
       {
+        "name": "autoGainControl",
+        "type": "boolean",
+        "description": "Whether the browser is applying automatic gain control. With AGC on, the meter reports the browser's opinion of the room rather than the room. Nothing is broken, so this surfaces as information — but it has to surface, or the meter looks perfect under every condition.",
+        "required": false
+      },
+      {
         "name": "consent",
         "type": "RecorderConsent | null",
         "description": "The basis the host asserts for recording. Absent or incomplete blocks the `armed → recording` edge. The component renders it and never authors it: it does not obtain consent and does not know what a lawful basis is where you are.",
         "required": false,
         "default": "null"
+      },
+      {
+        "name": "context",
+        "type": "string",
+        "description": "Where the capture is happening, in the host's own words — \"Encounter · Room 4\", or the field a dictation is going into. Rendered beside the device name, never instead of it.",
+        "required": false
       },
       {
         "name": "device",
@@ -9427,6 +9439,13 @@ export const CATALOG: ComponentDoc[] = [
         "default": "\"Recorder\""
       },
       {
+        "name": "markers",
+        "type": "readonly RecorderMarker[]",
+        "description": "Moments somebody marked, and spans struck from the record. A struck span stays on the timeline as a hatched gap rather than being removed: a removal a reader cannot see is a removal nobody can audit, and an audio file with an invisible splice is worse evidence than one with a labelled hole.",
+        "required": false,
+        "default": "[]"
+      },
+      {
         "name": "motion",
         "type": "RecorderMotion",
         "description": "Motion preference. An explicit mechanism rather than only the media query, because WCAG 2.2.2's \"essential\" exception does not apply once a conforming alternative exists — and the still state is that alternative.",
@@ -9443,6 +9462,24 @@ export const CATALOG: ComponentDoc[] = [
         "name": "onLevel",
         "type": "((frame: SignalFrame) => void)",
         "description": "Fires at most 10 times a second, not once a frame.",
+        "required": false
+      },
+      {
+        "name": "onPause",
+        "type": "(() => void)",
+        "description": "Suspend capture without ending the take. A control that is missing because the host passed no handler is hidden rather than disabled: a dead button is a promise the surface cannot keep.",
+        "required": false
+      },
+      {
+        "name": "onSend",
+        "type": "(() => void)",
+        "description": "Stop and insert, for Strip — the dictation equivalent of stop-and-attach.",
+        "required": false
+      },
+      {
+        "name": "onStop",
+        "type": "(() => void)",
+        "description": "End the take and hand it to the host. The primary action on the capture arts.",
         "required": false
       },
       {
@@ -9501,6 +9538,19 @@ export const CATALOG: ComponentDoc[] = [
         "default": "null"
       },
       {
+        "name": "title",
+        "type": "string",
+        "description": "What the take IS — \"Consultation — 14 Aug, 09:12\". The playback header carries this rather than the speaker names, because the names are already on the axis; printing them twice spends the one line a reviewer reads first on something the picture already says.",
+        "required": false
+      },
+      {
+        "name": "track",
+        "type": "TrackObservation | null",
+        "description": "The live state of the capture track — `readyState` and `muted`. This is what separates the four faults that are byte-identical at the signal layer. An OS mute, a headset mute, a device that ended and a device that was swapped all deliver near-silence on schedule; only the track and the device tell them apart, which is why the component asks for them rather than trying to read them out of the waveform.",
+        "required": false,
+        "default": "null"
+      },
+      {
         "name": "turns",
         "type": "readonly RecorderTurn[]",
         "description": "Turns for the transcript art. `interim` is drawn as a guess.",
@@ -9521,11 +9571,23 @@ export const CATALOG: ComponentDoc[] = [
         "name": "Recorder",
         "props": [
           {
+            "name": "autoGainControl",
+            "type": "boolean",
+            "description": "Whether the browser is applying automatic gain control. With AGC on, the meter reports the browser's opinion of the room rather than the room. Nothing is broken, so this surfaces as information — but it has to surface, or the meter looks perfect under every condition.",
+            "required": false
+          },
+          {
             "name": "consent",
             "type": "RecorderConsent | null",
             "description": "The basis the host asserts for recording. Absent or incomplete blocks the `armed → recording` edge. The component renders it and never authors it: it does not obtain consent and does not know what a lawful basis is where you are.",
             "required": false,
             "default": "null"
+          },
+          {
+            "name": "context",
+            "type": "string",
+            "description": "Where the capture is happening, in the host's own words — \"Encounter · Room 4\", or the field a dictation is going into. Rendered beside the device name, never instead of it.",
+            "required": false
           },
           {
             "name": "device",
@@ -9563,6 +9625,13 @@ export const CATALOG: ComponentDoc[] = [
             "default": "\"Recorder\""
           },
           {
+            "name": "markers",
+            "type": "readonly RecorderMarker[]",
+            "description": "Moments somebody marked, and spans struck from the record. A struck span stays on the timeline as a hatched gap rather than being removed: a removal a reader cannot see is a removal nobody can audit, and an audio file with an invisible splice is worse evidence than one with a labelled hole.",
+            "required": false,
+            "default": "[]"
+          },
+          {
             "name": "motion",
             "type": "RecorderMotion",
             "description": "Motion preference. An explicit mechanism rather than only the media query, because WCAG 2.2.2's \"essential\" exception does not apply once a conforming alternative exists — and the still state is that alternative.",
@@ -9579,6 +9648,24 @@ export const CATALOG: ComponentDoc[] = [
             "name": "onLevel",
             "type": "((frame: SignalFrame) => void)",
             "description": "Fires at most 10 times a second, not once a frame.",
+            "required": false
+          },
+          {
+            "name": "onPause",
+            "type": "(() => void)",
+            "description": "Suspend capture without ending the take. A control that is missing because the host passed no handler is hidden rather than disabled: a dead button is a promise the surface cannot keep.",
+            "required": false
+          },
+          {
+            "name": "onSend",
+            "type": "(() => void)",
+            "description": "Stop and insert, for Strip — the dictation equivalent of stop-and-attach.",
+            "required": false
+          },
+          {
+            "name": "onStop",
+            "type": "(() => void)",
+            "description": "End the take and hand it to the host. The primary action on the capture arts.",
             "required": false
           },
           {
@@ -9633,6 +9720,19 @@ export const CATALOG: ComponentDoc[] = [
             "name": "speakers",
             "type": "Uint8Array<ArrayBufferLike> | null",
             "description": "One byte of speaker per bucket. Without it Duet renders a single rail.",
+            "required": false,
+            "default": "null"
+          },
+          {
+            "name": "title",
+            "type": "string",
+            "description": "What the take IS — \"Consultation — 14 Aug, 09:12\". The playback header carries this rather than the speaker names, because the names are already on the axis; printing them twice spends the one line a reviewer reads first on something the picture already says.",
+            "required": false
+          },
+          {
+            "name": "track",
+            "type": "TrackObservation | null",
+            "description": "The live state of the capture track — `readyState` and `muted`. This is what separates the four faults that are byte-identical at the signal layer. An OS mute, a headset mute, a device that ended and a device that was swapped all deliver near-silence on schedule; only the track and the device tell them apart, which is why the component asks for them rather than trying to read them out of the waveform.",
             "required": false,
             "default": "null"
           },
