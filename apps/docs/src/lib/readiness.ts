@@ -29,6 +29,7 @@ export const READY_ORDER: readonly string[] = [
   "clinical-status",
   "accordion",
   "recorder",
+  "chart-context-menu",
 ];
 
 const READY = new Set(READY_ORDER);
