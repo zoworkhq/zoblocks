@@ -78,6 +78,9 @@ importers:
       '@oxygenui-design/identity':
         specifier: workspace:*
         version: link:packages/identity
+      '@oxygenui-design/recorder-core':
+        specifier: workspace:*
+        version: link:packages/recorder-core
       '@oxygenui-design/theme':
         specifier: workspace:*
         version: link:packages/theme

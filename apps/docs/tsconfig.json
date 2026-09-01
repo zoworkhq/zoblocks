@@ -24,6 +24,7 @@
       // the rest were simply unimportable, which is why several components had
       // no live preview: not a decision, a missing line in this file.
       "@/lib/oxygen-loader": ["../../registry/oxygen/lib/loader.tsx"],
+      "@/lib/oxygen-recorder": ["../../registry/oxygen/lib/recorder.tsx"],
       "@/lib/oxygen-switch": ["../../registry/oxygen/lib/switch.tsx"],
       "@/lib/oxygen-accordion": ["../../registry/oxygen/lib/accordion-core.tsx"],
       "@/lib/oxygen-clinical-note": ["../../registry/oxygen/lib/clinical-note.tsx"],

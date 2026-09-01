@@ -1,5 +1,5 @@
 {
-  "$description": "Semantic tier, light theme. This file defines the key space every other theme must match — a theme missing a key here is a build error, because a brand that forgets to define `status.critical` must fail the build rather than render the default green.\n\nComponents reference these and only these.",
+  "$description": "Semantic tier, light theme. This file defines the key space every other theme must match \u2014 a theme missing a key here is a build error, because a brand that forgets to define `status.critical` must fail the build rather than render the default green.\n\nComponents reference these and only these.",
   "bg": {
     "$type": "color",
     "$value": "{ref.white}"
@@ -28,7 +28,7 @@
     "$type": "color",
     "$value": "{ref.slate.200}"
   },
-  "$comment-border-strong": "Backs --ox-field-border and --ox-chart-axis, both UI components under WCAG 1.4.11. slate.300 measured 1.48:1 on white — half the 3:1 floor. slate.500 is 4.76:1.",
+  "$comment-border-strong": "Backs --ox-field-border and --ox-chart-axis, both UI components under WCAG 1.4.11. slate.300 measured 1.48:1 on white \u2014 half the 3:1 floor. slate.500 is 4.76:1.",
   "border-strong": {
     "$type": "color",
     "$value": "{ref.slate.500}"
@@ -52,9 +52,9 @@
   "text-on-fill": {
     "$type": "color",
     "$value": "{ref.white}",
-    "$description": "A label on a filled neutral — the Switch's off track, which is {border-strong} in every theme and therefore a mid-grey in every theme. Separate from text-on-accent because that one follows the accent, and the dark accent is light: pointing the off label at it put #071014 on #5d6c7e at 3.57:1. White clears AA on border-strong in all three themes, and the pair is in the contrast gate so it stays that way."
+    "$description": "A label on a filled neutral \u2014 the Switch's off track, which is {border-strong} in every theme and therefore a mid-grey in every theme. Separate from text-on-accent because that one follows the accent, and the dark accent is light: pointing the off label at it put #071014 on #5d6c7e at 3.57:1. White clears AA on border-strong in all three themes, and the pair is in the contrast gate so it stays that way."
   },
-  "$comment-accent": "White text on brand.600 measured 3.81:1, below the 4.5:1 floor for --ox-text-on-accent — that is every primary button label. brand.700 is 5.56:1.",
+  "$comment-accent": "White text on brand.600 measured 3.81:1, below the 4.5:1 floor for --ox-text-on-accent \u2014 that is every primary button label. brand.700 is 5.56:1.",
   "accent": {
     "$type": "color",
     "$value": "{ref.brand.700}"
@@ -71,7 +71,7 @@
     "$type": "color",
     "$value": "{ref.brand.200}"
   },
-  "$comment-focus-ring": "brand.500 measured 2.50:1 on white against the 3:1 floor in SC 1.4.11 and 2.4.11 — the focus indicator for every interactive component in the library. brand.600 is 3.81:1 and stays distinct from the accent.",
+  "$comment-focus-ring": "brand.500 measured 2.50:1 on white against the 3:1 floor in SC 1.4.11 and 2.4.11 \u2014 the focus indicator for every interactive component in the library. brand.600 is 3.81:1 and stays distinct from the accent.",
   "focus-ring": {
     "$type": "color",
     "$value": "{ref.brand.600}"
@@ -81,11 +81,11 @@
     "$value": "{ref.white}"
   },
   "status": {
-    "$description": "Clinical status. Paired with an icon and a text label in every component — these colours are reinforcement, not the signal.\n\n`high` and `low` are separated by HUE rather than intensity, so the direction of an abnormal result survives monochrome printing and the common forms of colour vision deficiency.",
+    "$description": "Clinical status. Paired with an icon and a text label in every component \u2014 these colours are reinforcement, not the signal.\n\n`high` and `low` are separated by HUE rather than intensity, so the direction of an abnormal result survives monochrome printing and the common forms of colour vision deficiency.",
     "$type": "color",
     "critical": {
       "$value": "{ref.red.700}",
-      "$description": "red-700, not red-600: at 600 this was 4.41:1 on its own background — under the 4.5:1 floor by a hair. This is the single most consequential token in the library; it does not get to be borderline."
+      "$description": "red-700, not red-600: at 600 this was 4.41:1 on its own background \u2014 under the 4.5:1 floor by a hair. This is the single most consequential token in the library; it does not get to be borderline."
     },
     "critical-bg": {
       "$value": "{ref.red.50}"
@@ -149,6 +149,16 @@
     },
     "provisional-border": {
       "$value": "{ref.cyan.200}"
+    },
+    "recording": {
+      "$value": "{ref.red.600}",
+      "$description": "The capture tell. The one red in the system that is not an alarm: fifty years of cameras, tape decks and voice-memo apps have made a red dot mean recording, and fighting that convention costs more than the collision does. Deliberately one step off status.critical rather than equal to it, so an alert raised DURING a capture is still the more urgent thing on screen \u2014 the pair is checked against each other, not only against the background."
+    },
+    "recording-bg": {
+      "$value": "{ref.red.50}"
+    },
+    "recording-border": {
+      "$value": "{ref.red.200}"
     }
   },
   "flag": {

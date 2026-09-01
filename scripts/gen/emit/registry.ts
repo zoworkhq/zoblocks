@@ -41,6 +41,27 @@ const SUPPORT_ITEMS: BuildableItem[] = [
     files: [{ path: "registry/oxygen/lib/utils.ts", type: "oxygen:lib", target: "lib/utils.ts" }],
   },
   {
+    name: "recorder-core",
+    type: "oxygen:lib",
+    title: "Recorder core",
+    description:
+      "Signal path, peak buffer, capture machine and the thirteen fault detectors behind Recorder. Installed automatically with the recorder.",
+    dependencies: ["clsx", "tailwind-merge", "@oxygenui-design/recorder-core"],
+    registryDependencies: ["utils"],
+    files: [
+      {
+        path: "registry/oxygen/lib/recorder.tsx",
+        type: "oxygen:lib",
+        target: "lib/oxygen-recorder.tsx",
+      },
+      {
+        path: "registry/oxygen/lib/recorder.css",
+        type: "oxygen:file",
+        target: "styles/oxygen-recorder.css",
+      },
+    ],
+  },
+  {
     name: "loader-core",
     type: "oxygen:lib",
     title: "Loader core",

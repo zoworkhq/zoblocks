@@ -126,6 +126,9 @@
       "@/lib/oxygen-provenance": [
         "./registry/oxygen/lib/provenance.ts"
       ],
+      "@/lib/oxygen-recorder": [
+        "./registry/oxygen/lib/recorder.tsx"
+      ],
       "@/lib/oxygen-recurrence": [
         "./registry/oxygen/lib/recurrence.ts"
       ],

@@ -159,6 +159,7 @@ export async function emitReactPackage(
   const sheets: Array<[string, string]> = [];
   for (const [file, target] of [
     ["lib/loader.css", "styles/loader.css"],
+    ["lib/recorder.css", "styles/recorder.css"],
     ["lib/accordion.css", "styles/accordion.css"],
     ["lib/switch.css", "styles/switch.css"],
     ["lib/clinical-note.css", "styles/clinical-note.css"],

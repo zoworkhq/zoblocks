@@ -1,5 +1,5 @@
 {
-  "$description": "Semantic tier, dark theme.\n\nStatus colours are re-tuned rather than reused. The light-mode values do not hold contrast on a dark surface, and critical must stay unmistakable — so each hue moves to a lighter step and each surface tint moves to the ink-composited version. Same key space as light; the build fails if a key is missing.",
+  "$description": "Semantic tier, dark theme.\n\nStatus colours are re-tuned rather than reused. The light-mode values do not hold contrast on a dark surface, and critical must stay unmistakable \u2014 so each hue moves to a lighter step and each surface tint moves to the ink-composited version. Same key space as light; the build fails if a key is missing.",
   "bg": {
     "$type": "color",
     "$value": "{ref.ink.950}"
@@ -23,7 +23,7 @@
   "surface-overlay": {
     "$type": "color",
     "$value": "{ref.ink.740}",
-    "$description": "Was #1d263000 in the hand-written file — an eight-digit hex with a zero alpha, which made every overlay surface fully transparent. Popovers and dialogs rendered with the page showing through. Fixed here at the source."
+    "$description": "Was #1d263000 in the hand-written file \u2014 an eight-digit hex with a zero alpha, which made every overlay surface fully transparent. Popovers and dialogs rendered with the page showing through. Fixed here at the source."
   },
   "border": {
     "$type": "color",
@@ -53,9 +53,9 @@
   "text-on-fill": {
     "$type": "color",
     "$value": "{ref.white}",
-    "$description": "A label on a filled neutral — the Switch's off track, which is {border-strong} in every theme and therefore a mid-grey in every theme. Separate from text-on-accent because that one follows the accent, and the dark accent is light: pointing the off label at it put #071014 on #5d6c7e at 3.57:1. White clears AA on border-strong in all three themes, and the pair is in the contrast gate so it stays that way."
+    "$description": "A label on a filled neutral \u2014 the Switch's off track, which is {border-strong} in every theme and therefore a mid-grey in every theme. Separate from text-on-accent because that one follows the accent, and the dark accent is light: pointing the off label at it put #071014 on #5d6c7e at 3.57:1. White clears AA on border-strong in all three themes, and the pair is in the contrast gate so it stays that way."
   },
-  "$comment-accent": "brand.300, not cyan.300. The dark tier used to reach for a hue the brand does not contain, so the same product was teal-green in light and cyan in dark — a difference nobody chose and everybody saw. brand.300 measures 12.74:1 for text-on-accent and 12.91:1 on bg, against cyan.300's 13.25 and 13.42: the same step of a different ramp, and the floors are untouched.",
+  "$comment-accent": "brand.300, not cyan.300. The dark tier used to reach for a hue the brand does not contain, so the same product was teal-green in light and cyan in dark \u2014 a difference nobody chose and everybody saw. brand.300 measures 12.74:1 for text-on-accent and 12.91:1 on bg, against cyan.300's 13.25 and 13.42: the same step of a different ramp, and the floors are untouched.",
   "accent": {
     "$type": "color",
     "$value": "{ref.brand.300}"
@@ -144,6 +144,16 @@
     },
     "provisional-border": {
       "$value": "{ref.tint.provisional.border}"
+    },
+    "recording": {
+      "$value": "{ref.red.500}",
+      "$description": "The capture tell. The one red in the system that is not an alarm: fifty years of cameras, tape decks and voice-memo apps have made a red dot mean recording, and fighting that convention costs more than the collision does. Deliberately one step off status.critical rather than equal to it, so an alert raised DURING a capture is still the more urgent thing on screen \u2014 the pair is checked against each other, not only against the background."
+    },
+    "recording-bg": {
+      "$value": "{ref.tint.critical.bg}"
+    },
+    "recording-border": {
+      "$value": "{ref.tint.critical.border}"
     }
   },
   "flag": {

@@ -50,6 +50,7 @@ export const SUPPORT_ITEM_NAMES: ReadonlySet<string> = new Set([
   "timeline-core",
   "timeline-fhir",
   "datetime-core",
+  "recorder-core",
 ]);
 
 /** Prefix the Oxygen CLI writes component files under, inside the consumer's project. */
