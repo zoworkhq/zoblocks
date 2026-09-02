@@ -10,7 +10,8 @@
  * its denominator, its window, and one line of what to do.
  */
 
-import { BarShare, BarTarget, Rail, RiskRow, Seg, SevRail, Status, Tile } from "./kit";
+import { BarShare, BarTarget, Face, Rail, RiskRow, Seg, SevRail, Status, Tile } from "./kit";
+import { facesFor } from "@/lib/faces";
 import { FunnelPanel, TrajectoryPanel } from "./charts";
 
 const CASELOAD: readonly (readonly [string, string, string, string, string, string, string])[] = [
@@ -21,6 +22,9 @@ const CASELOAD: readonly (readonly [string, string, string, string, string, stri
   ["norm", "S. Ferreira", "GAD-7 4", "↓ 11", "14", "remission", "norm"],
   ["unk", "A. Nakamura", "—", "—", "1", "awaiting baseline", "unk"],
 ];
+
+/* One face each: `faceFor` alone collides at this list length. */
+const FACE = facesFor(CASELOAD.map((row) => row[1]));
 
 export function Dashboard01() {
   return (
@@ -170,7 +174,10 @@ export function Dashboard01() {
                 <tr key={r[1]}>
                   <td>
                     <SevRail sev={r[0] as never} />
-                    {r[1]}
+                    <span className="whoCell">
+                      <Face name={r[1]} src={FACE(r[1])} />
+                      {r[1]}
+                    </span>
                   </td>
                   <td className="mono">{r[2]}</td>
                   <td className="mono">{r[3]}</td>

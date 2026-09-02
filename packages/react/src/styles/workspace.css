@@ -154,6 +154,23 @@
   color: var(--ox-stack-accent);
   font-size: var(--ox-text-2xs, 0.6875rem);
   font-weight: 700;
+  overflow: hidden;
+}
+
+/*
+ * A photograph fills the chip, and the accent stays as a ring around it.
+ *
+ * Inset rather than outset: an outer ring grows the avatar's box and shunts
+ * the name a pixel sideways on the one tab that happens to have a photograph,
+ * which is visible as a jitter down a stack where some charts have one and
+ * some do not.
+ */
+.ox-stack__face {
+  inline-size: 100%;
+  block-size: 100%;
+  border-radius: inherit;
+  object-fit: cover;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ox-stack-accent) 55%, transparent);
 }
 
 .ox-stack__who {

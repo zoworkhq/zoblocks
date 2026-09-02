@@ -375,8 +375,7 @@
   box-shadow: inset 6px 0 6px -6px rgb(0 0 0 / 0.12);
 }
 
-.ox-grid__tr--current > .ox-grid__pin,
-.ox-grid__tr--selected > .ox-grid__pin {
+.ox-grid__tr--current > .ox-grid__pin {
   background: var(--ox-grid-sunk);
 }
 
@@ -411,9 +410,8 @@
   cursor: pointer;
 }
 
-.ox-grid__tr--selected > .ox-grid__td {
-  background: var(--ox-grid-sunk);
-}
+/* Selection paints below, after the current row, because the two states
+   collide on the same cells and the later rule has to be selection. */
 
 .ox-grid__th:last-child,
 .ox-grid__td:last-child {
@@ -550,6 +548,29 @@
 
 .ox-grid__tr--current > .ox-grid__td {
   background: var(--ox-grid-sunk);
+}
+
+/*
+ * The selected rows, in the same colour as the bar that counts them.
+ *
+ * `--ox-grid-accent-bg`, not `--ox-grid-sunk`. Two things were wrong with the
+ * neutral: the bulk bar reporting "3 selected" is drawn in the accent tint, so
+ * the bar and the rows it refers to did not look related; and `sunk` is also
+ * the current row's ground, which made a row you had merely arrived at
+ * indistinguishable from a row you had chosen — in a worklist where the next
+ * action applies to the selection and not to the cursor.
+ *
+ * Declared after the current row and at the same specificity, so a selected
+ * row you are standing on reads as selected. The cursor is still marked: the
+ * inset rule in the first cell is a marker rather than a tint precisely so it
+ * survives being layered over something else.
+ *
+ * The pinned cells take it too. Leaving them `sunk` put a grey seam down the
+ * left of every selected row at the pin boundary.
+ */
+.ox-grid__tr--selected > .ox-grid__td,
+.ox-grid__tr--selected > .ox-grid__pin {
+  background: var(--ox-grid-accent-bg);
 }
 
 /*
@@ -755,6 +776,14 @@
 
   /* The tint goes; the margin marker is a border, so it survives. */
   .ox-grid__tr--current > .ox-grid__td {
+    background: Canvas;
+  }
+
+  /* Selection goes the same way, and for the same reason: an author colour is
+     not honoured here, and the checkbox is a real one that forced-colors
+     already draws correctly. The tint was never the signal. */
+  .ox-grid__tr--selected > .ox-grid__td,
+  .ox-grid__tr--selected > .ox-grid__pin {
     background: Canvas;
   }
 

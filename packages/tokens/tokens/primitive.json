@@ -269,6 +269,10 @@
         "bg": {
           "$value": "#0f2a25"
         },
+        "fill": {
+          "$description": "A committed accent band on a dark surface. `bg` sits 3 points of lightness off the panel it is painted on, which is a wash rather than a band; this is the step that reads as one.",
+          "$value": "#163a33"
+        },
         "border": {
           "$value": "#1b4a42"
         }

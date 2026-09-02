@@ -5977,6 +5977,23 @@ button.ox-prov:focus-visible,
   color: var(--ox-stack-accent);
   font-size: var(--ox-text-2xs, 0.6875rem);
   font-weight: 700;
+  overflow: hidden;
+}
+
+/*
+ * A photograph fills the chip, and the accent stays as a ring around it.
+ *
+ * Inset rather than outset: an outer ring grows the avatar's box and shunts
+ * the name a pixel sideways on the one tab that happens to have a photograph,
+ * which is visible as a jitter down a stack where some charts have one and
+ * some do not.
+ */
+.ox-stack__face {
+  inline-size: 100%;
+  block-size: 100%;
+  border-radius: inherit;
+  object-fit: cover;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ox-stack-accent) 55%, transparent);
 }
 
 .ox-stack__who {
@@ -7572,8 +7589,7 @@ button.ox-prov:focus-visible,
   box-shadow: inset 6px 0 6px -6px rgb(0 0 0 / 0.12);
 }
 
-.ox-grid__tr--current > .ox-grid__pin,
-.ox-grid__tr--selected > .ox-grid__pin {
+.ox-grid__tr--current > .ox-grid__pin {
   background: var(--ox-grid-sunk);
 }
 
@@ -7608,9 +7624,8 @@ button.ox-prov:focus-visible,
   cursor: pointer;
 }
 
-.ox-grid__tr--selected > .ox-grid__td {
-  background: var(--ox-grid-sunk);
-}
+/* Selection paints below, after the current row, because the two states
+   collide on the same cells and the later rule has to be selection. */
 
 .ox-grid__th:last-child,
 .ox-grid__td:last-child {
@@ -7747,6 +7762,29 @@ button.ox-prov:focus-visible,
 
 .ox-grid__tr--current > .ox-grid__td {
   background: var(--ox-grid-sunk);
+}
+
+/*
+ * The selected rows, in the same colour as the bar that counts them.
+ *
+ * `--ox-grid-accent-bg`, not `--ox-grid-sunk`. Two things were wrong with the
+ * neutral: the bulk bar reporting "3 selected" is drawn in the accent tint, so
+ * the bar and the rows it refers to did not look related; and `sunk` is also
+ * the current row's ground, which made a row you had merely arrived at
+ * indistinguishable from a row you had chosen — in a worklist where the next
+ * action applies to the selection and not to the cursor.
+ *
+ * Declared after the current row and at the same specificity, so a selected
+ * row you are standing on reads as selected. The cursor is still marked: the
+ * inset rule in the first cell is a marker rather than a tint precisely so it
+ * survives being layered over something else.
+ *
+ * The pinned cells take it too. Leaving them `sunk` put a grey seam down the
+ * left of every selected row at the pin boundary.
+ */
+.ox-grid__tr--selected > .ox-grid__td,
+.ox-grid__tr--selected > .ox-grid__pin {
+  background: var(--ox-grid-accent-bg);
 }
 
 /*
@@ -7952,6 +7990,14 @@ button.ox-prov:focus-visible,
 
   /* The tint goes; the margin marker is a border, so it survives. */
   .ox-grid__tr--current > .ox-grid__td {
+    background: Canvas;
+  }
+
+  /* Selection goes the same way, and for the same reason: an author colour is
+     not honoured here, and the checkbox is a real one that forced-colors
+     already draws correctly. The tint was never the signal. */
+  .ox-grid__tr--selected > .ox-grid__td,
+  .ox-grid__tr--selected > .ox-grid__pin {
     background: Canvas;
   }
 
@@ -8642,13 +8688,28 @@ button.ox-prov:focus-visible,
   color: var(--ox-datetime-cell-range-fg, inherit);
 }
 
-/* The half-built range, while the second end is still being pointed at. */
-.ox-dt-cal__day--previewed {
-  background: color-mix(in srgb, var(--ox-datetime-cell-range-bg, #dbeafe) 65%, transparent);
-}
-
 .ox-dt-cal__day--in-range:hover {
   background: var(--ox-datetime-cell-range-bg, #dbeafe);
+}
+
+/*
+ * The half-built range, while the second end is still being pointed at.
+ *
+ * The same wash as a plain hover, one step below the committed band, because
+ * a span that is being pointed at and a span that has been chosen are two
+ * states and must not paint as one — a reader who cannot tell them apart has
+ * no way to know whether the second click has landed.
+ *
+ * It has to beat `--in-range:hover`, which is why it is declared after it and
+ * repeats itself for the hovered case: every previewed cell is also in range
+ * (`datetime-field.tsx` sets `--previewed` only alongside `--in-range`), so a
+ * bare `--previewed` at (0,1,0) loses to that rule at (0,2,0) and the one cell
+ * under the pointer — the cell that *defines* the end being chosen — would
+ * paint as though it were already committed.
+ */
+.ox-dt-cal__day--previewed,
+.ox-dt-cal__day--previewed:hover {
+  background: var(--ox-datetime-cell-hover-bg, #f1f5f9);
 }
 
 .ox-dt-cal__day--range-lo,
@@ -8809,7 +8870,11 @@ button.ox-prov:focus-visible,
    reader's pointer at the exact moment they are reaching for it. */
 .ox-dt-cal__action[disabled] {
   border-color: var(--ox-border, #e2e8f0);
-  background: var(--ox-bg-muted, #f1f5f9);
+  /* `bg-subtle`, not `bg-muted`. Sitting beside a green panel, the muted step
+     of a blue-biased neutral ramp reads as a lavender chip rather than as an
+     absent button — the disabled state should recede, and a filled one that
+     draws the eye is the opposite of what it means. */
+  background: var(--ox-bg-subtle, #f8fafc);
   color: var(--ox-text-muted, #64748b);
   cursor: not-allowed;
 }

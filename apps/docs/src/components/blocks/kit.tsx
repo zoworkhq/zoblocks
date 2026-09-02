@@ -12,6 +12,7 @@
  */
 
 import * as React from "react";
+import { faceFor } from "@/lib/faces";
 
 /* ------------------------------------------------------------------ rail */
 
@@ -389,6 +390,38 @@ export function AttnRow({
  * its own says there is a deadline without saying where in it you are — and
  * "19h" reads very differently on a 24-hour window than on a 72-hour one.
  */
+/**
+ * A patient's face, at list size.
+ *
+ * The same portraits the worklist grid uses, so a reader who has seen one
+ * screen recognises the cohort on the next. `alt=""` and `aria-hidden`: the
+ * name is beside it in text on every row that has one, and a photograph
+ * announced before each of six names is noise with no way to skip it.
+ */
+export function Face({
+  name,
+  src,
+  size = 18,
+}: {
+  name: string;
+  /** A face chosen for a whole list, when one name's hash would collide with another's. */
+  src?: string;
+  size?: number;
+}) {
+  return (
+    // eslint-disable-next-line @next/next/no-img-element -- fixture from this origin, sized inline.
+    <img
+      className="face"
+      src={src ?? faceFor(name)}
+      alt=""
+      aria-hidden="true"
+      width={size}
+      height={size}
+      style={{ width: size, height: size }}
+    />
+  );
+}
+
 export function RiskRow({
   sev,
   who,

@@ -14,6 +14,7 @@
  */
 
 import * as React from "react";
+import { facesFor } from "@/lib/faces";
 import { PageLoader, PulseLoader } from "@/registry/oxygen/pulse-loader/pulse-loader";
 import { Recorder, RecorderDispositionStrip } from "@/registry/oxygen/recorder/recorder";
 import { RhythmLoader } from "@/registry/oxygen/rhythm-loader/rhythm-loader";
@@ -1331,10 +1332,14 @@ const CH_SAFETY: SafetyInput = {
 
 const RPS_NOW = "2026-08-24T10:00:00Z";
 
+/* One face each across the four open charts — see `facesFor`. */
+const RPS_FACE = facesFor(["A. Okonkwo", "T. Boateng", "L. Marsh", "R. Vance"]);
+
 const RPS_CHARTS: OpenChart[] = [
   {
     id: "chart-okonkwo",
     display: "A. Okonkwo",
+    photo: RPS_FACE("A. Okonkwo"),
     identifier: "093-441-208",
     reason: "Ward round",
     lastActiveAt: "2026-08-24T09:58:00Z",
@@ -1342,6 +1347,7 @@ const RPS_CHARTS: OpenChart[] = [
   {
     id: "chart-boateng",
     display: "T. Boateng",
+    photo: RPS_FACE("T. Boateng"),
     identifier: "093-118-774",
     reason: "Discharge summary",
     lastActiveAt: "2026-08-24T09:30:00Z",
@@ -1350,6 +1356,7 @@ const RPS_CHARTS: OpenChart[] = [
   {
     id: "chart-marsh",
     display: "L. Marsh",
+    photo: RPS_FACE("L. Marsh"),
     identifier: "093-772-115",
     reason: "Triage",
     lastActiveAt: "2026-08-24T08:00:00Z",
@@ -1358,6 +1365,7 @@ const RPS_CHARTS: OpenChart[] = [
   {
     id: "chart-vance",
     display: "R. Vance",
+    photo: RPS_FACE("R. Vance"),
     identifier: "093-004-661",
     reason: "Med review",
     pinned: true,
@@ -1365,7 +1373,15 @@ const RPS_CHARTS: OpenChart[] = [
   },
 ];
 
-/* Two names four letters apart, which is where the wrong note goes. */
+/*
+ * Two names four letters apart, which is where the wrong note goes.
+ *
+ * Deliberately without photographs, unlike the stack above. A face would make
+ * this pair trivially separable and the demo would stop demonstrating
+ * anything — the point is what the component does when the only things it has
+ * to work with are a name and an identifier, which is the common case in a
+ * service that does not hold photographs.
+ */
 const RPS_LOOKALIKES: OpenChart[] = [
   { id: "look-a", display: "J. Okonkwo", identifier: "093-441-208", reason: "Ward round" },
   { id: "look-b", display: "J. Okonjo", identifier: "093-118-774", reason: "Triage" },

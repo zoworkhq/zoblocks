@@ -85,6 +85,21 @@ export interface OpenChart {
   display: string;
   /** The identifier shown beside the name when two charts look alike. */
   identifier?: string;
+  /**
+   * The patient's photograph, if the host is willing to show one here.
+   *
+   * A face is the strongest disambiguator this component has — stronger than
+   * the hue, the initials and the identifier — which is the whole reason the
+   * stack exists rather than a dropdown. It stays optional and it degrades to
+   * the initials, because "no photograph on file" is a real and common state
+   * and a stack that renders it as a hole would be worse than one that never
+   * offered photographs at all.
+   *
+   * Serve it from your own origin. `packages/identity` states the rule and it
+   * holds here: a patient photograph does not go through a third-party image
+   * CDN to reach a chart tab.
+   */
+  photo?: string;
   /** Why this chart is open: "Ward round", "Discharge summary", "Triage". */
   reason?: string;
   /** ISO 8601. Last time the clinician had this chart in front of them. */

@@ -668,7 +668,8 @@
       "$description": "Adjacent-month and unavailable days. Not `text-subtle`: at the 4.5:1 floor the subtle step fails on the overlay ground a bottom sheet paints, and a day a user can still reach is not exempt."
     },
     "cell-hover-bg": {
-      "$value": "{bg-muted}"
+      "$description": "The transient tint under the pointer. `accent-wash`, not `bg-muted`: the neutral ramp is blue-biased slate, and a slate cell inside a green selection reads as a different system rather than as a weaker state of the same one.",
+      "$value": "{accent-wash}"
     },
     "cell-selected-bg": {
       "$value": "{accent}"
@@ -677,7 +678,8 @@
       "$value": "{text-on-accent}"
     },
     "cell-range-bg": {
-      "$value": "{accent-subtle}"
+      "$description": "The committed band. One step above the hover and the provisional preview, because a range that is chosen and a range that is being pointed at must not paint the same.",
+      "$value": "{accent-muted}"
     },
     "cell-range-fg": {
       "$value": "{text}"

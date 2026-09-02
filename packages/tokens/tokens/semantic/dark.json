@@ -68,6 +68,14 @@
     "$type": "color",
     "$value": "{ref.tint.accent.bg}"
   },
+  "accent-wash": {
+    "$type": "color",
+    "$value": "{ref.tint.accent.bg}"
+  },
+  "accent-muted": {
+    "$type": "color",
+    "$value": "{ref.tint.accent.fill}"
+  },
   "accent-border": {
     "$type": "color",
     "$value": "{ref.tint.accent.border}"

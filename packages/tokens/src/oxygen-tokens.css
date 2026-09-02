@@ -109,6 +109,7 @@
   --ox-ref-tint-unknown-bg: #141f22;
   --ox-ref-tint-unknown-border: #253338;
   --ox-ref-tint-accent-bg: #0f2a25;
+  --ox-ref-tint-accent-fill: #163a33;
   --ox-ref-tint-accent-border: #1b4a42;
   --ox-ref-tint-restricted-bg: #1c1533;
   --ox-ref-tint-restricted-border: #3c2d68;
@@ -234,6 +235,8 @@
   --ox-accent: var(--ox-ref-brand-700);
   --ox-accent-hover: var(--ox-ref-brand-800);
   --ox-accent-subtle: var(--ox-ref-brand-50);
+  --ox-accent-wash: var(--ox-ref-brand-50);
+  --ox-accent-muted: var(--ox-ref-brand-100);
   --ox-accent-border: var(--ox-ref-brand-200);
   --ox-focus-ring: var(--ox-ref-brand-600);
   --ox-focus-ring-offset: var(--ox-ref-white);
@@ -490,10 +493,10 @@
   --ox-stack-accent: var(--ox-text-muted);
   --ox-datetime-cell-fg: var(--ox-text);
   --ox-datetime-cell-muted-fg: var(--ox-text-muted);
-  --ox-datetime-cell-hover-bg: var(--ox-bg-muted);
+  --ox-datetime-cell-hover-bg: var(--ox-accent-wash);
   --ox-datetime-cell-selected-bg: var(--ox-accent);
   --ox-datetime-cell-selected-fg: var(--ox-text-on-accent);
-  --ox-datetime-cell-range-bg: var(--ox-accent-subtle);
+  --ox-datetime-cell-range-bg: var(--ox-accent-muted);
   --ox-datetime-cell-range-fg: var(--ox-text);
   --ox-datetime-today-marker: var(--ox-accent);
   --ox-datetime-weekday-fg: var(--ox-text-muted);
@@ -662,6 +665,8 @@
   --ox-accent: var(--ox-ref-brand-700);
   --ox-accent-hover: var(--ox-ref-brand-800);
   --ox-accent-subtle: var(--ox-ref-brand-50);
+  --ox-accent-wash: var(--ox-ref-brand-50);
+  --ox-accent-muted: var(--ox-ref-brand-100);
   --ox-accent-border: var(--ox-ref-brand-200);
   --ox-focus-ring: var(--ox-ref-brand-600);
   --ox-focus-ring-offset: var(--ox-ref-white);
@@ -864,10 +869,10 @@
   --ox-stack-accent: var(--ox-text-muted);
   --ox-datetime-cell-fg: var(--ox-text);
   --ox-datetime-cell-muted-fg: var(--ox-text-muted);
-  --ox-datetime-cell-hover-bg: var(--ox-bg-muted);
+  --ox-datetime-cell-hover-bg: var(--ox-accent-wash);
   --ox-datetime-cell-selected-bg: var(--ox-accent);
   --ox-datetime-cell-selected-fg: var(--ox-text-on-accent);
-  --ox-datetime-cell-range-bg: var(--ox-accent-subtle);
+  --ox-datetime-cell-range-bg: var(--ox-accent-muted);
   --ox-datetime-cell-range-fg: var(--ox-text);
   --ox-datetime-today-marker: var(--ox-accent);
   --ox-datetime-weekday-fg: var(--ox-text-muted);
@@ -922,6 +927,8 @@
   --ox-accent: var(--ox-ref-brand-300);
   --ox-accent-hover: var(--ox-ref-brand-200);
   --ox-accent-subtle: var(--ox-ref-tint-accent-bg);
+  --ox-accent-wash: var(--ox-ref-tint-accent-bg);
+  --ox-accent-muted: var(--ox-ref-tint-accent-fill);
   --ox-accent-border: var(--ox-ref-tint-accent-border);
   --ox-focus-ring: var(--ox-ref-brand-300);
   --ox-focus-ring-offset: var(--ox-ref-ink-950);
@@ -1124,10 +1131,10 @@
   --ox-stack-accent: var(--ox-text-muted);
   --ox-datetime-cell-fg: var(--ox-text);
   --ox-datetime-cell-muted-fg: var(--ox-text-muted);
-  --ox-datetime-cell-hover-bg: var(--ox-bg-muted);
+  --ox-datetime-cell-hover-bg: var(--ox-accent-wash);
   --ox-datetime-cell-selected-bg: var(--ox-accent);
   --ox-datetime-cell-selected-fg: var(--ox-text-on-accent);
-  --ox-datetime-cell-range-bg: var(--ox-accent-subtle);
+  --ox-datetime-cell-range-bg: var(--ox-accent-muted);
   --ox-datetime-cell-range-fg: var(--ox-text);
   --ox-datetime-today-marker: var(--ox-accent);
   --ox-datetime-weekday-fg: var(--ox-text-muted);
@@ -1181,6 +1188,8 @@
   --ox-accent: var(--ox-ref-hc-accent);
   --ox-accent-hover: var(--ox-ref-hc-accent-hover);
   --ox-accent-subtle: var(--ox-ref-white);
+  --ox-accent-wash: var(--ox-ref-slate-100);
+  --ox-accent-muted: var(--ox-ref-white);
   --ox-accent-border: var(--ox-ref-hc-accent);
   --ox-focus-ring: var(--ox-ref-black);
   --ox-focus-ring-offset: var(--ox-ref-white);
@@ -1383,10 +1392,10 @@
   --ox-stack-accent: var(--ox-text-muted);
   --ox-datetime-cell-fg: var(--ox-text);
   --ox-datetime-cell-muted-fg: var(--ox-text-muted);
-  --ox-datetime-cell-hover-bg: var(--ox-bg-muted);
+  --ox-datetime-cell-hover-bg: var(--ox-accent-wash);
   --ox-datetime-cell-selected-bg: var(--ox-accent);
   --ox-datetime-cell-selected-fg: var(--ox-text-on-accent);
-  --ox-datetime-cell-range-bg: var(--ox-accent-subtle);
+  --ox-datetime-cell-range-bg: var(--ox-accent-muted);
   --ox-datetime-cell-range-fg: var(--ox-text);
   --ox-datetime-today-marker: var(--ox-accent);
   --ox-datetime-weekday-fg: var(--ox-text-muted);

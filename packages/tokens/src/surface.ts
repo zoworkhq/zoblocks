@@ -1500,7 +1500,7 @@ export const TOKEN_SURFACE: readonly SurfaceEntry[] = [
     "component": "datetime",
     "source": "packages/tokens/tokens/component.json",
     "kind": "color",
-    "semantic": "--ox-bg-muted",
+    "semantic": "--ox-accent-wash",
     "frameworks": [],
     "fallback": true,
     "bridgeable": true
@@ -1530,7 +1530,7 @@ export const TOKEN_SURFACE: readonly SurfaceEntry[] = [
     "component": "datetime",
     "source": "packages/tokens/tokens/component.json",
     "kind": "color",
-    "semantic": "--ox-accent-subtle",
+    "semantic": "--ox-accent-muted",
     "frameworks": [],
     "fallback": true,
     "bridgeable": true
