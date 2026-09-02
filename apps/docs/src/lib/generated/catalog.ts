@@ -5443,7 +5443,10 @@ export const CATALOG: ComponentDoc[] = [
       "The row the reader is on",
       "Compact density",
       "Everything, with nothing hidden",
-      "Too many rows to render honestly"
+      "Too many rows to render honestly",
+      "Selected, with the verbs that reach them",
+      "Pinned identity, scrolled sideways",
+      "Paged, and paged past the end of what is known"
     ],
     "props": [
       {
@@ -5489,6 +5492,12 @@ export const CATALOG: ComponentDoc[] = [
         "required": false
       },
       {
+        "name": "bulkActions",
+        "type": "((selected: readonly Row[]) => React.ReactNode)",
+        "description": "What can be done to a selection, rendered in a bar above the table. Receives the selected rows rather than their keys, because the verbs a host offers usually depend on what was picked — and because handing back keys makes every caller re-derive the rows the grid already has.",
+        "required": false
+      },
+      {
         "name": "ceiling",
         "type": "number",
         "description": "Above this many rows the grid refuses rather than degrading.",
@@ -5509,8 +5518,8 @@ export const CATALOG: ComponentDoc[] = [
       },
       {
         "name": "density",
-        "type": "'compact' | 'regular'",
-        "description": "Row height and type scale. `compact` keeps every target above the density floor.",
+        "type": "'compact' | 'comfortable' | 'regular'",
+        "description": "Row height and type scale. Every density keeps targets above the 24px floor.",
         "required": false,
         "default": "\"regular\""
       },
@@ -5527,6 +5536,12 @@ export const CATALOG: ComponentDoc[] = [
         "required": false
       },
       {
+        "name": "maxHeight",
+        "type": "string",
+        "description": "A scroll height for the body. The header sticks to the top of it.",
+        "required": false
+      },
+      {
         "name": "note",
         "type": "React.ReactNode",
         "description": "The right-hand side of the masthead: a window, a source, a role.",
@@ -5539,15 +5554,46 @@ export const CATALOG: ComponentDoc[] = [
         "required": false
       },
       {
+        "name": "onPageChange",
+        "type": "((index: number) => void)",
+        "description": "The reader asked for a page. Zero-based, and the caller fetches it; the grid does not.",
+        "required": false
+      },
+      {
         "name": "onRowActivate",
         "type": "((row: Row) => void)",
         "description": "Enter on a row.",
         "required": false
       },
       {
+        "name": "onSelectionChange",
+        "type": "((keys: readonly string[]) => void)",
+        "description": "Fires with the whole new selection, never a delta — so a caller can store it as-is.",
+        "required": false
+      },
+      {
         "name": "onSortChange",
         "type": "((sort: GridSort | null) => void)",
         "description": "Fires on every sort change, including the third activation that clears it back to your order.",
+        "required": false
+      },
+      {
+        "name": "page",
+        "type": "GridPage",
+        "description": "Paging, reported rather than performed. The grid holds `rows` and nothing else — it does not slice, and it never fetches. This draws the control and tells the caller which page was asked for. Where `coverage.total` is `\"unknown\"` the pager says so instead of inventing a last page.",
+        "required": false
+      },
+      {
+        "name": "pinnedColumns",
+        "type": "number",
+        "description": "How many leading columns stay put while the rest scroll sideways. The identity column is the one a reader must never lose: scrolled twelve columns right with no name in view, every row is the same row. Offsets are measured rather than declared, so a pinned column needs no fixed width.",
+        "required": false,
+        "default": "0"
+      },
+      {
+        "name": "selectedKeys",
+        "type": "readonly string[]",
+        "description": "Rows the reader has selected, by `rowKey`. Controlled. Omit it and the grid renders no selection column at all — a checkbox that cannot lead anywhere is a control that teaches a reader to expect a bulk action the product does not have.",
         "required": false
       },
       {
@@ -5610,6 +5656,12 @@ export const CATALOG: ComponentDoc[] = [
             "required": false
           },
           {
+            "name": "bulkActions",
+            "type": "((selected: readonly Row[]) => React.ReactNode)",
+            "description": "What can be done to a selection, rendered in a bar above the table. Receives the selected rows rather than their keys, because the verbs a host offers usually depend on what was picked — and because handing back keys makes every caller re-derive the rows the grid already has.",
+            "required": false
+          },
+          {
             "name": "ceiling",
             "type": "number",
             "description": "Above this many rows the grid refuses rather than degrading.",
@@ -5630,8 +5682,8 @@ export const CATALOG: ComponentDoc[] = [
           },
           {
             "name": "density",
-            "type": "'compact' | 'regular'",
-            "description": "Row height and type scale. `compact` keeps every target above the density floor.",
+            "type": "'compact' | 'comfortable' | 'regular'",
+            "description": "Row height and type scale. Every density keeps targets above the 24px floor.",
             "required": false,
             "default": "\"regular\""
           },
@@ -5648,6 +5700,12 @@ export const CATALOG: ComponentDoc[] = [
             "required": false
           },
           {
+            "name": "maxHeight",
+            "type": "string",
+            "description": "A scroll height for the body. The header sticks to the top of it.",
+            "required": false
+          },
+          {
             "name": "note",
             "type": "React.ReactNode",
             "description": "The right-hand side of the masthead: a window, a source, a role.",
@@ -5660,15 +5718,46 @@ export const CATALOG: ComponentDoc[] = [
             "required": false
           },
           {
+            "name": "onPageChange",
+            "type": "((index: number) => void)",
+            "description": "The reader asked for a page. Zero-based, and the caller fetches it; the grid does not.",
+            "required": false
+          },
+          {
             "name": "onRowActivate",
             "type": "((row: Row) => void)",
             "description": "Enter on a row.",
             "required": false
           },
           {
+            "name": "onSelectionChange",
+            "type": "((keys: readonly string[]) => void)",
+            "description": "Fires with the whole new selection, never a delta — so a caller can store it as-is.",
+            "required": false
+          },
+          {
             "name": "onSortChange",
             "type": "((sort: GridSort | null) => void)",
             "description": "Fires on every sort change, including the third activation that clears it back to your order.",
+            "required": false
+          },
+          {
+            "name": "page",
+            "type": "GridPage",
+            "description": "Paging, reported rather than performed. The grid holds `rows` and nothing else — it does not slice, and it never fetches. This draws the control and tells the caller which page was asked for. Where `coverage.total` is `\"unknown\"` the pager says so instead of inventing a last page.",
+            "required": false
+          },
+          {
+            "name": "pinnedColumns",
+            "type": "number",
+            "description": "How many leading columns stay put while the rest scroll sideways. The identity column is the one a reader must never lose: scrolled twelve columns right with no name in view, every row is the same row. Offsets are measured rather than declared, so a pinned column needs no fixed width.",
+            "required": false,
+            "default": "0"
+          },
+          {
+            "name": "selectedKeys",
+            "type": "readonly string[]",
+            "description": "Rows the reader has selected, by `rowKey`. Controlled. Omit it and the grid renders no selection column at all — a checkbox that cannot lead anywhere is a control that teaches a reader to expect a bulk action the product does not have.",
             "required": false
           },
           {
@@ -5822,15 +5911,35 @@ export const CATALOG: ComponentDoc[] = [
         "control": "select",
         "label": "Density",
         "options": [
+          "comfortable",
           "regular",
           "compact"
         ],
         "defaultValue": "regular"
       },
       {
+        "prop": "pinnedColumns",
+        "control": "slider",
+        "label": "Pinned columns",
+        "min": 0,
+        "max": 2,
+        "step": 1,
+        "defaultValue": 0
+      },
+      {
         "prop": "onSortChange",
         "control": "event",
         "label": "onSortChange"
+      },
+      {
+        "prop": "onSelectionChange",
+        "control": "event",
+        "label": "onSelectionChange"
+      },
+      {
+        "prop": "onPageChange",
+        "control": "event",
+        "label": "onPageChange"
       },
       {
         "prop": "onRowActivate",
@@ -6049,7 +6158,7 @@ export const CATALOG: ComponentDoc[] = [
     "props": [
       {
         "name": "defaultValue",
-        "type": "string | number | DateRangeValue | BirthDateValue | OxTime | SessionInterval | OxTimeRange | RecurrenceRule | readonly string[]",
+        "type": "string | number | readonly string[] | DateRangeValue | BirthDateValue | OxTime | SessionInterval | OxTimeRange | RecurrenceRule",
         "description": "Uncontrolled initial value. Pass this **or** `value`, never both. There is deliberately no runtime warning: ADR 0009 forbids component source writing to the console at all, because a component that logs is one error-reporting integration away from putting a date of birth in a third party's index. When both are passed, `value` wins — the ordinary React contract. Uncontrolled initial value. Pass this or `value`, never both; `value` wins if you pass both. Uncontrolled initial value. Pass this or `value`, never both.",
         "required": false
       },
@@ -6072,7 +6181,7 @@ export const CATALOG: ComponentDoc[] = [
         "props": [
           {
             "name": "defaultValue",
-            "type": "string | number | DateRangeValue | BirthDateValue | OxTime | SessionInterval | OxTimeRange | RecurrenceRule | readonly string[]",
+            "type": "string | number | readonly string[] | DateRangeValue | BirthDateValue | OxTime | SessionInterval | OxTimeRange | RecurrenceRule",
             "description": "Uncontrolled initial value. Pass this **or** `value`, never both. There is deliberately no runtime warning: ADR 0009 forbids component source writing to the console at all, because a component that logs is one error-reporting integration away from putting a date of birth in a third party's index. When both are passed, `value` wins — the ordinary React contract. Uncontrolled initial value. Pass this or `value`, never both; `value` wins if you pass both. Uncontrolled initial value. Pass this or `value`, never both.",
             "required": false
           },

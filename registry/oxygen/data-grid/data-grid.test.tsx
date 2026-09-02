@@ -28,8 +28,13 @@ import {
 import {
   compareGridValues,
   describeGridCoverage,
+  describeGridPage,
+  describeGridSelection,
   describeGridIdentity,
   gridCapacityRefusal,
+  gridPageCount,
+  gridPageWindow,
+  gridSelectionState,
   gridUnseenCount,
   localGridCoverage,
   moveGridCursor,
@@ -37,6 +42,8 @@ import {
   nextGridSort,
   sortGridRows,
   toGridDelimited,
+  toggleAllGridSelection,
+  toggleGridSelection,
   type GridColumnSpec,
 } from "@/lib/oxygen-grid";
 
@@ -594,6 +601,175 @@ describe("the parts of the API nothing was exercising", () => {
     const stops = [...document.querySelectorAll('[data-ox-cell][tabindex="0"]')];
     expect(stops).toHaveLength(1);
     expect(stops[0]?.closest("thead")).not.toBeNull();
+  });
+});
+
+/* ------------------------------------------------------------------ */
+/* Selection                                                           */
+/* ------------------------------------------------------------------ */
+
+describe("selection, and what a bulk action may reach", () => {
+  it("renders no selection column until it can lead somewhere", () => {
+    // A checkbox with no handler teaches a reader to expect a bulk action the
+    // product does not have.
+    render(<DataGrid {...base} coverage={CASELOAD_COVERAGE} />);
+    expect(screen.queryByRole("checkbox")).toBeNull();
+    expect(screen.getByRole("grid").hasAttribute("aria-multiselectable")).toBe(false);
+  });
+
+  it("names every checkbox after the row it selects", () => {
+    render(
+      <DataGrid
+        {...base}
+        coverage={CASELOAD_COVERAGE}
+        selectedKeys={[]}
+        onSelectionChange={() => {}}
+        identify={(row) => ({ primary: row.name, secondary: `MRN ${row.mrn}` })}
+      />,
+    );
+    // "Select row 3" is a name that means nothing once the grid is sorted.
+    expect(screen.getByRole("checkbox", { name: "Select Adeyemi, R." })).toBeTruthy();
+    expect(screen.getByRole("grid").getAttribute("aria-multiselectable")).toBe("true");
+  });
+
+  it("says select-all means this page, not the cohort", () => {
+    render(
+      <DataGrid
+        {...base}
+        coverage={CASELOAD_COVERAGE}
+        selectedKeys={[]}
+        onSelectionChange={() => {}}
+      />,
+    );
+    // 6 on screen, 312 in the caseload. A checkbox that silently meant 312 is
+    // how a bulk action reaches a chart nobody has looked at.
+    expect(screen.getByRole("checkbox", { name: /Select all 6 rows on this page/ })).toBeTruthy();
+  });
+
+  it("reports the page's rows rather than clearing when some are picked", () => {
+    const keys = CASELOAD.map((row) => row.mrn);
+    expect(gridSelectionState([], keys)).toBe("none");
+    expect(gridSelectionState([keys[0]!], keys)).toBe("some");
+    expect(gridSelectionState(keys, keys)).toBe("all");
+
+    // Partially selected: the header adds the rest, it does not wipe the four
+    // a reader hand-picked.
+    expect(toggleAllGridSelection([keys[0]!], keys)).toHaveLength(keys.length);
+    expect(toggleAllGridSelection(keys, keys)).toEqual([]);
+    expect(toggleGridSelection([], "a")).toEqual(["a"]);
+    expect(toggleGridSelection(["a", "b"], "a")).toEqual(["b"]);
+  });
+
+  it("marks selected rows for a screen reader, not only for the eye", async () => {
+    const user = userEvent.setup();
+    const onSelectionChange = vi.fn();
+    render(
+      <DataGrid
+        {...base}
+        coverage={CASELOAD_COVERAGE}
+        selectedKeys={["4471902"]}
+        onSelectionChange={onSelectionChange}
+      />,
+    );
+    const selected = screen
+      .getAllByRole("row")
+      .filter((row) => row.getAttribute("aria-selected") === "true");
+    expect(selected).toHaveLength(1);
+    expect(selected[0]?.textContent).toContain("Adeyemi, R.");
+
+    await user.click(screen.getAllByRole("checkbox")[1]!);
+    expect(onSelectionChange).toHaveBeenCalled();
+  });
+
+  it("announces the count and offers the verbs only while something is picked", () => {
+    const { unmount } = render(
+      <DataGrid
+        {...base}
+        coverage={CASELOAD_COVERAGE}
+        selectedKeys={[]}
+        onSelectionChange={() => {}}
+        bulkActions={() => <button type="button">Assign clinician</button>}
+      />,
+    );
+    expect(screen.queryByRole("region", { name: "Selection actions" })).toBeNull();
+    unmount();
+
+    render(
+      <DataGrid
+        {...base}
+        coverage={CASELOAD_COVERAGE}
+        selectedKeys={["4471902", "3320145"]}
+        onSelectionChange={() => {}}
+        bulkActions={(rows) => <button type="button">Assign {rows.length}</button>}
+      />,
+    );
+    const bar = screen.getByRole("region", { name: "Selection actions" });
+    // Polite, because selecting one row at a time otherwise announces only
+    // that a checkbox changed — never that a bar of verbs appeared above it.
+    expect(within(bar).getByText("2 rows selected").getAttribute("aria-live")).toBe("polite");
+    expect(within(bar).getByRole("button", { name: "Assign 2" })).toBeTruthy();
+  });
+
+  it("counts one row in the singular", () => {
+    expect(describeGridSelection(1)).toBe("1 row selected");
+    expect(describeGridSelection(4, "client")).toBe("4 clients selected");
+    expect(describeGridSelection(0)).toBe("");
+  });
+});
+
+/* ------------------------------------------------------------------ */
+/* Pagination                                                          */
+/* ------------------------------------------------------------------ */
+
+describe("paging is reported, never performed", () => {
+  it("describes the window, and admits when the end is unknown", () => {
+    expect(describeGridPage({ index: 0, size: 50 }, 312)).toBe("1–50 of 312");
+    expect(describeGridPage({ index: 6, size: 50 }, 312)).toBe("301–312 of 312");
+    // The failure this prevents: a pager rendering "page 1 of 1" over a Bundle
+    // whose total the server withheld has invented the end of the list.
+    expect(describeGridPage({ index: 2, size: 50 }, "unknown")).toBe("101 onwards");
+    expect(gridPageCount("unknown", 50)).toBe("unknown");
+    expect(gridPageCount(312, 50)).toBe(7);
+  });
+
+  it("elides the middle rather than drawing sixty-three buttons", () => {
+    expect(gridPageWindow(0, 7)).toEqual([0, 1, "gap", 6]);
+    expect(gridPageWindow(3, 7)).toEqual([0, "gap", 2, 3, 4, "gap", 6]);
+    expect(gridPageWindow(6, 7)).toEqual([0, "gap", 5, 6]);
+    expect(gridPageWindow(2, "unknown")).toEqual([2]);
+  });
+
+  it("draws a named nav, and disables the ends", () => {
+    const onPageChange = vi.fn();
+    render(
+      <DataGrid
+        {...base}
+        coverage={CASELOAD_COVERAGE}
+        page={{ index: 0, size: 50 }}
+        onPageChange={onPageChange}
+      />,
+    );
+    const pager = screen.getByRole("navigation", { name: "Pages" });
+    expect(within(pager).getByText("1–50 of 312")).toBeTruthy();
+    expect(within(pager).getByRole("button", { name: "Previous page" })).toBeDisabled();
+    expect(within(pager).getByRole("button", { name: "Page 1" }).getAttribute("aria-current")).toBe(
+      "page",
+    );
+  });
+
+  it("leaves the next page reachable when the total is withheld", () => {
+    render(
+      <DataGrid
+        {...base}
+        coverage={UNKNOWN_TOTAL_COVERAGE}
+        page={{ index: 1, size: 50 }}
+        onPageChange={() => {}}
+      />,
+    );
+    const pager = screen.getByRole("navigation", { name: "Pages" });
+    // There is no last page to disable against, so the control must not guess
+    // that this is it.
+    expect(within(pager).getByRole("button", { name: "Next page" })).not.toBeDisabled();
   });
 });
 

@@ -396,6 +396,126 @@ export function gridCapacityRefusal(
 }
 
 /* ------------------------------------------------------------------ */
+/* Selection                                                           */
+/* ------------------------------------------------------------------ */
+
+/** What the header checkbox is showing. `some` renders indeterminate. */
+export type GridSelectionState = "none" | "some" | "all";
+
+/**
+ * The header checkbox's state, against the rows currently on screen.
+ *
+ * Against the *page*, not the cohort, and that is the honest reading: a
+ * "select all" that silently meant 312 rows a reader has never seen is how a
+ * bulk action reaches somebody's chart by accident. Selecting beyond the page
+ * has to be a second, explicit act with its own sentence.
+ */
+export function gridSelectionState(
+  selected: readonly string[],
+  keys: readonly string[],
+): GridSelectionState {
+  if (!keys.length) return "none";
+  const set = new Set(selected);
+  let hits = 0;
+  for (const key of keys) if (set.has(key)) hits += 1;
+  if (hits === 0) return "none";
+  return hits === keys.length ? "all" : "some";
+}
+
+/** Add or remove one row. Returns a new array; never mutates. */
+export function toggleGridSelection(selected: readonly string[], key: string): string[] {
+  return selected.includes(key) ? selected.filter((entry) => entry !== key) : [...selected, key];
+}
+
+/**
+ * The header checkbox.
+ *
+ * Anything short of every row on the page selects the rest rather than
+ * clearing — the behaviour every table has, and the one a reader who has
+ * hand-picked four of six expects when they reach for it.
+ */
+export function toggleAllGridSelection(
+  selected: readonly string[],
+  keys: readonly string[],
+): string[] {
+  if (gridSelectionState(selected, keys) === "all") {
+    const drop = new Set(keys);
+    return selected.filter((key) => !drop.has(key));
+  }
+  const merged = new Set(selected);
+  for (const key of keys) merged.add(key);
+  return [...merged];
+}
+
+/** The count, in words, for the bulk bar's live region. */
+export function describeGridSelection(count: number, noun = "row"): string {
+  if (count === 0) return "";
+  return `${count.toLocaleString("en")} ${count === 1 ? noun : `${noun}s`} selected`;
+}
+
+/* ------------------------------------------------------------------ */
+/* Pagination                                                          */
+/* ------------------------------------------------------------------ */
+
+/** Which page, and how big. Zero-based, because it indexes an array. */
+export interface GridPage {
+  index: number;
+  size: number;
+}
+
+/**
+ * How many pages there are, or that nobody knows.
+ *
+ * `"unknown"` propagates rather than collapsing to 1. A pager that renders a
+ * single page over a `Bundle` whose total the server withheld has invented the
+ * end of the list, which is the same failure as `coverage.total` inventing a
+ * count — and the reason the union exists in the first place.
+ */
+export function gridPageCount(total: number | "unknown", size: number): number | "unknown" {
+  if (total === "unknown") return "unknown";
+  if (size <= 0) return 1;
+  return Math.max(1, Math.ceil(total / size));
+}
+
+/** "51–100 of 312", or the honest version when the total is withheld. */
+export function describeGridPage(page: GridPage, total: number | "unknown"): string {
+  const first = page.index * page.size + 1;
+  if (total === "unknown") return `${first.toLocaleString("en")} onwards`;
+  const last = Math.min(total, (page.index + 1) * page.size);
+  if (total === 0) return "Nothing to show";
+  return `${first.toLocaleString("en")}–${last.toLocaleString("en")} of ${total.toLocaleString("en")}`;
+}
+
+/**
+ * The page numbers to draw, with gaps.
+ *
+ * First, last, and a window around the current one; `"gap"` marks an elision.
+ * A pager that renders sixty-three buttons has made the control useless at
+ * exactly the size it was added for.
+ */
+export function gridPageWindow(
+  index: number,
+  count: number | "unknown",
+  span = 1,
+): Array<number | "gap"> {
+  if (count === "unknown") return [index];
+  const wanted = new Set<number>([0, count - 1]);
+  for (let i = index - span; i <= index + span; i += 1) {
+    if (i >= 0 && i < count) wanted.add(i);
+  }
+  const pages = [...wanted].sort((a, b) => a - b);
+
+  const out: Array<number | "gap"> = [];
+  let previous = -1;
+  for (const page of pages) {
+    if (previous >= 0 && page - previous > 1) out.push("gap");
+    out.push(page);
+    previous = page;
+  }
+  return out;
+}
+
+/* ------------------------------------------------------------------ */
 /* Keyboard                                                            */
 /* ------------------------------------------------------------------ */
 

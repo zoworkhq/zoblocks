@@ -108,7 +108,7 @@ Rules that matter when generating code with these components:
 - [Data Grid](https://oxygenui.design/components/data-grid): A worklist that states what it is showing out of what, holds arriving results behind a line, and names the model when you sort by one.
   install: npx @oxygenui-design/cli add data-grid
   fhir: Bundle, Observation, Patient, RiskAssessment
-  states: Coverage above the data, A total the source will not give, Absence, said four ways, Sorted by a derived column, Results arrived, nothing moved, The row the reader is on, Compact density, Everything, with nothing hidden, Too many rows to render honestly
+  states: Coverage above the data, A total the source will not give, Absence, said four ways, Sorted by a derived column, Results arrived, nothing moved, The row the reader is on, Compact density, Everything, with nothing hidden, Too many rows to render honestly, Selected, with the verbs that reach them, Pinned identity, scrolled sideways, Paged, and paged past the end of what is known
   status: beta
 - [Date Picker](https://oxygenui.design/components/date-picker): One temporal control with sixteen variants: field, calendar, date and time ranges, birth date, session, slots, recurrence and the read-only record.
   install: npx @oxygenui-design/cli add date-picker

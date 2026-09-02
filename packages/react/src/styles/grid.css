@@ -38,6 +38,10 @@
   --ox-grid-surface: var(--ox-surface, #ffffff);
   --ox-grid-sunk: var(--ox-bg-muted, #f1f5f9);
   --ox-grid-accent: var(--ox-accent, #0d9488);
+  /* The selection bar's ground. Declared here so a brand override reaches it
+     without editing this file, and so the two are guaranteed to agree. */
+  --ox-grid-accent-bg: var(--ox-accent-subtle, #f0fdfa);
+  --ox-grid-accent-line: var(--ox-accent-border, #99f6e4);
   --ox-grid-pad-x: 0.75rem;
   --ox-grid-pad-y: 0.4rem;
   --ox-grid-font: var(--ox-text-sm, 0.875rem);
@@ -51,10 +55,22 @@
   line-height: 1.5;
 }
 
+/*
+ * Three densities, and the control is the product rather than a preference.
+ *
+ * A supervisor scanning three hundred clients and a clinician working six want
+ * different row heights, and asking a customer to pick one at build time means
+ * one of those two people is always working in the wrong grid.
+ */
 .ox-grid[data-ox-density="compact"] {
   --ox-grid-pad-y: 0.25rem;
   --ox-grid-pad-x: 0.625rem;
   --ox-grid-font: var(--ox-text-xs, 0.75rem);
+}
+
+.ox-grid[data-ox-density="comfortable"] {
+  --ox-grid-pad-y: 0.7rem;
+  --ox-grid-pad-x: 1rem;
 }
 
 /* ---------------------------------------------------------------- */
@@ -120,8 +136,16 @@
  * see, so it is only there for the screen reader that cannot.
  */
 .ox-grid__readingline[data-empty="true"] {
-  color: var(--ox-grid-subtle);
-  opacity: 0.55;
+  /*
+   * Muted, not faded.
+   *
+   * This was `--ox-grid-subtle` at 0.55 opacity and measured 2.1:1, which axe
+   * caught. Subtle is already the quiet end of the scale and it is calibrated
+   * against the surface; multiplying it by an opacity takes it somewhere
+   * nobody checked. Quiet is a tone, not a transparency.
+   */
+  color: var(--ox-grid-muted);
+  font-weight: 400;
 }
 
 /* ---------------------------------------------------------------- */
@@ -185,11 +209,80 @@
 }
 
 /* ---------------------------------------------------------------- */
+/* Selection actions                                                 */
+/* ---------------------------------------------------------------- */
+
+/*
+ * Above the table, never over it.
+ *
+ * A floating bar is the common pattern and the wrong one here: it covers the
+ * bottom rows, which is where a reader who has just scrolled to select
+ * something is looking. This pushes the table down instead — the one layout
+ * shift in the component that is worth its cost, because it happens in
+ * response to a click the reader just made.
+ */
+.ox-grid__bulk {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.75rem;
+  min-block-size: 2.5rem;
+  padding: 0.35rem var(--ox-grid-pad-x);
+  border-block-end: 1px solid var(--ox-grid-accent-line, var(--ox-grid-rule));
+  background: var(--ox-grid-accent-bg, var(--ox-grid-sunk));
+}
+
+.ox-grid__bulkcount {
+  margin: 0;
+  font-family: var(--ox-font-mono, ui-monospace, monospace);
+  font-size: var(--ox-text-2xs, 0.625rem);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ox-grid-ink);
+}
+
+.ox-grid__bulkclear {
+  min-block-size: 1.625rem;
+  padding: 0 0.4rem;
+  border: 0;
+  border-radius: var(--ox-radius-sm, 3px);
+  background: none;
+  color: var(--ox-grid-muted);
+  font-family: var(--ox-font-mono, ui-monospace, monospace);
+  font-size: var(--ox-text-2xs, 0.625rem);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.ox-grid__bulkclear:hover {
+  color: var(--ox-grid-ink);
+}
+
+.ox-grid__bulkactions {
+  margin-inline-start: auto;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+/* ---------------------------------------------------------------- */
 /* The table                                                         */
 /* ---------------------------------------------------------------- */
 
+/*
+ * The scroll container, and the reason the header can stick at all.
+ *
+ * `overflow: auto` makes this the scrolling ancestor, so `position: sticky` on
+ * a header cell resolves against this box rather than the viewport. Without a
+ * `max-block-size` there is nothing to scroll vertically and the sticky
+ * declaration costs nothing; with one, the header stays put over a hundred
+ * rows — which is the only reason a hundred-row grid is usable.
+ */
 .ox-grid__scroll {
-  overflow-x: auto;
+  overflow: auto;
+  overscroll-behavior-x: contain;
 }
 
 .ox-grid__table {
@@ -212,12 +305,87 @@
 }
 
 .ox-grid__th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
   padding: 0;
+  background: var(--ox-grid-surface);
   border-block-end: 1px solid var(--ox-grid-ink);
   border-inline-end: 1px solid var(--ox-grid-rule);
   vertical-align: bottom;
   font-weight: 600;
   white-space: nowrap;
+}
+
+/* ---------------------------------------------------------------- */
+/* Pinned columns                                                    */
+/* ---------------------------------------------------------------- */
+
+/*
+ * The identity column, kept.
+ *
+ * Scrolled twelve columns to the right with no name in view, every row is the
+ * same row — which is the wrong-patient error with the grid holding the door.
+ * `left` is measured and written by the component rather than declared here,
+ * so a pinned column does not have to give up its flexible width to be pinned.
+ *
+ * The seam is a shadow rather than a border: a border would change the column's
+ * width the moment pinning was turned on, and a grid that reflows when you pin
+ * a column has moved every cell under the pointer.
+ */
+.ox-grid__pin {
+  position: sticky;
+  z-index: 1;
+  background: var(--ox-grid-surface);
+}
+
+.ox-grid__th.ox-grid__pin {
+  z-index: 3;
+}
+
+/* Only the last pinned cell carries the seam, so the group reads as one slab. */
+.ox-grid__pin + :not(.ox-grid__pin) {
+  box-shadow: inset 6px 0 6px -6px rgb(0 0 0 / 0.12);
+}
+
+.ox-grid__tr--current > .ox-grid__pin,
+.ox-grid__tr--selected > .ox-grid__pin {
+  background: var(--ox-grid-sunk);
+}
+
+/* ---------------------------------------------------------------- */
+/* Selection                                                         */
+/* ---------------------------------------------------------------- */
+
+.ox-grid__th--select,
+.ox-grid__td--select {
+  inline-size: 2.5rem;
+  padding-inline: 0.625rem;
+  text-align: center;
+}
+
+.ox-grid__th--select {
+  padding-block: 0.3rem;
+}
+
+/*
+ * A real checkbox.
+ *
+ * Not a styled span: `indeterminate` has no ARIA equivalent that a screen
+ * reader announces as reliably, the native control is already in the tab order
+ * with the right role, and forced-colors mode draws it correctly for free.
+ * `accent-color` is the whole skin.
+ */
+.ox-grid__check {
+  inline-size: 0.9375rem;
+  block-size: 0.9375rem;
+  margin: 0;
+  accent-color: var(--ox-grid-accent);
+  cursor: pointer;
+}
+
+.ox-grid__tr--selected > .ox-grid__td {
+  background: var(--ox-grid-sunk);
 }
 
 .ox-grid__th:last-child,
@@ -385,7 +553,9 @@
 .ox-grid__td:focus-visible,
 .ox-grid__sort:focus-visible,
 .ox-grid__static:focus-visible,
-.ox-grid__admit:focus-visible {
+.ox-grid__admit:focus-visible,
+.ox-grid__page:focus-visible,
+.ox-grid__bulkclear:focus-visible {
   outline: none;
   box-shadow:
     inset 0 0 0 2px var(--ox-focus-ring, #0d9488),
@@ -445,6 +615,76 @@
   border-inline-start: 2px solid var(--ox-grid-ink);
   font-size: var(--ox-text-xs, 0.75rem);
   color: var(--ox-grid-ink);
+}
+
+/* ---------------------------------------------------------------- */
+/* Pagination                                                        */
+/* ---------------------------------------------------------------- */
+
+.ox-grid__pager {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.75rem;
+  margin-block: 0.5rem;
+}
+
+.ox-grid__pagecount {
+  font-family: var(--ox-font-mono, ui-monospace, monospace);
+  font-size: var(--ox-text-2xs, 0.625rem);
+  letter-spacing: 0.06em;
+  color: var(--ox-grid-muted);
+}
+
+.ox-grid__pagebuttons {
+  margin-inline-start: auto;
+  display: flex;
+  align-items: center;
+  gap: 0.2rem;
+}
+
+/*
+ * 26px, clearing SC 2.5.8's 24px floor.
+ *
+ * Not the 2.75rem density target: a pager sits in a footer beside 10px type,
+ * and the same borrowed token is what made the column headers half an inch
+ * tall before it was taken out of them.
+ */
+.ox-grid__page {
+  min-inline-size: 1.625rem;
+  min-block-size: 1.625rem;
+  padding: 0 0.35rem;
+  border: 1px solid var(--ox-grid-rule);
+  border-radius: var(--ox-radius-sm, 3px);
+  background: var(--ox-grid-surface);
+  color: var(--ox-grid-muted);
+  font-family: var(--ox-font-mono, ui-monospace, monospace);
+  font-size: var(--ox-text-2xs, 0.625rem);
+  cursor: pointer;
+}
+
+.ox-grid__page:hover:not(:disabled) {
+  border-color: var(--ox-grid-rule-strong);
+  color: var(--ox-grid-ink);
+}
+
+.ox-grid__page[aria-current="page"] {
+  border-color: var(--ox-grid-accent);
+  background: var(--ox-grid-accent);
+  color: var(--ox-text-on-accent, #fff);
+  font-weight: 600;
+}
+
+.ox-grid__page:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.ox-grid__pagegap {
+  color: var(--ox-grid-subtle);
+  font-family: var(--ox-font-mono, ui-monospace, monospace);
+  font-size: var(--ox-text-2xs, 0.625rem);
+  padding-inline: 0.15rem;
 }
 
 .ox-grid__notes {

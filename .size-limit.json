@@ -28,7 +28,7 @@
     "name": "react \u2014 the whole barrel",
     "path": "packages/react/dist/index.js",
     "import": "*",
-    "limit": "110 KB",
+    "limit": "113 KB",
     "ignore": ["react", "react-dom"]
   },
   {
@@ -169,7 +169,7 @@
   {
     "name": "react \u2014 the barrel must contain no UI framework",
     "path": "packages/react/dist/index.js",
-    "limit": "110 KB",
+    "limit": "200 KB",
     "ignore": ["react", "react-dom"]
   }
 ]

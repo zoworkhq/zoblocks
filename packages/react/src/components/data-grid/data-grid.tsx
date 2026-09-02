@@ -65,19 +65,27 @@ import * as React from "react";
 import { cn } from "../../lib/utils";
 import {
   describeGridArrivals,
+  describeGridPage,
+  describeGridSelection,
   describeGridCoverage,
   describeGridDerivation,
   describeGridIdentity,
   gridAbsenceDetail,
   gridAbsenceLabel,
   gridCapacityRefusal,
+  gridPageCount,
+  gridPageWindow,
+  gridSelectionState,
   isGridAbsent,
   moveGridCursor,
   nextGridSort,
   sortGridRows,
+  toggleAllGridSelection,
+  toggleGridSelection,
   type GridColumnSpec,
   type GridCoverage,
   type GridIdentity,
+  type GridPage,
   type GridSort,
   type GridValue,
 } from "../../lib/grid";
@@ -93,7 +101,12 @@ export {
   describeGridIdentity,
   gridAbsenceDetail,
   gridAbsenceLabel,
+  describeGridPage,
+  describeGridSelection,
   gridCapacityRefusal,
+  gridPageCount,
+  gridPageWindow,
+  gridSelectionState,
   gridUnseenCount,
   isGridAbsent,
   localGridCoverage,
@@ -102,6 +115,8 @@ export {
   nextGridSort,
   sortGridRows,
   toGridDelimited,
+  toggleAllGridSelection,
+  toggleGridSelection,
   type GridAbsence,
   type GridAbsent,
   type GridBounds,
@@ -112,6 +127,8 @@ export {
   type GridDerivation,
   type GridExportOptions,
   type GridIdentity,
+  type GridPage,
+  type GridSelectionState,
   type GridSort,
   type GridSortDirection,
   type GridValue,
@@ -196,8 +213,51 @@ export interface DataGridProps<Row> {
   /** Above this many rows the grid refuses rather than degrading. */
   ceiling?: number;
 
-  /** Row height and type scale. `compact` keeps every target above the density floor. */
-  density?: "regular" | "compact";
+  /**
+   * Rows the reader has selected, by `rowKey`. Controlled.
+   *
+   * Omit it and the grid renders no selection column at all — a checkbox that
+   * cannot lead anywhere is a control that teaches a reader to expect a bulk
+   * action the product does not have.
+   */
+  selectedKeys?: readonly string[];
+  /** Fires with the whole new selection, never a delta — so a caller can store it as-is. */
+  onSelectionChange?: (keys: readonly string[]) => void;
+  /**
+   * What can be done to a selection, rendered in a bar above the table.
+   *
+   * Receives the selected rows rather than their keys, because the verbs a
+   * host offers usually depend on what was picked — and because handing back
+   * keys makes every caller re-derive the rows the grid already has.
+   */
+  bulkActions?: (selected: readonly Row[]) => React.ReactNode;
+
+  /**
+   * How many leading columns stay put while the rest scroll sideways.
+   *
+   * The identity column is the one a reader must never lose: scrolled twelve
+   * columns right with no name in view, every row is the same row. Offsets are
+   * measured rather than declared, so a pinned column needs no fixed width.
+   */
+  pinnedColumns?: number;
+
+  /**
+   * Paging, reported rather than performed.
+   *
+   * The grid holds `rows` and nothing else — it does not slice, and it never
+   * fetches. This draws the control and tells the caller which page was asked
+   * for. Where `coverage.total` is `"unknown"` the pager says so instead of
+   * inventing a last page.
+   */
+  page?: GridPage;
+  /** The reader asked for a page. Zero-based, and the caller fetches it; the grid does not. */
+  onPageChange?: (index: number) => void;
+
+  /** A scroll height for the body. The header sticks to the top of it. */
+  maxHeight?: string;
+
+  /** Row height and type scale. Every density keeps targets above the 24px floor. */
+  density?: "comfortable" | "regular" | "compact";
   /** Merged onto the outer element. */
   className?: string;
   /** The outer element's id. Generated when absent; the masthead title and the grid's label derive from it. */
@@ -290,6 +350,13 @@ export function DataGrid<Row>({
   identify,
   onRowActivate,
   ceiling,
+  selectedKeys,
+  onSelectionChange,
+  bulkActions,
+  pinnedColumns = 0,
+  page,
+  onPageChange,
+  maxHeight,
   density = "regular",
   className,
   id,
@@ -321,6 +388,45 @@ export function DataGrid<Row>({
   const bodyRef = React.useRef<HTMLTableSectionElement>(null);
   const headRef = React.useRef<HTMLTableRowElement>(null);
   const wantsFocus = React.useRef(false);
+
+  const selectable = Boolean(selectedKeys && onSelectionChange);
+  const selected = React.useMemo(() => selectedKeys ?? [], [selectedKeys]);
+
+  /*
+   * Pinned offsets, measured.
+   *
+   * A pinned column needs a `left`, and declaring one means every caller has to
+   * give their identity column a fixed width — which is the column most likely
+   * to want the slack. So the header cells are measured after layout and the
+   * offsets written back, and a ResizeObserver keeps them true when the
+   * container changes width or the density control moves.
+   */
+  const [pinOffsets, setPinOffsets] = React.useState<number[]>([]);
+  React.useLayoutEffect(() => {
+    const head = headRef.current;
+    if (!head || pinnedColumns <= 0) {
+      setPinOffsets([]);
+      return;
+    }
+    const measure = () => {
+      const cells = [...head.children] as HTMLElement[];
+      const offsets: number[] = [];
+      let running = 0;
+      for (let i = 0; i < pinnedColumns + (selectable ? 1 : 0); i += 1) {
+        offsets.push(running);
+        running += cells[i]?.offsetWidth ?? 0;
+      }
+      setPinOffsets((current) =>
+        current.length === offsets.length && current.every((v, i) => v === offsets[i])
+          ? current
+          : offsets,
+      );
+    };
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(head);
+    return () => observer.disconnect();
+  }, [pinnedColumns, selectable, columns, density]);
 
   const refusal = gridCapacityRefusal(rows.length, ceiling);
 
@@ -454,9 +560,16 @@ export function DataGrid<Row>({
     );
   }
 
-  const footVisible = Boolean(identify) || Boolean(sortColumn?.derived) || notes.length > 0;
+  const footVisible =
+    Boolean(identify) || Boolean(sortColumn?.derived) || notes.length > 0 || Boolean(page);
   const held = arrivals?.length ?? 0;
   const heldLine = describeGridArrivals(held, arrivalsAt);
+
+  const selectState = gridSelectionState(selected, keys);
+  const selectedRows = ordered.filter((row) => selected.includes(rowKey(row)));
+  const pinnedCount = pinnedColumns + (selectable ? 1 : 0);
+  const pinStyle = (index: number) =>
+    index < pinOffsets.length ? { left: pinOffsets[index] } : undefined;
 
   return (
     <section
@@ -524,7 +637,32 @@ export function DataGrid<Row>({
         </div>
       ) : null}
 
-      <div className="ox-grid__scroll">
+      {/*
+        The bulk bar.
+
+        A region rather than a toolbar, with the count in a polite live region:
+        a screen-reader user selecting rows one at a time otherwise learns only
+        that a checkbox changed, never that a bar of verbs has appeared above
+        them. It sits above the table rather than floating, so it cannot cover
+        the row that is about to be acted on.
+      */}
+      {selectable && bulkActions && selectedRows.length > 0 ? (
+        <div className="ox-grid__bulk" role="region" aria-label="Selection actions">
+          <p className="ox-grid__bulkcount" aria-live="polite">
+            {describeGridSelection(selectedRows.length)}
+          </p>
+          <button
+            type="button"
+            className="ox-grid__bulkclear"
+            onClick={() => onSelectionChange?.([])}
+          >
+            Clear
+          </button>
+          <div className="ox-grid__bulkactions">{bulkActions(selectedRows)}</div>
+        </div>
+      ) : null}
+
+      <div className="ox-grid__scroll" style={maxHeight ? { maxBlockSize: maxHeight } : undefined}>
         <table
           className="ox-grid__table"
           role="grid"
@@ -534,13 +672,40 @@ export function DataGrid<Row>({
              not known", which is the honest value when the source will not
              say. */
           aria-rowcount={coverage.total === "unknown" ? -1 : coverage.total + 1}
-          aria-colcount={columns.length}
+          aria-colcount={columns.length + (selectable ? 1 : 0)}
+          aria-multiselectable={selectable ? true : undefined}
           onKeyDown={onKeyDown}
         >
           <caption className="ox-grid__caption">{caption}</caption>
 
           <thead role="rowgroup">
             <tr role="row" aria-rowindex={1} ref={headRef} className="ox-grid__headrow">
+              {/*
+                Select-all covers the page, not the cohort.
+                
+                A checkbox that silently meant 312 rows nobody has looked at is
+                how a bulk action reaches a chart by accident. `aria-label` says
+                which, and selecting beyond the page is left to the host as a
+                second, explicit act with its own sentence.
+              */}
+              {selectable ? (
+                <th
+                  scope="col"
+                  className={cn("ox-grid__th ox-grid__th--select", pinnedCount && "ox-grid__pin")}
+                  style={pinStyle(0)}
+                >
+                  <input
+                    type="checkbox"
+                    className="ox-grid__check"
+                    checked={selectState === "all"}
+                    ref={(node) => {
+                      if (node) node.indeterminate = selectState === "some";
+                    }}
+                    aria-label={`Select all ${keys.length} rows on this page`}
+                    onChange={() => onSelectionChange?.(toggleAllGridSelection(selected, keys))}
+                  />
+                </th>
+              ) : null}
               {columns.map((column, index) => {
                 const active = sort?.key === column.key;
                 const mark = marks.get(column.key);
@@ -560,8 +725,12 @@ export function DataGrid<Row>({
                       "ox-grid__th",
                       ALIGN_CLASS[defaultAlign(column)].th,
                       active && "ox-grid__th--sorted",
+                      index < pinnedColumns && "ox-grid__pin",
                     )}
-                    style={column.width ? { width: column.width } : undefined}
+                    style={{
+                      ...(column.width ? { width: column.width } : null),
+                      ...pinStyle(index + (selectable ? 1 : 0)),
+                    }}
                   >
                     {sortable ? (
                       <button
@@ -614,8 +783,32 @@ export function DataGrid<Row>({
                      is what a screen reader reads out. */
                   aria-rowindex={rowIndex + 2}
                   data-ox-row={rowIndex}
-                  className={cn("ox-grid__tr", current && "ox-grid__tr--current")}
+                  aria-selected={selectable ? selected.includes(key) : undefined}
+                  className={cn(
+                    "ox-grid__tr",
+                    current && "ox-grid__tr--current",
+                    selectable && selected.includes(key) && "ox-grid__tr--selected",
+                  )}
                 >
+                  {selectable ? (
+                    <td
+                      role="gridcell"
+                      className={cn("ox-grid__td ox-grid__td--select", "ox-grid__pin")}
+                      style={pinStyle(0)}
+                    >
+                      <input
+                        type="checkbox"
+                        className="ox-grid__check"
+                        checked={selected.includes(key)}
+                        aria-label={
+                          identify
+                            ? `Select ${identify(row).primary}`
+                            : `Select row ${rowIndex + 1}`
+                        }
+                        onChange={() => onSelectionChange?.(toggleGridSelection(selected, key))}
+                      />
+                    </td>
+                  ) : null}
                   {columns.map((column, index) => {
                     const value = column.value(row);
                     const tab = current && cursor.column === index ? 0 : -1;
@@ -633,7 +826,9 @@ export function DataGrid<Row>({
                           "ox-grid__td",
                           ALIGN_CLASS[defaultAlign(column)].td,
                           column.kind && KIND_CLASS[column.kind],
+                          index < pinnedColumns && "ox-grid__pin",
                         )}
+                        style={pinStyle(index + (selectable ? 1 : 0))}
                       >
                         <Cell value={value} marks={marks}>
                           {column.cell?.(row)}
@@ -698,6 +893,64 @@ export function DataGrid<Row>({
             <p className="ox-grid__sorted">
               Sorted by a prediction — see note {marks.get(sortColumn.key) ?? 1}.
             </p>
+          ) : null}
+
+          {/*
+            The pager.
+
+            `nav` with its own name, because a grid can sit on a page with more
+            than one. Where the total is withheld it renders the position it
+            knows and no last page: inventing an end to a list a server refused
+            to count is the same failure as inventing the count.
+          */}
+          {page ? (
+            <nav className="ox-grid__pager" aria-label="Pages">
+              <span className="ox-grid__pagecount">{describeGridPage(page, coverage.total)}</span>
+              {(() => {
+                const count = gridPageCount(coverage.total, page.size);
+                const last = count === "unknown" ? Number.POSITIVE_INFINITY : count - 1;
+                return (
+                  <span className="ox-grid__pagebuttons">
+                    <button
+                      type="button"
+                      className="ox-grid__page"
+                      disabled={page.index === 0}
+                      aria-label="Previous page"
+                      onClick={() => onPageChange?.(page.index - 1)}
+                    >
+                      ‹
+                    </button>
+                    {gridPageWindow(page.index, count).map((entry, at) =>
+                      entry === "gap" ? (
+                        <span key={`gap-${at}`} className="ox-grid__pagegap" aria-hidden="true">
+                          …
+                        </span>
+                      ) : (
+                        <button
+                          key={entry}
+                          type="button"
+                          className="ox-grid__page"
+                          aria-current={entry === page.index ? "page" : undefined}
+                          aria-label={`Page ${entry + 1}`}
+                          onClick={() => onPageChange?.(entry)}
+                        >
+                          {entry + 1}
+                        </button>
+                      ),
+                    )}
+                    <button
+                      type="button"
+                      className="ox-grid__page"
+                      disabled={page.index >= last}
+                      aria-label="Next page"
+                      onClick={() => onPageChange?.(page.index + 1)}
+                    >
+                      ›
+                    </button>
+                  </span>
+                );
+              })()}
+            </nav>
           ) : null}
 
           {notes.length ? (

@@ -204,6 +204,59 @@ export const Everything: Story = {
   },
 };
 
+export const Selected: Story = {
+  name: "Selected, with the verbs that reach them",
+  parameters: { state: "Selected, with the verbs that reach them" },
+  args: {
+    selectedKeys: ["4471902", "3320145"],
+    onSelectionChange: () => {},
+    identify: (row: CaseloadRow) => ({ primary: row.name, secondary: `MRN ${row.mrn}` }),
+    bulkActions: () => (
+      <>
+        <button type="button">Assign clinician</button>
+        <button type="button">Schedule contact</button>
+      </>
+    ),
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const bar = canvas.getByRole("region", { name: "Selection actions" });
+    expect(bar.textContent).toContain("2 rows selected");
+
+    // Select-all covers the page, and says so. A checkbox that silently meant
+    // 312 rows nobody has looked at is how a bulk action reaches a chart.
+    expect(canvas.getByRole("checkbox", { name: /Select all 6 rows on this page/ })).toBeTruthy();
+    // And every row checkbox is named after its client, not its position.
+    expect(canvas.getByRole("checkbox", { name: "Select Adeyemi, R." })).toBeTruthy();
+  },
+};
+
+export const Pinned: Story = {
+  name: "Pinned identity, scrolled sideways",
+  parameters: { state: "Pinned identity, scrolled sideways" },
+  args: { pinnedColumns: 1, maxHeight: "18rem" },
+  play: async ({ canvasElement }) => {
+    // Scrolled right with no name in view, every row is the same row — which
+    // is the wrong-patient error with the grid holding the door open.
+    const pinned = canvasElement.querySelectorAll(".ox-grid__pin");
+    expect(pinned.length).toBeGreaterThan(0);
+  },
+};
+
+export const Paged: Story = {
+  name: "Paged, and paged past the end of what is known",
+  parameters: { state: "Paged, and paged past the end of what is known" },
+  args: { page: { index: 2, size: 50 }, onPageChange: () => {} },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const pager = canvas.getByRole("navigation", { name: "Pages" });
+    expect(pager.textContent).toContain("101–150 of 312");
+    expect(canvas.getByRole("button", { name: "Page 3" }).getAttribute("aria-current")).toBe(
+      "page",
+    );
+  },
+};
+
 export const Refused: Story = {
   name: "Too many rows to render honestly",
   parameters: { state: "Too many rows to render honestly" },

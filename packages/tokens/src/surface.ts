@@ -13,7 +13,7 @@
  * change, because customers style against these names. The manifest is
  * committed so that change shows up as a reviewable diff.
  *
- * 356 tokens across 31 components:
+ * 358 tokens across 31 components:
  *
  *   switch          55
  *   tabs            44
@@ -22,9 +22,9 @@
  *   datetime        27
  *   badge           16
  *   field           14
+ *   grid            13
  *   alert           12
  *   chart           11
- *   grid            11
  *   copilot         10
  *   loader          10
  *   recorder        10
@@ -1900,6 +1900,26 @@ export const TOKEN_SURFACE: readonly SurfaceEntry[] = [
     "source": "packages/react/src/styles.css",
     "kind": "color",
     "semantic": "--ox-accent",
+    "frameworks": [],
+    "fallback": true,
+    "bridgeable": true
+  },
+  {
+    "name": "--ox-grid-accent-bg",
+    "component": "grid",
+    "source": "packages/react/src/styles.css",
+    "kind": "color",
+    "semantic": "--ox-accent-subtle",
+    "frameworks": [],
+    "fallback": true,
+    "bridgeable": true
+  },
+  {
+    "name": "--ox-grid-accent-line",
+    "component": "grid",
+    "source": "packages/react/src/styles.css",
+    "kind": "color",
+    "semantic": "--ox-accent-border",
     "frameworks": [],
     "fallback": true,
     "bridgeable": true
@@ -3849,6 +3869,8 @@ export const BRIDGEABLE: readonly string[] = [
   "--ox-field-prefilled-border",
   "--ox-field-radius",
   "--ox-grid-accent",
+  "--ox-grid-accent-bg",
+  "--ox-grid-accent-line",
   "--ox-grid-font",
   "--ox-grid-ink",
   "--ox-grid-muted",

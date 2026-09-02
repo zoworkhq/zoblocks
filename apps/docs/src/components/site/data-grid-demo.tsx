@@ -1,35 +1,29 @@
 "use client";
 
 /**
- * The Data Grid, on the home page, arguing for itself.
+ * The Data Grid on the home page, as the screen it is actually part of.
  *
- * This is the shipped component — `registry/oxygen/data-grid` — inside an
- * instrument frame, with the four claims the section makes lit one at a time
- * against the part of the grid that carries each. Everything on screen is
- * produced by the same props a consumer passes. A marketing mock of a grid is
- * the easiest thing in the world to draw and proves nothing about whether it
- * was built.
+ * This is the shipped component — `registry/oxygen/data-grid` — inside the
+ * application chrome a caseload worklist has in a real product: saved views,
+ * filter state with counts, a search field, a density control, and a page
+ * header with the actions a supervisor reaches for. The nav, the views and the
+ * filters belong to the *host*; the grid owns coverage, held arrivals,
+ * selection, pinning, sorting, provenance and paging.
  *
- * **Nothing changes height, ever.** That is the design constraint, not a nice
- * property: the first version cycled the row count 6 → 8, gained and lost the
- * held-arrivals strip, and grew and shrank its footnote list — so the panel
- * jumped about ninety pixels four times a minute, which on a scrolling page is
- * indistinguishable from a rendering fault. It was also, precisely, the failure
- * the component exists to prevent, performed on the page arguing against it.
+ * That division is the point. The comparison an enterprise buyer makes is
+ * against AG Grid inside myAvatar or CareFabric, and what they check is
+ * whether the thing survives contact with a screen: does it have a selection
+ * model, does the identity column survive a sideways scroll, is the pager
+ * honest when the server withheld a total.
  *
- * So the loop moves only what a real worklist moves:
+ * Two earlier versions of this file were marketing figures — a table on a page
+ * with a cycling caption. The distinction that turned out to matter is
+ * decorative chrome versus functional chrome. A caption that cycles is
+ * decoration. A filter bar that says how many rows each predicate removed is
+ * the product.
  *
- *   · the row set is fixed at eight, and arrivals *update* rows rather than
- *     adding them, so the table's height is constant;
- *   · the grid is sorted by the derived column from the first paint, so the
- *     provenance line is always there rather than appearing on beat three;
- *   · results are always arriving, so the held strip is never absent — the
- *     count ticks 1 → 2 → 3, and admitting them re-orders rows that were
- *     already on screen;
- *   · the footnotes never change, because the two absences are never resolved.
- *
- * Nothing here takes focus, and the loop stops permanently the moment anybody
- * touches it.
+ * Nothing takes focus on load, and every control is real: the checkboxes drive
+ * the bulk bar, the headers sort, the pager pages.
  *
  * Data is synthetic — invented names, invented MRNs, portraits of people who
  * do not exist — per the standing rule that no PHI enters this repository.
@@ -43,94 +37,58 @@ import {
   type GridSort,
 } from "@/registry/oxygen/data-grid/data-grid";
 import {
-  CSSRS_ORDER,
-  DISENGAGEMENT,
   CASELOAD,
   CASELOAD_COVERAGE,
+  CSSRS_ORDER,
+  DISENGAGEMENT,
   phq9Band,
   type CaseloadRow,
 } from "@/registry/oxygen/data-grid/data-grid.fixtures";
 
 /**
- * What is lit, and the four words for it.
+ * Results waiting to come in.
  *
- * These were four paragraphs in a rail under the grid, which made the panel a
- * piece of marketing copy with a table in it. The component is the argument;
- * the label only has to name which part of it is currently ringed, so it is a
- * label. `part` is what lights up — the frame carries `data-part` and the
- * stylesheet rings the matching region.
+ * All three land on rows that already carry a score, so admitting them changes
+ * numbers and order without changing the row count or the footnote list — the
+ * constraint that keeps the panel from jumping while somebody is reading it.
  */
-const BEATS = [
-  { part: "coverage", label: "States its coverage" },
-  { part: "held", label: "Holds arriving results" },
-  { part: "derived", label: "Cites the model it sorted by" },
-  { part: "absence", label: "Says which kind of missing" },
-] as const;
+const HELD: readonly CaseloadRow[] = [
+  { ...CASELOAD[3]!, phq9: 21, previousPhq9: 18, risk: 0.74 },
+  { ...CASELOAD[0]!, phq9: 14, previousPhq9: 11, risk: 0.58 },
+  { ...CASELOAD[2]!, phq9: 5, previousPhq9: 7, risk: 0.33 },
+];
 
-const PATCHES = [
-  { mrn: "3320145", phq9: 21, previousPhq9: 18, risk: 0.74 },
-  { mrn: "5518203", phq9: 14, previousPhq9: 11, risk: 0.58 },
-  { mrn: "6690321", phq9: 5, previousPhq9: 7, risk: 0.33 },
-] as const;
+const SORT: GridSort = { key: "risk", direction: "descending" };
 
-/** The patches resolved against the ward, so `arrivals` is a row set like any other. */
-const HELD: readonly CaseloadRow[] = PATCHES.map((patch) => ({
-  ...CASELOAD.find((row) => row.mrn === patch.mrn)!,
-  ...patch,
-}));
+/* ------------------------------------------------------------------ */
+/* Cells                                                               */
+/* ------------------------------------------------------------------ */
 
-const HOLD = 4200;
-
-function usePrefersReducedMotion() {
-  const [reduced, setReduced] = React.useState(false);
-  React.useEffect(() => {
-    const query = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const read = () => setReduced(query.matches);
-    read();
-    query.addEventListener("change", read);
-    return () => query.removeEventListener("change", read);
-  }, []);
-  return reduced;
-}
-
-/**
- * The identity cell, composed by the caller.
- *
- * The grid renders whatever `cell` returns and holds no opinion about
- * photographs — the "the grid does not own the cells" claim, shown rather than
- * stated. The MRN sits under the name rather than in a column of its own: a
- * name is not an identifier, and the row somebody acts on has to carry both.
- */
-function Patient({ row }: { row: CaseloadRow }) {
+function Client({ row }: { row: CaseloadRow }) {
   return (
-    <span className="flex min-w-0 items-center gap-2.5">
-      <PatientPortrait src={row.photo} size={26} />
-      <span className="min-w-0">
-        <span className="block truncate font-medium leading-tight">{row.name}</span>
-        <span className="numeric block text-[0.625rem] leading-tight opacity-60">{row.mrn}</span>
+    <span className="oxw__id">
+      <PatientPortrait src={row.photo} size={30} />
+      <span className="oxw__idtext">
+        <b>{row.name}</b>
+        <span className="numeric">{row.mrn}</span>
       </span>
     </span>
   );
 }
 
 /**
- * The 24-hour move, beside the value rather than in a column of its own.
+ * The move since the last assessment, beside the score.
  *
- * A stable 5.9 and a climbing 5.9 are different patients, and a worklist that
- * shows only the latest value has left the reader to remember which. It sits
- * inline because as a column it was absent on half the rows — a row with no
- * current score has no delta either — and a column that is mostly the word
- * "Not recorded" is a column arguing against itself. Typographic rather than a
- * sparkline: this direction is a ledger, and a chart in a ruled column is a
- * different component.
+ * A stable 18 and a climbing 18 are different clients, and a worklist showing
+ * only the latest total has left the reader to remember which.
  */
-function Delta({ row }: { row: CaseloadRow }) {
+function Move({ row }: { row: CaseloadRow }) {
   if (typeof row.phq9 !== "number" || row.previousPhq9 === undefined) return null;
   const move = row.phq9 - row.previousPhq9;
   if (move === 0) return null;
   const rising = move > 0;
   return (
-    <span className={rising ? "oxdg__crit" : "opacity-55"}>
+    <span className={rising ? "oxw__up" : "oxw__down"}>
       <span aria-hidden="true">{rising ? "▲" : "▼"}</span>
       {Math.abs(move)}
       <span className="sr-only">
@@ -140,182 +98,257 @@ function Delta({ row }: { row: CaseloadRow }) {
   );
 }
 
+/** The C-SSRS result as a chip. The word carries it; the tint is the second cue. */
+function Screen({ row }: { row: CaseloadRow }) {
+  const value = row.cssrs;
+  if (typeof value !== "string") return null;
+  const tone = value === "Ideation with plan" ? "sev" : value === "None reported" ? "ok" : "mod";
+  return <span className={`oxw__chip oxw__chip--${tone}`}>{value}</span>;
+}
+
 const COLUMNS: DataGridColumn<CaseloadRow>[] = [
   {
     key: "name",
-    header: "Patient",
+    header: "Client",
     kind: "text",
     value: (row) => row.name,
-    cell: (row) => <Patient row={row} />,
+    width: "15rem",
+    cell: (row) => <Client row={row} />,
   },
-  // An identifier, not a number: 4W-07 does not sort as seven.
-  // A term from a small vocabulary, so it sorts by care intensity rather than
-  // alphabetically — ACT above PHP above IOP above Outpatient.
   {
     key: "program",
     header: "Program",
     kind: "status",
+    // Sorted by intensity of care rather than alphabetically.
     order: ["ACT", "PHP", "IOP", "Outpatient"],
     value: (row) => row.program,
-    width: "7rem",
+    width: "8rem",
+    cell: (row) => <span className="oxw__chip oxw__chip--plain">{row.program}</span>,
   },
   {
     key: "phq9",
     header: "PHQ-9",
     kind: "measure",
-    value: (row) => row.phq9,
     /*
-     * Left-aligned, though the sort is numeric.
+     * Left-aligned though the sort is numeric.
      *
-     * `align` is separate from `kind` for exactly this cell: the value carries
-     * a qualifier word beside it, and right-aligning the pair lines up the
-     * *words* while leaving the numbers ragged — which defeats the one thing a
-     * ruled column is for.
+     * The value carries a band word and a delta beside it, and right-aligning
+     * the group lines up the *words* while leaving the numbers ragged — which
+     * defeats the one thing a ruled column is for.
      */
     align: "start",
-    width: "11rem",
-    /*
-     * The qualifier is a word, and it is the caller's. The grid holds no
-     * reference ranges: a library that shipped one would be asserting a
-     * threshold somebody else's laboratory disagrees with. Only the critical
-     * value takes colour, and it keeps the word beside it — the site's rule is
-     * that status is never colour alone.
-     */
+    width: "10rem",
+    value: (row) => row.phq9,
     cell: (row) => {
-      const word = phq9Band(row.phq9);
+      const band = phq9Band(row.phq9);
       return (
-        <span className="inline-flex items-baseline gap-1.5">
-          <span className={word === "severe" ? "oxdg__crit font-semibold" : undefined}>
+        <span className="oxw__measure">
+          <span className={band === "severe" ? "oxw__score oxw__score--hot" : "oxw__score"}>
             {String(row.phq9)}
           </span>
-          {word ? <span className="text-[0.6875rem] opacity-65">{word}</span> : null}
-          <Delta row={row} />
+          <span className="oxw__band">{band}</span>
+          <Move row={row} />
         </span>
       );
     },
   },
-  /*
-   * The C-SSRS screen, sorted by the declared order rather than alphabetically.
-   *
-   * This is the column the domain turns on, and the one that makes `status`
-   * worth having as a kind: sorted A–Z, "None reported" lands above "Ideation
-   * with plan" because N precedes I, which is how a caseload list buries the
-   * row it was built to surface.
-   */
   {
     key: "cssrs",
     header: "Risk screen",
     kind: "status",
     order: CSSRS_ORDER,
     value: (row) => row.cssrs,
-    width: "11rem",
+    width: "12rem",
+    cell: (row) => <Screen row={row} />,
   },
   {
     key: "risk",
-    header: "Disengagement risk",
+    header: "Disengagement",
     kind: "number",
-    width: "10.5rem",
+    width: "10rem",
     value: (row) => row.risk,
     derived: DISENGAGEMENT,
-    cell: (row) => row.risk.toFixed(2),
+    cell: (row) => (
+      <span className="oxw__meter">
+        <span className="oxw__track" aria-hidden="true">
+          <span
+            className={row.risk >= 0.7 ? "oxw__fill oxw__fill--hot" : "oxw__fill"}
+            style={{ width: `${Math.round(row.risk * 100)}%` }}
+          />
+        </span>
+        <span className="numeric">{row.risk.toFixed(2)}</span>
+      </span>
+    ),
   },
-  { key: "due", header: "Next contact", kind: "instant", value: (row) => row.due, width: "8rem" },
-  // Always populated, deliberately. A queue that says what is owed and not who
-  // owes it is a list somebody else will action.
+  {
+    key: "due",
+    header: "Next contact",
+    kind: "instant",
+    align: "end",
+    width: "9rem",
+    value: (row) => row.due,
+    cell: (row) => (
+      <span className={row.due.startsWith("Today") ? "oxw__due oxw__due--now" : "oxw__due"}>
+        {row.due}
+      </span>
+    ),
+  },
+  {
+    key: "clinician",
+    header: "Clinician",
+    kind: "text",
+    width: "8.5rem",
+    value: (row) => row.clinician,
+  },
 ];
 
-/** Held results applied to the rows already on screen. Never adds one. */
-function apply(rows: readonly CaseloadRow[], arriving: readonly CaseloadRow[]): CaseloadRow[] {
-  const byMrn = new Map(arriving.map((row) => [row.mrn, row]));
-  return rows.map((row) => ({ ...row, ...(byMrn.get(row.mrn) ?? {}) }));
-}
+/** The saved views a team keeps, with the counts that make them worth keeping. */
+const VIEWS = [
+  { id: "mine", label: "My caseload", n: 42 },
+  { id: "team", label: "Team", n: 312 },
+  { id: "risk", label: "High risk", n: 23 },
+  { id: "overdue", label: "Overdue contact", n: 27 },
+  { id: "awaiting", label: "Awaiting assessment", n: 11 },
+] as const;
 
-const SORT: GridSort = { key: "risk", direction: "descending" };
+/** The active predicates. Each is removable, which is what makes them state. */
+const FILTERS = [
+  { id: "program", label: "Program", value: "IOP, PHP" },
+  { id: "phq9", label: "PHQ-9", value: "≥ 10" },
+  { id: "screen", label: "Risk screen", value: "last 14 days" },
+] as const;
+
+const DENSITIES = ["compact", "regular", "comfortable"] as const;
+const DENSITY_LABEL = { compact: "Compact", regular: "Standard", comfortable: "Comfortable" };
 
 export function DataGridDemo() {
-  const reduced = usePrefersReducedMotion();
-
   const [rows, setRows] = React.useState<readonly CaseloadRow[]>(CASELOAD);
-  const [waiting, setWaiting] = React.useState(1);
-  const [beat, setBeat] = React.useState(0);
-  /*
-   * Any contact stops the loop, permanently.
-   *
-   * Wiring this only to the sort and admit handlers left the worst version of
-   * it: a visitor clicks a cell to read the identity line, and four seconds
-   * later the grid re-sorts under their pointer.
-   */
-  const [taken, setTaken] = React.useState(false);
-  const take = React.useCallback(() => setTaken(true), []);
-
-  const admit = React.useCallback(() => {
-    setRows((current) => apply(current, HELD.slice(0, waiting)));
-    setWaiting(1);
-  }, [waiting]);
-
-  React.useEffect(() => {
-    // Reduced motion gets the composed frame, not a faster loop. SC 2.3.3: the
-    // movement conveys nothing this does not.
-    if (reduced || taken) return;
-    const timer = setInterval(() => {
-      setBeat((current) => (current + 1) % BEATS.length);
-      setWaiting((current) => {
-        if (current < HELD.length) return current + 1;
-        setRows((rowsNow) => apply(rowsNow, HELD));
-        return 1;
-      });
-    }, HOLD);
-    return () => clearInterval(timer);
-  }, [reduced, taken]);
-
-  const active = BEATS[beat]!;
+  const [held, setHeld] = React.useState<readonly CaseloadRow[]>(HELD);
+  const [selected, setSelected] = React.useState<readonly string[]>([]);
+  const [sort, setSort] = React.useState<GridSort | null>(SORT);
+  const [view, setView] = React.useState("team");
+  const [density, setDensity] = React.useState<(typeof DENSITIES)[number]>("regular");
+  const [page, setPage] = React.useState(0);
 
   return (
-    <figure className="oxdg" data-part={taken ? "none" : active.part}>
-      {/*
-        The bar carries the beat, so the panel needs no caption strip of its
-        own. What was here — `role="grid" · 8 rows · aria-rowcount 1439` — is
-        developer jargon on a marketing page, and the beat label is the thing a
-        reader actually needs: which part of the grid is currently ringed.
-      */}
-      <figcaption className="oxdg__bar">
-        <span className="oxdg__live" aria-hidden="true" />
-        <span className="oxdg__title">Caseload · adult outpatient</span>
-        <span className="oxdg__beat">
-          <span className="oxdg__beatnum numeric">{String(beat + 1).padStart(2, "0")}</span>
-          {taken ? "Yours now — arrow keys move the cursor" : active.label}
-        </span>
-      </figcaption>
+    <div className="oxw">
+      <header className="oxw__head">
+        <div className="oxw__headtext">
+          <h3 className="oxw__title">Caseload worklist</h3>
+          <p className="oxw__sub">Adult outpatient · Team 4 · updated 11:47</p>
+        </div>
+        <div className="oxw__headactions">
+          <button type="button" className="oxw__btn">
+            Columns
+          </button>
+          <button type="button" className="oxw__btn">
+            Export
+          </button>
+          <button type="button" className="oxw__btn oxw__btn--primary">
+            New contact note
+          </button>
+        </div>
+      </header>
 
       {/*
-        No theme forced.
+        Saved views: a group of buttons, not a tablist.
 
-        This was pinned to the dark token set, on the reasoning that the home
-        page's instrument slot is hardware rather than document. That reasoning
-        was wrong twice over: the site's own rule in globals.css is that a live
-        preview follows the page theme, and pinning it meant the theme toggle
-        did nothing to the one component on the page a visitor is looking at.
+        They look like tabs and they are not — `role="tablist"` promises
+        `tabpanel` children, and there are none: every view drives the same
+        grid below. axe rates that critical, correctly, because a screen reader
+        then tells somebody to look for panels that do not exist. A group with
+        `aria-current` says the true thing, which is that one of several
+        equivalent options is the one in force.
+
+        Still buttons rather than a dropdown: the counts are the point, and a
+        count nobody can see until they open a menu is a count nobody uses.
       */}
-      <div className="oxdg__stage" onPointerDownCapture={take}>
-        <DataGrid
-          caption="Clients on this team's caseload with a raised PHQ-9 or a recent risk screen"
-          title="PHQ-9 raised, or risk screened in 14 days"
-          columns={COLUMNS}
-          rows={rows}
-          rowKey={(row) => row.mrn}
-          coverage={{ ...CASELOAD_COVERAGE, asOf: undefined, shown: rows.length }}
-          arrivals={HELD.slice(0, waiting)}
-          arrivalsAt="11:47"
-          onAdmitArrivals={() => {
-            take();
-            admit();
-          }}
-          sort={SORT}
-          onSortChange={take}
-          identify={(row) => ({ primary: row.name, secondary: `MRN ${row.mrn}` })}
-          onRowActivate={take}
-        />
+      <div className="oxw__views" role="group" aria-label="Saved views">
+        {VIEWS.map((entry) => (
+          <button
+            key={entry.id}
+            type="button"
+            aria-current={view === entry.id ? "true" : undefined}
+            className="oxw__view"
+            onClick={() => setView(entry.id)}
+          >
+            {entry.label}
+            <span className="oxw__viewn numeric">{entry.n}</span>
+          </button>
+        ))}
+        <button type="button" className="oxw__save">
+          + Save this view
+        </button>
       </div>
-    </figure>
+
+      <div className="oxw__filters">
+        <span className="oxw__search">
+          <span aria-hidden="true">⌕</span> Search clients, MRN, clinician…
+        </span>
+        {FILTERS.map((filter) => (
+          <span key={filter.id} className="oxw__pill">
+            {filter.label} <b>{filter.value}</b>
+            <button type="button" aria-label={`Remove the ${filter.label} filter`}>
+              ×
+            </button>
+          </span>
+        ))}
+        <button type="button" className="oxw__btn oxw__btn--ghost">
+          + Filter
+        </button>
+        <div className="oxw__seg" role="group" aria-label="Row density">
+          {DENSITIES.map((entry) => (
+            <button
+              key={entry}
+              type="button"
+              aria-pressed={density === entry}
+              onClick={() => setDensity(entry)}
+            >
+              {DENSITY_LABEL[entry]}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <DataGrid
+        caption="Clients on this team's caseload with a raised PHQ-9 or a recent risk screen"
+        title="Caseload · adult outpatient"
+        columns={COLUMNS}
+        rows={rows}
+        rowKey={(row) => row.mrn}
+        coverage={{ ...CASELOAD_COVERAGE, shown: rows.length }}
+        // The identity column stays put while the measures scroll sideways.
+        pinnedColumns={1}
+        density={density}
+        sort={sort}
+        onSortChange={setSort}
+        selectedKeys={selected}
+        onSelectionChange={setSelected}
+        bulkActions={(picked) => (
+          <>
+            <button type="button" className="oxw__btn">
+              Assign clinician
+            </button>
+            <button type="button" className="oxw__btn">
+              Schedule contact
+            </button>
+            <button type="button" className="oxw__btn">
+              Export {picked.length}
+            </button>
+          </>
+        )}
+        arrivals={held}
+        arrivalsAt="11:47"
+        onAdmitArrivals={(arriving) => {
+          const byMrn = new Map(arriving.map((row) => [row.mrn, row]));
+          setRows((current) => current.map((row) => ({ ...row, ...(byMrn.get(row.mrn) ?? {}) })));
+          setHeld([]);
+        }}
+        identify={(row) => ({ primary: row.name, secondary: `MRN ${row.mrn}` })}
+        page={{ index: page, size: 50 }}
+        onPageChange={setPage}
+        onRowActivate={() => {}}
+      />
+    </div>
   );
 }

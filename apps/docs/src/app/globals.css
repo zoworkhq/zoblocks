@@ -122,9 +122,10 @@
    block cannot collide with the site around it. */
 @import "./blocks.css";
 
-/* The home page's Data Grid instrument: the bezel, the claims rail and the
-   highlight that ties each claim to the part of the grid carrying it.
-   Scoped under `.oxdg`, same containment as the blocks above. */
+/* The application chrome around the home page's Data Grid — page header, saved
+   views, filter pills, density control and the cells the demo supplies.
+   Scoped under `.oxw`, same containment as the blocks above. Nothing in it
+   restyles the component itself. */
 @import "./data-grid-demo.css";
 
 /* The Pro page: glance stages, the feature browser and the tier table.

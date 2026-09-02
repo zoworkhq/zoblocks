@@ -1,243 +1,480 @@
 /**
- * The home page's Data Grid instrument.
+ * The application chrome around the home page's Data Grid.
  *
- * Scoped under `.oxdg`, so the plain class names inside cannot collide with the
- * site around them — the same containment `blocks.css` uses.
+ * Scoped under `.oxw` — the same containment `blocks.css` uses, so the plain
+ * class names inside cannot collide with the site around them.
  *
- * It follows the page. The first version pinned the stage to the dark token set
- * on the reasoning that this slot is hardware rather than document — which was
- * wrong twice: globals.css states outright that a live preview follows the page
- * theme, and pinning it meant the site's own light/dark toggle did nothing to
- * the one component a visitor on the home page is actually looking at.
+ * Everything here belongs to the *host*, not to the component: the page
+ * header, the saved views, the filter pills, the density control, and the cell
+ * renderers the demo passes in. The grid supplies coverage, held arrivals,
+ * selection, pinning, sorting, provenance and paging, and nothing in this file
+ * restyles any of it. A marketing page that repaints the component it is
+ * selling is showing something the customer cannot install.
  *
- * Nothing here restyles the grid. A marketing page that repaints the component
- * it is selling is showing something the customer cannot install; the frame
- * supplies a bezel and a highlight, and stops.
- *
- * Two rules earn their place:
- *
- *   **Nothing here changes height.** The demo's loop is deliberately confined to
- *   colour and content — a row count, a footnote list or a strip that came and
- *   went made the panel jump ninety pixels four times a minute, which reads as a
- *   fault rather than as life.
- *
- *   **The highlight is a ring, not a dimming.** Fading the rest of the grid to
- *   point at one part would make seven-eighths of a clinical worklist
- *   deliberately hard to read, on a page whose argument is that worklists should
- *   be legible.
+ * The division is the argument. What a buyer comparing this against AG Grid
+ * inside myAvatar wants to know is which half they would have to build, and
+ * the honest answer is: this file.
  */
 
-.oxdg {
-  /* The site's own surface set, so the frame turns over with the page. */
-  --oxdg-bezel: var(--color-paper);
-  --oxdg-rule: var(--color-rule);
-  --oxdg-fg: var(--color-ink);
-  --oxdg-muted: var(--color-graphite);
-  --oxdg-trace: var(--color-oxygen-deep);
+.oxw {
+  --oxw-line: var(--color-rule);
+  --oxw-line-strong: var(--color-rule-strong);
+  --oxw-ink: var(--color-ink);
+  --oxw-ink-2: var(--color-graphite);
+  --oxw-ink-3: var(--color-graphite-soft);
+  --oxw-surface: var(--color-paper);
+  --oxw-sunk: var(--color-paper-sunk);
+  --oxw-accent: var(--color-oxygen-deep);
+  --oxw-accent-bg: color-mix(in srgb, var(--color-oxygen) 10%, transparent);
+  --oxw-accent-line: color-mix(in srgb, var(--color-oxygen) 34%, transparent);
+  --oxw-danger: var(--color-critical);
   /*
-   * Critical, from the site's own pair.
+   * Critical, on a tint of critical.
    *
-   * `--color-critical` is #dc2626 on paper and #fb7185 under `.dark`, which is
-   * exactly the split this needs now the panel turns over with the page. It was
-   * a literal while the panel was pinned dark, and a literal here would now be
-   * unreadable in one of the two themes rather than in neither.
+   * `--color-critical` is #dc2626, chosen to be read on paper. Inside the
+   * severity chip it sits on a 12% wash of itself and measures 3.6:1, which
+   * axe caught on five nodes. This is the same hue taken darker so the word
+   * inside the chip clears 4.5:1 — and the word is what carries the meaning,
+   * so it is the thing that has to be readable.
    */
-  --oxdg-critical: var(--color-critical);
+  --oxw-danger-ink: #8f1d14;
+  /* Same problem, same fix: --color-electric on a wash of itself measured
+     4.48:1 against a 4.5 floor. Two hundredths is still a failure. */
+  --oxw-info-ink: #07596a;
 
-  margin: 0;
-  border-radius: 1.25rem;
-  background: var(--oxdg-bezel);
-  border: 1px solid var(--oxdg-rule);
+  border: 1px solid var(--oxw-line);
+  border-radius: 12px;
+  background: var(--oxw-surface);
   box-shadow:
     0 1px 2px -1px rgb(2 20 17 / 0.05),
-    0 24px 60px -32px rgb(2 20 17 / 0.28);
+    0 22px 56px -30px rgb(2 20 17 / 0.24);
   overflow: hidden;
 }
 
-/* ---------------------------------------------------------------- */
-/* Chrome                                                            */
-/* ---------------------------------------------------------------- */
-
-.oxdg__bar {
-  display: flex;
-  align-items: center;
-  gap: 0.65rem;
-  padding: 0.7rem 1.15rem;
-  border-block-end: 1px solid var(--oxdg-rule);
-  font-family: var(--font-mono);
-  font-size: 0.6875rem;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--oxdg-muted);
-}
-
-.oxdg__live {
-  inline-size: 0.375rem;
-  block-size: 0.375rem;
-  border-radius: 50%;
-  background: var(--oxdg-trace);
-  box-shadow: 0 0 0 0 color-mix(in srgb, var(--oxdg-trace) 55%, transparent);
-  animation: oxdg-pulse 2.4s ease-out infinite;
-}
-
-@keyframes oxdg-pulse {
-  70% {
-    box-shadow: 0 0 0 0.4rem color-mix(in srgb, var(--oxdg-trace) 0%, transparent);
-  }
-  100% {
-    box-shadow: 0 0 0 0 color-mix(in srgb, var(--oxdg-trace) 0%, transparent);
-  }
-}
-
-.oxdg__title {
-  color: var(--oxdg-fg);
-  font-weight: 600;
-}
-
-.oxdg__meta {
-  margin-inline-start: auto;
-  font-size: 0.625rem;
-  letter-spacing: 0.08em;
-  text-transform: none;
-}
-
-@media (max-width: 40rem) {
-  .oxdg__meta {
-    display: none;
-  }
-}
-
-/* ---------------------------------------------------------------- */
-/* The stage                                                         */
-/* ---------------------------------------------------------------- */
-
-/*
- * The component keeps its own border and radius; the bezel supplies the frame,
- * so the stage removes the doubled edge rather than nesting two boxes.
- */
-.oxdg__stage .ox-grid {
+/* The component sits inside the frame, so it drops its own edge rather than
+   nesting two boxes with two radii. */
+.oxw .ox-grid {
   border: 0;
   border-radius: 0;
   background: transparent;
 }
 
-.oxdg__stage .ox-grid__masthead,
-.oxdg__stage .ox-grid__foot {
-  border-color: var(--oxdg-rule);
+/* ---------------------------------------------------------------- */
+/* Page header                                                       */
+/* ---------------------------------------------------------------- */
+
+.oxw__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 0.75rem 1rem;
+  padding: 0.9rem 1.1rem 0.8rem;
+  border-block-end: 1px solid var(--oxw-line);
+}
+
+.oxw__headtext {
+  min-width: 0;
+}
+
+.oxw__title {
+  margin: 0;
+  font-size: 1.0625rem;
+  font-weight: 650;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.oxw__sub {
+  margin: 0.2rem 0 0;
+  font-size: 0.78125rem;
+  color: var(--oxw-ink-3);
+}
+
+.oxw__headactions {
+  margin-inline-start: auto;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
 }
 
 /* ---------------------------------------------------------------- */
-/* The highlight                                                     */
+/* Buttons                                                           */
+/* ---------------------------------------------------------------- */
+
+.oxw__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  /* 30px: comfortably past SC 2.5.8's 24px floor without becoming the
+     thumb-sized target that made every header in this component too tall. */
+  min-block-size: 1.875rem;
+  padding-inline: 0.65rem;
+  border: 1px solid var(--oxw-line-strong);
+  border-radius: 6px;
+  background: var(--oxw-surface);
+  color: var(--oxw-ink-2);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.oxw__btn:hover {
+  background: var(--oxw-sunk);
+  color: var(--oxw-ink);
+}
+
+.oxw__btn--primary {
+  border-color: var(--color-cta);
+  background: var(--color-cta);
+  color: var(--color-paper);
+}
+
+.oxw__btn--primary:hover {
+  border-color: var(--color-cta-hover);
+  background: var(--color-cta-hover);
+  color: var(--color-paper);
+}
+
+.oxw__btn--ghost {
+  border-color: transparent;
+  background: none;
+  color: var(--oxw-accent);
+}
+
+.oxw__btn--ghost:hover {
+  background: var(--oxw-accent-bg);
+}
+
+/* ---------------------------------------------------------------- */
+/* Saved views                                                       */
+/* ---------------------------------------------------------------- */
+
+.oxw__views {
+  display: flex;
+  align-items: stretch;
+  gap: 0.1rem;
+  padding-inline: 1.1rem;
+  border-block-end: 1px solid var(--oxw-line);
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+
+.oxw__view {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.55rem 0.6rem;
+  border: 0;
+  /* Drawn inside so selecting a view moves nothing. */
+  border-block-end: 2px solid transparent;
+  margin-block-end: -1px;
+  background: none;
+  color: var(--oxw-ink-3);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.oxw__view:hover {
+  color: var(--oxw-ink);
+}
+
+.oxw__view[aria-current="true"] {
+  color: var(--oxw-ink);
+  border-block-end-color: var(--oxw-accent);
+  font-weight: 600;
+}
+
+.oxw__viewn {
+  font-size: 0.6875rem;
+  color: var(--oxw-ink-3);
+}
+
+.oxw__save {
+  margin-inline-start: auto;
+  align-self: center;
+  border: 0;
+  background: none;
+  color: var(--oxw-accent);
+  font-size: 0.78125rem;
+  font-weight: 500;
+  white-space: nowrap;
+  padding: 0.35rem 0.4rem;
+  cursor: pointer;
+}
+
+/* ---------------------------------------------------------------- */
+/* Filter state                                                      */
 /* ---------------------------------------------------------------- */
 
 /*
- * One claim at a time, and each lands on its own evidence.
+ * The predicates, as removable objects.
  *
- * Ringed from the inside, never bordered: a 2px border on the masthead would
- * move every row below it down by two, and a demo that shifts while explaining
- * that it does not shift is worse than no demo. `box-shadow` and
- * `background-color` are the only two properties touched here for that reason.
- *
- * The first version pointed both the provenance claim and the absence claim at
- * the footnote block, because that is where both are written down. It read as
- * one highlight blinking twice. They now point at the thing each is *about* —
- * the sorted column and the sorted line for one, the absent cells for the other
- * — which is the difference between citing a footnote and showing the fact.
+ * This is the half of the screen the coverage line is *about*: the grid says
+ * six of 312, and these say which three rules removed the rest. A filter
+ * summarised as "3 filters applied" leaves a reader who inherited the screen
+ * unable to tell what they are looking at.
  */
-.oxdg__stage .ox-grid__masthead,
-.oxdg__stage .ox-grid__held,
-.oxdg__stage .ox-grid__sorted,
-.oxdg__stage .ox-grid__th,
-.oxdg__stage .ox-grid__absent {
-  transition:
-    box-shadow 0.5s var(--ease-out-expo),
-    background-color 0.5s var(--ease-out-expo),
-    color 0.5s var(--ease-out-expo);
+.oxw__filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.55rem 1.1rem;
+  border-block-end: 1px solid var(--oxw-line);
+  background: var(--oxw-sunk);
 }
 
-.oxdg[data-part="coverage"] .ox-grid__masthead,
-.oxdg[data-part="held"] .ox-grid__held {
-  background: color-mix(in srgb, var(--oxdg-trace) 11%, transparent);
-  box-shadow: inset 3px 0 0 var(--oxdg-trace);
+.oxw__search {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-block-size: 1.875rem;
+  min-inline-size: 15rem;
+  padding-inline: 0.6rem;
+  border: 1px solid var(--oxw-line-strong);
+  border-radius: 6px;
+  background: var(--oxw-surface);
+  color: var(--oxw-ink-3);
+  font-size: 0.8125rem;
 }
 
-/* Provenance: the column that was sorted, and the line that declares it. */
-.oxdg[data-part="derived"] .ox-grid__sorted {
-  background: color-mix(in srgb, var(--oxdg-trace) 11%, transparent);
-  border-inline-start-color: var(--oxdg-trace);
+.oxw__pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  min-block-size: 1.625rem;
+  padding-inline: 0.55rem 0.2rem;
+  border: 1px solid var(--oxw-accent-line);
+  border-radius: 999px;
+  background: var(--oxw-accent-bg);
+  color: var(--oxw-accent);
+  font-size: 0.75rem;
 }
 
-.oxdg[data-part="derived"] .ox-grid__th--sorted {
-  background: color-mix(in srgb, var(--oxdg-trace) 9%, transparent);
+.oxw__pill b {
+  font-weight: 600;
 }
 
-.oxdg[data-part="derived"] .ox-grid__th--sorted .ox-grid__sort {
-  color: var(--oxdg-trace);
+.oxw__pill button {
+  min-inline-size: 1.125rem;
+  min-block-size: 1.125rem;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  color: inherit;
+  opacity: 0.65;
+  font-size: 0.875rem;
+  line-height: 1;
+  cursor: pointer;
 }
 
-/*
- * Absence: the words themselves.
- *
- * The ring is a spread shadow rather than padding, so picking a cell out cannot
- * change the width of the column it sits in.
- */
-.oxdg[data-part="absence"] .ox-grid__absent {
-  color: var(--oxdg-trace);
-  background: color-mix(in srgb, var(--oxdg-trace) 13%, transparent);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--oxdg-trace) 13%, transparent);
-  border-radius: 2px;
+.oxw__pill button:hover {
+  opacity: 1;
+  background: color-mix(in srgb, currentColor 14%, transparent);
+}
+
+.oxw__seg {
+  margin-inline-start: auto;
+  display: inline-flex;
+  border: 1px solid var(--oxw-line-strong);
+  border-radius: 6px;
+  overflow: hidden;
+  background: var(--oxw-surface);
+}
+
+.oxw__seg button {
+  min-block-size: 1.75rem;
+  padding-inline: 0.55rem;
+  border: 0;
+  background: none;
+  color: var(--oxw-ink-3);
+  font-size: 0.75rem;
+  cursor: pointer;
+}
+
+.oxw__seg button + button {
+  border-inline-start: 1px solid var(--oxw-line);
+}
+
+.oxw__seg button[aria-pressed="true"] {
+  background: var(--oxw-sunk);
+  color: var(--oxw-ink);
+  font-weight: 600;
 }
 
 /* ---------------------------------------------------------------- */
-/* The beat caption                                                  */
+/* Cells the demo supplies                                           */
 /* ---------------------------------------------------------------- */
 
-/*
- * One line, one height, forever.
- *
- * It replaces a four-column rail of prose. The rail explained the component in
- * paragraphs beneath the component, which is the shape of a brochure rather
- * than of a demo — and the thing being sold here is legible on its own. All
- * this has to do is name which region is currently ringed.
- *
- * `nowrap` and a fixed block size are not tidiness: the label changes every few
- * seconds, and a caption that wrapped to two lines at some viewport width would
- * reintroduce the exact shifting this panel was rebuilt to remove.
- */
-.oxdg__beat {
+.oxw__id {
   display: flex;
   align-items: center;
-  gap: 0.7rem;
-  margin: 0;
-  block-size: 2.5rem;
-  padding-inline: 1.15rem;
-  border-block-start: 1px solid var(--oxdg-rule);
+  gap: 0.55rem;
+  min-width: 0;
+}
+
+.oxw__idtext {
+  min-width: 0;
+}
+
+.oxw__idtext b {
+  display: block;
+  font-weight: 600;
+  line-height: 1.25;
+  white-space: nowrap;
+}
+
+.oxw__idtext span {
+  display: block;
+  font-size: 0.625rem;
+  line-height: 1.3;
+  color: var(--oxw-ink-3);
+}
+
+.oxw__measure {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.3rem;
+}
+
+.oxw__score {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 0.9375rem;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+}
+
+/* The one colour in the grid, and it never travels alone — the band word sits
+   beside it, so the meaning survives grayscale and forced colours. */
+.oxw__score--hot {
+  color: var(--oxw-danger-ink);
+}
+
+.oxw__band {
+  font-size: 0.6875rem;
+  color: var(--oxw-ink-3);
+}
+
+.oxw__up,
+.oxw__down {
   font-family: var(--font-mono);
   font-size: 0.6875rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
+}
+
+.oxw__up {
+  color: var(--oxw-danger-ink);
+}
+
+.oxw__down {
+  color: var(--oxw-ink-3);
+}
+
+.oxw__chip {
+  display: inline-flex;
+  align-items: center;
+  min-block-size: 1.25rem;
+  padding-inline: 0.4rem;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  font-size: 0.6875rem;
+  font-weight: 600;
   white-space: nowrap;
+}
+
+.oxw__chip--sev {
+  background: color-mix(in srgb, var(--color-critical) 12%, transparent);
+  border-color: color-mix(in srgb, var(--color-critical) 30%, transparent);
+  color: var(--oxw-danger-ink);
+}
+
+.oxw__chip--mod {
+  background: color-mix(in srgb, var(--color-electric) 12%, transparent);
+  color: var(--oxw-info-ink);
+}
+
+.oxw__chip--ok,
+.oxw__chip--plain {
+  background: var(--oxw-sunk);
+  color: var(--oxw-ink-2);
+  font-weight: 500;
+}
+
+.oxw__meter {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  justify-content: flex-end;
+  inline-size: 100%;
+}
+
+.oxw__track {
+  flex: none;
+  inline-size: 2.75rem;
+  block-size: 4px;
+  border-radius: 2px;
+  background: var(--oxw-line);
   overflow: hidden;
 }
 
-.oxdg__beatnum {
-  color: var(--oxdg-trace);
+.oxw__fill {
+  display: block;
+  block-size: 100%;
+  border-radius: 2px;
+  background: var(--oxw-accent);
 }
 
-.oxdg__beatlabel {
-  color: var(--oxdg-muted);
-  overflow: hidden;
-  text-overflow: ellipsis;
+.oxw__fill--hot {
+  background: var(--oxw-danger);
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .oxdg__live {
-    animation: none;
+.oxw__due--now {
+  color: var(--oxw-danger-ink);
+  font-weight: 600;
+}
+
+/* ---------------------------------------------------------------- */
+/* Focus                                                             */
+/* ---------------------------------------------------------------- */
+
+.oxw__btn:focus-visible,
+.oxw__view:focus-visible,
+.oxw__save:focus-visible,
+.oxw__pill button:focus-visible,
+.oxw__seg button:focus-visible {
+  outline: 2px solid var(--color-oxygen);
+  outline-offset: 2px;
+}
+
+@media (max-width: 46rem) {
+  .oxw__seg {
+    margin-inline-start: 0;
+  }
+}
+
+@media (forced-colors: active) {
+  .oxw__chip,
+  .oxw__pill,
+  .oxw__btn {
+    border: 1px solid CanvasText;
   }
 
-  .oxdg *,
-  .oxdg::before,
-  .oxdg::after {
-    transition-duration: 0.01ms !important;
+  .oxw__track {
+    border: 1px solid CanvasText;
   }
+}
+
+/* The luminous red on dark grounds, and the AAA one under high contrast. The
+   panel follows the page, so the pair has to follow it too. */
+.dark .oxw {
+  --oxw-danger-ink: #ffa8b4;
+  --oxw-info-ink: #9ddcf5;
+}
+
+[data-ox-theme="high-contrast"] .oxw {
+  --oxw-danger-ink: #8c0000;
+  --oxw-info-ink: #003d52;
 }
