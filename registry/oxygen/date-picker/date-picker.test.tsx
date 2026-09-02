@@ -1,7 +1,7 @@
 /**
  * DatePicker — behaviour, asserted the way a reader or a screen reader gets it.
  *
- * Fourteen variants over one value space, so the weight here is on the parts
+ * Sixteen variants over one value space, so the weight here is on the parts
  * of the contract that have to hold identically across all of them: one tab
  * stop per field, one roving tabstop per grid, three message tiers with three
  * ARIA treatments, and a value that is never guessed at.

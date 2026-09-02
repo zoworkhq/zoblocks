@@ -126,6 +126,10 @@
    Scoped under `.oxp`. */
 @import "./pro.css";
 
+/* The Pro holding page. Independent of pro.css, so restoring the console
+   page is a change in one file rather than an untangling in two. */
+@import "./pro-soon.css";
+
 /* ===========================================================================
  * oxygenui.design — site design layer
  *
@@ -204,10 +208,25 @@
   --site-rule-strong: #c3d0cc;
 
   --site-ink: #08110f;
-  --site-graphite: #5a6b67;
-  /* Was #8b9c98 at 2.65:1 on paper — below the 4.5:1 AA floor, and it was
-     used for the footer's legal limitation statement. */
-  --site-graphite-soft: #5c6d68;
+  /* Was #5a6b67, which cleared the floor on paper (5.32:1) and nowhere else.
+     It is also `--color-panel-muted` inside a light preview, and previews tint
+     their cards: on an 8% accent wash it measured 4.502:1 — passing by two
+     thousandths, which is not passing, it is a coin that landed the right way
+     up. On the 12% wash and the 10% critical wash the same token measures
+     4.18:1 and 4.27:1, already under AA and unaudited only because no page axe
+     visits happens to put a word on those two grounds today.
+
+     A muted tone gated against bare paper is gated against the one surface it
+     is least likely to be read on. #4d5e59 clears 5:1 on all four — paper,
+     sunk, and both washes — and stays plainly lighter than `--site-ink`. */
+  --site-graphite: #4d5e59;
+  /* Was #8b9c98 at 2.65:1 on paper — below the 4.5:1 AA floor, and it was used
+     for the footer's legal limitation statement. Then #5c6d68, which cleared
+     paper at 5.17:1 and measured 4.32:1 and 4.06:1 on the two accent washes —
+     the same one-ground gating as `--site-graphite`, and already under AA on
+     any tinted card it happened to land on. Moved with it, and kept the lighter
+     of the two so the soft step stays the soft one. */
+  --site-graphite-soft: #51625d;
 
   --site-oxygen: #10b995;
   /* Accent used on text. Deep here for contrast on paper; bright in dark. */
@@ -241,6 +260,24 @@
      using it there is the fastest way to make this look generic. */
   --site-trace: #2dd4b0;
   --site-critical-lum: #fb7185;
+
+  /* The text-grade steps of the two panel hues, for when a panel is showing on
+     a light ground.
+
+     Same split as `--site-oxygen` (the mark) and `--site-accent-text` (the
+     word): a tone that reads on a surface is not automatically a tone that
+     reads as a letterform on it. These exist because the panels tint their own
+     chips — a status pill is `text-X` on a 10–15% wash of X — and a wash of the
+     foreground is the one background that moves toward it as the type gets
+     darker. `--site-critical` measured 3.89:1 as the hero's "Critical high"
+     pill and 4.30:1 as a data-grid reading; `--site-accent-text` measured
+     4.44:1 as the selected tab in the signature demo. All three are the same
+     mistake, which is why the answer is two tokens rather than three patches.
+
+     brand.800 and red.700: 6.11:1 and 5.22:1 on their own washes, and 7.38:1
+     and 6.12:1 on bare paper. */
+  --site-trace-text: #0a5d4f;
+  --site-critical-text: #b91c1c;
 
   color-scheme: light;
 }
@@ -286,6 +323,13 @@
   --site-panel-muted: #96a3b3;
   --site-trace: #2dd4b0;
   --site-critical-lum: #fb7185;
+
+  /* Dark never puts a panel on a light ground, so the text-grade steps are the
+     luminous ones. Declared rather than omitted: the palettes are read side by
+     side, and a token that exists in two of three themes reads as an oversight
+     even when the third genuinely has no use for it. */
+  --site-trace-text: #2dd4b0;
+  --site-critical-text: #fb7185;
 
   color-scheme: dark;
 }
@@ -334,6 +378,13 @@
   --site-panel-muted: #d6d6d6;
   --site-trace: #7ef0e0;
   --site-critical-lum: #ff9aa8;
+
+  /* This theme is light, so the panels that follow the page get the deep steps
+     it already defines rather than new ones — a fourth green and a fourth red
+     invented for one chip is how a high-contrast palette stops being a palette.
+     Both clear 7:1 on their own washes. */
+  --site-trace-text: var(--site-accent-text);
+  --site-critical-text: var(--site-critical);
 
   color-scheme: light;
 }
@@ -1202,8 +1253,8 @@ html:not(.dark) .signal-field {
   --color-panel-rule: var(--site-rule);
   --color-panel-fg: var(--site-ink);
   --color-panel-muted: var(--site-graphite);
-  --color-trace: var(--site-accent-text);
-  --color-critical-lum: var(--site-critical);
+  --color-trace: var(--site-trace-text);
+  --color-critical-lum: var(--site-critical-text);
   background: var(--color-panel);
   border-color: var(--color-panel-rule);
   box-shadow:
@@ -1427,6 +1478,43 @@ html:not(.dark) .signal-status {
   overflow: hidden;
 }
 
+/*
+ * The document's text tokens, re-pointed at the panel family.
+ *
+ * A bare `.instrument` is dark in all three themes — that is the point of it —
+ * so `text-ink` and `text-graphite-soft` inside one are the page's colours on a
+ * ground the page never has. It only looked fine in dark, where the document is
+ * dark too, and that coincidence is what kept it: on the light home page the
+ * closing CTA's paragraph measured 3.50:1 and the `oxygen init` code inside it
+ * measured 1:1 — near-black on near-black, invisible rather than merely dim, and
+ * reported by axe as `incomplete` because the trace behind it obscures the
+ * sample. High contrast was the loudest at 1.66:1 but the least surprising: the
+ * theme simply has no dark-on-dark tone to fall back to.
+ *
+ * Mapping the tokens is what fixes the class. Rewriting the two call sites to
+ * `text-panel-muted` would fix this instrument and leave the next one to be
+ * discovered the same way, because nothing about `text-graphite-soft` announces
+ * that it means "on paper".
+ *
+ * Both spellings, as the `.instrument-demo` block above already does. `@theme
+ * inline` compiles `text-graphite-soft` down to `color: var(--site-graphite-
+ * soft)` — the `--site-*` name is the one a utility actually reads, and setting
+ * only `--color-*` here changed nothing at all — while the hand-written rules in
+ * this file reach for `--color-*`. Miss either and half the subtree re-themes.
+ *
+ * `:not(.instrument-demo)` because a demo re-points the panel at the page
+ * instead: there the document tokens are already the right ones, and the two
+ * mappings would otherwise define each other.
+ */
+.instrument:not(.instrument-demo) {
+  --color-ink: var(--site-panel-fg);
+  --color-graphite: var(--site-panel-muted);
+  --color-graphite-soft: var(--site-panel-muted);
+  --site-ink: var(--site-panel-fg);
+  --site-graphite: var(--site-panel-muted);
+  --site-graphite-soft: var(--site-panel-muted);
+}
+
 /* Component demos follow the page theme. The dark instrument treatment is
    still reserved for the closing CTA and other deliberate contrast moments;
    live component previews should never look dark on a light page. */
@@ -1436,15 +1524,15 @@ html:not(.dark) .instrument-demo {
   --color-panel-rule: var(--site-rule);
   --color-panel-fg: var(--site-ink);
   --color-panel-muted: var(--site-graphite);
-  --color-trace: var(--site-accent-text);
-  --color-critical-lum: var(--site-critical);
+  --color-trace: var(--site-trace-text);
+  --color-critical-lum: var(--site-critical-text);
   --site-panel: var(--site-paper-sunk);
   --site-panel-raised: var(--site-paper);
   --site-panel-rule: var(--site-rule);
   --site-panel-fg: var(--site-ink);
   --site-panel-muted: var(--site-graphite);
-  --site-trace: var(--site-accent-text);
-  --site-critical-lum: var(--site-critical);
+  --site-trace: var(--site-trace-text);
+  --site-critical-lum: var(--site-critical-text);
   border-color: var(--color-panel-rule);
   box-shadow:
     0 0 0 1px rgb(255 255 255 / 0.75) inset,

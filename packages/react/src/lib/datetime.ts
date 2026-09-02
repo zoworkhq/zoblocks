@@ -1079,18 +1079,45 @@ interface ZonedFields {
   s: number;
 }
 
+/**
+ * One formatter per zone, kept for the life of the module.
+ *
+ * `new Intl.DateTimeFormat(...)` resolves locale and time-zone data on every
+ * construction, and it dominated everything else in here. A single
+ * `zoneOffsetMinutes` probes three instants and then round-trips each one, so
+ * it built a handful of formatters per call — and a caller that walks a range
+ * built one per day per probe. Sweeping a decade across four zones took four
+ * seconds on an idle machine and twenty-two on a loaded one, which is a
+ * component that stutters whenever a picker crosses a month in a zone that is
+ * not the reader's own.
+ *
+ * A formatter is immutable and there are only as many as there are zones a
+ * session touches, so keeping them costs nothing. Construction stays inside
+ * `fieldsInZone`'s `try`: an invalid zone throws here exactly as it did
+ * before, and is never cached.
+ */
+const ZONE_FORMATTERS = new Map<string, Intl.DateTimeFormat>();
+
+function zoneFormatter(zone: string): Intl.DateTimeFormat {
+  const cached = ZONE_FORMATTERS.get(zone);
+  if (cached) return cached;
+  const made = new Intl.DateTimeFormat("en-US", {
+    timeZone: zone,
+    hour12: false,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+  });
+  ZONE_FORMATTERS.set(zone, made);
+  return made;
+}
+
 function fieldsInZone(zone: string, epochMs: number): ZonedFields | null {
   try {
-    const parts = new Intl.DateTimeFormat("en-US", {
-      timeZone: zone,
-      hour12: false,
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
-    }).formatToParts(new Date(epochMs));
+    const parts = zoneFormatter(zone).formatToParts(new Date(epochMs));
 
     const read = (type: string) => {
       const found = parts.find((part) => part.type === type);

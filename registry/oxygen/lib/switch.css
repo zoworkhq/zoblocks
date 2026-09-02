@@ -490,8 +490,23 @@
 .ox-switch[data-ox-state="on"] .ox-switch__state {
   color: var(--ox-switch-state-on-fg);
 }
+/*
+ * The state label is a word on the page's own ground, not a chip on a tint.
+ *
+ * It read `--ox-switch-segment-unasked-fg`, which is `--ox-status-unknown` — a
+ * token the build gates only against `status.unknown-bg`, where it measures
+ * 4.55:1 in light. Nothing had ever measured it as bare text, and as bare text
+ * it is thin: 4.76:1 on `--ox-bg`, and 4.24:1 on the slightly sunk ground the
+ * docs preview it against, which is where axe caught "Not assessed" failing AA.
+ *
+ * So the hue keeps the two surfaces it was measured on — the unasked segment
+ * cell and the lapsed `until` pill — and the label joins every other state
+ * label on `--ox-switch-state-fg` (`--ox-text-muted`, gated 7.24:1 at worst).
+ * Nothing is lost by it: the word says "Not assessed", and this system holds
+ * that status is never carried by colour alone.
+ */
 .ox-switch[data-ox-state="unknown"] .ox-switch__state {
-  color: var(--ox-switch-segment-unasked-fg);
+  color: var(--ox-switch-state-fg);
 }
 .ox-switch__desc {
   font-size: var(--ox-switch-state-font);

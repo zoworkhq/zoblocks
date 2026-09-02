@@ -132,11 +132,19 @@ import {
   Calendar,
   ClinicalDateTime,
   DateField,
+  DateRangeField,
   SessionTimeField,
   TimeField,
+  TimeRangeField,
   timeGrid,
 } from "@/registry/oxygen/date-picker/date-picker";
-import { plainDate, plainTime, sessionFrom, withSessionEnd } from "@/lib/oxygen-datetime";
+import {
+  dateRangePresets,
+  plainDate,
+  plainTime,
+  sessionFrom,
+  withSessionEnd,
+} from "@/lib/oxygen-datetime";
 type Density = "patient" | "standard" | "clinical";
 
 /**
@@ -227,6 +235,31 @@ function AdvancingInfusion() {
 function InstrumentStage({ children }: { children: React.ReactNode }) {
   return <div className="rounded-xl">{children}</div>;
 }
+
+/**
+ * The small mono caption that names a row inside a preview.
+ *
+ * One object rather than the three identical inline copies it replaces, because
+ * all three carried `opacity: 0.55` and all three failed together: 10px text at
+ * 4.08:1 on the panel, eight nodes on `/components/clinical-status`. Opacity is
+ * the whole reason — it composites the inherited ink toward whatever is behind
+ * it, so the colour is decided by the surface rather than chosen, and no token
+ * change can reach it. The repository's rule from the date/time work is the one
+ * that applies: non-disabled dimmed text takes the muted ink, never a tone that
+ * happens to land above the floor in the theme it was eyeballed in.
+ *
+ * `--ox-text-muted` is gated against `bg`, `surface` and `bg-subtle` in all
+ * three themes (7.24:1 at worst, in light) — a caption on any of them is
+ * covered by a measurement that already exists.
+ */
+const PREVIEW_CAPTION: React.CSSProperties = {
+  margin: 0,
+  fontFamily: "var(--ox-font-mono, monospace)",
+  fontSize: 10,
+  letterSpacing: "0.08em",
+  textTransform: "uppercase",
+  color: "var(--ox-text-muted)",
+};
 
 const CHART_ITEMS: AccordionItem[] = [
   {
@@ -1992,7 +2025,7 @@ gridCapacityRefusal(120_000);
   /*
    * Four bands rather than eleven flat tabs.
    *
-   * DatePicker is one component with fourteen variants, and a flat strip of
+   * DatePicker is one component with sixteen variants, and a flat strip of
    * eleven made a reader scan every label to find the one about a session
    * crossing midnight. The bands are the four jobs it does: getting a date in,
    * picking one from a grid, timing a session, and rendering what the record
@@ -2220,11 +2253,46 @@ gridCapacityRefusal(120_000);
       id: "modes",
       label: "Range in two clicks, multiple with a cap",
       group: "Calendar",
-      note: "Range selection is two clicks and never a drag — WCAG 2.2 SC 2.5.7 asks that no function require one, and there is no drag path anywhere in the component. In multiple mode, clicking a selected date removes it: a remove control inside a 32px cell would be under the 24px target floor, and a second click is what people try first anyway.",
+      note: "Range selection is two clicks and never a drag — WCAG 2.2 SC 2.5.7 asks that no function require one, and there is no drag path anywhere in the component. Two months, because most ranges cross a boundary and choosing an end you cannot see is how a range picker ends up needing three attempts; the rail is data the host supplies, so nobody is stuck with seven periods somebody else chose. In multiple mode, clicking a selected date removes it: a remove control inside a 32px cell would be under the 24px target floor, and a second click is what people try first anyway.",
       render: () => (
         <DtStage>
-          <Calendar mode="range" now={DT_TODAY} defaultMonth={{ y: 2026, m: 9 }} />
+          <Calendar
+            mode="range"
+            months={2}
+            weekStart={1}
+            hints
+            presets={dateRangePresets(DT_TODAY, { weekStart: 1 })}
+            showCustomPreset
+            now={DT_TODAY}
+            defaultMonth={{ y: 2026, m: 8 }}
+            defaultRange={{ start: plainDate(2026, 8, 17), end: plainDate(2026, 9, 11) }}
+          />
           <Calendar mode="multiple" maxDates={4} now={DT_TODAY} defaultMonth={{ y: 2026, m: 9 }} />
+        </DtStage>
+      ),
+    },
+    {
+      id: "ranges",
+      label: "A span, and the length it works out to",
+      group: "Entry",
+      note: "Both ends are typeable in one shell, because a range is still mostly recall — an authorisation window, a reporting period, a leave of absence — and eight keystrokes per end beats paging a grid. The badge is the field's own proof-read: a transposed month is invisible in 03/07 – 07/07 and unmissable as a day count, and a start typed as PM when the reader meant AM is unmissable as a negative span. The day count includes both ends, because service from the 1st to the 7th is seven days of care rather than six.",
+      render: () => (
+        <DtStage>
+          <DateRangeField
+            label="Authorisation window"
+            now={DT_TODAY}
+            weekStart={1}
+            showSpan
+            presets={dateRangePresets(DT_TODAY, { weekStart: 1 })}
+            showCustomPreset
+            defaultValue={{ start: plainDate(2026, 8, 24), end: plainDate(2026, 9, 11) }}
+          />
+          <TimeRangeField
+            label="Night shift"
+            stepMinutes={30}
+            allowOvernight
+            defaultValue={{ start: plainTime(22, 0), end: plainTime(6, 30) }}
+          />
         </DtStage>
       ),
     },
@@ -3025,18 +3093,7 @@ gridCapacityRefusal(120_000);
         <div style={{ display: "grid", gap: 18 }}>
           {SCALE_NAMES.map((name: ScaleName) => (
             <div key={name} style={{ display: "grid", gap: 6 }}>
-              <p
-                style={{
-                  margin: 0,
-                  fontFamily: "var(--ox-font-mono, monospace)",
-                  fontSize: 10,
-                  letterSpacing: "0.08em",
-                  textTransform: "uppercase",
-                  opacity: 0.55,
-                }}
-              >
-                {SCALES[name].label}
-              </p>
+              <p style={PREVIEW_CAPTION}>{SCALES[name].label}</p>
               <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
                 {SCALES[name].steps.map((step: StatusStep) => (
                   <ClinicalStatus key={step.id} scale={name} step={step.id} />
@@ -3055,18 +3112,7 @@ gridCapacityRefusal(120_000);
         <div style={{ display: "grid", gap: 14 }}>
           {[false, true].map((flat) => (
             <div key={String(flat)} style={{ display: "grid", gap: 6 }}>
-              <p
-                style={{
-                  margin: 0,
-                  fontFamily: "var(--ox-font-mono, monospace)",
-                  fontSize: 10,
-                  letterSpacing: "0.08em",
-                  textTransform: "uppercase",
-                  opacity: 0.55,
-                }}
-              >
-                {flat ? "Desaturated" : "In colour"}
-              </p>
+              <p style={PREVIEW_CAPTION}>{flat ? "Desaturated" : "In colour"}</p>
               <div
                 style={{
                   display: "flex",
@@ -3143,18 +3189,7 @@ gridCapacityRefusal(120_000);
         <div style={{ display: "grid", gap: 14 }}>
           {(["clinician", "patient"] as const).map((audience) => (
             <div key={audience} style={{ display: "grid", gap: 6 }}>
-              <p
-                style={{
-                  margin: 0,
-                  fontFamily: "var(--ox-font-mono, monospace)",
-                  fontSize: 10,
-                  letterSpacing: "0.08em",
-                  textTransform: "uppercase",
-                  opacity: 0.55,
-                }}
-              >
-                {audience}
-              </p>
+              <p style={PREVIEW_CAPTION}>{audience}</p>
               <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
                 <ClinicalStatus scale="result-status" step="entered-in-error" audience={audience} />
                 <ClinicalStatus scale="result-status" step="preliminary" audience={audience} />

@@ -692,17 +692,34 @@ test.describe("the public marketplace @a11y", () => {
     await expect(first).toContainText(/\$|Free|By arrangement/);
   });
 
-  test("separates what can be bought from what has only been announced", async ({ page }) => {
+  test("refuses every purchase path, and still says what a built pack contains", async ({
+    page,
+  }) => {
     await page.goto("/marketplace");
 
-    await expect(page.getByRole("heading", { name: "Available now" })).toBeVisible();
-    await expect(page.getByRole("heading", { name: "In production" })).toBeVisible();
+    /*
+     * This asserted "Available now" against "In production" until selling was
+     * closed shelf-wide. Nothing is purchasable while `SELLING_OPEN` is false —
+     * the console cannot take money — so the ready section renders empty and
+     * the shelf is one list that announces rather than sells.
+     */
+    await expect(page.getByRole("heading", { name: "Coming soon" })).toBeVisible();
 
-    // An announced pack is priced and refuses every purchase path — the same
-    // rule the console applies to it.
-    const announced = page.locator("[data-ox-pack]", { hasText: "Not yet purchasable" });
-    expect(await announced.count()).toBeGreaterThan(0);
-    await expect(announced.first().getByRole("link", { name: /Buy in the app/ })).toHaveCount(0);
+    const cards = page.locator("[data-ox-pack]");
+    expect(await cards.count()).toBeGreaterThan(1);
+    await expect(cards.getByRole("link", { name: /Buy in the app/ })).toHaveCount(0);
+
+    /*
+     * A shut shop is not a claim about what a pack contains.
+     *
+     * `comingSoon` and `purchasable` were briefly one field, and while they
+     * were, packs with files committed in this repository rendered as unbuilt:
+     * no `4 files · v2` line, and a placeholder motif where their manifest
+     * belongs. Source-agnostic, like the test below — the console sends a file
+     * count and the local fallback sends paths, and this line is drawn from
+     * either.
+     */
+    await expect(cards.filter({ hasText: /[1-9]\d* files? · v[1-9]/ }).first()).toBeVisible();
   });
 
   /*

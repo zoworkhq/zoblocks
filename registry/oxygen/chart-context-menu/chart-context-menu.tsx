@@ -208,6 +208,21 @@ export interface ChartContextMenuProps {
    */
   onOpenChange?: (open: boolean, subject: MenuSubject) => void;
   /**
+   * Whether opening moves focus into the menu. Defaults to `true`.
+   *
+   * Set `false` only for a menu the reader did not summon — a demo that opens
+   * itself, a product tour, a walkthrough. Such a menu renders and reads
+   * normally but leaves the caret alone; on a page that opens one every few
+   * seconds the alternative is focus jumping under the reader and a screen
+   * reader announcing a menu nobody asked for.
+   *
+   * A prop rather than sniffing `event.isTrusted`, which was the first attempt:
+   * that inferred intent from whether a human dispatched the event, so the
+   * component behaved one way in tests and another in production — which is
+   * the property a test exists to rule out.
+   */
+  autoFocus?: boolean;
+  /**
    * Where the popup is portalled. Defaults to `document.body`.
    *
    * Worth setting when the surrounding page scopes theme, density or `dir` on
@@ -280,6 +295,32 @@ interface Placement {
   origin: string;
   /** Applied inline; the list scrolls inside it, the header and footer do not. */
   maxHeight: number;
+}
+
+/**
+ * A placement reduced to the values that actually render.
+ *
+ * `place()` builds a fresh object every call, and `setBox` compares by
+ * reference — so an identical placement still re-rendered and re-committed.
+ * That cost a second render on every open, because the pass runs twice by
+ * design (once synchronously, once in the rAF that measures the real height),
+ * and one per event during a scroll, which fires dozens.
+ *
+ * Feeding this through the updater below lets React bail out of the render
+ * entirely when nothing moved. It is a string rather than a field-by-field
+ * comparison because `top` and `bottom` are each present or absent depending
+ * on which edge the menu is anchored by, and six short-circuits would be six
+ * branches to keep covered for no gain.
+ */
+function placementKey(placement: Placement): string {
+  const { top, bottom, left, origin, maxHeight } = placement;
+  return `${top}|${bottom}|${left}|${origin}|${maxHeight}`;
+}
+
+/** `setBox` argument that keeps the previous object when the menu has not moved. */
+function keepIfUnmoved(next: Placement) {
+  return (previous: Placement | null): Placement =>
+    previous && placementKey(previous) === placementKey(next) ? previous : next;
 }
 
 function clamp(value: number, low: number, high: number): number {
@@ -707,6 +748,7 @@ export function ChartContextMenu(props: ChartContextMenuProps) {
     onDisclose,
     onBlocked,
     onOpenChange,
+    autoFocus = true,
     container,
     disabled = false,
     children,
@@ -974,6 +1016,8 @@ export function ChartContextMenu(props: ChartContextMenuProps) {
       const panel = panelRef.current;
       if (!panel) return;
       const w = panel.offsetWidth;
+      /* Only used to clamp inside a container — never to size the menu. */
+      const h = panel.offsetHeight;
       const rect = triggerRef.current?.getBoundingClientRect?.();
       if (!rect) return;
       const next = open.point
@@ -991,19 +1035,43 @@ export function ChartContextMenu(props: ChartContextMenuProps) {
        */
       if (contained) {
         const box = contained.getBoundingClientRect();
-        setBox({
-          ...(next.top === undefined
-            ? {
-                bottom:
-                  box.bottom - (window.innerHeight - (next.bottom ?? 0)) - contained.scrollTop,
-              }
-            : { top: next.top - box.top + contained.scrollTop }),
-          left: next.left - box.left + contained.scrollLeft,
-          origin: next.origin,
-          maxHeight: next.maxHeight,
-        });
+        /*
+         * Clamped to the container, not to the viewport.
+         *
+         * `placeAtPoint` works in viewport terms because that is what a pointer
+         * event gives you — but a host that portals into a bounded pane has told
+         * us the pane is the boundary, and the viewport has nothing to do with
+         * what clips. On the home page a menu opened from the third row of a
+         * worklist lost its withheld count off the bottom of the stage, which is
+         * the one row that must never be the one that goes missing.
+         *
+         * Only the offset is clamped. `maxHeight` stays the viewport's, so this
+         * cannot re-enter the loop that measuring a height while capping it
+         * caused. Clamping needs a top edge, so a flipped menu is resolved out
+         * of its bottom anchor here — inside a container the anchor was only
+         * ever a way to avoid measuring, and we have measured.
+         */
+        const pad = EDGE_PAD;
+        const viewportTop =
+          next.top === undefined ? window.innerHeight - (next.bottom ?? 0) - h : next.top;
+        setBox(
+          keepIfUnmoved({
+            top: clamp(
+              viewportTop - box.top + contained.scrollTop,
+              pad,
+              Math.max(pad, contained.clientHeight - h - pad),
+            ),
+            left: clamp(
+              next.left - box.left + contained.scrollLeft,
+              pad,
+              Math.max(pad, contained.clientWidth - w - pad),
+            ),
+            origin: next.origin,
+            maxHeight: next.maxHeight,
+          }),
+        );
       } else {
-        setBox(next);
+        setBox(keepIfUnmoved(next));
       }
     };
 
@@ -1035,12 +1103,29 @@ export function ChartContextMenu(props: ChartContextMenuProps) {
      */
     const onScroll = () => setTick((value) => value + 1);
     const onResize = () => close(false);
+    /*
+     * Escape, for the menu nothing is focused inside.
+     *
+     * The panel's own handler owns the focused case and does it better — one
+     * level at a time, submenu first. This is only for `autoFocus={false}`,
+     * where the popup is open and the reader's focus never entered it, so a
+     * key pressed at the document would otherwise reach nothing and the menu
+     * would have no keyboard dismissal at all.
+     */
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key !== "Escape") return;
+      if (panelRef.current?.contains(document.activeElement)) return;
+      if (subPanelRef.current?.contains(document.activeElement)) return;
+      close(false);
+    };
 
     document.addEventListener("mousedown", onPointer);
+    document.addEventListener("keydown", onKey);
     window.addEventListener("resize", onResize);
     window.addEventListener("scroll", onScroll, true);
     return () => {
       document.removeEventListener("mousedown", onPointer);
+      document.removeEventListener("keydown", onKey);
       window.removeEventListener("resize", onResize);
       window.removeEventListener("scroll", onScroll, true);
     };
@@ -1057,6 +1142,8 @@ export function ChartContextMenu(props: ChartContextMenuProps) {
      * unreachable. jsdom did not reproduce it; Chromium did, first try.
      */
     if (sub?.fromKeyboard) return;
+    /* A menu the reader did not summon does not take their focus. */
+    if (!autoFocus) return;
     /*
      * `preventScroll`, and it is load-bearing rather than tidy.
      *
@@ -1082,7 +1169,7 @@ export function ChartContextMenu(props: ChartContextMenuProps) {
      * the call succeeded silently and focus stayed on the trigger. Re-running
      * once the placement lands is what actually arms the first verb.
      */
-  }, [open, active, rows, confirming, reasoning, box, sub]);
+  }, [open, active, rows, confirming, reasoning, box, sub, autoFocus]);
 
   /*
    * Focus goes back to the trigger once the popup is gone, and only then.
@@ -1702,18 +1789,22 @@ function Submenu(props: {
     if (!panel || !rect) return;
     const next = placeBeside(rect, panel.offsetWidth);
     if (!contained) {
-      setBox(next);
+      setBox(keepIfUnmoved(next));
       return;
     }
     const host = contained.getBoundingClientRect();
-    setBox({
-      ...(next.top === undefined
-        ? { bottom: host.bottom - (window.innerHeight - (next.bottom ?? 0)) - contained.scrollTop }
-        : { top: next.top - host.top + contained.scrollTop }),
-      left: next.left - host.left + contained.scrollLeft,
-      origin: next.origin,
-      maxHeight: next.maxHeight,
-    });
+    setBox(
+      keepIfUnmoved({
+        ...(next.top === undefined
+          ? {
+              bottom: host.bottom - (window.innerHeight - (next.bottom ?? 0)) - contained.scrollTop,
+            }
+          : { top: next.top - host.top + contained.scrollTop }),
+        left: next.left - host.left + contained.scrollLeft,
+        origin: next.origin,
+        maxHeight: next.maxHeight,
+      }),
+    );
   }, [anchorEl, contained, tick, items.length]);
 
   React.useEffect(() => {

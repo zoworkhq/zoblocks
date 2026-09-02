@@ -109,6 +109,21 @@ describe("detectFaults — the four that are byte-identical at the signal layer"
     expect(found[0]?.audioIntact).toBe(true);
   });
 
+  it("6 — and names the device when there is one to name", () => {
+    const found = detectFaults(
+      healthy({
+        device: { deviceId: "jabra", label: "Jabra Link 380" },
+        sampleRate: 16_000,
+        baselineSampleRate: 48_000,
+      }),
+    );
+    const route = found.find((f) => f.code === "route-changed");
+    // A2DP to HFP mid-session. The clinician has one thing on their head and
+    // needs to be told it is the thing that changed.
+    expect(route?.message).toContain("Jabra Link 380");
+    expect(route?.message).toContain("48000 Hz to 16000 Hz");
+  });
+
   it("7 — the wrong device sounds entirely plausible and is caught by name", () => {
     const found = detectFaults(
       healthy({
@@ -215,6 +230,30 @@ describe("detectFaults — after the capture", () => {
     expect(found[0]?.fix).toMatch(/62%/);
   });
 
+  it("11 — a failure with no reason still says the recording is safe", () => {
+    // A fetch that rejected with nothing useful. The message degrades; the
+    // reassurance and the resume offer must not.
+    const found = detectFaults(
+      healthy({
+        phase: "held",
+        disposition: { state: "failed", bytes: 14_200_000, sent: 0 },
+      }),
+    );
+    expect(found[0]?.code).toBe("upload-failed");
+    expect(found[0]?.message).toBe("Upload failed.");
+    expect(found[0]?.audioIntact).toBe(true);
+    expect(found[0]?.fix).toMatch(/resumes from 0%/);
+  });
+
+  it("11 — a failure before the size was known does not divide by zero", () => {
+    const found = detectFaults(
+      healthy({ phase: "held", disposition: { state: "failed", bytes: 0, sent: 0 } }),
+    );
+    // `NaN%` on screen is how a user learns not to trust the number beside it.
+    expect(found[0]?.fix).toMatch(/resumes from 0%/);
+    expect(found[0]?.fix).not.toMatch(/NaN|Infinity/);
+  });
+
   it("12 — a stalled recogniser says the recorder is fine", () => {
     const found = detectFaults(healthy({ transcriptLagMs: 12_000 }));
     const stall = found.find((f) => f.code === "recogniser-stalled");
@@ -222,8 +261,25 @@ describe("detectFaults — after the capture", () => {
     expect(stall?.fix).toMatch(/recogniser is behind, not the recorder/i);
   });
 
+  it("12 — and is still worth saying once the recording has stopped", () => {
+    // The lag matters most here. Capture has finished, the audio is safe, and
+    // the only thing still running is the recogniser — so a surface that only
+    // watched `recording` would go quiet exactly when the user starts to
+    // wonder whether anything is happening.
+    const found = detectFaults(healthy({ phase: "transcribing", transcriptLagMs: 12_000 }));
+    const stall = found.find((f) => f.code === "recogniser-stalled");
+    expect(stall?.capturing).toBe(false);
+    expect(stall?.audioIntact).toBe(true);
+  });
+
   it("12 — a recogniser a beat behind is not stalled", () => {
     expect(codes(healthy({ transcriptLagMs: 900 }))).toHaveLength(0);
+  });
+
+  it("12 — a lagging recogniser on a settled recording is not a fault", () => {
+    // Neither capturing nor transcribing: nothing is supposed to be arriving,
+    // so a stale lag number is not news.
+    expect(codes(healthy({ phase: "held", transcriptLagMs: 12_000 }))).toHaveLength(0);
   });
 
   it("13 — AGC is declared rather than allowed to look perfect", () => {

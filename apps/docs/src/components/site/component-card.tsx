@@ -327,7 +327,7 @@ const PREVIEW: Record<string, (featured: boolean) => React.ReactNode> = {
   ),
   /* One card for the whole family. It shows the field with its calendar
      because that is the variant a reader reaches for first, and the card is
-     an identifier rather than a tour — the fourteen variants are the page. */
+     an identifier rather than a tour — the sixteen variants are the page. */
   "date-picker": () => (
     <DateField
       label="Date of service"

@@ -9,6 +9,7 @@
 
 import { describe, expect, it } from "vitest";
 import {
+  BUCKET_HZ,
   DEFAULT_BUFFER_CAPACITY,
   PeakBuffer,
   SPEAKER_UNKNOWN,
@@ -25,6 +26,18 @@ describe("PeakBuffer — the ring", () => {
     // enough to hold, post to a worker and serialise, against 58 million
     // samples for the same audio.
     expect(new Float32Array(DEFAULT_BUFFER_CAPACITY).byteLength).toBe(144_000);
+  });
+
+  it("takes that default when the host asks for no particular size", () => {
+    // The common construction, and the one a host writes without thinking:
+    // twenty minutes of buckets at the bucket rate, allocated up front so a
+    // recorder never pauses to reallocate in the middle of a consultation.
+    const buffer = new PeakBuffer();
+    expect(buffer.capacity).toBe(DEFAULT_BUFFER_CAPACITY);
+    expect(buffer.hz).toBe(BUCKET_HZ);
+    expect(buffer.length).toBe(0);
+    expect(buffer.written).toBe(0);
+    expect(buffer.durationMs).toBe(0);
   });
 
   it("reads back what was written, oldest first", () => {
@@ -105,6 +118,25 @@ describe("PeakBuffer — the speaker lane", () => {
     buffer.push(0.5, 2);
     buffer.push(0.5);
     expect(Array.from(buffer.toSpeakers())).toEqual([1, 2, SPEAKER_UNKNOWN]);
+  });
+
+  it("collapses a speaker id that is not a finite number to unknown", () => {
+    // Diarisation that hands back NaN is diarisation with no opinion, and
+    // `Uint8Array` would coerce it to 0 anyway — but silently, and 0 is a
+    // meaning here rather than a fallback. Infinity is not clamped to 255
+    // either: it is not an id, and unknown is not a guess.
+    const buffer = new PeakBuffer({ capacity: 4, speakers: true });
+    buffer.push(0.5, Number.NaN);
+    buffer.push(0.5, Number.POSITIVE_INFINITY);
+    expect(Array.from(buffer.toSpeakers())).toEqual([SPEAKER_UNKNOWN, SPEAKER_UNKNOWN]);
+  });
+
+  it("clamps a speaker id to the byte the lane can hold", () => {
+    const buffer = new PeakBuffer({ capacity: 4, speakers: true });
+    buffer.push(0.5, 900);
+    buffer.push(0.5, -3);
+    buffer.push(0.5, 2.7);
+    expect(Array.from(buffer.toSpeakers())).toEqual([255, SPEAKER_UNKNOWN, 2]);
   });
 });
 
