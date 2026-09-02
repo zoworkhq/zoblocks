@@ -87,6 +87,28 @@ test.describe("the Pro holding page @a11y", () => {
    * visually-hidden copy for the name — correct to a screen reader, and it put
    * `ComingsoonComing soon` on the clipboard.
    */
+  /**
+   * The rail says the same thing as the markers, in a second channel: the
+   * segments between settled steps are solid, and the one running into
+   * `Publish` is dashed because it has not been travelled. It is drawn
+   * entirely in `::before`, so nothing in the DOM would reveal a regression.
+   */
+  test("the rail into Publish is dashed, the rest solid", async ({ page }) => {
+    await page.goto("/pro");
+    const rails = await page.evaluate(() =>
+      [...document.querySelectorAll(".soon .soonStep")].map((s) => {
+        const cs = getComputedStyle(s, "::before");
+        return { drawn: cs.content !== "none", style: cs.borderLeftStyle };
+      }),
+    );
+    expect(rails.map((r) => (r.drawn ? r.style : "none"))).toEqual([
+      "solid",
+      "solid",
+      "dashed",
+      "none",
+    ]);
+  });
+
   test("the headline reads as one line, spoken and copied", async ({ page }) => {
     await page.goto("/pro");
     const h1 = page.getByRole("heading", { level: 1 });
@@ -100,6 +122,82 @@ test.describe("the Pro holding page @a11y", () => {
       ),
       "a headline letter was left in the accessibility tree",
     ).toBe(true);
+  });
+
+  /**
+   * Every colour on this page has to come from a site token.
+   *
+   * The stage was dark under both themes at first, so its colours were written
+   * as literals — which meant a light reader got a dark slab wedged between a
+   * light header and a light footer, and the high-contrast reader, who had
+   * asked for maximum contrast in the toggle, was the only one who did not get
+   * it. A literal is invisible to every theme; this is the test that sees it.
+   */
+  test("the stage follows the theme rather than a literal", async ({ page }) => {
+    await page.goto("/pro");
+
+    const read = () =>
+      page.evaluate(() => {
+        /*
+         * Colours are compared through a probe rather than as strings. The
+         * same colour comes back as `#000`, `#000000` or `rgb(0, 0, 0)`
+         * depending on the engine and on whether the stylesheet was minified;
+         * letting the browser resolve both sides removes all three from the
+         * comparison. The first version of this test failed on that alone.
+         */
+        const probe = document.createElement("span");
+        probe.style.display = "none";
+        document.body.append(probe);
+        const rgb = (value: string) => {
+          probe.style.color = "";
+          probe.style.color = value.trim();
+          return getComputedStyle(probe).color;
+        };
+        const root = getComputedStyle(document.documentElement);
+        const out = {
+          ink: rgb(root.getPropertyValue("--site-ink")),
+          head: rgb(getComputedStyle(document.querySelector(".soon .soonHead")!).color),
+          ground: rgb(root.getPropertyValue("--site-paper")),
+          decorHidden: [".soonGlow", ".soonRamp", ".soonGridPaper"].every(
+            (sel) => getComputedStyle(document.querySelector(`.soon ${sel}`)!).display === "none",
+          ),
+        };
+        probe.remove();
+        return out;
+      });
+
+    const setTheme = (t: "light" | "dark" | "high-contrast") =>
+      page.evaluate((theme) => {
+        const e = document.documentElement;
+        e.classList.toggle("dark", theme === "dark");
+        if (theme === "high-contrast") e.setAttribute("data-ox-theme", "high-contrast");
+        else e.removeAttribute("data-ox-theme");
+      }, t);
+
+    await setTheme("light");
+    const light = await read();
+    await setTheme("dark");
+    const dark = await read();
+    await setTheme("high-contrast");
+    const hc = await read();
+
+    // The headline takes the theme's own ink in every one of the three.
+    for (const [name, t] of [
+      ["light", light],
+      ["dark", dark],
+      ["high contrast", hc],
+    ] as const) {
+      expect(t.head, `${name}: the headline ignored --site-ink`).toBe(t.ink);
+    }
+
+    // And the three are genuinely different, so none of this passed by accident.
+    expect(new Set([light.head, dark.head, hc.head]).size).toBe(3);
+    expect(light.ground).not.toBe(dark.ground);
+
+    // Decoration exists to soften a surface. High contrast wants it hard.
+    expect(light.decorHidden).toBe(false);
+    expect(dark.decorHidden).toBe(false);
+    expect(hc.decorHidden, "a decorative wash survived into high contrast").toBe(true);
   });
 
   test("both ways off the page lead somewhere", async ({ page }) => {
@@ -131,20 +229,25 @@ test.describe("the Pro holding page @a11y", () => {
     );
     expect(running, "an animation ran under reduced motion").toBe(0);
 
-    // The panel is drawn, the headline is legible and the gate still reads.
+    // The stage is drawn, the headline is legible and the gate still reads.
     const composed = await page.evaluate(() => {
-      const panel = document.querySelector(".soon .soonPanel")!;
+      const stage = document.querySelector(".soon .soonStage")!;
       const head = document.querySelector(".soon .soonHead")!;
+      const gate = document.querySelector(".soon .soonGate")!;
       return {
-        panelHeight: panel.getBoundingClientRect().height,
+        stageHeight: stage.getBoundingClientRect().height,
+        gateHeight: gate.getBoundingClientRect().height,
         headOpacity: getComputedStyle(head).opacity,
+        gateOpacity: getComputedStyle(gate).opacity,
         letters: [...document.querySelectorAll(".soon .soonCh")].every(
           (n) => getComputedStyle(n).opacity === "1",
         ),
       };
     });
-    expect(composed.panelHeight).toBeGreaterThan(200);
+    expect(composed.stageHeight).toBeGreaterThan(400);
+    expect(composed.gateHeight).toBeGreaterThan(150);
     expect(composed.headOpacity).toBe("1");
+    expect(composed.gateOpacity).toBe("1");
     expect(composed.letters, "a headline letter stayed transparent").toBe(true);
   });
 
