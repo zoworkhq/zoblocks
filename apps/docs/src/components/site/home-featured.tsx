@@ -28,13 +28,9 @@ import { LoaderShowcase } from "@/components/site/loader-showcase";
 import { SignatureDrawing } from "@/components/site/signature-showcase";
 import { LiveSwitch } from "@/components/site/switch-gallery";
 import { Tabs } from "@oxygenui-design/tabs";
-import {
-  DateRangeField,
-  SessionTimeField,
-  TimeRangeField,
-  BEHAVIORAL_HEALTH_DURATIONS,
-} from "@/registry/oxygen/date-picker/date-picker";
-import { dateRangePresets, plainDate, plainTime, sessionFrom } from "@/lib/oxygen-datetime";
+import { Calendar } from "@/registry/oxygen/date-picker/date-picker";
+import { plainDate } from "@/lib/oxygen-datetime";
+import { cn } from "@/lib/utils";
 import {
   ChartContextMenu,
   type ChartMenuAction,
@@ -406,48 +402,192 @@ function TabsDemo() {
 }
 
 /**
- * Two date fields, because one does not show the argument.
+/**
+ * The reader's motion preference, watched rather than sampled once.
  *
- * The left is eight keystrokes and no calendar; the right is a session, where
- * start, end and duration are three values with two degrees of freedom and the
- * component says which one it derived.
+ * Read in an effect so the server and the first client pass agree: starting
+ * from `true` flashes the still state on every visit, and reading `matchMedia`
+ * during render is a hydration mismatch.
+ */
+function usePrefersReducedMotion(): boolean {
+  const [reduced, setReduced] = React.useState(false);
+  React.useEffect(() => {
+    if (typeof window === "undefined" || !window.matchMedia) return undefined;
+    const query = window.matchMedia("(prefers-reduced-motion: reduce)");
+    setReduced(query.matches);
+    const listener = (event: MediaQueryListEvent) => setReduced(event.matches);
+    query.addEventListener("change", listener);
+    return () => query.removeEventListener("change", listener);
+  }, []);
+  return reduced;
+}
+
+/* ------------------------------------------------------------------ */
+/* The date card's demo                                                */
+/* ------------------------------------------------------------------ */
+
+/** One beat of the script: find a target, do something to it, then rest. */
+interface Beat {
+  /** What to aim at. Null when the DOM has moved on, and the beat is skipped. */
+  find: (root: HTMLElement) => HTMLElement | null;
+  act: "hover" | "press";
+  /** Milliseconds to rest after acting. */
+  hold: number;
+}
+
+const dayNamed = (prefix: string) => (root: HTMLElement) =>
+  [...root.querySelectorAll<HTMLElement>('[role="gridcell"]')].find((cell) =>
+    (cell.getAttribute("aria-label") ?? "").startsWith(prefix),
+  ) ?? null;
+
+const actionNamed = (label: string) => (root: HTMLElement) =>
+  [...root.querySelectorAll<HTMLElement>(".ox-dt-cal__action")].find(
+    (button) => button.textContent?.trim() === label,
+  ) ?? null;
+
+/**
+ * The sequence a person would actually perform.
+ *
+ * It never presses Done, and that is deliberate rather than an omission: with
+ * nothing ever committed, Cancel always returns the panel to empty and the
+ * loop closes cleanly. Committing once would leave Cancel restoring the
+ * committed range instead of clearing, and the second pass would start from a
+ * selection the first one made.
+ */
+const SCRIPT: Beat[] = [
+  { find: actionNamed("Cancel"), act: "press", hold: 520 },
+  { find: dayNamed("Monday, August 17"), act: "hover", hold: 340 },
+  { find: dayNamed("Monday, August 17"), act: "press", hold: 460 },
+  { find: dayNamed("Friday, August 21"), act: "hover", hold: 230 },
+  { find: dayNamed("Wednesday, August 26"), act: "hover", hold: 230 },
+  { find: dayNamed("Monday, August 31"), act: "hover", hold: 230 },
+  { find: dayNamed("Saturday, September 5"), act: "hover", hold: 260 },
+  { find: dayNamed("Friday, September 11"), act: "press", hold: 1500 },
+];
+
+/**
+ * The card's live demo: a range being chosen, by a pointer that is drawn.
+ *
+ * It drives the shipped component with the events a real pointer produces —
+ * `mouseover` for the preview, `click` for the two ends — rather than replaying
+ * a recording of it, so if the behaviour it shows ever broke, the demo would
+ * break with it. React maps `onMouseEnter` from a bubbling `mouseover`, which
+ * is why the hover preview follows.
+ *
+ * Three rules, in the order they matter. It **stops the moment anybody touches
+ * it** — an animation that fights a reader for the control they are trying to
+ * try is worse than no animation. It **never starts under
+ * `prefers-reduced-motion`**; not slowed, not started. And Pause is a real
+ * button, because WCAG 2.2.2 asks that of anything moving for more than five
+ * seconds, and a loop is more than five seconds.
+ *
+ * No rail here: two months with one is 757px against the 638px this card
+ * gives, and of the two the cross-boundary preview is the part worth the
+ * space — it is the thing a single-month picker cannot do at all.
  */
 function DateDemo() {
-  /*
-    Flex with `items-start`, not a two-column grid.
+  const stageRef = React.useRef<HTMLDivElement>(null);
+  const cursorRef = React.useRef<HTMLSpanElement>(null);
+  const [playing, setPlaying] = React.useState(false);
+  const [beat, setBeat] = React.useState(0);
+  const [pressed, setPressed] = React.useState(false);
+  const reduced = usePrefersReducedMotion();
 
-    The grid stretched both cells to the height of the taller one, and each
-    field distributes its own label and input across whatever height it is
-    given — so a label floated about 150px above its own field, with an empty
-    column beside a dense one. Each takes its natural width here, both start at
-    the top, and they wrap rather than squeeze.
+  // Only once it is actually on screen. A card animating above the fold that
+  // nobody has scrolled to is spending attention where there is none.
+  const [seen, setSeen] = React.useState(false);
+  React.useEffect(() => {
+    const node = stageRef.current;
+    if (!node || typeof IntersectionObserver === "undefined") return undefined;
+    const observer = new IntersectionObserver(
+      (entries) => entries.forEach((entry) => entry.isIntersecting && setSeen(true)),
+      { threshold: 0.4 },
+    );
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, []);
 
-    All three fields carry a derived member — a day count, a length, a held
-    end — because that is the one thing this family does that a date input
-    does not, and a card with room for three fields should spend it saying so
-    rather than showing the same field three times.
-  */
+  React.useEffect(() => {
+    if (seen && !reduced) setPlaying(true);
+  }, [seen, reduced]);
+
+  React.useEffect(() => {
+    if (!playing) return undefined;
+    const root = stageRef.current;
+    if (!root) return undefined;
+
+    const step = SCRIPT[beat % SCRIPT.length];
+    const target = step?.find(root) ?? null;
+
+    // The cursor travels first and the event fires where it landed, so what a
+    // reader sees and what the component receives are the same place.
+    if (target && cursorRef.current) {
+      const base = root.getBoundingClientRect();
+      const spot = target.getBoundingClientRect();
+      cursorRef.current.style.translate = `${spot.left - base.left + spot.width / 2}px ${
+        spot.top - base.top + spot.height / 2
+      }px`;
+    }
+
+    const travel = 340;
+    const fire = setTimeout(() => {
+      if (!target) return;
+      if (step?.act === "press") {
+        setPressed(true);
+        setTimeout(() => setPressed(false), 200);
+        target.click();
+      } else {
+        target.dispatchEvent(new MouseEvent("mouseover", { bubbles: true }));
+      }
+    }, travel);
+
+    const advance = setTimeout(() => setBeat((n) => n + 1), travel + (step?.hold ?? 400));
+    return () => {
+      clearTimeout(fire);
+      clearTimeout(advance);
+    };
+  }, [playing, beat]);
+
   return (
-    <div className="flex w-full flex-wrap items-start gap-x-10 gap-y-8">
-      <DateRangeField
-        label="Authorisation window"
-        now={TODAY}
-        weekStart={1}
-        showSpan
-        presets={dateRangePresets(TODAY, { weekStart: 1 })}
-        showCustomPreset
-        defaultValue={{ start: plainDate(2026, 8, 24), end: plainDate(2026, 9, 11) }}
-      />
-      <TimeRangeField
-        label="Time range"
-        stepMinutes={60}
-        defaultValue={{ start: plainTime(7, 0), end: plainTime(10, 0) }}
-      />
-      <SessionTimeField
-        label="Individual therapy"
-        defaultValue={sessionFrom(plainTime(14, 0), 50)}
-        durationPresets={BEHAVIORAL_HEALTH_DURATIONS}
-      />
+    <div className="ox-dt-card">
+      <div className="ox-dt-card__bar">
+        <button
+          type="button"
+          className="ox-dt-card__toggle"
+          aria-pressed={playing}
+          onClick={() => setPlaying((was) => !was)}
+        >
+          {playing ? "Pause" : "Play"}
+        </button>
+        <p className="ox-dt-card__say" aria-live="polite">
+          {playing ? "Choosing a range — two clicks, with a preview between them." : "Paused."}
+        </p>
+      </div>
+
+      {/* `pointerdown` rather than `click`, so the handover happens before the
+          component sees the press rather than after it. */}
+      <div
+        ref={stageRef}
+        className="ox-dt-card__stage"
+        onPointerDown={() => setPlaying(false)}
+        onKeyDownCapture={() => setPlaying(false)}
+      >
+        <Calendar
+          mode="range"
+          months={2}
+          weekStart={1}
+          commit="explicit"
+          hints
+          now={TODAY}
+          defaultMonth={{ y: 2026, m: 8 }}
+        />
+        <span
+          ref={cursorRef}
+          aria-hidden="true"
+          className={cn("ox-dt-card__cursor", pressed && "ox-dt-card__cursor--press")}
+          data-ox-hidden={playing ? undefined : "true"}
+        />
+      </div>
     </div>
   );
 }
@@ -562,8 +702,8 @@ const FEATURED: readonly Featured[] = [
     name: "Date & time",
     resource: "Period",
     claim:
-      "Sixteen variants on one contract — a range is two clicks with the preview between them, and a bare 9 in a time field is asked about rather than resolved into a twelve-hour error.",
-    facts: ["16 variants", "8 keystrokes, no calendar", "Every span says its length"],
+      "Sixteen variants on one contract — a range is two clicks with a live preview between them, and nothing reaches your state until Done.",
+    facts: ["16 variants", "8 keystrokes, no calendar", "Two months, one tab stop"],
     demo: () => <DateDemo />,
   },
 ];
