@@ -380,23 +380,16 @@ function DataGridSection() {
             A worklist is a claim about a population.
           </h2>
           {/*
-            One paragraph, not three.
+            One sentence, where there were three paragraphs.
 
-            The four claims used to be listed here and then demonstrated below,
-            which made a reader parse the argument in prose and then look for it
-            in a table. They are now written against the part of the component
-            that carries each, inside the panel — so this is only what the panel
-            cannot say for itself.
+            The claims used to be argued here in prose and then demonstrated
+            below, which asked a reader to parse the argument and then go
+            looking for it in a table. The panel names each one against the part
+            of the grid carrying it, in four words, so the only thing left for
+            this to do is set the scene.
           */}
           <p className="body-lg mt-5 max-w-2xl text-pretty text-graphite" data-reveal>
-            Eight rows on screen, 1,438 in the cohort, and a filter somebody set this morning and
-            has since stopped seeing. Everything below is the real component, running.
-          </p>
-          <p className="body-sm mt-4 max-w-2xl text-pretty text-graphite-soft" data-reveal>
-            For contrast, we measured the engine underneath the grid most teams reach for:{" "}
-            <span className="numeric">@rc-component/table</span>, the table in antd v6, ships one{" "}
-            <span className="numeric">aria-*</span> attribute in its entire build, no{" "}
-            <span className="numeric">role</span>, and zero keyboard handlers.
+            Eight rows on screen, 1,438 in the cohort. Below is the real component, running.
           </p>
         </div>
 
@@ -405,11 +398,16 @@ function DataGridSection() {
         </div>
 
         <div className="mt-5 flex flex-wrap items-center gap-x-6 gap-y-2" data-reveal>
-          <p className="body-sm max-w-2xl text-pretty text-graphite-soft">
-            It runs itself until you touch it. Click a cell and use the arrow keys — it is a real{" "}
-            <span className="numeric">role=&quot;grid&quot;</span>, and the line at the foot names
-            the row your cursor is on, with its MRN. Every name, number and portrait here is
-            invented.
+          {/*
+            One line.
+
+            This was a paragraph explaining the keyboard model and the fixtures,
+            under a panel that had four more paragraphs inside it. The component
+            is the argument; this only has to say that it is operable and that
+            nobody here is real.
+          */}
+          <p className="body-sm text-graphite-soft">
+            Click a cell and use the arrow keys. Every name and number is invented.
           </p>
           <Link
             href="/components/data-grid"

@@ -225,8 +225,14 @@ export const SourcesOpen: Story = {
      * claim is wrapped in `<mark>`, which is what turns a citation into a
      * verification a clinician can make at a glance. A matcher that required
      * one unbroken text node would fail precisely because the feature works.
+     *
+     * And waited for rather than read once: the landmark exists a render before
+     * its passage does, so reading `textContent` the moment the region appears
+     * is a race that only shows up on a loaded machine.
      */
-    expect(panel.textContent).toMatch(/rate control is a reasonable initial approach/i);
+    await waitFor(() =>
+      expect(panel.textContent).toMatch(/rate control is a reasonable initial approach/i),
+    );
 
     // And the mark is on the supporting clause, not the whole passage.
     const mark = panel.querySelector("mark");

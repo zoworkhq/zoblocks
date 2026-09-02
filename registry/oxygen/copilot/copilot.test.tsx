@@ -235,7 +235,26 @@ describe("the basis drawer", () => {
     fireEvent.keyDown(field(), { key: "Enter" });
     const button = await screen.findByRole("button", { name: /show sources/i });
     fireEvent.click(button);
-    return screen.findByRole("region", { name: "Basis of this answer" });
+    const drawer = await screen.findByRole("region", { name: "Basis of this answer" });
+
+    /*
+     * Settle on the passage, not on the region that will hold it.
+     *
+     * The drawer's landmark exists a render before its content does, so
+     * `findByRole` resolved and every caller then read `textContent` off a box
+     * that was still filling. On an idle machine it all lands in one tick and
+     * looks fine; under a loaded `turbo run test` it does not, and this suite
+     * failed on a different assertion each run — the score, the highlight, the
+     * passage — which is the signature of a settle race rather than of a bug in
+     * any one of them.
+     *
+     * Waiting for the *last* words of the passage rather than for the `<mark>`,
+     * because the answer streams: the mark appears while its own text is still
+     * arriving, so a run that waited for the element still read a half-written
+     * clause. The tail is the only cheap proof that the stream is done.
+     */
+    await waitFor(() => expect(drawer.textContent).toContain("for those without severe symptoms."));
+    return drawer;
   }
 
   it("marks the clause that supports the claim", async () => {

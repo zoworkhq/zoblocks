@@ -114,9 +114,20 @@ describe("signUp", () => {
       ),
     ]);
 
-    const admin = await db().users.findOne({ role: "admin" });
+    /*
+     * Scoped to this test's own two accounts.
+     *
+     * It used to ask the collection for "the admin", full stop, and when the
+     * eight-way race above timed out its in-flight inserts landed after the
+     * afterEach cleanup — so this test failed reporting `racer1@example.org`,
+     * naming a row it had never created and a test that was not this one. The
+     * timeout is fixed by the bcrypt cost; this makes the assertion answer for
+     * its own subject either way.
+     */
+    const racers = ["a@example.org", "b@example.org"];
+    const admin = await db().users.findOne({ role: "admin", emailLower: { $in: racers } });
     expect(admin?.approvedAt).toBeInstanceOf(Date);
-    expect(["a@example.org", "b@example.org"]).toContain(admin?.emailLower);
+    expect(racers).toContain(admin?.emailLower);
     expect(await db().users.findOne({ role: "member" })).toMatchObject({
       status: "pending",
       approvedAt: null,

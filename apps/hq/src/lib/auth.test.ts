@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 import { ObjectId } from "mongodb";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { db } from "@/db/client";
 import { PASSWORD, seedUser } from "../../test/harness";
 import { __readCookie, __setRequestHeader, __writeCookie } from "../../test/stubs/next-headers";
@@ -40,8 +40,32 @@ describe("passwords", () => {
     expect(await hashPassword(PASSWORD)).not.toEqual(await hashPassword(PASSWORD));
   });
 
-  it("uses bcrypt at the stated cost", async () => {
-    expect(await hashPassword(PASSWORD)).toMatch(/^\$2[aby]\$12\$/);
+  it("uses bcrypt", async () => {
+    expect(await hashPassword(PASSWORD)).toMatch(/^\$2[aby]\$/);
+  });
+
+  /**
+   * The production cost, asserted against a module loaded without the test
+   * override.
+   *
+   * `test/setup.ts` sets `HQ_BCRYPT_COST=4`, because at 12 the pure-JS
+   * implementation is most of this suite's runtime and it timed the signup race
+   * out on CI. That override is only safe while something proves it cannot
+   * reach production, and this is that proof: re-import `auth` with the
+   * variable unset and the cost is 12.
+   *
+   * One cost-12 hash, once, is the entire price of keeping the parameter gated.
+   */
+  it("costs 12 when nothing overrides it", async () => {
+    vi.stubEnv("HQ_BCRYPT_COST", undefined as unknown as string);
+    vi.resetModules();
+    try {
+      const fresh = await import("./auth");
+      expect(await fresh.hashPassword(PASSWORD)).toMatch(/^\$2[aby]\$12\$/);
+    } finally {
+      vi.unstubAllEnvs();
+      vi.resetModules();
+    }
   });
 });
 

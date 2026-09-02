@@ -26,7 +26,24 @@ import type { UserDoc, UserRole, UserStatus } from "@/db/collections";
 
 const COOKIE = "hq_session";
 const SESSION_DAYS = 14;
-const BCRYPT_COST = 12;
+/**
+ * bcrypt cost. Twelve in production, and the tests turn it down.
+ *
+ * `bcryptjs` is pure JavaScript, so a cost-12 hash is a couple of hundred
+ * milliseconds of main-thread work rather than a few tens. That is the right
+ * trade for a login and the wrong one for a suite that signs up ninety-nine
+ * times: the eight-way signup race in `actions.test.ts` spent its whole budget
+ * hashing, hit the 30s timeout on a loaded CI runner, and then — because a
+ * timed-out test's in-flight inserts land *after* the afterEach cleanup — left
+ * a row behind that made the next test fail with an assertion naming the wrong
+ * account. One slow parameter, two red tests, neither of them about hashing.
+ *
+ * Read from the environment rather than exported as a mutable, so the value is
+ * fixed once at module load exactly as it was before. `auth.test.ts` asserts
+ * the default is still 12, so turning it down for a test run cannot quietly
+ * turn it down for production.
+ */
+const BCRYPT_COST = Number(process.env.HQ_BCRYPT_COST ?? 12);
 
 /** Reset links are short-lived: an admin mints one and hands it over now. */
 const RESET_MINUTES = 60;

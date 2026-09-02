@@ -51,49 +51,21 @@ import {
 } from "@/registry/oxygen/data-grid/data-grid.fixtures";
 
 /**
- * The four claims, each pointing at the thing that carries it.
+ * What is lit, and the four words for it.
  *
- * `part` is what lights up in the grid — the frame carries `data-part` and the
- * stylesheet rings the matching region. A claim beside a component is an
- * assertion; a claim wired to the pixel making it is a demonstration.
+ * These were four paragraphs in a rail under the grid, which made the panel a
+ * piece of marketing copy with a table in it. The component is the argument;
+ * the label only has to name which part of it is currently ringed, so it is a
+ * label. `part` is what lights up — the frame carries `data-part` and the
+ * stylesheet rings the matching region.
  */
-const CLAIMS = [
-  {
-    part: "coverage",
-    title: "It states its coverage",
-    body: "Eight rows, 1,438 in the cohort, and the filter written as a sentence. Most grids render the eight and say nothing about the other 1,430.",
-  },
-  {
-    part: "held",
-    title: "Nothing moves under your hand",
-    body: "Results are arriving now and the table has not moved. They wait behind the line until you ask, because a grid that reorders under a pointer is how the wrong row gets actioned.",
-  },
-  {
-    part: "derived",
-    title: "Sorting is a clinical act",
-    body: "This is ranked by model output, so the column cites the model, its version and the population it was validated in. No other grid treats a sort as something to declare.",
-  },
-  {
-    part: "absence",
-    title: "Absence is a word, never a dash",
-    body: "A specimen with the lab and a record you are not entitled to are different facts with different next actions. The type has no null to collapse them into.",
-  },
+const BEATS = [
+  { part: "coverage", label: "States its coverage" },
+  { part: "held", label: "Holds arriving results" },
+  { part: "derived", label: "Cites the model it sorted by" },
+  { part: "absence", label: "Says which kind of missing" },
 ] as const;
 
-/**
- * The results waiting to come in — three, and every one of them lands on a row
- * that already has a value.
- *
- * The shared `ARRIVALS` fixture resolves two of the ward's absences, which is
- * exactly right for the stories and wrong here: resolving an absence removes
- * its footnote, and two footnotes are forty pixels of panel height. Measured,
- * after the row count had already been pinned — it was the last thing still
- * moving.
- *
- * They are also chosen to make the re-order worth watching. Haddad goes from
- * seventh to fourth when these land, which is the whole point of the beat: the
- * order changed because new data arrived *and somebody asked for it*.
- */
 const PATCHES = [
   { mrn: "3320145", potassium: 5.9, previous: 5.4, risk: 0.68 },
   { mrn: "5518203", potassium: 4.6, previous: 4.1, risk: 0.52 },
@@ -241,7 +213,7 @@ export function DataGridDemo() {
 
   const [rows, setRows] = React.useState<readonly WardRow[]>(WARD_WITH_EVERY_ABSENCE);
   const [waiting, setWaiting] = React.useState(1);
-  const [claim, setClaim] = React.useState(0);
+  const [beat, setBeat] = React.useState(0);
   /*
    * Any contact stops the loop, permanently.
    *
@@ -262,7 +234,7 @@ export function DataGridDemo() {
     // movement conveys nothing this does not.
     if (reduced || taken) return;
     const timer = setInterval(() => {
-      setClaim((current) => (current + 1) % CLAIMS.length);
+      setBeat((current) => (current + 1) % BEATS.length);
       setWaiting((current) => {
         if (current < HELD.length) return current + 1;
         setRows((rowsNow) => apply(rowsNow, HELD));
@@ -272,7 +244,7 @@ export function DataGridDemo() {
     return () => clearInterval(timer);
   }, [reduced, taken]);
 
-  const active = CLAIMS[claim]!;
+  const active = BEATS[beat]!;
 
   return (
     <figure className="oxdg" data-part={taken ? "none" : active.part}>
@@ -315,23 +287,19 @@ export function DataGridDemo() {
       </div>
 
       {/*
-        The claims, lit one at a time against the part of the grid that carries
-        each. A list rather than a carousel: all four are readable at once on a
-        wide screen, and the highlight is the only thing that moves.
+        One line, fixed height, naming what is ringed.
+
+        A caption rather than a rail: four boxes of prose under a worklist read
+        as a brochure wrapped round a component, and the component is the
+        argument. `nowrap` and a fixed height because the label changes every
+        few seconds and this panel's whole claim is that it does not move.
       */}
-      <ol className="oxdg__claims">
-        {CLAIMS.map((entry, index) => (
-          <li
-            key={entry.part}
-            className="oxdg__claim"
-            data-on={!taken && index === claim ? "true" : "false"}
-          >
-            <span className="oxdg__claimnum numeric">{String(index + 1).padStart(2, "0")}</span>
-            <span className="oxdg__claimtitle">{entry.title}</span>
-            <span className="oxdg__claimbody">{entry.body}</span>
-          </li>
-        ))}
-      </ol>
+      <p className="oxdg__beat">
+        <span className="oxdg__beatnum numeric">{String(beat + 1).padStart(2, "0")}</span>
+        <span className="oxdg__beatlabel">
+          {taken ? "Yours now — arrow keys move the cursor" : active.label}
+        </span>
+      </p>
     </figure>
   );
 }

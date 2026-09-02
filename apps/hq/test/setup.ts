@@ -14,6 +14,22 @@ let server: MongoMemoryServer;
  */
 process.env.HQ_DB_NAME = "hq_test";
 
+/**
+ * The cheapest bcrypt cost the library accepts, for the same reason and at the
+ * same moment.
+ *
+ * The suite signs up ninety-nine times and `bcryptjs` is pure JavaScript, so at
+ * the production cost of 12 the hashing *is* the runtime — nine seconds for the
+ * twelve signUp cases on a fast laptop, and past the 30s timeout for the
+ * eight-way race on a loaded CI runner. What the tests here are about is which
+ * account wins a race and what the unique index does, none of which depends on
+ * how expensive the hash was.
+ *
+ * `auth.test.ts` asserts the production default is still 12 with this variable
+ * unset, so this line cannot weaken anything but the test run.
+ */
+process.env.HQ_BCRYPT_COST = "4";
+
 beforeAll(async () => {
   server = await MongoMemoryServer.create();
   // Read lazily inside connect(), so beforeAll is early enough for this one.
