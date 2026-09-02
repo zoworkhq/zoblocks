@@ -12,7 +12,7 @@
 
 import { cleanup, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { expectStatedInWords, itMeetsTheContract } from "../../../test/contract";
 import { DataGrid, type DataGridColumn } from "./data-grid";
 import {
@@ -28,13 +28,12 @@ import {
 import {
   compareGridValues,
   describeGridCoverage,
-  describeGridPage,
+  describeGridLoaded,
   describeGridSelection,
   describeGridIdentity,
   gridCapacityRefusal,
-  gridPageCount,
-  gridPageWindow,
   gridSelectionState,
+  shouldLoadMoreGridRows,
   gridUnseenCount,
   localGridCoverage,
   moveGridCursor,
@@ -50,8 +49,8 @@ import {
 const COLUMNS = CASELOAD_COLUMNS as DataGridColumn<CaseloadRow>[];
 
 const base = {
-  caption: "Patients on 4-West with a phq9 outside the reference range",
-  title: "Worklist · 4-West",
+  caption: "Clients on this team's caseload with a raised PHQ-9 or a recent risk screen",
+  title: "Caseload · adult outpatient",
   columns: COLUMNS,
   rows: CASELOAD,
   rowKey: (row: CaseloadRow) => row.mrn,
@@ -470,6 +469,38 @@ describe("a real grid, not a table with a click handler", () => {
 });
 
 /* ------------------------------------------------------------------ */
+/* Framing the host already does                                       */
+/* ------------------------------------------------------------------ */
+
+describe("gives the framing back to the host when asked", () => {
+  it("drops the masthead and keeps the accessible name", () => {
+    render(<DataGrid {...base} coverage={CASELOAD_COVERAGE} masthead={false} />);
+    // The claim is gone from the page.
+    expect(screen.queryByText(describeGridCoverage(CASELOAD_COVERAGE))).toBeNull();
+    // The grid is still named. Turning off chrome must never unname a table.
+    expect(screen.getByRole("grid").getAttribute("aria-label")).toBe(base.caption);
+  });
+
+  it("drops the foot without letting an absence go unlabelled", () => {
+    render(
+      <DataGrid
+        {...base}
+        rows={CASELOAD_WITH_EVERY_ABSENCE}
+        coverage={{ ...CASELOAD_COVERAGE, shown: CASELOAD_WITH_EVERY_ABSENCE.length }}
+        identify={(row) => ({ primary: row.name })}
+        footer={false}
+      />,
+    );
+    // No reading line, no notes, no numbered list.
+    expect(screen.queryByText(/^Reading$/)).toBeNull();
+    expect(screen.queryByRole("list")).toBeNull();
+    // But the cell still says the word. The superscript went; the meaning did not.
+    expect(screen.getAllByText("Restricted").length).toBeGreaterThan(0);
+    expect(document.querySelector(".ox-grid__mark")).toBeNull();
+  });
+});
+
+/* ------------------------------------------------------------------ */
 /* The rest of the surface                                             */
 /* ------------------------------------------------------------------ */
 
@@ -681,7 +712,7 @@ describe("selection, and what a bulk action may reach", () => {
     expect(onSelectionChange).toHaveBeenCalled();
   });
 
-  it("announces the count and offers the verbs only while something is picked", () => {
+  it("keeps the bar's box while nothing is picked, so nothing moves when something is", () => {
     const { unmount } = render(
       <DataGrid
         {...base}
@@ -691,7 +722,16 @@ describe("selection, and what a bulk action may reach", () => {
         bulkActions={() => <button type="button">Assign clinician</button>}
       />,
     );
-    expect(screen.queryByRole("region", { name: "Selection actions" })).toBeNull();
+    /*
+     * Laid out, and off. It used to be unmounted, and the first click then
+     * pushed every row down by the bar's height — under a pointer already
+     * moving towards the next checkbox, which in a caseload is how somebody
+     * actions the wrong client. The box stays; only its visibility changes.
+     */
+    const idle = document.querySelector(".ox-grid__bulk");
+    expect(idle?.getAttribute("data-ox-on")).toBe("false");
+    // Inert, so its buttons are not in the tab ring while it is hidden.
+    expect(idle?.hasAttribute("inert")).toBe(true);
     unmount();
 
     render(
@@ -704,6 +744,8 @@ describe("selection, and what a bulk action may reach", () => {
       />,
     );
     const bar = screen.getByRole("region", { name: "Selection actions" });
+    expect(bar.getAttribute("data-ox-on")).toBe("true");
+    expect(bar.hasAttribute("inert")).toBe(false);
     // Polite, because selecting one row at a time otherwise announces only
     // that a checkbox changed — never that a bar of verbs appeared above it.
     expect(within(bar).getByText("2 rows selected").getAttribute("aria-live")).toBe("polite");
@@ -718,58 +760,294 @@ describe("selection, and what a bulk action may reach", () => {
 });
 
 /* ------------------------------------------------------------------ */
-/* Pagination                                                          */
+/* Loading more                                                        */
 /* ------------------------------------------------------------------ */
 
-describe("paging is reported, never performed", () => {
-  it("describes the window, and admits when the end is unknown", () => {
-    expect(describeGridPage({ index: 0, size: 50 }, 312)).toBe("1–50 of 312");
-    expect(describeGridPage({ index: 6, size: 50 }, 312)).toBe("301–312 of 312");
-    // The failure this prevents: a pager rendering "page 1 of 1" over a Bundle
-    // whose total the server withheld has invented the end of the list.
-    expect(describeGridPage({ index: 2, size: 50 }, "unknown")).toBe("101 onwards");
-    expect(gridPageCount("unknown", 50)).toBe("unknown");
-    expect(gridPageCount(312, 50)).toBe(7);
-  });
-
-  it("elides the middle rather than drawing sixty-three buttons", () => {
-    expect(gridPageWindow(0, 7)).toEqual([0, 1, "gap", 6]);
-    expect(gridPageWindow(3, 7)).toEqual([0, "gap", 2, 3, 4, "gap", 6]);
-    expect(gridPageWindow(6, 7)).toEqual([0, "gap", 5, 6]);
-    expect(gridPageWindow(2, "unknown")).toEqual([2]);
-  });
-
-  it("draws a named nav, and disables the ends", () => {
-    const onPageChange = vi.fn();
+describe("the pinned column, measured rather than guessed", () => {
+  it("writes a left offset for every pinned cell, and leaves the rest alone", () => {
     render(
       <DataGrid
         {...base}
         coverage={CASELOAD_COVERAGE}
-        page={{ index: 0, size: 50 }}
-        onPageChange={onPageChange}
+        pinnedColumns={1}
+        selectedKeys={[]}
+        onSelectionChange={() => {}}
+        bulkActions={() => null}
       />,
     );
-    const pager = screen.getByRole("navigation", { name: "Pages" });
-    expect(within(pager).getByText("1–50 of 312")).toBeTruthy();
-    expect(within(pager).getByRole("button", { name: "Previous page" })).toBeDisabled();
-    expect(within(pager).getByRole("button", { name: "Page 1" }).getAttribute("aria-current")).toBe(
-      "page",
-    );
+    /*
+     * A hard-coded `left` is the usual version and it is wrong the moment a
+     * name is long, the density changes or a translation lands. The offsets
+     * come from the header's own widths, so the checkbox column and the
+     * identity column stack correctly whatever they turn out to measure.
+     */
+    const pinned = document.querySelectorAll(".ox-grid__pin");
+    expect(pinned.length).toBeGreaterThan(0);
+    const first = pinned[0] as HTMLElement | undefined;
+    expect(first?.style.left).toBe("0px");
   });
 
-  it("leaves the next page reachable when the total is withheld", () => {
+  it("keeps the same array when a re-measure finds the same widths", () => {
+    const props = {
+      ...base,
+      coverage: CASELOAD_COVERAGE,
+      pinnedColumns: 1,
+      selectedKeys: [] as readonly string[],
+      onSelectionChange: () => {},
+      bulkActions: () => null,
+    };
+    const { rerender } = render(<DataGrid {...props} density="regular" />);
+    // Density is in the effect's dependencies, so this measures a second time.
+    // Identical offsets have to return the *same* array: a new one every
+    // measure re-renders every pinned cell for nothing, and a ResizeObserver
+    // fires on every window drag.
+    rerender(<DataGrid {...props} density="comfortable" />);
+    rerender(<DataGrid {...props} density="regular" />);
+    const first = document.querySelector(".ox-grid__pin") as HTMLElement | null;
+    expect(first?.style.left).toBe("0px");
+  });
+});
+
+describe("the engine's two remaining orderings", () => {
+  it("ranks a status column by its declared vocabulary, worst first", () => {
+    // "None reported" sorting above "Ideation with plan" because N precedes I
+    // is how a worklist buries the row it was built to surface.
+    const cssrs = COLUMNS.find((column) => column.key === "cssrs");
+    const words = sortGridRows(CASELOAD, cssrs, "ascending").map((row) => row.cssrs);
+    expect(words[0]).toBe("Ideation with plan");
+
+    // A term the vocabulary does not list sorts after every term it does,
+    // rather than wherever the alphabet happens to put it.
+    const first = CASELOAD[0];
+    if (!first) throw new Error("no caseload row");
+    const odd = [...CASELOAD, { ...first, mrn: "0000001", cssrs: "Not in the list" }];
+    const withOdd = sortGridRows(odd, cssrs, "ascending")
+      .map((row) => row.cssrs)
+      // Absence still sorts below everything, so the last *word* is the one
+      // the vocabulary does not know about.
+      .filter((value) => typeof value === "string");
+    expect(withOdd.at(-1)).toBe("Not in the list");
+  });
+
+  it("moves a page at a time, and stops at both ends", () => {
+    const bounds = { rows: 40, columns: 5 };
+    expect(moveGridCursor({ row: 0, column: 0 }, "PageDown", bounds)).toEqual({
+      row: 10,
+      column: 0,
+    });
+    expect(moveGridCursor({ row: 12, column: 2 }, "PageUp", bounds)).toEqual({
+      row: 2,
+      column: 2,
+    });
+    // Clamped rather than wrapped, and the floor is -1 — the header row — so a
+    // reader who pages up off the top lands on the sort controls rather than
+    // on the bottom of the list they were trying to leave.
+    expect(moveGridCursor({ row: 3, column: 1 }, "PageUp", bounds)).toEqual({
+      row: -1,
+      column: 1,
+    });
+    expect(moveGridCursor({ row: 38, column: 1 }, "PageDown", bounds)).toEqual({
+      row: 39,
+      column: 1,
+    });
+  });
+});
+
+describe("the controls a mouse reaches", () => {
+  it("selects and clears the whole page from the header", async () => {
+    const user = userEvent.setup();
+    const changes: string[][] = [];
+    const { rerender } = render(
+      <DataGrid
+        {...base}
+        coverage={CASELOAD_COVERAGE}
+        selectedKeys={[]}
+        onSelectionChange={(next) => changes.push([...next])}
+        bulkActions={() => <button type="button">Assign clinician</button>}
+      />,
+    );
+    await user.click(screen.getByRole("checkbox", { name: /Select all 6 rows/ }));
+    expect(changes[0]).toHaveLength(CASELOAD.length);
+
+    // And the bar's own Clear, which is the only way back out without
+    // un-ticking six boxes one at a time.
+    rerender(
+      <DataGrid
+        {...base}
+        coverage={CASELOAD_COVERAGE}
+        selectedKeys={CASELOAD.map((row) => row.mrn)}
+        onSelectionChange={(next) => changes.push([...next])}
+        bulkActions={() => <button type="button">Assign clinician</button>}
+      />,
+    );
+    await user.click(screen.getByRole("button", { name: "Clear" }));
+    expect(changes[1]).toEqual([]);
+  });
+
+  it("shows the header box as part-selected rather than as off", () => {
     render(
       <DataGrid
         {...base}
-        coverage={UNKNOWN_TOTAL_COVERAGE}
-        page={{ index: 1, size: 50 }}
-        onPageChange={() => {}}
+        coverage={CASELOAD_COVERAGE}
+        selectedKeys={[CASELOAD[0]?.mrn ?? ""]}
+        onSelectionChange={() => {}}
+        bulkActions={() => null}
       />,
     );
-    const pager = screen.getByRole("navigation", { name: "Pages" });
-    // There is no last page to disable against, so the control must not guess
-    // that this is it.
-    expect(within(pager).getByRole("button", { name: "Next page" })).not.toBeDisabled();
+    // Indeterminate, not unchecked: "some" and "none" are different answers and
+    // an unticked box in a header that has two rows selected is a lie.
+    const box = screen.getByRole("checkbox", { name: /Select all 6 rows/ });
+    expect((box as HTMLInputElement).indeterminate).toBe(true);
+  });
+});
+
+/* ------------------------------------------------------------------ */
+/* Reaching the end                                                    */
+/* ------------------------------------------------------------------ */
+
+describe("the sentinel, once something actually crosses it", () => {
+  /**
+   * jsdom has no IntersectionObserver, so the callback the component installs
+   * is never invoked and the one line that matters — "should I ask for more?"
+   * — goes untested. This captures it and calls it by hand.
+   */
+  function captureObserver() {
+    const calls: IntersectionObserverCallback[] = [];
+    class Fake {
+      constructor(callback: IntersectionObserverCallback) {
+        calls.push(callback);
+      }
+      observe() {}
+      disconnect() {}
+      unobserve() {}
+      takeRecords() {
+        return [];
+      }
+      root = null;
+      rootMargin = "";
+      thresholds = [];
+    }
+    vi.stubGlobal("IntersectionObserver", Fake);
+    return calls;
+  }
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it("asks for more when the sentinel comes into view, and not otherwise", () => {
+    const calls = captureObserver();
+    const onReachEnd = vi.fn();
+    render(
+      <DataGrid
+        {...base}
+        coverage={{ shown: 6, total: 312, noun: "clients" }}
+        onReachEnd={onReachEnd}
+      />,
+    );
+    const fire = calls[0];
+    expect(fire).toBeTruthy();
+
+    // Nothing intersecting: nothing asked for.
+    fire?.([{ isIntersecting: false } as IntersectionObserverEntry], {} as IntersectionObserver);
+    expect(onReachEnd).not.toHaveBeenCalled();
+
+    fire?.([{ isIntersecting: true } as IntersectionObserverEntry], {} as IntersectionObserver);
+    expect(onReachEnd).toHaveBeenCalledTimes(1);
+  });
+
+  it("does not ask twice while a request is in flight", () => {
+    const calls = captureObserver();
+    const onReachEnd = vi.fn();
+    render(
+      <DataGrid
+        {...base}
+        coverage={{ shown: 6, total: 312, noun: "clients" }}
+        onReachEnd={onReachEnd}
+        loadingMore
+      />,
+    );
+    calls[0]?.([{ isIntersecting: true } as IntersectionObserverEntry], {} as IntersectionObserver);
+    // The defect every hand-rolled infinite scroll ships with, refused here.
+    expect(onReachEnd).not.toHaveBeenCalled();
+  });
+});
+
+describe("nothing matched", () => {
+  it("says so inside the grid, with the headers still there", () => {
+    render(<DataGrid {...base} rows={[]} coverage={{ shown: 0, total: 0, noun: "clients" }} />);
+    expect(screen.getByRole("status").textContent).toBe("No clients match.");
+    // The headers survive, because undoing the filter or the sort is the next
+    // thing the reader does and both controls live in them.
+    expect(screen.getAllByRole("columnheader").length).toBeGreaterThan(0);
+  });
+
+  it("lets the host say the thing the grid cannot know", () => {
+    render(
+      <DataGrid
+        {...base}
+        rows={[]}
+        coverage={{ shown: 0, total: 0 }}
+        empty="No clients match. Try dropping the PHQ-9 filter."
+      />,
+    );
+    expect(screen.getByRole("status").textContent).toContain("dropping the PHQ-9 filter");
+  });
+});
+
+describe("the end of the list, rather than a page number", () => {
+  it("says how far through it is, and admits when the end is not knowable", () => {
+    expect(describeGridLoaded({ shown: 24, total: 312, noun: "clients" })).toBe(
+      "24 of 312 clients loaded.",
+    );
+    expect(describeGridLoaded({ shown: 312, total: 312, noun: "clients" })).toBe(
+      "All 312 clients loaded.",
+    );
+    // The reason this replaced a pager: against a FHIR search the total is
+    // often withheld, and "page 4 of 7" is then a control that cannot be built.
+    expect(describeGridLoaded({ shown: 24, total: "unknown", noun: "clients" })).toBe(
+      "24 clients loaded. The source did not say how many match.",
+    );
+    expect(describeGridLoaded({ shown: 24, total: "unknown", noun: "clients" }, "exhausted")).toBe(
+      "All 24 clients loaded.",
+    );
+    expect(describeGridLoaded({ shown: 24, total: 312, noun: "clients" }, "loading")).toBe(
+      "Loading more clients…",
+    );
+  });
+
+  it("refuses a second request while one is in flight", () => {
+    // The defect every hand-rolled infinite scroll ships with: a scroll that
+    // crosses the sentinel twice fetches the same batch twice, and the list
+    // ends up holding it twice.
+    const coverage = { shown: 24, total: 312 };
+    expect(shouldLoadMoreGridRows(coverage, false, false)).toBe(true);
+    expect(shouldLoadMoreGridRows(coverage, true, false)).toBe(false);
+    expect(shouldLoadMoreGridRows(coverage, false, true)).toBe(false);
+    // Nothing left to ask for.
+    expect(shouldLoadMoreGridRows({ shown: 312, total: 312 }, false, false)).toBe(false);
+    // And an unknown total is always worth one more ask.
+    expect(shouldLoadMoreGridRows({ shown: 24, total: "unknown" }, false, false)).toBe(true);
+  });
+
+  it("announces its state rather than spinning", () => {
+    render(
+      <DataGrid
+        {...base}
+        coverage={{ ...CASELOAD_COVERAGE, shown: 6 }}
+        onReachEnd={() => {}}
+        loadingMore
+      />,
+    );
+    // A sentence a screen reader reads out, where a spinner is nothing at all.
+    expect(screen.getByRole("status").textContent).toBe(
+      "Loading more clients on this team's caseload…",
+    );
+  });
+
+  it("draws no end-of-list furniture when there is nothing more to fetch", () => {
+    render(<DataGrid {...base} coverage={CASELOAD_COVERAGE} />);
+    expect(screen.queryByRole("status")).toBeNull();
   });
 });
 

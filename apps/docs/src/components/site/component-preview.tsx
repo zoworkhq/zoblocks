@@ -77,16 +77,14 @@ import {
   ChartCommandPalette,
   type PaletteItem,
 } from "@/registry/oxygen/chart-command-palette/chart-command-palette";
-import { DataGrid, type DataGridColumn } from "@/registry/oxygen/data-grid/data-grid";
-import { PatientPortrait } from "@/components/site/patient-portrait";
+import { DataGrid } from "@/registry/oxygen/data-grid/data-grid";
+import { CASELOAD_COLUMNS_DOC } from "@/components/site/caseload-columns";
 import {
   ARRIVALS as GRID_ARRIVALS,
-  DISENGAGEMENT,
   UNKNOWN_TOTAL_COVERAGE,
   CASELOAD,
   CASELOAD_COVERAGE,
   CASELOAD_WITH_EVERY_ABSENCE,
-  phq9Band,
   type CaseloadRow,
 } from "@/registry/oxygen/data-grid/data-grid.fixtures";
 import {
@@ -1743,86 +1741,26 @@ const REC_TURNS = [
 /* Data Grid                                                           */
 /* ------------------------------------------------------------------ */
 
-/**
- * The identity cell, composed by the caller.
- *
- * The grid renders whatever `cell` returns and has no opinion about
- * photographs — which is the point of the cell host being open at all. What
- * the portrait does and does not claim is stated in `PatientPortrait`.
- */
-function WardPatient({ row }: { row: CaseloadRow }) {
-  return (
-    <span style={{ display: "flex", alignItems: "center", gap: "0.625rem", minWidth: 0 }}>
-      <PatientPortrait src={row.photo} size={26} />
-      <span style={{ minWidth: 0 }}>
-        <span style={{ display: "block", whiteSpace: "nowrap", fontWeight: 500, lineHeight: 1.2 }}>
-          {row.name}
-        </span>
-        {/* The identifier under the name rather than a column away: a name is
-            not an identifier, and the row somebody acts on has to carry both. */}
-        <span
-          className="numeric"
-          style={{ display: "block", fontSize: "0.625rem", lineHeight: 1.3, opacity: 0.65 }}
-        >
-          {row.mrn}
-        </span>
-      </span>
-    </span>
-  );
-}
-
-const GRID_COLUMNS: DataGridColumn<CaseloadRow>[] = [
-  {
-    key: "name",
-    header: "Patient",
-    kind: "text",
-    value: (row) => row.name,
-    cell: (row) => <WardPatient row={row} />,
-  },
-  {
-    key: "phq9",
-    header: "PHQ-9",
-    kind: "measure",
-    value: (row) => row.phq9,
-    align: "start",
-    width: "9rem",
-    footnote:
-      "PHQ-9 total, 0–27. Bands are the instrument's: 10 moderate, 15 moderately severe, 20 severe.",
-    // The qualifier is a word the caller supplies. The grid holds no reference
-    // ranges: inventing one is how a library ends up asserting a threshold
-    // somebody else's lab disagrees with.
-    cell: (row) => (
-      <span>
-        {String(row.phq9)}
-        {phq9Band(row.phq9) ? (
-          <span style={{ fontSize: "0.6875rem", opacity: 0.75 }}> {phq9Band(row.phq9)}</span>
-        ) : null}
-      </span>
-    ),
-  },
-  {
-    key: "risk",
-    header: "Disengagement risk",
-    kind: "number",
-    width: "11rem",
-    value: (row) => row.risk,
-    derived: DISENGAGEMENT,
-    cell: (row) => row.risk.toFixed(2),
-  },
-  { key: "due", header: "Next due", kind: "instant", value: (row) => row.due, width: "6rem" },
-];
-
 const GRID_BASE = {
   caption: "Clients on this team's caseload with a raised PHQ-9 or a recent risk screen",
   title: "Caseload · PHQ-9 raised or risk screened",
   note: "14-day window",
-  columns: GRID_COLUMNS,
+  columns: CASELOAD_COLUMNS_DOC,
   rowKey: (row: CaseloadRow) => row.mrn,
   identify: (row: CaseloadRow) => ({ primary: row.name, secondary: `MRN ${row.mrn}` }),
 } as const;
 
+/*
+ * The stage is an `.oxw` element.
+ *
+ * The shared caseload cells — portrait, chips, meter — are scoped under `.oxw`
+ * in `data-grid-demo.css`, the same containment the home page's chrome uses.
+ * `--bare` drops the card's own border and shadow, because the preview panel
+ * around this already has both and two nested frames read as a rendering
+ * fault.
+ */
 function GridStage({ children }: { children: React.ReactNode }) {
-  return <div style={{ maxInlineSize: "100%" }}>{children}</div>;
+  return <div className="oxw oxw--bare">{children}</div>;
 }
 
 /**

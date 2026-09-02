@@ -4,13 +4,13 @@
  * DataGrid — a worklist that states what it is showing, out of what.
  *
  *     <DataGrid
- *       caption="Patients on 4-West with a potassium outside the reference range"
- *       title="Worklist · 4-West · potassium out of range"
+ *       caption="Clients with a raised PHQ-9 or a recent risk screen"
+ *       title="Caseload · adult outpatient"
  *       columns={columns}
  *       rows={rows}
  *       rowKey={(row) => row.mrn}
  *       coverage={{ shown: 24, total: 1438, noun: "patients in the cohort",
- *                   predicate: "Unit is 4-West, and potassium outside the reference range in the last 24 hours." }}
+ *                   predicate: "Adult outpatient behavioral health, PHQ-9 of 10 or more in the last 30 days." }}
  *       identify={(row) => ({ primary: row.name, secondary: `MRN ${row.mrn}` })}
  *       arrivals={held}
  *       onAdmitArrivals={admit}
@@ -57,7 +57,7 @@ import * as React from "react";
 import { cn } from "@/lib/utils";
 import {
   describeGridArrivals,
-  describeGridPage,
+  describeGridLoaded,
   describeGridSelection,
   describeGridCoverage,
   describeGridDerivation,
@@ -65,9 +65,8 @@ import {
   gridAbsenceDetail,
   gridAbsenceLabel,
   gridCapacityRefusal,
-  gridPageCount,
-  gridPageWindow,
   gridSelectionState,
+  shouldLoadMoreGridRows,
   isGridAbsent,
   moveGridCursor,
   nextGridSort,
@@ -77,7 +76,6 @@ import {
   type GridColumnSpec,
   type GridCoverage,
   type GridIdentity,
-  type GridPage,
   type GridSort,
   type GridValue,
 } from "@/lib/oxygen-grid";
@@ -93,12 +91,11 @@ export {
   describeGridIdentity,
   gridAbsenceDetail,
   gridAbsenceLabel,
-  describeGridPage,
+  describeGridLoaded,
   describeGridSelection,
   gridCapacityRefusal,
-  gridPageCount,
-  gridPageWindow,
   gridSelectionState,
+  shouldLoadMoreGridRows,
   gridUnseenCount,
   isGridAbsent,
   localGridCoverage,
@@ -119,7 +116,6 @@ export {
   type GridDerivation,
   type GridExportOptions,
   type GridIdentity,
-  type GridPage,
   type GridSelectionState,
   type GridSort,
   type GridSortDirection,
@@ -158,6 +154,44 @@ export interface DataGridProps<Row> {
   caption: string;
   /** The masthead line. Falls back to `caption`. */
   title?: React.ReactNode;
+  /**
+   * Draw the masthead — the title, the coverage sentence and the predicate.
+   *
+   * On by default, because a grid dropped into a page with no framing has to
+   * carry its own. Turn it off when the host already frames it: an application
+   * screen with a page header naming the list and a filter bar naming the
+   * predicate is saying both things twice, and the second copy reads as
+   * chrome rather than as the claim it is.
+   *
+   * `caption` is unaffected — the accessible name never goes away, so the grid
+   * is still named for a screen reader when nothing is drawn for the eye. Where
+   * the masthead is off, the coverage sentence becomes the host's to place, and
+   * `describeGridCoverage(coverage)` is the one line that does it.
+   */
+  masthead?: boolean;
+  /**
+   * Draw the foot — the reading line, the sort citation and the footnotes.
+   *
+   * On by default, for the same reason as the masthead: a grid standing alone
+   * has to carry its own provenance, and a derived column with no note beside
+   * it is a number with no author.
+   *
+   * Turning it off does not make an absent cell lie. The absence keeps its
+   * word — "Not recorded", "Restricted" — and only loses the superscript that
+   * pointed at the note, because the note is no longer on the page. Turn it
+   * off only where the host carries provenance itself.
+   */
+  footer?: boolean;
+  /**
+   * What to say when the predicate matched nothing.
+   *
+   * A grid that renders a header over an empty body has said nothing about
+   * why, and the reader's next move — widen the filter, or trust that there is
+   * genuinely nobody — depends entirely on which it is. The default names the
+   * noun from `coverage`; pass a node to say something the host knows and the
+   * grid cannot, such as which filter to drop.
+   */
+  empty?: React.ReactNode;
   /** The right-hand side of the masthead: a window, a source, a role. */
   note?: React.ReactNode;
 
@@ -234,16 +268,23 @@ export interface DataGridProps<Row> {
   pinnedColumns?: number;
 
   /**
-   * Paging, reported rather than performed.
+   * The reader has reached the end of what is loaded. Fetch the next batch.
    *
-   * The grid holds `rows` and nothing else — it does not slice, and it never
-   * fetches. This draws the control and tells the caller which page was asked
-   * for. Where `coverage.total` is `"unknown"` the pager says so instead of
-   * inventing a last page.
+   * This replaced a numbered pager, and not for taste: FHIR search returns
+   * opaque `link.next` URLs, the spec forbids constructing paging URLs by
+   * hand, and `Bundle.total` is optional. "Page 4 of 7" is therefore a control
+   * that cannot be built against a conformant server — the count is not
+   * derivable and the jump target is not addressable. Following `next` until
+   * it stops is the shape the protocol has.
+   *
+   * The grid never fetches. It watches a sentinel below the last row and says
+   * when it comes into view; appending to `rows` is the caller's.
    */
-  page?: GridPage;
-  /** The reader asked for a page. Zero-based, and the caller fetches it; the grid does not. */
-  onPageChange?: (index: number) => void;
+  onReachEnd?: () => void;
+  /** A fetch is in flight. Draws the waiting line and suppresses further calls. */
+  loadingMore?: boolean;
+  /** There is no more to load. Draws the end of the list rather than waiting forever. */
+  exhausted?: boolean;
 
   /** A scroll height for the body. The header sticks to the top of it. */
   maxHeight?: string;
@@ -295,6 +336,19 @@ function defaultAlign<Row>(column: DataGridColumn<Row>): "start" | "end" {
  * numbers mean. Built once per render rather than during it, so the marker in
  * the header and the note at the bottom cannot disagree about a number.
  */
+/**
+ * How far below the last row the grid starts fetching, as an observer margin.
+ *
+ * About three rows. Far enough that the next batch is usually there before the
+ * reader arrives, near enough that a list which overfills its window by one
+ * screen does not fetch again the moment it paints — the defect that makes an
+ * infinite list open in a loading state nobody asked for.
+ */
+const GRID_LOAD_LEAD = "120px";
+
+/** One shared empty map, so `footer={false}` does not allocate a new one per render. */
+const EMPTY_MARKS: ReadonlyMap<string, number> = new Map<string, number>();
+
 function collectFootnotes<Row>(
   columns: readonly DataGridColumn<Row>[],
   absences: readonly string[],
@@ -342,12 +396,16 @@ export function DataGrid<Row>({
   identify,
   onRowActivate,
   ceiling,
+  masthead = true,
+  footer = true,
+  empty,
   selectedKeys,
   onSelectionChange,
   bulkActions,
   pinnedColumns = 0,
-  page,
-  onPageChange,
+  onReachEnd,
+  loadingMore = false,
+  exhausted = false,
   maxHeight,
   density = "regular",
   className,
@@ -380,6 +438,19 @@ export function DataGrid<Row>({
   const bodyRef = React.useRef<HTMLTableSectionElement>(null);
   const headRef = React.useRef<HTMLTableRowElement>(null);
   const wantsFocus = React.useRef(false);
+
+  /*
+   * The end of the list, watched rather than polled.
+   *
+   * An IntersectionObserver on a sentinel below the last row, with the root set
+   * to the scroll container so it fires against the grid's own scrolling rather
+   * than the page's. `shouldLoadMoreGridRows` is what stops a scroll that
+   * crosses the sentinel twice from firing two requests — the defect every
+   * hand-rolled infinite scroll ships with, and the one that turns a slow list
+   * into a duplicated one.
+   */
+  const sentinelRef = React.useRef<HTMLDivElement>(null);
+  const scrollRef = React.useRef<HTMLDivElement>(null);
 
   const selectable = Boolean(selectedKeys && onSelectionChange);
   const selected = React.useMemo(() => selectedKeys ?? [], [selectedKeys]);
@@ -462,8 +533,8 @@ export function DataGrid<Row>({
   }, [columns, ordered]);
 
   const { marks, notes } = React.useMemo(
-    () => collectFootnotes(columns, absenceNotes),
-    [absenceNotes, columns],
+    () => (footer ? collectFootnotes(columns, absenceNotes) : { marks: EMPTY_MARKS, notes: [] }),
+    [absenceNotes, columns, footer],
   );
 
   const focused = cursor.row >= 0 ? ordered[cursor.row] : undefined;
@@ -484,6 +555,25 @@ export function DataGrid<Row>({
       )
       ?.focus();
   }, [cursor]);
+
+  React.useEffect(() => {
+    const sentinel = sentinelRef.current;
+    const root = scrollRef.current;
+    if (!sentinel || !onReachEnd) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (!entries.some((entry) => entry.isIntersecting)) return;
+        if (!shouldLoadMoreGridRows(coverage, loadingMore, exhausted)) return;
+        onReachEnd();
+      },
+      // Ahead of the fold, so the next batch is in flight before the reader
+      // hits the bottom and sees a stall.
+      { root, rootMargin: GRID_LOAD_LEAD },
+    );
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [coverage, exhausted, loadingMore, onReachEnd]);
 
   const place = React.useCallback(
     (next: { row: number; column: number }) => {
@@ -531,13 +621,26 @@ export function DataGrid<Row>({
     [columns.length, cursor, onRowActivate, ordered, place],
   );
 
+  /*
+   * How the grid says its own name.
+   *
+   * `aria-labelledby` points at the masthead title, so with the masthead off it
+   * would point at an element that is not on the page — and a `role="grid"`
+   * with a dangling label is an unnamed grid, which is the exact wall this
+   * component exists to avoid. `caption` is required and is a string, so it is
+   * always available as the fallback.
+   */
+  const labelling = masthead
+    ? ({ "aria-labelledby": titleId } as const)
+    : ({ "aria-label": caption } as const);
+
   if (refusal) {
     return (
       <section
         className={cn("ox-grid ox-grid--refused", className)}
         data-ox-grid=""
         data-ox-density={density}
-        aria-labelledby={titleId}
+        {...labelling}
         id={gridId}
       >
         <div className="ox-grid__masthead">
@@ -553,12 +656,16 @@ export function DataGrid<Row>({
   }
 
   const footVisible =
-    Boolean(identify) || Boolean(sortColumn?.derived) || notes.length > 0 || Boolean(page);
+    footer && (Boolean(identify) || Boolean(sortColumn?.derived) || notes.length > 0);
   const held = arrivals?.length ?? 0;
   const heldLine = describeGridArrivals(held, arrivalsAt);
 
   const selectState = gridSelectionState(selected, keys);
   const selectedRows = ordered.filter((row) => selected.includes(rowKey(row)));
+  const bulkVisible = Boolean(selectable && bulkActions && selectedRows.length > 0);
+  /* The slot exists if either occupant could ever appear, so neither arriving
+     changes the height of anything below it. */
+  const stripVisible = held > 0 || Boolean(selectable && bulkActions);
   const pinnedCount = pinnedColumns + (selectable ? 1 : 0);
   const pinStyle = (index: number) =>
     index < pinOffsets.length ? { left: pinOffsets[index] } : undefined;
@@ -568,7 +675,7 @@ export function DataGrid<Row>({
       className={cn("ox-grid", className)}
       data-ox-grid=""
       data-ox-density={density}
-      aria-labelledby={titleId}
+      {...labelling}
       id={gridId}
     >
       {/*
@@ -578,14 +685,15 @@ export function DataGrid<Row>({
         before they meet the rows it is about. Below the table it is a
         disclaimer; above it, it is the heading of the thing they are reading.
       */}
-      <header className="ox-grid__masthead">
-        <div className="ox-grid__mastline">
-          <p className="ox-grid__title" id={titleId}>
-            {title ?? caption}
-          </p>
-          {note ? <p className="ox-grid__note">{note}</p> : null}
-        </div>
-        {/*
+      {masthead ? (
+        <header className="ox-grid__masthead">
+          <div className="ox-grid__mastline">
+            <p className="ox-grid__title" id={titleId}>
+              {title ?? caption}
+            </p>
+            {note ? <p className="ox-grid__note">{note}</p> : null}
+          </div>
+          {/*
           Three sentences, three elements, in descending order of consequence.
 
           They were one paragraph with the numbers picked out by `::first-line`
@@ -595,70 +703,92 @@ export function DataGrid<Row>({
           is its qualification; that is a structural difference, so it is
           structure rather than a typographic trick.
         */}
-        <p className="ox-grid__coverage">{describeGridCoverage(coverage)}</p>
-        {coverage.predicate || coverage.asOf ? (
-          <p className="ox-grid__predicate">
-            {coverage.predicate}
-            {coverage.asOf ? <> As of {coverage.asOf}.</> : null}
-          </p>
-        ) : null}
-      </header>
+          <p className="ox-grid__coverage">{describeGridCoverage(coverage)}</p>
+          {coverage.predicate || coverage.asOf ? (
+            <p className="ox-grid__predicate">
+              {coverage.predicate}
+              {coverage.asOf ? <> As of {coverage.asOf}.</> : null}
+            </p>
+          ) : null}
+        </header>
+      ) : null}
 
       {/*
-        Held arrivals.
+        One strip above the header, with two things that can occupy it.
 
-        Rendered as a ruled strip rather than a toast, because a toast is gone
-        by the time somebody looks up. The count is live so a screen-reader
-        user learns that results are arriving without the rows underneath
-        moving out from under their cursor.
+        Held arrivals and the selection bar were separate conditional blocks,
+        and the second one appearing on the first click pushed every row down
+        by its own height — under a pointer that was mid-checkbox, so the next
+        click landed on the wrong client. That is the exact error a worklist
+        cannot make.
+
+        So both are always laid out, stacked in a single grid cell. The slot is
+        as tall as the taller of the two whatever is showing, and swapping
+        between them moves nothing. The inactive one is `visibility: hidden`,
+        which keeps its box, keeps it out of the accessibility tree, and stops
+        its live region announcing; `inert` keeps its buttons off the tab ring.
+
+        The reserved height is the cost, and it is paid once at load rather
+        than on every click.
       */}
-      {held > 0 ? (
-        <div className="ox-grid__held">
-          <p className="ox-grid__heldline" aria-live="polite">
-            {heldLine}
-          </p>
-          {onAdmitArrivals ? (
-            <button
-              type="button"
-              className="ox-grid__admit"
-              onClick={() => onAdmitArrivals(arrivals ?? [])}
+      {stripVisible ? (
+        <div className="ox-grid__strip">
+          {arrivals ? (
+            <div className="ox-grid__held" data-ox-on={bulkVisible ? "false" : "true"}>
+              <p className="ox-grid__heldline" aria-live="polite">
+                {heldLine}
+              </p>
+              {onAdmitArrivals ? (
+                <button
+                  type="button"
+                  className="ox-grid__admit"
+                  onClick={() => onAdmitArrivals(arrivals)}
+                >
+                  Let them in
+                </button>
+              ) : null}
+            </div>
+          ) : null}
+
+          {/*
+            A region rather than a toolbar, with the count in a polite live
+            region: a screen-reader user selecting rows one at a time otherwise
+            learns only that a checkbox changed, never that a bar of verbs has
+            appeared above them.
+          */}
+          {selectable && bulkActions ? (
+            <div
+              className="ox-grid__bulk"
+              role="region"
+              aria-label="Selection actions"
+              data-ox-on={bulkVisible ? "true" : "false"}
+              inert={!bulkVisible}
             >
-              Let them in
-            </button>
+              <p className="ox-grid__bulkcount" aria-live="polite">
+                {describeGridSelection(selectedRows.length)}
+              </p>
+              <button
+                type="button"
+                className="ox-grid__bulkclear"
+                onClick={() => onSelectionChange?.([])}
+              >
+                Clear
+              </button>
+              <div className="ox-grid__bulkactions">{bulkActions(selectedRows)}</div>
+            </div>
           ) : null}
         </div>
       ) : null}
 
-      {/*
-        The bulk bar.
-
-        A region rather than a toolbar, with the count in a polite live region:
-        a screen-reader user selecting rows one at a time otherwise learns only
-        that a checkbox changed, never that a bar of verbs has appeared above
-        them. It sits above the table rather than floating, so it cannot cover
-        the row that is about to be acted on.
-      */}
-      {selectable && bulkActions && selectedRows.length > 0 ? (
-        <div className="ox-grid__bulk" role="region" aria-label="Selection actions">
-          <p className="ox-grid__bulkcount" aria-live="polite">
-            {describeGridSelection(selectedRows.length)}
-          </p>
-          <button
-            type="button"
-            className="ox-grid__bulkclear"
-            onClick={() => onSelectionChange?.([])}
-          >
-            Clear
-          </button>
-          <div className="ox-grid__bulkactions">{bulkActions(selectedRows)}</div>
-        </div>
-      ) : null}
-
-      <div className="ox-grid__scroll" style={maxHeight ? { maxBlockSize: maxHeight } : undefined}>
+      <div
+        className="ox-grid__scroll"
+        ref={scrollRef}
+        style={maxHeight ? { maxBlockSize: maxHeight } : undefined}
+      >
         <table
           className="ox-grid__table"
           role="grid"
-          aria-labelledby={titleId}
+          {...labelling}
           /* Against the cohort, not the page. A reader on row 3 of 24 in a
              cohort of 1,438 is told exactly that; -1 is ARIA's "the total is
              not known", which is the honest value when the source will not
@@ -763,6 +893,24 @@ export function DataGrid<Row>({
           </thead>
 
           <tbody role="rowgroup" ref={bodyRef}>
+            {/*
+              Nothing matched.
+
+              One row spanning the table, inside the grid rather than replacing
+              it, so the headers stay on screen — a reader who filtered their
+              way to nothing usually wants to undo a sort or a column, and
+              swapping the whole table for a panel takes those controls away
+              at the exact moment they are needed.
+            */}
+            {ordered.length === 0 ? (
+              <tr role="row" aria-rowindex={2}>
+                <td className="ox-grid__emptycell" colSpan={columns.length + (selectable ? 1 : 0)}>
+                  <p className="ox-grid__empty" role="status">
+                    {empty ?? `No ${coverage.noun ?? "rows"} match.`}
+                  </p>
+                </td>
+              </tr>
+            ) : null}
             {ordered.map((row, rowIndex) => {
               const key = keys[rowIndex] ?? String(rowIndex);
               const current = cursor.row === rowIndex;
@@ -833,6 +981,28 @@ export function DataGrid<Row>({
             })}
           </tbody>
         </table>
+        {/*
+          The sentinel, and what it says while it waits.
+
+          Inside the scroll container and after the table, because that is the
+          only place a browser can tell you the reader has reached the end.
+          `role="status"` rather than a spinner: "Loading more clients…" is a
+          sentence a screen reader announces, and a spinner is not.
+
+          Not drawn over an empty list: "All 0 clients loaded" is a sentence
+          about nothing, and the empty row is already saying the true thing in
+          the one live region this table should have.
+        */}
+        {onReachEnd && ordered.length > 0 ? (
+          <div className="ox-grid__more" ref={sentinelRef}>
+            <p className="ox-grid__moreline" role="status">
+              {describeGridLoaded(
+                coverage,
+                loadingMore ? "loading" : exhausted ? "exhausted" : "idle",
+              )}
+            </p>
+          </div>
+        ) : null}
       </div>
 
       {/*
@@ -860,13 +1030,11 @@ export function DataGrid<Row>({
           its own height, under a pointer that is already travelling. The
           layout has to be the same before and after the reader arrives.
         */}
-          {identify ? (
+          {identity ? (
             <p className="ox-grid__reading">
               <span className="ox-grid__readinglabel">Reading</span>
-              <span className="ox-grid__readingline" data-empty={!identity}>
-                {identity
-                  ? describeGridIdentity(identity, { row: cursor.row + 1, of: coverage.total })
-                  : "No row selected."}
+              <span className="ox-grid__readingline">
+                {describeGridIdentity(identity, { row: cursor.row + 1, of: coverage.total })}
               </span>
             </p>
           ) : null}
@@ -885,64 +1053,6 @@ export function DataGrid<Row>({
             <p className="ox-grid__sorted">
               Sorted by a prediction — see note {marks.get(sortColumn.key) ?? 1}.
             </p>
-          ) : null}
-
-          {/*
-            The pager.
-
-            `nav` with its own name, because a grid can sit on a page with more
-            than one. Where the total is withheld it renders the position it
-            knows and no last page: inventing an end to a list a server refused
-            to count is the same failure as inventing the count.
-          */}
-          {page ? (
-            <nav className="ox-grid__pager" aria-label="Pages">
-              <span className="ox-grid__pagecount">{describeGridPage(page, coverage.total)}</span>
-              {(() => {
-                const count = gridPageCount(coverage.total, page.size);
-                const last = count === "unknown" ? Number.POSITIVE_INFINITY : count - 1;
-                return (
-                  <span className="ox-grid__pagebuttons">
-                    <button
-                      type="button"
-                      className="ox-grid__page"
-                      disabled={page.index === 0}
-                      aria-label="Previous page"
-                      onClick={() => onPageChange?.(page.index - 1)}
-                    >
-                      ‹
-                    </button>
-                    {gridPageWindow(page.index, count).map((entry, at) =>
-                      entry === "gap" ? (
-                        <span key={`gap-${at}`} className="ox-grid__pagegap" aria-hidden="true">
-                          …
-                        </span>
-                      ) : (
-                        <button
-                          key={entry}
-                          type="button"
-                          className="ox-grid__page"
-                          aria-current={entry === page.index ? "page" : undefined}
-                          aria-label={`Page ${entry + 1}`}
-                          onClick={() => onPageChange?.(entry)}
-                        >
-                          {entry + 1}
-                        </button>
-                      ),
-                    )}
-                    <button
-                      type="button"
-                      className="ox-grid__page"
-                      disabled={page.index >= last}
-                      aria-label="Next page"
-                      onClick={() => onPageChange?.(page.index + 1)}
-                    >
-                      ›
-                    </button>
-                  </span>
-                );
-              })()}
-            </nav>
           ) : null}
 
           {notes.length ? (
@@ -976,7 +1086,7 @@ function Cell({
   children,
 }: {
   value: GridValue;
-  marks: Map<string, number>;
+  marks: ReadonlyMap<string, number>;
   children?: React.ReactNode;
 }) {
   if (isGridAbsent(value)) {

@@ -5,9 +5,9 @@
  * class names inside cannot collide with the site around them.
  *
  * Everything here belongs to the *host*, not to the component: the page
- * header, the saved views, the filter pills, the density control, and the cell
- * renderers the demo passes in. The grid supplies coverage, held arrivals,
- * selection, pinning, sorting, provenance and paging, and nothing in this file
+ * header, the saved views, the filter pills, and the cell renderers the demo
+ * passes in. The grid supplies coverage, held arrivals, selection, pinning,
+ * sorting, provenance and the end of the list, and nothing in this file
  * restyles any of it. A marketing page that repaints the component it is
  * selling is showing something the customer cannot install.
  *
@@ -51,6 +51,21 @@
   overflow: hidden;
 }
 
+/*
+ * The same chrome with no frame of its own.
+ *
+ * Used where the surface around it already draws one — the component page's
+ * preview panel — because two nested boxes with two radii read as a rendering
+ * fault rather than as depth. The tokens and the cell styling stay; only the
+ * card goes.
+ */
+.oxw--bare {
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
 /* The component sits inside the frame, so it drops its own edge rather than
    nesting two boxes with two radii. */
 .oxw .ox-grid {
@@ -90,13 +105,6 @@
   color: var(--oxw-ink-3);
 }
 
-.oxw__headactions {
-  margin-inline-start: auto;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.35rem;
-}
-
 /* ---------------------------------------------------------------- */
 /* Buttons                                                           */
 /* ---------------------------------------------------------------- */
@@ -122,18 +130,6 @@
 .oxw__btn:hover {
   background: var(--oxw-sunk);
   color: var(--oxw-ink);
-}
-
-.oxw__btn--primary {
-  border-color: var(--color-cta);
-  background: var(--color-cta);
-  color: var(--color-paper);
-}
-
-.oxw__btn--primary:hover {
-  border-color: var(--color-cta-hover);
-  background: var(--color-cta-hover);
-  color: var(--color-paper);
 }
 
 .oxw__btn--ghost {
@@ -192,19 +188,6 @@
   color: var(--oxw-ink-3);
 }
 
-.oxw__save {
-  margin-inline-start: auto;
-  align-self: center;
-  border: 0;
-  background: none;
-  color: var(--oxw-accent);
-  font-size: 0.78125rem;
-  font-weight: 500;
-  white-space: nowrap;
-  padding: 0.35rem 0.4rem;
-  cursor: pointer;
-}
-
 /* ---------------------------------------------------------------- */
 /* Filter state                                                      */
 /* ---------------------------------------------------------------- */
@@ -239,6 +222,75 @@
   background: var(--oxw-surface);
   color: var(--oxw-ink-3);
   font-size: 0.8125rem;
+}
+
+/* The ring goes on the box, not the input, so the glyph is inside it. */
+.oxw__search:focus-within {
+  outline: 2px solid var(--color-oxygen);
+  outline-offset: 2px;
+}
+
+.oxw__search input {
+  flex: 1;
+  min-inline-size: 0;
+  border: 0;
+  background: none;
+  color: var(--oxw-ink);
+  font: inherit;
+  outline: none;
+}
+
+.oxw__search input::placeholder {
+  color: var(--oxw-ink-3);
+}
+
+/* ---------------------------------------------------------------- */
+/* Add a filter                                                      */
+/* ---------------------------------------------------------------- */
+
+.oxw__add {
+  position: relative;
+  display: inline-flex;
+}
+
+.oxw__addmenu {
+  position: absolute;
+  z-index: 2;
+  inset-block-start: calc(100% + 0.35rem);
+  inset-inline-start: 0;
+  display: flex;
+  flex-direction: column;
+  min-inline-size: 11rem;
+  padding: 0.25rem;
+  border: 1px solid var(--oxw-line-strong);
+  border-radius: 8px;
+  background: var(--oxw-surface);
+  box-shadow: 0 12px 28px -14px rgb(2 20 17 / 0.3);
+}
+
+.oxw__addmenu button {
+  display: flex;
+  gap: 0.35rem;
+  min-block-size: 1.875rem;
+  padding-inline: 0.5rem;
+  align-items: center;
+  border: 0;
+  border-radius: 5px;
+  background: none;
+  color: var(--oxw-ink-2);
+  font-size: 0.8125rem;
+  text-align: start;
+  cursor: pointer;
+}
+
+.oxw__addmenu button:hover {
+  background: var(--oxw-sunk);
+  color: var(--oxw-ink);
+}
+
+.oxw__addmenu b {
+  color: var(--oxw-ink);
+  font-weight: 600;
 }
 
 .oxw__pill {
@@ -276,35 +328,6 @@
   background: color-mix(in srgb, currentColor 14%, transparent);
 }
 
-.oxw__seg {
-  margin-inline-start: auto;
-  display: inline-flex;
-  border: 1px solid var(--oxw-line-strong);
-  border-radius: 6px;
-  overflow: hidden;
-  background: var(--oxw-surface);
-}
-
-.oxw__seg button {
-  min-block-size: 1.75rem;
-  padding-inline: 0.55rem;
-  border: 0;
-  background: none;
-  color: var(--oxw-ink-3);
-  font-size: 0.75rem;
-  cursor: pointer;
-}
-
-.oxw__seg button + button {
-  border-inline-start: 1px solid var(--oxw-line);
-}
-
-.oxw__seg button[aria-pressed="true"] {
-  background: var(--oxw-sunk);
-  color: var(--oxw-ink);
-  font-weight: 600;
-}
-
 /* ---------------------------------------------------------------- */
 /* Cells the demo supplies                                           */
 /* ---------------------------------------------------------------- */
@@ -338,6 +361,7 @@
   display: inline-flex;
   align-items: baseline;
   gap: 0.3rem;
+  white-space: nowrap;
 }
 
 .oxw__score {
@@ -442,17 +466,10 @@
 
 .oxw__btn:focus-visible,
 .oxw__view:focus-visible,
-.oxw__save:focus-visible,
 .oxw__pill button:focus-visible,
-.oxw__seg button:focus-visible {
+.oxw__addmenu button:focus-visible {
   outline: 2px solid var(--color-oxygen);
   outline-offset: 2px;
-}
-
-@media (max-width: 46rem) {
-  .oxw__seg {
-    margin-inline-start: 0;
-  }
 }
 
 @media (forced-colors: active) {

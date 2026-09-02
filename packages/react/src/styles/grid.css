@@ -149,8 +149,39 @@
 }
 
 /* ---------------------------------------------------------------- */
-/* Held arrivals                                                     */
+/* The strip: one slot, two possible occupants                       */
 /* ---------------------------------------------------------------- */
+
+/*
+ * A single grid cell that both the arrivals line and the selection bar are
+ * laid into, so the slot is as tall as the taller of the two whether or not
+ * anything is selected.
+ *
+ * They used to be two conditional blocks in the flow, and the selection bar
+ * appearing on the first click moved every row down by its own height — under
+ * a pointer already travelling towards the next checkbox. In a caseload that
+ * is the wrong-client error, produced by the layout rather than by the reader.
+ */
+.ox-grid__strip {
+  display: grid;
+  border-block-end: 1px solid var(--ox-grid-rule);
+  background: var(--ox-grid-sunk);
+}
+
+.ox-grid__strip > * {
+  grid-area: 1 / 1;
+}
+
+/*
+ * Hidden, not unmounted.
+ *
+ * `visibility: hidden` keeps the box — which is the whole point, since the box
+ * is what holds the height — while taking the element out of the accessibility
+ * tree, silencing its live region and making it unclickable.
+ */
+.ox-grid__strip > [data-ox-on="false"] {
+  visibility: hidden;
+}
 
 .ox-grid__held {
   display: flex;
@@ -164,8 +195,6 @@
    */
   min-block-size: 2rem;
   padding: 0.2rem var(--ox-grid-pad-x);
-  border-block-end: 1px solid var(--ox-grid-rule);
-  background: var(--ox-grid-sunk);
 }
 
 .ox-grid__heldline {
@@ -217,9 +246,8 @@
  *
  * A floating bar is the common pattern and the wrong one here: it covers the
  * bottom rows, which is where a reader who has just scrolled to select
- * something is looking. This pushes the table down instead — the one layout
- * shift in the component that is worth its cost, because it happens in
- * response to a click the reader just made.
+ * something is looking. It sits in the reserved strip instead, so it costs no
+ * shift at all.
  */
 .ox-grid__bulk {
   display: flex;
@@ -228,7 +256,6 @@
   gap: 0.5rem 0.75rem;
   min-block-size: 2.5rem;
   padding: 0.35rem var(--ox-grid-pad-x);
-  border-block-end: 1px solid var(--ox-grid-accent-line, var(--ox-grid-rule));
   background: var(--ox-grid-accent-bg, var(--ox-grid-sunk));
 }
 
@@ -554,7 +581,6 @@
 .ox-grid__sort:focus-visible,
 .ox-grid__static:focus-visible,
 .ox-grid__admit:focus-visible,
-.ox-grid__page:focus-visible,
 .ox-grid__bulkclear:focus-visible {
   outline: none;
   box-shadow:
@@ -618,73 +644,54 @@
 }
 
 /* ---------------------------------------------------------------- */
-/* Pagination                                                        */
+/* Nothing matched                                                   */
 /* ---------------------------------------------------------------- */
 
-.ox-grid__pager {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.5rem 0.75rem;
-  margin-block: 0.5rem;
+.ox-grid__emptycell {
+  padding: 2.25rem var(--ox-grid-pad-x);
+  text-align: center;
 }
 
-.ox-grid__pagecount {
+.ox-grid__empty {
+  margin: 0;
+  font-family: var(--ox-font-mono, ui-monospace, monospace);
+  font-size: var(--ox-text-2xs, 0.625rem);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ox-grid-muted);
+}
+
+/* ---------------------------------------------------------------- */
+/* The end of the list                                               */
+/* ---------------------------------------------------------------- */
+
+/*
+ * The sentinel, and what it says while it waits.
+ *
+ * A line of text rather than a spinner. "Loading more clients…" is a sentence
+ * a screen reader reads out and a sighted reader can act on; a spinner is a
+ * shape that says something is happening and never says what or how much is
+ * left. It sits inside the scroll container after the last row, which is the
+ * only place a browser can tell you the reader reached the end.
+ *
+ * A fixed height, so the list does not shorten by a line every time a batch
+ * lands — the exact jitter infinite scroll is notorious for.
+ */
+.ox-grid__more {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-block-size: 2.75rem;
+  padding: 0.5rem var(--ox-grid-pad-x);
+  border-block-start: 1px solid var(--ox-grid-rule);
+}
+
+.ox-grid__moreline {
+  margin: 0;
   font-family: var(--ox-font-mono, ui-monospace, monospace);
   font-size: var(--ox-text-2xs, 0.625rem);
   letter-spacing: 0.06em;
   color: var(--ox-grid-muted);
-}
-
-.ox-grid__pagebuttons {
-  margin-inline-start: auto;
-  display: flex;
-  align-items: center;
-  gap: 0.2rem;
-}
-
-/*
- * 26px, clearing SC 2.5.8's 24px floor.
- *
- * Not the 2.75rem density target: a pager sits in a footer beside 10px type,
- * and the same borrowed token is what made the column headers half an inch
- * tall before it was taken out of them.
- */
-.ox-grid__page {
-  min-inline-size: 1.625rem;
-  min-block-size: 1.625rem;
-  padding: 0 0.35rem;
-  border: 1px solid var(--ox-grid-rule);
-  border-radius: var(--ox-radius-sm, 3px);
-  background: var(--ox-grid-surface);
-  color: var(--ox-grid-muted);
-  font-family: var(--ox-font-mono, ui-monospace, monospace);
-  font-size: var(--ox-text-2xs, 0.625rem);
-  cursor: pointer;
-}
-
-.ox-grid__page:hover:not(:disabled) {
-  border-color: var(--ox-grid-rule-strong);
-  color: var(--ox-grid-ink);
-}
-
-.ox-grid__page[aria-current="page"] {
-  border-color: var(--ox-grid-accent);
-  background: var(--ox-grid-accent);
-  color: var(--ox-text-on-accent, #fff);
-  font-weight: 600;
-}
-
-.ox-grid__page:disabled {
-  opacity: 0.4;
-  cursor: default;
-}
-
-.ox-grid__pagegap {
-  color: var(--ox-grid-subtle);
-  font-family: var(--ox-font-mono, ui-monospace, monospace);
-  font-size: var(--ox-text-2xs, 0.625rem);
-  padding-inline: 0.15rem;
 }
 
 .ox-grid__notes {
@@ -740,6 +747,7 @@
   .ox-grid__td,
   .ox-grid__tr,
   .ox-grid__masthead,
+  .ox-grid__strip,
   .ox-grid__held,
   .ox-grid__foot {
     border-color: CanvasText;

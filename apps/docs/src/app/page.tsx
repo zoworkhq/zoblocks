@@ -389,8 +389,7 @@ function DataGridSection() {
             this to do is set the scene.
           */}
           <p className="body-lg mt-5 max-w-2xl text-pretty text-graphite" data-reveal>
-            Six clients on screen, 312 on the team&rsquo;s caseload. Below is the real component,
-            running.
+            Scroll it, sort it, select rows. This is the shipped component, not a picture of one.
           </p>
         </div>
 
@@ -414,7 +413,7 @@ function DataGridSection() {
             href="/components/data-grid"
             className="group inline-flex shrink-0 items-center gap-1.5 text-sm font-medium text-oxygen-deep"
           >
-            All nine states
+            All fourteen states
             <ArrowRight
               aria-hidden="true"
               className="size-3.5 transition-transform duration-300 ease-[var(--ease-out-expo)] group-hover:translate-x-0.5"

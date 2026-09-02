@@ -55,7 +55,9 @@ export default defineComponentMeta({
     "Too many rows to render honestly",
     "Selected, with the verbs that reach them",
     "Pinned identity, scrolled sideways",
-    "Paged, and paged past the end of what is known",
+    "Loading more, and the end of what is known",
+    "Framed by the host, not by itself",
+    "The predicate matched nobody",
   ],
 
   a11y: [
@@ -240,7 +242,7 @@ const columns: DataGridColumn<Row>[] = [
     },
     { prop: "onSortChange", control: "event", label: "onSortChange" },
     { prop: "onSelectionChange", control: "event", label: "onSelectionChange" },
-    { prop: "onPageChange", control: "event", label: "onPageChange" },
+    { prop: "onReachEnd", control: "event", label: "onReachEnd" },
     { prop: "onRowActivate", control: "event", label: "onRowActivate" },
     { prop: "onAdmitArrivals", control: "event", label: "onAdmitArrivals" },
   ],

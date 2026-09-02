@@ -5446,7 +5446,9 @@ export const CATALOG: ComponentDoc[] = [
       "Too many rows to render honestly",
       "Selected, with the verbs that reach them",
       "Pinned identity, scrolled sideways",
-      "Paged, and paged past the end of what is known"
+      "Loading more, and the end of what is known",
+      "Framed by the host, not by itself",
+      "The predicate matched nobody"
     ],
     "props": [
       {
@@ -5524,6 +5526,26 @@ export const CATALOG: ComponentDoc[] = [
         "default": "\"regular\""
       },
       {
+        "name": "empty",
+        "type": "React.ReactNode",
+        "description": "What to say when the predicate matched nothing. A grid that renders a header over an empty body has said nothing about why, and the reader's next move — widen the filter, or trust that there is genuinely nobody — depends entirely on which it is. The default names the noun from `coverage`; pass a node to say something the host knows and the grid cannot, such as which filter to drop.",
+        "required": false
+      },
+      {
+        "name": "exhausted",
+        "type": "boolean",
+        "description": "There is no more to load. Draws the end of the list rather than waiting forever.",
+        "required": false,
+        "default": "false"
+      },
+      {
+        "name": "footer",
+        "type": "boolean",
+        "description": "Draw the foot — the reading line, the sort citation and the footnotes. On by default, for the same reason as the masthead: a grid standing alone has to carry its own provenance, and a derived column with no note beside it is a number with no author. Turning it off does not make an absent cell lie. The absence keeps its word — \"Not recorded\", \"Restricted\" — and only loses the superscript that pointed at the note, because the note is no longer on the page. Turn it off only where the host carries provenance itself.",
+        "required": false,
+        "default": "true"
+      },
+      {
         "name": "id",
         "type": "string",
         "description": "The outer element's id. Generated when absent; the masthead title and the grid's label derive from it.",
@@ -5534,6 +5556,20 @@ export const CATALOG: ComponentDoc[] = [
         "type": "((row: Row) => GridIdentity)",
         "description": "Who the row is about, re-stated in the footer at the point of action.",
         "required": false
+      },
+      {
+        "name": "loadingMore",
+        "type": "boolean",
+        "description": "A fetch is in flight. Draws the waiting line and suppresses further calls.",
+        "required": false,
+        "default": "false"
+      },
+      {
+        "name": "masthead",
+        "type": "boolean",
+        "description": "Draw the masthead — the title, the coverage sentence and the predicate. On by default, because a grid dropped into a page with no framing has to carry its own. Turn it off when the host already frames it: an application screen with a page header naming the list and a filter bar naming the predicate is saying both things twice, and the second copy reads as chrome rather than as the claim it is. `caption` is unaffected — the accessible name never goes away, so the grid is still named for a screen reader when nothing is drawn for the eye. Where the masthead is off, the coverage sentence becomes the host's to place, and `describeGridCoverage(coverage)` is the one line that does it.",
+        "required": false,
+        "default": "true"
       },
       {
         "name": "maxHeight",
@@ -5554,9 +5590,9 @@ export const CATALOG: ComponentDoc[] = [
         "required": false
       },
       {
-        "name": "onPageChange",
-        "type": "((index: number) => void)",
-        "description": "The reader asked for a page. Zero-based, and the caller fetches it; the grid does not.",
+        "name": "onReachEnd",
+        "type": "(() => void)",
+        "description": "The reader has reached the end of what is loaded. Fetch the next batch. This replaced a numbered pager, and not for taste: FHIR search returns opaque `link.next` URLs, the spec forbids constructing paging URLs by hand, and `Bundle.total` is optional. \"Page 4 of 7\" is therefore a control that cannot be built against a conformant server — the count is not derivable and the jump target is not addressable. Following `next` until it stops is the shape the protocol has. The grid never fetches. It watches a sentinel below the last row and says when it comes into view; appending to `rows` is the caller's.",
         "required": false
       },
       {
@@ -5575,12 +5611,6 @@ export const CATALOG: ComponentDoc[] = [
         "name": "onSortChange",
         "type": "((sort: GridSort | null) => void)",
         "description": "Fires on every sort change, including the third activation that clears it back to your order.",
-        "required": false
-      },
-      {
-        "name": "page",
-        "type": "GridPage",
-        "description": "Paging, reported rather than performed. The grid holds `rows` and nothing else — it does not slice, and it never fetches. This draws the control and tells the caller which page was asked for. Where `coverage.total` is `\"unknown\"` the pager says so instead of inventing a last page.",
         "required": false
       },
       {
@@ -5688,6 +5718,26 @@ export const CATALOG: ComponentDoc[] = [
             "default": "\"regular\""
           },
           {
+            "name": "empty",
+            "type": "React.ReactNode",
+            "description": "What to say when the predicate matched nothing. A grid that renders a header over an empty body has said nothing about why, and the reader's next move — widen the filter, or trust that there is genuinely nobody — depends entirely on which it is. The default names the noun from `coverage`; pass a node to say something the host knows and the grid cannot, such as which filter to drop.",
+            "required": false
+          },
+          {
+            "name": "exhausted",
+            "type": "boolean",
+            "description": "There is no more to load. Draws the end of the list rather than waiting forever.",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "footer",
+            "type": "boolean",
+            "description": "Draw the foot — the reading line, the sort citation and the footnotes. On by default, for the same reason as the masthead: a grid standing alone has to carry its own provenance, and a derived column with no note beside it is a number with no author. Turning it off does not make an absent cell lie. The absence keeps its word — \"Not recorded\", \"Restricted\" — and only loses the superscript that pointed at the note, because the note is no longer on the page. Turn it off only where the host carries provenance itself.",
+            "required": false,
+            "default": "true"
+          },
+          {
             "name": "id",
             "type": "string",
             "description": "The outer element's id. Generated when absent; the masthead title and the grid's label derive from it.",
@@ -5698,6 +5748,20 @@ export const CATALOG: ComponentDoc[] = [
             "type": "((row: Row) => GridIdentity)",
             "description": "Who the row is about, re-stated in the footer at the point of action.",
             "required": false
+          },
+          {
+            "name": "loadingMore",
+            "type": "boolean",
+            "description": "A fetch is in flight. Draws the waiting line and suppresses further calls.",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "masthead",
+            "type": "boolean",
+            "description": "Draw the masthead — the title, the coverage sentence and the predicate. On by default, because a grid dropped into a page with no framing has to carry its own. Turn it off when the host already frames it: an application screen with a page header naming the list and a filter bar naming the predicate is saying both things twice, and the second copy reads as chrome rather than as the claim it is. `caption` is unaffected — the accessible name never goes away, so the grid is still named for a screen reader when nothing is drawn for the eye. Where the masthead is off, the coverage sentence becomes the host's to place, and `describeGridCoverage(coverage)` is the one line that does it.",
+            "required": false,
+            "default": "true"
           },
           {
             "name": "maxHeight",
@@ -5718,9 +5782,9 @@ export const CATALOG: ComponentDoc[] = [
             "required": false
           },
           {
-            "name": "onPageChange",
-            "type": "((index: number) => void)",
-            "description": "The reader asked for a page. Zero-based, and the caller fetches it; the grid does not.",
+            "name": "onReachEnd",
+            "type": "(() => void)",
+            "description": "The reader has reached the end of what is loaded. Fetch the next batch. This replaced a numbered pager, and not for taste: FHIR search returns opaque `link.next` URLs, the spec forbids constructing paging URLs by hand, and `Bundle.total` is optional. \"Page 4 of 7\" is therefore a control that cannot be built against a conformant server — the count is not derivable and the jump target is not addressable. Following `next` until it stops is the shape the protocol has. The grid never fetches. It watches a sentinel below the last row and says when it comes into view; appending to `rows` is the caller's.",
             "required": false
           },
           {
@@ -5739,12 +5803,6 @@ export const CATALOG: ComponentDoc[] = [
             "name": "onSortChange",
             "type": "((sort: GridSort | null) => void)",
             "description": "Fires on every sort change, including the third activation that clears it back to your order.",
-            "required": false
-          },
-          {
-            "name": "page",
-            "type": "GridPage",
-            "description": "Paging, reported rather than performed. The grid holds `rows` and nothing else — it does not slice, and it never fetches. This draws the control and tells the caller which page was asked for. Where `coverage.total` is `\"unknown\"` the pager says so instead of inventing a last page.",
             "required": false
           },
           {
@@ -5937,9 +5995,9 @@ export const CATALOG: ComponentDoc[] = [
         "label": "onSelectionChange"
       },
       {
-        "prop": "onPageChange",
+        "prop": "onReachEnd",
         "control": "event",
-        "label": "onPageChange"
+        "label": "onReachEnd"
       },
       {
         "prop": "onRowActivate",

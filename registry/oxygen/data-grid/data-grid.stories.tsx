@@ -57,8 +57,8 @@ const meta: Meta<typeof DataGrid<CaseloadRow>> = {
   title: "Clinical/Data Grid",
   component: DataGrid,
   args: {
-    caption: "Patients on 4-West with a phq9 outside the reference range",
-    title: "Worklist · 4-West · phq9 out of range",
+    caption: "Clients on this team's caseload with a raised PHQ-9 or a recent risk screen",
+    title: "Caseload · adult outpatient",
     note: "24h window",
     columns: COLUMNS,
     rows: CASELOAD,
@@ -243,17 +243,42 @@ export const Pinned: Story = {
   },
 };
 
-export const Paged: Story = {
-  name: "Paged, and paged past the end of what is known",
-  parameters: { state: "Paged, and paged past the end of what is known" },
-  args: { page: { index: 2, size: 50 }, onPageChange: () => {} },
+export const LoadingMore: Story = {
+  name: "Loading more, and the end of what is known",
+  parameters: { state: "Loading more, and the end of what is known" },
+  args: { onReachEnd: () => {}, loadingMore: true, maxHeight: "18rem" },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const pager = canvas.getByRole("navigation", { name: "Pages" });
-    expect(pager.textContent).toContain("101–150 of 312");
-    expect(canvas.getByRole("button", { name: "Page 3" }).getAttribute("aria-current")).toBe(
-      "page",
-    );
+    // A sentence, not a spinner — and the noun comes from `coverage`, so the
+    // grid says "clients" rather than "records" without being told twice.
+    expect(canvas.getByRole("status").textContent).toContain("Loading more");
+  },
+};
+
+export const HostFramed: Story = {
+  name: "Framed by the host, not by itself",
+  parameters: { state: "Framed by the host, not by itself" },
+  args: { masthead: false, footer: false },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    // Both blocks gone — an application screen that already names the list and
+    // its predicate should not be told either thing twice.
+    expect(canvas.queryByText(/Showing/)).toBeNull();
+    // And the grid is still named, by `caption`, with nothing drawn for it.
+    expect(canvas.getByRole("grid")).toHaveAccessibleName(/caseload/i);
+  },
+};
+
+export const Empty: Story = {
+  name: "The predicate matched nobody",
+  parameters: { state: "The predicate matched nobody" },
+  args: { rows: [], coverage: { shown: 0, total: 0, noun: "clients" } },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    // Said inside the grid, so the headers a reader needs to widen the filter
+    // or drop the sort are still on screen.
+    expect(canvas.getByRole("status").textContent).toBe("No clients match.");
+    expect(canvas.getAllByRole("columnheader").length).toBeGreaterThan(0);
   },
 };
 

@@ -173,6 +173,436 @@ export const CASELOAD: CaseloadRow[] = [
 ];
 
 /**
+ * The rest of the caseload, for the surfaces that scroll.
+ *
+ * Twenty-two more rows so infinite scroll has something to reach the end of.
+ * Kept separate from `CASELOAD` on purpose: the stories and tests assert on six
+ * named rows, and a fixture that grew under them would turn every count in the
+ * suite into a moving target. Risk thins out down the list, which is what a
+ * caseload sorted by it actually looks like.
+ */
+export const CASELOAD_TAIL: CaseloadRow[] = [
+  {
+    name: "Okafor, B.",
+    mrn: "8812004",
+    program: "IOP",
+    phq9: 16,
+    previousPhq9: 12,
+    cssrs: "Ideation, no plan",
+    risk: 0.61,
+    due: "Mon 8:30",
+    clinician: "A. Vance",
+    photo: portrait("8812004"),
+  },
+  {
+    name: "Silva, M.",
+    mrn: "4420931",
+    program: "PHP",
+    phq9: 17,
+    previousPhq9: 18,
+    cssrs: "Ideation, no plan",
+    risk: 0.57,
+    due: "Tue 9:00",
+    clinician: "T. Boateng",
+    photo: portrait("4420931"),
+  },
+  {
+    name: "Dubois, H.",
+    mrn: "6673518",
+    program: "Outpatient",
+    phq9: 20,
+    previousPhq9: 19,
+    cssrs: "Ideation with plan",
+    risk: 0.58,
+    due: "Wed 10:30",
+    clinician: "K. Marsh",
+    photo: portrait("6673518"),
+  },
+  {
+    name: "Iqbal, S.",
+    mrn: "2298440",
+    program: "ACT",
+    phq9: 15,
+    previousPhq9: 12,
+    cssrs: "Ideation, no plan",
+    risk: 0.52,
+    due: "Thu 11:00",
+    clinician: "S. Okafor",
+    photo: portrait("2298440"),
+  },
+  {
+    name: "Kowalski, P.",
+    mrn: "5140276",
+    program: "IOP",
+    phq9: 16,
+    previousPhq9: 12,
+    cssrs: "Ideation, no plan",
+    risk: 0.51,
+    due: "Fri 12:30",
+    clinician: "A. Vance",
+    photo: portrait("5140276"),
+  },
+  {
+    name: "Mensah, A.",
+    mrn: "7731905",
+    program: "PHP",
+    phq9: 13,
+    previousPhq9: 12,
+    cssrs: "Ideation, no plan",
+    risk: 0.52,
+    due: "Mon 13:00",
+    clinician: "T. Boateng",
+    photo: portrait("7731905"),
+  },
+  {
+    name: "Rossi, G.",
+    mrn: "3384712",
+    program: "Outpatient",
+    phq9: 15,
+    previousPhq9: 11,
+    cssrs: "Ideation, no plan",
+    risk: 0.48,
+    due: "Tue 14:30",
+    clinician: "K. Marsh",
+    photo: portrait("3384712"),
+  },
+  {
+    name: "Andersen, L.",
+    mrn: "9905633",
+    program: "ACT",
+    phq9: 13,
+    previousPhq9: 12,
+    cssrs: "Ideation, no plan",
+    risk: 0.46,
+    due: "Wed 15:00",
+    clinician: "S. Okafor",
+    photo: portrait("9905633"),
+  },
+  {
+    name: "Nguyen, T.",
+    mrn: "1176284",
+    program: "IOP",
+    phq9: 14,
+    previousPhq9: 14,
+    cssrs: "Ideation, no plan",
+    risk: 0.4,
+    due: "Thu 16:30",
+    clinician: "A. Vance",
+    photo: portrait("1176284"),
+  },
+  {
+    name: "Farah, Y.",
+    mrn: "6620158",
+    program: "PHP",
+    phq9: 12,
+    previousPhq9: 12,
+    cssrs: "Passive ideation",
+    risk: 0.4,
+    due: "Fri 8:00",
+    clinician: "T. Boateng",
+    photo: portrait("6620158"),
+  },
+  {
+    name: "Brennan, C.",
+    mrn: "4471330",
+    program: "Outpatient",
+    phq9: 12,
+    previousPhq9: 9,
+    cssrs: "Passive ideation",
+    risk: 0.38,
+    due: "Mon 9:30",
+    clinician: "K. Marsh",
+    photo: portrait("4471330"),
+  },
+  {
+    name: "Tanaka, R.",
+    mrn: "8853097",
+    program: "ACT",
+    phq9: 12,
+    previousPhq9: 13,
+    cssrs: "Passive ideation",
+    risk: 0.36,
+    due: "Tue 10:00",
+    clinician: "S. Okafor",
+    photo: portrait("8853097"),
+  },
+  {
+    name: "Ortiz, E.",
+    mrn: "2214009",
+    program: "IOP",
+    phq9: 11,
+    previousPhq9: 7,
+    cssrs: "Passive ideation",
+    risk: 0.31,
+    due: "Wed 11:30",
+    clinician: "A. Vance",
+    photo: portrait("2214009"),
+  },
+  {
+    name: "Weber, J.",
+    mrn: "5567842",
+    program: "PHP",
+    phq9: 10,
+    previousPhq9: 12,
+    cssrs: "Passive ideation",
+    risk: 0.32,
+    due: "Thu 12:00",
+    clinician: "T. Boateng",
+    photo: portrait("5567842"),
+  },
+  {
+    name: "Ahmed, N.",
+    mrn: "3390264",
+    program: "Outpatient",
+    phq9: 9,
+    previousPhq9: 12,
+    cssrs: "Passive ideation",
+    risk: 0.3,
+    due: "Fri 13:30",
+    clinician: "K. Marsh",
+    photo: portrait("3390264"),
+  },
+  {
+    name: "Larsen, K.",
+    mrn: "7702581",
+    program: "ACT",
+    phq9: 6,
+    previousPhq9: 4,
+    cssrs: "Passive ideation",
+    risk: 0.25,
+    due: "Mon 14:00",
+    clinician: "S. Okafor",
+    photo: portrait("7702581"),
+  },
+  {
+    name: "Costa, D.",
+    mrn: "1148936",
+    program: "IOP",
+    phq9: 6,
+    previousPhq9: 6,
+    cssrs: "Passive ideation",
+    risk: 0.25,
+    due: "Tue 15:30",
+    clinician: "A. Vance",
+    photo: portrait("1148936"),
+  },
+  {
+    name: "Bello, F.",
+    mrn: "9963410",
+    program: "PHP",
+    phq9: 9,
+    previousPhq9: 12,
+    cssrs: "Passive ideation",
+    risk: 0.21,
+    due: "Wed 16:00",
+    clinician: "T. Boateng",
+    photo: portrait("9963410"),
+  },
+  {
+    name: "Hansen, M.",
+    mrn: "4405177",
+    program: "Outpatient",
+    phq9: 8,
+    previousPhq9: 5,
+    cssrs: "Passive ideation",
+    risk: 0.18,
+    due: "Thu 8:30",
+    clinician: "K. Marsh",
+    photo: portrait("4405177"),
+  },
+  {
+    name: "Grant, A.",
+    mrn: "6690822",
+    program: "ACT",
+    phq9: 3,
+    previousPhq9: 4,
+    cssrs: "None reported",
+    risk: 0.16,
+    due: "Fri 9:00",
+    clinician: "S. Okafor",
+    photo: portrait("6690822"),
+  },
+  {
+    name: "Yusuf, Z.",
+    mrn: "3327469",
+    program: "IOP",
+    phq9: 4,
+    previousPhq9: 0,
+    cssrs: "None reported",
+    risk: 0.12,
+    due: "Mon 10:30",
+    clinician: "A. Vance",
+    photo: portrait("3327469"),
+  },
+  {
+    name: "Moreau, V.",
+    mrn: "8814053",
+    program: "PHP",
+    phq9: 2,
+    previousPhq9: 3,
+    cssrs: "None reported",
+    risk: 0.14,
+    due: "Tue 11:00",
+    clinician: "T. Boateng",
+    photo: portrait("8814053"),
+  },
+];
+
+/** The twenty-eight hand-written rows the stories and tests assert on by name. */
+const CASELOAD_FULL_SEED: CaseloadRow[] = [...CASELOAD, ...CASELOAD_TAIL];
+
+/* ------------------------------------------------------------------ */
+/* The rest of the team's caseload, generated                          */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Three hundred more rows, made rather than typed.
+ *
+ * ⚠️  Still invented, and more obviously so: these come out of a seeded
+ * generator, which is the strongest guarantee this file can offer that nothing
+ * here was copied from a chart. The twenty-eight rows above are hand-written
+ * because the stories assert on them by name; the rest exist so a scrolling
+ * surface has something real to scroll, and so the demo is a caseload rather
+ * than a screenshot of one.
+ *
+ * Deterministic on purpose. A fixture that reshuffles on every import is a
+ * fixture that makes a snapshot flake and a screenshot lie.
+ */
+function seeded(seed: number): () => number {
+  // mulberry32 — 32 bits of state, uniform enough for names and scores, and
+  // short enough to read in one sitting.
+  let state = seed >>> 0;
+  return () => {
+    state = (state + 0x6d2b79f5) >>> 0;
+    let t = state;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+const FAMILY = [
+  "Abara",
+  "Alvarez",
+  "Baptiste",
+  "Bergström",
+  "Cardoso",
+  "Chowdhury",
+  "Delacroix",
+  "Duarte",
+  "Egwuatu",
+  "Eriksen",
+  "Fontaine",
+  "Gallagher",
+  "Georgiou",
+  "Guzmán",
+  "Halloran",
+  "Ibrahim",
+  "Ivanova",
+  "Jankowski",
+  "Kaur",
+  "Keita",
+  "Lindberg",
+  "Maalouf",
+  "Mbeki",
+  "Navarro",
+  "Nwosu",
+  "O'Doherty",
+  "Pereira",
+  "Petrosyan",
+  "Quintero",
+  "Rahimi",
+  "Reyes",
+  "Salazar",
+  "Sandoval",
+  "Sørensen",
+  "Tadesse",
+  "Thibault",
+  "Uddin",
+  "Vermeulen",
+  "Whitfield",
+  "Xiao",
+  "Yamamoto",
+  "Zubair",
+];
+
+const INITIAL = "ABCDEFGHIJKLMNOPRSTVWY".split("");
+
+const PROGRAMS: CaseloadRow["program"][] = ["IOP", "PHP", "Outpatient", "ACT"];
+
+/** Six clinicians, so "my caseload" is a sixth of the team rather than all of it. */
+const CLINICIANS = ["A. Vance", "K. Marsh", "S. Okafor", "T. Boateng", "R. Idris", "M. Halloway"];
+
+/* "Today" is in the pool so an overdue-contact view has something to select.
+   Weighted low: most of a caseload is not due in the next few hours. */
+const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Mon", "Tue", "Wed", "Thu", "Fri", "Today"];
+const TIMES = ["8:00", "8:30", "9:15", "10:00", "11:30", "13:00", "14:15", "15:45", "16:30"];
+
+/** The MRNs with a portrait on disk, reused across the generated rows. */
+const FACES = CASELOAD_FULL_SEED.map((row) => row.mrn);
+
+/**
+ * One generated row.
+ *
+ * Absence is sprinkled at roughly one row in nine, which is close to what a
+ * real caseload carries and well above what a demo usually admits to. The four
+ * reasons keep their proportions: a booked-but-unfinished assessment is common,
+ * a Part 2 restriction is not.
+ */
+function makeRow(index: number, random: () => number): CaseloadRow {
+  const pick = <T>(list: readonly T[]): T => list[Math.floor(random() * list.length)] as T;
+  // Drawn, not counted: a column of MRNs climbing by a fixed step reads as a
+  // spreadsheet's row number, which is the one thing an identifier must not
+  // look like.
+  const mrn = String(1_000_000 + Math.floor(random() * 8_999_000));
+  const phq9Total = Math.floor(random() * 28);
+  const drift = Math.floor(random() * 9) - 4;
+  const absence = random();
+
+  return {
+    name: `${pick(FAMILY)}, ${pick(INITIAL)}.`,
+    mrn,
+    program: pick(PROGRAMS),
+    phq9:
+      absence < 0.05
+        ? { absent: "awaiting", detail: "Assessment booked; the client has not completed it." }
+        : absence < 0.08
+          ? { absent: "refused" }
+          : phq9Total,
+    previousPhq9: absence < 0.08 ? undefined : Math.max(0, Math.min(27, phq9Total - drift)),
+    cssrs:
+      absence < 0.03
+        ? { absent: "restricted", detail: "Part 2 record — not available to you." }
+        : absence < 0.11
+          ? { absent: "not-recorded" }
+          : pick(CSSRS_ORDER),
+    risk: Math.round(random() * 80 + 5) / 100,
+    due: `${pick(DAYS)} ${pick(TIMES)}`,
+    clinician: pick(CLINICIANS),
+    photo: portrait(FACES[(index * 7) % FACES.length] ?? FACES[0] ?? ""),
+  };
+}
+
+/** The generated remainder. One seed, so the list is the same everywhere. */
+export const CASELOAD_GENERATED: CaseloadRow[] = (() => {
+  const random = seeded(20_260_902);
+  const taken = new Set(CASELOAD_FULL_SEED.map((row) => row.mrn));
+  const out: CaseloadRow[] = [];
+  for (let i = 0; out.length < 300; i += 1) {
+    const row = makeRow(i, random);
+    // An MRN that collided would give two rows the same key, which is the one
+    // thing this component's row identity may not tolerate.
+    if (taken.has(row.mrn)) continue;
+    taken.add(row.mrn);
+    out.push(row);
+  }
+  return out;
+})();
+
+/** The caseload as a scrolling surface sees it: the twenty-eight, then the rest. */
+export const CASELOAD_FULL: CaseloadRow[] = [...CASELOAD_FULL_SEED, ...CASELOAD_GENERATED];
+
+/**
  * Two more rows, for the state that shows every absence at once.
  *
  * `not-recorded` and `refused` are the two most often collapsed into one blank

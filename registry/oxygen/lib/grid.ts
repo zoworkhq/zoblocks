@@ -454,65 +454,55 @@ export function describeGridSelection(count: number, noun = "row"): string {
 }
 
 /* ------------------------------------------------------------------ */
-/* Pagination                                                          */
+/* Loading more                                                        */
 /* ------------------------------------------------------------------ */
 
-/** Which page, and how big. Zero-based, because it indexes an array. */
-export interface GridPage {
-  index: number;
-  size: number;
+/**
+ * How far through the list the reader is, for the status line under it.
+ *
+ * This replaced a numbered pager, and the reason is not taste. FHIR search
+ * returns opaque `link.next` URLs and the spec forbids constructing paging
+ * URLs by hand; `Bundle.total` is optional and several servers omit it. So
+ * "page 4 of 7" is a control that cannot be built against a conformant server
+ * — the page count is not derivable and the jump target is not addressable.
+ * Following `next` until it stops is the shape the protocol actually has, and
+ * a scroll is the shape that matches it.
+ */
+export function describeGridLoaded(
+  coverage: GridCoverage,
+  state: "idle" | "loading" | "exhausted" = "idle",
+): string {
+  const noun = coverage.noun ?? "records";
+  const shown = coverage.shown.toLocaleString("en");
+
+  if (state === "loading") return `Loading more ${noun}…`;
+
+  if (coverage.total === "unknown") {
+    return state === "exhausted"
+      ? `All ${shown} ${noun} loaded.`
+      : `${shown} ${noun} loaded. The source did not say how many match.`;
+  }
+
+  if (coverage.shown >= coverage.total)
+    return `All ${coverage.total.toLocaleString("en")} ${noun} loaded.`;
+  return `${shown} of ${coverage.total.toLocaleString("en")} ${noun} loaded.`;
 }
 
 /**
- * How many pages there are, or that nobody knows.
+ * Whether asking for more is worth doing.
  *
- * `"unknown"` propagates rather than collapsing to 1. A pager that renders a
- * single page over a `Bundle` whose total the server withheld has invented the
- * end of the list, which is the same failure as `coverage.total` inventing a
- * count — and the reason the union exists in the first place.
+ * `false` while a fetch is in flight, so a scroll that crosses the sentinel
+ * twice does not fire two requests — the defect every hand-rolled infinite
+ * scroll ships with, and the one that turns a slow list into a duplicated one.
  */
-export function gridPageCount(total: number | "unknown", size: number): number | "unknown" {
-  if (total === "unknown") return "unknown";
-  if (size <= 0) return 1;
-  return Math.max(1, Math.ceil(total / size));
-}
-
-/** "51–100 of 312", or the honest version when the total is withheld. */
-export function describeGridPage(page: GridPage, total: number | "unknown"): string {
-  const first = page.index * page.size + 1;
-  if (total === "unknown") return `${first.toLocaleString("en")} onwards`;
-  const last = Math.min(total, (page.index + 1) * page.size);
-  if (total === 0) return "Nothing to show";
-  return `${first.toLocaleString("en")}–${last.toLocaleString("en")} of ${total.toLocaleString("en")}`;
-}
-
-/**
- * The page numbers to draw, with gaps.
- *
- * First, last, and a window around the current one; `"gap"` marks an elision.
- * A pager that renders sixty-three buttons has made the control useless at
- * exactly the size it was added for.
- */
-export function gridPageWindow(
-  index: number,
-  count: number | "unknown",
-  span = 1,
-): Array<number | "gap"> {
-  if (count === "unknown") return [index];
-  const wanted = new Set<number>([0, count - 1]);
-  for (let i = index - span; i <= index + span; i += 1) {
-    if (i >= 0 && i < count) wanted.add(i);
-  }
-  const pages = [...wanted].sort((a, b) => a - b);
-
-  const out: Array<number | "gap"> = [];
-  let previous = -1;
-  for (const page of pages) {
-    if (previous >= 0 && page - previous > 1) out.push("gap");
-    out.push(page);
-    previous = page;
-  }
-  return out;
+export function shouldLoadMoreGridRows(
+  coverage: GridCoverage,
+  loading: boolean,
+  exhausted: boolean,
+): boolean {
+  if (loading || exhausted) return false;
+  if (coverage.total === "unknown") return true;
+  return coverage.shown < coverage.total;
 }
 
 /* ------------------------------------------------------------------ */
