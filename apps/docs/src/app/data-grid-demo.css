@@ -1,0 +1,275 @@
+/**
+ * The home page's Data Grid instrument.
+ *
+ * Scoped under `.oxdg`, so the plain class names inside cannot collide with the
+ * site around them — the same containment `blocks.css` uses.
+ *
+ * The panel is *hardware*: a dark bezel set into a light document, which is the
+ * home page's established treatment for a live component and the one the
+ * previous preview in this slot used. Inside it, the component runs with its own
+ * dark token set; nothing here restyles the grid, because a marketing page that
+ * repaints the component it is selling is showing something the customer cannot
+ * install.
+ *
+ * Two rules earn their place:
+ *
+ *   **Nothing here changes height.** The demo's loop is deliberately confined to
+ *   colour and content — a row count, a footnote list or a strip that came and
+ *   went made the panel jump ninety pixels four times a minute, which reads as a
+ *   fault rather than as life.
+ *
+ *   **The highlight is a ring, not a dimming.** Fading the rest of the grid to
+ *   point at one part would make seven-eighths of a clinical worklist
+ *   deliberately hard to read, on a page whose argument is that worklists should
+ *   be legible.
+ */
+
+.oxdg {
+  --oxdg-bezel: #08110f;
+  --oxdg-rule: #1d302d;
+  --oxdg-fg: #e8f4f1;
+  --oxdg-muted: #8b9c98;
+  --oxdg-trace: #2dd4b0;
+  /*
+   * Critical, in the luminous variant.
+   *
+   * The site's `--site-critical` is #dc2626, chosen to be read on paper; on
+   * this bezel it measures 3.96:1 and the axe run failed on it. The panel is
+   * always dark whatever the page is doing, so it takes the luminous red the
+   * palette already defines for dark grounds — 7.3:1 here — as a literal
+   * rather than a token, for the same reason every other colour in this block
+   * is a literal: the frame does not follow the page.
+   */
+  --oxdg-critical: #fb7185;
+
+  margin: 0;
+  border-radius: 1.25rem;
+  background: var(--oxdg-bezel);
+  border: 1px solid var(--oxdg-rule);
+  box-shadow:
+    0 0 0 1px rgb(255 255 255 / 0.02) inset,
+    0 34px 80px -28px rgb(2 20 17 / 0.55),
+    0 10px 28px -14px rgb(2 20 17 / 0.35);
+  overflow: hidden;
+}
+
+/* ---------------------------------------------------------------- */
+/* Chrome                                                            */
+/* ---------------------------------------------------------------- */
+
+.oxdg__bar {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.7rem 1.15rem;
+  border-block-end: 1px solid var(--oxdg-rule);
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--oxdg-muted);
+}
+
+.oxdg__live {
+  inline-size: 0.375rem;
+  block-size: 0.375rem;
+  border-radius: 50%;
+  background: var(--oxdg-trace);
+  box-shadow: 0 0 0 0 color-mix(in srgb, var(--oxdg-trace) 55%, transparent);
+  animation: oxdg-pulse 2.4s ease-out infinite;
+}
+
+@keyframes oxdg-pulse {
+  70% {
+    box-shadow: 0 0 0 0.4rem color-mix(in srgb, var(--oxdg-trace) 0%, transparent);
+  }
+  100% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--oxdg-trace) 0%, transparent);
+  }
+}
+
+.oxdg__title {
+  color: var(--oxdg-fg);
+  font-weight: 600;
+}
+
+.oxdg__meta {
+  margin-inline-start: auto;
+  font-size: 0.625rem;
+  letter-spacing: 0.08em;
+  text-transform: none;
+}
+
+@media (max-width: 40rem) {
+  .oxdg__meta {
+    display: none;
+  }
+}
+
+/* ---------------------------------------------------------------- */
+/* The stage                                                         */
+/* ---------------------------------------------------------------- */
+
+/*
+ * The component keeps its own border and radius; the bezel supplies the frame,
+ * so the stage removes the doubled edge rather than nesting two boxes.
+ */
+.oxdg__stage .ox-grid {
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+.oxdg__stage .ox-grid__masthead,
+.oxdg__stage .ox-grid__foot {
+  border-color: var(--oxdg-rule);
+}
+
+/* ---------------------------------------------------------------- */
+/* The highlight                                                     */
+/* ---------------------------------------------------------------- */
+
+/*
+ * One claim at a time, and each lands on its own evidence.
+ *
+ * Ringed from the inside, never bordered: a 2px border on the masthead would
+ * move every row below it down by two, and a demo that shifts while explaining
+ * that it does not shift is worse than no demo. `box-shadow` and
+ * `background-color` are the only two properties touched here for that reason.
+ *
+ * The first version pointed both the provenance claim and the absence claim at
+ * the footnote block, because that is where both are written down. It read as
+ * one highlight blinking twice. They now point at the thing each is *about* —
+ * the sorted column and the sorted line for one, the absent cells for the other
+ * — which is the difference between citing a footnote and showing the fact.
+ */
+.oxdg__stage .ox-grid__masthead,
+.oxdg__stage .ox-grid__held,
+.oxdg__stage .ox-grid__sorted,
+.oxdg__stage .ox-grid__th,
+.oxdg__stage .ox-grid__absent {
+  transition:
+    box-shadow 0.5s var(--ease-out-expo),
+    background-color 0.5s var(--ease-out-expo),
+    color 0.5s var(--ease-out-expo);
+}
+
+.oxdg[data-part="coverage"] .ox-grid__masthead,
+.oxdg[data-part="held"] .ox-grid__held {
+  background: color-mix(in srgb, var(--oxdg-trace) 11%, transparent);
+  box-shadow: inset 3px 0 0 var(--oxdg-trace);
+}
+
+/* Provenance: the column that was sorted, and the line that declares it. */
+.oxdg[data-part="derived"] .ox-grid__sorted {
+  background: color-mix(in srgb, var(--oxdg-trace) 11%, transparent);
+  border-inline-start-color: var(--oxdg-trace);
+}
+
+.oxdg[data-part="derived"] .ox-grid__th--sorted {
+  background: color-mix(in srgb, var(--oxdg-trace) 9%, transparent);
+}
+
+.oxdg[data-part="derived"] .ox-grid__th--sorted .ox-grid__sort {
+  color: var(--oxdg-trace);
+}
+
+/*
+ * Absence: the words themselves.
+ *
+ * The ring is a spread shadow rather than padding, so picking a cell out cannot
+ * change the width of the column it sits in.
+ */
+.oxdg[data-part="absence"] .ox-grid__absent {
+  color: var(--oxdg-trace);
+  background: color-mix(in srgb, var(--oxdg-trace) 13%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--oxdg-trace) 13%, transparent);
+  border-radius: 2px;
+}
+
+/* ---------------------------------------------------------------- */
+/* The claims                                                        */
+/* ---------------------------------------------------------------- */
+
+.oxdg__claims {
+  display: grid;
+  gap: 1px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-block-start: 1px solid var(--oxdg-rule);
+  background: var(--oxdg-rule);
+}
+
+@media (min-width: 52rem) {
+  .oxdg__claims {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.oxdg__claim {
+  display: grid;
+  grid-template-columns: 1.5rem minmax(0, 1fr);
+  gap: 0.15rem 0.5rem;
+  padding: 0.85rem 1rem 0.95rem;
+  background: var(--oxdg-bezel);
+  /* The bar is drawn inside, so lighting a claim moves nothing. */
+  box-shadow: inset 0 2px 0 transparent;
+  transition:
+    box-shadow 0.45s var(--ease-out-expo),
+    background-color 0.45s var(--ease-out-expo);
+}
+
+.oxdg__claim[data-on="true"] {
+  background: #0d1a18;
+  box-shadow: inset 0 2px 0 var(--oxdg-trace);
+}
+
+.oxdg__claimnum {
+  grid-row: 1 / span 2;
+  font-size: 0.625rem;
+  color: var(--oxdg-muted);
+  padding-block-start: 0.15rem;
+  transition: color 0.45s var(--ease-out-expo);
+}
+
+.oxdg__claim[data-on="true"] .oxdg__claimnum {
+  color: var(--oxdg-trace);
+}
+
+.oxdg__claimtitle {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--oxdg-fg);
+  letter-spacing: -0.01em;
+}
+
+.oxdg__claimbody {
+  font-size: 0.75rem;
+  line-height: 1.5;
+  color: var(--oxdg-muted);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .oxdg__live {
+    animation: none;
+  }
+
+  .oxdg *,
+  .oxdg::before,
+  .oxdg::after {
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/*
+ * The one colour in the grid, and it never travels alone.
+ *
+ * Applied by the demo's own cell renderers rather than by a Tailwind utility,
+ * because the utility resolves the page's critical colour and this panel is not
+ * on the page's ground. The word beside the number is what actually carries the
+ * meaning; this is the second cue, not the only one.
+ */
+.oxdg .oxdg__crit {
+  color: var(--oxdg-critical);
+}

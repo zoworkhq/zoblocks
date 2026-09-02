@@ -5897,7 +5897,7 @@ export const CATALOG: ComponentDoc[] = [
         "wcag": "2.5.8",
         "name": "Target size (minimum)",
         "status": "pass",
-        "how": "Header sort buttons and the admit control take the density target as a minimum block size, so neither goes under 24px at compact density.",
+        "how": "The admit control takes the density target; header sort buttons take a 28px floor of their own, because a 10px column label given a 44px pointer target puts half an inch of nothing above every row. Both clear the 24px minimum.",
         "evidence": "grid.css"
       }
     ],

@@ -1,31 +1,35 @@
 "use client";
 
 /**
- * The Data Grid, on the home page, doing the thing it is for.
+ * The Data Grid, on the home page, arguing for itself.
  *
- * This is the shipped component — `registry/oxygen/data-grid` — driven through
- * four beats, not a picture of one. Everything on screen is produced by the
- * same props a consumer passes, which is the only version of this section
- * worth having: a marketing mock of a grid is the easiest thing in the world
- * to draw and proves nothing about whether it was built.
+ * This is the shipped component — `registry/oxygen/data-grid` — inside an
+ * instrument frame, with the four claims the section makes lit one at a time
+ * against the part of the grid that carries each. Everything on screen is
+ * produced by the same props a consumer passes. A marketing mock of a grid is
+ * the easiest thing in the world to draw and proves nothing about whether it
+ * was built.
  *
- * The beats are the four claims, in the order they cost the most:
+ * **Nothing changes height, ever.** That is the design constraint, not a nice
+ * property: the first version cycled the row count 6 → 8, gained and lost the
+ * held-arrivals strip, and grew and shrank its footnote list — so the panel
+ * jumped about ninety pixels four times a minute, which on a scrolling page is
+ * indistinguishable from a rendering fault. It was also, precisely, the failure
+ * the component exists to prevent, performed on the page arguing against it.
  *
- *   0  coverage   Six rows on screen, 1,438 in the cohort, and the filter that
- *                 produced the difference written as a sentence you can print.
- *   1  arrivals   Three results land. The count appears on a ruled strip and
- *                 not one row moves — live data that reorders under a pointer
- *                 is how the wrong row gets actioned.
- *   2  admitted   The reader lets them in. Now the order changes, because now
- *                 somebody asked. The coverage line counts up with it.
- *   3  provenance Sorted by the model column, which cites the footnote naming
- *                 the model, its version and the population it was validated
- *                 in. Sorting is a clinical act; no other grid treats it as one.
+ * So the loop moves only what a real worklist moves:
  *
- * Nothing here takes focus. A section that stole the caret to demonstrate its
- * keyboard model would be scrolling the page out from under a reader — so the
- * cursor and the "Reading" line are left for the visitor to drive, and the
- * caption says so.
+ *   · the row set is fixed at eight, and arrivals *update* rows rather than
+ *     adding them, so the table's height is constant;
+ *   · the grid is sorted by the derived column from the first paint, so the
+ *     provenance line is always there rather than appearing on beat three;
+ *   · results are always arriving, so the held strip is never absent — the
+ *     count ticks 1 → 2 → 3, and admitting them re-orders rows that were
+ *     already on screen;
+ *   · the footnotes never change, because the two absences are never resolved.
+ *
+ * Nothing here takes focus, and the loop stops permanently the moment anybody
+ * touches it.
  *
  * Data is synthetic — invented names, invented MRNs, portraits of people who
  * do not exist — per the standing rule that no PHI enters this repository.
@@ -39,17 +43,70 @@ import {
   type GridSort,
 } from "@/registry/oxygen/data-grid/data-grid";
 import {
-  ARRIVALS,
   EARLY_WARNING,
-  WARD,
+  WARD_WITH_EVERY_ABSENCE,
   WARD_COVERAGE,
   potassiumQualifier,
   type WardRow,
 } from "@/registry/oxygen/data-grid/data-grid.fixtures";
 
-/** Beats, in order. `HOLD` is how long each one stays on screen. */
-const BEATS = 4;
-const HOLD = 3600;
+/**
+ * The four claims, each pointing at the thing that carries it.
+ *
+ * `part` is what lights up in the grid — the frame carries `data-part` and the
+ * stylesheet rings the matching region. A claim beside a component is an
+ * assertion; a claim wired to the pixel making it is a demonstration.
+ */
+const CLAIMS = [
+  {
+    part: "coverage",
+    title: "It states its coverage",
+    body: "Eight rows, 1,438 in the cohort, and the filter written as a sentence. Most grids render the eight and say nothing about the other 1,430.",
+  },
+  {
+    part: "held",
+    title: "Nothing moves under your hand",
+    body: "Results are arriving now and the table has not moved. They wait behind the line until you ask, because a grid that reorders under a pointer is how the wrong row gets actioned.",
+  },
+  {
+    part: "derived",
+    title: "Sorting is a clinical act",
+    body: "This is ranked by model output, so the column cites the model, its version and the population it was validated in. No other grid treats a sort as something to declare.",
+  },
+  {
+    part: "absence",
+    title: "Absence is a word, never a dash",
+    body: "A specimen with the lab and a record you are not entitled to are different facts with different next actions. The type has no null to collapse them into.",
+  },
+] as const;
+
+/**
+ * The results waiting to come in — three, and every one of them lands on a row
+ * that already has a value.
+ *
+ * The shared `ARRIVALS` fixture resolves two of the ward's absences, which is
+ * exactly right for the stories and wrong here: resolving an absence removes
+ * its footnote, and two footnotes are forty pixels of panel height. Measured,
+ * after the row count had already been pinned — it was the last thing still
+ * moving.
+ *
+ * They are also chosen to make the re-order worth watching. Haddad goes from
+ * seventh to fourth when these land, which is the whole point of the beat: the
+ * order changed because new data arrived *and somebody asked for it*.
+ */
+const PATCHES = [
+  { mrn: "3320145", potassium: 5.9, previous: 5.4, risk: 0.68 },
+  { mrn: "5518203", potassium: 4.6, previous: 4.1, risk: 0.52 },
+  { mrn: "6690321", potassium: 2.9, previous: 3.2, risk: 0.41 },
+] as const;
+
+/** The patches resolved against the ward, so `arrivals` is a row set like any other. */
+const HELD: readonly WardRow[] = PATCHES.map((patch) => ({
+  ...WARD_WITH_EVERY_ABSENCE.find((row) => row.mrn === patch.mrn)!,
+  ...patch,
+}));
+
+const HOLD = 4200;
 
 function usePrefersReducedMotion() {
   const [reduced, setReduced] = React.useState(false);
@@ -64,30 +121,47 @@ function usePrefersReducedMotion() {
 }
 
 /**
- * The patient cell, composed by the caller.
+ * The identity cell, composed by the caller.
  *
  * The grid renders whatever `cell` returns and holds no opinion about
- * photographs — the whole "the grid does not own the cells" claim, shown
- * rather than stated.
+ * photographs — the "the grid does not own the cells" claim, shown rather than
+ * stated. The MRN sits under the name rather than in a column of its own: a
+ * name is not an identifier, and the row somebody acts on has to carry both.
  */
 function Patient({ row }: { row: WardRow }) {
   return (
     <span className="flex min-w-0 items-center gap-2.5">
       <PatientPortrait src={row.photo} size={26} />
       <span className="min-w-0">
-        <span className="block whitespace-nowrap font-medium leading-tight">{row.name}</span>
-        {/*
-          The identifier under the name, not in a column of its own.
+        <span className="block truncate font-medium leading-tight">{row.name}</span>
+        <span className="numeric block text-[0.625rem] leading-tight opacity-60">{row.mrn}</span>
+      </span>
+    </span>
+  );
+}
 
-          A name is not an identifier — two patients on one ward sharing a
-          surname is in every study of wrong-patient documentation — so the MRN
-          has to be visible on the row rather than one column away. Under the
-          name it is read as part of the same fact, and the column it vacates
-          goes to the values somebody is actually scanning.
-        */}
-        <span className="numeric block text-[0.625rem] leading-tight text-graphite-soft">
-          {row.mrn}
-        </span>
+/**
+ * The 24-hour move, beside the value rather than in a column of its own.
+ *
+ * A stable 5.9 and a climbing 5.9 are different patients, and a worklist that
+ * shows only the latest value has left the reader to remember which. It sits
+ * inline because as a column it was absent on half the rows — a row with no
+ * current potassium has no delta either — and a column that is mostly the word
+ * "Not recorded" is a column arguing against itself. Typographic rather than a
+ * sparkline: this direction is a ledger, and a chart in a ruled column is a
+ * different component.
+ */
+function Delta({ row }: { row: WardRow }) {
+  if (typeof row.potassium !== "number" || row.previous === undefined) return null;
+  const move = Number((row.potassium - row.previous).toFixed(1));
+  if (Math.abs(move) < 0.05) return null;
+  const rising = move > 0;
+  return (
+    <span className={rising ? "oxdg__crit" : "opacity-55"}>
+      <span aria-hidden="true">{rising ? "▲" : "▼"}</span>
+      {Math.abs(move).toFixed(1)}
+      <span className="sr-only">
+        {rising ? "up" : "down"} {Math.abs(move).toFixed(1)} on 24 hours
       </span>
     </span>
   );
@@ -101,6 +175,8 @@ const COLUMNS: DataGridColumn<WardRow>[] = [
     value: (row) => row.name,
     cell: (row) => <Patient row={row} />,
   },
+  // An identifier, not a number: 4W-07 does not sort as seven.
+  { key: "bed", header: "Bed", kind: "identifier", value: (row) => row.bed, width: "5.5rem" },
   {
     key: "potassium",
     header: "Potassium",
@@ -112,28 +188,27 @@ const COLUMNS: DataGridColumn<WardRow>[] = [
      * `align` is separate from `kind` for exactly this cell: the value carries
      * a qualifier word beside it, and right-aligning the pair lines up the
      * *words* while leaving the numbers ragged — which defeats the one thing a
-     * ruled column is for. Aligned from the left with tabular figures, 3.2 and
-     * 6.8 stack, and the qualifier trails.
+     * ruled column is for.
      */
     align: "start",
-    width: "9rem",
-    footnote: "Serum potassium, mmol/L. Reference range 3.5–5.1.",
+    width: "11rem",
+    footnote: "Serum potassium, mmol/L. Reference range 3.5–5.1. Δ is the move on 24 hours.",
     /*
-     * The qualifier is a word, and it is the caller's.
-     *
-     * The grid holds no reference ranges: a component library that shipped one
-     * would be asserting a threshold somebody else's laboratory disagrees
-     * with. Only the critical value takes colour, and it keeps the word beside
-     * it — the site's own rule is that status is never colour alone.
+     * The qualifier is a word, and it is the caller's. The grid holds no
+     * reference ranges: a library that shipped one would be asserting a
+     * threshold somebody else's laboratory disagrees with. Only the critical
+     * value takes colour, and it keeps the word beside it — the site's rule is
+     * that status is never colour alone.
      */
     cell: (row) => {
       const word = potassiumQualifier(row.potassium);
       return (
         <span className="inline-flex items-baseline gap-1.5">
-          <span className={word === "critical" ? "font-semibold text-critical" : undefined}>
+          <span className={word === "critical" ? "oxdg__crit font-semibold" : undefined}>
             {String(row.potassium)}
           </span>
-          {word ? <span className="text-[0.6875rem] text-graphite-soft">{word}</span> : null}
+          {word ? <span className="text-[0.6875rem] opacity-65">{word}</span> : null}
+          <Delta row={row} />
         </span>
       );
     },
@@ -142,119 +217,121 @@ const COLUMNS: DataGridColumn<WardRow>[] = [
     key: "risk",
     header: "Deterioration risk",
     kind: "number",
-    width: "11rem",
+    width: "10.5rem",
     value: (row) => row.risk,
     derived: EARLY_WARNING,
     cell: (row) => row.risk.toFixed(2),
   },
-  { key: "due", header: "Next due", kind: "instant", value: (row) => row.due, width: "6rem" },
+  { key: "due", header: "Next due", kind: "instant", value: (row) => row.due, width: "6.5rem" },
+  // Always populated, deliberately. A queue that says what is owed and not who
+  // owes it is a list somebody else will action.
+  { key: "owner", header: "Reviewed by", kind: "text", value: (row) => row.owner, width: "8rem" },
 ];
 
-/** Arrivals merged into the ward, by MRN. The host's job, never the grid's. */
-function merge(rows: readonly WardRow[], arriving: readonly WardRow[]): WardRow[] {
-  const byMrn = new Map(rows.map((row) => [row.mrn, row]));
-  for (const row of arriving) byMrn.set(row.mrn, { ...byMrn.get(row.mrn), ...row });
-  return [...byMrn.values()];
+/** Held results applied to the rows already on screen. Never adds one. */
+function apply(rows: readonly WardRow[], arriving: readonly WardRow[]): WardRow[] {
+  const byMrn = new Map(arriving.map((row) => [row.mrn, row]));
+  return rows.map((row) => ({ ...row, ...(byMrn.get(row.mrn) ?? {}) }));
 }
+
+const SORT: GridSort = { key: "risk", direction: "descending" };
 
 export function DataGridDemo() {
   const reduced = usePrefersReducedMotion();
-  const [beat, setBeat] = React.useState(0);
+
+  const [rows, setRows] = React.useState<readonly WardRow[]>(WARD_WITH_EVERY_ABSENCE);
+  const [waiting, setWaiting] = React.useState(1);
+  const [claim, setClaim] = React.useState(0);
   /*
-   * The loop stops the moment a visitor touches it.
+   * Any contact stops the loop, permanently.
    *
-   * A demo that keeps re-sorting under somebody who has just clicked a header
-   * is the exact behaviour the component argues against, performed on its own
-   * marketing page. Interaction wins, permanently.
+   * Wiring this only to the sort and admit handlers left the worst version of
+   * it: a visitor clicks a cell to read the identity line, and four seconds
+   * later the grid re-sorts under their pointer.
    */
   const [taken, setTaken] = React.useState(false);
+  const take = React.useCallback(() => setTaken(true), []);
 
-  const [rows, setRows] = React.useState<readonly WardRow[]>(WARD);
-  const [held, setHeld] = React.useState<readonly WardRow[]>([]);
-  const [sort, setSort] = React.useState<GridSort | null>(null);
+  const admit = React.useCallback(() => {
+    setRows((current) => apply(current, HELD.slice(0, waiting)));
+    setWaiting(1);
+  }, [waiting]);
 
   React.useEffect(() => {
-    /*
-     * Reduced motion gets the composed state, not a faster loop.
-     *
-     * The final beat carries the most information — merged, sorted, with the
-     * provenance cited — so it is the honest still frame. SC 2.3.3: the
-     * movement conveys nothing this does not.
-     */
-    if (reduced) {
-      setRows(merge(WARD, ARRIVALS));
-      setHeld([]);
-      setSort({ key: "risk", direction: "descending" });
-      return;
-    }
-    if (taken) return;
-    const timer = setInterval(() => setBeat((current) => (current + 1) % BEATS), HOLD);
+    // Reduced motion gets the composed frame, not a faster loop. SC 2.3.3: the
+    // movement conveys nothing this does not.
+    if (reduced || taken) return;
+    const timer = setInterval(() => {
+      setClaim((current) => (current + 1) % CLAIMS.length);
+      setWaiting((current) => {
+        if (current < HELD.length) return current + 1;
+        setRows((rowsNow) => apply(rowsNow, HELD));
+        return 1;
+      });
+    }, HOLD);
     return () => clearInterval(timer);
   }, [reduced, taken]);
 
-  React.useEffect(() => {
-    if (reduced || taken) return;
-    if (beat === 0) {
-      setRows(WARD);
-      setHeld([]);
-      setSort(null);
-    } else if (beat === 1) {
-      setHeld(ARRIVALS);
-    } else if (beat === 2) {
-      setRows(merge(WARD, ARRIVALS));
-      setHeld([]);
-    } else {
-      setSort({ key: "risk", direction: "descending" });
-    }
-  }, [beat, reduced, taken]);
+  const active = CLAIMS[claim]!;
 
-  const take = React.useCallback(() => setTaken(true), []);
-
-  /*
-   * Any contact stops the loop, not just a sort.
-   *
-   * Wiring `take` only to the sort and admit handlers left the worst version
-   * of this: a visitor clicks a cell to read the identity line, and three
-   * seconds later the grid re-sorts under their pointer — the exact failure
-   * the component exists to prevent, performed on the page arguing against it.
-   * Captured on the wrapper so it fires for a click, a tab, or an arrow key,
-   * including the ones the grid handles itself.
-   */
   return (
-    <div onPointerDownCapture={take} onKeyDownCapture={take} onFocusCapture={take}>
-      <DataGrid
-        caption="Patients on 4-West with a potassium outside the reference range"
-        title="Worklist · 4-West · potassium out of range"
-        note='role="grid" · 24h window'
-        /*
-        Capped and centred rather than stretched to the section.
+    <figure className="oxdg" data-part={taken ? "none" : active.part}>
+      <figcaption className="oxdg__bar">
+        <span className="oxdg__live" aria-hidden="true" />
+        <span className="oxdg__title">Worklist · 4-West</span>
+        <span className="oxdg__meta numeric">
+          role=&quot;grid&quot; · {rows.length} rows · aria-rowcount 1439
+        </span>
+      </figcaption>
 
-        Five columns across 1,150px leaves the name column absorbing four
-        hundred pixels of nothing, and a ledger that airy reads as a web table
-        rather than as a document. The cap is what makes the rules do their
-        job: hairlines only organise a page when the columns are close enough
-        to scan in one movement.
-      */
-        className="mx-auto max-w-4xl rounded-xl shadow-[0_1px_2px_-1px_rgb(2_20_17/0.06),0_18px_40px_-28px_rgb(2_20_17/0.25)]"
-        columns={COLUMNS}
-        rows={rows}
-        rowKey={(row) => row.mrn}
-        coverage={{ ...WARD_COVERAGE, shown: rows.length }}
-        arrivals={held}
-        arrivalsAt="11:47"
-        onAdmitArrivals={(arriving) => {
-          take();
-          setRows((current) => merge(current, arriving));
-          setHeld([]);
-        }}
-        sort={sort}
-        onSortChange={(next) => {
-          take();
-          setSort(next);
-        }}
-        identify={(row) => ({ primary: row.name, secondary: `MRN ${row.mrn}` })}
-        onRowActivate={take}
-      />
-    </div>
+      {/*
+        The component's own tokens forced to their dark set.
+
+        The site's rule is that live previews follow the page theme — right for
+        a docs page showing a component in context. This is the home page's
+        instrument slot, where the panel is hardware rather than document, and
+        the previous preview in this position was dark for the same reason.
+      */}
+      <div className="oxdg__stage" data-ox-theme="dark" onPointerDownCapture={take}>
+        <DataGrid
+          caption="Patients on 4-West with a potassium outside the reference range"
+          title="Potassium out of range · last 24 hours"
+          note="live"
+          columns={COLUMNS}
+          rows={rows}
+          rowKey={(row) => row.mrn}
+          coverage={{ ...WARD_COVERAGE, shown: rows.length }}
+          arrivals={HELD.slice(0, waiting)}
+          arrivalsAt="11:47"
+          onAdmitArrivals={() => {
+            take();
+            admit();
+          }}
+          sort={SORT}
+          onSortChange={take}
+          identify={(row) => ({ primary: row.name, secondary: `MRN ${row.mrn}` })}
+          onRowActivate={take}
+        />
+      </div>
+
+      {/*
+        The claims, lit one at a time against the part of the grid that carries
+        each. A list rather than a carousel: all four are readable at once on a
+        wide screen, and the highlight is the only thing that moves.
+      */}
+      <ol className="oxdg__claims">
+        {CLAIMS.map((entry, index) => (
+          <li
+            key={entry.part}
+            className="oxdg__claim"
+            data-on={!taken && index === claim ? "true" : "false"}
+          >
+            <span className="oxdg__claimnum numeric">{String(index + 1).padStart(2, "0")}</span>
+            <span className="oxdg__claimtitle">{entry.title}</span>
+            <span className="oxdg__claimbody">{entry.body}</span>
+          </li>
+        ))}
+      </ol>
+    </figure>
   );
 }

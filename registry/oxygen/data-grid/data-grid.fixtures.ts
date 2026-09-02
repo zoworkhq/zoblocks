@@ -32,6 +32,24 @@ export interface WardRow {
    * five of them.
    */
   photo: string;
+  /** Ward and bed. An identifier, not a number: 4W-07 does not sort as seven. */
+  bed: string;
+  /**
+   * The previous potassium, so the row can carry a direction as well as a value.
+   *
+   * A worklist that shows 5.9 and not "up from 4.8 yesterday" has left the
+   * reader to remember the trajectory, and the trajectory is most of the
+   * clinical signal — a stable 5.9 and a climbing 5.9 are different patients.
+   */
+  previous?: number;
+  /**
+   * Who is answerable for the row.
+   *
+   * Present on every row on purpose. A queue that shows what is owed and not
+   * who owes it is a list somebody else will action, and the column that would
+   * most often be blank is the one worth making mandatory.
+   */
+  owner: string;
 }
 
 /** The model behind the risk column. Named so the footnote can be generated. */
@@ -56,6 +74,9 @@ export const WARD: WardRow[] = [
   {
     name: "Novak, K.",
     mrn: "5518203",
+    owner: "T. Boateng",
+    bed: "4W-02",
+    previous: 4.3,
     potassium: 4.1,
     risk: 0.44,
     due: "16:00",
@@ -64,6 +85,9 @@ export const WARD: WardRow[] = [
   {
     name: "Adeyemi, R.",
     mrn: "4471902",
+    owner: "A. Vance",
+    bed: "4W-07",
+    previous: 5.9,
     potassium: 6.8,
     risk: 0.82,
     due: "14:00",
@@ -72,6 +96,9 @@ export const WARD: WardRow[] = [
   {
     name: "Haddad, N.",
     mrn: "6690321",
+    owner: "K. Marsh",
+    bed: "4W-11",
+    previous: 3.6,
     potassium: 3.2,
     risk: 0.28,
     due: "18:20",
@@ -80,6 +107,9 @@ export const WARD: WardRow[] = [
   {
     name: "Raman, A.",
     mrn: "3320145",
+    owner: "A. Vance",
+    bed: "4W-04",
+    previous: 4.8,
     potassium: 5.4,
     risk: 0.61,
     due: "15:30",
@@ -88,6 +118,8 @@ export const WARD: WardRow[] = [
   {
     name: "Vasquez, I.",
     mrn: "2214870",
+    owner: "S. Okafor",
+    bed: "4W-15",
     potassium: { absent: "awaiting", detail: "Specimen received; the lab has not resulted it." },
     risk: 0.39,
     due: "17:10",
@@ -96,6 +128,8 @@ export const WARD: WardRow[] = [
   {
     name: "Lindqvist, S.",
     mrn: "7745012",
+    owner: "T. Boateng",
+    bed: "4W-09",
     potassium: { absent: "restricted" },
     risk: 0.19,
     due: "19:00",
@@ -116,6 +150,9 @@ export const WARD_WITH_EVERY_ABSENCE: WardRow[] = [
   {
     name: "Petrov, D.",
     mrn: "9910447",
+    owner: "K. Marsh",
+    bed: "4W-06",
+    previous: 4.7,
     potassium: { absent: "not-recorded" },
     risk: 0.35,
     due: "16:40",
@@ -124,6 +161,9 @@ export const WARD_WITH_EVERY_ABSENCE: WardRow[] = [
   {
     name: "Nakamura, Y.",
     mrn: "6031288",
+    owner: "S. Okafor",
+    bed: "4W-13",
+    previous: 4.0,
     potassium: { absent: "refused" },
     risk: 0.31,
     due: "17:55",
@@ -136,6 +176,9 @@ export const ARRIVALS: WardRow[] = [
   {
     name: "Raman, A.",
     mrn: "3320145",
+    owner: "A. Vance",
+    bed: "4W-04",
+    previous: 5.4,
     potassium: 5.9,
     risk: 0.68,
     due: "15:30",
@@ -144,6 +187,9 @@ export const ARRIVALS: WardRow[] = [
   {
     name: "Petrov, D.",
     mrn: "9910447",
+    owner: "K. Marsh",
+    bed: "4W-06",
+    previous: 5.2,
     potassium: 5.2,
     risk: 0.55,
     due: "16:40",
@@ -152,6 +198,9 @@ export const ARRIVALS: WardRow[] = [
   {
     name: "Nakamura, Y.",
     mrn: "6031288",
+    owner: "S. Okafor",
+    bed: "4W-13",
+    previous: 3.9,
     potassium: 3.4,
     risk: 0.31,
     due: "17:55",

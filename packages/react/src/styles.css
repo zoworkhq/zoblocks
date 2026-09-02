@@ -7406,8 +7406,17 @@ button.ox-prov:focus-visible,
   align-items: baseline;
   gap: 0.3rem;
   inline-size: 100%;
-  min-block-size: var(--ox-density-target, 1.5rem);
-  padding: 0.4rem var(--ox-grid-pad-x);
+  /*
+   * 1.75rem, not the density target.
+   *
+   * `--ox-density-target` is 2.75rem at standard density — a pointer target
+   * for a control somebody taps. A column header is a 10px label, and giving
+   * it a 44px box put half an inch of nothing above every worklist. 28px
+   * clears the 24px floor SC 2.5.8 asks for with room to spare, which is what
+   * the token was being borrowed for.
+   */
+  min-block-size: 1.75rem;
+  padding: 0.3rem var(--ox-grid-pad-x);
   border: 0;
   background: none;
   color: var(--ox-grid-muted);
@@ -7463,7 +7472,17 @@ button.ox-prov:focus-visible,
 .ox-grid__td {
   padding: var(--ox-grid-pad-y) var(--ox-grid-pad-x);
   border-inline-end: 1px solid var(--ox-grid-rule);
-  vertical-align: baseline;
+  /*
+   * Centred, not baseline.
+   *
+   * Baseline is the right answer for a table of single-line cells and the
+   * wrong one the moment any cell has two lines in it — which the identity
+   * cell does, because a name is not an identifier and both belong on the row.
+   * Every value in the row then sits on the *second* line's baseline, a third
+   * of a row lower than the name it belongs to, and the whole grid reads as
+   * misaligned rather than as dense.
+   */
+  vertical-align: middle;
 }
 
 .ox-grid__td--end {
@@ -7480,6 +7499,20 @@ button.ox-prov:focus-visible,
   font-family: var(--ox-font-numeric, var(--ox-font-mono, ui-monospace, monospace));
   font-variant-numeric: tabular-nums;
   font-feature-settings: "tnum" 1;
+}
+
+/*
+ * An identifier is never broken across two lines, and neither is a time.
+ *
+ * A wrapped MRN is a misread MRN: "4W-​07" over two lines reads as two
+ * fields, and the whole reason `identifier` is a kind of its own is that its
+ * digits are a name rather than a quantity. The column gets a scrollbar before
+ * the value gets a line break — which is the right trade, because a horizontal
+ * scrollbar is visible and a wrapped identifier is not.
+ */
+.ox-grid__td--identifier,
+.ox-grid__td--instant {
+  white-space: nowrap;
 }
 
 /*

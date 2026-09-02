@@ -379,13 +379,18 @@ function DataGridSection() {
           <h2 className="display-lg mt-4 text-balance" data-reveal>
             A worklist is a claim about a population.
           </h2>
+          {/*
+            One paragraph, not three.
+
+            The four claims used to be listed here and then demonstrated below,
+            which made a reader parse the argument in prose and then look for it
+            in a table. They are now written against the part of the component
+            that carries each, inside the panel — so this is only what the panel
+            cannot say for itself.
+          */}
           <p className="body-lg mt-5 max-w-2xl text-pretty text-graphite" data-reveal>
-            Six rows on screen, 1,438 in the cohort, and a filter somebody set this morning and has
-            since stopped seeing. Most grids render the six and say nothing about the other 1,432.
-            This one states its coverage above the data, prints the active predicate as a sentence,
-            holds arriving results behind a ruled line so nothing moves under your hand — and cites
-            the model, its version and the population it was validated in the moment you sort by a
-            derived column.
+            Eight rows on screen, 1,438 in the cohort, and a filter somebody set this morning and
+            has since stopped seeing. Everything below is the real component, running.
           </p>
           <p className="body-sm mt-4 max-w-2xl text-pretty text-graphite-soft" data-reveal>
             For contrast, we measured the engine underneath the grid most teams reach for:{" "}
@@ -395,7 +400,7 @@ function DataGridSection() {
           </p>
         </div>
 
-        <div className="mt-12" data-reveal>
+        <div className="mt-10" data-reveal>
           <DataGridDemo />
         </div>
 
