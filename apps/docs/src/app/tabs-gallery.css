@@ -838,3 +838,114 @@
     transition-duration: 1ms;
   }
 }
+
+/* ------------------------------------------------------------------ */
+/* The home card's date demo                                           */
+/* ------------------------------------------------------------------ */
+
+.ox-dt-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+  inline-size: 100%;
+}
+
+.ox-dt-card__bar {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-block-size: 2rem;
+}
+
+.ox-dt-card__toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-inline-size: 4.25rem;
+  min-block-size: 2rem;
+  padding-inline: 0.875rem;
+  border: 1px solid var(--color-rule);
+  border-radius: var(--ox-radius, 0.5rem);
+  background: var(--ox-surface);
+  color: var(--ox-text);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+  flex: none;
+}
+
+.ox-dt-card__toggle:hover {
+  background: var(--ox-bg-muted);
+}
+
+.ox-dt-card__toggle:focus-visible {
+  outline: 2px solid var(--ox-field-border-focus);
+  outline-offset: 2px;
+}
+
+/* Holds its line whether or not there is a sentence in it, so the calendar
+   below never steps up and down as the script talks. */
+.ox-dt-card__say {
+  margin: 0;
+  min-block-size: 1.25rem;
+  font-size: 0.8125rem;
+  line-height: 1.25rem;
+  color: var(--color-graphite);
+}
+
+.ox-dt-card__stage {
+  position: relative;
+  display: flex;
+  justify-content: flex-start;
+}
+
+/*
+ * The pointer the script is holding.
+ *
+ * Drawn rather than simulated: there is no way to move the real cursor, and a
+ * reader watching cells light up with nothing to attribute it to reads the
+ * component as glitching rather than as being driven. `translate` is animated
+ * rather than `left`/`top`, so the travel stays on the compositor.
+ */
+.ox-dt-card__cursor {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-start: 0;
+  inline-size: 1.125rem;
+  block-size: 1.125rem;
+  margin-block-start: -0.5rem;
+  margin-inline-start: -0.5rem;
+  border: 2px solid var(--ox-accent);
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--ox-accent) 22%, transparent);
+  /* A second ring in the surface colour, so the pointer still reads when it
+     lands on an accent-filled chip — which is exactly where it lands twice,
+     on each end of the range it is drawing. */
+  box-shadow: 0 0 0 2px var(--ox-surface);
+  pointer-events: none;
+  transition:
+    translate 320ms cubic-bezier(0.32, 0.72, 0, 1),
+    scale 170ms ease,
+    opacity 200ms ease;
+}
+
+.ox-dt-card__cursor--press {
+  scale: 0.62;
+}
+
+.ox-dt-card__cursor[data-ox-hidden="true"] {
+  opacity: 0;
+}
+
+/*
+ * Under reduced motion the cursor is placed, not flown.
+ *
+ * The demo does not autoplay there at all, so this only reaches a reader who
+ * pressed Play deliberately — and having asked for it, they still should not
+ * be given a third of a second of sliding.
+ */
+@media (prefers-reduced-motion: reduce) {
+  .ox-dt-card__cursor {
+    transition-duration: 1ms;
+  }
+}

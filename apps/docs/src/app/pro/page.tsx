@@ -94,8 +94,7 @@ export default function ProPage() {
 
       <main id="main" className="soon">
         <section className="soonStage">
-          {/* Texture, in three layers, none of it carrying information. */}
-          <div className="soonGridPaper" aria-hidden="true" />
+          {/* Texture, and none of it carries information. */}
           <div className="soonGlow" aria-hidden="true" />
           <div className="soonRamp" aria-hidden="true">
             {RAMP.map((c, i) => (
@@ -159,8 +158,13 @@ export default function ProPage() {
               piece of state the page exists to communicate.
             */}
             <ol className="soonGate">
-              {STEPS.map(({ step, label, note, pending }) => (
-                <li key={step} className="soonStep" {...(pending ? { "data-pending": "" } : {})}>
+              {STEPS.map(({ step, label, note, pending }, i) => (
+                <li
+                  key={step}
+                  className="soonStep"
+                  style={{ ["--n" as string]: i }}
+                  {...(pending ? { "data-pending": "" } : {})}
+                >
                   <i className="soonDot" aria-hidden="true" />
                   <span className="soonStepK">Step {step}</span>
                   <span className="soonStepV">

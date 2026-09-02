@@ -88,6 +88,39 @@ test.describe("the Pro holding page @a11y", () => {
    * `ComingsoonComing soon` on the clipboard.
    */
   /**
+   * State holds still.
+   *
+   * The gate's first animation cycled each settled dot from muted to accent
+   * and back, so a step that is *done* rendered as *not done* for part of every
+   * loop — a screenshot caught `Eleven steps` sitting grey between two green
+   * neighbours, saying the opposite of what it means. Motion on this page may
+   * travel the rail; it may not touch the thing the rail is reporting.
+   *
+   * Sampled across a full cycle rather than asserted on the mechanism, so it
+   * still holds if the animation is rewritten again.
+   */
+  test("no settled step ever renders as unsettled", async ({ page }) => {
+    await page.goto("/pro");
+    const read = () =>
+      page.evaluate(() =>
+        [...document.querySelectorAll(".soon .soonStep:not([data-pending]) .soonDot")].map(
+          (d) => getComputedStyle(d).color,
+        ),
+      );
+
+    const first = await read();
+    expect(first).toHaveLength(3);
+
+    // One full 6s loop, sampled well inside it.
+    for (let i = 0; i < 13; i += 1) {
+      await page.waitForTimeout(520);
+      expect(await read(), `a settled dot changed colour ${i * 520}ms into the cycle`).toEqual(
+        first,
+      );
+    }
+  });
+
+  /**
    * The rail says the same thing as the markers, in a second channel: the
    * segments between settled steps are solid, and the one running into
    * `Publish` is dashed because it has not been travelled. It is drawn
@@ -158,7 +191,7 @@ test.describe("the Pro holding page @a11y", () => {
           ink: rgb(root.getPropertyValue("--site-ink")),
           head: rgb(getComputedStyle(document.querySelector(".soon .soonHead")!).color),
           ground: rgb(root.getPropertyValue("--site-paper")),
-          decorHidden: [".soonGlow", ".soonRamp", ".soonGridPaper"].every(
+          decorHidden: [".soonGlow", ".soonRamp"].every(
             (sel) => getComputedStyle(document.querySelector(`.soon ${sel}`)!).display === "none",
           ),
         };
@@ -221,13 +254,21 @@ test.describe("the Pro holding page @a11y", () => {
     await page.goto("/pro");
     await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
 
-    const running = await page.evaluate(
-      () =>
-        [...document.querySelectorAll(".soon *")].filter(
-          (n) => getComputedStyle(n).animationName !== "none",
-        ).length,
+    /*
+     * Pseudo-elements are checked explicitly. The gate's motion — the pulse
+     * travelling the rail and the ring each dot throws — lives entirely in
+     * `::before` and `::after`, which `querySelectorAll` cannot reach, so an
+     * element-only sweep would have passed while every one of them ran.
+     */
+    const running = await page.evaluate(() =>
+      [...document.querySelectorAll(".soon, .soon *")].flatMap((n) =>
+        [null, "::before", "::after"]
+          .map((pseudo) => getComputedStyle(n, pseudo).animationName)
+          .filter((name) => name !== "none")
+          .map((name) => `${n.className || n.tagName} ${name}`),
+      ),
     );
-    expect(running, "an animation ran under reduced motion").toBe(0);
+    expect(running, `animations ran under reduced motion: ${running.join(", ")}`).toEqual([]);
 
     // The stage is drawn, the headline is legible and the gate still reads.
     const composed = await page.evaluate(() => {

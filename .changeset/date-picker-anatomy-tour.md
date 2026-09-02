@@ -36,11 +36,18 @@ itself — so every halo sat one cell to the right of the thing it named. The tw
 numbers agreed with each other and were both wrong, so it survived a numeric
 check and was only visible in a screenshot.
 
-**Stale counts, corrected.** The home page's featured card, the gallery
-heading, the catalogue card and three comments all still said "fourteen
-variants" and "14 variants". It has been sixteen since the range work landed.
-The featured card's demo also predated that work entirely — it now shows the
-date range, the time range and the session triple together, so all three
-visible fields carry a derived member, which is the one thing this family does
-that a date input does not. The catalogue preview gains a range scenario for
-the same reason.
+**The home page's featured card is now the ghost-cursor calendar.** It showed
+three static fields, which said what the component holds but not what using it
+is like — and a card above the fold is the one place motion earns its keep. A
+drawn pointer chooses a range across the month boundary: two clicks with a live
+preview between them, which is the part a single-month picker cannot do at all.
+No preset rail there, deliberately — two months with one is 757px against the
+638px the card gives, and of the two the cross-boundary preview is worth the
+space. It stops on touch, never starts under `prefers-reduced-motion`, and
+Pause is a real button. The card's claim was rewritten to describe what the
+demo now shows rather than the time field it no longer contains.
+
+**Stale counts, corrected.** The home card, the gallery heading, the catalogue
+card and three comments all still said "fourteen variants" and "14 variants".
+It has been sixteen since the range work landed. The catalogue preview gains a
+range scenario for the same reason.
