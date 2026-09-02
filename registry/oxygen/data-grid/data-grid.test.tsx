@@ -10,7 +10,7 @@
  * cheapest to keep true.
  */
 
-import { render, screen, within } from "@testing-library/react";
+import { cleanup, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 import { expectStatedInWords, itMeetsTheContract } from "../../../test/contract";
@@ -447,6 +447,139 @@ describe("a real grid, not a table with a click handler", () => {
     await user.click(screen.getAllByRole("gridcell")[0]!);
     await user.keyboard("{Enter}");
     expect(activate).toHaveBeenCalledWith(WARD[0]);
+  });
+});
+
+/* ------------------------------------------------------------------ */
+/* The rest of the surface                                             */
+/* ------------------------------------------------------------------ */
+
+/*
+ * Seven behaviours that shipped with no test, found by reading the branch
+ * coverage rather than by reading the diff — which is the point of running it.
+ * Each is a prop somebody can set today and a path nothing was exercising.
+ */
+describe("the parts of the API nothing was exercising", () => {
+  it("leaves a column out of the sort when it says so", async () => {
+    const user = userEvent.setup();
+    const columns: DataGridColumn<WardRow>[] = [
+      { key: "name", header: "Patient", kind: "text", value: (row) => row.name },
+      { key: "mrn", header: "MRN", kind: "identifier", value: (row) => row.mrn, sortable: false },
+    ];
+    render(<DataGrid {...base} columns={columns} coverage={WARD_COVERAGE} />);
+
+    const header = screen.getByRole("columnheader", { name: "MRN" });
+    // No button, so nothing to press — and no aria-sort, because "none" would
+    // announce it as a sortable column that happens to be unsorted.
+    expect(within(header).queryByRole("button")).toBeNull();
+    expect(header.hasAttribute("aria-sort")).toBe(false);
+
+    // The sortable one still is.
+    const patient = screen.getByRole("columnheader", { name: /Patient/ });
+    expect(patient.getAttribute("aria-sort")).toBe("none");
+    await user.click(within(patient).getByRole("button"));
+    expect(patient.getAttribute("aria-sort")).toBe("ascending");
+  });
+
+  it("shows the direction it is sorted in, both ways", async () => {
+    const user = userEvent.setup();
+    render(<DataGrid {...base} coverage={WARD_COVERAGE} />);
+    const header = screen.getByRole("columnheader", { name: /Patient/ });
+    const button = within(header).getByRole("button");
+
+    // Text sorts A–Z first, so this is the ascending glyph.
+    await user.click(button);
+    expect(button.textContent).toContain("↑");
+    await user.click(button);
+    expect(button.textContent).toContain("↓");
+  });
+
+  it("hands the sort to the caller and renders nothing without it", async () => {
+    // Controlled: the grid reports and does not decide. A component that also
+    // re-sorted itself would fight whatever the caller did with the event.
+    const user = userEvent.setup();
+    const onSortChange = vi.fn();
+    render(<DataGrid {...base} coverage={WARD_COVERAGE} sort={null} onSortChange={onSortChange} />);
+    await user.click(
+      within(screen.getByRole("columnheader", { name: /Patient/ })).getByRole("button"),
+    );
+
+    expect(onSortChange).toHaveBeenCalledWith({ key: "name", direction: "ascending" });
+    expect(screen.getAllByRole("row")[1]?.textContent).toContain("Novak, K.");
+  });
+
+  it("says Yes and No rather than true and false", () => {
+    // `[object Object]` and a bare `true` are both the contract suite's
+    // definition of a value reaching the screen that should have been handled.
+    const columns: DataGridColumn<WardRow>[] = [
+      { key: "name", header: "Patient", kind: "text", value: (row) => row.name },
+      { key: "flag", header: "On a hold", value: (row) => row.mrn === "4471902" },
+    ];
+    render(<DataGrid {...base} columns={columns} coverage={WARD_COVERAGE} />);
+    expect(screen.getAllByText("Yes")).toHaveLength(1);
+    expect(screen.getAllByText("No")).toHaveLength(WARD.length - 1);
+  });
+
+  it("draws no foot at all when there is nothing to put in it", () => {
+    // The rule that keeps a bare grid from closing with a 2px rule under it and
+    // nothing beneath — which reads as a rendering fault rather than restraint.
+    const columns: DataGridColumn<WardRow>[] = [
+      { key: "name", header: "Patient", kind: "text", value: (row) => row.name },
+    ];
+    const { container } = render(
+      <DataGrid
+        {...base}
+        columns={columns}
+        rows={WARD.slice(0, 2)}
+        coverage={{ shown: 2, total: 2 }}
+      />,
+    );
+    expect(container.querySelector(".ox-grid__foot")).toBeNull();
+
+    // One derived column is enough to bring it back.
+    cleanup();
+    render(<DataGrid {...base} coverage={WARD_COVERAGE} />);
+    expect(document.querySelector(".ox-grid__foot")).toBeTruthy();
+  });
+
+  it("honours an explicit alignment over the one its kind implies", () => {
+    // The escape hatch a measured value with a qualifier word beside it needs:
+    // right-aligning the pair lines up the words and leaves the numbers ragged.
+    const columns: DataGridColumn<WardRow>[] = [
+      { key: "name", header: "Patient", kind: "text", value: (row) => row.name },
+      {
+        key: "potassium",
+        header: "Potassium",
+        kind: "measure",
+        align: "start",
+        value: (row) => row.potassium,
+      },
+    ];
+    render(<DataGrid {...base} columns={columns} coverage={WARD_COVERAGE} />);
+    const cell = within(screen.getAllByRole("row")[1]!).getAllByRole("gridcell")[1]!;
+    expect(cell.className).toContain("ox-grid__td--start");
+    expect(cell.className).not.toContain("ox-grid__td--end");
+  });
+
+  it("falls back to the header when the focused row is no longer there", async () => {
+    // Not a hypothetical: a worklist row disappears when the filter behind it
+    // moves. The cursor goes to the header rather than to whoever inherited the
+    // position, which is the whole reason it is a key and not an index.
+    const user = userEvent.setup();
+    const view = render(<DataGrid {...base} coverage={WARD_COVERAGE} />);
+    await user.click(within(screen.getAllByRole("row")[2]!).getAllByRole("gridcell")[0]!);
+
+    view.rerender(
+      <DataGrid
+        {...base}
+        rows={WARD.filter((row) => row.mrn !== "4471902")}
+        coverage={WARD_COVERAGE}
+      />,
+    );
+
+    const stops = [...document.querySelectorAll('[data-ox-cell][tabindex="0"]')];
+    expect(stops).toHaveLength(1);
+    expect(stops[0]?.closest("thead")).not.toBeNull();
   });
 });
 
