@@ -1146,3 +1146,55 @@ export const careTeamCoverageGap: CareTeam = {
 };
 
 export const careTeams = [careTeamNightCoverage, careTeamCoverageGap];
+
+// ---------------------------------------------------------------------------
+// Worklists — the two shapes a search actually comes back in
+//
+// A grid's hardest question is not how to draw a row, it is what to say about
+// the rows it is not drawing. These two bundles are the same query against two
+// conformant servers, and they answer it differently: one states a total and
+// one will not. Both are correct FHIR, which is exactly why a component that
+// assumes the first is wrong in production.
+// ---------------------------------------------------------------------------
+
+/**
+ * A ward worklist that knows its own size.
+ *
+ * `total` is the count matching the search, not the count in `entry` — the
+ * distinction the whole coverage claim rests on. A grid rendering six rows here
+ * is showing six of 1,438, and saying so is the difference between a view and
+ * a claim.
+ */
+export const wardPotassium: Bundle = {
+  resourceType: "Bundle",
+  type: "searchset",
+  total: 1438,
+  link: [
+    { relation: "self", url: "http://example.org/fhir/Observation?code=2823-3&_count=6" },
+    { relation: "next", url: "http://example.org/fhir/Observation?code=2823-3&_page=2" },
+  ],
+  entry: [{ resource: observationPotassiumCritical }],
+};
+
+/**
+ * The same query against a server that will not say how many matched.
+ *
+ * `Bundle.total` is optional, and several production servers omit it on a
+ * searchset while returning only a `next` link — no `first`, no `last`, and no
+ * way to construct one, because the spec forbids building paging URLs by hand.
+ * So "6 of 1,438" is a sentence that cannot always be said, and a component
+ * whose coverage type is `number` will fill the gap with the page size.
+ *
+ * This fixture exists so that failure is reproducible rather than theoretical.
+ */
+export const unknownTotal: Bundle = {
+  resourceType: "Bundle",
+  type: "searchset",
+  link: [
+    { relation: "self", url: "http://example.org/fhir/Observation?code=2823-3&_count=6" },
+    { relation: "next", url: "http://example.org/fhir/Observation?_getpages=b1&_page=2" },
+  ],
+  entry: [{ resource: observationPotassiumCritical }],
+};
+
+export const worklists = { wardPotassium, unknownTotal };

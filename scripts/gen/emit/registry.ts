@@ -384,6 +384,27 @@ const SUPPORT_ITEMS: BuildableItem[] = [
     ],
   },
   {
+    name: "grid-core",
+    type: "oxygen:lib",
+    title: "Data grid core",
+    description:
+      'The engine behind DataGrid: a cell value type with no null member so an absence has to say which kind it is, coverage that admits a total of "unknown" because a FHIR server often will not say, comparison that keeps absent values at the bottom in both directions, two-dimensional cursor arithmetic for role="grid", a measured row ceiling the grid refuses past rather than degrading, and a CSV writer that neutralises formula injection with no way to switch it off. Installed automatically with DataGrid.',
+    dependencies: [] as string[],
+    registryDependencies: [] as string[],
+    files: [
+      {
+        path: "registry/oxygen/lib/grid.ts",
+        type: "oxygen:lib",
+        target: "lib/oxygen-grid.ts",
+      },
+      {
+        path: "registry/oxygen/lib/grid.css",
+        type: "oxygen:style",
+        target: "styles/oxygen-grid.css",
+      },
+    ],
+  },
+  {
     name: "switch-core",
     type: "oxygen:lib",
     title: "Switch core",

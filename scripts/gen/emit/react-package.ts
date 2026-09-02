@@ -65,6 +65,7 @@ function rewriteImports(source: string, fromDepth: number): string {
       .replace(/(["'])@\/lib\/oxygen-workspace\1/g, `"${up}lib/workspace"`)
       .replace(/(["'])@\/lib\/oxygen-palette\1/g, `"${up}lib/palette"`)
       .replace(/(["'])@\/lib\/oxygen-menu\1/g, `"${up}lib/menu"`)
+      .replace(/(["'])@\/lib\/oxygen-grid\1/g, `"${up}lib/grid"`)
       // The temporal engine and its React core. The longer specifier is
       // rewritten first: `@/lib/oxygen-datetime` is a prefix of
       // `@/lib/oxygen-datetime-field`, and the other order silently
@@ -134,6 +135,7 @@ export async function emitReactPackage(
     ["lib/workspace.ts", "lib/workspace.ts", 1],
     ["lib/palette.ts", "lib/palette.ts", 1],
     ["lib/menu.ts", "lib/menu.ts", 1],
+    ["lib/grid.ts", "lib/grid.ts", 1],
     ["lib/datetime.ts", "lib/datetime.ts", 1],
     ["lib/datetime-field.tsx", "lib/datetime-field.tsx", 1],
     ["lib/availability.ts", "lib/availability.ts", 1],
@@ -179,6 +181,7 @@ export async function emitReactPackage(
     ["lib/workspace.css", "styles/workspace.css"],
     ["lib/palette.css", "styles/palette.css"],
     ["lib/menu.css", "styles/menu.css"],
+    ["lib/grid.css", "styles/grid.css"],
     ["lib/datetime.css", "styles/datetime.css"],
     ["lib/timeline.css", "styles/timeline.css"],
   ] as const) {

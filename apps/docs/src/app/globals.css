@@ -86,6 +86,11 @@
 /* ChartContextMenu. Shipped as styles/oxygen-menu.css by `menu-core`. */
 @import "../../../../registry/oxygen/lib/menu.css";
 
+/* DataGrid, set as a ruled ledger: the masthead rule, the tabular figures,
+   the margin marker on the current row and the print block that keeps the
+   whole thing a document. Shipped as styles/oxygen-grid.css by `grid-core`. */
+@import "../../../../registry/oxygen/lib/grid.css";
+
 /* The rail, the coverage footer and the two-column register split. Shipped as
    styles/oxygen-timeline.css by the `timeline-core` registry item, carrying
    Timeline and CareTimeline between them.

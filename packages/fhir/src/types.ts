@@ -426,7 +426,23 @@ export interface Condition extends Resource {
 export interface Bundle<T extends Resource = Resource> {
   resourceType?: "Bundle";
   type?: string;
+  /**
+   * How many resources the search matched — which is not `entry.length`, and
+   * is optional. A server is conformant without it, and several omit it, so a
+   * consumer that treats its absence as zero or as the page size is wrong in
+   * production rather than in theory.
+   */
   total?: number;
+  /**
+   * Paging, as opaque URLs.
+   *
+   * `relation` is usually `self` and `next`; `first`, `previous` and `last`
+   * are frequently absent. The spec forbids constructing these by hand, so a
+   * bundle carrying only `next` cannot be turned into a page number — which
+   * is why anything rendering "page 3 of 60" over a FHIR search is inventing
+   * the denominator.
+   */
+  link?: Array<{ relation?: string; url?: string }>;
   entry?: Array<{ fullUrl?: string; resource?: T }>;
 }
 

@@ -30,6 +30,7 @@ export const READY_ORDER: readonly string[] = [
   "accordion",
   "recorder",
   "chart-context-menu",
+  "data-grid",
 ];
 
 const READY = new Set(READY_ORDER);

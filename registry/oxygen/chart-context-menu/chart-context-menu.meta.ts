@@ -118,7 +118,7 @@ export default defineComponentMeta({
     "Strings are English and not routed through @oxygenui/intl — true of every registry component today.",
   ],
 
-  related: ["chart-command-palette", "care-timeline"],
+  related: ["chart-command-palette", "care-timeline", "data-grid"],
 
   dependencies: ["clsx", "tailwind-merge"],
   registryDependencies: ["utils", "tokens", "menu-core"],

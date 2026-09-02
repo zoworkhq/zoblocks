@@ -4,7 +4,7 @@ import { Activity, ArrowRight, Braces, ShieldCheck } from "lucide-react";
 import { CATALOG } from "@/lib/catalog";
 import { HomeFeatured } from "@/components/site/home-featured";
 import { SiteFooter, SiteHeader } from "@/components/site/chrome";
-import { DataGridPreview } from "@/components/site/data-grid-preview";
+import { DataGridDemo } from "@/components/site/data-grid-demo";
 import { LoaderShowcase } from "@/components/site/loader-showcase";
 import { Counter, InstallCommand, RevealRoot } from "@/components/site/interactions";
 import { TelemetryTrace } from "@/components/site/telemetry-trace";
@@ -357,18 +357,16 @@ function StatesArgument() {
 /* ========================================================================== */
 
 /**
- * The Data Grid, previewed honestly.
+ * The Data Grid, running.
  *
- * The section it replaces compared two renderers on five results. The argument
- * was sound and the panel was not — and the grid is the better thing to lead
- * with anyway: it is the largest piece of work in front of this library, and a
- * clinical worklist is the screen an enterprise buyer already has an opinion
- * about.
+ * The section this replaces was an honest preview of unbuilt work. The
+ * component now exists, so the panel below is the real one — same props, same
+ * source, installable today — driven through the four claims that separate a
+ * clinical worklist from a table. A marketing mock of a grid is the easiest
+ * thing in the world to draw and proves nothing about whether it was built.
  *
- * Every claim below is from the brief and the architecture review, which are
- * written and public. The component is not built. Both facts are on the page,
- * because a preview that reads as shipping is the one thing that would cost
- * more than saying nothing.
+ * The measurement in the last paragraph is kept because it is the reason any
+ * of this had to be written rather than inherited.
  */
 function DataGridSection() {
   return (
@@ -376,18 +374,18 @@ function DataGridSection() {
       <div className="mx-auto max-w-6xl section-major px-5 sm:px-8">
         <div className="max-w-3xl">
           <p className="eyebrow eyebrow-rule text-graphite" data-reveal>
-            Coming next
+            New · Data Grid
           </p>
           <h2 className="display-lg mt-4 text-balance" data-reveal>
             A worklist is a claim about a population.
           </h2>
           <p className="body-lg mt-5 max-w-2xl text-pretty text-graphite" data-reveal>
-            Twenty-four rows on screen, 1,438 in the cohort, and a filter somebody set this morning
-            and has since stopped seeing. Most grids render the twenty-four and say nothing about
-            the other 1,414. This one states its coverage, prints the active predicate as a
-            sentence, holds arriving results behind a divider so nothing moves under your hand — and
-            refuses to sort by a model-derived column without naming the model, its version, and who
-            it was validated on.
+            Six rows on screen, 1,438 in the cohort, and a filter somebody set this morning and has
+            since stopped seeing. Most grids render the six and say nothing about the other 1,432.
+            This one states its coverage above the data, prints the active predicate as a sentence,
+            holds arriving results behind a ruled line so nothing moves under your hand — and cites
+            the model, its version and the population it was validated in the moment you sort by a
+            derived column.
           </p>
           <p className="body-sm mt-4 max-w-2xl text-pretty text-graphite-soft" data-reveal>
             For contrast, we measured the engine underneath the grid most teams reach for:{" "}
@@ -398,7 +396,26 @@ function DataGridSection() {
         </div>
 
         <div className="mt-12" data-reveal>
-          <DataGridPreview />
+          <DataGridDemo />
+        </div>
+
+        <div className="mt-5 flex flex-wrap items-center gap-x-6 gap-y-2" data-reveal>
+          <p className="body-sm max-w-2xl text-pretty text-graphite-soft">
+            It runs itself until you touch it. Click a cell and use the arrow keys — it is a real{" "}
+            <span className="numeric">role=&quot;grid&quot;</span>, and the line at the foot names
+            the row your cursor is on, with its MRN. Every name, number and portrait here is
+            invented.
+          </p>
+          <Link
+            href="/components/data-grid"
+            className="group inline-flex shrink-0 items-center gap-1.5 text-sm font-medium text-oxygen-deep"
+          >
+            All nine states
+            <ArrowRight
+              aria-hidden="true"
+              className="size-3.5 transition-transform duration-300 ease-[var(--ease-out-expo)] group-hover:translate-x-0.5"
+            />
+          </Link>
         </div>
       </div>
     </section>

@@ -77,6 +77,18 @@ import {
   ChartCommandPalette,
   type PaletteItem,
 } from "@/registry/oxygen/chart-command-palette/chart-command-palette";
+import { DataGrid, type DataGridColumn } from "@/registry/oxygen/data-grid/data-grid";
+import { PatientPortrait } from "@/components/site/patient-portrait";
+import {
+  ARRIVALS as GRID_ARRIVALS,
+  EARLY_WARNING,
+  UNKNOWN_TOTAL_COVERAGE,
+  WARD,
+  WARD_COVERAGE,
+  WARD_WITH_EVERY_ABSENCE,
+  potassiumQualifier,
+  type WardRow,
+} from "@/registry/oxygen/data-grid/data-grid.fixtures";
 import {
   AllergyChip,
   AllergyList,
@@ -1694,7 +1706,287 @@ const REC_TURNS = [
   { id: "3", speaker: "Patient", words: "I have to stop halfway which I", interim: "never" },
 ];
 
+/* ------------------------------------------------------------------ */
+/* Data Grid                                                           */
+/* ------------------------------------------------------------------ */
+
+/**
+ * The identity cell, composed by the caller.
+ *
+ * The grid renders whatever `cell` returns and has no opinion about
+ * photographs — which is the point of the cell host being open at all. What
+ * the portrait does and does not claim is stated in `PatientPortrait`.
+ */
+function WardPatient({ row }: { row: WardRow }) {
+  return (
+    <span style={{ display: "flex", alignItems: "center", gap: "0.625rem", minWidth: 0 }}>
+      <PatientPortrait src={row.photo} size={26} />
+      <span style={{ minWidth: 0 }}>
+        <span style={{ display: "block", whiteSpace: "nowrap", fontWeight: 500, lineHeight: 1.2 }}>
+          {row.name}
+        </span>
+        {/* The identifier under the name rather than a column away: a name is
+            not an identifier, and the row somebody acts on has to carry both. */}
+        <span
+          className="numeric"
+          style={{ display: "block", fontSize: "0.625rem", lineHeight: 1.3, opacity: 0.65 }}
+        >
+          {row.mrn}
+        </span>
+      </span>
+    </span>
+  );
+}
+
+const GRID_COLUMNS: DataGridColumn<WardRow>[] = [
+  {
+    key: "name",
+    header: "Patient",
+    kind: "text",
+    value: (row) => row.name,
+    cell: (row) => <WardPatient row={row} />,
+  },
+  {
+    key: "potassium",
+    header: "Potassium",
+    kind: "measure",
+    value: (row) => row.potassium,
+    align: "start",
+    width: "9rem",
+    footnote: "Serum potassium, mmol/L. Reference range 3.5–5.1.",
+    // The qualifier is a word the caller supplies. The grid holds no reference
+    // ranges: inventing one is how a library ends up asserting a threshold
+    // somebody else's lab disagrees with.
+    cell: (row) => (
+      <span>
+        {String(row.potassium)}
+        {potassiumQualifier(row.potassium) ? (
+          <span style={{ fontSize: "0.6875rem", opacity: 0.75 }}>
+            {" "}
+            {potassiumQualifier(row.potassium)}
+          </span>
+        ) : null}
+      </span>
+    ),
+  },
+  {
+    key: "risk",
+    header: "Deterioration risk",
+    kind: "number",
+    width: "11rem",
+    value: (row) => row.risk,
+    derived: EARLY_WARNING,
+    cell: (row) => row.risk.toFixed(2),
+  },
+  { key: "due", header: "Next due", kind: "instant", value: (row) => row.due, width: "6rem" },
+];
+
+const GRID_BASE = {
+  caption: "Patients on 4-West with a potassium outside the reference range",
+  title: "Worklist · 4-West · potassium out of range",
+  note: "24h window",
+  columns: GRID_COLUMNS,
+  rowKey: (row: WardRow) => row.mrn,
+  identify: (row: WardRow) => ({ primary: row.name, secondary: `MRN ${row.mrn}` }),
+} as const;
+
+function GridStage({ children }: { children: React.ReactNode }) {
+  return <div style={{ maxInlineSize: "100%" }}>{children}</div>;
+}
+
+/**
+ * The live one: results land, and the reader decides when they arrive.
+ *
+ * Held in the demo rather than merged on a timer, because a timer would be the
+ * exact behaviour the component argues against — demonstrated, on its own
+ * documentation page.
+ */
+function GridArrivalsDemo() {
+  const [rows, setRows] = React.useState<WardRow[]>(WARD);
+  const [held, setHeld] = React.useState<WardRow[]>(GRID_ARRIVALS);
+
+  return (
+    <GridStage>
+      <DataGrid
+        {...GRID_BASE}
+        rows={rows}
+        coverage={{ ...WARD_COVERAGE, shown: rows.length }}
+        arrivals={held}
+        arrivalsAt="11:47"
+        onAdmitArrivals={(arriving) => {
+          const merged = new Map(rows.map((row) => [row.mrn, row]));
+          for (const row of arriving) merged.set(row.mrn, { ...merged.get(row.mrn), ...row });
+          setRows([...merged.values()]);
+          setHeld([]);
+        }}
+      />
+    </GridStage>
+  );
+}
+
 const SCENARIOS: Record<string, Scenario[]> = {
+  /*
+   * Eight states in four bands, and every one of them is a claim rather than
+   * an appearance. A grid demonstrated with "default" and "striped" has
+   * documented its skin; these document what it does when the data is
+   * incomplete, when the source will not answer, and when results land while
+   * somebody's hand is on the pointer — which is where a worklist is used.
+   */
+  "data-grid": [
+    {
+      id: "coverage",
+      label: "Six of 1,438, and the filter that made it",
+      group: "The claim",
+      note: "Most grids render the six rows and say nothing about the other 1,432. That is not a missing feature, it is a claim the component makes and cannot support: the filter was set by somebody at 07:00 who has since stopped seeing it, and the reader at 15:00 believes they are looking at the ward. So `coverage` is required, the predicate prints as a sentence you could read aloud on a handover, and the count of what is not shown gets a line of its own.",
+      code: `<DataGrid
+  coverage={{
+    shown: rows.length,
+    total: 1438,
+    noun: "patients in the cohort",
+    predicate:
+      "Unit is 4-West, and potassium outside the reference range in the last 24 hours.",
+  }}
+/>`,
+      render: () => (
+        <GridStage>
+          <DataGrid {...GRID_BASE} rows={WARD} coverage={WARD_COVERAGE} />
+        </GridStage>
+      ),
+    },
+    {
+      id: "unknown-total",
+      label: "A total the source will not give",
+      group: "The claim",
+      note: 'Against FHIR this is the common case, not the edge one. `Bundle.total` is optional, the spec forbids constructing paging URLs by hand, and several production servers return a `next` link and nothing else — so “six of 1,438” is a sentence a conformant integration often cannot say. `total` is therefore `number | "unknown"`, and the unknown case says so in words. `aria-rowcount` becomes -1, which is ARIA\'s “not known”, rather than the page size dressed up as an answer.',
+      code: `coverage={{ shown: 6, total: "unknown", noun: "patients" }}
+// → "6 patients shown. The source did not say how many match."
+// → aria-rowcount="-1"`,
+      render: () => (
+        <GridStage>
+          <DataGrid {...GRID_BASE} rows={WARD} coverage={UNKNOWN_TOTAL_COVERAGE} note="unpaged" />
+        </GridStage>
+      ),
+    },
+    {
+      id: "absence",
+      label: "Four kinds of missing, four words",
+      group: "When there is no value",
+      note: "A specimen with the lab, a record this reader may not see, a question nobody asked, and an answer the patient declined. Four different situations, four different next actions, and one em dash in every other grid. `GridValue` has no null member, so a caller cannot express “missing” without saying which — and the reason is drawn by the grid rather than by the caller's renderer, so a cell function returning a dash can never paint over a restricted value.",
+      code: `value: (row) => row.potassium ?? { absent: "awaiting" }
+// The type has no null member. This will not compile:
+value: (row) => row.potassium ?? null`,
+      render: () => (
+        <GridStage>
+          <DataGrid
+            {...GRID_BASE}
+            rows={WARD_WITH_EVERY_ABSENCE}
+            coverage={{ ...WARD_COVERAGE, shown: WARD_WITH_EVERY_ABSENCE.length }}
+          />
+        </GridStage>
+      ),
+    },
+    {
+      id: "absence-sort",
+      label: "An absence sorts last, in both directions",
+      group: "When there is no value",
+      note: "Click Potassium twice to sort ascending. The awaited and restricted rows stay at the bottom — they do not rise to the top as though they were the lowest values on the ward. Every grid that treats a missing number as negative infinity has this defect, and it is invisible until it matters: four “Awaiting” rows above a potassium of 3.2 tells a reader the sickest patient here is fine.",
+      code: `sortGridRows(rows, potassium, "ascending").map((r) => r.potassium);
+// → [3.2, 4.1, 5.4, 6.8, { absent: "awaiting" }, { absent: "restricted" }]
+
+sortGridRows(rows, potassium, "descending").map((r) => r.potassium);
+// → [6.8, 5.4, 4.1, 3.2, { absent: "awaiting" }, { absent: "restricted" }]`,
+      render: () => (
+        <GridStage>
+          <DataGrid
+            {...GRID_BASE}
+            rows={WARD}
+            coverage={WARD_COVERAGE}
+            defaultSort={{ key: "potassium", direction: "ascending" }}
+          />
+        </GridStage>
+      ),
+    },
+    {
+      id: "derived",
+      label: "Sorting by a model, cited",
+      group: "Sorting is a clinical act",
+      note: "Deterioration risk is model output, not an observation, so the column carries its derivation and the grid turns that into footnote 1 — present whether or not anybody sorted, because a reader scanning the numbers needs to know what they are. Sorting by it adds a line saying this ranks a prediction and pointing at the note rather than repeating it. No other grid treats a sort as an act with consequences.",
+      code: `{
+  key: "risk",
+  header: "Deterioration risk",
+  kind: "number",
+  value: (row) => row.risk,
+  derived: {
+    model: "early-warning",
+    version: "v2.4",
+    validatedOn: "12,410 med-surg admissions",
+    population: "adults only",
+  },
+}`,
+      render: () => (
+        <GridStage>
+          <DataGrid
+            {...GRID_BASE}
+            rows={WARD}
+            coverage={WARD_COVERAGE}
+            defaultSort={{ key: "risk", direction: "descending" }}
+          />
+        </GridStage>
+      ),
+    },
+    {
+      id: "arrivals",
+      label: "Three results arrived; nothing moved",
+      group: "Live data",
+      note: "Press “Let them in”. Until you do, the results are counted on a ruled strip and the table is untouched — the row order is still the order they came back in, and the arrivals are nowhere in it. A grid that merges on a timer is how somebody actions the row that used to be there, so merging is a decision taken with a hand on the pointer. The count is a polite live region, so a screen-reader user hears that results are arriving without anything moving under their cursor.",
+      code: `<DataGrid
+  arrivals={held}
+  arrivalsAt="11:47"
+  onAdmitArrivals={(arriving) => setRows(merge(rows, arriving))}
+/>
+// The grid never merges. It counts, holds, and hands them back.`,
+      render: () => <GridArrivalsDemo />,
+    },
+    {
+      id: "reading",
+      label: "The row you are on, named at the bottom",
+      group: "Live data",
+      note: 'Click a cell, then use the arrow keys: it is a real `role="grid"` with two-dimensional navigation, and the ledger\'s “Reading” line names the row the cursor is on with its MRN. Acting on the wrong row is the retract-and-reorder error, and re-stating the identifier at the point of action is the intervention with evidence behind it. Sort while a cell is focused and the cursor stays with the patient rather than with the position — the cursor is a row key, not a pair of indices.',
+      code: `identify={(row) => ({ primary: row.name, secondary: \`MRN \${row.mrn}\` })}
+// → "Row 2 of 1,438 — Adeyemi, R., MRN 4471902."
+
+// Masked records are the one case it says less, never more:
+identify={() => ({ primary: name, masked: true })}
+// → "Row 2 of 1,438 — restricted record."`,
+      render: () => (
+        <GridStage>
+          <DataGrid
+            {...GRID_BASE}
+            rows={WARD}
+            coverage={WARD_COVERAGE}
+            density="compact"
+            onRowActivate={() => {}}
+          />
+        </GridStage>
+      ),
+    },
+    {
+      id: "refusal",
+      label: "It refuses rather than degrading",
+      group: "Limits",
+      note: "The ceiling is dropped to four here so the refusal is visible; in production it is 20,000, and that number is measured rather than chosen — a forty-column client-side model on a shared 4 GB ward workstation stops being something you put in front of a nurse at handover somewhere around there. A grid that accepts a million rows and takes nine seconds to paint has not failed loudly, it has taught the reader that the software is slow, which is what people say just before they stop trusting the number on the screen.",
+      code: `gridCapacityRefusal(18_000);   // → null
+gridCapacityRefusal(120_000);
+// → "120,000 rows is past what this renders on a ward workstation
+//    (the ceiling is 20,000). Narrow the query or move paging to
+//    the server — the grid will not pretend to hold them."`,
+      render: () => (
+        <GridStage>
+          <DataGrid {...GRID_BASE} rows={WARD} coverage={WARD_COVERAGE} ceiling={4} />
+        </GridStage>
+      ),
+    },
+  ],
   /* ---- the date, time and session family --------------------------- */
 
   /*

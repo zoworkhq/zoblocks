@@ -13,7 +13,7 @@
  * change, because customers style against these names. The manifest is
  * committed so that change shows up as a reviewable diff.
  *
- * 345 tokens across 30 components:
+ * 356 tokens across 31 components:
  *
  *   switch          55
  *   tabs            44
@@ -24,6 +24,7 @@
  *   field           14
  *   alert           12
  *   chart           11
+ *   grid            11
  *   copilot         10
  *   loader          10
  *   recorder        10
@@ -1894,6 +1895,114 @@ export const TOKEN_SURFACE: readonly SurfaceEntry[] = [
     "bridgeable": true
   },
   {
+    "name": "--ox-grid-accent",
+    "component": "grid",
+    "source": "packages/react/src/styles.css",
+    "kind": "color",
+    "semantic": "--ox-accent",
+    "frameworks": [],
+    "fallback": true,
+    "bridgeable": true
+  },
+  {
+    "name": "--ox-grid-font",
+    "component": "grid",
+    "source": "packages/react/src/styles.css",
+    "kind": "font",
+    "semantic": "--ox-text-sm",
+    "frameworks": [],
+    "fallback": true,
+    "bridgeable": true
+  },
+  {
+    "name": "--ox-grid-ink",
+    "component": "grid",
+    "source": "packages/react/src/styles.css",
+    "kind": "color",
+    "semantic": "--ox-text",
+    "frameworks": [],
+    "fallback": true,
+    "bridgeable": true
+  },
+  {
+    "name": "--ox-grid-muted",
+    "component": "grid",
+    "source": "packages/react/src/styles.css",
+    "kind": "color",
+    "semantic": "--ox-text-muted",
+    "frameworks": [],
+    "fallback": true,
+    "bridgeable": true
+  },
+  {
+    "name": "--ox-grid-pad-x",
+    "component": "grid",
+    "source": "packages/react/src/styles.css",
+    "kind": "dimension",
+    "frameworks": [],
+    "fallback": true,
+    "bridgeable": true
+  },
+  {
+    "name": "--ox-grid-pad-y",
+    "component": "grid",
+    "source": "packages/react/src/styles.css",
+    "kind": "dimension",
+    "frameworks": [],
+    "fallback": true,
+    "bridgeable": true
+  },
+  {
+    "name": "--ox-grid-rule",
+    "component": "grid",
+    "source": "packages/react/src/styles.css",
+    "kind": "color",
+    "semantic": "--ox-border",
+    "frameworks": [],
+    "fallback": true,
+    "bridgeable": true
+  },
+  {
+    "name": "--ox-grid-rule-strong",
+    "component": "grid",
+    "source": "packages/react/src/styles.css",
+    "kind": "color",
+    "semantic": "--ox-border-strong",
+    "frameworks": [],
+    "fallback": true,
+    "bridgeable": true
+  },
+  {
+    "name": "--ox-grid-subtle",
+    "component": "grid",
+    "source": "packages/react/src/styles.css",
+    "kind": "color",
+    "semantic": "--ox-text-subtle",
+    "frameworks": [],
+    "fallback": true,
+    "bridgeable": true
+  },
+  {
+    "name": "--ox-grid-sunk",
+    "component": "grid",
+    "source": "packages/react/src/styles.css",
+    "kind": "color",
+    "semantic": "--ox-bg-muted",
+    "frameworks": [],
+    "fallback": true,
+    "bridgeable": true
+  },
+  {
+    "name": "--ox-grid-surface",
+    "component": "grid",
+    "source": "packages/react/src/styles.css",
+    "kind": "color",
+    "semantic": "--ox-surface",
+    "frameworks": [],
+    "fallback": true,
+    "bridgeable": true
+  },
+  {
     "name": "--ox-loader-beat",
     "component": "loader",
     "source": "packages/react/src/styles.css",
@@ -3599,6 +3708,7 @@ export const SURFACE_COMPONENTS: readonly string[] = [
   "cs",
   "datetime",
   "field",
+  "grid",
   "loader",
   "menu",
   "nav",
@@ -3738,6 +3848,17 @@ export const BRIDGEABLE: readonly string[] = [
   "--ox-field-prefilled-bg",
   "--ox-field-prefilled-border",
   "--ox-field-radius",
+  "--ox-grid-accent",
+  "--ox-grid-font",
+  "--ox-grid-ink",
+  "--ox-grid-muted",
+  "--ox-grid-pad-x",
+  "--ox-grid-pad-y",
+  "--ox-grid-rule",
+  "--ox-grid-rule-strong",
+  "--ox-grid-subtle",
+  "--ox-grid-sunk",
+  "--ox-grid-surface",
   "--ox-loader-beat",
   "--ox-loader-color",
   "--ox-loader-cycle",

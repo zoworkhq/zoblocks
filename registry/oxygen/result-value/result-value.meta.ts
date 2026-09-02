@@ -91,6 +91,7 @@ export default defineComponentMeta({
     "risk-indicator",
     "provenance-chip",
     "trend-indicator",
+    "data-grid",
   ],
 
   dependencies: ["clsx", "tailwind-merge"],

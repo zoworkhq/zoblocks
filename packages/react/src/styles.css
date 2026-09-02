@@ -7179,6 +7179,537 @@ button.ox-prov:focus-visible,
   }
 }
 
+/* ---- registry/oxygen/lib/grid.css ---- */
+/**
+ * DataGrid — a worklist set as a ruled ledger.
+ *
+ * The form is the argument. A clinical worklist is printed, photographed,
+ * pasted into a handover and read at 3 a.m. on somebody else's filter, so it
+ * is set the way a lab report is set: a masthead with the claim in it, a
+ * heavy rule under the column names, hairlines between rows, tabular figures
+ * that stack into columns you can scan without reading, and numbered
+ * footnotes at the bottom for everything the header could not say in two
+ * words.
+ *
+ * Three rules hold the whole file together.
+ *
+ *   **Nothing is carried by colour.** One colour appears: critical, on a
+ *   value that has crossed a threshold, and it always has a word beside it
+ *   supplied by the host. Sort state is a glyph and a weight. The current row
+ *   is a marker in the margin. Absence is a word set in italic. All of it
+ *   survives a monochrome print, forced-colors mode, and a photograph of a
+ *   monitor.
+ *
+ *   **The rules are the layout.** Vertical hairlines between columns and a
+ *   double rule top and bottom are what make a dense table readable at 13px;
+ *   zebra striping is not, because it fights the row marker and disappears in
+ *   print.
+ *
+ *   **No Tailwind utilities.** A component whose layout depends on the host's
+ *   Tailwind config renders unstyled in somebody else's build, and every
+ *   colour here resolves through a semantic token so a brand override reaches
+ *   this file without editing it.
+ */
+
+.ox-grid {
+  --ox-grid-rule: var(--ox-border, #e2e8f0);
+  --ox-grid-rule-strong: var(--ox-border-strong, #94a3b8);
+  --ox-grid-ink: var(--ox-text, #0f172a);
+  --ox-grid-muted: var(--ox-text-muted, #64748b);
+  --ox-grid-subtle: var(--ox-text-subtle, #94a3b8);
+  --ox-grid-surface: var(--ox-surface, #ffffff);
+  --ox-grid-sunk: var(--ox-bg-muted, #f1f5f9);
+  --ox-grid-accent: var(--ox-accent, #0d9488);
+  --ox-grid-pad-x: 0.75rem;
+  --ox-grid-pad-y: 0.4rem;
+  --ox-grid-font: var(--ox-text-sm, 0.875rem);
+
+  display: block;
+  border: 1px solid var(--ox-grid-rule-strong);
+  background: var(--ox-grid-surface);
+  color: var(--ox-grid-ink);
+  font-family: var(--ox-font-sans, inherit);
+  font-size: var(--ox-grid-font);
+  line-height: 1.5;
+}
+
+.ox-grid[data-ox-density="compact"] {
+  --ox-grid-pad-y: 0.25rem;
+  --ox-grid-pad-x: 0.625rem;
+  --ox-grid-font: var(--ox-text-xs, 0.75rem);
+}
+
+/* ---------------------------------------------------------------- */
+/* Masthead — the claim, above the data it is about                  */
+/* ---------------------------------------------------------------- */
+
+.ox-grid__masthead {
+  padding: 0.75rem var(--ox-grid-pad-x) 0.625rem;
+  /* The heavy rule. A lab report has one here and it is the single cue that
+     tells a reader the block above is about the block below. */
+  border-block-end: 2px solid var(--ox-grid-ink);
+}
+
+.ox-grid__mastline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.5rem 0.75rem;
+}
+
+.ox-grid__title {
+  margin: 0;
+  font-family: var(--ox-font-mono, ui-monospace, monospace);
+  font-size: var(--ox-text-xs, 0.75rem);
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.ox-grid__note {
+  margin: 0 0 0 auto;
+  font-family: var(--ox-font-mono, ui-monospace, monospace);
+  font-size: var(--ox-text-2xs, 0.625rem);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ox-grid-muted);
+}
+
+/* The claim. Takes the ink, because it is the sentence a reader has to meet
+   before they meet the rows it is about. */
+.ox-grid__coverage {
+  margin: 0.5rem 0 0;
+  font-size: var(--ox-text-xs, 0.75rem);
+  font-weight: 500;
+  color: var(--ox-grid-ink);
+  max-inline-size: 78ch;
+}
+
+/* Its qualification: what the rows have in common, and when it was true. */
+.ox-grid__predicate {
+  margin: 0.15rem 0 0;
+  font-size: var(--ox-text-xs, 0.75rem);
+  color: var(--ox-grid-muted);
+  max-inline-size: 78ch;
+}
+
+.ox-grid__unseen {
+  margin: 0.2rem 0 0;
+  font-family: var(--ox-font-mono, ui-monospace, monospace);
+  font-size: var(--ox-text-2xs, 0.625rem);
+  letter-spacing: 0.06em;
+  color: var(--ox-grid-subtle);
+}
+
+/* ---------------------------------------------------------------- */
+/* Held arrivals                                                     */
+/* ---------------------------------------------------------------- */
+
+.ox-grid__held {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.35rem var(--ox-grid-pad-x);
+  border-block-end: 1px solid var(--ox-grid-rule);
+  background: var(--ox-grid-sunk);
+}
+
+.ox-grid__heldline {
+  margin: 0;
+  font-family: var(--ox-font-mono, ui-monospace, monospace);
+  font-size: var(--ox-text-2xs, 0.625rem);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ox-grid-ink);
+}
+
+.ox-grid__admit {
+  margin-inline-start: auto;
+  min-block-size: var(--ox-density-target, 1.5rem);
+  padding: 0.15rem 0.55rem;
+  border: 1px solid var(--ox-grid-rule-strong);
+  border-radius: var(--ox-radius-sm, 3px);
+  background: var(--ox-grid-surface);
+  color: var(--ox-grid-ink);
+  font-family: var(--ox-font-mono, ui-monospace, monospace);
+  font-size: var(--ox-text-2xs, 0.625rem);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.ox-grid__admit:hover {
+  background: var(--ox-grid-sunk);
+}
+
+/* ---------------------------------------------------------------- */
+/* The table                                                         */
+/* ---------------------------------------------------------------- */
+
+.ox-grid__scroll {
+  overflow-x: auto;
+}
+
+.ox-grid__table {
+  inline-size: 100%;
+  border-collapse: collapse;
+  text-align: start;
+}
+
+/* Present to a screen reader, absent from the page: the masthead already says
+   this in larger type, and printing it twice is what makes a caption look
+   like a mistake. */
+.ox-grid__caption {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.ox-grid__th {
+  padding: 0;
+  border-block-end: 1px solid var(--ox-grid-ink);
+  border-inline-end: 1px solid var(--ox-grid-rule);
+  vertical-align: bottom;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.ox-grid__th:last-child,
+.ox-grid__td:last-child {
+  border-inline-end: 0;
+}
+
+/* The header cell's content is the tab stop, so the button and the static
+   span have to be the same box. */
+.ox-grid__sort,
+.ox-grid__static {
+  display: flex;
+  align-items: baseline;
+  gap: 0.3rem;
+  inline-size: 100%;
+  min-block-size: var(--ox-density-target, 1.5rem);
+  padding: 0.4rem var(--ox-grid-pad-x);
+  border: 0;
+  background: none;
+  color: var(--ox-grid-muted);
+  font: inherit;
+  font-family: var(--ox-font-mono, ui-monospace, monospace);
+  font-size: var(--ox-text-2xs, 0.625rem);
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-align: inherit;
+}
+
+.ox-grid__sort {
+  cursor: pointer;
+}
+
+.ox-grid__sort:hover {
+  color: var(--ox-grid-ink);
+  background: var(--ox-grid-sunk);
+}
+
+.ox-grid__th--end .ox-grid__sort,
+.ox-grid__th--end .ox-grid__static {
+  justify-content: flex-end;
+}
+
+/* Sorted columns take the ink and the weight, and carry a glyph. Three cues,
+   none of them a colour. */
+.ox-grid__th--sorted .ox-grid__sort {
+  color: var(--ox-grid-ink);
+}
+
+.ox-grid__arrow {
+  font-family: var(--ox-font-sans, inherit);
+}
+
+.ox-grid__mark {
+  font-family: var(--ox-font-mono, ui-monospace, monospace);
+  font-size: 0.85em;
+  font-weight: 600;
+  line-height: 0;
+  color: var(--ox-grid-accent);
+}
+
+.ox-grid__tr {
+  border-block-end: 1px solid var(--ox-grid-rule);
+}
+
+.ox-grid__tr:last-child {
+  border-block-end: 0;
+}
+
+.ox-grid__td {
+  padding: var(--ox-grid-pad-y) var(--ox-grid-pad-x);
+  border-inline-end: 1px solid var(--ox-grid-rule);
+  vertical-align: baseline;
+}
+
+.ox-grid__td--end {
+  text-align: end;
+}
+
+/* Digits that have to stack into a column a reader can scan without reading
+   them. Every numeric kind, and identifiers, which are digits that are not a
+   quantity but still have to line up. */
+.ox-grid__td--number,
+.ox-grid__td--measure,
+.ox-grid__td--identifier,
+.ox-grid__td--instant {
+  font-family: var(--ox-font-numeric, var(--ox-font-mono, ui-monospace, monospace));
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
+
+/*
+ * The current row, marked in the margin.
+ *
+ * A marker rather than a background: a tint is the first thing a print or a
+ * photocopy loses, and it is also what a reader with a colour deficiency is
+ * least likely to see. The rule is inset so it does not move the cell.
+ */
+.ox-grid__tr--current > .ox-grid__td:first-child {
+  box-shadow: inset 3px 0 0 var(--ox-grid-ink);
+}
+
+.ox-grid__tr--current > .ox-grid__td {
+  background: var(--ox-grid-sunk);
+}
+
+/*
+ * Absence, set as a word in italic.
+ *
+ * Italic rather than a colour or a dash, because it has to read as "there is
+ * no value and here is why" on a monochrome page. The em dash this replaces
+ * cannot distinguish a specimen in the lab from a record this reader may not
+ * see, and those are different clinical situations.
+ */
+.ox-grid__absent {
+  font-style: italic;
+  color: var(--ox-grid-muted);
+}
+
+/* ---------------------------------------------------------------- */
+/* Focus                                                             */
+/* ---------------------------------------------------------------- */
+
+/*
+ * The cell is the tab stop, and its ring is drawn inside it.
+ *
+ * An outline on a `td` inside `border-collapse: collapse` is clipped by the
+ * neighbouring cell's border on two sides, so half the ring goes missing on
+ * exactly the cells at the edge of a scroll container — which is where a
+ * keyboard user most needs it.
+ */
+.ox-grid__td:focus-visible,
+.ox-grid__sort:focus-visible,
+.ox-grid__static:focus-visible,
+.ox-grid__admit:focus-visible {
+  outline: none;
+  box-shadow:
+    inset 0 0 0 2px var(--ox-focus-ring, #0d9488),
+    inset 0 0 0 4px var(--ox-grid-surface);
+}
+
+.ox-grid__tr--current > .ox-grid__td:first-child:focus-visible {
+  box-shadow:
+    inset 3px 0 0 var(--ox-grid-ink),
+    inset 0 0 0 2px var(--ox-focus-ring, #0d9488),
+    inset 0 0 0 4px var(--ox-grid-surface);
+}
+
+/* ---------------------------------------------------------------- */
+/* The foot of the ledger                                            */
+/* ---------------------------------------------------------------- */
+
+.ox-grid__foot {
+  border-block-start: 2px solid var(--ox-grid-ink);
+  padding: 0.55rem var(--ox-grid-pad-x) 0.7rem;
+}
+
+/*
+ * The "read by" line.
+ *
+ * A ledger has one, and this is it: the row the reader is on, named where
+ * they are about to act rather than at the top of a screen they read four
+ * minutes ago. Acting on the wrong row is the retract-and-reorder error, and
+ * re-stating the identifier at the point of action is the intervention that
+ * measurably reduces it.
+ */
+.ox-grid__reading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.5rem;
+  margin: 0 0 0.4rem;
+  font-family: var(--ox-font-mono, ui-monospace, monospace);
+  font-size: var(--ox-text-xs, 0.75rem);
+}
+
+.ox-grid__readinglabel {
+  font-size: var(--ox-text-2xs, 0.625rem);
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ox-grid-muted);
+}
+
+.ox-grid__readingline {
+  font-weight: 500;
+}
+
+.ox-grid__sorted {
+  margin: 0 0 0.4rem;
+  padding-inline-start: 0.6rem;
+  border-inline-start: 2px solid var(--ox-grid-ink);
+  font-size: var(--ox-text-xs, 0.75rem);
+  color: var(--ox-grid-ink);
+}
+
+.ox-grid__notes {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.2rem;
+}
+
+.ox-grid__noteitem {
+  display: grid;
+  grid-template-columns: 1.25rem minmax(0, 1fr);
+  font-size: var(--ox-text-2xs, 0.625rem);
+  line-height: 1.55;
+  color: var(--ox-grid-muted);
+}
+
+.ox-grid__notemark {
+  font-family: var(--ox-font-mono, ui-monospace, monospace);
+  font-weight: 600;
+  color: var(--ox-grid-accent);
+}
+
+/* ---------------------------------------------------------------- */
+/* Refusal                                                           */
+/* ---------------------------------------------------------------- */
+
+/*
+ * Not an error state.
+ *
+ * The grid was asked to hold more rows than it can render honestly and is
+ * saying so. The alternative — accepting them and taking nine seconds to
+ * paint — has not failed loudly; it has taught the reader that the software
+ * is slow, which is what people say right before they stop trusting what is
+ * on the screen.
+ */
+.ox-grid__refusal {
+  margin: 0;
+  padding: 0.9rem var(--ox-grid-pad-x);
+  font-size: var(--ox-text-xs, 0.75rem);
+  color: var(--ox-grid-ink);
+  max-inline-size: 68ch;
+}
+
+/* ---------------------------------------------------------------- */
+/* Forced colours                                                    */
+/* ---------------------------------------------------------------- */
+
+@media (forced-colors: active) {
+  .ox-grid,
+  .ox-grid__th,
+  .ox-grid__td,
+  .ox-grid__tr,
+  .ox-grid__masthead,
+  .ox-grid__held,
+  .ox-grid__foot {
+    border-color: CanvasText;
+  }
+
+  /* The tint goes; the margin marker is a border, so it survives. */
+  .ox-grid__tr--current > .ox-grid__td {
+    background: Canvas;
+  }
+
+  .ox-grid__tr--current > .ox-grid__td:first-child {
+    box-shadow: none;
+    border-inline-start: 3px solid Highlight;
+  }
+
+  .ox-grid__td:focus-visible,
+  .ox-grid__sort:focus-visible,
+  .ox-grid__static:focus-visible,
+  .ox-grid__admit:focus-visible {
+    box-shadow: none;
+    outline: 2px solid Highlight;
+    outline-offset: -3px;
+  }
+
+  .ox-grid__mark,
+  .ox-grid__notemark {
+    color: LinkText;
+  }
+}
+
+/* ---------------------------------------------------------------- */
+/* Print                                                             */
+/* ---------------------------------------------------------------- */
+
+/*
+ * The claim this direction makes, kept.
+ *
+ * A worklist gets printed and carried, so the printed copy has to be the
+ * document rather than a screenshot of a screen. The header repeats on every
+ * page, rows do not break across a fold, the held-arrivals control drops (it
+ * is not actionable on paper) while its count stays, and the footnotes print,
+ * because a page of numbers with no note explaining which of them a model
+ * produced is the sheet that gets acted on wrongly.
+ */
+@media print {
+  .ox-grid {
+    border-color: #000;
+    background: #fff;
+    color: #000;
+  }
+
+  .ox-grid__scroll {
+    overflow: visible;
+  }
+
+  .ox-grid__headrow {
+    display: table-header-group;
+  }
+
+  .ox-grid__tr {
+    break-inside: avoid;
+  }
+
+  .ox-grid__tr--current > .ox-grid__td {
+    background: transparent;
+  }
+
+  /* The reader on screen is not the reader on paper, so the marker and the
+     "Reading" line are dropped rather than frozen onto whoever happened to be
+     focused when Print was pressed. */
+  .ox-grid__tr--current > .ox-grid__td:first-child {
+    box-shadow: none;
+  }
+
+  .ox-grid__admit,
+  .ox-grid__reading {
+    display: none;
+  }
+
+  .ox-grid__masthead,
+  .ox-grid__foot {
+    border-color: #000;
+  }
+}
+
 /* ---- registry/oxygen/lib/datetime.css ---- */
 /**
  * Date, time and session — the shared stylesheet.

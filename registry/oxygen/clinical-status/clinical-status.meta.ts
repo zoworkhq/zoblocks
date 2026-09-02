@@ -102,6 +102,7 @@ export default defineComponentMeta({
     "provenance-chip",
     "trend-indicator",
     "care-team-presence",
+    "data-grid",
   ],
 
   dependencies: ["clsx", "tailwind-merge"],

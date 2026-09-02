@@ -78,7 +78,7 @@ export default defineComponentMeta({
     "The FHIR adapter cannot produce weighted drivers. `basis[]` names references without attribution, so they render as unweighted rather than with a bar the data does not support.",
   ],
 
-  related: ["clinical-status", "result-value"],
+  related: ["clinical-status", "result-value", "data-grid"],
 
   dependencies: ["clsx", "tailwind-merge"],
   registryDependencies: ["utils", "tokens", "risk-core", "clinical-status"],

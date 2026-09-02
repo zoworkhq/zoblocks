@@ -48,6 +48,9 @@
       "@/components/oxygen/copilot": [
         "./registry/oxygen/copilot/copilot.tsx"
       ],
+      "@/components/oxygen/data-grid": [
+        "./registry/oxygen/data-grid/data-grid.tsx"
+      ],
       "@/components/oxygen/date-picker": [
         "./registry/oxygen/date-picker/date-picker.tsx"
       ],
@@ -119,6 +122,9 @@
       ],
       "@/lib/oxygen-datetime-parts": [
         "./registry/oxygen/lib/datetime-parts.tsx"
+      ],
+      "@/lib/oxygen-grid": [
+        "./registry/oxygen/lib/grid.ts"
       ],
       "@/lib/oxygen-loader": [
         "./registry/oxygen/lib/loader.tsx"

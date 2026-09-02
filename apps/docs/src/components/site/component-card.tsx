@@ -58,6 +58,9 @@ import { ProvenanceChip } from "@/registry/oxygen/provenance-chip/provenance-chi
 import { TrendIndicator } from "@/registry/oxygen/trend-indicator/trend-indicator";
 import { PresenceChip } from "@/registry/oxygen/care-team-presence/care-team-presence";
 import { ChartHeader } from "@/registry/oxygen/chart-header/chart-header";
+import { DataGrid, type DataGridColumn } from "@/registry/oxygen/data-grid/data-grid";
+import { PatientPortrait } from "@/components/site/patient-portrait";
+import { WARD, type WardRow } from "@/registry/oxygen/data-grid/data-grid.fixtures";
 import { RecentPatientStack } from "@/registry/oxygen/recent-patient-stack/recent-patient-stack";
 import { ChartCommandPalette } from "@/registry/oxygen/chart-command-palette/chart-command-palette";
 import { ContextMenuArt } from "@/components/site/context-menu-demo";
@@ -256,7 +259,72 @@ const REC_SPEAKERS = Uint8Array.from({ length: 180 }, (_, i) =>
   Math.floor(i / 26) % 2 === 0 ? 0 : 1,
 );
 
+/**
+ * A three-column slice of the ledger.
+ *
+ * The card has 156px and the component's argument is a whole page, so the
+ * slice keeps the one thing that identifies it from across a catalogue — the
+ * coverage claim above the data, and the count of what is not shown — and
+ * drops the rest. The footnotes went with them: two of them wrap to six lines,
+ * which forced the scale down far enough that nothing on the card was legible,
+ * and an illegible card identifies nothing. The provenance and the absence
+ * vocabulary are the detail page's job; a card is an identifier, not a tour.
+ */
+const GRID_CARD_COLUMNS: DataGridColumn<WardRow>[] = [
+  {
+    key: "name",
+    header: "Patient",
+    kind: "text",
+    value: (row) => row.name,
+    cell: (row) => (
+      <span style={{ display: "flex", alignItems: "center", gap: "0.4rem" }}>
+        <PatientPortrait src={row.photo} size={18} />
+        <span style={{ whiteSpace: "nowrap" }}>{row.name}</span>
+      </span>
+    ),
+  },
+  {
+    key: "potassium",
+    header: "K+",
+    kind: "measure",
+    align: "start",
+    value: (row) => row.potassium,
+  },
+  {
+    key: "risk",
+    header: "Risk",
+    kind: "number",
+    value: (row) => row.risk,
+    cell: (row) => row.risk.toFixed(2),
+  },
+];
+
+/* Three rows with values in them. The absent ones are the better story and the
+   wrong card: each earns a footnote, and two footnotes are taller than the art
+   band the card has to fit inside. */
+const GRID_CARD_ROWS = [WARD[1]!, WARD[3]!, WARD[0]!];
+
 const PREVIEW: Record<string, (featured: boolean) => React.ReactNode> = {
+  /*
+   * The one card that has to show a claim rather than a control. Everything
+   * else in the catalogue is a thing you look at; this is a thing that tells
+   * you what it is not showing you.
+   */
+  "data-grid": (featured) => (
+    <ScaledArt scale={featured ? 1 : 0.94} fit={featured ? FEATURED_ART : STANDARD_ART}>
+      <div style={{ inlineSize: featured ? 420 : 380 }}>
+        <DataGrid
+          caption="Patients on 4-West with a potassium outside the reference range"
+          title="Worklist · 4-West"
+          density="compact"
+          columns={GRID_CARD_COLUMNS}
+          rows={featured ? GRID_CARD_ROWS : GRID_CARD_ROWS.slice(0, 2)}
+          rowKey={(row) => row.mrn}
+          coverage={{ shown: 6, total: 1438, noun: "patients in the cohort" }}
+        />
+      </div>
+    </ScaledArt>
+  ),
   /* One card for the whole family. It shows the field with its calendar
      because that is the variant a reader reaches for first, and the card is
      an identifier rather than a tour — the fourteen variants are the page. */

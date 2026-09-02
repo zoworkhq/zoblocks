@@ -30,6 +30,7 @@ export * from "./components/chart-context-menu/chart-context-menu";
 export * from "./components/chart-header/chart-header";
 export * from "./components/clinical-status/clinical-status";
 export * from "./components/copilot/copilot";
+export * from "./components/data-grid/data-grid";
 export * from "./components/date-picker/date-picker";
 export * from "./components/helix-loader/helix-loader";
 export * from "./components/infusion-loader/infusion-loader";
