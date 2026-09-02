@@ -30,6 +30,7 @@
     "gen:check": "tsx scripts/gen/index.ts --check",
     "gen:component": "tsx scripts/gen/scaffold.ts",
     "gen:strict": "tsx scripts/gen/index.ts --strict",
+    "icons": "tsx scripts/icons.ts",
     "lint": "eslint . --max-warnings 8 && pnpm lint:actions",
     "lint:actions": "bash scripts/actionlint.sh",
     "lint:fix": "eslint . --fix",
