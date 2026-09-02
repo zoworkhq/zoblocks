@@ -67,6 +67,14 @@
     "$type": "color",
     "$value": "{ref.white}"
   },
+  "accent-wash": {
+    "$type": "color",
+    "$value": "{ref.slate.100}"
+  },
+  "accent-muted": {
+    "$type": "color",
+    "$value": "{ref.white}"
+  },
   "accent-border": {
     "$type": "color",
     "$value": "{ref.hc.accent}"

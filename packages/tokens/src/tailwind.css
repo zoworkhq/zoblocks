@@ -49,6 +49,8 @@
   --color-ox-accent: var(--ox-accent);
   --color-ox-accent-hover: var(--ox-accent-hover);
   --color-ox-accent-subtle: var(--ox-accent-subtle);
+  --color-ox-accent-wash: var(--ox-accent-wash);
+  --color-ox-accent-muted: var(--ox-accent-muted);
   --color-ox-accent-border: var(--ox-accent-border);
   --color-ox-focus-ring: var(--ox-focus-ring);
   --color-ox-focus-ring-offset: var(--ox-focus-ring-offset);

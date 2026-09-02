@@ -60,6 +60,10 @@ import { PresenceChip } from "@/registry/oxygen/care-team-presence/care-team-pre
 import { ChartHeader } from "@/registry/oxygen/chart-header/chart-header";
 import { DataGrid, type DataGridColumn } from "@/registry/oxygen/data-grid/data-grid";
 import { PatientPortrait } from "@/components/site/patient-portrait";
+import { facesFor } from "@/lib/faces";
+
+/* One face each on the catalogue card — see `facesFor`. */
+const CARD_FACE = facesFor(["A. Okonkwo", "T. Boateng", "L. Marsh"]);
 import { CASELOAD, type CaseloadRow } from "@/registry/oxygen/data-grid/data-grid.fixtures";
 import { RecentPatientStack } from "@/registry/oxygen/recent-patient-stack/recent-patient-stack";
 import { ChartCommandPalette } from "@/registry/oxygen/chart-command-palette/chart-command-palette";
@@ -480,13 +484,19 @@ const PREVIEW: Record<string, (featured: boolean) => React.ReactNode> = {
         activeId="card-a"
         now="2026-08-24T10:00:00Z"
         charts={[
-          { id: "card-a", display: "A. Okonkwo", reason: "Ward round" },
+          {
+            id: "card-a",
+            display: "A. Okonkwo",
+            photo: CARD_FACE("A. Okonkwo"),
+            reason: "Ward round",
+          },
           {
             id: "card-b",
             display: "T. Boateng",
+            photo: CARD_FACE("T. Boateng"),
             work: [{ kind: "unsigned-note", since: "2026-08-21T09:00:00Z" }],
           },
-          { id: "card-c", display: "L. Marsh", pinned: true },
+          { id: "card-c", display: "L. Marsh", photo: CARD_FACE("L. Marsh"), pinned: true },
         ]}
       />
     </div>

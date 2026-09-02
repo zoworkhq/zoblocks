@@ -609,13 +609,28 @@
   color: var(--ox-datetime-cell-range-fg, inherit);
 }
 
-/* The half-built range, while the second end is still being pointed at. */
-.ox-dt-cal__day--previewed {
-  background: color-mix(in srgb, var(--ox-datetime-cell-range-bg, #dbeafe) 65%, transparent);
-}
-
 .ox-dt-cal__day--in-range:hover {
   background: var(--ox-datetime-cell-range-bg, #dbeafe);
+}
+
+/*
+ * The half-built range, while the second end is still being pointed at.
+ *
+ * The same wash as a plain hover, one step below the committed band, because
+ * a span that is being pointed at and a span that has been chosen are two
+ * states and must not paint as one — a reader who cannot tell them apart has
+ * no way to know whether the second click has landed.
+ *
+ * It has to beat `--in-range:hover`, which is why it is declared after it and
+ * repeats itself for the hovered case: every previewed cell is also in range
+ * (`datetime-field.tsx` sets `--previewed` only alongside `--in-range`), so a
+ * bare `--previewed` at (0,1,0) loses to that rule at (0,2,0) and the one cell
+ * under the pointer — the cell that *defines* the end being chosen — would
+ * paint as though it were already committed.
+ */
+.ox-dt-cal__day--previewed,
+.ox-dt-cal__day--previewed:hover {
+  background: var(--ox-datetime-cell-hover-bg, #f1f5f9);
 }
 
 .ox-dt-cal__day--range-lo,
@@ -776,7 +791,11 @@
    reader's pointer at the exact moment they are reaching for it. */
 .ox-dt-cal__action[disabled] {
   border-color: var(--ox-border, #e2e8f0);
-  background: var(--ox-bg-muted, #f1f5f9);
+  /* `bg-subtle`, not `bg-muted`. Sitting beside a green panel, the muted step
+     of a blue-biased neutral ramp reads as a lavender chip rather than as an
+     absent button — the disabled state should recede, and a filled one that
+     draws the eye is the opposite of what it means. */
+  background: var(--ox-bg-subtle, #f8fafc);
   color: var(--ox-text-muted, #64748b);
   cursor: not-allowed;
 }

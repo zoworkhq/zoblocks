@@ -261,8 +261,18 @@ export function RecentPatientStack({
                 onClick={() => activate(chart)}
                 onKeyDown={(event) => onKeyDown(event, chart, index)}
               >
+                {/*
+                  The face when there is one, the initials when there is not.
+                  The accent ring is drawn either way, so the hue identity
+                  survives a chart that has no photograph on file.
+                */}
                 <span className="ox-stack__avatar" aria-hidden="true">
-                  {initials(chart.display)}
+                  {chart.photo ? (
+                    // eslint-disable-next-line @next/next/no-img-element -- ships to consumers; no framework image component.
+                    <img className="ox-stack__face" src={chart.photo} alt="" />
+                  ) : (
+                    initials(chart.display)
+                  )}
                 </span>
 
                 {/*

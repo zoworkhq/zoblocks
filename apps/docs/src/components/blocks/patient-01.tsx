@@ -15,6 +15,7 @@
 
 import { AccItem, Instrument, ListRow, Pill, Rail, TabBar, TlItem } from "./kit";
 import { TrajectoryOne } from "./charts";
+import { faceFor } from "@/lib/faces";
 
 function Fact({ k, children }: { k: string; children: React.ReactNode }) {
   return (
@@ -46,9 +47,14 @@ export function Patient01() {
         </div>
 
         <div className="ptHead">
-          <div className="ptAvatar" aria-hidden="true">
-            RO
-          </div>
+          {/*
+            A face, not a monogram. A photograph in the chart header is
+            associated with measurably fewer wrong-patient orders, and this
+            block exists to argue what a record should do rather than to look
+            like the ones that ship. `alt=""` because the name is beside it.
+          */}
+          {/* eslint-disable-next-line @next/next/no-img-element -- fixture served from this origin; sized by CSS. */}
+          <img className="ptAvatar" src={faceFor("Okonkwo, Rachel")} alt="" aria-hidden="true" />
           <div style={{ flex: 1, minWidth: 0 }}>
             <div className="nameRow">
               <h3>Okonkwo, Rachel</h3>

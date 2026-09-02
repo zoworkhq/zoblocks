@@ -67,6 +67,15 @@
     "$type": "color",
     "$value": "{ref.brand.50}"
   },
+  "$comment-accent-wash": "Two tints below the accent, for controls that paint a range rather than a value \u2014 the calendar band is the case that forced them. A calendar whose selection is the brand accent must not hover in `bg-muted`: the neutral ramp is blue-biased slate and reads as a different system sitting inside the green one. `accent-wash` is the transient tint (hover, a provisional end), `accent-muted` the committed one, and the two must be separable at a glance or the half-built range looks finished. High-contrast keeps its own values: that theme spends its budget on text and borders, not on washes.",
+  "accent-wash": {
+    "$type": "color",
+    "$value": "{ref.brand.50}"
+  },
+  "accent-muted": {
+    "$type": "color",
+    "$value": "{ref.brand.100}"
+  },
   "accent-border": {
     "$type": "color",
     "$value": "{ref.brand.200}"

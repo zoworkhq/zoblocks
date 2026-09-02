@@ -559,6 +559,14 @@
   );
   border: 1px solid var(--site-rule-strong);
   letter-spacing: -0.02em;
+  /* The gradient above is the ground a monogram sits on; when the element is
+     a photograph it is covered, and the rule stays as the only edge. */
+  object-fit: cover;
+  /* Preflight gives every `img` `max-width: 100%`, which a `div` never had.
+     In a header narrower than the avatar that caps a fixed 56px box at the
+     container's content width — and this block is rendered inside a
+     fit-to-width frame that is briefly zero. A fixed avatar keeps its size. */
+  max-inline-size: none;
 }
 .oxb .nameRow {
   display: flex;
@@ -1644,4 +1652,27 @@
 }
 .oxb[data-vp="mobile"] .seg button {
   flex: 1;
+}
+
+/*
+ * Faces in a list.
+ *
+ * The same portraits the worklist grid uses. A round face beside a name is
+ * the cheapest identity cue a dense table has, and this site had it on one
+ * screen and not the others — so the screen with the photographs read as the
+ * mock-up and the rest read as the reference. One cohort, every surface.
+ */
+.oxb .face {
+  flex: none;
+  border-radius: 999px;
+  object-fit: cover;
+  box-shadow: 0 0 0 1px var(--site-rule-strong);
+  /* As above: the inline width is the size, and preflight must not cap it. */
+  max-inline-size: none;
+}
+.oxb .whoCell {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
 }
