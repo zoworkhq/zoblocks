@@ -218,7 +218,7 @@ export function CommandMenu() {
                   aria-activedescendant={results[active] ? `cmd-${results[active].id}` : undefined}
                   autoComplete="off"
                   spellCheck={false}
-                  className="w-full bg-transparent py-4 text-[0.9375rem] text-ink outline-none focus-visible:outline-none focus-visible:shadow-none placeholder:text-graphite-soft"
+                  className="focus-ring-none w-full bg-transparent py-4 text-[0.9375rem] text-ink outline-none placeholder:text-graphite-soft"
                 />
                 <kbd className="numeric shrink-0 rounded border border-rule px-1.5 py-0.5 text-[0.625rem] text-graphite-soft">
                   ESC

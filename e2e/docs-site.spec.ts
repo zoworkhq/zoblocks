@@ -9,7 +9,7 @@
  * only finds them once the change has shipped.
  */
 
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test, type Locator, type Page } from "@playwright/test";
 
 const CATALOG = "/components";
 const TABS = "/components/tabs";
@@ -650,6 +650,62 @@ test.describe("site chrome @a11y", () => {
       // AA for body text. The bug this replaces measured about 1.2:1.
       expect(contrast!, `${scheme} preview contrast`).toBeGreaterThan(4.5);
     }
+  });
+
+  /*
+   * The command palette's field draws no focus ring, and the rest of the site
+   * still does.
+   *
+   * Reported as "the green highlight looks odd": the field runs the full width
+   * of the dialog, so the global ring's `outline-offset: 3px` put it outside
+   * the panel, where `overflow-hidden` cut the top off and left a stray green
+   * box. The field already carried `focus-visible:outline-none`, and it did
+   * nothing — the global rule is unlayered and Tailwind's utilities are in
+   * @layer utilities, so the global rule wins whatever the specificity. That
+   * is invisible in the markup, which is why this asserts the painted result
+   * rather than the class list.
+   *
+   * The second half is the guard rail. Suppressing the ring is only safe here
+   * because the dialog is modal with a single focusable control; deleting the
+   * global rule to get the same effect would strip focus from the whole site,
+   * and would otherwise pass.
+   */
+  test("the palette field has no focus ring, and everything else keeps one", async ({ page }) => {
+    await page.goto(CATALOG);
+
+    const ring = (target: Locator) =>
+      target.evaluate((element) => {
+        const style = getComputedStyle(element);
+        return {
+          focusVisible: element.matches(":focus-visible"),
+          outlineStyle: style.outlineStyle,
+          boxShadow: style.boxShadow,
+        };
+      });
+
+    // Keyboard focus, so `:focus-visible` matches the way it does for a reader
+    // arriving on the Tab key rather than the pointer.
+    await page.keyboard.press("Tab");
+    const chrome = await ring(page.locator(":focus"));
+
+    expect(chrome.focusVisible, "the first tab stop is not focus-visible").toBe(true);
+    expect(chrome.outlineStyle, "the site lost its focus ring").toBe("solid");
+    expect(chrome.boxShadow, "the site lost its focus halo").not.toBe("none");
+
+    await page.getByRole("button", { name: /press Command K/i }).click();
+
+    // Scoped to the palette: the catalog page carries component demos of its
+    // own, and two of them are also comboboxes.
+    const field = page
+      .getByRole("dialog", { name: /search components and pages/i })
+      .getByRole("combobox");
+    await expect(field).toBeFocused();
+
+    const palette = await ring(field);
+
+    expect(palette.focusVisible, "the field is not focus-visible").toBe(true);
+    expect(palette.outlineStyle, "the clipped outline is back").toBe("none");
+    expect(palette.boxShadow, "the clipped halo is back").toBe("none");
   });
 });
 

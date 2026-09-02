@@ -530,6 +530,23 @@ body {
   box-shadow: 0 0 0 5px color-mix(in oklab, var(--color-oxygen) 18%, transparent);
 }
 
+/* Opting out of that ring. The rule above is unlayered, and unlayered styles
+   beat anything in a cascade layer whatever the specificity, so every Tailwind
+   `focus-visible:outline-none` — those compile into @layer utilities — is
+   silently inert on this site. Use this class instead, which sits in the same
+   layer and wins on specificity.
+
+   Only for elements where focus is already unmistakable without a ring. The
+   case it was written for is the command palette's search field: a modal with
+   one focusable control, opened by ⌘K straight into it, so the ring said
+   nothing the caret did not — and, on a field that runs the full width of the
+   dialog, a +3px offset drew it outside the panel, where `overflow-hidden`
+   sliced the top off. */
+.focus-ring-none:focus-visible {
+  outline: none;
+  box-shadow: none;
+}
+
 /* ===========================================================================
  * MATERIAL
  *
