@@ -4,12 +4,15 @@
  * Scoped under `.oxdg`, so the plain class names inside cannot collide with the
  * site around them — the same containment `blocks.css` uses.
  *
- * The panel is *hardware*: a dark bezel set into a light document, which is the
- * home page's established treatment for a live component and the one the
- * previous preview in this slot used. Inside it, the component runs with its own
- * dark token set; nothing here restyles the grid, because a marketing page that
- * repaints the component it is selling is showing something the customer cannot
- * install.
+ * It follows the page. The first version pinned the stage to the dark token set
+ * on the reasoning that this slot is hardware rather than document — which was
+ * wrong twice: globals.css states outright that a live preview follows the page
+ * theme, and pinning it meant the site's own light/dark toggle did nothing to
+ * the one component a visitor on the home page is actually looking at.
+ *
+ * Nothing here restyles the grid. A marketing page that repaints the component
+ * it is selling is showing something the customer cannot install; the frame
+ * supplies a bezel and a highlight, and stops.
  *
  * Two rules earn their place:
  *
@@ -25,31 +28,29 @@
  */
 
 .oxdg {
-  --oxdg-bezel: #08110f;
-  --oxdg-rule: #1d302d;
-  --oxdg-fg: #e8f4f1;
-  --oxdg-muted: #8b9c98;
-  --oxdg-trace: #2dd4b0;
+  /* The site's own surface set, so the frame turns over with the page. */
+  --oxdg-bezel: var(--color-paper);
+  --oxdg-rule: var(--color-rule);
+  --oxdg-fg: var(--color-ink);
+  --oxdg-muted: var(--color-graphite);
+  --oxdg-trace: var(--color-oxygen-deep);
   /*
-   * Critical, in the luminous variant.
+   * Critical, from the site's own pair.
    *
-   * The site's `--site-critical` is #dc2626, chosen to be read on paper; on
-   * this bezel it measures 3.96:1 and the axe run failed on it. The panel is
-   * always dark whatever the page is doing, so it takes the luminous red the
-   * palette already defines for dark grounds — 7.3:1 here — as a literal
-   * rather than a token, for the same reason every other colour in this block
-   * is a literal: the frame does not follow the page.
+   * `--color-critical` is #dc2626 on paper and #fb7185 under `.dark`, which is
+   * exactly the split this needs now the panel turns over with the page. It was
+   * a literal while the panel was pinned dark, and a literal here would now be
+   * unreadable in one of the two themes rather than in neither.
    */
-  --oxdg-critical: #fb7185;
+  --oxdg-critical: var(--color-critical);
 
   margin: 0;
   border-radius: 1.25rem;
   background: var(--oxdg-bezel);
   border: 1px solid var(--oxdg-rule);
   box-shadow:
-    0 0 0 1px rgb(255 255 255 / 0.02) inset,
-    0 34px 80px -28px rgb(2 20 17 / 0.55),
-    0 10px 28px -14px rgb(2 20 17 / 0.35);
+    0 1px 2px -1px rgb(2 20 17 / 0.05),
+    0 24px 60px -32px rgb(2 20 17 / 0.28);
   overflow: hidden;
 }
 

@@ -60,7 +60,7 @@ import { PresenceChip } from "@/registry/oxygen/care-team-presence/care-team-pre
 import { ChartHeader } from "@/registry/oxygen/chart-header/chart-header";
 import { DataGrid, type DataGridColumn } from "@/registry/oxygen/data-grid/data-grid";
 import { PatientPortrait } from "@/components/site/patient-portrait";
-import { WARD, type WardRow } from "@/registry/oxygen/data-grid/data-grid.fixtures";
+import { CASELOAD, type CaseloadRow } from "@/registry/oxygen/data-grid/data-grid.fixtures";
 import { RecentPatientStack } from "@/registry/oxygen/recent-patient-stack/recent-patient-stack";
 import { ChartCommandPalette } from "@/registry/oxygen/chart-command-palette/chart-command-palette";
 import { ContextMenuArt } from "@/components/site/context-menu-demo";
@@ -270,7 +270,7 @@ const REC_SPEAKERS = Uint8Array.from({ length: 180 }, (_, i) =>
  * and an illegible card identifies nothing. The provenance and the absence
  * vocabulary are the detail page's job; a card is an identifier, not a tour.
  */
-const GRID_CARD_COLUMNS: DataGridColumn<WardRow>[] = [
+const GRID_CARD_COLUMNS: DataGridColumn<CaseloadRow>[] = [
   {
     key: "name",
     header: "Patient",
@@ -284,11 +284,11 @@ const GRID_CARD_COLUMNS: DataGridColumn<WardRow>[] = [
     ),
   },
   {
-    key: "potassium",
-    header: "K+",
+    key: "phq9",
+    header: "PHQ-9",
     kind: "measure",
     align: "start",
-    value: (row) => row.potassium,
+    value: (row) => row.phq9,
   },
   {
     key: "risk",
@@ -302,7 +302,7 @@ const GRID_CARD_COLUMNS: DataGridColumn<WardRow>[] = [
 /* Three rows with values in them. The absent ones are the better story and the
    wrong card: each earns a footnote, and two footnotes are taller than the art
    band the card has to fit inside. */
-const GRID_CARD_ROWS = [WARD[1]!, WARD[3]!, WARD[0]!];
+const GRID_CARD_ROWS = [CASELOAD[1]!, CASELOAD[3]!, CASELOAD[0]!];
 
 const PREVIEW: Record<string, (featured: boolean) => React.ReactNode> = {
   /*
@@ -314,13 +314,13 @@ const PREVIEW: Record<string, (featured: boolean) => React.ReactNode> = {
     <ScaledArt scale={featured ? 1 : 0.94} fit={featured ? FEATURED_ART : STANDARD_ART}>
       <div style={{ inlineSize: featured ? 420 : 380 }}>
         <DataGrid
-          caption="Patients on 4-West with a potassium outside the reference range"
-          title="Worklist · 4-West"
+          caption="Clients on this caseload with a raised PHQ-9"
+          title="Caseload · adult outpatient"
           density="compact"
           columns={GRID_CARD_COLUMNS}
           rows={featured ? GRID_CARD_ROWS : GRID_CARD_ROWS.slice(0, 2)}
           rowKey={(row) => row.mrn}
-          coverage={{ shown: 6, total: 1438, noun: "patients in the cohort" }}
+          coverage={{ shown: 6, total: 312, noun: "clients on this caseload" }}
         />
       </div>
     </ScaledArt>

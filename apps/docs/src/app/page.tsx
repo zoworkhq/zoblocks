@@ -389,7 +389,8 @@ function DataGridSection() {
             this to do is set the scene.
           */}
           <p className="body-lg mt-5 max-w-2xl text-pretty text-graphite" data-reveal>
-            Eight rows on screen, 1,438 in the cohort. Below is the real component, running.
+            Six clients on screen, 312 on the team&rsquo;s caseload. Below is the real component,
+            running.
           </p>
         </div>
 

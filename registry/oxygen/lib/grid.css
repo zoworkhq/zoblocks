@@ -111,12 +111,17 @@
   max-inline-size: 78ch;
 }
 
-.ox-grid__unseen {
-  margin: 0.2rem 0 0;
-  font-family: var(--ox-font-mono, ui-monospace, monospace);
-  font-size: var(--ox-text-2xs, 0.625rem);
-  letter-spacing: 0.06em;
+/*
+ * The identity line holds its space when there is nothing to say in it.
+ *
+ * Hidden rather than absent: a footer that appears on the first click moves
+ * every row above it by its own height, under a pointer already travelling.
+ * And "No row selected." is a sentence that tells a reader something they can
+ * see, so it is only there for the screen reader that cannot.
+ */
+.ox-grid__readingline[data-empty="true"] {
   color: var(--ox-grid-subtle);
+  opacity: 0.55;
 }
 
 /* ---------------------------------------------------------------- */
@@ -127,7 +132,14 @@
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  padding: 0.35rem var(--ox-grid-pad-x);
+  /*
+   * Tight, because it is a rule with a sentence on it rather than a toolbar.
+   * It was 0.35rem of padding around a control that then claimed a 44px
+   * minimum height, so the strip stood half an inch tall carrying one line of
+   * 10px text and read as an empty band between the masthead and the header.
+   */
+  min-block-size: 2rem;
+  padding: 0.2rem var(--ox-grid-pad-x);
   border-block-end: 1px solid var(--ox-grid-rule);
   background: var(--ox-grid-sunk);
 }
@@ -141,10 +153,20 @@
   color: var(--ox-grid-ink);
 }
 
+/*
+ * 26px, not the density target.
+ *
+ * `--ox-density-target` is 2.75rem — the size of something a thumb finds on a
+ * tablet, and three times the height of the label inside it. The same borrowed
+ * token made the column headers half an inch tall. 26px clears the 24px floor
+ * SC 2.5.8 asks for, which is what the token was being reached for.
+ */
 .ox-grid__admit {
   margin-inline-start: auto;
-  min-block-size: var(--ox-density-target, 1.5rem);
-  padding: 0.15rem 0.55rem;
+  display: inline-flex;
+  align-items: center;
+  min-block-size: 1.625rem;
+  padding: 0 0.55rem;
   border: 1px solid var(--ox-grid-rule-strong);
   border-radius: var(--ox-radius-sm, 3px);
   background: var(--ox-grid-surface);
@@ -153,10 +175,12 @@
   font-size: var(--ox-text-2xs, 0.625rem);
   letter-spacing: 0.08em;
   text-transform: uppercase;
+  white-space: nowrap;
   cursor: pointer;
 }
 
 .ox-grid__admit:hover {
+  border-color: var(--ox-grid-accent);
   background: var(--ox-grid-sunk);
 }
 

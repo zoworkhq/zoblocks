@@ -71,7 +71,6 @@ import {
   gridAbsenceDetail,
   gridAbsenceLabel,
   gridCapacityRefusal,
-  gridUnseenCount,
   isGridAbsent,
   moveGridCursor,
   nextGridSort,
@@ -455,7 +454,6 @@ export function DataGrid<Row>({
     );
   }
 
-  const unseen = gridUnseenCount(coverage);
   const footVisible = Boolean(identify) || Boolean(sortColumn?.derived) || notes.length > 0;
   const held = arrivals?.length ?? 0;
   const heldLine = describeGridArrivals(held, arrivalsAt);
@@ -498,9 +496,6 @@ export function DataGrid<Row>({
             {coverage.predicate}
             {coverage.asOf ? <> As of {coverage.asOf}.</> : null}
           </p>
-        ) : null}
-        {unseen !== null && unseen > 0 ? (
-          <p className="ox-grid__unseen">{unseen.toLocaleString("en")} not shown by this filter.</p>
         ) : null}
       </header>
 
@@ -681,7 +676,7 @@ export function DataGrid<Row>({
           {identify ? (
             <p className="ox-grid__reading">
               <span className="ox-grid__readinglabel">Reading</span>
-              <span className="ox-grid__readingline">
+              <span className="ox-grid__readingline" data-empty={!identity}>
                 {identity
                   ? describeGridIdentity(identity, { row: cursor.row + 1, of: coverage.total })
                   : "No row selected."}
@@ -701,8 +696,7 @@ export function DataGrid<Row>({
         */}
           {sortColumn?.derived ? (
             <p className="ox-grid__sorted">
-              Sorted by a derived column — this ranks a prediction. See note{" "}
-              {marks.get(sortColumn.key) ?? 1}.
+              Sorted by a prediction — see note {marks.get(sortColumn.key) ?? 1}.
             </p>
           ) : null}
 

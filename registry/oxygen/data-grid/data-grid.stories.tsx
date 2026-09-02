@@ -14,63 +14,61 @@ import { expect, userEvent, within } from "../../../test/story-kit";
 import { DataGrid, type DataGridColumn } from "./data-grid";
 import {
   ARRIVALS,
-  EARLY_WARNING,
+  DISENGAGEMENT,
   UNKNOWN_TOTAL_COVERAGE,
-  WARD,
-  WARD_COVERAGE,
-  WARD_WITH_EVERY_ABSENCE,
-  potassiumQualifier,
-  type WardRow,
+  CASELOAD,
+  CASELOAD_COVERAGE,
+  CASELOAD_WITH_EVERY_ABSENCE,
+  phq9Band,
+  type CaseloadRow,
 } from "./data-grid.fixtures";
 
-const COLUMNS: DataGridColumn<WardRow>[] = [
-  { key: "name", header: "Patient", kind: "text", value: (row) => row.name },
+const COLUMNS: DataGridColumn<CaseloadRow>[] = [
+  { key: "name", header: "Client", kind: "text", value: (row) => row.name },
   { key: "mrn", header: "MRN", kind: "identifier", value: (row) => row.mrn, width: "7rem" },
   {
-    key: "potassium",
-    header: "Potassium",
+    key: "phq9",
+    header: "PHQ-9",
     kind: "measure",
-    value: (row) => row.potassium,
-    footnote: "Serum potassium, mmol/L. Reference range 3.5–5.1.",
+    value: (row) => row.phq9,
+    footnote: "Serum phq9, mmol/L. Reference range 3.5–5.1.",
     // The qualifier is a word, supplied here rather than by the grid: the
     // component holds no reference ranges and inventing one is how a library
     // ends up asserting a threshold somebody else's lab disagrees with.
     cell: (row) => (
       <span>
-        {String(row.potassium)}
-        {potassiumQualifier(row.potassium) ? (
-          <span> {potassiumQualifier(row.potassium)}</span>
-        ) : null}
+        {String(row.phq9)}
+        {phq9Band(row.phq9) ? <span> {phq9Band(row.phq9)}</span> : null}
       </span>
     ),
   },
   {
     key: "risk",
-    header: "Deterioration risk",
+    header: "Disengagement risk",
     kind: "number",
     value: (row) => row.risk,
-    derived: EARLY_WARNING,
+    derived: DISENGAGEMENT,
     cell: (row) => row.risk.toFixed(2),
   },
   { key: "due", header: "Next due", kind: "instant", value: (row) => row.due },
 ];
 
-const meta: Meta<typeof DataGrid<WardRow>> = {
+const meta: Meta<typeof DataGrid<CaseloadRow>> = {
   title: "Clinical/Data Grid",
   component: DataGrid,
   args: {
-    caption: "Patients on 4-West with a potassium outside the reference range",
-    title: "Worklist · 4-West · potassium out of range",
+    caption: "Patients on 4-West with a phq9 outside the reference range",
+    title: "Worklist · 4-West · phq9 out of range",
     note: "24h window",
     columns: COLUMNS,
-    rows: WARD,
-    rowKey: (row: WardRow) => row.mrn,
-    coverage: WARD_COVERAGE,
+    rows: CASELOAD,
+    rowKey: (row: CaseloadRow) => row.mrn,
+    coverage: CASELOAD_COVERAGE,
   },
 };
 
 export default meta;
-type Story = StoryObj<typeof DataGrid<WardRow>>;
+type Story = StoryObj<typeof DataGrid<CaseloadRow>>;
 
 export const Coverage: Story = {
   name: "Coverage above the data",
@@ -78,12 +76,11 @@ export const Coverage: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     // The claim, in the masthead, before the rows it is about.
-    expect(canvas.getByText(/6 of 1,438 patients in the cohort\./)).toBeTruthy();
-    expect(canvas.getByText(/1,432 not shown by this filter\./)).toBeTruthy();
+    expect(canvas.getByText(/6 of 312 clients on this team's caseload\./)).toBeTruthy();
 
     // aria-rowcount counts the cohort plus the header row, not the page.
     const grid = canvas.getByRole("grid");
-    expect(grid.getAttribute("aria-rowcount")).toBe("1439");
+    expect(grid.getAttribute("aria-rowcount")).toBe("313");
     expect(grid.getAttribute("aria-colcount")).toBe("5");
   },
 };
@@ -98,14 +95,13 @@ export const UnknownTotal: Story = {
     // -1 is ARIA's "not known". The alternative is the page size dressed up
     // as an answer, which is the failure the union type exists to prevent.
     expect(canvas.getByRole("grid").getAttribute("aria-rowcount")).toBe("-1");
-    expect(canvas.queryByText(/not shown by this filter/)).toBeNull();
   },
 };
 
 export const Absence: Story = {
   name: "Absence, said four ways",
   parameters: { state: "Absence, said four ways" },
-  args: { rows: WARD_WITH_EVERY_ABSENCE, coverage: { shown: 8, total: 1438 } },
+  args: { rows: CASELOAD_WITH_EVERY_ABSENCE, coverage: { shown: 8, total: 312 } },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     // Four words, not four dashes. Each leads somewhere different: chase the
@@ -114,8 +110,8 @@ export const Absence: Story = {
       expect(canvas.getByText(word)).toBeTruthy();
     }
     // Every one of them earns a numbered footnote saying what it means.
-    expect(canvas.getByText(/Specimen received; the lab has not resulted it\./)).toBeTruthy();
-    expect(canvas.getByText(/A value exists and is not available to you\./)).toBeTruthy();
+    expect(canvas.getByText(/Assessment booked; the client has not completed it\./)).toBeTruthy();
+    expect(canvas.getByText(/Part 2 record — not available to you\./)).toBeTruthy();
     expect(canvas.getByText(/The patient declined\./)).toBeTruthy();
   },
 };
@@ -126,18 +122,18 @@ export const SortedByDerived: Story = {
   args: { defaultSort: { key: "risk", direction: "descending" } },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const header = canvas.getByRole("columnheader", { name: /Deterioration risk/ });
+    const header = canvas.getByRole("columnheader", { name: /Disengagement risk/ });
     expect(header.getAttribute("aria-sort")).toBe("descending");
 
     // The provenance is a statement under the table, not a tooltip: it has to
     // survive a print and a screenshot.
     expect(
-      canvas.getByText(/early-warning v2\.4, validated on 12,410 med-surg admissions/),
+      canvas.getByText(/disengagement v1\.8, validated on 9,140 outpatient episodes/),
     ).toBeTruthy();
     // Cited rather than restated: the derivation is footnote 1 whether or not
     // anybody sorted, and printing it twice on one page is how a reader ends
     // up unsure whether they are looking at two different models.
-    expect(canvas.getByText(/Sorted by a derived column — this ranks a prediction\./)).toBeTruthy();
+    expect(canvas.getByText(/Sorted by a prediction — see note 1\./)).toBeTruthy();
 
     // Worst first, and the row order actually changed.
     const first = canvas.getAllByRole("row")[1];
@@ -157,7 +153,7 @@ export const Arrivals: Story = {
     // arrivals are nowhere in the table.
     const rows = canvas.getAllByRole("row");
     expect(rows[1]?.textContent).toContain("Novak, K.");
-    expect(rows).toHaveLength(WARD.length + 1);
+    expect(rows).toHaveLength(CASELOAD.length + 1);
   },
 };
 
@@ -165,7 +161,7 @@ export const Reading: Story = {
   name: "The row the reader is on",
   parameters: { state: "The row the reader is on" },
   args: {
-    identify: (row: WardRow) => ({ primary: row.name, secondary: `MRN ${row.mrn}` }),
+    identify: (row: CaseloadRow) => ({ primary: row.name, secondary: `MRN ${row.mrn}` }),
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
@@ -176,11 +172,11 @@ export const Reading: Story = {
     // The identity line names the row at the point of action. Acting on the
     // wrong row is the retract-and-reorder error, and re-stating the
     // identifier where the action happens is the intervention that reduces it.
-    expect(canvas.getByText("Row 1 of 1,438 — Novak, K., MRN 5518203.")).toBeTruthy();
+    expect(canvas.getByText("Row 1 of 312 — Novak, K., MRN 5518203.")).toBeTruthy();
 
     // Arrow down moves the cursor and the line follows it.
     await userEvent.keyboard("{ArrowDown}");
-    expect(canvas.getByText("Row 2 of 1,438 — Adeyemi, R., MRN 4471902.")).toBeTruthy();
+    expect(canvas.getByText("Row 2 of 312 — Adeyemi, R., MRN 4471902.")).toBeTruthy();
   },
 };
 
@@ -197,7 +193,7 @@ export const Everything: Story = {
   name: "Everything, with nothing hidden",
   parameters: { state: "Everything, with nothing hidden" },
   args: {
-    coverage: { shown: WARD.length, total: WARD.length, noun: "referrals" },
+    coverage: { shown: CASELOAD.length, total: CASELOAD.length, noun: "referrals" },
     note: undefined,
   },
   play: async ({ canvasElement }) => {
@@ -205,7 +201,6 @@ export const Everything: Story = {
     // The escape hatch, and the reason `coverage` can stay required: a caller
     // who genuinely has everything says so in one line rather than lying.
     expect(canvas.getByText(/All 6 referrals\./)).toBeTruthy();
-    expect(canvas.queryByText(/not shown by this filter/)).toBeNull();
   },
 };
 
@@ -214,7 +209,7 @@ export const Refused: Story = {
   parameters: { state: "Too many rows to render honestly" },
   args: {
     ceiling: 4,
-    coverage: { shown: WARD.length, total: 1438, noun: "patients" },
+    coverage: { shown: CASELOAD.length, total: 1438, noun: "patients" },
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);

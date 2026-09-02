@@ -43,11 +43,12 @@ import {
   type GridSort,
 } from "@/registry/oxygen/data-grid/data-grid";
 import {
-  EARLY_WARNING,
-  WARD_WITH_EVERY_ABSENCE,
-  WARD_COVERAGE,
-  potassiumQualifier,
-  type WardRow,
+  CSSRS_ORDER,
+  DISENGAGEMENT,
+  CASELOAD,
+  CASELOAD_COVERAGE,
+  phq9Band,
+  type CaseloadRow,
 } from "@/registry/oxygen/data-grid/data-grid.fixtures";
 
 /**
@@ -67,14 +68,14 @@ const BEATS = [
 ] as const;
 
 const PATCHES = [
-  { mrn: "3320145", potassium: 5.9, previous: 5.4, risk: 0.68 },
-  { mrn: "5518203", potassium: 4.6, previous: 4.1, risk: 0.52 },
-  { mrn: "6690321", potassium: 2.9, previous: 3.2, risk: 0.41 },
+  { mrn: "3320145", phq9: 21, previousPhq9: 18, risk: 0.74 },
+  { mrn: "5518203", phq9: 14, previousPhq9: 11, risk: 0.58 },
+  { mrn: "6690321", phq9: 5, previousPhq9: 7, risk: 0.33 },
 ] as const;
 
 /** The patches resolved against the ward, so `arrivals` is a row set like any other. */
-const HELD: readonly WardRow[] = PATCHES.map((patch) => ({
-  ...WARD_WITH_EVERY_ABSENCE.find((row) => row.mrn === patch.mrn)!,
+const HELD: readonly CaseloadRow[] = PATCHES.map((patch) => ({
+  ...CASELOAD.find((row) => row.mrn === patch.mrn)!,
   ...patch,
 }));
 
@@ -100,7 +101,7 @@ function usePrefersReducedMotion() {
  * stated. The MRN sits under the name rather than in a column of its own: a
  * name is not an identifier, and the row somebody acts on has to carry both.
  */
-function Patient({ row }: { row: WardRow }) {
+function Patient({ row }: { row: CaseloadRow }) {
   return (
     <span className="flex min-w-0 items-center gap-2.5">
       <PatientPortrait src={row.photo} size={26} />
@@ -118,28 +119,28 @@ function Patient({ row }: { row: WardRow }) {
  * A stable 5.9 and a climbing 5.9 are different patients, and a worklist that
  * shows only the latest value has left the reader to remember which. It sits
  * inline because as a column it was absent on half the rows — a row with no
- * current potassium has no delta either — and a column that is mostly the word
+ * current score has no delta either — and a column that is mostly the word
  * "Not recorded" is a column arguing against itself. Typographic rather than a
  * sparkline: this direction is a ledger, and a chart in a ruled column is a
  * different component.
  */
-function Delta({ row }: { row: WardRow }) {
-  if (typeof row.potassium !== "number" || row.previous === undefined) return null;
-  const move = Number((row.potassium - row.previous).toFixed(1));
-  if (Math.abs(move) < 0.05) return null;
+function Delta({ row }: { row: CaseloadRow }) {
+  if (typeof row.phq9 !== "number" || row.previousPhq9 === undefined) return null;
+  const move = row.phq9 - row.previousPhq9;
+  if (move === 0) return null;
   const rising = move > 0;
   return (
     <span className={rising ? "oxdg__crit" : "opacity-55"}>
       <span aria-hidden="true">{rising ? "▲" : "▼"}</span>
-      {Math.abs(move).toFixed(1)}
+      {Math.abs(move)}
       <span className="sr-only">
-        {rising ? "up" : "down"} {Math.abs(move).toFixed(1)} on 24 hours
+        {rising ? "up" : "down"} {Math.abs(move)} since the last assessment
       </span>
     </span>
   );
 }
 
-const COLUMNS: DataGridColumn<WardRow>[] = [
+const COLUMNS: DataGridColumn<CaseloadRow>[] = [
   {
     key: "name",
     header: "Patient",
@@ -148,12 +149,21 @@ const COLUMNS: DataGridColumn<WardRow>[] = [
     cell: (row) => <Patient row={row} />,
   },
   // An identifier, not a number: 4W-07 does not sort as seven.
-  { key: "bed", header: "Bed", kind: "identifier", value: (row) => row.bed, width: "5.5rem" },
+  // A term from a small vocabulary, so it sorts by care intensity rather than
+  // alphabetically — ACT above PHP above IOP above Outpatient.
   {
-    key: "potassium",
-    header: "Potassium",
+    key: "program",
+    header: "Program",
+    kind: "status",
+    order: ["ACT", "PHP", "IOP", "Outpatient"],
+    value: (row) => row.program,
+    width: "7rem",
+  },
+  {
+    key: "phq9",
+    header: "PHQ-9",
     kind: "measure",
-    value: (row) => row.potassium,
+    value: (row) => row.phq9,
     /*
      * Left-aligned, though the sort is numeric.
      *
@@ -164,7 +174,6 @@ const COLUMNS: DataGridColumn<WardRow>[] = [
      */
     align: "start",
     width: "11rem",
-    footnote: "Serum potassium, mmol/L. Reference range 3.5–5.1. Δ is the move on 24 hours.",
     /*
      * The qualifier is a word, and it is the caller's. The grid holds no
      * reference ranges: a library that shipped one would be asserting a
@@ -173,11 +182,11 @@ const COLUMNS: DataGridColumn<WardRow>[] = [
      * that status is never colour alone.
      */
     cell: (row) => {
-      const word = potassiumQualifier(row.potassium);
+      const word = phq9Band(row.phq9);
       return (
         <span className="inline-flex items-baseline gap-1.5">
-          <span className={word === "critical" ? "oxdg__crit font-semibold" : undefined}>
-            {String(row.potassium)}
+          <span className={word === "severe" ? "oxdg__crit font-semibold" : undefined}>
+            {String(row.phq9)}
           </span>
           {word ? <span className="text-[0.6875rem] opacity-65">{word}</span> : null}
           <Delta row={row} />
@@ -185,23 +194,38 @@ const COLUMNS: DataGridColumn<WardRow>[] = [
       );
     },
   },
+  /*
+   * The C-SSRS screen, sorted by the declared order rather than alphabetically.
+   *
+   * This is the column the domain turns on, and the one that makes `status`
+   * worth having as a kind: sorted A–Z, "None reported" lands above "Ideation
+   * with plan" because N precedes I, which is how a caseload list buries the
+   * row it was built to surface.
+   */
+  {
+    key: "cssrs",
+    header: "Risk screen",
+    kind: "status",
+    order: CSSRS_ORDER,
+    value: (row) => row.cssrs,
+    width: "11rem",
+  },
   {
     key: "risk",
-    header: "Deterioration risk",
+    header: "Disengagement risk",
     kind: "number",
     width: "10.5rem",
     value: (row) => row.risk,
-    derived: EARLY_WARNING,
+    derived: DISENGAGEMENT,
     cell: (row) => row.risk.toFixed(2),
   },
-  { key: "due", header: "Next due", kind: "instant", value: (row) => row.due, width: "6.5rem" },
+  { key: "due", header: "Next contact", kind: "instant", value: (row) => row.due, width: "8rem" },
   // Always populated, deliberately. A queue that says what is owed and not who
   // owes it is a list somebody else will action.
-  { key: "owner", header: "Reviewed by", kind: "text", value: (row) => row.owner, width: "8rem" },
 ];
 
 /** Held results applied to the rows already on screen. Never adds one. */
-function apply(rows: readonly WardRow[], arriving: readonly WardRow[]): WardRow[] {
+function apply(rows: readonly CaseloadRow[], arriving: readonly CaseloadRow[]): CaseloadRow[] {
   const byMrn = new Map(arriving.map((row) => [row.mrn, row]));
   return rows.map((row) => ({ ...row, ...(byMrn.get(row.mrn) ?? {}) }));
 }
@@ -211,7 +235,7 @@ const SORT: GridSort = { key: "risk", direction: "descending" };
 export function DataGridDemo() {
   const reduced = usePrefersReducedMotion();
 
-  const [rows, setRows] = React.useState<readonly WardRow[]>(WARD_WITH_EVERY_ABSENCE);
+  const [rows, setRows] = React.useState<readonly CaseloadRow[]>(CASELOAD);
   const [waiting, setWaiting] = React.useState(1);
   const [beat, setBeat] = React.useState(0);
   /*
@@ -248,31 +272,38 @@ export function DataGridDemo() {
 
   return (
     <figure className="oxdg" data-part={taken ? "none" : active.part}>
+      {/*
+        The bar carries the beat, so the panel needs no caption strip of its
+        own. What was here — `role="grid" · 8 rows · aria-rowcount 1439` — is
+        developer jargon on a marketing page, and the beat label is the thing a
+        reader actually needs: which part of the grid is currently ringed.
+      */}
       <figcaption className="oxdg__bar">
         <span className="oxdg__live" aria-hidden="true" />
-        <span className="oxdg__title">Worklist · 4-West</span>
-        <span className="oxdg__meta numeric">
-          role=&quot;grid&quot; · {rows.length} rows · aria-rowcount 1439
+        <span className="oxdg__title">Caseload · adult outpatient</span>
+        <span className="oxdg__beat">
+          <span className="oxdg__beatnum numeric">{String(beat + 1).padStart(2, "0")}</span>
+          {taken ? "Yours now — arrow keys move the cursor" : active.label}
         </span>
       </figcaption>
 
       {/*
-        The component's own tokens forced to their dark set.
+        No theme forced.
 
-        The site's rule is that live previews follow the page theme — right for
-        a docs page showing a component in context. This is the home page's
-        instrument slot, where the panel is hardware rather than document, and
-        the previous preview in this position was dark for the same reason.
+        This was pinned to the dark token set, on the reasoning that the home
+        page's instrument slot is hardware rather than document. That reasoning
+        was wrong twice over: the site's own rule in globals.css is that a live
+        preview follows the page theme, and pinning it meant the theme toggle
+        did nothing to the one component on the page a visitor is looking at.
       */}
-      <div className="oxdg__stage" data-ox-theme="dark" onPointerDownCapture={take}>
+      <div className="oxdg__stage" onPointerDownCapture={take}>
         <DataGrid
-          caption="Patients on 4-West with a potassium outside the reference range"
-          title="Potassium out of range · last 24 hours"
-          note="live"
+          caption="Clients on this team's caseload with a raised PHQ-9 or a recent risk screen"
+          title="PHQ-9 raised, or risk screened in 14 days"
           columns={COLUMNS}
           rows={rows}
           rowKey={(row) => row.mrn}
-          coverage={{ ...WARD_COVERAGE, shown: rows.length }}
+          coverage={{ ...CASELOAD_COVERAGE, asOf: undefined, shown: rows.length }}
           arrivals={HELD.slice(0, waiting)}
           arrivalsAt="11:47"
           onAdmitArrivals={() => {
@@ -285,21 +316,6 @@ export function DataGridDemo() {
           onRowActivate={take}
         />
       </div>
-
-      {/*
-        One line, fixed height, naming what is ringed.
-
-        A caption rather than a rail: four boxes of prose under a worklist read
-        as a brochure wrapped round a component, and the component is the
-        argument. `nowrap` and a fixed height because the label changes every
-        few seconds and this panel's whole claim is that it does not move.
-      */}
-      <p className="oxdg__beat">
-        <span className="oxdg__beatnum numeric">{String(beat + 1).padStart(2, "0")}</span>
-        <span className="oxdg__beatlabel">
-          {taken ? "Yours now — arrow keys move the cursor" : active.label}
-        </span>
-      </p>
     </figure>
   );
 }

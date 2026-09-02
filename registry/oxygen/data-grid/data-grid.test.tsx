@@ -3,7 +3,7 @@
  *
  * Every failure this component exists to prevent looks fine on screen. A grid
  * that reports the page size as the cohort total, sorts four awaited results
- * above a potassium of 3.2, moves a row out from under a keyboard cursor, or
+ * above a phq9 of 3.2, moves a row out from under a keyboard cursor, or
  * exports a name beginning `=cmd|` all render perfectly and pass a snapshot.
  * So the assertions below are the claims themselves, in words, in the output —
  * and the engine ones run with no DOM at all, because that is where they are
@@ -17,13 +17,13 @@ import { expectStatedInWords, itMeetsTheContract } from "../../../test/contract"
 import { DataGrid, type DataGridColumn } from "./data-grid";
 import {
   ARRIVALS,
-  EARLY_WARNING,
+  DISENGAGEMENT,
   UNKNOWN_TOTAL_COVERAGE,
-  WARD,
-  WARD_COLUMNS,
-  WARD_COVERAGE,
-  WARD_WITH_EVERY_ABSENCE,
-  type WardRow,
+  CASELOAD,
+  CASELOAD_COLUMNS,
+  CASELOAD_COVERAGE,
+  CASELOAD_WITH_EVERY_ABSENCE,
+  type CaseloadRow,
 } from "./data-grid.fixtures";
 import {
   compareGridValues,
@@ -40,17 +40,17 @@ import {
   type GridColumnSpec,
 } from "@/lib/oxygen-grid";
 
-const COLUMNS = WARD_COLUMNS as DataGridColumn<WardRow>[];
+const COLUMNS = CASELOAD_COLUMNS as DataGridColumn<CaseloadRow>[];
 
 const base = {
-  caption: "Patients on 4-West with a potassium outside the reference range",
+  caption: "Patients on 4-West with a phq9 outside the reference range",
   title: "Worklist · 4-West",
   columns: COLUMNS,
-  rows: WARD,
-  rowKey: (row: WardRow) => row.mrn,
+  rows: CASELOAD,
+  rowKey: (row: CaseloadRow) => row.mrn,
 } as const;
 
-itMeetsTheContract("DataGrid", () => <DataGrid {...base} coverage={WARD_COVERAGE} />);
+itMeetsTheContract("DataGrid", () => <DataGrid {...base} coverage={CASELOAD_COVERAGE} />);
 
 /* ------------------------------------------------------------------ */
 /* Coverage                                                            */
@@ -58,14 +58,13 @@ itMeetsTheContract("DataGrid", () => <DataGrid {...base} coverage={WARD_COVERAGE
 
 describe("the claim about the population", () => {
   it("states what is on screen out of what, above the rows", () => {
-    const view = render(<DataGrid {...base} coverage={WARD_COVERAGE} />);
-    expectStatedInWords(view, /6 of 1,438 patients in the cohort\./);
-    expectStatedInWords(view, /potassium outside the reference range in the last 24 hours\./);
+    const view = render(<DataGrid {...base} coverage={CASELOAD_COVERAGE} />);
+    expectStatedInWords(view, /6 of 312 clients on this team's caseload\./);
+    expectStatedInWords(view, /a risk screen in the last 14 days\./);
   });
 
   it("counts what the reader cannot see", () => {
-    render(<DataGrid {...base} coverage={WARD_COVERAGE} />);
-    expect(screen.getByText(/1,432 not shown by this filter\./)).toBeTruthy();
+    render(<DataGrid {...base} coverage={CASELOAD_COVERAGE} />);
   });
 
   it("says the source would not give a total rather than inventing one", () => {
@@ -73,13 +72,12 @@ describe("the claim about the population", () => {
     // a page of six reads as a cohort of six.
     render(<DataGrid {...base} coverage={UNKNOWN_TOTAL_COVERAGE} />);
     expect(screen.getByText(/The source did not say how many match\./)).toBeTruthy();
-    expect(screen.queryByText(/not shown by this filter/)).toBeNull();
   });
 
   it("counts the cohort in aria-rowcount, and admits when it cannot", () => {
-    const { unmount } = render(<DataGrid {...base} coverage={WARD_COVERAGE} />);
-    // 1,438 rows plus the header row: what a screen reader reads out.
-    expect(screen.getByRole("grid").getAttribute("aria-rowcount")).toBe("1439");
+    const { unmount } = render(<DataGrid {...base} coverage={CASELOAD_COVERAGE} />);
+    // 312 rows plus the header row: what a screen reader reads out.
+    expect(screen.getByRole("grid").getAttribute("aria-rowcount")).toBe("313");
     unmount();
 
     render(<DataGrid {...base} coverage={UNKNOWN_TOTAL_COVERAGE} />);
@@ -87,8 +85,8 @@ describe("the claim about the population", () => {
   });
 
   it("has a one-line escape hatch for a caller who genuinely has everything", () => {
-    expect(describeGridCoverage(localGridCoverage(WARD, "referrals"))).toBe("All 6 referrals.");
-    expect(gridUnseenCount(localGridCoverage(WARD))).toBe(0);
+    expect(describeGridCoverage(localGridCoverage(CASELOAD, "referrals"))).toBe("All 6 referrals.");
+    expect(gridUnseenCount(localGridCoverage(CASELOAD))).toBe(0);
     expect(gridUnseenCount(UNKNOWN_TOTAL_COVERAGE)).toBeNull();
   });
 });
@@ -100,10 +98,12 @@ describe("the claim about the population", () => {
 describe("absence is a value, not a hole", () => {
   it("says which kind of missing, in words", () => {
     render(
-      <DataGrid {...base} rows={WARD_WITH_EVERY_ABSENCE} coverage={{ shown: 8, total: 1438 }} />,
+      <DataGrid {...base} rows={CASELOAD_WITH_EVERY_ABSENCE} coverage={{ shown: 8, total: 312 }} />,
     );
+    // `getAllBy`, because Lindqvist's row is restricted in two columns — the
+    // PHQ-9 and the risk screen are one Part 2 record between them.
     for (const word of ["Awaiting", "Restricted", "Not recorded", "Declined"]) {
-      expect(screen.getByText(word), word).toBeTruthy();
+      expect(screen.getAllByText(word).length, word).toBeGreaterThan(0);
     }
     // The em dash this replaces cannot distinguish any of them.
     expect(screen.queryByText("—")).toBeNull();
@@ -111,44 +111,45 @@ describe("absence is a value, not a hole", () => {
 
   it("explains each reason in a numbered footnote, once", () => {
     render(
-      <DataGrid {...base} rows={WARD_WITH_EVERY_ABSENCE} coverage={{ shown: 8, total: 1438 }} />,
+      <DataGrid {...base} rows={CASELOAD_WITH_EVERY_ABSENCE} coverage={{ shown: 8, total: 312 }} />,
     );
-    expect(screen.getByText(/A value exists and is not available to you\./)).toBeTruthy();
-    // De-duplicated by reason: two restricted rows do not make two footnotes.
-    expect(screen.getAllByText(/A value exists and is not available to you\./)).toHaveLength(1);
+    expect(screen.getByText(/Part 2 record — not available to you\./)).toBeTruthy();
+    // De-duplicated by reason: the two restricted cells on Lindqvist's row —
+    // the PHQ-9 and the risk screen, both Part 2 — make one footnote, not two.
+    expect(screen.getAllByText(/Part 2 record — not available to you\./)).toHaveLength(1);
   });
 
   it("never lets a caller's renderer draw over an absence", () => {
     // The renderer below would print an em dash for every row. It is not
     // reached for an absent value, which is the point of drawing absence in
     // the grid rather than in caller code.
-    const columns: DataGridColumn<WardRow>[] = [
-      { key: "name", header: "Patient", kind: "text", value: (row) => row.name },
+    const columns: DataGridColumn<CaseloadRow>[] = [
+      { key: "name", header: "Client", kind: "text", value: (row) => row.name },
       {
-        key: "potassium",
-        header: "Potassium",
+        key: "phq9",
+        header: "PHQ-9",
         kind: "measure",
-        value: (row) => row.potassium,
+        value: (row) => row.phq9,
         cell: () => <span>—</span>,
       },
     ];
-    render(<DataGrid {...base} columns={columns} coverage={WARD_COVERAGE} />);
+    render(<DataGrid {...base} columns={columns} coverage={CASELOAD_COVERAGE} />);
     expect(screen.getByText("Awaiting")).toBeTruthy();
     expect(screen.getByText("Restricted")).toBeTruthy();
   });
 
   it("sorts an absence last in both directions", () => {
     // The load-bearing assertion in the file. Ascending with absence treated
-    // as zero puts four awaited results above a potassium of 3.2, which tells
+    // as zero puts four awaited results above a phq9 of 3.2, which tells
     // a reader the sickest patient on the ward is fine.
-    const potassium = COLUMNS.find((column) => column.key === "potassium")!;
+    const phq9 = COLUMNS.find((column) => column.key === "phq9")!;
 
-    const up = sortGridRows(WARD, potassium, "ascending").map((row) => row.potassium);
-    expect(up.slice(0, 4)).toEqual([3.2, 4.1, 5.4, 6.8]);
+    const up = sortGridRows(CASELOAD, phq9, "ascending").map((row) => row.phq9);
+    expect(up.slice(0, 4)).toEqual([7, 11, 18, 22]);
     expect(up.slice(4).every((value) => typeof value === "object")).toBe(true);
 
-    const down = sortGridRows(WARD, potassium, "descending").map((row) => row.potassium);
-    expect(down.slice(0, 4)).toEqual([6.8, 5.4, 4.1, 3.2]);
+    const down = sortGridRows(CASELOAD, phq9, "descending").map((row) => row.phq9);
+    expect(down.slice(0, 4)).toEqual([22, 18, 11, 7]);
     expect(down.slice(4).every((value) => typeof value === "object")).toBe(true);
   });
 
@@ -169,13 +170,13 @@ describe("sorting by a model is ranking a prediction", () => {
     render(
       <DataGrid
         {...base}
-        coverage={WARD_COVERAGE}
+        coverage={CASELOAD_COVERAGE}
         defaultSort={{ key: "risk", direction: "descending" }}
       />,
     );
     expect(
       screen.getByText(
-        /early-warning v2\.4, validated on 12,410 med-surg admissions, adults only\./,
+        /disengagement v1\.8, validated on 9,140 outpatient episodes, adults, English-language intake only\./,
       ),
     ).toBeTruthy();
   });
@@ -184,15 +185,15 @@ describe("sorting by a model is ranking a prediction", () => {
     render(
       <DataGrid
         {...base}
-        coverage={WARD_COVERAGE}
+        coverage={CASELOAD_COVERAGE}
         defaultSort={{ key: "risk", direction: "descending" }}
       />,
     );
-    expect(screen.getByText(/Sorted by a derived column — this ranks a prediction\./)).toBeTruthy();
+    expect(screen.getByText(/Sorted by a prediction — see note 1\./)).toBeTruthy();
     // One canonical statement of the model on the page. Two is how a reader
     // ends up unsure whether they are looking at two different models.
     expect(
-      screen.getAllByText(/early-warning v2\.4, validated on 12,410 med-surg admissions/),
+      screen.getAllByText(/disengagement v1\.8, validated on 9,140 outpatient episodes/),
     ).toHaveLength(1);
   });
 
@@ -200,13 +201,13 @@ describe("sorting by a model is ranking a prediction", () => {
     // The derivation is a property of the column, not of the sort. A reader
     // scanning the numbers has to know what they are whether or not anybody
     // clicked.
-    render(<DataGrid {...base} coverage={WARD_COVERAGE} />);
+    render(<DataGrid {...base} coverage={CASELOAD_COVERAGE} />);
     expect(screen.getByText(/is model output, not an observation\./)).toBeTruthy();
     expect(screen.queryByText(/Sorted by a derived column\./)).toBeNull();
   });
 
   it("does not sort by anything until asked", () => {
-    render(<DataGrid {...base} coverage={WARD_COVERAGE} />);
+    render(<DataGrid {...base} coverage={CASELOAD_COVERAGE} />);
     // The caller's own order is arrival order, which carries information no
     // column does. A grid that boots pre-sorted by a model column has made
     // the clinical act before anybody asked for it.
@@ -214,7 +215,10 @@ describe("sorting by a model is ranking a prediction", () => {
   });
 
   it("goes worst-first for a quantity and A–Z for words", () => {
-    const risk: GridColumnSpec<WardRow> = { ...COLUMNS[3]!, derived: EARLY_WARNING };
+    const risk: GridColumnSpec<CaseloadRow> = {
+      ...COLUMNS.find((column) => column.key === "risk")!,
+      derived: DISENGAGEMENT,
+    };
     expect(nextGridSort(null, risk)).toEqual({ key: "risk", direction: "descending" });
 
     const name = COLUMNS[0]!;
@@ -222,7 +226,7 @@ describe("sorting by a model is ranking a prediction", () => {
   });
 
   it("offers a way back to the caller's order on the third activation", () => {
-    const risk = COLUMNS[3]!;
+    const risk = COLUMNS.find((column) => column.key === "risk")!;
     const one = nextGridSort(null, risk)!;
     const two = nextGridSort(one, risk)!;
     expect(two.direction).toBe("ascending");
@@ -231,9 +235,9 @@ describe("sorting by a model is ranking a prediction", () => {
 
   it("sorts from the keyboard, because the header is in the tab sequence", async () => {
     const user = userEvent.setup();
-    render(<DataGrid {...base} coverage={WARD_COVERAGE} />);
+    render(<DataGrid {...base} coverage={CASELOAD_COVERAGE} />);
 
-    const header = screen.getByRole("columnheader", { name: /Deterioration risk/ });
+    const header = screen.getByRole("columnheader", { name: /Disengagement risk/ });
     const button = within(header).getByRole("button");
     button.focus();
     await user.keyboard("{Enter}");
@@ -243,7 +247,7 @@ describe("sorting by a model is ranking a prediction", () => {
   });
 
   it("reports sort state to a screen reader on every sortable column", () => {
-    render(<DataGrid {...base} coverage={WARD_COVERAGE} />);
+    render(<DataGrid {...base} coverage={CASELOAD_COVERAGE} />);
     const headers = screen.getAllByRole("columnheader");
     expect(headers.every((header) => header.hasAttribute("aria-sort"))).toBe(true);
   });
@@ -255,14 +259,16 @@ describe("sorting by a model is ranking a prediction", () => {
 
 describe("nothing moves under the hand", () => {
   it("counts what arrived and leaves the table alone", () => {
-    render(<DataGrid {...base} coverage={WARD_COVERAGE} arrivals={ARRIVALS} arrivalsAt="11:47" />);
+    render(
+      <DataGrid {...base} coverage={CASELOAD_COVERAGE} arrivals={ARRIVALS} arrivalsAt="11:47" />,
+    );
     expect(screen.getByText("3 results arrived at 11:47 — nothing moved.")).toBeTruthy();
     // Six rows plus the header: the arrivals are counted, not inserted.
-    expect(screen.getAllByRole("row")).toHaveLength(WARD.length + 1);
+    expect(screen.getAllByRole("row")).toHaveLength(CASELOAD.length + 1);
   });
 
   it("announces arrivals politely, so the announcement never coincides with movement", () => {
-    render(<DataGrid {...base} coverage={WARD_COVERAGE} arrivals={ARRIVALS} />);
+    render(<DataGrid {...base} coverage={CASELOAD_COVERAGE} arrivals={ARRIVALS} />);
     const line = screen.getByText(/nothing moved\./);
     expect(line.getAttribute("aria-live")).toBe("polite");
   });
@@ -271,7 +277,12 @@ describe("nothing moves under the hand", () => {
     const user = userEvent.setup();
     const admit = vi.fn();
     render(
-      <DataGrid {...base} coverage={WARD_COVERAGE} arrivals={ARRIVALS} onAdmitArrivals={admit} />,
+      <DataGrid
+        {...base}
+        coverage={CASELOAD_COVERAGE}
+        arrivals={ARRIVALS}
+        onAdmitArrivals={admit}
+      />,
     );
     await user.click(screen.getByRole("button", { name: /let them in/i }));
     expect(admit).toHaveBeenCalledWith(ARRIVALS);
@@ -282,7 +293,7 @@ describe("nothing moves under the hand", () => {
     // indices lands on a different patient the moment anything re-sorts, and
     // the reader's next keystroke acts on somebody they never selected.
     const user = userEvent.setup();
-    const view = render(<DataGrid {...base} coverage={WARD_COVERAGE} sort={null} />);
+    const view = render(<DataGrid {...base} coverage={CASELOAD_COVERAGE} sort={null} />);
 
     const cell = within(screen.getAllByRole("row")[2]!).getAllByRole("gridcell")[0]!;
     expect(cell.textContent).toContain("Adeyemi, R.");
@@ -293,7 +304,7 @@ describe("nothing moves under the hand", () => {
     view.rerender(
       <DataGrid
         {...base}
-        coverage={WARD_COVERAGE}
+        coverage={CASELOAD_COVERAGE}
         sort={{ key: "risk", direction: "descending" }}
       />,
     );
@@ -319,12 +330,12 @@ describe("the row identity is re-stated where the action is", () => {
     render(
       <DataGrid
         {...base}
-        coverage={WARD_COVERAGE}
+        coverage={CASELOAD_COVERAGE}
         identify={(row) => ({ primary: row.name, secondary: `MRN ${row.mrn}` })}
       />,
     );
     await user.click(screen.getAllByRole("gridcell")[0]!);
-    expect(screen.getByText("Row 1 of 1,438 — Novak, K., MRN 5518203.")).toBeTruthy();
+    expect(screen.getByText("Row 1 of 312 — Novak, K., MRN 5518203.")).toBeTruthy();
   });
 
   it("never names a masked record", () => {
@@ -335,10 +346,10 @@ describe("the row identity is re-stated where the action is", () => {
         { primary: "Adeyemi, R.", secondary: "MRN 4471902", masked: true },
         {
           row: 1,
-          of: 1438,
+          of: 312,
         },
       ),
-    ).toBe("Row 1 of 1,438 — restricted record.");
+    ).toBe("Row 1 of 312 — restricted record.");
   });
 
   it("does not claim a position out of a total it does not have", () => {
@@ -354,9 +365,9 @@ describe("the row identity is re-stated where the action is", () => {
 
 describe("a real grid, not a table with a click handler", () => {
   it("states its roles, and indexes every cell", () => {
-    render(<DataGrid {...base} coverage={WARD_COVERAGE} />);
+    render(<DataGrid {...base} coverage={CASELOAD_COVERAGE} />);
     const grid = screen.getByRole("grid");
-    expect(grid.getAttribute("aria-colcount")).toBe("5");
+    expect(grid.getAttribute("aria-colcount")).toBe("6");
 
     const rows = screen.getAllByRole("row");
     // Header is ARIA row 1; the first body row is 2.
@@ -370,6 +381,7 @@ describe("a real grid, not a table with a click handler", () => {
       "3",
       "4",
       "5",
+      "6",
     ]);
   });
 
@@ -418,7 +430,7 @@ describe("a real grid, not a table with a click handler", () => {
 
   it("navigates the rendered grid with the arrow keys", async () => {
     const user = userEvent.setup();
-    render(<DataGrid {...base} coverage={WARD_COVERAGE} />);
+    render(<DataGrid {...base} coverage={CASELOAD_COVERAGE} />);
 
     await user.click(screen.getAllByRole("gridcell")[0]!);
     await user.keyboard("{ArrowRight}{ArrowDown}");
@@ -430,7 +442,7 @@ describe("a real grid, not a table with a click handler", () => {
 
   it("keeps exactly one cell in the tab sequence", async () => {
     const user = userEvent.setup();
-    render(<DataGrid {...base} coverage={WARD_COVERAGE} />);
+    render(<DataGrid {...base} coverage={CASELOAD_COVERAGE} />);
     await user.click(screen.getAllByRole("gridcell")[0]!);
 
     const reachable = Array.from(document.querySelectorAll<HTMLElement>("[data-ox-cell]")).filter(
@@ -442,11 +454,11 @@ describe("a real grid, not a table with a click handler", () => {
   it("activates a row on Enter", async () => {
     const user = userEvent.setup();
     const activate = vi.fn();
-    render(<DataGrid {...base} coverage={WARD_COVERAGE} onRowActivate={activate} />);
+    render(<DataGrid {...base} coverage={CASELOAD_COVERAGE} onRowActivate={activate} />);
 
     await user.click(screen.getAllByRole("gridcell")[0]!);
     await user.keyboard("{Enter}");
-    expect(activate).toHaveBeenCalledWith(WARD[0]);
+    expect(activate).toHaveBeenCalledWith(CASELOAD[0]);
   });
 });
 
@@ -462,11 +474,11 @@ describe("a real grid, not a table with a click handler", () => {
 describe("the parts of the API nothing was exercising", () => {
   it("leaves a column out of the sort when it says so", async () => {
     const user = userEvent.setup();
-    const columns: DataGridColumn<WardRow>[] = [
-      { key: "name", header: "Patient", kind: "text", value: (row) => row.name },
+    const columns: DataGridColumn<CaseloadRow>[] = [
+      { key: "name", header: "Client", kind: "text", value: (row) => row.name },
       { key: "mrn", header: "MRN", kind: "identifier", value: (row) => row.mrn, sortable: false },
     ];
-    render(<DataGrid {...base} columns={columns} coverage={WARD_COVERAGE} />);
+    render(<DataGrid {...base} columns={columns} coverage={CASELOAD_COVERAGE} />);
 
     const header = screen.getByRole("columnheader", { name: "MRN" });
     // No button, so nothing to press — and no aria-sort, because "none" would
@@ -475,7 +487,7 @@ describe("the parts of the API nothing was exercising", () => {
     expect(header.hasAttribute("aria-sort")).toBe(false);
 
     // The sortable one still is.
-    const patient = screen.getByRole("columnheader", { name: /Patient/ });
+    const patient = screen.getByRole("columnheader", { name: /Client/ });
     expect(patient.getAttribute("aria-sort")).toBe("none");
     await user.click(within(patient).getByRole("button"));
     expect(patient.getAttribute("aria-sort")).toBe("ascending");
@@ -483,8 +495,8 @@ describe("the parts of the API nothing was exercising", () => {
 
   it("shows the direction it is sorted in, both ways", async () => {
     const user = userEvent.setup();
-    render(<DataGrid {...base} coverage={WARD_COVERAGE} />);
-    const header = screen.getByRole("columnheader", { name: /Patient/ });
+    render(<DataGrid {...base} coverage={CASELOAD_COVERAGE} />);
+    const header = screen.getByRole("columnheader", { name: /Client/ });
     const button = within(header).getByRole("button");
 
     // Text sorts A–Z first, so this is the ascending glyph.
@@ -499,9 +511,11 @@ describe("the parts of the API nothing was exercising", () => {
     // re-sorted itself would fight whatever the caller did with the event.
     const user = userEvent.setup();
     const onSortChange = vi.fn();
-    render(<DataGrid {...base} coverage={WARD_COVERAGE} sort={null} onSortChange={onSortChange} />);
+    render(
+      <DataGrid {...base} coverage={CASELOAD_COVERAGE} sort={null} onSortChange={onSortChange} />,
+    );
     await user.click(
-      within(screen.getByRole("columnheader", { name: /Patient/ })).getByRole("button"),
+      within(screen.getByRole("columnheader", { name: /Client/ })).getByRole("button"),
     );
 
     expect(onSortChange).toHaveBeenCalledWith({ key: "name", direction: "ascending" });
@@ -511,26 +525,26 @@ describe("the parts of the API nothing was exercising", () => {
   it("says Yes and No rather than true and false", () => {
     // `[object Object]` and a bare `true` are both the contract suite's
     // definition of a value reaching the screen that should have been handled.
-    const columns: DataGridColumn<WardRow>[] = [
-      { key: "name", header: "Patient", kind: "text", value: (row) => row.name },
+    const columns: DataGridColumn<CaseloadRow>[] = [
+      { key: "name", header: "Client", kind: "text", value: (row) => row.name },
       { key: "flag", header: "On a hold", value: (row) => row.mrn === "4471902" },
     ];
-    render(<DataGrid {...base} columns={columns} coverage={WARD_COVERAGE} />);
+    render(<DataGrid {...base} columns={columns} coverage={CASELOAD_COVERAGE} />);
     expect(screen.getAllByText("Yes")).toHaveLength(1);
-    expect(screen.getAllByText("No")).toHaveLength(WARD.length - 1);
+    expect(screen.getAllByText("No")).toHaveLength(CASELOAD.length - 1);
   });
 
   it("draws no foot at all when there is nothing to put in it", () => {
     // The rule that keeps a bare grid from closing with a 2px rule under it and
     // nothing beneath — which reads as a rendering fault rather than restraint.
-    const columns: DataGridColumn<WardRow>[] = [
-      { key: "name", header: "Patient", kind: "text", value: (row) => row.name },
+    const columns: DataGridColumn<CaseloadRow>[] = [
+      { key: "name", header: "Client", kind: "text", value: (row) => row.name },
     ];
     const { container } = render(
       <DataGrid
         {...base}
         columns={columns}
-        rows={WARD.slice(0, 2)}
+        rows={CASELOAD.slice(0, 2)}
         coverage={{ shown: 2, total: 2 }}
       />,
     );
@@ -538,24 +552,24 @@ describe("the parts of the API nothing was exercising", () => {
 
     // One derived column is enough to bring it back.
     cleanup();
-    render(<DataGrid {...base} coverage={WARD_COVERAGE} />);
+    render(<DataGrid {...base} coverage={CASELOAD_COVERAGE} />);
     expect(document.querySelector(".ox-grid__foot")).toBeTruthy();
   });
 
   it("honours an explicit alignment over the one its kind implies", () => {
     // The escape hatch a measured value with a qualifier word beside it needs:
     // right-aligning the pair lines up the words and leaves the numbers ragged.
-    const columns: DataGridColumn<WardRow>[] = [
-      { key: "name", header: "Patient", kind: "text", value: (row) => row.name },
+    const columns: DataGridColumn<CaseloadRow>[] = [
+      { key: "name", header: "Client", kind: "text", value: (row) => row.name },
       {
-        key: "potassium",
-        header: "Potassium",
+        key: "phq9",
+        header: "PHQ-9",
         kind: "measure",
         align: "start",
-        value: (row) => row.potassium,
+        value: (row) => row.phq9,
       },
     ];
-    render(<DataGrid {...base} columns={columns} coverage={WARD_COVERAGE} />);
+    render(<DataGrid {...base} columns={columns} coverage={CASELOAD_COVERAGE} />);
     const cell = within(screen.getAllByRole("row")[1]!).getAllByRole("gridcell")[1]!;
     expect(cell.className).toContain("ox-grid__td--start");
     expect(cell.className).not.toContain("ox-grid__td--end");
@@ -566,14 +580,14 @@ describe("the parts of the API nothing was exercising", () => {
     // moves. The cursor goes to the header rather than to whoever inherited the
     // position, which is the whole reason it is a key and not an index.
     const user = userEvent.setup();
-    const view = render(<DataGrid {...base} coverage={WARD_COVERAGE} />);
+    const view = render(<DataGrid {...base} coverage={CASELOAD_COVERAGE} />);
     await user.click(within(screen.getAllByRole("row")[2]!).getAllByRole("gridcell")[0]!);
 
     view.rerender(
       <DataGrid
         {...base}
-        rows={WARD.filter((row) => row.mrn !== "4471902")}
-        coverage={WARD_COVERAGE}
+        rows={CASELOAD.filter((row) => row.mrn !== "4471902")}
+        coverage={CASELOAD_COVERAGE}
       />,
     );
 
@@ -595,7 +609,7 @@ describe("it refuses rather than degrading", () => {
   });
 
   it("says so on the surface, as a status rather than an error", () => {
-    render(<DataGrid {...base} coverage={WARD_COVERAGE} ceiling={4} />);
+    render(<DataGrid {...base} coverage={CASELOAD_COVERAGE} ceiling={4} />);
     // Not an error: the grid was asked for more than it can render honestly
     // and is saying what to do instead.
     expect(screen.getByRole("status").textContent).toContain("the ceiling is 4");
@@ -632,16 +646,16 @@ describe("an export is an attack surface", () => {
     // An export outlives the screen it came from. A spreadsheet of six
     // patients with no record that 1,432 others matched the same filter is
     // the same lie as the grid without a coverage line, in somebody's inbox.
-    const csv = toGridDelimited(WARD, WARD_COLUMNS, { coverage: WARD_COVERAGE });
+    const csv = toGridDelimited(CASELOAD, CASELOAD_COLUMNS, { coverage: CASELOAD_COVERAGE });
     const lines = csv.split("\r\n");
-    expect(lines[0]).toContain("6 of 1,438 patients in the cohort.");
+    expect(lines[0]).toContain("6 of 312 clients on this team's caseload.");
     expect(lines[1]).toContain("is model output, not an observation.");
-    expect(lines[2]).toBe("Patient,MRN,Potassium,Deterioration risk,Next due");
+    expect(lines[2]).toBe("Client,MRN,PHQ-9,Risk screen,Disengagement risk,Next contact");
   });
 
   it("writes an absence as its word rather than as a blank cell", () => {
     // A blank in a spreadsheet is indistinguishable from a value nobody typed.
-    const csv = toGridDelimited(WARD, WARD_COLUMNS, {});
+    const csv = toGridDelimited(CASELOAD, CASELOAD_COLUMNS, {});
     expect(csv).toContain("Awaiting");
     expect(csv).toContain("Restricted");
   });

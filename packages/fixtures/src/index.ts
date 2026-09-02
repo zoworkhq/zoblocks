@@ -1158,17 +1158,17 @@ export const careTeams = [careTeamNightCoverage, careTeamCoverageGap];
 // ---------------------------------------------------------------------------
 
 /**
- * A ward worklist that knows its own size.
+ * A caseload search that knows its own size.
  *
  * `total` is the count matching the search, not the count in `entry` — the
  * distinction the whole coverage claim rests on. A grid rendering six rows here
- * is showing six of 1,438, and saying so is the difference between a view and
- * a claim.
+ * is showing six of 312, and saying so is the difference between a view and a
+ * claim.
  */
-export const wardPotassium: Bundle = {
+export const caseloadPhq9: Bundle = {
   resourceType: "Bundle",
   type: "searchset",
-  total: 1438,
+  total: 312,
   link: [
     { relation: "self", url: "http://example.org/fhir/Observation?code=2823-3&_count=6" },
     { relation: "next", url: "http://example.org/fhir/Observation?code=2823-3&_page=2" },
@@ -1182,7 +1182,7 @@ export const wardPotassium: Bundle = {
  * `Bundle.total` is optional, and several production servers omit it on a
  * searchset while returning only a `next` link — no `first`, no `last`, and no
  * way to construct one, because the spec forbids building paging URLs by hand.
- * So "6 of 1,438" is a sentence that cannot always be said, and a component
+ * So "6 of 312" is a sentence that cannot always be said, and a component
  * whose coverage type is `number` will fill the gap with the page size.
  *
  * This fixture exists so that failure is reproducible rather than theoretical.
@@ -1197,4 +1197,4 @@ export const unknownTotal: Bundle = {
   entry: [{ resource: observationPotassiumCritical }],
 };
 
-export const worklists = { wardPotassium, unknownTotal };
+export const worklists = { caseloadPhq9, unknownTotal };

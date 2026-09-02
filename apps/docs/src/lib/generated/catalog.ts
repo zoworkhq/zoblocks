@@ -5405,7 +5405,7 @@ export const CATALOG: ComponentDoc[] = [
     "summary": "A worklist that states what it is showing out of what, holds arriving results behind a line, and names the model when you sort by one.",
     "tagline": "States its coverage before it shows you the rows.",
     "description": "A ruled ledger with role=\"grid\": coverage above the data rather than under it, a total that may honestly be unknown, absence said in words rather than an em dash, numbered footnotes naming the model behind a derived column, and results that arrive without anything moving under your hand.",
-    "rationale": "Every grid renders the six rows on screen and says nothing about the other 1,432. That is the defect, and it is not a missing feature — it is a claim the component makes and cannot support. A filtered worklist is a worse liar than a paginated one, because the filter was set by a human at 07:00 who has since stopped seeing it, and the reader at 15:00 believes they are looking at the ward. So coverage is required, the predicate prints as a sentence, and a total the source will not give is rendered as \"the source did not say\" rather than as the page size. Three further consequences follow from taking a worklist seriously as a safety surface: absence has five reasons and no em dash, because a specimen in the lab and a record this reader may not see are different situations; sorting by a model-derived column is ranking a prediction, so the column carries the model, its version and the population it was validated in; and results that land are counted and held rather than merged, because a grid that reorders under a pointer is how somebody actions the row that used to be there.",
+    "rationale": "Every grid renders the six rows on screen and says nothing about the other 306. That is the defect, and it is not a missing feature — it is a claim the component makes and cannot support. A filtered caseload is a worse liar than a paginated one, because the filter was set by somebody at 07:00 who has since stopped seeing it, and the reader at 15:00 believes they are looking at the whole team's list. So coverage is required, the predicate prints as a sentence, and a total the source will not give is rendered as \"the source did not say\" rather than as the page size. Three further consequences follow from taking a worklist seriously as a safety surface: absence has five reasons and no em dash, because an assessment the client declined and a Part 2 record this reader may not see are different situations with different next actions; sorting by a model-derived column is ranking a prediction, so the column carries the model, its version and the population it was validated in; and results that land are counted and held rather than merged, because a grid that reorders under a pointer is how somebody actions the row that used to be there.",
     "categories": [
       "Clinical",
       "Data Display"
@@ -5414,22 +5414,22 @@ export const CATALOG: ComponentDoc[] = [
       {
         "name": "Bundle",
         "url": "https://hl7.org/fhir/R4/bundle.html",
-        "note": "Why `total` is `number | \"unknown\"`. `Bundle.total` is optional, the spec forbids constructing paging URLs, and some servers return only a `next` link — so \"24 of 1,438\" is a sentence a conformant server cannot always support."
+        "note": "Why `total` is `number | \"unknown\"`. `Bundle.total` is optional, the spec forbids constructing paging URLs, and some servers return only a `next` link — so \"6 of 312\" is a sentence a conformant server cannot always support."
       },
       {
         "name": "Observation",
         "url": "https://hl7.org/fhir/R4/observation.html",
-        "note": "The absence vocabulary is `dataAbsentReason` narrowed to the five distinctions a reader acts on differently."
+        "note": "The absence vocabulary is `dataAbsentReason` narrowed to the five distinctions a reader acts on differently. `asked-declined` is the one this domain cannot afford to lose: a client refusing a PHQ-9 is a clinical event, not a gap."
       },
       {
         "name": "Patient",
         "url": "https://hl7.org/fhir/R4/patient.html",
-        "note": "The subject of the identity line. A masked row produces a line that says \"restricted record\" and names nobody."
+        "note": "The subject of the identity line. A masked row produces a line that says \"restricted record\" and names nobody — which is what 42 CFR Part 2 requires of every surface that touches such a record."
       },
       {
         "name": "RiskAssessment",
         "url": "https://hl7.org/fhir/R4/riskassessment.html",
-        "note": "The shape a derived column usually carries. `prediction.probabilityDecimal` is the number; the derivation is what makes it safe to sort by."
+        "note": "The shape a derived column usually carries — here a disengagement risk. `prediction.probabilityDecimal` is the number; the derivation is what makes it safe to sort by at all."
       }
     ],
     "resource": "Bundle",
@@ -5686,7 +5686,7 @@ export const CATALOG: ComponentDoc[] = [
         ]
       }
     ],
-    "usage": "import { DataGrid, type DataGridColumn } from \"@/components/oxygen/data-grid\";\nimport \"@/styles/oxygen-grid.css\";\n\nconst columns: DataGridColumn<Row>[] = [\n  { key: \"name\", header: \"Patient\", kind: \"text\", value: (r) => r.name },\n  { key: \"mrn\", header: \"MRN\", kind: \"identifier\", value: (r) => r.mrn },\n  {\n    key: \"k\",\n    header: \"Potassium\",\n    kind: \"measure\",\n    // An absence is a value, not a hole. There is no null to pass here.\n    value: (r) => r.potassium ?? { absent: \"awaiting\" },\n  },\n  {\n    key: \"risk\",\n    header: \"Deterioration risk\",\n    kind: \"number\",\n    value: (r) => r.risk,\n    derived: {\n      model: \"early-warning\",\n      version: \"v2.4\",\n      validatedOn: \"12,410 med-surg admissions\",\n      population: \"adults only\",\n    },\n  },\n];\n\n<DataGrid\n  caption=\"Patients on 4-West with a potassium outside the reference range\"\n  title=\"Worklist · 4-West · potassium out of range\"\n  columns={columns}\n  rows={rows}\n  rowKey={(row) => row.mrn}\n  coverage={{\n    shown: rows.length,\n    total: cohortTotal,\n    noun: \"patients in the cohort\",\n    predicate: \"Unit is 4-West, and potassium outside the reference range in the last 24 hours.\",\n  }}\n  identify={(row) => ({ primary: row.name, secondary: `MRN ${row.mrn}` })}\n  arrivals={held}\n  onAdmitArrivals={admit}\n/>",
+    "usage": "import { DataGrid, type DataGridColumn } from \"@/components/oxygen/data-grid\";\nimport \"@/styles/oxygen-grid.css\";\n\nconst columns: DataGridColumn<Row>[] = [\n  { key: \"name\", header: \"Patient\", kind: \"text\", value: (r) => r.name },\n  { key: \"mrn\", header: \"MRN\", kind: \"identifier\", value: (r) => r.mrn },\n  {\n    key: \"phq9\",\n    header: \"PHQ-9\",\n    kind: \"measure\",\n    // An absence is a value, not a hole. There is no null to pass here.\n    value: (r) => r.phq9 ?? { absent: \"awaiting\" },\n  },\n  {\n    key: \"risk\",\n    header: \"Disengagement risk\",\n    kind: \"number\",\n    value: (r) => r.risk,\n    derived: {\n      model: \"disengagement\",\n      version: \"v1.8\",\n      validatedOn: \"9,140 outpatient episodes\",\n      population: \"adults, English-language intake only\",\n    },\n  },\n];\n\n<DataGrid\n  caption=\"Clients on this team's caseload with a raised PHQ-9 or a recent risk screen\"\n  title=\"Caseload · PHQ-9 raised or risk screened\"\n  columns={columns}\n  rows={rows}\n  rowKey={(row) => row.mrn}\n  coverage={{\n    shown: rows.length,\n    total: cohortTotal,\n    noun: \"clients on this team's caseload\",\n    predicate: \"PHQ-9 of 10 or more, or a risk screen in the last 14 days.\",\n  }}\n  identify={(row) => ({ primary: row.name, secondary: `MRN ${row.mrn}` })}\n  arrivals={held}\n  onAdmitArrivals={admit}\n/>",
     "guidance": {
       "use": [
         "For any list somebody will act from — a worklist, a queue, a cohort, a results review. The coverage line is what makes it safe to act from, and it is the reason to reach for this rather than a table.",
@@ -5710,7 +5710,7 @@ export const CATALOG: ComponentDoc[] = [
       },
       {
         "label": "aria-rowcount counts the cohort, not the page",
-        "detail": "A reader on row 4 of 24 in a cohort of 1,438 is told exactly that. Where the source will not give a total the attribute is -1, which is ARIA's \"not known\", rather than the page size dressed up as an answer."
+        "detail": "A reader on row 4 of 6 in a caseload of 312 is told exactly that. Where the source will not give a total the attribute is -1, which is ARIA's \"not known\", rather than the page size dressed up as an answer."
       },
       {
         "label": "Focus follows the row, not the row's position",
@@ -5777,9 +5777,9 @@ export const CATALOG: ComponentDoc[] = [
     ],
     "uxGuidelines": {
       "do": [
-        "Write `predicate` as a sentence somebody could read aloud on a handover: “Unit is 4-West, and potassium outside the reference range in the last 24 hours.”",
-        "Give `noun` the thing being counted — “patients in the cohort”, “orders awaiting review” — so the coverage line reads as a claim rather than as a row count.",
-        "Put the identifier in `identity.secondary`. A name is not an identifier, and two patients on one ward sharing a surname is in every study of this failure.",
+        "Write `predicate` as a sentence somebody could read aloud in supervision: “PHQ-9 of 10 or more, or a risk screen in the last 14 days.”",
+        "Give `noun` the thing being counted — “clients on this team's caseload”, “assessments awaiting review” — so the coverage line reads as a claim rather than as a row count.",
+        "Put the identifier in `identity.secondary`. A name is not an identifier, and two clients on one caseload sharing a surname is in every study of this failure.",
         "Set `kind` on every column. It decides alignment, whether digits are compared as a quantity, and whether the first click sorts worst-first.",
         "Use `footnote` for anything the header cannot say in two words — a unit, a reference range, a collection method — instead of widening the header."
       ],
@@ -5796,7 +5796,7 @@ export const CATALOG: ComponentDoc[] = [
         "healthcare",
         "behavioral-health"
       ],
-      "clinicalContext": "A worklist is the screen clinical work is dispatched from, so its two failure modes are structural rather than cosmetic: it can imply completeness it does not have, and it can move a row out from under an action. Coverage answers the first and held arrivals answer the second.",
+      "clinicalContext": "A caseload list is the screen behavioral health work is dispatched from, and it carries two structural failure modes: it can imply a completeness it does not have, and it can move a row out from under an action. Coverage answers the first and held arrivals the second. The third is specific to this field — 42 CFR Part 2 governs substance use records separately from the chart around them, so a grid that renders a withheld value and an unrecorded one identically is not merely unhelpful, it is wrong about which of them the reader is entitled to.",
       "workflows": [
         "assessment",
         "care-coordination",
@@ -5897,7 +5897,7 @@ export const CATALOG: ComponentDoc[] = [
         "wcag": "2.5.8",
         "name": "Target size (minimum)",
         "status": "pass",
-        "how": "The admit control takes the density target; header sort buttons take a 28px floor of their own, because a 10px column label given a 44px pointer target puts half an inch of nothing above every row. Both clear the 24px minimum.",
+        "how": "Header sort buttons take a 28px floor and the admit control 26px, rather than the 2.75rem density target — a pointer size for a thumb, and three times the height of the 10px labels inside them. Both clear the 24px minimum SC 2.5.8 asks for.",
         "evidence": "grid.css"
       }
     ],
@@ -5906,35 +5906,35 @@ export const CATALOG: ComponentDoc[] = [
         "id": "coverage",
         "title": "Coverage is arithmetic, not a footer note",
         "description": "The claim goes above the rows it is about, and a total the source will not give says so in words. Rendering the page size as the total is the one failure this type exists to prevent.",
-        "fixture": "wardPotassium",
-        "code": "describeGridCoverage({ shown: 24, total: 1438, noun: \"patients in the cohort\" });\n// → \"24 of 1,438 patients in the cohort.\"\n\ndescribeGridCoverage({ shown: 24, total: \"unknown\", noun: \"patients\" });\n// → \"24 patients shown. The source did not say how many match.\"\n\ngridUnseenCount({ shown: 24, total: 1438 });   // → 1414\ngridUnseenCount({ shown: 24, total: \"unknown\" }); // → null"
+        "fixture": "caseloadPhq9",
+        "code": "describeGridCoverage({ shown: 6, total: 312, noun: \"clients on this caseload\" });\n// → \"6 of 312 clients on this caseload.\"\n\ndescribeGridCoverage({ shown: 6, total: \"unknown\", noun: \"clients\" });\n// → \"6 clients shown. The source did not say how many match.\"\n\ngridUnseenCount({ shown: 6, total: 312 });     // → 306\ngridUnseenCount({ shown: 6, total: \"unknown\" }); // → null"
       },
       {
         "id": "absence",
         "title": "An absence sorts last, in both directions",
-        "description": "The load-bearing line in the engine. A potassium that has not come back is not a low potassium — sorting ascending and finding four “Awaiting” rows above the 3.2 tells the reader the sickest patient is fine.",
-        "fixture": "wardPotassium",
-        "code": "const k = { key: \"k\", header: \"Potassium\", kind: \"measure\",\n            value: (r) => r.potassium };\n\nsortGridRows(rows, k, \"ascending\").map((r) => r.potassium);\n// → [3.2, 4.1, 5.4, 6.8, { absent: \"awaiting\" }, { absent: \"restricted\" }]\n\nsortGridRows(rows, k, \"descending\").map((r) => r.potassium);\n// → [6.8, 5.4, 4.1, 3.2, { absent: \"awaiting\" }, { absent: \"restricted\" }]"
+        "description": "The load-bearing line in the engine. A PHQ-9 the client has not completed is not a PHQ-9 of zero — sorting ascending and finding four “Awaiting” rows above the score of 7 tells the reader the caseload is doing better than it is.",
+        "fixture": "caseloadPhq9",
+        "code": "const phq9 = { key: \"phq9\", header: \"PHQ-9\", kind: \"measure\",\n               value: (r) => r.phq9 };\n\nsortGridRows(rows, phq9, \"ascending\").map((r) => r.phq9);\n// → [7, 11, 18, 22, { absent: \"awaiting\" }, { absent: \"restricted\" }]\n\nsortGridRows(rows, phq9, \"descending\").map((r) => r.phq9);\n// → [22, 18, 11, 7, { absent: \"awaiting\" }, { absent: \"restricted\" }]"
       },
       {
         "id": "derived",
         "title": "Sorting by a model is ranking a prediction",
         "description": "The derivation travels with the column, so the footnote is generated rather than remembered. Sorting by it promotes that footnote to a statement under the table naming the model, its version and the population it was validated in.",
-        "fixture": "wardPotassium",
-        "code": "describeGridDerivation({\n  model: \"early-warning\",\n  version: \"v2.4\",\n  validatedOn: \"12,410 med-surg admissions\",\n  population: \"adults only\",\n});\n// → \"early-warning v2.4, validated on 12,410 med-surg admissions, adults only.\""
+        "fixture": "caseloadPhq9",
+        "code": "describeGridDerivation({\n  model: \"disengagement\",\n  version: \"v1.8\",\n  validatedOn: \"9,140 outpatient episodes\",\n  population: \"adults, English-language intake only\",\n});\n// → \"disengagement v1.8, validated on 9,140 outpatient episodes,\n//    adults, English-language intake only.\""
       },
       {
         "id": "arrivals",
         "title": "Results arrive; nothing moves",
         "description": "The grid counts what has landed and holds it. Merging is the reader's decision, taken with their hand on the pointer — which is the difference between a live grid and one that actioned the row that used to be there.",
-        "fixture": "wardPotassium",
+        "fixture": "caseloadPhq9",
         "code": "describeGridArrivals(3, \"11:47\");\n// → \"3 results arrived at 11:47 — nothing moved.\"\n\n<DataGrid arrivals={held} arrivalsAt=\"11:47\" onAdmitArrivals={admit} … />\n// The rows prop never changes until admit() is called."
       },
       {
         "id": "export",
         "title": "An export is an attack surface",
         "description": "A patient's preferred name is free text arriving from a registration desk. There is no option that turns this off, because the person who opens the file is rarely the person who chose the column.",
-        "fixture": "wardPotassium",
+        "fixture": "caseloadPhq9",
         "code": "neutraliseGridCell(\"=cmd|' /C calc'!A0\");   // → \"'=cmd|' /C calc'!A0\"\nneutraliseGridCell(\"＝HYPERLINK(...)\");      // → \"'＝HYPERLINK(...)\"  full-width too\nneutraliseGridCell(\"Ade-Smith\");             // → \"Ade-Smith\"        unchanged\n\ntoGridDelimited(rows, columns, { coverage });\n// Row 1 is the coverage sentence, because an export outlives its screen."
       },
       {
@@ -5946,7 +5946,7 @@ export const CATALOG: ComponentDoc[] = [
       }
     ],
     "fixtures": [
-      "wardPotassium",
+      "caseloadPhq9",
       "unknownTotal"
     ],
     "seo": {
