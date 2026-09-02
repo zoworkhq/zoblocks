@@ -54,20 +54,14 @@
    * these are alpha washes, and the alpha that reads as depth on near-black
    * reads as haze on paper. So they are tuned per ground rather than derived.
    */
-  --s-line: color-mix(in oklab, var(--site-oxygen) 8%, transparent);
   --s-bloom: color-mix(in oklab, var(--site-oxygen) 9%, transparent);
-  --s-top-wash: transparent;
   --s-sweep: color-mix(in oklab, var(--site-oxygen) 5%, transparent);
   --s-card: color-mix(in oklab, var(--site-paper) 62%, transparent);
   --s-ramp-opacity: 0.26;
 }
 
 .dark .soon {
-  --s-line: rgb(45 212 176 / 0.055);
   --s-bloom: rgb(45 212 176 / 0.09);
-  /* The dark stage needs a wash at the top to lift its head off the header;
-     paper is already the lightest thing on screen and only muddies. */
-  --s-top-wash: rgb(28 58 51 / 0.5);
   --s-sweep: rgb(45 212 176 / 0.07);
   --s-card: rgb(255 255 255 / 0.018);
   --s-ramp-opacity: 0.3;
@@ -82,7 +76,6 @@
  */
 [data-ox-theme="high-contrast"] .soon .soonGlow,
 [data-ox-theme="high-contrast"] .soon .soonRamp,
-[data-ox-theme="high-contrast"] .soon .soonGridPaper,
 [data-ox-theme="high-contrast"] .soon .soonSweep {
   display: none;
 }
@@ -100,9 +93,18 @@
   display: grid;
   align-items: center;
   padding: clamp(3.5rem, 9vh, 7rem) 1.25rem clamp(4.5rem, 11vh, 8rem);
-  background:
-    radial-gradient(120% 90% at 50% 0%, var(--s-top-wash) 0%, transparent 58%),
-    linear-gradient(180deg, var(--s-ground) 0%, var(--s-ground-2) 100%);
+  /*
+   * The first band is the whole trick: the stage opens on exactly the colour
+   * the header sits on and only then drifts into its own ground, so the two
+   * meet as a dissolve rather than as an edge. It used to open on a tinted
+   * wash, which put a hard horizontal seam directly under the menu.
+   */
+  background: linear-gradient(
+    180deg,
+    var(--site-paper) 0%,
+    var(--s-ground) 18%,
+    var(--s-ground-2) 100%
+  );
   color: var(--s-fg);
   border-bottom: 1px solid var(--site-rule);
 }
@@ -110,18 +112,6 @@
   .soon .soonStage {
     padding-inline: 2rem;
   }
-}
-
-/* Grid paper. The console's own background, at page scale. */
-.soon .soonGridPaper {
-  position: absolute;
-  inset: 0;
-  z-index: -3;
-  background-image:
-    linear-gradient(to right, var(--s-line) 1px, transparent 1px),
-    linear-gradient(to bottom, var(--s-line) 1px, transparent 1px);
-  background-size: 44px 44px;
-  mask-image: radial-gradient(80% 70% at 50% 42%, #000 0%, transparent 82%);
 }
 
 .soon .soonGlow {
@@ -319,6 +309,7 @@
   width: 1.25rem;
   height: 1.25rem;
   margin-top: 0.2rem;
+  position: relative;
   display: grid;
   place-items: center;
   color: var(--s-mark);
@@ -418,27 +409,106 @@
     }
   }
 
-  /* The three settled steps tick over in sequence, then hold. */
-  .soon .soonStep:nth-child(1) .soonDot {
-    animation: soon-tick 7s var(--s-ease) 1.2s infinite;
+  /*
+   * The pipeline runs, once per cycle.
+   *
+   * What was here before cycled each settled dot from muted to accent and back
+   * — which meant a step that is *done* rendered as *not done* for part of
+   * every loop, and a screenshot caught exactly that: `Eleven steps` grey
+   * between two green neighbours, saying the opposite of what it means. State
+   * is not a thing to animate. It is the one thing on this page that must hold
+   * still.
+   *
+   * So the motion is a signal travelling the rail instead. A pulse glides down
+   * each settled segment, each dot throws a ring as the pulse reaches it, and
+   * the run stops dead at the dashed gap — because that segment has not been
+   * travelled. Nothing dims, nothing changes state, and the stop is the point.
+   */
+  .soon .soonStep {
+    animation: soon-step-in 700ms var(--s-ease) both;
+    animation-delay: calc(320ms + var(--n, 0) * 80ms);
   }
-  .soon .soonStep:nth-child(2) .soonDot {
-    animation: soon-tick 7s var(--s-ease) 1.8s infinite;
-  }
-  .soon .soonStep:nth-child(3) .soonDot {
-    animation: soon-tick 7s var(--s-ease) 2.4s infinite;
-  }
-  @keyframes soon-tick {
-    0%,
-    4% {
-      color: var(--s-muted);
+  @keyframes soon-step-in {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+      filter: blur(4px);
     }
-    10%,
-    92% {
-      color: var(--s-mark);
+  }
+
+  /* The pulse. Only on segments the signal actually crosses — never the
+     dashed one, whose emptiness is carrying the meaning. */
+  .soon .soonStep:not(:last-child):not(:has(+ [data-pending]))::after {
+    content: "";
+    position: absolute;
+    left: 0.625rem;
+    top: 1.5rem;
+    bottom: 0.25rem;
+    width: 1px;
+    background-image: linear-gradient(to bottom, transparent, var(--s-mark), transparent);
+    background-size: 100% 46%;
+    background-repeat: no-repeat;
+    background-position-y: 0%;
+    opacity: 0;
+    animation: soon-signal 6s linear infinite;
+  }
+  .soon .soonStep:nth-child(1)::after {
+    animation-delay: 0.5s;
+  }
+  .soon .soonStep:nth-child(2)::after {
+    animation-delay: 1.2s;
+  }
+  @keyframes soon-signal {
+    0% {
+      background-position-y: 0%;
+      opacity: 0;
     }
+    2% {
+      opacity: 1;
+    }
+    10% {
+      background-position-y: 100%;
+      opacity: 1;
+    }
+    13%,
     100% {
-      color: var(--s-muted);
+      background-position-y: 100%;
+      opacity: 0;
+    }
+  }
+
+  /* The ring each settled dot throws as the pulse arrives. */
+  .soon .soonStep:not([data-pending]) .soonDot::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0.55rem;
+    height: 0.55rem;
+    border-radius: 999px;
+    border: 1.5px solid var(--s-mark);
+    translate: -50% -50%;
+    opacity: 0;
+    animation: soon-ping 6s var(--s-ease) infinite;
+  }
+  .soon .soonStep:nth-child(1) .soonDot::after {
+    animation-delay: 0.45s;
+  }
+  .soon .soonStep:nth-child(2) .soonDot::after {
+    animation-delay: 1.15s;
+  }
+  .soon .soonStep:nth-child(3) .soonDot::after {
+    animation-delay: 1.85s;
+  }
+  @keyframes soon-ping {
+    0% {
+      opacity: 0.7;
+      scale: 0.7;
+    }
+    14%,
+    100% {
+      opacity: 0;
+      scale: 3;
     }
   }
 
