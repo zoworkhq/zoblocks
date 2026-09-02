@@ -31,6 +31,8 @@ import { Tabs } from "@oxygenui-design/tabs";
 import { Calendar } from "@/registry/oxygen/date-picker/date-picker";
 import { plainDate } from "@/lib/oxygen-datetime";
 import { cn } from "@/lib/utils";
+import { PatientPortrait } from "@/components/site/patient-portrait";
+import { facesFor } from "@/lib/faces";
 import {
   ChartContextMenu,
   type ChartMenuAction,
@@ -99,6 +101,14 @@ const WORKLIST: readonly (MenuSubject & { at: string })[] = [
     at: "11:30",
   },
 ];
+
+/*
+ * One face each, from the cohort the worklist grid further up this page draws
+ * from. A right-click menu whose header claims to be about *this patient* is
+ * a weaker claim above three rows that are only text, and the grid two
+ * sections above already establishes what a patient row looks like here.
+ */
+const WORKLIST_FACE = facesFor(WORKLIST.map((person) => person.label));
 
 const WORKLIST_ACTIONS: readonly ChartMenuAction[] = [
   { id: "open", label: "Open chart", tier: "routine", shortcut: "↵" },
@@ -290,6 +300,7 @@ function ContextMenuDemo() {
                   index > 0 ? "border-t border-rule" : ""
                 } ${active === index ? "bg-paper-sunk" : ""}`}
               >
+                <PatientPortrait src={WORKLIST_FACE(person.label)} size={32} />
                 <span className="min-w-0 flex-1">
                   <span className="block truncate text-sm font-medium text-ink">
                     {person.label}

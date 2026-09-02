@@ -32,7 +32,12 @@ export function PatientPortrait({ src, size = 22 }: { src: string; size?: number
       alt=""
       width={size}
       height={size}
-      className="flex-none rounded-full object-cover ring-1 ring-black/15"
+      /* `max-w-none`: preflight caps every `img` at `max-width: 100%`, so a
+         fixed-size portrait collapses to nothing inside a container narrower
+         than itself — a fit-to-width block frame, a flex row mid-layout. The
+         inline width below is the size, and nothing should be allowed to
+         reinterpret it as a maximum. */
+      className="max-w-none flex-none rounded-full object-cover ring-1 ring-black/15"
       style={{ width: size, height: size }}
     />
   );
