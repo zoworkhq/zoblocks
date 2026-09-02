@@ -14,9 +14,21 @@ import { SiteFooter, SiteHeader } from "@/components/site/chrome";
  *
  * So the page keeps its own argument and holds it one step short. The gate's
  * four steps are the console's real pipeline; three tick over in sequence and
- * `Publish` stays a hollow ring. Done and pending are two *shapes* rather than
- * two colours, so the state survives a greyscale print and a red-green
- * deficiency — the same rule the components are held to.
+ * `Publish` stays an open ring on a dashed rail. Done and pending are two
+ * *shapes* rather than two colours, so the state survives a greyscale print
+ * and a red-green deficiency — the same rule the components are held to.
+ *
+ * ## Why the stage is full-bleed
+ *
+ * The first build was a dark card centred on the light page with a blurred
+ * copy of the old hero behind it. At 1280px that read as an overlay. At
+ * 1920px it read as a bug: the blurred material sat on the left only, because
+ * a left-aligned hero has nothing on its right, and the card floated in white
+ * with a smudge beside it. An overlay only reads as one when something sits
+ * behind it *everywhere*.
+ *
+ * So the stage is the overlay now — edge to edge, at any width, with the
+ * console's own output out of focus along the bottom. Nothing to go lopsided.
  *
  * The page it replaces is still here, whole, in `console-page.tsx`.
  */
@@ -31,12 +43,41 @@ export const metadata: Metadata = {
 const HEADLINE = "Coming soon";
 
 /** The console's real pipeline. Only the last one is outstanding. */
-const STEPS: { step: string; label: string; pending?: boolean }[] = [
-  { step: "01", label: "Brand colour" },
-  { step: "02", label: "Eleven steps" },
-  { step: "03", label: "Contrast gate" },
-  { step: "04", label: "Publish", pending: true },
+const STEPS: { step: string; label: string; note: string; pending?: boolean }[] = [
+  { step: "01", label: "Brand colour", note: "one hex, from you" },
+  { step: "02", label: "Eleven steps", note: "generated, not guessed" },
+  { step: "03", label: "Contrast gate", note: "every pair checked" },
+  { step: "04", label: "Publish", note: "held for the next release", pending: true },
 ];
+
+/**
+ * The eleven steps the console emits from one hue — its output, blurred along
+ * the bottom of the stage.
+ *
+ * Mirrored, and that is the whole point. Laid out in its natural order the
+ * ramp runs light to dark across the viewport, and once blurred that is a
+ * band bright on the left and black on the right — the exact lopsidedness the
+ * full-bleed stage exists to avoid. Reflected about its darkest step it reads
+ * as a centred bloom instead, symmetric at any width.
+ *
+ * Hard-coded rather than computed: a decorative band that changes between
+ * renders is a visual-regression failure waiting to happen, and ADR 0007 is
+ * explicit that VRT must be deterministic.
+ */
+const RAMP_STEPS = [
+  "#eafaf5",
+  "#c6f1e5",
+  "#9be7d4",
+  "#6cdcc1",
+  "#3fd0ad",
+  "#10b995",
+  "#0d9c7e",
+  "#0a7f67",
+  "#086651",
+  "#064e3e",
+  "#04372c",
+];
+const RAMP = [...RAMP_STEPS].reverse().concat(RAMP_STEPS.slice(1));
 
 /*
  * No waitlist exists to post to, and a field that swallows an address is worse
@@ -52,37 +93,22 @@ export default function ProPage() {
       <SiteHeader />
 
       <main id="main" className="soon">
-        <section className="soonFrame">
-          {/*
-            The page underneath, out of focus. Decoration — it carries no
-            information the reader is expected to recover, so it is hidden
-            from the accessibility tree rather than read out blurred.
-          */}
-          <div className="soonBehind" aria-hidden="true">
-            <div className="soonBehindInner">
-              <p className="eyebrow text-oxygen-deep">Oxygen Pro</p>
-              <p className="soonBehindHead">
-                Your brand, through a gate that will not let it fail.
-              </p>
-              <p className="soonBehindBody">
-                A theming console for behavioral health. Set one brand colour, get eleven validated
-                steps. Publish only what passes contrast.
-              </p>
-              <div className="soonBehindBtns">
-                <span />
-                <span />
-              </div>
-            </div>
+        <section className="soonStage">
+          {/* Texture, in three layers, none of it carrying information. */}
+          <div className="soonGridPaper" aria-hidden="true" />
+          <div className="soonGlow" aria-hidden="true" />
+          <div className="soonRamp" aria-hidden="true">
+            {RAMP.map((c, i) => (
+              <span key={`${c}${i}`} style={{ ["--c" as string]: c }} />
+            ))}
           </div>
-          <div className="soonScrim" aria-hidden="true" />
+          {/* The validation sweep, crossing the stage the way it crosses a theme. */}
+          <div className="soonSweep" aria-hidden="true">
+            <i />
+          </div>
 
-          <div className="soonStack">
-            <div className="soonPanel">
-              {/* The validation sweep, crossing the panel the way it crosses a theme. */}
-              <div className="soonSweep" aria-hidden="true">
-                <i />
-              </div>
-
+          <div className="soonInner">
+            <div className="soonSay">
               <p className="eyebrow eyebrow-rule soonEyebrow">Oxygen Pro</p>
               {/*
                 One span per letter is what staggers the entrance, and eleven
@@ -111,21 +137,9 @@ export default function ProPage() {
                 </span>
               </h1>
               <p className="soonLede">
-                Built, gated, and not in the first release. The open components are.
+                The theming console is built and the gate works. It is not in the first release —
+                the 27 open components are.
               </p>
-
-              <ol className="soonGate">
-                {STEPS.map(({ step, label, pending }) => (
-                  <li key={step} className="soonStep" {...(pending ? { "data-pending": "" } : {})}>
-                    <span className="soonStepK">Step {step}</span>
-                    <span className="soonStepV">
-                      <i className="soonDot" aria-hidden="true" />
-                      {label}
-                      <span className="sr-only">{pending ? " — not yet" : " — done"}</span>
-                    </span>
-                  </li>
-                ))}
-              </ol>
 
               <div className="soonActions">
                 <a href={NOTIFY_HREF} className="soonCta">
@@ -138,6 +152,25 @@ export default function ProPage() {
               </div>
               <p className="soonNote">Free · no card · the components ship today</p>
             </div>
+
+            {/*
+              The pipeline, read top to bottom. The rail into `Publish` is
+              dashed because that segment has not been travelled — the one
+              piece of state the page exists to communicate.
+            */}
+            <ol className="soonGate">
+              {STEPS.map(({ step, label, note, pending }) => (
+                <li key={step} className="soonStep" {...(pending ? { "data-pending": "" } : {})}>
+                  <i className="soonDot" aria-hidden="true" />
+                  <span className="soonStepK">Step {step}</span>
+                  <span className="soonStepV">
+                    {label}
+                    <span className="sr-only">{pending ? " — not yet" : " — done"}</span>
+                  </span>
+                  <span className="soonStepN">{note}</span>
+                </li>
+              ))}
+            </ol>
           </div>
         </section>
       </main>
