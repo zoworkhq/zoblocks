@@ -1,0 +1,104 @@
+{
+  "name": "@oxygenui-design/host-react",
+  "version": "0.1.0",
+  "description": "The host primitives an application is built from — Button, Input, Switch, Checkbox, Select, Tabs — resolved from whichever UI framework the host runs, so one demo source renders under Ant Design, Material UI, or neither.",
+  "license": "MIT",
+  "homepage": "https://oxygenui.design",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zoworkhq/oxygenui.git",
+    "directory": "packages/host-react"
+  },
+  "keywords": [
+    "ant-design",
+    "material-ui",
+    "mui",
+    "design-system",
+    "react",
+    "healthcare"
+  ],
+  "type": "module",
+  "sideEffects": [
+    "*.css"
+  ],
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./antd": "./src/antd.tsx",
+    "./mui": "./src/mui.tsx",
+    "./host.css": "./src/host.css",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "src",
+    "!src/**/*.test.ts",
+    "!src/**/*.test.tsx"
+  ],
+  "engines": {
+    "node": ">=20.11.0"
+  },
+  "publishConfig": {
+    "access": "public",
+    "main": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "exports": {
+      ".": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "./antd": {
+        "types": "./dist/antd.d.ts",
+        "default": "./dist/antd.js"
+      },
+      "./mui": {
+        "types": "./dist/mui.d.ts",
+        "default": "./dist/mui.js"
+      },
+      "./host.css": "./dist/host.css",
+      "./package.json": "./package.json"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json && cp src/host.css dist/host.css",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage"
+  },
+  "dependencies": {
+    "@oxygenui-design/bridge-antd": "workspace:*",
+    "@oxygenui-design/bridge-core": "workspace:*",
+    "@oxygenui-design/bridge-mui": "workspace:*"
+  },
+  "peerDependencies": {
+    "@mui/material": "^9.0.0",
+    "antd": "^6.0.0",
+    "react": "^18.2.0 || ^19.0.0"
+  },
+  "peerDependenciesMeta": {
+    "antd": {
+      "optional": true
+    },
+    "@mui/material": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.0",
+    "@mui/material": "^9.3.1",
+    "@oxygenui-design/tsconfig": "workspace:*",
+    "@testing-library/react": "^16",
+    "@testing-library/user-event": "^14",
+    "@types/react": "^19.0.2",
+    "@types/react-dom": "^19.0.2",
+    "@vitest/coverage-v8": "^4.1.10",
+    "antd": "^6.6.0",
+    "jsdom": "^30",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "typescript": "^5.7.2",
+    "vitest": "^4.1.10"
+  }
+}

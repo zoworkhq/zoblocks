@@ -17,6 +17,7 @@
 import * as React from "react";
 import { ConfigProvider, Form, theme } from "antd";
 import { useSiteTheme } from "./use-site-theme";
+import { useAntdBrandTokens } from "./language-antd-theme";
 import {
   Signature,
   SignatureManifest,
@@ -155,6 +156,11 @@ export function SignatureDemo() {
   const dark = override ?? siteDark;
   const setDark = (next: (previous: boolean) => boolean) => setOverride(next(dark));
 
+  // Signature wraps antd, so the framework switch cannot change what it is
+  // made of — only what it is wearing. Under "Ant Design" this resolves to
+  // nothing at all, which is how the reader sees antd's real default blue.
+  const brand = useAntdBrandTokens(dark);
+
   const current = SCENARIOS.find((s) => s.id === scenario) ?? SCENARIOS[0]!;
   const shown = FIXED[scenario] ?? value;
 
@@ -234,21 +240,25 @@ export function SignatureDemo() {
         style={dark ? { colorScheme: "dark" } : undefined}
       >
         {/*
-          The accent comes from Oxygen, not from Ant Design.
+          The accent follows the design language, and used to be pinned to
+          Oxygen's.
 
-          With only the algorithm set, the primary button was antd's default
-          #1677ff with white on it — 4.1:1, an AA failure, and on the one page
-          in the docs that renders antd. It was also the wrong demo: a reader
-          looking at Oxygen's signature control should see Oxygen's accent.
-          `colorTextLightSolid` has to move with it, because the dark accent is
-          a light teal and white on it would be worse than what it replaced.
+          Pinning it was right while Oxygen was the only language: with only
+          the algorithm set, the primary button was antd's #1677ff with white
+          on it — 4.10:1, an AA failure on the one page in the docs that
+          renders antd — and a reader looking at Oxygen's signature control
+          should see Oxygen's accent. It became wrong the moment the switcher
+          shipped, because this was then the one panel on the page that ignored
+          it.
+
+          Under "Ant Design" the override is empty on purpose, so the 4.10:1
+          default is exactly what a reader sees. That is antd's number to own,
+          and showing it is the honest version of the demo.
         */}
         <ConfigProvider
           theme={{
             algorithm: dark ? theme.darkAlgorithm : theme.defaultAlgorithm,
-            token: dark
-              ? { colorPrimary: "#6ce7cb", colorTextLightSolid: "#071014" }
-              : { colorPrimary: "#067662", colorTextLightSolid: "#ffffff" },
+            token: brand,
           }}
         >
           <Form layout="vertical" style={{ maxWidth: 560, margin: "0 auto" }}>

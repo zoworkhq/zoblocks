@@ -1,0 +1,319 @@
+/**
+ * Oxygen's reference host chrome.
+ *
+ * Structure and geometry only — every colour, radius, duration and easing is
+ * read from `--ox-*`, so these controls restyle under a bridge exactly as a
+ * clinical component does. That is what makes the Oxygen state in the
+ * framework switcher worth having: it is not "antd with our palette", it is
+ * our own geometry wearing whatever tokens are in scope.
+ *
+ * Fallbacks are given on every `var()` because these may be mounted in a page
+ * that has not loaded `oxygen-tokens.css` — an unstyled button is a worse
+ * failure than a slightly wrong one.
+ */
+
+/* ---------------------------------------------------------------- */
+/* Button                                                            */
+/* ---------------------------------------------------------------- */
+
+.ox-host-btn {
+  --ox-host-btn-h: 2.25rem;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  min-block-size: var(--ox-host-btn-h);
+  padding-inline: 0.95rem;
+  border: 1px solid transparent;
+  border-radius: var(--ox-radius, 0.5rem);
+  font-family: var(--ox-font-sans, inherit);
+  font-size: var(--ox-text-base, 0.875rem);
+  font-weight: 500;
+  line-height: 1.2;
+  cursor: pointer;
+  white-space: nowrap;
+  background: var(--ox-accent, #067662);
+  color: var(--ox-text-on-accent, #ffffff);
+  transition:
+    background-color var(--ox-duration, 180ms) var(--ox-ease, ease),
+    border-color var(--ox-duration, 180ms) var(--ox-ease, ease),
+    color var(--ox-duration, 180ms) var(--ox-ease, ease);
+}
+
+.ox-host-btn[data-ox-host-size="small"] {
+  --ox-host-btn-h: 1.75rem;
+  padding-inline: 0.65rem;
+  font-size: var(--ox-text-sm, 0.8125rem);
+}
+
+.ox-host-btn[data-ox-host-size="large"] {
+  --ox-host-btn-h: 2.75rem;
+  padding-inline: 1.25rem;
+}
+
+.ox-host-btn:hover:not(:disabled) {
+  background: var(--ox-accent-hover, #0a5d4f);
+}
+
+/* `default` is the outlined one, matching antd's vocabulary. */
+.ox-host-btn[data-ox-host-variant="default"] {
+  background: var(--ox-surface, #ffffff);
+  color: var(--ox-text, #0f172a);
+  border-color: var(--ox-border-strong, #64748b);
+}
+
+.ox-host-btn[data-ox-host-variant="default"]:hover:not(:disabled) {
+  background: var(--ox-surface, #ffffff);
+  color: var(--ox-accent, #067662);
+  border-color: var(--ox-accent, #067662);
+}
+
+.ox-host-btn[data-ox-host-variant="text"] {
+  background: transparent;
+  color: var(--ox-text, #0f172a);
+  border-color: transparent;
+}
+
+.ox-host-btn[data-ox-host-variant="text"]:hover:not(:disabled) {
+  background: var(--ox-bg-muted, #f1f5f9);
+}
+
+.ox-host-btn[data-ox-host-danger] {
+  background: var(--ox-status-critical, #b91c1c);
+  color: #ffffff;
+  border-color: transparent;
+}
+
+.ox-host-btn[data-ox-host-danger][data-ox-host-variant="default"],
+.ox-host-btn[data-ox-host-danger][data-ox-host-variant="text"] {
+  background: transparent;
+  color: var(--ox-status-critical, #b91c1c);
+  border-color: currentColor;
+}
+
+.ox-host-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+/* ---------------------------------------------------------------- */
+/* Field — input and select share the shell                          */
+/* ---------------------------------------------------------------- */
+
+.ox-host-field {
+  --ox-host-field-h: 2.25rem;
+
+  display: inline-flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-inline-size: 0;
+}
+
+.ox-host-field[data-ox-host-size="small"] {
+  --ox-host-field-h: 1.75rem;
+}
+.ox-host-field[data-ox-host-size="large"] {
+  --ox-host-field-h: 2.75rem;
+}
+
+.ox-host-field__label {
+  font-family: var(--ox-font-sans, inherit);
+  font-size: var(--ox-text-xs, 0.75rem);
+  line-height: 1.2;
+  color: var(--ox-text-muted, #475569);
+}
+
+.ox-host-field__input {
+  inline-size: 100%;
+  min-block-size: var(--ox-host-field-h);
+  padding-inline: 0.7rem;
+  border: 1px solid var(--ox-border-strong, #64748b);
+  border-radius: var(--ox-radius, 0.5rem);
+  background: var(--ox-surface, #ffffff);
+  color: var(--ox-text, #0f172a);
+  font-family: var(--ox-font-sans, inherit);
+  font-size: var(--ox-text-base, 0.875rem);
+  transition: border-color var(--ox-duration, 180ms) var(--ox-ease, ease);
+}
+
+.ox-host-field__input::placeholder {
+  color: var(--ox-text-subtle, #64748b);
+}
+
+.ox-host-field__input:hover:not(:disabled) {
+  border-color: var(--ox-accent, #067662);
+}
+
+.ox-host-field__input[data-ox-host-status="error"] {
+  border-color: var(--ox-status-critical, #b91c1c);
+}
+.ox-host-field__input[data-ox-host-status="warning"] {
+  border-color: var(--ox-status-high, #b45309);
+}
+
+.ox-host-field__input:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.ox-host-select {
+  appearance: none;
+  padding-inline-end: 1.9rem;
+  cursor: pointer;
+  /* The chevron is drawn rather than imported: one gradient pair costs nothing
+     and keeps this stylesheet free of an asset the consumer has to host. */
+  background-image:
+    linear-gradient(45deg, transparent 50%, currentColor 50%),
+    linear-gradient(135deg, currentColor 50%, transparent 50%);
+  background-position:
+    calc(100% - 1.05rem) 55%,
+    calc(100% - 0.75rem) 55%;
+  background-size:
+    0.3rem 0.3rem,
+    0.3rem 0.3rem;
+  background-repeat: no-repeat;
+}
+
+/* ---------------------------------------------------------------- */
+/* Switch                                                            */
+/* ---------------------------------------------------------------- */
+
+.ox-host-switch {
+  --ox-host-switch-w: 2.5rem;
+  --ox-host-switch-h: 1.4rem;
+
+  display: inline-flex;
+  align-items: center;
+  flex: none;
+  inline-size: var(--ox-host-switch-w);
+  block-size: var(--ox-host-switch-h);
+  padding: 2px;
+  border: 0;
+  border-radius: 999px;
+  cursor: pointer;
+  background: var(--ox-border-strong, #64748b);
+  transition: background-color var(--ox-duration, 180ms) var(--ox-ease, ease);
+}
+
+.ox-host-switch[data-ox-host-size="small"] {
+  --ox-host-switch-w: 1.9rem;
+  --ox-host-switch-h: 1.1rem;
+}
+
+.ox-host-switch[aria-checked="true"] {
+  background: var(--ox-accent, #067662);
+}
+
+.ox-host-switch__thumb {
+  display: block;
+  inline-size: calc(var(--ox-host-switch-h) - 6px);
+  block-size: calc(var(--ox-host-switch-h) - 6px);
+  border-radius: 50%;
+  background: #ffffff;
+  transition: transform var(--ox-duration, 180ms) var(--ox-ease, ease);
+}
+
+.ox-host-switch[aria-checked="true"] .ox-host-switch__thumb {
+  transform: translateX(calc(var(--ox-host-switch-w) - var(--ox-host-switch-h)));
+}
+
+.ox-host-switch:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+/* ---------------------------------------------------------------- */
+/* Checkbox                                                          */
+/* ---------------------------------------------------------------- */
+
+.ox-host-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--ox-font-sans, inherit);
+  font-size: var(--ox-text-base, 0.875rem);
+  color: var(--ox-text, #0f172a);
+  cursor: pointer;
+}
+
+.ox-host-check input {
+  inline-size: 1rem;
+  block-size: 1rem;
+  margin: 0;
+  accent-color: var(--ox-accent, #067662);
+  cursor: pointer;
+}
+
+/* ---------------------------------------------------------------- */
+/* Tabs                                                              */
+/* ---------------------------------------------------------------- */
+
+.ox-host-tabs__strip {
+  display: flex;
+  gap: 0.25rem;
+  border-block-end: 1px solid var(--ox-border, #e2e8f0);
+}
+
+.ox-host-tabs__tab {
+  padding: 0.5rem 0.85rem;
+  border: 0;
+  border-block-end: 2px solid transparent;
+  margin-block-end: -1px;
+  background: none;
+  font-family: var(--ox-font-sans, inherit);
+  font-size: var(--ox-text-base, 0.875rem);
+  font-weight: 500;
+  color: var(--ox-text-muted, #475569);
+  cursor: pointer;
+  transition: color var(--ox-duration, 180ms) var(--ox-ease, ease);
+}
+
+.ox-host-tabs__tab:hover:not(:disabled) {
+  color: var(--ox-text, #0f172a);
+}
+
+.ox-host-tabs__tab[aria-selected="true"] {
+  color: var(--ox-accent, #067662);
+  border-block-end-color: var(--ox-accent, #067662);
+}
+
+.ox-host-tabs__tab:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.ox-host-tabs__panel {
+  padding-block-start: 1rem;
+}
+
+/* ---------------------------------------------------------------- */
+/* Focus                                                             */
+/* ---------------------------------------------------------------- */
+
+/*
+ * One rule for every control, and deliberately unlayered.
+ *
+ * Tailwind v4 puts its utilities in a cascade layer, so an unlayered rule here
+ * wins over any `focus-visible:` utility a consumer might add — which is what
+ * we want: the focus indicator for these controls is decided here, once, and
+ * cannot be half-overridden into invisibility.
+ */
+.ox-host-btn:focus-visible,
+.ox-host-field__input:focus-visible,
+.ox-host-switch:focus-visible,
+.ox-host-check input:focus-visible,
+.ox-host-tabs__tab:focus-visible {
+  outline: 2px solid var(--ox-focus-ring, #059478);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ox-host-btn,
+  .ox-host-field__input,
+  .ox-host-switch,
+  .ox-host-switch__thumb,
+  .ox-host-tabs__tab {
+    transition-duration: 1ms;
+  }
+}

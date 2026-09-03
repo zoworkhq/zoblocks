@@ -88,6 +88,35 @@ module.exports = {
       },
     },
     {
+      name: "host-react-stays-at-composition",
+      severity: "error",
+      comment:
+        "ADR 0010 keeps Oxygen's primitives at Ant Design's API and free of any dependency on it, which is what preserves copy-as-source distribution for the whole form family (ADR 0002). `@oxygenui-design/host-react` imports antd and MUI behind its subpath exports; the moment a component or a registry item reaches it, both frameworks enter the graph of everything downstream and that channel closes. It belongs to composition — apps and demos — and nothing below.",
+      from: {
+        path: "^(packages/(?!host-react)[^/]+/src|registry)/",
+      },
+      to: {
+        /*
+         * Two spellings, because only one of them is a file path.
+         *
+         * `registry/` is not inside any package, so `@oxygenui-design/host-react`
+         * does not resolve from there at all — dependency-cruiser reports the
+         * bare specifier with `dependencyTypes: ["unknown"]`, and a rule matching
+         * only `^packages/host-react/` silently never fires. That was the first
+         * version of this rule, and it passed a deliberate violation.
+         */
+        path: "^packages/host-react/|^@oxygenui-design/host-react($|/)",
+      },
+    },
+    {
+      name: "no-framework-in-oxygen-host",
+      severity: "error",
+      comment:
+        "The Oxygen host is the switch's third state and its whole claim is that it is ours: structure of our own, drawn from `--ox-*`. A framework import here would make it antd or MUI wearing our colours, and the switcher would be comparing two things that were the same thing.",
+      from: { path: "^packages/host-react/src/(primitives-oxygen|contract|context|index)\\." },
+      to: { path: "node_modules/(antd|@mui|@ant-design)/" },
+    },
+    {
       name: "no-dev-dep-in-shipped-source",
       severity: "error",
       comment:

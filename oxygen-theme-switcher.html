@@ -1,0 +1,872 @@
+<title>The Framework Switch</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&family=Roboto:wght@400;500&display=swap">
+
+<style>
+/* ---------------------------------------------------------------
+   Palette taken from packages/tokens — this page is about Oxygen,
+   so it is drawn in Oxygen's own values rather than invented ones.
+   --------------------------------------------------------------- */
+:root {
+  --ink: #0f172a;
+  --ink-muted: #475569;
+  --ink-subtle: #64748b;
+  --paper: #ffffff;
+  --sunk: #f8fafc;
+  --rule: #e2e8f0;
+  --rule-soft: #eef2f6;
+  --accent: #067662;
+  --accent-soft: #ecfdf8;
+  --bad: #b91c1c;
+  --bad-soft: #fef2f2;
+  --warn: #b45309;
+  --warn-soft: #fffbeb;
+
+  /* The instrument bezel is dark in both themes. That is the point of it. */
+  --panel: #0d1520;
+  --panel-2: #111c28;
+  --panel-fg: #e8eef5;
+  --panel-muted: #8fa2b5;
+  --panel-rule: #23303f;
+
+  --mark-oxygen: #067662;
+  --mark-antd: #1677ff;
+  --mark-mui: #007fff;
+
+  --sans: "Instrument Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  --measure: 40rem;
+  --wide: 74rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ink: #edf2f7; --ink-muted: #a5b1be; --ink-subtle: #82909f;
+    --paper: #0a0d12; --sunk: #11161d; --rule: #29333f; --rule-soft: #1c242e;
+    --accent: #6ce7cb; --accent-soft: #0f2a25;
+    --bad: #fb7185; --bad-soft: #2a1216;
+    --warn: #fbbf24; --warn-soft: #2a1f0c;
+    --mark-oxygen: #6ce7cb; --mark-antd: #69b1ff; --mark-mui: #66b2ff;
+  }
+}
+:root[data-theme="dark"] {
+  --ink: #edf2f7; --ink-muted: #a5b1be; --ink-subtle: #82909f;
+  --paper: #0a0d12; --sunk: #11161d; --rule: #29333f; --rule-soft: #1c242e;
+  --accent: #6ce7cb; --accent-soft: #0f2a25;
+  --bad: #fb7185; --bad-soft: #2a1216;
+  --warn: #fbbf24; --warn-soft: #2a1f0c;
+  --mark-oxygen: #6ce7cb; --mark-antd: #69b1ff; --mark-mui: #66b2ff;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0; background: var(--paper); color: var(--ink);
+  font-family: var(--sans); font-size: 16px; line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+.shell { max-width: var(--wide); margin: 0 auto; padding: 0 1.25rem 6rem; }
+.col { max-width: var(--measure); }
+
+h1, h2, h3, h4 { text-wrap: balance; margin: 0; font-weight: 600; letter-spacing: -0.018em; }
+h1 { font-size: clamp(2rem, 1.3rem + 2.6vw, 3.25rem); line-height: 1.06; }
+h2 { font-size: clamp(1.35rem, 1.1rem + 0.9vw, 1.75rem); line-height: 1.15; }
+h3 { font-size: 1.0625rem; line-height: 1.3; letter-spacing: -0.008em; }
+p { margin: 0; }
+
+.eyebrow { font-family: var(--mono); font-size: 0.6875rem; text-transform: uppercase; letter-spacing: 0.14em; color: var(--ink-subtle); }
+.lede { font-size: 1.125rem; line-height: 1.55; color: var(--ink-muted); }
+.small { font-size: 0.875rem; color: var(--ink-muted); }
+.mono { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+
+.masthead { padding: 4.5rem 0 2.5rem; }
+.masthead .col { display: flex; flex-direction: column; gap: 1.1rem; }
+.byline { display: flex; flex-wrap: wrap; gap: 0.5rem 1.1rem; font-family: var(--mono); font-size: 0.6875rem; letter-spacing: 0.06em; color: var(--ink-subtle); text-transform: uppercase; }
+.byline span { display: inline-flex; align-items: center; gap: 0.4rem; }
+.byline span::before { content: ""; width: 5px; height: 5px; border-radius: 1px; background: var(--accent); }
+
+section { padding-top: 3.75rem; }
+.sec-head { display: flex; flex-direction: column; gap: 0.7rem; padding-bottom: 1.5rem; }
+.stack { display: flex; flex-direction: column; gap: 1rem; }
+
+/* ================================================================
+   THE MOCKUP
+   ================================================================ */
+.mock { border: 1px solid var(--rule); border-radius: 14px; overflow: hidden; background: var(--paper); box-shadow: 0 22px 60px -30px rgb(15 23 42 / 0.35); }
+.mock-bar { display: flex; align-items: center; gap: 0.6rem; padding: 0.6rem 0.9rem; background: var(--sunk); border-bottom: 1px solid var(--rule); }
+.dot { width: 9px; height: 9px; border-radius: 50%; background: var(--rule); }
+.mock-url { margin-left: 0.4rem; font-family: var(--mono); font-size: 0.6875rem; color: var(--ink-subtle); }
+
+.pagehead { padding: 1.9rem 1.6rem 1.6rem; border-bottom: 1px solid var(--rule); }
+.backlink { font-size: 0.8125rem; color: var(--ink-subtle); }
+.titlerow { display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem; margin-top: 1.1rem; }
+.titlerow h2 { font-size: clamp(1.6rem, 1.2rem + 1.4vw, 2.25rem); }
+.pill { border: 1px solid color-mix(in srgb, var(--accent) 32%, transparent); background: var(--accent-soft); color: var(--accent); border-radius: 999px; padding: 0.25rem 0.65rem; font-family: var(--mono); font-size: 0.625rem; text-transform: uppercase; letter-spacing: 0.1em; }
+.facts { margin-top: 0.85rem; display: flex; flex-wrap: wrap; gap: 0.4rem 0.85rem; font-family: var(--mono); font-size: 0.6875rem; text-transform: uppercase; letter-spacing: 0.07em; color: var(--ink-subtle); }
+.summary { margin-top: 1rem; max-width: 46rem; color: var(--ink-muted); font-size: 0.975rem; }
+
+/* --- the control ------------------------------------------------- */
+.control { margin-top: 1.6rem; display: flex; flex-wrap: wrap; align-items: center; gap: 0.9rem 1.4rem; padding: 0.9rem 1rem; border: 1px solid var(--rule); border-radius: 11px; background: var(--sunk); }
+.control-label { font-family: var(--mono); font-size: 0.625rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--ink-subtle); }
+.seg { display: inline-flex; gap: 3px; padding: 3px; border: 1px solid var(--rule); border-radius: 9px; background: var(--paper); }
+.seg button { font: inherit; font-size: 0.8125rem; font-weight: 500; display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.4rem 0.75rem; min-height: 34px; border: 0; border-radius: 6px; background: transparent; color: var(--ink-muted); cursor: pointer; transition: background-color 160ms ease, color 160ms ease; }
+.seg button:hover { color: var(--ink); }
+/* Three cues, because one is not enough on either ground: a sunk
+   plate, a ring, and heavier type. --rule-soft alone came out at
+   1.4:1 against the panel in dark and read as unselected. */
+.seg button[aria-pressed="true"] {
+  background: var(--sunk); color: var(--ink); font-weight: 600;
+  box-shadow: inset 0 0 0 1px var(--rule);
+}
+.seg button:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.seg svg { width: 17px; height: 17px; flex: none; }
+
+/* --- instrument -------------------------------------------------- */
+.instrument { background: var(--panel); color: var(--panel-fg); }
+.inst-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.75rem; padding: 0.65rem 1rem; border-bottom: 1px solid var(--panel-rule); }
+.live { display: inline-flex; align-items: center; gap: 0.55rem; font-family: var(--mono); font-size: 0.625rem; text-transform: uppercase; letter-spacing: 0.13em; color: var(--panel-muted); }
+.live::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: #4ade80; box-shadow: 0 0 8px #4ade80; }
+.bridge-tag { font-family: var(--mono); font-size: 0.625rem; letter-spacing: 0.06em; color: var(--panel-muted); }
+.bridge-tag b { color: var(--panel-fg); font-weight: 500; }
+
+.inst-body { display: grid; grid-template-columns: 1fr; }
+@media (min-width: 64rem) { .inst-body { grid-template-columns: minmax(0,1fr) 19rem; } }
+
+.stage { padding: 1.6rem 1.5rem; background: var(--ox-bg); color: var(--ox-text); font-family: var(--ox-font-sans); display: flex; flex-direction: column; gap: 1.25rem; transition: background-color 220ms ease, color 220ms ease; }
+
+.band { display: flex; flex-direction: column; gap: 0.6rem; }
+.band-label { display: flex; align-items: center; gap: 0.5rem; font-family: var(--ox-font-mono, monospace); font-size: 0.5625rem; text-transform: uppercase; letter-spacing: 0.14em; color: var(--ox-text-subtle); }
+.band-label::after { content: ""; flex: 1; height: 1px; background: var(--ox-border); }
+.band-label i { font-style: normal; padding: 0.1rem 0.35rem; border-radius: 3px; border: 1px solid var(--ox-border); letter-spacing: 0.1em; }
+
+.readout { border-top: 1px solid var(--panel-rule); padding: 1.1rem 1.15rem; display: flex; flex-direction: column; gap: 0.85rem; background: var(--panel-2); }
+@media (min-width: 64rem) { .readout { border-top: 0; border-left: 1px solid var(--panel-rule); } }
+.readout h4 { font-family: var(--mono); font-size: 0.625rem; text-transform: uppercase; letter-spacing: 0.13em; color: var(--panel-muted); font-weight: 400; }
+.pair-top { display: flex; align-items: baseline; justify-content: space-between; gap: 0.6rem; }
+.pair-name { font-family: var(--mono); font-size: 0.6875rem; color: var(--panel-fg); }
+.pair-val { font-family: var(--mono); font-size: 0.75rem; font-variant-numeric: tabular-nums; }
+.pair-note { font-size: 0.6875rem; color: var(--panel-muted); line-height: 1.5; }
+.verdict { font-family: var(--mono); font-size: 0.5625rem; text-transform: uppercase; letter-spacing: 0.1em; padding: 0.1rem 0.32rem; border-radius: 3px; }
+.v-pass { background: rgb(74 222 128 / 0.14); color: #86efac; }
+.v-fail { background: rgb(251 113 133 / 0.16); color: #fda4af; }
+.src { display: flex; flex-direction: column; gap: 0.3rem; font-family: var(--mono); font-size: 0.625rem; color: var(--panel-muted); }
+.src b { color: var(--panel-fg); font-weight: 500; }
+
+/* ---------- Oxygen clinical components: tokens only -------------- */
+.ox-card { border: 1px solid var(--ox-border); border-radius: var(--ox-radius); background: var(--ox-surface); box-shadow: var(--ox-shadow-sm); overflow: hidden; }
+.ox-card-head { display: flex; align-items: baseline; justify-content: space-between; gap: 0.75rem; padding: 0.6rem 0.9rem; border-bottom: 1px solid var(--ox-border); background: var(--ox-bg-subtle); }
+.ox-card-title { font-size: var(--ox-text-base); font-weight: 600; }
+.ox-card-meta { font-family: var(--ox-font-mono); font-size: 0.6875rem; color: var(--ox-text-subtle); }
+.ox-row { display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem; padding: 0.65rem 0.9rem; }
+.ox-row + .ox-row { border-top: 1px solid var(--ox-border); }
+.ox-analyte { flex: 1 1 8rem; min-width: 0; font-size: 0.8125rem; font-weight: 500; color: var(--ox-text-muted); }
+.ox-value { display: inline-flex; align-items: baseline; gap: 0.25rem; }
+.ox-number { font-size: 1.0625rem; font-weight: 600; font-variant-numeric: tabular-nums; letter-spacing: -0.01em; }
+.ox-unit { font-size: 0.75rem; color: var(--ox-text-muted); }
+.ox-range { font-family: var(--ox-font-mono); font-size: 0.6875rem; color: var(--ox-text-subtle); }
+.ox-absent { font-size: 0.8125rem; font-style: italic; color: var(--ox-text-subtle); }
+.ox-chip { display: inline-flex; align-items: center; gap: 0.35rem; min-height: 1.625rem; padding: 0 0.55rem; border: 1px solid var(--chip-border); background: var(--chip-bg); color: var(--chip-fg); border-radius: var(--ox-radius-sm); font-size: 0.6875rem; font-weight: 500; white-space: nowrap; }
+.ox-chip::before { content: ""; width: 0.5rem; height: 0.5rem; border-radius: 1px; background: var(--chip-fg); flex: none; }
+
+/* ---------- Host chrome: the library's own components ------------
+   Reproductions, drawn to each library's measured geometry.
+   Defaults are Oxygen's; [data-host] restates them per library.    */
+.host-row { display: flex; flex-wrap: wrap; align-items: center; gap: 0.7rem; }
+.host-btn {
+  font-family: inherit; font-size: var(--ox-text-base); font-weight: 500;
+  min-height: 2.25rem; padding: 0 0.95rem; border-radius: var(--ox-radius);
+  border: 1px solid transparent; background: var(--ox-accent); color: var(--ox-text-on-accent);
+  cursor: pointer; letter-spacing: normal; text-transform: none; box-shadow: none;
+  transition: background-color var(--ox-duration) var(--ox-ease);
+}
+.host-btn:hover { background: var(--ox-accent-hover); }
+.host-btn--ghost { background: transparent; color: var(--ox-text); border-color: var(--ox-border); }
+.host-btn--ghost:hover { background: transparent; color: var(--ox-accent); border-color: var(--ox-accent); }
+.host-btn:focus-visible { outline: 2px solid var(--ox-focus-ring); outline-offset: 2px; }
+
+.host-field-wrap { position: relative; flex: 1 1 12rem; min-width: 0; }
+.host-field {
+  display: flex; align-items: center; width: 100%;
+  min-height: 2.25rem; padding: 0 0.7rem;
+  border: 1px solid var(--ox-border); border-radius: var(--ox-radius);
+  background: var(--ox-surface); color: var(--ox-text-subtle); font-size: var(--ox-text-base);
+}
+.host-field-label { display: none; }
+
+.host-switch { width: 2.5rem; height: 1.4rem; flex: none; padding: 2px; border-radius: 999px; border: 0; cursor: pointer; background: var(--ox-accent); display: flex; justify-content: flex-end; align-items: center; position: relative; transition: background-color var(--ox-duration) var(--ox-ease); }
+.host-switch span { width: 1rem; height: 1rem; border-radius: 50%; background: var(--ox-text-on-accent); display: block; box-shadow: none; }
+.host-switch:focus-visible { outline: 2px solid var(--ox-focus-ring); outline-offset: 2px; }
+.host-switch-row { display: flex; align-items: center; gap: 0.6rem; font-size: 0.8125rem; }
+
+.host-tabs { display: flex; gap: 0.25rem; border-bottom: 1px solid var(--ox-border); }
+.host-tab { font: inherit; font-size: 0.8125rem; padding: 0.5rem 0.85rem; border: 0; background: none; color: var(--ox-text-muted); cursor: pointer; border-bottom: 2px solid transparent; text-transform: none; letter-spacing: normal; font-weight: 500; }
+.host-tab[aria-selected="true"] { color: var(--ox-accent); border-bottom-color: var(--ox-accent); }
+
+/* --- Ant Design v6: 32px control, 6px radius, 14px, no caps ------ */
+.stage[data-host="antd"] .host-btn { min-height: 32px; padding: 0 16px; border-radius: 6px; font-size: 14px; font-weight: 400; box-shadow: 0 2px 0 rgba(5,145,255,0.1); }
+.stage[data-host="antd"] .host-btn--ghost { border-color: var(--ox-border); box-shadow: 0 2px 0 rgba(0,0,0,0.02); }
+.stage[data-host="antd"] .host-field { min-height: 32px; border-radius: 6px; font-size: 14px; padding: 0 11px; }
+.stage[data-host="antd"] .host-switch { width: 44px; height: 22px; border-radius: 100px; padding: 2px; }
+.stage[data-host="antd"] .host-switch span { width: 18px; height: 18px; background: #fff; box-shadow: 0 2px 4px rgba(0,35,11,0.2); }
+.stage[data-host="antd"] .host-tab { font-size: 14px; padding: 12px 0; margin-right: 32px; border-bottom-width: 2px; }
+
+/* --- Material UI v9: uppercase, 4px radius, elevation ------------ */
+.stage[data-host="mui"] .host-btn {
+  min-height: 36.5px; padding: 6px 16px; min-width: 64px; border-radius: 4px;
+  font-size: 0.875rem; font-weight: 500; line-height: 1.75;
+  letter-spacing: 0.02857em; text-transform: uppercase;
+  box-shadow: 0px 3px 1px -2px rgba(0,0,0,0.2),0px 2px 2px 0px rgba(0,0,0,0.14),0px 1px 5px 0px rgba(0,0,0,0.12);
+}
+.stage[data-host="mui"] .host-btn--ghost { box-shadow: none; color: var(--ox-accent); border-color: color-mix(in srgb, var(--ox-accent) 50%, transparent); }
+.stage[data-host="mui"] .host-field { min-height: 40px; border-radius: 4px; padding: 0 14px; }
+.stage[data-host="mui"] .host-field-label {
+  display: block; position: absolute; top: -0.55rem; left: 0.6rem; padding: 0 0.28rem;
+  background: var(--ox-surface); color: var(--ox-accent);
+  font-size: 0.75rem; line-height: 1;
+}
+.stage[data-host="mui"] .host-field { border-color: var(--ox-accent); border-width: 2px; }
+.stage[data-host="mui"] .host-switch {
+  width: 34px; height: 14px; padding: 0; border-radius: 7px; overflow: visible;
+  background: color-mix(in srgb, var(--ox-accent) 50%, transparent);
+}
+.stage[data-host="mui"] .host-switch span {
+  width: 20px; height: 20px; margin-right: -3px; background: var(--ox-accent);
+  box-shadow: 0px 2px 1px -1px rgba(0,0,0,0.2),0px 1px 1px 0px rgba(0,0,0,0.14),0px 1px 3px 0px rgba(0,0,0,0.12);
+}
+.stage[data-host="mui"] .host-tab { text-transform: uppercase; letter-spacing: 0.02857em; font-size: 0.875rem; padding: 12px 16px; min-width: 90px; }
+
+/* ================================================================ */
+.stats { display: grid; gap: 1px; background: var(--rule); border: 1px solid var(--rule); border-radius: 12px; overflow: hidden; }
+@media (min-width: 45rem) { .stats { grid-template-columns: repeat(3, 1fr); } }
+.stat { background: var(--paper); padding: 1.2rem 1.15rem; display: flex; flex-direction: column; gap: 0.4rem; }
+.stat b { font-family: var(--mono); font-size: 2rem; font-weight: 500; line-height: 1; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
+.stat .k { font-family: var(--mono); font-size: 0.625rem; text-transform: uppercase; letter-spacing: 0.13em; color: var(--ink-subtle); }
+.stat .d { font-size: 0.8125rem; color: var(--ink-muted); line-height: 1.45; }
+
+.scroller { overflow-x: auto; border: 1px solid var(--rule); border-radius: 12px; }
+table { border-collapse: collapse; width: 100%; font-size: 0.8125rem; }
+th, td { text-align: left; padding: 0.6rem 0.75rem; border-bottom: 1px solid var(--rule-soft); vertical-align: top; }
+thead th { font-family: var(--mono); font-size: 0.625rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--ink-subtle); font-weight: 400; background: var(--sunk); border-bottom: 1px solid var(--rule); }
+tbody tr:last-child td { border-bottom: 0; }
+td.tok { font-family: var(--mono); font-size: 0.6875rem; white-space: nowrap; color: var(--ink); }
+td.num { font-family: var(--mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.val { font-family: var(--mono); font-size: 0.6875rem; color: var(--ink-muted); }
+
+.tag { font-family: var(--mono); font-size: 0.5625rem; text-transform: uppercase; letter-spacing: 0.1em; padding: 0.16rem 0.38rem; border-radius: 3px; white-space: nowrap; display: inline-block; }
+.tag-lib { background: color-mix(in srgb, var(--mark-antd) 14%, transparent); color: var(--mark-antd); }
+.tag-swap { background: var(--warn-soft); color: var(--warn); }
+.tag-tok { background: var(--accent-soft); color: var(--accent); }
+.tag-fail { background: var(--bad-soft); color: var(--bad); }
+
+.note { border-left: 2px solid var(--accent); padding: 0.1rem 0 0.1rem 1rem; color: var(--ink-muted); font-size: 0.9375rem; }
+.note.warn { border-left-color: var(--bad); }
+.note.hold { border-left-color: var(--warn); }
+
+.phases { display: flex; flex-direction: column; gap: 1px; background: var(--rule); border: 1px solid var(--rule); border-radius: 12px; overflow: hidden; }
+.phase { background: var(--paper); padding: 1.25rem 1.3rem; display: grid; gap: 0.6rem 1.2rem; grid-template-columns: 1fr; }
+@media (min-width: 48rem) { .phase { grid-template-columns: 8.5rem 1fr; } }
+.phase-key { display: flex; flex-direction: column; gap: 0.3rem; }
+.phase-key .n { font-family: var(--mono); font-size: 0.625rem; text-transform: uppercase; letter-spacing: 0.13em; color: var(--ink-subtle); }
+.phase-key .t { font-family: var(--mono); font-size: 0.875rem; color: var(--accent); font-variant-numeric: tabular-nums; }
+.phase-body { display: flex; flex-direction: column; gap: 0.6rem; }
+.phase-body p { font-size: 0.9375rem; color: var(--ink-muted); }
+.deliv { display: flex; flex-direction: column; gap: 0.35rem; margin: 0; padding: 0; list-style: none; }
+.deliv li { font-size: 0.875rem; color: var(--ink-muted); padding-left: 1rem; position: relative; }
+.deliv li::before { content: "→"; position: absolute; left: 0; color: var(--accent); }
+
+.inline-code, code { font-family: var(--mono); font-size: 0.8125em; background: var(--sunk); border: 1px solid var(--rule-soft); padding: 0.05em 0.3em; border-radius: 4px; color: var(--ink); }
+pre { margin: 0; overflow-x: auto; background: var(--panel); color: var(--panel-fg); border-radius: 10px; padding: 1rem 1.1rem; font-family: var(--mono); font-size: 0.75rem; line-height: 1.6; }
+pre code { background: none; border: 0; padding: 0; color: inherit; font-size: inherit; }
+pre .c { color: var(--panel-muted); }
+pre .k { color: #6ce7cb; }
+
+ol.qs { margin: 0; padding-left: 1.25rem; display: flex; flex-direction: column; gap: 0.85rem; }
+ol.qs li { padding-left: 0.3rem; }
+ol.qs span { display: block; color: var(--ink-muted); font-size: 0.9375rem; margin-top: 0.15rem; }
+
+footer { margin-top: 4.5rem; padding-top: 1.5rem; border-top: 1px solid var(--rule); }
+
+@media (prefers-reduced-motion: reduce) { * { transition-duration: 1ms !important; } }
+</style>
+
+<div class="shell">
+
+  <header class="masthead">
+    <div class="col">
+      <p class="eyebrow">Oxygen UI · component pages</p>
+      <h1>The framework switch</h1>
+      <p class="lede">A control at the top of every component page that renders the demo in Ant Design's or Material UI's real components — MUI's ripple included — with Oxygen's clinical components bridged to match. This is built and running. Below: the mockup, the one structural fact that shaped it, and what shipped.</p>
+      <p class="byline">
+        <span>Built &amp; verified</span>
+        <span>2 September 2026</span>
+        <span>antd 6.6.0 · MUI 9.3.1</span>
+      </p>
+    </div>
+  </header>
+
+  <!-- ============================================================ -->
+  <section id="mockup">
+    <div class="sec-head col">
+      <p class="eyebrow">The proposal, operable</p>
+      <h2>Switch it and watch</h2>
+      <p class="small">The upper band is host chrome — a Button, a text field, a Switch and Tabs, drawn to each library's measured geometry. The lower band is Oxygen's own component, restyled by the token bridge. Colours and radii are the real output of <span class="inline-code">antdBridge.map()</span> and <span class="inline-code">muiBridge.map()</span>.</p>
+    </div>
+
+    <div class="mock">
+      <div class="mock-bar">
+        <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+        <span class="mock-url">oxygenui.design/components/result-value</span>
+      </div>
+
+      <div class="pagehead">
+        <span class="backlink">← All components</span>
+        <div class="titlerow">
+          <h2>Result value</h2>
+          <span class="pill">Stable</span>
+        </div>
+        <p class="facts">
+          <span>Observation</span><span aria-hidden="true">·</span>
+          <span>18 states</span><span aria-hidden="true">·</span>
+          <span>12 props</span><span aria-hidden="true">·</span>
+          <span>4.8 KB installed</span>
+        </p>
+        <p class="summary">A single observation, rendered so the four ways it can lie are all impossible: a preliminary result that looks final, a rangeless result that looks normal, a correction that replaces what you read, and an absence rendered as an em dash.</p>
+
+        <div class="control">
+          <span class="control-label">Design language</span>
+          <div class="seg" role="group" aria-label="Design language">
+            <button type="button" data-fw="oxygen" aria-pressed="true">
+              <svg viewBox="0 0 28 16" aria-hidden="true" style="width:22px">
+                <line x1="8" y1="8" x2="20" y2="8" stroke="var(--mark-oxygen)" stroke-width="2.5"/>
+                <circle cx="8" cy="8" r="5.5" fill="none" stroke="currentColor" stroke-width="2"/>
+                <circle cx="20" cy="8" r="5.5" fill="none" stroke="currentColor" stroke-width="2"/>
+              </svg>Oxygen</button>
+            <button type="button" data-fw="antd" aria-pressed="false">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 1.6 22.4 12 12 22.4 1.6 12Z" fill="none" stroke="var(--mark-antd)" stroke-width="2.1" stroke-linejoin="round"/>
+                <path d="M12 7.4 16.6 12 12 16.6 7.4 12Z" fill="var(--mark-antd)"/>
+              </svg>Ant Design</button>
+            <button type="button" data-fw="mui" aria-pressed="false">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M1.5 15.6V8.4l6.2 3.6v7.2Z" fill="var(--mark-mui)" opacity="0.55"/>
+                <path d="M7.7 12 13.9 8.4v7.2L7.7 19.2Z" fill="var(--mark-mui)" opacity="0.8"/>
+                <path d="M13.9 8.4 20.1 4.8V12l-6.2 3.6Z" fill="var(--mark-mui)"/>
+              </svg>Material UI</button>
+          </div>
+          <span class="control-label">Surface</span>
+          <div class="seg" role="group" aria-label="Preview surface">
+            <button type="button" data-mode="light" aria-pressed="true">Light</button>
+            <button type="button" data-mode="dark" aria-pressed="false">Dark</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="instrument">
+        <div class="inst-bar">
+          <span class="live">Live · real component</span>
+          <span class="bridge-tag" id="bridge-tag"></span>
+        </div>
+
+        <div class="inst-body">
+          <div class="stage" id="stage" data-host="oxygen">
+
+            <div class="band">
+              <p class="band-label">Host chrome <i id="host-name">Oxygen</i></p>
+              <div class="host-tabs" role="tablist">
+                <button type="button" class="host-tab" role="tab" aria-selected="true">Results</button>
+                <button type="button" class="host-tab" role="tab" aria-selected="false">Trend</button>
+                <button type="button" class="host-tab" role="tab" aria-selected="false">Orders</button>
+              </div>
+              <div class="host-row">
+                <button type="button" class="host-btn">Acknowledge</button>
+                <button type="button" class="host-btn host-btn--ghost">Order repeat</button>
+                <span class="host-field-wrap">
+                  <span class="host-field-label">Note</span>
+                  <span class="host-field">Add a note…</span>
+                </span>
+              </div>
+              <div class="host-switch-row">
+                <button type="button" class="host-switch" aria-label="Contact precautions" aria-pressed="true"><span></span></button>
+                Contact precautions
+              </div>
+            </div>
+
+            <div class="band">
+              <p class="band-label">Oxygen clinical <i>token-bridged</i></p>
+              <div class="ox-card">
+                <div class="ox-card-head">
+                  <span class="ox-card-title">Chemistry panel</span>
+                  <span class="ox-card-meta">collected 14:02 · 2 h ago</span>
+                </div>
+                <div class="ox-row">
+                  <span class="ox-analyte">Potassium</span>
+                  <span class="ox-value"><span class="ox-number">6.1</span><span class="ox-unit">mmol/L</span></span>
+                  <span class="ox-chip" style="--chip-fg:var(--ox-status-critical);--chip-bg:var(--ox-status-critical-bg);--chip-border:var(--ox-status-critical-border)">Critical high</span>
+                  <span class="ox-range">3.5–5.1</span>
+                </div>
+                <div class="ox-row">
+                  <span class="ox-analyte">Sodium</span>
+                  <span class="ox-value"><span class="ox-number">139</span><span class="ox-unit">mmol/L</span></span>
+                  <span class="ox-chip" style="--chip-fg:var(--ox-status-normal);--chip-bg:var(--ox-status-normal-bg);--chip-border:var(--ox-status-normal-border)">Normal</span>
+                  <span class="ox-range">135–145</span>
+                </div>
+                <div class="ox-row">
+                  <span class="ox-analyte">HIV 1/2 antigen</span>
+                  <span class="ox-absent">Restricted — you do not have access</span>
+                  <span class="ox-chip" style="--chip-fg:var(--ox-status-unknown);--chip-bg:var(--ox-status-unknown-bg);--chip-border:var(--ox-status-unknown-border)">Not interpreted</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="readout">
+            <h4>What is rendering</h4>
+            <div class="src" id="src"></div>
+            <h4 style="margin-top:0.35rem">Contrast, computed live</h4>
+            <div id="pairs"></div>
+            <p class="pair-note" id="readout-note"></p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <p class="small col" style="margin-top:1rem">The brand marks above are placeholders drawn to the right size and colour. Production must use each project's official SVG, self-hosted — see phase 2.</p>
+  </section>
+
+  <!-- ============================================================ -->
+  <section id="fact">
+    <div class="sec-head col">
+      <p class="eyebrow">Read this before scoping anything</p>
+      <h2>Oxygen has no Button to swap</h2>
+    </div>
+    <div class="col stack">
+      <p>You asked for the Button and the text field to come from Material UI. They can — but not as a swap, because <b>Oxygen does not ship a Button, a TextField, a Select or a Checkbox.</b> The registry holds 28 components: 27 clinical, and exactly one primitive, <span class="inline-code">Switch</span>. The button and field in the mockup above are host chrome, not Oxygen components.</p>
+      <p>That is a deliberate position, not a gap — <span class="inline-code">ADR 0010</span> says primitives match Ant Design's public API exactly and take no dependency on it, so that <span class="inline-code">import { Switch } from "antd"</span> → <span class="inline-code">"@oxygenui-design/react"</span> is the whole migration. It means the request splits cleanly into three tiers, and each needs a different mechanism.</p>
+    </div>
+
+    <div class="scroller" style="margin-top:1.5rem">
+      <table>
+        <thead><tr><th>Tier</th><th>What it covers</th><th>In Oxygen</th><th>Mechanism</th><th></th></tr></thead>
+        <tbody>
+          <tr>
+            <td><b>Host chrome</b></td>
+            <td>Button, TextField, Select, Checkbox, Radio, Tabs, Modal, Tooltip, Menu — everything an application is built from around the clinical parts.</td>
+            <td class="num">0</td>
+            <td>Render the real library component. Nothing to reconcile: Oxygen never claimed this ground.</td>
+            <td><span class="tag tag-lib">real library</span></td>
+          </tr>
+          <tr>
+            <td><b>Swappable primitive</b></td>
+            <td><span class="inline-code">Switch</span> only. antd and MUI both have one, and ADR 0010 already made the prop surface identical.</td>
+            <td class="num">1</td>
+            <td>Real swap is possible for the boolean subset. It loses the third value <span class="inline-code">"unknown"</span> and the commit-phase machine — which is most of why the component exists.</td>
+            <td><span class="tag tag-swap">swap, at a cost</span></td>
+          </tr>
+          <tr>
+            <td><b>Clinical</b></td>
+            <td>ResultValue, ClinicalStatus, DataGrid, Timeline, Copilot, DatePicker, the five loaders — plus the <b>153 bare <span class="inline-code">&lt;button&gt;</span> elements</b> inside 20 of them.</td>
+            <td class="num">27</td>
+            <td>Token bridge only. There is no <span class="inline-code">&lt;MuiResultValue&gt;</span> to swap to, and a calendar day cell is not a Material Button.</td>
+            <td><span class="tag tag-tok">tokens only</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="col stack" style="margin-top:1.5rem">
+      <p class="note hold"><b>So "every component changes" is true of the theme and false of the implementation.</b> All 28 restyle — the bridge reaches 828 of the 1,906 <span class="inline-code">var(--ox-*)</span> call sites in the registry, 43%. What does not change is what they are made of, and for 27 of them there is nothing in either library to change them into. The plan below states that on screen rather than letting a reader infer it.</p>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <section id="cost">
+    <div class="sec-head col">
+      <p class="eyebrow">Measured, not estimated</p>
+      <h2>What the libraries weigh</h2>
+      <p class="small">Bundled with esbuild from the installed packages: ConfigProvider or ThemeProvider plus Button, text input, Switch, Tabs, Select and Checkbox. React external.</p>
+    </div>
+    <div class="stats">
+      <div class="stat">
+        <span class="k">Ant Design 6.6.0</span>
+        <b>142 KB</b>
+        <span class="d">gzipped, for seven components. cssinjs carries most of it.</span>
+      </div>
+      <div class="stat">
+        <span class="k">Material UI 9.3.1</span>
+        <b>76 KB</b>
+        <span class="d">gzipped, plus emotion, which the docs site does not yet ship.</span>
+      </div>
+      <div class="stat">
+        <span class="k">Both, if shared</span>
+        <b>218 KB</b>
+        <span class="d">Before React, before Oxygen, before the site's own code. This is the number that forces the architecture below.</span>
+      </div>
+    </div>
+    <div class="col stack" style="margin-top:1.5rem">
+      <p class="note"><b>The consequence is not "don't do it" — it is "never put them in the shared chunk."</b> Each host implementation is a dynamic <span class="inline-code">import()</span> behind the switch, so a reader who never touches the control downloads neither. The default is Oxygen, and Oxygen stays free.</p>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <section id="built">
+    <div class="sec-head col">
+      <p class="eyebrow">Shipped</p>
+      <h2>What is in the working tree</h2>
+      <p class="small">One new package, five new files in the docs app, two enforcement rules. Real <span class="inline-code">antd@6.6.0</span> and <span class="inline-code">@mui/material@9.3.1</span>, not reproductions.</p>
+    </div>
+
+    <div class="phases">
+
+      <div class="phase">
+        <div class="phase-key"><span class="n">Package</span><span class="t">host-react</span></div>
+        <div class="phase-body">
+          <h3>Six primitives, three implementations</h3>
+          <p>Button, Input, Switch, Checkbox, Select and Tabs behind one context. Props are Ant Design's, per ADR 0010, so the antd adapter is a pass-through and only the MUI adapter translates — and every conversion it makes is named in the file rather than left to be discovered.</p>
+          <ul class="deliv">
+            <li><span class="inline-code">contract.ts</span> — the prop shapes. Imports no framework.</li>
+            <li><span class="inline-code">primitives-oxygen.tsx</span> + <span class="inline-code">host.css</span> — reference chrome, structure only, every colour from <span class="inline-code">--ox-*</span>.</li>
+            <li><span class="inline-code">antd.tsx</span> — real antd, inside <span class="inline-code">ConfigProvider</span> and <span class="inline-code">AntdBridge</span>.</li>
+            <li><span class="inline-code">mui.tsx</span> — real <span class="inline-code">@mui/material</span>, inside <span class="inline-code">ThemeProvider</span> and <span class="inline-code">MuiBridge</span>. <span class="inline-code">disableRipple</span> is never set.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="phase">
+        <div class="phase-key"><span class="n">Docs app</span><span class="t">5 files</span></div>
+        <div class="phase-body">
+          <h3>The control, and where its patch lands</h3>
+          <p>A radiogroup in the component page header — arrow keys move within one tab stop, and the choice is written to a cookie and mirrored to <span class="inline-code">?lang=</span> so a link can pin it. The patch lands on the preview stage only; the site's own chrome is never bridged.</p>
+          <ul class="deliv">
+            <li><span class="inline-code">design-language.ts</span> — a <span class="inline-code">useSyncExternalStore</span> store, because the control and the preview are in different subtrees of a server-rendered page.</li>
+            <li><span class="inline-code">host-stage.tsx</span> — <span class="inline-code">React.lazy</span>, not <span class="inline-code">next/dynamic</span>: <span class="inline-code">dynamic</span>'s <span class="inline-code">loading</span> replaces the subtree and takes no children, so the preview would blank for the length of the download. A Suspense fallback keeps the component on screen under the Oxygen host.</li>
+            <li><span class="inline-code">host-chrome.tsx</span>, <span class="inline-code">language-switch.tsx</span>, <span class="inline-code">framework-marks.tsx</span>.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="phase">
+        <div class="phase-key"><span class="n">Marks</span><span class="t">2 of 3 real</span></div>
+        <div class="phase-body">
+          <h3>Ant Design's own glyph; MUI's is still a stand-in</h3>
+          <p>Ant Design publishes its logo as <span class="inline-code">AntDesignOutlined</span> in <span class="inline-code">@ant-design/icons-svg</span> (MIT). That path is inlined unmodified, with attribution — inlined rather than imported because that package is a transitive dependency of antd rather than one this app declares.</p>
+          <p><b>MUI ships no logo in any package we depend on.</b> Its mark is currently ours: a geometric stand-in in MUI's brand blue. Replace it with the official SVG from MUI's brand assets before this is public. Both marks are used only to name their own framework and neither is recoloured.</p>
+        </div>
+      </div>
+
+      <div class="phase">
+        <div class="phase-key"><span class="n">Guards</span><span class="t">2 rules</span></div>
+        <div class="phase-body">
+          <h3>ADR 0010, made executable</h3>
+          <p>If any package or registry item imports <span class="inline-code">host-react</span>, antd and MUI enter the graph of every form component and copy-as-source distribution closes for the family. <span class="inline-code">host-react-stays-at-composition</span> fails the build on it, and <span class="inline-code">no-framework-in-oxygen-host</span> keeps the Oxygen state from quietly becoming antd in our colours.</p>
+          <p class="note warn"><b>The first version of that rule was broken and passed a deliberate violation.</b> <span class="inline-code">registry/</span> is not inside any package, so <span class="inline-code">@oxygenui-design/host-react</span> does not resolve from there at all — dependency-cruiser reports the bare specifier with <span class="inline-code">dependencyTypes: ["unknown"]</span>, and a rule matching only <span class="inline-code">^packages/host-react/</span> never fires. It now matches both spellings, and it was re-tested against a planted import.</p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <section id="verified">
+    <div class="sec-head col">
+      <p class="eyebrow">Checked, not assumed</p>
+      <h2>How it was verified</h2>
+    </div>
+    <div class="scroller">
+      <table>
+        <thead><tr><th>Claim</th><th>How</th><th>Result</th></tr></thead>
+        <tbody>
+          <tr><td>MUI's ripple is real</td><td>Assert <span class="inline-code">.MuiTouchRipple-root</span> is absent at rest and present after a click — MUI mounts it lazily on first interaction, so a static assertion fails against a working button.</td><td class="val">passes; 1 live ripple node in the browser</td></tr>
+          <tr><td>The real libraries mount</td><td>Look for the classes each library emits — <span class="inline-code">.ant-btn-primary</span>, <span class="inline-code">.MuiButton-contained</span> — rather than for the props passed.</td><td class="val">antd and MUI Button, Input, Switch, Select and Tabs all live</td></tr>
+          <tr><td>One demo source, three hosts</td><td><span class="inline-code">describe.each</span> renders the identical component tree under all three and asserts the same roles and labels.</td><td class="val">16 tests, all passing</td></tr>
+          <tr><td>Clinical colours never move</td><td>Assert the bridge wrapper writes no <span class="inline-code">--ox-status-critical</span>, and read the chip's computed colour in the browser under each language.</td><td class="val"><span class="mono">#b91c1c</span> in all three, light and dark</td></tr>
+          <tr><td>The switch handler is one argument</td><td>Assert <span class="inline-code">mock.calls[0]</span> deep-equals <span class="inline-code">[false]</span> under every host.</td><td class="val">caught a real defect — see below</td></tr>
+          <tr><td>The ADR guard fires</td><td>Plant an import of <span class="inline-code">host-react</span> in <span class="inline-code">result-value.tsx</span>, run <span class="inline-code">pnpm deps</span>, restore.</td><td class="val">fails with the violation; passes clean</td></tr>
+          <tr><td>It works in a real browser</td><td>A Playwright spec, <span class="inline-code">e2e/language-switch.spec.ts</span>, tagged <span class="inline-code">@bridge</span> — lazy chunks, the real cascade, the ripple on a real pointer event, the deep link, and the roving tabindex.</td><td class="val">5 tests, all passing</td></tr>
+          <tr><td>No framework reaches the shared chunk</td><td>Four <span class="inline-code">size-limit</span> entries. The root one <b>omits antd and MUI from <span class="inline-code">ignore</span> on purpose</b>: if either were ever imported there, 1.4 kB would become hundreds and the budget would fail.</td><td class="val">1.39 kB root · 6.4 and 6.6 kB hosts</td></tr>
+          <tr><td>Nothing else broke</td><td><span class="inline-code">pnpm verify</span> — generated artifacts, lint, format, types, dependency rules, the audit, the PHI scan, tests, coverage, build and bundle budgets.</td><td class="val">every gate green but two, and both fail on <span class="inline-code">main</span> already</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="col stack" style="margin-top:1.75rem">
+      <h3>The two gates that are still red, and why they are not this work</h3>
+      <p><b>Dependency audit.</b> Four high advisories, every one of them reached through <span class="inline-code">@commitlint/cli</span> — a root devDependency this branch does not touch. <span class="inline-code">fast-uri@3.1.5</span> is already in the committed lockfile, and none of the added packages appears in any advisory path.</p>
+      <p><b>Registry coverage.</b> The root gate reports <span class="mono">126</span> uncovered lines and <span class="mono">25</span> uncovered functions against thresholds of 100/100 — the same two numbers this repository has been carrying since the <span class="inline-code">apps/hq</span> fix first let the gate run, concentrated in <span class="inline-code">chart-context-menu.tsx</span> and <span class="inline-code">lib/datetime-parts.tsx</span>. No registry component was added or changed here. Every package-level suite passes, including the new one at 94% statements and 96% branches.</p>
+
+      <h3 style="margin-top:1.5rem">Three defects the build surfaced</h3>
+      <p><b>antd's Switch passes two arguments.</b> It calls <span class="inline-code">onChange(checked, event)</span>; the contract promises one. A caller who wrote <span class="inline-code">(checked) =&gt; …</span> would never notice, and a caller who spread the arguments very much would. The adapter now drops the second rather than documenting it as a quirk.</p>
+      <p><b>A circular import that typechecked.</b> <span class="inline-code">context.tsx</span> seeded its default from <span class="inline-code">oxygen.tsx</span>, which imported the provider back. TypeScript was happy; the browser said <span class="inline-code">Cannot access 'oxygenPrimitives' before initialization</span> at runtime. Split into a leaf module.</p>
+      <p><b>antd v6 narrowed <span class="inline-code">cssVar</span>.</b> It is an object now, not a boolean, and v6 emits custom properties by default — so the v5 spelling is a type error rather than a switch. Removed.</p>
+      <p><b>A pinned link did not stick.</b> <span class="inline-code">?lang=mui</span> styled the page it opened and evaporated on the next navigation, because only the click path wrote the cookie. The URL is now a way of setting the preference, not a one-page override — caught by the browser test, invisible to every unit test.</p>
+
+      <h3 style="margin-top:1.5rem">And one in a bridge that shipped months ago</h3>
+      <p><b>Ant Design does expose a label colour, and the bridge said it did not.</b> <span class="inline-code">bridge-antd</span> listed <span class="inline-code">--ox-text-on-accent</span> as unmapped, with a comment explaining that antd computes the label per component and offers nothing to read. It offers <span class="inline-code">colorTextLightSolid</span> — and the docs site's own playground was already using it.</p>
+      <p class="note warn">The cost was visible and nobody had seen it. With the token unmapped, Oxygen's <b>dark</b> label — <span class="mono">#071014</span>, near-black — landed on antd's dark primary at <span class="mono">3.70:1</span>. antd renders white there, at <span class="mono">5.19:1</span>. Every dark antd preview was showing a button antd would never produce. Now mapped, and the type system caught the blast radius immediately: <span class="inline-code">apps/app</span> builds a <span class="inline-code">Required&lt;AntdTokens&gt;</span> probe precisely so that adding a token to the interface fails the build until the probe is updated.</p>
+      <p><b>This also closes the hole in the gate.</b> <span class="inline-code">contrastViolations</span> only measures a pair when the bridge supplies both sides — anything else would be guessing at a value it cannot see. So a half-mapped pair was invisible to it by construction. With both halves mapped, antd's own default now reports <span class="mono">4.10:1</span> against its primary in light: a real AA failure in antd's palette, which is antd's to own and ours to surface rather than hide.</p>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <section id="risks">
+    <div class="sec-head col">
+      <p class="eyebrow">What can go wrong</p>
+      <h2>Five risks, and what each costs</h2>
+    </div>
+    <div class="scroller">
+      <table>
+        <thead><tr><th>Risk</th><th>Why it bites</th><th>Mitigation</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><b>ADR 0010 collapses</b></td>
+            <td>If any Oxygen component imports <span class="inline-code">host-react</span>, antd and MUI enter the graph of every form component and copy-as-source distribution ends for the whole family — the channel ADR 0002 exists to protect.</td>
+            <td><b>Closed.</b> <span class="inline-code">host-react-stays-at-composition</span> in <span class="inline-code">.dependency-cruiser.cjs</span>, verified against a planted violation.</td>
+          </tr>
+          <tr>
+            <td><b>Eight AA failures ship</b></td>
+            <td><span class="mono">2.99:1</span> for a label on antd's hover fill; <span class="mono">2.68:1</span> for MUI's third text tone. Our own <span class="inline-code">pnpm a11y</span> run would flag them on our own site.</td>
+            <td>Phase 0. Show them deliberately with the ratio on screen, or exclude the demo stage from the audit and say why.</td>
+          </tr>
+          <tr>
+            <td><b>Bundle regression</b></td>
+            <td>218 KB gzipped if either library reaches the shared chunk. The repo already has size budgets and two were red before this started.</td>
+            <td><b>Closed.</b> Each host is a <span class="inline-code">React.lazy</span> import, so the Oxygen default downloads neither, and four <span class="inline-code">size-limit</span> entries now enforce it — including one whose entire job is to fail if a framework ever reaches the root entry.</td>
+          </tr>
+          <tr>
+            <td><b>Prop surfaces diverge</b></td>
+            <td>antd's <span class="inline-code">onChange(checked)</span> against MUI's <span class="inline-code">onChange(event, checked)</span>; <span class="inline-code">type</span> against <span class="inline-code">variant</span>; antd's <span class="inline-code">Tabs items</span> against MUI's <span class="inline-code">Tabs</span>/<span class="inline-code">Tab</span> children. A translation layer that silently drops a prop is worse than no layer.</td>
+            <td><b>Partly closed.</b> Two <span class="inline-code">describe.each</span> suites — 46 tests — render one source under all three across every variant, size and controlled/uncontrolled path. They caught antd's two-argument Switch. Still not done: throwing on a prop MUI cannot express, the way <span class="inline-code">assertBridgeOutput</span> does for clinical tokens.</td>
+          </tr>
+          <tr>
+            <td><b>Trademark use</b></td>
+            <td>Both marks are trademarks of their projects. Naming a framework with its own mark is ordinary, but recolouring one, or implying endorsement, is not.</td>
+            <td><b>Half done.</b> Ant Design's own glyph is in, unmodified and attributed. MUI's is still our stand-in and must be replaced with their official asset before this is public.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <section id="questions">
+    <div class="sec-head col">
+      <p class="eyebrow">Blocking, or close to it</p>
+      <h2>Four questions</h2>
+    </div>
+    <div class="col">
+      <ol class="qs">
+        <li><b>Replace the Material UI mark.</b><span>The only thing between this and shipping publicly. MUI publishes no logo in the packages we depend on, so it needs to come from their brand assets by hand. Everything else is done.</span></li>
+        <li><b>Is this a docs demo or a supported package?</b><span>It is built as a real package because that is where it belongs, but nothing is published yet. A supported <span class="inline-code">host-react</span> means peer ranges, a deprecation policy and two more majors to track forever. The code is the same; the commitment is not.</span></li>
+        <li><b>Do we show antd's real defaults, failures and all?</b><span>Currently yes — both hosts mount their framework's untouched default theme, so a reader sees antd's own white on <span class="mono">#1677ff</span> at <span class="mono">4.10:1</span>. Honest, and an argument for us. Nudging <span class="inline-code">colorPrimary</span> would make a prettier page and a weaker claim. Mapping the label colour means the existing gate now measures this pair rather than skipping it.</span></li>
+        <li><b>Do the 153 internal buttons happen?</b><span>Untouched, deliberately. The switch changes the chrome and the colours but not the interior of a clinical component. Doing it means classifying every one as action-shaped or structural first — a calendar day cell must never become a Material Button — and that classification wants review before any conversion.</span></li>
+      </ol>
+    </div>
+  </section>
+
+  <footer class="col">
+    <p class="small">Counts from <span class="inline-code">registry/oxygen</span> and <span class="inline-code">registry.json</span> at commit <span class="inline-code">563f4f9</span>. Bundle sizes measured with esbuild against the installed <span class="inline-code">antd@6.6.0</span> and <span class="inline-code">@mui/material@9.3.1</span>. Control geometry read from each library's own resolved theme. Contrast computed with WCAG 2.x relative luminance, translucent colours composited over the surface beneath. Oxygen UI is not affiliated with the Ant Design or MUI projects.</p>
+  </footer>
+</div>
+
+<script>
+const OXYGEN = {
+  light: {
+    "--ox-status-critical":"#b91c1c","--ox-status-critical-bg":"#fef2f2","--ox-status-critical-border":"#fecaca",
+    "--ox-status-normal":"#047857","--ox-status-normal-bg":"#ecfdf5","--ox-status-normal-border":"#a7f3d0",
+    "--ox-status-unknown":"#64748b","--ox-status-unknown-bg":"#f8fafc","--ox-status-unknown-border":"#e2e8f0",
+    "--ox-accent":"#067662","--ox-accent-hover":"#0a5d4f","--ox-accent-subtle":"#ecfdf8","--ox-accent-border":"#a4f3df",
+    "--ox-text":"#0f172a","--ox-text-muted":"#475569","--ox-text-subtle":"#64748b","--ox-text-on-accent":"#ffffff",
+    "--ox-bg":"#ffffff","--ox-bg-subtle":"#f8fafc","--ox-bg-muted":"#f1f5f9",
+    "--ox-surface":"#ffffff","--ox-surface-raised":"#ffffff",
+    "--ox-border":"#e2e8f0","--ox-border-strong":"#64748b","--ox-focus-ring":"#059478",
+    "--ox-radius-sm":"0.25rem","--ox-radius":"0.5rem","--ox-radius-lg":"0.75rem",
+    "--ox-font-sans":'ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif',
+    "--ox-font-mono":'ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace',
+    "--ox-text-base":"0.875rem","--ox-duration":"180ms","--ox-ease":"cubic-bezier(0.22, 1, 0.36, 1)",
+    "--ox-density-target":"2.75rem","--ox-shadow-sm":"0 1px 2px 0 rgb(2 6 23 / 0.05)"
+  },
+  dark: {
+    "--ox-status-critical":"#fb7185","--ox-status-critical-bg":"#2a1216","--ox-status-critical-border":"#5c1f28",
+    "--ox-status-normal":"#4ade80","--ox-status-normal-bg":"#10271e","--ox-status-normal-border":"#1e5138",
+    "--ox-status-unknown":"#94a3b8","--ox-status-unknown-bg":"#141f22","--ox-status-unknown-border":"#253338",
+    "--ox-accent":"#6ce7cb","--ox-accent-hover":"#a4f3df","--ox-accent-subtle":"#0f2a25","--ox-accent-border":"#1b4a42",
+    "--ox-text":"#edf2f7","--ox-text-muted":"#a5b1be","--ox-text-subtle":"#82909f","--ox-text-on-accent":"#071014",
+    "--ox-bg":"#0a0d12","--ox-bg-subtle":"#11161d","--ox-bg-muted":"#181f28",
+    "--ox-surface":"#141a22","--ox-surface-raised":"#1a222c",
+    "--ox-border":"#29333f","--ox-border-strong":"#5d6c7e","--ox-focus-ring":"#6ce7cb",
+    "--ox-radius-sm":"0.25rem","--ox-radius":"0.5rem","--ox-radius-lg":"0.75rem",
+    "--ox-font-sans":'ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif',
+    "--ox-font-mono":'ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace',
+    "--ox-text-base":"0.875rem","--ox-duration":"180ms","--ox-ease":"cubic-bezier(0.22, 1, 0.36, 1)",
+    "--ox-density-target":"2.75rem","--ox-shadow-sm":"0 1px 2px 0 rgb(0 0 0 / 0.4)"
+  }
+};
+
+const ANTD_SANS = "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif";
+const ANTD_MONO = "'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace";
+const MUI_SANS  = '"Roboto", "Helvetica", "Arial", sans-serif';
+
+const PATCH = {
+  antd: {
+    light: {
+      "--ox-accent":"#1677ff","--ox-accent-hover":"#4096ff","--ox-accent-subtle":"#e6f4ff","--ox-accent-border":"#91caff",
+      "--ox-focus-ring":"#1677ff",
+      "--ox-text":"rgba(0,0,0,0.88)","--ox-text-muted":"rgba(0,0,0,0.65)","--ox-text-subtle":"rgba(0,0,0,0.45)",
+      "--ox-bg":"#f5f5f5","--ox-bg-subtle":"rgba(0,0,0,0.02)","--ox-bg-muted":"rgba(0,0,0,0.04)",
+      "--ox-surface":"#ffffff","--ox-surface-raised":"#ffffff","--ox-surface-overlay":"#ffffff",
+      "--ox-border":"#d9d9d9",
+      "--ox-radius-sm":"4px","--ox-radius":"6px","--ox-radius-lg":"8px",
+      "--ox-font-sans":ANTD_SANS,"--ox-font-mono":ANTD_MONO,"--ox-text-base":"14px",
+      "--ox-duration-fast":"0.1s","--ox-duration":"0.2s","--ox-duration-slow":"0.3s",
+      "--ox-ease":"cubic-bezier(0.645, 0.045, 0.355, 1)",
+      "--ox-shadow-sm":"0 1px 2px 0 rgba(0,0,0,0.05), 0 1px 6px -1px rgba(0,0,0,0.03), 0 2px 4px 0 rgba(0,0,0,0.03)",
+      "--ox-shadow":"0 6px 16px 0 rgba(0,0,0,0.08), 0 3px 6px -4px rgba(0,0,0,0.12), 0 9px 28px 8px rgba(0,0,0,0.05)",
+      "--ox-shadow-lg":"0 6px 16px 0 rgba(0,0,0,0.08), 0 3px 6px -4px rgba(0,0,0,0.12), 0 9px 28px 8px rgba(0,0,0,0.05)",
+      "--ox-density-target":"max(44px, 32px)","--ox-density-font":"14px"
+    },
+    dark: {
+      "--ox-accent":"#1668dc","--ox-accent-hover":"#3c89e8","--ox-accent-subtle":"#15325b","--ox-accent-border":"#15325b",
+      "--ox-focus-ring":"#1668dc",
+      "--ox-text":"rgba(255,255,255,0.85)","--ox-text-muted":"rgba(255,255,255,0.65)","--ox-text-subtle":"rgba(255,255,255,0.45)",
+      "--ox-bg":"#000000","--ox-bg-subtle":"rgba(255,255,255,0.04)","--ox-bg-muted":"rgba(255,255,255,0.08)",
+      "--ox-surface":"#141414","--ox-surface-raised":"#1f1f1f","--ox-surface-overlay":"#1f1f1f",
+      "--ox-border":"#424242",
+      "--ox-radius-sm":"4px","--ox-radius":"6px","--ox-radius-lg":"8px",
+      "--ox-font-sans":ANTD_SANS,"--ox-font-mono":ANTD_MONO,"--ox-text-base":"14px",
+      "--ox-duration-fast":"0.1s","--ox-duration":"0.2s","--ox-duration-slow":"0.3s",
+      "--ox-ease":"cubic-bezier(0.645, 0.045, 0.355, 1)",
+      "--ox-shadow-sm":"0 1px 2px 0 rgba(255,255,255,0.01), 0 1px 6px -1px rgba(255,255,255,0.006), 0 2px 4px 0 rgba(255,255,255,0.006)",
+      "--ox-shadow":"0 6px 16px 0 rgba(255,255,255,0.016), 0 3px 6px -4px rgba(255,255,255,0.024), 0 9px 28px 8px rgba(255,255,255,0.01)",
+      "--ox-shadow-lg":"0 6px 16px 0 rgba(255,255,255,0.016), 0 3px 6px -4px rgba(255,255,255,0.024), 0 9px 28px 8px rgba(255,255,255,0.01)",
+      "--ox-density-target":"max(44px, 32px)","--ox-density-font":"14px"
+    }
+  },
+  mui: {
+    light: {
+      "--ox-accent":"#1976d2","--ox-accent-hover":"#1565c0","--ox-accent-subtle":"#42a5f5",
+      "--ox-focus-ring":"#1976d2","--ox-text-on-accent":"#fff",
+      "--ox-text":"rgba(0, 0, 0, 0.87)","--ox-text-muted":"rgba(0, 0, 0, 0.6)","--ox-text-subtle":"rgba(0, 0, 0, 0.38)",
+      "--ox-bg":"#fff","--ox-surface":"#fff","--ox-surface-raised":"#fff","--ox-surface-overlay":"#fff",
+      "--ox-border":"rgba(0, 0, 0, 0.12)",
+      "--ox-radius":"4px",
+      "--ox-font-sans":MUI_SANS,"--ox-text-base":"14px",
+      "--ox-duration-fast":"200ms","--ox-duration":"300ms","--ox-duration-slow":"375ms",
+      "--ox-ease":"cubic-bezier(0.4, 0, 0.2, 1)",
+      "--ox-shadow-sm":"0px 2px 1px -1px rgba(0,0,0,0.2),0px 1px 1px 0px rgba(0,0,0,0.14),0px 1px 3px 0px rgba(0,0,0,0.12)",
+      "--ox-shadow":"0px 2px 4px -1px rgba(0,0,0,0.2),0px 4px 5px 0px rgba(0,0,0,0.14),0px 1px 10px 0px rgba(0,0,0,0.12)",
+      "--ox-shadow-lg":"0px 5px 5px -3px rgba(0,0,0,0.2),0px 8px 10px 1px rgba(0,0,0,0.14),0px 3px 14px 2px rgba(0,0,0,0.12)"
+    },
+    dark: {
+      "--ox-accent":"#90caf9","--ox-accent-hover":"#42a5f5","--ox-accent-subtle":"#e3f2fd",
+      "--ox-focus-ring":"#90caf9","--ox-text-on-accent":"rgba(0, 0, 0, 0.87)",
+      "--ox-text":"#fff","--ox-text-muted":"rgba(255, 255, 255, 0.7)","--ox-text-subtle":"rgba(255, 255, 255, 0.5)",
+      "--ox-bg":"#121212","--ox-surface":"#121212","--ox-surface-raised":"#121212","--ox-surface-overlay":"#121212",
+      "--ox-border":"rgba(255, 255, 255, 0.12)",
+      "--ox-radius":"4px",
+      "--ox-font-sans":MUI_SANS,"--ox-text-base":"14px",
+      "--ox-duration-fast":"200ms","--ox-duration":"300ms","--ox-duration-slow":"375ms",
+      "--ox-ease":"cubic-bezier(0.4, 0, 0.2, 1)",
+      "--ox-shadow-sm":"0px 2px 1px -1px rgba(0,0,0,0.2),0px 1px 1px 0px rgba(0,0,0,0.14),0px 1px 3px 0px rgba(0,0,0,0.12)",
+      "--ox-shadow":"0px 2px 4px -1px rgba(0,0,0,0.2),0px 4px 5px 0px rgba(0,0,0,0.14),0px 1px 10px 0px rgba(0,0,0,0.12)",
+      "--ox-shadow-lg":"0px 5px 5px -3px rgba(0,0,0,0.2),0px 8px 10px 1px rgba(0,0,0,0.14),0px 3px 14px 2px rgba(0,0,0,0.12)"
+    }
+  }
+};
+
+const UNMAPPED = {
+  antd: ["--ox-status-critical","--ox-status-high","--ox-status-low","--ox-status-normal","--ox-status-unknown",
+         "--ox-flag-deceased","--ox-flag-restricted","--ox-flag-provisional",
+         "--ox-border-strong","--ox-text-on-accent"],
+  mui:  ["--ox-status-critical","--ox-status-high","--ox-status-low","--ox-status-normal","--ox-status-unknown",
+         "--ox-flag-deceased","--ox-flag-restricted","--ox-flag-provisional",
+         "--ox-bg-subtle","--ox-bg-muted","--ox-radius-sm","--ox-radius-lg","--ox-border-strong",
+         "--ox-density-target","--ox-density-font","--ox-font-mono","--ox-accent-border"]
+};
+
+const META = {
+  oxygen: { name: "Oxygen", chrome: "Oxygen (registry source)", clinical: "Oxygen tokens, unbridged", weight: "0 KB — already loaded" },
+  antd:   { name: "Ant Design", chrome: "antd@6.6.0 · ConfigProvider", clinical: "27 components, antd tokens", weight: "142 KB gzip, lazy" },
+  mui:    { name: "Material UI", chrome: "@mui/material@9.3.1 · ThemeProvider", clinical: "27 components, MUI tokens", weight: "76 KB gzip, lazy" }
+};
+
+const NOTES = {
+  oxygen: "Oxygen's own theme clears all 19 pairs the gate checks, in light, dark and high contrast.",
+  antd: "antd maps the button fill and leaves the label unmapped, so Oxygen's own label colour lands on antd's blue.",
+  mui: "MUI exposes contrastText, so the bridge maps both halves of the button pair and it passes."
+};
+
+/* --- colour maths ------------------------------------------------ */
+function parse(c) {
+  if (!c) return null;
+  c = c.trim();
+  let m = /^#([0-9a-f]{6})$/i.exec(c);
+  if (m) { const v = parseInt(m[1],16); return [v>>16&255, v>>8&255, v&255, 1]; }
+  m = /^#([0-9a-f]{3})$/i.exec(c);
+  if (m) { const h=m[1]; return [parseInt(h[0]+h[0],16),parseInt(h[1]+h[1],16),parseInt(h[2]+h[2],16),1]; }
+  m = /^rgba?\(\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)\s*(?:,\s*([\d.]+)\s*)?\)$/i.exec(c);
+  if (m) return [+m[1], +m[2], +m[3], m[4] === undefined ? 1 : +m[4]];
+  return null;
+}
+const over = (f, b) => [0,1,2].map(i => f[i]*f[3] + b[i]*(1-f[3])).concat(1);
+function lum(c) {
+  const ch = x => { x /= 255; return x <= 0.04045 ? x/12.92 : Math.pow((x+0.055)/1.055, 2.4); };
+  return 0.2126*ch(c[0]) + 0.7152*ch(c[1]) + 0.0722*ch(c[2]);
+}
+function ratio(fgRaw, bgRaw, groundRaw) {
+  const f = parse(fgRaw), b0 = parse(bgRaw), g = parse(groundRaw);
+  if (!f || !b0) return null;
+  const b = b0[3] < 1 && g ? over(b0, g) : b0;
+  const fc = f[3] < 1 ? over(f, b) : f;
+  let L1 = lum(fc), L2 = lum(b);
+  if (L1 < L2) [L1, L2] = [L2, L1];
+  return (L1 + 0.05) / (L2 + 0.05);
+}
+
+let fw = "oxygen", mode = "light";
+const stage = document.getElementById("stage");
+
+const PAIRS = [
+  { fg:"--ox-text-on-accent", bg:"--ox-accent",  label:"button label / fill",   floor:4.5 },
+  { fg:"--ox-text-subtle",    bg:"--ox-surface", label:"subtle text / surface", floor:4.5 },
+  { fg:"--ox-text",           bg:"--ox-surface", label:"body text / surface",   floor:4.5 },
+  { fg:"--ox-focus-ring",     bg:"--ox-surface", label:"focus ring / surface",  floor:3   }
+];
+
+function render() {
+  const t = fw === "oxygen" ? { ...OXYGEN[mode] } : { ...OXYGEN[mode], ...PATCH[fw][mode] };
+  for (const [k, v] of Object.entries(t)) stage.style.setProperty(k, v);
+  stage.dataset.host = fw;
+
+  document.querySelectorAll("[data-fw]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.fw === fw)));
+  document.querySelectorAll("[data-mode]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.mode === mode)));
+
+  const meta = META[fw];
+  document.getElementById("host-name").textContent = meta.name;
+  document.getElementById("bridge-tag").innerHTML = fw === "oxygen"
+    ? 'no bridge · <b>all</b> tokens from Oxygen'
+    : `data-ox-bridge="${fw}" · <b>${Object.keys(PATCH[fw][mode]).length}</b> written · <b>${UNMAPPED[fw].length}</b> held by Oxygen`;
+
+  document.getElementById("src").innerHTML =
+    `<span>chrome &nbsp;<b>${meta.chrome}</b></span>` +
+    `<span>clinical &nbsp;<b>${meta.clinical}</b></span>` +
+    `<span>added &nbsp;<b>${meta.weight}</b></span>`;
+
+  const ground = t["--ox-surface"];
+  document.getElementById("pairs").innerHTML = PAIRS.map(p => {
+    const r = ratio(t[p.fg], t[p.bg], ground);
+    const ok = r >= p.floor;
+    return `<div class="pair-top">
+      <span class="pair-name">${p.label}</span>
+      <span class="pair-val" style="color:${ok ? "#86efac" : "#fda4af"}">${r.toFixed(2)}:1
+        <span class="verdict ${ok ? "v-pass" : "v-fail"}">${ok ? "pass" : "fail"}</span></span>
+    </div>`;
+  }).join("");
+  document.getElementById("readout-note").textContent = NOTES[fw];
+}
+
+document.querySelectorAll("[data-fw]").forEach(b => b.addEventListener("click", () => { fw = b.dataset.fw; render(); }));
+document.querySelectorAll("[data-mode]").forEach(b => b.addEventListener("click", () => { mode = b.dataset.mode; render(); }));
+render();
+</script>

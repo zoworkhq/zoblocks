@@ -30,6 +30,14 @@ const nextConfig: NextConfig = {
     "@oxygenui-design/component-meta",
     "@oxygenui-design/fhir",
     "@oxygenui-design/fixtures",
+    // host-react resolves the two bridges from source as well, because all
+    // three publish `main: src/index.ts` for local development and swap to
+    // `dist` only in `publishConfig`. A missing entry here does not warn — the
+    // module simply fails to resolve and the page 500s.
+    "@oxygenui-design/host-react",
+    "@oxygenui-design/bridge-core",
+    "@oxygenui-design/bridge-antd",
+    "@oxygenui-design/bridge-mui",
     "@oxygenui-design/signature",
     "@oxygenui-design/signature-core",
   ],

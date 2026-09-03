@@ -73,7 +73,24 @@ describe("the partial-mapping rule", () => {
   it("declares what it cannot express instead of guessing", () => {
     expect(antdBridge.unmapped).toContain("--ox-status-critical");
     expect(antdBridge.unmapped).toContain("--ox-status-low");
-    expect(antdBridge.unmapped).toContain("--ox-text-on-accent");
+    expect(antdBridge.unmapped).toContain("--ox-border-strong");
+  });
+
+  /**
+   * `--ox-text-on-accent` used to be in `unmapped`, on the belief that antd
+   * exposed no such token. It exposes `colorTextLightSolid`, and the belief
+   * cost a rendering: Oxygen's dark label on antd's dark primary at 3.70:1,
+   * which antd never produces.
+   *
+   * The pairing is what matters. bridge-core only measures a contrast pair
+   * when the bridge supplies both sides, so leaving one half unmapped hides
+   * the pair from the gate entirely — and that is worse than mapping neither.
+   */
+  it("maps both halves of the button-label pair, so the gate can see it", () => {
+    const out = patch({ colorPrimary: "#1677ff", colorTextLightSolid: "#fff" });
+    expect(out["--ox-accent"]).toBe("#1677ff");
+    expect(out["--ox-text-on-accent"]).toBe("#fff");
+    expect(antdBridge.unmapped).not.toContain("--ox-text-on-accent");
   });
 });
 

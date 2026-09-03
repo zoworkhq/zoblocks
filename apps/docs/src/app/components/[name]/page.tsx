@@ -14,6 +14,8 @@ import { CopilotGallery } from "@/components/site/copilot-gallery";
 import { SwitchGallery } from "@/components/site/switch-gallery";
 import { DatePickerGallery } from "@/components/site/date-picker-gallery";
 import { InstallCommand, RevealRoot } from "@/components/site/interactions";
+import { LanguageSwitch } from "@/components/site/language-switch";
+import { HostStage } from "@/components/site/host-stage";
 import { SectionRail, type RailSection } from "@/components/site/section-rail";
 import { Playground } from "@/components/site/playground";
 import { hasPlayground } from "@/components/site/playground-registry";
@@ -295,6 +297,7 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
   const alternatives = component.relationships?.alternatives ?? [];
   const controls = component.controls ?? [];
   const playable = controls.length > 0 && hasPlayground(component.name);
+  // See the note beside the control below.
   /*
    * One props table per exported component.
    *
@@ -424,6 +427,36 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
               ) : null}
             </p>
 
+            {/*
+              The design-language switch.
+
+              Here rather than in the site header, because it changes the
+              preview on this page and nothing else — a global control would
+              imply it re-skins the site, and it deliberately does not. Beside
+              the install command because both answer the same question: does
+              this fit the stack we already have.
+            */}
+            {/*
+              On every component page, with no exceptions.
+
+              Signature was excepted at first, on the reasoning that it wraps
+              Ant Design itself so a second framework around it would either
+              fight its own provider or show an antd control inside a Material
+              frame. That was the wrong call: the second half of it is *true
+              and worth showing*. `@oxygenui-design/signature` declares antd as
+              a peer, so a Material UI shop installing it really does get antd
+              components in their palette, and a demo that hides that is a demo
+              that misleads about what the package costs.
+            */}
+            <div className="mt-8 flex flex-wrap items-center gap-x-4 gap-y-2">
+              <span className="eyebrow text-graphite-soft">Design language</span>
+              <LanguageSwitch />
+              <span className="max-w-[36ch] text-[0.75rem] leading-snug text-graphite-soft">
+                Renders the preview in that framework&rsquo;s own components and tokens. Clinical
+                colours never change.
+              </span>
+            </div>
+
             <div className="mt-8 max-w-2xl">
               {/*
                 Two channels, and the command has to match the one this
@@ -502,7 +535,16 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
             />
             <div className="mt-8" data-reveal>
               {component.name === "switch" ? (
-                <SwitchGallery />
+                /*
+                  The gallery replaces the shared preview here, so it has to
+                  mount the host itself — otherwise the one page whose subject
+                  is a primitive would be the one page the language switch did
+                  nothing on. No chrome band: forty switches already answer
+                  every question a row of buttons would.
+                */
+                <HostStage className="flex w-full min-w-0 flex-col">
+                  <SwitchGallery />
+                </HostStage>
               ) : (
                 <ComponentPreview name={component.name} states={component.states} />
               )}
@@ -535,7 +577,9 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
               <div data-reveal>
                 <SectionHeading eyebrow="Gallery" title="Every variant, mode and state — live." />
                 <div className="mt-8">
-                  <TabsGallery />
+                  <HostStage className="flex w-full min-w-0 flex-col">
+                    <TabsGallery />
+                  </HostStage>
                 </div>
               </div>
             </div>
@@ -556,7 +600,9 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
               <div data-reveal>
                 <SectionHeading eyebrow="Gallery" title="Sixteen variants, one contract — live." />
                 <div className="mt-8">
-                  <DatePickerGallery />
+                  <HostStage className="flex w-full min-w-0 flex-col">
+                    <DatePickerGallery />
+                  </HostStage>
                 </div>
               </div>
             </div>
@@ -579,7 +625,9 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
                   title="The part that is not a chat box."
                 />
                 <div className="mt-8">
-                  <CopilotGallery />
+                  <HostStage className="flex w-full min-w-0 flex-col">
+                    <CopilotGallery />
+                  </HostStage>
                 </div>
               </div>
             </div>
@@ -645,7 +693,9 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
                   type — so a control here cannot offer a value the component
                   would reject. */}
               <div className="mt-8" data-reveal>
-                <Playground name={component.name} controls={controls} />
+                <HostStage className="flex w-full min-w-0 flex-col">
+                  <Playground name={component.name} controls={controls} />
+                </HostStage>
               </div>
             </div>
           </section>

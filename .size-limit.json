@@ -171,5 +171,31 @@
     "path": "packages/react/dist/index.js",
     "limit": "200 KB",
     "ignore": ["react", "react-dom"]
+  },
+  {
+    "name": "host-react \u2014 the root entry must contain no UI framework",
+    "path": "packages/host-react/dist/index.js",
+    "import": "*",
+    "limit": "2 KB",
+    "ignore": ["react", "react-dom"]
+  },
+  {
+    "name": "host-react \u2014 the antd host, excluding the framework it mounts",
+    "path": "packages/host-react/dist/antd.js",
+    "import": "{ AntdHost }",
+    "limit": "7 KB",
+    "ignore": ["react", "react-dom", "antd"]
+  },
+  {
+    "name": "host-react \u2014 the MUI host, excluding the framework it mounts",
+    "path": "packages/host-react/dist/mui.js",
+    "import": "{ MuiHost }",
+    "limit": "7 KB",
+    "ignore": ["react", "react-dom", "@mui/material", "@emotion/react", "@emotion/styled"]
+  },
+  {
+    "name": "host chrome stylesheet",
+    "path": "packages/host-react/dist/host.css",
+    "limit": "1.5 KB"
   }
 ]

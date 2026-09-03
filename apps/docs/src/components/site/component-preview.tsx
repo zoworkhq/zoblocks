@@ -15,6 +15,8 @@
 
 import * as React from "react";
 import { facesFor } from "@/lib/faces";
+import { HostStage } from "./host-stage";
+import { HostChrome } from "./host-chrome";
 import { PageLoader, PulseLoader } from "@/registry/oxygen/pulse-loader/pulse-loader";
 import { Recorder, RecorderDispositionStrip } from "@/registry/oxygen/recorder/recorder";
 import { RhythmLoader } from "@/registry/oxygen/rhythm-loader/rhythm-loader";
@@ -4179,6 +4181,34 @@ gridCapacityRefusal(120_000);
 
 const DENSITIES: Density[] = ["patient", "standard", "clinical"];
 
+/**
+ * Which previews get a host-chrome band above the component.
+ *
+ * Not all of them. The five loaders are drawn almost entirely from clinical
+ * and motion tokens and take no chrome at all, so a band of buttons above one
+ * says nothing about the loader and makes the stage twice as tall. Recorder is
+ * the same case: it owns its own transport controls, and a second set beside
+ * them reads as part of the component.
+ *
+ * Everything else earns it, because everything else is something a reader
+ * would place inside a form or a toolbar they already own.
+ */
+const NO_CHROME = new Set([
+  "pulse-loader",
+  "breath-loader",
+  "helix-loader",
+  "infusion-loader",
+  "rhythm-loader",
+  "recorder",
+  // Signature returns early above and never consults this list; named here so
+  // the set reads as the complete answer to "which previews show no chrome".
+  "signature",
+]);
+
+function chromeFor(name: string): boolean {
+  return !NO_CHROME.has(name);
+}
+
 /** Scenarios in rail order, grouped. Ungrouped ones fall under one heading. */
 function grouped(scenarios: Scenario[]): Array<{ group: string; items: Scenario[] }> {
   const order: string[] = [];
@@ -4282,10 +4312,23 @@ export function ComponentPreview({
     return () => window.clearTimeout(timer);
   }, [copied]);
 
-  // Signature is the one component the site loads Ant Design for. Showing a
-  // static mark instead would undercut its entire argument: the only way to
-  // demonstrate that a decline is recordable is to let someone record one.
-  if (name === "signature") return <SignatureDemo />;
+  /*
+   * Signature is the one component the site loads Ant Design for. Showing a
+   * static mark instead would undercut its entire argument: the only way to
+   * demonstrate that a decline is recordable is to let someone record one.
+   *
+   * It returns early, before the stage below, so it needs its own `HostStage`
+   * or it would be the one preview on the site the language switch could not
+   * reach. No chrome band: the demo is already a form, and a second row of
+   * buttons beside it would read as part of the component.
+   */
+  if (name === "signature") {
+    return (
+      <HostStage className="flex w-full min-w-0 flex-col">
+        <SignatureDemo />
+      </HostStage>
+    );
+  }
 
   if (!scenarios?.length) {
     return (
@@ -4436,7 +4479,21 @@ export function ComponentPreview({
             */
             className="flex min-h-[13rem] flex-1 flex-col justify-center p-4 sm:p-6 lg:max-h-[24rem] lg:overflow-y-auto"
           >
-            {scenario.render()}
+            {/*
+              The stage is where the framework lands, and only the stage.
+
+              `HostStage` mounts the selected framework's provider and its
+              token bridge on one wrapper, so the component below is drawn from
+              that framework's tokens while the panel around it — rail, chrome,
+              code, notes — stays Oxygen's. A docs site that rebranded itself
+              into Ant Design when a reader clicked "Ant Design" would have
+              stopped being able to show what Oxygen looks like, which is the
+              thing it exists to do.
+            */}
+            <HostStage className="flex w-full min-w-0 flex-col gap-6">
+              {chromeFor(name) ? <HostChrome /> : null}
+              {scenario.render()}
+            </HostStage>
           </div>
 
           <div className="animate-rail-settle border-t border-panel-rule bg-panel/60 px-4 py-3.5 sm:px-5">

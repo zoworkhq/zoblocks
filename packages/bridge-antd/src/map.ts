@@ -46,6 +46,20 @@ export interface AntdTokens {
   colorPrimaryBg?: string;
   colorPrimaryBorder?: string;
 
+  /**
+   * The label colour on a filled surface.
+   *
+   * antd's own name for it, and the reason `--ox-text-on-accent` is no longer
+   * in `unmapped`: it was listed there on the belief that antd computed the
+   * label per component and exposed nothing to read. It does expose this, the
+   * docs site's playground was already using it, and the cost of the mistake
+   * was visible — with the token unmapped, Oxygen's *dark* label (#071014,
+   * near-black) landed on antd's dark primary at 3.70:1, which is not a
+   * rendering antd would ever produce. Mapped, it is antd's own #fff at
+   * 5.19:1.
+   */
+  colorTextLightSolid?: string;
+
   colorText?: string;
   colorTextSecondary?: string;
   colorTextTertiary?: string;
@@ -101,6 +115,18 @@ function semantic(token: AntdTokens): TokenPatch {
     // antd has no separate focus colour; it draws focus in the primary hue,
     // which is a real correspondence rather than an approximation.
     "--ox-focus-ring": token.colorPrimary,
+    /*
+     * Mapping both halves of this pair is the point, not a convenience.
+     *
+     * `contrastViolations` in bridge-core only checks a pair when the bridge
+     * supplies *both* sides — anything else would be guessing at a value it
+     * cannot see. So a half-mapped pair is invisible to the gate by
+     * construction: with the fill mapped and the label left to Oxygen, the
+     * ratio was never measured by anything. Now it is, and antd's own default
+     * duly reports 4.10:1 against its primary — a real AA failure in antd's
+     * palette, which is antd's to own and ours to surface rather than hide.
+     */
+    "--ox-text-on-accent": token.colorTextLightSolid,
 
     /* Text --------------------------------------------------------------- */
     "--ox-text": token.colorText,
@@ -204,8 +230,5 @@ export const antdBridge: BridgeDefinition<AntdTokens> = {
     // antd has one border weight; `border-strong` delimits a field and has to
     // clear 3:1, which `colorBorder` does not.
     "--ox-border-strong",
-    // The label colour on a filled action. antd computes it per component
-    // rather than exposing one token, so there is nothing honest to read.
-    "--ox-text-on-accent",
   ],
 };

@@ -12,12 +12,16 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.0",
+    "@mui/material": "^9.3.1",
     "@oxygenui-design/clinical-note-core": "workspace:*",
     "@oxygenui-design/component-meta": "workspace:*",
     "@oxygenui-design/copilot-core": "workspace:*",
     "@oxygenui-design/copilot-react": "workspace:*",
     "@oxygenui-design/fhir": "workspace:*",
     "@oxygenui-design/fixtures": "workspace:*",
+    "@oxygenui-design/host-react": "workspace:*",
     "@oxygenui-design/identity": "workspace:*",
     "@oxygenui-design/signature": "workspace:*",
     "@oxygenui-design/tabs": "workspace:*",

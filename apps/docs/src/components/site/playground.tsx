@@ -25,6 +25,7 @@ import { ConfigProvider, Form, theme } from "antd";
 import { Signature, signatureRequired, type SignatureProps } from "@oxygenui-design/signature";
 import { PLAYGROUND_COMPONENTS } from "./playground-registry";
 import { useSiteTheme } from "./use-site-theme";
+import { useAntdBrandTokens } from "./language-antd-theme";
 
 type Props = Record<string, unknown>;
 
@@ -379,6 +380,10 @@ export function Playground({ name, controls }: { name: string; controls: readonl
   const [props, setProps] = React.useState<Props>(initial);
   const [log, setLog] = React.useState<string[]>([]);
   const dark = useSiteTheme();
+  // The playground mounts antd directly for the renderers that need it, so it
+  // needs the same language-aware brand the Signature demo does — otherwise
+  // this is the one panel on the page the switcher does not reach.
+  const brand = useAntdBrandTokens(dark);
 
   const render = RENDERERS[name];
   if (!render) return null;
@@ -405,19 +410,18 @@ export function Playground({ name, controls }: { name: string; controls: readonl
         style={dark ? { colorScheme: "dark" } : undefined}
       >
         {/*
-          Oxygen's accent, not Ant Design's default.
+          The accent follows the design language.
 
-          With only the algorithm set this rendered antd's #1677ff with white
-          on it — 4.1:1, an AA failure on the one page in the docs that mounts
-          antd. `colorTextLightSolid` moves with it because the dark accent is a
-          light teal, and white on that is worse than the blue it replaced.
+          It was pinned to Oxygen's, for a good reason at the time: with only
+          the algorithm set this rendered antd's #1677ff with white on it —
+          4.10:1, an AA failure. Under "Ant Design" that failure is now shown
+          rather than corrected, because a reader comparing frameworks should
+          see what antd actually ships.
         */}
         <ConfigProvider
           theme={{
             algorithm: dark ? theme.darkAlgorithm : theme.defaultAlgorithm,
-            token: dark
-              ? { colorPrimary: "#6ce7cb", colorTextLightSolid: "#071014" }
-              : { colorPrimary: "#067662", colorTextLightSolid: "#ffffff" },
+            token: brand,
           }}
         >
           <PlaygroundBoundary resetKey={JSON.stringify(props)}>

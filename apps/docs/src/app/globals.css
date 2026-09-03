@@ -12,6 +12,14 @@
 /* Loader keyframes and structure. Shipped to customers as
    styles/oxygen-loader.css by the `loader-core` registry item; imported here
    so the docs render the same file a customer installs, not a copy of it. */
+/* Oxygen's reference host chrome — the Button, field, Switch, Checkbox and
+   Tabs that surround a clinical component when no framework is mounted.
+   Shipped by `@oxygenui-design/host-react`; imported here so the previews
+   render the package's own sheet rather than a copy of it. Structure only:
+   every colour and radius in it comes from `--ox-*`, which is what lets the
+   Oxygen state in the language switcher restyle under a bridge. */
+@import "../../../../packages/host-react/src/host.css";
+
 @import "../../../../registry/oxygen/lib/loader.css";
 
 /* Recorder ships styles/oxygen-recorder.css by the `recorder-core` registry

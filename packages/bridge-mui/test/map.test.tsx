@@ -94,14 +94,26 @@ describe("what MUI cannot express", () => {
   });
 
   /**
-   * The reverse: something MUI has that antd does not. MUI resolves a label
-   * colour for a filled action against its own contrast threshold; antd
-   * computes it per component and exposes no token.
+   * Both bridges map the label colour, and they do not mean the same thing.
+   *
+   * MUI *derives* `contrastText` per palette entry, against its own contrast
+   * threshold, so it moves when the brand does. antd's `colorTextLightSolid`
+   * is one fixed value for every filled surface — white by default in both its
+   * light and dark algorithms — and it is the caller's problem if their
+   * primary is too pale for it.
+   *
+   * This assertion used to say antd had no equivalent at all. That was wrong,
+   * and the error had a visible cost: with the token unmapped, Oxygen's own
+   * near-black dark label landed on antd's dark primary at 3.70:1, a button
+   * antd would never render. Left here as a comparison rather than deleted,
+   * because the difference between a derived value and a fixed one is the
+   * thing a reader of these two bridges should take away.
    */
-  it("maps contrastText, which antd has no equivalent for", () => {
+  it("derives the label colour, where antd supplies one fixed value", () => {
     const out = patch({ palette: { primary: { main: "#1976d2", contrastText: "#ffffff" } } });
     expect(out["--ox-text-on-accent"]).toBe("#ffffff");
-    expect(antdBridge.unmapped).toContain("--ox-text-on-accent");
+    expect(muiBridge.unmapped).not.toContain("--ox-text-on-accent");
+    expect(antdBridge.unmapped).not.toContain("--ox-text-on-accent");
   });
 });
 

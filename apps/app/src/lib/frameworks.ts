@@ -44,6 +44,7 @@ const ANTD_PROBE: Required<AntdTokens> = {
   colorPrimaryHover: "#000002",
   colorPrimaryBg: "#000003",
   colorPrimaryBorder: "#000004",
+  colorTextLightSolid: "#000010",
   colorText: "#000005",
   colorTextSecondary: "#000006",
   colorTextTertiary: "#000007",
