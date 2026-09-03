@@ -200,7 +200,19 @@
  * summarised as "3 filters applied" leaves a reader who inherited the screen
  * unable to tell what they are looking at.
  */
+/*
+ * A stacking context above the grid, so the popover inside it can win.
+ *
+ * The grid's sticky header is `z-index: 2` and its pinned header cells are 3,
+ * in the same root context as this bar. The add-a-filter menu was also 2 and
+ * came earlier in the document, so the header painted over it — a menu you
+ * could open, read half of, and click through to a column sort. Raising the
+ * *bar* rather than the menu keeps the fix at the layer it belongs to: host
+ * chrome sits above the component, whatever the component does internally.
+ */
 .oxw__filters {
+  position: relative;
+  z-index: 10;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -255,7 +267,8 @@
 
 .oxw__addmenu {
   position: absolute;
-  z-index: 2;
+  /* Local to the filter bar's context, which is what does the real work. */
+  z-index: 1;
   inset-block-start: calc(100% + 0.35rem);
   inset-inline-start: 0;
   display: flex;

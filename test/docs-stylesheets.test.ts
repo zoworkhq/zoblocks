@@ -64,3 +64,38 @@ describe("registry stylesheets are wired everywhere they have to be", () => {
     ).toContain(`styles/${owned}.css`);
   });
 });
+
+/**
+ * The host chrome outranks the component it wraps.
+ *
+ * `.oxw__addmenu` — the home page's add-a-filter popover — was `z-index: 2` in
+ * the same stacking context as the grid's sticky header, also 2, with the
+ * pinned header cells at 3. Same context, same or lower number, earlier in the
+ * document: the header painted over the menu, so half of it was unreadable and
+ * a click landed on a column sort behind it.
+ *
+ * The fix raises `.oxw__filters` — the bar the menu lives in — above anything
+ * the grid declares, which is the layer the rule belongs at: a host may not
+ * have to read a component's stylesheet to put a menu over it. This asserts
+ * the ordering rather than the number, so a grid that needs a higher z-index
+ * one day fails here instead of on a page nobody screenshotted.
+ */
+describe("a popover in the host chrome paints over the grid", () => {
+  const hostSheet = readFileSync(path.join(ROOT, "apps/docs/src/app/data-grid-demo.css"), "utf8");
+  const gridSheet = readFileSync(path.join(LIB, "grid.css"), "utf8");
+
+  const zIndexes = (css: string) =>
+    [...css.matchAll(/z-index:\s*(-?\d+)/g)].map((match) => Number(match[1]));
+
+  it("gives the filter bar a stacking context above every z-index in grid.css", () => {
+    const bar = /\.oxw__filters\s*\{[^}]*\}/.exec(hostSheet)?.[0] ?? "";
+    expect(bar).toMatch(/position:\s*relative/);
+
+    const barZ = zIndexes(bar)[0];
+    expect(barZ).toBeDefined();
+
+    const highestInGrid = Math.max(...zIndexes(gridSheet));
+    expect(highestInGrid).toBeGreaterThan(0);
+    expect(barZ).toBeGreaterThan(highestInGrid);
+  });
+});
