@@ -250,16 +250,32 @@ export function Counter({
   className?: string;
 }) {
   const ref = React.useRef<HTMLSpanElement>(null);
-  const [value, setValue] = React.useState(0);
+
+  /*
+   * Starts at the answer, not at zero.
+   *
+   * It initialised at 0 and only reached `to` once an IntersectionObserver
+   * fired, which meant the server rendered "0 STATES" and "0 MODES" under
+   * headings reading "Result states per component" and "Density modes". That
+   * is what a crawler indexes, what a link preview screenshots, what a reader
+   * with JavaScript blocked keeps, and what anybody who does not scroll past
+   * the fold sees — the home page's proof section claiming the product has
+   * none of the thing it is proving.
+   *
+   * So the value is the initial state and the animation is the enhancement:
+   * `count` drops to zero and runs up only after we know the element is both
+   * mounted and visible. Nothing can leave the number at zero any more,
+   * because zero is no longer where it starts.
+   */
+  const [count, setCount] = React.useState<number | null>(null);
 
   React.useEffect(() => {
     const node = ref.current;
     if (!node) return;
 
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      setValue(to);
-      return;
-    }
+    // Nothing to animate to, and nothing gained by animating to it.
+    if (to === 0) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -273,10 +289,13 @@ export function Counter({
           const progress = Math.min((now - start) / duration, 1);
           // Ease-out-expo: fast arrival, gentle settle.
           const eased = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
-          setValue(Math.round(eased * to));
+          // Settles on `to` exactly rather than on whatever the easing rounds
+          // to, so the last frame cannot land one short of the real figure.
+          setCount(progress === 1 ? to : Math.round(eased * to));
           if (progress < 1) frame = requestAnimationFrame(tick);
         };
 
+        setCount(0);
         frame = requestAnimationFrame(tick);
         return () => cancelAnimationFrame(frame);
       },
@@ -289,7 +308,7 @@ export function Counter({
 
   return (
     <span ref={ref} className={cn("numeric", className)}>
-      {value}
+      {count ?? to}
       {suffix}
     </span>
   );

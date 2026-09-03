@@ -49,7 +49,13 @@ const LOADERS = [
   },
 ] as const;
 
-export function LoaderShowcase() {
+/**
+ * @param caption  The pacing note under the grid. Off where the surrounding
+ *   section already carries its own claim about the loaders — this component
+ *   is rendered twice on the home page, and the note was the one part that
+ *   read as a mistake rather than as a reprise.
+ */
+export function LoaderShowcase({ caption = true }: { caption?: boolean } = {}) {
   return (
     <div className="instrument instrument-demo">
       <div className="relative flex items-center justify-between gap-4 border-b border-panel-rule px-4 py-2.5">
@@ -78,14 +84,18 @@ export function LoaderShowcase() {
         ))}
       </div>
 
-      <div className="relative border-t border-panel-rule bg-panel/60 px-4 py-3">
-        <p className="max-w-3xl text-[0.8125rem] leading-relaxed text-panel-muted">
-          Paced to resting physiology rather than to a spinner: 60 beats a minute, a seven percent
-          beat, nothing above 1.7 Hz. Each one is installed on its own, respects{" "}
-          <code className="font-mono text-[0.75rem] text-panel-fg/80">prefers-reduced-motion</code>{" "}
-          with a designed still state, and announces the wait in words.
-        </p>
-      </div>
+      {caption ? (
+        <div className="relative border-t border-panel-rule bg-panel/60 px-4 py-3">
+          <p className="max-w-3xl text-[0.8125rem] leading-relaxed text-panel-muted">
+            Paced to resting physiology rather than to a spinner: 60 beats a minute, a seven percent
+            beat, nothing above 1.7 Hz. Each one is installed on its own, respects{" "}
+            <code className="font-mono text-[0.75rem] text-panel-fg/80">
+              prefers-reduced-motion
+            </code>{" "}
+            with a designed still state, and announces the wait in words.
+          </p>
+        </div>
+      ) : null}
     </div>
   );
 }

@@ -99,14 +99,15 @@ export const UnknownTotal: Story = {
 };
 
 export const Absence: Story = {
-  name: "Absence, said four ways",
-  parameters: { state: "Absence, said four ways" },
+  name: "Absence, said five ways",
+  parameters: { state: "Absence, said five ways" },
   args: { rows: CASELOAD_WITH_EVERY_ABSENCE, coverage: { shown: 8, total: 312 } },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    // Four words, not four dashes. Each leads somewhere different: chase the
-    // lab, ask for access, ask the question, respect the answer.
-    for (const word of ["Awaiting", "Restricted", "Not recorded", "Declined"]) {
+    // Five words, not five dashes. Each leads somewhere different: chase the
+    // lab, ask for access, ask the question, respect the answer — and, for the
+    // last, know that there is nobody to ask because the source said nothing.
+    for (const word of ["Awaiting", "Restricted", "Not recorded", "Declined", "Not known"]) {
       expect(canvas.getByText(word)).toBeTruthy();
     }
     // Every one of them earns a numbered footnote saying what it means.

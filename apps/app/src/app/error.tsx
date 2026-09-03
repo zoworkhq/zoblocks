@@ -26,7 +26,11 @@ export default function RootError({
     <Failure
       error={error}
       retry={retry}
-      title="Something went wrong"
+      // "Something went wrong" is the first entry on CONTENT.md §5's list of
+      // error copy that names nothing. The authenticated boundary two files
+      // away already says "This screen did not load"; this is the same fact
+      // about a page that has no shell around it yet.
+      title="This page did not load"
       back={{ href: "/login", label: "Back to sign in" }}
     >
       You have not been signed out, and nothing was changed.

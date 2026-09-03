@@ -20,6 +20,7 @@ import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
 import { ArrowRight, CornerDownLeft, Search } from "lucide-react";
 import { CATALOG } from "@/lib/catalog";
+import { isReady, readyRank } from "@/lib/readiness";
 import { cn } from "@/lib/utils";
 
 interface Item {
@@ -38,32 +39,79 @@ const PAGES: Item[] = [
     label: "Components",
     group: "Pages",
     href: "/components",
-    keywords: "catalog browse all",
+    keywords: "catalogue browse all",
+  },
+  /*
+   * Install and Compare were missing.
+   *
+   * Both are footer-only in the site chrome, which made this the one place a
+   * reader could have reached them without scrolling — and it did not list
+   * them. Install is the page a developer needs most and the hardest to find.
+   */
+  {
+    id: "p-install",
+    label: "Install",
+    group: "Pages",
+    href: "/install",
+    keywords: "setup getting started next vite tailwind alias tokens cli init",
   },
   {
-    id: "p-showcase",
-    label: "Showcase",
+    id: "p-compare",
+    label: "Compare",
+    group: "Pages",
+    href: "/compare",
+    keywords: "antd ant design mui tanstack alternatives build in-house versus",
+  },
+  {
+    id: "p-blocks",
+    label: "Blocks",
     group: "Pages",
     href: "/showcase",
-    keywords: "examples compositions demos",
+    keywords: "showcase examples compositions demos dashboard note patient copilot",
   },
   {
+    id: "p-marketplace",
+    label: "Marketplace",
+    group: "Pages",
+    href: "/marketplace",
+    keywords: "packs icons illustration theme fixtures artwork",
+  },
+  {
+    /*
+     * No "pricing" keyword. It matched here while /pro was a tier table, and
+     * the page is a holding page now — typing "pricing" opened a screen with no
+     * prices on it, which is a worse answer than no answer.
+     */
     id: "p-pro",
     label: "Pro",
     group: "Pages",
     href: "/pro",
-    keywords: "pricing templates kits paid enterprise",
+    keywords: "console theming publish gate paid enterprise",
   },
 ];
 
-const COMPONENT_ITEMS: Item[] = CATALOG.map((c) => ({
-  id: `c-${c.name}`,
-  label: c.title,
-  hint: c.resource,
-  group: "Components",
-  href: `/components/${c.name}`,
-  keywords: `${c.name} ${c.resource} ${c.categories.join(" ")} ${c.summary}`.toLowerCase(),
-}));
+/*
+ * Only components with a page.
+ *
+ * This mapped the whole catalogue, so over half the results led to a 404 —
+ * `/components/timeline` and fifteen others resolve to nothing. The route,
+ * the catalogue card and the sitemap all filter by readiness; this was the
+ * one navigation surface that did not, and it is the fastest one to reach.
+ *
+ * Sorted the same way the catalogue is, so the first result for a vague query
+ * is the most finished component rather than the alphabetically luckiest.
+ */
+const COMPONENT_ITEMS: Item[] = CATALOG.filter((c) => isReady(c.name))
+  .slice()
+  .sort((a, b) => readyRank(a.name) - readyRank(b.name))
+  .map((c) => ({
+    id: `c-${c.name}`,
+    label: c.title,
+    hint: c.resource,
+    group: "Components",
+    href: `/components/${c.name}`,
+    keywords: `${c.name} ${c.resource} ${c.categories.join(" ")} ${c.summary}`.toLowerCase(),
+  }));
 
 const ALL = [...PAGES, ...COMPONENT_ITEMS];
 
@@ -210,7 +258,7 @@ export function CommandMenu() {
                   value={query}
                   onChange={(event) => setQuery(event.target.value)}
                   onKeyDown={onKeyDown}
-                  placeholder="Search components, resources, pages…"
+                  placeholder="Search components and pages…"
                   aria-label="Search"
                   role="combobox"
                   aria-expanded="true"

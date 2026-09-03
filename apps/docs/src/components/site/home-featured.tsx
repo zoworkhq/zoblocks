@@ -24,6 +24,7 @@ import * as React from "react";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 
+import { CATALOG } from "@/lib/catalog";
 import { LoaderShowcase } from "@/components/site/loader-showcase";
 import { SignatureDrawing } from "@/components/site/signature-showcase";
 import { LiveSwitch } from "@/components/site/switch-gallery";
@@ -661,6 +662,25 @@ function SignatureHomeDemo() {
 
 /* ------------------------------------------------------------------ */
 
+/**
+ * The prop counts, from the catalogue rather than from memory.
+ *
+ * All four of the ones typed here were wrong: Signature claimed 19 against 22,
+ * Context menu 15 against 16, Tabs 22 against 30, Switch 25 against 44. Nobody
+ * mistyped them — each was right when the card was written and drifted the
+ * next time the component gained a prop, which is the failure the lint rule
+ * beside this now catches.
+ *
+ * `?? 0` rather than a throw: a home page that 500s because a component was
+ * renamed is a worse outcome than one fact reading zero, and the catalogue
+ * check in CI catches the rename first anyway.
+ */
+const propCount = (name: string) => CATALOG.find((c) => c.name === name)?.props.length ?? 0;
+const variantCount = (name: string) => CATALOG.find((c) => c.name === name)?.variants?.length ?? 0;
+
+/** The loader family, counted rather than remembered. */
+const LOADER_COUNT = CATALOG.filter((c) => c.name.endsWith("-loader")).length;
+
 const FEATURED: readonly Featured[] = [
   {
     slug: "signature",
@@ -668,7 +688,7 @@ const FEATURED: readonly Featured[] = [
     resource: "Provenance",
     claim:
       "It records what was on screen at the moment of signing, so a countersignature can be defended a year later.",
-    facts: ["19 props", "Draw, type or certify", "Bound to what was shown"],
+    facts: [`${propCount("signature")} props`, "Draw, type or certify", "Bound to what was shown"],
     demo: () => <SignatureHomeDemo />,
   },
   {
@@ -677,8 +697,11 @@ const FEATURED: readonly Featured[] = [
     resource: "—",
     claim:
       "Five waits with different meanings, each with a designed reduced-motion state rather than a spinner that simply stops.",
-    facts: ["5 loaders", "Reduced motion designed", "Announced, not silent"],
-    demo: () => <LoaderShowcase />,
+    facts: [`${LOADER_COUNT} loaders`, "Reduced motion designed", "Announced, not silent"],
+    // No caption here. The card's own `claim` above says the same thing in
+    // fewer words, and the hero renders this component with its note already —
+    // the two together put one 44-word paragraph on the page twice.
+    demo: () => <LoaderShowcase caption={false} />,
     bare: true,
   },
   {
@@ -687,7 +710,11 @@ const FEATURED: readonly Featured[] = [
     resource: "Patient",
     claim:
       "It names the record before it offers to change it, so the first thing under the pointer is never a verb.",
-    facts: ["15 props", "4 consequence tiers", "Withheld is counted, not hidden"],
+    facts: [
+      `${propCount("chart-context-menu")} props`,
+      "4 consequence tiers",
+      "Withheld is counted, not hidden",
+    ],
     demo: () => <ContextMenuDemo />,
   },
   {
@@ -696,7 +723,10 @@ const FEATURED: readonly Featured[] = [
     resource: "—",
     claim:
       "Eleven skins over one accessibility tree, so choosing a look is never a choice about whether a keyboard works.",
-    facts: ["22 props", "11 variants", "APG roving tabindex"],
+    // "11 variants" contradicted the catalogue, which records five. The
+    // eleven are skins — a CSS choice — and the claim above already says so,
+    // so the fact says the thing the catalogue can actually vouch for.
+    facts: [`${propCount("tabs")} props`, "Four semantic modes", "APG roving tabindex"],
     demo: () => <TabsDemo />,
   },
   {
@@ -705,7 +735,7 @@ const FEATURED: readonly Featured[] = [
     resource: "Flag",
     claim:
       "Three values, not two: on, off, and nobody has said. The commit is visible, reversible, and survives a conflict.",
-    facts: ["25 props", "Third value: unknown", "Optimistic with rollback"],
+    facts: [`${propCount("switch")} props`, "Third value: unknown", "Optimistic with rollback"],
     demo: () => <SwitchDemo />,
   },
   {
@@ -713,8 +743,12 @@ const FEATURED: readonly Featured[] = [
     name: "Date & time",
     resource: "Period",
     claim:
-      "Sixteen variants on one contract — a range is two clicks with a live preview between them, and nothing reaches your state until Done.",
-    facts: ["16 variants", "8 keystrokes, no calendar", "Two months, one tab stop"],
+      "One contract behind every temporal control — a range is two clicks with a live preview between them, and nothing reaches your state until Done.",
+    facts: [
+      `${variantCount("date-picker")} variants`,
+      "8 keystrokes, no calendar",
+      "Two months, one tab stop",
+    ],
     demo: () => <DateDemo />,
   },
 ];
@@ -826,8 +860,13 @@ export function HomeFeatured({ total }: { total: number }) {
           <p className="eyebrow eyebrow-rule text-graphite" data-reveal>
             The library
           </p>
+          {/*
+            Derived. It was "Six components", which is a count of the array
+            directly below it — the shortest possible distance between a claim
+            and the thing that would falsify it.
+          */}
           <h2 className="display-lg mt-4 text-balance" data-reveal>
-            Six components, at the size you would actually use them.
+            {FEATURED.length} components, at the size you would actually use them.
           </h2>
           <p className="lede mt-5 max-w-2xl text-pretty" data-reveal>
             Every one below is the real component, running. Operate it — right-click a patient, type

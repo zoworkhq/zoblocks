@@ -8,6 +8,7 @@
  * types rather than from a second description of them.
  */
 
+import { installCommandFor } from "@oxygenui-design/component-meta";
 import type { ComponentDoc, PropDoc } from "@oxygenui-design/component-meta";
 import { banner, paths } from "../config";
 import type { LoadedComponent } from "../load";
@@ -86,7 +87,16 @@ export function buildCatalog(
       related: meta.related,
 
       dependencies: meta.dependencies,
-      install: `npx @oxygenui-design/cli add ${meta.name}`,
+      /*
+       * From the component's own distribution channel, not from a template.
+       *
+       * Three components publish to npm because they wrap antd, and this line
+       * handed all three an `oxygen add` command for a registry item that does
+       * not exist. The card computed the right line locally, so the same
+       * component advertised two different commands depending on which surface
+       * you read it from.
+       */
+      install: installCommandFor(meta),
 
       // The standard's second half. Emitted only when populated, so a component
       // that has not adopted it yet produces the same catalogue entry it always

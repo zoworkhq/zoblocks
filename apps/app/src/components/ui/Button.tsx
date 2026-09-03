@@ -91,6 +91,12 @@ export function Button({
   size?: ButtonSize;
   /** Present means blocked. Rendered beneath and bound with aria-describedby. */
   reason?: string;
+  /**
+   * Forwarded to the element. Declared rather than inherited: React 19 passes
+   * `ref` as an ordinary prop, but `ButtonHTMLAttributes` does not include it,
+   * so a caller that needs to move focus here would not typecheck.
+   */
+  ref?: React.Ref<HTMLButtonElement>;
 }) {
   const blocked = Boolean(reason);
   const reasonId = blocked ? `${props.id ?? "action"}-reason` : undefined;

@@ -144,6 +144,9 @@ export default async function MembersPage({
       cell: (row) => (
         <MemberRow
           memberId={row.id}
+          // Named, because the confirmation has to say who it applies to.
+          // Acting on the wrong person is the error the sentence prevents.
+          name={row.name}
           status={row.status}
           isSelf={row.isSelf}
           canManage={canManage}

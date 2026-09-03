@@ -18,11 +18,13 @@ export default function NotFound() {
         <OxygenMark className="h-4 w-7 text-ink" />
         <h1 className="display-sm mt-5">There is nothing at this address</h1>
         <p className="mt-2 text-[0.875rem] leading-relaxed text-graphite">
-          Check the link, or start from the app.
+          Check the link, or sign in and start from there.
         </p>
         <div className="mt-6">
+          {/* The destination is a password form, so the label says so. "Go to
+              the app" promised the application itself. */}
           <Link href="/login" className={buttonClasses()}>
-            Go to the app
+            Sign in
           </Link>
         </div>
       </div>

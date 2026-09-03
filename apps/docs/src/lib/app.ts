@@ -22,11 +22,24 @@ export const APP = process.env.NEXT_PUBLIC_APP_URL ?? "https://app.oxygenui.desi
 export const signInHref = `${APP}/login`;
 
 /**
- * For someone who does not.
+ * For someone who does not have an account.
  *
- * Signing up does not sign you in: the app creates a *pending* member and
- * an administrator approves it, so this leads to a form and then a waiting
- * room. The label is "Sign up" rather than "Get started" for that reason — the
- * second promises an app on the other side of the click.
+ * Signing up does not sign you in: the app creates a *pending* member and an
+ * administrator approves it, so this leads to a form and then a waiting room.
+ *
+ * The label was "Sign up", chosen over "Get started" because the second
+ * promises an app on the other side of the click. "Sign up" makes the same
+ * promise slightly more quietly, and it turned out to be the wrong one for a
+ * different reason: the form asks for an organisation address, and an
+ * organisation is created by us rather than by the person filling it in. A
+ * first-time reader clicking the one filled button on the site reached a field
+ * they could not fill.
+ *
+ * "Request a workspace" is what actually happens. The console's own heading has
+ * said "Request access" for as long as the flow has existed; the site is the
+ * half that had not caught up.
  */
 export const signUpHref = `${APP}/signup`;
+
+/** The label for `signUpHref`, so both places that render it agree. */
+export const SIGN_UP_LABEL = "Request a workspace";

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
+import { CATALOG } from "@/lib/catalog";
 import { SiteFooter, SiteHeader } from "@/components/site/chrome";
 
 /**
@@ -35,8 +36,11 @@ import { SiteFooter, SiteHeader } from "@/components/site/chrome";
 
 export const metadata: Metadata = {
   title: "Pro — coming soon",
+  // Derived. Both counts on this page said 27 against a catalogue of 30, which
+  // undersells the only half of the product a reader can actually have today.
   description:
-    "The Oxygen theming console is built and gated, and not in the first release. The 27 open-source components are.",
+    `The Oxygen theming console is built and gated, and not in the first release. ` +
+    `The ${CATALOG.length} open-source components are.`,
   alternates: { canonical: "/pro" },
 };
 
@@ -137,7 +141,7 @@ export default function ProPage() {
               </h1>
               <p className="soonLede">
                 The theming console is built and the gate works. It is not in the first release —
-                the 27 open components are.
+                the {CATALOG.length} open components are.
               </p>
 
               <div className="soonActions">

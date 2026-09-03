@@ -7,9 +7,13 @@ library reaches those.
 
 Two of these rules are enforced by lint. The rest are review material.
 
-> **Scope.** This governs user-visible text in clinical interfaces. It is not a
-> brand voice guide, and it does not override a regulator, a formulary, or a
-> local terminology policy.
+> **Scope.** Sections 1–9 govern user-visible text in clinical interfaces.
+> Section 10 governs our own product surfaces — `oxygenui.design` and the
+> console — which were outside this document until a content audit found that
+> both places it was being broken were places it did not claim to reach.
+>
+> It is not a brand voice guide, and it does not override a regulator, a
+> formulary, or a local terminology policy.
 
 ---
 
@@ -30,16 +34,28 @@ Almost every rule below is a specific instance of that one.
 
 Absence is a value with a reason, not a gap in the layout.
 
-Five kinds of absence are clinically distinct and must never collapse into one
-another:
+Six kinds of absence are clinically distinct and must never collapse into one
+another. The wording column is not illustrative — it is what the components
+actually render, so a team writing its own strings alongside them stays in one
+vocabulary:
 
-| Kind      | Means                         | Example wording            |
-| --------- | ----------------------------- | -------------------------- |
-| Not asked | Nobody collected it           | "Not asked"                |
-| Declined  | The person refused            | "Declined by patient"      |
-| Masked    | Policy withheld it from you   | "Restricted — not shown"   |
-| Pending   | Collected, result not back    | "Result pending"           |
-| Error     | The system could not fetch it | "Could not load allergies" |
+| Kind         | Means                                     | The word the components use |
+| ------------ | ----------------------------------------- | --------------------------- |
+| Not asked    | Nobody collected it                       | "Not asked"                 |
+| Not recorded | Asked, and nothing written down           | "Not recorded"              |
+| Declined     | The person refused                        | "Declined"                  |
+| Masked       | Policy withheld it from you               | "Restricted"                |
+| Pending      | Collected, result not back                | "Awaiting"                  |
+| Unattributed | No value came back, and no reason with it | "Not known"                 |
+
+A seventh case is not absence and does not belong in this table: a section that
+**failed to load** is an error, and §5 governs it. "Could not load allergies"
+is a statement about the system, not about the patient.
+
+> The five members of `GridAbsence` are the last five rows; `Not asked` is
+> `switch`'s, where a tri-state control is the thing doing the asking. A
+> component that needs a distinction not listed here is a conversation, not a
+> new string.
 
 ✅ **Do**
 
@@ -292,20 +308,160 @@ const label = useTerm({ clinician: "K+", patient: "Potassium" });
 
 ---
 
+## 10. Our own surfaces
+
+Sections 1–9 are about a clinical record. This one is about the marketing site
+and the console, and it exists because a content audit found the two rules we
+break most often are broken on our own pages rather than in the library.
+
+The failure mode is specific and worth naming: **a claim that was true when it
+was written, in a place nobody re-reads.** Not one of the defects below was a
+lie when it was typed.
+
+### 10.1 A countable number is derived or it is absent
+
+If a reader can count it, the page computes it. `27 components` sat in three
+page descriptions against a catalogue of thirty; `Twenty-two of the forty-four
+registry items` described a registry of fifty. Both were written accurately.
+
+✅ **Do**
+
+- Read the count from the catalogue: `` `${CATALOG.length} components` ``.
+- Prefer a qualifier to a stale integer when a figure is not worth deriving:
+  "about half the registry" cannot go wrong by one.
+- Use numerals for anything countable. Words are for figures inside a
+  rhetorical sentence — "twelve hours of a record being wrong" — where the
+  number is doing prose work rather than reporting a quantity.
+
+❌ **Don't**
+
+- Type a number into a meta description. Descriptions are the strings nobody
+  sees while editing and search results quote verbatim.
+- Spell out a countable figure. "All fourteen states" is the shape every stale
+  number here started as.
+
+### 10.2 Never publish a number you did not measure
+
+A decorative `0.8ms` sat in the home page's hero panel, measuring nothing. It
+is the first thing a technical reader tests, on the one site whose argument is
+that its figures can be re-checked.
+
+❌ **Don't** invent a latency, a trace identifier, or a throughput for texture.
+A panel labelled "worked example" is honest; one labelled "live parser" is not.
+
+### 10.3 Availability is three facts
+
+Built · documented · purchasable. One label carrying all three was wrong about
+two of them: fifteen components that install from the registry today were
+badged "Coming soon" beside a working install command.
+
+| Fact                  | Says               |
+| --------------------- | ------------------ |
+| Not in the registry   | "Not built"        |
+| Installs, no page yet | "Docs in progress" |
+| Finished, shop closed | "Not on sale"      |
+
+✅ **Do** suppress the control when the fact makes it meaningless. A card with
+no page does not show "View"; a component with nothing to install does not
+offer a command.
+
+### 10.4 A link is a promise about its destination
+
+"The full table is on the Pro page" pointed at a holding page with no table.
+"Compare with Pro" pointed at the same page with nothing to compare.
+
+✅ **Do** re-read the destination when you change it. A page that loses its
+table has to lose the links that promised one.
+
+### 10.5 One name per destination
+
+The blocks page was "Showcase" in the navigation, "Blocks" in its own heading
+and landmark, and "examples compositions demos" in the command palette. The
+shop was "Marketplace" on the site and "Catalogue" in the console, one click
+apart — while "catalogue" already meant the component catalogue.
+
+✅ **Do** make the navigation label, the eyebrow, the heading, the landmark and
+the search keywords the same word, across both applications.
+
+### 10.6 A CTA names what happens next
+
+"Sign up" led to a form requiring an organisation address that only we can
+issue. The console's own heading had said "Request access" all along.
+
+✅ **Do** name the outcome the click actually produces, and say so where the
+reader is, not one screen later.
+
+### 10.7 §4 and §5 apply here too
+
+The console's root error boundary said "Something went wrong" — the first
+entry on §5's forbidden list. Publish, Archive and Disable fired on one click
+with no consequence stated, against §4.
+
+✅ **Do** state the consequence at the control, not in the page lede. A reader
+deciding whether to click has the lede behind them.
+
+> `ConfirmSubmit` is the console's implementation of §4, and `ActionGate` is
+> the library's. Neither asks "Are you sure?".
+
+### 10.8 One English
+
+British, throughout both applications: **colour, catalogue, licence,
+behaviour, organisation**. `organisation` is a data field, which settles it.
+
+Exempt: code identifiers, CSS properties, Tailwind class names, and quoted
+external vocabulary such as schema.org's `Organization`.
+
+### 10.9 A density budget for prose
+
+Measured across 33,579 words of catalogue copy: 367 em dashes — one every 91
+words — and 186 uses of "rather than", one every 180. The voice is fine. The
+density is a tic.
+
+✅ **Do** aim for one em dash per 250 words of body copy, sentences under about
+35 words in rationale sections, and a full stop where a semicolon is carrying a
+third clause.
+
+❌ **Don't** reach for "rather than" when "not" or "instead of" will do.
+
+---
+
 ## Enforcement
 
-| Rule                                   | Severity | Catches                                                            |
-| -------------------------------------- | -------- | ------------------------------------------------------------------ |
-| `@oxygenui/no-absence-placeholder`     | error    | A placeholder string substituted for a missing value               |
-| `@oxygenui/no-ambiguous-clinical-copy` | warning  | Bare "Normal", "Are you sure?", generic error copy, bare "Unknown" |
+| Rule                                   | Severity | Applies to    | Catches                                                            |
+| -------------------------------------- | -------- | ------------- | ------------------------------------------------------------------ |
+| `@oxygenui/no-absence-placeholder`     | error    | components    | A placeholder string substituted for a missing value               |
+| `@oxygenui/no-ambiguous-clinical-copy` | warning  | components    | Bare "Normal", "Are you sure?", generic error copy, bare "Unknown" |
+| `@oxygenui/no-hardcoded-count`         | error    | site, console | A countable figure typed into copy instead of derived (§10.1)      |
+| `@oxygenui/no-vague-failure`           | error    | site, console | A failure message that names nothing (§10.7, §5)                   |
 
-Both are scoped to prose positions in JSX. A comparison operand, a React key, a
-`className` and an enum-ish prop value are not copy, and firing on those would
-train everyone to ignore the rule.
+The two clinical rules are scoped to prose positions in JSX. A comparison
+operand, a React key, a `className` and an enum-ish prop value are not copy,
+and firing on those would train everyone to ignore the rule.
 
 The rest of this document is review material. If a rule here turns out to be
 mechanically checkable without false positives, it should become a rule —
-`packages/eslint-plugin/rules/` and a case in `content-rules.test.js`.
+`packages/eslint-plugin/rules/`, with cases in `content-rules.test.js` for
+sections 1–9 and `product-rules.test.js` for section 10.
+
+Two of section 10 are linted: **10.1** and **10.7**, as
+`no-hardcoded-count` and `no-vague-failure`, applied through
+`configs.product` to `apps/docs` and `apps/app`. Neither existed when this
+section was written, and writing them was worth it on the first run —
+`no-hardcoded-count` immediately found four wrong prop counts on the home
+page's featured cards that the audit and two reviews had both read past.
+
+Both are scoped by file rather than by string, and the scope is the
+interesting part. Demo modules are exempt, because a panel labelled "Nine
+states, one green dot" is describing the nine things in _that panel_ — a
+curated set no expression can derive — while a page saying "27 components"
+asserts a total this repository can compute. The rule cannot tell those apart
+from the string alone. Where a page genuinely needs a typed figure, the
+exemption is a disable comment carrying the reason, as the install page's
+record of what was actually run does.
+
+The rest of section 10 is review material. Two more look checkable and are
+not yet written: a link whose text promises something the destination does not
+contain (10.4), and the American spellings in prose positions (10.8).
 
 ---
 

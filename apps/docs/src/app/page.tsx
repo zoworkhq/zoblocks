@@ -156,10 +156,22 @@ function Hero() {
               className="hero-proofline enter mt-6"
               style={{ "--enter-delay": "470ms" } as React.CSSProperties}
             >
+              {/*
+                Two hedges removed.
+
+                "WCAG-minded" sat six inches from a chip reading "WCAG 2.2 AA"
+                and a paragraph saying the standard is enforced in CI on every
+                commit — so the weakest statement of the claim was the one in
+                the hero, and a reader who found the stronger one later had
+                been undersold rather than reassured. "Runtime: 0" reads as a
+                timing of zero, which is meaningless; the actual claim is that
+                installing a component adds no runtime dependency, and that is
+                worth saying in words.
+              */}
               {[
                 { label: "Source copied", icon: Braces },
-                { label: "WCAG-minded", icon: ShieldCheck },
-                { label: "Runtime: 0", icon: Activity },
+                { label: "WCAG 2.2 AA", icon: ShieldCheck },
+                { label: "No runtime deps", icon: Activity },
               ].map(({ label, icon: Icon }) => (
                 <span key={label} className="inline-flex items-center gap-1.5">
                   <Icon aria-hidden="true" className="size-3.5 text-oxygen-deep" />
@@ -204,13 +216,23 @@ function SignalField() {
     <div
       className="signal-field"
       role="img"
-      aria-label="Live FHIR observation translated into a clinical UI: a critical potassium result is interpreted, while an observation without a reference range remains not interpreted."
+      aria-label="A worked example of a FHIR observation translated into a clinical UI: a critical potassium result is interpreted, while an observation without a reference range remains not interpreted."
     >
       <div className="signal-field__chrome">
+        {/*
+          A worked example, and it says so.
+
+          This was labelled "Live parser" over a fabricated trace URI, and the
+          footer carried "0.8ms" — a measurement of nothing, on the one panel a
+          technical reader looks at first. The rest of the site refuses to
+          invent a number; this was the exception, and it was the exception in
+          the most visible place. What the panel actually demonstrates is the
+          argument the page is making, so it now says that instead.
+        */}
         <span className="inline-flex items-center gap-2">
-          <span className="signal-live-dot" aria-hidden="true" /> Live parser
+          <span className="signal-live-dot" aria-hidden="true" /> Worked example
         </span>
-        <span className="numeric">trace://observation/001</span>
+        <span className="numeric">Observation · potassium</span>
       </div>
 
       <div className="signal-field__stage" aria-hidden="true">
@@ -257,7 +279,7 @@ function SignalField() {
         <span>
           <span className="signal-footer-dot" aria-hidden="true" /> Rendered state
         </span>
-        <span className="numeric">0.8ms · source owned</span>
+        <span className="numeric">one input, two outcomes</span>
       </div>
     </div>
   );
@@ -368,6 +390,16 @@ function StatesArgument() {
  * The measurement in the last paragraph is kept because it is the reason any
  * of this had to be written rather than inherited.
  */
+/*
+ * Derived, and spelled with a numeral.
+ *
+ * "All fourteen states" was right and hand-written, which is the combination
+ * every stale number on this site started as. It is also the only countable
+ * figure on the page that was spelled out, so it read as prose while every
+ * other number read as data.
+ */
+const DATA_GRID_STATES = CATALOG.find((c) => c.name === "data-grid")?.states.length ?? 0;
+
 function DataGridSection() {
   return (
     <section id="data-grid" className="scroll-mt-16 border-t border-rule">
@@ -413,7 +445,7 @@ function DataGridSection() {
             href="/components/data-grid"
             className="group inline-flex shrink-0 items-center gap-1.5 text-sm font-medium text-oxygen-deep"
           >
-            All fourteen states
+            All {DATA_GRID_STATES} states
             <ArrowRight
               aria-hidden="true"
               className="size-3.5 transition-transform duration-300 ease-[var(--ease-out-expo)] group-hover:translate-x-0.5"
@@ -435,7 +467,7 @@ const QUALITY = [
     body: "WCAG 2.2 AA is the bar, and it is enforced in CI — every page is audited with axe-core in both light and dark on each commit. That check found and fixed four real violations, three of them in the clinical status tokens themselves. Automated testing catches roughly a third of WCAG issues, so keyboard and screen-reader passes remain manual.",
   },
   {
-    title: "Status is never color alone",
+    title: "Status is never colour alone",
     body: "Every severity carries an icon, a text label, and a second structural cue. View any component in forced-colors mode: nothing that mattered disappears.",
   },
   {
@@ -509,8 +541,8 @@ function ClosingCta() {
                     Run <code className="font-mono text-[0.6875rem] text-ink">oxygen init</code>{" "}
                     once to say where your{" "}
                     <code className="font-mono text-[0.6875rem] text-ink">@/</code> alias points.
-                    The public catalog needs no configuration and no account — paid components add a
-                    registry namespace and a token.
+                    The public catalogue needs no configuration and no account — paid components add
+                    a registry namespace and a token.
                   </>
                 }
               />

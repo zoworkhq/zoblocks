@@ -109,13 +109,14 @@ export default async function MarketplacePage() {
                   }
                   data-reveal
                 >
-                  <h2 className="display-sm">Coming soon</h2>
-                  <p className="numeric text-xs text-graphite-soft">{announced.length} announced</p>
+                  <h2 className="display-sm">Announced</h2>
+                  <p className="numeric text-xs text-graphite-soft">{announced.length} packs</p>
                 </div>
                 <p className="body-sm mt-2 max-w-2xl text-graphite" data-reveal>
                   Announced rather than hidden — a team deciding whether to build one of these
-                  themselves deserves to know it is coming. Nothing is on sale yet: the price is
-                  what a pack will cost, not an offer.
+                  themselves deserves to know it is coming. Selling is closed while the console is
+                  out of the first release, so every price here is what a pack will cost rather than
+                  an offer. Several are finished and measured; the shop is what is shut.
                 </p>
 
                 <ul className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
@@ -133,18 +134,19 @@ export default async function MarketplacePage() {
             <div className="surface flex flex-wrap items-center justify-between gap-6 px-7 py-7">
               <div className="max-w-xl">
                 <h2 className="font-display text-xl font-semibold tracking-[-0.015em]">
-                  Buying will happen in the app
+                  Buying will happen in the console
                 </h2>
                 <p className="body-sm mt-2 text-graphite">
-                  A purchase belongs to an organisation, not to the person who paid. Packs will be
-                  perpetual and install into a theme draft. Nothing can be bought yet.
+                  A purchase belongs to an organisation, not to the person who paid — so checkout,
+                  entitlement and delivery all live there. Packs will be perpetual and install into
+                  a theme draft.
                 </p>
               </div>
               <a
                 href={`${APP}/market`}
                 className="group inline-flex items-center gap-2 rounded-xl bg-cta px-5 py-3.5 text-sm font-medium text-paper transition-all duration-300 ease-[var(--ease-out-expo)] hover:-translate-y-0.5 hover:bg-cta-hover"
               >
-                Open the app
+                Open the console
                 <ArrowUpRight
                   aria-hidden="true"
                   className="size-4 transition-transform duration-300 ease-[var(--ease-out-expo)] group-hover:translate-x-0.5"
@@ -189,11 +191,16 @@ function PackCard({ item, index }: { item: ShelfItem; index: number }) {
       >
         <div className="flex items-baseline justify-between gap-3">
           <p className="eyebrow text-graphite-soft">{KIND_LABEL[item.kind]}</p>
-          {item.purchasable ? null : (
+          {/*
+            "Coming soon" was wrong on a finished pack and duplicated by the
+            button below it. The badge answers whether the pack exists; the
+            button answers whether you can have it.
+          */}
+          {item.comingSoon ? (
             <span className="rounded-full border border-rule px-2 py-0.5 font-mono text-[0.5625rem] uppercase tracking-wider text-graphite-soft">
-              Coming soon
+              Not built yet
             </span>
-          )}
+          ) : null}
         </div>
 
         <h3 className="mt-3 font-display text-lg font-semibold tracking-[-0.015em]">
@@ -242,7 +249,13 @@ function PackCard({ item, index }: { item: ShelfItem; index: number }) {
                 "bg-paper-sunk px-2.5 py-1.5 text-[0.6875rem] font-semibold text-graphite-soft"
               }
             >
-              Coming soon
+              {/*
+                The badge above answers "does this exist"; this answers "can I
+                have it". On an unbuilt pack both are no, and repeating the
+                badge's word here was the third statement of one fact that this
+                page had too many of already.
+              */}
+              Not on sale
             </button>
           ) : (
             <a

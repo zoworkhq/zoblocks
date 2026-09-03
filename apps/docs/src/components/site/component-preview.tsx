@@ -1861,9 +1861,9 @@ const SCENARIOS: Record<string, Scenario[]> = {
     },
     {
       id: "absence",
-      label: "Four kinds of missing, four words",
+      label: "Five kinds of missing, five words",
       group: "When there is no value",
-      note: "An assessment the client has not completed, a Part 2 record this reader is not entitled to, a form nobody handed out, and a questionnaire the client declined. Four situations, four different next actions, and one em dash in every other grid. `GridValue` has no null member, so a caller cannot express “missing” without saying which — and the reason is drawn by the grid rather than by the caller's renderer, so a cell function returning a dash can never paint over a Part 2 value.",
+      note: "An assessment the client has not completed, a Part 2 record this reader is not entitled to, a form nobody handed out, a questionnaire the client declined, and a source that returned nothing and gave no reason. Five situations, five different next actions, and one em dash in every other grid. `GridValue` has no null member, so a caller cannot express “missing” without saying which — and the reason is drawn by the grid rather than by the caller's renderer, so a cell function returning a dash can never paint over a Part 2 value.",
       code: `value: (row) => row.phq9 ?? { absent: "awaiting" }
 // The type has no null member. This will not compile:
 value: (row) => row.phq9 ?? null`,
@@ -3641,7 +3641,7 @@ gridCapacityRefusal(120_000);
     {
       id: "patient",
       label: "The same chart, for the patient",
-      note: "A different catalog, not a softer tone. “Visit” and “Test result” are what a person recognises; “Encounter” and “Laboratory” are what a chart says. Since April 2021 a result reaches the patient when it reaches the ordering clinician, so a portal has to be able to say that nobody has looked at it yet.",
+      note: "A different catalogue, not a softer tone. “Visit” and “Test result” are what a person recognises; “Encounter” and “Laboratory” are what a chart says. Since April 2021 a result reaches the patient when it reaches the ordering clinician, so a portal has to be able to say that nobody has looked at it yet.",
       render: () => (
         <InstrumentStage>
           <CareTimeline

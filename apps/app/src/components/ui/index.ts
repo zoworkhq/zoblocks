@@ -17,6 +17,7 @@ export { Textarea } from "./Textarea";
 export { controlClasses } from "./control";
 export { Button, buttonClasses, type ButtonSize, type ButtonVariant } from "./Button";
 export { SubmitButton } from "./SubmitButton";
+export { ConfirmSubmit } from "./ConfirmSubmit";
 export { StatusChip, type ChipTone } from "./StatusChip";
 export { Verdict } from "./Verdict";
 export { Callout } from "./Callout";

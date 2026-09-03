@@ -8,13 +8,13 @@ import { publishThemeAction } from "@/lib/actions";
 import { ActionForm } from "@/components/action-form";
 import {
   Callout,
+  ConfirmSubmit,
   CopyButton,
   DataTable,
   PageHeader,
   Panel,
   Ramp,
   StatusChip,
-  SubmitButton,
   type Column,
 } from "@/components/ui";
 import type { ThemeVersionDoc } from "@/db/collections";
@@ -151,9 +151,32 @@ export default async function ThemePage({ params }: { params: Promise<{ slug: st
               // sends focus to the document body — exactly when the reader is
               // waiting to hear whether their theme published.
               footer={
-                <SubmitButton id="publish" reason={publishReason} pendingLabel="Publishing…">
+                /*
+                 * The consequence, at the moment of the action.
+                 *
+                 * The page lede states the model — nothing reaches a running
+                 * application until you publish — and that is the right thing
+                 * for it to say. It is not a confirmation: a reader who has
+                 * scrolled to the header and is deciding whether to click has
+                 * the sentence behind them. §4 asks for what happens, to whom,
+                 * and what cannot be undone, at the control.
+                 */
+                <ConfirmSubmit
+                  id="publish"
+                  reason={publishReason}
+                  pendingLabel="Publishing…"
+                  confirmLabel={`Publish v${(theme.liveVersion ?? 0) + 1}`}
+                  consequence={
+                    theme.liveVersion
+                      ? `Serves v${(theme.liveVersion ?? 0) + 1} to every application pinned to ${theme.name}. ` +
+                        `v${theme.liveVersion} stays served at its own URL. A published version cannot be ` +
+                        `withdrawn, only superseded.`
+                      : `Publishes ${theme.name} for the first time and serves it to any application ` +
+                        `pinned to it. A published version cannot be withdrawn, only superseded.`
+                  }
+                >
                   Publish
-                </SubmitButton>
+                </ConfirmSubmit>
               }
             >
               <input type="hidden" name="themeId" value={theme._id.toHexString()} />

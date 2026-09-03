@@ -9,7 +9,7 @@ export default function NewThemePage() {
       <PageHeader
         eyebrow="New"
         title="Create a theme"
-        lede="Give us your brand colour. We generate the ramp and check every derived pair."
+        lede="One brand colour. The console derives the ramp and checks every pair it produces."
       />
       <NewThemeForm />
     </>

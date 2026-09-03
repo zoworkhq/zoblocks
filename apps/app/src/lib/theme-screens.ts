@@ -11,7 +11,7 @@ import {
 import { RAMP_STEPS, type ThemeTokens } from "@oxygenui-design/theme";
 
 /**
- * The seven screens that operate on one theme — declared once.
+ * The eight screens that operate on one theme — declared once.
  *
  * They were declared in the rail, as two hardcoded arrays. That was survivable
  * while the rail was the only thing that listed them, and it stopped being
@@ -145,7 +145,7 @@ export const THEME_SCREENS: readonly ThemeScreen[] = [
   },
   {
     path: "transfer",
-    label: "Import / export",
+    label: "Import and export",
     group: "tools",
     Icon: ArrowLeftRight,
     purpose: "Five ways out, one way in — including the antd and MUI mappings.",

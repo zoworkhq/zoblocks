@@ -32,36 +32,49 @@ export const metadata: Metadata = {
 };
 
 const REQUIREMENTS = [
-  { name: "React", version: "19", note: "18 is untested." },
+  { name: "React", version: "19", note: "18 is partly covered." },
   { name: "TypeScript", version: "5.7+", note: "Sources ship as .tsx and .ts." },
   { name: "Tailwind CSS", version: "4", note: "CSS-first config. No tailwind.config.js." },
   { name: "npm dependencies", version: "2", note: "clsx and tailwind-merge. Nothing else." },
 ];
 
-const MATRIX = [
+const MATRIX: ReadonlyArray<{
+  stack: string;
+  status: "verified" | "partial" | "untested";
+  detail: string;
+}> = [
   {
     stack: "Next.js 16, App Router",
-    status: "verified" as const,
+    status: "verified",
     detail:
       "This documentation site is built on it, including every live demo on every component page.",
   },
   {
     stack: "Vite 6 + @tailwindcss/vite",
-    status: "verified" as const,
+    status: "verified",
+    /*
+     * A record of what was run, not a claim about what exists.
+     *
+     * Deriving this from the catalogue would make it lie the next time a
+     * component ships: the probe installed four, and it will always have
+     * installed four. This is the case the count rule cannot see from the
+     * string, so it is stated here.
+     */
     detail:
+      // eslint-disable-next-line @oxygenui/no-hardcoded-count -- historical record; see above
       "Four components installed from the registry, then vite build and tsc --noEmit, both clean. 40 modules, no polyfills, no shims.",
   },
   {
     stack: "Remix / React Router 7",
-    status: "untested" as const,
+    status: "untested",
     detail:
       "Nothing about the components is Next-specific — no framework imports, no Node built-ins anywhere in the registry — so it is expected to work. We have not run it, so it is listed as untested rather than supported.",
   },
   {
     stack: "React 18",
-    status: "untested" as const,
+    status: "partial",
     detail:
-      "Components are authored against React 19. Some use hooks and patterns that may not have 18 equivalents; nobody has checked.",
+      "The loaders and tokens build and typecheck against React 18 in a dedicated smoke package. The registry components are authored against React 19 and some use patterns that may not have 18 equivalents; nobody has checked those.",
   },
 ];
 
@@ -158,7 +171,7 @@ resolve: { alias: { "@": path.resolve(__dirname, "src") } }`}
               <Step
                 n="03"
                 title="The client boundary"
-                body="Twenty-two of the forty-four registry items carry a “use client” directive of their own, so they work unchanged in a React Server Component tree. The ones that do not are pure presentation and render on the server."
+                body="About half the registry declares its own “use client” boundary, so components work unchanged in a React Server Component tree. The ones that do not are pure presentation and render on the server."
                 code={`// app/page.tsx — a Server Component
 import { ResultValue } from "@/components/oxygen/result-value";
 
@@ -176,7 +189,8 @@ import { ResultValue } from "@/components/oxygen/result-value";
               What we have actually run.
             </h2>
             <p className="mt-4 max-w-2xl text-pretty text-graphite" data-reveal>
-              &ldquo;Untested&rdquo; below means nobody has run it, not that it is known to fail. We
+              &ldquo;Untested&rdquo; below means nobody has run it, not that it is known to fail;
+              &ldquo;partial&rdquo; means some of the surface is covered and the rest is not. We
               would rather name the gap than let you find it.
             </p>
 
@@ -192,7 +206,9 @@ import { ResultValue } from "@/components/oxygen/result-value";
                       className={`numeric rounded px-2 py-0.5 text-[0.625rem] uppercase tracking-wider ${
                         row.status === "verified"
                           ? "bg-oxygen/10 text-oxygen-deep"
-                          : "bg-rule/60 text-graphite"
+                          : row.status === "partial"
+                            ? "border border-rule-strong text-ink"
+                            : "bg-rule/60 text-graphite"
                       }`}
                     >
                       {row.status}

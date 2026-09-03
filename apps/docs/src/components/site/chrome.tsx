@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import { ArrowUpRight, Github } from "lucide-react";
 import { CommandMenu } from "@/components/site/command-menu";
 import { ThemeToggle } from "@/components/site/theme-toggle";
-import { signInHref, signUpHref } from "@/lib/app";
+import { SIGN_UP_LABEL, signInHref, signUpHref } from "@/lib/app";
 import { cn } from "@/lib/utils";
 
 export function OxygenMark({ className = "h-4 w-7" }: { className?: string }) {
@@ -20,11 +20,24 @@ export function OxygenMark({ className = "h-4 w-7" }: { className?: string }) {
   );
 }
 
+/*
+ * Four slots, spent on what a reader can act on.
+ *
+ * Two of them used to point at surfaces that cannot be transacted — the
+ * marketplace, where nothing is on sale, and Pro, which is a holding page —
+ * while Install and Compare, the two highest-intent pages for a developer and
+ * an engineering lead, were reachable only from the footer.
+ *
+ * "Blocks" rather than "Showcase" for the same destination: the page's own
+ * eyebrow, heading and landmark all say Blocks, and "showcase" additionally
+ * promises customer work that the page then has to walk back in its first
+ * paragraph.
+ */
 const NAV = [
   { href: "/components", label: "Components" },
-  { href: "/showcase", label: "Showcase" },
-  { href: "/marketplace", label: "Marketplace" },
-  { href: "/pro", label: "Pro" },
+  { href: "/install", label: "Install" },
+  { href: "/compare", label: "Compare" },
+  { href: "/showcase", label: "Blocks" },
 ];
 
 /**
@@ -186,7 +199,7 @@ export function SiteHeader() {
             href={signUpHref}
             className="ml-1 inline-flex shrink-0 items-center rounded-lg bg-cta px-3 py-1.5 text-sm font-medium text-paper transition-colors duration-200 hover:bg-cta-hover"
           >
-            Sign up
+            {SIGN_UP_LABEL}
           </a>
         </nav>
       </div>
@@ -200,10 +213,10 @@ const FOOTER_LINKS = [
     links: [
       { href: "/components", label: "Components" },
       { href: "/install", label: "Install" },
-      { href: "/showcase", label: "Showcase" },
+      { href: "/compare", label: "Compare" },
+      { href: "/showcase", label: "Blocks" },
       { href: "/marketplace", label: "Marketplace" },
       { href: "/pro", label: "Pro" },
-      { href: "/compare", label: "Compare" },
     ],
   },
   {
@@ -227,7 +240,7 @@ const FOOTER_LINKS = [
     title: "App",
     links: [
       { href: signInHref, label: "Sign in", external: true },
-      { href: signUpHref, label: "Sign up", external: true },
+      { href: signUpHref, label: SIGN_UP_LABEL, external: true },
     ],
   },
 ];

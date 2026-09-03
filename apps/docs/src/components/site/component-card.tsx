@@ -69,10 +69,15 @@ import { RecentPatientStack } from "@/registry/oxygen/recent-patient-stack/recen
 import { ChartCommandPalette } from "@/registry/oxygen/chart-command-palette/chart-command-palette";
 import { ContextMenuArt } from "@/components/site/context-menu-demo";
 import { IdentityProvider, PatientChip, IdentitySet } from "@oxygenui-design/identity";
-import { STATUS_LABEL, type ComponentDoc } from "@/lib/catalog";
+import { STATUS_CONTRACT, STATUS_LABEL, type ComponentDoc } from "@/lib/catalog";
 import { AcquireAction, PriceTag } from "@/components/site/acquire";
 import { cn } from "@/lib/utils";
-import { isReady } from "@/lib/readiness";
+import {
+  DISTRIBUTION_CONTRACT,
+  DISTRIBUTION_LABEL,
+  distributionState,
+  isReady,
+} from "@/lib/readiness";
 
 import { Recorder } from "@/registry/oxygen/recorder/recorder";
 import { DateField } from "@/registry/oxygen/date-picker/date-picker";
@@ -1116,6 +1121,15 @@ export function ComponentCard({
 }) {
   const preview = PREVIEW[component.name];
   const ready = isReady(component.name);
+  /*
+   * Three facts, not one label.
+   *
+   * `ready` answers "does it have a page". The badge was reading it as "does
+   * it exist" and printing "Coming soon" — on fifteen components that install
+   * from the registry today, directly beside a working install button. The
+   * label undersold shipped work and contradicted the control next to it.
+   */
+  const distribution = distributionState(component.name);
 
   return (
     /*
@@ -1186,8 +1200,9 @@ export function ComponentCard({
             "shrink-0 rounded-full border px-2 py-0.5 font-mono text-[0.625rem] uppercase tracking-wider",
             ready ? STATUS_STYLE[component.status] : "border-rule text-graphite-soft",
           )}
+          title={ready ? STATUS_CONTRACT[component.status] : DISTRIBUTION_CONTRACT[distribution]}
         >
-          {ready ? STATUS_LABEL[component.status] : "Coming soon"}
+          {ready ? STATUS_LABEL[component.status] : DISTRIBUTION_LABEL[distribution]}
         </span>
       </div>
 
@@ -1291,13 +1306,22 @@ export function ComponentCard({
 
         <div className="flex items-center gap-2">
           <AcquireAction component={component} />
-          <span
-            aria-hidden="true"
-            className="inline-flex items-center gap-1 text-xs font-medium text-oxygen-deep"
-          >
-            View
-            <ArrowRight className="size-3.5 transition-transform duration-300 ease-[var(--ease-out-expo)] group-hover:translate-x-1" />
-          </span>
+          {/*
+            "View" only where there is something to view.
+
+            The card drops its overlay link when a component has no page, but
+            this affordance stayed — so an unopenable card still showed "View →"
+            in the corner and read as a link that had stopped working.
+          */}
+          {ready ? (
+            <span
+              aria-hidden="true"
+              className="inline-flex items-center gap-1 text-xs font-medium text-oxygen-deep"
+            >
+              View
+              <ArrowRight className="size-3.5 transition-transform duration-300 ease-[var(--ease-out-expo)] group-hover:translate-x-1" />
+            </span>
+          ) : null}
         </div>
       </div>
     </article>

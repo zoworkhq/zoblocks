@@ -3,7 +3,7 @@
 import { Archive, ArchiveRestore } from "lucide-react";
 import { archiveThemeAction } from "@/lib/actions";
 import { ActionForm } from "@/components/action-form";
-import { SubmitButton } from "@/components/ui";
+import { ConfirmSubmit, SubmitButton } from "@/components/ui";
 
 /**
  * Take a theme out of the list, or put it back.
@@ -31,27 +31,51 @@ export function ArchiveForm({
   return (
     // `quiet` for the same reason the publish form beside it is: this sits in
     // the header's control row, where a result panel displaces the buttons.
-    <ActionForm quiet action={archiveThemeAction}>
+    <ActionForm
+      quiet
+      action={archiveThemeAction}
+      /*
+        In `footer`, not in `children`: children sit inside the fieldset the
+        form disables while the action runs, and a button that goes `disabled`
+        mid-submit drops out of the accessibility tree and sends focus to the
+        document body. The publish form beside this one has always done it this
+        way; this one had not.
+      */
+      footer={
+        <>
+          {/*
+            Restoring needs no sentence; archiving does.
+
+            Archiving is reversible — that is the whole reason it is not a
+            delete — but it removes a theme from everybody's list in the
+            organisation, and the published stylesheets carry on serving
+            underneath. A reader who thinks they have taken something out of
+            production has the wrong model, and the button is where that gets
+            corrected.
+          */}
+          {archived ? (
+            <SubmitButton variant="secondary" size="sm" reason={reason} pendingLabel="Restoring…">
+              <ArchiveRestore aria-hidden="true" strokeWidth={2} className="size-3.5" />
+              Restore
+            </SubmitButton>
+          ) : (
+            <ConfirmSubmit
+              variant="secondary"
+              size="sm"
+              reason={reason}
+              pendingLabel="Archiving…"
+              confirmLabel="Archive it"
+              consequence="Hides this theme from everyone in your organisation. Published versions keep serving at their own URLs, so any application pinned to one is unaffected. You can restore it."
+            >
+              <Archive aria-hidden="true" strokeWidth={2} className="size-3.5" />
+              Archive
+            </ConfirmSubmit>
+          )}
+        </>
+      }
+    >
       <input type="hidden" name="themeId" value={themeId} />
       <input type="hidden" name="archived" value={archived ? "false" : "true"} />
-      <SubmitButton
-        variant="secondary"
-        size="sm"
-        reason={reason}
-        pendingLabel={archived ? "Restoring…" : "Archiving…"}
-      >
-        {archived ? (
-          <>
-            <ArchiveRestore aria-hidden="true" strokeWidth={2} className="size-3.5" />
-            Restore
-          </>
-        ) : (
-          <>
-            <Archive aria-hidden="true" strokeWidth={2} className="size-3.5" />
-            Archive
-          </>
-        )}
-      </SubmitButton>
     </ActionForm>
   );
 }

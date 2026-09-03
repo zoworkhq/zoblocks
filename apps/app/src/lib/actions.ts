@@ -535,11 +535,21 @@ export async function signUpAction(form: FormData): Promise<ActionResult> {
   });
 
   if (!result.ok) {
+    /*
+     * Names what failed, which "that request could not be completed" did not.
+     *
+     * The old message also assumed the reader had an administrator to ask.
+     * Somebody arriving from the public site does not — organisations are
+     * created by us — so the message sent every genuinely new visitor to a
+     * person who does not exist. CONTENT.md §5: say what failed, and say what
+     * is still available.
+     */
     return {
       ok: false,
-      message: "That request could not be completed.",
+      message: "No organisation is registered at that address.",
       problems: [
-        "Check the organisation address with your administrator — it is the short name in your app URLs.",
+        "If your team already uses Oxygen, ask an administrator for the short name in your app URLs.",
+        "If you are starting a new organisation, email hello@zowork.com and we will set one up.",
         "If you already have an account, sign in instead.",
       ],
     };
@@ -659,13 +669,20 @@ export async function changePasswordAction(form: FormData): Promise<ActionResult
     await currentSessionToken(),
   );
 
-  // One message, and it does not distinguish "wrong current password" from
-  // anything else — the same reasoning as sign-in.
+  /*
+   * One message, and it does not distinguish "wrong current password" from
+   * anything else — the same reasoning as sign-in.
+   *
+   * Undistinguished is not the same as unnamed, which is what "That did not
+   * work" was. Naming the field that was refused tells an honest reader where
+   * to look without telling an attacker anything they could not already
+   * determine by trying.
+   */
   if (!ok) {
     return {
       ok: false,
-      message: "That did not work.",
-      problems: ["Check your current password and try again."],
+      message: "Your current password was not accepted.",
+      problems: ["Check it and try again. Your password has not been changed."],
     };
   }
 

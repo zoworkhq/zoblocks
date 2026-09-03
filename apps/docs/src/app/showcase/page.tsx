@@ -7,7 +7,7 @@ import { RevealRoot } from "@/components/site/interactions";
 import { BlockGallery } from "@/components/site/block-gallery";
 
 export const metadata: Metadata = {
-  title: "Showcase — Oxygen UI blocks",
+  title: "Blocks — clinical screens built from Oxygen UI",
   description:
     "Production-shaped clinical screens built from Oxygen UI: caseload dashboard, progress note with provenance, patient view, sourced copilot. Live, synthetic data.",
   alternates: { canonical: "/showcase" },

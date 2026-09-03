@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
+import { CATALOG, getComponent } from "@/lib/catalog";
 import { SiteFooter, SiteHeader } from "@/components/site/chrome";
 import { RevealRoot } from "@/components/site/interactions";
 
@@ -26,13 +27,26 @@ export const metadata: Metadata = {
   alternates: { canonical: "/compare" },
 };
 
+/*
+ * Derived, because both were typed and both were wrong.
+ *
+ * "27 components carrying 300-plus documented states" understated a catalogue
+ * of 30 carrying 352 — on the page whose whole premise is that its figures can
+ * be re-checked. The catalogue page computes both correctly one click away.
+ */
+const COMPONENT_COUNT = CATALOG.filter((component) => component.status !== "deprecated").length;
+const STATE_COUNT = CATALOG.reduce((total, component) => total + component.states.length, 0);
+
+/** The grid's own numbers, so the table below cannot describe a version it is not. */
+const GRID = getComponent("data-grid");
+const GRID_COLUMN = `Oxygen DataGrid ${GRID?.since ?? ""}`.trim();
+
 const OPTIONS = [
   {
     name: "Build it in-house",
     when: "You have a design system, an accessibility practice, and a team that can carry both.",
     cost: "The components are the small part. The states are the work.",
-    detail:
-      "A lab result is an afternoon. A lab result that renders a corrected value without hiding the number a clinician saw an hour ago, distinguishes “no reference range published” from “within range”, and says “restricted” rather than showing an em dash — that is the part that takes a quarter and gets cut when the quarter runs out. Oxygen ships 27 components carrying 300-plus documented states because those states are the reason the library exists.",
+    detail: `A lab result is an afternoon. A lab result that renders a corrected value without hiding the number a clinician saw an hour ago, distinguishes “no reference range published” from “within range”, and says “restricted” rather than showing an em dash — that is the part that takes a quarter and gets cut when the quarter runs out. Oxygen ships ${COMPONENT_COUNT} components carrying ${STATE_COUNT} documented states because those states are the reason the library exists.`,
   },
   {
     name: "A general-purpose React library",
@@ -46,7 +60,7 @@ const OPTIONS = [
     when: "You need a data grid and you have the design and accessibility capacity to finish it.",
     cost: "You get the row model. You still own every cell and every keyboard interaction.",
     detail:
-      "TanStack Table v9 went stable on 4 August 2026 at roughly 25 KB with a substantially leaner memory profile than v8, and its row-model pipeline is the best in the ecosystem — we read it closely while designing our own grid and chose not to depend on it. The reason is narrow: our row carries disclosure, absence and coverage semantics that a general row model has no place for, and adapting one costs more than the pipeline saves.",
+      "TanStack Table v9 went stable on 4 August 2026 at roughly 25 KB with a substantially leaner memory profile than v8, and its row-model pipeline is the best in the ecosystem — we read it closely while building our own grid and chose not to depend on it. The reason is narrow: our row carries disclosure, absence and coverage semantics that a general row model has no place for, and adapting one costs more than the pipeline saves.",
   },
 ];
 
@@ -61,7 +75,7 @@ const RC_TABLE = [
   {
     claim: "aria-* attributes in the published ES build",
     finding: "One — aria-hidden.",
-    ours: "Full grid semantics is the design target for our own grid.",
+    ours: "Full grid semantics, shipped.",
     tone: "gap" as const,
   },
   {
@@ -91,7 +105,7 @@ const RC_TABLE = [
   {
     claim: "Shift-range selection",
     finding: "Handled by useSelection.",
-    ours: "Same behaviour expected.",
+    ours: "Same behaviour, shipped.",
     tone: "credit" as const,
   },
   {
@@ -105,7 +119,7 @@ const RC_TABLE = [
 const NOT_FOR_YOU = [
   "You want components you can upgrade with a version bump. Source is copied into your repo, so fixes arrive as a diff you take deliberately — that is the trade, and for some teams it is the wrong one.",
   "You need a component library for a general product. Most of Oxygen is clinical, and the parts that are not are better served by antd or MUI.",
-  "You need a data grid today. Ours is researched and not built; there is no code yet.",
+  "You need a general-purpose table. Ours is built for clinical worklists — a required coverage claim, five kinds of absence, model provenance on a derived column — and it does not generalise into a reporting grid.",
   "You are looking for a compliance shortcut. Oxygen is not a compliance boundary and not a medical device, and using it changes nothing about your regulatory position.",
 ];
 
@@ -180,7 +194,7 @@ export default function ComparePage() {
               <table className="w-full min-w-[46rem] border-collapse text-left text-sm">
                 <thead>
                   <tr className="border-b border-rule bg-paper-sunk">
-                    {["Checked", "rc-table + antd", "Oxygen DataGrid (designed)"].map((h) => (
+                    {["Checked", "rc-table + antd", GRID_COLUMN].map((h) => (
                       <th
                         key={h}
                         scope="col"
@@ -209,11 +223,20 @@ export default function ComparePage() {
               </table>
             </div>
 
+            {/*
+              The last sentence used to read "our grid is designed and not yet
+              implemented". It shipped at 0.6.0, and the home page has been
+              running it since — so the most sceptical page on the site was
+              telling a reader the flagship component did not exist while the
+              component itself ran two clicks away. The column carries the
+              version now, which is the form of this claim that stays true.
+            */}
             <p className="mt-5 max-w-2xl text-sm leading-relaxed text-graphite" data-reveal>
               The last three rows matter as much as the first four. rc-table is careful, well-built
               software that was not written for a clinical grid, and the gaps above are a
-              description of its scope rather than of its quality. Our grid is designed and not yet
-              implemented — the column says &ldquo;designed&rdquo; because that is what it is.
+              description of its scope rather than of its quality. Our grid ships at{" "}
+              {GRID?.status ?? "beta"} — the column names the version so the row can be checked
+              against it.
             </p>
           </div>
         </section>

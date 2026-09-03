@@ -9,8 +9,12 @@ import { InstallCommand, RevealRoot } from "@/components/site/interactions";
 
 export const metadata: Metadata = {
   title: "Components — React healthcare UI library",
+  // Derived, like the count in the page body directly below it. This said 27
+  // against a catalogue of 30 — and a description is the one string on a page
+  // that nobody sees while editing, so it is the one that stays wrong longest.
   description:
-    "27 React components for clinical software, typed to FHIR R4. Live preview and install line on every card. MIT licensed, installed one at a time.",
+    `${CATALOG.length} React components for clinical software, typed to FHIR R4. ` +
+    `Live preview and install line on every card. MIT licensed, installed one at a time.`,
   alternates: { canonical: "/components" },
 };
 
@@ -37,7 +41,7 @@ export default function ComponentsPage() {
           <div className="mx-auto grid max-w-6xl section-major gap-10 px-5 sm:px-8 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)] lg:items-end lg:gap-16">
             <div>
               <p className="eyebrow eyebrow-rule text-oxygen-deep" data-reveal>
-                Catalog
+                Catalogue
               </p>
               <h1 className="display-lg mt-5 text-balance" data-reveal>
                 Every component ships the states a demo would skip.
@@ -48,10 +52,10 @@ export default function ComponentsPage() {
                   a different number in the pricing table, and both were wrong
                   by the time anybody read them.
                 */}
-                All {free} of them are free and MIT licensed. Install them one at a time — the line
-                is on every card. Each one handles reduced motion with a designed still state,
-                announces itself in words, and resolves every colour through a token your brand can
-                override.
+                All {free} are free, MIT licensed, and installed as source you own — the command is
+                on every card. Each one has a designed still state for reduced motion, says its
+                status in words rather than colour alone, and takes every colour from a token your
+                brand can override.
               </p>
 
               <div className="mt-8 max-w-md" data-reveal>
@@ -60,9 +64,9 @@ export default function ComponentsPage() {
                   command="npx @oxygenui-design/cli init"
                   note={
                     <>
-                      Once per project, to say where your{" "}
-                      <code className="font-mono text-[0.6875rem] text-ink">@/</code> alias points.
-                      After that every card&rsquo;s install line works.
+                      Run once per project. It records where your{" "}
+                      <code className="font-mono text-[0.6875rem] text-ink">@/</code> alias points,
+                      and every install command below works after that.
                     </>
                   }
                 />
@@ -78,7 +82,7 @@ export default function ComponentsPage() {
                   value: new Set(CATALOG.flatMap((component) => component.categories)).size,
                 },
                 {
-                  label: "States handled",
+                  label: "Documented states",
                   value: CATALOG.reduce((total, component) => total + component.states.length, 0),
                 },
               ].map((stat) => (
@@ -169,11 +173,24 @@ export default function ComponentsPage() {
                 </div>
               </div>
 
+              {/*
+                No link to a table that does not exist.
+
+                This pointed at /pro for "the full table", and /pro has been a
+                holding page since the console left the first release — no
+                tiers, no prices, nothing to compare. A link is a promise about
+                the destination, and this one promised the single thing the
+                destination does not have. The address is the honest next step,
+                because talking to somebody is genuinely how these are priced.
+              */}
               <p className="mt-4 text-xs text-graphite-soft" data-reveal>
-                Team and Enterprise add starter kits, shared design assets and support —{" "}
-                <Link href="/pro" className="underline underline-offset-2 hover:text-ink">
-                  the full table is on the Pro page
-                </Link>
+                Team and Enterprise add starter kits, shared design assets and support.{" "}
+                <a
+                  href="mailto:hello@zowork.com?subject=Oxygen%20UI%20Team%20and%20Enterprise"
+                  className="underline underline-offset-2 hover:text-ink"
+                >
+                  Ask us for the current terms
+                </a>
                 .
               </p>
             </div>

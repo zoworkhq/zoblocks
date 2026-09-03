@@ -24,6 +24,7 @@ export function SubmitButton({
   reason,
   className,
   id,
+  ref,
 }: {
   children: React.ReactNode;
   /** Shown while the action runs. Falls back to the idle label. */
@@ -34,11 +35,14 @@ export function SubmitButton({
   reason?: string;
   className?: string;
   id?: string;
+  /** Forwarded, so a confirmation step can move focus onto the real submit. */
+  ref?: React.Ref<HTMLButtonElement>;
 }) {
   const { pending } = useFormStatus();
 
   return (
     <Button
+      ref={ref}
       type="submit"
       id={id}
       variant={variant}

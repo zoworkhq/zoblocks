@@ -5405,7 +5405,7 @@ export const CATALOG: ComponentDoc[] = [
     "summary": "A worklist that states what it is showing out of what, holds arriving results behind a line, and names the model when you sort by one.",
     "tagline": "States its coverage before it shows you the rows.",
     "description": "A ruled ledger with role=\"grid\": coverage above the data rather than under it, a total that may honestly be unknown, absence said in words rather than an em dash, numbered footnotes naming the model behind a derived column, and results that arrive without anything moving under your hand.",
-    "rationale": "Every grid renders the six rows on screen and says nothing about the other 306. That is the defect, and it is not a missing feature — it is a claim the component makes and cannot support. A filtered caseload is a worse liar than a paginated one, because the filter was set by somebody at 07:00 who has since stopped seeing it, and the reader at 15:00 believes they are looking at the whole team's list. So coverage is required, the predicate prints as a sentence, and a total the source will not give is rendered as \"the source did not say\" rather than as the page size. Three further consequences follow from taking a worklist seriously as a safety surface: absence has five reasons and no em dash, because an assessment the client declined and a Part 2 record this reader may not see are different situations with different next actions; sorting by a model-derived column is ranking a prediction, so the column carries the model, its version and the population it was validated in; and results that land are counted and held rather than merged, because a grid that reorders under a pointer is how somebody actions the row that used to be there.",
+    "rationale": "Every grid renders the six rows on screen and says nothing about the other 306. That is the defect, and it is not a missing feature — it is a claim the component makes and cannot support. A filtered caseload is a worse liar than a paginated one, because the filter was set by somebody at 07:00 who has since stopped seeing it, and the reader at 15:00 believes they are looking at the whole team's list. So coverage is required, the predicate prints as a sentence, and a total the source will not give is rendered as \"the source did not say\" rather than as the page size. Three further consequences follow from taking a worklist seriously as a safety surface. Absence has five reasons and no em dash: an assessment the client declined and a Part 2 record this reader may not see are different situations with different next actions. Sorting by a model-derived column ranks a prediction, so the column carries the model, its version and the population it was validated in. And results that land are counted and held rather than merged, because a grid that reorders under a pointer is how somebody actions the row that used to be there.",
     "categories": [
       "Clinical",
       "Data Display"
@@ -5437,7 +5437,7 @@ export const CATALOG: ComponentDoc[] = [
     "states": [
       "Coverage above the data",
       "A total the source will not give",
-      "Absence, said four ways",
+      "Absence, said five ways",
       "Sorted by a derived column",
       "Results arrived, nothing moved",
       "The row the reader is on",
@@ -13913,7 +13913,7 @@ export const CATALOG: ComponentDoc[] = [
     "dependencies": [
       "@oxygenui-design/identity-core"
     ],
-    "install": "npx @oxygenui-design/cli add identity"
+    "install": "pnpm add @oxygenui-design/identity"
   },
   {
     "name": "signature",
@@ -14305,7 +14305,7 @@ export const CATALOG: ComponentDoc[] = [
       "antd",
       "@oxygenui-design/signature-core"
     ],
-    "install": "npx @oxygenui-design/cli add signature",
+    "install": "pnpm add @oxygenui-design/signature",
     "technicalName": "Signature",
     "aliases": [
       "signature pad",
@@ -15076,7 +15076,7 @@ export const CATALOG: ComponentDoc[] = [
     "dependencies": [
       "@oxygenui-design/tabs-core"
     ],
-    "install": "npx @oxygenui-design/cli add tabs",
+    "install": "pnpm add @oxygenui-design/tabs",
     "technicalName": "Tabs",
     "aliases": [
       "tab strip",

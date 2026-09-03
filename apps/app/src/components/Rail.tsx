@@ -217,7 +217,11 @@ export function Rail({
    * has never opened the catalogue.
    */
   const marketplace: Item[] = [
-    { href: "/market", label: "Catalogue", Icon: ShoppingBag },
+    // "Marketplace", matching the site. A reader crosses from one to the
+    // other in a click, and "catalogue" is already taken here by the
+    // component catalogue — two names for the shop and one name for two
+    // different things.
+    { href: "/market", label: "Marketplace", Icon: ShoppingBag },
     { href: "/market/purchases", label: "Purchases", Icon: Receipt, count: purchaseCount },
     ...(canMintTokens ? [{ href: "/market/tokens", label: "Access tokens", Icon: KeyRound }] : []),
   ];

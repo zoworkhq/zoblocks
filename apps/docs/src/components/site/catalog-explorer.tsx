@@ -151,9 +151,17 @@ export function CatalogExplorer({ catalog }: { catalog: readonly ComponentDoc[] 
         components: ready,
       },
       soon.length && {
-        name: "Coming soon",
+        /*
+         * Not "Coming soon", which was wrong about almost everything in it.
+         *
+         * All but one of these components are in the registry and install
+         * today — the band was describing a documentation backlog in the
+         * language of a product roadmap, under cards carrying working install
+         * commands. What they share is that nobody has written the page.
+         */
+        name: "Installable, not yet documented",
         blurb:
-          "Announced rather than hidden. These are in the catalogue so the shape of the library is honest, but they have no page to open yet.",
+          "These install from the registry today. Their pages are not written yet, so the card is all there is to read — the install line on each one works.",
         components: soon,
       },
     ].filter(Boolean) as Array<{ name: string; blurb: string; components: ComponentDoc[] }>;

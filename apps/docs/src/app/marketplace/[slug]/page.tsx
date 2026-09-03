@@ -85,19 +85,26 @@ export default async function MarketplaceItemPage({
               {item.blurb}
             </p>
 
-            <div className="mt-8 flex flex-wrap items-center gap-5" data-reveal>
+            {/*
+              One statement of availability, not three.
+
+              A chip reading "Coming soon", a line reading "what it will cost ·
+              not yet on sale", and a disabled button reading "Coming soon" all
+              sat in a sixty-pixel band saying the same thing three ways — which
+              reads as hedging rather than as clarity. It was also the wrong
+              word for a finished pack: these are built and measured, and the
+              shop is what is shut.
+            */}
+            <div className="mt-8 flex flex-wrap items-baseline gap-4" data-reveal>
               <span className="tabular font-mono text-2xl font-semibold">
                 {priceLabel(item.price)}
               </span>
-              {item.purchasable ? null : (
-                <span className="rounded-full border border-rule px-2.5 py-1 font-mono text-[0.625rem] uppercase tracking-wider text-graphite-soft">
-                  Coming soon
-                </span>
-              )}
               <span className="body-sm text-graphite">
                 {item.purchasable
                   ? "one-time · the whole organisation · perpetual"
-                  : "what it will cost · not yet on sale"}
+                  : item.comingSoon
+                    ? "the price it will carry · not built yet"
+                    : "the price it will carry · not yet on sale"}
               </span>
             </div>
 
@@ -108,7 +115,9 @@ export default async function MarketplaceItemPage({
                   disabled
                   className="inline-flex cursor-not-allowed items-center gap-2 rounded-xl border border-rule bg-paper-sunk px-5 py-3.5 text-sm font-medium text-graphite-soft"
                 >
-                  Coming soon
+                  {/* The line above carries whether it is built; this carries whether
+                      it can be bought. Two questions, two answers, said once each. */}
+                  Not on sale
                 </button>
               ) : (
                 <a
@@ -122,11 +131,16 @@ export default async function MarketplaceItemPage({
                   />
                 </a>
               )}
+              {/*
+                Was "Compare with Pro", pointing at a holding page with nothing
+                to compare against. The useful second destination from an item
+                is the rest of the shelf.
+              */}
               <Link
-                href="/pro"
+                href="/marketplace"
                 className="inline-flex items-center gap-2 rounded-xl border border-rule px-5 py-3.5 text-sm font-medium text-ink transition-all duration-300 ease-[var(--ease-out-expo)] hover:-translate-y-0.5 hover:border-oxygen/40"
               >
-                Compare with Pro
+                See the whole shelf
               </Link>
             </div>
           </div>

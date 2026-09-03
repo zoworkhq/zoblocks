@@ -12,11 +12,13 @@ import noAbsencePlaceholder from "./rules/no-absence-placeholder.js";
 import noAmbiguousClinicalCopy from "./rules/no-ambiguous-clinical-copy.js";
 import noDynamicClassName from "./rules/no-dynamic-class-name.js";
 import noForbiddenCapability from "./rules/no-forbidden-capability.js";
+import noHardcodedCount from "./rules/no-hardcoded-count.js";
 import noHeadingLevelDrift from "./rules/no-heading-level-drift.js";
 import noPrimitiveToken from "./rules/no-primitive-token.js";
 import noRoomNumberIdentifier from "./rules/no-room-number-identifier.js";
 import noStigmatisingLanguage from "./rules/no-stigmatising-language.js";
 import noTruncatedIdentity from "./rules/no-truncated-identity.js";
+import noVagueFailure from "./rules/no-vague-failure.js";
 import preferLogicalProperties from "./rules/prefer-logical-properties.js";
 import requireAccordionSummary from "./rules/require-accordion-summary.js";
 import signatureRequiresTypedPath from "./rules/signature-requires-typed-path.js";
@@ -36,11 +38,13 @@ const plugin = {
     "no-ambiguous-clinical-copy": noAmbiguousClinicalCopy,
     "no-dynamic-class-name": noDynamicClassName,
     "no-forbidden-capability": noForbiddenCapability,
+    "no-hardcoded-count": noHardcodedCount,
     "no-heading-level-drift": noHeadingLevelDrift,
     "no-primitive-token": noPrimitiveToken,
     "no-room-number-identifier": noRoomNumberIdentifier,
     "no-stigmatising-language": noStigmatisingLanguage,
     "no-truncated-identity": noTruncatedIdentity,
+    "no-vague-failure": noVagueFailure,
     "prefer-logical-properties": preferLogicalProperties,
     "require-accordion-summary": requireAccordionSummary,
     "signature-requires-typed-path": signatureRequiresTypedPath,
@@ -107,6 +111,32 @@ plugin.configs = {
       // the author reach for `segmented` deliberately rather than by default.
       "@oxygenui/switch-not-for-questions": "warn",
     },
+  },
+};
+
+/**
+ * Our own surfaces — the marketing site and the console.
+ *
+ * These had no preset, which is the reason they exist. `components` is scoped
+ * to the registry and to each package's `src` tree, so a content audit found
+ * the two rules broken most often were broken in `apps/` — the console's root
+ * error boundary opening with "Something went wrong", and four stale counts
+ * typed into page descriptions nobody re-reads.
+ *
+ * Deliberately not the whole `components` preset. Most of those rules are
+ * about rendering a clinical record and would be noise on a pricing page; a
+ * preset that fires on the wrong things is a preset somebody turns off. These
+ * two are the ones CONTENT.md §10 says are mechanically checkable without
+ * false positives, and nothing else is here until that is true of it too.
+ */
+plugin.configs.product = {
+  plugins: { "@oxygenui": plugin },
+  rules: {
+    // Errors, both. Neither is a matter of taste, and neither is visible in a
+    // diff — a count goes stale while nobody touches the file, and a vague
+    // failure reads as finished copy right up until somebody hits it.
+    "@oxygenui/no-hardcoded-count": "error",
+    "@oxygenui/no-vague-failure": "error",
   },
 };
 

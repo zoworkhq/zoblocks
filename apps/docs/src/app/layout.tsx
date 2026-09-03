@@ -5,6 +5,7 @@ import { Instrument_Sans, JetBrains_Mono } from "next/font/google";
 import "@oxygenui-design/tokens/oxygen-tokens.css";
 import "./globals.css";
 import { THEME_BOOT_SCRIPT } from "@/lib/theme";
+import { CATALOG } from "@/lib/catalog";
 
 const instrumentSans = Instrument_Sans({
   subsets: ["latin"],
@@ -28,9 +29,16 @@ const jetbrainsMono = JetBrains_Mono({
  * What is left leads with the framework, names the standard, gives a number and
  * states the licence — the four things an evaluator screens on before they read
  * a word of prose.
+ *
+ * The number is derived now. It was typed, and it said 27 while the catalogue
+ * held 30 — in the one sentence a search result, a link preview and an answer
+ * engine all quote. Every other count on the site is computed; this was the
+ * last hand-written one, and being wrong here is more expensive than being
+ * wrong anywhere else.
  */
 const description =
-  "Open-source React components for clinical software. FHIR R4 types, WCAG 2.2 AA, 27 components installed as source you own. MIT core, no runtime.";
+  `Open-source React components for clinical software. FHIR R4 types, WCAG 2.2 AA, ` +
+  `${CATALOG.length} components installed as source you own. MIT core, no runtime dependencies.`;
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://oxygenui.design"),

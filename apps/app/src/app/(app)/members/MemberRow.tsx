@@ -4,7 +4,7 @@ import { KeyRound } from "lucide-react";
 import { issueResetAction, updateMemberAction } from "@/lib/actions";
 import { ROLE_SUMMARY } from "@/lib/roles";
 import { ActionForm } from "@/components/action-form";
-import { Select, StatusChip, SubmitButton } from "@/components/ui";
+import { ConfirmSubmit, Select, StatusChip, SubmitButton } from "@/components/ui";
 import type { MemberRole } from "@/db/collections";
 
 /**
@@ -81,12 +81,15 @@ export function RoleCell({
 
 export function MemberRow({
   memberId,
+  name,
   status,
   isSelf,
   canManage,
   reason,
 }: {
   memberId: string;
+  /** The person this row acts on. Named in the confirmation, per CONTENT.md §4. */
+  name: string;
   status: "pending" | "active" | "disabled";
   isSelf: boolean;
   canManage: boolean;
@@ -131,18 +134,40 @@ export function MemberRow({
    */
   return (
     <div className="flex flex-col items-start gap-1.5">
-      <ActionForm quiet action={updateMemberAction}>
+      <ActionForm
+        quiet
+        action={updateMemberAction}
+        // In `footer`, so the control does not go `disabled` mid-submit and
+        // drop focus to the document body — the same reason the publish form
+        // on the theme page does it this way.
+        footer={
+          /*
+            Disabling takes somebody's access away and re-enabling gives it
+            back; only one of those is worth a sentence. The name is in it
+            because a column of identical buttons in a member table is exactly
+            where the wrong one gets clicked.
+          */
+          status === "active" ? (
+            <ConfirmSubmit
+              variant="danger"
+              reason={isSelf ? "You cannot disable your own account." : reason}
+              size="sm"
+              pendingLabel="Saving…"
+              confirmLabel="Disable"
+              consequence={`Signs ${name} out everywhere and blocks them from signing back in. The account and its audit trail are kept, and you can re-enable it.`}
+            >
+              Disable
+            </ConfirmSubmit>
+          ) : (
+            <SubmitButton variant="secondary" reason={reason} size="sm" pendingLabel="Saving…">
+              Re-enable
+            </SubmitButton>
+          )
+        }
+      >
         <input type="hidden" name="memberId" value={memberId} />
         <input type="hidden" name="intent" value="status" />
         <input type="hidden" name="status" value={status === "active" ? "disabled" : "active"} />
-        <SubmitButton
-          variant={status === "active" ? "danger" : "secondary"}
-          reason={isSelf && status === "active" ? "You cannot disable your own account." : reason}
-          size="sm"
-          pendingLabel="Saving…"
-        >
-          {status === "active" ? "Disable" : "Re-enable"}
-        </SubmitButton>
       </ActionForm>
 
       {status === "active" && (

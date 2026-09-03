@@ -8,6 +8,7 @@
  * costs one emitter.
  */
 
+import { distributionState, installCommandFor } from "@oxygenui-design/component-meta";
 import { HOMEPAGE, paths } from "../config";
 import type { LoadedComponent } from "../load";
 import type { Emitter } from "../write";
@@ -32,9 +33,34 @@ export async function emitAgentManifest(
         .get(layer)!
         .map((c) => {
           const fhir = c.meta.fhir.map((r) => r.name).join(", ");
+          const state = distributionState(c.meta.name);
+
+          /*
+           * Only a documented component gets a link.
+           *
+           * This emitted a canonical URL for every component in the catalogue,
+           * and sixteen of the thirty returned 404 — on the one file written
+           * specifically to be read by an answer engine. A model that follows
+           * a dead link either drops the entity or cites the 404, and both are
+           * worse than an entry with no link.
+           *
+           * The entry stays either way. Knowing a component is announced is
+           * useful to an agent choosing between building something and waiting
+           * for it; a URL that does not resolve is not.
+           */
+          const heading =
+            state === "ready"
+              ? `- [${c.meta.title}](${HOMEPAGE}/components/${c.meta.name}): ${c.meta.summary}`
+              : `- ${c.meta.title}: ${c.meta.summary}`;
+
           return [
-            `- [${c.meta.title}](${HOMEPAGE}/components/${c.meta.name}): ${c.meta.summary}`,
-            `  install: npx @oxygenui-design/cli add ${c.meta.name}`,
+            heading,
+            state === "announced"
+              ? "  availability: announced — nothing to install yet"
+              : `  install: ${installCommandFor(c.meta)}`,
+            state === "installable"
+              ? "  docs: no page yet — this component installs from the registry today"
+              : undefined,
             fhir ? `  fhir: ${fhir}` : undefined,
             `  states: ${c.meta.states.join(", ")}`,
             `  status: ${c.meta.status}`,

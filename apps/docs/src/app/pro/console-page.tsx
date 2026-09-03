@@ -10,6 +10,18 @@ import { Stage } from "@/components/pro/stage-map";
 import { StageGate, VisionFilters } from "@/components/pro/stages";
 
 /**
+ * NOT RENDERED. `/pro` is the holding page in `page.tsx`; this is the console
+ * pitch it replaced, kept whole for when the console ships.
+ *
+ * It carried three claims that stopped being true while it sat here — a
+ * "buyable today" badge over a shelf that is closed, a "Create an organisation"
+ * button for a flow that does not exist, and a marketplace described in the
+ * present tense. Dead code is not a licence to be wrong: this file is one
+ * import away from production, and it is exactly the file a future pricing
+ * page will reach for.
+ */
+
+/**
  * Pro.
  *
  * The page this replaces sold Team and Enterprise with a waitlist and six
@@ -58,7 +70,7 @@ export function ConsolePage() {
                   href={signUpHref}
                   className="group inline-flex items-center gap-2 rounded-xl bg-cta px-5 py-3.5 text-sm font-medium text-paper transition-all duration-300 ease-[var(--ease-out-expo)] hover:-translate-y-0.5 hover:bg-cta-hover"
                 >
-                  Create an organisation
+                  Request a workspace
                   <ArrowRight
                     aria-hidden="true"
                     className="size-4 transition-transform duration-300 ease-[var(--ease-out-expo)] group-hover:translate-x-0.5"
@@ -72,7 +84,7 @@ export function ConsolePage() {
                 </a>
               </div>
               <p className="mt-4 text-xs text-graphite-soft" data-reveal>
-                Free while in preview · no card · the marketplace is the paid part
+                Free while in preview · no card · the marketplace will be the paid part
               </p>
             </div>
 
@@ -238,7 +250,7 @@ export function ConsolePage() {
                 >
                   <div className="tn">
                     <b>{tier.name}</b>
-                    {tier.featured ? <span className="badge">buyable today</span> : null}
+                    {tier.featured ? <span className="badge">not yet on sale</span> : null}
                     {tier.href === "#waitlist" ? (
                       <span className="badge" style={{ color: "var(--site-graphite-soft)" }}>
                         waitlist
@@ -276,7 +288,7 @@ export function ConsolePage() {
           <div className="mx-auto max-w-6xl section-minor px-5 sm:px-8">
             <div className="authBand" data-reveal>
               <div>
-                <h2>Create an organisation, or sign back in.</h2>
+                <h2>Request a workspace, or sign back in.</h2>
                 <p>
                   Themes, members and purchases belong to an organisation rather than a person, so
                   the first account creates one. Signing up puts you in a pending state until an
@@ -288,7 +300,7 @@ export function ConsolePage() {
                   href={signUpHref}
                   className="inline-flex items-center gap-2 rounded-xl bg-cta px-5 py-3 text-sm font-medium text-paper transition-colors duration-200 hover:bg-cta-hover"
                 >
-                  Create an organisation
+                  Request a workspace
                 </a>
                 <a
                   href={signInHref}

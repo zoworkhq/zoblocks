@@ -28,6 +28,7 @@ import * as React from "react";
 import Link from "next/link";
 import { ArrowUpRight, Check, Copy } from "lucide-react";
 import type { ComponentDoc } from "@/lib/catalog";
+import { distributionState, installCommandFor } from "@/lib/readiness";
 import { cn } from "@/lib/utils";
 
 /**
@@ -38,9 +39,10 @@ import { cn } from "@/lib/utils";
  * the detail page already learned this, and the card must not relearn it.
  */
 export function installCommand(component: ComponentDoc): string {
-  return component.distribution === "package"
-    ? `pnpm add ${component.packageName}`
-    : `npx @oxygenui-design/cli add ${component.name}`;
+  // The rule lives in `component-meta` now, beside the metadata it reads, so
+  // the card, the generated catalogue and `llms.txt` cannot disagree about a
+  // component's install line — which they did, for the three that ship on npm.
+  return installCommandFor(component);
 }
 
 export function AcquireAction({
@@ -83,6 +85,28 @@ export function AcquireAction({
         Buy in the marketplace
         <ArrowUpRight aria-hidden="true" className="size-3" />
       </Link>
+    );
+  }
+
+  /*
+   * Nothing to copy for a component that does not exist.
+   *
+   * Every card rendered this button, including the one component in the
+   * catalogue with no registry item behind it — so the card offered a command
+   * that fails at the prompt. A stated absence is better than a control that
+   * hands somebody a broken line.
+   */
+  if (distributionState(component.name) === "announced") {
+    return (
+      <span
+        className={cn(
+          "relative z-10 inline-flex items-center rounded-lg border border-dashed border-rule",
+          "px-2.5 py-1.5 font-mono text-[0.6875rem] text-graphite-soft",
+          className,
+        )}
+      >
+        Not built yet
+      </span>
     );
   }
 

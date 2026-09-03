@@ -635,6 +635,28 @@ export const CASELOAD_WITH_EVERY_ABSENCE: CaseloadRow[] = [
     clinician: "S. Okafor",
     photo: portrait("6031288"),
   },
+  /*
+   * The fifth reason, which the fixture was missing.
+   *
+   * `GridAbsence` has five members and this list demonstrated four, so the
+   * component's own state was published as "Absence, said four ways" while the
+   * type, the rationale and the FHIR note all said five. `unknown` is the one
+   * that gets dropped because it feels like a non-answer — and it is precisely
+   * the one a federated query produces most often: the source returned no
+   * value and gave no reason, which is different from every other row here
+   * because there is nobody to chase.
+   */
+  {
+    name: "Adebayo, K.",
+    mrn: "7742019",
+    program: "Outpatient",
+    phq9: { absent: "unknown" },
+    cssrs: "None reported",
+    risk: 0.28,
+    due: "Fri 09:15",
+    clinician: "K. Marsh",
+    photo: portrait("7742019"),
+  },
 ];
 
 /**

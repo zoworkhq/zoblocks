@@ -17,7 +17,7 @@ export default function SignUpPage() {
     <>
       <h1 className="display-sm">Request access</h1>
       <p className="body-sm mt-1.5 text-graphite">
-        Join an organisation that already uses the Oxygen app.
+        Join an organisation that already uses the Oxygen console.
       </p>
 
       <div className="mt-7">
@@ -29,7 +29,25 @@ export default function SignUpPage() {
         first, because a role decides whether you can publish a theme to production applications.
       </Callout>
 
+      {/*
+        The other half of the flow, which was missing.
+
+        This form needs an organisation address, and an organisation is created
+        by us rather than by the person filling the form in — so somebody
+        arriving from the site's primary button met a required field they had
+        no way to complete, and a failure message telling them to ask an
+        administrator they do not have. Naming the second path here is cheaper
+        than a self-serve provisioning flow and honest about how it works.
+      */}
       <p className="body-sm mt-5 text-graphite">
+        Starting a new organisation?{" "}
+        <a href="mailto:hello@zowork.com?subject=New%20Oxygen%20workspace" className="link">
+          Ask us to set one up
+        </a>
+        . We create the organisation and make you its first administrator.
+      </p>
+
+      <p className="body-sm mt-3 text-graphite">
         Already have an account?{" "}
         <Link href="/login" className="link">
           Sign in

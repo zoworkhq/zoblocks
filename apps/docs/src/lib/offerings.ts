@@ -124,7 +124,7 @@ export const TIERS: Tier[] = [
   {
     name: "Core",
     price: "Free",
-    summary: "Every component in the public catalog, MIT licensed, forever.",
+    summary: "Every component in the public catalogue, MIT licensed, forever.",
     features: [
       /*
        * No count here.
@@ -134,7 +134,7 @@ export const TIERS: Tier[] = [
        * prose is a number nobody updates. The catalogue page derives its own
        * from `CATALOG`; this line simply stops asserting one.
        */
-      "Every component in the public catalog",
+      "Every component in the public catalogue",
       "FHIR R4 types and helpers",
       "Design tokens and density modes",
       "Public registry and docs",
@@ -160,20 +160,31 @@ export const TIERS: Tier[] = [
      */
     name: "Marketplace",
     price: "From $120",
-    cadence: "per pack",
-    summary: "Icon sets, illustration systems, theme packs and components — bought one at a time.",
+    /*
+     * "when it opens", and every feature below in the future tense.
+     *
+     * `SELLING_OPEN` is false — checkout, entitlement and delivery all live in
+     * the console and none of it is reachable — so this card was describing a
+     * live tier and sending a reader to a shelf where every item is disabled.
+     * That is the worst order in which to discover a shop is shut. The price
+     * stays, because a number is genuinely useful to somebody budgeting; the
+     * tense is what had to change.
+     */
+    cadence: "per pack, when it opens",
+    summary:
+      "Icon sets, illustration systems, theme packs and components — announced with their contrast records, not yet on sale.",
     features: [
       "Everything in Core",
-      "Licensed to the whole organisation",
-      "Perpetual — it does not expire",
+      "Will be licensed to the whole organisation",
+      "Will be perpetual — it will not expire",
       "Every item states what was checked",
       "Installs into a theme draft",
       "Components install with the Oxygen CLI",
     ],
-    cta: "Browse the marketplace",
+    cta: "See what is coming",
     href: "/marketplace",
     featured: true,
-    note: "Bought in the app, because a purchase belongs to an organisation rather than a person.",
+    note: "Bought in the app when it opens, because a purchase belongs to an organisation rather than a person.",
   },
   {
     name: "Team",
@@ -211,7 +222,7 @@ export const TIERS: Tier[] = [
 export const FAQ: Array<{ q: string; a: string }> = [
   {
     q: "How does the marketplace relate to these tiers?",
-    a: "The marketplace is the paid tier that exists today. You buy one thing — an icon set, an empty-state system, a theme pack, a component — licensed to your whole organisation and perpetual, and it does not stop working when anything lapses. Team and Enterprise add the starter kits, the shared design assets and the support around them. There used to be a $199 bundle in between; it was priced against a far larger market than this one and never left its waitlist, so it is gone rather than quietly still on the page.",
+    a: "The marketplace is the paid tier closest to existing, and it is not open yet. The unit is one thing — an icon set, an empty-state system, a theme pack, a component — licensed to your whole organisation and perpetual, and it does not stop working when anything lapses. Team and Enterprise add the starter kits, the shared design assets and the support around them. There used to be a $199 bundle in between; it was priced against a far larger market than this one and never left its waitlist, so it is gone rather than quietly still on the page.",
   },
   {
     q: "Is any of this a compliance boundary?",
@@ -219,15 +230,15 @@ export const FAQ: Array<{ q: string; a: string }> = [
   },
   {
     q: "What exactly do I own?",
-    a: "The source. Components are copied into your repository by the Oxygen CLI — there is no runtime package between you and the render, and you can read, audit, fork, and change every line. Core is MIT. Pro adds a commercial licence for the premium catalog; it does not restrict what you build with it.",
+    a: "The source. Components are copied into your repository by the Oxygen CLI — there is no runtime package between you and the render, and you can read, audit, fork, and change every line. Core is MIT, and every component in the public catalogue is Core. Marketplace packs will carry a commercial licence that does not restrict what you build with them.",
   },
   {
     q: "Can I use it for client work?",
-    a: "Yes, on every paid tier, for unlimited client projects. What you cannot do is redistribute the catalog itself — reselling the components as a competing kit, or publishing them as your own registry.",
+    a: "Yes. The MIT core permits commercial use with nothing to sign, for unlimited client projects. What you cannot do is redistribute the catalogue itself — reselling the components as a competing kit, or publishing them as your own registry.",
   },
   {
     q: "What happens when a licence lapses?",
-    a: "Nothing you already installed stops working, and nothing is revoked. You keep every version released during your term and can keep shipping it commercially. You stop receiving new components and updates until you renew.",
+    a: "Nothing you already installed stops working, and nothing is revoked. Marketplace packs are perpetual by design and are not part of any term. On a subscription tier you keep every version released during your term and can keep shipping it commercially; you stop receiving new work until you renew.",
   },
   {
     q: "Do the components work outside FHIR?",
@@ -239,7 +250,7 @@ export const FAQ: Array<{ q: string; a: string }> = [
   },
   {
     q: "Is any of this actually buyable yet?",
-    a: "The marketplace is. Those packs exist, they are delivered by the app, and buying one charges you today. The starter kits are not — the first is still in build, and charging before a kit ships would be charging for a promise, so that half stays a free waitlist until there is something to bill for.",
+    a: "No. The packs exist and several are finished, but selling is closed shelf-wide — checkout, entitlement and delivery all live in the console, and the console is not in the first release. Everything on the marketplace is announced at the price it will cost, which is not an offer. The starter kits are further back still: the first is in build, and charging before a kit ships would be charging for a promise.",
   },
 ];
 
@@ -284,7 +295,7 @@ export const SHOWCASE: ShowcaseEntry[] = [
     blurb:
       "The first screen of a visit: who, what is active, what they react to, and what they are taking.",
     demonstrates:
-      "Clinical density across four components, with a critical result and a high-risk allergy both escalating without colour alone.",
+      "Clinical density across every component in the view, with a critical result and a high-risk allergy both escalating without colour alone.",
     density: "clinical",
     uses: ["patient-banner", "condition-list", "allergy-list", "medication-card"],
   },

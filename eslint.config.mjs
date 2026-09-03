@@ -216,6 +216,47 @@ export default tseslint.config(
   },
 
   // -------------------------------------------------------------------------
+  // Our own product surfaces — the docs site and the console.
+  //
+  // These had no @oxygen rules at all, and that is exactly where the content
+  // rules were being broken: the console's root error boundary opened with
+  // "Something went wrong", and four page descriptions carried counts that had
+  // been accurate months earlier. `configs.components` is scoped to
+  // `registry/**` and `packages/*/src/**`, so it never reached either.
+  //
+  // `configs.product` is two rules rather than the whole component preset —
+  // see the note beside it. The rest of the clinical rules would be noise on a
+  // pricing page, and a preset that fires on the wrong things gets turned off.
+  // -------------------------------------------------------------------------
+  {
+    files: ["apps/docs/**/*.{ts,tsx}", "apps/app/**/*.{ts,tsx}"],
+    ignores: [
+      "**/*.test.{ts,tsx}",
+      /*
+       * Demo modules are exempt from `no-hardcoded-count`, and the distinction
+       * is real rather than convenient.
+       *
+       * A page that says "27 components" asserts a total this repository can
+       * compute, and it goes stale on its own. A demo panel labelled "Nine
+       * states, one green dot" is describing the nine things in *that panel* —
+       * a curated set the author chose, which no expression can derive — and a
+       * fixture reading "24 items across 3 shipments" is invented delivery
+       * data. Deriving either would make it wrong.
+       *
+       * The rule cannot tell those apart from the string alone, so the scope
+       * does it. Everything here is a demo definition; everything outside it is
+       * a page, a page description, or the data one reads from.
+       */
+      "apps/docs/src/components/site/component-preview.tsx",
+      "apps/docs/src/components/site/*-gallery.tsx",
+      "apps/docs/src/components/site/*-demo.tsx",
+      "apps/docs/src/components/site/*-showcase.tsx",
+      "apps/docs/src/components/blocks/**",
+    ],
+    ...oxygen.configs.product,
+  },
+
+  // -------------------------------------------------------------------------
   // Docs site. A marketing surface, not a shipped component.
   // -------------------------------------------------------------------------
   {

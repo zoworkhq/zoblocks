@@ -14,7 +14,7 @@
 
 export function DemoPlaceholder({
   label = "Live demo",
-  children = "This demo returns with the rebuilt component catalog.",
+  children = "This demo returns with the rebuilt component catalogue.",
 }: {
   label?: string;
   children?: React.ReactNode;

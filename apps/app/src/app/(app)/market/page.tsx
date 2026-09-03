@@ -37,7 +37,7 @@ export default async function MarketPage() {
       <>
         <PageHeader
           eyebrow="Marketplace"
-          title="Catalogue"
+          title="Marketplace"
           lede="Packs, components and themes for this organisation."
         />
         <EmptyState
@@ -52,7 +52,7 @@ export default async function MarketPage() {
     <>
       <PageHeader
         eyebrow="Marketplace"
-        title="Catalogue"
+        title="Marketplace"
         lede="Purchases are perpetual and belong to the organisation, not to the person who paid. Nothing installed here is live until a theme is published."
       />
 
