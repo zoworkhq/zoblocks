@@ -5405,7 +5405,7 @@ export const CATALOG: ComponentDoc[] = [
     "summary": "A worklist that states what it is showing out of what, holds arriving results behind a line, and names the model when you sort by one.",
     "tagline": "States its coverage before it shows you the rows.",
     "description": "A ruled ledger with role=\"grid\": coverage above the data rather than under it, a total that may honestly be unknown, absence said in words rather than an em dash, numbered footnotes naming the model behind a derived column, and results that arrive without anything moving under your hand.",
-    "rationale": "Every grid renders the six rows on screen and says nothing about the other 306. That is the defect, and it is not a missing feature — it is a claim the component makes and cannot support. A filtered caseload is a worse liar than a paginated one, because the filter was set by somebody at 07:00 who has since stopped seeing it, and the reader at 15:00 believes they are looking at the whole team's list. So coverage is required, the predicate prints as a sentence, and a total the source will not give is rendered as \"the source did not say\" rather than as the page size. Three further consequences follow from taking a worklist seriously as a safety surface: absence has five reasons and no em dash, because an assessment the client declined and a Part 2 record this reader may not see are different situations with different next actions; sorting by a model-derived column is ranking a prediction, so the column carries the model, its version and the population it was validated in; and results that land are counted and held rather than merged, because a grid that reorders under a pointer is how somebody actions the row that used to be there.",
+    "rationale": "Every grid renders the six rows on screen and says nothing about the other 306. That is a claim the component makes and cannot support: the filter was set at 07:00 by somebody who has stopped seeing it, and the reader at 15:00 believes this is the whole team. So coverage is required, absence is said in words rather than an em dash, a derived column names the model it ranks by, and results that land are held rather than merged.",
     "categories": [
       "Clinical",
       "Data Display"
@@ -5414,22 +5414,22 @@ export const CATALOG: ComponentDoc[] = [
       {
         "name": "Bundle",
         "url": "https://hl7.org/fhir/R4/bundle.html",
-        "note": "Why `total` is `number | \"unknown\"`. `Bundle.total` is optional, the spec forbids constructing paging URLs, and some servers return only a `next` link — so \"6 of 312\" is a sentence a conformant server cannot always support."
+        "note": "Bundle.total is optional and the spec forbids building paging URLs by hand, so \"6 of 312\" is a sentence many conformant servers cannot support. That is why total accepts \"unknown\"."
       },
       {
         "name": "Observation",
         "url": "https://hl7.org/fhir/R4/observation.html",
-        "note": "The absence vocabulary is `dataAbsentReason` narrowed to the five distinctions a reader acts on differently. `asked-declined` is the one this domain cannot afford to lose: a client refusing a PHQ-9 is a clinical event, not a gap."
+        "note": "dataAbsentReason, narrowed to the five distinctions a reader acts on differently. A client who declines a PHQ-9 is a clinical event, not a gap."
       },
       {
         "name": "Patient",
         "url": "https://hl7.org/fhir/R4/patient.html",
-        "note": "The subject of the identity line. A masked row produces a line that says \"restricted record\" and names nobody — which is what 42 CFR Part 2 requires of every surface that touches such a record."
+        "note": "The subject of the identity line. A masked row says \"restricted record\" and names nobody, which is what 42 CFR Part 2 requires."
       },
       {
         "name": "RiskAssessment",
         "url": "https://hl7.org/fhir/R4/riskassessment.html",
-        "note": "The shape a derived column usually carries — here a disengagement risk. `prediction.probabilityDecimal` is the number; the derivation is what makes it safe to sort by at all."
+        "note": "The shape a derived column carries. prediction.probabilityDecimal is the number; the derivation is what makes it safe to sort by at all."
       }
     ],
     "resource": "Bundle",
@@ -5943,7 +5943,7 @@ export const CATALOG: ComponentDoc[] = [
         "healthcare",
         "behavioral-health"
       ],
-      "clinicalContext": "A caseload list is the screen behavioral health work is dispatched from, and it carries two structural failure modes: it can imply a completeness it does not have, and it can move a row out from under an action. Coverage answers the first and held arrivals the second. The third is specific to this field — 42 CFR Part 2 governs substance use records separately from the chart around them, so a grid that renders a withheld value and an unrecorded one identically is not merely unhelpful, it is wrong about which of them the reader is entitled to.",
+      "clinicalContext": "A caseload list is where behavioral health work is dispatched from, and it fails in three ways: it implies a completeness it does not have, it moves a row out from under an action, and it draws a withheld value the same as an unrecorded one. 42 CFR Part 2 makes the third a question of entitlement rather than of tidiness.",
       "workflows": [
         "assessment",
         "care-coordination",
@@ -5952,7 +5952,7 @@ export const CATALOG: ComponentDoc[] = [
       ],
       "phi": {
         "handles": true,
-        "notes": "Every cell is caller-supplied and the grid stores none of it. The identity line renders what `identify` returns and refuses to render more; a masked identity produces a line that names nobody. The export helper writes what the columns already display."
+        "notes": "Every cell is caller-supplied and the grid stores none of it. The identity line renders what identify returns and no more, and a masked identity names nobody."
       },
       "auditable": false,
       "permissions": [
@@ -6072,42 +6072,42 @@ export const CATALOG: ComponentDoc[] = [
       {
         "id": "coverage",
         "title": "Coverage is arithmetic, not a footer note",
-        "description": "The claim goes above the rows it is about, and a total the source will not give says so in words. Rendering the page size as the total is the one failure this type exists to prevent.",
+        "description": "The claim goes above the rows it is about. Rendering the page size as the total is the one failure this type exists to prevent.",
         "fixture": "caseloadPhq9",
         "code": "describeGridCoverage({ shown: 6, total: 312, noun: \"clients on this caseload\" });\n// → \"6 of 312 clients on this caseload.\"\n\ndescribeGridCoverage({ shown: 6, total: \"unknown\", noun: \"clients\" });\n// → \"6 clients shown. The source did not say how many match.\"\n\ngridUnseenCount({ shown: 6, total: 312 });     // → 306\ngridUnseenCount({ shown: 6, total: \"unknown\" }); // → null"
       },
       {
         "id": "absence",
         "title": "An absence sorts last, in both directions",
-        "description": "The load-bearing line in the engine. A PHQ-9 the client has not completed is not a PHQ-9 of zero — sorting ascending and finding four “Awaiting” rows above the score of 7 tells the reader the caseload is doing better than it is.",
+        "description": "A PHQ-9 the client has not completed is not a PHQ-9 of zero. Four “Awaiting” rows above a score of 7 tells a reader the caseload is doing better than it is.",
         "fixture": "caseloadPhq9",
         "code": "const phq9 = { key: \"phq9\", header: \"PHQ-9\", kind: \"measure\",\n               value: (r) => r.phq9 };\n\nsortGridRows(rows, phq9, \"ascending\").map((r) => r.phq9);\n// → [7, 11, 18, 22, { absent: \"awaiting\" }, { absent: \"restricted\" }]\n\nsortGridRows(rows, phq9, \"descending\").map((r) => r.phq9);\n// → [22, 18, 11, 7, { absent: \"awaiting\" }, { absent: \"restricted\" }]"
       },
       {
         "id": "derived",
         "title": "Sorting by a model is ranking a prediction",
-        "description": "The derivation travels with the column, so the footnote is generated rather than remembered. Sorting by it promotes that footnote to a statement under the table naming the model, its version and the population it was validated in.",
+        "description": "The derivation travels with the column, so the footnote is generated rather than remembered. Sorting by it promotes the footnote to a statement under the table.",
         "fixture": "caseloadPhq9",
         "code": "describeGridDerivation({\n  model: \"disengagement\",\n  version: \"v1.8\",\n  validatedOn: \"9,140 outpatient episodes\",\n  population: \"adults, English-language intake only\",\n});\n// → \"disengagement v1.8, validated on 9,140 outpatient episodes,\n//    adults, English-language intake only.\""
       },
       {
         "id": "arrivals",
         "title": "Results arrive; nothing moves",
-        "description": "The grid counts what has landed and holds it. Merging is the reader's decision, taken with their hand on the pointer — which is the difference between a live grid and one that actioned the row that used to be there.",
+        "description": "The grid counts what has landed and holds it. Merging is the reader's decision, taken with a hand on the pointer.",
         "fixture": "caseloadPhq9",
         "code": "describeGridArrivals(3, \"11:47\");\n// → \"3 results arrived at 11:47 — nothing moved.\"\n\n<DataGrid arrivals={held} arrivalsAt=\"11:47\" onAdmitArrivals={admit} … />\n// The rows prop never changes until admit() is called."
       },
       {
         "id": "export",
         "title": "An export is an attack surface",
-        "description": "A patient's preferred name is free text arriving from a registration desk. There is no option that turns this off, because the person who opens the file is rarely the person who chose the column.",
+        "description": "A patient's preferred name is free text from a registration desk. Nothing turns this off, because the person who opens the file rarely chose the column.",
         "fixture": "caseloadPhq9",
         "code": "neutraliseGridCell(\"=cmd|' /C calc'!A0\");   // → \"'=cmd|' /C calc'!A0\"\nneutraliseGridCell(\"＝HYPERLINK(...)\");      // → \"'＝HYPERLINK(...)\"  full-width too\nneutraliseGridCell(\"Ade-Smith\");             // → \"Ade-Smith\"        unchanged\n\ntoGridDelimited(rows, columns, { coverage });\n// Row 1 is the coverage sentence, because an export outlives its screen."
       },
       {
         "id": "refusal",
         "title": "A refusal, not a nine-second paint",
-        "description": "Twenty thousand is measured rather than chosen: a forty-column client-side model on a shared 4 GB ward workstation stops being something you put in front of a nurse at handover somewhere around there.",
+        "description": "Twenty thousand is measured, not chosen. It is where a forty-column model on a shared 4 GB ward workstation stops being usable at handover.",
         "fixture": "unknownTotal",
         "code": "gridCapacityRefusal(18_000);   // → null\ngridCapacityRefusal(120_000);\n// → \"120,000 rows is past what this renders on a ward workstation\n//    (the ceiling is 20,000). Narrow the query or move paging to the\n//    server — the grid will not pretend to hold them.\""
       }

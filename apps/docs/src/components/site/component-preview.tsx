@@ -172,7 +172,16 @@ interface Scenario {
   group?: string;
   /** The props that produce exactly what is on the stage. Copyable. */
   code?: string;
-  render: () => React.ReactNode;
+  /**
+   * What goes on the stage, at the density the reader has chosen.
+   *
+   * Almost every scenario ignores the argument: the density control writes
+   * `data-ox-density` onto the stage wrapper and the tokens under it do the
+   * rest. A component that reads the attribute on its *own* element — the data
+   * grid sets its own row height that way — shadows the wrapper's, so it has to
+   * be told instead, and this is how it is told.
+   */
+  render: (density: Density) => React.ReactNode;
 }
 
 /**
@@ -1759,10 +1768,27 @@ const REC_TURNS = [
 /* Data Grid                                                           */
 /* ------------------------------------------------------------------ */
 
+/*
+ * The table, and by default nothing above or below it.
+ *
+ * `masthead` and `footer` are on in the component because a grid dropped into
+ * a bare page has to carry its own framing. A demo is not a bare page: the
+ * state's own name is already the heading, and a title, a coverage sentence, a
+ * predicate and four numbered notes around six rows is more apparatus than
+ * data. The home page runs this grid the same way, for the same reason.
+ *
+ * Four states turn one back on, because for those the apparatus *is* the
+ * subject — the coverage claim lives in the masthead, and the citation and the
+ * reading line live in the foot. Each says so where it does it.
+ *
+ * `caption` is untouched either way, so the grid keeps its accessible name.
+ */
 const GRID_BASE = {
   caption: "Clients on this team's caseload with a raised PHQ-9 or a recent risk screen",
   title: "Caseload · PHQ-9 raised or risk screened",
   note: "14-day window",
+  masthead: false,
+  footer: false,
   columns: CASELOAD_COLUMNS_DOC,
   rowKey: (row: CaseloadRow) => row.mrn,
   identify: (row: CaseloadRow) => ({ primary: row.name, secondary: `MRN ${row.mrn}` }),
@@ -1782,13 +1808,30 @@ function GridStage({ children }: { children: React.ReactNode }) {
 }
 
 /**
+ * The page's density vocabulary, in the grid's own.
+ *
+ * They are two different words for the same control and they collide on one
+ * attribute: the preview writes `data-ox-density="patient|standard|clinical"`
+ * on the stage, and the grid writes `comfortable|regular|compact` on itself,
+ * which shadows it. So the grid is passed the value rather than left to inherit
+ * one it will overwrite — and the mapping is the one grid.css already argues
+ * for, a supervisor scanning three hundred clients against a clinician working
+ * six.
+ */
+const GRID_DENSITY: Record<Density, "comfortable" | "regular" | "compact"> = {
+  patient: "comfortable",
+  standard: "regular",
+  clinical: "compact",
+};
+
+/**
  * The live one: results land, and the reader decides when they arrive.
  *
  * Held in the demo rather than merged on a timer, because a timer would be the
  * exact behaviour the component argues against — demonstrated, on its own
  * documentation page.
  */
-function GridArrivalsDemo() {
+function GridArrivalsDemo({ density }: { density: Density }) {
   const [rows, setRows] = React.useState<CaseloadRow[]>(CASELOAD);
   const [held, setHeld] = React.useState<CaseloadRow[]>(GRID_ARRIVALS);
 
@@ -1796,6 +1839,7 @@ function GridArrivalsDemo() {
     <GridStage>
       <DataGrid
         {...GRID_BASE}
+        density={GRID_DENSITY[density]}
         rows={rows}
         coverage={{ ...CASELOAD_COVERAGE, shown: rows.length }}
         arrivals={held}
@@ -1813,18 +1857,23 @@ function GridArrivalsDemo() {
 
 const SCENARIOS: Record<string, Scenario[]> = {
   /*
-   * Eight states in four bands, and every one of them is a claim rather than
+   * Eight states in five bands, and every one of them is a claim rather than
    * an appearance. A grid demonstrated with "default" and "striped" has
    * documented its skin; these document what it does when the data is
    * incomplete, when the source will not answer, and when results land while
    * somebody's hand is on the pointer — which is where a worklist is used.
+   *
+   * The labels are two or three words each and the notes are one line. They
+   * were sentences, and a rail of sentences wraps: eight states in a 15.5rem
+   * column ran past the rail's own height, so the last one was cut in half and
+   * the band it sat in could not be read at all.
    */
   "data-grid": [
     {
       id: "coverage",
-      label: "Six of 312, and the filter that made it",
-      group: "The claim",
-      note: "Most grids render the six rows and say nothing about the other 306. That is not a missing feature, it is a claim the component makes and cannot support: the filter was set by somebody at 07:00 who has since stopped seeing it, and the reader at 15:00 believes they are looking at the whole team's list. So `coverage` is required, and the predicate prints as a sentence somebody could read aloud in supervision.",
+      label: "Six of 312",
+      group: "Coverage",
+      note: "Six rows are on screen and 306 are not. The predicate that made the list prints above it, so nobody reads a filtered caseload as the whole team's.",
       code: `<DataGrid
   coverage={{
     shown: rows.length,
@@ -1834,43 +1883,55 @@ const SCENARIOS: Record<string, Scenario[]> = {
       "PHQ-9 of 10 or more, or a risk screen in the last 14 days.",
   }}
 />`,
-      render: () => (
+      render: (density) => (
         <GridStage>
-          <DataGrid {...GRID_BASE} rows={CASELOAD} coverage={CASELOAD_COVERAGE} />
+          <DataGrid
+            {...GRID_BASE}
+            density={GRID_DENSITY[density]}
+            rows={CASELOAD}
+            coverage={CASELOAD_COVERAGE}
+            // The coverage sentence and the predicate are drawn by the
+            // masthead. This state is that sentence.
+            masthead
+          />
         </GridStage>
       ),
     },
     {
       id: "unknown-total",
-      label: "A total the source will not give",
-      group: "The claim",
-      note: 'Against FHIR this is the common case, not the edge one. `Bundle.total` is optional, the spec forbids constructing paging URLs by hand, and several production servers return a `next` link and nothing else — so “six of 312” is a sentence a conformant integration often cannot say. `total` is therefore `number | "unknown"`, and the unknown case says so in words. `aria-rowcount` becomes -1, which is ARIA\'s “not known”, rather than the page size dressed up as an answer.',
+      label: "Total unknown",
+      group: "Coverage",
+      note: "A FHIR total is optional, so against a real server it is often missing. The unknown case says so in words instead of printing the page size as the answer.",
       code: `coverage={{ shown: 6, total: "unknown", noun: "clients" }}
 // → "6 clients shown. The source did not say how many match."
 // → aria-rowcount="-1"`,
-      render: () => (
+      render: (density) => (
         <GridStage>
           <DataGrid
             {...GRID_BASE}
+            density={GRID_DENSITY[density]}
             rows={CASELOAD}
             coverage={UNKNOWN_TOTAL_COVERAGE}
             note="unpaged"
+            // "The source did not say how many match" is a masthead line.
+            masthead
           />
         </GridStage>
       ),
     },
     {
       id: "absence",
-      label: "Four kinds of missing, four words",
-      group: "When there is no value",
-      note: "An assessment the client has not completed, a Part 2 record this reader is not entitled to, a form nobody handed out, and a questionnaire the client declined. Four situations, four different next actions, and one em dash in every other grid. `GridValue` has no null member, so a caller cannot express “missing” without saying which — and the reason is drawn by the grid rather than by the caller's renderer, so a cell function returning a dash can never paint over a Part 2 value.",
+      label: "Four kinds of missing",
+      group: "Absence",
+      note: "Awaiting, declined, not asked, restricted. Four different next actions, so four words rather than the one em dash every other grid draws.",
       code: `value: (row) => row.phq9 ?? { absent: "awaiting" }
 // The type has no null member. This will not compile:
 value: (row) => row.phq9 ?? null`,
-      render: () => (
+      render: (density) => (
         <GridStage>
           <DataGrid
             {...GRID_BASE}
+            density={GRID_DENSITY[density]}
             rows={CASELOAD_WITH_EVERY_ABSENCE}
             coverage={{ ...CASELOAD_COVERAGE, shown: CASELOAD_WITH_EVERY_ABSENCE.length }}
           />
@@ -1879,18 +1940,19 @@ value: (row) => row.phq9 ?? null`,
     },
     {
       id: "absence-sort",
-      label: "An absence sorts last, in both directions",
-      group: "When there is no value",
-      note: "Click PHQ-9 twice to sort ascending. The awaiting and Part 2 rows stay at the bottom — they do not rise to the top as though they scored zero. Every grid that treats a missing number as negative infinity has this defect, and it is invisible until it matters: four “Awaiting” rows above a score of 7 tells a reader the caseload is doing better than it is.",
+      label: "Absence sorts last",
+      group: "Absence",
+      note: "Click PHQ-9 twice for ascending. The missing rows stay at the bottom rather than rising as though they scored zero.",
       code: `sortGridRows(rows, phq9, "ascending").map((r) => r.phq9);
 // → [7, 11, 18, 22, { absent: "awaiting" }, { absent: "restricted" }]
 
 sortGridRows(rows, phq9, "descending").map((r) => r.phq9);
 // → [22, 18, 11, 7, { absent: "awaiting" }, { absent: "restricted" }]`,
-      render: () => (
+      render: (density) => (
         <GridStage>
           <DataGrid
             {...GRID_BASE}
+            density={GRID_DENSITY[density]}
             rows={CASELOAD}
             coverage={CASELOAD_COVERAGE}
             defaultSort={{ key: "phq9", direction: "ascending" }}
@@ -1900,9 +1962,9 @@ sortGridRows(rows, phq9, "descending").map((r) => r.phq9);
     },
     {
       id: "derived",
-      label: "Sorting by a model, cited",
-      group: "Sorting is a clinical act",
-      note: "Disengagement risk is model output, not an observation, so the column carries its derivation and the grid turns that into footnote 1 — present whether or not anybody sorted, because a reader scanning the numbers needs to know what they are. The population clause is the point: a model fitted on English-language intakes does not apply to a good part of the caseload it will be pointed at. Sorting by it adds a line saying this ranks a prediction and pointing at the note rather than repeating it.",
+      label: "A model, cited",
+      group: "Sorting",
+      note: "Disengagement is model output, not an observation. The column carries the model, its version and the population it was fitted on, and sorting by it says so.",
       code: `{
   key: "risk",
   header: "Disengagement risk",
@@ -1915,66 +1977,78 @@ sortGridRows(rows, phq9, "descending").map((r) => r.phq9);
     population: "adults, English-language intake only",
   },
 }`,
-      render: () => (
+      render: (density) => (
         <GridStage>
           <DataGrid
             {...GRID_BASE}
+            density={GRID_DENSITY[density]}
             rows={CASELOAD}
             coverage={CASELOAD_COVERAGE}
             defaultSort={{ key: "risk", direction: "descending" }}
+            // "Cited" is the footnote naming the model. Without the foot this
+            // state is a column of numbers with no author.
+            footer
           />
         </GridStage>
       ),
     },
     {
       id: "arrivals",
-      label: "Three results arrived; nothing moved",
+      label: "Arrivals, held",
       group: "Live data",
-      note: "Press “Let them in”. Until you do, the results are counted on a ruled strip and the table is untouched — the row order is still the order they came back in, and the arrivals are nowhere in it. A grid that merges on a timer is how somebody actions the row that used to be there, so merging is a decision taken with a hand on the pointer. The count is a polite live region, so a screen-reader user hears that results are arriving without anything moving under their cursor.",
+      note: "Three results have landed and no row has moved. Merging is the reader's decision, taken with a hand on the pointer.",
       code: `<DataGrid
   arrivals={held}
   arrivalsAt="11:47"
   onAdmitArrivals={(arriving) => setRows(merge(rows, arriving))}
 />
 // The grid never merges. It counts, holds, and hands them back.`,
-      render: () => <GridArrivalsDemo />,
+      render: (density) => <GridArrivalsDemo density={density} />,
     },
     {
       id: "reading",
-      label: "The row you are on, named at the bottom",
+      label: "The row you are on",
       group: "Live data",
-      note: 'Click a cell, then use the arrow keys: it is a real `role="grid"` with two-dimensional navigation, and the ledger\'s “Reading” line names the row the cursor is on with its MRN. Acting on the wrong row is the retract-and-reorder error, and re-stating the identifier at the point of action is the intervention with evidence behind it. Sort while a cell is focused and the cursor stays with the patient rather than with the position — the cursor is a row key, not a pair of indices.',
+      note: "Click a cell and use the arrow keys. The line under the table names the row the cursor is on, with its MRN, and it follows the patient through a sort.",
       code: `identify={(row) => ({ primary: row.name, secondary: \`MRN \${row.mrn}\` })}
 // → "Row 2 of 312 — Adeyemi, R., MRN 4471902."
 
 // Masked records are the one case it says less, never more:
 identify={() => ({ primary: name, masked: true })}
 // → "Row 2 of 312 — restricted record."`,
-      render: () => (
+      render: (density) => (
         <GridStage>
           <DataGrid
             {...GRID_BASE}
+            density={GRID_DENSITY[density]}
             rows={CASELOAD}
             coverage={CASELOAD_COVERAGE}
-            density="compact"
             onRowActivate={() => {}}
+            // The line that names the row the cursor is on is the foot.
+            footer
           />
         </GridStage>
       ),
     },
     {
       id: "refusal",
-      label: "It refuses rather than degrading",
+      label: "Refuses to degrade",
       group: "Limits",
-      note: "The ceiling is dropped to four here so the refusal is visible; in production it is 20,000, and that number is measured rather than chosen — a forty-column client-side model on a shared 4 GB ward workstation stops being something you put in front of a nurse at handover somewhere around there. A grid that accepts a million rows and takes nine seconds to paint has not failed loudly, it has taught the reader that the software is slow, which is what people say just before they stop trusting the number on the screen.",
+      note: "The ceiling is four here so the refusal is visible. In production it is 20,000, measured on a shared ward workstation, and past it the grid says no rather than taking nine seconds to paint.",
       code: `gridCapacityRefusal(18_000);   // → null
 gridCapacityRefusal(120_000);
 // → "120,000 rows is past what this renders on a ward workstation
 //    (the ceiling is 20,000). Narrow the query or move paging to
 //    the server — the grid will not pretend to hold them."`,
-      render: () => (
+      render: (density) => (
         <GridStage>
-          <DataGrid {...GRID_BASE} rows={CASELOAD} coverage={CASELOAD_COVERAGE} ceiling={4} />
+          <DataGrid
+            {...GRID_BASE}
+            density={GRID_DENSITY[density]}
+            rows={CASELOAD}
+            coverage={CASELOAD_COVERAGE}
+            ceiling={4}
+          />
         </GridStage>
       ),
     },
@@ -4200,6 +4274,18 @@ const NO_CHROME = new Set([
   "infusion-loader",
   "rhythm-loader",
   "recorder",
+  /*
+   * Data Grid is a whole screen, not something placed inside a toolbar.
+   *
+   * It also could not afford the band. The chrome is five stacked blocks —
+   * tabs, three buttons, an input and a select, a switch and a checkbox — and
+   * above a worklist that came to 583px of content in a 384px stage, centred,
+   * which clipped the top of the chrome out of reach and the last table row off
+   * the bottom. The grid re-themes on its own under the language switch (its
+   * type, accent and radius all come off the bridged `--ox-*` values), so
+   * dropping the band costs the reader nothing that switch was showing them.
+   */
+  "data-grid",
   // Signature returns early above and never consults this list; named here so
   // the set reads as the complete answer to "which previews show no chrome".
   "signature",
@@ -4208,6 +4294,40 @@ const NO_CHROME = new Set([
 function chromeFor(name: string): boolean {
   return !NO_CHROME.has(name);
 }
+
+/**
+ * How tall the rail and the stage are allowed to get, by component.
+ *
+ * 24rem suits a control demonstrated on its own, and it is what everything
+ * still gets. A worklist is not that: eight rows at 44px each is past 384px
+ * before anything is drawn around them, so 24rem cut the last row through the
+ * middle. 34rem clears the tallest state at the loosest density — the cited
+ * model at patient spacing, 520px — with a little room, and every other state
+ * sits well inside it.
+ */
+const STAGE_HEIGHT: Record<string, string> = {
+  "data-grid": "lg:max-h-[34rem]",
+};
+
+function stageHeightFor(name: string): string {
+  return STAGE_HEIGHT[name] ?? "lg:max-h-[24rem]";
+}
+
+/**
+ * Previews that show the component and nothing else.
+ *
+ * The two panels under the stage — the reason the state exists, and the props
+ * that produced it — are the right furniture around a control being explained.
+ * Around a full screen they are a second and third caption under a thing that
+ * is already showing you what it does, and they push the table half a viewport
+ * up. The home page runs this same grid with neither and reads better for it.
+ *
+ * Nothing is lost that the page does not say elsewhere: the state still deep
+ * links, because selecting one writes `?state=` whether or not the hint under
+ * the code is drawn, and Usage & props below carries a fuller example than any
+ * per-state snippet did.
+ */
+const BARE_STAGE = new Set(["data-grid"]);
 
 /** Scenarios in rail order, grouped. Ungrouped ones fall under one heading. */
 function grouped(scenarios: Scenario[]): Array<{ group: string; items: Scenario[] }> {
@@ -4359,6 +4479,7 @@ export function ComponentPreview({
 
   const scenario = scenarios.find((item) => item.id === scenarioId) ?? scenarios[0]!;
   const bands = grouped(scenarios);
+  const bare = BARE_STAGE.has(name);
 
   return (
     <div className="instrument instrument-demo">
@@ -4404,7 +4525,10 @@ export function ComponentPreview({
             screens down on a 420px viewport — which is the same mistake the
             page itself was making, one level in.
           */
-          className="scroll-thin-dark max-h-[13rem] overflow-y-auto border-b border-panel-rule py-2 sm:max-h-[17rem] lg:max-h-[24rem] lg:border-b-0 lg:border-r"
+          className={cn(
+            "scroll-thin-dark max-h-[13rem] overflow-y-auto border-b border-panel-rule py-2 sm:max-h-[17rem] lg:border-b-0 lg:border-r",
+            stageHeightFor(name),
+          )}
         >
           {bands.map((band) => (
             <div key={band.group}>
@@ -4476,8 +4600,21 @@ export function ComponentPreview({
               child is a WCAG 2.1.1 failure the audit caught. A column with the
               default `stretch` gives the same visual centring without taking
               width away from anything.
+
+              The centring is `margin: auto` on the child rather than
+              `justify-content: center` here, and that is the bug fix rather
+              than a preference. Centred content taller than a scroll container
+              overflows both edges, and the top edge of a scroll box cannot be
+              reached: the data grid's stage held 583px in 384px, so the first
+              200px — the whole chrome band — was painted above scrollTop 0 and
+              nothing could scroll to it. An auto margin collapses to zero the
+              moment the content stops fitting, so a tall scenario starts at its
+              top and a short one still sits in the middle.
             */
-            className="flex min-h-[13rem] flex-1 flex-col justify-center p-4 sm:p-6 lg:max-h-[24rem] lg:overflow-y-auto"
+            className={cn(
+              "flex min-h-[13rem] flex-1 flex-col p-4 sm:p-6 lg:overflow-y-auto",
+              stageHeightFor(name),
+            )}
           >
             {/*
               The stage is where the framework lands, and only the stage.
@@ -4490,20 +4627,22 @@ export function ComponentPreview({
               stopped being able to show what Oxygen looks like, which is the
               thing it exists to do.
             */}
-            <HostStage className="flex w-full min-w-0 flex-col gap-6">
+            <HostStage className="my-auto flex w-full min-w-0 flex-col gap-6">
               {chromeFor(name) ? <HostChrome /> : null}
-              {scenario.render()}
+              {scenario.render(density)}
             </HostStage>
           </div>
 
-          <div className="animate-rail-settle border-t border-panel-rule bg-panel/60 px-4 py-3.5 sm:px-5">
-            <p className="eyebrow text-trace">Why this state exists</p>
-            <p className="mt-2 max-w-[68ch] text-[0.8125rem] leading-relaxed text-panel-muted">
-              {scenario.note}
-            </p>
-          </div>
+          {bare ? null : (
+            <div className="animate-rail-settle border-t border-panel-rule bg-panel/60 px-4 py-3.5 sm:px-5">
+              <p className="eyebrow text-trace">Why this state exists</p>
+              <p className="mt-2 max-w-[68ch] text-[0.8125rem] leading-relaxed text-panel-muted">
+                {scenario.note}
+              </p>
+            </div>
+          )}
 
-          {scenario.code ? (
+          {scenario.code && !bare ? (
             <div className="border-t border-panel-rule">
               <pre
                 tabIndex={0}
