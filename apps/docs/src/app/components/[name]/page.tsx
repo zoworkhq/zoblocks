@@ -266,6 +266,16 @@ function frameworkNote(component: ComponentDoc): string {
   );
 }
 
+/**
+ * Previews that need more width than the prose column.
+ *
+ * Switch shows forty controls at once. Data Grid is a five-column worklist with
+ * a 15.5rem state rail beside it, which at 6xl left the table about 840px —
+ * two hundred less than the same grid gets on the home page, and the reason its
+ * columns read as cramped there and comfortable here.
+ */
+const WIDE_PREVIEW = new Set(["switch", "data-grid"]);
+
 export default async function ComponentPage({ params }: { params: Promise<{ name: string }> }) {
   const { name } = await params;
   const component = getComponent(name);
@@ -522,7 +532,7 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
           */}
           <div
             className={`mx-auto section-minor px-5 sm:px-8 ${
-              component.name === "switch" ? "max-w-[92rem]" : "max-w-6xl"
+              WIDE_PREVIEW.has(component.name) ? "max-w-[92rem]" : "max-w-6xl"
             }`}
           >
             <SectionHeading
