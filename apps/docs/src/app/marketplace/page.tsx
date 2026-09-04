@@ -203,13 +203,27 @@ function PackCard({ item, index }: { item: ShelfItem; index: number }) {
           ) : null}
         </div>
 
+        {/*
+          A card leads somewhere only when there is somewhere to go.
+
+          While selling is closed the detail page has nothing a card does not
+          already say — the same blurb, the same price, the same disabled
+          control — and Rahul asked that a card not open it. So the title is a
+          link only for a purchasable pack, and the overlay that made the whole
+          card clickable goes with it. When the shop opens, `purchasable`
+          flips and the links come back without anyone touching this.
+        */}
         <h3 className="mt-3 font-display text-lg font-semibold tracking-[-0.015em]">
-          <Link
-            href={`/marketplace/${item.slug}`}
-            className="after:absolute after:inset-0 after:content-[''] focus-visible:outline-none"
-          >
-            {item.title}
-          </Link>
+          {item.purchasable ? (
+            <Link
+              href={`/marketplace/${item.slug}`}
+              className="after:absolute after:inset-0 after:content-[''] focus-visible:outline-none"
+            >
+              {item.title}
+            </Link>
+          ) : (
+            item.title
+          )}
         </h3>
 
         <p className="body-sm mt-2 text-graphite">{item.blurb}</p>
@@ -249,13 +263,10 @@ function PackCard({ item, index }: { item: ShelfItem; index: number }) {
                 "bg-paper-sunk px-2.5 py-1.5 text-[0.6875rem] font-semibold text-graphite-soft"
               }
             >
-              {/*
-                The badge above answers "does this exist"; this answers "can I
-                have it". On an unbuilt pack both are no, and repeating the
-                badge's word here was the third statement of one fact that this
-                page had too many of already.
-              */}
-              Not on sale
+              {/* "Coming soon", in Rahul's words. The badge above still says
+                  "Not built yet" on the packs that do not exist, because that
+                  is a different fact from the shop being shut. */}
+              Coming soon
             </button>
           ) : (
             <a

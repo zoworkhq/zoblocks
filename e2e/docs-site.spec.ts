@@ -794,7 +794,10 @@ test.describe("the public marketplace @a11y", () => {
     // The title owns the card; the buy control is the second destination, which
     // is why this names the link rather than taking the first one it finds.
     const first = cards.first();
-    await expect(first.getByRole("link").first()).toHaveAttribute("href", /\/marketplace\//);
+    // No card links anywhere while nothing can be bought — the detail page
+    // says nothing the card does not, and the shelf must not send a reader
+    // through a door with nothing behind it.
+    await expect(first.getByRole("link")).toHaveCount(0);
     await expect(first).toContainText(/\$|Free|By arrangement/);
   });
 
@@ -875,7 +878,10 @@ test.describe("the public marketplace @a11y", () => {
   test("an item states what was checked and where it is bought", async ({ page }) => {
     await page.goto("/marketplace");
 
-    await page.locator("[data-ox-pack]").first().getByRole("link").first().click();
+    // By address, not by clicking a card: cards do not link while selling
+    // is closed. The page is still built and still reachable.
+    const slug = await page.locator("[data-ox-pack]").first().getAttribute("data-ox-pack");
+    await page.goto(`/marketplace/${slug}`);
 
     await expect(page.getByRole("heading", { name: "What was checked" })).toBeVisible();
     await expect(page.getByText(/contrast pairs at or above/)).toBeVisible();
@@ -900,11 +906,11 @@ test.describe("the public marketplace @a11y", () => {
      */
     /*
      * While `SELLING_OPEN` is false there is no buy link at all — the control
-     * is a disabled "Not on sale" and the price line says what the figure is.
+     * is a disabled "Coming soon" and the price line says what the figure is.
      * When selling opens, this becomes the `/market/` href check it used to be.
      */
     await expect(page.getByRole("link", { name: /Buy in the app/ })).toHaveCount(0);
-    await expect(page.getByRole("button", { name: "Not on sale" })).toBeDisabled();
+    await expect(page.getByRole("button", { name: "Coming soon" })).toBeDisabled();
     await expect(page.getByText(/not yet on sale|not built yet/)).toBeVisible();
 
     // And the licence is stated before anybody spends anything.

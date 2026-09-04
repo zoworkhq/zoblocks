@@ -117,7 +117,7 @@ export default async function MarketplaceItemPage({
                 >
                   {/* The line above carries whether it is built; this carries whether
                       it can be bought. Two questions, two answers, said once each. */}
-                  Not on sale
+                  Coming soon
                 </button>
               ) : (
                 <a
