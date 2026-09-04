@@ -35,11 +35,12 @@ export const signInHref = `${APP}/login`;
  * first-time reader clicking the one filled button on the site reached a field
  * they could not fill.
  *
- * "Request a workspace" is what actually happens. The console's own heading has
- * said "Request access" for as long as the flow has existed; the site is the
- * half that had not caught up.
+ * "Request access" is what actually happens, and it is the console's own
+ * heading for the same form — one name for one action across both apps. It
+ * was briefly "Request a workspace", which said the same thing in nineteen
+ * characters and pushed the header to 393px in a 375px viewport.
  */
 export const signUpHref = `${APP}/signup`;
 
 /** The label for `signUpHref`, so both places that render it agree. */
-export const SIGN_UP_LABEL = "Request a workspace";
+export const SIGN_UP_LABEL = "Request access";

@@ -117,60 +117,103 @@ test.describe("scrolling @a11y", () => {
     }
   });
 
-  test("the section rail still tracks the section being read", async ({ page }) => {
-    // Removing the hijack must not cost the affordance it was there for.
+  test("the section bar is tabs: one panel at a time, and the page does not move", async ({
+    page,
+  }) => {
+    /*
+     * This used to assert scroll-spy on a row of anchors. The row is a tablist
+     * now — the anchors jumped the page under the reader — so what it owes is
+     * the opposite: choosing a tab swaps the panel in place and scrolls
+     * nothing. Every panel is still in the document, hidden, which is what
+     * keeps the page indexable and the audit complete.
+     */
     await page.goto(TABS);
     await settle(page);
 
-    const rail = page.locator("nav[aria-label='On this page']");
-    await expect(rail).toBeVisible();
-
-    const current = () => rail.locator("[aria-current='true']").first().textContent();
-    expect(await current()).toBe("Preview");
+    const bar = page.locator("nav[aria-label='On this page']");
+    await expect(bar).toBeVisible();
+    const tabs = bar.getByRole("tab");
+    await expect(tabs.first()).toHaveAttribute("aria-selected", "true");
+    await expect(tabs.first()).toHaveText("Preview");
 
     /*
-     * To the end of the document, and compared against the rail's own last
-     * entry rather than a hardcoded label.
-     *
-     * Two reasons. The preview section on this page is taller than several
-     * viewports — it holds the whole gallery — so scrolling any fixed number of
-     * pixels can legitimately leave the answer unchanged, and asserting "it
-     * changed" would really be asserting the gallery's height. And the rail is
-     * built conditionally from what the component actually documents, so the
-     * last entry is not the same on every page.
+     * Scroll into the page first, so a jump would be measurable — but not so
+     * far that a shorter panel could not hold the position. Preview on this
+     * page is taller than several viewports; switching to a short panel
+     * shrinks the document and the browser clamps scrollY to the new maximum,
+     * which is not a scroll and must not read as one.
      */
-    const labels = await rail.locator("li a").allTextContents();
-    const last = labels.at(-1)!;
-    expect(last).not.toBe("Preview");
+    await page.evaluate(() => window.scrollTo(0, 300));
 
-    await page.evaluate(() =>
-      window.scrollTo({ top: document.documentElement.scrollHeight, behavior: "auto" }),
+    /*
+     * Measured after Playwright has positioned the element and before it
+     * clicks. `click()` first scrolls its target into view, and for a sticky
+     * bar the engines disagree about where that is — Chromium settled at 3px,
+     * Gecko at 296px — while a real click in a real browser moved nothing.
+     * What this test owes is that *choosing the tab* does not move the page,
+     * so the baseline is taken once the harness has finished moving it.
+     */
+    const usage = bar.getByRole("tab", { name: "Usage & props" });
+    await usage.scrollIntoViewIfNeeded();
+    const before = await page.evaluate(() => window.scrollY);
+    await usage.click();
+    await expect(usage).toHaveAttribute("aria-selected", "true");
+
+    /*
+     * Within a few pixels, not exact. Swapping a panel several viewports tall
+     * for a short one reflows the document, and the engines settle scrollY on
+     * different sub-pixel values afterwards — measured at 0.9px, 2px, and once
+     * 5px in WebKit under a full parallel run. The defect this rules out is the
+     * old one: an anchor jump to the section, which is hundreds of pixels.
+     */
+    const after = await page.evaluate(() => window.scrollY);
+    expect(Math.abs(after - before), `scrolled from ${before} to ${after}`).toBeLessThan(8);
+    expect(await page.evaluate(() => window.location.hash)).toBe("#usage");
+
+    /*
+     * Only the bar's own panels. The Tabs page demonstrates the Tabs
+     * component, so the document holds a dozen other tabpanels that belong to
+     * the demos; the ones this bar controls are named by its tabs.
+     */
+    const visible = await page.evaluate(() => {
+      const owned = [
+        ...document.querySelectorAll<HTMLElement>("nav[aria-label='On this page'] [role='tab']"),
+      ].map((tab) => tab.getAttribute("aria-controls"));
+      return owned.filter((id) => id && !document.getElementById(id)?.hidden);
+    });
+    expect(visible).toEqual(["usage"]);
+  });
+
+  test("a section link still opens its tab", async ({ page }) => {
+    // An old `#usage` link — from a README, a chat, a bookmark — must keep
+    // landing on Usage, not on a hidden panel.
+    await page.goto(`${TABS}#usage`);
+    await settle(page);
+    const bar = page.locator("nav[aria-label='On this page']");
+    await expect(bar.getByRole("tab", { name: "Usage & props" })).toHaveAttribute(
+      "aria-selected",
+      "true",
     );
-    await page.waitForTimeout(600);
-
-    expect(await current()).toBe(last);
+    expect(await page.evaluate(() => document.getElementById("usage")?.hidden)).toBe(false);
   });
 
   /*
-   * The rail is built from what the component documents, and every entry is
-   * conditional on the section existing — except `related`, which was not, and
-   * whose section only renders when there is something in it. The result was a
-   * tab in the in-page nav pointing at an id that was not on the page.
-   *
-   * Checked across several components rather than one, because the whole point
-   * is that the entries differ per component.
+   * A tab that controls nothing is the tabs version of a link into a 404:
+   * a section that was renamed or removed leaves a control in the bar that
+   * shows an empty page. Checked across several components rather than one,
+   * because the bar is built conditionally from what each one documents.
    */
-  test("every rail entry points at a section that exists", async ({ page }) => {
-    for (const name of ["tabs", "switch", "accordion", "copilot", "pulse-loader"]) {
+  test("every tab controls a panel that exists", async ({ page }) => {
+    for (const name of ["tabs", "switch", "accordion", "pulse-loader", "data-grid"]) {
       await page.goto(`/components/${name}`);
 
       const missing = await page.evaluate(() =>
-        [...document.querySelectorAll<HTMLAnchorElement>("nav[aria-label='On this page'] li a")]
-          .map((link) => link.getAttribute("href")!.slice(1))
-          .filter((id) => !document.getElementById(id)),
+        [...document.querySelectorAll<HTMLElement>("nav[aria-label='On this page'] [role='tab']")]
+          .map((tab) => tab.getAttribute("aria-controls") ?? "")
+          .filter((id) => !id || !document.getElementById(id)),
       );
 
-      expect(missing, `${name} has rail entries pointing at nothing`).toEqual([]);
+      expect(missing, `${name} has tabs controlling nothing`).toEqual([]);
     }
   });
 });
@@ -523,7 +566,7 @@ test.describe("the app doors @a11y", () => {
    */
   for (const [label, path] of [
     ["Sign in", "/login"],
-    ["Sign up", "/signup"],
+    ["Request access", "/signup"],
   ] as const) {
     test(`${label} points at the app's ${path}`, async ({ page }) => {
       await page.goto("/");
@@ -569,7 +612,7 @@ test.describe("the app doors @a11y", () => {
       overflow.box,
     );
 
-    for (const label of ["Sign in", "Sign up"]) {
+    for (const label of ["Sign in", "Request access"]) {
       await expect(siteHeader.getByRole("link", { name: label, exact: true })).toBeVisible();
     }
   });
@@ -619,7 +662,14 @@ test.describe("site chrome @a11y", () => {
     // disclosure family to dark, which put pale cyan on near-white.
     for (const scheme of ["light", "dark"] as const) {
       await page.emulateMedia({ colorScheme: scheme });
-      await page.goto("/components/safety-plan");
+      /*
+       * Accordion, not Safety Plan. Safety Plan is installable but has no
+       * page — the route refuses it by the readiness list — so this was
+       * asserting against a 404. Accordion is the documented member of the
+       * same disclosure family, and the fix this guards was made to that
+       * family's shared preview.
+       */
+      await page.goto("/components/accordion");
       await settle(page);
 
       const panel = page.locator(".instrument-demo").first();
@@ -759,7 +809,7 @@ test.describe("the public marketplace @a11y", () => {
      * the console cannot take money — so the ready section renders empty and
      * the shelf is one list that announces rather than sells.
      */
-    await expect(page.getByRole("heading", { name: "Coming soon" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Announced" })).toBeVisible();
 
     const cards = page.locator("[data-ox-pack]");
     expect(await cards.count()).toBeGreaterThan(1);
@@ -803,7 +853,9 @@ test.describe("the public marketplace @a11y", () => {
     // The seed's reviewer is "SEED DATA — nobody has reviewed this". Neither
     // that nor a plausible substitute may reach a reader.
     await expect(page.getByText(/SEED DATA/i)).toHaveCount(0);
-    await expect(page.getByText(/Clinical review is not yet in place/)).toBeVisible();
+    await expect(
+      page.getByText(/No pack has been reviewed by a registered clinician/),
+    ).toBeVisible();
 
     /*
      * The detail page too, which is where this actually escaped.
@@ -846,8 +898,14 @@ test.describe("the public marketplace @a11y", () => {
      * Buying leaves for the app, because a purchase belongs to an
      * organisation and this site does not know about organisations.
      */
-    const buy = page.getByRole("link", { name: /Buy in the app/ });
-    await expect(buy).toHaveAttribute("href", /\/market\//);
+    /*
+     * While `SELLING_OPEN` is false there is no buy link at all — the control
+     * is a disabled "Not on sale" and the price line says what the figure is.
+     * When selling opens, this becomes the `/market/` href check it used to be.
+     */
+    await expect(page.getByRole("link", { name: /Buy in the app/ })).toHaveCount(0);
+    await expect(page.getByRole("button", { name: "Not on sale" })).toBeDisabled();
+    await expect(page.getByText(/not yet on sale|not built yet/)).toBeVisible();
 
     // And the licence is stated before anybody spends anything.
     await expect(page.getByRole("heading", { name: "Licence" })).toBeVisible();

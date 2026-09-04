@@ -16,10 +16,11 @@ import { DatePickerGallery } from "@/components/site/date-picker-gallery";
 import { InstallCommand, RevealRoot } from "@/components/site/interactions";
 import { LanguageSwitch } from "@/components/site/language-switch";
 import { HostStage } from "@/components/site/host-stage";
-import { SectionRail, type RailSection } from "@/components/site/section-rail";
+import { SectionTabs, type RailSection } from "@/components/site/section-tabs";
 import { Playground } from "@/components/site/playground";
 import { hasPlayground } from "@/components/site/playground-registry";
-import { isReady } from "@/lib/readiness";
+import { isReady, readyRank } from "@/lib/readiness";
+import { ComponentNav, type NavItem } from "@/components/site/component-nav";
 
 export function generateStaticParams() {
   return CATALOG.filter((component) => isReady(component.name)).map((component) => ({
@@ -292,6 +293,30 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
   const weight = await readRegistryWeight(name);
 
   /*
+   * The left pane's list: a projection, not the catalogue.
+   *
+   * Name, title, stability and categories — the four things the pane draws.
+   * Sent whole, a ComponentDoc carries every prop table and example on the
+   * site, and a client component would ship all thirty to draw fourteen
+   * names. Documented ones in catalogue order; the rest listed, never linked.
+   */
+  const toNavItem = (entry: ComponentDoc): NavItem => ({
+    name: entry.name,
+    title: entry.title,
+    status: entry.status,
+    category: entry.categories[0] ?? "Other",
+    categories: entry.categories,
+  });
+  const navItems = CATALOG.filter((entry) => isReady(entry.name))
+    .slice()
+    .sort((a, b) => readyRank(a.name) - readyRank(b.name))
+    .map(toNavItem);
+  const navSoon = CATALOG.filter((entry) => !isReady(entry.name) && entry.status !== "deprecated")
+    .slice()
+    .sort((a, b) => a.title.localeCompare(b.title))
+    .map(toNavItem);
+
+  /*
    * Every entry here is conditional on the section it points at, `related`
    * included — it used to be unconditional while the section it links to only
    * renders when there is something to put in it. A component with no related
@@ -365,44 +390,57 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
           dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbData(component)) }}
         />
 
-        {/* Header ------------------------------------------------------- */}
-        <section className="border-b border-rule">
-          <div className="mx-auto max-w-6xl section-minor px-5 sm:px-8">
-            <Link
-              href="/components"
-              className="inline-flex items-center gap-1.5 text-sm text-graphite transition-colors hover:text-ink"
-            >
-              <ArrowLeft aria-hidden="true" className="size-3.5" />
-              All components
-            </Link>
+        {/*
+          Two columns from `lg`: the component list, then the page.
 
-            <div className="mt-6 flex flex-wrap items-center gap-3">
-              <h1 className="display-lg text-balance">{component.title}</h1>
-              <span className="rounded-full border border-oxygen/30 bg-oxygen/8 px-2.5 py-1 font-mono text-[0.6875rem] uppercase tracking-wider text-oxygen-deep">
-                {STATUS_LABEL[component.status]}
-              </span>
-            </div>
+          The outer measure is wider than the site's 6xl because the pane is
+          added beside the content rather than taken out of it — at 1440px
+          the content column still lands within a few pixels of 6xl. Every
+          section keeps its own `mx-auto max-w-6xl` container and simply
+          centres inside the narrower column; the two wide previews fill it.
+        */}
+        <div className="mx-auto grid max-w-[92rem] px-5 sm:px-8 lg:grid-cols-[14rem_minmax(0,1fr)] lg:gap-x-10">
+          <ComponentNav items={navItems} soon={navSoon} current={component.name} />
 
-            <p className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-graphite">
-              {/* Primitives take no FHIR resource. Rendering the link anyway
+          <div className="min-w-0">
+            {/* Header ------------------------------------------------------- */}
+            <section className="border-b border-rule">
+              <div className="mx-auto max-w-6xl section-minor px-5 sm:px-8">
+                <Link
+                  href="/components"
+                  className="inline-flex items-center gap-1.5 text-sm text-graphite transition-colors hover:text-ink"
+                >
+                  <ArrowLeft aria-hidden="true" className="size-3.5" />
+                  All components
+                </Link>
+
+                <div className="mt-6 flex flex-wrap items-center gap-3">
+                  <h1 className="display-lg text-balance">{component.title}</h1>
+                  <span className="rounded-full border border-oxygen/30 bg-oxygen/8 px-2.5 py-1 font-mono text-[0.6875rem] uppercase tracking-wider text-oxygen-deep">
+                    {STATUS_LABEL[component.status]}
+                  </span>
+                </div>
+
+                <p className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-graphite">
+                  {/* Primitives take no FHIR resource. Rendering the link anyway
                   leaves an anchor with no text and no destination, which is
                   both an empty affordance and an axe violation. */}
-              {/* Every resource, not just the first. A component that reads
+                  {/* Every resource, not just the first. A component that reads
                   three of them said so in its metadata and showed one. */}
-              {component.fhir.map((resource) => (
-                <a
-                  key={resource.url}
-                  href={resource.url}
-                  className="numeric inline-flex items-center gap-1 text-oxygen-deep transition-colors hover:text-ink"
-                >
-                  {resource.name}
-                  <ArrowUpRight aria-hidden="true" className="size-3" />
-                </a>
-              ))}
-              <span className="text-graphite-soft">{component.categories.join(" · ")}</span>
-            </p>
+                  {component.fhir.map((resource) => (
+                    <a
+                      key={resource.url}
+                      href={resource.url}
+                      className="numeric inline-flex items-center gap-1 text-oxygen-deep transition-colors hover:text-ink"
+                    >
+                      {resource.name}
+                      <ArrowUpRight aria-hidden="true" className="size-3" />
+                    </a>
+                  ))}
+                  <span className="text-graphite-soft">{component.categories.join(" · ")}</span>
+                </p>
 
-            {/*
+                {/*
               The summary goes here; the rationale goes below the preview.
 
               Three of the four people who open this page are looking rather
@@ -412,32 +450,32 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
               so a client in a demo call met a paragraph instead of the product.
               The prose is not cut; it is moved and given a lead line.
             */}
-            <p className="lede mt-6 max-w-3xl text-pretty">{component.summary}</p>
+                <p className="lede mt-6 max-w-3xl text-pretty">{component.summary}</p>
 
-            {/* Facts a reader scans for before deciding to read anything. */}
-            <p className="numeric mt-4 flex flex-wrap items-center gap-x-3 gap-y-1 text-[0.6875rem] uppercase tracking-wide text-graphite-soft">
-              <span>{component.states.length} states</span>
-              <span aria-hidden="true">·</span>
-              <span>{component.props.length} props</span>
-              {weight ? (
-                <>
+                {/* Facts a reader scans for before deciding to read anything. */}
+                <p className="numeric mt-4 flex flex-wrap items-center gap-x-3 gap-y-1 text-[0.6875rem] uppercase tracking-wide text-graphite-soft">
+                  <span>{component.states.length} states</span>
                   <span aria-hidden="true">·</span>
-                  <span
-                    title={`Gzipped source copied by \`oxygen add\`: ${weight.files} files across this component and ${weight.shared} shared registry modules. A ceiling, not a bundle delta.`}
-                  >
-                    {(weight.gzip / 1024).toFixed(1)} KB installed
-                  </span>
-                </>
-              ) : null}
-              {component.since ? (
-                <>
-                  <span aria-hidden="true">·</span>
-                  <span>since {component.since}</span>
-                </>
-              ) : null}
-            </p>
+                  <span>{component.props.length} props</span>
+                  {weight ? (
+                    <>
+                      <span aria-hidden="true">·</span>
+                      <span
+                        title={`Gzipped source copied by \`oxygen add\`: ${weight.files} files across this component and ${weight.shared} shared registry modules. A ceiling, not a bundle delta.`}
+                      >
+                        {(weight.gzip / 1024).toFixed(1)} KB installed
+                      </span>
+                    </>
+                  ) : null}
+                  {component.since ? (
+                    <>
+                      <span aria-hidden="true">·</span>
+                      <span>since {component.since}</span>
+                    </>
+                  ) : null}
+                </p>
 
-            {/*
+                {/*
               The design-language switch.
 
               Here rather than in the site header, because it changes the
@@ -446,7 +484,7 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
               the install command because both answer the same question: does
               this fit the stack we already have.
             */}
-            {/*
+                {/*
               On every component page, with no exceptions.
 
               Signature was excepted at first, on the reasoning that it wraps
@@ -458,28 +496,28 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
               components in their palette, and a demo that hides that is a demo
               that misleads about what the package costs.
             */}
-            <div className="mt-8 flex flex-wrap items-center gap-x-4 gap-y-2">
-              <span className="eyebrow text-graphite-soft">Design language</span>
-              <LanguageSwitch />
-              <span className="max-w-[36ch] text-[0.75rem] leading-snug text-graphite-soft">
-                Renders the preview in that framework&rsquo;s own components and tokens. Clinical
-                colours never change.
-              </span>
-            </div>
+                <div className="mt-8 flex flex-wrap items-center gap-x-4 gap-y-2">
+                  <span className="eyebrow text-graphite-soft">Design language</span>
+                  <LanguageSwitch />
+                  <span className="max-w-[36ch] text-[0.75rem] leading-snug text-graphite-soft">
+                    Renders the preview in that framework&rsquo;s own components and tokens.
+                    Clinical colours never change.
+                  </span>
+                </div>
 
-            <div className="mt-8 max-w-2xl">
-              {/*
+                <div className="mt-8 max-w-2xl">
+                  {/*
                 Two channels, and the command has to match the one this
                 component actually uses. A package component shown an
                 `oxygen add` line sends the reader to a registry item that does
                 not exist — which is worse than no install instructions.
               */}
-              {component.distribution === "package" ? (
-                <InstallCommand
-                  command={`pnpm add ${component.packageName}`}
-                  note={
-                    <>
-                      {/*
+                  {component.distribution === "package" ? (
+                    <InstallCommand
+                      command={`pnpm add ${component.packageName}`}
+                      note={
+                        <>
+                          {/*
                         Read from the component's own metadata rather than a
                         conditional on its name. The reason differs per package
                         and stating the wrong one is worse than stating none —
@@ -487,37 +525,47 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
                         does not need. A hardcoded `name === "signature"` was
                         right for exactly as long as there were two of these.
                       */}
-                      {frameworkNote(component)} Import its stylesheet too:{" "}
-                      <code className="font-mono text-[0.6875rem] text-ink">
-                        {`import "${component.packageName}/styles.css"`}
-                      </code>
-                      .
-                    </>
-                  }
-                />
-              ) : (
-                <InstallCommand
-                  command={`npx @oxygenui-design/cli add ${component.name}`}
-                  note={
-                    <>
-                      First install? Run{" "}
-                      <code className="font-mono text-[0.6875rem] text-ink">oxygen init</code> once
-                      to say where your{" "}
-                      <code className="font-mono text-[0.6875rem] text-ink">@/</code> alias points.
-                      The source is copied into your repository, along with anything it depends on.
-                    </>
-                  }
-                />
-              )}
-            </div>
-          </div>
-        </section>
+                          {frameworkNote(component)} Import its stylesheet too:{" "}
+                          <code className="font-mono text-[0.6875rem] text-ink">
+                            {`import "${component.packageName}/styles.css"`}
+                          </code>
+                          .
+                        </>
+                      }
+                    />
+                  ) : (
+                    <InstallCommand
+                      command={`npx @oxygenui-design/cli add ${component.name}`}
+                      note={
+                        <>
+                          First install? Run{" "}
+                          <code className="font-mono text-[0.6875rem] text-ink">oxygen init</code>{" "}
+                          once to say where your{" "}
+                          <code className="font-mono text-[0.6875rem] text-ink">@/</code> alias
+                          points. The source is copied into your repository, along with anything it
+                          depends on.
+                        </>
+                      }
+                    />
+                  )}
+                </div>
+              </div>
+            </section>
 
-        <SectionRail sections={railSections} />
+            {/*
 
-        {/* Preview ------------------------------------------------------ */}
-        <section id="preview" className="scroll-mt-24 border-b border-rule bg-paper-sunk/40">
-          {/*
+              Tabs, not anchors. One section shows at a time and nothing
+
+              scrolls when a tab is chosen; every section still renders on the
+
+              server and stays in the document, hidden. See `SectionTabs`.
+
+            */}
+
+            <SectionTabs sections={railSections}>
+              {/* Preview ------------------------------------------------------ */}
+              <section id="preview" className="scroll-mt-24 border-b border-rule bg-paper-sunk/40">
+                {/*
             Switch takes the whole width and shows everything at once rather
             than one card behind a switcher.
 
@@ -530,45 +578,45 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
             only make their point side by side, where the word changes and the
             colour does not.
           */}
-          <div
-            className={`mx-auto section-minor px-5 sm:px-8 ${
-              WIDE_PREVIEW.has(component.name) ? "max-w-[92rem]" : "max-w-6xl"
-            }`}
-          >
-            <SectionHeading
-              eyebrow="Preview"
-              title={
-                component.name === "switch"
-                  ? "Every state, phase and surface — live, on the page."
-                  : "Every state, switchable."
-              }
-            />
-            <div className="mt-8" data-reveal>
-              {component.name === "switch" ? (
-                /*
+                <div
+                  className={`mx-auto section-minor px-5 sm:px-8 ${
+                    WIDE_PREVIEW.has(component.name) ? "max-w-[92rem]" : "max-w-6xl"
+                  }`}
+                >
+                  <SectionHeading
+                    eyebrow="Preview"
+                    title={
+                      component.name === "switch"
+                        ? "Every state, phase and surface — live, on the page."
+                        : "Every state, switchable."
+                    }
+                  />
+                  <div className="mt-8" data-reveal>
+                    {component.name === "switch" ? (
+                      /*
                   The gallery replaces the shared preview here, so it has to
                   mount the host itself — otherwise the one page whose subject
                   is a primitive would be the one page the language switch did
                   nothing on. No chrome band: forty switches already answer
                   every question a row of buttons would.
                 */
-                <HostStage className="flex w-full min-w-0 flex-col">
-                  <SwitchGallery />
-                </HostStage>
-              ) : (
-                <ComponentPreview name={component.name} states={component.states} />
-              )}
-            </div>
+                      <HostStage className="flex w-full min-w-0 flex-col">
+                        <SwitchGallery />
+                      </HostStage>
+                    ) : (
+                      <ComponentPreview name={component.name} states={component.states} />
+                    )}
+                  </div>
 
-            {/*
+                  {/*
               The declared states are rendered by the preview itself, which is
               the only place that knows whether it had scenarios to show. Two
               lists of the same eighteen strings, one under the other, was the
               shape this page had before.
             */}
-          </div>
+                </div>
 
-          {/*
+                {/*
             Tabs earns a gallery rather than a single preview: the claim it
             makes is that eleven skins and four semantic modes share one
             keyboard model, and a claim about sameness cannot be shown with
@@ -582,20 +630,23 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
             being too small to hold it.
           */}
 
-          {component.name === "tabs" && (
-            <div className="mx-auto max-w-[92rem] px-5 pb-[clamp(2.75rem,5vw,4.5rem)] sm:px-8">
-              <div data-reveal>
-                <SectionHeading eyebrow="Gallery" title="Every variant, mode and state — live." />
-                <div className="mt-8">
-                  <HostStage className="flex w-full min-w-0 flex-col">
-                    <TabsGallery />
-                  </HostStage>
-                </div>
-              </div>
-            </div>
-          )}
+                {component.name === "tabs" && (
+                  <div className="mx-auto max-w-[92rem] px-5 pb-[clamp(2.75rem,5vw,4.5rem)] sm:px-8">
+                    <div data-reveal>
+                      <SectionHeading
+                        eyebrow="Gallery"
+                        title="Every variant, mode and state — live."
+                      />
+                      <div className="mt-8">
+                        <HostStage className="flex w-full min-w-0 flex-col">
+                          <TabsGallery />
+                        </HostStage>
+                      </div>
+                    </div>
+                  </div>
+                )}
 
-          {/*
+                {/*
             The date control earns a gallery for Tabs' reason, doubled. Its
             claim is that fourteen presentations share one value space, one
             keyboard model and one accessibility contract — and a claim about
@@ -605,26 +656,26 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
             it they render permanently scrolled, which demonstrates overflow
             rather than scheduling.
           */}
-          {component.name === "date-picker" && (
-            <div className="mx-auto max-w-[92rem] px-5 pb-[clamp(2.75rem,5vw,4.5rem)] sm:px-8">
-              <div data-reveal>
-                {/* Derived from the component being rendered, not typed — this
+                {component.name === "date-picker" && (
+                  <div className="mx-auto max-w-[92rem] px-5 pb-[clamp(2.75rem,5vw,4.5rem)] sm:px-8">
+                    <div data-reveal>
+                      {/* Derived from the component being rendered, not typed — this
                     heading sits directly above the gallery that would falsify
                     it. */}
-                <SectionHeading
-                  eyebrow="Gallery"
-                  title={`${component.variants?.length ?? 0} variants, one contract — live.`}
-                />
-                <div className="mt-8">
-                  <HostStage className="flex w-full min-w-0 flex-col">
-                    <DatePickerGallery />
-                  </HostStage>
-                </div>
-              </div>
-            </div>
-          )}
+                      <SectionHeading
+                        eyebrow="Gallery"
+                        title={`${component.variants?.length ?? 0} variants, one contract — live.`}
+                      />
+                      <div className="mt-8">
+                        <HostStage className="flex w-full min-w-0 flex-col">
+                          <DatePickerGallery />
+                        </HostStage>
+                      </div>
+                    </div>
+                  </div>
+                )}
 
-          {/*
+                {/*
             Copilot earns one for the opposite reason to Tabs. Tabs needs a
             gallery because one strip cannot show that eleven skins share a
             keyboard model. Copilot needs one because the scenario switcher
@@ -633,25 +684,25 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
             order, the fence and the crisis classifier are the product, and
             none of them is visible in a screenshot of a text field.
           */}
-          {component.name === "copilot" && (
-            <div className="mx-auto max-w-[92rem] px-5 pb-[clamp(2.75rem,5vw,4.5rem)] sm:px-8">
-              <div data-reveal>
-                <SectionHeading
-                  eyebrow="Under the surface"
-                  title="The part that is not a chat box."
-                />
-                <div className="mt-8">
-                  <HostStage className="flex w-full min-w-0 flex-col">
-                    <CopilotGallery />
-                  </HostStage>
-                </div>
-              </div>
-            </div>
-          )}
-        </section>
+                {component.name === "copilot" && (
+                  <div className="mx-auto max-w-[92rem] px-5 pb-[clamp(2.75rem,5vw,4.5rem)] sm:px-8">
+                    <div data-reveal>
+                      <SectionHeading
+                        eyebrow="Under the surface"
+                        title="The part that is not a chat box."
+                      />
+                      <div className="mt-8">
+                        <HostStage className="flex w-full min-w-0 flex-col">
+                          <CopilotGallery />
+                        </HostStage>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </section>
 
-        {/* Why it exists ------------------------------------------------ */}
-        {/*
+              {/* Why it exists ------------------------------------------------ */}
+              {/*
           The rationale, under the thing it is describing.
 
           It keeps every word it had at the top of the page. What it gains is a
@@ -660,111 +711,117 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
           rather than as a wall. `leadOf` splits on the first sentence boundary
           and falls back to the whole string when there is no clean one.
         */}
-        <section id="why" className="scroll-mt-24 border-b border-rule">
-          <div className="mx-auto max-w-6xl section-minor px-5 sm:px-8">
-            <SectionHeading eyebrow="Why it exists" title={leadOf(component.rationale).lead} />
-            {leadOf(component.rationale).rest ? (
-              <p
-                className="mt-6 max-w-3xl text-pretty text-[1.0625rem] leading-relaxed text-graphite"
-                data-reveal
-              >
-                {leadOf(component.rationale).rest}
-              </p>
-            ) : null}
+              <section id="why" className="scroll-mt-24 border-b border-rule">
+                <div className="mx-auto max-w-6xl section-minor px-5 sm:px-8">
+                  <SectionHeading
+                    eyebrow="Why it exists"
+                    title={leadOf(component.rationale).lead}
+                  />
+                  {leadOf(component.rationale).rest ? (
+                    <p
+                      className="mt-6 max-w-3xl text-pretty text-[1.0625rem] leading-relaxed text-graphite"
+                      data-reveal
+                    >
+                      {leadOf(component.rationale).rest}
+                    </p>
+                  ) : null}
 
-            {/* Which elements the component reads, and what it does with them.
+                  {/* Which elements the component reads, and what it does with them.
                 Visible text rather than a `title` tooltip: this is the detail an
                 integrator checks their own feed against, and a tooltip is
                 unreachable by keyboard, invisible on touch, and unsearchable. */}
-            {component.fhir.some((resource) => resource.note) ? (
-              <dl
-                className="mt-8 max-w-3xl space-y-2 border-l-2 border-rule pl-4 text-sm"
-                data-reveal
-              >
-                {component.fhir
-                  .filter((resource) => resource.note)
-                  .map((resource) => (
-                    <div key={resource.url} className="flex flex-wrap gap-x-2">
-                      <dt className="numeric font-medium text-ink">{resource.name}</dt>
-                      <dd className="flex-1 text-graphite">{resource.note}</dd>
-                    </div>
-                  ))}
-              </dl>
-            ) : null}
-          </div>
-        </section>
+                  {component.fhir.some((resource) => resource.note) ? (
+                    <dl
+                      className="mt-8 max-w-3xl space-y-2 border-l-2 border-rule pl-4 text-sm"
+                      data-reveal
+                    >
+                      {component.fhir
+                        .filter((resource) => resource.note)
+                        .map((resource) => (
+                          <div key={resource.url} className="flex flex-wrap gap-x-2">
+                            <dt className="numeric font-medium text-ink">{resource.name}</dt>
+                            <dd className="flex-1 text-graphite">{resource.note}</dd>
+                          </div>
+                        ))}
+                    </dl>
+                  ) : null}
+                </div>
+              </section>
 
-        {/* Playground --------------------------------------------------- */}
-        {playable && (
-          <section id="playground" className="scroll-mt-24 border-b border-rule">
-            <div className="mx-auto max-w-6xl section-minor px-5 sm:px-8">
-              <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
-                <SectionHeading eyebrow="Playground" title="Change a prop, watch it change." />
-                <p className="numeric shrink-0 text-xs text-graphite-soft">
-                  {controls.length} PROPS / LIVE
-                </p>
-              </div>
-              {/* The knobs come from the same metadata the props table does,
+              {/* Playground --------------------------------------------------- */}
+              {playable && (
+                <section id="playground" className="scroll-mt-24 border-b border-rule">
+                  <div className="mx-auto max-w-6xl section-minor px-5 sm:px-8">
+                    <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
+                      <SectionHeading
+                        eyebrow="Playground"
+                        title="Change a prop, watch it change."
+                      />
+                      <p className="numeric shrink-0 text-xs text-graphite-soft">
+                        {controls.length} PROPS / LIVE
+                      </p>
+                    </div>
+                    {/* The knobs come from the same metadata the props table does,
                   and the generator checks every option against the prop's real
                   type — so a control here cannot offer a value the component
                   would reject. */}
-              <div className="mt-8" data-reveal>
-                <HostStage className="flex w-full min-w-0 flex-col">
-                  <Playground name={component.name} controls={controls} />
-                </HostStage>
-              </div>
-            </div>
-          </section>
-        )}
-
-        {/* Variants ----------------------------------------------------- */}
-        {variants.length > 0 && (
-          <section id="variants" className="scroll-mt-24 border-b border-rule">
-            <div className="mx-auto max-w-6xl section-minor px-5 sm:px-8">
-              <SectionHeading
-                eyebrow="Variants"
-                title="One component, and what each skin is for."
-              />
-              <p className="mt-3 max-w-2xl text-sm text-graphite" data-reveal>
-                Every variant is the same accessibility contract and the same keyboard model. Pick
-                by what the surface needs, not by what the code would be easier to write.
-              </p>
-
-              <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                {variants.map((variant, index) => (
-                  <div
-                    key={variant.id}
-                    data-reveal
-                    style={{ "--reveal-delay": `${index * 40}ms` } as React.CSSProperties}
-                    className="surface-2 rounded-2xl p-5"
-                  >
-                    <h3 className="font-display text-base font-semibold tracking-tight">
-                      {variant.label}
-                    </h3>
-                    <p className="mt-2 text-sm leading-relaxed text-graphite">
-                      {variant.description}
-                    </p>
-                    {Object.keys(variant.args ?? {}).length > 0 && (
-                      <p className="mt-3 font-mono text-[0.7rem] leading-relaxed text-graphite-soft">
-                        {Object.entries(variant.args ?? {})
-                          .map(([key, value]) => `${key}=${JSON.stringify(value)}`)
-                          .join("  ")}
-                      </p>
-                    )}
+                    <div className="mt-8" data-reveal>
+                      <HostStage className="flex w-full min-w-0 flex-col">
+                        <Playground name={component.name} controls={controls} />
+                      </HostStage>
+                    </div>
                   </div>
-                ))}
-              </div>
-            </div>
-          </section>
-        )}
+                </section>
+              )}
 
-        {/* Usage & props ------------------------------------------------ */}
-        {component.usage && (
-          <section id="usage" className="scroll-mt-24 border-b border-rule">
-            <div className="mx-auto max-w-6xl section-minor px-5 sm:px-8">
-              <SectionHeading eyebrow="Usage" title="Props are the FHIR resource." />
+              {/* Variants ----------------------------------------------------- */}
+              {variants.length > 0 && (
+                <section id="variants" className="scroll-mt-24 border-b border-rule">
+                  <div className="mx-auto max-w-6xl section-minor px-5 sm:px-8">
+                    <SectionHeading
+                      eyebrow="Variants"
+                      title="One component, and what each skin is for."
+                    />
+                    <p className="mt-3 max-w-2xl text-sm text-graphite" data-reveal>
+                      Every variant is the same accessibility contract and the same keyboard model.
+                      Pick by what the surface needs, not by what the code would be easier to write.
+                    </p>
 
-              {/*
+                    <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                      {variants.map((variant, index) => (
+                        <div
+                          key={variant.id}
+                          data-reveal
+                          style={{ "--reveal-delay": `${index * 40}ms` } as React.CSSProperties}
+                          className="surface-2 rounded-2xl p-5"
+                        >
+                          <h3 className="font-display text-base font-semibold tracking-tight">
+                            {variant.label}
+                          </h3>
+                          <p className="mt-2 text-sm leading-relaxed text-graphite">
+                            {variant.description}
+                          </p>
+                          {Object.keys(variant.args ?? {}).length > 0 && (
+                            <p className="mt-3 font-mono text-[0.7rem] leading-relaxed text-graphite-soft">
+                              {Object.entries(variant.args ?? {})
+                                .map(([key, value]) => `${key}=${JSON.stringify(value)}`)
+                                .join("  ")}
+                            </p>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </section>
+              )}
+
+              {/* Usage & props ------------------------------------------------ */}
+              {component.usage && (
+                <section id="usage" className="scroll-mt-24 border-b border-rule">
+                  <div className="mx-auto max-w-6xl section-minor px-5 sm:px-8">
+                    <SectionHeading eyebrow="Usage" title="Props are the FHIR resource." />
+
+                    {/*
                 The sample and its dependencies share the top row; the API takes
                 the full width underneath.
 
@@ -775,38 +832,38 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
                 The sample was clipping its own import path in the same column
                 (580px of code in 501px of box), which full width also fixes.
               */}
-              <div className="mt-8 grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,14rem)] lg:items-start">
-                <pre
-                  data-reveal
-                  tabIndex={0}
-                  className="scroll-thin-dark overflow-x-auto rounded-2xl border border-panel-rule bg-panel p-5 font-mono text-[0.75rem] leading-relaxed text-panel-fg/90"
-                >
-                  <code>{component.usage}</code>
-                </pre>
-
-                <div data-reveal style={{ "--reveal-delay": "80ms" } as React.CSSProperties}>
-                  <h3 className="font-display text-sm font-semibold uppercase tracking-wide text-graphite">
-                    Dependencies
-                  </h3>
-                  <ul className="mt-3 flex flex-wrap gap-2">
-                    {component.dependencies.map((dep) => (
-                      <li
-                        key={dep}
-                        className="numeric rounded-lg border border-rule bg-paper-sunk px-2.5 py-1 text-xs text-graphite"
+                    <div className="mt-8 grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,14rem)] lg:items-start">
+                      <pre
+                        data-reveal
+                        tabIndex={0}
+                        className="scroll-thin-dark overflow-x-auto rounded-2xl border border-panel-rule bg-panel p-5 font-mono text-[0.75rem] leading-relaxed text-panel-fg/90"
                       >
-                        {dep}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
+                        <code>{component.usage}</code>
+                      </pre>
 
-              <div
-                data-reveal
-                style={{ "--reveal-delay": "120ms" } as React.CSSProperties}
-                className="mt-10 space-y-8"
-              >
-                {/*
+                      <div data-reveal style={{ "--reveal-delay": "80ms" } as React.CSSProperties}>
+                        <h3 className="font-display text-sm font-semibold uppercase tracking-wide text-graphite">
+                          Dependencies
+                        </h3>
+                        <ul className="mt-3 flex flex-wrap gap-2">
+                          {component.dependencies.map((dep) => (
+                            <li
+                              key={dep}
+                              className="numeric rounded-lg border border-rule bg-paper-sunk px-2.5 py-1 text-xs text-graphite"
+                            >
+                              {dep}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
+
+                    <div
+                      data-reveal
+                      style={{ "--reveal-delay": "120ms" } as React.CSSProperties}
+                      className="mt-10 space-y-8"
+                    >
+                      {/*
                     One table per exported component, not one for the first.
 
                     The catalog has always carried `exports`; the page rendered
@@ -820,33 +877,36 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
                     union, so the intersection the checker can see is three
                     props and the whole API was missing from its own page.
                   */}
-                {apiTables.map(({ name, props: exportProps }, tableIndex) => (
-                  <div key={name}>
-                    {apiTables.length > 1 && (
-                      <h3 className="mb-3 flex flex-wrap items-baseline gap-x-2 font-display text-sm font-semibold tracking-tight">
-                        <code className="numeric text-oxygen-deep">{name}</code>
-                        <span className="text-xs font-normal text-graphite-soft">
-                          {exportProps.length} {exportProps.length === 1 ? "prop" : "props"}
-                          {tableIndex === 0 && component.exports.length > 1
-                            ? " · the front door"
-                            : ""}
-                        </span>
-                      </h3>
-                    )}
-                    <PropsTable props={exportProps} label={name} />
+                      {apiTables.map(({ name, props: exportProps }, tableIndex) => (
+                        <div key={name}>
+                          {apiTables.length > 1 && (
+                            <h3 className="mb-3 flex flex-wrap items-baseline gap-x-2 font-display text-sm font-semibold tracking-tight">
+                              <code className="numeric text-oxygen-deep">{name}</code>
+                              <span className="text-xs font-normal text-graphite-soft">
+                                {exportProps.length} {exportProps.length === 1 ? "prop" : "props"}
+                                {tableIndex === 0 && component.exports.length > 1
+                                  ? " · the front door"
+                                  : ""}
+                              </span>
+                            </h3>
+                          )}
+                          <PropsTable props={exportProps} label={name} />
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                ))}
-              </div>
-            </div>
-          </section>
-        )}
+                </section>
+              )}
 
-        {/* Examples ----------------------------------------------------- */}
-        {examples.length > 0 && (
-          <section id="examples" className="scroll-mt-24 border-b border-rule bg-paper-sunk/40">
-            <div className="mx-auto max-w-6xl section-minor px-5 sm:px-8">
-              <SectionHeading eyebrow="Examples" title="The cases worth copying." />
-              {/*
+              {/* Examples ----------------------------------------------------- */}
+              {examples.length > 0 && (
+                <section
+                  id="examples"
+                  className="scroll-mt-24 border-b border-rule bg-paper-sunk/40"
+                >
+                  <div className="mx-auto max-w-6xl section-minor px-5 sm:px-8">
+                    <SectionHeading eyebrow="Examples" title="The cases worth copying." />
+                    {/*
                 Under the heading rather than beside it.
 
                 These are identifiers, not a caption: seven of them set in mono
@@ -856,258 +916,280 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
                 They also keep their camel case now, because uppercasing
                 `observationPotassiumCritical` is what made it unreadable.
               */}
-              {(component.fixtures ?? []).length > 0 && (
-                <p className="mt-4 flex flex-wrap items-baseline gap-x-2 gap-y-1 text-xs text-graphite-soft">
-                  <span className="numeric uppercase tracking-wide">Data</span>
-                  {(component.fixtures ?? []).map((fixture) => (
-                    <code key={fixture} className="font-mono tracking-normal">
-                      {fixture}
-                    </code>
-                  ))}
-                </p>
-              )}
+                    {(component.fixtures ?? []).length > 0 && (
+                      <p className="mt-4 flex flex-wrap items-baseline gap-x-2 gap-y-1 text-xs text-graphite-soft">
+                        <span className="numeric uppercase tracking-wide">Data</span>
+                        {(component.fixtures ?? []).map((fixture) => (
+                          <code key={fixture} className="font-mono tracking-normal">
+                            {fixture}
+                          </code>
+                        ))}
+                      </p>
+                    )}
 
-              <div className="mt-8 space-y-8">
-                {examples.map((example, index) => (
-                  <article
-                    key={example.id}
-                    data-reveal
-                    style={{ "--reveal-delay": `${index * 60}ms` } as React.CSSProperties}
-                  >
-                    <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-                      <h3 className="font-display text-lg font-semibold tracking-tight">
-                        {example.title}
-                      </h3>
-                      {/* No `uppercase` here. These are identifiers a reader
+                    <div className="mt-8 space-y-8">
+                      {examples.map((example, index) => (
+                        <article
+                          key={example.id}
+                          data-reveal
+                          style={{ "--reveal-delay": `${index * 60}ms` } as React.CSSProperties}
+                        >
+                          <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                            <h3 className="font-display text-lg font-semibold tracking-tight">
+                              {example.title}
+                            </h3>
+                            {/* No `uppercase` here. These are identifiers a reader
                           types, and the camel case is the only thing making
                           `observationPotassiumCritical` legible — uppercasing it
                           produces OBSERVATIONPOTASSIUMCRITICAL, which is a wall. */}
-                      {example.fixture && (
-                        <code className="font-mono text-[0.6875rem] tracking-normal text-graphite-soft">
-                          {example.fixture}
-                        </code>
-                      )}
-                    </div>
-                    <p className="mt-2 max-w-3xl text-sm leading-relaxed text-graphite">
-                      {example.description}
-                    </p>
-                    <pre
-                      tabIndex={0}
-                      className="scroll-thin-dark mt-4 overflow-auto rounded-2xl border border-panel-rule bg-panel p-5 font-mono text-[0.7rem] leading-relaxed text-panel-fg/90"
-                    >
-                      <code>{example.code}</code>
-                    </pre>
-                  </article>
-                ))}
-              </div>
-            </div>
-          </section>
-        )}
-
-        {/* Clinical ----------------------------------------------------- */}
-        {hasClinical && domain && (
-          <section id="clinical" className="scroll-mt-24 border-b border-rule">
-            <div className="mx-auto max-w-6xl section-minor px-5 sm:px-8">
-              <SectionHeading eyebrow="Clinical" title="Where it sits in the record." />
-
-              {domain.clinicalContext && (
-                <p className="mt-3 max-w-3xl text-sm leading-relaxed text-graphite" data-reveal>
-                  {domain.clinicalContext}
-                </p>
-              )}
-
-              <dl className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3" data-reveal>
-                <Fact label="Industries" values={domain.industries} />
-                <Fact label="Workflows" values={domain.workflows} />
-                <Fact label="Terminology" values={domain.terminology} />
-                <Fact label="Permissions" values={domain.permissions} />
-                {typeof domain.auditable === "boolean" && (
-                  <Fact
-                    label="Audit"
-                    values={[domain.auditable ? "Emits AuditEvent" : "Emits no AuditEvent"]}
-                  />
-                )}
-              </dl>
-
-              {domain.phi && (
-                <div className="limitation-panel mt-8 self-start" data-reveal>
-                  <div className="limitation-panel__header">
-                    <div className="flex min-w-0 items-center gap-3">
-                      <span className="limitation-panel__signal" aria-hidden="true">
-                        <CircleAlert className="size-4" />
-                      </span>
-                      <div>
-                        <p className="limitation-panel__kicker numeric text-[0.625rem] text-graphite-soft">
-                          Protected health information
-                        </p>
-                        <h3 className="mt-1 font-display text-base font-semibold tracking-tight">
-                          {domain.phi.handles ? "Handles PHI" : "Handles no PHI"}
-                        </h3>
-                      </div>
+                            {example.fixture && (
+                              <code className="font-mono text-[0.6875rem] tracking-normal text-graphite-soft">
+                                {example.fixture}
+                              </code>
+                            )}
+                          </div>
+                          <p className="mt-2 max-w-3xl text-sm leading-relaxed text-graphite">
+                            {example.description}
+                          </p>
+                          <pre
+                            tabIndex={0}
+                            className="scroll-thin-dark mt-4 overflow-auto rounded-2xl border border-panel-rule bg-panel p-5 font-mono text-[0.7rem] leading-relaxed text-panel-fg/90"
+                          >
+                            <code>{example.code}</code>
+                          </pre>
+                        </article>
+                      ))}
                     </div>
                   </div>
-                  <p className="px-5 pb-5 text-sm leading-relaxed text-graphite">
-                    {domain.phi.notes}
-                  </p>
-                </div>
+                </section>
               )}
-            </div>
-          </section>
-        )}
 
-        {/* Conformance -------------------------------------------------- */}
-        {a11yChecks.length > 0 && (
-          <section id="conformance" className="scroll-mt-24 border-b border-rule bg-paper-sunk/40">
-            <div className="mx-auto max-w-6xl section-minor px-5 sm:px-8">
-              <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
-                <SectionHeading
-                  eyebrow="Conformance"
-                  title="Every claim, and the test behind it."
-                />
-                <p className="numeric shrink-0 text-xs text-graphite-soft">
-                  WCAG 2.2 AA / {a11yChecks.filter((c) => c.status === "pass").length} OF{" "}
-                  {a11yChecks.length} PASS
-                </p>
-              </div>
+              {/* Clinical ----------------------------------------------------- */}
+              {hasClinical && domain && (
+                <section id="clinical" className="scroll-mt-24 border-b border-rule">
+                  <div className="mx-auto max-w-6xl section-minor px-5 sm:px-8">
+                    <SectionHeading eyebrow="Clinical" title="Where it sits in the record." />
 
-              {/* A claim with no evidence is prose, and prose in an
+                    {domain.clinicalContext && (
+                      <p
+                        className="mt-3 max-w-3xl text-sm leading-relaxed text-graphite"
+                        data-reveal
+                      >
+                        {domain.clinicalContext}
+                      </p>
+                    )}
+
+                    <dl className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3" data-reveal>
+                      <Fact label="Industries" values={domain.industries} />
+                      <Fact label="Workflows" values={domain.workflows} />
+                      <Fact label="Terminology" values={domain.terminology} />
+                      <Fact label="Permissions" values={domain.permissions} />
+                      {typeof domain.auditable === "boolean" && (
+                        <Fact
+                          label="Audit"
+                          values={[domain.auditable ? "Emits AuditEvent" : "Emits no AuditEvent"]}
+                        />
+                      )}
+                    </dl>
+
+                    {domain.phi && (
+                      <div className="limitation-panel mt-8 self-start" data-reveal>
+                        <div className="limitation-panel__header">
+                          <div className="flex min-w-0 items-center gap-3">
+                            <span className="limitation-panel__signal" aria-hidden="true">
+                              <CircleAlert className="size-4" />
+                            </span>
+                            <div>
+                              <p className="limitation-panel__kicker numeric text-[0.625rem] text-graphite-soft">
+                                Protected health information
+                              </p>
+                              <h3 className="mt-1 font-display text-base font-semibold tracking-tight">
+                                {domain.phi.handles ? "Handles PHI" : "Handles no PHI"}
+                              </h3>
+                            </div>
+                          </div>
+                        </div>
+                        <p className="px-5 pb-5 text-sm leading-relaxed text-graphite">
+                          {domain.phi.notes}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </section>
+              )}
+
+              {/* Conformance -------------------------------------------------- */}
+              {a11yChecks.length > 0 && (
+                <section
+                  id="conformance"
+                  className="scroll-mt-24 border-b border-rule bg-paper-sunk/40"
+                >
+                  <div className="mx-auto max-w-6xl section-minor px-5 sm:px-8">
+                    <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
+                      <SectionHeading
+                        eyebrow="Conformance"
+                        title="Every claim, and the test behind it."
+                      />
+                      <p className="numeric shrink-0 text-xs text-graphite-soft">
+                        WCAG 2.2 AA / {a11yChecks.filter((c) => c.status === "pass").length} OF{" "}
+                        {a11yChecks.length} PASS
+                      </p>
+                    </div>
+
+                    {/* A claim with no evidence is prose, and prose in an
                   accessibility panel is how a library ends up asserting
                   conformance it has never measured. The schema requires the
                   evidence column; this renders it. */}
-              <div className="scroll-thin mt-8 overflow-x-auto" data-reveal>
-                <table className="w-full min-w-[44rem] border-collapse text-left text-sm">
-                  <thead>
-                    <tr className="border-b border-rule">
-                      <Th>Criterion</Th>
-                      <Th>Status</Th>
-                      <Th>How</Th>
-                      <Th>Evidence</Th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {a11yChecks.map((check) => (
-                      <tr key={`${check.wcag}-${check.name}`} className="border-b border-rule/60">
-                        <td className="py-3 pr-4 align-top">
-                          <span className="numeric text-xs text-graphite-soft">{check.wcag}</span>
-                          <span className="mt-0.5 block font-medium">{check.name}</span>
-                        </td>
-                        <td className="py-3 pr-4 align-top">
-                          <span
-                            className="numeric text-[0.625rem] uppercase tracking-wide"
-                            data-ox-check={check.status}
-                          >
-                            {check.status === "not-applicable" ? "n/a" : check.status}
-                          </span>
-                        </td>
-                        <td className="max-w-md py-3 pr-4 align-top leading-relaxed text-graphite">
-                          {check.how}
-                        </td>
-                        <td className="py-3 align-top font-mono text-[0.7rem] text-graphite-soft">
-                          {check.evidence ?? "—"}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </section>
-        )}
+                    <div className="scroll-thin mt-8 overflow-x-auto" data-reveal>
+                      <table className="w-full min-w-[44rem] border-collapse text-left text-sm">
+                        <thead>
+                          <tr className="border-b border-rule">
+                            <Th>Criterion</Th>
+                            <Th>Status</Th>
+                            <Th>How</Th>
+                            <Th>Evidence</Th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {a11yChecks.map((check) => (
+                            <tr
+                              key={`${check.wcag}-${check.name}`}
+                              className="border-b border-rule/60"
+                            >
+                              <td className="py-3 pr-4 align-top">
+                                <span className="numeric text-xs text-graphite-soft">
+                                  {check.wcag}
+                                </span>
+                                <span className="mt-0.5 block font-medium">{check.name}</span>
+                              </td>
+                              <td className="py-3 pr-4 align-top">
+                                <span
+                                  className="numeric text-[0.625rem] uppercase tracking-wide"
+                                  data-ox-check={check.status}
+                                >
+                                  {check.status === "not-applicable" ? "n/a" : check.status}
+                                </span>
+                              </td>
+                              <td className="max-w-md py-3 pr-4 align-top leading-relaxed text-graphite">
+                                {check.how}
+                              </td>
+                              <td className="py-3 align-top font-mono text-[0.7rem] text-graphite-soft">
+                                {check.evidence ?? "—"}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </section>
+              )}
 
-        {/* Source ------------------------------------------------------- */}
-        {source && (
-          <section id="source" className="scroll-mt-24 border-b border-rule bg-paper-sunk/40">
-            <div className="mx-auto max-w-6xl section-minor px-5 sm:px-8">
-              <SectionHeading eyebrow="Source" title="Exactly what lands in your repository." />
-              <p className="mt-3 max-w-2xl text-sm text-graphite" data-reveal>
-                Read directly from the published registry, so this can never drift from what the CLI
-                installs.
-              </p>
-              <details className="mt-6 group" data-reveal>
-                <summary className="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-rule bg-paper px-4 py-2 text-sm text-graphite transition-colors hover:border-rule-strong hover:text-ink">
-                  <span className="group-open:hidden">Show source</span>
-                  <span className="hidden group-open:inline">Hide source</span>
-                  <span className="numeric text-xs text-graphite-soft">
-                    {source.split("\n").length} lines
-                  </span>
-                </summary>
-                <pre
-                  tabIndex={0}
-                  className="scroll-thin-dark mt-4 max-h-[32rem] overflow-auto rounded-2xl border border-panel-rule bg-panel p-5 font-mono text-[0.7rem] leading-relaxed text-panel-fg/90"
-                >
-                  <code>{source}</code>
-                </pre>
-              </details>
-            </div>
-          </section>
-        )}
+              {/* Source ------------------------------------------------------- */}
+              {source && (
+                <section id="source" className="scroll-mt-24 border-b border-rule bg-paper-sunk/40">
+                  <div className="mx-auto max-w-6xl section-minor px-5 sm:px-8">
+                    <SectionHeading
+                      eyebrow="Source"
+                      title="Exactly what lands in your repository."
+                    />
+                    <p className="mt-3 max-w-2xl text-sm text-graphite" data-reveal>
+                      Read directly from the published registry, so this can never drift from what
+                      the CLI installs.
+                    </p>
+                    <details className="mt-6 group" data-reveal>
+                      <summary className="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-rule bg-paper px-4 py-2 text-sm text-graphite transition-colors hover:border-rule-strong hover:text-ink">
+                        <span className="group-open:hidden">Show source</span>
+                        <span className="hidden group-open:inline">Hide source</span>
+                        <span className="numeric text-xs text-graphite-soft">
+                          {source.split("\n").length} lines
+                        </span>
+                      </summary>
+                      <pre
+                        tabIndex={0}
+                        className="scroll-thin-dark mt-4 max-h-[32rem] overflow-auto rounded-2xl border border-panel-rule bg-panel p-5 font-mono text-[0.7rem] leading-relaxed text-panel-fg/90"
+                      >
+                        <code>{source}</code>
+                      </pre>
+                    </details>
+                  </div>
+                </section>
+              )}
 
-        {/* Related ------------------------------------------------------ */}
-        {(related.length > 0 ||
-          alternatives.length > 0 ||
-          builtWith.length > 0 ||
-          usedIn.length > 0) && (
-          <section id="related" className="scroll-mt-24">
-            <div className="mx-auto max-w-6xl section-minor px-5 sm:px-8">
-              <SectionHeading eyebrow="Related" title="Pairs well with." />
+              {/* Related ------------------------------------------------------ */}
+              {(related.length > 0 ||
+                alternatives.length > 0 ||
+                builtWith.length > 0 ||
+                usedIn.length > 0) && (
+                <section id="related" className="scroll-mt-24">
+                  <div className="mx-auto max-w-6xl section-minor px-5 sm:px-8">
+                    <SectionHeading eyebrow="Related" title="Pairs well with." />
 
-              {/* "Use X instead when Y" is the single strongest trust signal a
+                    {/* "Use X instead when Y" is the single strongest trust signal a
                   component page carries: a library that will send you
                   elsewhere is one you can believe when it does not. */}
-              {alternatives.length > 0 && (
-                <ul className="mt-6 space-y-2" data-reveal>
-                  {alternatives.map((alternative: Alternative) => {
-                    const found = getComponent(alternative.ref);
-                    const target = found && isReady(found.name) ? found : undefined;
-                    return (
-                      <li key={alternative.ref} className="text-sm leading-relaxed text-graphite">
-                        Use{" "}
-                        {target ? (
-                          <Link
-                            href={`/components/${target.name}`}
-                            className="font-medium text-ink underline decoration-rule-strong underline-offset-4 hover:decoration-oxygen"
-                          >
-                            {target.title}
-                          </Link>
-                        ) : (
-                          <span className="font-medium text-ink">{alternative.ref}</span>
-                        )}{" "}
-                        instead when {alternative.when}.
-                      </li>
-                    );
-                  })}
-                </ul>
-              )}
+                    {alternatives.length > 0 && (
+                      <ul className="mt-6 space-y-2" data-reveal>
+                        {alternatives.map((alternative: Alternative) => {
+                          const found = getComponent(alternative.ref);
+                          const target = found && isReady(found.name) ? found : undefined;
+                          return (
+                            <li
+                              key={alternative.ref}
+                              className="text-sm leading-relaxed text-graphite"
+                            >
+                              Use{" "}
+                              {target ? (
+                                <Link
+                                  href={`/components/${target.name}`}
+                                  className="font-medium text-ink underline decoration-rule-strong underline-offset-4 hover:decoration-oxygen"
+                                >
+                                  {target.title}
+                                </Link>
+                              ) : (
+                                <span className="font-medium text-ink">{alternative.ref}</span>
+                              )}{" "}
+                              instead when {alternative.when}.
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    )}
 
-              <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                {related.map((item) => (
-                  <Link
-                    key={item!.name}
-                    href={`/components/${item!.name}`}
-                    data-reveal
-                    className="group surface-2 lift rounded-2xl p-5 hover:border-oxygen/45"
-                  >
-                    <h3 className="font-display text-base font-semibold tracking-tight">
-                      {item!.title}
-                    </h3>
-                    <p className="numeric mt-1 text-xs text-oxygen-deep">{item!.resource}</p>
-                    <p className="mt-2 text-sm leading-relaxed text-graphite">{item!.summary}</p>
-                  </Link>
-                ))}
-              </div>
+                    <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                      {related.map((item) => (
+                        <Link
+                          key={item!.name}
+                          href={`/components/${item!.name}`}
+                          data-reveal
+                          className="group surface-2 lift rounded-2xl p-5 hover:border-oxygen/45"
+                        >
+                          <h3 className="font-display text-base font-semibold tracking-tight">
+                            {item!.title}
+                          </h3>
+                          <p className="numeric mt-1 text-xs text-oxygen-deep">{item!.resource}</p>
+                          <p className="mt-2 text-sm leading-relaxed text-graphite">
+                            {item!.summary}
+                          </p>
+                        </Link>
+                      ))}
+                    </div>
 
-              {/* Derived from what each component depends on, never declared.
+                    {/* Derived from what each component depends on, never declared.
                   `usedIn` in particular is a fact no component can know about
                   itself, and a hand-maintained one is wrong within a month. */}
-              {(builtWith.length > 0 || usedIn.length > 0) && (
-                <dl className="mt-10 grid gap-6 sm:grid-cols-2" data-reveal>
-                  <ComponentLinks label="Built with" names={builtWith} />
-                  <ComponentLinks label="Used in" names={usedIn} />
-                </dl>
+                    {(builtWith.length > 0 || usedIn.length > 0) && (
+                      <dl className="mt-10 grid gap-6 sm:grid-cols-2" data-reveal>
+                        <ComponentLinks label="Built with" names={builtWith} />
+                        <ComponentLinks label="Used in" names={usedIn} />
+                      </dl>
+                    )}
+                  </div>
+                </section>
               )}
-            </div>
-          </section>
-        )}
+            </SectionTabs>
+          </div>
+        </div>
       </main>
 
       <SiteFooter />

@@ -242,7 +242,15 @@ test.describe("@a11y a submenu is a menu, not a chevron", () => {
     // Beside, not on top of, and fully on screen.
     const p = await parent.boundingBox();
     const c = await child.boundingBox();
-    expect(c!.x + c!.width <= p!.x + 2 || c!.x >= p!.x + p!.width - 6).toBeTruthy();
+    /*
+     * Beside, on either side, tucked under the parent's edge by the same
+     * 4px `placeBeside` uses in both directions. This allowed 6px on the
+     * right and 2px on the left — a tolerance the left flip never met, and
+     * never had to, because at 6xl the parent always had room on its right.
+     * With the component list beside the page the demo rows sit further
+     * right, the child flips left, and the asymmetry surfaced.
+     */
+    expect(c!.x + c!.width <= p!.x + 6 || c!.x >= p!.x + p!.width - 6).toBeTruthy();
     await expect(child).toBeInViewport();
 
     // The one jsdom nearly missed: the child is a separate portal, so a click

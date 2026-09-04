@@ -21,23 +21,24 @@ export function OxygenMark({ className = "h-4 w-7" }: { className?: string }) {
 }
 
 /*
- * Four slots, spent on what a reader can act on.
+ * Four slots: the catalogue, the blocks, the marketplace and Pro.
  *
- * Two of them used to point at surfaces that cannot be transacted — the
- * marketplace, where nothing is on sale, and Pro, which is a holding page —
- * while Install and Compare, the two highest-intent pages for a developer and
- * an engineering lead, were reachable only from the footer.
+ * Install and Compare were promoted here briefly during the content audit,
+ * on the argument that they are the two highest-intent pages for a developer
+ * and an engineering lead. Rahul reversed that on 4 Sep 2026 — the header is
+ * for what the product *is*, and those two are how you get it and why. Both
+ * stay one keystroke away in the command palette and in the footer, which is
+ * where they were before.
  *
- * "Blocks" rather than "Showcase" for the same destination: the page's own
- * eyebrow, heading and landmark all say Blocks, and "showcase" additionally
- * promises customer work that the page then has to walk back in its first
- * paragraph.
+ * "Blocks" rather than "Showcase" for the third slot: the page's own eyebrow,
+ * heading and landmark all say Blocks, and "showcase" additionally promises
+ * customer work that the page then has to walk back in its first paragraph.
  */
 const NAV = [
   { href: "/components", label: "Components" },
-  { href: "/install", label: "Install" },
-  { href: "/compare", label: "Compare" },
   { href: "/showcase", label: "Blocks" },
+  { href: "/marketplace", label: "Marketplace" },
+  { href: "/pro", label: "Pro" },
 ];
 
 /**
